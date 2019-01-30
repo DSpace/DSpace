@@ -15,7 +15,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.dspace.app.cris.model.ACrisObject;
 import org.dspace.app.cris.service.ApplicationService;
+import org.dspace.app.webui.cris.web.tag.PropertyDefinitionI18NWrapper;
 import org.dspace.app.webui.util.IDisplayMetadataValueStrategy;
+import org.dspace.app.webui.util.UIUtil;
 import org.dspace.browse.BrowseDSpaceObject;
 import org.dspace.browse.BrowseItem;
 import org.dspace.content.Item;
@@ -113,7 +115,7 @@ public class CrisDropdownDisplayStrategy implements
             {
                 PropertiesDefinition pd = applicationService.findPropertiesDefinitionByShortName(crisObject.getClassPropertiesDefinition(), field.split("\\.")[1]);
                 for(Metadatum mm : metadataArray) {
-                    metadata += JDynATagLibraryFunctions.getCheckRadioDisplayValue((((WidgetCheckRadio)pd.getRendering()).getStaticValues()), mm.value);
+                    metadata += JDynATagLibraryFunctions.getCheckRadioDisplayValue(PropertyDefinitionI18NWrapper.getWidgetCheckRadioWrapper((WidgetCheckRadio) pd.getRendering(), pd.getAnagraficaHolderClass().getSimpleName(), pd.getShortName(), UIUtil.obtainContext(hrq).getCurrentLocale()).getStaticValues(), mm.value);
                 }
             }
             catch (Exception ex)

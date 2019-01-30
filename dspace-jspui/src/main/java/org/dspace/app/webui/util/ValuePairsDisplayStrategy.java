@@ -9,7 +9,9 @@ package org.dspace.app.webui.util;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -28,6 +30,7 @@ import org.dspace.content.authority.Choice;
 import org.dspace.content.authority.ChoiceAuthority;
 import org.dspace.content.authority.Choices;
 import org.dspace.core.Context;
+import org.dspace.core.I18nUtil;
 import org.dspace.core.PluginManager;
 
 public class ValuePairsDisplayStrategy extends ASimpleDisplayStrategy
@@ -36,13 +39,16 @@ public class ValuePairsDisplayStrategy extends ASimpleDisplayStrategy
     private static final Logger log = Logger
             .getLogger(ValuePairsDisplayStrategy.class);
 
-    private DCInputsReader dcInputsReader;
+    private Map<String, DCInputsReader> dcInputsReader = new HashMap<>();
 
     private void init() throws DCInputsReaderException
     {
-        if (dcInputsReader == null)
-        {
-            dcInputsReader = new DCInputsReader();
+        if(dcInputsReader.isEmpty()) {
+            for (Locale locale : I18nUtil.getSupportedLocales())
+            {
+                dcInputsReader.put(locale.getLanguage(),
+                    new DCInputsReader(I18nUtil.getInputFormsFileName(locale)));
+            }
         }
     }
 
@@ -82,7 +88,8 @@ public class ValuePairsDisplayStrategy extends ASimpleDisplayStrategy
             // workaround, a sort of fuzzy match search in all valuepairs (possible wrong result due to the same stored value in many valuepairs)
             if (StringUtils.isBlank(result))
             {
-                Map<String, List<String>> mappedValuePairs = dcInputsReader
+                String language = I18nUtil.getSupportedLocale(obtainContext.getCurrentLocale()).getLanguage();
+                Map<String, List<String>> mappedValuePairs = dcInputsReader.get(language)
                         .getMappedValuePairs();
                 List<String> pairsnames = new ArrayList<String>();
                 if (mappedValuePairs != null)
@@ -138,7 +145,8 @@ public class ValuePairsDisplayStrategy extends ASimpleDisplayStrategy
             Metadatum[] metadataArray, String result, Context obtainContext,
             Collection collection) throws DCInputsReaderException
     {
-        DCInputSet dcInputSet = dcInputsReader
+        String language = I18nUtil.getSupportedLocale(obtainContext.getCurrentLocale()).getLanguage();
+        DCInputSet dcInputSet = dcInputsReader.get(language)
                 .getInputs(collection.getHandle());
         for (int i = 0; i < dcInputSet.getNumberPages(); i++)
         {
