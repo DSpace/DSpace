@@ -29,8 +29,10 @@
         <!-- Define our starting class for our Spring Boot Application -->
         <start-class>org.dspace.app.rest.Application</start-class>
         <spring-boot.version>1.4.4.RELEASE</spring-boot.version>
-        <json-path.version>2.2.0</json-path.version>
-        <!-- <springdata.commons>1.13.0.RELEASE</springdata.commons> -->
+        <!-- Library for reading JSON documents: https://github.com/json-path/JsonPath -->
+        <json-path.version>2.4.0</json-path.version>
+        <!-- Library for managing JSON Web Tokens (JWT): https://bitbucket.org/connect2id/nimbus-jose-jwt/wiki/Home -->
+        <nimbus-jose-jwt.version>6.2</nimbus-jose-jwt.version>
     </properties>
 
     <profiles>
@@ -273,7 +275,7 @@
         <dependency>
             <groupId>com.nimbusds</groupId>
             <artifactId>nimbus-jose-jwt</artifactId>
-            <version>6.2</version>
+            <version>${nimbus-jose-jwt.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.solr</groupId>
@@ -295,13 +297,18 @@
                     <groupId>org.json</groupId>
                     <artifactId>json</artifactId>
                 </exclusion>
+                <!-- More recent version used for testing below -->
+                <exclusion>
+                    <groupId>com.jayway.jsonpath</groupId>
+                    <artifactId>json-path</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
             <groupId>com.jayway.jsonpath</groupId>
             <artifactId>json-path</artifactId>
-            <scope>test</scope>
             <version>${json-path.version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.jayway.jsonpath</groupId>
