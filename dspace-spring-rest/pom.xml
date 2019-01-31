@@ -259,6 +259,8 @@
             <artifactId>dspace-services</artifactId>
         </dependency>
 
+        <!-- DSpace modules to deploy (this modules are all optional, but add features/endpoints to webapp) -->
+        <!-- You may choose to comment out any of these modules if you do not want/need its features -->
         <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-sword</artifactId>

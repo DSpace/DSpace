@@ -13,6 +13,8 @@ import static org.junit.Assert.assertThat;
 
 import org.dspace.app.rest.test.AbstractWebClientIntegrationTest;
 import org.dspace.services.ConfigurationService;
+import org.junit.Assume;
+import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -33,6 +35,18 @@ public class Swordv1IT extends AbstractWebClientIntegrationTest {
 
     @Autowired
     private ConfigurationService configurationService;
+
+    @Before
+    public void onlyRunIfConfigExists() {
+        // These integration tests REQUIRE that SWORDWebConfig is found/available (as this class deploys SWORD)
+        // If this class is not available, the below "Assume" will cause all tests to be SKIPPED
+        // NOTE: SWORDWebConfig is provided by the 'dspace-sword' module
+        try {
+            Class.forName("org.dspace.app.configuration.SWORDWebConfig");
+        } catch (ClassNotFoundException ce) {
+            Assume.assumeNoException(ce);
+        }
+    }
 
     @Test
     public void serviceDocumentUnauthorizedTest() throws Exception {
