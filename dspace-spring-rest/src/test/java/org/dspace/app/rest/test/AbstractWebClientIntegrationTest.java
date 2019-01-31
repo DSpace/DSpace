@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.embedded.LocalServerPort;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.context.ApplicationContext;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -51,6 +52,10 @@ public class AbstractWebClientIntegrationTest extends AbstractIntegrationTestWit
     // RestTemplate class with access to test web server
     @Autowired
     private TestRestTemplate restTemplate;
+
+    // Spring Application context
+    @Autowired
+    protected ApplicationContext applicationContext;
 
     /**
      * Get client TestRestTemplate for making HTTP requests to test webserver
