@@ -241,6 +241,31 @@
 			</list>
 		</property>
 	</bean>
+
+	<bean class="org.dspace.content.ItemEnhancer">
+		<property name="alias" value="languageiso639-1" />
+		<property name="metadata">
+			<list>
+				<value>dc.language.iso</value>
+			</list>
+		</property>
+		<property name="generators">
+			<list>				
+			    <ref bean="enhancerLanguageISO639-1MapConverter"/>
+			</list>
+		</property>
+	</bean>	
+	
+	<bean name="enhancerLanguageISO639-1MapConverter" class="org.dspace.content.integration.defaultvalues.MapConverterValueGenerator" >
+		<property name="converter" ref="MapConverterLanguageISO639-1" />
+	</bean>
+		<bean name="MapConverterLanguageISO639-1" class="org.dspace.util.SimpleMapConverter"
+				init-method="init">
+				<constructor-arg value="enhancerLanguageISO639-1MapConverter" />
+				<property name="converterNameFile" value="mapConverter-iso639-1.properties" />
+				<property name="configurationService" ref="org.dspace.services.ConfigurationService" />
+				<property name="defaultValue" value="other"/>
+			</bean>	
 	
 	<bean name="enhancerFulltext" class="org.dspace.content.integration.defaultvalues.FulltextInfoGenerator"/>
 	<bean name="enhancerPermissionFulltext" class="org.dspace.content.integration.defaultvalues.FulltextPermissionGenerator"/>
