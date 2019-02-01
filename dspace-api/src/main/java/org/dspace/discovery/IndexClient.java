@@ -58,8 +58,8 @@ public class IndexClient {
         Context context = new Context(Context.Mode.READ_ONLY);
         context.turnOffAuthorisationSystem();
 
-        String usage = "org.dspace.discovery.IndexClient [-cbhf] | [-r <handle>] | [-i <handle>] or nothing to " +
-            "update/clean an existing index.";
+        String usage = "org.dspace.discovery.IndexClient [-h | -d | -c | -r <handle> | -b | -i <handle> | -f] [-os] or " +
+                "nothing to update an existing index.";
         Options options = new Options();
         HelpFormatter formatter = new HelpFormatter();
         CommandLine line = null;
@@ -83,6 +83,12 @@ public class IndexClient {
                               .withDescription(
                                   "clean existing index removing any documents that no longer exist in the db")
                               .create("c"));
+
+        options.addOption(OptionBuilder
+                              .isRequired(false)
+                              .withDescription(
+                                  "delete existing index removing all documents")
+                              .create("d"));
 
         options.addOption(OptionBuilder
                               .isRequired(false)
@@ -135,22 +141,20 @@ public class IndexClient {
             IndexingService.class
         );
 
-        if (line.hasOption("r")) {
+        if (line.hasOption("d")) { // Delete
+            log.info("Deleting Index");
+            indexer.cleanIndex(true);
+        } else if (line.hasOption("c")) { // Clean
+            log.info("Cleaning Index");
+            indexer.cleanIndex(false);
+        } else if (line.hasOption("r")) { // Remove
             log.info("Removing " + line.getOptionValue("r") + " from Index");
             indexer.unIndexContent(context, line.getOptionValue("r"));
-        } else if (line.hasOption("c")) {
-            log.info("Cleaning Index");
-            indexer.cleanIndex(line.hasOption("f"));
-        } else if (line.hasOption("b")) {
+        } else if (line.hasOption("b")) { // Build
             log.info("(Re)building index from scratch.");
+            indexer.cleanIndex(true);
             indexer.createIndex(context);
-            checkRebuildSpellCheck(line, indexer);
-        } else if (line.hasOption("o")) {
-            log.info("Optimizing search core.");
-            indexer.optimize();
-        } else if (line.hasOption('s')) {
-            checkRebuildSpellCheck(line, indexer);
-        } else if (line.hasOption('i')) {
+        } else if (line.hasOption('i')) { // Index
             final String handle = line.getOptionValue('i');
             final DSpaceObject dso = HandleServiceFactory.getInstance().getHandleService()
                                                          .resolveToObject(context, handle);
@@ -162,11 +166,17 @@ public class IndexClient {
             final long count = indexAll(indexer, ContentServiceFactory.getInstance().getItemService(), context, dso);
             final long seconds = (System.currentTimeMillis() - startTimeMillis) / 1000;
             log.info("Indexed " + count + " DSpace object" + (count > 1 ? "s" : "") + " in " + seconds + " seconds");
-        } else {
+        } else { // No Option (or Force)
             log.info("Updating and Cleaning Index");
-            indexer.cleanIndex(line.hasOption("f"));
             indexer.updateIndex(context, line.hasOption("f"));
-            checkRebuildSpellCheck(line, indexer);
+        }
+        if (line.hasOption('s')) { // Spell-checker
+            log.info("Rebuilding spell checker.");
+            indexer.buildSpellCheck();
+        }
+        if (line.hasOption("o")) { // Optimize
+            log.info("Optimizing search core.");
+            indexer.optimize();
         }
 
         log.info("Done with indexing");
@@ -246,20 +256,5 @@ public class IndexClient {
         indexingService.commit();
 
         return count;
-    }
-
-    /**
-     * Check the command line options and rebuild the spell check if active.
-     *
-     * @param line    the command line options
-     * @param indexer the solr indexer
-     * @throws SearchServiceException in case of a solr exception
-     */
-    protected static void checkRebuildSpellCheck(CommandLine line, IndexingService indexer)
-        throws SearchServiceException {
-        if (line.hasOption("s")) {
-            log.info("Rebuilding spell checker.");
-            indexer.buildSpellCheck();
-        }
     }
 }
