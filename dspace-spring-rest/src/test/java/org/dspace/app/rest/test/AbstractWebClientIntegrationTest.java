@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest.test;
 
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.Application;
 import org.dspace.app.rest.utils.DSpaceConfigurationInitializer;
 import org.dspace.app.rest.utils.DSpaceKernelInitializer;
@@ -16,6 +17,7 @@ import org.springframework.boot.context.embedded.LocalServerPort;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.context.ApplicationContext;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -93,6 +95,24 @@ public class AbstractWebClientIntegrationTest extends AbstractIntegrationTestWit
      */
     public ResponseEntity<String> getResponseAsString(String path, String username, String password) {
         return getClient().withBasicAuth(username, password).getForEntity(getURL(path), String.class);
+    }
+
+    /**
+     * Perform an authenticated (via Basic Auth) POST request and return response as a String.
+     * @param path path to perform GET against
+     * @param username Username (may be null to perform an unauthenticated POST)
+     * @param password Password
+     * @return ResponseEntity with a String body
+     */
+    public ResponseEntity<String> postResponseAsString(String path, String username, String password,
+                                                       HttpEntity requestEntity) {
+        // If username is not empty, perform an authenticated POST. Else attempt without AuthN
+        if (StringUtils.isNotBlank(username)) {
+            return getClient().withBasicAuth(username, password).postForEntity(getURL(path), requestEntity,
+                                                                               String.class);
+        } else {
+            return getClient().postForEntity(getURL(path), requestEntity, String.class);
+        }
     }
 }
 
