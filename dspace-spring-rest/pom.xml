@@ -28,7 +28,6 @@
         <resource.delimiter>@</resource.delimiter>
         <!-- Define our starting class for our Spring Boot Application -->
         <start-class>org.dspace.app.rest.Application</start-class>
-        <spring-boot.version>1.4.4.RELEASE</spring-boot.version>
         <!-- Library for reading JSON documents: https://github.com/json-path/JsonPath -->
         <json-path.version>2.4.0</json-path.version>
         <!-- Library for managing JSON Web Tokens (JWT): https://bitbucket.org/connect2id/nimbus-jose-jwt/wiki/Home -->
@@ -264,6 +263,10 @@
         <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-sword</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-swordv2</artifactId>
         </dependency>
 
         <dependency>

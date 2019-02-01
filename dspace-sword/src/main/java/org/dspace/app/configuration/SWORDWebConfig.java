@@ -40,6 +40,12 @@ public class SWORDWebConfig {
     @Value("${sword-server.authentication-method:Basic}")
     private String authenticationMethod;
 
+    /**
+     * Initialize all required Context Parameters (i.e. <context-param> in web.xml), based on configurations above.
+     * <p>
+     * This bean is only loaded when sword-server.enabled = true
+     * @return ServletContextInitializer which includes all required params
+     */
     @Bean
     @ConditionalOnProperty("sword-server.enabled")
     public ServletContextInitializer swordv1ContextInitializer() {
@@ -48,6 +54,10 @@ public class SWORDWebConfig {
             servletContext.setInitParameter("authentication-method", authenticationMethod);
         };
     }
+
+    // Servlet Beans. All of the below bean definitions map servlets to respond to specific URL patterns
+    // These are the combined equivalent of <servlet> and <servlet-mapping> in web.xml
+    // All beans are only loaded when sword-server.enabled = true
 
     @Bean
     @ConditionalOnProperty("sword-server.enabled")
