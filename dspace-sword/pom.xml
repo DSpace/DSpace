@@ -6,7 +6,7 @@
     <packaging>jar</packaging>
     <name>DSpace SWORD</name>
     <description>
-        DSpace SWORD Deposit Service Provider Web Application
+        DSpace SWORD Deposit Service Provider Extension
     </description>
 
     <!--
@@ -74,11 +74,11 @@
             <artifactId>dspace-api-lang</artifactId>
         </dependency>
 
-        <!-- TODO: Spring boot version should be shared at Parent POM level -->
+        <!-- Needed to support Spring @Configuration classes (to register servlets/beans with Spring Boot webapp) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
-            <version>1.4.4.RELEASE</version>
+            <version>${spring-boot.version}</version>
         </dependency>
 
         <dependency>

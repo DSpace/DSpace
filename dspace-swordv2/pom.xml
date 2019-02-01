@@ -3,9 +3,9 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.dspace</groupId>
     <artifactId>dspace-swordv2</artifactId>
-    <packaging>war</packaging>
+    <packaging>jar</packaging>
     <name>DSpace SWORD v2</name>
-    <description>DSpace SWORD v2 Deposit Service Provider Web Application</description>
+    <description>DSpace SWORD v2 Deposit Service Provider Extension</description>
 
     <!--
        A Parent POM that Maven inherits DSpace Default
@@ -22,29 +22,6 @@
         <!-- This is the path to the root [dspace-src] directory. -->
         <root.basedir>${basedir}/..</root.basedir>
     </properties>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-war-plugin</artifactId>
-                <configuration>
-                    <attachClasses>true</attachClasses>
-                    <!-- In version 2.1-alpha-1, this was incorrectly named warSourceExcludes -->
-                    <packagingExcludes>WEB-INF/lib/*.jar</packagingExcludes>
-                    <warSourceExcludes>WEB-INF/lib/*.jar</warSourceExcludes>
-                    <!-- Filter the web.xml (needed for IDE compatibility/debugging) -->
-                    <filteringDeploymentDescriptors>true</filteringDeploymentDescriptors>
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>prepare-package</phase>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
-
 
     <profiles>
         <profile>
@@ -84,6 +61,8 @@
             <artifactId>javax.servlet-api</artifactId>
             <scope>provided</scope>
         </dependency>
+
+        <!-- SWORDv2 Java implementation -->
         <dependency>
             <groupId>org.swordapp</groupId>
             <artifactId>sword2-server</artifactId>
@@ -99,26 +78,30 @@
                     <groupId>javax.servlet</groupId>
                     <artifactId>servlet-api</artifactId>
                 </exclusion>
-		<exclusion>
-		    <groupId>log4j</groupId>
+                <exclusion>
+                    <groupId>log4j</groupId>
                     <artifactId>log4j</artifactId>
-	        </exclusion>
-		<exclusion>
-		    <groupId>org.slf4j</groupId>
-		    <artifactId>slf4j-log4j12</artifactId>
-	        </exclusion>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
-        <dependency>
-            <groupId>org.swordapp</groupId>
-            <artifactId>sword2-server</artifactId>
-            <version>1.0</version>
-            <type>war</type>
-        </dependency>
+
+        <!-- DSpace Java API -->
         <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-api</artifactId>
         </dependency>
+
+        <!-- Needed to support Spring @Configuration classes (to register servlets/beans with Spring Boot webapp) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <version>${spring-boot.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-api</artifactId>
@@ -135,7 +118,6 @@
             <groupId>org.apache.abdera</groupId>
             <artifactId>abdera-client</artifactId>
             <version>1.1.3</version>
-
             <exclusions>
                 <exclusion>
                     <groupId>org.apache.ws.commons.axiom</groupId>
