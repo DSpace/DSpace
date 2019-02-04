@@ -31,6 +31,7 @@ import org.dspace.app.cris.statistics.CrisSolrLogger;
 import org.dspace.app.cris.statistics.SummaryStatBean;
 import org.dspace.app.cris.statistics.SummaryStatBean.StatDataBean;
 import org.dspace.app.cris.util.Researcher;
+import org.dspace.content.DSpaceObject;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.discovery.SearchServiceException;
@@ -136,7 +137,8 @@ public class StatsViewIndicatorsPlugin extends AStatsIndicatorsPlugin
                             }
                         }
                     }
-
+                    DSpaceObject dspaceObject = (DSpaceObject)statDaily.getObject();
+                    context.removeCached(dspaceObject, resourceId);
                 }
                 catch (SolrServerException | SQLException e)
                 {

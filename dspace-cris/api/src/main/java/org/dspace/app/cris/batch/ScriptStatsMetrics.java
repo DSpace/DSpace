@@ -54,7 +54,8 @@ public class ScriptStatsMetrics
                 .getSingletonService(SolrLogger.class);
 
         ApplicationService applicationService = researcher.getApplicationService();
-
+        applicationService.disableCacheManager();
+        
         CommandLineParser parser = new PosixParser();
 
         Options options = new Options();
