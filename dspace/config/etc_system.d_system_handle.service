@@ -1,0 +1,13 @@
+[Unit]
+Description=Handle Service
+After=syslog.target network.target
+
+[Service]
+Type=simple
+ExecStart=/var/dspace/install/bin/run-handle-server
+ExecStop=/bin/kill $MAINPID
+User=dspace
+Group=dspace
+
+[Install]
+WantedBy=multi-user.target
