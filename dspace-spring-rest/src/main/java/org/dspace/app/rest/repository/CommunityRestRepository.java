@@ -197,7 +197,7 @@ public class CommunityRestRepository extends DSpaceRestRepository<CommunityRest,
     }
 
     @Override
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasPermission(#id, 'COMMUNITY', 'WRITE')")
     protected CommunityRest put(Context context, HttpServletRequest request, String apiCategory, String model, UUID id,
                        JsonNode jsonNode)
         throws RepositoryMethodNotImplementedException, SQLException, AuthorizeException {
@@ -217,7 +217,7 @@ public class CommunityRestRepository extends DSpaceRestRepository<CommunityRest,
         return converter.fromModel(community);
     }
     @Override
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasPermission(#id, 'COMMUNITY', 'DELETE')")
     protected void delete(Context context, UUID id) throws AuthorizeException {
         Community community = null;
         try {

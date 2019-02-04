@@ -31,8 +31,10 @@ import org.dspace.app.rest.matcher.CommunityMetadataMatcher;
 import org.dspace.app.rest.model.CollectionRest;
 import org.dspace.app.rest.model.MetadataEntryRest;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.core.Constants;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +44,9 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
 
     @Autowired
     CollectionConverter collectionConverter;
+
+    @Autowired
+    AuthorizeService authorizeService;
 
     @Test
     public void findAllTest() throws Exception {
@@ -527,6 +532,119 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                                     CommunityMetadataMatcher.matchMetadata("dc.title",
                                                                            "Title Text")
                                 )))));
+
+    }
+
+
+    @Test
+    public void deleteCollectionEpersonWithDeleteRightsTest() throws Exception {
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .withLogo("ThisIsSomeDummyText")
+                                          .build();
+
+        Community parentCommunity2 = CommunityBuilder.createCommunity(context)
+                                                     .withName("Parent Community 2")
+                                                     .withLogo("SomeTest")
+                                                     .build();
+
+        Community parentCommunityChild1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                                          .withName("Sub Community")
+                                                          .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunityChild1)
+                                           .withName("Collection 1")
+                                           .build();
+
+
+        context.setCurrentUser(eperson);
+        authorizeService.addPolicy(context, col1, Constants.DELETE, eperson);
+        authorizeService.addPolicy(context, col1, Constants.WRITE, eperson);
+
+        String token = getAuthToken(eperson.getEmail(), password);
+
+        getClient(token).perform(get("/api/core/collections/" + col1.getID().toString()))
+                        .andExpect(status().isOk())
+                        .andExpect(content().contentType(contentType))
+                        .andExpect(jsonPath("$", Matchers.is(
+                            CollectionMatcher.matchCollectionEntry(col1.getName(), col1.getID(), col1.getHandle())
+                        )))
+                        .andExpect(jsonPath("$._links.self.href",
+                                            Matchers.containsString("/api/core/collections")))        ;
+        getClient(token).perform(delete("/api/core/collections/" + col1.getID().toString()))
+                        .andExpect(status().isNoContent())
+        ;
+        getClient(token).perform(get("/api/core/collections/" + col1.getID().toString()))
+                        .andExpect(status().isNotFound())
+        ;
+
+        authorizeService.removePoliciesActionFilter(context, eperson, Constants.DELETE);
+        authorizeService.removePoliciesActionFilter(context, eperson, Constants.WRITE);
+
+    }
+
+    @Test
+    public void updateCollectionEpersonWithWriteRightsTest() throws Exception {
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        getClient().perform(get("/api/core/collections/" + col1.getID().toString()))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$", Matchers.is(
+                       CollectionMatcher.matchCollectionEntry(col1.getName(), col1.getID(), col1.getHandle())
+                   )))
+                   .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/collections")))
+        ;
+
+
+        context.setCurrentUser(eperson);
+        authorizeService.addPolicy(context, col1, Constants.WRITE, eperson);
+
+        String token = getAuthToken(eperson.getEmail(), password);
+        ObjectMapper mapper = new ObjectMapper();
+
+        CollectionRest collectionRest = collectionConverter.fromModel(col1);
+
+        MetadataEntryRest metadataEntryRest = new MetadataEntryRest();
+        metadataEntryRest.setKey("dc.title");
+        metadataEntryRest.setValue("Electronic theses and dissertations");
+
+        collectionRest.setMetadata(Arrays.asList(metadataEntryRest));
+
+        getClient(token).perform(put("/api/core/collections/" + col1.getID().toString())
+                                     .contentType(MediaType.APPLICATION_JSON)
+                                     .content(mapper.writeValueAsBytes(collectionRest)))
+                        .andExpect(status().isOk())
+        ;
+
+        getClient().perform(get("/api/core/collections/" + col1.getID().toString()))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$", Matchers.is(
+                       CollectionMatcher.matchCollectionEntry("Electronic theses and dissertations",
+                                                              col1.getID(), col1.getHandle())
+                   )))
+                   .andExpect(jsonPath("$._links.self.href",
+                                       Matchers.containsString("/api/core/collections")))
+        ;
+
+        authorizeService.removePoliciesActionFilter(context, eperson, Constants.WRITE);
 
     }
 }

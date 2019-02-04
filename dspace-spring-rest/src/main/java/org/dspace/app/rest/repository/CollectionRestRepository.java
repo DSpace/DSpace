@@ -214,7 +214,7 @@ public class CollectionRestRepository extends DSpaceRestRepository<CollectionRes
 
 
     @Override
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasPermission(#id, 'COLLECTION', 'WRITE')")
     protected CollectionRest put(Context context, HttpServletRequest request, String apiCategory, String model, UUID id,
                                 JsonNode jsonNode)
         throws RepositoryMethodNotImplementedException, SQLException, AuthorizeException {
@@ -242,7 +242,7 @@ public class CollectionRestRepository extends DSpaceRestRepository<CollectionRes
         return converter.fromModel(collection);
     }
     @Override
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasPermission(#id, 'COLLECTION', 'DELETE')")
     protected void delete(Context context, UUID id) throws AuthorizeException {
         Collection collection = null;
         try {
