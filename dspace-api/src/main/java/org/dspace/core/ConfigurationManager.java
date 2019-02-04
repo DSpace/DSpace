@@ -22,6 +22,7 @@ import java.util.Properties;
 import org.apache.log4j.Category;
 import org.apache.log4j.Logger;
 import org.apache.log4j.helpers.OptionConverter;
+import org.dspace.servicemanager.config.DSpaceConfigurationService;
 
 /**
  * Class for reading the DSpace system configuration. The main configuration is
@@ -692,6 +693,25 @@ public class ConfigurationManager
                 reader = new InputStreamReader(is, "UTF-8");
                 properties.load(reader);
 
+                // load all properties from the system which begin with the
+                // prefix
+                Properties systemProps = System.getProperties();
+                for (Object o : systemProps.keySet()) {
+                    String key = (String) o;
+                    if (key != null && !key.equals(DSpaceConfigurationService.DSPACE_HOME)) {
+                        try {
+                            if (key.startsWith(DSpaceConfigurationService.DSPACE_PREFIX)) {
+                                String propName = key.substring(DSpaceConfigurationService.DSPACE_PREFIX.length());
+                                String propVal = systemProps.getProperty(key);
+                                log.info("Loading system property as config: " + propName + "=>" + propVal);
+                                properties.put(propName, propVal);
+                            }
+                        } catch (RuntimeException e) {
+                            log.error("Failed to properly get config value from system property: " + o, e);
+                        }
+                    }
+                }
+                
                 // walk values, interpolating any embedded references.
                 for (Enumeration<?> pe = properties.propertyNames(); pe.hasMoreElements(); )
                 {
