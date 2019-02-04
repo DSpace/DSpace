@@ -186,6 +186,7 @@ public class ItemUtils
                     
                     String url = "";
                     String bsName = bit.getName();
+                    String bitID= Integer.toString(bit.getID());
                     String sid = String.valueOf(bit.getSequenceID());
                     String baseUrl = ConfigurationManager.getProperty("oai",
                             "bitstream.baseUrl");
@@ -225,6 +226,7 @@ public class ItemUtils
                     String name = bit.getName();
                     String description = bit.getDescription();
 
+                    bitstream.getField().add(createValue("id", bitID));
                     if (name != null)
                         bitstream.getField().add(
                                 createValue("name", name));
