@@ -214,7 +214,7 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
 
     @SearchRestMethod(name = "byLabel")
     public Page<RelationshipRest> findByLabel(@Parameter(value = "label", required = true) String label,
-                                              @Parameter(value = "dso", required = true) UUID dsoId,
+                                              @Parameter(value = "dso", required = false) UUID dsoId,
                                               Pageable pageable) throws SQLException {
 
         Context context = obtainContext();
