@@ -32,8 +32,10 @@ import org.dspace.app.rest.matcher.CommunityMetadataMatcher;
 import org.dspace.app.rest.model.CommunityRest;
 import org.dspace.app.rest.model.MetadataEntryRest;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.core.Constants;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +45,9 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
 
     @Autowired
     CommunityConverter communityConverter;
+
+    @Autowired
+    AuthorizeService authorizeService;
 
     @Test
     public void createTest() throws Exception {
@@ -771,4 +776,105 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                         .andExpect(status().isUnauthorized())
         ;
     }
+
+    @Test
+    public void deleteCommunityEpersonWithDeleteRightsTest() throws Exception {
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        context.setCurrentUser(eperson);
+        authorizeService.addPolicy(context, parentCommunity, Constants.DELETE, eperson);
+
+        String token = getAuthToken(eperson.getEmail(), password);
+
+        getClient(token).perform(get("/api/core/communities/" + parentCommunity.getID().toString()))
+                        .andExpect(status().isOk())
+                        .andExpect(content().contentType(contentType))
+                        .andExpect(jsonPath("$", Matchers.is(
+                            CommunityMatcher.matchCommunityEntry(parentCommunity.getName(), parentCommunity.getID(),
+                                                                 parentCommunity.getHandle())
+                        )))
+                        .andExpect(jsonPath("$._links.self.href",
+                                            Matchers.containsString("/api/core/communities")))        ;
+        getClient(token).perform(delete("/api/core/communities/" + parentCommunity.getID().toString()))
+                        .andExpect(status().isNoContent())
+        ;
+        getClient(token).perform(get("/api/core/communities/" + parentCommunity.getID().toString()))
+                        .andExpect(status().isNotFound())
+        ;
+
+        authorizeService.removePoliciesActionFilter(context, eperson, Constants.DELETE);
+    }
+
+    @Test
+    public void updateCommunityEpersonWithWriteRightsTest() throws Exception {
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+
+        getClient().perform(get("/api/core/communities/" + parentCommunity.getID().toString()))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$", Matchers.is(
+                       CommunityMatcher.matchCommunityEntry(parentCommunity.getName(), parentCommunity.getID(),
+                                                            parentCommunity.getHandle())
+                   )))
+                   .andExpect(jsonPath("$", Matchers.not(
+                       Matchers.is(
+                           CommunityMatcher.matchCommunityEntry(child1.getName(), child1.getID(), child1.getHandle())
+                       )
+                   )))
+                   .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/communities")))
+        ;
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        CommunityRest communityRest = communityConverter.fromModel(parentCommunity);
+
+        MetadataEntryRest metadataEntryRest = new MetadataEntryRest();
+        metadataEntryRest.setKey("dc.title");
+        metadataEntryRest.setValue("Electronic theses and dissertations");
+
+        communityRest.setMetadata(Arrays.asList(metadataEntryRest));
+
+        context.setCurrentUser(eperson);
+        authorizeService.addPolicy(context, parentCommunity, Constants.WRITE, eperson);
+
+        String token = getAuthToken(eperson.getEmail(), password);
+
+        getClient(token).perform(put("/api/core/communities/" + parentCommunity.getID().toString())
+                                     .contentType(MediaType.APPLICATION_JSON)
+                                     .content(mapper.writeValueAsBytes(communityRest)))
+                        .andExpect(status().isOk())
+        ;
+
+        getClient().perform(get("/api/core/communities/" + parentCommunity.getID().toString()))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$", Matchers.is(
+                       CommunityMatcher.matchCommunityEntry("Electronic theses and dissertations",
+                                                            parentCommunity.getID(),
+                                                            parentCommunity.getHandle())
+                   )))
+                   .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/communities")))
+        ;
+
+        authorizeService.removePoliciesActionFilter(context, eperson, Constants.DELETE);
+
+    }
+
 }
