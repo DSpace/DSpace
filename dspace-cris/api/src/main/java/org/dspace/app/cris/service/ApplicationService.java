@@ -129,22 +129,11 @@ public class ApplicationService extends ExtendedTabService
                 cacheManager = CacheManager.create();
                 if (cacheManager != null)
                 {
-                    int maxInMemoryObjects = 100;
-                    // ConfigurationManager.getIntProperty("cris",
-                    // "applicationServiceCache.max-in-memory-objects", 100);
-                    boolean overflowToDisk = true;
-                    // ConfigurationManager.getBooleanProperty("cris",
-                    // "applicationServiceCache.overflow-to-disk", true);
-                    int timeToLive = 0;
-                    // ConfigurationManager.getIntProperty("cris",
-                    // "applicationServiceCache.time-to-live", 0);
-                    int timeToIdle = 0;
-                    // ConfigurationManager.getIntProperty("cris",
-                    // "applicationServiceCache.time-to-idle", 0);
-                    int diskExpireThreadInterval = 600;
-                    // ConfigurationManager.getIntProperty("cris",
-                    // "applicationServiceCache.disk-expire-thread-interval",
-                    // 600);
+                    int maxInMemoryObjects = configurationService.getPropertyAsType("cris.applicationServiceCache.max-in-memory-objects", 1000);
+                    boolean overflowToDisk = configurationService.getPropertyAsType("cris.applicationServiceCache.overflow-to-disk", true);
+                    int timeToLive = configurationService.getPropertyAsType("cris.applicationServiceCache.time-to-live", 0);
+                    int timeToIdle = configurationService.getPropertyAsType("cris.applicationServiceCache.time-to-idle", 0);
+                    int diskExpireThreadInterval = configurationService.getPropertyAsType("cris.applicationServiceCache.disk-expire-thread-interval", 600);
 
                     cache = cacheManager.getCache("applicationServiceCache");
                     if (cache == null)
