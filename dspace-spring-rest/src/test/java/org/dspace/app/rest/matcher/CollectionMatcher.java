@@ -32,7 +32,7 @@ public class CollectionMatcher {
             hasJsonPath("$.name", is(name)),
             hasJsonPath("$.handle", is(handle)),
             hasJsonPath("$.type", is("collection")),
-            hasJsonPath("$.metadata", Matchers.contains(
+            hasJsonPath("$.metadata", Matchers.hasItem(
                 CollectionMetadataMatcher.matchTitle(name)
             )),
             matchLinks(uuid),
