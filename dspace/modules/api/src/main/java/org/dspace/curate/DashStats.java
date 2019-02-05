@@ -275,21 +275,21 @@ public class DashStats extends AbstractCurationTask {
                     String userAgent = getNamedChildText(aView, "userAgent");
                     report(eventTime + "\t" +
                            clientIP + "\t" +
-                           "- \t" +  //session_cookie_id
-                           "- \t" +  //user_cookie_id
-                           "- \t" +  //user__id
+                           "-\t" +  //session_cookie_id
+                           "-\t" +  //user_cookie_id
+                           "-\t" +  //user__id
                            "https://datadryad.org/resource/" + packageDOI + "\t" +
                            packageDOI + "\t" +
-                           "- \t" +  //filename
-                           "- \t" +  //size
+                           "-\t" +  //filename
+                           "-\t" +  //size
                            userAgent + "\t" +
                            packageTitle + "\t" +
                            "Dryad Digital Repository\t" + //publisher
                            "grid.466587.e\t" + //publisher_id
                            packageAuthors + "\t" +
                            dateAccessioned + "\t" +
-                           "1 \t" +  //version
-                           "- \t" +  //other_id
+                           "-\t" +  //version
+                           "-\t" +  //other_id
                            "https://datadryad.org/resource/" + packageDOI + "\t" +
                            publicationYear
                            );
