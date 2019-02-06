@@ -20,6 +20,6 @@ COPY dspace/src/main/docker/local.cfg /app/local.cfg
 # Clean up the built artifacts in the same step to keep the docker image small
 RUN mvn package -Dmirage2.on=true && mvn clean
 
-# clear the contents of the /app directory so no artifacts are left when dspace:dspace is built
+# Clear the contents of the /app directory so no artifacts are left when dspace:dspace is built
 USER root
 RUN rm -rf /app/*
