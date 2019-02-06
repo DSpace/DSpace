@@ -146,8 +146,8 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
                 relationship.setLeftItem(leftItem);
                 relationship.setRightItem(rightItem);
 
-            relationshipService.updatePlaceInRelationship(context, relationship, false);
-            relationshipService.update(context, relationship);
+                relationshipService.updatePlaceInRelationship(context, relationship, false);
+                relationshipService.update(context, relationship);
 
                 return relationshipConverter.fromModel(relationship);
             } else {
