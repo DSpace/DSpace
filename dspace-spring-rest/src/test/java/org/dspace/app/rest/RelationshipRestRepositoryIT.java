@@ -13,6 +13,7 @@ import static org.junit.Assert.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -268,15 +269,13 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
         String token = getAuthToken(user.getEmail(), password);
 
         MvcResult mvcResult = getClient(token).perform(post("/api/core/relationships")
-                                                           .param("leftItem", publication.getID().toString())
-                                                           .param("rightItem", author1.getID().toString())
                                                            .param("relationshipType",
-                                                                       isAuthorOfPublicationRelationshipType.getID()
-                                                                                                            .toString())
-                                                           .contentType(MediaType.APPLICATION_JSON).content(
-                "{\"id\":530,\"leftId\":\"77877343-3f75-4c33-9492" +
-                    "-6ed7c98ed84e\",\"relationshipTypeId\":0,\"rightId\":\"423d0eda-b808-4b87-97ae-b85fe9d59418\"," +
-                    "\"leftPlace\":1,\"rightPlace\":1}"))
+                                                                  isAuthorOfPublicationRelationshipType.getID()
+                                                                                                       .toString())
+                                                           .contentType(MediaType.parseMediaType("text/uri-list"))
+                                                           .content(
+                               "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
+                               "https://localhost:8080/spring-rest/api/core/items/" + author1.getID()))
                                               .andExpect(status().isCreated())
                                               .andReturn();
 
@@ -334,15 +333,13 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
         String token = getAuthToken(user.getEmail(), password);
 
         MvcResult mvcResult = getClient(token).perform(post("/api/core/relationships")
-                                                           .param("leftItem", publication.getID().toString())
-                                                           .param("rightItem", author1.getID().toString())
                                                            .param("relationshipType",
                                                                   isAuthorOfPublicationRelationshipType.getID()
                                                                                                        .toString())
-                                                           .contentType(MediaType.APPLICATION_JSON).content(
-                "{\"id\":530,\"leftId\":\"77877343-3f75-4c33-9492" +
-                    "-6ed7c98ed84e\",\"relationshipTypeId\":0,\"rightId\":\"423d0eda-b808-4b87-97ae-b85fe9d59418\"," +
-                    "\"leftPlace\":1,\"rightPlace\":1}"))
+                                                           .contentType(MediaType.parseMediaType("text/uri-list"))
+                                                           .content(
+            "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
+            "https://localhost:8080/spring-rest/api/core/items/" + author1.getID()))
                                               .andExpect(status().isCreated())
                                               .andReturn();
 
@@ -399,15 +396,13 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
         String token = getAuthToken(user.getEmail(), password);
 
         MvcResult mvcResult = getClient(token).perform(post("/api/core/relationships")
-                                                           .param("leftItem", publication.getID().toString())
-                                                           .param("rightItem", author1.getID().toString())
                                                            .param("relationshipType",
                                                                   isAuthorOfPublicationRelationshipType.getID()
                                                                                                        .toString())
-                                                           .contentType(MediaType.APPLICATION_JSON).content(
-                "{\"id\":530,\"leftId\":\"77877343-3f75-4c33-9492" +
-                    "-6ed7c98ed84e\",\"relationshipTypeId\":0,\"rightId\":\"423d0eda-b808-4b87-97ae-b85fe9d59418\"," +
-                    "\"leftPlace\":1,\"rightPlace\":1}"))
+                                                           .contentType(MediaType.parseMediaType("text/uri-list"))
+                                                           .content(
+                               "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
+                               "https://localhost:8080/spring-rest/api/core/items/" + author1.getID()))
                                               .andExpect(status().isForbidden())
                                               .andReturn();
 
@@ -1311,6 +1306,81 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
         getClient(adminToken).perform(get("/api/core/relationships/" + thirdRelationshipIdString))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("rightPlace", is(1)));
+
+    }
+
+    @Test
+    public void putRelationshipAccess() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
+        Collection col3 = CollectionBuilder.createCollection(context, child1).withName("OrgUnits").build();
+
+        Item author1 = ItemBuilder.createItem(context, col1)
+                                  .withTitle("Author1")
+                                  .withIssueDate("2017-10-17")
+                                  .withAuthor("Smith, Donald")
+                                  .withRelationshipType("Person")
+                                  .build();
+
+        Item author2 = ItemBuilder.createItem(context, col1)
+                                  .withTitle("Author2")
+                                  .withIssueDate("2017-10-12")
+                                  .withAuthor("Smith, Donalaze")
+                                  .withRelationshipType("Person")
+                                  .build();
+
+        Item publication = ItemBuilder.createItem(context, col3)
+                                      .withTitle("Publication1")
+                                      .withAuthor("Testy, TEst")
+                                      .withIssueDate("2015-01-01")
+                                      .withRelationshipType("Publication")
+                                      .build();
+
+        RelationshipType isAuthorOfPublicationRelationshipType = relationshipTypeService
+            .findbyTypesAndLabels(context, entityTypeService.findByEntityType(context, "Publication"),
+                                  entityTypeService.findByEntityType(context, "Person"),
+                                  "isAuthorOfPublication", "isPublicationOfAuthor");
+
+
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        MvcResult mvcResult = getClient(token).perform(post("/api/core/relationships")
+                                                           .param("relationshipType",
+                                                                  isAuthorOfPublicationRelationshipType.getID()
+                                                                                                       .toString())
+                                                           .contentType(MediaType.parseMediaType("text/uri-list"))
+                                                           .content(
+                               "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
+                               "https://localhost:8080/spring-rest/api/core/items/" + author1.getID()))
+                                              .andExpect(status().isCreated())
+                                              .andReturn();
+
+        ObjectMapper mapper = new ObjectMapper();
+        String content = mvcResult.getResponse().getContentAsString();
+        Map<String,Object> map = mapper.readValue(content, Map.class);
+        String id = String.valueOf(map.get("id"));
+
+        MvcResult mvcResult2 = getClient(token).perform(put("/api/core/relationships/" + id)
+                                                           .contentType(MediaType.parseMediaType("text/uri-list"))
+                                                           .content(
+                               "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
+                               "https://localhost:8080/spring-rest/api/core/items/" + author2.getID()))
+                                              .andExpect(status().isOk())
+                                              .andReturn();
+
+        getClient(token).perform(get("/api/core/relationships/" + id))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.rightId", is(author2.getID().toString())));
 
     }
 }
