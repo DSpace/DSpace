@@ -16,9 +16,15 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.SQLException;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Scanner;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
 import org.dspace.app.rest.exception.PaginationException;
 import org.dspace.app.rest.exception.RepositoryNotFoundException;
 import org.dspace.app.rest.model.AuthorityRest;
@@ -30,7 +36,11 @@ import org.dspace.app.rest.model.RestAddressableModel;
 import org.dspace.app.rest.model.hateoas.DSpaceResource;
 import org.dspace.app.rest.repository.DSpaceRestRepository;
 import org.dspace.app.rest.repository.LinkRestRepository;
+import org.dspace.content.DSpaceObject;
+import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Context;
+import org.dspace.util.UUIDUtils;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -48,8 +58,15 @@ import org.springframework.web.multipart.MultipartFile;
  */
 @Component
 public class Utils {
+
+    private static final Logger log = Logger.getLogger(Utils.class);
+
     @Autowired
     ApplicationContext applicationContext;
+
+    @Autowired(required = true)
+    private List<DSpaceObjectService<? extends DSpaceObject>> dSpaceObjectServices;
+
 
     public <T> Page<T> getPage(List<T> fullContents, Pageable pageable) {
         int total = fullContents.size();
@@ -218,5 +235,61 @@ public class Utils {
         } else {
             return multipartFile.getName();
         }
+    }
+
+    private List<DSpaceObject> constructDSpaceObjectList(Context context,
+                                                         HttpServletRequest request) throws IOException {
+        List<String> list = readFromRequest(request);
+
+        List<DSpaceObject> dSpaceObjects = new LinkedList<>();
+        for (String string : list) {
+            String uuid = string.substring(string.lastIndexOf('/') + 1);
+            try {
+                for (DSpaceObjectService dSpaceObjectService : dSpaceObjectServices) {
+                    DSpaceObject dSpaceObject = dSpaceObjectService.find(context, UUIDUtils.fromString(uuid));
+                    if (dSpaceObject != null) {
+                        dSpaceObjects.add(dSpaceObject);
+                        break;
+                    }
+                }
+            } catch (SQLException e) {
+                log.error(e.getMessage(), e);
+            }
+
+        }
+        return dSpaceObjects;
+    }
+
+    private List<String> readFromRequest(HttpServletRequest request) throws IOException {
+        List<String> list = new LinkedList<>();
+        Scanner scanner = new Scanner(request.getInputStream());
+
+        try {
+
+            while (scanner.hasNextLine()) {
+
+                String line = scanner.nextLine();
+                if (org.springframework.util.StringUtils.hasText(line)) {
+                    list.add(line);
+                }
+            }
+
+        } finally {
+            scanner.close();
+        }
+        return list;
+    }
+
+
+    /**
+     * This method will retrieve a list of DSpaceObjects from the Request by reading in the Request's InputStream
+     * with a Scanner and searching the InputStream for UUIDs which will then be resolved to a DSpaceObject.
+     * These will all be added to a list and returned by this method.
+     * @param request       The request of which the InputStream will be used
+     * @return              The list of DSpaceObjects that we could find in the InputStream
+     * @throws IOException  If something goes wrong
+     */
+    public List<DSpaceObject> getdSpaceObjectsFromRequest(HttpServletRequest request) throws IOException {
+        return constructDSpaceObjectList(ContextUtil.obtainContext(request), request);
     }
 }
