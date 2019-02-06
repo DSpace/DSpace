@@ -61,7 +61,7 @@
     	<schema>bundle</schema>
         <element>iiif</element>
         <qualifier>autocompleteid</qualifier>
-        <scope_note>Metadata field used to store the endpoint of the IIIF Search API 
+        <scope_note>Repeatable metadata field used to store the endpoint of the IIIF Search API 
         			Autocomplete service</scope_note>
     </dc-type>
 
