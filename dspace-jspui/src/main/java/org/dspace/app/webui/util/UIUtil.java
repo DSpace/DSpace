@@ -137,13 +137,14 @@ public class UIUtil extends Util
             if (userID != null)
             {
                 String remAddr = (String)session.getAttribute("dspace.current.remote.addr");
-                if (remAddr != null && remAddr.equals(request.getRemoteAddr()))
+                boolean ipSessionCheck = ConfigurationManager.getBooleanProperty("jspui.session.ipcheck",true);
+                if ( (remAddr != null && remAddr.equals(request.getRemoteAddr())) ||
+                		!ipSessionCheck)
                 {
                 	EPerson e = EPerson.find(c, userID.intValue());
 
                 	Authenticate.loggedIn(c, request, e);
-                }
-                else
+                }else
                 {
                     log.warn("POSSIBLE HIJACKED SESSION: request from "+
                              request.getRemoteAddr()+" does not match original "+
