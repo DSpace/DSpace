@@ -114,19 +114,26 @@ public class ApproveRejectReviewItem {
         }
     }
 
-    public static void processReviewPackageUsingManuscript(Context c, DryadDataPackage dryadDataPackage, Manuscript manuscript) throws ApproveRejectReviewItemException {
+    public static void processReviewPackageUsingManuscript(Context c, DryadDataPackage dryadDataPackage, Manuscript manuscript)
+        throws ApproveRejectReviewItemException {
+        String msid =  manuscript.getManuscriptId();
         try {
             if (dryadDataPackage.isPackageInReview(c)) {
                 // update duplicate submission metadata for this item.
                 dryadDataPackage.updateDuplicatePackages(c);
-                if (Manuscript.statusIsApproved(manuscript.getStatus())) { // approve
+                if (Manuscript.statusIsApproved(manuscript.getStatus())) {
+                    log.info("Approving " + msid + " based on manuscript status " + manuscript.getStatus());
                     dryadDataPackage.approvePackageUsingManuscript(c, manuscript);
                 } else { // reject
+                    log.info("Rejecting " + msid + " based on manuscript status " + manuscript.getStatus());
                     String reason = "The journal with which your data submission is associated has notified us that your manuscript is no longer being considered for publication. If you feel this has happened in error or wish to re-submit your data associated with a different journal, please contact us at help@datadryad.org.";
                     dryadDataPackage.rejectPackageUsingManuscript(c, manuscript, reason);
                 }
+            } else {
+                log.error("processReviewPackageUsingManuscript called for an item that is not in review! " + msid);
             }
         } catch (Exception ex) {
+            log.error("cannot process manuscript " + msid, ex);
             throw new ApproveRejectReviewItemException(ex);
         }
     }
