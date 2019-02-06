@@ -288,7 +288,7 @@ public class DashStats extends AbstractCurationTask {
                            "grid.466587.e\t" + //publisher_id
                            packageAuthors + "\t" +
                            dateAccessioned + "\t" +
-                           "-\t" +  //version
+                           "1\t" +  //version
                            "-\t" +  //other_id
                            "https://datadryad.org/resource/" + packageDOI + "\t" +
                            publicationYear
@@ -424,14 +424,20 @@ public class DashStats extends AbstractCurationTask {
     **/
     private String getNamedChildText(Node aNode, String fieldName) {
         String result = null;
-        NodeList childNodes = aNode.getChildNodes();
-        for(int i = 0; i < childNodes.getLength(); i++) {
-            Node aChild = childNodes.item(i);
-            String name = aChild.getAttributes().getNamedItem("name").getTextContent();
-            if(name.equals(fieldName)) {
-                result = aChild.getFirstChild().getTextContent();
-                break;
+        try {
+            NodeList childNodes = aNode.getChildNodes();
+            for(int i = 0; i < childNodes.getLength(); i++) {
+                Node aChild = childNodes.item(i);
+                String name = aChild.getAttributes().getNamedItem("name").getTextContent();
+                if(name.equals(fieldName)) {
+                    result = aChild.getFirstChild().getTextContent();
+                    break;
+                }
             }
+        } catch (Exception e) {
+            // an exception processing one field shouldn't cause problems for the entire log entry,
+            // so log it and move on.
+            log.error("unable to get field " + fieldname + " out of node " + aNode, e);
         }
         return result;
     }
