@@ -437,7 +437,7 @@ public class DashStats extends AbstractCurationTask {
         } catch (Exception e) {
             // an exception processing one field shouldn't cause problems for the entire log entry,
             // so log it and move on.
-            log.error("unable to get field " + fieldname + " out of node " + aNode, e);
+            log.error("unable to get field " + fieldName + " out of node " + aNode, e);
         }
         return result;
     }

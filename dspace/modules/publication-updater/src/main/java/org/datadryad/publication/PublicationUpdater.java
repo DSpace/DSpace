@@ -1,5 +1,5 @@
 package org.datadryad.publication;
-
+ 
 import org.apache.http.NameValuePair;
 import org.apache.log4j.Logger;
 import org.datadryad.api.DryadDataPackage;
@@ -226,11 +226,14 @@ public class PublicationUpdater extends HttpServlet {
                     databaseManuscript = JournalUtils.getStoredManuscriptForPackage(context, dryadDataPackage);
                     // is this package in review?
                     if (dryadDataPackage.isPackageInReview(context) && databaseManuscript != null) {
-                        StringBuilder provenance = new StringBuilder("Journal-provided metadata for msid " + databaseManuscript.getManuscriptId() + " with title '" + databaseManuscript.getTitle() + "' was added. ");
+                        String msid =  databaseManuscript.getManuscriptId();
+                        LOGGER.info("Review item " + dryadDataPackage.getIdentifier() + " with MSID " + msid + "being processed");
+                        StringBuilder provenance = new StringBuilder("Journal-provided metadata for msid " + msid + " with title '" + databaseManuscript.getTitle() + "' was added. ");
                         if (dryadDataPackage.updateMetadataFromManuscript(databaseManuscript, context, provenance)) {
                             message = provenance;
                         }
                         if (databaseManuscript.isAccepted()) {
+                            LOGGER.info("Manuscript " + msid + "is accepted, updating...");
                             // see if this can be pushed out of review
                             ApproveRejectReviewItem.processReviewPackageUsingManuscript(context, dryadDataPackage, databaseManuscript);
                         }
