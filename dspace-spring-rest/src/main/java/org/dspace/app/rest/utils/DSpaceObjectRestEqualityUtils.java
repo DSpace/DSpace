@@ -27,8 +27,7 @@ public class DSpaceObjectRestEqualityUtils {
     public boolean isDSpaceObjectEqualsWithoutMetadata(DSpaceObjectRest original, DSpaceObjectRest updated) {
         return StringUtils.equals(original.getId(), updated.getId()) &&
             StringUtils.equals(original.getCategory(), updated.getCategory()) &&
-            StringUtils.equals(original.getHandle(), updated.getHandle()) &&
-            StringUtils.equals(original.getName(), updated.getName());
+            StringUtils.equals(original.getHandle(), updated.getHandle());
 
     }
 }
