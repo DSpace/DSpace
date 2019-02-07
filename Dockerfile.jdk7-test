@@ -22,6 +22,7 @@ USER dspace
 # Copy the DSpace source code into the workdir (excluding .dockerignore contents)
 ADD --chown=dspace . /app/
 COPY --chown=dspace dspace/src/main/docker/build.properties /app/build.properties
+COPY dspace/src/main/docker/test/solr_web.xml /app/dspace-solr/src/main/webapp/WEB-INF/web.xml
 
 # Build DSpace.  Copy the dspace-install directory to /install.  Clean up the build to keep the docker image small
 RUN mvn package -Dmirage2.on=true && \
@@ -61,7 +62,3 @@ RUN ln -s $DSPACE_INSTALL/webapps/solr    /usr/local/tomcat/webapps/solr    && \
     ln -s $DSPACE_INSTALL/webapps/rdf     /usr/local/tomcat/webapps/rdf     && \
     ln -s $DSPACE_INSTALL/webapps/sword   /usr/local/tomcat/webapps/sword   && \
     ln -s $DSPACE_INSTALL/webapps/swordv2 /usr/local/tomcat/webapps/swordv2
-
-COPY dspace/src/main/docker/test/solr_web.xml /app/dspace-solr/src/main/webapp/WEB-INF/web.xml
-
-RUN sed -i -e "s|\${dspace.dir}|$DSPACE_INSTALL|" $DSPACE_INSTALL/webapps/solr/WEB-INF/web.xml
