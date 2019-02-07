@@ -12,17 +12,26 @@ import org.dspace.content.MetadataValue;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
+/**
+ * Converter to translate between domain {@link MetadataValue}s and {@link MetadataValueRest} representations.
+ */
 @Component
 public class MetadataValueConverter implements Converter<MetadataValue, MetadataValueRest> {
 
+    /**
+     * Gets a rest representation of the given domain metadata value.
+     *
+     * @param metadataValue the domain value.
+     * @return the rest representation.
+     */
     @Override
-    public MetadataValueRest convert(MetadataValue model) {
+    public MetadataValueRest convert(MetadataValue metadataValue) {
         MetadataValueRest metadataValueRest = new MetadataValueRest();
-        metadataValueRest.setValue(model.getValue());
-        metadataValueRest.setLanguage(model.getLanguage());
-        metadataValueRest.setAuthority(model.getAuthority());
-        metadataValueRest.setConfidence(model.getConfidence());
-        metadataValueRest.setPlace(model.getPlace());
+        metadataValueRest.setValue(metadataValue.getValue());
+        metadataValueRest.setLanguage(metadataValue.getLanguage());
+        metadataValueRest.setAuthority(metadataValue.getAuthority());
+        metadataValueRest.setConfidence(metadataValue.getConfidence());
+        metadataValueRest.setPlace(metadataValue.getPlace());
         return metadataValueRest;
     }
 }

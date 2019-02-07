@@ -29,6 +29,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
+/**
+ * Converter to translate between lists of domain {@link MetadataValue}s and {@link MetadataRest} representations.
+ */
 @Component
 public class MetadataConverter implements Converter<List<MetadataValue>, MetadataRest> {
 
@@ -38,6 +41,12 @@ public class MetadataConverter implements Converter<List<MetadataValue>, Metadat
     @Autowired
     private MetadataValueConverter valueConverter;
 
+    /**
+     * Gets a rest representation of the given list of domain metadata values.
+     *
+     * @param metadataValueList the domain values.
+     * @return the rest representation.
+     */
     @Override
     public MetadataRest convert(List<MetadataValue> metadataValueList) {
         // Convert each value to a DTO while retaining place order in a map of key -> SortedSet
@@ -64,11 +73,11 @@ public class MetadataConverter implements Converter<List<MetadataValue>, Metadat
     }
 
     /**
-     * Completely replaces the metadata in the given dso.
+     * Sets a DSpace object's domain metadata values from a rest representation.
      *
      * @param context the context to use.
-     * @param dso the dso whose metadata should be updated.
-     * @param metadataRest the new metadata.
+     * @param dso the DSpace object.
+     * @param metadataRest the rest representation of the new metadata.
      * @throws SQLException if a database error occurs.
      * @throws AuthorizeException if an authorization error occurs.
      */

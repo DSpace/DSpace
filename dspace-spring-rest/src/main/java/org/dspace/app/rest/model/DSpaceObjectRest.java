@@ -51,6 +51,11 @@ public abstract class DSpaceObjectRest extends BaseObjectRest<String> {
         this.handle = handle;
     }
 
+    /**
+     * Gets the rest representation of all metadata of the DSpace object.
+     *
+     * @return the metadata.
+     */
     public MetadataRest getMetadata() {
         return metadata;
     }
