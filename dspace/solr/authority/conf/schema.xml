@@ -16,19 +16,6 @@
  limitations under the License.
 -->
 
-<!--
- This is the Solr schema file. This file should be named "schema.xml" and
- should be in the conf directory under the solr home
- (i.e. ./solr/conf/schema.xml by default)
- or located where the classloader for the Solr webapp can find it.
-
- This example schema is the recommended starting point for users.
- It should be kept correct and concise, usable out-of-the-box.
-
- For more information, on how to customize this file, please see
- http://wiki.apache.org/solr/SchemaXml
--->
-
 <schema name="authority" version="1.1">
 
   <types>
@@ -43,26 +30,6 @@
                sortMissingLast="true"
                omitNorms="true"/>
 
-    <!-- The format for this date field is of the form 1995-12-31T23:59:59Z, and
-         is a more restricted form of the canonical representation of dateTime
-         http://www.w3.org/TR/xmlschema-2/#dateTime
-         The trailing "Z" designates UTC time and is mandatory.
-         Optional fractional seconds are allowed: 1995-12-31T23:59:59.999Z
-         All other components are mandatory.
-
-         Expressions can also be used to denote calculations that should be
-         performed relative to "NOW" to determine the value, ie...
-
-               NOW/HOUR
-                  ... Round to the start of the current hour
-               NOW-1DAY
-                  ... Exactly 1 day prior to now
-               NOW/DAY+6MONTHS+3DAYS
-                  ... 6 months and 3 days in the future from the start of
-                      the current day
-
-         Consult the DateField javadocs for more information.
-      -->
     <fieldType name="date"
                class="solr.DatePointField"
                sortMissingLast="true"
