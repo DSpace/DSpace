@@ -8,7 +8,7 @@
 package org.dspace.app.rest.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.dspace.app.rest.RestResourceController;
 
 /**
@@ -16,7 +16,6 @@ import org.dspace.app.rest.RestResourceController;
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class MetadataFieldRest extends BaseObjectRest<Integer> {
     public static final String NAME = "metadatafield";
     public static final String CATEGORY = RestAddressableModel.CORE;
@@ -63,6 +62,7 @@ public class MetadataFieldRest extends BaseObjectRest<Integer> {
     }
 
     @Override
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     public String getType() {
         return NAME;
     }
