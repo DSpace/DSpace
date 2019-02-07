@@ -22,13 +22,13 @@ public class VirtualMetadataPopulator {
     /**
      * The map that holds this representation
      */
-    private Map map;
+    private Map<String, HashMap<String, VirtualBean>> map;
 
     /**
      * Standard setter for the map
      * @param map   The map to be used in the VirtualMetadataPopulator
      */
-    public void setMap(Map map) {
+    public void setMap(Map<String, HashMap<String, VirtualBean>> map) {
         this.map = map;
     }
 
@@ -36,18 +36,16 @@ public class VirtualMetadataPopulator {
      * Standard getter for the map
      * @return  The map that is used in the VirtualMetadataPopulator
      */
-    public Map getMap() {
+    public Map<String, HashMap<String, VirtualBean>> getMap() {
         return map;
     }
 
     public boolean isUseForPlaceTrueForRelationshipType(RelationshipType relationshipType, boolean isLeft) {
-        HashMap<String, VirtualBean> hashMaps = new HashMap<>();
+        HashMap<String, VirtualBean> hashMaps;
         if (isLeft) {
-            hashMaps = (HashMap<String, VirtualBean>) this
-                .getMap().get(relationshipType.getLeftLabel());
+            hashMaps = this.getMap().get(relationshipType.getLeftLabel());
         } else {
-            hashMaps = (HashMap<String, VirtualBean>) this
-                .getMap().get(relationshipType.getRightLabel());
+            hashMaps = this.getMap().get(relationshipType.getRightLabel());
         }
         if (hashMaps != null) {
             for (Map.Entry<String, VirtualBean> entry : hashMaps.entrySet()) {

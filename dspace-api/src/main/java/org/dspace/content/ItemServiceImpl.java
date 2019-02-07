@@ -1379,22 +1379,23 @@ prevent the generation of resource policy entry values with null dspace_object a
         throws SQLException {
         List<RelationshipMetadataValue> resultingMetadataValueList = new LinkedList<>();
         RelationshipType relationshipType = relationship.getRelationshipType();
-        HashMap<String, VirtualBean> hashMaps = new HashMap<>();
+        HashMap<String, VirtualBean> hashMaps;
         String relationName = "";
         Item otherItem = null;
         int place = 0;
         if (StringUtils.equals(relationshipType.getLeftType().getLabel(), entityType)) {
-            hashMaps = (HashMap<String, VirtualBean>) virtualMetadataPopulator
-                .getMap().get(relationshipType.getLeftLabel());
+            hashMaps = virtualMetadataPopulator.getMap().get(relationshipType.getLeftLabel());
             otherItem = relationship.getRightItem();
             relationName = relationship.getRelationshipType().getLeftLabel();
             place = relationship.getLeftPlace();
         } else if (StringUtils.equals(relationshipType.getRightType().getLabel(), entityType)) {
-            hashMaps = (HashMap<String, VirtualBean>) virtualMetadataPopulator
-                .getMap().get(relationshipType.getRightLabel());
+            hashMaps = virtualMetadataPopulator.getMap().get(relationshipType.getRightLabel());
             otherItem = relationship.getLeftItem();
             relationName = relationship.getRelationshipType().getRightLabel();
             place = relationship.getRightPlace();
+        } else {
+            //No virtual metadata can be created
+            return resultingMetadataValueList;
         }
 
         if (hashMaps != null && enableVirtualMetadata) {
@@ -1402,8 +1403,11 @@ prevent the generation of resource policy entry values with null dspace_object a
                                                                                      otherItem, relationName,
                                                                                      relationship.getID(), place));
         }
-        resultingMetadataValueList
-            .add(getRelationMetadataFromOtherItem(context, otherItem, relationName, relationship.getID()));
+        RelationshipMetadataValue relationMetadataFromOtherItem =
+                getRelationMetadataFromOtherItem(context, otherItem, relationName, relationship.getID());
+        if (relationMetadataFromOtherItem != null) {
+            resultingMetadataValueList.add(relationMetadataFromOtherItem);
+        }
         return resultingMetadataValueList;
     }
 
@@ -1420,11 +1424,13 @@ prevent the generation of resource policy entry values with null dspace_object a
 
             for (String value : virtualBean.getValues(context, otherItem)) {
                 RelationshipMetadataValue metadataValue = constructMetadataValue(context, key);
-                metadataValue = constructResultingMetadataValue(item, value, metadataValue, relationshipId);
-                metadataValue.setUseForPlace(virtualBean.getUseForPlace());
-                metadataValue.setPlace(place);
-                if (StringUtils.isNotBlank(metadataValue.getValue())) {
-                    resultingMetadataValueList.add(metadataValue);
+                if (metadataValue != null) {
+                    metadataValue = constructResultingMetadataValue(item, value, metadataValue, relationshipId);
+                    metadataValue.setUseForPlace(virtualBean.getUseForPlace());
+                    metadataValue.setPlace(place);
+                    if (StringUtils.isNotBlank(metadataValue.getValue())) {
+                        resultingMetadataValueList.add(metadataValue);
+                    }
                 }
             }
         }
@@ -1437,9 +1443,12 @@ prevent the generation of resource policy entry values with null dspace_object a
         RelationshipMetadataValue metadataValue = constructMetadataValue(context,
                                                                          MetadataSchemaEnum.RELATION
                                                                              .getName() + "." + relationName);
-        metadataValue.setAuthority(Constants.VIRTUAL_AUTHORITY_PREFIX + relationshipId);
-        metadataValue.setValue(otherItem.getID().toString());
-        return metadataValue;
+        if (metadataValue != null) {
+            metadataValue.setAuthority(Constants.VIRTUAL_AUTHORITY_PREFIX + relationshipId);
+            metadataValue.setValue(otherItem.getID().toString());
+            return metadataValue;
+        }
+        return null;
     }
 
     private String getEntityTypeStringFromMetadata(List<MetadataValue> list) {
