@@ -15,11 +15,19 @@ import java.util.TreeMap;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 
+/**
+ * Rest representation of a map of metadata keys to ordered lists of values.
+ */
 public class MetadataRest {
 
     @JsonAnySetter
     private SortedMap<String, List<MetadataValueRest>> map = new TreeMap();
 
+    /**
+     * Gets the map.
+     *
+     * @return the map of keys to ordered values.
+     */
     @JsonAnyGetter
     public SortedMap<String, List<MetadataValueRest>> getMap() {
         return map;
@@ -30,9 +38,9 @@ public class MetadataRest {
      *
      * @param key the key.
      * @param values the values. The values will be ordered according to their {@code place} value, if
-     *               nonnegative. Values that are negative (the default is -1) are assume to be non-explicitly
-     *               set and will will be ordered at the end of the list, after the last value with an order,
-     *               in the order they are passed to this method.
+     *               nonnegative. Values that are negative (the default is -1) are assumed to be non-explicitly
+     *               set and will will be ordered at the end of any explicitly ordered values, in the order
+     *               they are passed to this method.
      * @return this instance, to support chaining calls for easy initialization.
      */
     public MetadataRest put(String key, MetadataValueRest... values) {
