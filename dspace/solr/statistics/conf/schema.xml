@@ -23,12 +23,12 @@
 
     <fieldType name="boolean" class="solr.BoolField" sortMissingLast="true" omitNorms="true"/>
 
-    <fieldType name="integer" class="solr.TrieIntField" omitNorms="true"/>
-    <fieldType name="long" class="solr.TrieLongField" omitNorms="true"/>
-    <fieldType name="float" class="solr.TrieFloatField" omitNorms="true"/>
-    <fieldType name="double" class="solr.TrieDoubleField" omitNorms="true"/>
+    <fieldType name="integer" class="solr.IntPointField" omitNorms="true"/>
+    <fieldType name="long" class="solr.LongPointField" omitNorms="true"/>
+    <fieldType name="float" class="solr.FloatPointField" omitNorms="true"/>
+    <fieldType name="double" class="solr.DoublePointField" omitNorms="true"/>
 
-    <fieldType name="date" class="solr.TrieDateField" sortMissingLast="true" omitNorms="true"/>
+    <fieldType name="date" class="solr.DatePointField" sortMissingLast="true" omitNorms="true"/>
 
     <fieldType name="text" class="solr.TextField" positionIncrementGap="100">
       <analyzer type="index">
