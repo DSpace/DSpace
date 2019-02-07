@@ -9,7 +9,7 @@
 # - default tag for branch: dspace/dspace: dspace/dspace:dspace-4_x-jdk7
 
 # Step 1 - Run Maven Build
-FROM dspace/dspace-dependencies:dspace-4_x- as build
+FROM dspace/dspace-dependencies:dspace-4_x as build
 ARG TARGET_DIR=dspace-build
 WORKDIR /app
 

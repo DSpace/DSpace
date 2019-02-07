@@ -1,4 +1,4 @@
-# This image will be published as dspace/dspace-dependencies:dspace-5_x
+# This image will be published as dspace/dspace-dependencies:dspace-4_x
 # The purpose of this image is to make the build for dspace/dspace run faster 
 
 # Step 1 - Run Maven Build
