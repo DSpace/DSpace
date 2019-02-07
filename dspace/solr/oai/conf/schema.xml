@@ -101,6 +101,9 @@
 
     <!-- UUID support -->
     <fieldType name="uuid" class="solr.UUIDField" indexed="true" />
+
+    <!-- These fields are ignored -->
+    <fieldType name="ignored" class="solr.StrField" indexed="false" stored="false"/>
  </types>
 
  <fields>
