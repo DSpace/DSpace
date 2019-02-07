@@ -409,7 +409,8 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
     }
 
     /**
-     * Method to support updating a DSpace instance.
+     * This method will fully replace the REST object with the given UUID with the REST object that is described
+     * in the JsonNode parameter
      *
      * @param request     the http request
      * @param apiCategory the API category e.g. "api"
@@ -433,7 +434,9 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
     }
 
     /**
-     * Implement this method in the subclass to support updating a DSpace instance.
+     * Implement this method in the subclass to support the PUT functionality for a REST object.
+     * This PUT functionality will fully replace the REST object with the given UUID with the REST object that is
+     * described in the JsonNode parameter
      *
      * @param context     the dspace context
      * @param request     the http request
