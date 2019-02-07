@@ -23,9 +23,6 @@
 
     <fieldType name="boolean" class="solr.BoolField" sortMissingLast="true" omitNorms="true"/>
 
-    <!-- numeric field types that store and index the text
-         value verbatim (and hence don't support range queries, since the
-         lexicographic ordering isn't equal to the numeric ordering) -->
     <fieldType name="integer" class="solr.TrieIntField" omitNorms="true"/>
     <fieldType name="long" class="solr.TrieLongField" omitNorms="true"/>
     <fieldType name="float" class="solr.TrieFloatField" omitNorms="true"/>
@@ -71,7 +68,6 @@
       </analyzer>
     </fieldType>
  </types>
-
 
  <fields>
  	<field name="_version_" type="long" indexed="true" stored="true" multiValued="false"/>
