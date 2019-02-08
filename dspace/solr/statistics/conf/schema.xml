@@ -16,6 +16,12 @@
  limitations under the License.
 -->
 
+<!--
+    This is the DSpace "statistics" core, which holds records of each reference
+    to DSpace content.  Each search or view/download event is logged here.
+    See dspace-api:org.dspace.statistics.SolrLoggerServiceImpl.
+-->
+
 <schema name="statistics" version="1.1">
 
   <types>
@@ -83,6 +89,7 @@
     <field name="longitude" type="float" indexed="true" stored="true" required="false" />
     <field name="latitude" type="float" indexed="true" stored="true" required="false" />
     <field name="owningComm" type="string" indexed="true" stored="true" required="false" multiValued="true" />
+    <!-- NOTE:  actually *all* related collections, owning or mapped. -->
     <field name="owningColl" type="string" indexed="true" stored="true" required="false" multiValued="true" />
     <field name="owningItem" type="string" indexed="true" stored="true" required="false" multiValued="true" />
     <field name="dns" type="string" indexed="true" stored="true" required="false" docValues="true"/>
