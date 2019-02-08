@@ -16,6 +16,12 @@
  limitations under the License.
 -->
 
+<!--
+    This is the DSpace "search" core, which supports full-text searching for
+    DSpace content bitstreams, Discovery, autocompletion, etc.
+    See dspace-api:org.dspace.discovery.SolrServiceImpl.
+-->
+
 <schema name="discovery" version="1.5">
 
   <types>
