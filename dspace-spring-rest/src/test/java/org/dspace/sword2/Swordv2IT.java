@@ -16,6 +16,7 @@ import org.dspace.app.rest.test.AbstractWebClientIntegrationTest;
 import org.dspace.services.ConfigurationService;
 import org.junit.Assume;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -39,6 +40,10 @@ public class Swordv2IT extends AbstractWebClientIntegrationTest {
 
     // All SWORD v2 paths that we test against
     private final String SERVICE_DOC_PATH = "/swordv2/servicedocument";
+    private final String COLLECTION_PATH = "/swordv2/collection";
+    private final String MEDIA_RESOURCE_PATH = "/swordv2/edit-media";
+    private final String CONTAINER_PATH = "/swordv2/edit";
+    private final String STATEMENT_PATH = "/swordv2/statement";
 
     @Before
     public void onlyRunIfConfigExists() {
@@ -58,7 +63,7 @@ public class Swordv2IT extends AbstractWebClientIntegrationTest {
 
     @Test
     public void serviceDocumentUnauthorizedTest() throws Exception {
-        // Attempt to load the ServiceDocument without first authenticating
+        // Attempt to GET the ServiceDocument without first authenticating
         ResponseEntity<String> response = getResponseAsString(SERVICE_DOC_PATH);
         // Expect a 401 response code
         assertThat(response.getStatusCode(), equalTo(HttpStatus.UNAUTHORIZED));
@@ -66,7 +71,7 @@ public class Swordv2IT extends AbstractWebClientIntegrationTest {
 
     @Test
     public void serviceDocumentTest() throws Exception {
-        // Attempt to load the ServiceDocument as an Admin user.
+        // Attempt to GET the ServiceDocument as an Admin user.
         ResponseEntity<String> response = getResponseAsString(SERVICE_DOC_PATH,
                                                               admin.getEmail(), password);
         // Expect a 200 response code, and an ATOM UTF-8 document
@@ -74,9 +79,69 @@ public class Swordv2IT extends AbstractWebClientIntegrationTest {
         assertThat(response.getHeaders().getContentType().toString(),
                    equalTo("application/atomserv+xml;charset=UTF-8"));
 
-        // Check for SWORD version in response body
+        // Check for correct SWORD version in response body
         assertThat(response.getBody(),
                    containsString("<version xmlns=\"http://purl.org/net/sword/terms/\">2.0</version>"));
+    }
+
+    @Test
+    public void collectionUnauthorizedTest() throws Exception {
+        // Attempt to POST to /collection endpoint without sending authentication information
+        ResponseEntity<String> response = postResponseAsString(COLLECTION_PATH, null, null, null);
+        // Expect a 401 response code
+        assertThat(response.getStatusCode(), equalTo(HttpStatus.UNAUTHORIZED));
+    }
+
+    @Test
+    @Ignore
+    public void collectionTest() throws Exception {
+        // TODO: Actually test collection endpoint via SWORDv2.
+        // Currently, we are just ensuring the /collection endpoint exists (see above) and isn't throwing a 404
+    }
+
+    @Test
+    public void mediaResourceUnauthorizedTest() throws Exception {
+        // Attempt to POST to /mediaresource endpoint without sending authentication information
+        ResponseEntity<String> response = postResponseAsString(MEDIA_RESOURCE_PATH, null, null, null);
+        // Expect a 401 response code
+        assertThat(response.getStatusCode(), equalTo(HttpStatus.UNAUTHORIZED));
+    }
+
+    @Test
+    @Ignore
+    public void mediaResourceTest() throws Exception {
+        // TODO: Actually test this endpoint via SWORDv2.
+        // Currently, we are just ensuring the /mediaresource endpoint exists (see above) and isn't throwing a 404
+    }
+
+    @Test
+    public void containerUnauthorizedTest() throws Exception {
+        // Attempt to POST to /container endpoint without sending authentication information
+        ResponseEntity<String> response = postResponseAsString(CONTAINER_PATH, null, null, null);
+        // Expect a 401 response code
+        assertThat(response.getStatusCode(), equalTo(HttpStatus.UNAUTHORIZED));
+    }
+
+    @Test
+    @Ignore
+    public void containerTest() throws Exception {
+        // TODO: Actually test this endpoint via SWORDv2.
+        // Currently, we are just ensuring the /container endpoint exists (see above) and isn't throwing a 404
+    }
+
+    @Test
+    public void statementUnauthorizedTest() throws Exception {
+        // Attempt to GET /statement endpoint without sending authentication information
+        ResponseEntity<String> response = getResponseAsString(STATEMENT_PATH);
+        // Expect a 401 response code
+        assertThat(response.getStatusCode(), equalTo(HttpStatus.UNAUTHORIZED));
+    }
+
+    @Test
+    @Ignore
+    public void statementTest() throws Exception {
+        // TODO: Actually test this endpoint via SWORDv2.
+        // Currently, we are just ensuring the /statement endpoint exists (see above) and isn't throwing a 404
     }
 }
 
