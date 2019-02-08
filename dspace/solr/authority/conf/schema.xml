@@ -39,7 +39,8 @@
     <fieldType name="date"
                class="solr.DatePointField"
                sortMissingLast="true"
-               omitNorms="true"/>
+               omitNorms="true"
+               docValues="true"/>
 
     <fieldType name="text"
                class="solr.TextField"
