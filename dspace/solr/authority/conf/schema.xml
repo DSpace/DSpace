@@ -16,6 +16,12 @@
  limitations under the License.
 -->
 
+<!--
+    This is the DSpace "authority" core, which holds records of attributions
+    provided by some metadata authority.
+    See dspace-api:org.dspace.authority.AuthoritySolrServiceImpl.
+-->
+
 <schema name="authority" version="1.1">
 
   <types>

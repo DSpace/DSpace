@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
+<!--
+    This is the DSpace "xoai" core.
+    See dspace-oai.
+-->
+
 <schema name="xoai" version="1.2">
   <types>
     <fieldtype name="lengthfilter" class="solr.TextField">
