@@ -380,6 +380,7 @@ public class DashStats extends AbstractCurationTask {
                                        userAgent + "\t" +
                                        filename + "\t" +
                                        "Dryad Digital Repository \t" + //publisher
+                                       "grid.466587.e\t" + //publisher_id
                                        packageAuthors + "\t" +
                                        dateAccessioned + "\t" +
                                        "1 \t" +  //version
