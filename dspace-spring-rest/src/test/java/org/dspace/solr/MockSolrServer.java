@@ -120,6 +120,17 @@ public class MockSolrServer {
     }
 
     /**
+     * Remove all records.
+     */
+    public void reset() {
+        try {
+            solrServer.deleteByQuery("*:*");
+        } catch (SolrServerException | IOException ex) {
+            log.warn("Exception while clearing '{}' core", coreName, ex);
+        }
+    }
+
+    /**
      * Decrease the reference count for connection to the current core.
      * If now zero, shut down the connection and discard it.  If no connections
      * remain, destroy the container.

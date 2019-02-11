@@ -26,11 +26,18 @@ public class MockSolrServiceImpl extends SolrServiceImpl implements Initializing
 
     private MockSolrServer mockSolrServer;
 
+    @Override
     public void afterPropertiesSet() throws Exception {
         mockSolrServer = new MockSolrServer("search");
         solr = mockSolrServer.getSolrServer();
     }
 
+    /** Clear all records from the search core. */
+    public void reset() {
+        mockSolrServer.reset();
+    }
+
+    @Override
     public void destroy() throws Exception {
         mockSolrServer.destroy();
     }
