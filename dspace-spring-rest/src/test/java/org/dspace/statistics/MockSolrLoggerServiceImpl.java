@@ -92,6 +92,11 @@ public class MockSolrLoggerServiceImpl
         super.postWorkflow(usageWorkflowEvent);
     }
 
+    /** Remove all records. */
+    public void reset() {
+        mockSolrServer.reset();
+    }
+
     @Override
     public void destroy() throws Exception {
         mockSolrServer.destroy();

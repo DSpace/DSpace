@@ -20,11 +20,14 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Community;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
+import org.dspace.discovery.MockSolrServiceImpl;
+import org.dspace.discovery.SearchService;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.storage.rdbms.DatabaseUtils;
 import org.jdom.Document;
 import org.junit.After;
@@ -163,7 +166,9 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
      * clean resources initialized by the @Before methods.
      *
      * Other methods can be annotated with @After here or in subclasses
-     * but no execution order is guaranteed
+     * but no execution order is guaranteed.
+     *
+     * @throws java.lang.Exception passed through.
      */
     @After
     public void destroy() throws Exception {
@@ -172,6 +177,12 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
             AbstractBuilder.cleanupObjects();
             parentCommunity = null;
             cleanupContext();
+
+            // Clear the search core.
+            MockSolrServiceImpl searchService = DSpaceServicesFactory.getInstance()
+                    .getServiceManager()
+                    .getServiceByName(SearchService.class.getName(), MockSolrServiceImpl.class);
+            searchService.reset();
 
             // NOTE: we explicitly do NOT destroy our default eperson & admin as they
             // are cached and reused for all tests. This speeds up all tests.
