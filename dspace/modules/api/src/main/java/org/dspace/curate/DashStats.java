@@ -74,6 +74,7 @@ import org.apache.log4j.Logger;
 public class DashStats extends AbstractCurationTask {
 
     private static Logger log = Logger.getLogger(DashStats.class);
+    private static final int STATS_PAGE_SIZE = 100;
     private static boolean headersReported = false;
     private IdentifierService identifierService = null;
     DocumentBuilderFactory dbf = null;
@@ -258,43 +259,53 @@ public class DashStats extends AbstractCurationTask {
                            );
                     headersReported = true;
                 }
+
+                //  Keep processing views while there are more pages of views to process
+                int numSeenViews = 0;
+                int totalPackageViews = 1; // starts at 1, but will be reset when an actual number comes in
+                while(totalPackageViews > numSeenViews) {
+                    URL pageviewsURL = new URL("http://datadryad.org/solr/statistics/select/?rows=" + STATS_PAGE_SIZE +
+                                               "&q=id:" + item.getID() +
+                                               "&start=" + numSeenViews);
+
+                    log.debug("fetching pageviews " + pageviewsURL);
+                    Document viewsdoc = docb.parse(pageviewsURL.openStream());
+                    NodeList nl = viewsdoc.getElementsByTagName("result");
+                    String viewsAtt = nl.item(0).getAttributes().getNamedItem("numFound").getTextContent();
+                    totalPackageViews = Integer.parseInt(viewsAtt);
+                    log.debug("number of pageviews " + totalPackageViews);
                 
-                URL pageviewsURL = new URL("http://datadryad.org/solr/statistics/select/?rows=10000000&q=id:" + item.getID());
-                log.debug("fetching pageviews " + pageviewsURL);
-                Document viewsdoc = docb.parse(pageviewsURL.openStream());
-                NodeList nl = viewsdoc.getElementsByTagName("result");
-                String viewsAtt = nl.item(0).getAttributes().getNamedItem("numFound").getTextContent();
-                int currViews = Integer.parseInt(viewsAtt);
-                log.debug("number of pageviews " + currViews);
-                NodeList viewNodes = nl.item(0).getChildNodes();
-                log.debug("number of nodes returned " + viewNodes.getLength());
-                for(int i = 0; i < viewNodes.getLength(); i++) {
-                    Node aView = viewNodes.item(i);
-                    String eventTime = getNamedChildText(aView, "time");
-                    String clientIP = getNamedChildText(aView, "ip");
-                    String userAgent = getNamedChildText(aView, "userAgent");
-                    report(eventTime + "\t" +
-                           clientIP + "\t" +
-                           "-\t" +  //session_cookie_id
-                           "-\t" +  //user_cookie_id
-                           "-\t" +  //user__id
-                           "https://datadryad.org/resource/" + packageDOI + "\t" +
-                           packageDOI + "\t" +
-                           "-\t" +  //filename
-                           "-\t" +  //size
-                           userAgent + "\t" +
-                           packageTitle + "\t" +
-                           "Dryad Digital Repository\t" + //publisher
-                           "grid.466587.e\t" + //publisher_id
-                           packageAuthors + "\t" +
-                           dateAccessioned + "\t" +
-                           "1\t" +  //version
-                           "-\t" +  //other_id
-                           "https://datadryad.org/resource/" + packageDOI + "\t" +
-                           publicationYear
-                           );
+                    NodeList viewNodes = nl.item(0).getChildNodes();
+                    int numCurrentViews = viewNodes.getLength();
+                    log.debug("number of nodes returned " + numCurrentViews);
+                    for(int i = 0; i < numCurrentViews; i++) {
+                        Node aView = viewNodes.item(i);
+                        String eventTime = getNamedChildText(aView, "time");
+                        String clientIP = getNamedChildText(aView, "ip");
+                        String userAgent = getNamedChildText(aView, "userAgent");
+                        report(eventTime + "\t" +
+                               clientIP + "\t" +
+                               "-\t" +  //session_cookie_id
+                               "-\t" +  //user_cookie_id
+                               "-\t" +  //user__id
+                               "https://datadryad.org/resource/" + packageDOI + "\t" +
+                               packageDOI + "\t" +
+                               "-\t" +  //filename
+                               "-\t" +  //size
+                               userAgent + "\t" +
+                               packageTitle + "\t" +
+                               "Dryad Digital Repository\t" + //publisher
+                               "grid.466587.e\t" + //publisher_id
+                               packageAuthors + "\t" +
+                               dateAccessioned + "\t" +
+                               "1\t" +  //version
+                               "-\t" +  //other_id
+                               "https://datadryad.org/resource/" + packageDOI + "\t" +
+                               publicationYear
+                               );
+                    }
+                    numSeenViews = numSeenViews + numCurrentViews;
                 }
-                
                 // ================= START DATA FILES ================
                 
 		// count the files, and compute statistics that depend on the files
@@ -329,44 +340,55 @@ public class DashStats extends AbstractCurationTask {
                         String filename = bitstream.getName();
                         Long fileSize = bitstream.getSize();
                         String fileDOI = ddf.getIdentifier();
-                                              
-			// must use the DSpace item ID, since the solr stats system is based on this ID
-			// The SOLR address is hardcoded to the production system here, because even when we run on test servers,
-			// it's easiest to use the real stats --the test servers typically don't have useful stats available
-			URL downloadStatURL = new URL("http://datadryad.org/solr/statistics/select/?rows=1000000&q=owningItem:" + fileItem.getID());
-			log.debug("fetching " + downloadStatURL);
-			Document downloadsdoc = docb.parse(downloadStatURL.openStream());
-			NodeList dnl = downloadsdoc.getElementsByTagName("result");
-			String downloadsAtt = dnl.item(0).getAttributes().getNamedItem("numFound").getTextContent();
-			int currDownloads = Integer.parseInt(downloadsAtt);
-                        log.debug("number of downloads " + currDownloads);
-                        NodeList dlNodes = dnl.item(0).getChildNodes();
-                        log.debug("number of nodes returned " + dlNodes.getLength());
 
-                        for(int j = 0; j < dlNodes.getLength(); j++) {
-                            Node aDownload = dlNodes.item(j);
-                            String eventTime = getNamedChildText(aDownload, "time");
-                            String clientIP = getNamedChildText(aDownload, "ip");
-                            String userAgent = getNamedChildText(aDownload, "userAgent");
-                            report(eventTime + "\t" +
-                                   clientIP + "\t" +
-                                   "- \t" +  //session_cookie_id
-                                   "- \t" +  //user_cookie_id
-                                   "- \t" +  //user__id
-                                   "https://datadryad.org/resource/" + fileDOI + "\t" +
-                                   packageDOI + "\t" +
-                                   filename + "\t" +
-                                   fileSize + "\t" +
-                                   userAgent + "\t" +
-                                   filename + "\t" +
-                                   "Dryad Digital Repository \t" + //publisher
-                                   packageAuthors + "\t" +
-                                   dateAccessioned + "\t" +
-                                   "1 \t" +  //version
-                                   "- \t" +  //other_id
-                                   "https://datadryad.org/resource/" + fileDOI + "\t" +
-                                   publicationYear
-                                   );
+
+                        //  Keep processing downloads while there are more pages of downloads to process
+                        int numSeenDownloads = 0;
+                        int totalFileDownloads = 1; // starts at 1, but will be reset when an actual number comes in
+                        while(totalFileDownloads > numSeenDownloads) {
+                    
+                            // must use the DSpace item ID, since the solr stats system is based on this ID
+                            // The SOLR address is hardcoded to the production system here, because even when we run on test servers,
+                            // it's easiest to use the real stats --the test servers typically don't have useful stats available
+                            URL downloadStatURL = new URL("http://datadryad.org/solr/statistics/select/?rows=" + STATS_PAGE_SIZE +
+                                                          "&q=owningItem:" + fileItem.getID() +
+                                                          "&start=" + numSeenDownloads);
+                            log.debug("fetching " + downloadStatURL);
+                            Document downloadsdoc = docb.parse(downloadStatURL.openStream());
+                            NodeList dnl = downloadsdoc.getElementsByTagName("result");
+                            String downloadsAtt = dnl.item(0).getAttributes().getNamedItem("numFound").getTextContent();
+                            totalFileDownloads = Integer.parseInt(downloadsAtt);
+                            log.debug("total of downloads " + totalFileDownloads);
+                            
+                            NodeList dlNodes = dnl.item(0).getChildNodes();
+                            int numCurrentDownloads = dlNodes.getLength();
+                            log.debug("number of nodes returned " + numCurrentDownloads);
+                            for(int j = 0; j < numCurrentDownloads; j++) {
+                                Node aDownload = dlNodes.item(j);
+                                String eventTime = getNamedChildText(aDownload, "time");
+                                String clientIP = getNamedChildText(aDownload, "ip");
+                                String userAgent = getNamedChildText(aDownload, "userAgent");
+                                report(eventTime + "\t" +
+                                       clientIP + "\t" +
+                                       "- \t" +  //session_cookie_id
+                                       "- \t" +  //user_cookie_id
+                                       "- \t" +  //user__id
+                                       "https://datadryad.org/resource/" + fileDOI + "\t" +
+                                       packageDOI + "\t" +
+                                       filename + "\t" +
+                                       fileSize + "\t" +
+                                       userAgent + "\t" +
+                                       filename + "\t" +
+                                       "Dryad Digital Repository \t" + //publisher
+                                       packageAuthors + "\t" +
+                                       dateAccessioned + "\t" +
+                                       "1 \t" +  //version
+                                       "- \t" +  //other_id
+                                       "https://datadryad.org/resource/" + fileDOI + "\t" +
+                                       publicationYear
+                                       );
+                            }
+                            numSeenDownloads = numSeenDownloads + numCurrentDownloads;
                         }
                     }
                 }
