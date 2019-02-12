@@ -35,7 +35,7 @@
        that you fully re-index after changing this setting as it can
        affect both how text is indexed and queried.
   -->
-  <luceneMatchVersion>4.10</luceneMatchVersion>
+  <luceneMatchVersion>7.2.1</luceneMatchVersion>
 
   <!-- <lib/> directives can be used to instruct Solr to load an Jars
        identified and use them to resolve any "plugins" specified in
@@ -93,6 +93,11 @@
   <!--
      <lib path="../a-jar-that-does-not-exist.jar" /> 
   -->
+
+  <lib dir='${solr.install.dir}/contrib/analysis-extras/lib/'
+       regex='icu4j-.*\.jar'/>
+  <lib dir='${solr.install.dir}/contrib/analysis-extras/lucene-libs/'
+       regex='lucene-analyzers-icu-.*\.jar'/>
   
   <!-- Data Directory
 
@@ -1024,14 +1029,9 @@
   </requestHandler>
 
   <!-- for back compat with clients using /update/json and /update/csv -->  
-  <requestHandler name="/update/json" class="solr.JsonUpdateRequestHandler">
+  <requestHandler name="/update/json" class="solr.UpdateRequestHandler">
         <lst name="defaults">
          <str name="stream.contentType">application/json</str>
-       </lst>
-  </requestHandler>
-  <requestHandler name="/update/csv" class="solr.CSVRequestHandler">
-        <lst name="defaults">
-         <str name="stream.contentType">application/csv</str>
        </lst>
   </requestHandler>
 
@@ -1112,22 +1112,20 @@
                   class="solr.DocumentAnalysisRequestHandler" 
                   startup="lazy" />
 
-  <!-- Admin Handlers
+  <!-- Admin Handlers -->
+  <requestHandler name="/admin/luke"
+                  class="solr.admin.LukeRequestHandler" />
+  <requestHandler name="/admin/system"
+                  class="solr.admin.SystemInfoHandler" />
+  <requestHandler name="/admin/plugins"
+                  class="solr.admin.PluginInfoHandler" />
+  <requestHandler name="/admin/threads"
+                  class="solr.admin.ThreadDumpHandler" />
+  <requestHandler name="/admin/properties"
+                  class="solr.admin.PropertiesRequestHandler" />
+  <requestHandler name="/admin/file"
+                  class="solr.admin.ShowFileRequestHandler" />
 
-       Admin Handlers - This will register all the standard admin
-       RequestHandlers.  
-    -->
-  <requestHandler name="/admin/" 
-                  class="solr.admin.AdminHandlers" />
-  <!-- This single handler is equivalent to the following... -->
-  <!--
-     <requestHandler name="/admin/luke"       class="solr.admin.LukeRequestHandler" />
-     <requestHandler name="/admin/system"     class="solr.admin.SystemInfoHandler" />
-     <requestHandler name="/admin/plugins"    class="solr.admin.PluginInfoHandler" />
-     <requestHandler name="/admin/threads"    class="solr.admin.ThreadDumpHandler" />
-     <requestHandler name="/admin/properties" class="solr.admin.PropertiesRequestHandler" />
-     <requestHandler name="/admin/file"       class="solr.admin.ShowFileRequestHandler" >
-    -->
   <!-- If you wish to hide files under ${solr.home}/conf, explicitly
        register the ShowFileRequestHandler using: 
     -->
