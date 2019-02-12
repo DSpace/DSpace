@@ -84,17 +84,6 @@
             </modules>
         </profile>
         <profile>
-            <id>dspace-solr</id>
-            <activation>
-                <file>
-                    <exists>solr/pom.xml</exists>
-                </file>
-            </activation>
-            <modules>
-                <module>solr</module>
-            </modules>
-        </profile>
-        <profile>
             <id>dspace-oai</id>
             <activation>
                 <file>
