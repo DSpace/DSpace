@@ -32,8 +32,16 @@ public class DSpaceSolrSearch {
 
     public static SolrDocumentList query(SolrClient server, SolrQuery solrParams)
         throws DSpaceSolrException, IOException {
+        solrParams.addSort("item.id", ORDER.asc);
+        // No longer can set default search field in the schema
+        if (null == solrParams.get("df")) {
+            solrParams.set("df", "item.handle");
+        }
+        // No longer can set default match operator in the schema
+        if (null == solrParams.get("q.op")) {
+            solrParams.set("q.op", "OR");
+        }
         try {
-            solrParams.addSort("item.id", ORDER.asc);
             QueryResponse response = server.query(solrParams);
             return response.getResults();
         } catch (SolrServerException ex) {
