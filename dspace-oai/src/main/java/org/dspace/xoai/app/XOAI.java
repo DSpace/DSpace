@@ -360,7 +360,7 @@ public class XOAI {
     private SolrInputDocument index(Item item)
             throws SQLException, IOException, XMLStreamException, WritingXmlException {
         SolrInputDocument doc = new SolrInputDocument();
-        doc.addField("item.id", item.getID());
+        doc.addField("item.id", item.getID().toString());
 
         String handle = item.getHandle();
         doc.addField("item.handle", handle);
