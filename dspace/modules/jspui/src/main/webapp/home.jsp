@@ -133,7 +133,11 @@ if (submissions != null && submissions.count() > 0)
 	    	       width = 36;
 	    	    }
 	%>
-	    <a href="<%= request.getContextPath() %>/feed/<%= fmts[j] %>/site"><img src="<%= request.getContextPath() %>/image/<%= icon %>" alt="RSS Feed" width="<%= width %>" height="15" style="margin: 3px 0 3px" /></a>
+	  <!--  <a href="<%= request.getContextPath() %>/feed/<%= fmts[j] %>/site">Transformar a las personas a través de una formación integral de calidad, mediante 
+                compromiso, ética, respeto y pertinencia social, con la participación de la comunidad
+                universitaria, impulsando el desarrollo regional, estatal y nacional, de manera sustentable,
+                mediante investigación de alto nivel que impacte a los diferentes sectores de la sociedad,
+                proyectando la imagen de la universidad en el ámbito internacional.<img src="<%= request.getContextPath() %>/image/<%= icon %>" alt="RSS Feed" width="<%= width %>" height="15" style="margin: 3px 0 3px" /></a>-->
 	<%
 	    	}
 	    }
@@ -205,7 +209,7 @@ if (communities != null && communities.size() != 0)
                 <div class="row container">
                	<div class="col-md-3"></div>
                 <div class="col-md-6">
-                <h3 style="padding-bottom: 2%; color: #410401">Comunidades</h3>
+                <h3 style="padding-bottom: 2%; color: #410401">Comunidades</h3> <!--comunidades-->
 				<div class="list-group" style="display: block;">
 <%
 	boolean showLogos = configurationService.getBooleanProperty("jspui.home-page.logos", true);
@@ -258,5 +262,16 @@ if (communities != null && communities.size() != 0)
 	<%@ include file="discovery/static-tagcloud-facet.jsp" %>
 </div>
 	
+	<div class="row" >
+		<div class="container" style="max-width: 1000px; border-top: 1px solid #6b6b6b;">
+			<h4 style="text-align: center; font-size: 14px; color: #4c000e;">Misión del repositorio</h4>
+			<p style="color: #6b6b6b; font-size: 12px; text-align: justify;">
+				Es una plataforma que emplea estándares internacionales y mecanismos de acceso abierto para albergar publicaciones e información académica, científica y tecnológica generada en nuestra institución. La visibilidad de esta producción se logra a través de la conexión con el Repositorio Nacional (RN) de CONACYT. 
+
+				El RI-UTM funcionará como una memoria institucional, difundiendo y preservando la producción científica evaluada por pares de la comunidad de manera libre, inmediata, gratuita y protegida. Gracias a esta difusión se fomentarán las discusiones académicas, se crearán comunidades de colaboración y se acelerará el desarrollo del conocimiento
+	        </p>
+        </div>
+	</div>
+
 </div>
 </dspace:layout>

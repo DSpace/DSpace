@@ -24,6 +24,7 @@
 <%@ page import="javax.servlet.jsp.jstl.core.*" %>
 <%@ page import="javax.servlet.jsp.jstl.fmt.*" %>
 
+
 <%
     String title = (String) request.getAttribute("dspace.layout.title");
     String navbar = (String) request.getAttribute("dspace.layout.navbar");
@@ -94,7 +95,6 @@
     <%
     }
     %>
-    
 
 <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
 <!--[if lt IE 9]>
@@ -130,8 +130,16 @@
 
 <main id="content" role="main" style="margin-top: -9px; background-color: #eee;">
 <!--<div class="container banner" style="text-align: center;" > -->
-    <div class="row" style= "background-image: url('<%= request.getContextPath() %>/image/fondito.jpg') ; background-repeat: no-repeat ; background-size: cover; background-position: center; text-align: center; padding: 2% 2%">
-        <img src="<%= request.getContextPath() %>/image/logo_rep.png" alt="Repositorio UTM" align="middle" />
+   
+
+    <div class="row" style= "display: block; background-image: url('<%= request.getContextPath() %>/image/fondito.jpg') ; background-repeat: no-repeat ; background-size: cover; background-position: center; text-align: center; padding: 2% 2%;">
+
+    <div style="width: 20%; height: 100%">
+                <div class="box2"> </div>
+                 <div class="box3"> </div>
+        </div>
+
+        <img  src="<%= request.getContextPath() %>/image/logo_rep.png" alt="Repositorio UTM" align="middle" />
         <!--<div class="col-md-9 brand">
             <h1><fmt:message key="jsp.layout.header-default.brand.heading" /></h1>
             <fmt:message key="jsp.layout.header-default.brand.description" /> 

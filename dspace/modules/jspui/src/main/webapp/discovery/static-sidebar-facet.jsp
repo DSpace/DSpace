@@ -64,7 +64,7 @@
 <!--<h3 class="facets"><fmt:message key="jsp.search.facet.refine" /></h3>-->
 				<div class="row container">
                 <div class="col-md-10">
-<h3 style="color: #410401">Consulta</h3>
+<h3 style="color: #410401">Consulta</h3> <!--consulta-->
 <div id="facets" class="facetsBox row panel" style="background-color: inherit;">
 <%
 	for (DiscoverySearchFilterFacet facetConf : facetsConf)
@@ -81,49 +81,61 @@
  	    }
 	    String fkey = "jsp.search.facet.refine."+f;
 	    int limit = facetConf.getFacetLimit()+1;
-	    %><div id="facet_<%= f %>" class="facet col-md-<%= discovery_facet_cols %>">
-	    <span class="facetName" style="color: #5b0d02"><fmt:message key="<%= fkey %>" /></span>
-	    <ul class="list-group"><%
-	    int idx = 1;
-	    int currFp = UIUtil.getIntParameter(request, f+"_page");
-	    if (currFp < 0)
-	    {
-	        currFp = 0;
-	    }
-	    if (facet != null)
-	    {
-		    for (FacetResult fvalue : facet)
-		    { 
-		        if (idx != limit)
-		        {
-		        %><li class="list-group-item"><span class="badge"><%= fvalue.getCount() %></span> <a href="<%= request.getContextPath()
-		            + searchScope
-	                + "/simple-search?filterquery="+URLEncoder.encode(fvalue.getAsFilterQuery(),"UTF-8")
-	                + "&amp;filtername="+URLEncoder.encode(f,"UTF-8")
-	                + "&amp;filtertype="+URLEncoder.encode(fvalue.getFilterType(),"UTF-8") %>"
-	                title="<fmt:message key="jsp.search.facet.narrow"><fmt:param><%=fvalue.getDisplayedValue() %></fmt:param></fmt:message>">
-	                <%= StringUtils.abbreviate(fvalue.getDisplayedValue(),36) %></a></li><%
-		        }
-		        idx++;
-		    }
-		    if (currFp > 0 || idx > limit)
-		    {
-		        %><li class="list-group-item"><span style="visibility: hidden;">.</span>
-		        <% if (currFp > 0) { %>
-		        <a class="pull-left" href="<%= request.getContextPath()
-		                + searchScope
-		                + "?"+f+"_page="+(currFp-1) %>"><fmt:message key="jsp.search.facet.refine.previous" /></a>
-	            <% } %>
-	            <% if (idx > limit) { %>
-	            <a href="<%= request.getContextPath()
-		            + searchScope
-	                + "?"+f+"_page="+(currFp+1) %>"><span class="pull-right"><fmt:message key="jsp.search.facet.refine.next" /></span></a>
-	            <%
-	            }
-	            %></li><%
-		    }
-	    }
-	    %></ul></div><%
+	    %>
+	    
+	    <%
+	   	 	String nombres[] = {"Autor", "Tema", "Fecha"};
+	    	int i=0;
+	    %>
+
+	    <div id="facet_<%= f %>" class="facet col-md-<%= discovery_facet_cols %>">
+		   <span class="facetName" style="color: #5b0d02"><fmt:message key="<%= fkey %>" /></span>  <!--nombres de las columnas-->
+		   <!--<span class="facetName" style="color: #5b0d02"> <%=nombres[i]%></span>-->
+
+		   <%i = i+1;%> <!--termina for-->
+		    <ul class="list-group"><%
+			    int idx = 1;
+			    int currFp = UIUtil.getIntParameter(request, f+"_page");
+			    if (currFp < 0)
+			    {
+			        currFp = 0;
+			    }
+			    if (facet != null)
+			    {
+				    for (FacetResult fvalue : facet)
+				    { 
+				        if (idx != limit)
+				        {
+				        %><li class="list-group-item"><span class="badge"><%= fvalue.getCount() %></span> <a href="<%= request.getContextPath()
+				            + searchScope
+			                + "/simple-search?filterquery="+URLEncoder.encode(fvalue.getAsFilterQuery(),"UTF-8")
+			                + "&amp;filtername="+URLEncoder.encode(f,"UTF-8")
+			                + "&amp;filtertype="+URLEncoder.encode(fvalue.getFilterType(),"UTF-8") %>"
+			                title="<fmt:message key="jsp.search.facet.narrow"><fmt:param><%=fvalue.getDisplayedValue() %></fmt:param></fmt:message>">
+			                <%= StringUtils.abbreviate(fvalue.getDisplayedValue(),36) %></a></li><%
+				        }
+				        idx++;
+				    }
+				    if (currFp > 0 || idx > limit)
+				    {
+				        %><li class="list-group-item"><span style="visibility: hidden;">.</span>
+				        <% if (currFp > 0) { %>
+				        <a class="pull-left" href="<%= request.getContextPath()
+				                + searchScope
+				                + "?"+f+"_page="+(currFp-1) %>"><fmt:message key="jsp.search.facet.refine.previous" /></a>
+			            <% } %>
+			            <% if (idx > limit) { %>
+			            <a href="<%= request.getContextPath()
+				            + searchScope
+			                + "?"+f+"_page="+(currFp+1) %>"><span class="pull-right"><fmt:message key="jsp.search.facet.refine.next" /></span></a>
+			            <%
+			            }
+			            %></li><%
+				    }
+			    }
+			    %>
+		    </ul>
+	    </div><%
 	}
 %></div>
 </div><!---add-->
