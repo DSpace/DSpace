@@ -51,9 +51,7 @@ public class DSpaceSolrSearch {
 
     public static SolrDocument querySingle(SolrClient server, SolrQuery solrParams)
         throws SolrSearchEmptyException, IOException {
-        try {
-            solrParams.addSort("item.id", ORDER.asc);
-        // No longer can set default search field in the schema
+        solrParams.addSort("item.id", ORDER.asc);
         if (null == solrParams.get("df")) {
             solrParams.set("df", "item.handle");
         }
@@ -61,6 +59,8 @@ public class DSpaceSolrSearch {
         if (null == solrParams.get("q.op")) {
             solrParams.set("q.op", "OR");
         }
+        try {
+        // No longer can set default search field in the schema
             QueryResponse response = server.query(solrParams);
             if (response.getResults().getNumFound() > 0) {
                 return response.getResults().get(0);
