@@ -37,6 +37,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+/**
+ * Integration tests for the {@link org.dspace.app.rest.repository.MetadataFieldRestRepository}
+ * This class will include all the tests for the logic with regards to the
+ * {@link org.dspace.app.rest.repository.MetadataFieldRestRepository}
+ */
 public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     private static final String ELEMENT = "test element";
@@ -66,14 +71,15 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
         context.turnOffAuthorisationSystem();
         MetadataField metadataField = MetadataFieldBuilder
             .createMetadataField(context, "AnElement", "AQualifier", "AScopeNote").build();
+        context.restoreAuthSystemState();
 
         getClient().perform(get("/api/core/metadatafields")
-                        .param("size", String.valueOf(100)))
+                                .param("size", String.valueOf(100)))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$._embedded.metadatafields", Matchers.hasItems(
-                           MetadataFieldMatcher.matchMetadataFieldByKeys("dc","title", null),
-                           MetadataFieldMatcher.matchMetadataFieldByKeys("dc","date", "issued"))
+                       MetadataFieldMatcher.matchMetadataFieldByKeys("dc", "title", null),
+                       MetadataFieldMatcher.matchMetadataFieldByKeys("dc", "date", "issued"))
                    ))
                    .andExpect(jsonPath("$._links.first.href", Matchers.containsString("/api/core/metadatafields")))
                    .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/metadatafields")))
@@ -89,6 +95,7 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
         context.turnOffAuthorisationSystem();
         MetadataField metadataField = MetadataFieldBuilder
             .createMetadataField(context, "AnElement", "AQualifier", "AScopeNote").build();
+        context.restoreAuthSystemState();
 
         getClient().perform(get("/api/core/metadatafields/" + metadataField.getID()))
                    .andExpect(status().isOk())
@@ -100,7 +107,6 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
 
     @Test
     public void searchMethodsExist() throws Exception {
-        context.turnOffAuthorisationSystem();
 
         getClient().perform(get("/api/core/metadatafields"))
                    .andExpect(jsonPath("$._links.search.href", notNullValue()));
@@ -116,39 +122,39 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
 
         context.turnOffAuthorisationSystem();
         MetadataSchema schema = MetadataSchemaBuilder.createMetadataSchema(context, "ASchema",
-                "http://www.dspace.org/ns/aschema").build();
+                                                                           "http://www.dspace.org/ns/aschema").build();
 
         MetadataField metadataField = MetadataFieldBuilder
             .createMetadataField(context, schema, "AnElement", "AQualifier", "AScopeNote").build();
+        context.restoreAuthSystemState();
 
         getClient().perform(get("/api/core/metadatafields/search/bySchema")
-                        .param("schema", "dc")
-                        .param("size", String.valueOf(100)))
+                                .param("schema", "dc")
+                                .param("size", String.valueOf(100)))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$._embedded.metadatafields", Matchers.hasItems(
-                       MetadataFieldMatcher.matchMetadataFieldByKeys("dc","title", null),
-                       MetadataFieldMatcher.matchMetadataFieldByKeys("dc","date", "issued"))
+                       MetadataFieldMatcher.matchMetadataFieldByKeys("dc", "title", null),
+                       MetadataFieldMatcher.matchMetadataFieldByKeys("dc", "date", "issued"))
                    ))
                    .andExpect(jsonPath("$.page.size", is(100)));
 
         getClient().perform(get("/api/core/metadatafields/search/bySchema")
-                .param("schema", schema.getName()))
-           .andExpect(status().isOk())
-           .andExpect(content().contentType(contentType))
-           .andExpect(jsonPath("$._embedded.metadatafields", Matchers.hasItem(
-                   MetadataFieldMatcher.matchMetadataField(metadataField))
-           ))
-           .andExpect(jsonPath("$.page.size", is(20)))
-           .andExpect(jsonPath("$.page.totalElements", is(1)));
+                                .param("schema", schema.getName()))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$._embedded.metadatafields", Matchers.hasItem(
+                       MetadataFieldMatcher.matchMetadataField(metadataField))
+                   ))
+                   .andExpect(jsonPath("$.page.size", is(20)))
+                   .andExpect(jsonPath("$.page.totalElements", is(1)));
     }
 
     @Test
     public void findByUndefinedSchema() throws Exception {
-        context.turnOffAuthorisationSystem();
 
         getClient().perform(get("/api/core/metadatafields/search/bySchema")
-                        .param("schema", "undefined"))
+                                .param("schema", "undefined"))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$.page.size", is(20)))
@@ -157,7 +163,6 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
 
     @Test
     public void findByNullSchema() throws Exception {
-        context.turnOffAuthorisationSystem();
 
         getClient().perform(get("/api/core/metadatafields/search/bySchema"))
                    .andExpect(status().isUnprocessableEntity());
@@ -165,7 +170,6 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
 
     @Test
     public void createSuccess() throws Exception {
-        context.turnOffAuthorisationSystem();
 
         MetadataFieldRest metadataFieldRest = new MetadataFieldRest();
         metadataFieldRest.setElement("testElementForCreate");
@@ -178,12 +182,12 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
         assertThat(metadataFieldService.findByElement(context, metadataSchema, ELEMENT, QUALIFIER), nullValue());
 
         getClient(authToken)
-                .perform(post("/api/core/metadatafields")
-                        .param("schemaId", metadataSchema.getID() + "")
-                        .content(new ObjectMapper().writeValueAsBytes(metadataFieldRest))
-                        .contentType(contentType))
-                .andExpect(status().isCreated())
-                .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
+            .perform(post("/api/core/metadatafields")
+                         .param("schemaId", metadataSchema.getID() + "")
+                         .content(new ObjectMapper().writeValueAsBytes(metadataFieldRest))
+                         .contentType(contentType))
+            .andExpect(status().isCreated())
+            .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
 
         getClient(authToken).perform(get("/api/core/metadatafields/" + idRef.get()))
                             .andExpect(status().isOk())
@@ -193,7 +197,6 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
 
     @Test
     public void createUnauthorized() throws Exception {
-        context.turnOffAuthorisationSystem();
 
         MetadataFieldRest metadataFieldRest = new MetadataFieldRest();
         metadataFieldRest.setElement(ELEMENT);
@@ -201,16 +204,15 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
         metadataFieldRest.setScopeNote(SCOPE_NOTE);
 
         getClient()
-                .perform(post("/api/core/metadatafields")
-                        .param("schemaId", metadataSchema.getID() + "")
-                        .content(new ObjectMapper().writeValueAsBytes(metadataFieldRest))
-                        .contentType(contentType))
-                .andExpect(status().isUnauthorized());
+            .perform(post("/api/core/metadatafields")
+                         .param("schemaId", metadataSchema.getID() + "")
+                         .content(new ObjectMapper().writeValueAsBytes(metadataFieldRest))
+                         .contentType(contentType))
+            .andExpect(status().isUnauthorized());
     }
 
     @Test
     public void createUnauthorizedEPersonNoAdminRights() throws Exception {
-        context.turnOffAuthorisationSystem();
 
         MetadataFieldRest metadataFieldRest = new MetadataFieldRest();
         metadataFieldRest.setElement(ELEMENT);
@@ -233,13 +235,14 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
 
         MetadataField metadataField = MetadataFieldBuilder.createMetadataField(context, ELEMENT, QUALIFIER, SCOPE_NOTE)
                                                           .build();
+        context.restoreAuthSystemState();
 
 
         getClient().perform(get("/api/core/metadatafields/" + metadataField.getID()))
                    .andExpect(status().isOk());
         getClient(getAuthToken(admin.getEmail(), password))
-                .perform(delete("/api/core/metadatafields/" + metadataField.getID()))
-                .andExpect(status().isNoContent());
+            .perform(delete("/api/core/metadatafields/" + metadataField.getID()))
+            .andExpect(status().isNoContent());
 
         getClient().perform(get("/api/core/metadatafields/" + metadataField.getID()))
                    .andExpect(status().isNotFound());
@@ -252,11 +255,13 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
         MetadataField metadataField = MetadataFieldBuilder.createMetadataField(context, ELEMENT, QUALIFIER, SCOPE_NOTE)
                                                           .build();
 
+        context.restoreAuthSystemState();
+
         getClient().perform(get("/api/core/metadatafields/" + metadataField.getID()))
                    .andExpect(status().isOk());
         getClient()
-                .perform(delete("/api/core/metadatafields/" + metadataField.getID()))
-                .andExpect(status().isUnauthorized());
+            .perform(delete("/api/core/metadatafields/" + metadataField.getID()))
+            .andExpect(status().isUnauthorized());
 
         getClient().perform(get("/api/core/metadatafields/" + metadataField.getID()))
                    .andExpect(status().isOk());
@@ -268,6 +273,9 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
 
         MetadataField metadataField = MetadataFieldBuilder.createMetadataField(context, ELEMENT, QUALIFIER, SCOPE_NOTE)
                                                           .build();
+
+        context.restoreAuthSystemState();
+
         String token = getAuthToken(eperson.getEmail(), password);
 
 
@@ -289,6 +297,8 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
         MetadataField metadataField = MetadataFieldBuilder.createMetadataField(context, ELEMENT, QUALIFIER, SCOPE_NOTE)
                                                           .build();
 
+        context.restoreAuthSystemState();
+
         Integer id = metadataField.getID();
         getClient(getAuthToken(admin.getEmail(), password))
             .perform(delete("/api/core/metadatafields/" + id))
@@ -297,8 +307,8 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
         assertThat(metadataFieldService.find(context, id), nullValue());
 
         getClient(getAuthToken(admin.getEmail(), password))
-                .perform(delete("/api/core/metadatafields/" + id))
-                .andExpect(status().isNotFound());
+            .perform(delete("/api/core/metadatafields/" + id))
+            .andExpect(status().isNotFound());
     }
 
     @Test
@@ -307,6 +317,9 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
 
         MetadataField metadataField = MetadataFieldBuilder.createMetadataField(context, ELEMENT, QUALIFIER, SCOPE_NOTE)
                                                           .build();
+
+        context.restoreAuthSystemState();
+
         MetadataFieldRest metadataFieldRest = new MetadataFieldRest();
         metadataFieldRest.setId(metadataField.getID());
         metadataFieldRest.setElement(ELEMENT_UPDATED);
@@ -314,10 +327,10 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
         metadataFieldRest.setScopeNote(SCOPE_NOTE_UPDATED);
 
         getClient(getAuthToken(admin.getEmail(), password))
-                .perform(put("/api/core/metadatafields/" + metadataField.getID())
-                        .content(new ObjectMapper().writeValueAsBytes(metadataFieldRest))
-                        .contentType(contentType))
-                .andExpect(status().isOk());
+            .perform(put("/api/core/metadatafields/" + metadataField.getID())
+                         .content(new ObjectMapper().writeValueAsBytes(metadataFieldRest))
+                         .contentType(contentType))
+            .andExpect(status().isOk());
 
         getClient().perform(get("/api/core/metadatafields/" + metadataField.getID()))
                    .andExpect(status().isOk())
@@ -332,6 +345,9 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
 
         MetadataField metadataField = MetadataFieldBuilder.createMetadataField(context, ELEMENT, QUALIFIER, SCOPE_NOTE)
                                                           .build();
+
+        context.restoreAuthSystemState();
+
         MetadataFieldRest metadataFieldRest = new MetadataFieldRest();
         metadataFieldRest.setId(metadataField.getID());
         metadataFieldRest.setElement(ELEMENT_UPDATED);
@@ -339,10 +355,40 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
         metadataFieldRest.setScopeNote(SCOPE_NOTE_UPDATED);
 
         getClient()
-                .perform(put("/api/core/metadatafields/" + metadataField.getID())
-                        .content(new ObjectMapper().writeValueAsBytes(metadataFieldRest))
-                        .contentType(contentType))
-                .andExpect(status().isUnauthorized());
+            .perform(put("/api/core/metadatafields/" + metadataField.getID())
+                         .content(new ObjectMapper().writeValueAsBytes(metadataFieldRest))
+                         .contentType(contentType))
+            .andExpect(status().isUnauthorized());
+
+        getClient().perform(get("/api/core/metadatafields/" + metadataField.getID()))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$", MetadataFieldMatcher.matchMetadataFieldByKeys(
+                       metadataSchema.getName(), ELEMENT, QUALIFIER)
+                   ));
+
+
+    }
+
+    @Test
+    public void updateWrongRights() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        MetadataField metadataField = MetadataFieldBuilder.createMetadataField(context, ELEMENT, QUALIFIER, SCOPE_NOTE)
+                                                          .build();
+
+        context.restoreAuthSystemState();
+
+        MetadataFieldRest metadataFieldRest = new MetadataFieldRest();
+        metadataFieldRest.setId(metadataField.getID());
+        metadataFieldRest.setElement(ELEMENT_UPDATED);
+        metadataFieldRest.setQualifier(QUALIFIER_UPDATED);
+        metadataFieldRest.setScopeNote(SCOPE_NOTE_UPDATED);
+
+        getClient(getAuthToken(eperson.getEmail(), password))
+            .perform(put("/api/core/metadatafields/" + metadataField.getID())
+                         .content(new ObjectMapper().writeValueAsBytes(metadataFieldRest))
+                         .contentType(contentType))
+            .andExpect(status().isForbidden());
 
         getClient().perform(get("/api/core/metadatafields/" + metadataField.getID()))
                    .andExpect(status().isOk())
