@@ -25,6 +25,9 @@
     <ul class="list-group">
         <li class="list-group-item"><a href="/statistics/report"><%= LocaleSupport.getLocalizedMessage(pageContext, "report.statistics") %></a></li>
         <li class="list-group-item"><a href="/stat/person-stat.jsp"><%= LocaleSupport.getLocalizedMessage(pageContext, "report.newest-persons") %></a></li>
+        <li class="list-group-item"><a href="/stat/speciality-stat.jsp"><%= LocaleSupport.getLocalizedMessage(pageContext, "jsp.admin.person-stat.speciality-title") %></a></li>
+
+
     </ul>
 </dspace:layout>
 

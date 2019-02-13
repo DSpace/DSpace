@@ -106,6 +106,17 @@
 
         <field>
           <dc-schema>dc</dc-schema>
+          <dc-element>speciality</dc-element>
+          <dc-qualifier>id</dc-qualifier>
+          <repeatable>false</repeatable>
+          <label>Speciality id</label>
+          <input-type>onebox</input-type>
+          <hint></hint>
+          <required></required>
+        </field>
+
+        <field>
+          <dc-schema>dc</dc-schema>
           <dc-element>type</dc-element>
           <dc-qualifier></dc-qualifier>
           <repeatable>true</repeatable>
@@ -114,6 +125,17 @@
           <hint>Выберите тип(ы) содержания материала. Для того чтобы выбрать больше чем одно значение в списке, Вам необходимо держать нажатой клавишу [CTRL] или [Shift].</hint>
           <required></required>
         </field>
+
+          <field>
+              <dc-schema>dc</dc-schema>
+              <dc-element>date</dc-element>
+              <dc-qualifier>presentation</dc-qualifier>
+              <repeatable>false</repeatable>
+              <label>Дата представления</label>
+              <input-type>onebox</input-type>
+              <hint></hint>
+              <required></required>
+          </field>
 
         <field>
           <dc-schema>dc</dc-schema>

@@ -46,6 +46,7 @@
 <%@ page import="org.dspace.core.ConfigurationManager" %>
 <%@ page import="org.dspace.core.Utils" %>
 <%@ page import="org.dspace.content.*" %>
+<%@ page import="java.io.IOException" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
@@ -1302,8 +1303,8 @@
         {
             sb.append(" disabled=\"disabled\"");
         }
+        sb.append(" onchange=\"paperTypeSelected()\" ");
         sb.append(">");
-
         for (int i = 0; i < valueList.size(); i += 2)
         {
             display = (String)valueList.get(i);
@@ -1321,6 +1322,7 @@
                     .append(display)
                     .append("</option>");
         }
+
 
         sb.append("</select></span></div><br/>");
         out.write(sb.toString());
@@ -1441,6 +1443,17 @@
 
         out.write(sb.toString());
     }//end doList
+    void doSpecialityRow(javax.servlet.jsp.JspWriter out, PageContext pageContext) throws IOException {
+        StringBuilder sb = new StringBuilder();
+        sb.append("<div class=\"row\" id = \"speciality-select-row\"><span class=\"col-md-2\"><b>")
+                .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.speciality-select"))
+        .append("</b></span>")
+                .append("<span class=\"col-md-8\">")
+                .append("<div id=\"speciality-selector\"></div>")
+                .append("</span></div></br>");
+        sb.append(" <input type=\"hidden\" id=\"dc_speciality_id\" name=\"dc_speciality_id\">");
+        out.write(sb.toString());
+    }
 %>
 
 <%
@@ -1676,6 +1689,9 @@
                             repeatable, required, readonly, fieldCountIncr, label, pageContext, vocabulary,
                             closedVocabulary, collectionID);
                 }
+                if ("dc_type".equals(fieldName)) {
+                    doSpecialityRow(out, pageContext);
+                }
 
             } // end of 'for rows'
         %>
@@ -1698,7 +1714,94 @@
                 </div><br/>
             </div>
     </form>
+    <style>
+        .ui-datepicker-calendar {
+            display: none;
+        }
+    </style>
     <script>
+        var a = [];
+        var request = jQuery.ajax({
+            type: 'GET',
+            url: '/statistics/facultylist'
+        }).done(function(data) {
+            var re = new RegExp("chairs", 'g');
+            a = data.replace(re, "d");
+
+            re = new RegExp("specialities", 'g');
+            a = a.replace(re, "d");
+
+            re = new RegExp("id", 'g');
+            a = a.replace(re, "c");
+
+            re = new RegExp("name", 'g');
+            a = a.replace(re, "n");
+
+            a = JSON.parse(a);
+
+            var getSpecialityInfo = function() {
+                var val = jQuery('#dc_speciality_id').val();
+                if(!val || !val.length) {
+                    return [];
+                }
+                return JSON.parse(val);
+            };
+            jQuery(document).ready(function(){
+
+                jQuery(function() {
+                    jQuery('#dc_date_presentation').datepicker( {
+                        changeMonth: true,
+                        changeYear: true,
+                        showButtonPanel: true,
+                        dateFormat: 'MM yy',
+                        onClose: function(dateText, inst) {
+                            jQuery(this).datepicker('setDate', new Date(inst.selectedYear, inst.selectedMonth, 1));
+                        }
+                    });
+                });
+
+
+                jQuery('#dc_speciality_id').parentsUntil('form').hide();
+                jQuery('#dc_speciality_id').parentsUntil('form').prev().hide();
+
+                jQuery("#speciality-selector").bsCascader({
+                    splitChar: '/',
+                    placeHolder: 'Select...',
+                    dropUp: true,
+                    value : getSpecialityInfo(),
+                    loadData: function(name, id) {
+                        id(a)
+                    }
+                }).on({
+                    "bs.cascader.change bs.cascader.select": function (name, id, a) {
+                        var res = JSON.stringify(a);
+                        if(res && res.length)
+                            jQuery('#dc_speciality_id').val(JSON.stringify(a));
+                    }
+                });
+
+                <% if (!documentType.equals("Bachelous paper") && !documentType.equals("Masters thesis")) { %>
+                    jQuery('#speciality-select-row').hide();
+                    jQuery('#dc_date_presentation').parentsUntil('form').hide();
+                    jQuery('#dc_date_presentation').parentsUntil('form').prev().hide();
+                <% } %>
+            });
+
+        });
+
+        function paperTypeSelected() {
+            var selectedType = jQuery('[name = "dc_type"] option:selected').val();
+            if(selectedType.trim() === 'Bachelous paper' || selectedType.trim() === 'Masters thesis') {
+                jQuery('#speciality-select-row').show();
+                jQuery('#dc_date_presentation').parentsUntil('form').show();
+                jQuery('#dc_date_presentation').parentsUntil('form').prev().show();
+            }
+            else {
+                jQuery('#speciality-select-row').hide();
+                jQuery('#dc_date_presentation').parentsUntil('form').hide();
+                jQuery('#dc_date_presentation').parentsUntil('form').prev().hide();
+            }
+        }
         function enableSubmitButton() {
             jQuery('[name=submit_dc_contributor_author_add]').attr('disabled', false);
         }

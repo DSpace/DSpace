@@ -55,7 +55,10 @@
 	    <link rel="stylesheet" href="<%= request.getContextPath() %>/static/css/bootstrap/bootstrap-theme.min.css" type="text/css" />
 	    <link rel="stylesheet" href="<%= request.getContextPath() %>/static/css/bootstrap/dspace-theme.css" type="text/css" />
         <link rel="stylesheet" href="<%= request.getContextPath() %>/static/css/pagination.css">
-<%
+        <link href="<%= request.getContextPath() %>/static/css/bootstrap-cascader/bootstrap-cascader.min.css" rel="stylesheet">
+
+
+        <%
     if (!"NONE".equals(feedRef))
     {
         for (int i = 0; i < parts.size(); i+= 3)
@@ -81,7 +84,7 @@
 %>
 
 	<script type='text/javascript' src="<%= request.getContextPath() %>/static/js/jquery/jquery-1.10.2.min.js"></script>
-        <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/jquery-migrate.js"></script>
+    <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/jquery-migrate.js"></script>
 	<script type='text/javascript' src='<%= request.getContextPath() %>/static/js/jquery/jquery-ui-1.10.3.custom.min.js'></script>
 	<script type='text/javascript' src='<%= request.getContextPath() %>/static/js/bootstrap/bootstrap.min.js'></script>
 	<script type='text/javascript' src='<%= request.getContextPath() %>/static/js/holder.js'></script>
@@ -90,6 +93,7 @@
 
     <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/jquery.autocomplete.js"></script>
     <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/jquery.keyboard.js"></script>
+    <script src="<%= request.getContextPath() %>/static/js/bootstrap-cascader/bootstrap-cascader.min.js"></script>
     <script type="text/javascript"> jQuery(function(){jQuery('input.keyboard_layout').keyboardLayout();});</script>
 
     <%--Gooogle Analytics recording.--%>

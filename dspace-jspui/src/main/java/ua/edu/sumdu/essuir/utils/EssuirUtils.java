@@ -7,25 +7,29 @@ import org.springframework.stereotype.Component;
 import ua.edu.sumdu.essuir.cache.Author;
 import ua.edu.sumdu.essuir.cache.AuthorCache;
 import ua.edu.sumdu.essuir.entity.*;
-import ua.edu.sumdu.essuir.repository.AuthorsRepository;
-import ua.edu.sumdu.essuir.repository.ChairRepository;
-import ua.edu.sumdu.essuir.repository.FacultyRepository;
+import ua.edu.sumdu.essuir.repository.*;
 import ua.edu.sumdu.essuir.service.DatabaseService;
 
 import javax.sql.rowset.CachedRowSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.*;
 
 @Component
 public class EssuirUtils {
     private static final String MINIMAL_YEAR = "1964";
-
     private static DatabaseService databaseService;
     private static ChairRepository chairRepository;
     private static FacultyRepository facultyRepository;
     private static AuthorsRepository authorsRepository;
+    private static SpecialityStatisticsService specialityStatisticsService;
 
     private static Logger logger = Logger.getLogger(EssuirUtils.class);
+
+    @Autowired
+    public void setSpecialityStatisticsController(SpecialityStatisticsService specialityStatisticsService) {
+        EssuirUtils.specialityStatisticsService = specialityStatisticsService;
+    }
 
     @Autowired
     public void setDatabaseService(DatabaseService databaseService) {
@@ -183,4 +187,9 @@ public class EssuirUtils {
         AuthorCache.update();
         return findAuthor(surname, initials);
     }
+
+    public static Map<Speciality, Long> getSpecialityStatistics(LocalDate from, LocalDate to) {
+        return specialityStatisticsService.getSpecialityStatistics(from, to);
+    }
+
 }

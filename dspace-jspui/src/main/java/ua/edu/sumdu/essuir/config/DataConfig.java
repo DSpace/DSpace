@@ -1,5 +1,6 @@
 package ua.edu.sumdu.essuir.config;
 
+import liquibase.integration.spring.SpringLiquibase;
 import org.dspace.core.ConfigurationManager;
 import org.hibernate.jpa.HibernatePersistenceProvider;
 import org.springframework.context.annotation.Bean;
@@ -71,4 +72,11 @@ public class DataConfig {
         return properties;
     }
 
+    @Bean
+    public SpringLiquibase liquibase() {
+        SpringLiquibase liquibase = new SpringLiquibase();
+        liquibase.setChangeLog("classpath:db/liquibase-changeLog.xml");
+        liquibase.setDataSource(dataSource());
+        return liquibase;
+    }
 }

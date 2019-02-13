@@ -105,6 +105,17 @@
        </field>
 
        <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>speciality</dc-element>
+         <dc-qualifier>id</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Speciality id</label>
+         <input-type>onebox</input-type>
+         <hint></hint>
+         <required></required>
+       </field>
+
+       <field>
 		 <dc-schema>dc</dc-schema>
          <dc-element>type</dc-element>
          <dc-qualifier></dc-qualifier>
@@ -114,6 +125,17 @@
          <hint>Виберіть тип(и) змісту матеріалу. Щоб вибрати більш ніж одне значення у списку, Вам необхідно тримати натиснутою клавішу [CTRL] або ж [Shift].</hint>
          <required></required>
        </field>
+
+         <field>
+             <dc-schema>dc</dc-schema>
+             <dc-element>date</dc-element>
+             <dc-qualifier>presentation</dc-qualifier>
+             <repeatable>false</repeatable>
+             <label>Дата представлення</label>
+             <input-type>onebox</input-type>
+             <hint></hint>
+             <required></required>
+         </field>
 
        <field>
 		 <dc-schema>dc</dc-schema>

@@ -102,6 +102,18 @@
          <repeatable>false</repeatable>
          <label>Citation</label>
          <input-type>onebox</input-type>
+         <hint></hint>
+         <required></required>
+       </field>
+
+
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>speciality</dc-element>
+         <dc-qualifier>id</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Speciality id</label>
+         <input-type>onebox</input-type>
          <hint>Enter the standard citation for the previously issued instance of this item.</hint>
          <required></required>
        </field>
@@ -114,6 +126,17 @@
          <label>Type</label>
          <input-type value-pairs-name="common_types">dropdown</input-type>
          <hint>Select the type(s) of content of the item. To select more than one value in the list, you may have to hold down the "CTRL" or "Shift" key.</hint>
+         <required></required>
+       </field>
+
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>date</dc-element>
+         <dc-qualifier>presentation</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Presentation date</label>
+         <input-type>onebox</input-type>
+         <hint></hint>
          <required></required>
        </field>
 

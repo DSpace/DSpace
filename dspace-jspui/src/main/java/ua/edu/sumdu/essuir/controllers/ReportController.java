@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import ua.edu.sumdu.essuir.entity.Faculty;
+import ua.edu.sumdu.essuir.repository.FacultyRepository;
 import ua.edu.sumdu.essuir.service.ReportService;
 
 import javax.annotation.Resource;
@@ -33,6 +34,8 @@ public class ReportController {
     private static final DateTimeFormatter format = DateTimeFormat.forPattern("dd.MM.YYYY");
     @Resource
     private ReportService reportService;
+    @Resource
+    private FacultyRepository facultyRepository;
 
     @RequestMapping(value = "/person", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
     @ResponseBody
@@ -61,5 +64,16 @@ public class ReportController {
     @RequestMapping(value = "/report", method = RequestMethod.GET)
     public String getTotalReport(ModelMap model) {
         return "report";
+    }
+
+    @RequestMapping(value = "/facultylist", method = RequestMethod.GET, produces = "text/plain;charset=UTF-8")
+    @ResponseBody
+    public String getFacultyList() throws JsonProcessingException {
+        try {
+            return new ObjectMapper().writeValueAsString(facultyRepository.findAll());
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        return "";
     }
 }
