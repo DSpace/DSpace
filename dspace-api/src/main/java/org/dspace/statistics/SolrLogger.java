@@ -147,7 +147,7 @@ public class SolrLogger
         return useProxies;
     }
 
-    public HttpSolrServer getSolr()
+    public synchronized HttpSolrServer getSolr()
     {
         if (solr == null)
         {
