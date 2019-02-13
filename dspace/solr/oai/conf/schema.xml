@@ -2,6 +2,9 @@
 <!--
     This is the DSpace "xoai" core.
     See dspace-oai.
+
+    You should find the extensively commented example schema distributed with
+    Solr in [Solr]/server/solr/configsets/_default/conf/.
 -->
 
 <schema name="xoai" version="1.2">
