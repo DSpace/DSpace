@@ -53,6 +53,14 @@ public class DSpaceSolrSearch {
         throws SolrSearchEmptyException, IOException {
         try {
             solrParams.addSort("item.id", ORDER.asc);
+        // No longer can set default search field in the schema
+        if (null == solrParams.get("df")) {
+            solrParams.set("df", "item.handle");
+        }
+        // No longer can set default match operator in the schema
+        if (null == solrParams.get("q.op")) {
+            solrParams.set("q.op", "OR");
+        }
             QueryResponse response = server.query(solrParams);
             if (response.getResults().getNumFound() > 0) {
                 return response.getResults().get(0);
