@@ -195,7 +195,7 @@
         </insert>
     </changeSet>
 
-    <changeSet id="4" author="Igor Marchenko">
+    <changeSet id="4" author="Igor Marchenko" runOnChange="true">
         <insert tableName="speciality">
             <column name="code" value="141"/>
             <column name="name" value="Електроенергетика, електротехніка та електромеханіка"/>
@@ -277,13 +277,13 @@
         <insert tableName="speciality">
             <column name="code" value="127"/>
             <column name="name" value="Прикладна математика"/>
-            <column name="chair_id" value="27"/>
+            <column name="chair_id" value="28"/>
         </insert>
 
         <insert tableName="speciality">
             <column name="code" value="6.040301"/>
             <column name="name" value="Прикладна математика"/>
-            <column name="chair_id" value="27"/>
+            <column name="chair_id" value="28"/>
         </insert>
 
         <insert tableName="speciality">
