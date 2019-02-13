@@ -56,7 +56,7 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.services.ConfigurationService; //added
+import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.xoai.exceptions.CompilingException;
 import org.dspace.xoai.services.api.CollectionsService;
@@ -304,7 +304,7 @@ public class XOAI {
                     log.error(ex.getMessage(), ex);
                 }
                 i++;
-                if (i % 1000 == 0) {
+                if (i % 1000 == 0 && batchSize != 1000) {
                     System.out.println(i + " items imported so far...");
                 }
                 if (i % batchSize == 0) {
