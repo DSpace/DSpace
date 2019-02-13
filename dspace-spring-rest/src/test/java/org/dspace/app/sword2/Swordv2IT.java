@@ -24,9 +24,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 
 /**
- * Integration test to test the /swordv2 endpoint which loads/embeds the SWORDv2 webapp into the REST API.
- * This is a AbstractWebClientIntegrationTest because testing the SWORDv2 webapp requires
- * running a web server (as the SWORDv2 webapp makes use of Servlets, not Controllers).
+ * Integration test to verify the /swordv2 endpoint is responding as a valid SWORDv2 endpoint.
+ * This tests that our dspace-swordv2 module is running at this endpoint.
+ * <P>
+ * This is a AbstractWebClientIntegrationTest because testing dspace-swordv2 requires
+ * running a web server (as dspace-swordv2 makes use of Servlets, not Controllers).
  *
  * @author Tim Donohue
  */
