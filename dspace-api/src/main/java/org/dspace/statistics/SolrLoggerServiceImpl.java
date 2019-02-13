@@ -971,6 +971,15 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
                                              .setFacetMinCount(1);
         addAdditionalSolrYearCores(solrQuery);
 
+        // Can no longer set default field in schema
+        if (null == solrQuery.get("df")) {
+            solrQuery.add("df", "id");
+        }
+        // Can no longer set default match operator in schema
+        if (null == solrQuery.get("q.op")) {
+            solrQuery.add("q.op", "AND");
+        }
+
         // Set the date facet if present
         if (dateType != null) {
             solrQuery.setParam("facet.date", "time")

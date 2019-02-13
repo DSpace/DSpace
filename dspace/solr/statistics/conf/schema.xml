@@ -20,6 +20,9 @@
     This is the DSpace "statistics" core, which holds records of each reference
     to DSpace content.  Each search or view/download event is logged here.
     See dspace-api:org.dspace.statistics.SolrLoggerServiceImpl.
+
+    You should find the extensively commented example schema distributed with
+    Solr in [Solr]/server/solr/configsets/_default/conf/.
 -->
 
 <schema name="statistics" version="1.1">

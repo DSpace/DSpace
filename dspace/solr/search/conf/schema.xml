@@ -20,6 +20,9 @@
     This is the DSpace "search" core, which supports full-text searching for
     DSpace content bitstreams, Discovery, autocompletion, etc.
     See dspace-api:org.dspace.discovery.SolrServiceImpl.
+
+    You should find the extensively commented example schema distributed with
+    Solr in [Solr]/server/solr/configsets/_default/conf/.
 -->
 
 <schema name="discovery" version="1.5">
