@@ -31,6 +31,11 @@ import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+/**
+ * Integration tests for the {@link org.dspace.app.rest.repository.MetadataSchemaRestRepository}
+ * This class will include all the tests for the logic with regards to the
+ * {@link org.dspace.app.rest.repository.MetadataSchemaRestRepository}
+ */
 public class MetadataSchemaRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     private static final String TEST_NAME = "testSchemaName";
@@ -48,6 +53,7 @@ public class MetadataSchemaRestRepositoryIT extends AbstractControllerIntegratio
         context.turnOffAuthorisationSystem();
         MetadataSchema metadataSchema = MetadataSchemaBuilder.createMetadataSchema(context, "ATest", "ANamespace")
             .build();
+        context.restoreAuthSystemState();
 
         getClient().perform(get("/api/core/metadataschemas"))
                 .andExpect(status().isOk())
@@ -65,6 +71,7 @@ public class MetadataSchemaRestRepositoryIT extends AbstractControllerIntegratio
         context.turnOffAuthorisationSystem();
         MetadataSchema metadataSchema = MetadataSchemaBuilder.createMetadataSchema(context, "ATest", "ANamespace")
                 .build();
+        context.restoreAuthSystemState();
 
         getClient().perform(get("/api/core/metadataschemas/" + metadataSchema.getID()))
                 .andExpect(status().isOk())
@@ -79,8 +86,7 @@ public class MetadataSchemaRestRepositoryIT extends AbstractControllerIntegratio
 
         MetadataSchema metadataSchema = MetadataSchemaBuilder.createMetadataSchema(context, "ATest", "ANamespace")
                                                              .build();
-
-
+        context.restoreAuthSystemState();
 
         MetadataSchemaRest metadataSchemaRest = metadataSchemaConverter.fromModel(metadataSchema);
         metadataSchemaRest.setPrefix(TEST_NAME);
@@ -103,10 +109,8 @@ public class MetadataSchemaRestRepositoryIT extends AbstractControllerIntegratio
     }
 
     @Test
-    public void createUnauthauthorizedTest()
+    public void createUnauthorizedTest()
             throws Exception {
-        context.turnOffAuthorisationSystem();
-
         MetadataSchemaRest metadataSchemaRest = new MetadataSchemaRest();
         metadataSchemaRest.setPrefix(TEST_NAME);
         metadataSchemaRest.setNamespace(TEST_NAMESPACE);
@@ -124,6 +128,8 @@ public class MetadataSchemaRestRepositoryIT extends AbstractControllerIntegratio
 
         MetadataSchema metadataSchema = MetadataSchemaBuilder.createMetadataSchema(context, "ATest", "A namespace")
                                                              .build();
+
+        context.restoreAuthSystemState();
 
         getClient().perform(get("/api/core/metadataschemas/" + metadataSchema.getID()))
                    .andExpect(status().isOk());
@@ -145,6 +151,8 @@ public class MetadataSchemaRestRepositoryIT extends AbstractControllerIntegratio
         MetadataSchema metadataSchema = MetadataSchemaBuilder.createMetadataSchema(context, TEST_NAME, TEST_NAMESPACE)
                                                              .build();
 
+        context.restoreAuthSystemState();
+
         getClient().perform(get("/api/core/metadataschemas/" + metadataSchema.getID())).andExpect(status().isOk());
 
         getClient()
@@ -161,6 +169,8 @@ public class MetadataSchemaRestRepositoryIT extends AbstractControllerIntegratio
 
         MetadataSchema metadataSchema = MetadataSchemaBuilder.createMetadataSchema(context, "A name", "A namespace")
                                                              .build();
+
+        context.restoreAuthSystemState();
 
         Integer id = metadataSchema.getID();
 
@@ -179,6 +189,8 @@ public class MetadataSchemaRestRepositoryIT extends AbstractControllerIntegratio
 
         MetadataSchema metadataSchema = MetadataSchemaBuilder.createMetadataSchema(context, TEST_NAME, TEST_NAMESPACE)
                                                              .build();
+
+        context.restoreAuthSystemState();
 
         MetadataSchemaRest metadataSchemaRest = new MetadataSchemaRest();
         metadataSchemaRest.setId(metadataSchema.getID());
@@ -204,6 +216,8 @@ public class MetadataSchemaRestRepositoryIT extends AbstractControllerIntegratio
         MetadataSchema metadataSchema = MetadataSchemaBuilder.createMetadataSchema(context, TEST_NAME, TEST_NAMESPACE)
                                                              .build();
 
+        context.restoreAuthSystemState();
+
         MetadataSchemaRest metadataSchemaRest = new MetadataSchemaRest();
         metadataSchemaRest.setId(metadataSchema.getID());
         metadataSchemaRest.setPrefix(TEST_NAME_UPDATED);
@@ -219,6 +233,32 @@ public class MetadataSchemaRestRepositoryIT extends AbstractControllerIntegratio
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$", MetadataschemaMatcher
                        .matchEntry(TEST_NAME, TEST_NAMESPACE)));
-}
+    }
+
+    @Test
+    public void updateWrongRights() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        MetadataSchema metadataSchema = MetadataSchemaBuilder.createMetadataSchema(context, TEST_NAME, TEST_NAMESPACE)
+                                                             .build();
+
+        context.restoreAuthSystemState();
+
+        MetadataSchemaRest metadataSchemaRest = new MetadataSchemaRest();
+        metadataSchemaRest.setId(metadataSchema.getID());
+        metadataSchemaRest.setPrefix(TEST_NAME_UPDATED);
+        metadataSchemaRest.setNamespace(TEST_NAMESPACE_UPDATED);
+
+        getClient(getAuthToken(eperson.getEmail(), password))
+            .perform(put("/api/core/metadataschemas/" + metadataSchema.getID())
+                         .content(new ObjectMapper().writeValueAsBytes(metadataSchemaRest))
+                         .contentType(contentType))
+            .andExpect(status().isForbidden());
+
+        getClient().perform(get("/api/core/metadataschemas/" + metadataSchema.getID()))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$", MetadataschemaMatcher
+                       .matchEntry(TEST_NAME, TEST_NAMESPACE)));
+    }
 
 }
