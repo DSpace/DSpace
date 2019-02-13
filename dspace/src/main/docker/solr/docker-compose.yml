@@ -1,0 +1,8 @@
+version: "3.3"
+
+services:
+  solr:
+    image: dspace/dspace-solr
+    container_name: solr
+    ports:
+     - "8983:8983"
