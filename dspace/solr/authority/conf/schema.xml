@@ -20,6 +20,9 @@
     This is the DSpace "authority" core, which holds records of attributions
     provided by some metadata authority.
     See dspace-api:org.dspace.authority.AuthoritySolrServiceImpl.
+
+    You should find the extensively commented example schema distributed with
+    Solr in [Solr]/server/solr/configsets/_default/conf/.
 -->
 
 <schema name="authority" version="1.1">
