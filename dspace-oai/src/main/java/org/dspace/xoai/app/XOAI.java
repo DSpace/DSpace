@@ -300,9 +300,11 @@ public class XOAI {
                 }
             }
             System.out.println("Total: " + i + " items");
-            server.add(list);
-            server.commit(true, true);
-            list.clear();
+            if (i > 0) {
+                server.add(list);
+                server.commit(true, true);
+                list.clear();
+            }
             return i;
         } catch (SolrServerException | IOException ex) {
             throw new DSpaceSolrIndexerException(ex.getMessage(), ex);
