@@ -376,6 +376,11 @@ public class AssociationAnywhere {
 
     private static String createRequest(Context context, String customerID, String transactionDescription, String form)
     {
+        // AssociationAnywhere should no longer be used, so if this is being called,
+        // log an error and let us trace it.
+        log.error("called createRequest ", new Throwable());
+        return null;
+        
         try {
             if(template == null) {
                 template = TransformerFactory.newInstance().newTemplates(new StreamSource(AssociationAnywhere.class.getResourceAsStream("/anywhere/request-templates.xsl")));
