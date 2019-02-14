@@ -1026,4 +1026,58 @@ public class RestResourceController implements InitializingBean {
         repository.delete(id);
         return ControllerUtils.toEmptyResponse(HttpStatus.NO_CONTENT);
     }
+
+
+    /**
+     * Execute a PUT request for an entity with id of type UUID;
+     *
+     * curl -X PUT http://<dspace.url>/dspace-spring-rest/api/{apiCategory}/{model}/{uuid}
+     *
+     * Example:
+     * <pre>
+     * {@code
+     *      curl -X PUT http://<dspace.url>/dspace-spring-rest/api/collection/320c0492-de1d-4646-9e69-193d36b366e9
+     * }
+     * </pre>
+     *
+     * @param request     the http request
+     * @param apiCategory the API category e.g. "api"
+     * @param model       the DSpace model e.g. "collection"
+     * @param uuid        the ID of the target REST object
+     * @param jsonNode    the part of the request body representing the updated rest object
+     * @return the relevant REST resource
+     */
+    @RequestMapping(method = RequestMethod.PUT, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID)
+    public DSpaceResource<RestAddressableModel> put(HttpServletRequest request,
+                                                    @PathVariable String apiCategory, @PathVariable String model,
+                                                    @PathVariable UUID uuid,
+                                                    @RequestBody(required = true) JsonNode jsonNode) {
+        return putOneInternal(request, apiCategory, model, uuid, jsonNode);
+    }
+
+    /**
+     * Internal method to update a single entity
+     *
+     * @param request     the http request
+     * @param apiCategory the API category e.g. "api"
+     * @param model       the DSpace model e.g. "metadatafield"
+     * @param uuid        the ID of the target REST object
+     * @param jsonNode    the part of the request body representing the updated rest object
+     * @return the relevant REST resource
+     */
+    private <ID extends Serializable> DSpaceResource<RestAddressableModel> putOneInternal(HttpServletRequest request,
+                                                                                          String apiCategory,
+                                                                                          String model, ID uuid,
+                                                                                          JsonNode jsonNode) {
+        checkModelPluralForm(apiCategory, model);
+        DSpaceRestRepository<RestAddressableModel, ID> repository = utils.getResourceRepository(apiCategory, model);
+        RestAddressableModel modelObject = null;
+        modelObject = repository.put(request, apiCategory, model, uuid, jsonNode);
+        if (modelObject == null) {
+            throw new ResourceNotFoundException(apiCategory + "." + model + " with id: " + uuid + " not found");
+        }
+        DSpaceResource result = repository.wrapResource(modelObject);
+        linkService.addLinks(result);
+        return result;
+    }
 }

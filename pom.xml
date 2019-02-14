@@ -242,6 +242,22 @@
                         </execution>
                     </executions>
                 </plugin>
+                <!-- Used to clean all 'target' directories from parent project -->
+                <!-- This additional configuration also cleans sub-modules -->
+                <plugin>
+                    <artifactId>maven-clean-plugin</artifactId>
+                    <version>2.5</version>
+                    <configuration>
+                        <filesets>
+                            <fileset>
+                                <directory>dspace/modules</directory>
+                                <includes>
+                                    <include>**/target</include>
+                                </includes>
+                            </fileset>
+                        </filesets>
+                    </configuration>
+                </plugin>
                 <plugin>
                     <artifactId>maven-antrun-plugin</artifactId>
                     <version>1.8</version>
