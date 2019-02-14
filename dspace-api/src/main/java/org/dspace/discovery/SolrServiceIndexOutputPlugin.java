@@ -8,7 +8,7 @@
 package org.dspace.discovery;
 
 import org.apache.solr.common.SolrInputDocument;
-import org.dspace.content.DSpaceObject;
+import org.dspace.browse.BrowsableDSpaceObject;
 import org.dspace.core.Context;
 
 
@@ -20,7 +20,7 @@ import org.dspace.core.Context;
 public class SolrServiceIndexOutputPlugin implements SolrServiceIndexPlugin {
 
     @Override
-    public void additionalIndex(Context context, DSpaceObject dso, SolrInputDocument document) {
-        System.out.println("Currently indexing: " + dso.getHandle());
+    public void additionalIndex(Context context, BrowsableDSpaceObject dso, SolrInputDocument document) {
+        System.out.println("Currently indexing: " + dso.getUniqueIndexID());
     }
 }

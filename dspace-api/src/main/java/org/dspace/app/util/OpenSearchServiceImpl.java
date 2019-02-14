@@ -22,6 +22,7 @@ import com.sun.syndication.feed.module.opensearch.impl.OpenSearchModuleImpl;
 import com.sun.syndication.io.FeedException;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.service.OpenSearchService;
+import org.dspace.browse.BrowsableDSpaceObject;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -118,7 +119,7 @@ public class OpenSearchServiceImpl implements OpenSearchService {
     @Override
     public String getResultsString(Context context, String format, String query, int totalResults, int start,
                                    int pageSize,
-                                   DSpaceObject scope, List<DSpaceObject> results,
+                                   DSpaceObject scope, List<BrowsableDSpaceObject> results,
                                    Map<String, String> labels) throws IOException {
         try {
             return getResults(context, format, query, totalResults, start, pageSize, scope, results, labels)
@@ -132,7 +133,7 @@ public class OpenSearchServiceImpl implements OpenSearchService {
     @Override
     public Document getResultsDoc(Context context, String format, String query, int totalResults, int start,
                                   int pageSize,
-                                  DSpaceObject scope, List<DSpaceObject> results, Map<String, String> labels)
+                                  DSpaceObject scope, List<BrowsableDSpaceObject> results, Map<String, String> labels)
         throws IOException {
         try {
             return getResults(context, format, query, totalResults, start, pageSize, scope, results, labels)
@@ -144,8 +145,8 @@ public class OpenSearchServiceImpl implements OpenSearchService {
     }
 
     protected SyndicationFeed getResults(Context context, String format, String query, int totalResults, int start,
-                                         int pageSize,
-                                         DSpaceObject scope, List<DSpaceObject> results, Map<String, String> labels) {
+                                         int pageSize, DSpaceObject scope,
+                                         List<BrowsableDSpaceObject> results, Map<String, String> labels) {
         // Encode results in requested format
         if ("rss".equals(format)) {
             format = "rss_2.0";

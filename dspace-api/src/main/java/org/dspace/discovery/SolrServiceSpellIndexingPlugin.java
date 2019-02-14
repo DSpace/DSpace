@@ -10,7 +10,7 @@ package org.dspace.discovery;
 import java.util.List;
 
 import org.apache.solr.common.SolrInputDocument;
-import org.dspace.content.DSpaceObject;
+import org.dspace.browse.BrowsableDSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.service.ItemService;
@@ -30,7 +30,7 @@ public class SolrServiceSpellIndexingPlugin implements SolrServiceIndexPlugin {
     protected ItemService itemService;
 
     @Override
-    public void additionalIndex(Context context, DSpaceObject dso, SolrInputDocument document) {
+    public void additionalIndex(Context context, BrowsableDSpaceObject dso, SolrInputDocument document) {
         if (dso instanceof Item) {
             Item item = (Item) dso;
             List<MetadataValue> dcValues = itemService.getMetadata(item, Item.ANY, Item.ANY, Item.ANY, Item.ANY);

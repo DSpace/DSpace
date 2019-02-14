@@ -30,6 +30,7 @@ import org.dspace.app.util.factory.UtilServiceFactory;
 import org.dspace.app.util.service.OpenSearchService;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.browse.BrowsableDSpaceObject;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
@@ -140,7 +141,7 @@ public class OpenSearchController {
 
             // format and return results
             Map<String, String> labelMap = getLabels(request);
-            List<DSpaceObject> dsoResults = qResults.getDspaceObjects();
+            List<BrowsableDSpaceObject> dsoResults = qResults.getDspaceObjects();
             Document resultsDoc = openSearchService.getResultsDoc(context, format, query,
                 (int) qResults.getTotalSearchResults(), qResults.getStart(),
                 qResults.getMaxResults(), container, dsoResults, labelMap);

@@ -50,28 +50,28 @@ public class DiscoverFacetsConverter {
         return searchResultsRest;
     }
 
-
-    private void addFacetValues(Context context, final DiscoverResult searchResult,
-                                final SearchResultsRest searchResultsRest,
-                                final DiscoveryConfiguration configuration) {
+    public void addFacetValues(Context context, final DiscoverResult searchResult, final SearchResultsRest resultsRest,
+            final DiscoveryConfiguration configuration) {
 
         List<DiscoverySearchFilterFacet> facets = configuration.getSidebarFacets();
         for (DiscoverySearchFilterFacet field : CollectionUtils.emptyIfNull(facets)) {
-
             List<DiscoverResult.FacetResult> facetValues = searchResult.getFacetResult(field);
 
             SearchFacetEntryRest facetEntry = new SearchFacetEntryRest(field.getIndexFieldName());
             int valueCount = 0;
+            facetEntry.setHasMore(false);
             facetEntry.setFacetLimit(field.getFacetLimit());
-            facetEntry.setExposeMinMax(field.exposeMinAndMaxValue());
             if (field.exposeMinAndMaxValue()) {
-                handleExposeMinMaxValues(context,field,facetEntry);
+                handleExposeMinMaxValues(context, field, facetEntry);
             }
+            facetEntry.setExposeMinMax(field.exposeMinAndMaxValue());
             for (DiscoverResult.FacetResult value : CollectionUtils.emptyIfNull(facetValues)) {
-                //The discover results contains max facetLimit + 1 values. If we reach the "+1", indicate that there are
-                //more results available.
+                // The discover results contains max facetLimit + 1 values. If we reach the "+1", indicate that there
+                // are
+                // more results available.
                 if (valueCount < field.getFacetLimit()) {
                     SearchFacetValueRest valueRest = facetValueConverter.convert(value);
+
                     facetEntry.addValue(valueRest);
                 } else {
                     facetEntry.setHasMore(true);
@@ -84,27 +84,27 @@ public class DiscoverFacetsConverter {
                 valueCount++;
             }
 
-            searchResultsRest.addFacetEntry(facetEntry);
+            resultsRest.addFacetEntry(facetEntry);
         }
     }
 
     /**
-      * This method will fill the facetEntry with the appropriate min and max values if they're not empty
-      * @param context       The relevant DSpace context
-      * @param field         The DiscoverySearchFilterFacet field to search for this value in solr
-      * @param facetEntry    The SearchFacetEntryRest facetEntry for which this needs to be filled in
-      */
-    private void handleExposeMinMaxValues(Context context,DiscoverySearchFilterFacet field,
-                                          SearchFacetEntryRest facetEntry) {
+     * This method will fill the facetEntry with the appropriate min and max values if they're not empty
+     * 
+     * @param context
+     *            The relevant DSpace context
+     * @param field
+     *            The DiscoverySearchFilterFacet field to search for this value in solr
+     * @param facetEntry
+     *            The SearchFacetEntryRest facetEntry for which this needs to be filled in
+     */
+    private void handleExposeMinMaxValues(Context context, DiscoverySearchFilterFacet field,
+            SearchFacetEntryRest facetEntry) {
         try {
-            String minValue = searchService.calculateExtremeValue(context,
-                                                                  field.getIndexFieldName() + "_min",
-                                                                  field.getIndexFieldName() + "_min_sort",
-                                                                  DiscoverQuery.SORT_ORDER.asc);
-            String maxValue = searchService.calculateExtremeValue(context,
-                                                                  field.getIndexFieldName() + "_max",
-                                                                  field.getIndexFieldName() + "_max_sort",
-                                                                  DiscoverQuery.SORT_ORDER.desc);
+            String minValue = searchService.calculateExtremeValue(context, field.getIndexFieldName() + "_min",
+                    field.getIndexFieldName() + "_min_sort", DiscoverQuery.SORT_ORDER.asc);
+            String maxValue = searchService.calculateExtremeValue(context, field.getIndexFieldName() + "_max",
+                    field.getIndexFieldName() + "_max_sort", DiscoverQuery.SORT_ORDER.desc);
 
             if (StringUtils.isNotBlank(minValue) && StringUtils.isNotBlank(maxValue)) {
                 facetEntry.setMinValue(minValue);
@@ -114,7 +114,6 @@ public class DiscoverFacetsConverter {
             log.error(e.getMessage(), e);
         }
     }
-
 
     private void setRequestInformation(final Context context, final String query, final String dsoType,
                                        final String configurationName, final String scope,

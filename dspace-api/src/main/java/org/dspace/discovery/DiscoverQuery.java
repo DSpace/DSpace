@@ -69,6 +69,8 @@ public class DiscoverQuery {
      **/
     private Map<String, List<String>> properties;
 
+    private String discoveryConfigurationName;
+
     public DiscoverQuery() {
         //Initialize all our lists
         this.filterQueries = new ArrayList<String>();
@@ -331,6 +333,7 @@ public class DiscoverQuery {
             // Example: 2001 and a gap from 10 we need the following result: 2010 - 2000 ; 2000 - 1990 hence the top
             // year
             int topYear = getTopYear(newestYear, gap);
+
             if (gap == 1) {
                 //We need a list of our years
                 //We have a date range add faceting for our field
@@ -376,4 +379,11 @@ public class DiscoverQuery {
         return (int) (Math.ceil((float) (newestYear) / gap) * gap);
     }
 
+    public String getDiscoveryConfigurationName() {
+        return discoveryConfigurationName;
+    }
+
+    public void setDiscoveryConfigurationName(String discoveryConfigurationName) {
+        this.discoveryConfigurationName = discoveryConfigurationName;
+    }
 }

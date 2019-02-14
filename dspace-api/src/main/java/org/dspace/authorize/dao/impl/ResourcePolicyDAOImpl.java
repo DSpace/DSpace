@@ -201,4 +201,21 @@ public class ResourcePolicyDAOImpl extends AbstractHibernateDAO<ResourcePolicy> 
         query.setParameter("rptype", type);
         query.executeUpdate();
     }
+
+    @Override
+    public List<ResourcePolicy> findByDSoAndActionExceptRpType(Context context, DSpaceObject dso, int action,
+                                                               String rpType) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, ResourcePolicy.class);
+
+        Root<ResourcePolicy> resourcePolicyRoot = criteriaQuery.from(ResourcePolicy.class);
+        criteriaQuery.select(resourcePolicyRoot);
+        criteriaQuery.where(
+            criteriaBuilder.and(criteriaBuilder.equal(resourcePolicyRoot.get(ResourcePolicy_.dSpaceObject), dso),
+                                criteriaBuilder.equal(resourcePolicyRoot.get(ResourcePolicy_.actionId), action),
+                                criteriaBuilder.notEqual(resourcePolicyRoot.get(ResourcePolicy_.rptype), rpType)
+            )
+        );
+        return list(context, criteriaQuery, false, ResourcePolicy.class, 1, -1);
+    }
 }

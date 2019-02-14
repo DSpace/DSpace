@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import org.dspace.app.rest.DiscoveryRestController;
 
 /**
@@ -24,10 +25,9 @@ public class SearchResultEntryRest implements RestAddressableModel {
 
     private Map<String, List<String>> hitHighlights;
 
+    private RestAddressableModel rObject;
+
     @JsonIgnore
-    private DSpaceObjectRest dspaceObject;
-
-
     public String getCategory() {
         return CATEGORY;
     }
@@ -36,6 +36,7 @@ public class SearchResultEntryRest implements RestAddressableModel {
         return NAME;
     }
 
+    @JsonIgnore
     public Class getController() {
         return DiscoveryRestController.class;
     }
@@ -55,11 +56,12 @@ public class SearchResultEntryRest implements RestAddressableModel {
         this.hitHighlights = hitHighlights;
     }
 
-    public DSpaceObjectRest getDspaceObject() {
-        return dspaceObject;
+    @JsonIgnore
+    public RestAddressableModel getRObject() {
+        return rObject;
     }
 
-    public void setDspaceObject(final DSpaceObjectRest dspaceObject) {
-        this.dspaceObject = dspaceObject;
+    public void setRObject(final RestAddressableModel dspaceObject) {
+        this.rObject = dspaceObject;
     }
 }
