@@ -7,23 +7,38 @@
  */
 package org.dspace.app.rest.repository;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import javax.servlet.ServletInputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.BadRequestException;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.CollectionConverter;
+import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
+import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.CollectionRest;
 import org.dspace.app.rest.model.CommunityRest;
+import org.dspace.app.rest.model.MetadataEntryRest;
 import org.dspace.app.rest.model.hateoas.CollectionResource;
+import org.dspace.app.rest.utils.CollectionRestEqualityUtils;
+import org.dspace.app.rest.utils.DSpaceObjectUtils;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.util.UUIDUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -49,6 +64,12 @@ public class CollectionRestRepository extends DSpaceRestRepository<CollectionRes
 
     @Autowired
     CollectionConverter converter;
+
+    @Autowired
+    DSpaceObjectUtils dspaceObjectUtils;
+
+    @Autowired
+    CollectionRestEqualityUtils collectionRestEqualityUtils;
 
 
     public CollectionRestRepository() {
@@ -137,6 +158,109 @@ public class CollectionRestRepository extends DSpaceRestRepository<CollectionRes
     @Override
     public CollectionResource wrapResource(CollectionRest collection, String... rels) {
         return new CollectionResource(collection, utils, rels);
+    }
+
+    @Override
+    @PreAuthorize("hasAuthority('ADMIN')")
+    protected CollectionRest createAndReturn(Context context) throws AuthorizeException {
+        HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
+        ObjectMapper mapper = new ObjectMapper();
+        CollectionRest collectionRest;
+        try {
+            ServletInputStream input = req.getInputStream();
+            collectionRest = mapper.readValue(input, CollectionRest.class);
+        } catch (IOException e1) {
+            throw new UnprocessableEntityException("Error parsing request body: " + e1.toString());
+        }
+
+        Collection collection;
+
+
+        String parentCommunityString = req.getParameter("parent");
+        try {
+            Community parent = null;
+            if (StringUtils.isNotBlank(parentCommunityString)) {
+
+                UUID parentCommunityUuid = UUIDUtils.fromString(parentCommunityString);
+                if (parentCommunityUuid == null) {
+                    throw new BadRequestException("The given parent was invalid: "
+                            + parentCommunityString);
+                }
+
+                parent = communityService.find(context, parentCommunityUuid);
+                if (parent == null) {
+                    throw new UnprocessableEntityException("Parent community for id: "
+                            + parentCommunityUuid + " not found");
+                }
+            } else {
+                throw new BadRequestException("The parent parameter cannot be left empty," +
+                                                  "collections require a parent community.");
+            }
+            collection = cs.create(context, parent);
+            cs.update(context, collection);
+            if (collectionRest.getMetadata() != null) {
+                for (MetadataEntryRest mer : collectionRest.getMetadata()) {
+                    String[] metadatakey = mer.getKey().split("\\.");
+                    cs.addMetadata(context, collection, metadatakey[0], metadatakey[1],
+                                   metadatakey.length == 3 ? metadatakey[2] : null, mer.getLanguage(), mer.getValue());
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Unable to create new Collection under parent Community " +
+                                           parentCommunityString, e);
+        }
+        return converter.convert(collection);
+    }
+
+
+    @Override
+    @PreAuthorize("hasPermission(#id, 'COLLECTION', 'WRITE')")
+    protected CollectionRest put(Context context, HttpServletRequest request, String apiCategory, String model, UUID id,
+                                JsonNode jsonNode)
+        throws RepositoryMethodNotImplementedException, SQLException, AuthorizeException {
+        CollectionRest collectionRest = null;
+        try {
+            collectionRest = new ObjectMapper().readValue(jsonNode.toString(), CollectionRest.class);
+        } catch (IOException e) {
+            throw new UnprocessableEntityException("error parsing the body ..." + e.getMessage());
+        }
+        Collection collection = cs.find(context, id);
+        if (collection == null) {
+            throw new ResourceNotFoundException(apiCategory + "." + model + " with id: " + id + " not found");
+        }
+        CollectionRest originalCollectionRest = converter.fromModel(collection);
+        if (collectionRestEqualityUtils.isCollectionRestEqualWithoutMetadata(originalCollectionRest, collectionRest)) {
+            List<MetadataEntryRest> metadataEntryRestList = collectionRest.getMetadata();
+            collection = (Collection) dspaceObjectUtils.replaceMetadataValues(context,
+                                                                              collection,
+                                                                              metadataEntryRestList);
+        } else {
+            throw new IllegalArgumentException("The UUID in the Json and the UUID in the url do not match: "
+                                                   + id + ", "
+                                                   + collectionRest.getId());
+        }
+        return converter.fromModel(collection);
+    }
+    @Override
+    @PreAuthorize("hasPermission(#id, 'COLLECTION', 'DELETE')")
+    protected void delete(Context context, UUID id) throws AuthorizeException {
+        Collection collection = null;
+        try {
+            collection = cs.find(context, id);
+            if (collection == null) {
+                throw new ResourceNotFoundException(
+                    CollectionRest.CATEGORY + "." + CollectionRest.NAME + " with id: " + id + " not found");
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Unable to find Collection with id = " + id, e);
+        }
+        try {
+            cs.delete(context, collection);
+        } catch (SQLException e) {
+            throw new RuntimeException("Unable to delete Collection with id = " + id, e);
+        } catch (IOException e) {
+            throw new RuntimeException("Unable to delete collection because the logo couldn't be deleted", e);
+        }
     }
 
 }
