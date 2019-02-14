@@ -16,7 +16,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.ClaimedTaskConverter;
 import org.dspace.app.rest.exception.RESTAuthorizationException;
@@ -47,6 +46,7 @@ import org.dspace.xmlworkflow.storedcomponents.service.ClaimedTaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Component;
 
 /**
@@ -93,7 +93,7 @@ public class ClaimedTaskRestRepository extends DSpaceRestRepository<ClaimedTaskR
     }
 
     @SearchRestMethod(name = "findByUser")
-    public Page<ClaimedTaskRest> findByUser(@Parameter(value = "uuid") UUID userID, Pageable pageable) {
+    public Page<ClaimedTaskRest> findByUser(@Param(value = "uuid") UUID userID, Pageable pageable) {
         List<ClaimedTask> tasks = null;
         try {
             Context context = obtainContext();
