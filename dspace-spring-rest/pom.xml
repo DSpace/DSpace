@@ -262,6 +262,10 @@
         <!-- You may choose to comment out any of these modules if you do not want/need its features -->
         <dependency>
             <groupId>org.dspace</groupId>
+            <artifactId>dspace-oai</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.dspace</groupId>
             <artifactId>dspace-sword</artifactId>
         </dependency>
         <dependency>

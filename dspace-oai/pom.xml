@@ -2,9 +2,9 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <artifactId>dspace-oai</artifactId>
-    <packaging>war</packaging>
+    <packaging>jar</packaging>
     <name>DSpace OAI-PMH</name>
-    <description>DSpace OAI-PMH Web Application and API</description>
+    <description>DSpace OAI-PMH Extension</description>
 
     <parent>
         <artifactId>dspace-parent</artifactId>
@@ -23,27 +23,11 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-war-plugin</artifactId>
-                <configuration>
-                    <attachClasses>true</attachClasses>
-                    <!-- In version 2.1-alpha-1, this was incorrectly named warSourceExcludes -->
-                    <packagingExcludes>WEB-INF/lib/*.jar</packagingExcludes>
-                    <warSourceExcludes>WEB-INF/lib/*.jar</warSourceExcludes>
-                    <!-- Filter the web.xml (needed for IDE compatibility/debugging) -->
-                    <filteringDeploymentDescriptors>true</filteringDeploymentDescriptors>
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>prepare-package</phase>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
                 <groupId>com.mycila</groupId>
                 <artifactId>license-maven-plugin</artifactId>
                 <configuration>
                     <excludes>
+                        <!-- Ignore license header requirements on CSS/images/HTML/XSL -->
                         <exclude>src/main/webapp/**</exclude>
                         <exclude>**/*.xsl</exclude>
                     </excludes>
@@ -107,42 +91,27 @@
                     <groupId>org.apache.commons</groupId>
                     <artifactId>commons-lang3</artifactId>
 	        </exclusion>
-		<exclusion>
-		    <groupId>log4j</groupId>
-		    <artifactId>log4j</artifactId>
-	        </exclusion>
-		<exclusion>
-		    <groupId>org.slf4j</groupId>
-		    <artifactId>slf4j-log4j12</artifactId>
-		</exclusion>
+                <exclusion>
+                    <groupId>log4j</groupId>
+                    <artifactId>log4j</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
+                </exclusion>
+                <!-- Later version provided by SolrJ -->
+                <exclusion>
+                    <groupId>org.codehaus.woodstox</groupId>
+                    <artifactId>wstx-asl</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
 
-        <!-- Java Injection and MVC -->
+        <!-- Needed to support Spring @Configuration classes (to register servlets/beans with Spring Boot webapp) -->
         <dependency>
-            <groupId>javax.inject</groupId>
-            <artifactId>javax.inject</artifactId>
-            <version>1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-webmvc</artifactId>
-            <version>${spring.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-beans</artifactId>
-            <version>${spring.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context</artifactId>
-            <version>${spring.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-web</artifactId>
-            <version>${spring.version}</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <version>${spring-boot.version}</version>
         </dependency>
 
         <!-- Templating Engine -->
@@ -294,24 +263,4 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
-    <developers>
-        <developer>
-            <name>DSpace @ Lyncode</name>
-            <email>dspace@lyncode.com</email>
-            <organization>Lyncode</organization>
-            <organizationUrl>http://www.lyncode.com</organizationUrl>
-        </developer>
-        <developer>
-            <id>helix84</id>
-            <name>Ivan Másar</name>
-            <email>helix84@centrum.sk</email>
-        </developer>
-        <developer>
-            <name>Ariel J. Lira</name>
-            <email>arieljlira@gmail.com</email>
-            <organization>SeDiCI</organization>
-            <organizationUrl>http://sedici.unlp.edu.ar</organizationUrl>
-        </developer>
-    </developers>
 </project>

@@ -952,14 +952,6 @@
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-oai</artifactId>
                 <version>7.0-SNAPSHOT</version>
-                <type>jar</type>
-                <classifier>classes</classifier>
-            </dependency>
-            <dependency>
-                <groupId>org.dspace</groupId>
-                <artifactId>dspace-oai</artifactId>
-                <version>7.0-SNAPSHOT</version>
-                <type>war</type>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
