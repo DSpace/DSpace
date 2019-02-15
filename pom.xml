@@ -1366,6 +1366,12 @@
               <version>3.6.2</version>
           </dependency>
 
+          <dependency>
+              <groupId>org.codehaus.janino</groupId>
+              <artifactId>janino</artifactId>
+              <version>3.0.12</version>
+          </dependency>
+
       </dependencies>
    </dependencyManagement>
 
