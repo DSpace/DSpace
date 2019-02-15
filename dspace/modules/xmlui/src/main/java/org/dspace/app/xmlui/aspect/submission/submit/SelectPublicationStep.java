@@ -107,6 +107,9 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
 
     protected static final Message T_license_head = message("xmlui.submit.select.license.head");
 
+
+    private static java.util.List<DryadJournalConcept> allJournalConcepts = null;
+    
     public void addPageMeta(PageMeta pageMeta) throws SAXException,
             WingException, SQLException, IOException,
             AuthorizeException
@@ -120,6 +123,13 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
 
     public void addBody(Body body) throws SAXException, WingException, SQLException, IOException, AuthorizeException
     {
+        log.debug("addBody");
+        
+        // initialize journal concepts (if they haven't been before)
+        if(allJournalConcepts == null) {
+            allJournalConcepts = Arrays.asList((DryadJournalConcept[]) JournalUtils.getAllJournalConcepts());
+        }
+        
         Request request = ObjectModelHelper.getRequest(objectModel);
         Collection collection = submission.getCollection();
         String actionURL = contextPath + "/handle/"+collection.getHandle() + "/submit/" + knot.getId() + ".continue";
@@ -146,6 +156,7 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
         String selectedJournalName = null;
         // get journal status and name
         if (selectedJournalId!=null) {
+            log.debug("getting journal status/name");
             try {
                 DryadJournalConcept journalConcept = JournalUtils.getJournalConceptByJournalID(selectedJournalId);
                 selectedJournalName = journalConcept.getFullName();
@@ -167,6 +178,7 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
             }
         }
 
+        log.debug("addArticleStatusRadios");
         // add radios: Accepted, In Review, Published, Not Yet Submitted
         addArticleStatusRadios(request, form, manuscript);
 
@@ -183,7 +195,7 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
 
         // case B: (radio selected ==> accepted)
         addfieldsStatusAccepted(newItem, request, manuscript);
-
+        
         // case D: (radio selected ==>  In Review)
         addJournalSelectStatusInReview(newItem, manuscript, request);
 
@@ -194,15 +206,18 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
 
         addManuscriptNumber(request, newItem, manuscriptNumber);
 
+        log.debug("generateCountryList");
         generateCountryList(form,request);
         generateFundingInfo(form,request);
 
         // add License checkbox.
         addLicense(form);
-
+        
         //add "Next" button
-	    Item actions = form.addItem();
-	    actions.addButton(AbstractProcessingStep.NEXT_BUTTON).setValue(T_next);
+        Item actions = form.addItem();
+        actions.addButton(AbstractProcessingStep.NEXT_BUTTON).setValue(T_next);
+        
+        log.debug("addBody done");
     }
 
 
@@ -284,11 +299,14 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
     }
 
     private void addJournalSelectStatusInReview(Item newItem, Manuscript manuscript, Request request) throws WingException,SQLException {
+        log.debug("addJournalSelectStatusInReview");
+        
+        // initilize the journalSelectOptions the first time this page is loaded
         Composite optionsList = newItem.addComposite("journalID_status_in_review");
         Select journalID = optionsList.addSelect("journalIDStatusInReview");
         journalID.addOption("", "Please select a valid journal");
-        java.util.List<DryadJournalConcept> journalConcepts = Arrays.asList((DryadJournalConcept[]) JournalUtils.getAllJournalConcepts());
-        for (DryadJournalConcept journalConcept : journalConcepts) {
+
+        for (DryadJournalConcept journalConcept : allJournalConcepts) {
             String val = journalConcept.getJournalID();
             String name = journalConcept.getFullName();
             // add only journal with allowReviewWorkflow=true;
@@ -296,27 +314,32 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
                 journalID.addOption(val, name);
             }
         }
+
         String selectedJournalID = request.getParameter("journalIDStatusInReview");
         if (selectedJournalID == null && manuscript != null) {
             selectedJournalID = manuscript.getJournalConcept().getJournalID();
         }
-        log.error("selected journal is " + selectedJournalID);
+        log.info("selected journal is " + selectedJournalID);
+        
         if (!"".equals(selectedJournalID)) {
             journalID.setOptionSelected(selectedJournalID);
         }
         journalID.setLabel(T_SELECT_LABEL);
         journalID.setHelp(T_SELECT_HELP_IN_REVIEW);
-        if(this.errorFlag == org.dspace.submit.step.SelectPublicationStep.ERROR_INVALID_JOURNAL)
+        if(this.errorFlag == org.dspace.submit.step.SelectPublicationStep.ERROR_INVALID_JOURNAL) {
             journalID.addError(T_SELECT_ERROR);
+        }
+        
+        log.debug("addJournalSelectStatusInReview done");
     }
 
 
     private void addJournalSelectStatusIntegrated(String selectedJournalName, Item newItem) throws WingException,SQLException {
+        log.debug("addJournalSelectStatusIntegrated");
         Composite optionsList = newItem.addComposite("journalID_status_integrated");
         Select journalID = optionsList.addSelect("journalIDStatusIntegrated");
         if (selectedJournalName == null || "".equals(selectedJournalName)) {
-            java.util.List<DryadJournalConcept> journalConcepts = Arrays.asList((DryadJournalConcept[]) JournalUtils.getAllJournalConcepts());
-            for (DryadJournalConcept journalConcept : journalConcepts) {
+            for (DryadJournalConcept journalConcept : allJournalConcepts) {
                 if (journalConcept.getIntegrated()) {
                     String val = journalConcept.getFullName();
                     journalID.addOption(val.equals(selectedJournalName), val, val);
@@ -326,6 +349,7 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
             log.error("journal was " + selectedJournalName);
             journalID.setOptionSelected(selectedJournalName);
         }
+        log.debug("addJournalSelectStatusIntegrated done");
     }
 
     public List addReviewSection(List list) throws SAXException, WingException, SQLException, IOException, AuthorizeException {
