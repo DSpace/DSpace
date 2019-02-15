@@ -10,6 +10,7 @@ package org.dspace.storage.rdbms;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -88,7 +89,8 @@ public class DatabaseUtils {
         // Usage checks
         if (argv.length < 1) {
             System.out.println("\nDatabase action argument is missing.");
-            System.out.println("Valid actions: 'test', 'info', 'migrate', 'repair', 'validate' or 'clean'");
+            System.out.println("Valid actions: 'test', 'info', 'migrate', 'repair', 'validate', " +
+                    "'update-sequences' or 'clean'");
             System.out.println("\nOr, type 'database help' for more information.\n");
             System.exit(1);
         }
@@ -328,24 +330,54 @@ public class DatabaseUtils {
                     e.printStackTrace();
                     System.exit(1);
                 }
+            } else if (argv[0].equalsIgnoreCase("update-sequences")) {
+                try (Connection connection = dataSource.getConnection()) {
+                    String dbType = getDbType(connection);
+                    String sqlfile = "org/dspace/storage/rdbms/sqlmigration/" + dbType +
+                            "/update-sequences.sql";
+                    InputStream sqlstream = DatabaseUtils.class.getClassLoader().getResourceAsStream(sqlfile);
+                    if (sqlstream != null) {
+                        StringBuilder sb = new StringBuilder();
+                        try (BufferedReader br = new BufferedReader(new InputStreamReader(sqlstream))) {
+                            for (String line = br.readLine(); line != null; line = br.readLine()) {
+                                sb.append(line);
+                            }
+                        }
+                        if (sb.length() > 0) {
+                            System.out.println("Running " + sqlfile);
+                            connection.createStatement().execute(sb.toString());
+                            System.out.println("update-sequences complete");
+                        } else {
+                            System.err.println(sqlfile + " contains no SQL to execute");
+                        }
+                    } else {
+                        System.err.println(sqlfile + " not found");
+                    }
+                }
             } else {
                 System.out.println("\nUsage: database [action]");
-                System.out.println("Valid actions: 'test', 'info', 'migrate', 'repair' or 'clean'");
+                System.out.println("Valid actions: 'test', 'info', 'migrate', 'repair', " +
+                    "'update-sequences' or 'clean'");
                 System.out.println(
-                    " - test          = Performs a test connection to database to validate connection settings");
+                    " - test             = Performs a test connection to database to " +
+                    "validate connection settings");
                 System.out.println(
-                    " - info / status = Describe basic info/status about database, including validating the " +
-                        "compatibility of this database");
-                System.out.println(" - migrate       = Migrate the database to the latest version");
+                    " - info / status    = Describe basic info/status about database, including validating the " +
+                    "compatibility of this database");
                 System.out.println(
-                    " - repair        = Attempt to repair any previously failed database migrations or checksum " +
-                        "mismatches (via Flyway repair)");
+                    " - migrate          = Migrate the database to the latest version");
                 System.out.println(
-                    " - validate      = Validate current database's migration status (via Flyway validate), " +
-                        "validating all migration checksums.");
+                    " - repair           = Attempt to repair any previously failed database " +
+                    "migrations or checksum mismatches (via Flyway repair)");
                 System.out.println(
-                    " - clean         = DESTROY all data and tables in database (WARNING there is no going back!). " +
-                        "Requires 'db.cleanDisabled=false' setting in config.");
+                    " - validate         = Validate current database's migration status (via Flyway validate), " +
+                    "validating all migration checksums.");
+                System.out.println(
+                    " - update-sequences = Update database sequences after running AIP ingest.");
+                System.out.println(
+                    " - clean            = DESTROY all data and tables in database " +
+                    "(WARNING there is no going back!). " +
+                    "Requires 'db.cleanDisabled=false' setting in config.");
                 System.out.println("");
                 System.exit(0);
             }
