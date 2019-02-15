@@ -380,49 +380,6 @@ public class AssociationAnywhere {
         // log an error and let us trace it.
         log.error("called createRequest ", new Throwable());
         return null;
-        
-        try {
-            if(template == null) {
-                template = TransformerFactory.newInstance().newTemplates(new StreamSource(AssociationAnywhere.class.getResourceAsStream("/anywhere/request-templates.xsl")));
-	        }
-            Transformer transformer = template.newTransformer();
-            transformer.setParameter("username",ConfigurationManager.getProperty("association.anywhere.username"));
-            transformer.setParameter("password", ConfigurationManager.getProperty("association.anywhere.password"));
-            transformer.setParameter("customerID", customerID);
-            transformer.setParameter("date", dateFormat.format(new Date()));
-
-            if (transactionDescription == null) {
-                transactionDescription = "";
-            }
-
-            transformer.setParameter("transactionDescription", transactionDescription);
-
-            DryadJournalConcept journalConcept = JournalUtils.getJournalConceptByCustomerID(customerID);
-            if (journalConcept != null) {
-                String transactionType = journalConcept.getPaymentPlan();
-
-                if (transactionType != null) {
-                    transformer.setParameter("transactionType", transactionType);
-
-                    String creditsAccepted = "1";
-                    if(transactionType.equals(DryadJournalConcept.PREPAID_PLAN)) {
-                        creditsAccepted = "-1";
-                    }
-
-                    transformer.setParameter("creditsAccepted", creditsAccepted);
-                } else {
-                    log.error("Journal w/ customerID " + customerID + " does not have a transactionType.");
-                }
-            }
-            StringWriter writer = new StringWriter();
-            transformer.transform(new StreamSource(new StringReader("<" + form + "/>")),new StreamResult(writer));
-            return writer.toString();
-        } catch (TransformerConfigurationException e) {
-            log.error("Unable to generate request URL", e);
-        } catch (TransformerException e) {
-            log.error("Unable to generate request URL", e);
-        }
-        return null;
     }
 }
 
