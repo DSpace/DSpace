@@ -125,6 +125,7 @@
         <str name="echoParams">explicit</str>
         <int name="rows">10</int>
         <str name="df">search_text</str>
+        <str name="q.op">AND</str>
     </lst>
     <arr name="last-components">
         <str>spellcheck</str>
