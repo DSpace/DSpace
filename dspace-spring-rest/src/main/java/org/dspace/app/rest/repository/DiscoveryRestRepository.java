@@ -94,7 +94,6 @@ public class DiscoveryRestRepository extends AbstractDSpaceRestRepository {
                                               final List<SearchFilter> searchFilters, final Pageable page)
         throws InvalidRequestException {
         Context context = obtainContext();
-
         BrowsableDSpaceObject scopeObject = scopeResolver.resolveScope(context, dsoScope);
         DiscoveryConfiguration discoveryConfiguration = searchConfigurationService
             .getDiscoveryConfigurationByNameOrDso(configuration, scopeObject);
