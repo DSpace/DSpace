@@ -5,11 +5,11 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.xoai.app;
-
+package org.dspace.app.configuration;
 import static java.lang.Integer.MAX_VALUE;
 
 import com.lyncode.jtwig.mvc.JtwigViewResolver;
+import org.dspace.xoai.app.BasicConfiguration;
 import org.dspace.xoai.services.api.xoai.ItemRepositoryResolver;
 import org.dspace.xoai.services.impl.xoai.DSpaceItemRepositoryResolver;
 import org.springframework.context.annotation.Bean;
@@ -22,13 +22,25 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
-@Import( {
-    BasicConfiguration.class
-})
+/**
+ * OAI-PMH webapp configuration. Replaces the old web.xml
+ * <p>
+ * This @Configuration class is automatically discovered by Spring Boot via a @ComponentScan
+ * on the org.dspace.app.configuration package.
+ * <p>
+ *
+ *
+ * @author Tim Donohue
+ */
 @Configuration
+// Import WebMVC configuration (and allow us to extend WebMvcConfigurerAdapter)
 @EnableWebMvc
+// Import additional configuration and beans from BasicConfiguration
+@Import(BasicConfiguration.class)
+// Scan for controllers in this package
 @ComponentScan("org.dspace.xoai.controller")
-public class DSpaceWebappConfiguration extends WebMvcConfigurerAdapter {
+public class OAIWebConfig extends WebMvcConfigurerAdapter {
+
     private static final String TWIG_HTML_EXTENSION = ".twig.html";
     private static final String VIEWS_LOCATION = "/WEB-INF/views/";
 
@@ -58,5 +70,5 @@ public class DSpaceWebappConfiguration extends WebMvcConfigurerAdapter {
     public ItemRepositoryResolver xoaiItemRepositoryResolver() {
         return new DSpaceItemRepositoryResolver();
     }
-
 }
+

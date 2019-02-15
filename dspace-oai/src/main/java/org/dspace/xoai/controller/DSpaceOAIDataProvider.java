@@ -40,6 +40,7 @@ import org.dspace.xoai.services.api.xoai.ItemRepositoryResolver;
 import org.dspace.xoai.services.api.xoai.SetRepositoryResolver;
 import org.dspace.xoai.services.impl.xoai.DSpaceResumptionTokenFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -49,6 +50,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
  * @author Lyncode Development Team (dspace at lyncode dot com)
  */
 @Controller
+// Use the configured "oai.path" for all requests, or "/oai" by default
+@RequestMapping("/${oai.path:oai}")
+// Only enable this controller if "oai.enabled=true"
+@ConditionalOnProperty("oai.enabled")
 public class DSpaceOAIDataProvider {
     private static final Logger log = getLogger(DSpaceOAIDataProvider.class);
 
