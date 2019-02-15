@@ -57,13 +57,16 @@ public class SolrServiceResourceRestrictionPlugin implements SolrServiceIndexPlu
 
     @Override
     public void additionalIndex(Context context, BrowsableDSpaceObject bdso, SolrInputDocument document) {
+        System.out.println(bdso.getTypeText());
         if (!(bdso instanceof DSpaceObject)) {
+            System.out.println("NO DSO");
             return;
         }
         DSpaceObject dso = (DSpaceObject) bdso;
         try {
             List<ResourcePolicy> policies = authorizeService
-                .getPoliciesActionFilterExceptRpType(context, dso, Constants.READ, ResourcePolicy.TYPE_WORKFLOW);
+                  .getPoliciesActionFilter(context, dso, Constants.READ);
+                //.getPoliciesActionFilterExceptRpType(context, dso, Constants.READ, ResourcePolicy.TYPE_WORKFLOW);
             for (ResourcePolicy resourcePolicy : policies) {
                 String fieldValue;
                 if (resourcePolicy.getGroup() != null) {
@@ -74,7 +77,7 @@ public class SolrServiceResourceRestrictionPlugin implements SolrServiceIndexPlu
                     fieldValue = "e" + resourcePolicy.getEPerson().getID();
 
                 }
-
+                System.out.println("add READ FIELD= " + fieldValue + " " + resourcePolicy.getRpType());
                 document.addField("read", fieldValue);
 
                 //remove the policy from the cache to save memory
@@ -89,66 +92,65 @@ public class SolrServiceResourceRestrictionPlugin implements SolrServiceIndexPlu
     @Override
     public void additionalSearchParameters(Context context, DiscoverQuery discoveryQuery, SolrQuery solrQuery) {
         try {
-            if (context != null && !authorizeService.isAdmin(context)) {
+            if (context != null) {
 
-                boolean isInProgessSubmission = false;
+                boolean isWorkspace = StringUtils.startsWith(discoveryQuery.getDiscoveryConfigurationName(),
+                        "workspace");
+                boolean isWorkflow = StringUtils.startsWith(discoveryQuery.getDiscoveryConfigurationName(), "workflow");
                 EPerson currentUser = context.getCurrentUser();
                 // Retrieve all the groups the current user is a member of !
                 Set<Group> groups = groupService.allMemberGroupsSet(context, currentUser);
 
-                if (currentUser != null) {
-                    if (StringUtils.isNotBlank(discoveryQuery.getDiscoveryConfigurationName())) {
-                        if (discoveryQuery.getDiscoveryConfigurationName().startsWith("workspace")) {
-                            // insert filter by submitter
-                            solrQuery
-                                .addFilterQuery("read:(e" + currentUser.getID() + " OR ws" + currentUser.getID() + ")");
-                            isInProgessSubmission = true;
-                        } else if (discoveryQuery.getDiscoveryConfigurationName().startsWith("workflow")) {
-                            // insert filter by controllers
-                            StringBuilder controllerQuery = new StringBuilder();
-                            controllerQuery.append("read:(we" + currentUser.getID());
-                            for (Group group : groups) {
-                                controllerQuery.append(" OR wg").append(group.getID());
-                            }
-                            controllerQuery.append(")");
-                            solrQuery.addFilterQuery(controllerQuery.toString());
-                            isInProgessSubmission = true;
-                        }
-                    }
+                // extra security check to avoid the possibility that an anonymous user
+                // get access to workspace or workflow
+                if (currentUser == null && (isWorkflow || isWorkspace)) {
+                    throw new IllegalStateException("An anonymous user cannot perform a workspace or workflow search");
                 }
-
-                if (!isInProgessSubmission) {
-                    StringBuilder resourceQuery = new StringBuilder();
-                    //Always add the anonymous group id to the query
-                    Group anonymousGroup = groupService.findByName(context, Group.ANONYMOUS);
-                    String anonGroupId = "";
-                    if (anonymousGroup != null) {
-                        anonGroupId = anonymousGroup.getID().toString();
-                    }
-                    resourceQuery.append("read:(g" + anonGroupId);
-
-                    if (currentUser != null) {
-                        resourceQuery.append(" OR e").append(currentUser.getID());
-                    }
-
-                    //Retrieve all the groups the current user is a member of !
+                if (isWorkspace) {
+                    // insert filter by submitter
+                    solrQuery
+                        .addFilterQuery("read:(e" + currentUser.getID() + " OR ws" + currentUser.getID() + ")");
+                } else if (isWorkflow) {
+                    // insert filter by controllers
+                    StringBuilder controllerQuery = new StringBuilder();
+                    controllerQuery.append("read:(we" + currentUser.getID());
                     for (Group group : groups) {
-                        resourceQuery.append(" OR g").append(group.getID());
+                        controllerQuery.append(" OR wg").append(group.getID());
                     }
+                    controllerQuery.append(")");
+                    solrQuery.addFilterQuery(controllerQuery.toString());
+                } else {
+                    if (!authorizeService.isAdmin(context)) {
+                        StringBuilder resourceQuery = new StringBuilder();
+                        //Always add the anonymous group id to the query
+                        Group anonymousGroup = groupService.findByName(context, Group.ANONYMOUS);
+                        String anonGroupId = "";
+                        if (anonymousGroup != null) {
+                            anonGroupId = anonymousGroup.getID().toString();
+                        }
+                        resourceQuery.append("read:(g" + anonGroupId);
 
-                    resourceQuery.append(")");
+                        if (currentUser != null) {
+                            resourceQuery.append(" OR e").append(currentUser.getID());
+                        }
 
-                    if (authorizeService.isCommunityAdmin(context)
-                        || authorizeService.isCollectionAdmin(context)) {
-                        resourceQuery.append(" OR ");
-                        resourceQuery.append(DSpaceServicesFactory.getInstance()
-                                                                  .getServiceManager()
-                                                                  .getServiceByName(SearchService.class.getName(),
-                                                                                    SearchService.class)
-                                                                  .createLocationQueryForAdministrableItems(context));
+                        //Retrieve all the groups the current user is a member of !
+                        for (Group group : groups) {
+                            resourceQuery.append(" OR g").append(group.getID());
+                        }
+
+                        resourceQuery.append(")");
+
+                        if (authorizeService.isCommunityAdmin(context)
+                            || authorizeService.isCollectionAdmin(context)) {
+                            resourceQuery.append(" OR ");
+                            resourceQuery.append(DSpaceServicesFactory.getInstance().getServiceManager()
+                                    .getServiceByName(SearchService.class.getName(), SearchService.class)
+                                    .createLocationQueryForAdministrableItems(context));
+                        }
+
+                        solrQuery.addFilterQuery(resourceQuery.toString());
                     }
-
-                    solrQuery.addFilterQuery(resourceQuery.toString());
                 }
             }
         } catch (SQLException e) {

@@ -210,12 +210,26 @@ public class ResourcePolicyDAOImpl extends AbstractHibernateDAO<ResourcePolicy> 
 
         Root<ResourcePolicy> resourcePolicyRoot = criteriaQuery.from(ResourcePolicy.class);
         criteriaQuery.select(resourcePolicyRoot);
-        criteriaQuery.where(
-            criteriaBuilder.and(criteriaBuilder.equal(resourcePolicyRoot.get(ResourcePolicy_.dSpaceObject), dso),
-                                criteriaBuilder.equal(resourcePolicyRoot.get(ResourcePolicy_.actionId), action),
-                                criteriaBuilder.notEqual(resourcePolicyRoot.get(ResourcePolicy_.rptype), rpType)
-            )
-        );
+        if (rpType != null) {
+            criteriaQuery.where(
+                criteriaBuilder.and(criteriaBuilder.equal(resourcePolicyRoot.get(ResourcePolicy_.dSpaceObject), dso),
+                                    criteriaBuilder.equal(resourcePolicyRoot.get(ResourcePolicy_.actionId), action),
+                                    criteriaBuilder.or(
+                                            criteriaBuilder.notEqual(resourcePolicyRoot.get(ResourcePolicy_.rptype),
+                                                    rpType),
+                                            criteriaBuilder.isNull(resourcePolicyRoot.get(ResourcePolicy_.rptype))
+                                    )
+                )
+            );
+        } else {
+            criteriaQuery.where(
+                    criteriaBuilder.and(
+                            criteriaBuilder.equal(resourcePolicyRoot.get(ResourcePolicy_.dSpaceObject), dso),
+                            criteriaBuilder.equal(resourcePolicyRoot.get(ResourcePolicy_.actionId), action),
+                            criteriaBuilder.isNotNull(resourcePolicyRoot.get(ResourcePolicy_.rptype))
+                    )
+            );
+        }
         return list(context, criteriaQuery, false, ResourcePolicy.class, 1, -1);
     }
 }
