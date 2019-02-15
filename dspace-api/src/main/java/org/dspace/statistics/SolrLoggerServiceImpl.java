@@ -348,14 +348,14 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
         }
 
         if (dspaceObject != null) {
-            doc1.addField("id", dspaceObject.getID());
+            doc1.addField("id", dspaceObject.getID().toString());
             doc1.addField("type", dspaceObject.getType());
             storeParents(doc1, dspaceObject);
         }
         // Save the current time
         doc1.addField("time", DateFormatUtils.format(new Date(), DATE_FORMAT_8601));
         if (currentUser != null) {
-            doc1.addField("epersonid", currentUser.getID());
+            doc1.addField("epersonid", currentUser.getID().toString());
         }
 
         return doc1;
@@ -418,14 +418,14 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
         }
 
         if (dspaceObject != null) {
-            doc1.addField("id", dspaceObject.getID());
+            doc1.addField("id", dspaceObject.getID().toString());
             doc1.addField("type", dspaceObject.getType());
             storeParents(doc1, dspaceObject);
         }
         // Save the current time
         doc1.addField("time", DateFormatUtils.format(new Date(), DATE_FORMAT_8601));
         if (currentUser != null) {
-            doc1.addField("epersonid", currentUser.getID());
+            doc1.addField("epersonid", currentUser.getID().toString());
         }
 
         return doc1;
@@ -454,7 +454,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
             }
             //Store the scope
             if (scope != null) {
-                solrDoc.addField("scopeId", scope.getID());
+                solrDoc.addField("scopeId", scope.getID().toString());
                 solrDoc.addField("scopeType", scope.getType());
             }
 
@@ -489,7 +489,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
             SolrInputDocument solrDoc = getCommonSolrDoc(usageWorkflowEvent.getObject(), null, null);
 
             //Log the current collection & the scope !
-            solrDoc.addField("owningColl", usageWorkflowEvent.getScope().getID());
+            solrDoc.addField("owningColl", usageWorkflowEvent.getScope().getID().toString());
             storeParents(solrDoc, usageWorkflowEvent.getScope());
 
             if (usageWorkflowEvent.getWorkflowStep() != null) {
@@ -501,25 +501,25 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
             if (usageWorkflowEvent.getGroupOwners() != null) {
                 for (int i = 0; i < usageWorkflowEvent.getGroupOwners().length; i++) {
                     Group group = usageWorkflowEvent.getGroupOwners()[i];
-                    solrDoc.addField("owner", "g" + group.getID());
+                    solrDoc.addField("owner", "g" + group.getID().toString());
                 }
             }
             if (usageWorkflowEvent.getEpersonOwners() != null) {
                 for (int i = 0; i < usageWorkflowEvent.getEpersonOwners().length; i++) {
                     EPerson ePerson = usageWorkflowEvent.getEpersonOwners()[i];
-                    solrDoc.addField("owner", "e" + ePerson.getID());
+                    solrDoc.addField("owner", "e" + ePerson.getID().toString());
                 }
             }
 
-            solrDoc.addField("workflowItemId", usageWorkflowEvent.getWorkflowItem().getID());
+            solrDoc.addField("workflowItemId", usageWorkflowEvent.getWorkflowItem().getID().toString());
 
             EPerson submitter = ((Item) usageWorkflowEvent.getObject()).getSubmitter();
             if (submitter != null) {
-                solrDoc.addField("submitter", submitter.getID());
+                solrDoc.addField("submitter", submitter.getID().toString());
             }
             solrDoc.addField("statistics_type", StatisticsType.WORKFLOW.text());
             if (usageWorkflowEvent.getActor() != null) {
-                solrDoc.addField("actor", usageWorkflowEvent.getActor().getID());
+                solrDoc.addField("actor", usageWorkflowEvent.getActor().getID().toString());
             }
 
             solr.add(solrDoc);
@@ -537,21 +537,21 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
             Community comm = (Community) dso;
             List<Community> parentCommunities = comm.getParentCommunities();
             for (Community parent : parentCommunities) {
-                doc1.addField("owningComm", parent.getID());
+                doc1.addField("owningComm", parent.getID().toString());
                 storeParents(doc1, parent);
             }
         } else if (dso instanceof Collection) {
             Collection coll = (Collection) dso;
             List<Community> communities = coll.getCommunities();
             for (Community community : communities) {
-                doc1.addField("owningComm", community.getID());
+                doc1.addField("owningComm", community.getID().toString());
                 storeParents(doc1, community);
             }
         } else if (dso instanceof Item) {
             Item item = (Item) dso;
             List<Collection> collections = item.getCollections();
             for (Collection collection : collections) {
-                doc1.addField("owningColl", collection.getID());
+                doc1.addField("owningColl", collection.getID().toString());
                 storeParents(doc1, collection);
             }
         } else if (dso instanceof Bitstream) {
@@ -560,7 +560,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
             for (Bundle bundle : bundles) {
                 List<Item> items = bundle.getItems();
                 for (Item item : items) {
-                    doc1.addField("owningItem", item.getID());
+                    doc1.addField("owningItem", item.getID().toString());
                     storeParents(doc1, item);
                 }
             }
