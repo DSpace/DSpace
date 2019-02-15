@@ -119,6 +119,7 @@
         <str name="echoParams">explicit</str>
         <int name="rows">10</int>
         <str name="df">item.handle</str>
+        <str name="q.op">OR</str>
     </lst>
   </requestHandler>
 
