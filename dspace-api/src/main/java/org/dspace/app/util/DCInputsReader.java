@@ -7,6 +7,7 @@
  */
 package org.dspace.app.util;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.dspace.content.MetadataSchema;
 import org.dspace.core.ConfigurationManager;
 import org.w3c.dom.Document;
@@ -20,6 +21,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.FactoryConfigurationError;
 import java.io.File;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Submission form generator for DSpace. Reads and parses the installation
@@ -536,8 +539,7 @@ public class DCInputsReader
                                 throw new SAXException(errString);
 
                         }
-                        List<String> pairs = new ArrayList<String>();
-                        valuePairs.put(pairsName, pairs);
+                        List<Pair<String, String>> nameValuePairs = new ArrayList<>();
                         NodeList cl = nd.getChildNodes();
                         int lench = cl.getLength();
                         for (int j = 0; j < lench; j++)
@@ -567,10 +569,16 @@ public class DCInputsReader
                                                         }
                                                 } // ignore any children that aren't 'display' or 'storage'
                                         }
-                                        pairs.add(display);
-                                        pairs.add(storage);
+                                        nameValuePairs.add(Pair.of(display, storage));
                                 } // ignore any children that aren't a 'pair'
                         }
+                        List<String> pairs = nameValuePairs
+                                .stream()
+                                .sorted()
+                                .flatMap(item -> Stream.of(item.getKey(), item.getValue()))
+                                .collect(Collectors.toList());
+                        valuePairs.put(pairsName, pairs);
+
                     } // ignore any children that aren't a 'value-pair'
         }
     }
