@@ -3,6 +3,8 @@ package ua.edu.sumdu.essuir.entity;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import javax.persistence.*;
 import java.util.List;
@@ -54,6 +56,28 @@ public class FacultyEntity {
 
     public void setChairs(List<ChairEntity> chairs) {
         this.chairs = chairs;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (o == null || getClass() != o.getClass()) return false;
+
+        FacultyEntity that = (FacultyEntity) o;
+
+        return new EqualsBuilder()
+                .append(id, that.id)
+                .append(name, that.name)
+                .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37)
+                .append(id)
+                .append(name)
+                .toHashCode();
     }
 
     public static final class Builder {

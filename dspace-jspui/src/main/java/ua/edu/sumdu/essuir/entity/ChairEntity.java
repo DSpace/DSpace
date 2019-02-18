@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import javax.persistence.*;
 import java.util.List;
@@ -74,6 +76,28 @@ public class ChairEntity {
         this.facultyEntityName = facultyEntityName;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ChairEntity that = (ChairEntity) o;
+
+        return new EqualsBuilder()
+                .append(id, that.id)
+                .append(chairName, that.chairName)
+                .append(facultyEntityName, that.facultyEntityName)
+                .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37)
+                .append(id)
+                .append(chairName)
+                .toHashCode();
+    }
 
     public static final class Builder {
         private Integer id;

@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Controller
 public class SpecialityStatisticsService {
@@ -51,8 +52,9 @@ public class SpecialityStatisticsService {
     }
 
     private List<PaperDescription> getBachelousPapers() {
-        List<Integer> bachelousPaperIds = metadatavalueRepository.findDistinctByTextValue("Bachelous paper")
-                .stream()
+        List<Integer> bachelousPaperIds = Stream.concat(
+                metadatavalueRepository.findDistinctByTextValue("Bachelous paper").stream(),
+                metadatavalueRepository.findDistinctByTextValue("Masters thesis").stream())
                 .map(Metadatavalue::getResourceId)
                 .collect(Collectors.toList());
 

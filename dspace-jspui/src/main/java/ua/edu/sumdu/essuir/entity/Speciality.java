@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.hp.hpl.jena.sparql.function.library.print;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import javax.persistence.*;
 
@@ -57,6 +59,32 @@ public class Speciality {
 
     public ChairEntity getChairEntity() {
         return chairEntity;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Speciality that = (Speciality) o;
+
+        return new EqualsBuilder()
+                .append(id, that.id)
+                .append(name, that.name)
+                .append(code, that.code)
+                .append(chairEntity, that.chairEntity)
+                .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37)
+                .append(id)
+                .append(name)
+                .append(code)
+                .append(chairEntity)
+                .toHashCode();
     }
 
     public static final class Builder {
