@@ -7,4 +7,5 @@
     <include file="changelog/01-create-speciality-table.xml" relativeToChangelogFile="true"/>
     <include file="changelog/02-fill-speciality-table.xml" relativeToChangelogFile="true"/>
     <include file="changelog/03-metadata-field.xml" relativeToChangelogFile="true"/>
+    <include file="changelog/04-add-law-speciality.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>
