@@ -212,15 +212,14 @@ public class RelationshipServiceImpl implements RelationshipService {
 
     public void update(Context context, List<Relationship> relationships) throws SQLException, AuthorizeException {
         if (CollectionUtils.isNotEmpty(relationships)) {
-            // Check authorisation - only administrators can change formats
-            if (!authorizeService.isAdmin(context)) {
-                throw new AuthorizeException(
-                    "Only administrators can modify relationship");
-            }
-
             for (Relationship relationship : relationships) {
-                if (isRelationshipValidToCreate(context, relationship)) {
-                    relationshipDAO.save(context, relationship);
+                if (authorizeService.authorizeActionBoolean(context, relationship.getLeftItem(), Constants.WRITE) ||
+                    authorizeService.authorizeActionBoolean(context, relationship.getRightItem(), Constants.WRITE)) {
+                    if (isRelationshipValidToCreate(context, relationship)) {
+                        relationshipDAO.save(context, relationship);
+                    }
+                } else {
+                    throw new AuthorizeException("You do not have write rights on this relationship's items");
                 }
             }
         }
@@ -228,6 +227,7 @@ public class RelationshipServiceImpl implements RelationshipService {
 
     public void delete(Context context, Relationship relationship) throws SQLException, AuthorizeException {
         if (isRelationshipValidToDelete(context, relationship)) {
+            // To delete a relationship, a user must have WRITE permissions on one of the related Items
             if (authorizeService.authorizeActionBoolean(context, relationship.getLeftItem(), Constants.WRITE) ||
                 authorizeService.authorizeActionBoolean(context, relationship.getRightItem(), Constants.WRITE)) {
                 relationshipDAO.delete(context, relationship);

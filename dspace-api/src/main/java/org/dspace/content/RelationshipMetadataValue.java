@@ -22,6 +22,17 @@ public class RelationshipMetadataValue extends MetadataValue {
      */
     private boolean useForPlace;
 
+    /**
+     * This property determines whether this RelationshipMetadataValue should be used in place calculation or not.
+     * This is retrieved from Spring configuration when constructing RelationshipMetadataValues. This Spring
+     * configuration is located in the core-services.xml configuration file.
+     * Putting this property on true will imply that we're now mixing plain-text metadatavalues with the
+     * metadatavalues that are constructed through Relationships with regards to the place attribute.
+     * For example, currently the RelationshipMetadataValue dc.contributor.author that is constructed through a
+     * Relationship for a Publication will have its useForPlace set to true. This means that the place
+     * calculation will take both these RelationshipMetadataValues into account together with the normal
+     * plain text metadatavalues.
+     */
     public boolean isUseForPlace() {
         return useForPlace;
     }

@@ -1428,26 +1428,28 @@ prevent the generation of resource policy entry values with null dspace_object a
     }
 
     private RelationshipMetadataValue constructMetadataValue(Context context, String key) {
+        String[] splittedKey = key.split("\\.");
+        RelationshipMetadataValue metadataValue = new RelationshipMetadataValue();
+        String metadataSchema = splittedKey.length > 0 ? splittedKey[0] : null;
+        String metadataElement = splittedKey.length > 1 ? splittedKey[1] : null;
+        String metadataQualifier = splittedKey.length > 2 ? splittedKey[2] : null;
+        MetadataField metadataField = null;
         try {
-            String[] splittedKey = key.split("\\.");
-            RelationshipMetadataValue metadataValue = new RelationshipMetadataValue();
-            String metadataSchema = splittedKey.length > 0 ? splittedKey[0] : null;
-            String metadataElement = splittedKey.length > 1 ? splittedKey[1] : null;
-            String metadataQualifier = splittedKey.length > 2 ? splittedKey[2] : null;
-            MetadataField metadataField = metadataFieldService
+            metadataField = metadataFieldService
                 .findByElement(context, metadataSchema, metadataElement, metadataQualifier);
-            if (metadataField == null) {
-                log.error("A MetadataValue was attempted to construct with MetadataField for parameters: " +
-                              "metadataschema: {}, metadataelement: {}, metadataqualifier: {}",
-                          metadataSchema, metadataElement, metadataQualifier);
-                return null;
-            }
-            metadataValue.setMetadataField(metadataField);
-            metadataValue.setLanguage(Item.ANY);
-            return metadataValue;
         } catch (SQLException e) {
-            log.error(e.getMessage(), e);
+            log.error("Could not find element with MetadataSchema: " + metadataSchema +
+                          ", MetadataElement: " + metadataElement + " and MetadataQualifier: " + metadataQualifier, e);
+            return null;
         }
-        return null;
+        if (metadataField == null) {
+            log.error("A MetadataValue was attempted to construct with MetadataField for parameters: " +
+                          "metadataschema: {}, metadataelement: {}, metadataqualifier: {}",
+                      metadataSchema, metadataElement, metadataQualifier);
+            return null;
+        }
+        metadataValue.setMetadataField(metadataField);
+        metadataValue.setLanguage(Item.ANY);
+        return metadataValue;
     }
 }

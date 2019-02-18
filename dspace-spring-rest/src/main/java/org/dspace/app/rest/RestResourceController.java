@@ -474,11 +474,12 @@ public class RestResourceController implements InitializingBean {
         checkModelPluralForm(apiCategory, model);
         DSpaceRestRepository<RestAddressableModel, ID> repository = utils.getResourceRepository(apiCategory, model);
         RestAddressableModel modelObject = null;
+        List<DSpaceObject> dSpaceObjectList = utils.getdSpaceObjectsFromRequest(request);
         try {
-            List<DSpaceObject> dSpaceObjectList = utils.getdSpaceObjectsFromRequest(request);
             modelObject = repository.createAndReturn(dSpaceObjectList);
-        } catch (ClassCastException | IOException e) {
-            log.error(e.getMessage(), e);
+        } catch (ClassCastException e) {
+            log.error("Something went wrong whilst creating the object for apiCategory: " + apiCategory +
+                          " and model: " + model, e);
             return ControllerUtils.toEmptyResponse(HttpStatus.INTERNAL_SERVER_ERROR);
         }
         if (modelObject == null) {
