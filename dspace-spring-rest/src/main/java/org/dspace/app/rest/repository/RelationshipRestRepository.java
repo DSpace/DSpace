@@ -30,7 +30,6 @@ import org.dspace.content.service.RelationshipService;
 import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.eperson.EPerson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -92,6 +91,7 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
         return new RelationshipResource(model, utils, rels);
     }
 
+    @Override
     protected RelationshipRest createAndReturn(Context context, List<DSpaceObject> list)
         throws AuthorizeException, SQLException, RepositoryMethodNotImplementedException {
 
@@ -104,17 +104,15 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
             RelationshipType relationshipType = relationshipTypeService
                 .find(context, Integer.parseInt(req.getParameter("relationshipType")));
 
-            EPerson ePerson = context.getCurrentUser();
-            if (authorizeService.authorizeActionBoolean(context, leftItem, Constants.WRITE) ||
-                authorizeService.authorizeActionBoolean(context, rightItem, Constants.WRITE)) {
-                relationship.setLeftItem(leftItem);
-                relationship.setRightItem(rightItem);
-                relationship.setRelationshipType(relationshipType);
+            relationship.setLeftItem(leftItem);
+            relationship.setRightItem(rightItem);
+            relationship.setRelationshipType(relationshipType);
+            try {
                 relationship = relationshipService.create(context, relationship);
-                return relationshipConverter.fromModel(relationship);
-            } else {
+            } catch (AuthorizeException e) {
                 throw new AccessDeniedException("You do not have write rights on this relationship's items");
             }
+            return relationshipConverter.fromModel(relationship);
         } else {
             throw new UnprocessableEntityException("The given items in the request were not valid items");
         }
@@ -161,10 +159,9 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
         try {
             relationship = relationshipService.find(context, id);
             if (relationship != null) {
-                if (authorizeService.authorizeActionBoolean(context, relationship.getLeftItem(), Constants.WRITE) ||
-                    authorizeService.authorizeActionBoolean(context, relationship.getRightItem(), Constants.WRITE)) {
+                try {
                     relationshipService.delete(context, relationship);
-                } else {
+                } catch (AuthorizeException e) {
                     throw new AccessDeniedException("You do not have write rights on this relationship's items");
                 }
             }
