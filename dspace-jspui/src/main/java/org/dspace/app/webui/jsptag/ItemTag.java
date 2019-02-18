@@ -401,6 +401,9 @@ public class ItemTag extends TagSupport
         while (st.hasMoreTokens())
         {
         	String field = st.nextToken().trim();
+        	if(request.getRequestURI().contains("display-item.jsp") && ("dc.speciality.id".equals(field) || "dc.date.presentation".equals(field))) {
+        	    continue;
+            }
             boolean isDate = false;
             boolean isLink = false;
             boolean isResolver = false;

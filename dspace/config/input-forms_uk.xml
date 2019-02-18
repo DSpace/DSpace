@@ -109,7 +109,7 @@
          <dc-element>speciality</dc-element>
          <dc-qualifier>id</dc-qualifier>
          <repeatable>false</repeatable>
-         <label>Speciality id</label>
+         <label>Спеціальність</label>
          <input-type>onebox</input-type>
          <hint></hint>
          <required></required>
@@ -131,7 +131,7 @@
              <dc-element>date</dc-element>
              <dc-qualifier>presentation</dc-qualifier>
              <repeatable>false</repeatable>
-             <label>Дата представлення</label>
+             <label>Дата захисту</label>
              <input-type>onebox</input-type>
              <hint></hint>
              <required></required>
