@@ -147,8 +147,22 @@ public class ScopusUtils
         LinkedList<Value> authUrl = new LinkedList<Value>();
         LinkedList<Value> authScopusID = new LinkedList<Value>();
         LinkedList<Value> authOrcid = new LinkedList<Value>();
+        List<String> sequenceAuthors = new LinkedList<String>(); 
         //TODO: Manage Author Affiliation
-        for(Element author: authors){
+        authors : for(Element author: authors){
+            
+            //check sequence number
+            String sequenceAuthor = author.getAttribute("seq");
+            if(StringUtils.isNotBlank(sequenceAuthor)) {
+                if(sequenceAuthors.contains(sequenceAuthor)) {
+                    //author already managed, skip it
+                    continue authors;
+                }
+                else {
+                    //manage new author
+                    sequenceAuthors.add(sequenceAuthor);
+                }
+            }
             String givenname = XMLUtils.getElementValue(author,
                     "given-name");
             String surname = XMLUtils.getElementValue(author,
