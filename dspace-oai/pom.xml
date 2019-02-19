@@ -17,7 +17,8 @@
         <!-- This is the path to the root [dspace-src] directory. -->
         <root.basedir>${basedir}/..</root.basedir>
         <xoai.version>3.2.10</xoai.version>
-        <jtwig.version>2.0.1</jtwig.version>
+        <!-- NOTE: Once updated to Spring Boot v2, this should update to 5.87.0.RELEASE -->
+        <jtwig.version>5.86.1.RELEASE</jtwig.version>
     </properties>
 
     <build>
@@ -28,7 +29,7 @@
                 <configuration>
                     <excludes>
                         <!-- Ignore license header requirements on CSS/images/HTML/XSL -->
-                        <exclude>src/main/webapp/**</exclude>
+                        <exclude>src/main/resources/**</exclude>
                         <exclude>**/*.xsl</exclude>
                     </excludes>
                 </configuration>
@@ -116,34 +117,25 @@
 
         <!-- Templating Engine -->
         <dependency>
-            <groupId>com.lyncode</groupId>
-            <artifactId>jtwig-spring</artifactId>
+            <groupId>org.jtwig</groupId>
+            <artifactId>jtwig-spring-boot-starter</artifactId>
             <version>${jtwig.version}</version>
             <exclusions>
+                <!-- We specify our own version of spring-boot classes -->
                 <exclusion>
-                    <groupId>com.google.guava</groupId>
-                    <artifactId>guava</artifactId>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-web</artifactId>
                 </exclusion>
+                <!-- More recent version is pulled in via solr-core -->
                 <exclusion>
-                    <groupId>org.javassist</groupId>
-                    <artifactId>javassist</artifactId>
+                    <groupId>org.ow2.asm</groupId>
+                    <artifactId>asm</artifactId>
                 </exclusion>
+                <!-- This exclusion may be removable once we update to Spring Boot v2 -->
                 <exclusion>
-                    <groupId>org.apache.commons</groupId>
-                    <artifactId>commons-lang3</artifactId>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-configuration-processor</artifactId>
                 </exclusion>
-                <exclusion>
-                    <groupId>javax.servlet</groupId>
-                    <artifactId>servlet-api</artifactId>
-                </exclusion>
-		<exclusion>
-		    <groupId>log4j</groupId>
-		    <artifactId>log4j</artifactId>
-	        </exclusion>
-		<exclusion>
-		    <groupId>org.slf4j</groupId>
-		    <artifactId>slf4j-log4j12</artifactId>
-	        </exclusion>
             </exclusions>
         </dependency>
 
@@ -253,7 +245,7 @@
         <dependency>
             <groupId>org.parboiled</groupId>
             <artifactId>parboiled-core</artifactId>
-            <version>1.1.6</version>
+            <version>1.1.7</version>
             <scope>test</scope>
         </dependency>
         <dependency>

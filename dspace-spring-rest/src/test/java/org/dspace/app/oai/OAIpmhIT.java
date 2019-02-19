@@ -59,7 +59,7 @@ public class OAIpmhIT extends AbstractControllerIntegrationTest {
         // Attempt to call the root endpoint
         getClient().perform(get(ROOT_PATH))
                     // Expect a 400 response code (OAI requires a context)
-                   .andExpect(status().isOk())
+                   .andExpect(status().isBadRequest())
         ;
     }
 
