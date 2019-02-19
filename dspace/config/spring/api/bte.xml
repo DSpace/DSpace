@@ -303,10 +303,9 @@
 	            <entry key="allkeywords">
 	                <list>
 						<value>keywords</value>
-						<value>scopusKeywords</value>
-						<value>mesh</value>
+						<value>meshheadings</value>
+						<value>meshqualifiers</value>
 						<value>arxivCategory</value>
-						<value>wosCategory</value>
 						<value>classificationASJC</value>						
 					</list>
 	            </entry>
@@ -774,7 +773,6 @@
 				<entry value="editors" key="dc.contributor.editor" />
 				<entry value="others" key="dc.contributor.other" />
 				<entry value="abstract" key="dc.description.abstract" />
-				<entry value="description" key="dc.description" />
 				<entry value="allkeywords" key="dc.subject" />
 				<entry value="doi" key="dc.identifier.doi" />
 				<entry value="publisher" key="dc.publisher" />
@@ -798,7 +796,7 @@
 				<entry value="providerType" key="dc.source.type" />
 				<entry value="orcid" key="dc.contributor.orcid" />
 				<entry value="rights" key="dc.rights" />
-				<entry value="description" key="dc.description" />
+				<entry value="note" key="dc.description" />
 				<entry value="externalID" key="dc.identifier.external" />				
 				
 				<!-- Not used - new metadata fields need to be declared for them in DSpace registry -->
@@ -844,7 +842,7 @@
                     <entry key="sourceTitle" value="journal" />
                     <entry key="isbn" value="pisbn" />
                     <entry key="issn" value="jissn" />
-                    <entry key="eissn" value="eissn" />
+                    <entry key="eissn" value="jeissn" />
                     <entry key="issued" value="issued" />
                     <entry key="volume" value="volume" />
                     <entry key="issue" value="issue" />
@@ -890,20 +888,20 @@
 				<entry key="year" value="issued" />
 				<entry key="volume" value="volume" />
 				<entry key="issue" value="issue" />
-				<entry key="edition" value="edition" />
+				<entry key="edition" value="editionnumber" />
 				<entry key="startPage" value="firstpage" />
 				<entry key="endPage" value="lastpage" />
 				<entry key="authors" value="authors" />
 				<entry key="chairs" value="others" />
 				<entry key="affiliations" value="affiliations" />
-				<entry key="articleNumber" value="articleNumber" />
-				<entry key="authorsWithAffiliations" value="authorsWithAffiliations" />
+				<entry key="articleNumber" value="articlenumber" />
+				<entry key="authorsWithAffiliations" value="authorsWithAffiliation" />
 				<entry key="displayUrl" value="scopusUrl" />
 				<entry key="citationCount" value="scopusCitation" />
 				<entry key="citationUrl" value="scopusCitationUrl" />
 				<entry key="url" value="url" />
 				<entry key="classificationASJC" value="classificationASJC" />
-				<entry key="keywords" value="keywords" />
+				<entry key="keywords" value="keywords" />  
 				<entry key="language" value="language" />
 				<entry key="abstracts" value="abstract" />
 				<entry key="abstractita" value="abstractita" />
@@ -1040,7 +1038,7 @@
 			<map key-type="java.lang.String" value-type="java.lang.String">
 				<entry key="abstract" value="abstract" /> 
 				<entry key="aff" value="affiliation" />
-				<entry key="alternate_title"  value="titleAlternative" />
+				<entry key="alternate_title"  value="titlealternative" />
 				<entry key="arxiv_class"  value="arXivCategory" /> 
 				<entry key="author" value="authors" />
 				<entry key="bibcode" value="adsbibcode" />
@@ -1057,7 +1055,7 @@
 				<entry key="volume" value="volume" />
 				<entry key="title" value="title" />
 				<entry key="copyright" value="rights" />
-				 <entry key="ack" value="description" />
+				 <entry key="ack" value="note" />
 				<!--  <entry key="vizier" value="" />
 						<entry key="indexstamp" value="" />
 						<entry key="alternate_bibcode" value="" />
