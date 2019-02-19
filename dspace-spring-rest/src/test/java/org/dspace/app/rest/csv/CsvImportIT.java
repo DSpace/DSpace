@@ -39,12 +39,12 @@ import org.dspace.content.service.RelationshipService;
 import org.dspace.content.service.RelationshipTypeService;
 import org.hamcrest.Matchers;
 import org.junit.After;
-import org.junit.Ignore;
+//import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 
-@Ignore
+//@Ignore
 public class CsvImportIT extends AbstractEntityIntegrationTest {
 
     @Autowired
