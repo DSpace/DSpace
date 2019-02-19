@@ -119,6 +119,7 @@ public class DataPackageStats extends AbstractCurationTask {
 	String embargoDate = "";
 	int maxDownloads = 0;
 	String numberOfDownloads = "\"[unknown]\"";
+        String numberOfViews = "";
 	String manuscriptNum = null;
 	int numReadmes = 0;
 	boolean wentThroughReview = false;
@@ -135,7 +136,7 @@ public class DataPackageStats extends AbstractCurationTask {
 	if (dso.getType() == Constants.COLLECTION) {
 	    // output headers for the CSV file that will be created by processing all items in this collection
 	    report("handle, packageDOI, articleDOI, journal, journalAllowsEmbargo, journalAllowsReview, numKeywords, numKeywordsJournal, numberOfFiles, packageSize, " +
-		   "embargoType, embargoDate, numberOfDownloads, manuscriptNum, numReadmes, wentThroughReview, dateAccessioned");
+		   "embargoType, embargoDate, numberOfViews, numberOfDownloads, manuscriptNum, numReadmes, wentThroughReview, dateAccessioned");
 	} else if (dso.getType() == Constants.ITEM) {
             Item item = (Item)dso;
 
@@ -189,21 +190,21 @@ public class DataPackageStats extends AbstractCurationTask {
 		// journalAllowsEmbargo
 		// embargoes are allowed for all non-integrated journals
 		// embargoes are also allowed for integrated journals that have set the embargoesAllowed option
-        //use new journal utils to read the configuration from database instead of from the file
-        Scheme journalScheme = Scheme.findByIdentifier(context,"Journal");
+                //use new journal utils to read the configuration from database instead of from the file
+                Scheme journalScheme = Scheme.findByIdentifier(context,"Journal");
 		DryadJournalConcept journalConcept = JournalUtils.getJournalConceptByJournalName(journal);
-
+                
 		if (journalConcept != null) {
-            if (journalConcept.getIntegrated() || journalConcept.getAllowEmbargo()) {
+                    if (journalConcept.getIntegrated() || journalConcept.getAllowEmbargo()) {
 		        journalAllowsEmbargo = true;
-            }
+                    }
 
-			// journalAllowsReview
-			if (journalConcept.getAllowReviewWorkflow()) {
-				journalAllowsReview = true;
-			}
+                    // journalAllowsReview
+                    if (journalConcept.getAllowReviewWorkflow()) {
+                        journalAllowsReview = true;
+                    }
 		}
-
+                
 		// accession date
 		vals = item.getMetadata("dc.date.accessioned");
 		if (vals.length == 0) {
@@ -250,8 +251,12 @@ public class DataPackageStats extends AbstractCurationTask {
 
 		}
 
-
-		
+                URL viewStatURL = new URL("http://datadryad.org/solr/statistics/select/?q=isBot:false+id:" + item.getID());
+                log.debug("fetching " + viewStatURL);
+                Document viewdoc = docb.parse(viewStatURL.openStream());
+                NodeList nl = viewdoc.getElementsByTagName("result");
+                numberOfViews = nl.item(0).getAttributes().getNamedItem("numFound").getTextContent();
+                        
 		// count the files, and compute statistics that depend on the files
 		log.debug("getting data file info");
 		DCValue[] dataFiles = item.getMetadata("dc.relation.haspart");
@@ -334,8 +339,8 @@ public class DataPackageStats extends AbstractCurationTask {
 			URL downloadStatURL = new URL("http://datadryad.org/solr/statistics/select/?indent=on&q=owningItem:" + fileItem.getID());
 			log.debug("fetching " + downloadStatURL);
 			Document statsdoc = docb.parse(downloadStatURL.openStream());
-			NodeList nl = statsdoc.getElementsByTagName("result");
-			String downloadsAtt = nl.item(0).getAttributes().getNamedItem("numFound").getTextContent();
+			NodeList dnl = statsdoc.getElementsByTagName("result");
+			String downloadsAtt = dnl.item(0).getAttributes().getNamedItem("numFound").getTextContent();
 			int currDownloads = Integer.parseInt(downloadsAtt);
 			if(currDownloads > maxDownloads) {
 			    maxDownloads = currDownloads;
@@ -367,7 +372,7 @@ public class DataPackageStats extends AbstractCurationTask {
 	report(handle + ", " + packageDOI + ", " + articleDOI + ", \"" + journal + "\", " +
 	       journalAllowsEmbargo + ", " + journalAllowsReview + ", " + numKeywords + ", " +
 	       numKeywordsJournal + ", " + numberOfFiles + ", " + packageSize + ", " +
-	       embargoType + ", " + embargoDate + ", " + numberOfDownloads + ", " + manuscriptNum + ", " +
+	       embargoType + ", " + embargoDate + ", " + numberOfViews + ", " + numberOfDownloads + ", " + manuscriptNum + ", " +
 	       numReadmes + ", " + wentThroughReview + ", " + dateAccessioned);
 
 	// slow this down a bit so we don't overwhelm the production SOLR server with requests
