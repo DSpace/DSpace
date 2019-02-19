@@ -24,6 +24,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.sql.DataSource;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.core.Context;
@@ -337,15 +338,10 @@ public class DatabaseUtils {
                             "/update-sequences.sql";
                     InputStream sqlstream = DatabaseUtils.class.getClassLoader().getResourceAsStream(sqlfile);
                     if (sqlstream != null) {
-                        StringBuilder sb = new StringBuilder();
-                        try (BufferedReader br = new BufferedReader(new InputStreamReader(sqlstream))) {
-                            for (String line = br.readLine(); line != null; line = br.readLine()) {
-                                sb.append(line);
-                            }
-                        }
-                        if (sb.length() > 0) {
+                        String s = IOUtils.toString(sqlstream, "UTF-8");
+                        if (!s.isEmpty()) {
                             System.out.println("Running " + sqlfile);
-                            connection.createStatement().execute(sb.toString());
+                            connection.createStatement().execute(s);
                             System.out.println("update-sequences complete");
                         } else {
                             System.err.println(sqlfile + " contains no SQL to execute");
