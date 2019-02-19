@@ -333,7 +333,7 @@ public class DatabaseUtils {
             } else if (argv[0].equalsIgnoreCase("update-sequences")) {
                 try (Connection connection = dataSource.getConnection()) {
                     String dbType = getDbType(connection);
-                    String sqlfile = "org/dspace/storage/rdbms/sqlmigration/" + dbType +
+                    String sqlfile = "/org/dspace/storage/rdbms/sqlmigration/" + dbType +
                             "/update-sequences.sql";
                     InputStream sqlstream = DatabaseUtils.class.getClassLoader().getResourceAsStream(sqlfile);
                     if (sqlstream != null) {
