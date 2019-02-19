@@ -11,7 +11,6 @@ import javax.annotation.Nonnull;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.data.rest.webmvc.json.patch.LateObjectEvaluator;
 import org.springframework.data.rest.webmvc.json.patch.PatchException;
 
 /**
