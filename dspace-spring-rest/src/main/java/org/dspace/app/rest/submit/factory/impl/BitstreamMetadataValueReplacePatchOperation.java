@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 import org.dspace.app.rest.model.MetadataValueRest;
+import org.dspace.app.rest.model.patch.LateObjectEvaluator;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.InProgressSubmission;
@@ -22,7 +23,6 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.services.model.Request;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.rest.webmvc.json.patch.LateObjectEvaluator;
 import org.springframework.util.Assert;
 
 /**

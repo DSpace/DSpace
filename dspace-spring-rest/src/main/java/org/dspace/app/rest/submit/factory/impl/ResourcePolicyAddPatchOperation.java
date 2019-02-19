@@ -12,6 +12,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.dspace.app.rest.model.ResourcePolicyRest;
+import org.dspace.app.rest.model.patch.LateObjectEvaluator;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Bitstream;
@@ -28,7 +29,6 @@ import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.services.model.Request;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.rest.webmvc.json.patch.LateObjectEvaluator;
 
 /**
  * Submission "add" operation to add resource policies in the Bitstream
