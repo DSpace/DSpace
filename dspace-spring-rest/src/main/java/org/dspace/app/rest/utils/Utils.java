@@ -237,12 +237,29 @@ public class Utils {
         }
     }
 
-    private List<DSpaceObject> constructDSpaceObjectList(Context context,
-                                                         HttpServletRequest request) throws IOException {
-        List<String> list = readFromRequest(request);
+    /**
+     * This method will construct a List of DSpaceObjects by executing the method
+     * {@link Utils#readFromRequest(HttpServletRequest)} and fetching the List of Strings from the request.
+     * The method will iterate over this list of Strings and parse the String to retrieve the UUID from it.
+     * It will then look through all the DSpaceObjectServices to try and match this UUID to a DSpaceObject.
+     * If one is found, this DSpaceObject is added to the List of DSpaceObjects that we will return.
+     * @param context   The relevant DSpace context
+     * @param request   The request out of which we'll create the List of DSpaceObjects
+     * @return          The resulting list of DSpaceObjects that we parsed out of the request
+     */
+    private List<DSpaceObject> constructDSpaceObjectList(Context context, HttpServletRequest request) {
+        List<String> list = null;
+        try {
+            list = readFromRequest(request);
+        } catch (IOException e) {
+            log.error("Something went wrong with reading in the inputstream from the request", e);
+        }
 
         List<DSpaceObject> dSpaceObjects = new LinkedList<>();
         for (String string : list) {
+            if (string.endsWith("/")) {
+                string = string.substring(0, string.length() - 1);
+            }
             String uuid = string.substring(string.lastIndexOf('/') + 1);
             try {
                 for (DSpaceObjectService dSpaceObjectService : dSpaceObjectServices) {
@@ -253,13 +270,19 @@ public class Utils {
                     }
                 }
             } catch (SQLException e) {
-                log.error(e.getMessage(), e);
+                log.error("Could not find DSpaceObject for UUID: " + uuid, e);
             }
 
         }
         return dSpaceObjects;
     }
 
+    /**
+     * This method reads lines from the request's InputStream and will add this to a list of Strings.
+     * @param request       The request from which the InputStream will be fetched
+     * @return              A list of String constructed from the request's InputStream
+     * @throws IOException  If something goes wrong
+     */
     private List<String> readFromRequest(HttpServletRequest request) throws IOException {
         List<String> list = new LinkedList<>();
         Scanner scanner = new Scanner(request.getInputStream());
@@ -289,7 +312,7 @@ public class Utils {
      * @return              The list of DSpaceObjects that we could find in the InputStream
      * @throws IOException  If something goes wrong
      */
-    public List<DSpaceObject> getdSpaceObjectsFromRequest(HttpServletRequest request) throws IOException {
+    public List<DSpaceObject> getdSpaceObjectsFromRequest(HttpServletRequest request) {
         return constructDSpaceObjectList(ContextUtil.obtainContext(request), request);
     }
 }
