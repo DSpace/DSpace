@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-
 import javax.servlet.ServletException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -27,6 +26,9 @@ import org.dspace.content.Collection;
 import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.core.Utils;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.submit.model.UploadConfiguration;
+import org.dspace.submit.model.UploadConfigurationService;
+import org.dspace.utils.DSpace;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -71,7 +73,6 @@ public class DCInputsReader {
      * Keyname for storing dropdown value-pair set name
      */
     static final String PAIR_TYPE_NAME = "value-pairs-name";
-
 
     /**
      * Reference to the forms definitions map, computed from the forms
@@ -179,6 +180,32 @@ public class DCInputsReader {
         }
     }
 
+    public List<DCInputSet> getInputsUploadByCollectionHandle(String collectionHandle)
+            throws DCInputsReaderException {
+    	SubmissionConfig config;
+        try {
+            config = new SubmissionConfigReader().getSubmissionConfigByCollection(collectionHandle);
+            String formName = config.getSubmissionName();
+            if (formName == null) {
+                throw new DCInputsReaderException("No form designated as default");
+            }
+            List<DCInputSet> results = new ArrayList<DCInputSet>();
+            for (int idx = 0; idx < config.getNumberOfSteps(); idx++) {
+                SubmissionStepConfig step = config.getStep(idx);
+                if (SubmissionStepConfig.UPLOAD_STEP_NAME.equals(step.getType())) {
+                	UploadConfigurationService uploadConfigurationService = new DSpace().getServiceManager()
+                            .getServiceByName("uploadConfigurationService", UploadConfigurationService.class);
+                	UploadConfiguration uploadConfig = uploadConfigurationService.getMap().get(step.getId());
+                    results.add(getInputsByFormName(uploadConfig.getMetadata()));
+                }
+            }
+            return results;
+        } catch (SubmissionConfigReaderException e) {
+            throw new DCInputsReaderException("No form designated as default", e);
+        }
+    	
+    }
+    
     public List<DCInputSet> getInputsGroupByCollectionHandle(String collectionHandle)
             throws DCInputsReaderException {
     	SubmissionConfig config;
@@ -734,6 +761,7 @@ public class DCInputsReader {
     	ArrayList<List<DCInputSet>> arrayInputSets = new ArrayList<List<DCInputSet>>();
     	arrayInputSets.add(getInputsByCollectionHandle(collection.getHandle()));
     	arrayInputSets.add(getInputsGroupByCollectionHandle(collection.getHandle()));
+    	arrayInputSets.add(getInputsUploadByCollectionHandle(collection.getHandle()));
 
 		for (List<DCInputSet> inputSets: arrayInputSets) {
 	        for (DCInputSet inputSet : inputSets) {
