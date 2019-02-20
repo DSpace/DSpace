@@ -475,7 +475,7 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
     }
 
     @Test
-    public void putRelationshipRightItemWriteAccess() throws Exception {
+    public void putRelationshipWriteAccessOnAuthors() throws Exception {
 
         context.turnOffAuthorisationSystem();
 
@@ -564,7 +564,7 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
     }
 
     @Test
-    public void putRelationshipNewRightItemWriteAccess() throws Exception {
+    public void putRelationshipWriteAccessOnPublication() throws Exception {
 
         context.turnOffAuthorisationSystem();
 
@@ -617,96 +617,6 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
         ePersonService.update(context, user);
         context.setCurrentUser(user);
 
-        authorizeService.addPolicy(context, author1, Constants.WRITE, user);
-        authorizeService.addPolicy(context, author2, Constants.WRITE, user);
-
-        String token = getAuthToken(user.getEmail(), password);
-
-        MvcResult mvcResult = getClient(token).perform(post("/api/core/relationships")
-                                                           .param("relationshipType",
-                                                                  isAuthorOfPublicationRelationshipType.getID()
-                                                                                                       .toString())
-                                                           .contentType(MediaType.parseMediaType("text/uri-list"))
-                                                           .content(
-                                                               "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
-                                                                   "https://localhost:8080/spring-rest/api/core/items/" + author1.getID()))
-                                              .andExpect(status().isCreated())
-                                              .andReturn();
-
-        ObjectMapper mapper = new ObjectMapper();
-        String content = mvcResult.getResponse().getContentAsString();
-        Map<String,Object> map = mapper.readValue(content, Map.class);
-        String id = String.valueOf(map.get("id"));
-
-        MvcResult mvcResult2 = getClient(token).perform(put("/api/core/relationships/" + id)
-                                                            .contentType(MediaType.parseMediaType("text/uri-list"))
-                                                            .content(
-                                                                "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
-                                                                    "https://localhost:8080/spring-rest/api/core/items/" + author2.getID()))
-                                               .andExpect(status().isOk())
-                                               .andReturn();
-
-        getClient(token).perform(get("/api/core/relationships/" + id))
-                        .andExpect(status().isOk())
-                        .andExpect(jsonPath("$.rightId", is(author2.getID().toString())));
-
-    }
-
-
-    @Test
-    public void putRelationshipLeftItemWriteAccess() throws Exception {
-
-        context.turnOffAuthorisationSystem();
-
-        parentCommunity = CommunityBuilder.createCommunity(context)
-                                          .withName("Parent Community")
-                                          .build();
-        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
-                                           .withName("Sub Community")
-                                           .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
-        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
-        Collection col3 = CollectionBuilder.createCollection(context, child1).withName("OrgUnits").build();
-
-        Item author1 = ItemBuilder.createItem(context, col1)
-                                  .withTitle("Author1")
-                                  .withIssueDate("2017-10-17")
-                                  .withAuthor("Smith, Donald")
-                                  .withRelationshipType("Person")
-                                  .build();
-
-        Item author2 = ItemBuilder.createItem(context, col1)
-                                  .withTitle("Author2")
-                                  .withIssueDate("2017-10-12")
-                                  .withAuthor("Smith, Donalaze")
-                                  .withRelationshipType("Person")
-                                  .build();
-
-        Item publication = ItemBuilder.createItem(context, col3)
-                                      .withTitle("Publication1")
-                                      .withAuthor("Testy, TEst")
-                                      .withIssueDate("2015-01-01")
-                                      .withRelationshipType("Publication")
-                                      .build();
-
-        RelationshipType isAuthorOfPublicationRelationshipType = relationshipTypeService
-            .findbyTypesAndLabels(context, entityTypeService.findByEntityType(context, "Publication"),
-                                  entityTypeService.findByEntityType(context, "Person"),
-                                  "isAuthorOfPublication", "isPublicationOfAuthor");
-
-
-
-        EPerson user = ePersonService.create(context);
-        user.setFirstName(context, "first");
-        user.setLastName(context, "last");
-        user.setEmail("tturturu@email.com");
-        user.setCanLogIn(true);
-        user.setLanguage(context, I18nUtil.getDefaultLocale().getLanguage());
-        ePersonService.setPassword(user, password);
-        // actually save the eperson to unit testing DB
-        ePersonService.update(context, user);
-        context.setCurrentUser(user);
-
         authorizeService.addPolicy(context, publication, Constants.WRITE, user);
 
         String token = getAuthToken(user.getEmail(), password);
@@ -741,8 +651,9 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
 
     }
 
+
     @Test
-    public void putRelationshipNewLeftItemWriteAccess() throws Exception {
+    public void putRelationshipWriteAccessOnPublications() throws Exception {
 
         context.turnOffAuthorisationSystem();
 
@@ -770,7 +681,102 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
                                   .withRelationshipType("Person")
                                   .build();
 
-        Item publication = ItemBuilder.createItem(context, col3)
+        Item publication1 = ItemBuilder.createItem(context, col3)
+                                      .withTitle("Publication1")
+                                      .withAuthor("Testy, TEst")
+                                      .withIssueDate("2015-01-01")
+                                      .withRelationshipType("Publication")
+                                      .build();
+        Item publication2 = ItemBuilder.createItem(context, col3)
+                                      .withTitle("Publication2")
+                                      .withAuthor("Testy, TEstzeaze")
+                                      .withIssueDate("2015-01-01")
+                                      .withRelationshipType("Publication")
+                                      .build();
+
+        RelationshipType isAuthorOfPublicationRelationshipType = relationshipTypeService
+            .findbyTypesAndLabels(context, entityTypeService.findByEntityType(context, "Publication"),
+                                  entityTypeService.findByEntityType(context, "Person"),
+                                  "isAuthorOfPublication", "isPublicationOfAuthor");
+
+
+
+        EPerson user = ePersonService.create(context);
+        user.setFirstName(context, "first");
+        user.setLastName(context, "last");
+        user.setEmail("tturturu@email.com");
+        user.setCanLogIn(true);
+        user.setLanguage(context, I18nUtil.getDefaultLocale().getLanguage());
+        ePersonService.setPassword(user, password);
+        // actually save the eperson to unit testing DB
+        ePersonService.update(context, user);
+        context.setCurrentUser(user);
+
+        authorizeService.addPolicy(context, publication1, Constants.WRITE, user);
+        authorizeService.addPolicy(context, publication2, Constants.WRITE, user);
+
+        String token = getAuthToken(user.getEmail(), password);
+
+        MvcResult mvcResult = getClient(token).perform(post("/api/core/relationships")
+                                                           .param("relationshipType",
+                                                                  isAuthorOfPublicationRelationshipType.getID()
+                                                                                                       .toString())
+                                                           .contentType(MediaType.parseMediaType("text/uri-list"))
+                                                           .content(
+                                                               "https://localhost:8080/spring-rest/api/core/items/" + publication1.getID() + "\n" +
+                                                                   "https://localhost:8080/spring-rest/api/core/items/" + author1.getID()))
+                                              .andExpect(status().isCreated())
+                                              .andReturn();
+
+        ObjectMapper mapper = new ObjectMapper();
+        String content = mvcResult.getResponse().getContentAsString();
+        Map<String,Object> map = mapper.readValue(content, Map.class);
+        String id = String.valueOf(map.get("id"));
+
+        MvcResult mvcResult2 = getClient(token).perform(put("/api/core/relationships/" + id)
+                                                            .contentType(MediaType.parseMediaType("text/uri-list"))
+                                                            .content(
+                                                                "https://localhost:8080/spring-rest/api/core/items/" + publication2.getID() + "\n" +
+                                                                    "https://localhost:8080/spring-rest/api/core/items/" + author1.getID()))
+                                               .andExpect(status().isOk())
+                                               .andReturn();
+
+        getClient(token).perform(get("/api/core/relationships/" + id))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.leftId", is(publication2.getID().toString())));
+
+    }
+
+    @Test
+    public void putRelationshipWriteAccessOnAuthor() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
+        Collection col3 = CollectionBuilder.createCollection(context, child1).withName("OrgUnits").build();
+
+        Item author1 = ItemBuilder.createItem(context, col1)
+                                  .withTitle("Author1")
+                                  .withIssueDate("2017-10-17")
+                                  .withAuthor("Smith, Donald")
+                                  .withRelationshipType("Person")
+                                  .build();
+
+        Item author2 = ItemBuilder.createItem(context, col1)
+                                  .withTitle("Author2")
+                                  .withIssueDate("2017-10-12")
+                                  .withAuthor("Smith, Donalaze")
+                                  .withRelationshipType("Person")
+                                  .build();
+
+        Item publication1 = ItemBuilder.createItem(context, col3)
                                       .withTitle("Publication1")
                                       .withAuthor("Testy, TEst")
                                       .withIssueDate("2015-01-01")
@@ -803,7 +809,6 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
         context.setCurrentUser(user);
 
         authorizeService.addPolicy(context, author1, Constants.WRITE, user);
-        authorizeService.addPolicy(context, publication2, Constants.WRITE, user);
 
         String token = getAuthToken(user.getEmail(), password);
 
@@ -814,7 +819,7 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
                                                                    .toString())
                        .contentType(MediaType.parseMediaType("text/uri-list"))
                        .content(
-                           "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
+                           "https://localhost:8080/spring-rest/api/core/items/" + publication1.getID() + "\n" +
                                "https://localhost:8080/spring-rest/api/core/items/" + author1.getID()))
           .andExpect(status().isCreated())
           .andReturn();
@@ -885,7 +890,7 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
         EPerson user = ePersonService.create(context);
         user.setFirstName(context, "first");
         user.setLastName(context, "last");
-        user.setEmail("ytureye@email.com");
+        user.setEmail("erertertgrdgf@email.com");
         user.setCanLogIn(true);
         user.setLanguage(context, I18nUtil.getDefaultLocale().getLanguage());
         ePersonService.setPassword(user, password);
@@ -920,6 +925,185 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
                                                                     "https://localhost:8080/spring-rest/api/core/items/" + author2.getID()))
                                                .andExpect(status().isForbidden())
                                                .andReturn();
+
+    }
+
+    @Test
+    public void putRelationshipOnlyAccessOnOneAuthor() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
+        Collection col3 = CollectionBuilder.createCollection(context, child1).withName("OrgUnits").build();
+
+        Item author1 = ItemBuilder.createItem(context, col1)
+                                  .withTitle("Author1")
+                                  .withIssueDate("2017-10-17")
+                                  .withAuthor("Smith, Donald")
+                                  .withRelationshipType("Person")
+                                  .build();
+
+        Item author2 = ItemBuilder.createItem(context, col1)
+                                  .withTitle("Author2")
+                                  .withIssueDate("2017-10-12")
+                                  .withAuthor("Smith, Donalaze")
+                                  .withRelationshipType("Person")
+                                  .build();
+
+        Item publication = ItemBuilder.createItem(context, col3)
+                                      .withTitle("Publication1")
+                                      .withAuthor("Testy, TEst")
+                                      .withIssueDate("2015-01-01")
+                                      .withRelationshipType("Publication")
+                                      .build();
+
+        RelationshipType isAuthorOfPublicationRelationshipType = relationshipTypeService
+            .findbyTypesAndLabels(context, entityTypeService.findByEntityType(context, "Publication"),
+                                  entityTypeService.findByEntityType(context, "Person"),
+                                  "isAuthorOfPublication", "isPublicationOfAuthor");
+
+
+
+        EPerson user = ePersonService.create(context);
+        user.setFirstName(context, "first");
+        user.setLastName(context, "last");
+        user.setEmail("tjyhrgefdg@email.com");
+        user.setCanLogIn(true);
+        user.setLanguage(context, I18nUtil.getDefaultLocale().getLanguage());
+        ePersonService.setPassword(user, password);
+        // actually save the eperson to unit testing DB
+        ePersonService.update(context, user);
+        context.setCurrentUser(user);
+
+        authorizeService.addPolicy(context, author1, Constants.WRITE, user);
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        MvcResult mvcResult = getClient(token).perform(post("/api/core/relationships")
+                                                           .param("relationshipType",
+                                                                  isAuthorOfPublicationRelationshipType.getID()
+                                                                                                       .toString())
+                                                           .contentType(MediaType.parseMediaType("text/uri-list"))
+                                                           .content(
+                                                               "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
+                                                                   "https://localhost:8080/spring-rest/api/core/items/" + author1.getID()))
+                                              .andExpect(status().isCreated())
+                                              .andReturn();
+
+        ObjectMapper mapper = new ObjectMapper();
+        String content = mvcResult.getResponse().getContentAsString();
+        Map<String,Object> map = mapper.readValue(content, Map.class);
+        String id = String.valueOf(map.get("id"));
+        token = getAuthToken(user.getEmail(), password);
+
+        MvcResult mvcResult2 = getClient(token).perform(put("/api/core/relationships/" + id)
+                                                            .contentType(MediaType.parseMediaType("text/uri-list"))
+                                                            .content(
+                                                                "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
+                                                                    "https://localhost:8080/spring-rest/api/core/items/" + author2.getID()))
+                                               .andExpect(status().isForbidden())
+                                               .andReturn();
+
+    }
+
+    @Test
+    public void putRelationshipOnlyAccessOnOnePublication() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
+        Collection col3 = CollectionBuilder.createCollection(context, child1).withName("OrgUnits").build();
+
+        Item author1 = ItemBuilder.createItem(context, col1)
+                                  .withTitle("Author1")
+                                  .withIssueDate("2017-10-17")
+                                  .withAuthor("Smith, Donald")
+                                  .withRelationshipType("Person")
+                                  .build();
+
+        Item author2 = ItemBuilder.createItem(context, col1)
+                                  .withTitle("Author2")
+                                  .withIssueDate("2017-10-12")
+                                  .withAuthor("Smith, Donalaze")
+                                  .withRelationshipType("Person")
+                                  .build();
+
+        Item publication1 = ItemBuilder.createItem(context, col3)
+                                       .withTitle("Publication1")
+                                       .withAuthor("Testy, TEst")
+                                       .withIssueDate("2015-01-01")
+                                       .withRelationshipType("Publication")
+                                       .build();
+        Item publication2 = ItemBuilder.createItem(context, col3)
+                                       .withTitle("Publication2")
+                                       .withAuthor("Testy, TEstzeaze")
+                                       .withIssueDate("2015-01-01")
+                                       .withRelationshipType("Publication")
+                                       .build();
+
+        RelationshipType isAuthorOfPublicationRelationshipType = relationshipTypeService
+            .findbyTypesAndLabels(context, entityTypeService.findByEntityType(context, "Publication"),
+                                  entityTypeService.findByEntityType(context, "Person"),
+                                  "isAuthorOfPublication", "isPublicationOfAuthor");
+
+
+
+        EPerson user = ePersonService.create(context);
+        user.setFirstName(context, "first");
+        user.setLastName(context, "last");
+        user.setEmail("tyerzergt@email.com");
+        user.setCanLogIn(true);
+        user.setLanguage(context, I18nUtil.getDefaultLocale().getLanguage());
+        ePersonService.setPassword(user, password);
+        // actually save the eperson to unit testing DB
+        ePersonService.update(context, user);
+        context.setCurrentUser(user);
+
+        authorizeService.addPolicy(context, publication1, Constants.WRITE, user);
+
+        String token = getAuthToken(user.getEmail(), password);
+
+        MvcResult mvcResult = getClient(token).perform(post("/api/core/relationships")
+                                                           .param("relationshipType",
+                                                                  isAuthorOfPublicationRelationshipType.getID()
+                                                                                                       .toString())
+                                                           .contentType(MediaType.parseMediaType("text/uri-list"))
+                                                           .content(
+                                                               "https://localhost:8080/spring-rest/api/core/items/" + publication1.getID() + "\n" +
+                                                                   "https://localhost:8080/spring-rest/api/core/items/" + author1.getID()))
+                                              .andExpect(status().isCreated())
+                                              .andReturn();
+
+        ObjectMapper mapper = new ObjectMapper();
+        String content = mvcResult.getResponse().getContentAsString();
+        Map<String,Object> map = mapper.readValue(content, Map.class);
+        String id = String.valueOf(map.get("id"));
+
+        MvcResult mvcResult2 = getClient(token).perform(put("/api/core/relationships/" + id)
+                                                            .contentType(MediaType.parseMediaType("text/uri-list"))
+                                                            .content(
+                                                                "https://localhost:8080/spring-rest/api/core/items/" + publication2.getID() + "\n" +
+                                                                    "https://localhost:8080/spring-rest/api/core/items/" + author1.getID()))
+                                               .andExpect(status().isForbidden())
+                                               .andReturn();
+
+        getClient(token).perform(get("/api/core/relationships/" + id))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.leftId", is(publication1.getID().toString())));
 
     }
 }
