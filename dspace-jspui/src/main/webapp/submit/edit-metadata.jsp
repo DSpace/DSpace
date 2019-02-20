@@ -1490,10 +1490,7 @@
 %>
 
 <c:set var="dspace.layout.head.last" scope="request">
-    <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/scriptaculous/prototype.min.js"></script>
-    <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/scriptaculous/builder.min.js"></script>
-    <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/scriptaculous/effects.min.js"></script>
-    <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/scriptaculous/controls.min.js"></script>
+
 
     <%--<script type="text/javascript" src="<%= request.getContextPath() %>/static/js/scriptaculous/scriptaculous.js"> </script>--%>
 </c:set>
@@ -1505,7 +1502,7 @@
 
 
 
-    <form action="<%= request.getContextPath() %>/submit#<%= si.getJumpToField()%>" method="post" name="edit_metadata" id="edit_metadata" onkeydown="return disableEnterKey(event);">
+    <form action="<%= request.getContextPath() %>/submit#<%= si.getJumpToField()%>" method="post" name="edit_metadata" id="edit_metadata" onkeydown="return disableEnterKey(event);" onsubmit="return validateSpecialityInfo()">
 
         <jsp:include page="/submit/progressbar.jsp"></jsp:include>
 
@@ -1831,5 +1828,28 @@
 
             jQuery('#authors_block').on('change', '[id^=dc_contributor_author_]', changeButtonStatus);
         });
+
+        function getErrorMessageBlock(message, blockId) {
+        return '<div class="alert alert-warning" id="error-block-'+blockId+'">' + message + '</div>';
+        }
+        function validateSpecialityInfo() {
+            var specialityId = jQuery('#dc_speciality_id').val();
+            var presentationDate = jQuery('#dc_date_presentation').val();
+            var selectedType = jQuery('[name = "dc_type"] option:selected').val();
+            jQuery('#error-block-speciality').remove();
+            jQuery('#error-block-presentation-date').remove();
+            if(selectedType.trim() === 'Bachelous paper' || selectedType.trim() === 'Masters thesis') {
+                if(!specialityId) {
+                    jQuery('#speciality-select-row').prepend(getErrorMessageBlock('<%= LocaleSupport.getLocalizedMessage(pageContext, "metadata.dc.speciality.id.error") %>', 'speciality'));
+                }
+                if(!presentationDate) {
+                    jQuery('#speciality-select-row').next().after(getErrorMessageBlock('<%= LocaleSupport.getLocalizedMessage(pageContext, "metadata.dc.date.presentation.error") %>', 'presentation-date'));
+                }
+                var res = specialityId && presentationDate;
+                return !!res;
+            }
+            return true;
+        }
     </script>
 </dspace:layout>
+
