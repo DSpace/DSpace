@@ -27,6 +27,20 @@ import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
  */
 public interface XmlWorkflowItemDAO extends GenericDAO<XmlWorkflowItem> {
 
+    /**
+     * Find all the workflow items in a specific collection using the pagination parameters (offset, limit)
+     * 
+     * @param context
+     *            dspace context
+     * @param offset
+     *            the first record to return
+     * @param limit
+     *            the max number of records to return
+     * @param collection
+     *            the collection where the workflowitem has been submitted
+     * @return all the workflow items respecting the parameters conditions
+     * @throws SQLException
+     */
     public List<XmlWorkflowItem> findAllInCollection(Context context, Integer offset, Integer limit,
                                                      Collection collection) throws SQLException;
 

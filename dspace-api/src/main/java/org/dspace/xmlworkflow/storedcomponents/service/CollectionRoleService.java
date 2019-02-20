@@ -28,6 +28,17 @@ public interface CollectionRoleService {
 
     public CollectionRole find(Context context, Collection collection, String role) throws SQLException;
 
+    /**
+     * 
+     * @param context
+     *            DSpace context
+     * @param group
+     *            EPerson Group
+     * @return the list of CollectionRole assigned to the specified group
+     * @throws SQLException
+     */
+    public List<CollectionRole> findByGroup(Context context, Group group) throws SQLException;
+
     public List<CollectionRole> findByCollection(Context context, Collection collection) throws SQLException;
 
     public CollectionRole create(Context context, Collection collection, String roleId, Group group)

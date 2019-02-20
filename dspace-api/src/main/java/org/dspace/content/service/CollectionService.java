@@ -159,11 +159,12 @@ public interface CollectionService
      * This returns <code>null</code> if there is no group associated with
      * this collection for the given step.
      *
+     * @param context    DSpace Context
      * @param collection Collection
      * @param step       the workflow step (1-3)
      * @return the group of reviewers or <code>null</code>
      */
-    public Group getWorkflowGroup(Collection collection, int step);
+    public Group getWorkflowGroup(Context context, Collection collection, int step);
 
     /**
      * Create a default submitters group if one does not already exist. Returns
@@ -317,6 +318,13 @@ public interface CollectionService
     public List<Collection> findAuthorized(Context context, Community community, int actionID)
         throws java.sql.SQLException;
 
+    /**
+     * 
+     * @param context DSpace Context
+     * @param group EPerson Group
+     * @return the collection, if any, that has the specified group as administrators or submitters
+     * @throws SQLException
+     */
     public Collection findByGroup(Context context, Group group) throws SQLException;
 
     List<Collection> findCollectionsWithSubscribers(Context context) throws SQLException;

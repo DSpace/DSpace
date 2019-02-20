@@ -161,11 +161,6 @@ public class XmlWorkflowItem implements WorkflowItem, ReloadableEntity<Integer>,
     }
 
     @Override
-    public String getTypeText() {
-        return "workflowitem";
-    }
-
-    @Override
     public int getType() {
         return Constants.WORKFLOWITEM;
     }
@@ -182,7 +177,7 @@ public class XmlWorkflowItem implements WorkflowItem, ReloadableEntity<Integer>,
 
     @Override
     public String getHandle() {
-        return getType() + "-" + getID();
+        return null;
     }
 
 }

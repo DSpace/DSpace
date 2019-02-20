@@ -99,13 +99,17 @@ public class XmlWorkflowItemServiceImpl implements XmlWorkflowItemService {
     }
 
     @Override
-    public List<XmlWorkflowItem> findAll(Context context, Integer offset, Integer pagesize) throws SQLException {
-        return findAllInCollection(context, offset, pagesize, null);
+    public List<XmlWorkflowItem> findAll(Context context, Integer page, Integer pagesize) throws SQLException {
+        return findAllInCollection(context, page, pagesize, null);
     }
 
     @Override
-    public List<XmlWorkflowItem> findAllInCollection(Context context, Integer offset, Integer pagesize,
+    public List<XmlWorkflowItem> findAllInCollection(Context context, Integer page, Integer pagesize,
                                                      Collection collection) throws SQLException {
+        Integer offset = null;
+        if (page != null && pagesize != null) {
+            offset = page * pagesize;
+        }
         return xmlWorkflowItemDAO.findAllInCollection(context, offset, pagesize, collection);
     }
 
