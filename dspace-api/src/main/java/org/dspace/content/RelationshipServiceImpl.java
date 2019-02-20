@@ -86,6 +86,8 @@ public class RelationshipServiceImpl implements RelationshipService {
                                                                               false);
 
         context.turnOffAuthorisationSystem();
+        //If useForPlace for the leftlabel is false for the relationshipType,
+        // we need to sort the relationships here based on leftplace.
         if (!virtualMetadataPopulator.isUseForPlaceTrueForRelationshipType(relationship.getRelationshipType(), true)) {
             if (!leftRelationships.isEmpty()) {
                 leftRelationships.sort(Comparator.comparingInt(Relationship::getLeftPlace));
@@ -101,6 +103,8 @@ public class RelationshipServiceImpl implements RelationshipService {
 
         }
 
+        //If useForPlace for the rightLabel is false for the relationshipType,
+        // we need to sort the relationships here based on the rightplace.
         if (!virtualMetadataPopulator.isUseForPlaceTrueForRelationshipType(relationship.getRelationshipType(), false)) {
             if (!rightRelationships.isEmpty()) {
                 rightRelationships.sort(Comparator.comparingInt(Relationship::getRightPlace));
@@ -132,6 +136,8 @@ public class RelationshipServiceImpl implements RelationshipService {
     }
 
 
+    //Sets the places for the Relationship properly if the updatePlaceInRelationship was called for a new creation
+    //of this Relationship
     private void handleCreationPlaces(Context context, Relationship relationship) throws SQLException {
         List<Relationship> leftRelationships;
         List<Relationship> rightRelationships;
