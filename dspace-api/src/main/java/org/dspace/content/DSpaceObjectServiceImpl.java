@@ -249,7 +249,7 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
                 }
             }
             MetadataValue metadataValue = metadataValueService.create(context, dso, metadataField);
-            // TODO Set place to list length
+            //Set place to list length
             metadataValue.setPlace(this.getMetadata(dso, Item.ANY, Item.ANY, Item.ANY, Item.ANY).size());
 
             metadataValue.setLanguage(lang == null ? null : lang.trim());
@@ -560,6 +560,10 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
             } else {
                 metadataValues = dso.getMetadata();
             }
+            //This inline sort function will sort the MetadataValues based on their place in ascending order
+            //If two places are the same then the MetadataValue instance will be placed before the
+            //RelationshipMetadataValue instance.
+            //This is done to ensure that the order is correct.
             metadataValues.sort(new Comparator<MetadataValue>() {
                 public int compare(MetadataValue o1, MetadataValue o2) {
                     int compare = o1.getPlace() - o2.getPlace();

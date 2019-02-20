@@ -204,6 +204,8 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
         Relationship relationship3 = RelationshipBuilder
             .createRelationshipBuilder(context, publication, auhor1, isAuthorOfPublicationRelationshipType).build();
 
+        context.restoreAuthSystemState();
+
         getClient().perform(get("/api/core/relationships"))
 
                    .andExpect(status().isOk())
@@ -233,11 +235,11 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
         Collection col3 = CollectionBuilder.createCollection(context, child1).withName("OrgUnits").build();
 
         Item author1 = ItemBuilder.createItem(context, col1)
-                                 .withTitle("Author1")
-                                 .withIssueDate("2017-10-17")
-                                 .withAuthor("Smith, Donald")
-                                 .withRelationshipType("Person")
-                                 .build();
+                                  .withTitle("Author1")
+                                  .withIssueDate("2017-10-17")
+                                  .withAuthor("Smith, Donald")
+                                  .withRelationshipType("Person")
+                                  .build();
 
         Item publication = ItemBuilder.createItem(context, col3)
                                       .withTitle("Publication1")
@@ -266,16 +268,20 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
 
         authorizeService.addPolicy(context, publication, Constants.WRITE, user);
 
+        context.restoreAuthSystemState();
+
         String token = getAuthToken(user.getEmail(), password);
 
         MvcResult mvcResult = getClient(token).perform(post("/api/core/relationships")
                                                            .param("relationshipType",
                                                                   isAuthorOfPublicationRelationshipType.getID()
                                                                                                        .toString())
-                                                           .contentType(MediaType.parseMediaType("text/uri-list"))
+                                                           .contentType(MediaType.parseMediaType
+                                                               (org.springframework.data.rest.webmvc.RestMediaTypes
+                                                                    .TEXT_URI_LIST_VALUE))
                                                            .content(
-                               "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
-                               "https://localhost:8080/spring-rest/api/core/items/" + author1.getID()))
+                                                               "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
+                                                                   "https://localhost:8080/spring-rest/api/core/items/" + author1.getID()))
                                               .andExpect(status().isCreated())
                                               .andReturn();
 
@@ -329,6 +335,7 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
         context.setCurrentUser(user);
 
         authorizeService.addPolicy(context, author1, Constants.WRITE, user);
+        context.restoreAuthSystemState();
 
         String token = getAuthToken(user.getEmail(), password);
 
@@ -336,10 +343,12 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
                                                            .param("relationshipType",
                                                                   isAuthorOfPublicationRelationshipType.getID()
                                                                                                        .toString())
-                                                           .contentType(MediaType.parseMediaType("text/uri-list"))
+                                                           .contentType(MediaType.parseMediaType
+                                                               (org.springframework.data.rest.webmvc.RestMediaTypes
+                                                                    .TEXT_URI_LIST_VALUE))
                                                            .content(
-            "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
-            "https://localhost:8080/spring-rest/api/core/items/" + author1.getID()))
+                                                               "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
+                                                                   "https://localhost:8080/spring-rest/api/core/items/" + author1.getID()))
                                               .andExpect(status().isCreated())
                                               .andReturn();
 
@@ -392,6 +401,7 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
         // actually save the eperson to unit testing DB
         ePersonService.update(context, user);
         context.setCurrentUser(user);
+        context.restoreAuthSystemState();
 
         String token = getAuthToken(user.getEmail(), password);
 
@@ -399,15 +409,22 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
                                                            .param("relationshipType",
                                                                   isAuthorOfPublicationRelationshipType.getID()
                                                                                                        .toString())
-                                                           .contentType(MediaType.parseMediaType("text/uri-list"))
+                                                           .contentType(MediaType.parseMediaType
+                                                               (org.springframework.data.rest.webmvc.RestMediaTypes
+                                                                    .TEXT_URI_LIST_VALUE))
                                                            .content(
-                               "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
-                               "https://localhost:8080/spring-rest/api/core/items/" + author1.getID()))
+                                                               "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
+                                                                   "https://localhost:8080/spring-rest/api/core/items/" + author1.getID()))
                                               .andExpect(status().isForbidden())
                                               .andReturn();
 
     }
 
+    /**
+     * This method will test the addition of a mixture of plain-text metadatavalues and relationships to then
+     * verify that the place property is still being handled correctly.
+     * @throws Exception
+     */
     @Test
     public void addRelationshipsAndMetadataToValidatePlaceTest() throws Exception {
 
@@ -459,14 +476,18 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
 
         String adminToken = getAuthToken(admin.getEmail(), password);
 
+        // Here we create our first Relationship to the Publication to give it a dc.contributor.author virtual
+        // metadata field.
         MvcResult mvcResult = getClient(adminToken).perform(post("/api/core/relationships")
                                                                 .param("relationshipType",
                                                                        isAuthorOfPublicationRelationshipType.getID()
                                                                                                             .toString())
-                                                                .contentType(MediaType.parseMediaType("text/uri-list"))
+                                                                .contentType(MediaType.parseMediaType
+                                                                    (org.springframework.data.rest.webmvc.RestMediaTypes
+                                                                         .TEXT_URI_LIST_VALUE))
                                                                 .content(
-                        "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
-                        "https://localhost:8080/spring-rest/api/core/items/" + author1.getID()))
+                                                                    "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
+                                                                        "https://localhost:8080/spring-rest/api/core/items/" + author1.getID()))
                                                    .andExpect(status().isCreated())
                                                    .andReturn();
         ObjectMapper mapper = new ObjectMapper();
@@ -475,50 +496,67 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
         Map<String, Object> map = mapper.readValue(content, Map.class);
         String firstRelationshipIdString = String.valueOf(map.get("id"));
 
+        // Here we call the relationship and verify that the relationship's leftplace is 0
         getClient(adminToken).perform(get("/api/core/relationships/" + firstRelationshipIdString))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("leftPlace", is(0)));
 
 
+        // Make sure we grab the latest instance of the Item from the database
         publication = itemService.find(context, publication.getID());
+        // Add a plain text dc.contributor.author value
         itemService.addMetadata(context, publication, "dc", "contributor", "author", Item.ANY, "plain text");
         itemService.update(context, publication);
 
         List<MetadataValue> list = itemService.getMetadata(publication, "dc", "contributor", "author", Item.ANY);
 
+        // Ensure that the list of dc.contributor.author values now holds two values ("Smith, Donald" and "plain text")
         assertEquals(2, list.size());
         for (MetadataValue mdv : list) {
+            // Here we want to ensure that the "plain text" metadatavalue has place 1 because it was added later than
+            // the Relationship, so the "Smith, Donald" should have place 0 and "plain text" should have place 1
             if (StringUtils.equals(mdv.getValue(), "plain text")) {
                 assertEquals(1, mdv.getPlace());
             }
         }
+        // Testing what was describe above
         MetadataValue author0MD = list.get(0);
         assertEquals("Smith, Donald", author0MD.getValue());
         MetadataValue author1MD = list.get(1);
         assertEquals("plain text", author1MD.getValue());
 
 
+        // Verfiy the leftPlace of our relationship is still 0.
         getClient(adminToken).perform(get("/api/core/relationships/" + firstRelationshipIdString))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("leftPlace", is(0)));
 
+        // Create another Relationship for the Publication, thus creating a third dc.contributor.author mdv
         mvcResult = getClient(adminToken).perform(post("/api/core/relationships")
                                                       .param("relationshipType",
                                                              isAuthorOfPublicationRelationshipType.getID()
                                                                                                   .toString())
-                                                      .contentType(MediaType.parseMediaType("text/uri-list"))
-                                                        .content(
-                        "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
-                        "https://localhost:8080/spring-rest/api/core/items/" + author2.getID()))
+                                                      .contentType(MediaType.parseMediaType
+                                                          (org.springframework.data.rest.webmvc.RestMediaTypes
+                                                               .TEXT_URI_LIST_VALUE))
+                                                      .content(
+                                                          "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
+                                                              "https://localhost:8080/spring-rest/api/core/items/" + author2.getID()))
                                          .andExpect(status().isCreated())
                                          .andReturn();
 
         content = mvcResult.getResponse().getContentAsString();
         map = mapper.readValue(content, Map.class);
+        // Grab the ID for the second relationship for future calling in the rest
         String secondRelationshipIdString = String.valueOf(map.get("id"));
 
         list = itemService.getMetadata(publication, "dc", "contributor", "author", Item.ANY);
+        // Ensure that we now have three dc.contributor.author mdv ("Smith, Donald", "plain text", "Smith, Maria"
+        // In that order which will be checked below the rest call
         assertEquals(3, list.size());
+        // Perform the REST call to the relationship to ensure its leftPlace is 2 even though it's only the second
+        // Relationship. Note that leftPlace 1 was skipped due to the dc.contributor.author plain text value and
+        // This is expected behaviour and should be tested
         getClient(adminToken).perform(get("/api/core/relationships/" + secondRelationshipIdString))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("leftPlace", is(2)));
@@ -530,15 +568,16 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
         MetadataValue author2MD = list.get(2);
         assertEquals("Smith, Maria", author2MD.getValue());
 
+        // Ensure we have the latest instance of the Item from the database
         publication = itemService.find(context, publication.getID());
+        // Add a fourth dc.contributor.author mdv
         itemService.addMetadata(context, publication, "dc", "contributor", "author", Item.ANY, "plain text two");
-//        itemService.addMetadata(context, publication, "dc", "contributor", "author", Item.ANY, "plain text three");
         itemService.update(context, publication);
 
-//        itemService.addMetadata(context, publication, "dc", "contributor", "author", Item.ANY, "plain text four");
-//        itemService.update(context, publication);
         list = itemService.getMetadata(publication, "dc", "contributor", "author", Item.ANY);
 
+        // Assert that the list of dc.contributor.author mdv is now of size 4 in the following order:
+        // "Smith, Donald", "plain text", "Smith, Maria", "plain text two"
         assertEquals(4, list.size());
         for (MetadataValue mdv : list) {
             if (StringUtils.equals(mdv.getValue(), "plain text two")) {
@@ -556,27 +595,37 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
         assertEquals("plain text two", author3MD.getValue());
 
 
+        // Create the third Relationship thus adding a fifth dc.contributor.author mdv
         mvcResult = getClient(adminToken).perform(post("/api/core/relationships")
                                                       .param("relationshipType",
                                                              isAuthorOfPublicationRelationshipType.getID()
                                                                                                   .toString())
-                                                      .contentType(MediaType.parseMediaType("text/uri-list"))
+                                                      .contentType(MediaType.parseMediaType
+                                                          (org.springframework.data.rest.webmvc.RestMediaTypes
+                                                               .TEXT_URI_LIST_VALUE))
                                                       .content(
-                        "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
-                        "https://localhost:8080/spring-rest/api/core/items/" + author3.getID()))
+                                                          "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
+                                                              "https://localhost:8080/spring-rest/api/core/items/" + author3.getID()))
                                          .andExpect(status().isCreated())
                                          .andReturn();
 
         content = mvcResult.getResponse().getContentAsString();
         map = mapper.readValue(content, Map.class);
+        // Save the third Relationship's ID for future calling
         String thirdRelationshipIdString = String.valueOf(map.get("id"));
 
         list = itemService.getMetadata(publication, "dc", "contributor", "author", Item.ANY);
+        // Assert that our dc.contributor.author mdv list is now of size 5
         assertEquals(5, list.size());
+        // Assert that the third Relationship has leftPlace 4, even though 3 relationships were created.
+        // This is because the plain text values 'occupy' place 1 and 3.
         getClient(adminToken).perform(get("/api/core/relationships/" + thirdRelationshipIdString))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("leftPlace", is(4)));
 
+        // Assert that the list is of size 5 and in the following order:
+        // "Smith, Donald", "plain text", "Smith, Maria", "plain text two", "Maybe, Maybe"
+        // Thus the order they were added in
         author0MD = list.get(0);
         assertEquals("Smith, Donald", author0MD.getValue());
         author1MD = list.get(1);
@@ -588,6 +637,7 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
         MetadataValue author4MD = list.get(4);
         assertEquals("Maybe, Maybe", author4MD.getValue());
 
+        // The following additions of Metadata will perform the same sequence of logic and tests as described above
         publication = itemService.find(context, publication.getID());
         itemService.addMetadata(context, publication, "dc", "contributor", "author", Item.ANY, "plain text three");
         itemService.update(context, publication);
@@ -669,6 +719,11 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
         assertEquals(20, list.size()); //also includes type and 3 relation.isAuthorOfPublication values
     }
 
+    /**
+     * This method will test the deletion of a plain-text metadatavalue to then
+     * verify that the place property is still being handled correctly.
+     * @throws Exception
+     */
     @Test
     public void deleteMetadataValueAndValidatePlace() throws Exception {
 
@@ -720,15 +775,18 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
 
         String adminToken = getAuthToken(admin.getEmail(), password);
 
+        // First create the structure of 5 metadatavalues just like the additions test.
 
         MvcResult mvcResult = getClient(adminToken).perform(post("/api/core/relationships")
                                                                 .param("relationshipType",
                                                                        isAuthorOfPublicationRelationshipType.getID()
                                                                                                             .toString())
-                                                                .contentType(MediaType.parseMediaType("text/uri-list"))
+                                                                .contentType(MediaType.parseMediaType
+                                                                    (org.springframework.data.rest.webmvc.RestMediaTypes
+                                                                         .TEXT_URI_LIST_VALUE))
                                                                 .content(
-                        "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
-                        "https://localhost:8080/spring-rest/api/core/items/" + author1.getID()))
+                                                                    "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
+                                                                        "https://localhost:8080/spring-rest/api/core/items/" + author1.getID()))
                                                    .andExpect(status().isCreated())
                                                    .andReturn();
         ObjectMapper mapper = new ObjectMapper();
@@ -762,10 +820,12 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
                                                       .param("relationshipType",
                                                              isAuthorOfPublicationRelationshipType.getID()
                                                                                                   .toString())
-                                                      .contentType(MediaType.parseMediaType("text/uri-list"))
+                                                      .contentType(MediaType.parseMediaType
+                                                          (org.springframework.data.rest.webmvc.RestMediaTypes
+                                                               .TEXT_URI_LIST_VALUE))
                                                       .content(
-                        "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
-                        "https://localhost:8080/spring-rest/api/core/items/" + author2.getID()))
+                                                          "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
+                                                              "https://localhost:8080/spring-rest/api/core/items/" + author2.getID()))
                                          .andExpect(status().isCreated())
                                          .andReturn();
 
@@ -779,11 +839,8 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
 
         publication = itemService.find(context, publication.getID());
         itemService.addMetadata(context, publication, "dc", "contributor", "author", Item.ANY, "plain text two");
-//        itemService.addMetadata(context, publication, "dc", "contributor", "author", Item.ANY, "plain text three");
         itemService.update(context, publication);
 
-//        itemService.addMetadata(context, publication, "dc", "contributor", "author", Item.ANY, "plain text four");
-//        itemService.update(context, publication);
         list = itemService.getMetadata(publication, "dc", "contributor", "author", Item.ANY);
 
         for (MetadataValue mdv : list) {
@@ -797,10 +854,12 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
                                                       .param("relationshipType",
                                                              isAuthorOfPublicationRelationshipType.getID()
                                                                                                   .toString())
-                                                      .contentType(MediaType.parseMediaType("text/uri-list"))
+                                                      .contentType(MediaType.parseMediaType
+                                                          (org.springframework.data.rest.webmvc.RestMediaTypes
+                                                               .TEXT_URI_LIST_VALUE))
                                                       .content(
-                        "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
-                        "https://localhost:8080/spring-rest/api/core/items/" + author3.getID()))
+                                                          "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
+                                                              "https://localhost:8080/spring-rest/api/core/items/" + author3.getID()))
                                          .andExpect(status().isCreated())
                                          .andReturn();
 
@@ -824,6 +883,8 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
             }
         }
 
+        // Now we will have a dc.contributor.author metadatavalue list of size 5 in the following order:
+        // "Smith, Donald", "plain text", "Smith, Maria", "plain text two", "Maybe, Maybe"
         List<MetadataValue> authors = itemService.getMetadata(publication, "dc", "contributor", "author", Item.ANY);
         List<MetadataValue> listToRemove = new LinkedList<>();
         for (MetadataValue metadataValue : authors) {
@@ -831,6 +892,9 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
                 listToRemove.add(metadataValue);
             }
         }
+
+        // Remove the "plain text two" metadatavalue. Ensure that all mdvs prior to that in the list are unchanged
+        // And ensure that the ones coming after this mdv have its place lowered by one.
         itemService.removeMetadataValues(context, publication, listToRemove);
 
         itemService.update(context, publication);
@@ -861,6 +925,11 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
 
     }
 
+    /**
+     * This method will test the deletion of a Relationship to then
+     * verify that the place property is still being handled correctly.
+     * @throws Exception
+     */
     @Test
     public void deleteRelationshipsAndValidatePlace() throws Exception {
 
@@ -912,15 +981,18 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
 
         String adminToken = getAuthToken(admin.getEmail(), password);
 
+        // First create the structure of 5 metadatavalues just like the additions test.
 
         MvcResult mvcResult = getClient(adminToken).perform(post("/api/core/relationships")
                                                                 .param("relationshipType",
                                                                        isAuthorOfPublicationRelationshipType.getID()
                                                                                                             .toString())
-                                                                .contentType(MediaType.parseMediaType("text/uri-list"))
+                                                                .contentType(MediaType.parseMediaType
+                                                                    (org.springframework.data.rest.webmvc.RestMediaTypes
+                                                                         .TEXT_URI_LIST_VALUE))
                                                                 .content(
-                        "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
-                        "https://localhost:8080/spring-rest/api/core/items/" + author1.getID()))
+                                                                    "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
+                                                                        "https://localhost:8080/spring-rest/api/core/items/" + author1.getID()))
                                                    .andExpect(status().isCreated())
                                                    .andReturn();
         ObjectMapper mapper = new ObjectMapper();
@@ -954,10 +1026,12 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
                                                       .param("relationshipType",
                                                              isAuthorOfPublicationRelationshipType.getID()
                                                                                                   .toString())
-                                                      .contentType(MediaType.parseMediaType("text/uri-list"))
+                                                      .contentType(MediaType.parseMediaType
+                                                          (org.springframework.data.rest.webmvc.RestMediaTypes
+                                                               .TEXT_URI_LIST_VALUE))
                                                       .content(
-                        "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
-                        "https://localhost:8080/spring-rest/api/core/items/" + author2.getID()))
+                                                          "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
+                                                              "https://localhost:8080/spring-rest/api/core/items/" + author2.getID()))
                                          .andExpect(status().isCreated())
                                          .andReturn();
 
@@ -986,10 +1060,12 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
                                                       .param("relationshipType",
                                                              isAuthorOfPublicationRelationshipType.getID()
                                                                                                   .toString())
-                                                      .contentType(MediaType.parseMediaType("text/uri-list"))
+                                                      .contentType(MediaType.parseMediaType
+                                                          (org.springframework.data.rest.webmvc.RestMediaTypes
+                                                               .TEXT_URI_LIST_VALUE))
                                                       .content(
-                        "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
-                        "https://localhost:8080/spring-rest/api/core/items/" + author3.getID()))
+                                                          "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
+                                                              "https://localhost:8080/spring-rest/api/core/items/" + author3.getID()))
                                          .andExpect(status().isCreated())
                                          .andReturn();
 
@@ -1014,6 +1090,12 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
         }
 
 
+        // Now we will have a dc.contributor.author metadatavalue list of size 5 in the following order:
+        // "Smith, Donald", "plain text", "Smith, Maria", "plain text two", "Maybe, Maybe"
+
+        // Now we delete the second relationship, the one that made "Smith, Maria" metadatavalue
+        // Ensure that all metadatavalues before this one in the list still hold the same place
+        // Ensure that all the metadatavalues after this one have their place lowered by one
         getClient(adminToken).perform(delete("/api/core/relationships/" + secondRelationshipIdString));
 
         getClient(adminToken).perform(get("/api/core/relationships/" + firstRelationshipIdString))
@@ -1052,6 +1134,12 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
 
     }
 
+    /**
+     * This test will simply add Relationships between Items with a useForPlace attribute set to false for the
+     * RelationshipType. We want to test that the Relationships that are created will still have their place
+     * attributes handled in a correct way
+     * @throws Exception
+     */
     @Test
     public void addRelationshipsNotUseForPlace() throws Exception {
 
@@ -1101,14 +1189,18 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
 
         String adminToken = getAuthToken(admin.getEmail(), password);
 
+        // This is essentially a sequence of adding Relationships by POST and then checking with GET to see
+        // if the place is being set properly.
         MvcResult mvcResult = getClient(adminToken).perform(post("/api/core/relationships")
                                                                 .param("relationshipType",
                                                                        isOrgUnitOfPersonRelationshipType.getID()
                                                                                                         .toString())
-                                                                .contentType(MediaType.parseMediaType("text/uri-list"))
+                                                                .contentType(MediaType.parseMediaType
+                                                                    (org.springframework.data.rest.webmvc.RestMediaTypes
+                                                                         .TEXT_URI_LIST_VALUE))
                                                                 .content(
-                        "https://localhost:8080/spring-rest/api/core/items/" + author1.getID() + "\n" +
-                        "https://localhost:8080/spring-rest/api/core/items/" + orgUnit1.getID()))
+                                                                    "https://localhost:8080/spring-rest/api/core/items/" + author1.getID() + "\n" +
+                                                                        "https://localhost:8080/spring-rest/api/core/items/" + orgUnit1.getID()))
                                                    .andExpect(status().isCreated())
                                                    .andReturn();
         ObjectMapper mapper = new ObjectMapper();
@@ -1124,10 +1216,12 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
         mvcResult = getClient(adminToken).perform(post("/api/core/relationships")
                                                       .param("relationshipType",
                                                              isOrgUnitOfPersonRelationshipType.getID().toString())
-                                                      .contentType(MediaType.parseMediaType("text/uri-list"))
-                .content(
-                        "https://localhost:8080/spring-rest/api/core/items/" + author2.getID() + "\n" +
-                        "https://localhost:8080/spring-rest/api/core/items/" + orgUnit1.getID()))
+                                                      .contentType(MediaType.parseMediaType
+                                                          (org.springframework.data.rest.webmvc.RestMediaTypes
+                                                               .TEXT_URI_LIST_VALUE))
+                                                      .content(
+                                                          "https://localhost:8080/spring-rest/api/core/items/" + author2.getID() + "\n" +
+                                                              "https://localhost:8080/spring-rest/api/core/items/" + orgUnit1.getID()))
                                          .andExpect(status().isCreated())
                                          .andReturn();
         mapper = new ObjectMapper();
@@ -1143,10 +1237,12 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
         mvcResult = getClient(adminToken).perform(post("/api/core/relationships")
                                                       .param("relationshipType",
                                                              isOrgUnitOfPersonRelationshipType.getID().toString())
-                                                      .contentType(MediaType.parseMediaType("text/uri-list"))
-                .content(
-                        "https://localhost:8080/spring-rest/api/core/items/" + author3.getID() + "\n" +
-                        "https://localhost:8080/spring-rest/api/core/items/" + orgUnit1.getID()))
+                                                      .contentType(MediaType.parseMediaType
+                                                          (org.springframework.data.rest.webmvc.RestMediaTypes
+                                                               .TEXT_URI_LIST_VALUE))
+                                                      .content(
+                                                          "https://localhost:8080/spring-rest/api/core/items/" + author3.getID() + "\n" +
+                                                              "https://localhost:8080/spring-rest/api/core/items/" + orgUnit1.getID()))
                                          .andExpect(status().isCreated())
                                          .andReturn();
         mapper = new ObjectMapper();
@@ -1160,6 +1256,13 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
                              .andExpect(jsonPath("rightPlace", is(2)));
     }
 
+    /**
+     * This test will simply add Relationships between Items with a useForPlace attribute set to false for the
+     * RelationshipType. We want to test that the Relationships that are created will still have their place
+     * attributes handled in a correct way. It will then delete a Relationship and once again ensure that the place
+     * attributes are being handled correctly.
+     * @throws Exception
+     */
     @Test
     public void addAndDeleteRelationshipsNotUseForPlace() throws Exception {
 
@@ -1209,14 +1312,18 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
 
         String adminToken = getAuthToken(admin.getEmail(), password);
 
+        // This is essentially a sequence of adding Relationships by POST and then checking with GET to see
+        // if the place is being set properly.
         MvcResult mvcResult = getClient(adminToken).perform(post("/api/core/relationships")
                                                                 .param("relationshipType",
                                                                        isOrgUnitOfPersonRelationshipType.getID()
                                                                                                         .toString())
-                                                                .contentType(MediaType.parseMediaType("text/uri-list"))
-                .content(
-                        "https://localhost:8080/spring-rest/api/core/items/" + author1.getID() + "\n" +
-                        "https://localhost:8080/spring-rest/api/core/items/" + orgUnit1.getID()))
+                                                                .contentType(MediaType.parseMediaType
+                                                                    (org.springframework.data.rest.webmvc.RestMediaTypes
+                                                                         .TEXT_URI_LIST_VALUE))
+                                                                .content(
+                                                                    "https://localhost:8080/spring-rest/api/core/items/" + author1.getID() + "\n" +
+                                                                        "https://localhost:8080/spring-rest/api/core/items/" + orgUnit1.getID()))
                                                    .andExpect(status().isCreated())
                                                    .andReturn();
         ObjectMapper mapper = new ObjectMapper();
@@ -1232,10 +1339,12 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
         mvcResult = getClient(adminToken).perform(post("/api/core/relationships")
                                                       .param("relationshipType",
                                                              isOrgUnitOfPersonRelationshipType.getID().toString())
-                                                      .contentType(MediaType.parseMediaType("text/uri-list"))
-                .content(
-                        "https://localhost:8080/spring-rest/api/core/items/" + author2.getID() + "\n" +
-                        "https://localhost:8080/spring-rest/api/core/items/" + orgUnit1.getID()))
+                                                      .contentType(MediaType.parseMediaType
+                                                          (org.springframework.data.rest.webmvc.RestMediaTypes
+                                                               .TEXT_URI_LIST_VALUE))
+                                                      .content(
+                                                          "https://localhost:8080/spring-rest/api/core/items/" + author2.getID() + "\n" +
+                                                              "https://localhost:8080/spring-rest/api/core/items/" + orgUnit1.getID()))
                                          .andExpect(status().isCreated())
                                          .andReturn();
         mapper = new ObjectMapper();
@@ -1251,10 +1360,12 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
         mvcResult = getClient(adminToken).perform(post("/api/core/relationships")
                                                       .param("relationshipType",
                                                              isOrgUnitOfPersonRelationshipType.getID().toString())
-                                                      .contentType(MediaType.parseMediaType("text/uri-list"))
-                .content(
-                        "https://localhost:8080/spring-rest/api/core/items/" + author3.getID() + "\n" +
-                        "https://localhost:8080/spring-rest/api/core/items/" + orgUnit1.getID()))
+                                                      .contentType(MediaType.parseMediaType
+                                                          (org.springframework.data.rest.webmvc.RestMediaTypes
+                                                               .TEXT_URI_LIST_VALUE))
+                                                      .content(
+                                                          "https://localhost:8080/spring-rest/api/core/items/" + author3.getID() + "\n" +
+                                                              "https://localhost:8080/spring-rest/api/core/items/" + orgUnit1.getID()))
                                          .andExpect(status().isCreated())
                                          .andReturn();
         mapper = new ObjectMapper();
@@ -1267,6 +1378,7 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("rightPlace", is(2)));
 
+        // Here we will delete the secondRelationship and then verify that the others have their place handled properly
         getClient(adminToken).perform(delete("/api/core/relationships/" + secondRelationshipIdString));
 
         getClient(adminToken).perform(get("/api/core/relationships/" + firstRelationshipIdString))
@@ -1328,10 +1440,12 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
                                                            .param("relationshipType",
                                                                   isAuthorOfPublicationRelationshipType.getID()
                                                                                                        .toString())
-                                                           .contentType(MediaType.parseMediaType("text/uri-list"))
+                                                           .contentType(MediaType.parseMediaType
+                                                               (org.springframework.data.rest.webmvc.RestMediaTypes
+                                                                    .TEXT_URI_LIST_VALUE))
                                                            .content(
-                               "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
-                               "https://localhost:8080/spring-rest/api/core/items/" + author1.getID()))
+                                                               "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
+                                                                   "https://localhost:8080/spring-rest/api/core/items/" + author1.getID()))
                                               .andExpect(status().isCreated())
                                               .andReturn();
 
@@ -1341,12 +1455,14 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
         String id = String.valueOf(map.get("id"));
 
         MvcResult mvcResult2 = getClient(token).perform(put("/api/core/relationships/" + id)
-                                                           .contentType(MediaType.parseMediaType("text/uri-list"))
-                                                           .content(
-                               "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
-                               "https://localhost:8080/spring-rest/api/core/items/" + author2.getID()))
-                                              .andExpect(status().isOk())
-                                              .andReturn();
+                                                            .contentType(MediaType.parseMediaType
+                                                                (org.springframework.data.rest.webmvc.RestMediaTypes
+                                                                     .TEXT_URI_LIST_VALUE))
+                                                            .content(
+                                                                "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
+                                                                    "https://localhost:8080/spring-rest/api/core/items/" + author2.getID()))
+                                               .andExpect(status().isOk())
+                                               .andReturn();
 
         getClient(token).perform(get("/api/core/relationships/" + id))
                         .andExpect(status().isOk())

@@ -1314,7 +1314,7 @@ prevent the generation of resource policy entry values with null dspace_object a
 
             }
         } catch (SQLException e) {
-            log.error(e, e);
+            log.error("Lookup for Relationships for item with uuid: " + item.getID() + " caused DSpace to crash", e);
         }
         return fullMetadataValueList;
     }
@@ -1357,6 +1357,12 @@ prevent the generation of resource policy entry values with null dspace_object a
 
     }
 
+    /**
+     * This method will sort the List of MetadataValue objects based on the MetadataSchema, MetadataField Element,
+     * MetadataField Qualifier and MetadataField Place in that order.
+     * @param listToReturn  The list to be sorted
+     * @return              The list sorted on those criteria
+     */
     private List<MetadataValue> sortMetadataValueList(List<MetadataValue> listToReturn) {
         Comparator<MetadataValue> comparator = Comparator.comparing(
             metadataValue -> metadataValue.getMetadataField().getMetadataSchema().getName(),
@@ -1373,6 +1379,8 @@ prevent the generation of resource policy entry values with null dspace_object a
         return listToReturn;
     }
 
+    //This method processes the Relationship of an Item and will return a list of RelationshipMetadataValue objects
+    //that are generated for this specfic relationship for the item through the config in VirtualMetadataPopulator
     private List<RelationshipMetadataValue> handleItemRelationship(Context context, Item item, String entityType,
                                                                    Relationship relationship,
                                                                    boolean enableVirtualMetadata)
@@ -1399,23 +1407,26 @@ prevent the generation of resource policy entry values with null dspace_object a
         }
 
         if (hashMaps != null && enableVirtualMetadata) {
-            resultingMetadataValueList.addAll(handleRelationshipTypeMetadataMappping(context, item, hashMaps,
-                                                                                     otherItem, relationName,
-                                                                                     relationship.getID(), place));
+            resultingMetadataValueList.addAll(handleRelationshipTypeMetadataMapping(context, item, hashMaps,
+                                                                                    otherItem, relationName,
+                                                                                    relationship.getID(), place));
         }
         RelationshipMetadataValue relationMetadataFromOtherItem =
-                getRelationMetadataFromOtherItem(context, otherItem, relationName, relationship.getID());
+            getRelationMetadataFromOtherItem(context, otherItem, relationName, relationship.getID());
         if (relationMetadataFromOtherItem != null) {
             resultingMetadataValueList.add(relationMetadataFromOtherItem);
         }
         return resultingMetadataValueList;
     }
 
-    private List<RelationshipMetadataValue> handleRelationshipTypeMetadataMappping(Context context, Item item,
-                                                                                   HashMap<String, VirtualBean>
-                                                                                       hashMaps,
-                                                                                   Item otherItem, String relationName,
-                                                                                   Integer relationshipId, int place)
+    //This method will retrieve a list of RelationshipMetadataValue objects based on the config passed along in the
+    //hashmaps parameter. The beans will be used to retrieve the values for the RelationshipMetadataValue objects
+    //and the keys of the hashmap will be used to construct the RelationshipMetadataValue object.
+    private List<RelationshipMetadataValue> handleRelationshipTypeMetadataMapping(Context context, Item item,
+                                                                                  HashMap<String, VirtualBean>
+                                                                                      hashMaps,
+                                                                                  Item otherItem, String relationName,
+                                                                                  Integer relationshipId, int place)
         throws SQLException {
         List<RelationshipMetadataValue> resultingMetadataValueList = new LinkedList<>();
         for (Map.Entry<String, VirtualBean> entry : hashMaps.entrySet()) {
@@ -1475,6 +1486,8 @@ prevent the generation of resource policy entry values with null dspace_object a
         return metadataValue;
     }
 
+    //This method will construct a RelationshipMetadataValue object with proper schema, element and qualifier based
+    //on the key String parameter passed along to it
     private RelationshipMetadataValue constructMetadataValue(Context context, String key) {
         String[] splittedKey = key.split("\\.");
         RelationshipMetadataValue metadataValue = new RelationshipMetadataValue();

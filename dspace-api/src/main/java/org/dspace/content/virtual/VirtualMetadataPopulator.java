@@ -40,6 +40,13 @@ public class VirtualMetadataPopulator {
         return map;
     }
 
+    /**
+     * This method will return a boolean indicating whether the useForPlace is true or false for the given
+     * RelationshipType for the left or right label as indicated by the second parameter.
+     * @param relationshipType  The relationshipType for which this should be checked
+     * @param isLeft            The boolean indicating whether to check the left or the right label
+     * @return                  A boolean indicating whether the useForPlace is true or not for the given parameters
+     */
     public boolean isUseForPlaceTrueForRelationshipType(RelationshipType relationshipType, boolean isLeft) {
         HashMap<String, VirtualBean> hashMaps;
         if (isLeft) {
