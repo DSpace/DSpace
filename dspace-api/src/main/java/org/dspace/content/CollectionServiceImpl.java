@@ -47,6 +47,11 @@ import org.dspace.event.Event;
 import org.dspace.harvest.HarvestedCollection;
 import org.dspace.harvest.service.HarvestedCollectionService;
 import org.dspace.workflow.factory.WorkflowServiceFactory;
+import org.dspace.xmlworkflow.WorkflowConfigurationException;
+import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
+import org.dspace.xmlworkflow.state.Workflow;
+import org.dspace.xmlworkflow.storedcomponents.CollectionRole;
+import org.dspace.xmlworkflow.storedcomponents.service.CollectionRoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -88,6 +93,11 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
     @Autowired(required = true)
     protected HarvestedCollectionService harvestedCollectionService;
 
+    @Autowired(required = true)
+    protected XmlWorkflowFactory workflowFactory;
+
+    @Autowired(required = true)
+    protected CollectionRoleService collectionRoleService;
 
     protected CollectionServiceImpl() {
         super();
@@ -338,91 +348,95 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         // Check authorisation - Must be an Admin to create Workflow Group
         AuthorizeUtil.authorizeManageWorkflowsGroup(context, collection);
 
-        if (getWorkflowGroup(collection, step) == null) {
+        if (getWorkflowGroup(context, collection, step) == null) {
             //turn off authorization so that Collection Admins can create Collection Workflow Groups
             context.turnOffAuthorisationSystem();
             Group g = groupService.create(context);
-            context.restoreAuthSystemState();
-
             groupService.setName(g,
                                  "COLLECTION_" + collection.getID() + "_WORKFLOW_STEP_" + step);
             groupService.update(context, g);
+            context.restoreAuthSystemState();
             setWorkflowGroup(context, collection, step, g);
-
         }
 
-        return getWorkflowGroup(collection, step);
+        return getWorkflowGroup(context, collection, step);
     }
 
     @Override
     public void setWorkflowGroup(Context context, Collection collection, int step, Group group)
         throws SQLException, AuthorizeException {
-        // we need to store the old group to be able to revoke permissions if granted before
-        Group oldGroup = null;
-        int action;
+        Workflow workflow = null;
+        try {
+            workflow = workflowFactory.getWorkflow(collection);
+        } catch (IOException | WorkflowConfigurationException e) {
+            log.error(LogManager.getHeader(context, "setWorkflowGroup",
+                    "collection_id=" + collection.getID() + " " + e.getMessage()), e);
+        }
+        if (!StringUtils.equals("default", workflow.getID())) {
+            throw new IllegalArgumentException(
+                    "setWorkflowGroup can be used only on collection with the default basic dspace workflow. "
+                    + "Instead, the collection: "
+                            + collection.getID() + " has the workflow: " + workflow.getID());
+        }
+        String roleId;
 
         switch (step) {
             case 1:
-                oldGroup = collection.getWorkflowStep1();
-                action = Constants.WORKFLOW_STEP_1;
-                collection.setWorkflowStep1(group);
+                roleId = "reviewer";
                 break;
             case 2:
-                oldGroup = collection.getWorkflowStep2();
-                action = Constants.WORKFLOW_STEP_2;
-                collection.setWorkflowStep2(group);
+                roleId = "editor";
                 break;
             case 3:
-                oldGroup = collection.getWorkflowStep3();
-                action = Constants.WORKFLOW_STEP_3;
-                collection.setWorkflowStep3(group);
+                roleId = "finaleditor";
                 break;
             default:
                 throw new IllegalArgumentException("Illegal step count: " + step);
         }
 
-        // deal with permissions.
-        try {
-            context.turnOffAuthorisationSystem();
-            // remove the policies for the old group
-            if (oldGroup != null) {
-                Iterator<ResourcePolicy> oldPolicies =
-                    resourcePolicyService.find(context, collection, oldGroup, action).iterator();
-                while (oldPolicies.hasNext()) {
-                    resourcePolicyService.delete(context, oldPolicies.next());
-                }
-                oldPolicies = resourcePolicyService.find(context, collection, oldGroup, Constants.ADD).iterator();
-                while (oldPolicies.hasNext()) {
-                    ResourcePolicy rp = oldPolicies.next();
-                    if (rp.getRpType() == ResourcePolicy.TYPE_WORKFLOW) {
-                        resourcePolicyService.delete(context, rp);
-                    }
-                }
-            }
-
-            // group can be null to delete workflow step.
-            // we need to grant permissions if group is not null
+        CollectionRole colRole = collectionRoleService.find(context, collection, roleId);
+        if (colRole == null) {
             if (group != null) {
-                authorizeService.addPolicy(context, collection, action, group, ResourcePolicy.TYPE_WORKFLOW);
-                authorizeService.addPolicy(context, collection, Constants.ADD, group, ResourcePolicy.TYPE_WORKFLOW);
+                colRole = collectionRoleService.create(context, collection, roleId, group);
             }
-        } finally {
-            context.restoreAuthSystemState();
+        } else {
+            if (group != null) {
+                colRole.setGroup(group);
+                collectionRoleService.update(context, colRole);
+            } else {
+                collectionRoleService.delete(context, colRole);
+            }
         }
         collection.setModified();
     }
 
     @Override
-    public Group getWorkflowGroup(Collection collection, int step) {
+    public Group getWorkflowGroup(Context context, Collection collection, int step) {
+        String roleId;
+
         switch (step) {
             case 1:
-                return collection.getWorkflowStep1();
+                roleId = "reviewer";
+                break;
             case 2:
-                return collection.getWorkflowStep2();
+                roleId = "editor";
+                break;
             case 3:
-                return collection.getWorkflowStep3();
+                roleId = "finaleditor";
+                break;
             default:
-                throw new IllegalStateException("Illegal step count: " + step);
+                throw new IllegalArgumentException("Illegal step count: " + step);
+        }
+
+        CollectionRole colRole;
+        try {
+            colRole = collectionRoleService.find(context, collection, roleId);
+            if (colRole != null) {
+                return colRole.getGroup();
+            }
+            return null;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -733,29 +747,11 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         // Remove any Handle
         handleService.unbindHandle(context, collection);
 
-        // Remove any workflow groups - must happen after deleting collection
-        Group g = collection.getWorkflowStep1();
-        if (g != null) {
-            collection.setWorkflowStep1(null);
-            groupService.delete(context, g);
-        }
-
-        g = collection.getWorkflowStep2();
-
-        if (g != null) {
-            collection.setWorkflowStep2(null);
-            groupService.delete(context, g);
-        }
-
-        g = collection.getWorkflowStep3();
-
-        if (g != null) {
-            collection.setWorkflowStep3(null);
-            groupService.delete(context, g);
-        }
+        // Remove any workflow roles
+        collectionRoleService.deleteByCollection(context, collection);
 
         // Remove default administrators group
-        g = collection.getAdministrators();
+        Group g = collection.getAdministrators();
 
         if (g != null) {
             collection.setAdmins(null);

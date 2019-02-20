@@ -74,23 +74,6 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
     @JoinColumn(name = "template_item_id")
     private Item template;
 
-    /**
-     * Groups corresponding to workflow steps - NOTE these start from one, so
-     * workflowGroups[0] corresponds to workflow_step_1.
-     */
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "workflow_step_1")
-    private Group workflowStep1;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "workflow_step_2")
-    private Group workflowStep2;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "workflow_step_3")
-    private Group workflowStep3;
-
-
     @OneToOne
     @JoinColumn(name = "submitter")
     /** The default group of administrators */
@@ -205,31 +188,16 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
         setModified();
     }
 
-    public Group getWorkflowStep1() {
-        return workflowStep1;
+    public Group getWorkflowStep1(Context context) {
+        return getCollectionService().getWorkflowGroup(context, this, 1);
     }
 
-    public Group getWorkflowStep2() {
-        return workflowStep2;
+    public Group getWorkflowStep2(Context context) {
+        return getCollectionService().getWorkflowGroup(context, this, 2);
     }
 
-    public Group getWorkflowStep3() {
-        return workflowStep3;
-    }
-
-    void setWorkflowStep1(Group workflowStep1) {
-        this.workflowStep1 = workflowStep1;
-        setModified();
-    }
-
-    void setWorkflowStep2(Group workflowStep2) {
-        this.workflowStep2 = workflowStep2;
-        setModified();
-    }
-
-    void setWorkflowStep3(Group workflowStep3) {
-        this.workflowStep3 = workflowStep3;
-        setModified();
+    public Group getWorkflowStep3(Context context) {
+        return getCollectionService().getWorkflowGroup(context, this, 3);
     }
 
     /**

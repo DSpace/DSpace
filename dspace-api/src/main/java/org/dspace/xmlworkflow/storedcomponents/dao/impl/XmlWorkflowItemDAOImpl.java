@@ -56,6 +56,7 @@ public class XmlWorkflowItemDAOImpl extends AbstractHibernateDAO<XmlWorkflowItem
         if (limit == null) {
             limit = -1;
         }
+        criteriaQuery.orderBy(criteriaBuilder.asc(xmlWorkflowItemRoot.get(XmlWorkflowItem_.id)));
         return list(context, criteriaQuery, false, XmlWorkflowItem.class, limit, offset);
     }
 

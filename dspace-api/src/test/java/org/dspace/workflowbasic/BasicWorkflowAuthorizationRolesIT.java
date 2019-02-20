@@ -291,9 +291,9 @@ public class BasicWorkflowAuthorizationRolesIT
 
         try {
             contextReload();
-            Assert.assertEquals(collection.getWorkflowStep1(), roleGroups.get(ROLE.STEP1));
-            Assert.assertNull(collection.getWorkflowStep2());
-            Assert.assertNull(collection.getWorkflowStep3());
+            Assert.assertEquals(collection.getWorkflowStep1(context), roleGroups.get(ROLE.STEP1));
+            Assert.assertNull(collection.getWorkflowStep2(context));
+            Assert.assertNull(collection.getWorkflowStep3(context));
 
             Assert.assertEquals(BasicWorkflowService.WFSTATE_STEP1POOL, wfi.getState());
 
@@ -340,9 +340,9 @@ public class BasicWorkflowAuthorizationRolesIT
 
         try {
             contextReload();
-            Assert.assertEquals(collection.getWorkflowStep1(), roleGroups.get(ROLE.STEP1));
-            Assert.assertNull(collection.getWorkflowStep2());
-            Assert.assertNull(collection.getWorkflowStep3());
+            Assert.assertEquals(collection.getWorkflowStep1(context), roleGroups.get(ROLE.STEP1));
+            Assert.assertNull(collection.getWorkflowStep2(context));
+            Assert.assertNull(collection.getWorkflowStep3(context));
 
             Assert.assertEquals(BasicWorkflowService.WFSTATE_STEP1POOL, wfi.getState());
 
@@ -389,9 +389,9 @@ public class BasicWorkflowAuthorizationRolesIT
 
         try {
             contextReload();
-            Assert.assertEquals(collection.getWorkflowStep1(), roleGroups.get(ROLE.STEP1));
-            Assert.assertNull(collection.getWorkflowStep2());
-            Assert.assertNull(collection.getWorkflowStep3());
+            Assert.assertEquals(collection.getWorkflowStep1(context), roleGroups.get(ROLE.STEP1));
+            Assert.assertNull(collection.getWorkflowStep2(context));
+            Assert.assertNull(collection.getWorkflowStep3(context));
 
             Assert.assertEquals(BasicWorkflowService.WFSTATE_STEP1POOL, wfi.getState());
 
@@ -438,9 +438,9 @@ public class BasicWorkflowAuthorizationRolesIT
 
         try {
             contextReload();
-            Assert.assertEquals(collection.getWorkflowStep1(), roleGroups.get(ROLE.STEP1));
-            Assert.assertNull(collection.getWorkflowStep2());
-            Assert.assertNull(collection.getWorkflowStep3());
+            Assert.assertEquals(collection.getWorkflowStep1(context), roleGroups.get(ROLE.STEP1));
+            Assert.assertNull(collection.getWorkflowStep2(context));
+            Assert.assertNull(collection.getWorkflowStep3(context));
 
             Assert.assertEquals(BasicWorkflowService.WFSTATE_STEP1POOL, wfi.getState());
 
@@ -490,9 +490,9 @@ public class BasicWorkflowAuthorizationRolesIT
 
         try {
             contextReload();
-            Assert.assertNull(collection.getWorkflowStep1());
-            Assert.assertEquals(collection.getWorkflowStep2(), roleGroups.get(ROLE.STEP2));
-            Assert.assertNull(collection.getWorkflowStep3());
+            Assert.assertNull(collection.getWorkflowStep1(context));
+            Assert.assertEquals(collection.getWorkflowStep2(context), roleGroups.get(ROLE.STEP2));
+            Assert.assertNull(collection.getWorkflowStep3(context));
 
             Assert.assertEquals(BasicWorkflowService.WFSTATE_STEP2POOL, wfi.getState());
 
@@ -538,9 +538,9 @@ public class BasicWorkflowAuthorizationRolesIT
 
         try {
             contextReload();
-            Assert.assertNull(collection.getWorkflowStep1());
-            Assert.assertEquals(collection.getWorkflowStep2(), roleGroups.get(ROLE.STEP2));
-            Assert.assertNull(collection.getWorkflowStep3());
+            Assert.assertNull(collection.getWorkflowStep1(context));
+            Assert.assertEquals(collection.getWorkflowStep2(context), roleGroups.get(ROLE.STEP2));
+            Assert.assertNull(collection.getWorkflowStep3(context));
 
             Assert.assertEquals(BasicWorkflowService.WFSTATE_STEP2POOL, wfi.getState());
 
@@ -586,9 +586,9 @@ public class BasicWorkflowAuthorizationRolesIT
 
         try {
             contextReload();
-            Assert.assertNull(collection.getWorkflowStep1());
-            Assert.assertEquals(collection.getWorkflowStep2(), roleGroups.get(ROLE.STEP2));
-            Assert.assertNull(collection.getWorkflowStep3());
+            Assert.assertNull(collection.getWorkflowStep1(context));
+            Assert.assertEquals(collection.getWorkflowStep2(context), roleGroups.get(ROLE.STEP2));
+            Assert.assertNull(collection.getWorkflowStep3(context));
 
             Assert.assertEquals(BasicWorkflowService.WFSTATE_STEP2POOL, wfi.getState());
 
@@ -634,9 +634,9 @@ public class BasicWorkflowAuthorizationRolesIT
 
         try {
             contextReload();
-            Assert.assertNull(collection.getWorkflowStep1());
-            Assert.assertEquals(collection.getWorkflowStep2(), roleGroups.get(ROLE.STEP2));
-            Assert.assertNull(collection.getWorkflowStep3());
+            Assert.assertNull(collection.getWorkflowStep1(context));
+            Assert.assertEquals(collection.getWorkflowStep2(context), roleGroups.get(ROLE.STEP2));
+            Assert.assertNull(collection.getWorkflowStep3(context));
 
             Assert.assertEquals(BasicWorkflowService.WFSTATE_STEP2POOL, wfi.getState());
 
@@ -685,9 +685,9 @@ public class BasicWorkflowAuthorizationRolesIT
 
         try {
             contextReload();
-            Assert.assertNull(collection.getWorkflowStep1());
-            Assert.assertNull(collection.getWorkflowStep2());
-            Assert.assertEquals(collection.getWorkflowStep3(), roleGroups.get(ROLE.STEP3));
+            Assert.assertNull(collection.getWorkflowStep1(context));
+            Assert.assertNull(collection.getWorkflowStep2(context));
+            Assert.assertEquals(collection.getWorkflowStep3(context), roleGroups.get(ROLE.STEP3));
 
             Assert.assertEquals(BasicWorkflowService.WFSTATE_STEP3POOL, wfi.getState());
 
@@ -733,9 +733,9 @@ public class BasicWorkflowAuthorizationRolesIT
 
         try {
             contextReload();
-            Assert.assertNull(collection.getWorkflowStep1());
-            Assert.assertNull(collection.getWorkflowStep2());
-            Assert.assertEquals(collection.getWorkflowStep3(), roleGroups.get(ROLE.STEP3));
+            Assert.assertNull(collection.getWorkflowStep1(context));
+            Assert.assertNull(collection.getWorkflowStep2(context));
+            Assert.assertEquals(collection.getWorkflowStep3(context), roleGroups.get(ROLE.STEP3));
 
             Assert.assertEquals(BasicWorkflowService.WFSTATE_STEP3POOL, wfi.getState());
 
@@ -781,9 +781,9 @@ public class BasicWorkflowAuthorizationRolesIT
 
         try {
             contextReload();
-            Assert.assertNull(collection.getWorkflowStep1());
-            Assert.assertNull(collection.getWorkflowStep2());
-            Assert.assertEquals(collection.getWorkflowStep3(), roleGroups.get(ROLE.STEP3));
+            Assert.assertNull(collection.getWorkflowStep1(context));
+            Assert.assertNull(collection.getWorkflowStep2(context));
+            Assert.assertEquals(collection.getWorkflowStep3(context), roleGroups.get(ROLE.STEP3));
 
             Assert.assertEquals(BasicWorkflowService.WFSTATE_STEP3POOL, wfi.getState());
 
@@ -829,9 +829,9 @@ public class BasicWorkflowAuthorizationRolesIT
 
         try {
             contextReload();
-            Assert.assertNull(collection.getWorkflowStep1());
-            Assert.assertNull(collection.getWorkflowStep2());
-            Assert.assertEquals(collection.getWorkflowStep3(), roleGroups.get(ROLE.STEP3));
+            Assert.assertNull(collection.getWorkflowStep1(context));
+            Assert.assertNull(collection.getWorkflowStep2(context));
+            Assert.assertEquals(collection.getWorkflowStep3(context), roleGroups.get(ROLE.STEP3));
 
             Assert.assertEquals(BasicWorkflowService.WFSTATE_STEP3POOL, wfi.getState());
 
@@ -880,9 +880,9 @@ public class BasicWorkflowAuthorizationRolesIT
 
         try {
             contextReload();
-            Assert.assertEquals(collection.getWorkflowStep1(), roleGroups.get(ROLE.STEP1));
-            Assert.assertEquals(collection.getWorkflowStep2(), roleGroups.get(ROLE.STEP2));
-            Assert.assertNull(collection.getWorkflowStep3());
+            Assert.assertEquals(collection.getWorkflowStep1(context), roleGroups.get(ROLE.STEP1));
+            Assert.assertEquals(collection.getWorkflowStep2(context), roleGroups.get(ROLE.STEP2));
+            Assert.assertNull(collection.getWorkflowStep3(context));
 
             Assert.assertEquals(BasicWorkflowService.WFSTATE_STEP1POOL, wfi.getState());
 
@@ -928,9 +928,9 @@ public class BasicWorkflowAuthorizationRolesIT
 
         try {
             contextReload();
-            Assert.assertEquals(collection.getWorkflowStep1(), roleGroups.get(ROLE.STEP1));
-            Assert.assertEquals(collection.getWorkflowStep2(), roleGroups.get(ROLE.STEP2));
-            Assert.assertNull(collection.getWorkflowStep3());
+            Assert.assertEquals(collection.getWorkflowStep1(context), roleGroups.get(ROLE.STEP1));
+            Assert.assertEquals(collection.getWorkflowStep2(context), roleGroups.get(ROLE.STEP2));
+            Assert.assertNull(collection.getWorkflowStep3(context));
 
             Assert.assertEquals(BasicWorkflowService.WFSTATE_STEP1POOL, wfi.getState());
 
@@ -976,9 +976,9 @@ public class BasicWorkflowAuthorizationRolesIT
 
         try {
             contextReload();
-            Assert.assertEquals(collection.getWorkflowStep1(), roleGroups.get(ROLE.STEP1));
-            Assert.assertEquals(collection.getWorkflowStep2(), roleGroups.get(ROLE.STEP2));
-            Assert.assertNull(collection.getWorkflowStep3());
+            Assert.assertEquals(collection.getWorkflowStep1(context), roleGroups.get(ROLE.STEP1));
+            Assert.assertEquals(collection.getWorkflowStep2(context), roleGroups.get(ROLE.STEP2));
+            Assert.assertNull(collection.getWorkflowStep3(context));
 
             Assert.assertEquals(BasicWorkflowService.WFSTATE_STEP1POOL, wfi.getState());
 
@@ -1029,9 +1029,9 @@ public class BasicWorkflowAuthorizationRolesIT
 
         try {
             contextReload();
-            Assert.assertEquals(collection.getWorkflowStep1(), roleGroups.get(ROLE.STEP1));
-            Assert.assertNull(collection.getWorkflowStep2());
-            Assert.assertEquals(collection.getWorkflowStep3(), roleGroups.get(ROLE.STEP3));
+            Assert.assertEquals(collection.getWorkflowStep1(context), roleGroups.get(ROLE.STEP1));
+            Assert.assertNull(collection.getWorkflowStep2(context));
+            Assert.assertEquals(collection.getWorkflowStep3(context), roleGroups.get(ROLE.STEP3));
 
             Assert.assertEquals(BasicWorkflowService.WFSTATE_STEP1POOL, wfi.getState());
 
@@ -1077,9 +1077,9 @@ public class BasicWorkflowAuthorizationRolesIT
 
         try {
             contextReload();
-            Assert.assertEquals(collection.getWorkflowStep1(), roleGroups.get(ROLE.STEP1));
-            Assert.assertNull(collection.getWorkflowStep2());
-            Assert.assertEquals(collection.getWorkflowStep3(), roleGroups.get(ROLE.STEP3));
+            Assert.assertEquals(collection.getWorkflowStep1(context), roleGroups.get(ROLE.STEP1));
+            Assert.assertNull(collection.getWorkflowStep2(context));
+            Assert.assertEquals(collection.getWorkflowStep3(context), roleGroups.get(ROLE.STEP3));
 
             Assert.assertEquals(BasicWorkflowService.WFSTATE_STEP1POOL, wfi.getState());
 
@@ -1126,9 +1126,9 @@ public class BasicWorkflowAuthorizationRolesIT
 
         try {
             contextReload();
-            Assert.assertEquals(collection.getWorkflowStep1(), roleGroups.get(ROLE.STEP1));
-            Assert.assertNull(collection.getWorkflowStep2());
-            Assert.assertEquals(collection.getWorkflowStep3(), roleGroups.get(ROLE.STEP3));
+            Assert.assertEquals(collection.getWorkflowStep1(context), roleGroups.get(ROLE.STEP1));
+            Assert.assertNull(collection.getWorkflowStep2(context));
+            Assert.assertEquals(collection.getWorkflowStep3(context), roleGroups.get(ROLE.STEP3));
 
             Assert.assertEquals(BasicWorkflowService.WFSTATE_STEP1POOL, wfi.getState());
 
@@ -1178,9 +1178,9 @@ public class BasicWorkflowAuthorizationRolesIT
 
         try {
             contextReload();
-            Assert.assertNull(collection.getWorkflowStep1());
-            Assert.assertEquals(collection.getWorkflowStep2(), roleGroups.get(ROLE.STEP2));
-            Assert.assertEquals(collection.getWorkflowStep3(), roleGroups.get(ROLE.STEP3));
+            Assert.assertNull(collection.getWorkflowStep1(context));
+            Assert.assertEquals(collection.getWorkflowStep2(context), roleGroups.get(ROLE.STEP2));
+            Assert.assertEquals(collection.getWorkflowStep3(context), roleGroups.get(ROLE.STEP3));
 
             Assert.assertEquals(BasicWorkflowService.WFSTATE_STEP2POOL, wfi.getState());
 
@@ -1226,9 +1226,9 @@ public class BasicWorkflowAuthorizationRolesIT
 
         try {
             contextReload();
-            Assert.assertNull(collection.getWorkflowStep1());
-            Assert.assertEquals(collection.getWorkflowStep2(), roleGroups.get(ROLE.STEP2));
-            Assert.assertEquals(collection.getWorkflowStep3(), roleGroups.get(ROLE.STEP3));
+            Assert.assertNull(collection.getWorkflowStep1(context));
+            Assert.assertEquals(collection.getWorkflowStep2(context), roleGroups.get(ROLE.STEP2));
+            Assert.assertEquals(collection.getWorkflowStep3(context), roleGroups.get(ROLE.STEP3));
 
             Assert.assertEquals(BasicWorkflowService.WFSTATE_STEP2POOL, wfi.getState());
 
@@ -1274,9 +1274,9 @@ public class BasicWorkflowAuthorizationRolesIT
 
         try {
             contextReload();
-            Assert.assertNull(collection.getWorkflowStep1());
-            Assert.assertEquals(collection.getWorkflowStep2(), roleGroups.get(ROLE.STEP2));
-            Assert.assertEquals(collection.getWorkflowStep3(), roleGroups.get(ROLE.STEP3));
+            Assert.assertNull(collection.getWorkflowStep1(context));
+            Assert.assertEquals(collection.getWorkflowStep2(context), roleGroups.get(ROLE.STEP2));
+            Assert.assertEquals(collection.getWorkflowStep3(context), roleGroups.get(ROLE.STEP3));
 
             Assert.assertEquals(BasicWorkflowService.WFSTATE_STEP2POOL, wfi.getState());
 
@@ -1326,9 +1326,9 @@ public class BasicWorkflowAuthorizationRolesIT
 
         try {
             contextReload();
-            Assert.assertEquals(collection.getWorkflowStep1(), roleGroups.get(ROLE.STEP1));
-            Assert.assertEquals(collection.getWorkflowStep2(), roleGroups.get(ROLE.STEP2));
-            Assert.assertEquals(collection.getWorkflowStep3(), roleGroups.get(ROLE.STEP3));
+            Assert.assertEquals(collection.getWorkflowStep1(context), roleGroups.get(ROLE.STEP1));
+            Assert.assertEquals(collection.getWorkflowStep2(context), roleGroups.get(ROLE.STEP2));
+            Assert.assertEquals(collection.getWorkflowStep3(context), roleGroups.get(ROLE.STEP3));
 
             Assert.assertEquals(BasicWorkflowService.WFSTATE_STEP1POOL, wfi.getState());
 
@@ -1382,9 +1382,9 @@ public class BasicWorkflowAuthorizationRolesIT
 
         try {
             contextReload();
-            Assert.assertEquals(collection.getWorkflowStep1(), roleGroups.get(ROLE.STEP1));
-            Assert.assertEquals(collection.getWorkflowStep2(), roleGroups.get(ROLE.STEP2));
-            Assert.assertEquals(collection.getWorkflowStep3(), roleGroups.get(ROLE.STEP3));
+            Assert.assertEquals(collection.getWorkflowStep1(context), roleGroups.get(ROLE.STEP1));
+            Assert.assertEquals(collection.getWorkflowStep2(context), roleGroups.get(ROLE.STEP2));
+            Assert.assertEquals(collection.getWorkflowStep3(context), roleGroups.get(ROLE.STEP3));
 
             Assert.assertEquals(BasicWorkflowService.WFSTATE_STEP1POOL, wfi.getState());
 
@@ -1438,9 +1438,9 @@ public class BasicWorkflowAuthorizationRolesIT
 
         try {
             contextReload();
-            Assert.assertEquals(collection.getWorkflowStep1(), roleGroups.get(ROLE.STEP1));
-            Assert.assertEquals(collection.getWorkflowStep2(), roleGroups.get(ROLE.STEP2));
-            Assert.assertEquals(collection.getWorkflowStep3(), roleGroups.get(ROLE.STEP3));
+            Assert.assertEquals(collection.getWorkflowStep1(context), roleGroups.get(ROLE.STEP1));
+            Assert.assertEquals(collection.getWorkflowStep2(context), roleGroups.get(ROLE.STEP2));
+            Assert.assertEquals(collection.getWorkflowStep3(context), roleGroups.get(ROLE.STEP3));
 
             Assert.assertEquals(BasicWorkflowService.WFSTATE_STEP1POOL, wfi.getState());
 

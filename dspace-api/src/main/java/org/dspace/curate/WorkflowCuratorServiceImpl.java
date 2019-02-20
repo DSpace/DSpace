@@ -211,7 +211,7 @@ public class WorkflowCuratorServiceImpl implements WorkflowCuratorService {
                 int step = state2step(wfi.getState());
                 // make sure this step exists
                 if (step < 4) {
-                    Group wfGroup = collectionService.getWorkflowGroup(wfi.getCollection(), step);
+                    Group wfGroup = collectionService.getWorkflowGroup(c, wfi.getCollection(), step);
                     if (wfGroup != null) {
                         epList.addAll(groupService.allMembers(c, wfGroup));
                     }

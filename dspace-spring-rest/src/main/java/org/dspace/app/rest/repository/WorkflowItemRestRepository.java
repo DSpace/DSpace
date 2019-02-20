@@ -15,6 +15,7 @@ import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
+import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.WorkflowItemConverter;
 import org.dspace.app.rest.exception.PatchBadRequestException;
@@ -49,7 +50,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -123,7 +123,7 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
     }
 
     @SearchRestMethod(name = "findBySubmitter")
-    public Page<WorkflowItemRest> findBySubmitter(@Param(value = "uuid") UUID submitterID, Pageable pageable) {
+    public Page<WorkflowItemRest> findBySubmitter(@Parameter(value = "uuid") UUID submitterID, Pageable pageable) {
         List<XmlWorkflowItem> witems = null;
         try {
             Context context = obtainContext();
