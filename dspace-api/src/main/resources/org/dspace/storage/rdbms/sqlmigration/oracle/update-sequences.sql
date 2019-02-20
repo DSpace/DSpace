@@ -25,43 +25,27 @@
 
 -- 
 
-create or replace
- PROCEDURE updateseq ( seq IN VARCHAR,
-                       tbl IN VARCHAR,
-                       attr IN VARCHAR,
-                       cond IN VARCHAR ) IS
-   curr NUMBER := 0;
-   BEGIN
-     EXECUTE IMMEDIATE 'SELECT max('
-             || attr
-             || ') INTO curr FROM '
-             || tbl || ' ' || cond;
-     curr := curr + 1;
-     EXECUTE IMMEDIATE 'DROP SEQUENCE ' || seq;
-     EXECUTE IMMEDIATE 'CREATE SEQUENCE '
-             || seq
-             || ' START WITH '
-             || NVL(curr, 1);
-   END;
-
 create or replace procedure updateseq(
   seq IN VARCHAR,
   tbl IN VARCHAR,
-  attr IN VARCHAR,
-  cond IN VARCHAR ) 
+  attr IN VARCHAR2,
+  cond IN VARCHAR2 ) 
 IS
   l_val number := 0;
   new_val number:= 0;
-  offset number:=0;
 BEGIN
   execute immediate
   'select ' || seq || '.nextval from dual' INTO l_val;
 
   execute immediate
   'select max(' || attr || ') from ' || tbl || ' ' || cond || '' INTO new_val;
+  
+  IF new_val is null THEN 
+    new_val := 0;
+  END IF;
 
   execute immediate
-  'alter sequence ' || seq || ' increment by ' || (new_val - l_val + 1) || ' minvalue 0';
+  'alter sequence ' || seq || ' increment by ' || (new_val - l_val) || ' minvalue 0';
 
   execute immediate
   'select ' || seq || '.nextval from dual' INTO l_val;
@@ -87,6 +71,7 @@ execute updateseq('webapp_seq', 'webapp', 'webapp_id', '');
 execute updateseq('requestitem_seq', 'requestitem', 'requestitem_id', '');
 execute updateseq('handle_id_seq', 'handle', 'handle_id', '');
 
+
 -- Handle Sequence is a special case.  Since Handles minted by DSpace use the 'handle_seq',
 -- we need to ensure the next assigned handle will *always* be unique.  So, 'handle_seq'
 -- always needs to be set to the value of the *largest* handle suffix.  That way when the
@@ -94,4 +79,32 @@ execute updateseq('handle_id_seq', 'handle', 'handle_id', '');
 --  For all 'handle' values which have a number in their suffix (after '/'), find the maximum
 --  suffix value, convert it to a number, and set the 'handle_seq' to start at the next value
 -- (see updateseq.sql script for more)
-execute updateseq('handle_seq', 'handle', "to_number(regexp_replace(handle, '.*/', ''), '999999999999')", "WHERE REGEXP_LIKE(handle, '^.*/[0123456789]*$')");
+
+create or replace procedure updatehandleseq(
+  seq IN VARCHAR ) 
+IS
+  l_val number := 0;
+  new_val number := 0;
+BEGIN
+  execute immediate
+  'select ' || seq || '.nextval from dual' INTO l_val;
+
+  execute immediate
+  'select max(to_number(regexp_replace(handle, ''.*/'', ''''), ''999999999999'')) from handle WHERE REGEXP_LIKE(handle, ''^.*/[0123456789]*$'')' INTO new_val;
+ 
+  IF new_val is null THEN 
+    new_val := 0;
+  END IF;
+
+  execute immediate
+  'alter sequence ' || seq || ' increment by ' || (new_val - l_val) || ' minvalue 0';
+
+  execute immediate
+  'select ' || seq || '.nextval from dual' INTO l_val;
+
+  execute immediate
+  'alter sequence ' || seq || ' increment by 1 minvalue 0';
+END;
+
+
+execute updatehandleseq('bitstreamformatregistry_seq');
