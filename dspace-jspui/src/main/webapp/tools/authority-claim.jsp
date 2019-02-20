@@ -52,6 +52,8 @@
 <p style="display:none" id="founddifferentauthority_<%= item.getID() %>" class="text-danger"><fmt:message key="jsp.authority-claim.found.different.authority"/></p>
 <p style="display:none" id="foundrequestforclaim_<%= item.getID() %>" class="text-warning"><fmt:message key="jsp.authority-claim.found.local.message"/></p>
 <dspace:discovery-artifact style="global" artifact="<%= item %>" view="<%= mapViewMetadata.get(\"publications\") %>" selectorCssView="<%=selectorViewMetadata %>"/>
+
+<div id="wrapperMyTabContent<%= item.getID() %>" >
 <ul class="nav nav-tabs" role="tablist" id="ul<%= item.getID() %>">
 <%
     // Keep a count of the number of values of each element+qualifier
@@ -108,10 +110,12 @@ for (String key : result.keySet())
 		}
 		
 		if(localMessageFound) {
-	%>
+		%>
 				<script type="text/javascript">
-					jQuery("#foundrequestforclaim_<%= item.getID() %>").toggle();
-				</script>	
+					jQuery("#foundrequestforclaim_<%= item.getID() %>").show();
+					jQuery("#wrapperMyTabContent<%= item.getID() %>").hide();
+				</script>
+					
 		<% } %>			      
 		
 		<div class="col-md-5">
@@ -191,11 +195,11 @@ for (String key : result.keySet())
 				%>
 				
 				
-        	<label for="userchoice_<%= keyID %>"> <fmt:message key="jsp.authority-claim.choice.fromdropdown"/></label>
+        	<label for="userchoice_<%= keyID %>"><fmt:message key="jsp.authority-claim.choice.fromdropdown"/></label>
 			<select class="form-check-input" name="userchoice_<%= keyID %>" id="userchoice_<%= keyID %>">
 					<%
 					Integer subCount = new Integer(0);
-					
+					boolean isSelected = false;
 					for(String[] record : result.get(key)) { 
 				
 			        String sequenceNumber = subCount.toString();
@@ -216,14 +220,18 @@ for (String key : result.keySet())
 							        %>
 							        <%= "selected" %>
 							        <%    		
+							        isSelected = true;
 							    }
 						    }
 		          %>>
-		            <%= value %>
-		          </option>
+		            <%= value %>		            
+		          </option>		          
 		          <% 
 		          	subCount++;
 					} %>
+				<% if(!isSelected) { %>
+					<option value="" selected><fmt:message key="jsp.authority-claim.choice.noneofthem"/></option>
+				<% } %>	
 			</select>
 			
         
@@ -234,13 +242,13 @@ for (String key : result.keySet())
 				    <textarea class="form-control" name="requestNote_<%= keyID %>" id="requestNote_<%= keyID %>" rows="3" cols="100"></textarea>
 			  </div>
 		</div>
-
-<% 
-	i++;
-} %>
       </div>
     </div>
   </div>
+<% 
+	i++;
+} %>
+
 
         <input type="hidden" name="handle_<%= item.getID() %>" value="<%= handle %>"/>
         <input type="hidden" name="selectedId" value="<%= item.getID() %>"/>
@@ -252,13 +260,13 @@ for (String key : result.keySet())
 	%>
 				<script type="text/javascript">
 					jQuery('input[name="submit_approve"]').toggle();
-					jQuery('input[name="submit_reject"]').toggle();
+					jQuery('input[name="submit_unclaim"]').toggle();
 				</script>
 	<%
 				}
 	%>				
 </div>	
-
+</div>
 </form>
 
 </dspace:layout>

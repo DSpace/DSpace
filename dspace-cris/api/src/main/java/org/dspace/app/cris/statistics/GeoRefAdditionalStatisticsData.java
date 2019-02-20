@@ -113,7 +113,7 @@ public class GeoRefAdditionalStatisticsData implements
                 }
             }
         } catch (IOException | GeoIp2Exception e) {
-            log.error("Unable to get location of request:  {}", e);
+            log.warn("Unable to get location of request: " + e.getMessage());
         }
     
     }
