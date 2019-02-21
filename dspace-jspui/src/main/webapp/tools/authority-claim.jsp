@@ -199,7 +199,6 @@ for (String key : result.keySet())
 			<select class="form-check-input" name="userchoice_<%= keyID %>" id="userchoice_<%= keyID %>">
 					<%
 					Integer subCount = new Integer(0);
-					boolean isSelected = false;
 					for(String[] record : result.get(key)) { 
 				
 			        String sequenceNumber = subCount.toString();
@@ -220,7 +219,6 @@ for (String key : result.keySet())
 							        %>
 							        <%= "selected" %>
 							        <%    		
-							        isSelected = true;
 							    }
 						    }
 		          %>>
@@ -229,9 +227,6 @@ for (String key : result.keySet())
 		          <% 
 		          	subCount++;
 					} %>
-				<% if(!isSelected) { %>
-					<option value="" selected><fmt:message key="jsp.authority-claim.choice.noneofthem"/></option>
-				<% } %>	
 			</select>
 			
         
@@ -253,14 +248,12 @@ for (String key : result.keySet())
         <input type="hidden" name="handle_<%= item.getID() %>" value="<%= handle %>"/>
         <input type="hidden" name="selectedId" value="<%= item.getID() %>"/>
         <input class="btn btn-primary pull-right col-md-3" type="submit" name="submit_approve" value="<fmt:message key="jsp.tools.general.approve"/>" />
-        <input class="btn btn-warning pull-right col-md-3" type="submit" name="submit_unclaim" value="<fmt:message key="jsp.tools.general.reject"/>" />
 		<input class="btn btn-default pull-right col-md-3" type="submit" name="submit_cancel" value="<fmt:message key="jsp.tools.general.cancel"/>" />
 	<%	
 				if(localMessageFound) {
 	%>
 				<script type="text/javascript">
 					jQuery('input[name="submit_approve"]').toggle();
-					jQuery('input[name="submit_unclaim"]').toggle();
 				</script>
 	<%
 				}

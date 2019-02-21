@@ -31,6 +31,7 @@ import org.dspace.app.cris.model.ResearcherPage;
 import org.dspace.app.cris.service.ApplicationService;
 import org.dspace.app.cris.util.Researcher;
 import org.dspace.app.cris.util.ResearcherPageUtils;
+import org.dspace.app.util.Util;
 import org.dspace.app.webui.servlet.DSpaceServlet;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
@@ -62,6 +63,8 @@ import it.cilea.osd.common.constants.Constants;
 public class AuthorityClaimServlet extends DSpaceServlet
 {
     
+    private static final String UNCLAIM_ACTION = "unclaim";
+
     private Logger log = Logger.getLogger(AuthorityClaimServlet.class);
     
     private static final String[] METADATA_MESSAGE = new String[] { "local",
@@ -76,7 +79,6 @@ public class AuthorityClaimServlet extends DSpaceServlet
     private static final String PUBLICATION_CLAIM_REVIEW = "publication-claim-request-review";
     
     private static final String SUBMIT_DISCARD = "submit_reject";
-    private static final String SUBMIT_UNCLAIM = "submit_unclaim";
     private static final String SUBMIT_CLAIM = "submit_approve";
     
     private static final SimpleDateFormat sdf = new SimpleDateFormat(
@@ -102,11 +104,13 @@ public class AuthorityClaimServlet extends DSpaceServlet
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
     {
+        String action = request.getParameter("action");
 
         String handle = request.getParameter("handle");
         String crisID = (String) request
                 .getAttribute("requesterMapPublication");
-
+        String metadata = request.getParameter("metadata");
+        
         // find list of match
         DiscoveryViewAndHighlightConfiguration discoveryViewAndHighlightConfigurationByName = SearchUtils
                 .getDiscoveryViewAndHighlightConfigurationByName("global");
@@ -121,25 +125,88 @@ public class AuthorityClaimServlet extends DSpaceServlet
         {
             crisID = context.getCrisID();
         }
-        List<Item> publications = (List<Item>) request
-                .getAttribute("publicationList");
-        if (publications != null)
-        {
-            showPossibleMatch(context, request, response, crisID, publications);
+        
+        
+        if(UNCLAIM_ACTION.equals(action)) {
+            unclaim(context, request, response, handle, crisID, metadata);
         }
-        else
-        {
-            Map<String, List<String[]>> result = new HashMap<String, List<String[]>>();
-            Map<String, Boolean> haveSimilar = new HashMap<String, Boolean>();
-            showClaimPublication(context, request, response, handle, crisID,
-                    result, haveSimilar);
+        else {
+            List<Item> publications = (List<Item>) request
+                    .getAttribute("publicationList");
+            if (publications != null)
+            {
+                showPossibleMatch(context, request, response, crisID,
+                        publications, metadata);
+            }
+            else
+            {
+                Map<String, List<String[]>> result = new HashMap<String, List<String[]>>();
+                Map<String, Boolean> haveSimilar = new HashMap<String, Boolean>();
+                showClaimPublication(context, request, response, handle, crisID,
+                        result, haveSimilar, metadata);
+            }
         }
+    }
 
+    private void unclaim(Context context, HttpServletRequest request,
+            HttpServletResponse response, String handle, String crisID,
+            String metadata)
+            throws SQLException, AuthorizeException, IOException
+    {
+        if(StringUtils.isNotBlank(metadata)) {
+            context.turnOffAuthorisationSystem();       
+            // retrieve Group users to send notification; Default is Administrator
+            // Group
+            String notifyGroupSelfClaim = ConfigurationManager.getProperty("cris",
+                    "notify-publication.claim.group.name");
+            if (StringUtils.isBlank(notifyGroupSelfClaim))
+            {
+                notifyGroupSelfClaim = "Administrator";
+            }
+
+            String[] splitted = Utils.tokenize(metadata);
+            String schema = splitted[0];
+            String element = splitted[1];
+            String qualifier = splitted[2];
+            
+            Item item = (Item)HandleManager.resolveToObject(context, handle);
+            
+            String templateEmailParamMetadataValue = "";
+            String templateEmailParamMetadataAuthority = "";
+            String templateEmailParamMetadataConfidence = "";
+            
+            Metadatum[] mmm = item.getMetadataByMetadataString(metadata);
+            item.clearMetadata(schema, element, qualifier, Item.ANY);
+            for(Metadatum mm : mmm) {
+                if(crisID.equals(mm.authority)) {
+                    templateEmailParamMetadataValue = mm.value;
+                    templateEmailParamMetadataAuthority = mm.authority;
+                    templateEmailParamMetadataConfidence = ""+mm.confidence;
+                    item.addMetadata(schema, element, qualifier,
+                            mm.language, mm.value, null, Choices.CF_UNSET);
+                }
+                else {
+                    item.addMetadata(schema, element, qualifier,
+                            mm.language, mm.value, mm.authority, mm.confidence);
+                }
+            }
+            item.update();
+            context.commit();
+            
+            sendEmail(context, PUBLICATION_REJECTED, notifyGroupSelfClaim,
+                    context.getCurrentUser().getEmail(), metadata,
+                    templateEmailParamMetadataValue, templateEmailParamMetadataAuthority,
+                    templateEmailParamMetadataConfidence, "None", handle, crisID, context.getCurrentUser(), item.getName());
+            
+            response.sendRedirect(
+                    request.getContextPath() + "/handle/" + handle);
+            context.restoreAuthSystemState();
+        }
     }
 
     private void showPossibleMatch(Context context, HttpServletRequest request,
             HttpServletResponse response, String crisID,
-            List<Item> publications)
+            List<Item> publications, String metadata)
             throws SQLException, ServletException, IOException
     {
         Map<String, Map<String, List<String[]>>> mapResult = new HashMap<String, Map<String, List<String[]>>>();
@@ -152,7 +219,7 @@ public class AuthorityClaimServlet extends DSpaceServlet
             Map<String, List<String[]>> result = new HashMap<String, List<String[]>>();
             Map<String, Boolean> haveSimilar = new HashMap<String, Boolean>();
             String handle = ii.getHandle();
-            internalDoResult(context, handle, crisID, result, haveSimilar, rp);
+            doResult(context, handle, crisID, result, haveSimilar, rp, metadata);
             mapResult.put(handle, result);
             mapItem.put(handle, HandleManager.resolveToObject(context, handle));
             haveSimilarResult.put(handle, haveSimilar);
@@ -174,14 +241,14 @@ public class AuthorityClaimServlet extends DSpaceServlet
     private void showClaimPublication(Context context, HttpServletRequest request,
             HttpServletResponse response, String handle, String crisID,
             Map<String, List<String[]>> result,
-            Map<String, Boolean> haveSimilar)
+            Map<String, Boolean> haveSimilar, String metadata)
             throws SQLException, ServletException, IOException
     {
 
         ResearcherPage rp = applicationService.getEntityByCrisId(crisID,
                 ResearcherPage.class);
 
-        internalDoResult(context, handle, crisID, result, haveSimilar, rp);
+        doResult(context, handle, crisID, result, haveSimilar, rp, metadata);
 
         request.setAttribute("item",
                 HandleManager.resolveToObject(context, handle));
@@ -197,9 +264,9 @@ public class AuthorityClaimServlet extends DSpaceServlet
         JSPManager.showJSP(request, response, "/tools/authority-claim.jsp");
     }
 
-    private void internalDoResult(Context context, String handle, String crisID,
+    private void doResult(Context context, String handle, String crisID,
             Map<String, List<String[]>> result,
-            Map<String, Boolean> haveSimilar, ResearcherPage rp)
+            Map<String, Boolean> haveSimilar, ResearcherPage rp, String metadata)
             throws SQLException
     {
         //alghoritm used to calculate the similarity (Default)
@@ -213,7 +280,7 @@ public class AuthorityClaimServlet extends DSpaceServlet
 
             List<MetadataField> metadataFields = BindItemToRP
                     .metadataFieldWithAuthorityRP(context);
-            for (MetadataField metadataField : metadataFields)
+            general : for (MetadataField metadataField : metadataFields)
             {
 
                 MetadataSchema find = MetadataSchema.find(context,
@@ -224,49 +291,72 @@ public class AuthorityClaimServlet extends DSpaceServlet
                 String standardizeField = Utils.standardize(find.getName(),
                         metadataField.getElement(),
                         metadataField.getQualifier(), ".");
-                Metadatum[] metadatum = item
-                        .getMetadataByMetadataString(standardizeField);
-
+                
                 haveSimilar.put(field, false);
-
-                for (Metadatum meta : metadatum)
-                {
-                    String similar = null;
-                    choice: for (String allname : rp.getAllNames())
-                    {
-                        if (crisID.equals(meta.authority)
-                                || allname.equals(meta.value)
-                                || jaroWinklerDistance.getDistance(allname,
-                                        meta.value) > checksimilarity
-                                || allname.startsWith(meta.value)
-                                || meta.value.startsWith(allname))
-                        {
-                            similar = meta.value;
-                            haveSimilar.put(field, true);
-                            break choice;
-                        }
+                
+                if(StringUtils.isNotBlank(metadata)) {
+                    if(standardizeField.equals(metadata)) {
+                        
+                        prepareAndFindSimilarity(crisID, result, haveSimilar, rp,
+                                jaroWinklerDistance, checksimilarity, item, field,
+                                standardizeField);
+                        break general;
                     }
-
-
-                    List<String[]> options = null;
-                    if (result.containsKey(field))
-                    {
-                        options = result.get(field);
-                    }
-                    else
-                    {
-                        options = new ArrayList<String[]>();
-                    }
-
-                    String[] innerOptions = new String[] { meta.value,
-                            meta.authority, "" + meta.confidence, meta.language,
-                            similar };
-                    options.add(innerOptions);
-                    result.put(field, options);
                 }
+                else {
+                    
+                    prepareAndFindSimilarity(crisID, result, haveSimilar, rp,
+                            jaroWinklerDistance, checksimilarity, item, field,
+                            standardizeField);
+                }
+
 
             }
 
+        }
+    }
+
+    private void prepareAndFindSimilarity(String crisID, Map<String, List<String[]>> result,
+            Map<String, Boolean> haveSimilar, ResearcherPage rp,
+            JaroWinklerDistance jaroWinklerDistance, double checksimilarity,
+            Item item, String field, String standardizeField)
+    {
+        Metadatum[] metadatum = item
+                .getMetadataByMetadataString(standardizeField);
+
+        for (Metadatum meta : metadatum)
+        {
+            String similar = null;
+            choice: for (String allname : rp.getAllNames())
+            {
+                if (crisID.equals(meta.authority)
+                        || allname.equals(meta.value)
+                        || jaroWinklerDistance.getDistance(allname,
+                                meta.value) > checksimilarity
+                        || allname.startsWith(meta.value)
+                        || meta.value.startsWith(allname))
+                {
+                    similar = meta.value;
+                    haveSimilar.put(field, true);
+                    break choice;
+                }
+            }
+
+            List<String[]> options = null;
+            if (result.containsKey(field))
+            {
+                options = result.get(field);
+            }
+            else
+            {
+                options = new ArrayList<String[]>();
+            }
+
+            String[] innerOptions = new String[] { meta.value,
+                    meta.authority, "" + meta.confidence, meta.language,
+                    similar };
+            options.add(innerOptions);
+            result.put(field, options);
         }
     }
 
@@ -284,6 +374,31 @@ public class AuthorityClaimServlet extends DSpaceServlet
         String handle = request.getParameter("handle");
         String crisID = context.getCrisID();
 
+        String notifyGroupSelfClaim = getSelfClaimGroup();
+
+        boolean selfClaim = isMemberOfSelfClaimGroup(context);
+
+        if (!"submit_cancel".equals(submitButton))
+        {
+            claim(context, request, now, submitButton, crisID,
+                    notifyGroupSelfClaim, selfClaim);
+        }
+
+        if (StringUtils.isBlank(handle))
+        {
+            response.sendRedirect(
+                    request.getContextPath() + "/cris/rp/" + crisID);
+        }
+        else
+        {
+            response.sendRedirect(
+                    request.getContextPath() + "/handle/" + handle);
+        }
+        context.restoreAuthSystemState();
+    }
+
+    private String getSelfClaimGroup()
+    {
         // retrieve Group users to send notification; Default is Administrator
         // Group
         String notifyGroupSelfClaim = ConfigurationManager.getProperty("cris",
@@ -292,7 +407,11 @@ public class AuthorityClaimServlet extends DSpaceServlet
         {
             notifyGroupSelfClaim = "Administrator";
         }
+        return notifyGroupSelfClaim;
+    }
 
+    private boolean isMemberOfSelfClaimGroup(Context context) throws SQLException
+    {
         // check if currentUser is member of the self claim group
         boolean selfClaim = false;
         String nameGroupSelfClaim = ConfigurationManager.getProperty("cris",
@@ -309,103 +428,94 @@ public class AuthorityClaimServlet extends DSpaceServlet
                 }
             }
         }
+        return selfClaim;
+    }
 
-        if (!"submit_cancel".equals(submitButton))
+    private void claim(Context context, HttpServletRequest request,
+            final Date now, final String submitButton, String crisID,
+            String notifyGroupSelfClaim, boolean selfClaim)
+    {
+        int[] selectedIds = UIUtil.getIntParameters(request, "selectedId");
+
+        String message = null;
+        int failures = 0;
+        int successes = 0;
+        int discarded = 0;
+        for (int selectedId : selectedIds)
         {
-            int[] selectedIds = UIUtil.getIntParameters(request, "selectedId");
-
-            String message = null;
-            int failures = 0;
-            int successes = 0;
-            int discarded = 0;
-            for (int selectedId : selectedIds)
+            try
             {
-                try
-                {
-                    String selectedHandle = request
-                            .getParameter("handle_" + selectedId);
-                    workNow(context, request, now, selectedHandle, crisID,
-                            notifyGroupSelfClaim, selfClaim, selectedId,
-                            submitButton);
-                    if (SUBMIT_CLAIM.equalsIgnoreCase(submitButton))
-                    {
-                        successes++;
-                    }
-                    else
-                    {
-                        discarded++;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    failures++;
-                    log.error(ex.getMessage(), ex);
-                }
-            }
-
-            if (failures > 0)
-            {
+                String selectedHandle = request
+                        .getParameter("handle_" + selectedId);
+                workNow(context, request, now, selectedHandle, crisID,
+                        notifyGroupSelfClaim, selfClaim, selectedId,
+                        submitButton);
                 if (SUBMIT_CLAIM.equalsIgnoreCase(submitButton))
                 {
-                    message = I18nUtil.getMessage(
-                            "jsp.dspace.authority-listclaim.failure.success",
-                            new Object[] { successes, failures },
-                            context.getCurrentLocale(), false);
+                    successes++;
                 }
                 else
                 {
-                    message = I18nUtil.getMessage(
-                            "jsp.dspace.authority-listclaim.failure.reject",
-                            new Object[] { discarded, failures },
-                            context.getCurrentLocale(), false);
+                    discarded++;
                 }
+            }
+            catch (Exception ex)
+            {
+                failures++;
+                log.error(ex.getMessage(), ex);
+            }
+        }
+
+        if (failures > 0)
+        {
+            if (SUBMIT_CLAIM.equalsIgnoreCase(submitButton))
+            {
+                message = I18nUtil.getMessage(
+                        "jsp.dspace.authority-listclaim.failure.success",
+                        new Object[] { successes, failures },
+                        context.getCurrentLocale(), false);
             }
             else
             {
-                if (successes > 0)
-                {
-                    message = I18nUtil.getMessage(
-                            "jsp.dspace.authority-listclaim.success",
-                            new Object[] { successes },
-                            context.getCurrentLocale(), false);
-                }
-                else
-                {
-                    message = I18nUtil.getMessage(
-                            "jsp.dspace.authority-listclaim.reject",
-                            new Object[] { selectedIds.length },
-                            context.getCurrentLocale(), false);
-                }
+                message = I18nUtil.getMessage(
+                        "jsp.dspace.authority-listclaim.failure.reject",
+                        new Object[] { discarded, failures },
+                        context.getCurrentLocale(), false);
             }
-            if (StringUtils.isNotBlank(message))
-            {
-                request.getSession().setAttribute(Constants.MESSAGES_KEY,
-                        Arrays.asList(message));
-            }
-            if (forceCommit)
-            {
-                try
-                {
-                    indexer.commit();
-                }
-                catch (SearchServiceException e)
-                {
-                    log.error(e.getMessage(), e);
-                }
-            }
-        }
-
-        if (StringUtils.isBlank(handle))
-        {
-            response.sendRedirect(
-                    request.getContextPath() + "/cris/rp/" + crisID);
         }
         else
         {
-            response.sendRedirect(
-                    request.getContextPath() + "/handle/" + handle);
+            if (successes > 0)
+            {
+                message = I18nUtil.getMessage(
+                        "jsp.dspace.authority-listclaim.success",
+                        new Object[] { successes },
+                        context.getCurrentLocale(), false);
+            }
+            else
+            {
+                message = I18nUtil.getMessage(
+                        "jsp.dspace.authority-listclaim.reject",
+                        new Object[] { selectedIds.length },
+                        context.getCurrentLocale(), false);
+            }
         }
-        context.restoreAuthSystemState();
+        if (StringUtils.isNotBlank(message))
+        {
+            request.getSession().setAttribute(Constants.MESSAGES_KEY,
+                    Arrays.asList(message));
+        }
+        if (forceCommit)
+        {
+            try
+            {
+                indexer.commit();
+            }
+            catch (SearchServiceException e)
+            {
+                log.error(e.getMessage(), e);
+            }
+        }
     }
 
     private void workNow(Context context, HttpServletRequest request,
@@ -457,7 +567,7 @@ public class AuthorityClaimServlet extends DSpaceServlet
                 Set<Integer> itemRejectedIDs = new HashSet<Integer>();
                 if (StringUtils.isNotBlank(fieldChoice))
                 {
-                    if (SUBMIT_DISCARD.equalsIgnoreCase(submitMode) || SUBMIT_UNCLAIM.equalsIgnoreCase(submitMode))
+                    if (SUBMIT_DISCARD.equalsIgnoreCase(submitMode))
                     {
                         itemRejectedIDs.add(item.getID());
                     }
@@ -612,23 +722,7 @@ public class AuthorityClaimServlet extends DSpaceServlet
                     }
                     if (itemRejectedIDs.size() > 0)
                     {
-                        // notify reject
-                        int[] ids = new int[itemRejectedIDs.size()];
-                        Iterator<Integer> iter = itemRejectedIDs.iterator();
-                        int i = 0;
-                        while (iter.hasNext())
-                        {
-                            ids[i] = (Integer) iter.next();
-                            i++;
-                        }
-    
-                        String[] splitted = fieldChoice.split("_");
-                        // skip item id ---> e.g. 01_dc_contributor_author
-                        String schema = splitted[1];
-                        String element = splitted[2];
-                        String qualifier = (splitted.length == 4) ? splitted[3]
-                                : null;
-                        cam.notifyReject(ids, schema, element, qualifier, crisID);
+                        discard(context, crisID, cam, fieldChoice, itemRejectedIDs, submitMode);
                     }
                 }
     
@@ -641,6 +735,29 @@ public class AuthorityClaimServlet extends DSpaceServlet
             }
         }
 
+    }
+
+    private void discard(Context context, String crisID, ChoiceAuthorityManager cam,
+            String fieldChoice, Set<Integer> itemRejectedIDs, String submitMode) throws SQLException, AuthorizeException
+    {
+        // notify reject
+        int[] ids = new int[itemRejectedIDs.size()];
+        Iterator<Integer> iter = itemRejectedIDs.iterator();
+        int i = 0;
+        while (iter.hasNext())
+        {
+            ids[i] = (Integer) iter.next();
+            i++;
+        }
+   
+        String[] splitted = fieldChoice.split("_");
+        // skip item id ---> e.g. 01_dc_contributor_author
+        String schema = splitted[1];
+        String element = splitted[2];
+        String qualifier = (splitted.length == 4) ? splitted[3]
+                : null;
+
+        cam.notifyReject(ids, schema, element, qualifier, crisID);
     }
 
     private void findSelectedPersons(HttpServletRequest request, int selectedId,
@@ -671,33 +788,41 @@ public class AuthorityClaimServlet extends DSpaceServlet
             String templateEmailParamMetadataConfidence,
             String templateEmailParamUserNote, Item item, String fieldChoice)
     {
-        if (SUBMIT_UNCLAIM.equalsIgnoreCase(submitMode)) {
-            sendEmail(context, PUBLICATION_REJECTED, notifyGroupSelfClaim,
-                    context.getCurrentUser().getEmail(), fieldChoice,
-                    templateEmailParamMetadataValue, templateEmailParamMetadataAuthority,
-                    templateEmailParamMetadataConfidence, templateEmailParamUserNote, handle, crisID, context.getCurrentUser(), item.getName());
-        }
-        else {
-            if (!SUBMIT_DISCARD.equalsIgnoreCase(submitMode)) {
-                if (isReview)
-                {
-                    //if template email exist we have to send the follow notification: review info for administrators; request done for user
-                    sendEmail(context, PUBLICATION_CLAIM_REVIEW, notifyGroupSelfClaim, null,
-                            templateEmailParamFieldKey, templateEmailParamMetadataValue,
-                            templateEmailParamMetadataAuthority, templateEmailParamMetadataConfidence, templateEmailParamUserNote, handle,
-                            crisID, context.getCurrentUser(), item.getName());
-                    sendEmail(context, PUBLICATION_CLAIM_REQUEST, null, context.getCurrentUser().getEmail(),
-                            templateEmailParamFieldKey, templateEmailParamMetadataValue,
-                            templateEmailParamMetadataAuthority, templateEmailParamMetadataConfidence, templateEmailParamUserNote, handle,
-                            crisID, context.getCurrentUser(), item.getName());
-                }
-                else {
-                    //automatically claim the publication, send notification to the user and administrators
-                    sendEmail(context, PUBLICATION_CLAIMED, notifyGroupSelfClaim,
-                        context.getCurrentUser().getEmail(), templateEmailParamFieldKey,
-                        templateEmailParamMetadataValue, templateEmailParamMetadataAuthority,
-                        templateEmailParamMetadataConfidence, templateEmailParamUserNote, handle, crisID, context.getCurrentUser(), item.getName());
-                }
+        if (!SUBMIT_DISCARD.equalsIgnoreCase(submitMode))
+        {
+            if (isReview)
+            {
+                // if template email exist we have to send the follow
+                // notification: review info for administrators; request done
+                // for user
+                sendEmail(context, PUBLICATION_CLAIM_REVIEW,
+                        notifyGroupSelfClaim, null, templateEmailParamFieldKey,
+                        templateEmailParamMetadataValue,
+                        templateEmailParamMetadataAuthority,
+                        templateEmailParamMetadataConfidence,
+                        templateEmailParamUserNote, handle, crisID,
+                        context.getCurrentUser(), item.getName());
+                sendEmail(context, PUBLICATION_CLAIM_REQUEST, null,
+                        context.getCurrentUser().getEmail(),
+                        templateEmailParamFieldKey,
+                        templateEmailParamMetadataValue,
+                        templateEmailParamMetadataAuthority,
+                        templateEmailParamMetadataConfidence,
+                        templateEmailParamUserNote, handle, crisID,
+                        context.getCurrentUser(), item.getName());
+            }
+            else
+            {
+                // automatically claim the publication, send notification to the
+                // user and administrators
+                sendEmail(context, PUBLICATION_CLAIMED, notifyGroupSelfClaim,
+                        context.getCurrentUser().getEmail(),
+                        templateEmailParamFieldKey,
+                        templateEmailParamMetadataValue,
+                        templateEmailParamMetadataAuthority,
+                        templateEmailParamMetadataConfidence,
+                        templateEmailParamUserNote, handle, crisID,
+                        context.getCurrentUser(), item.getName());
             }
         }
     }
