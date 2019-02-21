@@ -36,8 +36,8 @@ public class CommunityMatcher {
             hasJsonPath("$.name", is(name)),
             hasJsonPath("$.handle", is(handle)),
             hasJsonPath("$.type", is("community")),
-            hasJsonPath("$.metadata", Matchers.hasItem(
-                CommunityMetadataMatcher.matchMetadata("dc.title", name)
+            hasJsonPath("$.metadata", Matchers.allOf(
+                MetadataMatcher.matchMetadata("dc.title", name)
             ))
         );
     }

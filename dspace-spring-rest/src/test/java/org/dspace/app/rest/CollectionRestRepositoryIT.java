@@ -19,7 +19,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.util.Arrays;
 import java.util.UUID;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -27,9 +26,10 @@ import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.converter.CollectionConverter;
 import org.dspace.app.rest.matcher.CollectionMatcher;
-import org.dspace.app.rest.matcher.CommunityMetadataMatcher;
+import org.dspace.app.rest.matcher.MetadataMatcher;
 import org.dspace.app.rest.model.CollectionRest;
-import org.dspace.app.rest.model.MetadataEntryRest;
+import org.dspace.app.rest.model.MetadataRest;
+import org.dspace.app.rest.model.MetadataValueRest;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Collection;
@@ -358,11 +358,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
 
         CollectionRest collectionRest = collectionConverter.fromModel(col1);
 
-        MetadataEntryRest metadataEntryRest = new MetadataEntryRest();
-        metadataEntryRest.setKey("dc.title");
-        metadataEntryRest.setValue("Electronic theses and dissertations");
-
-        collectionRest.setMetadata(Arrays.asList(metadataEntryRest));
+        collectionRest.setMetadata(new MetadataRest()
+                .put("dc.title", new MetadataValueRest("Electronic theses and dissertations")));
 
         getClient(token).perform(put("/api/core/collections/" + col1.getID().toString())
                                      .contentType(MediaType.APPLICATION_JSON)
@@ -479,32 +476,18 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         CollectionRest collectionRest = new CollectionRest();
         // We send a name but the created collection should set this to the title
         collectionRest.setName("Collection");
-        MetadataEntryRest description = new MetadataEntryRest();
-        description.setKey("dc.description");
-        description.setValue("<p>Some cool HTML code here</p>");
 
-        MetadataEntryRest abs = new MetadataEntryRest();
-        abs.setKey("dc.description.abstract");
-        abs.setValue("Sample top-level community created via the REST API");
-
-        MetadataEntryRest contents = new MetadataEntryRest();
-        contents.setKey("dc.description.tableofcontents");
-        contents.setValue("<p>HTML News</p>");
-
-        MetadataEntryRest copyright = new MetadataEntryRest();
-        copyright.setKey("dc.rights");
-        copyright.setValue("Custom Copyright Text");
-
-        MetadataEntryRest title = new MetadataEntryRest();
-        title.setKey("dc.title");
-        title.setValue("Title Text");
-
-        collectionRest.setMetadata(Arrays.asList(description,
-                                       abs,
-                                       contents,
-                                       copyright,
-                                       title));
-
+        collectionRest.setMetadata(new MetadataRest()
+                .put("dc.description",
+                        new MetadataValueRest("<p>Some cool HTML code here</p>"))
+                .put("dc.description.abstract",
+                        new MetadataValueRest("Sample top-level community created via the REST API"))
+                .put("dc.description.tableofcontents",
+                        new MetadataValueRest("<p>HTML News</p>"))
+                .put("dc.rights",
+                        new MetadataValueRest("Custom Copyright Text"))
+                .put("dc.title",
+                        new MetadataValueRest("Title Text")));
 
         String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken).perform(post("/api/core/collections")
@@ -519,18 +502,17 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                                 hasJsonPath("$.name", is("Title Text")),
                                 hasJsonPath("$.handle", not(empty())),
                                 hasJsonPath("$.type", is("collection")),
-                                hasJsonPath("$.metadata", Matchers.containsInAnyOrder(
-                                    CommunityMetadataMatcher.matchMetadata("dc.description",
-                                                                           "<p>Some cool HTML code here</p>"),
-                                    CommunityMetadataMatcher.matchMetadata("dc.description.abstract",
-                                                                           "Sample top-level community " +
-                                                                               "created via the REST API"),
-                                    CommunityMetadataMatcher.matchMetadata("dc.description.tableofcontents",
-                                                                           "<p>HTML News</p>"),
-                                    CommunityMetadataMatcher.matchMetadata("dc.rights",
-                                                                           "Custom Copyright Text"),
-                                    CommunityMetadataMatcher.matchMetadata("dc.title",
-                                                                           "Title Text")
+                                hasJsonPath("$.metadata", Matchers.allOf(
+                                    MetadataMatcher.matchMetadata("dc.description",
+                                            "<p>Some cool HTML code here</p>"),
+                                    MetadataMatcher.matchMetadata("dc.description.abstract",
+                                            "Sample top-level community created via the REST API"),
+                                    MetadataMatcher.matchMetadata("dc.description.tableofcontents",
+                                            "<p>HTML News</p>"),
+                                    MetadataMatcher.matchMetadata("dc.rights",
+                                            "Custom Copyright Text"),
+                                    MetadataMatcher.matchMetadata("dc.title",
+                                            "Title Text")
                                 )))));
 
     }
@@ -621,11 +603,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
 
         CollectionRest collectionRest = collectionConverter.fromModel(col1);
 
-        MetadataEntryRest metadataEntryRest = new MetadataEntryRest();
-        metadataEntryRest.setKey("dc.title");
-        metadataEntryRest.setValue("Electronic theses and dissertations");
-
-        collectionRest.setMetadata(Arrays.asList(metadataEntryRest));
+        collectionRest.setMetadata(new MetadataRest()
+                .put("dc.title", new MetadataValueRest("Electronic theses and dissertations")));
 
         getClient(token).perform(put("/api/core/collections/" + col1.getID().toString())
                                      .contentType(MediaType.APPLICATION_JSON)
