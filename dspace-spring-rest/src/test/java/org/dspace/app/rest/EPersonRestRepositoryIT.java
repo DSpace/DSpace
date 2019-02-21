@@ -8,6 +8,7 @@
 package org.dspace.app.rest;
 
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
+import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
@@ -21,7 +22,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import javax.ws.rs.core.MediaType;
@@ -32,9 +32,9 @@ import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.builder.EPersonBuilder;
 import org.dspace.app.rest.builder.ItemBuilder;
 import org.dspace.app.rest.matcher.EPersonMatcher;
-import org.dspace.app.rest.matcher.EPersonMetadataMatcher;
 import org.dspace.app.rest.model.EPersonRest;
-import org.dspace.app.rest.model.MetadataEntryRest;
+import org.dspace.app.rest.model.MetadataRest;
+import org.dspace.app.rest.model.MetadataValueRest;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.ReplaceOperation;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
@@ -54,15 +54,16 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         // we should check how to get it from Spring
         ObjectMapper mapper = new ObjectMapper();
         EPersonRest data = new EPersonRest();
+        MetadataRest metadataRest = new MetadataRest();
         data.setEmail("createtest@fake-email.com");
         data.setCanLogIn(true);
-        MetadataEntryRest surname = new MetadataEntryRest();
-        surname.setKey("eperson.lastname");
+        MetadataValueRest surname = new MetadataValueRest();
         surname.setValue("Doe");
-        MetadataEntryRest firstname = new MetadataEntryRest();
-        firstname.setKey("eperson.firstname");
+        metadataRest.put("eperson.lastname", surname);
+        MetadataValueRest firstname = new MetadataValueRest();
         firstname.setValue("John");
-        data.setMetadata(Arrays.asList(surname, firstname));
+        metadataRest.put("eperson.firstname", firstname);
+        data.setMetadata(metadataRest);
 
         String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken).perform(post("/api/eperson/epersons")
@@ -79,9 +80,9 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                                hasJsonPath("$.canLogIn", is(true)),
                                hasJsonPath("$.requireCertificate", is(false)),
                                hasJsonPath("$._links.self.href", not(empty())),
-                               hasJsonPath("$.metadata", Matchers.containsInAnyOrder(
-                                   EPersonMetadataMatcher.matchFirstName("John"),
-                                   EPersonMetadataMatcher.matchLastName("Doe")
+                               hasJsonPath("$.metadata", Matchers.allOf(
+                                       matchMetadata("eperson.firstname", "John"),
+                                       matchMetadata("eperson.lastname", "Doe")
                                )))));
         // TODO cleanup the context!!!
     }

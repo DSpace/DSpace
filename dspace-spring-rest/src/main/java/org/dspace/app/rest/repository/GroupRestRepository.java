@@ -16,10 +16,10 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.app.rest.converter.GroupConverter;
+import org.dspace.app.rest.converter.MetadataConverter;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.GroupRest;
-import org.dspace.app.rest.model.MetadataEntryRest;
 import org.dspace.app.rest.model.hateoas.GroupResource;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
@@ -46,6 +46,9 @@ public class GroupRestRepository extends DSpaceRestRepository<GroupRest, UUID> {
     @Autowired
     GroupConverter converter;
 
+    @Autowired
+    MetadataConverter metadataConverter;
+
     @Override
     @PreAuthorize("hasAuthority('ADMIN')")
     protected GroupRest createAndReturn(Context context)
@@ -65,14 +68,7 @@ public class GroupRestRepository extends DSpaceRestRepository<GroupRest, UUID> {
             group = gs.create(context);
             gs.setName(group, groupRest.getName());
             gs.update(context, group);
-
-            if (groupRest.getMetadata() != null) {
-                for (MetadataEntryRest mer: groupRest.getMetadata()) {
-                    String[] metadatakey = mer.getKey().split("\\.");
-                    gs.addMetadata(context, group, metadatakey[0], metadatakey[1],
-                            metadatakey.length == 3 ? metadatakey[2] : null, mer.getLanguage(), mer.getValue());
-                }
-            }
+            metadataConverter.setMetadata(context, group, groupRest.getMetadata());
         } catch (SQLException excSQL) {
             throw new RuntimeException(excSQL.getMessage(), excSQL);
         }
