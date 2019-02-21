@@ -633,7 +633,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                     .param("collection", col1.getID().toString()))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.status", is(false)))
-                // title and author are required in the first panel
+                // title and dateissued are required in the first panel
                 // the json path with a @ selector always return an array
                 .andExpect(jsonPath("$.errors[?(@.message=='error.validation.required')]",
                         Matchers.contains(
