@@ -7,15 +7,25 @@
  */
 package org.dspace.app.rest;
 
+import static com.jayway.jsonpath.JsonPath.read;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
+
+import javax.ws.rs.core.MediaType;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.CharEncoding;
@@ -24,18 +34,24 @@ import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.builder.EPersonBuilder;
 import org.dspace.app.rest.builder.WorkflowItemBuilder;
+import org.dspace.app.rest.builder.WorkspaceItemBuilder;
 import org.dspace.app.rest.matcher.CollectionMatcher;
 import org.dspace.app.rest.matcher.ItemMatcher;
 import org.dspace.app.rest.matcher.WorkflowItemMatcher;
+import org.dspace.app.rest.matcher.WorkspaceItemMatcher;
+import org.dspace.app.rest.model.patch.AddOperation;
+import org.dspace.app.rest.model.patch.Operation;
+import org.dspace.app.rest.model.patch.RemoveOperation;
+import org.dspace.app.rest.model.patch.ReplaceOperation;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
+import org.dspace.content.WorkspaceItem;
 import org.dspace.eperson.EPerson;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.hamcrest.Matchers;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -261,61 +277,6 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
 
     @Test
     /**
-     * Removing a workflowitem should result in delete of all the underline resources (item and bitstreams)
-     * 
-     * @throws Exception
-     */
-    @Ignore
-    public void deleteOneTest() throws Exception {
-        context.turnOffAuthorisationSystem();
-
-        //** GIVEN **
-        //1. A community with one collection.
-        parentCommunity = CommunityBuilder.createCommunity(context)
-                                          .withName("Parent Community")
-                                          .build();
-        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1")
-                .withWorkflowGroup(1, admin).build();
-
-        //2. a workspace item
-        XmlWorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
-                .withTitle("Workflow Item 1")
-                .withIssueDate("2017-10-17")
-                .build();
-
-        Item item = witem.getItem();
-
-        //Add a bitstream to the item
-        String bitstreamContent = "ThisIsSomeDummyText";
-        Bitstream bitstream = null;
-        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
-            bitstream = BitstreamBuilder
-                    .createBitstream(context, item, is)
-                    .withName("Bitstream1")
-                    .withMimeType("text/plain").build();
-        }
-
-        String token = getAuthToken(admin.getEmail(), password);
-
-        //Delete the workflowitem
-        getClient(token).perform(delete("/api/workflow/workflowitems/" + witem.getID()))
-                    .andExpect(status().is(204));
-
-        //Trying to get deleted item should fail with 404
-        getClient().perform(get("/api/workflow/workflowitems/" + witem.getID()))
-                   .andExpect(status().is(404));
-
-        //Trying to get deleted workflowitem's item should fail with 404
-        getClient().perform(get("/api/core/items/" + item.getID()))
-                   .andExpect(status().is(404));
-
-        //Trying to get deleted workflowitem's bitstream should fail with 404
-        getClient().perform(get("/api/core/biststreams/" + bitstream.getID()))
-                   .andExpect(status().is(404));
-    }
-
-    @Test
-    /**
      * Create three workflowitem with two different submitter and verify that the findBySubmitter return the proper
      * list of workflowitem for each submitter also paginating
      * 
@@ -417,6 +378,741 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                                     "2016-02-13"))))
             .andExpect(jsonPath("$.page.size", is(20)))
             .andExpect(jsonPath("$.page.totalElements", is(1)));
+    }
+
+    @Test
+    /**
+     * A delete request over a workflowitem should result in abort the workflow sending the item back to the submitter
+     * workspace
+     * 
+     * @throws Exception
+     */
+    public void deleteOneTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community with one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1")
+                .withWorkflowGroup(1, admin).build();
+
+        //2. create a normal user to use as submitter
+        EPerson submitter = EPersonBuilder.createEPerson(context)
+                .withEmail("submitter@example.com")
+                .withPassword("dspace")
+                .build();
+
+        context.setCurrentUser(submitter);
+
+        //3. a workflow item
+        XmlWorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
+                .withTitle("Workflow Item 1")
+                .withIssueDate("2017-10-17")
+                .build();
+
+        Item item = witem.getItem();
+
+        String tokenSubmitter = getAuthToken(submitter.getEmail(), "dspace");
+
+        //Add a bitstream to the item
+        String bitstreamContent = "ThisIsSomeDummyText";
+        Bitstream bitstream = null;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream = BitstreamBuilder
+                    .createBitstream(context, item, is)
+                    .withName("Bitstream1")
+                    .withMimeType("text/plain").build();
+        }
+
+        String token = getAuthToken(admin.getEmail(), password);
+        context.restoreAuthSystemState();
+
+        // Delete the workflowitem
+        getClient(token).perform(delete("/api/workflow/workflowitems/" + witem.getID()))
+                    .andExpect(status().is(204));
+
+        // Trying to get deleted workflowitem should fail with 404
+        getClient(token).perform(get("/api/workflow/workflowitems/" + witem.getID()))
+                   .andExpect(status().is(404));
+
+        // the workflowitem's item should still exist
+        getClient(token).perform(get("/api/core/items/" + item.getID()))
+                   .andExpect(status().is(200));
+
+        // the workflowitem's bitstream should still exist
+        getClient(token).perform(get("/api/core/bitstreams/" + bitstream.getID()))
+                   .andExpect(status().is(200));
+
+        // a workspaceitem should exist now in the submitter workspace
+        getClient(tokenSubmitter).perform(get("/api/submission/workspaceitems"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$._embedded.workspaceitems", Matchers.containsInAnyOrder(
+                        WorkspaceItemMatcher.matchItemWithTitleAndDateIssued(null, "Workflow Item 1",
+                                "2017-10-17"))))
+                   .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/submission/workspaceitems")))
+                   .andExpect(jsonPath("$.page.size", is(20)))
+                   .andExpect(jsonPath("$.page.totalElements", is(1)));
+
+    }
+
+    @Test
+    /**
+     * Test the creation of workflowitem POSTing to the resource workflowitems collection endpoint a workspaceitem (as
+     * uri-list). This corresponds to the deposit action done by the submitter.
+     *
+     * @throws Exception
+     */
+    public void createWorkflowItemTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        // hold the id of the created workflow item
+        AtomicReference<Integer> idRef = new AtomicReference<Integer>();
+        try {
+            //** GIVEN **
+            //1. A community with one collection.
+            parentCommunity = CommunityBuilder.createCommunity(context)
+                                              .withName("Parent Community")
+                                              .build();
+            Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1")
+                    .withWorkflowGroup(1, admin).build();
+
+            //2. create a normal user to use as submitter
+            EPerson submitter = EPersonBuilder.createEPerson(context)
+                    .withEmail("submitter@example.com")
+                    .withPassword("dspace")
+                    .build();
+
+            context.setCurrentUser(submitter);
+
+            //3. a workspace item
+            WorkspaceItem wsitem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+                    .withTitle("Submission Item")
+                    .withIssueDate("2017-10-17")
+                    .build();
+            context.restoreAuthSystemState();
+
+            // get the submitter auth token
+            String authToken = getAuthToken(submitter.getEmail(), "dspace");
+
+            // submit the workspaceitem to start the workflow
+            getClient(authToken)
+                    .perform(post(BASE_REST_SERVER_URL + "/api/workflow/workflowitems")
+                            .content("/api/submission/workspaceitems/" + wsitem.getID())
+                            .contentType(textUriContentType))
+                    .andExpect(status().isCreated())
+                    .andExpect(jsonPath("$",
+                            WorkflowItemMatcher.matchItemWithTitleAndDateIssued(null, "Submission Item", "2017-10-17")))
+                    .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
+
+            // check that the workflowitem is persisted
+            getClient().perform(get("/api/workflow/workflowitems/" + idRef.get())).andExpect(status().isOk())
+                    .andExpect(jsonPath("$",
+                            Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssued(null,
+                                    "Submission Item", "2017-10-17"))));
+        } finally {
+            // remove the workflowitem if any
+            WorkflowItemBuilder.deleteWorkflowItem(idRef);
+        }
+    }
+
+    /**
+     * Test the exposition of validation error for missing required metadata
+     *
+     * @throws Exception
+     */
+    public void validationErrorsRequiredMetadataTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community with one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1")
+                .withWorkflowGroup(1, admin).build();
+
+        //2. create a normal user to use as submitter
+        EPerson submitter = EPersonBuilder.createEPerson(context)
+                .withEmail("submitter@example.com")
+                .withPassword("dspace")
+                .build();
+
+        context.setCurrentUser(submitter);
+
+        //3. a workflow item will all the required fields
+        XmlWorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
+                .withTitle("Workflow Item 1")
+                .withIssueDate("2017-10-17")
+                .build();
+
+        //4. a workflow item without the dateissued required field
+        XmlWorkflowItem witemMissingFields = WorkflowItemBuilder.createWorkflowItem(context, col1)
+                .withTitle("Workflow Item 1")
+                .build();
+        String authToken = getAuthToken(admin.getEmail(), password);
+
+        getClient(authToken).perform(get("/api/workflow/worfklowitems/" + witem.getID()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status", is(true)))
+                .andExpect(jsonPath("$.errors").doesNotExist())
+        ;
+
+        getClient(authToken).perform(get("/api/workflow/worfklowitems/" + witemMissingFields.getID()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status", is(false)))
+                .andExpect(jsonPath("$.errors[?(@.message=='error.validation.required')]",
+                        Matchers.contains(
+                                hasJsonPath("$.paths", Matchers.contains(
+                                        hasJsonPath("$", Matchers.is("/sections/traditionalpageone/dc.date.issued"))
+                                )))))
+        ;
+    }
+
+    @Test
+    /**
+     * Test the update of metadata
+     *
+     * @throws Exception
+     */
+    public void patchUpdateMetadataTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community with one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1")
+                .withWorkflowGroup(1, admin).build();
+
+        //2. create a normal user to use as submitter
+        EPerson submitter = EPersonBuilder.createEPerson(context)
+                .withEmail("submitter@example.com")
+                .withPassword("dspace")
+                .build();
+
+        context.setCurrentUser(submitter);
+
+        //3. a workflow item
+        XmlWorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
+                .withTitle("Workflow Item 1")
+                .withIssueDate("2017-10-17")
+                .withSubject("ExtraEntry")
+                .build();
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+
+        // a simple patch to update an existent metadata
+        List<Operation> updateTitle = new ArrayList<Operation>();
+        Map<String, String> value = new HashMap<String, String>();
+        value.put("value", "New Title");
+        updateTitle.add(new ReplaceOperation("/sections/traditionalpageone/dc.title/0", value));
+
+        String patchBody = getPatchContent(updateTitle);
+
+        getClient(authToken).perform(patch("/api/workflow/workflowitems/" + witem.getID())
+            .content(patchBody)
+            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.status", is(true)))
+                        .andExpect(jsonPath("$.errors").doesNotExist())
+                        .andExpect(jsonPath("$",
+                                // check the new title and untouched values
+                                Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(witem,
+                                        "New Title", "2017-10-17", "ExtraEntry"))));
+        ;
+
+        // verify that the patch changes have been persisted
+        getClient().perform(get("/api/workflow/workflowitems/" + witem.getID()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.status", is(true)))
+            .andExpect(jsonPath("$.errors").doesNotExist())
+            .andExpect(jsonPath("$",
+                    Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(witem,
+                            "New Title", "2017-10-17", "ExtraEntry"))))
+        ;
+    }
+
+    @Test
+    /**
+     * Test delete of a metadata
+     *
+     * @throws Exception
+     */
+    public void patchDeleteMetadataTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community with one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1")
+                .withWorkflowGroup(1, admin).build();
+
+        //2. create a normal user to use as submitter
+        EPerson submitter = EPersonBuilder.createEPerson(context)
+                .withEmail("submitter@example.com")
+                .withPassword("dspace")
+                .build();
+
+        context.setCurrentUser(submitter);
+
+        //3. some workflow items for our test
+        XmlWorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
+                .withTitle("Workflow Item 1")
+                .withIssueDate("2017-10-17")
+                .withSubject("ExtraEntry")
+                .build();
+
+        XmlWorkflowItem witemMultipleSubjects = WorkflowItemBuilder.createWorkflowItem(context, col1)
+                .withTitle("Workflow Item 2")
+                .withIssueDate("2017-10-17")
+                .withSubject("Subject1")
+                .withSubject("Subject2")
+                .withSubject("Subject3")
+                .withSubject("Subject4")
+                .build();
+
+        XmlWorkflowItem witemWithTitleDateAndSubjects = WorkflowItemBuilder.createWorkflowItem(context, col1)
+                .withTitle("Workflow Item 3")
+                .withIssueDate("2017-10-17")
+                .withSubject("Subject1")
+                .withSubject("Subject2")
+                .withSubject("Subject3")
+                .withSubject("Subject4")
+                .build();
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+        // try to remove the title
+        List<Operation> removeTitle = new ArrayList<Operation>();
+        removeTitle.add(new RemoveOperation("/sections/traditionalpageone/dc.title/0"));
+
+        String patchBody = getPatchContent(removeTitle);
+        getClient(authToken).perform(patch("/api/workflow/workflowitems/" + witem.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$.status", is(false)))
+                            .andExpect(jsonPath("$.errors[?(@.message=='error.validation.required')]",
+                                Matchers.contains(hasJsonPath("$.paths",
+                                        Matchers.contains(
+                                                hasJsonPath("$",
+                                                        Matchers.is("/sections/traditionalpageone/dc.title")))))))
+                            .andExpect(jsonPath("$",
+                                    // check the new title and untouched values
+                                    Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(witem,
+                                            null, "2017-10-17", "ExtraEntry"))));
+        ;
+
+        // verify that the patch changes have been persisted
+        getClient().perform(get("/api/workflow/workflowitems/" + witem.getID()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.status", is(false)))
+            .andExpect(jsonPath("$.errors[?(@.message=='error.validation.required')]",
+                    Matchers.contains(
+                            hasJsonPath("$.paths", Matchers.contains(
+                                    hasJsonPath("$", Matchers.is("/sections/traditionalpageone/dc.title"))
+                            )))))
+            .andExpect(jsonPath("$",
+                    Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(witem,
+                            null, "2017-10-17", "ExtraEntry"))))
+        ;
+
+        // try to remove a metadata in a specific position
+        List<Operation> removeMidSubject = new ArrayList<Operation>();
+        removeMidSubject.add(new RemoveOperation("/sections/traditionalpagetwo/dc.subject/1"));
+
+        patchBody = getPatchContent(removeMidSubject);
+        getClient(authToken).perform(patch("/api/workflow/workflowitems/" + witemMultipleSubjects.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$.status", is(true)))
+                            .andExpect(jsonPath("$.errors").doesNotExist())
+                            .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject'][0].value", is("Subject1")))
+                            .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject'][1].value", is("Subject3")))
+                            .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject'][2].value", is("Subject4")))
+        ;
+
+        // verify that the patch changes have been persisted
+        getClient().perform(get("/api/workflow/workflowitems/" + witemMultipleSubjects.getID()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.status", is(true)))
+            .andExpect(jsonPath("$.errors").doesNotExist())
+            .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject'][0].value", is("Subject1")))
+            .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject'][1].value", is("Subject3")))
+            .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject'][2].value", is("Subject4")))
+        ;
+
+        List<Operation> removeFirstSubject = new ArrayList<Operation>();
+        removeFirstSubject.add(new RemoveOperation("/sections/traditionalpagetwo/dc.subject/0"));
+
+        patchBody = getPatchContent(removeFirstSubject);
+        getClient(authToken).perform(patch("/api/workflow/workflowitems/" + witemMultipleSubjects.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$.status", is(true)))
+                            .andExpect(jsonPath("$.errors").doesNotExist())
+                            .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject'][0].value", is("Subject3")))
+                            .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject'][1].value", is("Subject4")))
+        ;
+
+        // verify that the patch changes have been persisted
+        getClient().perform(get("/api/workflow/workflowitems/" + witemMultipleSubjects.getID()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.status", is(true)))
+            .andExpect(jsonPath("$.errors").doesNotExist())
+            .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject'][0].value", is("Subject3")))
+            .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject'][1].value", is("Subject4")))
+        ;
+
+        List<Operation> removeLastSubject = new ArrayList<Operation>();
+        removeLastSubject.add(new RemoveOperation("/sections/traditionalpagetwo/dc.subject/1"));
+
+        patchBody = getPatchContent(removeLastSubject);
+        getClient(authToken).perform(patch("/api/workflow/workflowitems/" + witemMultipleSubjects.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status", is(true)))
+                .andExpect(jsonPath("$.errors").doesNotExist())
+                .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject'][0].value", is("Subject3")))
+        ;
+
+        // verify that the patch changes have been persisted
+        getClient().perform(get("/api/workflow/workflowitems/" + witemMultipleSubjects.getID()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.status", is(true)))
+            .andExpect(jsonPath("$.errors").doesNotExist())
+            .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject'][0].value", is("Subject3")))
+        ;
+
+        List<Operation> removeFinalSubject = new ArrayList<Operation>();
+        removeFinalSubject.add(new RemoveOperation("/sections/traditionalpagetwo/dc.subject/0"));
+
+        patchBody = getPatchContent(removeFinalSubject);
+        getClient(authToken).perform(patch("/api/workflow/workflowitems/" + witemMultipleSubjects.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$.status", is(true)))
+                            .andExpect(jsonPath("$.errors").doesNotExist())
+                            .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject']").doesNotExist())
+        ;
+
+        // verify that the patch changes have been persisted
+        getClient().perform(get("/api/workflow/workflowitems/" + witemMultipleSubjects.getID()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.status", is(true)))
+            .andExpect(jsonPath("$.errors").doesNotExist())
+            .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject']").doesNotExist())
+        ;
+
+        // remove all the subjects with a single operation
+        List<Operation> removeSubjectsAllAtOnce = new ArrayList<Operation>();
+        removeSubjectsAllAtOnce.add(new RemoveOperation("/sections/traditionalpagetwo/dc.subject"));
+
+        patchBody = getPatchContent(removeSubjectsAllAtOnce);
+        getClient(authToken).perform(patch("/api/workflow/workflowitems/" + witemWithTitleDateAndSubjects.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$.status", is(true)))
+                            .andExpect(jsonPath("$.errors").doesNotExist())
+                            .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject']").doesNotExist())
+        ;
+
+        // verify that the patch changes have been persisted
+        getClient().perform(get("/api/workflow/workflowitems/" + witemWithTitleDateAndSubjects.getID()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.status", is(true)))
+            .andExpect(jsonPath("$.errors").doesNotExist())
+            .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject']").doesNotExist())
+        ;
+    }
+
+    @Test
+    /**
+     * Test the addition of metadata
+     *
+     * @throws Exception
+     */
+    public void patchAddMetadataTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community with one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1")
+                .withWorkflowGroup(1, admin).build();
+
+        //2. create a normal user to use as submitter
+        EPerson submitter = EPersonBuilder.createEPerson(context)
+                .withEmail("submitter@example.com")
+                .withPassword("dspace")
+                .build();
+
+        context.setCurrentUser(submitter);
+
+        //3. some workflow items for our test
+        XmlWorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
+                .withIssueDate("2017-10-17")
+                .withSubject("ExtraEntry")
+                .build();
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+        // try to add the title
+        List<Operation> addTitle = new ArrayList<Operation>();
+        // create a list of values to use in add operation
+        List<Map<String, String>> values = new ArrayList<Map<String, String>>();
+        Map<String, String> value = new HashMap<String, String>();
+        value.put("value", "New Title");
+        values.add(value);
+        addTitle.add(new AddOperation("/sections/traditionalpageone/dc.title", values));
+
+        String patchBody = getPatchContent(addTitle);
+        getClient(authToken).perform(patch("/api/workflow/workflowitems/" + witem.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$.status", is(true)))
+                            .andExpect(jsonPath("$.errors").doesNotExist())
+                            .andExpect(jsonPath("$",
+                                    // check if the new title if back and the other values untouched
+                                    Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(witem,
+                                            "New Title", "2017-10-17", "ExtraEntry"))));
+        ;
+
+        // verify that the patch changes have been persisted
+        getClient().perform(get("/api/workflow/workflowitems/" + witem.getID()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.status", is(true)))
+            .andExpect(jsonPath("$.errors").doesNotExist())
+            .andExpect(jsonPath("$",
+                    Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(witem,
+                            "New Title", "2017-10-17", "ExtraEntry"))))
+        ;
+    }
+
+    @Test
+    /**
+     * Test the addition of metadata
+     *
+     * @throws Exception
+     */
+    public void patchAddMultipleMetadataValuesTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community with one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1")
+                .withWorkflowGroup(1, admin).build();
+
+        //2. create a normal user to use as submitter
+        EPerson submitter = EPersonBuilder.createEPerson(context)
+                .withEmail("submitter@example.com")
+                .withPassword("dspace")
+                .build();
+
+        context.setCurrentUser(submitter);
+
+        //3. some workflow items for our test
+        XmlWorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
+                .withTitle("Test WorkflowItem")
+                .withIssueDate("2017-10-17")
+                .build();
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+
+        // try to add multiple subjects at once
+        List<Operation> addSubjects = new ArrayList<Operation>();
+        // create a list of values to use in add operation
+        List<Map<String, String>> values = new ArrayList<Map<String, String>>();
+        Map<String, String> value1 = new HashMap<String, String>();
+        value1.put("value", "Subject1");
+        Map<String, String> value2 = new HashMap<String, String>();
+        value2.put("value", "Subject2");
+        values.add(value1);
+        values.add(value2);
+
+        addSubjects.add(new AddOperation("/sections/traditionalpagetwo/dc.subject", values));
+
+        String patchBody = getPatchContent(addSubjects);
+        getClient(authToken).perform(patch("/api/workflow/workflowitems/" + witem.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$.status", is(true)))
+                            .andExpect(jsonPath("$.errors").doesNotExist())
+                            .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject'][0].value",
+                                    is("Subject1")))
+                            .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject'][1].value",
+                                    is("Subject2")))
+        ;
+
+        // verify that the patch changes have been persisted
+        getClient().perform(get("/api/workflow/workflowitems/" + witem.getID()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.status", is(true)))
+            .andExpect(jsonPath("$.errors").doesNotExist())
+            .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject'][0].value", is("Subject1")))
+            .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject'][1].value", is("Subject2")))
+        ;
+
+        // add a subject in the first position
+        List<Operation> addFirstSubject = new ArrayList<Operation>();
+        Map<String, String> firstSubject = new HashMap<String, String>();
+        firstSubject.put("value", "First Subject");
+
+        addFirstSubject.add(new AddOperation("/sections/traditionalpagetwo/dc.subject/0", firstSubject));
+
+        patchBody = getPatchContent(addFirstSubject);
+        getClient(authToken).perform(patch("/api/workflow/workflowitems/" + witem.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$.status", is(true)))
+                            .andExpect(jsonPath("$.errors").doesNotExist())
+                            .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject'][0].value",
+                                    is("First Subject")))
+                            .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject'][1].value",
+                                    is("Subject1")))
+                            .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject'][2].value",
+                                    is("Subject2")))
+        ;
+
+        // verify that the patch changes have been persisted
+        getClient().perform(get("/api/workflow/workflowitems/" + witem.getID()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.status", is(true)))
+            .andExpect(jsonPath("$.errors").doesNotExist())
+            .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject'][0].value", is("First Subject")))
+            .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject'][1].value", is("Subject1")))
+            .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject'][2].value", is("Subject2")))
+        ;
+
+        // add a subject in a central position
+        List<Operation> addMidSubject = new ArrayList<Operation>();
+        Map<String, String> midSubject = new HashMap<String, String>();
+        midSubject.put("value", "Mid Subject");
+
+        addMidSubject.add(new AddOperation("/sections/traditionalpagetwo/dc.subject/2", midSubject));
+
+        patchBody = getPatchContent(addMidSubject);
+        getClient(authToken).perform(patch("/api/workflow/workflowitems/" + witem.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$.status", is(true)))
+                            .andExpect(jsonPath("$.errors").doesNotExist())
+                            .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject'][0].value",
+                                    is("First Subject")))
+                            .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject'][1].value",
+                                    is("Subject1")))
+                            .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject'][2].value",
+                                    is("Mid Subject")))
+                            .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject'][3].value",
+                                    is("Subject2")))
+        ;
+
+        // verify that the patch changes have been persisted
+        getClient().perform(get("/api/workflow/workflowitems/" + witem.getID()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.status", is(true)))
+            .andExpect(jsonPath("$.errors").doesNotExist())
+            .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject'][0].value", is("First Subject")))
+            .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject'][1].value", is("Subject1")))
+            .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject'][2].value", is("Mid Subject")))
+            .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject'][3].value", is("Subject2")))
+        ;
+
+        // append a last subject without specifying the index
+        List<Operation> addLastSubject = new ArrayList<Operation>();
+        Map<String, String> lastSubject = new HashMap<String, String>();
+        lastSubject.put("value", "Last Subject");
+
+        addLastSubject.add(new AddOperation("/sections/traditionalpagetwo/dc.subject/4", lastSubject));
+
+        patchBody = getPatchContent(addLastSubject);
+        getClient(authToken).perform(patch("/api/workflow/workflowitems/" + witem.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$.status", is(true)))
+                            .andExpect(jsonPath("$.errors").doesNotExist())
+                            .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject'][0].value",
+                                    is("First Subject")))
+                            .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject'][1].value",
+                                    is("Subject1")))
+                            .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject'][2].value",
+                                    is("Mid Subject")))
+                            .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject'][3].value",
+                                    is("Subject2")))
+                            .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject'][4].value",
+                                    is("Last Subject")))
+        ;
+
+        // verify that the patch changes have been persisted
+        getClient().perform(get("/api/workflow/workflowitems/" + witem.getID()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.status", is(true)))
+            .andExpect(jsonPath("$.errors").doesNotExist())
+            .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject'][0].value", is("First Subject")))
+            .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject'][1].value", is("Subject1")))
+            .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject'][2].value", is("Mid Subject")))
+            .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject'][3].value", is("Subject2")))
+            .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject'][4].value", is("Last Subject")))
+        ;
+
+        // append a last subject without specifying the index
+        List<Operation> addFinalSubject = new ArrayList<Operation>();
+        Map<String, String> finalSubject = new HashMap<String, String>();
+        finalSubject.put("value", "Final Subject");
+
+        addFinalSubject.add(new AddOperation("/sections/traditionalpagetwo/dc.subject/-", finalSubject));
+
+        patchBody = getPatchContent(addFinalSubject);
+        getClient(authToken).perform(patch("/api/workflow/workflowitems/" + witem.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$.status", is(true)))
+                            .andExpect(jsonPath("$.errors").doesNotExist())
+                            .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject'][0].value",
+                                    is("First Subject")))
+                            .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject'][1].value",
+                                    is("Subject1")))
+                            .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject'][2].value",
+                                    is("Mid Subject")))
+                            .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject'][3].value",
+                                    is("Subject2")))
+                            .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject'][4].value",
+                                    is("Last Subject")))
+                            .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject'][5].value",
+                                    is("Final Subject")))
+        ;
+
+        // verify that the patch changes have been persisted
+        getClient().perform(get("/api/workflow/workflowitems/" + witem.getID()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.status", is(true)))
+            .andExpect(jsonPath("$.errors").doesNotExist())
+            .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject'][0].value", is("First Subject")))
+            .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject'][1].value", is("Subject1")))
+            .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject'][2].value", is("Mid Subject")))
+            .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject'][3].value", is("Subject2")))
+            .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject'][4].value", is("Last Subject")))
+            .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject'][5].value", is("Final Subject")))
+        ;
     }
 
 }
