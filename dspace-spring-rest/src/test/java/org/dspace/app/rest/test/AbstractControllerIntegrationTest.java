@@ -73,6 +73,7 @@ public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWi
     protected MediaType contentType = new MediaType(MediaTypes.HAL_JSON.getType(),
                                                     MediaTypes.HAL_JSON.getSubtype(), Charsets.UTF_8);
 
+    protected MediaType textUriContentType = new MediaType("text", "uri-list");
 
     protected HttpMessageConverter mappingJackson2HttpMessageConverter;
 

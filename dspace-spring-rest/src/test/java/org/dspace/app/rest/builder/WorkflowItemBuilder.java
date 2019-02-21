@@ -7,8 +7,12 @@
  */
 package org.dspace.app.rest.builder;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.sql.SQLException;
+import java.util.concurrent.atomic.AtomicReference;
 
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.DCDate;
@@ -17,6 +21,7 @@ import org.dspace.content.LicenseUtils;
 import org.dspace.content.MetadataSchema;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Context;
+import org.dspace.discovery.SearchServiceException;
 import org.dspace.eperson.EPerson;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
@@ -181,5 +186,25 @@ public class WorkflowItemBuilder extends AbstractBuilder<XmlWorkflowItem, XmlWor
             handleException(e);
         }
         return this;
+    }
+
+    public static void deleteWorkflowItem(AtomicReference<Integer> idRef)
+            throws SQLException, IOException, SearchServiceException {
+        if (idRef != null && idRef.get() != null) {
+            try (Context c = new Context()) {
+                c.turnOffAuthorisationSystem();
+                XmlWorkflowItem wi = workflowItemService.find(c, idRef.get());
+                if (wi != null) {
+                    try {
+                        workflowItemService.delete(c, wi);
+                    } catch (AuthorizeException e) {
+                        // cannot occur, just wrap it to make the compilar happy
+                        throw new RuntimeException(e.getMessage(), e);
+                    }
+                }
+                c.complete();
+            }
+            indexingService.commit();
+        }
     }
 }

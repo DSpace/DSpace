@@ -90,7 +90,7 @@ public class WorkflowItemMatcher {
      */
     public static Matcher<? super Object> matchProperties(XmlWorkflowItem witem) {
         return allOf(
-                hasJsonPath("$.id", is(witem.getID())),
+                witem != null ? hasJsonPath("$.id", is(witem.getID())) : hasJsonPath("$.id"),
                 hasJsonPath("$.type", is("workflowitem"))
         );
     }
@@ -104,7 +104,10 @@ public class WorkflowItemMatcher {
      */
     public static Matcher<? super Object> matchLinks(XmlWorkflowItem witem) {
         return allOf(
-                hasJsonPath("$._links.self.href", is(REST_SERVER_URL + "workflow/workflowitems/" + witem.getID())),
+                witem != null
+                        ? hasJsonPath("$._links.self.href",
+                                is(REST_SERVER_URL + "workflow/workflowitems/" + witem.getID()))
+                        : hasJsonPath("$._links.self.href"),
                 hasJsonPath("$._links.item.href", startsWith(REST_SERVER_URL)),
                 hasJsonPath("$._links.collection.href", startsWith(REST_SERVER_URL)),
                 hasJsonPath("$._links.submitter.href", startsWith(REST_SERVER_URL)),
