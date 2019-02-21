@@ -26,7 +26,9 @@ public class Chair {
     }
 
     public void addSubmission(String personName, Integer submissionCount) {
-        staff.add(new Person(personName, submissionCount));
+        if(staff.stream().noneMatch(person -> person.getName().equals(personName))) {
+            staff.add(new Person(personName, submissionCount));
+        }
     }
 
 }

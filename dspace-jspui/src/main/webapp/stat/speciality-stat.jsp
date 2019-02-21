@@ -43,13 +43,61 @@
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
         LocalDate from = request.getParameter("fromDate") == null ? LocalDate.MIN : LocalDate.parse(request.getParameter("fromDate"), formatter);
         LocalDate to = request.getParameter("endDate") == null ? LocalDate.MAX : LocalDate.parse(request.getParameter("endDate"), formatter);
-        Map<Speciality, Long> specialityStatistics = EssuirUtils.getSpecialityStatistics(from, to);
 %>
 
 
 <dspace:layout locbar="nolink" title="Statistics" feedData="NONE">
+    <div class="center-block">
+        <div style="margin: 0 auto; width: 800px;">
+            <form class="form-inline" style="margin-bottom: 20px;" action="" method="get">
+                <div class="form-group">
+                    <label for="beginDate"><%= LocaleSupport.getLocalizedMessage(pageContext, "report.date-from") %>
+                        :</label>
+                    <input type="text" id="beginDate" class="form-control" name="fromDate" value="05.12.2010">
+                </div>
+                <div class="form-group">
+                    <label for="endDate"><%= LocaleSupport.getLocalizedMessage(pageContext, "report.date-to") %>
+                        :</label>
+                    <input type="text" id="endDate" class="form-control" name="endDate" value="01.01.2016">
+                </div>
+                <button type="submit"
+                        class="btn btn-default"><%= LocaleSupport.getLocalizedMessage(pageContext, "report.update") %>
+                </button>
+            </form>
 
+            <div id="reportTable" style="width:800px;"></div>
+        </div>
+    </div>
     <script>
+        webix.ready(function () {
+            grid = webix.ui({
+                container: "reportTable",
+                view: "treetable",
+                columns: [
+                    {
+                        id: "name",
+                        header: ["<%= LocaleSupport.getLocalizedMessage(pageContext, "report.depositor") %>", {content: "textFilter"}],
+                        width: 600,
+                        sort: "string",
+                        template: "{common.treetable()} #name#"
+                    },
+                    {id: "submission_count", header: "<%= LocaleSupport.getLocalizedMessage(pageContext, "report.submissions-count") %>", width: 200, sort: "int"}
+                ],
+                autoheight: true,
+                autowidth: true,
+                on: {
+                    onBeforeLoad: function () {
+                        this.showOverlay("Loading...");
+                    },
+                    onAfterLoad: function () {
+                        this.hideOverlay();
+                    }
+                },
+                url: "/statistics/speciality?from=" + $('#beginDate').val() + "&to=" + $('#endDate').val(),
+                datatype: "json"
+            });
+        });
+
         $(document).ready(function () {
             var today = new Date();
             var day = today.getDate();
@@ -79,54 +127,15 @@
                 yearRange: "2010:" + new Date().getFullYear()
             });
         });
+
+        function updateGrid() {
+            var beginDate = $('#beginDate').val();
+            var endDate = $('#endDate').val();
+            grid.clearAll();
+            grid.load("/statistics/speciality?from=" + beginDate + "&to=" + endDate);
+        }
+
     </script>
-
-    <div class="center-block">
-        <div style="margin: 0 auto; width: 800px;">
-            <form class="form-inline" style="margin-bottom: 20px;" action="" method="get">
-                <div class="form-group">
-                    <label for="beginDate"><%= LocaleSupport.getLocalizedMessage(pageContext, "report.date-from") %>
-                        :</label>
-                    <input type="text" id="beginDate" class="form-control" name="fromDate" value="05.12.2010">
-                </div>
-                <div class="form-group">
-                    <label for="endDate"><%= LocaleSupport.getLocalizedMessage(pageContext, "report.date-to") %>
-                        :</label>
-                    <input type="text" id="endDate" class="form-control" name="endDate" value="01.01.2016">
-                </div>
-                <button type="submit"
-                        class="btn btn-default"><%= LocaleSupport.getLocalizedMessage(pageContext, "report.update") %>
-                </button>
-            </form>
-
-            <div id="reportTable" style="width:800px;"></div>
-        </div>
-    </div>
-
-    <table class="table">
-        <thead>
-        <tr>
-            <th class="evenRowEvenCol"><fmt:message key="jsp.admin.person-stat.faculty"/></th>
-            <th class="evenRowEvenCol"><fmt:message key="jsp.admin.person-stat.chair"/></th>
-            <th class="evenRowEvenCol"><fmt:message key="jsp.admin.person-stat.speciality"/></th>
-            <th class="evenRowEvenCol"><fmt:message key="report.submissions-count"/></th>
-        </tr>
-        </thead>
-        <tbody>
-        <%
-            for (Map.Entry<Speciality, Long> paper : specialityStatistics.entrySet()) {
-        %>
-        <tr>
-            <td class="evenRowOddCol"><%= paper.getKey().getChairEntity().getFacultyEntityName() %></td>
-            <td class="evenRowOddCol"><%= paper.getKey().getChairEntity().getChairName() %></td>
-            <td class="evenRowOddCol"><%= paper.getKey().getName() %></td>
-            <td class="evenRowOddCol"><%= paper.getValue() %></td>
-        </tr>
-        <% }
-        %>
-
-        </tbody>
-    </table>
 </dspace:layout>
 
 <%

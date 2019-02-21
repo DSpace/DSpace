@@ -9,6 +9,7 @@ import ua.edu.sumdu.essuir.cache.AuthorCache;
 import ua.edu.sumdu.essuir.entity.*;
 import ua.edu.sumdu.essuir.repository.*;
 import ua.edu.sumdu.essuir.service.DatabaseService;
+import ua.edu.sumdu.essuir.service.ReportService;
 
 import javax.sql.rowset.CachedRowSet;
 import java.sql.SQLException;
@@ -22,13 +23,14 @@ public class EssuirUtils {
     private static ChairRepository chairRepository;
     private static FacultyRepository facultyRepository;
     private static AuthorsRepository authorsRepository;
-    private static SpecialityStatisticsService specialityStatisticsService;
+    private static ReportService reportService;
+
 
     private static Logger logger = Logger.getLogger(EssuirUtils.class);
 
     @Autowired
-    public void setSpecialityStatisticsController(SpecialityStatisticsService specialityStatisticsService) {
-        EssuirUtils.specialityStatisticsService = specialityStatisticsService;
+    public void setSpecialityStatisticsController(ReportService reportService) {
+        EssuirUtils.reportService = reportService;
     }
 
     @Autowired
@@ -189,7 +191,7 @@ public class EssuirUtils {
     }
 
     public static Map<Speciality, Long> getSpecialityStatistics(LocalDate from, LocalDate to) {
-        return specialityStatisticsService.getSpecialityStatistics(from, to);
+        return reportService.getSpecialityStatistics(from, to);
     }
 
 }

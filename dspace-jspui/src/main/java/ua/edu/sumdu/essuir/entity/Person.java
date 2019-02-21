@@ -16,4 +16,8 @@ public class Person {
     public Integer getSubmissionCount() {
         return submissionCount;
     }
+
+    public String getName() {
+        return name;
+    }
 }
