@@ -89,6 +89,7 @@ public class XmlWorkflowItemDAOImpl extends AbstractHibernateDAO<XmlWorkflowItem
         Join<XmlWorkflowItem, Item> join = xmlWorkflowItemRoot.join("item");
         criteriaQuery.select(xmlWorkflowItemRoot);
         criteriaQuery.where(criteriaBuilder.equal(join.get(Item_.submitter), ep));
+        criteriaQuery.orderBy(criteriaBuilder.asc(xmlWorkflowItemRoot.get(XmlWorkflowItem_.id)));
         return list(context, criteriaQuery, false, XmlWorkflowItem.class, -1, -1);
     }
 
@@ -99,6 +100,7 @@ public class XmlWorkflowItemDAOImpl extends AbstractHibernateDAO<XmlWorkflowItem
         Root<XmlWorkflowItem> xmlWorkflowItemRoot = criteriaQuery.from(XmlWorkflowItem.class);
         criteriaQuery.select(xmlWorkflowItemRoot);
         criteriaQuery.where(criteriaBuilder.equal(xmlWorkflowItemRoot.get(XmlWorkflowItem_.collection), collection));
+        criteriaQuery.orderBy(criteriaBuilder.asc(xmlWorkflowItemRoot.get(XmlWorkflowItem_.id)));
         return list(context, criteriaQuery, false, XmlWorkflowItem.class, -1, -1);
     }
 
