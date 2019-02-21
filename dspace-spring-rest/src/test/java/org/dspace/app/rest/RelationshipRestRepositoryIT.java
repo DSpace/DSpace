@@ -474,6 +474,11 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
 
     }
 
+    /**
+     * Create a relationship between publication 1 and author 1
+     * Change it to a relationship between publication 1 and author 2
+     * Verify this is possible for a user with WRITE permissions on author 1 and author 2
+     */
     @Test
     public void putRelationshipWriteAccessOnAuthors() throws Exception {
 
@@ -563,6 +568,11 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
 
     }
 
+    /**
+     * Create a relationship between publication 1 and author 1
+     * Change it to a relationship between publication 1 and author 2
+     * Verify this is possible for a user with WRITE permissions on publication 1
+     */
     @Test
     public void putRelationshipWriteAccessOnPublication() throws Exception {
 
@@ -652,6 +662,11 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
     }
 
 
+    /**
+     * Create a relationship between publication 1 and author 1
+     * Change it to a relationship between publication 2 and author 1
+     * Verify this is possible for a user with WRITE permissions on publication 1 and publication 2
+     */
     @Test
     public void putRelationshipWriteAccessOnPublications() throws Exception {
 
@@ -747,6 +762,12 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
 
     }
 
+
+    /**
+     * Create a relationship between publication 1 and author 1
+     * Change it to a relationship between publication 2 and author 1
+     * Verify this is possible for a user with WRITE permissions on author 1
+     */
     @Test
     public void putRelationshipWriteAccessOnAuthor() throws Exception {
 
@@ -844,6 +865,11 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
     }
 
 
+    /**
+     * Create a relationship between publication 1 and author 1
+     * Change it to a relationship between publication 1 and author 2
+     * Verify this is NOT possible for a user without WRITE permissions
+     */
     @Test
     public void putRelationshipNoAccess() throws Exception {
 
@@ -928,6 +954,11 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
 
     }
 
+    /**
+     * Create a relationship between publication 1 and author 1
+     * Change it to a relationship between publication 1 and author 2
+     * Verify this is NOT possible for a user with WRITE permissions on author 1
+     */
     @Test
     public void putRelationshipOnlyAccessOnOneAuthor() throws Exception {
 
@@ -1013,6 +1044,11 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
 
     }
 
+    /**
+     * Create a relationship between publication 1 and author 1
+     * Change it to a relationship between publication 2 and author 1
+     * Verify this is NOT possible for a user with WRITE permissions on publication 1
+     */
     @Test
     public void putRelationshipOnlyAccessOnOnePublication() throws Exception {
 
