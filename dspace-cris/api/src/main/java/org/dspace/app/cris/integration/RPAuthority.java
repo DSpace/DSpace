@@ -14,7 +14,6 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.util.ClientUtils;
-import org.dspace.app.cris.model.ACrisObject;
 import org.dspace.app.cris.model.CrisConstants;
 import org.dspace.app.cris.model.ResearcherPage;
 import org.dspace.app.cris.model.RestrictedField;
@@ -339,12 +338,8 @@ public class RPAuthority extends CRISAuthority implements
                         cris.getCrisID(), itemID);
             }
             
-			// FIXME this should be performed by the AuthorityManagementServlet
-			// and not here!
-			// when done in the proper way, the relationpreference should invoke
-			// the notify to provide hack
-			// for external authority services
-            relationPreferenceService.unlink(context, cris, PUBLICATIONS_RELATION_NAME,
+            String defaultRelation = configurationService.getPropertyAsType(RP_AUTHORITY_NAME + ".relation.name", PUBLICATIONS_RELATION_NAME, true);
+            relationPreferenceService.unlink(context, cris, defaultRelation,
                     list);
             context.commit();
             context.restoreAuthSystemState();
@@ -409,18 +404,12 @@ public class RPAuthority extends CRISAuthority implements
 								authorityKey, itemID);
 			}
 			context.commit();
-			// FIXME this should be performed by the AuthorityManagementServlet
-			// and not here!
-			// when done in the proper way, the relationpreference should invoke
-			// the notify to provide hack
-			// for external authority services
-			ResearcherPage rp = applicationService
-					.getResearcherByAuthorityKey(authorityKey);
+
+			ResearcherPage rp = applicationService.getResearcherByAuthorityKey(authorityKey);
 			List<String> list = new ArrayList<String>();
 			list.add(String.valueOf(itemID));
-			relationPreferenceService.active(context, rp,
-					PUBLICATIONS_RELATION_NAME,
-                    list);
+			String defaultRelation = configurationService.getPropertyAsType(RP_AUTHORITY_NAME + ".relation.name", PUBLICATIONS_RELATION_NAME, true);
+			relationPreferenceService.active(context, rp, defaultRelation, list);
 			context.restoreAuthSystemState();
 		} catch (SQLException e) {
 			log.error(e.getMessage(), e);
