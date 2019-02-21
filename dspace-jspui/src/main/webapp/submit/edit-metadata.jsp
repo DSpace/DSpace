@@ -1445,9 +1445,9 @@
     }//end doList
     void doSpecialityRow(javax.servlet.jsp.JspWriter out, PageContext pageContext) throws IOException {
         StringBuilder sb = new StringBuilder();
-        sb.append("<div class=\"row\" id = \"speciality-select-row\"><span class=\"col-md-2\"><b>")
+        sb.append("<div class=\"row\" id = \"speciality-select-row\"><label class=\"col-md-2 label-required\">")
                 .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.speciality-select"))
-        .append("</b></span>")
+        .append("</label>")
                 .append("<span class=\"col-md-8\">")
                 .append("<div id=\"speciality-selector\"></div>")
                 .append("</span></div></br>");
@@ -1782,6 +1782,8 @@
                     jQuery('#dc_date_presentation').parentsUntil('form').hide();
                     jQuery('#dc_date_presentation').parentsUntil('form').prev().hide();
                 <% } %>
+
+                jQuery('#speciality-select-row').nextAll("div.row").first().children('label').addClass('label-required');
             });
 
         });
