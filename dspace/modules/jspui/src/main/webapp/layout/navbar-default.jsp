@@ -97,19 +97,21 @@
            
            <!--<li class="<%= currentPage.endsWith("/home.jsp")? "active" : "" %>"><a href="<%= request.getContextPath() %>/"><span class="glyphicon glyphicon-home"></span> <fmt:message key="jsp.layout.navbar-default.home"/></a></li>-->
 
-           <li class="<%= currentPage.endsWith("/home.jsp")? "active" : "" %>"><a href="<%= request.getContextPath() %>/"><span class="glyphicon glyphicon-home"></span> Inicio</a></li>
+           <li class="<%= currentPage.endsWith("/home.jsp")? "active" : "" %>"><a href="<%= request.getContextPath() %>/"><span class="glyphicon glyphicon-home"></span> <fmt:message key="jsp.layout.navbar-default.home"/></a></li>
+           <!--incio-->
                 
            <li class="dropdown">
              <!--<a href="#" class="dropdown-toggle" data-toggle="dropdown"><fmt:message key="jsp.layout.navbar-default.browse"/> <b class="caret"></b></a>-->
 
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Búsqueda <b class="caret"></b></a>
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown"><fmt:message key="jsp.layout.navbar-default.browse"/> <b class="caret"></b></a> <!--busqueda-->
 
              <ul class="dropdown-menu">
                <!--<li><a href="<%= request.getContextPath() %>/community-list"><fmt:message key="jsp.layout.navbar-default.communities-collections"/></a></li>-->
-               <li><a href="<%= request.getContextPath() %>/community-list">Comunidades y Colecciones</a></li>
+               <li><a href="<%= request.getContextPath() %>/community-list"><fmt:message key="jsp.layout.navbar-default.communities-collections"/></a></li> <!--comunidades y colecciones-->
+
       				<li class="divider"></li>
               <!--<li class="dropdown-header"><fmt:message key="jsp.layout.navbar-default.browseitemsby"/></li>-->
-              <li class="dropdown-header">Buscar por: </li>
+              <li class="dropdown-header"><fmt:message key="jsp.layout.navbar-default.browseitemsby"/> </li> <!--buscar por-->
       				<%-- Insert the dynamic browse indices here --%>
       				
       				<%
@@ -121,8 +123,8 @@
                   String menu[] = {"Fecha de publicación", "Autor", "Título", "Tema", "Fecha de envío"};
                   
       					%>
-      				      			<!--<li><a href="<%= request.getContextPath() %>/browse?type=<%= bix.getName() %>"><fmt:message key="<%= key %>"/></a></li>-->
-                          <li><a href="<%= request.getContextPath() %>/browse?type=<%= bix.getName() %>"><%=menu[i] %></a></li>
+      				      			<li><a href="<%= request.getContextPath() %>/browse?type=<%= bix.getName() %>"><fmt:message key="<%= key %>"/></a></li>
+                         <!-- <li><a href="<%= request.getContextPath() %>/browse?type=<%= bix.getName() %>"><%=menu[i] %></a></li>-->
       					<%	
       					 }
       				%>
@@ -130,16 +132,10 @@
       				<%-- End of dynamic browse indices --%>
 
                   </ul>
-          </li>
-
-            <!--<li class="<%= ( currentPage.endsWith( "/help" ) ? "active" : "" ) %>">-->
-            <!--CHECAR ESTA PARTE... NO SE UTILIZA PERO AL COMENTARLA GENERA UN SÍMBOLO DESPUÉS DEL BOTÓN DE ESTADÍSTICAS-->
-                <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") %>"><fmt:message key="jsp.layout.navbar-default.help"/></dspace:popup>
-           <!-- </li> -->
-             
+          </li>       
           
 
-          <li class="<%= ( currentPage.endsWith( "/help" ) ? "active" : "" ) %>"><a>Estadísticas</a></li>
+         <!-- <li class="<%= ( currentPage.endsWith( "/help" ) ? "active" : "" ) %>"><a>Estadísticas</a></li>-->
        </ul>
 
  <% if (supportedLocales != null && supportedLocales.length > 1)
@@ -194,15 +190,17 @@
     if (user != null)
     {
 		%>
-		<a href="#" class="dropdown-toggle" style="color: #fff" data-toggle="dropdown"><span class="glyphicon glyphicon-user"></span> <fmt:message key="jsp.layout.navbar-default.loggedin">
-		      <fmt:param><%= StringUtils.abbreviate(navbarEmail, 20) %></fmt:param>
-		  </fmt:message> <b class="caret"></b></a>
+		<a href="#" class="dropdown-toggle" style="color: #fff" data-toggle="dropdown"><span class="glyphicon glyphicon-user"></span> 
+         <fmt:message key="jsp.layout.navbar-default.loggedin">
+		      <fmt:param><%= StringUtils.abbreviate(navbarEmail, 13) %></fmt:param>
+		  </fmt:message> 
+      <b class="caret"></b></a>
 		<%
     } else {
 		%>
-             <!--<a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-user"></span> <fmt:message key="jsp.layout.navbar-default.sign"/> <b class="caret"></b></a>-->
+             <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-user"></span> <fmt:message key="jsp.layout.navbar-default.sign"/> <b class="caret"></b></a>
 
-             <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-user"></span> Admin<b class="caret"></b></a>
+             <!--<a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-user"></span> Admin<b class="caret"></b></a>-->
 	<% } %>             
              <ul class="dropdown-menu">
                <li><a href="<%= request.getContextPath() %>/mydspace"><fmt:message key="jsp.layout.navbar-default.users"/></a></li>

@@ -81,8 +81,8 @@
     <div class="col-md-3"></div>
 		<div class="col-md-6 offset-md-3" align="center">
 	    	<form method="get" action="<%= request.getContextPath() %>/simple-search" class="navbar-form"> <!--navbar-right-->
-			    <div class="form-group"><!--form-group-->
-		          <input type="text" maxlength="70" size="70" class="form-control" placeholder="Buscar en Repostorio UTM" name="query" id="tequery" style="width: 70%"/>
+			    <div class="form-group"><!--form-group  Buscar en Repostorio UTM"-->
+		          <input type="text" maxlength="70" size="70" class="form-control" placeholder="<fmt:message key="jsp.layout.navbar-default.search"/>" name="query" id="tequery" style="width: 70%"/>
 		          <!-- <input type="text" class="form-control" placeholder="<fmt:message key="jsp.layout.navbar-default.search"/>" name="query" id="tequery" size="25" />-->
 
 		          <button type="submit" class="btn btn-primary" style="background-image: none; background-color:#410401; border-color: #240200;"><span class="glyphicon glyphicon-search"></span></button>
@@ -209,7 +209,7 @@ if (communities != null && communities.size() != 0)
                 <div class="row container">
                	<div class="col-md-3"></div>
                 <div class="col-md-6">
-                <h3 style="padding-bottom: 2%; color: #410401">Comunidades</h3> <!--comunidades-->
+                <h3 style="padding-bottom: 2%; color: #410401"><fmt:message key="jsp.home.com1"/></h3> <!--comunidades-->
 				<div class="list-group" style="display: block;">
 <%
 	boolean showLogos = configurationService.getBooleanProperty("jspui.home-page.logos", true);

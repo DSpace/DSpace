@@ -64,7 +64,7 @@
 <!--<h3 class="facets"><fmt:message key="jsp.search.facet.refine" /></h3>-->
 				<div class="row container">
                 <div class="col-md-10">
-<h3 style="color: #410401">Consulta</h3> <!--consulta-->
+<h3 style="color: #410401"><fmt:message key="jsp.search.facet.refine" /></h3> <!--consulta-->
 <div id="facets" class="facetsBox row panel" style="background-color: inherit;">
 <%
 	for (DiscoverySearchFilterFacet facetConf : facetsConf)
