@@ -88,4 +88,13 @@ public class EPersonBuilder extends AbstractDSpaceObjectBuilder<EPerson> {
         ePersonService.setPassword(ePerson, password);
         return this;
     }
+
+    @Override
+    /**
+     * Set a lower custom priority for the EPerson. It is the last object to delete to reduced the risk of pending
+     * references
+     */
+    protected int getPriority() {
+        return -20;
+    }
 }

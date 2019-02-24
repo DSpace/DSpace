@@ -142,4 +142,12 @@ public class WorkspaceItemBuilder extends AbstractBuilder<WorkspaceItem, Workspa
         }
         return this;
     }
+
+    @Override
+    /**
+     * Set a slightly lower priority for the workspaceitem has it can be generated "deleting" a workflowitem
+     */
+    protected int getPriority() {
+        return 5;
+    }
 }
