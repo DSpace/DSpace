@@ -26,7 +26,7 @@ public class MetadataSchemaBuilder extends AbstractBuilder<MetadataSchema, Metad
 
     @Override
     protected int getPriority() {
-        return Integer.MAX_VALUE;
+        return Integer.MIN_VALUE;
     }
 
     protected MetadataSchemaBuilder(Context context) {
