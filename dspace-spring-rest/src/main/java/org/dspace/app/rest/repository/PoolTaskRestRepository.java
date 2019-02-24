@@ -18,6 +18,7 @@ import org.apache.log4j.Logger;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.PoolTaskConverter;
+import org.dspace.app.rest.exception.RESTAuthorizationException;
 import org.dspace.app.rest.model.PoolTaskRest;
 import org.dspace.app.rest.model.hateoas.PoolTaskResource;
 import org.dspace.authorize.AuthorizeException;
@@ -92,7 +93,9 @@ public class PoolTaskRestRepository extends DSpaceRestRepository<PoolTaskRest, I
             Context context = obtainContext();
             EPerson ep = epersonService.find(context, userID);
             tasks = poolTaskService.findByEperson(context, ep);
-        } catch (SQLException | AuthorizeException | IOException e) {
+        } catch (AuthorizeException e) {
+            throw new RESTAuthorizationException(e);
+        } catch (SQLException | IOException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
         Page<PoolTaskRest> page = utils.getPage(tasks, pageable).map(converter);
