@@ -30,6 +30,12 @@ public class PoolTaskConverter
     @Autowired
     private WorkflowItemConverter workflowItemConverter;
 
+    @Autowired
+    private EPersonConverter epersonConverter;
+
+    @Autowired
+    private GroupConverter groupConverter;
+
     @Override
     public PoolTaskRest fromModel(PoolTask obj) {
         PoolTaskRest taskRest = new PoolTaskRest();
@@ -37,6 +43,12 @@ public class PoolTaskConverter
         XmlWorkflowItem witem = obj.getWorkflowItem();
         taskRest.setId(obj.getID());
         taskRest.setWorkflowitem(workflowItemConverter.convert(witem));
+        if (obj.getEperson() != null) {
+            taskRest.setEperson(epersonConverter.convert(obj.getEperson()));
+        }
+        if (obj.getGroup() != null) {
+            taskRest.setGroup(groupConverter.convert(obj.getGroup()));
+        }
         taskRest.setAction(obj.getActionID());
         taskRest.setStep(obj.getStepID());
         return taskRest;

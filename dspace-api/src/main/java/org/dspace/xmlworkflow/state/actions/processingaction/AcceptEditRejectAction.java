@@ -46,7 +46,7 @@ public class AcceptEditRejectAction extends ProcessingAction {
         throws SQLException, AuthorizeException, IOException {
 
         if (request.getParameter("submit_approve") != null) {
-            return processMainPage(c, wfi, step, request);
+            return processAccept(c, wfi, step, request);
         } else {
             if (request.getParameter("submit_reject") != null) {
                 return processRejectPage(c, wfi, step, request);
@@ -55,7 +55,7 @@ public class AcceptEditRejectAction extends ProcessingAction {
         return new ActionResult(ActionResult.TYPE.TYPE_CANCEL);
     }
 
-    public ActionResult processMainPage(Context c, XmlWorkflowItem wfi, Step step, HttpServletRequest request)
+    public ActionResult processAccept(Context c, XmlWorkflowItem wfi, Step step, HttpServletRequest request)
         throws SQLException, AuthorizeException {
         //Delete the tasks
         addApprovedProvenance(c, wfi);

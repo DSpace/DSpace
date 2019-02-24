@@ -25,6 +25,12 @@ public class PoolTaskRest extends BaseObjectRest<Integer> {
     private String action;
 
     @JsonIgnore
+    private EPersonRest eperson;
+
+    @JsonIgnore
+    private GroupRest group;
+
+    @JsonIgnore
     private WorkflowItemRest workflowitem;
 
     @Override
@@ -64,6 +70,30 @@ public class PoolTaskRest extends BaseObjectRest<Integer> {
 
     public void setAction(String action) {
         this.action = action;
+    }
+
+    /**
+     * @see PoolTask#getEperson()
+     * @return
+     */
+    public EPersonRest getEperson() {
+        return eperson;
+    }
+
+    public void setEperson(EPersonRest eperson) {
+        this.eperson = eperson;
+    }
+
+    /**
+     * @see PoolTask#getGroup()
+     * @return
+     */
+    public GroupRest getGroup() {
+        return group;
+    }
+
+    public void setGroup(GroupRest group) {
+        this.group = group;
     }
 
     /**
