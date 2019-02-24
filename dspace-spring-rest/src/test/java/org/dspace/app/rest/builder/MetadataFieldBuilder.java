@@ -28,7 +28,7 @@ public class MetadataFieldBuilder extends AbstractBuilder<MetadataField, Metadat
 
     @Override
     protected int getPriority() {
-        return Integer.MAX_VALUE - 1;
+        return Integer.MIN_VALUE + 1;
     }
 
     protected MetadataFieldBuilder(Context context) {
