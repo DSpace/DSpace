@@ -222,6 +222,6 @@ public class ClaimedTaskBuilder extends AbstractBuilder<ClaimedTask, ClaimedTask
      * Set a higher priority than workflowitem for the pooltask has it holds a reference to it
      */
     protected int getPriority() {
-        return 20;
+        return 300;
     }
 }

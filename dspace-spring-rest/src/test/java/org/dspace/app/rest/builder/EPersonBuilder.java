@@ -91,10 +91,10 @@ public class EPersonBuilder extends AbstractDSpaceObjectBuilder<EPerson> {
 
     @Override
     /**
-     * Set a lower custom priority for the EPerson. It is the last object to delete to reduced the risk of pending
-     * references
+     * Set a lower custom priority for the EPerson. It is one of the last object to delete to reduced the risk of
+     * pending references
      */
     protected int getPriority() {
-        return -20;
+        return 50;
     }
 }

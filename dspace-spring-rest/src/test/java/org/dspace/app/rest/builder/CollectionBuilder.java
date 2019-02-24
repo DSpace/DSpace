@@ -123,4 +123,12 @@ public class CollectionBuilder extends AbstractDSpaceObjectBuilder<Collection> {
     protected DSpaceObjectService<Collection> getService() {
         return collectionService;
     }
+
+    @Override
+    /**
+     * Collection must be deleted before community
+     */
+    protected int getPriority() {
+        return 150;
+    }
 }

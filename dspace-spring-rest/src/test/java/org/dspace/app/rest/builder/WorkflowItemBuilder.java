@@ -205,7 +205,7 @@ public class WorkflowItemBuilder extends AbstractBuilder<XmlWorkflowItem, XmlWor
                 try {
                     workflowItemService.delete(c, wi);
                 } catch (AuthorizeException e) {
-                    // cannot occur, just wrap it to make the compilar happy
+                    // cannot occur, just wrap it to make the compiler happy
                     throw new RuntimeException(e.getMessage(), e);
                 }
             }
@@ -219,6 +219,6 @@ public class WorkflowItemBuilder extends AbstractBuilder<XmlWorkflowItem, XmlWor
      * Set a higher priority for the workflowitem has it holds lot of reference
      */
     protected int getPriority() {
-        return 10;
+        return 200;
     }
 }
