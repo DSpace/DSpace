@@ -51,6 +51,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -285,15 +286,16 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
         XmlWorkflowItem witem = null;
         try {
             witem = wis.find(context, id);
-        } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage(), e);
-        }
-        try {
+            if (witem == null) {
+                throw new ResourceNotFoundException("WorkflowItem ID " + id + " not found");
+            }
             wfs.abort(context, witem, context.getCurrentUser());
             context.addEvent(new Event(Event.MODIFY, Constants.ITEM, witem.getItem().getID(), null,
                 itemService.getIdentifiers(context, witem.getItem())));
-        } catch (SQLException | AuthorizeException | IOException e) {
-            log.error(e.getMessage(), e);
+        } catch (AuthorizeException e) {
+            throw new RESTAuthorizationException(e);
+        } catch (SQLException | IOException e) {
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 }
