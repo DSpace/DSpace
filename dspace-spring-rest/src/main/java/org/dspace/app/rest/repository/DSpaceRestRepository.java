@@ -25,6 +25,7 @@ import org.dspace.app.rest.model.hateoas.DSpaceResource;
 import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.service.MetadataFieldService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -54,6 +55,9 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
     @Autowired
     private DSpaceRestRepository<T, ID> thisRepository;
 
+    @Autowired
+    private MetadataFieldService metadataFieldService;
+
     @Override
     public <S extends T> S save(S entity) {
         Context context = null;
@@ -71,7 +75,7 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
 
     /**
      * Method to implement to support full update of a REST object. This is usually required by a PUT request.
-     * 
+     *
      * @param context
      *            the dspace context
      * @param entity
@@ -98,7 +102,7 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
     @Override
     /**
      * Return a specific REST object
-     * 
+     *
      * @return the REST object identified by its ID
      */
     public T findOne(ID id) {
@@ -108,7 +112,7 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
 
     /**
      * Method to implement to support retrieval of a specific REST object instance
-     * 
+     *
      * @param context
      *            the dspace context
      * @param id
@@ -171,7 +175,7 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
 
     /**
      * Method to implement to support delete of a single object instance
-     * 
+     *
      * @param context
      *            the dspace context
      * @param id
@@ -229,7 +233,7 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
 
     /**
      * Method to implement to support scroll of entity instances from the collection resource endpoin
-     * 
+     *
      * @param context
      *            the dspace context
      * @param pageable
@@ -245,7 +249,7 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
 
     /**
      * Wrap the REST model in a REST HAL Resource
-     * 
+     *
      * @param model
      *            the rest model instance
      * @param rels
@@ -256,7 +260,7 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
 
     /**
      * Create and return a new instance. Data are usually retrieved from the thread bound http request
-     * 
+     *
      * @return the created REST object
      */
     public T createAndReturn() {
@@ -276,7 +280,7 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
     /**
      * Method to implement to support the creation of a new instance. Usually require to retrieve the http request from
      * the thread bound attribute
-     * 
+     *
      * @param context
      *            the dspace context
      * @return the created REST object
@@ -292,7 +296,7 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
 
     /**
      * Method to implement to attach/upload a file to a specific REST object
-     * 
+     *
      * @param request
      *            the http request
      * @param apiCategory
@@ -311,7 +315,7 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
 
     /**
      * Apply a partial update to the REST object via JSON Patch
-     * 
+     *
      * @param request
      *            the http request
      * @param apiCategory
@@ -341,7 +345,7 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
 
     /**
      * Method to implement to allow partial update of the REST object via JSON Patch
-     * 
+     *
      * @param request
      *            the http request
      * @param apiCategory
@@ -356,7 +360,7 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
      * @throws PatchBadRequestException
      * @throws RepositoryMethodNotImplementedException
      *             returned by the default implementation when the operation is not supported for the entity
-     * 
+     *
      * @throws SQLException
      * @throws AuthorizeException
      * @throws DCInputsReaderException
@@ -381,7 +385,7 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
 
     /**
      * Bulk create object instances from an uploaded file
-     * 
+     *
      * @param request
      *            the http request
      * @param uploadfile
@@ -402,7 +406,7 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
 
     /**
      * Method to implement to support bulk creation of objects from a file
-     * 
+     *
      * @param request
      *            the http request
      * @param uploadfile
@@ -421,7 +425,8 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
     }
 
     /**
-     * Method to support updating a DSpace instance.
+     * This method will fully replace the REST object with the given UUID with the REST object that is described
+     * in the JsonNode parameter
      *
      * @param request     the http request
      * @param apiCategory the API category e.g. "api"
@@ -445,9 +450,12 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
     }
 
     /**
-     * Implement this method in the subclass to support updating a DSpace instance.
+     * Implement this method in the subclass to support the PUT functionality for a REST object.
+     * This PUT functionality will fully replace the REST object with the given UUID with the REST object that is
+     * described in the JsonNode parameter
      *
      * @param context     the dspace context
+     * @param request     the http request
      * @param apiCategory the API category e.g. "api"
      * @param model       the DSpace model e.g. "metadatafield"
      * @param id          the ID of the target REST object
