@@ -7,11 +7,8 @@
  */
 package org.dspace.app.rest.builder;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.sql.SQLException;
 
-import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.DCDate;
@@ -20,44 +17,50 @@ import org.dspace.content.LicenseUtils;
 import org.dspace.content.MetadataSchema;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Context;
-import org.dspace.discovery.SearchServiceException;
 import org.dspace.eperson.EPerson;
+import org.dspace.xmlworkflow.storedcomponents.PoolTask;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
-import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
+import org.dspace.xmlworkflow.storedcomponents.service.PoolTaskService;
 
 /**
- * Builder to construct WorkflowItem objects
+ * Builder to construct PoolTask objects
  *
  **/
-public class WorkflowItemBuilder extends AbstractBuilder<XmlWorkflowItem, XmlWorkflowItemService> {
+public class PoolTaskBuilder extends AbstractBuilder<PoolTask, PoolTaskService> {
 
     private WorkspaceItem workspaceItem;
 
     private XmlWorkflowItem workflowItem;
 
-    protected WorkflowItemBuilder(Context context) {
+    private PoolTask poolTask;
+
+    private EPerson user;
+
+    protected PoolTaskBuilder(Context context) {
         super(context);
     }
 
     /**
-     * Create a WorkflowItemBuilder. Until the build is finalized the builder works on a workspaceitem to add metadata,
-     * files, grant license, etc. The builder could result in a null workflowItem if the selected collection doesn't
+     * Create a PoolTaskBuilder. Until the build is finalized the builder works on a workspaceitem to add metadata,
+     * files, grant license, etc. The builder could result in a null pooltask if the selected collection doesn't
      * have a workflow enabled
      * 
      * @param context
      *            the dspace context
      * @param col
      *            the collection where the submission will occur
-     * @return a WorkflowItemBuilder
+     * @param user
+     *            the user that will own the pool task
+     * @return a PoolTaskBuilder
      */
-    public static WorkflowItemBuilder createWorkflowItem(final Context context, final Collection col) {
-        WorkflowItemBuilder builder = new WorkflowItemBuilder(context);
-        return builder.create(context, col);
+    public static PoolTaskBuilder createPoolTask(final Context context, final Collection col, final EPerson user) {
+        PoolTaskBuilder builder = new PoolTaskBuilder(context);
+        return builder.create(context, col, user);
     }
 
-    private WorkflowItemBuilder create(final Context context, final Collection col) {
+    private PoolTaskBuilder create(final Context context, final Collection col, final EPerson user) {
         this.context = context;
-
+        this.user = user;
         try {
             workspaceItem = workspaceItemService.create(context, col, false);
         } catch (Exception e) {
@@ -68,11 +71,12 @@ public class WorkflowItemBuilder extends AbstractBuilder<XmlWorkflowItem, XmlWor
     }
 
     @Override
-    public XmlWorkflowItem build() {
+    public PoolTask build() {
         try {
             workflowItem = workflowService.start(context, workspaceItem);
             workspaceItem = null;
-            return workflowItem;
+            poolTask = getService().findByWorkflowIdAndEPerson(context, workflowItem, user);
+            return poolTask;
         } catch (Exception e) {
             return handleException(e);
         }
@@ -80,17 +84,17 @@ public class WorkflowItemBuilder extends AbstractBuilder<XmlWorkflowItem, XmlWor
     }
 
     @Override
-    public void delete(XmlWorkflowItem dso) throws Exception {
+    public void delete(PoolTask poolTask) throws Exception {
         try (Context c = new Context()) {
             c.turnOffAuthorisationSystem();
-            XmlWorkflowItem attachedDso = c.reloadEntity(dso);
-            if (attachedDso != null) {
-                getService().delete(c, attachedDso);
+            PoolTask attachedPoolTask = c.reloadEntity(poolTask);
+            if (attachedPoolTask != null) {
+                // to delete a pooltask keeping the system in a consistent state you need to delete the underline
+                // workflowitem
+                WorkflowItemBuilder.deleteWorkflowItem(attachedPoolTask.getWorkflowItem().getID());
             }
             c.complete();
         }
-
-        indexingService.commit();
     }
 
     private void deleteWsi(WorkspaceItem dso) throws Exception {
@@ -113,16 +117,18 @@ public class WorkflowItemBuilder extends AbstractBuilder<XmlWorkflowItem, XmlWor
             deleteWsi(workspaceItem);
         }
         if (workflowItem != null) {
-            delete(workflowItem);
+            // to delete the pooltask keeping the system in a consistent state you need to delete the underline
+            // workflowitem
+            WorkflowItemBuilder.deleteWorkflowItem(workflowItem.getID());
         }
     }
 
     @Override
-    protected XmlWorkflowItemService getService() {
-        return workflowItemService;
+    protected PoolTaskService getService() {
+        return poolTaskService;
     }
 
-    protected WorkflowItemBuilder addMetadataValue(final String schema,
+    protected PoolTaskBuilder addMetadataValue(final String schema,
             final String element, final String qualifier, final String value) {
         try {
             itemService.addMetadata(context, workspaceItem.getItem(), schema, element, qualifier, Item.ANY, value);
@@ -132,7 +138,7 @@ public class WorkflowItemBuilder extends AbstractBuilder<XmlWorkflowItem, XmlWor
         return this;
     }
 
-    protected WorkflowItemBuilder setMetadataSingleValue(final String schema,
+    protected PoolTaskBuilder setMetadataSingleValue(final String schema,
             final String element, final String qualifier, final String value) {
         try {
             itemService.setMetadataSingleValue(context, workspaceItem.getItem(), schema, element, qualifier, Item.ANY,
@@ -144,23 +150,23 @@ public class WorkflowItemBuilder extends AbstractBuilder<XmlWorkflowItem, XmlWor
         return this;
     }
 
-    public WorkflowItemBuilder withTitle(final String title) {
+    public PoolTaskBuilder withTitle(final String title) {
         return setMetadataSingleValue(MetadataSchema.DC_SCHEMA, "title", null, title);
     }
 
-    public WorkflowItemBuilder withIssueDate(final String issueDate) {
+    public PoolTaskBuilder withIssueDate(final String issueDate) {
         return addMetadataValue(MetadataSchema.DC_SCHEMA, "date", "issued", new DCDate(issueDate).toString());
     }
 
-    public WorkflowItemBuilder withAuthor(final String authorName) {
+    public PoolTaskBuilder withAuthor(final String authorName) {
         return addMetadataValue(MetadataSchema.DC_SCHEMA, "contributor", "author", authorName);
     }
 
-    public WorkflowItemBuilder withSubject(final String subject) {
+    public PoolTaskBuilder withSubject(final String subject) {
         return addMetadataValue(MetadataSchema.DC_SCHEMA, "subject", null, subject);
     }
 
-    public WorkflowItemBuilder grantLicense() {
+    public PoolTaskBuilder grantLicense() {
         Item item = workspaceItem.getItem();
         String license;
         try {
@@ -175,7 +181,7 @@ public class WorkflowItemBuilder extends AbstractBuilder<XmlWorkflowItem, XmlWor
         return this;
     }
 
-    public WorkflowItemBuilder withFulltext(String name, String source, InputStream is) {
+    public PoolTaskBuilder withFulltext(String name, String source, InputStream is) {
         try {
             Item item = workspaceItem.getItem();
             Bitstream b = itemService.createSingleBitstream(context, is, item);
@@ -187,38 +193,11 @@ public class WorkflowItemBuilder extends AbstractBuilder<XmlWorkflowItem, XmlWor
         return this;
     }
 
-    /**
-     * Delete a workflow item and all the underlying resources committing the changes to SOLR as well
-     * 
-     * @param id
-     *            the id of the workflowitem to delete
-     * @throws SQLException
-     * @throws IOException
-     * @throws SearchServiceException
-     */
-    public static void deleteWorkflowItem(Integer id)
-            throws SQLException, IOException, SearchServiceException {
-        try (Context c = new Context()) {
-            c.turnOffAuthorisationSystem();
-            XmlWorkflowItem wi = workflowItemService.find(c, id);
-            if (wi != null) {
-                try {
-                    workflowItemService.delete(c, wi);
-                } catch (AuthorizeException e) {
-                    // cannot occur, just wrap it to make the compilar happy
-                    throw new RuntimeException(e.getMessage(), e);
-                }
-            }
-            c.complete();
-        }
-        indexingService.commit();
-    }
-
     @Override
     /**
-     * Set a higher priority for the workflowitem has it holds lot of reference
+     * Set a higher priority than workflowitem for the pooltask has it holds a reference to it
      */
     protected int getPriority() {
-        return 10;
+        return 20;
     }
 }

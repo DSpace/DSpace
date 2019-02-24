@@ -152,7 +152,8 @@ public abstract class AbstractBuilder<T, S> {
         builders.sort(new Comparator<AbstractBuilder>() {
             @Override
             public int compare(AbstractBuilder o1, AbstractBuilder o2) {
-                return o1.getPriority() - o2.getPriority();
+                // we want descending order, hight priority first
+                return o2.getPriority() - o1.getPriority();
             }
         });
         for (AbstractBuilder builder : builders) {

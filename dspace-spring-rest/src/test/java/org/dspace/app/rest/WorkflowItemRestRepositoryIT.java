@@ -513,7 +513,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                                     "Submission Item", "2017-10-17"))));
         } finally {
             // remove the workflowitem if any
-            WorkflowItemBuilder.deleteWorkflowItem(idRef);
+            WorkflowItemBuilder.deleteWorkflowItem(idRef.get());
         }
     }
 

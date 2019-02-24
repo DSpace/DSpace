@@ -83,4 +83,12 @@ public class GroupBuilder extends AbstractDSpaceObjectBuilder<Group> {
         return this;
     }
 
+    /**
+     * Set a lower custom priority for the Group. It could be referenced in several places
+     * 
+     */
+    @Override
+    protected int getPriority() {
+        return -10;
+    }
 }
