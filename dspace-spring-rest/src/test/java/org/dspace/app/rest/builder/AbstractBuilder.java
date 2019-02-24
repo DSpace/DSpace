@@ -175,8 +175,14 @@ public abstract class AbstractBuilder<T, S> {
         }
     }
 
+    /**
+     * Return the priority to give to the builder during the cleanup phase. It MUST be a positive integer. High values
+     * mean that the builder will be invoked soon during the cleanup phase
+     * 
+     * @return
+     */
     protected int getPriority() {
-        return 0;
+        return 100;
     }
 
     protected abstract void cleanup() throws Exception;
