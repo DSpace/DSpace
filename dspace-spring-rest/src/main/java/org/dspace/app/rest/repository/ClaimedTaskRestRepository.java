@@ -14,10 +14,13 @@ import java.util.UUID;
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.ClaimedTaskConverter;
+import org.dspace.app.rest.exception.RESTAuthorizationException;
+import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.ClaimedTaskRest;
 import org.dspace.app.rest.model.PoolTaskRest;
@@ -129,19 +132,28 @@ public class ClaimedTaskRestRepository extends DSpaceRestRepository<ClaimedTaskR
                 .doState(context, context.getCurrentUser(), request, task.getWorkflowItem().getID(), workflow,
                     currentActionConfig);
             if (!Action.getErrorFields(request).isEmpty()) {
-                throw new UnprocessableEntityException("Missing required fields");
+                throw new UnprocessableEntityException(
+                        "Missing required fields: " + StringUtils.join(Action.getErrorFields(request), ","));
             }
             // workflowRequirementsService.removeClaimedUser(context, task.getWorkflowItem(), task.getOwner(), task
             // .getStepID());
             context.addEvent(new Event(Event.MODIFY, Constants.ITEM, task.getWorkflowItem().getItem().getID(), null,
                 itemService.getIdentifiers(context, task.getWorkflowItem().getItem())));
-        } catch (WorkflowConfigurationException | MessagingException | WorkflowException e) {
+        } catch (WorkflowException e) {
+            throw new UnprocessableEntityException(
+                    "Invalid workflow action: " + e.getMessage(), e);
+        } catch (WorkflowConfigurationException | MessagingException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
         return null;
     }
 
     @Override
+    /**
+     * This method delete only the claimed task. The workflow engine will return it to the pool if there are not
+     * enough other claimed tasks for the same workflowitem.
+     * 
+     */
     protected void delete(Context context, Integer id) {
         ClaimedTask task = null;
         try {
@@ -151,13 +163,14 @@ public class ClaimedTaskRestRepository extends DSpaceRestRepository<ClaimedTaskR
             workflowRequirementsService.removeClaimedUser(context, workflowItem, task.getOwner(), task.getStepID());
             context.addEvent(new Event(Event.MODIFY, Constants.ITEM, workflowItem.getItem().getID(), null,
                 itemService.getIdentifiers(context, workflowItem.getItem())));
-        } catch (SQLException | IOException | WorkflowConfigurationException | AuthorizeException e) {
+        } catch (AuthorizeException e) {
+            throw new RESTAuthorizationException(e);
+        } catch (SQLException | IOException | WorkflowConfigurationException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
 
-    @Override
     public Page<ClaimedTaskRest> findAll(Context context, Pageable pageable) {
-        throw new RuntimeException("Method not allowed!");
+        throw new RepositoryMethodNotImplementedException(ClaimedTaskRest.NAME, "findAll");
     }
 }

@@ -19,6 +19,8 @@ import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.WorkflowItemConverter;
 import org.dspace.app.rest.exception.PatchBadRequestException;
+import org.dspace.app.rest.exception.RESTAuthorizationException;
+import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.ErrorRest;
 import org.dspace.app.rest.model.WorkflowItemRest;
 import org.dspace.app.rest.model.hateoas.WorkflowItemResource;
@@ -41,7 +43,6 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.EPersonServiceImpl;
 import org.dspace.event.Event;
 import org.dspace.services.ConfigurationService;
-import org.dspace.submit.AbstractProcessingStep;
 import org.dspace.workflow.WorkflowException;
 import org.dspace.workflow.WorkflowService;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
@@ -141,7 +142,12 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
         XmlWorkflowItem source;
         try {
             source = submissionService.createWorkflowItem(context, getRequestService().getCurrentRequest());
-        } catch (SQLException | AuthorizeException | WorkflowException e) {
+        } catch (AuthorizeException e) {
+            throw new RESTAuthorizationException(e);
+        } catch (WorkflowException e) {
+            throw new UnprocessableEntityException(
+                    "Invalid workflow action: " + e.getMessage(), e);
+        } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
         //if the item go directly in published status we have to manage a status code 204 with no content
@@ -149,48 +155,6 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
             return null;
         }
         return converter.convert(source);
-    }
-
-    @Override
-    protected WorkflowItemRest save(Context context, WorkflowItemRest wfi) {
-        SubmissionConfig submissionConfig =
-            submissionConfigReader.getSubmissionConfigByName(submissionConfigReader.getDefaultSubmissionConfigName());
-        XmlWorkflowItem source = converter.toModel(wfi);
-        for (int stepNum = 0; stepNum < submissionConfig.getNumberOfSteps(); stepNum++) {
-
-            SubmissionStepConfig stepConfig = submissionConfig.getStep(stepNum);
-            /*
-             * First, load the step processing class (using the current
-             * class loader)
-             */
-            ClassLoader loader = this.getClass().getClassLoader();
-            Class stepClass;
-            try {
-                stepClass = loader.loadClass(stepConfig.getProcessingClassName());
-
-                Object stepInstance = stepClass.newInstance();
-
-                if (stepInstance instanceof AbstractProcessingStep) {
-                    // load the JSPStep interface for this step
-                    AbstractProcessingStep stepProcessing = (AbstractProcessingStep) stepClass.newInstance();
-                    stepProcessing.doPreProcessing(context, source);
-                } else {
-                    throw new Exception(
-                        "The submission step class specified by '" + stepConfig.getProcessingClassName() +
-                        "' does not extend the class org.dspace.submit.AbstractProcessingStep!" +
-                        " Therefore it cannot be used by the Configurable Submission as the <processing-class>!");
-                }
-
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
-            }
-        }
-        try {
-            submissionService.saveWorkflowItem(context, source);
-        } catch (SQLException | AuthorizeException e) {
-            throw new RuntimeException(e.getMessage(), e);
-        }
-        return wfi;
     }
 
     @Override
