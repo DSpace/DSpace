@@ -23,14 +23,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.CollectionConverter;
+import org.dspace.app.rest.converter.MetadataConverter;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.CollectionRest;
 import org.dspace.app.rest.model.CommunityRest;
-import org.dspace.app.rest.model.MetadataEntryRest;
 import org.dspace.app.rest.model.hateoas.CollectionResource;
 import org.dspace.app.rest.utils.CollectionRestEqualityUtils;
-import org.dspace.app.rest.utils.DSpaceObjectUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -66,7 +65,7 @@ public class CollectionRestRepository extends DSpaceRestRepository<CollectionRes
     CollectionConverter converter;
 
     @Autowired
-    DSpaceObjectUtils dspaceObjectUtils;
+    MetadataConverter metadataConverter;
 
     @Autowired
     CollectionRestEqualityUtils collectionRestEqualityUtils;
@@ -198,13 +197,7 @@ public class CollectionRestRepository extends DSpaceRestRepository<CollectionRes
             }
             collection = cs.create(context, parent);
             cs.update(context, collection);
-            if (collectionRest.getMetadata() != null) {
-                for (MetadataEntryRest mer : collectionRest.getMetadata()) {
-                    String[] metadatakey = mer.getKey().split("\\.");
-                    cs.addMetadata(context, collection, metadatakey[0], metadatakey[1],
-                                   metadatakey.length == 3 ? metadatakey[2] : null, mer.getLanguage(), mer.getValue());
-                }
-            }
+            metadataConverter.setMetadata(context, collection, collectionRest.getMetadata());
         } catch (SQLException e) {
             throw new RuntimeException("Unable to create new Collection under parent Community " +
                                            parentCommunityString, e);
@@ -218,11 +211,11 @@ public class CollectionRestRepository extends DSpaceRestRepository<CollectionRes
     protected CollectionRest put(Context context, HttpServletRequest request, String apiCategory, String model, UUID id,
                                 JsonNode jsonNode)
         throws RepositoryMethodNotImplementedException, SQLException, AuthorizeException {
-        CollectionRest collectionRest = null;
+        CollectionRest collectionRest;
         try {
             collectionRest = new ObjectMapper().readValue(jsonNode.toString(), CollectionRest.class);
         } catch (IOException e) {
-            throw new UnprocessableEntityException("error parsing the body ..." + e.getMessage());
+            throw new UnprocessableEntityException("Error parsing collection json: " + e.getMessage());
         }
         Collection collection = cs.find(context, id);
         if (collection == null) {
@@ -230,10 +223,7 @@ public class CollectionRestRepository extends DSpaceRestRepository<CollectionRes
         }
         CollectionRest originalCollectionRest = converter.fromModel(collection);
         if (collectionRestEqualityUtils.isCollectionRestEqualWithoutMetadata(originalCollectionRest, collectionRest)) {
-            List<MetadataEntryRest> metadataEntryRestList = collectionRest.getMetadata();
-            collection = (Collection) dspaceObjectUtils.replaceMetadataValues(context,
-                                                                              collection,
-                                                                              metadataEntryRestList);
+            metadataConverter.setMetadata(context, collection, collectionRest.getMetadata());
         } else {
             throw new IllegalArgumentException("The UUID in the Json and the UUID in the url do not match: "
                                                    + id + ", "
