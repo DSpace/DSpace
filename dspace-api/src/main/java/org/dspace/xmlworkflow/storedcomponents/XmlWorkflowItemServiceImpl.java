@@ -21,6 +21,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
+import org.dspace.xmlworkflow.service.WorkflowRequirementsService;
 import org.dspace.xmlworkflow.storedcomponents.dao.XmlWorkflowItemDAO;
 import org.dspace.xmlworkflow.storedcomponents.service.ClaimedTaskService;
 import org.dspace.xmlworkflow.storedcomponents.service.PoolTaskService;
@@ -47,6 +48,8 @@ public class XmlWorkflowItemServiceImpl implements XmlWorkflowItemService {
     protected ItemService itemService;
     @Autowired(required = true)
     protected PoolTaskService poolTaskService;
+    @Autowired(required = true)
+    protected WorkflowRequirementsService workflowRequirementsService;
     @Autowired(required = true)
     protected WorkflowItemRoleService workflowItemRoleService;
 
@@ -185,6 +188,7 @@ public class XmlWorkflowItemServiceImpl implements XmlWorkflowItemService {
         }
 
         poolTaskService.deleteByWorkflowItem(context, workflowItem);
+        workflowRequirementsService.clearInProgressUsers(context, workflowItem);
         claimedTaskService.deleteByWorkflowItem(context, workflowItem);
 
         // FIXME - auth?
