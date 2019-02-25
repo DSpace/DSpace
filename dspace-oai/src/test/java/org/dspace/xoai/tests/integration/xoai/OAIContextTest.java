@@ -12,8 +12,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
+@Ignore
 public class OAIContextTest extends AbstractDSpaceTest {
     public static final String ROOT_URL = "/";
 
