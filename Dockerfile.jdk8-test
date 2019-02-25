@@ -15,7 +15,8 @@ WORKDIR /app
 
 # The dspace-install directory will be written to /install
 RUN mkdir /install \
-    && chown -Rv dspace: /install
+    && chown -Rv dspace: /install \
+    && chown -Rv dspace: /app
 
 USER dspace
 
