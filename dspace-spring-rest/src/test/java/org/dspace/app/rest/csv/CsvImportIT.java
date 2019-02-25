@@ -79,6 +79,7 @@ public class CsvImportIT extends AbstractEntityIntegrationTest {
             itemService.delete(context, item);
         }
 
+        indexingService.cleanIndex(true);
         indexingService.updateIndex(context, true);
 
         super.destroy();
@@ -125,8 +126,7 @@ public class CsvImportIT extends AbstractEntityIntegrationTest {
             Relationship relationship = relationships.get(i);
             if (relationship.getRightItem().getID().equals(itemC.getID())) {
                 relationC = relationship;
-            }
-            else if (relationship.getRightItem().getID().equals(itemB.getID())) {
+            } else if (relationship.getRightItem().getID().equals(itemB.getID())) {
                 relationB = relationship;
             }
         }
