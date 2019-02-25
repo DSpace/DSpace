@@ -260,6 +260,7 @@ public class Package {
                 if(ddfs.size() > 0) {
                     String fileListString = "";
                     for(DryadDataFile dryadFile : ddfs) {
+                        log.debug("serializing file " + dryadFile.getIdentifier() + ", " + dryadFile.getDryadDOI()); 
                         String fileTitle = dryadFile.getTitle();
                         fileListString = fileListString + "<h4>" + fileTitle + "</h4>";
                         String fileDescription = dryadFile.getDescription();

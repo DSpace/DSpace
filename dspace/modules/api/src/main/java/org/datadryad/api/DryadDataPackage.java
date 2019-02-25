@@ -506,9 +506,9 @@ public class DryadDataPackage extends DryadObject {
     public String getCurationStatus() {
         if (getItem() != null) {
             if (getItem().isArchived()) {
-                return "Published";
+                return "published";
             } else {
-                return "Unpublished";
+                return "submitted";
             }
         } else {
             return curationStatus;
@@ -523,8 +523,10 @@ public class DryadDataPackage extends DryadObject {
         if (getItem() != null) {
             item.addMetadata(PROVENANCE, "en", "PublicationUpdater: " + reason + " on " + DCDate.getCurrent().toString() + " (GMT)", null, -1);
         } else {
-            // add a curation activity note
-            curationStatus = status;
+            // add a curation activity note, but if there is no explicit status, leave it at the current value
+            if(status != null && status.length() > 0) {
+                curationStatus = status;
+            }
             curationStatusReason = reason;
         }
     }
@@ -541,6 +543,10 @@ public class DryadDataPackage extends DryadObject {
             log.fatal("Can't create a context! Something is very wrong!", e);
         }
 
+        // currentStatus is updated at each step to reflect the most current status
+        // and will be used for any status that is not recognized
+        String currentStatus = "in_progress";
+        
         for (String provenance : provenances) {
             provenance = provenance.replaceAll("[\\n|\\r]", " ");
             Matcher authorActionRequired = Pattern.compile(".*Rejected by .+?, reason: .+ on (\\d+-\\d+-\\d+T\\d+:\\d+:\\d+Z).*").matcher(provenance);
@@ -560,52 +566,64 @@ public class DryadDataPackage extends DryadObject {
             node.put("user", (JsonNode) null);
 
             if (authorActionRequired.matches()) {
-                node.put("status", "Author Action Required");
+                currentStatus = "action_required";
+                node.put("status", currentStatus);
                 node.put("created_at", authorActionRequired.group(1));
             } else if (submitted1.matches()) {
                 if(isPackageClaimed(c)) {
-                    node.put("status", "Curation");
+                    currentStatus = "curation";
+                    node.put("status", currentStatus);
                 } else {
-                    node.put("status", "Submitted");
+                    currentStatus = "submitted";
+                    node.put("status", currentStatus);
                 }
                 node.put("created_at", submitted1.group(1));
             } else if (submitted2.matches()) {
                 if(isPackageClaimed(c)) {
-                    node.put("status", "Curation");
+                    currentStatus = "curation";
+                    node.put("status", currentStatus);
                 } else {
-                    node.put("status", "Submitted");
+                    currentStatus = "submitted";
+                    node.put("status", currentStatus);
                 }
                 node.put("created_at", submitted2.group(1));
             } else if (submitted3.matches()) {
                 if(isPackageClaimed(c)) {
-                    node.put("status", "Curation");
+                    currentStatus = "curation";
+                    node.put("status", currentStatus);
                 } else {
-                    node.put("status", "Submitted");
+                    currentStaus = "submitted";
+                    node.put("status", currentStatus);
                 }
                 node.put("created_at", submitted3.group(1));
             } else if (embargoed.matches()) {
-                node.put("status", "Embargoed");
+                currentStatus = "embargoed";
+                node.put("status", currentStatus);
                 node.put("created_at", embargoed.group(1));
             } else if (peerReview1.matches()) {
-                node.put("status", "Private for Peer Review");
+                currentStatus = "peer_review";
+                node.put("status", currentStatus);
                 node.put("created_at", peerReview1.group(1));
             } else if (peerReview2.matches()) {
-                node.put("status", "Private for Peer Review");
+                currentStatus = "peer_review";
+                node.put("status", currentStatus);
                 node.put("created_at", peerReview2.group(1));
             } else if (published.matches()) {
-                node.put("status", "Published");
+                currentStatus = "published";
+                node.put("status", currentStatus);
                 node.put("created_at", published.group(1));
             } else if (approved.matches()) {
                 // There are times when something is approved in Dryad classic but not published (e.g., Reauthorize Payment)
-                // These items will get Published status in the new system
-                node.put("status", "Published");
+                // These items will get published status in the new system
+                currentStatus = "published";
+                node.put("status", currentStatus);
                 node.put("created_at", approved.group(1));
             } else if (withdrawn.matches()) {
-                node.put("status", "Withdrawn");
+                currentStatus = "withdrawn";
+                node.put("status", currentStatus);
                 node.put("created_at", withdrawn.group(1));
             } else {
-                node.put("status", "Status Unchanged");
-                // it doesn't really matter what the date is for Status Unchanged, because it doesn't affect status, I guess.
+                node.put("status", currentStatus);
             }
             resultNode.add(node);
         }
@@ -670,7 +688,7 @@ public class DryadDataPackage extends DryadObject {
                 for (int i = 0; i < provenances.size(); i++) {
                     try {
                         JsonNode resultNode = provenances.get(i);
-                        if (resultNode.get("status").textValue().equals("Private for Peer Review")) {
+                        if (resultNode.get("status").textValue().equals("peer_review")) {
                             String dateString = resultNode.get("created_at").textValue();
                             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
                             Date reviewDate = sdf.parse(dateString);
@@ -692,7 +710,7 @@ public class DryadDataPackage extends DryadObject {
         if (useDryadClassic) {
             return DryadWorkflowUtils.isItemInReview(c, getWorkflowItem(c));
         } else {
-            return curationStatus.equals("Private for Peer Review");
+            return curationStatus.equals("peer_review");
         }
     }
 
@@ -700,7 +718,7 @@ public class DryadDataPackage extends DryadObject {
         if (useDryadClassic) {
             return DryadWorkflowUtils.isItemClaimed(c, getWorkflowItem(c));
         } else {
-            return curationStatus.equals("Curation");
+            return curationStatus.equals("curation");
         }
     }
 
@@ -884,10 +902,15 @@ public class DryadDataPackage extends DryadObject {
             throw new IllegalArgumentException("Data package must have an identifier");
         }
         try {
-            ItemIterator dataFiles = Item.findByMetadataField(context, RELATION_SCHEMA, RELATION_ELEMENT, RELATION_ISPARTOF_QUALIFIER, packageIdentifier, false);
-            while(dataFiles.hasNext()) {
-                log.debug(" -- adding file ");
-                fileList.add(new DryadDataFile(dataFiles.next()));
+            // get list of file DOIs from the package metadata
+            List<String> fileDOIs = dataPackage.getMultipleMetadataValues("dc", "relation", "haspart");
+            for(String fileDOI : fileDOIs) {
+                // for each DOI, add the file to the fileList            
+                ItemIterator dataFiles = Item.findByMetadataField(context, "dc", "identifier", null, fileDOI, false);
+                while(dataFiles.hasNext()) {
+                    log.debug(" -- adding file ");
+                    fileList.add(new DryadDataFile(dataFiles.next()));
+                }
             }
             log.debug(" -- found " + fileList.size() + " data files ");
         } catch (AuthorizeException ex) {
@@ -1177,7 +1200,7 @@ public class DryadDataPackage extends DryadObject {
             }
 
         } else {
-            setCurationStatus("Curation", reason.toString());
+            setCurationStatus("curation", reason.toString());
         }
     }
 
@@ -1287,7 +1310,7 @@ public class DryadDataPackage extends DryadObject {
         if (fieldsChanged.size() > 0) {
             if (!"".equals(provenance.toString())) {
                 log.info("writing provenance for package " + getIdentifier() + ": " + provenance);
-                setCurationStatus("Status Unchanged", provenance.toString());
+                setCurationStatus(null, provenance.toString());
             }
 
             // only return true if we want to get email notifications about this update: FULL_CITATION or PUBLICATION_DOI was updated.
