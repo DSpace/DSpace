@@ -40,6 +40,7 @@ import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.discovery.IndexingService;
 import org.hamcrest.Matchers;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -118,18 +119,31 @@ public class CsvImportIT extends AbstractEntityIntegrationTest {
                                                                            itemC, itemB);
 
         List<Relationship> relationships = relationshipService.findByItem(context, itemE);
-        getClient().perform(get("/api/core/relationships/" + relationships.get(0).getID()))
+        Relationship relationC = null;
+        Relationship relationB = null;
+        for (int i = 0; i < relationships.size(); i++) {
+            Relationship relationship = relationships.get(i);
+            if (relationship.getRightItem().getID().equals(itemC.getID())) {
+                relationC = relationship;
+            }
+            else if (relationship.getRightItem().getID().equals(itemB.getID())) {
+                relationB = relationship;
+            }
+        }
+        Assert.assertNotNull(relationB);
+        Assert.assertNotNull(relationC);
+        getClient().perform(get("/api/core/relationships/" + relationC.getID()))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.leftPlace", is(1)))
                    .andExpect(jsonPath("$.rightId", is(itemC.getID().toString())))
                    .andExpect(jsonPath("$.rightPlace", is(2)))
-                   .andExpect(jsonPath("$", Matchers.is(RelationshipMatcher.matchRelationship(relationships.get(0)))));
-        getClient().perform(get("/api/core/relationships/" + relationships.get(1).getID().toString()))
+                   .andExpect(jsonPath("$", Matchers.is(RelationshipMatcher.matchRelationship(relationC))));
+        getClient().perform(get("/api/core/relationships/" + relationB.getID().toString()))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.leftPlace", is(2)))
                    .andExpect(jsonPath("$.rightId", is(itemB.getID().toString())))
                    .andExpect(jsonPath("$.rightPlace", is(2)))
-                   .andExpect(jsonPath("$", Matchers.is(RelationshipMatcher.matchRelationship(relationships.get(1)))));
+                   .andExpect(jsonPath("$", Matchers.is(RelationshipMatcher.matchRelationship(relationB))));
 
         Item itemF = validateSpecificItemRelationCreationCsvImport(col1, itemE, "TestItemF", "Person",
                                                                    "isPublicationOfAuthor",
