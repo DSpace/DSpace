@@ -15,8 +15,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.Date;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
+@Ignore
 public class IdentifyTest extends AbstractDSpaceTest {
 
     public static final Date EARLIEST_DATE = new Date();
