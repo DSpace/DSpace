@@ -79,9 +79,9 @@ public class CsvImportIT extends AbstractEntityIntegrationTest {
             itemService.delete(context, item);
         }
 
-        indexingService.cleanIndex(true);
-
         super.destroy();
+
+        indexingService.cleanIndex(true);
     }
 
     @Test
