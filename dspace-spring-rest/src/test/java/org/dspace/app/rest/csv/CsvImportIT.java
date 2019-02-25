@@ -23,37 +23,31 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.dspace.app.bulkedit.DSpaceCSV;
+import org.dspace.app.bulkedit.MetadataImport;
 import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.builder.ItemBuilder;
 import org.dspace.app.rest.matcher.RelationshipMatcher;
-import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.app.rest.test.AbstractEntityIntegrationTest;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
-import org.dspace.content.EntityType;
 import org.dspace.content.Item;
 import org.dspace.content.Relationship;
-import org.dspace.content.RelationshipType;
-import org.dspace.content.service.EntityTypeService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.RelationshipService;
 import org.dspace.content.service.RelationshipTypeService;
-import org.dspace.services.ConfigurationService;
+import org.dspace.discovery.IndexingService;
 import org.hamcrest.Matchers;
 import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
+import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-@Ignore
-public class CsvImportIT extends AbstractControllerIntegrationTest {
+public class CsvImportIT extends AbstractEntityIntegrationTest {
 
     @Autowired
     private RelationshipTypeService relationshipTypeService;
-
-    @Autowired
-    private EntityTypeService entityTypeService;
 
     @Autowired
     private RelationshipService relationshipService;
@@ -62,23 +56,13 @@ public class CsvImportIT extends AbstractControllerIntegrationTest {
     private ItemService itemService;
 
     @Autowired
-    private ConfigurationService configurationService;
+    private IndexingService indexingService;
 
-    @Before
-    public void setup() throws Exception {
-
-        //Set up the database for the next test
-        String pathToFile = configurationService.getProperty("dspace.dir") +
-            File.separator + "config" + File.separator + "entities" + File.separator + "relationship-types.xml";
-        runDSpaceScript("initialize-entities", "-f", pathToFile);
-    }
 
     @After
     public void destroy() throws Exception {
         //Clean up the database for the next test
         context.turnOffAuthorisationSystem();
-        List<RelationshipType> relationshipTypeList = relationshipTypeService.findAll(context);
-        List<EntityType> entityTypeList = entityTypeService.findAll(context);
         List<Relationship> relationships = relationshipService.findAll(context);
         Iterator<Item> itemIterator = itemService.findAll(context);
 
@@ -89,20 +73,6 @@ public class CsvImportIT extends AbstractControllerIntegrationTest {
             relationshipService.delete(context, relationship);
         }
 
-        Iterator<RelationshipType> relationshipTypeIterator = relationshipTypeList.iterator();
-        while (relationshipTypeIterator.hasNext()) {
-            RelationshipType relationshipType = relationshipTypeIterator.next();
-            relationshipTypeIterator.remove();
-            relationshipTypeService.delete(context, relationshipType);
-        }
-
-        Iterator<EntityType> entityTypeIterator = entityTypeList.iterator();
-        while (entityTypeIterator.hasNext()) {
-            EntityType entityType = entityTypeIterator.next();
-            entityTypeIterator.remove();
-            entityTypeService.delete(context, entityType);
-        }
-
         while (itemIterator.hasNext()) {
             Item item = itemIterator.next();
             itemIterator.remove();
@@ -110,6 +80,8 @@ public class CsvImportIT extends AbstractControllerIntegrationTest {
         }
 
         super.destroy();
+
+        indexingService.cleanIndex(true);
     }
 
     @Test
@@ -147,18 +119,30 @@ public class CsvImportIT extends AbstractControllerIntegrationTest {
                                                                            itemC, itemB);
 
         List<Relationship> relationships = relationshipService.findByItem(context, itemE);
-        getClient().perform(get("/api/core/relationships/" + relationships.get(0).getID()))
+        Relationship relationC = null;
+        Relationship relationB = null;
+        for (int i = 0; i < relationships.size(); i++) {
+            Relationship relationship = relationships.get(i);
+            if (relationship.getRightItem().getID().equals(itemC.getID())) {
+                relationC = relationship;
+            } else if (relationship.getRightItem().getID().equals(itemB.getID())) {
+                relationB = relationship;
+            }
+        }
+        Assert.assertNotNull(relationB);
+        Assert.assertNotNull(relationC);
+        getClient().perform(get("/api/core/relationships/" + relationC.getID()))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.leftPlace", is(1)))
                    .andExpect(jsonPath("$.rightId", is(itemC.getID().toString())))
                    .andExpect(jsonPath("$.rightPlace", is(2)))
-                   .andExpect(jsonPath("$", Matchers.is(RelationshipMatcher.matchRelationship(relationships.get(0)))));
-        getClient().perform(get("/api/core/relationships/" + relationships.get(1).getID().toString()))
+                   .andExpect(jsonPath("$", Matchers.is(RelationshipMatcher.matchRelationship(relationC))));
+        getClient().perform(get("/api/core/relationships/" + relationB.getID().toString()))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.leftPlace", is(2)))
                    .andExpect(jsonPath("$.rightId", is(itemB.getID().toString())))
                    .andExpect(jsonPath("$.rightPlace", is(2)))
-                   .andExpect(jsonPath("$", Matchers.is(RelationshipMatcher.matchRelationship(relationships.get(1)))));
+                   .andExpect(jsonPath("$", Matchers.is(RelationshipMatcher.matchRelationship(relationB))));
 
         Item itemF = validateSpecificItemRelationCreationCsvImport(col1, itemE, "TestItemF", "Person",
                                                                    "isPublicationOfAuthor",
@@ -284,10 +268,14 @@ public class CsvImportIT extends AbstractControllerIntegrationTest {
         for (String csvLine : csv) {
             out.write(csvLine + "\n");
         }
+
         out.flush();
         out.close();
         out = null;
 
-        runDSpaceScript("metadata-import", "-f", "test.csv", "-e", "admin@email.com", "-s");
+        DSpaceCSV dspaceCsv = new DSpaceCSV(new File(filename), context);
+
+        MetadataImport importer = new MetadataImport(context, dspaceCsv);
+        importer.runImport(true, false, false, false);
     }
 }

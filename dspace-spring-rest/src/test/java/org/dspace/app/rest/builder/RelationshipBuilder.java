@@ -87,4 +87,8 @@ public class RelationshipBuilder extends AbstractBuilder<Relationship, Relations
 
         return this;
     }
+
+    protected int getPriority() {
+        return -10 ;
+    }
 }
