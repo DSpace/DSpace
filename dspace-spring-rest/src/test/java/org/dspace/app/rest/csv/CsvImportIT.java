@@ -80,7 +80,6 @@ public class CsvImportIT extends AbstractEntityIntegrationTest {
         }
 
         indexingService.cleanIndex(true);
-        indexingService.updateIndex(context, true);
 
         super.destroy();
     }
