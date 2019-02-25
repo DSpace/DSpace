@@ -37,13 +37,12 @@ import org.dspace.content.Relationship;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.RelationshipService;
 import org.dspace.content.service.RelationshipTypeService;
+import org.dspace.discovery.IndexingService;
 import org.hamcrest.Matchers;
 import org.junit.After;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-@Ignore
 public class CsvImportIT extends AbstractEntityIntegrationTest {
 
     @Autowired
@@ -54,6 +53,10 @@ public class CsvImportIT extends AbstractEntityIntegrationTest {
 
     @Autowired
     private ItemService itemService;
+
+    @Autowired
+    private IndexingService indexingService;
+
 
     @After
     public void destroy() throws Exception {
@@ -74,6 +77,8 @@ public class CsvImportIT extends AbstractEntityIntegrationTest {
             itemIterator.remove();
             itemService.delete(context, item);
         }
+
+        indexingService.updateIndex(context, true);
 
         super.destroy();
     }
