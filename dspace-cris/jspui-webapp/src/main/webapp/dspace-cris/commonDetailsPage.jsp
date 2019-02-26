@@ -34,7 +34,17 @@
 							<c:when test="${rowCounter.count == 1}">${root}/cris/${specificPartPath}/${authority}?onlytab=true</c:when>
 							<c:otherwise>${root}/cris/${specificPartPath}/${authority}/${area.shortName}.html?onlytab=true</c:otherwise>
 						</c:choose></c:set>
-						<li data-tabname="${area.shortName}" id="bar-tab-${area.id}">
+
+						<c:choose>
+							<c:when test="${(researcher:isTabHidden(entity,area.shortName) == false)}">
+								<c:set var="tabName" value="researcher-menu-item"/>
+							</c:when>
+							<c:otherwise>
+								<c:set var="tabName" value="researcher-menu-item-hidden"/>
+							</c:otherwise>
+						</c:choose>
+
+						<li data-tabname="${area.shortName}" class="${tabName}" id="bar-tab-${area.id}">
 						<c:choose>
 							<c:when test="${area.id == tabId}">
 								<a href="#tab-${area.id}">

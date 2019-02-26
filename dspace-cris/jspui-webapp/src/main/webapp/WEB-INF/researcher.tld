@@ -66,6 +66,13 @@
 </function>
 
 <function>
+	<description>Check if Tab has empty boxes or unrelevant</description>
+	<name>isTabHidden</name>
+	<function-class>org.dspace.app.webui.cris.web.tag.ResearcherTagLibraryFunctions</function-class>
+	<function-signature>boolean isTabHidden(java.lang.Object,java.lang.String)</function-signature>
+</function>
+
+<function>
 	<description>Check if box are not public</description>
 	<name>isBoxHidden</name>
 	<function-class>org.dspace.app.webui.cris.web.tag.ResearcherTagLibraryFunctions</function-class>

@@ -300,3 +300,8 @@ footer .container {
 .submit-identifier > .form-control{
 	width:50%;
 }
+
+
+.nav > .researcher-menu-item-hidden {
+	display:none;
+}

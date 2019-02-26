@@ -59,7 +59,7 @@ public class MyRPController extends
             ResearcherPage rp = applicationService.getResearcherPageByEPersonId(id);
             if (rp != null && rp.getStatus() != null && rp.getStatus().booleanValue())
             {
-                response.sendRedirect(request.getContextPath() + "/rp/" + ResearcherPageUtils.getPersistentIdentifier(rp));
+                response.sendRedirect(request.getContextPath() + "/cris/rp/" + ResearcherPageUtils.getPersistentIdentifier(rp));
             }
             else
             {
