@@ -92,16 +92,22 @@
     boolean wosEnabled = ConfigurationManager.getBooleanProperty("cris","ametrics.thomsonreuters.wos.enabled",false);
     String doiMetadata = ConfigurationManager.getProperty("cris","ametrics.identifier.doi");
     String isbnMetadata = ConfigurationManager.getProperty("cris","ametrics.identifier.isbn");
+    String pmidMetadata = ConfigurationManager.getProperty("cris","ametrics.identifier.pmid");
     if (doiMetadata == null) {
     	doiMetadata = "dc.identifier.doi";
     }
     if (isbnMetadata == null) {
     	isbnMetadata = "dc.identifier.isbn";
     }
+    if (pmidMetadata == null) {
+    	pmidMetadata = "dc.identifier.pmid";
+    }
     String doi = item.getMetadata(doiMetadata);
     String isbn = item.getMetadata(isbnMetadata);
+    String pmid = item.getMetadata(pmidMetadata);
     boolean scholarEnabled = ConfigurationManager.getBooleanProperty("cris","ametrics.google.scholar.enabled",false);
     boolean altMetricEnabled = ConfigurationManager.getBooleanProperty("cris","ametrics.altmetric.enabled",false) && (StringUtils.isNotBlank(doi) || StringUtils.isNotBlank(isbn));
+    boolean altMetricDimensionsEnabled = ConfigurationManager.getBooleanProperty("cris","ametrics.altmetric.dimensionsbadges.enabled",false) && (StringUtils.isNotBlank(doi) || StringUtils.isNotBlank(pmid));
     
     Boolean versioningEnabledBool = (Boolean)request.getAttribute("versioning.enabled");
     boolean versioningEnabled = (versioningEnabledBool!=null && versioningEnabledBool.booleanValue());
@@ -620,6 +626,20 @@ if (dedupEnabled && admin_button) { %>
 	<div class="media-left">
       		<div class='altmetric-embed' data-hide-no-mentions="true" data-badge-popover="right" data-badge-type="donut" data-link-target='_blank'
       		<% if (doi != null) { %> data-doi="<%= doi %>"<% } else if (isbn != null) { %> data-isbn="<%= isbn %>"<% } %>></div>
+	</div>
+	<div class="media-body media-middle text-center">
+		<h4 class="media-heading"><fmt:message key="jsp.display-item.citation.altmetric"/></h4>
+	</div>
+</div>
+</div>
+<% } 
+  if(altMetricDimensionsEnabled) { %>
+<div class="col-lg-12 col-md-4 col-sm-6">
+<div class="altmetric">
+	<div class="media-left">
+	
+      	<div class="__dimensions_badge_embed__" data-legend="hover-right" data-style="small_circle" <% if (doi != null) { %> data-doi="<%= doi %>"<% } else if (pmid != null) { %> data-pmid="<%= pmid %>"<% } %>" ></div>
+      	<script async src="https://badge.dimensions.ai/badge.js" charset="utf-8"></script>
 	</div>
 	<div class="media-body media-middle text-center">
 		<h4 class="media-heading"><fmt:message key="jsp.display-item.citation.altmetric"/></h4>

@@ -136,7 +136,7 @@ public class ScopusUtils
             record.addValue("articlenumber", new StringValue(articleNumber));
         }
         String keywords = XMLUtils.getElementValue(article,
-                "authorkeywords");
+                "authkeywords");
         if (keywords != null){
             record.addValue("scopusKeywords", new StringValue(keywords));
         }

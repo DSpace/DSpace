@@ -47,6 +47,10 @@ import org.dspace.app.cris.model.jdyna.RPNestedProperty;
 import org.dspace.app.cris.model.jdyna.RPPropertiesDefinition;
 import org.dspace.app.cris.model.jdyna.RPProperty;
 import org.dspace.app.cris.model.jdyna.RPTypeNestedObject;
+import org.dspace.app.cris.model.jdyna.TabDynamicObject;
+import org.dspace.app.cris.model.jdyna.TabOrganizationUnit;
+import org.dspace.app.cris.model.jdyna.TabProject;
+import org.dspace.app.cris.model.jdyna.TabResearcherPage;
 import org.dspace.app.cris.service.ApplicationService;
 import org.dspace.app.cris.util.Researcher;
 import org.dspace.app.cris.util.ResearcherPageUtils;
@@ -194,6 +198,70 @@ public class ResearcherTagLibraryFunctions
 
         result = isGroupFieldsHidden(researcher.getDynamicField(), logicGroup);
         return result;
+
+    }
+
+
+    public static boolean isTabHidden(Object anagrafica,String tabName)
+            throws IllegalArgumentException, IllegalAccessException,
+            InvocationTargetException{
+
+        boolean hidden = true;
+        if(anagrafica instanceof ResearcherPage){
+            TabResearcherPage tab = applicationService.getTabByShortName(TabResearcherPage.class, tabName);
+            List<BoxResearcherPage> boxes = tab.getMask();
+
+            for(Box b: boxes){
+                if(b.isUnrelevant()){
+                    continue;
+                }
+                if(!isBoxHidden(anagrafica, b.getShortName())){
+                    hidden= false;
+                    break;
+                }
+            }
+        }else if(anagrafica instanceof OrganizationUnit){
+            TabOrganizationUnit tab = applicationService.getTabByShortName(TabOrganizationUnit.class, tabName);
+            List<BoxOrganizationUnit> boxes = tab.getMask();
+
+            for(Box b: boxes){
+                if(b.isUnrelevant()){
+                    continue;
+                }
+                if(!isBoxHidden(anagrafica, b.getShortName())){
+                    hidden= false;
+                    break;
+                }
+            }
+        }else if(anagrafica instanceof Project){
+            TabProject tab = applicationService.getTabByShortName(TabProject.class, tabName);
+            List<BoxProject> boxes = tab.getMask();
+
+            for(Box b: boxes){
+                if(b.isUnrelevant()){
+                    continue;
+                }
+                if(!isBoxHidden(anagrafica, b.getShortName())){
+                    hidden= false;
+                    break;
+                }
+            }
+        }else if(anagrafica instanceof ResearchObject){
+            TabDynamicObject tab = applicationService.getTabByShortName(TabDynamicObject.class, tabName);
+            List<BoxDynamicObject> boxes = tab.getMask();
+
+            for(Box b: boxes){
+                if(b.isUnrelevant()){
+                    continue;
+                }
+                if(!isBoxHidden(anagrafica, b.getShortName())){
+                    hidden= false;
+                    break;
+                }
+            }
+        }
+
+        return hidden;
 
     }
 
