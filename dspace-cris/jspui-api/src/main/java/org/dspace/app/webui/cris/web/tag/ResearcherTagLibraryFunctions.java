@@ -980,10 +980,10 @@ public class ResearcherTagLibraryFunctions
 
         if (pdLocalized != null)
         {
-            return (IPropertiesDefinition) PropertyDefintionI18NWrapper
+            return (IPropertiesDefinition) PropertyDefinitionI18NWrapper
                     .getWrapper((IPropertiesDefinition) pdLocalized, locale);
         }
-        return (IPropertiesDefinition) PropertyDefintionI18NWrapper
+        return (IPropertiesDefinition) PropertyDefinitionI18NWrapper
                 .getWrapper((IPropertiesDefinition) ipd, locale);
     }
 }

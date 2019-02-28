@@ -86,7 +86,7 @@
 	<bean id="multiLanguageAuthorityIndexer" class="org.dspace.app.cris.discovery.MultilanguageAuthorityIndexer"/>
 
 	<!--  Additional indexing and retrieve index for valuepairs and check/dropdown widget -->
-	<bean id="valuePairsAuthorityIndexer" class="org.dspace.app.cris.discovery.CrisValuePairsIndexPlugin">
+	<bean id="valuePairsAuthorityIndexer" class="org.dspace.app.webui.cris.util.CrisValuePairsIndexPlugin">
 		<property name="applicationService" ref="applicationService" />
 		<property name="configurationService" ref="org.dspace.services.ConfigurationService"/>
 	</bean>
@@ -1742,7 +1742,7 @@
 	</bean>
 
 	<bean id="searchFilterType"
-		class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
+		class="org.dspace.discovery.configuration.DiscoverySearchMultilanguageFilterFacet">
 		<property name="indexFieldName" value="itemtype" />
 		<property name="metadataFields">
 			<list>

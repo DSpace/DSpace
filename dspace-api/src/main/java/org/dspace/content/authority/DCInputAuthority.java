@@ -9,14 +9,18 @@ package org.dspace.content.authority;
 
 import java.util.Iterator;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
 
 import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.util.DCInputsReaderException;
+import org.dspace.core.I18nUtil;
 import org.dspace.core.SelfNamedPlugin;
 
 /**
@@ -46,7 +50,7 @@ public class DCInputAuthority extends SelfNamedPlugin implements ChoiceAuthority
     private String values[] = null;
     private String labels[] = null;
 
-    private static DCInputsReader dci = null;
+    private static Map<String, DCInputsReader> dcInputsReader = new HashMap<>();
     private static String pluginNames[] = null;
 
     public DCInputAuthority()
@@ -68,36 +72,44 @@ public class DCInputAuthority extends SelfNamedPlugin implements ChoiceAuthority
     {
         if (pluginNames == null)
         {
-            try
-            {
-                if (dci == null)
+            
+            if(dcInputsReader.isEmpty()) {
+                for (Locale locale : I18nUtil.getSupportedLocales())
                 {
-                    dci = new DCInputsReader();
+                    try
+                    {
+                        dcInputsReader.put(locale.getLanguage(),
+                                new DCInputsReader(I18nUtil
+                                        .getInputFormsFileName(locale)));
+                    }
+                    catch (DCInputsReaderException e)
+                    {
+                        log.error("Failed reading DCInputs initialization: ",
+                                e);
+                    }
                 }
             }
-            catch (DCInputsReaderException e)
-            {
-                log.error("Failed reading DCInputs initialization: ",e);
-            }
-            List<String> names = new ArrayList<String>();
-            Iterator pi = dci.getPairsNameIterator();
-            while (pi.hasNext())
-            {
-                names.add((String)pi.next());
-            }
 
+            List<String> names = new ArrayList<String>();
+            for(String key : dcInputsReader.keySet()) {
+                Iterator pi = dcInputsReader.get(key).getPairsNameIterator();
+                while (pi.hasNext())
+                {
+                    names.add((String)pi.next());
+                }
+            }
             pluginNames = names.toArray(new String[names.size()]);
             log.debug("Got plugin names = "+Arrays.deepToString(pluginNames));
         }
     }
 
     // once-only load of values and labels
-    private void init()
+    private void init(String locale)
     {
         if (values == null)
         {
             String pname = this.getPluginInstanceName();
-            List<String> pairs = dci.getPairs(pname);
+            List<String> pairs = dcInputsReader.get(locale).getPairs(pname);
             if (pairs != null)
             {
                 values = new String[pairs.size()/2];
@@ -119,7 +131,7 @@ public class DCInputAuthority extends SelfNamedPlugin implements ChoiceAuthority
 
     public Choices getMatches(String field, String query, int collection, int start, int limit, String locale)
     {
-        init();
+        init(locale);
 
         int dflt = -1;
         Choice v[] = new Choice[values.length];
@@ -136,7 +148,7 @@ public class DCInputAuthority extends SelfNamedPlugin implements ChoiceAuthority
 
     public Choices getBestMatch(String field, String text, int collection, String locale)
     {
-        init();
+        init(locale);
         for (int i = 0; i < values.length; ++i)
         {
             if (text.equalsIgnoreCase(values[i]))
@@ -151,7 +163,7 @@ public class DCInputAuthority extends SelfNamedPlugin implements ChoiceAuthority
 
     public String getLabel(String field, String key, String locale)
     {
-        init();
+        init(locale);
         return labels[Integer.parseInt(key)];
     }
 }

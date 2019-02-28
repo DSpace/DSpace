@@ -20,6 +20,8 @@
 <%@ taglib uri="http://ajaxtags.org/tags/ajax" prefix="ajax"%>
 
 <%@page import="java.util.List"%>
+<%@ page import="java.util.Locale"%>
+<%@ page import="org.dspace.app.webui.util.UIUtil" %>
 <%@page import="java.util.ArrayList"%>
 <%@page import="it.cilea.osd.jdyna.model.PropertiesDefinition"%>
 <%@page
@@ -39,6 +41,11 @@
     Boolean admin = (Boolean)request.getAttribute("isAdmin");
     boolean isAdmin = (admin == null ? false : admin.booleanValue());
 
+    Locale sessionLocale = UIUtil.getSessionLocale(request);
+	String currLocale = null;
+	if (sessionLocale != null) {
+		currLocale = sessionLocale.toString();
+	}
 %>
 <c:set var="root"><%=request.getContextPath()%></c:set>
 <c:set var="admin"><%=isAdmin%></c:set>
@@ -811,7 +818,8 @@
 						  <div>
 						<c:forEach
 							items="${propertiesDefinitionsInHolder[holder.shortName]}"
-							var="tipologiaDaVisualizzare">
+							var="tipologiaDaVisualizzareNoI18n">
+							<c:set var="tipologiaDaVisualizzare" value="${researcher:getPropertyDefinitionI18N(tipologiaDaVisualizzareNoI18n,currLocale)}" />
 							<c:set var="hideLabel">${fn:length(propertiesDefinitionsInHolder[holder.shortName]) le 1}</c:set>
 							<c:set var="disabled" value=" readonly='readonly'"/>
 							
