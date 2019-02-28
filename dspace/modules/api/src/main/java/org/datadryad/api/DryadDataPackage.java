@@ -592,7 +592,7 @@ public class DryadDataPackage extends DryadObject {
                     currentStatus = "curation";
                     node.put("status", currentStatus);
                 } else {
-                    currentStaus = "submitted";
+                    currentStatus = "submitted";
                     node.put("status", currentStatus);
                 }
                 node.put("created_at", submitted3.group(1));
