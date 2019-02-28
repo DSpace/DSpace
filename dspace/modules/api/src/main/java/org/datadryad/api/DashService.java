@@ -173,6 +173,7 @@ public class DashService {
     *
      * @param pkg*/
     public int putDataset(Package pkg) {
+        log.info("Putting dataset " + pkg.getItemID() + ", " + pkg.getDryadDOI());
         String dashJSON = pkg.getDataPackage().getDashJSON();
         log.debug("Got JSON object: " + dashJSON);
         int responseCode = 0;
@@ -395,9 +396,9 @@ public class DashService {
         log.debug("migrating provenances");
         // get curationActivities from Dash package
         JsonNode curationActivities = getCurationActivity(pkg);
-        // if the only curation activity is the default "Unsubmitted," delete it
+        // if the only curation activity is the default "in_progress," delete it
         if (curationActivities.size() == 1) {
-            if (curationActivities.get(0).get("status").textValue().equals("Unsubmitted")) {
+            if (curationActivities.get(0).get("status").textValue().equals("in_progress")) {
                 int unsubmittedID = curationActivities.get(0).get("id").intValue();
                 try {
                     URL url = new URL(dashServer + "/api/curation_activity/" + unsubmittedID);
