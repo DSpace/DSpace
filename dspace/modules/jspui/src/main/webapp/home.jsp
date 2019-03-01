@@ -203,7 +203,7 @@ if (submissions != null && submissions.count() > 0)
 if (communities != null && communities.size() != 0)
 {
 %>
-	<div class="col-sm-5 col-md-6 "><!--col-md-4-->		
+	<div class="col-md-4"><!--col-sm-5 col-md-6 //orig: col-md-4 -->		
                <!--<h3><fmt:message key="jsp.home.com1"/></h3>
                 <p><fmt:message key="jsp.home.com2"/></p>-->
                 <div class="row container">
@@ -249,7 +249,7 @@ if (communities != null && communities.size() != 0)
 }
 %>
 </div><!---add-->
-<div class="col-md-3"></div>
+<!--<div class="col-md-3"></div>-->
 </div><!---add-->
 	<%
     	int discovery_panel_cols = 8;

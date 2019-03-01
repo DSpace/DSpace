@@ -60,7 +60,7 @@
 	}
 	if (brefine) {
 %>
-<div class="col-sm-5 offset-sm-2 col-md-6 offset-md-0 "><!--col-md-<%= discovery_panel_cols %>   la variable esta en home.jsp y vale 8-->
+<div class="col-md-<%= discovery_panel_cols %>"><!--orig: col-md-<%= discovery_panel_cols %>   la variable esta en home.jsp y vale 8   otra: col-sm-5 offset-sm-2 col-md-6 offset-md-0 -->
 <!--<h3 class="facets"><fmt:message key="jsp.search.facet.refine" /></h3>-->
 				<div class="row container">
                 <div class="col-md-10">

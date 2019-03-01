@@ -132,22 +132,22 @@
 <!--<div class="container banner" style="text-align: center;" > -->
    
 
-    <div class="row" style= "display: block; background-image: url('<%= request.getContextPath() %>/image/fondito.jpg') ; background-repeat: no-repeat ; background-size: cover; background-position: center; text-align: center; padding: 2% 2%;">
+    <div class="row" style= "display: block; background-image: url('<%= request.getContextPath() %>/image/banner.jpg') ; background-repeat: no-repeat ; background-size: cover; background-position: center; text-align: center; padding: 2% 2%;>
 
-    <div style="width: 20%; height: 100%">
-                <div class="box2"> </div>
-                 <div class="box3"> </div>
-        </div>
+        <div style="width: 20%; height: 100%">
+                    <div class="box2"> </div>
+                     <div class="box3"> </div>
+            
 
-        <img  src="<%= request.getContextPath() %>/image/logo_rep.png" alt="Repositorio UTM" align="middle" />
-        <!--<div class="col-md-9 brand">
-            <h1><fmt:message key="jsp.layout.header-default.brand.heading" /></h1>
-            <fmt:message key="jsp.layout.header-default.brand.description" /> 
+            <img  src="<%= request.getContextPath() %>/image/logo_rep.png" alt="Repositorio UTM" align="middle" />
+            <!--<div class="col-md-9 brand">
+                <h1><fmt:message key="jsp.layout.header-default.brand.heading" /></h1>
+                <fmt:message key="jsp.layout.header-default.brand.description" /> 
+            </div>
+            <div class="col-md-3">
+            </div>-->
         </div>
-        <div class="col-md-3">
-        </div>-->
-   </div>
-<!--</div>-->
+    </div>
 <!--<br/>-->
 
 <!--
@@ -168,5 +168,6 @@
 <div class="container">
 <% if (request.getAttribute("dspace.layout.sidebar") != null) { %>
     <div class="row">
+    <hr>
     <div class="col-md-9">
 <% } %>	

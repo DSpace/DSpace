@@ -166,8 +166,8 @@
 
     <%-- <h1>Search Results</h1> --%>
 
-<!--<h2><fmt:message key="jsp.search.title"/></h2>-->
-<h2>Búsquedas</h2>
+<h2><fmt:message key="jsp.search.title"/></h2>
+<!--<h2>Búsquedas</h2>-->
 
 <div class="discovery-search-form panel panel-default">
     <%-- Controls for a repeat search --%>
@@ -470,20 +470,7 @@ else if( qResults != null)
 
 
 %>
-<!--barra citas-->
-	<div class="panel panel-success">
-		<div class="panel-heading" style="padding: 2%; font-weight: normal; color: black; border-color: #ADADAD"> 
-			Ejemplo de citación: <br> 
-			@book{licona1995tecnologias, <br> 
-			   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;title={Tecnolog{\'\i}as corporales: danza, cuerpo e historia}, <br> 
-				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;author={Licona, Hilda C Islas},  <br> 
-				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;year={1995}, <br> 
-				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;publisher={Instituto Nacional de Bellas Artes}<br> 
-			}
-		</div>
-	</div>
-
-<!--<hr/>-->
+<hr/>
 
 <!--barra del total de resultados y en cuanto tiempo-->
 <div class="discovery-result-pagination row container">
@@ -554,7 +541,11 @@ else if( qResults != null)
 	%>
 	</ul>
 <!-- give a content to the div -->
+
 </div>
+
+
+
 <div class="discovery-result-results">
 <% if (communities.size() > 0 ) { %>
     <div class="panel panel-info">
@@ -576,26 +567,38 @@ else if( qResults != null)
     <dspace:itemlist items="<%= items %>" authorLimit="<%= etAl %>" />
     </div>
 <% } %>
-
-	<div class="panel panel-info">
-    	<div class="panel-heading">Ejemplo de citación</div>
-       	<table align="center" class="table">
-           	<tbody>
-              	<tr header="t5" class="evenRowEvenCol">
-                   	<td>
-                       	<a href="#"> @book{licona1995tecnologias, <br> 
-		   					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;title={Tecnolog{\'\i}as corporales: danza, cuerpo e historia}, <br> 
-							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;author={Licona, Hilda C Islas},  <br> 
-							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;year={1995}, <br> 
-							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;publisher={Instituto Nacional de Bellas Artes}<br> 
-							}
-                       	</a>
-                   	</td>
-               	</tr>
-           	</tbody>
-        </table>
-	</div>
 </div>
+
+
+<!--barra citas-->
+	<!--*********************ejemplo de citacion******************************-->
+<div class="discovery-result-results">
+		<div class="panel panel-info">
+            <div class="panel-heading">Ejemplo de citación</div>
+            	<table align="center" class="table">
+                    <tbody>
+                        <tr header="t5" class="evenRowEvenCol">
+                            <td>
+                            <a href="#">s
+				@book{licona1995tecnologias, <br> 
+			   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;title={Tecnolog{\\i}as corporales: danza, cuerpo e historia}, <br> 
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;author={Licona, Hilda C Islas},  <br> 
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;year={1995}, <br> 
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;publisher={Instituto Nacional de Bellas Artes}<br> 
+			}
+                            </a>
+                           </td>
+                       </tr>
+                    </tbody>
+                 </table>
+        	</div>
+        </div>
+
+<!--*********************ejemplo de citacion******************************-->
+
+
+
+
 <%-- if the result page is enought long... --%>
 <% if ((communities.size() + collections.size() + items.size()) > 10) {%>
 <%-- show again the navigation info/links --%>
