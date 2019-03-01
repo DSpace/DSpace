@@ -80,13 +80,13 @@ a:hover {
 .ds-header-logo {
     float:left;
     width: 149px;
-    height: 50px;
-    margin-top: 10px;
+    height: 26px;
     background-position: left bottom;
     background-repeat: no-repeat;
     background-color: transparent;
     margin-right: 15px;
     margin-top: 35px;
+    margin-bottom: 10px;
 }
 
 #ds-header-logo-prod {
