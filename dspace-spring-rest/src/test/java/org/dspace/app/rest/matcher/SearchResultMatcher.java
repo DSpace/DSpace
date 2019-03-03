@@ -63,13 +63,8 @@ public class SearchResultMatcher {
 
     private static Matcher<? super Object> matchEmbeddedObjectOnItemName(String type, String itemName) {
         return allOf(
-            Matchers.anyOf(
-                    allOf(
-                        hasJsonPath("$.uuid", notNullValue()),
-                        hasJsonPath("$.name", notNullValue())
-                    ),
-                    hasJsonPath("$.id", notNullValue())
-                ),
+            hasJsonPath("$.uuid", notNullValue()),
+            hasJsonPath("$.name", is(itemName)),
             hasJsonPath("$.type", is(type))
         );
     }
