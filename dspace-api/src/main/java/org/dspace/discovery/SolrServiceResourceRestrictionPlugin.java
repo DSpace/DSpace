@@ -57,9 +57,7 @@ public class SolrServiceResourceRestrictionPlugin implements SolrServiceIndexPlu
 
     @Override
     public void additionalIndex(Context context, BrowsableDSpaceObject bdso, SolrInputDocument document) {
-        System.out.println(bdso.getTypeText());
         if (!(bdso instanceof DSpaceObject)) {
-            System.out.println("NO DSO");
             return;
         }
         DSpaceObject dso = (DSpaceObject) bdso;
@@ -77,7 +75,6 @@ public class SolrServiceResourceRestrictionPlugin implements SolrServiceIndexPlu
                     fieldValue = "e" + resourcePolicy.getEPerson().getID();
 
                 }
-                System.out.println("add READ FIELD= " + fieldValue + " " + resourcePolicy.getRpType());
                 document.addField("read", fieldValue);
 
                 //remove the policy from the cache to save memory
@@ -109,7 +106,7 @@ public class SolrServiceResourceRestrictionPlugin implements SolrServiceIndexPlu
                 if (isWorkspace) {
                     // insert filter by submitter
                     solrQuery
-                        .addFilterQuery("read:(e" + currentUser.getID() + " OR ws" + currentUser.getID() + ")");
+                        .addFilterQuery("read:(ws" + currentUser.getID() + ")");
                 } else if (isWorkflow) {
                     // insert filter by controllers
                     StringBuilder controllerQuery = new StringBuilder();

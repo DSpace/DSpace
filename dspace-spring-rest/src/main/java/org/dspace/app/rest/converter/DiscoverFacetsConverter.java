@@ -65,6 +65,7 @@ public class DiscoverFacetsConverter {
                 handleExposeMinMaxValues(context, field, facetEntry);
             }
             facetEntry.setExposeMinMax(field.exposeMinAndMaxValue());
+            facetEntry.setFacetType(field.getType());
             for (DiscoverResult.FacetResult value : CollectionUtils.emptyIfNull(facetValues)) {
                 // The discover results contains max facetLimit + 1 values. If we reach the "+1", indicate that there
                 // are
@@ -75,10 +76,6 @@ public class DiscoverFacetsConverter {
                     facetEntry.addValue(valueRest);
                 } else {
                     facetEntry.setHasMore(true);
-                }
-
-                if (StringUtils.isBlank(facetEntry.getFacetType())) {
-                    facetEntry.setFacetType(value.getFieldType());
                 }
 
                 valueCount++;
