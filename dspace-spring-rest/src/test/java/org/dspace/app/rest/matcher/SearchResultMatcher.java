@@ -14,15 +14,16 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 
 import org.hamcrest.Matcher;
+import org.hamcrest.Matchers;
 
 public class SearchResultMatcher {
 
     private SearchResultMatcher() { }
 
-    public static Matcher<? super Object> match(String type, String typePlural) {
+    public static Matcher<? super Object> match(String category, String type, String typePlural) {
         return allOf(
             hasJsonPath("$.type", is("discover")),
-            hasJsonPath("$._links.rObject.href", containsString("/api/core/" + typePlural)),
+            hasJsonPath("$._links.rObject.href", containsString("/api/" + category + "/" + typePlural)),
             hasJsonPath("$._embedded", notNullValue()),
             hasJsonPath("$._embedded.rObject", is(
                 matchEmbeddedObject(type)
@@ -38,8 +39,13 @@ public class SearchResultMatcher {
 
     private static Matcher<? super Object> matchEmbeddedObject(String type) {
         return allOf(
-            hasJsonPath("$.uuid", notNullValue()),
-            hasJsonPath("$.name", notNullValue()),
+            Matchers.anyOf(
+                allOf(
+                    hasJsonPath("$.uuid", notNullValue()),
+                    hasJsonPath("$.name", notNullValue())
+                ),
+                hasJsonPath("$.id", notNullValue())
+            ),
             hasJsonPath("$.type", is(type))
         );
     }
@@ -57,8 +63,13 @@ public class SearchResultMatcher {
 
     private static Matcher<? super Object> matchEmbeddedObjectOnItemName(String type, String itemName) {
         return allOf(
-            hasJsonPath("$.uuid", notNullValue()),
-            hasJsonPath("$.name", is(itemName)),
+            Matchers.anyOf(
+                    allOf(
+                        hasJsonPath("$.uuid", notNullValue()),
+                        hasJsonPath("$.name", notNullValue())
+                    ),
+                    hasJsonPath("$.id", notNullValue())
+                ),
             hasJsonPath("$.type", is(type))
         );
     }

@@ -100,6 +100,8 @@ public class ClaimedTaskBuilder extends AbstractBuilder<ClaimedTask, ClaimedTask
             claimedTask = getService().findByWorkflowIdAndEPerson(context, workflowItem, user);
             // restore the submitter as current user
             context.setCurrentUser(submitter);
+            context.dispatchEvents();
+            indexingService.commit();
             return claimedTask;
         } catch (Exception e) {
             return handleException(e);

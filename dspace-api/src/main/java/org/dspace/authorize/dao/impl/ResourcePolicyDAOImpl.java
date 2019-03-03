@@ -131,8 +131,7 @@ public class ResourcePolicyDAOImpl extends AbstractHibernateDAO<ResourcePolicy> 
                                 criteriaBuilder.equal(resourcePolicyRoot.get(ResourcePolicy_.actionId), action),
                                 criteriaBuilder
                                     .or(criteriaBuilder.equal(resourcePolicyRoot.get(ResourcePolicy_.eperson), e),
-                                        criteriaBuilder
-                                            .in(resourcePolicyRoot.get(ResourcePolicy_.epersonGroup).in(groups)))
+                                        (resourcePolicyRoot.get(ResourcePolicy_.epersonGroup).in(groups)))
             )
         );
         return list(context, criteriaQuery, false, ResourcePolicy.class, 1, -1);

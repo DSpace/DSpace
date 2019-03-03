@@ -1119,6 +1119,9 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             Set<String> moreLikeThisFields = new HashSet<String>();
             // some configuration are returned multiple times, skip them to save CPU cycles
             Set<String> appliedConf = new HashSet<String>();
+            // it is common to have search filter shared between multiple configurations
+            Set<String> appliedDiscoverySearchFilter = new HashSet<String>();
+
             for (DiscoveryConfiguration discoveryConfiguration : discoveryConfigurations) {
                 if (appliedConf.contains(discoveryConfiguration.getId())) {
                     continue;
@@ -1126,7 +1129,13 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                     appliedConf.add(discoveryConfiguration.getId());
                 }
                 for (int i = 0; i < discoveryConfiguration.getSearchFilters().size(); i++) {
-
+                    if (appliedDiscoverySearchFilter
+                            .contains(discoveryConfiguration.getSearchFilters().get(i).getIndexFieldName())) {
+                        continue;
+                    } else {
+                        appliedDiscoverySearchFilter
+                                .add(discoveryConfiguration.getSearchFilters().get(i).getIndexFieldName());
+                    }
                     List<MetadataValue> metadataValueList = new LinkedList<>();
                     boolean shouldExposeMinMax = false;
                     DiscoverySearchFilter discoverySearchFilter = discoveryConfiguration.getSearchFilters().get(i);

@@ -56,6 +56,17 @@ public class FacetEntryMatcher {
         );
     }
 
+    public static Matcher<? super Object> submitterFacet(boolean hasNext) {
+        return allOf(
+            hasJsonPath("$.name", is("submitter")),
+            hasJsonPath("$.facetType", is("text")),
+            hasJsonPath("$.facetLimit", any(Integer.class)),
+            hasJsonPath("$._links.self.href", containsString("api/discover/facets/submitter")),
+            hasJsonPath("$._links", matchNextLink(hasNext, "api/discover/facets/submitter"))
+
+        );
+    }
+
     public static Matcher<? super Object> dateIssuedFacet(boolean hasNext) {
         return allOf(
             hasJsonPath("$.name", is("dateIssued")),
@@ -86,6 +97,41 @@ public class FacetEntryMatcher {
             hasJsonPath("$._links.self.href", containsString("api/discover/facets/has_content_in_original_bundle")),
             hasJsonPath("$._links", matchNextLink(hasNext, "api/discover/facets/has_content_in_original_bundle"))
         );
+    }
+
+    /**
+     * Check that a facet over the dc.type exists and match the default configuration
+     * 
+     * @param b
+     *            true if we expect more values
+     * @return a Matcher
+     */
+    public static Matcher<? super Object> typeFacet(boolean b) {
+        return allOf(
+                hasJsonPath("$.name", is("itemtype")),
+                hasJsonPath("$.facetType", is("text")),
+                hasJsonPath("$.facetLimit", any(Integer.class)),
+                hasJsonPath("$._links.self.href", containsString("api/discover/facets/itemtype")),
+                hasJsonPath("$._links", matchNextLink(b, "api/discover/facets/itemtype"))
+            );
+    }
+
+    /**
+     * Check that a facet over the object type (workspaceitem, workflowitem, etc.) exists and match the default
+     * configuration
+     * 
+     * @param b
+     *            true if we expect more values
+     * @return a Matcher
+     */
+    public static Matcher<? super Object> resourceTypeFacet(boolean b) {
+        return allOf(
+                hasJsonPath("$.name", is("namedresourcetype")),
+                hasJsonPath("$.facetType", is("text")),
+                hasJsonPath("$.facetLimit", any(Integer.class)),
+                hasJsonPath("$._links.self.href", containsString("api/discover/facets/namedresourcetype")),
+                hasJsonPath("$._links", matchNextLink(b, "api/discover/facets/namedresourcetype"))
+            );
     }
 
     private static AnyOf<? super Object> matchNextLink(boolean hasNext, String path) {
