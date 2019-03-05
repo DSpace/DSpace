@@ -442,6 +442,8 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
 
 
 
+        context.restoreAuthSystemState();
+
         String token = getAuthToken(admin.getEmail(), password);
 
         MvcResult mvcResult = getClient(token).perform(post("/api/core/relationships")
@@ -536,6 +538,8 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
         authorizeService.addPolicy(context, author1, Constants.WRITE, user);
         authorizeService.addPolicy(context, author2, Constants.WRITE, user);
 
+        context.restoreAuthSystemState();
+
         String token = getAuthToken(user.getEmail(), password);
 
         MvcResult mvcResult = getClient(token).perform(post("/api/core/relationships")
@@ -628,6 +632,8 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
         context.setCurrentUser(user);
 
         authorizeService.addPolicy(context, publication, Constants.WRITE, user);
+
+        context.restoreAuthSystemState();
 
         String token = getAuthToken(user.getEmail(), password);
 
@@ -730,6 +736,8 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
         authorizeService.addPolicy(context, publication1, Constants.WRITE, user);
         authorizeService.addPolicy(context, publication2, Constants.WRITE, user);
 
+        context.restoreAuthSystemState();
+
         String token = getAuthToken(user.getEmail(), password);
 
         MvcResult mvcResult = getClient(token).perform(post("/api/core/relationships")
@@ -831,6 +839,8 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
 
         authorizeService.addPolicy(context, author1, Constants.WRITE, user);
 
+        context.restoreAuthSystemState();
+
         String token = getAuthToken(user.getEmail(), password);
 
         MvcResult mvcResult = getClient(getAuthToken(admin.getEmail(), password))
@@ -924,6 +934,7 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
         ePersonService.update(context, user);
         context.setCurrentUser(user);
 
+        context.restoreAuthSystemState();
 
         String token = getAuthToken(admin.getEmail(), password);
 
@@ -1014,6 +1025,8 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
         context.setCurrentUser(user);
 
         authorizeService.addPolicy(context, author1, Constants.WRITE, user);
+
+        context.restoreAuthSystemState();
 
         String token = getAuthToken(admin.getEmail(), password);
 
@@ -1112,6 +1125,8 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
         authorizeService.addPolicy(context, publication1, Constants.WRITE, user);
 
         String token = getAuthToken(user.getEmail(), password);
+
+        context.restoreAuthSystemState();
 
         MvcResult mvcResult = getClient(token).perform(post("/api/core/relationships")
                                                            .param("relationshipType",
