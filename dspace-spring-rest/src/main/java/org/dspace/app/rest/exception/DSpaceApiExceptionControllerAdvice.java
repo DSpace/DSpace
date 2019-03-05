@@ -44,7 +44,7 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
     @Autowired
     private RestAuthenticationService restAuthenticationService;
 
-    @ExceptionHandler( {AuthorizeException.class, RESTAuthorizationException.class})
+    @ExceptionHandler({AuthorizeException.class, RESTAuthorizationException.class, AccessDeniedException.class})
     protected void handleAuthorizeException(HttpServletRequest request, HttpServletResponse response, Exception ex)
         throws IOException {
         if (restAuthenticationService.hasAuthenticationData(request)) {
@@ -118,14 +118,6 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
         }
         sendErrorResponse(request, response, ex, "An Exception has occured", returnCode);
 
-    }
-
-    @ExceptionHandler(AccessDeniedException.class)
-    protected void handleAccessDeniedException(HttpServletRequest request, HttpServletResponse response,
-                                               Exception ex)
-        throws IOException {
-        sendErrorResponse(request, response, ex, "An AccessDenied Exception has occured",
-                          HttpServletResponse.SC_UNAUTHORIZED);
     }
 
 
