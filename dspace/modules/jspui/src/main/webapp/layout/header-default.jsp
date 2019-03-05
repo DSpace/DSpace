@@ -128,7 +128,7 @@
 %>
 </header>
 
-<main id="content" role="main" style="margin-top: -9px; background-color: #eee;">
+<main id="content" role="main" style="margin-top: -1.5%; background-color: #eee;">
 <!--<div class="container banner" style="text-align: center;" > -->
    
 

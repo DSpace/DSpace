@@ -43,6 +43,20 @@
 <%@ page import="org.dspace.services.ConfigurationService" %>
 <%@ page import="org.dspace.services.factory.DSpaceServicesFactory" %>
 
+	<script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-135180655-1']);
+_gaq.push(['_setDomainName', 'none']);
+_gaq.push(['_setAllowLinker', 'true']);
+_gaq.push(['_trackPageview']);
+
+(function() {
+var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})();
+</script>
+
 <%
     List<Community> communities = (List<Community>) request.getAttribute("communities");
 
@@ -198,71 +212,72 @@ if (submissions != null && submissions.count() > 0)
 
 </div>
 
-<div class="row " " style="background-color: #eee;"> <!--container -->
-<%
-if (communities != null && communities.size() != 0)
-{
-%>
-	<div class="col-md-4"><!--col-sm-5 col-md-6 //orig: col-md-4 -->		
-               <!--<h3><fmt:message key="jsp.home.com1"/></h3>
-                <p><fmt:message key="jsp.home.com2"/></p>-->
-                <div class="row container">
-               	<div class="col-md-3"></div>
-                <div class="col-md-6">
-                <h3 style="padding-bottom: 2%; color: #410401"><fmt:message key="jsp.home.com1"/></h3> <!--comunidades-->
-				<div class="list-group" style="display: block;">
-<%
-	boolean showLogos = configurationService.getBooleanProperty("jspui.home-page.logos", true);
-    for (Community com : communities)
-    {
-%><div class="list-group-item row ">
-<%  
-		Bitstream logo = com.getLogo();
-		if (showLogos && logo != null) { %>
-	<div class="col-md-3">
-        <img alt="Logo" class="img-responsive" src="<%= request.getContextPath() %>/retrieve/<%= logo.getID() %>" /> 
-	</div>
-	<div class="col-md-9">
-<% } else { %>
-	<div class="col-md-12">
-<% }  %>		
-		<h4 class="list-group-item-heading"><a href="<%= request.getContextPath() %>/handle/<%= com.getHandle() %>"><%= com.getName() %></a>
-<%
-        if (configurationService.getBooleanProperty("webui.strengths.show"))
-        {
-%>
-		<span class="badge pull-right"><%= ic.getCount(com) %></span>
-<%
-        }
-
-%>
-		</h4>
-		<p style="text-align: justify;"><%= communityService.getMetadata(com, "short_description") %></p>
-    </div>
-</div> <!--col-md-9-->                           
-<%
-    }
-%>
-	</div>
-	</div>
-<%
-}
-%>
-</div><!---add-->
-<!--<div class="col-md-3"></div>-->
-</div><!---add-->
+<div class="row "  style="background-color: #eee;"> <!--container -->
+ <div class="row " style="background-color: #fff; margin-top:2%; margin-right: 3%; margin-left: 3%;">
 	<%
-    	int discovery_panel_cols = 8;
-    	int discovery_facet_cols = 4;
-    %>
-	<%@ include file="discovery/static-sidebar-facet.jsp" %>
-</div> <!--col-md-4-->
+	if (communities != null && communities.size() != 0)
+	{
+	%>
+		<div class="col-md-4"><!--col-sm-5 col-md-6 //orig: col-md-4 -->		
+	        <!--<h3><fmt:message key="jsp.home.com1"/></h3>
+	        <p><fmt:message key="jsp.home.com2"/></p>-->
+	        <div class="row container">
+		        <div class="col-md-3"></div>
+		        <div class="col-md-6">
+		          	<h3 style="padding-bottom: 2%; color: #410401"><fmt:message key="jsp.home.com1"/></h3> <!--comunidades-->
+					<div class="list-group" style="display: block;">
+						<%
+						boolean showLogos = configurationService.getBooleanProperty("jspui.home-page.logos", true);
+					    for (Community com : communities)
+					    {
+						%><div class="list-group-item row ">
+							<%  
+							Bitstream logo = com.getLogo();
+							if (showLogos && logo != null) { %>
+							<div class="col-md-3">
+					        	<img alt="Logo" class="img-responsive" src="<%= request.getContextPath() %>/retrieve/<%= logo.getID() %>" /> 
+							</div>
+							<div class="col-md-9">
+							<% } else { %>
+								<div class="col-md-12">
+							<% }  %>		
+									<h4 class="list-group-item-heading"><a href="<%= request.getContextPath() %>/handle/<%= com.getHandle() %>"><%= com.getName() %></a>
+							<%
+							        if (configurationService.getBooleanProperty("webui.strengths.show"))
+							        {
+							%>
+									<span class="badge pull-right"><%= ic.getCount(com) %></span>
+							<%
+							        }
 
-<div class="row">
-	<%@ include file="discovery/static-tagcloud-facet.jsp" %>
-</div>
+							%>
+									</h4>
+									<p style="text-align: justify;"><%= communityService.getMetadata(com, "short_description") %></p>
+							    </div>
+							</div> <!--col-md-9-->                           
+						<%
+						}
+						%>
+						</div>
+					</div>
+	<%
+	}
+	%>
+				</div><!---add-->
+				<!--<div class="col-md-3"></div>-->
+			</div><!---add-->
+			<%
+		    	int discovery_panel_cols = 8;
+		    	int discovery_facet_cols = 4;
+		    %>
+			<%@ include file="discovery/static-sidebar-facet.jsp" %>
+		</div> <!--col-md-4-->
+
+	<div class="row">
+		<%@ include file="discovery/static-tagcloud-facet.jsp" %>
+	</div>
 	
-	<div class="row" >
+	<div class="row" style="background-color: #fff; margin-right: 3%; margin-left: 3%; margin-bottom: -2%; padding-bottom: 1%">
 		<div class="container" style="max-width: 1000px; border-top: 1px solid #6b6b6b;">
 			<h4 style="text-align: center; font-size: 14px; color: #4c000e;">Misión del repositorio</h4>
 			<p style="color: #6b6b6b; font-size: 12px; text-align: justify;">
@@ -272,6 +287,6 @@ if (communities != null && communities.size() != 0)
 	        </p>
         </div>
 	</div>
-
+ </div>
 </div>
 </dspace:layout>
