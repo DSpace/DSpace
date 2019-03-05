@@ -3,9 +3,9 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.dspace</groupId>
     <artifactId>dspace-rdf</artifactId>
-    <packaging>war</packaging>
+    <packaging>jar</packaging>
     <name>DSpace RDF</name>
-    <description>Parent project for the RDF API and Webapp</description>
+    <description>DSpace RDF (Linked Data) Extension</description>
 
     <parent>
         <groupId>org.dspace</groupId>
@@ -58,8 +58,15 @@
             <artifactId>dspace-services</artifactId>
         </dependency>
 
-        <!-- Spring 3 dependencies -->
+        <!-- Needed to support Spring @Configuration classes (to register servlets/beans with Spring Boot webapp) -->
         <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <version>${spring-boot.version}</version>
+        </dependency>
+
+        <!-- Spring dependencies -->
+        <!--<dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-core</artifactId>
         </dependency>
@@ -72,7 +79,7 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>
-        </dependency>
+        </dependency>-->
 
         <dependency>
             <groupId>javax.servlet</groupId>
