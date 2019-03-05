@@ -203,7 +203,6 @@
                 <dependency>
                     <groupId>org.dspace</groupId>
                     <artifactId>dspace-rdf</artifactId>
-                    <type>war</type>
                     <scope>compile</scope>
                 </dependency>
                 <dependency>
