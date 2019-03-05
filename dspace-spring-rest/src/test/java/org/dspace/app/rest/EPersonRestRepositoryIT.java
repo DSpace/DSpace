@@ -473,7 +473,6 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .andExpect(status().isOk());
     }
 
-    @Ignore
     @Test
     public void deleteViolatingConstraints() throws Exception {
         // We turn off the authorization system in order to create the structure as defined below
