@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest;
 
+import static com.jayway.jsonpath.JsonPath.read;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -14,6 +15,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.dspace.app.rest.builder.ClaimedTaskBuilder;
 import org.dspace.app.rest.builder.CollectionBuilder;
@@ -575,4 +578,223 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
             .andExpect(jsonPath("$.inArchive", is(false)));
 
     }
+
+    @Test
+    /**
+     * Test the run over a complete workflow
+     *
+     * @throws Exception
+     */
+    public void fullWorkflowTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        //** GIVEN **
+        //1. three reviewers
+        EPerson reviewer1 = EPersonBuilder.createEPerson(context)
+                .withEmail("reviewer1@example.com")
+                .withPassword(password)
+                .build();
+
+        EPerson reviewer2 = EPersonBuilder.createEPerson(context)
+                .withEmail("reviewer2@example.com")
+                .withPassword(password)
+                .build();
+
+        EPerson reviewer3 = EPersonBuilder.createEPerson(context)
+                .withEmail("reviewer3@example.com")
+                .withPassword(password)
+                .build();
+
+        //2. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
+                .withWorkflowGroup(1, reviewer1)
+                .withWorkflowGroup(2, reviewer2)
+                .withWorkflowGroup(3, reviewer3)
+                .build();
+
+        //3. create a normal user to use as submitter
+        EPerson submitter = EPersonBuilder.createEPerson(context)
+                .withEmail("submitter@example.com")
+                .withPassword(password)
+                .build();
+
+        context.setCurrentUser(submitter);
+
+        //3. create a workflowitem (so a pool task in step1)
+        XmlWorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
+                        .withTitle("Test item full workflow")
+                        .withIssueDate("2019-03-06")
+                        .withSubject("ExtraEntry")
+                        .build();
+
+        Item item = witem.getItem();
+
+        context.restoreAuthSystemState();
+
+        String reviewer1Token = getAuthToken(reviewer1.getEmail(), password);
+        String reviewer2Token = getAuthToken(reviewer2.getEmail(), password);
+        String reviewer3Token = getAuthToken(reviewer3.getEmail(), password);
+        String adminToken = getAuthToken(admin.getEmail(), password);
+
+        AtomicReference<Integer> idRef = new AtomicReference<Integer>();
+
+        // step 1
+        getClient(reviewer1Token).perform(get("/api/workflow/pooltasks/search/findByUser")
+                .param("uuid", reviewer1.getID().toString()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.pooltasks", Matchers.contains(
+                    Matchers.allOf(
+                            Matchers.is(PoolTaskMatcher.matchPoolTask(null, "reviewstep")),
+                            hasJsonPath("$._embedded.workflowitem",
+                                    Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
+                                            witem, "Test item full workflow", "2019-03-06", "ExtraEntry")))
+                            ))))
+            .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/workflow/pooltasks")))
+            .andExpect(jsonPath("$.page.size", is(20)))
+            .andExpect(jsonPath("$.page.totalElements", is(1)))
+                .andDo((result -> idRef
+                        .set(read(result.getResponse().getContentAsString(), "$._embedded.pooltasks[0].id"))));
+
+        // claim the task
+        getClient(reviewer1Token).perform(post("/api/workflow/pooltasks/" + idRef.get())
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED))
+            .andExpect(status().isNoContent());
+
+        // get the id of the claimed task
+        getClient(reviewer1Token).perform(get("/api/workflow/claimedtasks/search/findByUser")
+                .param("uuid", reviewer1.getID().toString()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.claimedtasks", Matchers.contains(
+                    Matchers.allOf(
+                            hasJsonPath("$._links.self.href", Matchers.containsString("/api/workflow/claimedtasks/")),
+                            hasJsonPath("$.type", Matchers.is("claimedtask")),
+                            hasJsonPath("$._embedded.workflowitem",
+                                     Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
+                                             witem, "Test item full workflow", "2019-03-06", "ExtraEntry")))
+                    ))))
+            .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/workflow/claimedtasks")))
+            .andExpect(jsonPath("$.page.size", is(20)))
+            .andExpect(jsonPath("$.page.totalElements", is(1)))
+                .andDo((result -> idRef
+                        .set(read(result.getResponse().getContentAsString(), "$._embedded.claimedtasks[0].id"))));
+
+        // approve the claimedTask, wf step 1
+        getClient(reviewer1Token).perform(post("/api/workflow/claimedtasks/" + idRef.get())
+                .param("submit_approve", "true")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED))
+            .andExpect(status().isNoContent());
+
+        // verify that the underline item is still unpublished
+        getClient(adminToken).perform(get("/api/core/items/" + item.getID()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.inArchive", is(false)));
+
+        // step 2
+        getClient(reviewer2Token).perform(get("/api/workflow/pooltasks/search/findByUser")
+                .param("uuid", reviewer2.getID().toString()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.pooltasks", Matchers.contains(
+                    Matchers.allOf(
+                            Matchers.is(PoolTaskMatcher.matchPoolTask(null, "editstep")),
+                            hasJsonPath("$._embedded.workflowitem",
+                                    Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
+                                            witem, "Test item full workflow", "2019-03-06", "ExtraEntry")))
+                            ))))
+            .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/workflow/pooltasks")))
+            .andExpect(jsonPath("$.page.size", is(20)))
+            .andExpect(jsonPath("$.page.totalElements", is(1)))
+                .andDo((result -> idRef
+                        .set(read(result.getResponse().getContentAsString(), "$._embedded.pooltasks[0].id"))));
+
+        // claim the task
+        getClient(reviewer2Token).perform(post("/api/workflow/pooltasks/" + idRef.get())
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED))
+            .andExpect(status().isNoContent());
+
+        // get the id of the claimed task
+        getClient(reviewer2Token).perform(get("/api/workflow/claimedtasks/search/findByUser")
+                .param("uuid", reviewer2.getID().toString()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.claimedtasks", Matchers.contains(
+                    Matchers.allOf(
+                            hasJsonPath("$._links.self.href", Matchers.containsString("/api/workflow/claimedtasks/")),
+                            hasJsonPath("$.type", Matchers.is("claimedtask")),
+                            hasJsonPath("$._embedded.workflowitem",
+                                     Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
+                                             witem, "Test item full workflow", "2019-03-06", "ExtraEntry")))
+                    ))))
+            .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/workflow/claimedtasks")))
+            .andExpect(jsonPath("$.page.size", is(20)))
+            .andExpect(jsonPath("$.page.totalElements", is(1)))
+                .andDo((result -> idRef
+                        .set(read(result.getResponse().getContentAsString(), "$._embedded.claimedtasks[0].id"))));
+
+        // approve the claimedTask, wf step 2
+        getClient(reviewer2Token).perform(post("/api/workflow/claimedtasks/" + idRef.get())
+                .param("submit_approve", "true")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED))
+            .andExpect(status().isNoContent());
+
+        // verify that the underline item is still unpublished
+        getClient(adminToken).perform(get("/api/core/items/" + item.getID()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.inArchive", is(false)));
+
+        // step 3
+        getClient(reviewer3Token).perform(get("/api/workflow/pooltasks/search/findByUser")
+                .param("uuid", reviewer3.getID().toString()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.pooltasks", Matchers.contains(
+                    Matchers.allOf(
+                            Matchers.is(PoolTaskMatcher.matchPoolTask(null, "finaleditstep")),
+                            hasJsonPath("$._embedded.workflowitem",
+                                    Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
+                                            witem, "Test item full workflow", "2019-03-06", "ExtraEntry")))
+                            ))))
+            .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/workflow/pooltasks")))
+            .andExpect(jsonPath("$.page.size", is(20)))
+            .andExpect(jsonPath("$.page.totalElements", is(1)))
+                .andDo((result -> idRef
+                        .set(read(result.getResponse().getContentAsString(), "$._embedded.pooltasks[0].id"))));
+
+        // claim the task
+        getClient(reviewer3Token).perform(post("/api/workflow/pooltasks/" + idRef.get())
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED))
+            .andExpect(status().isNoContent());
+
+        // get the id of the claimed task
+        getClient(reviewer3Token).perform(get("/api/workflow/claimedtasks/search/findByUser")
+                .param("uuid", reviewer3.getID().toString()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.claimedtasks", Matchers.contains(
+                    Matchers.allOf(
+                            hasJsonPath("$._links.self.href", Matchers.containsString("/api/workflow/claimedtasks/")),
+                            hasJsonPath("$.type", Matchers.is("claimedtask")),
+                            hasJsonPath("$._embedded.workflowitem",
+                                     Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
+                                             witem, "Test item full workflow", "2019-03-06", "ExtraEntry")))
+                    ))))
+            .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/workflow/claimedtasks")))
+            .andExpect(jsonPath("$.page.size", is(20)))
+            .andExpect(jsonPath("$.page.totalElements", is(1)))
+                .andDo((result -> idRef
+                        .set(read(result.getResponse().getContentAsString(), "$._embedded.claimedtasks[0].id"))));
+
+        // approve the claimedTask, wf step 3
+        getClient(reviewer3Token).perform(post("/api/workflow/claimedtasks/" + idRef.get())
+                .param("submit_approve", "true")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED))
+            .andExpect(status().isNoContent());
+
+        // verify that the item has been published!!!
+        getClient().perform(get("/api/core/items/" + item.getID()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.inArchive", is(true)));
+    }
+
 }
