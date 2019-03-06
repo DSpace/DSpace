@@ -82,6 +82,18 @@ public class XmlWorkflowItemDAOImpl extends AbstractHibernateDAO<XmlWorkflowItem
 
     @Override
     public List<XmlWorkflowItem> findBySubmitter(Context context, EPerson ep) throws SQLException {
+        return findBySubmitter(context, ep, null, null);
+    }
+
+    @Override
+    public List<XmlWorkflowItem> findBySubmitter(Context context, EPerson ep, Integer offset, Integer limit)
+            throws SQLException {
+        if (offset == null) {
+            offset = -1;
+        }
+        if (limit == null) {
+            limit = -1;
+        }
 
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, XmlWorkflowItem.class);
@@ -90,7 +102,17 @@ public class XmlWorkflowItemDAOImpl extends AbstractHibernateDAO<XmlWorkflowItem
         criteriaQuery.select(xmlWorkflowItemRoot);
         criteriaQuery.where(criteriaBuilder.equal(join.get(Item_.submitter), ep));
         criteriaQuery.orderBy(criteriaBuilder.asc(xmlWorkflowItemRoot.get(XmlWorkflowItem_.id)));
-        return list(context, criteriaQuery, false, XmlWorkflowItem.class, -1, -1);
+        return list(context, criteriaQuery, false, XmlWorkflowItem.class, limit, offset);
+    }
+
+    @Override
+    public int countBySubmitter(Context context, EPerson ep) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery<Long> criteriaQuery = criteriaBuilder.createQuery(Long.class);
+        Root<XmlWorkflowItem> xmlWorkflowItemRoot = criteriaQuery.from(XmlWorkflowItem.class);
+        Join<XmlWorkflowItem, Item> join = xmlWorkflowItemRoot.join("item");
+        criteriaQuery.where(criteriaBuilder.equal(join.get(Item_.submitter), ep));
+        return count(context, criteriaQuery, criteriaBuilder, xmlWorkflowItemRoot);
     }
 
     @Override
