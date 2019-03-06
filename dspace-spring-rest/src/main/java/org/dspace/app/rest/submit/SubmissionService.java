@@ -43,7 +43,6 @@ import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.Utils;
-import org.dspace.event.Event;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.RequestService;
 import org.dspace.services.model.Request;
@@ -74,7 +73,7 @@ public class SubmissionService {
     @Autowired
     protected WorkspaceItemService workspaceItemService;
     @Autowired
-    protected WorkflowItemService workflowItemService;
+    protected WorkflowItemService<XmlWorkflowItem> workflowItemService;
     @Autowired
     protected WorkflowService<XmlWorkflowItem> workflowService;
     @Autowired
@@ -86,6 +85,17 @@ public class SubmissionService {
     @Autowired(required = true)
     ResourcePolicyConverter aCConverter;
 
+    /**
+     * Create a workspaceitem using the information in the reqest
+     * 
+     * @param context
+     *            the dspace context
+     * @param request
+     *            the request containing the details about the workspace to create
+     * @return
+     * @throws SQLException
+     * @throws AuthorizeException
+     */
     public WorkspaceItem createWorkspaceItem(Context context, Request request) throws SQLException, AuthorizeException {
         WorkspaceItem wsi = null;
         Collection collection = null;
@@ -119,8 +129,6 @@ public class SubmissionService {
             throw new RESTAuthorizationException(ae);
         }
 
-        context.addEvent(new Event(Event.MODIFY, Constants.ITEM, wsi.getItem().getID(), null,
-            itemService.getIdentifiers(context, wsi.getItem())));
         return wsi;
     }
 
@@ -183,11 +191,24 @@ public class SubmissionService {
         return data;
     }
 
+    /**
+     * Create a workflowitem using the information in the reqest
+     * 
+     * @param context
+     *            the dspace context
+     * @param currentRequest
+     *            the request containing the details about the workspace to create
+     * @return
+     * @throws SQLException
+     * @throws AuthorizeException
+     * @throws WorkflowException
+     */
     public XmlWorkflowItem createWorkflowItem(Context context, Request currentRequest)
             throws SQLException, AuthorizeException, WorkflowException {
         Reader reader = null;
         XmlWorkflowItem wi = null;
         try {
+            //FIXME use utility method to extract the ID from the text/uri-list body
             reader = currentRequest.getHttpServletRequest().getReader();
             char[] arr = new char[1024];
             StringBuilder buffer = new StringBuilder();
@@ -202,6 +223,7 @@ public class SubmissionService {
             if (split.length != 2) {
                 throw new RuntimeException("Malformed body..." + buffer);
             }
+            // END FIXME
             WorkspaceItem wsi = workspaceItemService.find(context, Integer.parseInt(split[1]));
 
             if (!workspaceItemConverter.convert(wsi).getErrors().isEmpty()) {
@@ -211,8 +233,6 @@ public class SubmissionService {
 
             wi = workflowService.start(context, wsi);
 
-            context.addEvent(new Event(Event.MODIFY, Constants.ITEM, wi.getItem().getID(), null,
-                    itemService.getIdentifiers(context, wi.getItem())));
         } catch (IOException e) {
             throw new RuntimeException(e.getMessage(), e);
         } finally {

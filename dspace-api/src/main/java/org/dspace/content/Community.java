@@ -11,7 +11,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
 import javax.persistence.Cacheable;
 import javax.persistence.CascadeType;
@@ -27,7 +26,6 @@ import javax.persistence.Transient;
 
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.logging.log4j.Logger;
-import org.dspace.browse.BrowsableDSpaceObject;
 import org.dspace.content.comparator.NameAscendingComparator;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CommunityService;
@@ -51,7 +49,7 @@ import org.hibernate.proxy.HibernateProxyHelper;
 @Table(name = "community")
 @Cacheable
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE, include = "non-lazy")
-public class Community extends DSpaceObject implements DSpaceObjectLegacySupport, BrowsableDSpaceObject<UUID> {
+public class Community extends DSpaceObject implements DSpaceObjectLegacySupport {
     /**
      * log4j category
      */

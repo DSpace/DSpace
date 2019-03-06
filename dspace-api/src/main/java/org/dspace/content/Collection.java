@@ -12,7 +12,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
 import javax.persistence.Cacheable;
 import javax.persistence.CascadeType;
@@ -27,7 +26,6 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.browse.BrowsableDSpaceObject;
 import org.dspace.content.comparator.NameAscendingComparator;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
@@ -55,7 +53,7 @@ import org.hibernate.proxy.HibernateProxyHelper;
 @Table(name = "collection")
 @Cacheable
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE, include = "non-lazy")
-public class Collection extends DSpaceObject implements DSpaceObjectLegacySupport, BrowsableDSpaceObject<UUID> {
+public class Collection extends DSpaceObject implements DSpaceObjectLegacySupport {
 
     @Column(name = "collection_id", insertable = false, updatable = false)
     private Integer legacyId;
@@ -188,14 +186,20 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
         setModified();
     }
 
+    // FIXME this should be moved to the collectionService or completely removed, see also
+    // https://jira.duraspace.org/browse/DS-3041
     public Group getWorkflowStep1(Context context) {
         return getCollectionService().getWorkflowGroup(context, this, 1);
     }
 
+    // FIXME this should be moved to the collectionService or completely removed, see also
+    // https://jira.duraspace.org/browse/DS-3041
     public Group getWorkflowStep2(Context context) {
         return getCollectionService().getWorkflowGroup(context, this, 2);
     }
 
+    // FIXME this should be moved to the collectionService or completely removed, see also
+    // https://jira.duraspace.org/browse/DS-3041
     public Group getWorkflowStep3(Context context) {
         return getCollectionService().getWorkflowGroup(context, this, 3);
     }

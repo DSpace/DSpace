@@ -29,9 +29,9 @@ import org.springframework.stereotype.Component;
  * the authenticated EPerson is allowed to perform the requested action.
  */
 @Component
-public class AdminRestPermissionEvaluatorPlugin extends DSpaceObjectPermissionEvaluatorPlugin {
+public class AdminRestPermissionEvaluatorPlugin extends RestObjectPermissionEvaluatorPlugin {
 
-    private static final Logger log = LoggerFactory.getLogger(DSpaceObjectPermissionEvaluatorPlugin.class);
+    private static final Logger log = LoggerFactory.getLogger(RestObjectPermissionEvaluatorPlugin.class);
 
     @Autowired
     private AuthorizeService authorizeService;

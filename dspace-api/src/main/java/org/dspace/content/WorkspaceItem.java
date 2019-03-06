@@ -28,7 +28,7 @@ import javax.persistence.Table;
 
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.browse.BrowsableDSpaceObject;
+import org.dspace.browse.BrowsableObject;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -47,7 +47,7 @@ import org.hibernate.proxy.HibernateProxyHelper;
 @Entity
 @Table(name = "workspaceitem")
 public class WorkspaceItem
-    implements InProgressSubmission<Integer>, Serializable, ReloadableEntity<Integer>, BrowsableDSpaceObject<Integer> {
+    implements InProgressSubmission<Integer>, Serializable, ReloadableEntity<Integer>, BrowsableObject<Integer> {
 
     @Id
     @Column(name = "workspace_item_id", unique = true, nullable = false)

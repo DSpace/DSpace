@@ -650,17 +650,4 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
      */
     boolean isInProgressSubmission(Context context, Item item) throws SQLException;
 
-    /**
-     * counts all items regardless of their status (workspace, workflow, archived, withdrawn) from a specified submitter
-     *
-     * @param context
-     *            DSpace context object
-     * @param ep
-     *            the eperson to lookup as submitter
-     * @return total items from the ep eperson
-     * @throws SQLException
-     *             if database error
-     */
-    public int countBySubmitter(Context context, EPerson ep) throws SQLException;
-
 }
