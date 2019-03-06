@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
@@ -37,11 +38,9 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.ItemService;
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.EPersonServiceImpl;
-import org.dspace.event.Event;
 import org.dspace.services.ConfigurationService;
 import org.dspace.workflow.WorkflowException;
 import org.dspace.workflow.WorkflowService;
@@ -297,8 +296,6 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
                 throw new ResourceNotFoundException("WorkflowItem ID " + id + " not found");
             }
             wfs.abort(context, witem, context.getCurrentUser());
-            context.addEvent(new Event(Event.MODIFY, Constants.ITEM, witem.getItem().getID(), null,
-                itemService.getIdentifiers(context, witem.getItem())));
         } catch (AuthorizeException e) {
             throw new RESTAuthorizationException(e);
         } catch (SQLException | IOException e) {
