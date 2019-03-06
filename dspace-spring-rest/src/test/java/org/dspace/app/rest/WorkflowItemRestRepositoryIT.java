@@ -30,6 +30,7 @@ import javax.ws.rs.core.MediaType;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.CharEncoding;
 import org.dspace.app.rest.builder.BitstreamBuilder;
+import org.dspace.app.rest.builder.ClaimedTaskBuilder;
 import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.builder.EPersonBuilder;
@@ -50,8 +51,10 @@ import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.eperson.EPerson;
+import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.hamcrest.Matchers;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -154,6 +157,8 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                                       .withIssueDate("2016-02-13")
                                       .build();
 
+        context.restoreAuthSystemState();
+
         String token = getAuthToken(admin.getEmail(), password);
 
         getClient(token).perform(get("/api/workflow/workflowitems").param("size", "2"))
@@ -184,6 +189,57 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
 
     @Test
     /**
+     * The findAll should be available only to admins regardless to having or less a role in the workflow
+     * 
+     * @throws Exception
+     */
+    public void findAllForbiddenTest() throws Exception {
+        context.setCurrentUser(admin);
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
+                .withWorkflowGroup(1, admin).build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2")
+                .withWorkflowGroup(1, eperson).build();
+
+
+        //2. Three workflow items in two different collections
+        XmlWorkflowItem workflowItem1 = WorkflowItemBuilder.createWorkflowItem(context, col1)
+                                      .withTitle("Workflow Item 1")
+                                      .withIssueDate("2017-10-17")
+                                      .build();
+
+        // these two items will be visible individually to the user
+        XmlWorkflowItem workflowItem2 = WorkflowItemBuilder.createWorkflowItem(context, col2)
+                                      .withTitle("Workflow Item 2")
+                                      .withIssueDate("2016-02-13")
+                                      .build();
+
+        XmlWorkflowItem workflowItem3 = WorkflowItemBuilder.createWorkflowItem(context, col2)
+                                      .withTitle("Workflow Item 3")
+                                      .withIssueDate("2016-02-13")
+                                      .build();
+
+        String token = getAuthToken(eperson.getEmail(), password);
+
+        // a normal user cannot access the workflowitems collection endpoint
+        getClient(token).perform(get("/api/workflow/workflowitems"))
+                   .andExpect(status().isForbidden());
+
+        // the workflowitems collection endpoint requires authentication
+        getClient().perform(get("/api/workflow/workflowitems"))
+                   .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    /**
      * The workflowitem resource endpoint must expose the proper structure
      * 
      * @throws Exception
@@ -210,10 +266,147 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                 .withSubject("ExtraEntry")
                 .build();
 
-        getClient().perform(get("/api/workflow/workflowitems/" + witem.getID())).andExpect(status().isOk())
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+
+        getClient(authToken).perform(get("/api/workflow/workflowitems/" + witem.getID())).andExpect(status().isOk())
                 .andExpect(jsonPath("$",
                         Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(witem,
                                 "Workflow Item 1", "2017-10-17", "ExtraEntry"))));
+    }
+
+    @Test
+    /**
+     * The workflowitem resource endpoint should be visible only to member of the corresponding workflow step
+     * 
+     * @throws Exception
+     */
+    public void findOneForbiddenTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        // 1. A community-collection structure with one parent community with sub-community and three collections
+        // (different workflow steps and reviewers).
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        EPerson reviewer1 = EPersonBuilder.createEPerson(context).withEmail("reviewer1@example.com")
+                .withPassword(password).build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
+                .withWorkflowGroup(1, reviewer1).build();
+
+        EPerson reviewer2 = EPersonBuilder.createEPerson(context).withEmail("reviewer2@example.com")
+                .withPassword(password).build();
+
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2")
+                .withWorkflowGroup(2, reviewer2).build();
+
+        EPerson reviewer3 = EPersonBuilder.createEPerson(context).withEmail("reviewer3@example.com")
+                .withPassword(password).build();
+
+        Collection col3 = CollectionBuilder.createCollection(context, child1).withName("Collection 3")
+                .withWorkflowGroup(3, reviewer3).build();
+
+        //2. three workflow items in the three collections (this will lead to pool task)
+        XmlWorkflowItem witem1 = WorkflowItemBuilder.createWorkflowItem(context, col1)
+                .withTitle("Workflow Item 1")
+                .build();
+
+        XmlWorkflowItem witem2 = WorkflowItemBuilder.createWorkflowItem(context, col2)
+                .withTitle("Workflow Item 2")
+                .build();
+
+        XmlWorkflowItem witem3 = WorkflowItemBuilder.createWorkflowItem(context, col3)
+                .withTitle("Workflow Item 3")
+                .build();
+
+        //3. Three claimed tasks (and corresponding workflowitems)
+        ClaimedTask claimed1 = ClaimedTaskBuilder.createClaimedTask(context, col1, reviewer1).withTitle("Pool 1")
+                .build();
+        XmlWorkflowItem wClaimed1 = claimed1.getWorkflowItem();
+
+        ClaimedTask claimed2 = ClaimedTaskBuilder.createClaimedTask(context, col2, reviewer2).withTitle("Pool 2")
+                .build();
+        XmlWorkflowItem wClaimed2 = claimed2.getWorkflowItem();
+
+        ClaimedTask claimed3 = ClaimedTaskBuilder.createClaimedTask(context, col3, reviewer3).withTitle("Pool 3")
+                .build();
+        XmlWorkflowItem wClaimed3 = claimed3.getWorkflowItem();
+
+        context.restoreAuthSystemState();
+
+        String rev1Token = getAuthToken(reviewer1.getEmail(), password);
+        String rev2Token = getAuthToken(reviewer2.getEmail(), password);
+        String rev3Token = getAuthToken(reviewer3.getEmail(), password);
+
+        // anonymous users should be unable to see workflowitem regardless to their workflow status (pool/claimed)
+        getClient().perform(get("/api/workflow/workflowitems/" + witem1.getID()))
+                .andExpect(status().isUnauthorized());
+
+        getClient().perform(get("/api/workflow/workflowitems/" + claimed1.getID()))
+                .andExpect(status().isUnauthorized());
+
+        // reviewer 1 should be able to access only the first workflow item of each group
+        getClient(rev1Token).perform(get("/api/workflow/workflowitems/" + witem1.getID()))
+                .andExpect(status().isOk());
+
+        getClient(rev1Token).perform(get("/api/workflow/workflowitems/" + witem2.getID()))
+                .andExpect(status().isForbidden());
+
+        getClient(rev1Token).perform(get("/api/workflow/workflowitems/" + witem3.getID()))
+                .andExpect(status().isForbidden());
+
+        getClient(rev1Token).perform(get("/api/workflow/workflowitems/" + wClaimed1.getID()))
+                .andExpect(status().isOk());
+
+        getClient(rev1Token).perform(get("/api/workflow/workflowitems/" + wClaimed2.getID()))
+                .andExpect(status().isForbidden());
+
+        getClient(rev1Token).perform(get("/api/workflow/workflowitems/" + wClaimed3.getID()))
+                .andExpect(status().isForbidden());
+
+        // reviewer 2 should be able to access only the second workflow item of each group
+        getClient(rev2Token).perform(get("/api/workflow/workflowitems/" + witem1.getID()))
+                .andExpect(status().isForbidden());
+
+        getClient(rev2Token).perform(get("/api/workflow/workflowitems/" + witem2.getID()))
+                .andExpect(status().isOk());
+
+        getClient(rev2Token).perform(get("/api/workflow/workflowitems/" + witem3.getID()))
+                .andExpect(status().isForbidden());
+
+        getClient(rev2Token).perform(get("/api/workflow/workflowitems/" + wClaimed1.getID()))
+                .andExpect(status().isForbidden());
+
+        getClient(rev2Token).perform(get("/api/workflow/workflowitems/" + wClaimed2.getID()))
+                .andExpect(status().isOk());
+
+        getClient(rev2Token).perform(get("/api/workflow/workflowitems/" + wClaimed3.getID()))
+                .andExpect(status().isForbidden());
+
+        // reviewer 3 should be able to access only the third workflow item of each group
+        getClient(rev3Token).perform(get("/api/workflow/workflowitems/" + witem1.getID()))
+                .andExpect(status().isForbidden());
+
+        getClient(rev3Token).perform(get("/api/workflow/workflowitems/" + witem2.getID()))
+                .andExpect(status().isForbidden());
+
+        getClient(rev3Token).perform(get("/api/workflow/workflowitems/" + witem3.getID()))
+                .andExpect(status().isOk());
+
+        getClient(rev3Token).perform(get("/api/workflow/workflowitems/" + wClaimed1.getID()))
+                .andExpect(status().isForbidden());
+
+        getClient(rev3Token).perform(get("/api/workflow/workflowitems/" + wClaimed2.getID()))
+                .andExpect(status().isForbidden());
+
+        getClient(rev3Token).perform(get("/api/workflow/workflowitems/" + wClaimed3.getID()))
+                .andExpect(status().isOk());
     }
 
     @Test
@@ -244,16 +437,21 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                 .withSubject("ExtraEntry")
                 .build();
 
-        getClient().perform(get("/api/workflow/workflowitems/" + witem.getID() + "/collection"))
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+
+        getClient(authToken).perform(get("/api/workflow/workflowitems/" + witem.getID() + "/collection"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", Matchers
                         .is(CollectionMatcher.matchCollectionEntry(col1.getName(), col1.getID(), col1.getHandle()))));
 
-        getClient().perform(get("/api/workflow/workflowitems/" + witem.getID() + "/item")).andExpect(status().isOk())
+        getClient(authToken).perform(get("/api/workflow/workflowitems/" + witem.getID() + "/item"))
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("$", Matchers.is(ItemMatcher.matchItemWithTitleAndDateIssued(witem.getItem(),
                         "Workflow Item 1", "2017-10-17"))));
 
-        getClient().perform(get("/api/workflow/workflowitems/" + witem.getID() + "/submissionDefinition"))
+        getClient(authToken).perform(get("/api/workflow/workflowitems/" + witem.getID() + "/submissionDefinition"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", Matchers.is(hasJsonPath("$.id", is("traditional")))));
 
@@ -327,6 +525,8 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                                       .withTitle("Workflow Item 3")
                                       .withIssueDate("2016-02-13")
                                       .build();
+
+        context.restoreAuthSystemState();
 
         // use our admin to retrieve all the workspace by submitter
         String token = getAuthToken(admin.getEmail(), password);
@@ -414,8 +614,6 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
 
         Item item = witem.getItem();
 
-        String tokenSubmitter = getAuthToken(submitter.getEmail(), "dspace");
-
         //Add a bitstream to the item
         String bitstreamContent = "ThisIsSomeDummyText";
         Bitstream bitstream = null;
@@ -426,8 +624,10 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                     .withMimeType("text/plain").build();
         }
 
-        String token = getAuthToken(admin.getEmail(), password);
         context.restoreAuthSystemState();
+
+        String token = getAuthToken(admin.getEmail(), password);
+        String tokenSubmitter = getAuthToken(submitter.getEmail(), "dspace");
 
         // Delete the workflowitem
         getClient(token).perform(delete("/api/workflow/workflowitems/" + witem.getID()))
@@ -491,6 +691,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                     .withTitle("Submission Item")
                     .withIssueDate("2017-10-17")
                     .build();
+
             context.restoreAuthSystemState();
 
             // get the submitter auth token
@@ -507,7 +708,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                     .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
 
             // check that the workflowitem is persisted
-            getClient().perform(get("/api/workflow/workflowitems/" + idRef.get())).andExpect(status().isOk())
+            getClient(authToken).perform(get("/api/workflow/workflowitems/" + idRef.get())).andExpect(status().isOk())
                     .andExpect(jsonPath("$",
                             Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssued(null,
                                     "Submission Item", "2017-10-17"))));
@@ -531,7 +732,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                                           .withName("Parent Community")
                                           .build();
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1")
-                .withWorkflowGroup(1, admin).build();
+                .withWorkflowGroup(1, eperson).build();
 
         //2. create a normal user to use as submitter
         EPerson submitter = EPersonBuilder.createEPerson(context)
@@ -551,17 +752,18 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
         XmlWorkflowItem witemMissingFields = WorkflowItemBuilder.createWorkflowItem(context, col1)
                 .withTitle("Workflow Item 1")
                 .build();
-        String authToken = getAuthToken(admin.getEmail(), password);
+
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
 
         getClient(authToken).perform(get("/api/workflow/worfklowitems/" + witem.getID()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status", is(true)))
                 .andExpect(jsonPath("$.errors").doesNotExist())
         ;
 
         getClient(authToken).perform(get("/api/workflow/worfklowitems/" + witemMissingFields.getID()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status", is(false)))
                 .andExpect(jsonPath("$.errors[?(@.message=='error.validation.required')]",
                         Matchers.contains(
                                 hasJsonPath("$.paths", Matchers.contains(
@@ -585,7 +787,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                                           .withName("Parent Community")
                                           .build();
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1")
-                .withWorkflowGroup(1, admin).build();
+                .withWorkflowGroup(2, eperson).build();
 
         //2. create a normal user to use as submitter
         EPerson submitter = EPersonBuilder.createEPerson(context)
@@ -602,7 +804,9 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                 .withSubject("ExtraEntry")
                 .build();
 
-        String authToken = getAuthToken(admin.getEmail(), password);
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
 
         // a simple patch to update an existent metadata
         List<Operation> updateTitle = new ArrayList<Operation>();
@@ -616,7 +820,6 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
             .content(patchBody)
             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                         .andExpect(status().isOk())
-                        .andExpect(jsonPath("$.status", is(true)))
                         .andExpect(jsonPath("$.errors").doesNotExist())
                         .andExpect(jsonPath("$",
                                 // check the new title and untouched values
@@ -625,9 +828,133 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
         ;
 
         // verify that the patch changes have been persisted
-        getClient().perform(get("/api/workflow/workflowitems/" + witem.getID()))
+        getClient(authToken).perform(get("/api/workflow/workflowitems/" + witem.getID()))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.status", is(true)))
+            .andExpect(jsonPath("$.errors").doesNotExist())
+            .andExpect(jsonPath("$",
+                    Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(witem,
+                            "New Title", "2017-10-17", "ExtraEntry"))))
+        ;
+    }
+
+    @Test
+    @Ignore(value = "This demonstrate the bug logged in DS-4179")
+    /**
+     * Verify that update of metadata is forbidden in step 1.
+     *
+     * @throws Exception
+     */
+    public void patchUpdateMetadataStep1ForbiddenTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community with one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1")
+                .withWorkflowGroup(1, eperson).build();
+
+        //2. create a normal user to use as submitter
+        EPerson submitter = EPersonBuilder.createEPerson(context)
+                .withEmail("submitter@example.com")
+                .withPassword("dspace")
+                .build();
+
+        context.setCurrentUser(submitter);
+
+        //3. a workflow item
+        XmlWorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
+                .withTitle("Workflow Item 1")
+                .withIssueDate("2017-10-17")
+                .withSubject("ExtraEntry")
+                .build();
+
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+
+        // a simple patch to update an existent metadata
+        List<Operation> updateTitle = new ArrayList<Operation>();
+        Map<String, String> value = new HashMap<String, String>();
+        value.put("value", "New Title");
+        updateTitle.add(new ReplaceOperation("/sections/traditionalpageone/dc.title/0", value));
+
+        String patchBody = getPatchContent(updateTitle);
+
+        getClient(authToken).perform(patch("/api/workflow/workflowitems/" + witem.getID())
+            .content(patchBody)
+            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                        .andExpect(status().isForbidden())
+        ;
+
+        // verify that the patch changes have been rejected
+        getClient(authToken).perform(get("/api/workflow/workflowitems/" + witem.getID()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$",
+                    Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(witem,
+                            "New Title", "2017-10-17", "ExtraEntry"))))
+        ;
+    }
+
+    @Test
+    /**
+     * Test the update of metadata in step3
+     *
+     * @throws Exception
+     */
+    public void patchUpdateMetadataStep3Test() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community with one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1")
+                .withWorkflowGroup(3, eperson).build();
+
+        //2. create a normal user to use as submitter
+        EPerson submitter = EPersonBuilder.createEPerson(context)
+                .withEmail("submitter@example.com")
+                .withPassword("dspace")
+                .build();
+
+        context.setCurrentUser(submitter);
+
+        //3. a workflow item
+        XmlWorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
+                .withTitle("Workflow Item 1")
+                .withIssueDate("2017-10-17")
+                .withSubject("ExtraEntry")
+                .build();
+
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+
+        // a simple patch to update an existent metadata
+        List<Operation> updateTitle = new ArrayList<Operation>();
+        Map<String, String> value = new HashMap<String, String>();
+        value.put("value", "New Title");
+        updateTitle.add(new ReplaceOperation("/sections/traditionalpageone/dc.title/0", value));
+
+        String patchBody = getPatchContent(updateTitle);
+
+        getClient(authToken).perform(patch("/api/workflow/workflowitems/" + witem.getID())
+            .content(patchBody)
+            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.errors").doesNotExist())
+                        .andExpect(jsonPath("$",
+                                // check the new title and untouched values
+                                Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(witem,
+                                        "New Title", "2017-10-17", "ExtraEntry"))))
+        ;
+
+        // verify that the patch changes have been persisted
+        getClient(authToken).perform(get("/api/workflow/workflowitems/" + witem.getID()))
+            .andExpect(status().isOk())
             .andExpect(jsonPath("$.errors").doesNotExist())
             .andExpect(jsonPath("$",
                     Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(witem,
@@ -650,7 +977,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                                           .withName("Parent Community")
                                           .build();
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1")
-                .withWorkflowGroup(1, admin).build();
+                .withWorkflowGroup(1, eperson).build();
 
         //2. create a normal user to use as submitter
         EPerson submitter = EPersonBuilder.createEPerson(context)
@@ -685,7 +1012,9 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                 .withSubject("Subject4")
                 .build();
 
-        String authToken = getAuthToken(admin.getEmail(), password);
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
         // try to remove the title
         List<Operation> removeTitle = new ArrayList<Operation>();
         removeTitle.add(new RemoveOperation("/sections/traditionalpageone/dc.title/0"));
@@ -695,7 +1024,6 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                 .content(patchBody)
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                             .andExpect(status().isOk())
-                            .andExpect(jsonPath("$.status", is(false)))
                             .andExpect(jsonPath("$.errors[?(@.message=='error.validation.required')]",
                                 Matchers.contains(hasJsonPath("$.paths",
                                         Matchers.contains(
@@ -708,9 +1036,8 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
         ;
 
         // verify that the patch changes have been persisted
-        getClient().perform(get("/api/workflow/workflowitems/" + witem.getID()))
+        getClient(authToken).perform(get("/api/workflow/workflowitems/" + witem.getID()))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.status", is(false)))
             .andExpect(jsonPath("$.errors[?(@.message=='error.validation.required')]",
                     Matchers.contains(
                             hasJsonPath("$.paths", Matchers.contains(
@@ -730,7 +1057,6 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                 .content(patchBody)
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                             .andExpect(status().isOk())
-                            .andExpect(jsonPath("$.status", is(true)))
                             .andExpect(jsonPath("$.errors").doesNotExist())
                             .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject'][0].value", is("Subject1")))
                             .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject'][1].value", is("Subject3")))
@@ -738,9 +1064,8 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
         ;
 
         // verify that the patch changes have been persisted
-        getClient().perform(get("/api/workflow/workflowitems/" + witemMultipleSubjects.getID()))
+        getClient(authToken).perform(get("/api/workflow/workflowitems/" + witemMultipleSubjects.getID()))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.status", is(true)))
             .andExpect(jsonPath("$.errors").doesNotExist())
             .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject'][0].value", is("Subject1")))
             .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject'][1].value", is("Subject3")))
@@ -755,16 +1080,14 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                 .content(patchBody)
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                             .andExpect(status().isOk())
-                            .andExpect(jsonPath("$.status", is(true)))
                             .andExpect(jsonPath("$.errors").doesNotExist())
                             .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject'][0].value", is("Subject3")))
                             .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject'][1].value", is("Subject4")))
         ;
 
         // verify that the patch changes have been persisted
-        getClient().perform(get("/api/workflow/workflowitems/" + witemMultipleSubjects.getID()))
+        getClient(authToken).perform(get("/api/workflow/workflowitems/" + witemMultipleSubjects.getID()))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.status", is(true)))
             .andExpect(jsonPath("$.errors").doesNotExist())
             .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject'][0].value", is("Subject3")))
             .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject'][1].value", is("Subject4")))
@@ -778,15 +1101,13 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                 .content(patchBody)
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status", is(true)))
                 .andExpect(jsonPath("$.errors").doesNotExist())
                 .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject'][0].value", is("Subject3")))
         ;
 
         // verify that the patch changes have been persisted
-        getClient().perform(get("/api/workflow/workflowitems/" + witemMultipleSubjects.getID()))
+        getClient(authToken).perform(get("/api/workflow/workflowitems/" + witemMultipleSubjects.getID()))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.status", is(true)))
             .andExpect(jsonPath("$.errors").doesNotExist())
             .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject'][0].value", is("Subject3")))
         ;
@@ -799,15 +1120,13 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                 .content(patchBody)
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                             .andExpect(status().isOk())
-                            .andExpect(jsonPath("$.status", is(true)))
                             .andExpect(jsonPath("$.errors").doesNotExist())
                             .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject']").doesNotExist())
         ;
 
         // verify that the patch changes have been persisted
-        getClient().perform(get("/api/workflow/workflowitems/" + witemMultipleSubjects.getID()))
+        getClient(authToken).perform(get("/api/workflow/workflowitems/" + witemMultipleSubjects.getID()))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.status", is(true)))
             .andExpect(jsonPath("$.errors").doesNotExist())
             .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject']").doesNotExist())
         ;
@@ -821,15 +1140,13 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                 .content(patchBody)
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                             .andExpect(status().isOk())
-                            .andExpect(jsonPath("$.status", is(true)))
                             .andExpect(jsonPath("$.errors").doesNotExist())
                             .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject']").doesNotExist())
         ;
 
         // verify that the patch changes have been persisted
-        getClient().perform(get("/api/workflow/workflowitems/" + witemWithTitleDateAndSubjects.getID()))
+        getClient(authToken).perform(get("/api/workflow/workflowitems/" + witemWithTitleDateAndSubjects.getID()))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.status", is(true)))
             .andExpect(jsonPath("$.errors").doesNotExist())
             .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject']").doesNotExist())
         ;
@@ -850,7 +1167,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                                           .withName("Parent Community")
                                           .build();
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1")
-                .withWorkflowGroup(1, admin).build();
+                .withWorkflowGroup(1, eperson).build();
 
         //2. create a normal user to use as submitter
         EPerson submitter = EPersonBuilder.createEPerson(context)
@@ -866,7 +1183,9 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                 .withSubject("ExtraEntry")
                 .build();
 
-        String authToken = getAuthToken(admin.getEmail(), password);
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
         // try to add the title
         List<Operation> addTitle = new ArrayList<Operation>();
         // create a list of values to use in add operation
@@ -881,7 +1200,6 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                 .content(patchBody)
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                             .andExpect(status().isOk())
-                            .andExpect(jsonPath("$.status", is(true)))
                             .andExpect(jsonPath("$.errors").doesNotExist())
                             .andExpect(jsonPath("$",
                                     // check if the new title if back and the other values untouched
@@ -890,9 +1208,8 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
         ;
 
         // verify that the patch changes have been persisted
-        getClient().perform(get("/api/workflow/workflowitems/" + witem.getID()))
+        getClient(authToken).perform(get("/api/workflow/workflowitems/" + witem.getID()))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.status", is(true)))
             .andExpect(jsonPath("$.errors").doesNotExist())
             .andExpect(jsonPath("$",
                     Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(witem,
@@ -915,7 +1232,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                                           .withName("Parent Community")
                                           .build();
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1")
-                .withWorkflowGroup(1, admin).build();
+                .withWorkflowGroup(1, eperson).build();
 
         //2. create a normal user to use as submitter
         EPerson submitter = EPersonBuilder.createEPerson(context)
@@ -931,7 +1248,9 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                 .withIssueDate("2017-10-17")
                 .build();
 
-        String authToken = getAuthToken(admin.getEmail(), password);
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
 
         // try to add multiple subjects at once
         List<Operation> addSubjects = new ArrayList<Operation>();
@@ -951,7 +1270,6 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                 .content(patchBody)
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                             .andExpect(status().isOk())
-                            .andExpect(jsonPath("$.status", is(true)))
                             .andExpect(jsonPath("$.errors").doesNotExist())
                             .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject'][0].value",
                                     is("Subject1")))
@@ -960,9 +1278,8 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
         ;
 
         // verify that the patch changes have been persisted
-        getClient().perform(get("/api/workflow/workflowitems/" + witem.getID()))
+        getClient(authToken).perform(get("/api/workflow/workflowitems/" + witem.getID()))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.status", is(true)))
             .andExpect(jsonPath("$.errors").doesNotExist())
             .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject'][0].value", is("Subject1")))
             .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject'][1].value", is("Subject2")))
@@ -980,7 +1297,6 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                 .content(patchBody)
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                             .andExpect(status().isOk())
-                            .andExpect(jsonPath("$.status", is(true)))
                             .andExpect(jsonPath("$.errors").doesNotExist())
                             .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject'][0].value",
                                     is("First Subject")))
@@ -991,9 +1307,8 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
         ;
 
         // verify that the patch changes have been persisted
-        getClient().perform(get("/api/workflow/workflowitems/" + witem.getID()))
+        getClient(authToken).perform(get("/api/workflow/workflowitems/" + witem.getID()))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.status", is(true)))
             .andExpect(jsonPath("$.errors").doesNotExist())
             .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject'][0].value", is("First Subject")))
             .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject'][1].value", is("Subject1")))
@@ -1012,7 +1327,6 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                 .content(patchBody)
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                             .andExpect(status().isOk())
-                            .andExpect(jsonPath("$.status", is(true)))
                             .andExpect(jsonPath("$.errors").doesNotExist())
                             .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject'][0].value",
                                     is("First Subject")))
@@ -1025,9 +1339,8 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
         ;
 
         // verify that the patch changes have been persisted
-        getClient().perform(get("/api/workflow/workflowitems/" + witem.getID()))
+        getClient(authToken).perform(get("/api/workflow/workflowitems/" + witem.getID()))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.status", is(true)))
             .andExpect(jsonPath("$.errors").doesNotExist())
             .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject'][0].value", is("First Subject")))
             .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject'][1].value", is("Subject1")))
@@ -1047,7 +1360,6 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                 .content(patchBody)
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                             .andExpect(status().isOk())
-                            .andExpect(jsonPath("$.status", is(true)))
                             .andExpect(jsonPath("$.errors").doesNotExist())
                             .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject'][0].value",
                                     is("First Subject")))
@@ -1062,9 +1374,8 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
         ;
 
         // verify that the patch changes have been persisted
-        getClient().perform(get("/api/workflow/workflowitems/" + witem.getID()))
+        getClient(authToken).perform(get("/api/workflow/workflowitems/" + witem.getID()))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.status", is(true)))
             .andExpect(jsonPath("$.errors").doesNotExist())
             .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject'][0].value", is("First Subject")))
             .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject'][1].value", is("Subject1")))
@@ -1085,7 +1396,6 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                 .content(patchBody)
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                             .andExpect(status().isOk())
-                            .andExpect(jsonPath("$.status", is(true)))
                             .andExpect(jsonPath("$.errors").doesNotExist())
                             .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject'][0].value",
                                     is("First Subject")))
@@ -1102,9 +1412,8 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
         ;
 
         // verify that the patch changes have been persisted
-        getClient().perform(get("/api/workflow/workflowitems/" + witem.getID()))
+        getClient(authToken).perform(get("/api/workflow/workflowitems/" + witem.getID()))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.status", is(true)))
             .andExpect(jsonPath("$.errors").doesNotExist())
             .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject'][0].value", is("First Subject")))
             .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject'][1].value", is("Subject1")))

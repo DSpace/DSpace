@@ -7,7 +7,7 @@
  */
 package org.dspace.app.rest.converter;
 
-import org.dspace.browse.BrowsableDSpaceObject;
+import org.dspace.browse.BrowsableObject;
 
 /**
  * This is the base converter from/to objects in the DSpace API data model and
@@ -17,7 +17,7 @@ import org.dspace.browse.BrowsableDSpaceObject;
  * @param <R> the Class in the DSpace REST data model
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
-public abstract class BrowsableDSpaceObjectConverter<M extends BrowsableDSpaceObject,
+public abstract class BrowsableDSpaceObjectConverter<M extends BrowsableObject,
     R extends org.dspace.app.rest.model.RestAddressableModel> extends DSpaceConverter<M, R> {
 
     /**
@@ -26,6 +26,6 @@ public abstract class BrowsableDSpaceObjectConverter<M extends BrowsableDSpaceOb
      *            the browsableDSpaceObject to check
      * @return true if the actual converter implementation is able to manage the supplied BrowsableDSpaceObject
      */
-    public abstract boolean supportsModel(BrowsableDSpaceObject bdso);
+    public abstract boolean supportsModel(BrowsableObject bdso);
 
 }

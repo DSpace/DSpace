@@ -21,7 +21,7 @@ import org.dspace.core.Constants;
  * @param <PK>
  *            the Class of the primary key
  */
-public interface BrowsableDSpaceObject<PK extends Serializable> {
+public interface BrowsableObject<PK extends Serializable> {
     Map<String, Object> extraInfo = new HashMap<String, Object>();
 
     /**

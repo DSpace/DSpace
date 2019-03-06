@@ -23,7 +23,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-import org.dspace.browse.BrowsableDSpaceObject;
+import org.dspace.browse.BrowsableObject;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.ReloadableEntity;
@@ -40,7 +40,7 @@ import org.dspace.eperson.Group;
  */
 @Entity
 @Table(name = "cwf_pooltask")
-public class PoolTask implements ReloadableEntity<Integer>, BrowsableDSpaceObject<Integer> {
+public class PoolTask implements ReloadableEntity<Integer>, BrowsableObject<Integer> {
 
     @Transient
     public transient Map<String, Object> extraInfo = new HashMap<String, Object>();

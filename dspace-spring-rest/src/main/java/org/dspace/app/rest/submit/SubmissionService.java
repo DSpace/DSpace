@@ -74,7 +74,7 @@ public class SubmissionService {
     @Autowired
     protected WorkspaceItemService workspaceItemService;
     @Autowired
-    protected WorkflowItemService workflowItemService;
+    protected WorkflowItemService<XmlWorkflowItem> workflowItemService;
     @Autowired
     protected WorkflowService<XmlWorkflowItem> workflowService;
     @Autowired
@@ -86,6 +86,17 @@ public class SubmissionService {
     @Autowired(required = true)
     ResourcePolicyConverter aCConverter;
 
+    /**
+     * Create a workspaceitem using the information in the reqest
+     * 
+     * @param context
+     *            the dspace context
+     * @param request
+     *            the request containing the details about the workspace to create
+     * @return
+     * @throws SQLException
+     * @throws AuthorizeException
+     */
     public WorkspaceItem createWorkspaceItem(Context context, Request request) throws SQLException, AuthorizeException {
         WorkspaceItem wsi = null;
         Collection collection = null;
@@ -183,6 +194,18 @@ public class SubmissionService {
         return data;
     }
 
+    /**
+     * Create a workflowitem using the information in the reqest
+     * 
+     * @param context
+     *            the dspace context
+     * @param currentRequest
+     *            the request containing the details about the workspace to create
+     * @return
+     * @throws SQLException
+     * @throws AuthorizeException
+     * @throws WorkflowException
+     */
     public XmlWorkflowItem createWorkflowItem(Context context, Request currentRequest)
             throws SQLException, AuthorizeException, WorkflowException {
         Reader reader = null;
