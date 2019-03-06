@@ -15,10 +15,21 @@ public class AcceptRoleOrNotAdmin extends ClaimAction {
 	 * an upper community,then evaluate if exists users that can handle the actions of the current step.
 	 */
 	public boolean isValidUserSelection(Context ctx, XmlWorkflowItem wfi, boolean hasUI) throws WorkflowConfigurationException, SQLException {
+		boolean authsIsTurnedOff = ctx.ignoreAuthorization();
+		//If authorizaton system was initially turned off, then restore it...
+		if(authsIsTurnedOff) {
+			ctx.restoreAuthSystemState();
+		}
+		boolean isValid;
 		if (isUserMemberInStepRole(ctx,wfi) || !AuthorizeManager.isAdmin(ctx, wfi.getCollection()))
-			return super.isValidUserSelection(ctx, wfi, hasUI);
+			isValid = super.isValidUserSelection(ctx, wfi, hasUI);
 		else
-			return false;
+			isValid = false;
+		//Finally, if authorizaton system was initially turned off, then turn off again...
+		if(authsIsTurnedOff) {
+			ctx.turnOffAuthorisationSystem();
+		}
+		return isValid;
 	}
 	/*
 	 * @return true if current user is member of the role configured for the current step. 
