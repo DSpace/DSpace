@@ -10,7 +10,7 @@ package org.dspace.content.factory;
 import java.io.Serializable;
 import java.util.List;
 
-import org.dspace.browse.BrowsableDSpaceObject;
+import org.dspace.browse.BrowsableObject;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.content.WorkspaceItem;
@@ -103,7 +103,7 @@ public abstract class ContentServiceFactory {
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends BrowsableDSpaceObject<PK>, PK extends Serializable> BrowsableObjectService<T, PK>
+    public <T extends BrowsableObject<PK>, PK extends Serializable> BrowsableObjectService<T, PK>
         getBrowsableDSpaceObjectService(int type) {
         for (int i = 0; i < getBrowsableDSpaceObjectServices().size(); i++) {
             BrowsableObjectService objectService = getBrowsableDSpaceObjectServices().get(i);

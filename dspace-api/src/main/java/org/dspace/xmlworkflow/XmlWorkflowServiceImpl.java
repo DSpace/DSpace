@@ -50,6 +50,7 @@ import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
+import org.dspace.event.Event;
 import org.dspace.handle.service.HandleService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.usage.UsageWorkflowEvent;
@@ -218,6 +219,8 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
             // remove the WorkspaceItem
             workspaceItemService.deleteWrapper(context, wsi);
             context.restoreAuthSystemState();
+            context.addEvent(new Event(Event.MODIFY, Constants.ITEM, wfi.getItem().getID(), null,
+                    itemService.getIdentifiers(context, wfi.getItem())));
             return wfi;
         } catch (WorkflowConfigurationException e) {
             throw new WorkflowException(e);
@@ -312,6 +315,8 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
             Step currentStep = currentActionConfig.getStep();
             if (currentActionConfig.getProcessingAction().isAuthorized(c, request, wi)) {
                 ActionResult outcome = currentActionConfig.getProcessingAction().execute(c, wi, currentStep, request);
+                c.addEvent(new Event(Event.MODIFY, Constants.ITEM, wi.getItem().getID(), null,
+                        itemService.getIdentifiers(c, wi.getItem())));
                 return processOutcome(c, user, workflow, currentStep, currentActionConfig, outcome, wi, false);
             } else {
                 throw new AuthorizeException("You are not allowed to to perform this task.");
@@ -924,6 +929,8 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
             + "collection_id=" + wi.getCollection().getID() + "eperson_id="
             + e.getID()));
 
+        c.addEvent(new Event(Event.MODIFY, Constants.ITEM, wsi.getItem().getID(), null,
+                itemService.getIdentifiers(c, wsi.getItem())));
 
         c.restoreAuthSystemState();
         return wsi;

@@ -442,12 +442,14 @@ public class RestResourceController implements InitializingBean {
      * @param id
      * @return
      * @throws HttpRequestMethodNotSupportedException
+     * @throws IOException
+     * @throws SQLException
      */
     @RequestMapping(method = RequestMethod.POST, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_DIGIT, headers =
         "content-type=application/x-www-form-urlencoded")
     public ResponseEntity<ResourceSupport> action(HttpServletRequest request, @PathVariable String apiCategory,
                                                   @PathVariable String model, @PathVariable Integer id)
-        throws HttpRequestMethodNotSupportedException {
+        throws HttpRequestMethodNotSupportedException, SQLException, IOException {
         checkModelPluralForm(apiCategory, model);
         DSpaceRestRepository<RestAddressableModel, Integer> repository =
             utils.getResourceRepository(apiCategory, model);
@@ -458,9 +460,6 @@ public class RestResourceController implements InitializingBean {
         } catch (UnprocessableEntityException e) {
             log.error(e.getMessage(), e);
             return ControllerUtils.toEmptyResponse(HttpStatus.UNPROCESSABLE_ENTITY);
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return ControllerUtils.toEmptyResponse(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         if (modelObject != null) {

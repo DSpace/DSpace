@@ -126,8 +126,8 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
     @Override
     public Iterator<Item> findByMetadataField(Context context, MetadataField metadataField, String value,
                                               boolean inArchive) throws SQLException {
-        String hqlQueryString = "SELECT item FROM Item as item join item.metadata metadatavalue WHERE item" +
-            ".inArchive=:in_archive AND metadatavalue.metadataField = :metadata_field";
+        String hqlQueryString = "SELECT item FROM Item as item join item.metadata metadatavalue " +
+                "WHERE item.inArchive=:in_archive AND metadatavalue.metadataField = :metadata_field";
         if (value != null) {
             hqlQueryString += " AND STR(metadatavalue.value) = :text_value";
         }
@@ -257,9 +257,9 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
     public Iterator<Item> findByAuthorityValue(Context context, MetadataField metadataField, String authority,
                                                boolean inArchive) throws SQLException {
         Query query = createQuery(context,
-                                  "SELECT item FROM Item as item join item.metadata metadatavalue WHERE item" +
-                                      ".inArchive=:in_archive AND metadatavalue.metadataField = :metadata_field AND " +
-                                      "metadatavalue.authority = :authority");
+                  "SELECT item FROM Item as item join item.metadata metadatavalue " +
+                  "WHERE item.inArchive=:in_archive AND metadatavalue.metadataField = :metadata_field AND " +
+                      "metadatavalue.authority = :authority");
         query.setParameter("in_archive", inArchive);
         query.setParameter("metadata_field", metadataField);
         query.setParameter("authority", authority);
@@ -270,8 +270,8 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
     public Iterator<Item> findArchivedByCollection(Context context, Collection collection, Integer limit,
                                                    Integer offset) throws SQLException {
         Query query = createQuery(context,
-                                  "select i from Item i join i.collections c WHERE :collection IN c AND i" +
-                                      ".inArchive=:in_archive");
+              "select i from Item i join i.collections c " +
+              "WHERE :collection IN c AND i.inArchive=:in_archive");
         query.setParameter("collection", collection);
         query.setParameter("in_archive", true);
         if (offset != null) {
@@ -311,8 +311,8 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
     public int countItems(Context context, Collection collection, boolean includeArchived, boolean includeWithdrawn)
         throws SQLException {
         Query query = createQuery(context,
-                                  "select count(i) from Item i join i.collections c WHERE :collection IN c AND i" +
-                                      ".inArchive=:in_archive AND i.withdrawn=:withdrawn");
+              "select count(i) from Item i join i.collections c " +
+              "WHERE :collection IN c AND i.inArchive=:in_archive AND i.withdrawn=:withdrawn");
         query.setParameter("collection", collection);
         query.setParameter("in_archive", includeArchived);
         query.setParameter("withdrawn", includeWithdrawn);
@@ -352,8 +352,8 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
     @Override
     public int countItems(Context context, boolean includeArchived, boolean includeWithdrawn) throws SQLException {
         Query query = createQuery(context,
-                                  "SELECT count(*) FROM Item i WHERE i.inArchive=:in_archive AND i" +
-                                      ".withdrawn=:withdrawn");
+                "SELECT count(*) FROM Item i " +
+                "WHERE i.inArchive=:in_archive AND i.withdrawn=:withdrawn");
         query.setParameter("in_archive", includeArchived);
         query.setParameter("withdrawn", includeWithdrawn);
         return count(query);
@@ -363,8 +363,8 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
     public int countItems(Context context, EPerson submitter, boolean includeArchived, boolean includeWithdrawn)
         throws SQLException {
         Query query = createQuery(context,
-                                  "SELECT count(*) FROM Item i join i.submitter submitter WHERE i" +
-                                      ".inArchive=:in_archive AND i.withdrawn=:withdrawn AND submitter = :submitter");
+                "SELECT count(*) FROM Item i join i.submitter submitter " +
+                "WHERE i.inArchive=:in_archive AND i.withdrawn=:withdrawn AND submitter = :submitter");
         query.setParameter("submitter", submitter);
         query.setParameter("in_archive", includeArchived);
         query.setParameter("withdrawn", includeWithdrawn);

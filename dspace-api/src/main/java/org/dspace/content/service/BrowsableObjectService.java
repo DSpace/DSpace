@@ -10,7 +10,7 @@ package org.dspace.content.service;
 import java.io.Serializable;
 import java.sql.SQLException;
 
-import org.dspace.browse.BrowsableDSpaceObject;
+import org.dspace.browse.BrowsableObject;
 import org.dspace.core.Context;
 
 /**
@@ -21,7 +21,7 @@ import org.dspace.core.Context;
  * @param <T> class type
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
-public interface BrowsableObjectService<T extends BrowsableDSpaceObject<PK>, PK extends Serializable> {
+public interface BrowsableObjectService<T extends BrowsableObject<PK>, PK extends Serializable> {
 
 
     /**

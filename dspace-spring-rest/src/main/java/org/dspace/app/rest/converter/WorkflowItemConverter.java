@@ -21,7 +21,7 @@ import org.dspace.app.rest.submit.SubmissionService;
 import org.dspace.app.util.SubmissionConfigReader;
 import org.dspace.app.util.SubmissionConfigReaderException;
 import org.dspace.app.util.SubmissionStepConfig;
-import org.dspace.browse.BrowsableDSpaceObject;
+import org.dspace.browse.BrowsableObject;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.eperson.EPerson;
@@ -88,10 +88,6 @@ public class WorkflowItemConverter
         // info
 
         if (collection != null) {
-            // we set the status to true as we will discover validation error later in this block
-            // we could eventually leave the status to empty if we don't have collection information, this could be
-            // eventually the case when projection support will be included
-            witem.setStatus(true);
             SubmissionDefinitionRest def = submissionDefinitionConverter
                 .convert(submissionConfigReader.getSubmissionConfigByCollection(collection.getHandle()));
             witem.setSubmissionDefinition(def);
@@ -115,7 +111,6 @@ public class WorkflowItemConverter
                             (AbstractRestProcessingStep) stepClass.newInstance();
                         for (ErrorRest error : stepProcessing.validate(submissionService, obj, stepConfig)) {
                             addError(witem.getErrors(), error);
-                            witem.setStatus(false);
                         }
                         witem.getSections()
                             .put(sections.getId(), stepProcessing.getData(submissionService, obj, stepConfig));
@@ -160,7 +155,7 @@ public class WorkflowItemConverter
     }
 
     @Override
-    public boolean supportsModel(BrowsableDSpaceObject object) {
+    public boolean supportsModel(BrowsableObject object) {
         return object instanceof XmlWorkflowItem;
     }
 }

@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
@@ -37,11 +38,9 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.ItemService;
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.EPersonServiceImpl;
-import org.dspace.event.Event;
 import org.dspace.services.ConfigurationService;
 import org.dspace.workflow.WorkflowException;
 import org.dspace.workflow.WorkflowService;
@@ -52,6 +51,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -97,6 +97,7 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
     }
 
     @Override
+    @PreAuthorize("hasPermission(#id, 'WORKFLOWITEM', 'READ')")
     public WorkflowItemRest findOne(Context context, Integer id) {
         XmlWorkflowItem witem = null;
         try {
@@ -111,6 +112,7 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
     }
 
     @Override
+    @PreAuthorize("hasAuthority('ADMIN')")
     public Page<WorkflowItemRest> findAll(Context context, Pageable pageable) {
         List<XmlWorkflowItem> witems = null;
         int total = 0;
@@ -125,16 +127,19 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
     }
 
     @SearchRestMethod(name = "findBySubmitter")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public Page<WorkflowItemRest> findBySubmitter(@Parameter(value = "uuid") UUID submitterID, Pageable pageable) {
         List<XmlWorkflowItem> witems = null;
+        int total = 0;
         try {
             Context context = obtainContext();
             EPerson ep = epersonService.find(context, submitterID);
-            witems = wis.findBySubmitter(context, ep);
+            witems = wis.findBySubmitter(context, ep, pageable.getPageNumber(), pageable.getPageSize());
+            total = wis.countBySubmitter(context, ep);
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<WorkflowItemRest> page = utils.getPage(witems, pageable).map(converter);
+        Page<WorkflowItemRest> page = new PageImpl<XmlWorkflowItem>(witems, pageable, total).map(converter);
         return page;
     }
 
@@ -209,10 +214,7 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
         }
         wsi = converter.convert(source);
 
-        if (errors.isEmpty()) {
-            wsi.setStatus(true);
-        } else {
-            wsi.setStatus(false);
+        if (!errors.isEmpty()) {
             wsi.getErrors().addAll(errors);
         }
 
@@ -282,6 +284,10 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
     }
 
     @Override
+    /**
+     * This method provides support for the administrative abort workflow functionality. The abort functionality will
+     * move the workflowitem back to the submitter workspace regardless to how the workflow is designed
+     */
     protected void delete(Context context, Integer id) {
         XmlWorkflowItem witem = null;
         try {
@@ -290,8 +296,6 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
                 throw new ResourceNotFoundException("WorkflowItem ID " + id + " not found");
             }
             wfs.abort(context, witem, context.getCurrentUser());
-            context.addEvent(new Event(Event.MODIFY, Constants.ITEM, witem.getItem().getID(), null,
-                itemService.getIdentifiers(context, witem.getItem())));
         } catch (AuthorizeException e) {
             throw new RESTAuthorizationException(e);
         } catch (SQLException | IOException e) {
