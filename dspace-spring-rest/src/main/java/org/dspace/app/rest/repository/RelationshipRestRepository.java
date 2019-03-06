@@ -142,8 +142,7 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
             Item leftItem = (Item) dSpaceObjects.get(0);
             Item rightItem = (Item) dSpaceObjects.get(1);
 
-            if (authorizeService.authorizeActionBoolean(context, leftItem, Constants.WRITE) ||
-                authorizeService.authorizeActionBoolean(context, rightItem, Constants.WRITE)) {
+            if (isAllowedToModifyRelationship(context, relationship, leftItem, rightItem)) {
                 relationship.setLeftItem(leftItem);
                 relationship.setRightItem(rightItem);
 
@@ -158,6 +157,25 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
             throw new UnprocessableEntityException("The given items in the request were not valid");
         }
 
+    }
+
+    /**
+     * This method will check with the current user has write rights on both one of the original items and one of the
+     * new items for the relationship.
+     * @param context       The relevant DSpace context
+     * @param relationship  The relationship to be checked on
+     * @param leftItem      The new left Item
+     * @param rightItem     The new right Item
+     * @return              A boolean indicating whether the user is allowed or not
+     * @throws SQLException If something goes wrong
+     */
+    private boolean isAllowedToModifyRelationship(Context context, Relationship relationship, Item leftItem,
+                                                  Item rightItem) throws SQLException {
+        return (authorizeService.authorizeActionBoolean(context, leftItem, Constants.WRITE) ||
+            authorizeService.authorizeActionBoolean(context, rightItem, Constants.WRITE)) &&
+            (authorizeService.authorizeActionBoolean(context, relationship.getLeftItem(), Constants.WRITE) ||
+            authorizeService.authorizeActionBoolean(context, relationship.getRightItem(), Constants.WRITE)
+            );
     }
 
     @Override
