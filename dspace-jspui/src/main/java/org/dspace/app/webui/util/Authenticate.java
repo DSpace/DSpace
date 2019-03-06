@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.UUID;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -29,6 +30,7 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 
@@ -278,7 +280,11 @@ public class Authenticate
 
             // Get the original URL of interrupted request, if set
             String requestUrl = (String) session.getAttribute("interrupted.request.url");
-
+            
+            // Shibboleth stores information about special groups in the session. Preserve these information.
+	    Boolean shibbolethAuthenticated = (Boolean) session.getAttribute("shib.authenticated");
+            List<UUID> shibbolethSpecialGroups = (List<UUID>) session.getAttribute("shib.specialgroup");
+           
             // Invalidate session unless dspace.cfg says not to
             if(ConfigurationManager.getBooleanProperty("webui.session.invalidate", true))
             {
@@ -298,6 +304,14 @@ public class Authenticate
             if (requestInfo != null && requestUrl != null) {
                 session.setAttribute("interrupted.request.info", requestInfo);
                 session.setAttribute("interrupted.request.url", requestUrl);
+            }
+            
+            // Restore shibboleth special groups
+	    if (shibbolethAuthenticated != null) {
+		    session.setAttribute("shib.authenticated", shibbolethAuthenticated.booleanValue());
+	    }
+            if (shibbolethSpecialGroups != null) {
+                session.setAttribute("shib.specialgroup", shibbolethSpecialGroups);
             }
         }
 
