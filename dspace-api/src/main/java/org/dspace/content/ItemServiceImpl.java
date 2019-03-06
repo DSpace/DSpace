@@ -1276,9 +1276,4 @@ prevent the generation of resource policy entry values with null dspace_object a
         return false;
     }
 
-    @Override
-    public int countBySubmitter(Context context, EPerson ep) throws SQLException {
-        return itemDAO.countItems(context, ep, true, false);
-    }
-
 }
