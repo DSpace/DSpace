@@ -22,7 +22,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.browse.BrowsableDSpaceObject;
+import org.dspace.browse.BrowsableObject;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.core.Constants;
@@ -42,7 +42,7 @@ import org.dspace.workflow.factory.WorkflowServiceFactory;
  */
 @Entity
 @Table(name = "cwf_workflowitem")
-public class XmlWorkflowItem implements WorkflowItem, ReloadableEntity<Integer>, BrowsableDSpaceObject<Integer> {
+public class XmlWorkflowItem implements WorkflowItem, ReloadableEntity<Integer>, BrowsableObject<Integer> {
 
     @Id
     @Column(name = "workflowitem_id")

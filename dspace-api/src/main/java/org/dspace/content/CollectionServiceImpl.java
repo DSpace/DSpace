@@ -382,13 +382,13 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
 
         switch (step) {
             case 1:
-                roleId = "reviewer";
+                roleId = CollectionRoleService.LEGACY_WORKFLOW_STEP1_NAME;
                 break;
             case 2:
-                roleId = "editor";
+                roleId = CollectionRoleService.LEGACY_WORKFLOW_STEP2_NAME;
                 break;
             case 3:
-                roleId = "finaleditor";
+                roleId = CollectionRoleService.LEGACY_WORKFLOW_STEP3_NAME;
                 break;
             default:
                 throw new IllegalArgumentException("Illegal step count: " + step);
@@ -416,13 +416,13 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
 
         switch (step) {
             case 1:
-                roleId = "reviewer";
+                roleId = CollectionRoleService.LEGACY_WORKFLOW_STEP1_NAME;
                 break;
             case 2:
-                roleId = "editor";
+                roleId = CollectionRoleService.LEGACY_WORKFLOW_STEP2_NAME;
                 break;
             case 3:
-                roleId = "finaleditor";
+                roleId = CollectionRoleService.LEGACY_WORKFLOW_STEP3_NAME;
                 break;
             default:
                 throw new IllegalArgumentException("Illegal step count: " + step);
