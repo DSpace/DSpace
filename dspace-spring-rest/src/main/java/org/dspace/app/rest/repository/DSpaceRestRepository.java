@@ -371,7 +371,7 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
         throw new RepositoryMethodNotImplementedException(apiCategory, model);
     }
 
-    public T action(HttpServletRequest request, ID id) throws SQLException, IOException, AuthorizeException {
+    public T action(HttpServletRequest request, ID id) throws SQLException, IOException {
         Context context = obtainContext();
         T entity = action(context, request, id);
         context.commit();
@@ -379,7 +379,7 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
     }
 
     protected T action(Context context, HttpServletRequest request, ID id)
-        throws SQLException, IOException, AuthorizeException {
+        throws SQLException, IOException {
         throw new RuntimeException("No implementation found; Method not allowed!");
     }
 
