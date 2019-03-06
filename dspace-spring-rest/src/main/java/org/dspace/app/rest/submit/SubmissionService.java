@@ -211,6 +211,7 @@ public class SubmissionService {
         Reader reader = null;
         XmlWorkflowItem wi = null;
         try {
+            //FIXME use utility method to extract the ID from the text/uri-list body
             reader = currentRequest.getHttpServletRequest().getReader();
             char[] arr = new char[1024];
             StringBuilder buffer = new StringBuilder();
@@ -225,6 +226,7 @@ public class SubmissionService {
             if (split.length != 2) {
                 throw new RuntimeException("Malformed body..." + buffer);
             }
+            // END FIXME
             WorkspaceItem wsi = workspaceItemService.find(context, Integer.parseInt(split[1]));
 
             if (!workspaceItemConverter.convert(wsi).getErrors().isEmpty()) {
