@@ -219,6 +219,8 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
             // remove the WorkspaceItem
             workspaceItemService.deleteWrapper(context, wsi);
             context.restoreAuthSystemState();
+            context.addEvent(new Event(Event.MODIFY, Constants.ITEM, wfi.getItem().getID(), null,
+                    itemService.getIdentifiers(context, wfi.getItem())));
             return wfi;
         } catch (WorkflowConfigurationException e) {
             throw new WorkflowException(e);
