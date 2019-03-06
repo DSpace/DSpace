@@ -485,6 +485,78 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
 
     @Test
     /**
+     * Test that only the task owner can approve it
+     *
+     * @throws Exception
+     */
+    public void approvalForbiddenTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        //** GIVEN **
+        //1. two reviewers
+        EPerson reviewer1 = EPersonBuilder.createEPerson(context)
+                .withEmail("reviewer1@example.com")
+                .withPassword(password)
+                .build();
+
+        EPerson reviewer2 = EPersonBuilder.createEPerson(context)
+                .withEmail("reviewer2@example.com")
+                .withPassword(password)
+                .build();
+
+        //2. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+
+        // the reviewer2 is a reviewer in a different step for the col1 and with the same role than reviewer1 for
+        // another collection
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
+                .withWorkflowGroup(1, reviewer1)
+                .withWorkflowGroup(2, reviewer2)
+                .build();
+
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2")
+                .withWorkflowGroup(1, reviewer2)
+                .build();
+
+        //3. create a normal user to use as submitter
+        EPerson submitter = EPersonBuilder.createEPerson(context)
+                .withEmail("submitter@example.com")
+                .withPassword(password)
+                .build();
+
+        context.setCurrentUser(submitter);
+
+        //4. a claimed task
+        ClaimedTask claimedTask = ClaimedTaskBuilder.createClaimedTask(context, col1, reviewer1)
+                .withTitle("Workflow Item 1")
+                .withIssueDate("2017-10-17")
+                .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                .withSubject("ExtraEntry")
+                .build();
+        XmlWorkflowItem witem = claimedTask.getWorkflowItem();
+        Item item = witem.getItem();
+
+        context.restoreAuthSystemState();
+
+        String reviewer1Token = getAuthToken(reviewer1.getEmail(), password);
+        String reviewer2Token = getAuthToken(reviewer2.getEmail(), password);
+
+        getClient(reviewer2Token).perform(post("/api/workflow/claimedtasks/" + claimedTask.getID())
+                .param("submit_approve", "true")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED))
+            .andExpect(status().isForbidden());
+
+        // verify that the task is still here
+        getClient(reviewer1Token).perform(get("/api/workflow/claimedtasks/" + claimedTask.getID()))
+            .andExpect(status().isOk());
+    }
+
+    @Test
+    /**
      * Test the rejection of a claimed task
      *
      * @throws Exception
@@ -576,6 +648,81 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
         getClient(adminToken).perform(get("/api/core/items/" + item.getID()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.inArchive", is(false)));
+
+    }
+
+    @Test
+    /**
+     * Test that only the task owner can reject it
+     *
+     * @throws Exception
+     */
+    public void rejectForbiddenTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        //** GIVEN **
+        //1. two reviewers
+        EPerson reviewer1 = EPersonBuilder.createEPerson(context)
+                .withEmail("reviewer1@example.com")
+                .withPassword(password)
+                .build();
+
+        EPerson reviewer2 = EPersonBuilder.createEPerson(context)
+                .withEmail("reviewer2@example.com")
+                .withPassword(password)
+                .build();
+
+        //2. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+
+        // the reviewer2 is a reviewer in a different step for the col1 and with the same role than reviewer1 for
+        // another collection
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
+                .withWorkflowGroup(1, reviewer1)
+                .withWorkflowGroup(2, reviewer2)
+                .build();
+
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2")
+                .withWorkflowGroup(1, reviewer2)
+                .build();
+
+        //3. create a normal user to use as submitter
+        EPerson submitter = EPersonBuilder.createEPerson(context)
+                .withEmail("submitter@example.com")
+                .withPassword(password)
+                .build();
+
+        context.setCurrentUser(submitter);
+
+        //4. a claimed task
+        ClaimedTask claimedTask = ClaimedTaskBuilder.createClaimedTask(context, col1, reviewer1)
+                .withTitle("Workflow Item 1")
+                .withIssueDate("2017-10-17")
+                .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                .withSubject("ExtraEntry")
+                .build();
+        XmlWorkflowItem witem = claimedTask.getWorkflowItem();
+        Item item = witem.getItem();
+
+        context.restoreAuthSystemState();
+
+        String reviewer1Token = getAuthToken(reviewer1.getEmail(), password);
+        String reviewer2Token = getAuthToken(reviewer2.getEmail(), password);
+
+        // try to reject with reviewer2
+        getClient(reviewer2Token).perform(post("/api/workflow/claimedtasks/" + claimedTask.getID())
+                .param("submit_reject", "true")
+                .param("reason", "I need to test the reject")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED))
+            .andExpect(status().isForbidden());
+
+        // verify that the task has not been processed and is still here
+        getClient(reviewer1Token).perform(get("/api/workflow/claimedtasks/" + claimedTask.getID()))
+            .andExpect(status().isOk());
 
     }
 

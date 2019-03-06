@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
+
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 
@@ -118,7 +119,7 @@ public class ClaimedTaskRestRepository extends DSpaceRestRepository<ClaimedTaskR
 
     @Override
     protected ClaimedTaskRest action(Context context, HttpServletRequest request, Integer id)
-        throws SQLException, IOException, AuthorizeException {
+        throws SQLException, IOException {
         ClaimedTask task = null;
         task = claimedTaskService.find(context, id);
         XmlWorkflowServiceFactory factory = (XmlWorkflowServiceFactory) XmlWorkflowServiceFactory.getInstance();
@@ -139,6 +140,8 @@ public class ClaimedTaskRestRepository extends DSpaceRestRepository<ClaimedTaskR
             // .getStepID());
             context.addEvent(new Event(Event.MODIFY, Constants.ITEM, task.getWorkflowItem().getItem().getID(), null,
                 itemService.getIdentifiers(context, task.getWorkflowItem().getItem())));
+        } catch (AuthorizeException e) {
+            throw new RESTAuthorizationException(e);
         } catch (WorkflowException e) {
             throw new UnprocessableEntityException(
                     "Invalid workflow action: " + e.getMessage(), e);

@@ -20,6 +20,7 @@ import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.PoolTaskConverter;
 import org.dspace.app.rest.exception.RESTAuthorizationException;
+import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.PoolTaskRest;
 import org.dspace.app.rest.model.hateoas.PoolTaskResource;
 import org.dspace.authorize.AuthorizeException;
@@ -113,7 +114,7 @@ public class PoolTaskRestRepository extends DSpaceRestRepository<PoolTaskRest, I
 
     @Override
     protected PoolTaskRest action(Context context, HttpServletRequest request, Integer id)
-        throws SQLException, IOException, AuthorizeException {
+        throws SQLException, IOException {
         PoolTask task = null;
         try {
             task = poolTaskService.find(context, id);
@@ -124,8 +125,10 @@ public class PoolTaskRestRepository extends DSpaceRestRepository<PoolTaskRest, I
             workflowService
                 .doState(context, context.getCurrentUser(), request, task.getWorkflowItem().getID(), workflow,
                     currentActionConfig);
+        } catch (AuthorizeException e) {
+            throw new RESTAuthorizationException(e);
         } catch (WorkflowConfigurationException | MessagingException | WorkflowException e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new UnprocessableEntityException(e.getMessage(), e);
         }
         return null;
     }
