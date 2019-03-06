@@ -43,7 +43,6 @@ import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.Utils;
-import org.dspace.event.Event;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.RequestService;
 import org.dspace.services.model.Request;
@@ -130,8 +129,6 @@ public class SubmissionService {
             throw new RESTAuthorizationException(ae);
         }
 
-        context.addEvent(new Event(Event.MODIFY, Constants.ITEM, wsi.getItem().getID(), null,
-            itemService.getIdentifiers(context, wsi.getItem())));
         return wsi;
     }
 
@@ -236,8 +233,6 @@ public class SubmissionService {
 
             wi = workflowService.start(context, wsi);
 
-            context.addEvent(new Event(Event.MODIFY, Constants.ITEM, wi.getItem().getID(), null,
-                    itemService.getIdentifiers(context, wi.getItem())));
         } catch (IOException e) {
             throw new RuntimeException(e.getMessage(), e);
         } finally {
