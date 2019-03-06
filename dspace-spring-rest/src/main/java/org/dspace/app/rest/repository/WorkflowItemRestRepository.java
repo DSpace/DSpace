@@ -131,14 +131,16 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
     @PreAuthorize("hasAuthority('ADMIN')")
     public Page<WorkflowItemRest> findBySubmitter(@Parameter(value = "uuid") UUID submitterID, Pageable pageable) {
         List<XmlWorkflowItem> witems = null;
+        int total = 0;
         try {
             Context context = obtainContext();
             EPerson ep = epersonService.find(context, submitterID);
-            witems = wis.findBySubmitter(context, ep);
+            witems = wis.findBySubmitter(context, ep, pageable.getPageNumber(), pageable.getPageSize());
+            total = wis.countBySubmitter(context, ep);
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<WorkflowItemRest> page = utils.getPage(witems, pageable).map(converter);
+        Page<WorkflowItemRest> page = new PageImpl<XmlWorkflowItem>(witems, pageable, total).map(converter);
         return page;
     }
 

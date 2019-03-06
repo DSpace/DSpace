@@ -132,6 +132,21 @@ public class XmlWorkflowItemServiceImpl implements XmlWorkflowItemService {
     }
 
     @Override
+    public List<XmlWorkflowItem> findBySubmitter(Context context, EPerson ep, Integer pageNumber, Integer pageSize)
+            throws SQLException {
+        Integer offset = null;
+        if (pageNumber != null && pageSize != null) {
+            offset = pageNumber * pageSize;
+        }
+        return xmlWorkflowItemDAO.findBySubmitter(context, ep, pageNumber, pageSize);
+    }
+
+    @Override
+    public int countBySubmitter(Context context, EPerson ep) throws SQLException {
+        return xmlWorkflowItemDAO.countBySubmitter(context, ep);
+    }
+
+    @Override
     public void deleteByCollection(Context context, Collection collection)
         throws SQLException, IOException, AuthorizeException {
         List<XmlWorkflowItem> xmlWorkflowItems = findByCollection(context, collection);
