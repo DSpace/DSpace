@@ -186,14 +186,20 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
         setModified();
     }
 
+    // FIXME this should be moved to the collectionService or completely removed, see also
+    // https://jira.duraspace.org/browse/DS-3041
     public Group getWorkflowStep1(Context context) {
         return getCollectionService().getWorkflowGroup(context, this, 1);
     }
 
+    // FIXME this should be moved to the collectionService or completely removed, see also
+    // https://jira.duraspace.org/browse/DS-3041
     public Group getWorkflowStep2(Context context) {
         return getCollectionService().getWorkflowGroup(context, this, 2);
     }
 
+    // FIXME this should be moved to the collectionService or completely removed, see also
+    // https://jira.duraspace.org/browse/DS-3041
     public Group getWorkflowStep3(Context context) {
         return getCollectionService().getWorkflowGroup(context, this, 3);
     }
