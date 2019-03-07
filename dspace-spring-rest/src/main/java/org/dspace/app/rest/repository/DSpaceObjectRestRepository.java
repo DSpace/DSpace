@@ -12,7 +12,6 @@ import java.util.UUID;
 
 import org.dspace.app.rest.converter.DSpaceObjectConverter;
 import org.dspace.app.rest.converter.MetadataConverter;
-import org.dspace.app.rest.exception.PatchBadRequestException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.DSpaceObjectRest;
 import org.dspace.app.rest.model.patch.Patch;
