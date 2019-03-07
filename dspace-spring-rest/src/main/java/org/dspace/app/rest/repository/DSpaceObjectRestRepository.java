@@ -23,6 +23,12 @@ import org.dspace.content.service.DSpaceObjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 
+/**
+ * Base class for DSpaceObject-based Rest Repositories, providing common functionality.
+ *
+ * @param <M> the specific type of DSpaceObject.
+ * @param <R> the corresponding DSpaceObjectRest.
+ */
 public abstract class DSpaceObjectRestRepository<M extends DSpaceObject, R extends DSpaceObjectRest>
         extends DSpaceRestRepository<R, UUID> {
 
@@ -41,9 +47,20 @@ public abstract class DSpaceObjectRestRepository<M extends DSpaceObject, R exten
         this.dsoConverter = dsoConverter;
     }
 
+    /**
+     * Updates the DSpaceObject according to the given Patch.
+     *
+     * @param apiCategory the api category.
+     * @param model the api model.
+     * @param id the id of the DSpaceObject.
+     * @param patch the patch to apply.
+     * @throws AuthorizeException if the action is unauthorized.
+     * @throws ResourceNotFoundException if the DSpace object was not found.
+     * @throws SQLException if a database error occurs.
+     * @throws UnprocessableEntityException if the patch attempts to modify an unmodifiable attribute of the object.
+     */
     protected void patchDSpaceObject(String apiCategory, String model, UUID id, Patch patch)
-            throws AuthorizeException, PatchBadRequestException, ResourceNotFoundException,
-            SQLException, UnprocessableEntityException {
+            throws AuthorizeException, ResourceNotFoundException, SQLException, UnprocessableEntityException {
         M dso = dsoService.find(obtainContext(), id);
         if (dso == null) {
             throw new ResourceNotFoundException(apiCategory + "." + model + " with id: " + id + " not found");
