@@ -21,6 +21,11 @@ import org.dspace.app.rest.model.MetadataRest;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.Patch;
 
+/**
+ * Base class for DSpaceObject-based PATCH operations, providing common functionality.
+ *
+ * @param <R> the type of DSpaceObjectRest object the class is applicable to.
+ */
 public abstract class DSpaceObjectPatch<R extends DSpaceObjectRest> extends AbstractResourcePatch<R> {
 
     private static final String METADATA_PATH = "/metadata";
@@ -29,6 +34,16 @@ public abstract class DSpaceObjectPatch<R extends DSpaceObjectRest> extends Abst
 
     private JsonPatchConverter jsonPatchConverter = new JsonPatchConverter(objectMapper);
 
+    /**
+     * Applies the given patch operations to the given DSpaceObjectRest instance.
+     *
+     * This extends the default implementation by first applying metadata-based patch operations,
+     * then applying any others.
+     *
+     * @param dsoRest the instance to apply the changes to.
+     * @param operations the list of patch operations.
+     * @return the modified DSpaceObectRest instance.
+     */
     @Override
     public R patch(R dsoRest, List<Operation> operations) {
         List<Operation> metadataOperations = new ArrayList<>();
