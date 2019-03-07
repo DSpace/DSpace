@@ -3393,7 +3393,13 @@
     
     <!-- Institutional Membership: Size -->
         <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_inst_size.label1">2b. Membership level - Institution<span class="required-mark">*</span></message>
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_inst_size.label2">Dryad membership brings significant value to institutions and therefore we don’t want interested organizations to not join due to pricing.  We recognize that any method Dryad chose for determining size of institution might not be applicable to every school. Therefore, we are asking institutions to self-determine the level of your commitment. Below are examples of parameters you might like to use, but &lt;b&gt;ultimately it is up to each institution to select their own level.&lt;/b&gt;</message>
+	<message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_inst_size.label2">Dryad membership brings significant value to institutions and therefore we don’t want interested organizations to not join due to pricing.  We recognize that any method Dryad chose for determining size of institution might not be applicable to every school. Therefore, we are asking institutions to self-determine the level of your commitment. Below are examples of parameters you might like to use, but &lt;b&gt;ultimately it is up to each institution to select their own level.&lt;/b&gt;&#x3C;table&#x3E;
+	&#x3C;tr&#x3E;&#x3C;td&#x3E;Size of Institution&#x3C;/td&#x3E;&#x3C;td&#x3E;Suggested Examples for Determining Size&#x3C;/td&#x3E;&#x3C;/tr&#x3E;
+	&#x3C;tr&#x3E;&#x3C;td&#x3E;Level 1&#x3C;/td&#x3E;&#x3C;td&#x3E;R3 or FTE under 5K or less than $50M in research grant funding.&#x3C;/td&#x3E;&#x3C;/tr&#x3E;
+	&#x3C;tr&#x3E;&#x3C;td&#x3E;Level II&#x3C;/td&#x3E;&#x3C;td&#x3E;R2 or FTE 5K - 10K or  $50M - $300M in research grant funding.&#x3C;/td&#x3E;&#x3C;/tr&#x3E;
+	&#x3C;tr&#x3E;&#x3C;td&#x3E;Level III&#x3C;/td&#x3E;&#x3C;td&#x3E;RI or FTE +10K FTE or +$300M in research grant funding.&#x3C;/td&#x3E;&#x3C;/tr&#x3E;
+	&#x3C;/table&#x3E;
+	</message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.errors.org_inst_size_currency">Currency selection is required</message>
 
     <!-- Checkbox options for org_annual_revenue -->
