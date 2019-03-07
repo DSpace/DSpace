@@ -231,9 +231,12 @@ jQuery(document).ready(function() {
                     ".revenueThreshold" : amountsByCurrency[currencyCode].revenueThreshold,
                     ".smallOrgFee"      : amountsByCurrency[currencyCode].smallOrgFee,
                     ".largeOrgFee"      : amountsByCurrency[currencyCode].largeOrgFee,
-                    ".advocateFee"      : amountsByCurrency[currencyCode].advocateFee
+                    ".advocateFee"      : amountsByCurrency[currencyCode].advocateFee,
+		    ".instFeeLevel1"      : amountsByCurrency[currencyCode].instFeeLevel1,
+		    ".instFeeLevel2"      : amountsByCurrency[currencyCode].instFeeLevel2,
+		    ".instFeeLevel3"      : amountsByCurrency[currencyCode].instFeeLevel3
                 };
-               jQuery.each(['.msg-less_than_10_million', '.msg-greater_than_10_million', '.msg-advocate-all-organizations'], function(i,klass) {
+		jQuery.each(['.msg-less_than_10_million', '.msg-greater_than_10_million', '.msg-advocate-all-organizations', '.msg-inst-level1', '.msg-inst-level2', '.msg-inst-level3'], function(i,klass) {
                     var $elt = jQuery(klass);
                     if ($elt.length === 0) return;
                     jQuery.each(replacements, function(prop, val) {

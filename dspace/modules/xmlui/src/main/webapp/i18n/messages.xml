@@ -3388,20 +3388,20 @@
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_annual_revenue.less_than_10_million"><span class="msg-less_than_10_million"><b>Supporter</b>: annual membership dues <span class="smallOrgFee">&#x00A0;</span> (annual revenue less than <span class="revenueThreshold">&#x00A0;</span> per year)</span></message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_annual_revenue.advocate_all_organizations"><span class="msg-advocate-all-organizations"><b>Advocate</b>: annual membership dues <span class="advocateFee">&#x00A0;</span> (open to all organizations, no journal discounts)</span></message>
     
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.errors.org_annual_revenue">Annual revenue is required</message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.errors.org_annual_revenue">Membership level is required, either for publisher or institution</message>
 
     
     <!-- Institutional Membership: Size -->
         <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_inst_size.label1">2b. Membership level - Institution<span class="required-mark">*</span></message>
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_inst_size.label2">Dryad membership brings significant value to institutions and therefore we don’t want interested organizations to not join due to pricing.  We recognize that any method Dryad chose for determining size of institution might not be applicable to every school. Therefore, we are asking institutions to self-determine the level of your commitment. Below are examples of parameters you might like to use, but <b>ultimately it is up to each institution to select their own level. </b></message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_inst_size.label2">Dryad membership brings significant value to institutions and therefore we don’t want interested organizations to not join due to pricing.  We recognize that any method Dryad chose for determining size of institution might not be applicable to every school. Therefore, we are asking institutions to self-determine the level of your commitment. Below are examples of parameters you might like to use, but &lt;b&gt;ultimately it is up to each institution to select their own level.&lt;/b&gt;</message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.errors.org_inst_size_currency">Currency selection is required</message>
 
     <!-- Checkbox options for org_annual_revenue -->
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_inst_size.level3"><span class="msg-inst-level3"><b>Level III</b>: annual membership dues <span class="instFeeLevel3">&#x00A0;</span></span></message>
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_inst_size.level2"><span class="msg-inst-level2"><b>Level II</b>: annual membership dues <span class="instFeeLevel2">&#x00A0;</span></span></message>
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_inst_size.level1"><span class="msg-inst-level1"><b>Level I</b>: annual membership dues <span class="instFeeLevel1">&#x00A0;</span></span></message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_inst_size.level3"><span class="msg-inst-level3"><b>Level III</b>: annual membership dues <span class="instFeeLevel3">$13,000</span></span></message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_inst_size.level2"><span class="msg-inst-level2"><b>Level II</b>: annual membership dues <span class="instFeeLevel2">$7,500</span></span></message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_inst_size.level1"><span class="msg-inst-level1"><b>Level I</b>: annual membership dues <span class="instFeeLevel1">$3,000</span></span></message>
     
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.errors.org_annual_revenue">Institution size is required</message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.errors.org_annual_revenue">Membership level is required, either for publisher or institution</message>
 
     
     <!-- Billing Contact -->

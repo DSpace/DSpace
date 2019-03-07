@@ -179,6 +179,7 @@ public class MembershipApplicationForm extends AbstractDSpaceTransformer impleme
         // Institution Membership Level -- Size
         Item orgInstSize = form.addItem("org_inst_size", "");
 
+ 
         Select orgInstSizeCurrencySelect = orgInstSize.addSelect("org_inst_size_currency");
         orgInstSizeCurrencySelect.setLabel(message(message_prefix + "fields.org_inst_size.label1"));
         orgInstSizeCurrencySelect.setHelp(message(message_prefix + "fields.org_inst_size.label2"));
@@ -193,6 +194,7 @@ public class MembershipApplicationForm extends AbstractDSpaceTransformer impleme
         if(errorFieldList.contains("org_inst_size_currency")) {
             orgInstSizeCurrencySelect.addError(message(message_prefix + "errors.org_inst_size_currency"));
         }
+ 
 
         Radio orgInstSizeRadios = orgInstSize.addRadio("org_inst_size");
         orgInstSizeRadios.addOption("inst_level3", message(message_prefix + "fields.org_inst_size.level3"));
