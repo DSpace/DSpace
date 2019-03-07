@@ -251,7 +251,11 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
         Group group = GroupBuilder.createGroup(context).withName("Group").build();
         String token = getAuthToken(asUser.getEmail(), password);
 
-        new MetadataPatchSuite().runWith(getClient(token), "/api/eperson/groups/"
-                + group.getID(), expectedStatus);
+        try {
+            new MetadataPatchSuite().runWith(getClient(token), "/api/eperson/groups/"
+                    + group.getID(), expectedStatus);
+        } finally {
+            context.restoreAuthSystemState();
+        }
     }
 }

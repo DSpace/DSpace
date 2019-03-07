@@ -643,7 +643,11 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         Collection col = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection").build();
         String token = getAuthToken(asUser.getEmail(), password);
 
-        new MetadataPatchSuite().runWith(getClient(token), "/api/core/collections/"
-                + col.getID(), expectedStatus);
+        try {
+            new MetadataPatchSuite().runWith(getClient(token), "/api/core/collections/"
+                    + col.getID(), expectedStatus);
+        } finally {
+            context.restoreAuthSystemState();
+        }
     }
 }

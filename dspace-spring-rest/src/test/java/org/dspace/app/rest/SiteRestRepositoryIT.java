@@ -85,7 +85,11 @@ public class SiteRestRepositoryIT extends AbstractControllerIntegrationTest {
         Site site = SiteBuilder.createSite(context).build();
         String token = getAuthToken(asUser.getEmail(), password);
 
-        new MetadataPatchSuite().runWith(getClient(token), "/api/core/sites/" + site.getID(), expectedStatus);
+        try {
+            new MetadataPatchSuite().runWith(getClient(token), "/api/core/sites/" + site.getID(), expectedStatus);
+        } finally {
+            context.restoreAuthSystemState();
+        }
 
     }
 }
