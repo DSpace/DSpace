@@ -112,8 +112,6 @@ public class DiscoverResultConverter {
         SearchQueryConverter searchQueryConverter = new SearchQueryConverter();
         List<SearchFilter> transformedFilters = searchQueryConverter.convert(searchFilters);
 
-        SearchFilterToAppliedFilterConverter searchFilterToAppliedFilterConverter =
-                new SearchFilterToAppliedFilterConverter();
         for (SearchFilter searchFilter : CollectionUtils.emptyIfNull(transformedFilters)) {
             resultsRest
                     .addAppliedFilter(searchFilterToAppliedFilterConverter.convertSearchFilter(context, searchFilter));
