@@ -105,6 +105,7 @@ public class MembershipApplicationForm extends AbstractDSpaceTransformer impleme
 
         membership.addPara(message(message_prefix + "overview.p1"));
         membership.addPara(message(message_prefix + "overview.p2"));
+        membership.addPara(message(message_prefix + "overview.p3"));
         membership.addPara(message(message_prefix + "markedfields"));
 
         // Check for errors
@@ -135,6 +136,7 @@ public class MembershipApplicationForm extends AbstractDSpaceTransformer impleme
         orgLegalNameText.setValue(parameters.getParameter("org_legalname", ""));
 
         // Org Type
+        /*
         Item orgType = form.addItem("org_type", "");
         TextArea orgTypeTextArea = orgType.addTextArea("org_type");
         orgTypeTextArea.setLabel(message(message_prefix + "fields.org_type.label1"));
@@ -144,13 +146,14 @@ public class MembershipApplicationForm extends AbstractDSpaceTransformer impleme
         if(errorFieldList.contains("org_type")) {
             orgTypeTextArea.addError(message(message_prefix + "errors.org_type"));
         }
+        */
 
-        // Annual Revenue
+        // Publisher Membership Level -- Annual Revenue
         Item orgAnnualRevenue = form.addItem("org_annual_revenue", "");
 
         Select orgAnnualRevenueCurrencySelect = orgAnnualRevenue.addSelect("org_annual_revenue_currency");
         orgAnnualRevenueCurrencySelect.setLabel(message(message_prefix + "fields.org_annual_revenue.label1"));
-        orgAnnualRevenueCurrencySelect.setHelp(message(message_prefix + "fields.org_annual_revenue.label2"));
+        // orgAnnualRevenueCurrencySelect.setHelp(message(message_prefix + "fields.org_annual_revenue.label2"));
         orgAnnualRevenueCurrencySelect.addOption("USD", "$ USD");
         orgAnnualRevenueCurrencySelect.addOption("GBP", "£ GBP");
         orgAnnualRevenueCurrencySelect.addOption("CAD", "C$ CAD");
@@ -171,6 +174,34 @@ public class MembershipApplicationForm extends AbstractDSpaceTransformer impleme
         orgAnnualRevenueRadios.setOptionSelected(parameters.getParameter("org_annual_revenue", ""));
         if(errorFieldList.contains("org_annual_revenue")) {
             orgAnnualRevenueRadios.addError(message(message_prefix + "errors.org_annual_revenue"));
+        }
+
+        // Institution Membership Level -- Size
+        Item orgInstSize = form.addItem("org_inst_size", "");
+
+        Select orgInstSizeCurrencySelect = orgInstSize.addSelect("org_inst_size_currency");
+        orgInstSizeCurrencySelect.setLabel(message(message_prefix + "fields.org_inst_size.label1"));
+        orgInstSizeCurrencySelect.setHelp(message(message_prefix + "fields.org_inst_size.label2"));
+        orgInstSizeCurrencySelect.addOption("USD", "$ USD");
+        orgInstSizeCurrencySelect.addOption("GBP", "£ GBP");
+        orgInstSizeCurrencySelect.addOption("CAD", "C$ CAD");
+        orgInstSizeCurrencySelect.addOption("EUR", "€ EUR");
+        orgInstSizeCurrencySelect.addOption("AUD", "$ AUD");
+    	orgInstSizeCurrencySelect.addOption("JPY", "¥ JPY");
+        orgInstSizeCurrencySelect.setOptionSelected(parameters.getParameter("org_inst_size_currency", "USD"));
+        orgInstSizeCurrencySelect.setRequired();
+        if(errorFieldList.contains("org_inst_size_currency")) {
+            orgInstSizeCurrencySelect.addError(message(message_prefix + "errors.org_inst_size_currency"));
+        }
+
+        Radio orgInstSizeRadios = orgInstSize.addRadio("org_inst_size");
+        orgInstSizeRadios.addOption("inst_level3", message(message_prefix + "fields.org_inst_size.level3"));
+        orgInstSizeRadios.addOption("inst_level2", message(message_prefix + "fields.org_inst_size.level2"));
+        orgInstSizeRadios.addOption("inst_level1", message(message_prefix + "fields.org_inst_size.level1"));        
+        orgInstSizeRadios.setRequired();
+        orgInstSizeRadios.setOptionSelected(parameters.getParameter("org_inst_size", ""));
+        if(errorFieldList.contains("org_inst_size")) {
+            orgInstSizeRadios.addError(message(message_prefix + "errors.org_inst_size"));
         }
 
         // Billing Contact Name
@@ -206,10 +237,10 @@ public class MembershipApplicationForm extends AbstractDSpaceTransformer impleme
             billingAddressTextArea.addError(message(message_prefix + "errors.billing_address"));
         }
 
+        /*
         // Publications
         Item publications = form.addItem("publications","");
         TextArea publicationsTextArea = publications.addTextArea("publications");
-
         publicationsTextArea.setLabel(message(message_prefix + "fields.publications.label1"));
         publicationsTextArea.setHelp(message(message_prefix + "fields.publications.label2"));
         publicationsTextArea.setValue(parameters.getParameter("publications", ""));
@@ -243,7 +274,8 @@ public class MembershipApplicationForm extends AbstractDSpaceTransformer impleme
         if(errorFieldList.contains("membership_length")) {
             membershipLengthSelect.addError(message(message_prefix + "errors.membership_length"));
     	}
-
+        */
+        
         // Organizational representative
         Item repOrg = form.addItem("rep_org","");
         Hidden repOrgHidden = repOrg.addHidden("rep_org");

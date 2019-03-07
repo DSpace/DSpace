@@ -807,6 +807,12 @@ li.ds-form-item .ds-select-field {
     margin-bottom: 5px;
 }
 
+#aspect_dryadfeedback_MembershipApplicationForm_field_org_annual_revenue_currency {
+    margin-top: 5px;
+    margin-bottom: 5px;
+    margin-left: 100px;
+}
+
 .ds-add-button,
 label.ds-composite-component .ds-select-field {
     margin-top: 6px;

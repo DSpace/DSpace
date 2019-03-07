@@ -448,7 +448,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
                                     <a href="/pages/employment">Employment opportunities</a>
                                 </li>
                                 <li>
-                                    <a href="/pages/membershipMeeting">Membership meeting</a>
+                                    <a href="/pages/events">Events</a>
                                 </li>
                                 <li>
                                   <a href="/pages/faq">FAQs</a>
@@ -500,7 +500,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
                                     <a href="/pages/membershipOverview">Membership</a>
                                 </li> 
                                 <li>
-                                    <a href="/pages/membershipMeeting">Membership meeting</a>
+                                    <a href="/pages/Events">Events</a>
                                 </li>                            
                                 <li>
                                     <a href="/pages/paymentPlans">Payment plans</a>
