@@ -35,8 +35,9 @@ public class MembershipApplicationAction extends AbstractAction
 
         String org_name = request.getParameter("org_name"); // required
         String org_legalname = request.getParameter("org_legalname");
-        String org_type = request.getParameter("org_type");
+        //String org_type = request.getParameter("org_type");
         String org_annual_revenue = request.getParameter("org_annual_revenue"); // required
+        String org_inst_size = request.getParameter("org_inst_size"); // required
         String org_annual_revenue_currency = request.getParameter("org_annual_revenue_currency"); // required
         String billing_contact_name = request.getParameter("billing_contact_name"); // required
         String billing_email = request.getParameter("billing_email"); // required
@@ -61,8 +62,8 @@ public class MembershipApplicationAction extends AbstractAction
                 (billing_contact_name == null) || (billing_contact_name.equals("")) ||
                 (billing_address == null) || (billing_address.equals("")) ||
                 (billing_email == null) || (billing_email.equals("")) ||
-                (membership_year_start == null) ||
-                (membership_length == null) ||
+                // (membership_year_start == null) ||
+                // (membership_length == null) ||
                 (rep_name == null) || (rep_name.equals("")) ||
                 (rep_email == null) || (rep_email.equals(""))
                 ) {
@@ -71,17 +72,18 @@ public class MembershipApplicationAction extends AbstractAction
             Map<String, String> map = new HashMap<String, String>();
             map.put("org_name", org_name);
             map.put("org_annual_revenue", org_annual_revenue);
+            map.put("org_inst_size", org_inst_size);
             map.put("org_annual_revenue_currency", org_annual_revenue_currency);
             map.put("org_legalname", org_legalname);
-            map.put("org_type", org_type);
+            //map.put("org_type", org_type);
 
             map.put("billing_contact_name", billing_contact_name);
             map.put("billing_email", billing_email);
             map.put("billing_address", billing_address);
             
             map.put("publications", publications);
-            map.put("membership_year_start", membership_year_start);
-            map.put("membership_length", membership_length);
+            //map.put("membership_year_start", membership_year_start);
+            //map.put("membership_length", membership_length);
 
             map.put("rep_name", rep_name);
             map.put("rep_email", rep_email);
@@ -94,9 +96,11 @@ public class MembershipApplicationAction extends AbstractAction
             if((org_name != null) && org_name.equals("")) {
                 errorFieldNames.add("org_name");
             }
-            if((org_type != null) && org_type.equals("")) {
+            /*
+              if((org_type != null) && org_type.equals("")) {
                 errorFieldNames.add("org_type");
             }
+            */
             if((submittedOnce != null) && ((org_annual_revenue == null) || org_annual_revenue.equals(""))) {
                 errorFieldNames.add("org_annual_revenue");
             }
@@ -112,9 +116,11 @@ public class MembershipApplicationAction extends AbstractAction
             if((billing_address != null) && billing_address.equals("")) {
                 errorFieldNames.add("billing_address");
             }
-            if((submittedOnce != null) && ((membership_year_start == null) || membership_year_start.equals(""))) {
+            /*
+              if((submittedOnce != null) && ((membership_year_start == null) || membership_year_start.equals(""))) {
                 errorFieldNames.add("membership_year_start");
             }
+            */
             if((submittedOnce != null) && ((membership_length == null) || membership_length.equals(""))) {
                 errorFieldNames.add("membership_length");
             }
@@ -187,9 +193,10 @@ public class MembershipApplicationAction extends AbstractAction
 //# {2}   Organization Legalname (if different)
         email.addArgument(org_legalname);
 //# {3}   Organization Type
-        email.addArgument(org_type);
+        //email.addArgument(org_type);
 //# {4}   Organization annual revenue
         email.addArgument(org_annual_revenue);
+        email.addArgument(org_inst_size);
 //# {5}   Organization annual revenue currency
         email.addArgument(org_annual_revenue_currency);
 //# {6}   Billing Contact Name
@@ -201,9 +208,9 @@ public class MembershipApplicationAction extends AbstractAction
 //# {9}   Publications
         email.addArgument(publications);
 //# {10}   Membership Year Start
-        email.addArgument(membership_year_start);
+        //email.addArgument(membership_year_start);
 //# {11}   Membership Year Duration (yearsa)
-        email.addArgument(membership_length);
+        //email.addArgument(membership_length);
 //# {12}   Dryad Representative Name
         email.addArgument(rep_name);
 //# {13}  Dryad Representative Title
@@ -231,9 +238,10 @@ public class MembershipApplicationAction extends AbstractAction
 //# {2}   Organization Legalname (if different)
         confEmail.addArgument(org_legalname);
 //# {3}   Organization Type
-        confEmail.addArgument(org_type);
+        //confEmail.addArgument(org_type);
 //# {4}   Organization annual revenue
         confEmail.addArgument(org_annual_revenue);
+        confEmail.addArgument(org_inst_size);
 //# {5}   Organization annual revenue currency
         confEmail.addArgument(org_annual_revenue_currency);
 //# {6}   Billing Contact Name
@@ -245,9 +253,9 @@ public class MembershipApplicationAction extends AbstractAction
 //# {9}   Publications
         confEmail.addArgument(publications);
 //# {10}   Membership Year Start
-        confEmail.addArgument(membership_year_start);
+        //confEmail.addArgument(membership_year_start);
 //# {11}   Membership Year Duration (yearsa)
-        confEmail.addArgument(membership_length);
+        //confEmail.addArgument(membership_length);
 //# {12}   Dryad Representative Name
         confEmail.addArgument(rep_name);
 //# {13}  Dryad Representative Title
