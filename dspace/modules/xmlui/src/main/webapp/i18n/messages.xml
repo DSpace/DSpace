@@ -3379,33 +3379,35 @@
 
     
     <!-- Publisher Membership: Annual Revenue -->
-        <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_annual_revenue.label1">2a. Membership level - Publisher<span class="required-mark">*</span></message>
+        <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_annual_revenue.label1">2. Membership level - Publisher<span class="required-mark">*</span></message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_annual_revenue.label2">Please specify currency.</message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.errors.org_annual_revenue_currency">Currency selection is required</message>
 
     <!-- Checkbox options for org_annual_revenue -->
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_annual_revenue.greater_than_10_million"><span class="msg-greater_than_10_million"><b>Sustainer</b>: annual membership dues <span class="largeOrgFee">&#x00A0;</span> (annual revenue greater than <span class="revenueThreshold">&#x00A0;</span> per year)</span></message>
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_annual_revenue.less_than_10_million"><span class="msg-less_than_10_million"><b>Supporter</b>: annual membership dues <span class="smallOrgFee">&#x00A0;</span> (annual revenue less than <span class="revenueThreshold">&#x00A0;</span> per year)</span></message>
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_annual_revenue.advocate_all_organizations"><span class="msg-advocate-all-organizations"><b>Advocate</b>: annual membership dues <span class="advocateFee">&#x00A0;</span> (open to all organizations, no journal discounts)</span></message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_annual_revenue.greater_than_10_million"><span class="msg-greater_than_10_million"><b>Sustainer</b>: annual membership dues USD $5,000 (annual revenue greater than 10 million US Dollars per year)</span></message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_annual_revenue.less_than_10_million"><span class="msg-less_than_10_million"><b>Supporter</b>: annual membership dues USD $1,000 (annual revenue less than 10 million US Dollars per year)</span></message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_annual_revenue.advocate_all_organizations"><span class="msg-advocate-all-organizations"><b>Advocate</b>: annual membership dues USD $500 (open to all organizations, no journal discounts)</span></message>
     
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.errors.org_annual_revenue">Membership level is required, either for publisher or institution</message>
 
     
     <!-- Institutional Membership: Size -->
-        <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_inst_size.label1">2b. Membership level - Institution<span class="required-mark">*</span></message>
-	<message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_inst_size.label2">Dryad membership brings significant value to institutions and therefore we don’t want interested organizations to not join due to pricing.  We recognize that any method Dryad chose for determining size of institution might not be applicable to every school. Therefore, we are asking institutions to self-determine the level of your commitment. Below are examples of parameters you might like to use, but &lt;b&gt;ultimately it is up to each institution to select their own level.&lt;/b&gt;&#x3C;table&#x3E;
-	&#x3C;tr&#x3E;&#x3C;td&#x3E;Size of Institution&#x3C;/td&#x3E;&#x3C;td&#x3E;Suggested Examples for Determining Size&#x3C;/td&#x3E;&#x3C;/tr&#x3E;
-	&#x3C;tr&#x3E;&#x3C;td&#x3E;Level 1&#x3C;/td&#x3E;&#x3C;td&#x3E;R3 or FTE under 5K or less than $50M in research grant funding.&#x3C;/td&#x3E;&#x3C;/tr&#x3E;
-	&#x3C;tr&#x3E;&#x3C;td&#x3E;Level II&#x3C;/td&#x3E;&#x3C;td&#x3E;R2 or FTE 5K - 10K or  $50M - $300M in research grant funding.&#x3C;/td&#x3E;&#x3C;/tr&#x3E;
-	&#x3C;tr&#x3E;&#x3C;td&#x3E;Level III&#x3C;/td&#x3E;&#x3C;td&#x3E;RI or FTE +10K FTE or +$300M in research grant funding.&#x3C;/td&#x3E;&#x3C;/tr&#x3E;
-	&#x3C;/table&#x3E;
+        <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_inst_size.label1">2. Membership level - Institution<span class="required-mark">*</span></message>
+	<message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_inst_size.label2">Dryad membership brings significant value to institutions and therefore we don’t want interested organizations to not join due to pricing.  We recognize that any method Dryad chose for determining size of institution might not be applicable to every school. Therefore, we are asking institutions to self-determine the level of your commitment. Below are examples of parameters you might like to use, but <b>ultimately it is up to each institution to select their own level.</b>
+	<table>
+	  <tr><td>Size of Institution</td><td>Suggested Examples for Determining Size</td></tr>
+	  <tr><td>Level 1</td><td>R3 or FTE under 5K or less than $50M in research grant funding.</td></tr>
+	  <tr><td>Level II</td><td>R2 or FTE 5K - 10K or  $50M - $300M in research grant funding.</td></tr>
+	  <tr><td>Level III</td><td>RI or FTE +10K FTE or +$300M in research grant funding.</td></tr>
+	</table>
+	
 	</message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.errors.org_inst_size_currency">Currency selection is required</message>
 
     <!-- Checkbox options for org_annual_revenue -->
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_inst_size.inst_level3"><span class="msg-inst_level3"><b>Level III</b>: annual membership dues <span class="instFeeLevel3">$13,000</span></span></message>
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_inst_size.inst_level2"><span class="msg-inst_level2"><b>Level II</b>: annual membership dues <span class="instFeeLevel2">$7,500</span></span></message>
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_inst_size.inst_level1"><span class="msg-inst_level1"><b>Level I</b>: annual membership dues <span class="instFeeLevel1">$3,000</span></span></message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_inst_size.inst_level3"><span class="msg-inst_level3"><b>Level III</b>: annual membership dues $13,000</span></message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_inst_size.inst_level2"><span class="msg-inst_level2"><b>Level II</b>: annual membership dues $7,500</span></message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_inst_size.inst_level1"><span class="msg-inst_level1"><b>Level I</b>: annual membership dues $3,000</span></message>
     
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.errors.org_annual_revenue">Membership level is required, either for publisher or institution</message>
 
