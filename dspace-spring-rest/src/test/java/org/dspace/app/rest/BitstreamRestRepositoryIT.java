@@ -604,13 +604,10 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
         context.turnOffAuthorisationSystem();
         parentCommunity = CommunityBuilder.createCommunity(context).withName("Community").withLogo("logo_community")
                 .build();
+        context.restoreAuthSystemState();
         String token = getAuthToken(asUser.getEmail(), password);
 
-        try {
-            new MetadataPatchSuite().runWith(getClient(token), "/api/core/bitstreams/"
-                    + parentCommunity.getLogo().getID(), expectedStatus);
-        } finally {
-            context.restoreAuthSystemState();
-        }
+        new MetadataPatchSuite().runWith(getClient(token), "/api/core/bitstreams/"
+                + parentCommunity.getLogo().getID(), expectedStatus);
     }
 }

@@ -1762,13 +1762,10 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .withName("Sub Community").build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
         Item item = ItemBuilder.createItem(context, col1).build();
+        context.restoreAuthSystemState();
         String token = getAuthToken(asUser.getEmail(), password);
 
-        try {
-            new MetadataPatchSuite().runWith(getClient(token), "/api/core/items/" + item.getID(), expectedStatus);
-        } finally {
-            context.restoreAuthSystemState();
-        }
+        new MetadataPatchSuite().runWith(getClient(token), "/api/core/items/" + item.getID(), expectedStatus);
     }
 
 }
