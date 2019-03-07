@@ -42,7 +42,7 @@ import org.dspace.workflow.factory.WorkflowServiceFactory;
  */
 public abstract class ContentServiceFactory {
 
-    public abstract List<BrowsableObjectService> getBrowsableDSpaceObjectServices();
+    public abstract List<BrowsableObjectService> getBrowsableObjectServices();
 
     public abstract List<DSpaceObjectService<? extends DSpaceObject>> getDSpaceObjectServices();
 
@@ -104,9 +104,9 @@ public abstract class ContentServiceFactory {
 
     @SuppressWarnings("unchecked")
     public <T extends BrowsableObject<PK>, PK extends Serializable> BrowsableObjectService<T, PK>
-        getBrowsableDSpaceObjectService(int type) {
-        for (int i = 0; i < getBrowsableDSpaceObjectServices().size(); i++) {
-            BrowsableObjectService objectService = getBrowsableDSpaceObjectServices().get(i);
+        getBrowsableObjectService(int type) {
+        for (int i = 0; i < getBrowsableObjectServices().size(); i++) {
+            BrowsableObjectService objectService = getBrowsableObjectServices().get(i);
             if (objectService.getSupportsTypeConstant() == type) {
                 return (BrowsableObjectService<T, PK>) objectService;
             }

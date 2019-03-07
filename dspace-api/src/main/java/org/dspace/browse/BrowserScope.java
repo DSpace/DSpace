@@ -133,7 +133,7 @@ public class BrowserScope {
      * @param dso the container object; a Community or Collection
      * @throws BrowseException if browse error
      */
-    public void setBrowseContainer(BrowsableDSpaceObject dso)
+    public void setBrowseContainer(BrowsableObject dso)
         throws BrowseException {
         if (dso instanceof Collection) {
             this.collection = (Collection) dso;

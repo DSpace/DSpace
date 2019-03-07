@@ -10,7 +10,7 @@ package org.dspace.discovery;
 import java.util.List;
 
 import org.apache.solr.common.SolrInputDocument;
-import org.dspace.browse.BrowsableDSpaceObject;
+import org.dspace.browse.BrowsableObject;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Item;
@@ -41,7 +41,7 @@ public class SolrServiceFileInfoPlugin implements SolrServiceIndexPlugin {
     private static final String SOLR_FIELD_NAME_FOR_DESCRIPTIONS = "original_bundle_descriptions";
 
     @Override
-    public void additionalIndex(Context context, BrowsableDSpaceObject dso, SolrInputDocument document) {
+    public void additionalIndex(Context context, BrowsableObject dso, SolrInputDocument document) {
         if (dso instanceof Item) {
             Item item = (Item) dso;
             List<Bundle> bundles = item.getBundles();

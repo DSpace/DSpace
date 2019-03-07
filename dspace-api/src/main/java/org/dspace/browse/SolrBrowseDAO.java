@@ -307,7 +307,7 @@ public class SolrBrowseDAO implements BrowseDAO {
         DiscoverResult resp = getSolrResponse();
 
         List<Item> bitems = new ArrayList<>();
-        for (BrowsableDSpaceObject<UUID> solrDoc : resp.getDspaceObjects()) {
+        for (BrowsableObject<UUID> solrDoc : resp.getDspaceObjects()) {
             // FIXME introduce project, don't retrieve Item immediately when
             // processing the query...
             Item item = (Item) solrDoc;

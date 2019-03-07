@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.dspace.browse.BrowsableDSpaceObject;
+import org.dspace.browse.BrowsableObject;
 import org.dspace.core.Context;
 import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
 
@@ -46,7 +46,7 @@ public class FacetYearRange {
         return oldestYear != -1 && newestYear != -1;
     }
 
-    public void calculateRange(Context context, List<String> filterQueries, BrowsableDSpaceObject scope,
+    public void calculateRange(Context context, List<String> filterQueries, BrowsableObject scope,
                                SearchService searchService, DiscoverQuery parentQuery) throws SearchServiceException {
         dateFacet = facet.getIndexFieldName() + ".year";
         //Get a range query so we can create facet queries ranging from our first to our last date
@@ -94,7 +94,7 @@ public class FacetYearRange {
     }
 
     private void calculateNewRangeBasedOnSearchIndex(Context context, List<String> filterQueries,
-                                                     BrowsableDSpaceObject scope, SearchService searchService,
+                                                     BrowsableObject scope, SearchService searchService,
                                                      DiscoverQuery parentQuery) throws SearchServiceException {
         DiscoverQuery yearRangeQuery = new DiscoverQuery();
         yearRangeQuery.setDiscoveryConfigurationName(parentQuery.getDiscoveryConfigurationName());

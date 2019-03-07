@@ -23,8 +23,8 @@ public abstract class BrowsableDSpaceObjectConverter<M extends BrowsableObject,
     /**
      * 
      * @param bdso
-     *            the browsableDSpaceObject to check
-     * @return true if the actual converter implementation is able to manage the supplied BrowsableDSpaceObject
+     *            the BrowsableObject to check
+     * @return true if the actual converter implementation is able to manage the supplied BrowsableObject
      */
     public abstract boolean supportsModel(BrowsableObject bdso);
 

@@ -18,7 +18,7 @@ import org.dspace.app.rest.model.RestAddressableModel;
 import org.dspace.app.rest.model.SearchResultEntryRest;
 import org.dspace.app.rest.model.SearchResultsRest;
 import org.dspace.app.rest.parameter.SearchFilter;
-import org.dspace.browse.BrowsableDSpaceObject;
+import org.dspace.browse.BrowsableObject;
 import org.dspace.core.Context;
 import org.dspace.discovery.DiscoverResult;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
@@ -66,7 +66,7 @@ public class DiscoverResultConverter {
     }
 
     private void addSearchResults(final DiscoverResult searchResult, final SearchResultsRest resultsRest) {
-        for (BrowsableDSpaceObject dspaceObject : CollectionUtils.emptyIfNull(searchResult.getDspaceObjects())) {
+        for (BrowsableObject dspaceObject : CollectionUtils.emptyIfNull(searchResult.getDspaceObjects())) {
             SearchResultEntryRest resultEntry = new SearchResultEntryRest();
 
             //Convert the DSpace Object to its REST model
@@ -86,8 +86,8 @@ public class DiscoverResultConverter {
         }
     }
 
-    private RestAddressableModel convertDSpaceObject(final BrowsableDSpaceObject dspaceObject) {
-        for (BrowsableDSpaceObjectConverter<BrowsableDSpaceObject, RestAddressableModel> converter : converters) {
+    private RestAddressableModel convertDSpaceObject(final BrowsableObject dspaceObject) {
+        for (BrowsableDSpaceObjectConverter<BrowsableObject, RestAddressableModel> converter : converters) {
             if (converter.supportsModel(dspaceObject)) {
                 return converter.convert(dspaceObject);
             }

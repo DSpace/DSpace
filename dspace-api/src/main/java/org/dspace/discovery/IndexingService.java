@@ -12,11 +12,11 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 
-import org.dspace.browse.BrowsableDSpaceObject;
+import org.dspace.browse.BrowsableObject;
 import org.dspace.core.Context;
 
 /**
- * Interface used for indexing BrowsableDSpaceObject into discovery
+ * Interface used for indexing BrowsableObject into discovery
  *
  * @author Kevin Van de Velde (kevin at atmire dot com)
  * @author Mark Diggory (markd at atmire dot com)
@@ -24,19 +24,19 @@ import org.dspace.core.Context;
  */
 public interface IndexingService {
 
-    void indexContent(Context context, BrowsableDSpaceObject dso)
+    void indexContent(Context context, BrowsableObject dso)
         throws SQLException;
 
-    void indexContent(Context context, BrowsableDSpaceObject dso,
+    void indexContent(Context context, BrowsableObject dso,
                       boolean force) throws SQLException;
 
-    void indexContent(Context context, BrowsableDSpaceObject dso,
+    void indexContent(Context context, BrowsableObject dso,
                       boolean force, boolean commit) throws SQLException, SearchServiceException;
 
-    void unIndexContent(Context context, BrowsableDSpaceObject dso)
+    void unIndexContent(Context context, BrowsableObject dso)
         throws SQLException, IOException;
 
-    void unIndexContent(Context context, BrowsableDSpaceObject dso, boolean commit)
+    void unIndexContent(Context context, BrowsableObject dso, boolean commit)
         throws SQLException, IOException;
 
     void unIndexContent(Context context, String uniqueSearchID)
@@ -45,7 +45,7 @@ public interface IndexingService {
     void unIndexContent(Context context, String uniqueSearchID, boolean commit)
         throws IOException;
 
-    void reIndexContent(Context context, BrowsableDSpaceObject dso)
+    void reIndexContent(Context context, BrowsableObject dso)
         throws SQLException, IOException;
 
     void createIndex(Context context) throws SQLException, IOException;

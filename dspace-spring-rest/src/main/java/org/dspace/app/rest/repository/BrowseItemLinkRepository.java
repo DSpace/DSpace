@@ -19,7 +19,7 @@ import org.dspace.app.rest.model.BrowseIndexRest;
 import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.hateoas.ItemResource;
 import org.dspace.app.rest.utils.ScopeResolver;
-import org.dspace.browse.BrowsableDSpaceObject;
+import org.dspace.browse.BrowsableObject;
 import org.dspace.browse.BrowseEngine;
 import org.dspace.browse.BrowseException;
 import org.dspace.browse.BrowseIndex;
@@ -75,7 +75,7 @@ public class BrowseItemLinkRepository extends AbstractDSpaceRestRepository
         BrowseEngine be = new BrowseEngine(context);
         BrowserScope bs = new BrowserScope(context);
 
-        BrowsableDSpaceObject scopeObj = scopeResolver.resolveScope(context, scope);
+        BrowsableObject scopeObj = scopeResolver.resolveScope(context, scope);
 
         // process the input, performing some inline validation
         BrowseIndex bi = null;
@@ -152,7 +152,7 @@ public class BrowseItemLinkRepository extends AbstractDSpaceRestRepository
         Pageable pageResultInfo =
                 new PageRequest((binfo.getStart() - 1) / binfo.getResultsPerPage(), binfo.getResultsPerPage());
         List<Item> tmpResult = new ArrayList<Item>();
-        for (BrowsableDSpaceObject bb : binfo.getBrowseItemResults()) {
+        for (BrowsableObject bb : binfo.getBrowseItemResults()) {
             tmpResult.add((Item) bb);
         }
         Page<ItemRest> page = new PageImpl<Item>(tmpResult, pageResultInfo, binfo.getTotal()).map(converter);

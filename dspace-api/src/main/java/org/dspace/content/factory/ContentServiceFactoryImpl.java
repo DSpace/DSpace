@@ -70,7 +70,7 @@ public class ContentServiceFactoryImpl extends ContentServiceFactory {
     private SiteService siteService;
 
     @Override
-    public List<BrowsableObjectService> getBrowsableDSpaceObjectServices() {
+    public List<BrowsableObjectService> getBrowsableObjectServices() {
         return new DSpace().getServiceManager().getServicesByType(BrowsableObjectService.class);
     }
 

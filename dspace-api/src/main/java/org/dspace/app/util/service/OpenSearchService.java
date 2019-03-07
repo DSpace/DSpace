@@ -12,7 +12,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
-import org.dspace.browse.BrowsableDSpaceObject;
+import org.dspace.browse.BrowsableObject;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 import org.w3c.dom.Document;
@@ -92,7 +92,7 @@ public interface OpenSearchService {
      */
     public String getResultsString(Context context, String format, String query, int totalResults, int start,
                                    int pageSize,
-                                   DSpaceObject scope, List<BrowsableDSpaceObject> results,
+                                   DSpaceObject scope, List<BrowsableObject> results,
                                    Map<String, String> labels) throws IOException;
 
     /**
@@ -112,7 +112,7 @@ public interface OpenSearchService {
      */
     public Document getResultsDoc(Context context, String format, String query, int totalResults, int start,
                                   int pageSize,
-                                  DSpaceObject scope, List<BrowsableDSpaceObject> results, Map<String, String> labels)
+                                  DSpaceObject scope, List<BrowsableObject> results, Map<String, String> labels)
         throws IOException;
 
     public DSpaceObject resolveScope(Context context, String scope) throws SQLException;

@@ -15,7 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.common.SolrInputDocument;
-import org.dspace.browse.BrowsableDSpaceObject;
+import org.dspace.browse.BrowsableObject;
 import org.dspace.browse.BrowseException;
 import org.dspace.browse.BrowseIndex;
 import org.dspace.content.Item;
@@ -57,7 +57,7 @@ public class SolrServiceMetadataBrowseIndexingPlugin implements SolrServiceIndex
     protected ChoiceAuthorityService choiceAuthorityService;
 
     @Override
-    public void additionalIndex(Context context, BrowsableDSpaceObject dso, SolrInputDocument document) {
+    public void additionalIndex(Context context, BrowsableObject dso, SolrInputDocument document) {
         // Only works for Items
         if (!(dso instanceof Item)) {
             return;

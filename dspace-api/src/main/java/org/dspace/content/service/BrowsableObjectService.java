@@ -14,7 +14,7 @@ import org.dspace.browse.BrowsableObject;
 import org.dspace.core.Context;
 
 /**
- * Service interface class for any BrowsableDSpaceObject.
+ * Service interface class for any BrowsableObject.
  * All BrowsableObject service classes should implement this class since it offers some basic methods which all
  * BrowsableObjects are required to have.
  *
@@ -38,7 +38,7 @@ public interface BrowsableObjectService<T extends BrowsableObject<PK>, PK extend
     /**
      * Returns the Constants which this service supports
      *
-     * @return a org.dspace.core.Constants that represents a BrowsableDSpaceObject type
+     * @return a org.dspace.core.Constants that represents a BrowsableObject type
      */
     public int getSupportsTypeConstant();
 }
