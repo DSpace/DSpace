@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.collections4.ListUtils;
-import org.dspace.browse.BrowsableDSpaceObject;
+import org.dspace.browse.BrowsableObject;
 import org.dspace.discovery.configuration.DiscoveryConfigurationParameters;
 import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
 
@@ -28,7 +28,7 @@ public class DiscoverResult {
 
     private long totalSearchResults;
     private int start;
-    private List<BrowsableDSpaceObject> dspaceObjects;
+    private List<BrowsableObject> dspaceObjects;
     private Map<String, List<FacetResult>> facetResults;
     private Map<String, List<FacetResult>> facetQueryResults;
     private Map<String, List<FacetResult>> facetFieldResults;
@@ -43,7 +43,7 @@ public class DiscoverResult {
     private String spellCheckQuery;
 
     public DiscoverResult() {
-        dspaceObjects = new ArrayList<BrowsableDSpaceObject>();
+        dspaceObjects = new ArrayList<BrowsableObject>();
         facetResults = new LinkedHashMap<String, List<FacetResult>>();
         facetQueryResults = new LinkedHashMap<String, List<FacetResult>>();
         facetFieldResults = new LinkedHashMap<String, List<FacetResult>>();
@@ -51,11 +51,11 @@ public class DiscoverResult {
         highlightedResults = new HashMap<String, DSpaceObjectHighlightResult>();
     }
 
-    public void addDSpaceObject(BrowsableDSpaceObject dso) {
+    public void addDSpaceObject(BrowsableObject dso) {
         this.dspaceObjects.add(dso);
     }
 
-    public List<BrowsableDSpaceObject> getDspaceObjects() {
+    public List<BrowsableObject> getDspaceObjects() {
         return dspaceObjects;
     }
 
@@ -151,11 +151,11 @@ public class DiscoverResult {
         return ListUtils.emptyIfNull(facetValues);
     }
 
-    public DSpaceObjectHighlightResult getHighlightedResults(BrowsableDSpaceObject dso) {
+    public DSpaceObjectHighlightResult getHighlightedResults(BrowsableObject dso) {
         return highlightedResults.get(dso.getUniqueIndexID());
     }
 
-    public void addHighlightedResult(BrowsableDSpaceObject dso, DSpaceObjectHighlightResult highlightedResult) {
+    public void addHighlightedResult(BrowsableObject dso, DSpaceObjectHighlightResult highlightedResult) {
         this.highlightedResults.put(dso.getUniqueIndexID(), highlightedResult);
     }
 
@@ -219,18 +219,18 @@ public class DiscoverResult {
     }
 
     public static final class DSpaceObjectHighlightResult {
-        private BrowsableDSpaceObject dso;
+        private BrowsableObject dso;
         private Map<String, List<String>> highlightResults;
         private Map<String, List<String[]>> highlightResultsWithAuthority;
 
-        public DSpaceObjectHighlightResult(BrowsableDSpaceObject dso, Map<String, List<String>> highlightResults,
+        public DSpaceObjectHighlightResult(BrowsableObject dso, Map<String, List<String>> highlightResults,
                 Map<String, List<String[]>> highlightResultsWithAuthority) {
             this.dso = dso;
             this.highlightResults = highlightResults;
             this.highlightResultsWithAuthority = highlightResultsWithAuthority;
         }
 
-        public BrowsableDSpaceObject getDso() {
+        public BrowsableObject getDso() {
             return dso;
         }
 
@@ -247,7 +247,7 @@ public class DiscoverResult {
         }
     }
 
-    public void addSearchDocument(BrowsableDSpaceObject dso, SearchDocument searchDocument) {
+    public void addSearchDocument(BrowsableObject dso, SearchDocument searchDocument) {
         String dsoString = SearchDocument.getDspaceObjectStringRepresentation(dso);
         List<SearchDocument> docs = searchDocuments.get(dsoString);
         if (docs == null) {
@@ -264,7 +264,7 @@ public class DiscoverResult {
      *            the dspace object we want our search documents for
      * @return the search documents list
      */
-    public List<SearchDocument> getSearchDocument(BrowsableDSpaceObject dso) {
+    public List<SearchDocument> getSearchDocument(BrowsableObject dso) {
         String dsoString = SearchDocument.getDspaceObjectStringRepresentation(dso);
         List<SearchDocument> result = searchDocuments.get(dsoString);
         if (result == null) {
@@ -305,7 +305,7 @@ public class DiscoverResult {
             }
         }
 
-        public static String getDspaceObjectStringRepresentation(BrowsableDSpaceObject dso) {
+        public static String getDspaceObjectStringRepresentation(BrowsableObject dso) {
             return dso.getType() + ":" + dso.getID();
         }
     }

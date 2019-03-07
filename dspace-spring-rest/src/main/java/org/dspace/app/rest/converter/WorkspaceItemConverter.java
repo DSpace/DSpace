@@ -21,7 +21,7 @@ import org.dspace.app.rest.submit.SubmissionService;
 import org.dspace.app.util.SubmissionConfigReader;
 import org.dspace.app.util.SubmissionConfigReaderException;
 import org.dspace.app.util.SubmissionStepConfig;
-import org.dspace.browse.BrowsableDSpaceObject;
+import org.dspace.browse.BrowsableObject;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
@@ -155,7 +155,7 @@ public class WorkspaceItemConverter
     }
 
     @Override
-    public boolean supportsModel(BrowsableDSpaceObject object) {
+    public boolean supportsModel(BrowsableObject object) {
         return object instanceof WorkspaceItem;
     }
 }

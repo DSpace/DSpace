@@ -20,7 +20,7 @@ import org.dspace.app.rest.model.BrowseEntryRest;
 import org.dspace.app.rest.model.BrowseIndexRest;
 import org.dspace.app.rest.model.hateoas.BrowseEntryResource;
 import org.dspace.app.rest.utils.ScopeResolver;
-import org.dspace.browse.BrowsableDSpaceObject;
+import org.dspace.browse.BrowsableObject;
 import org.dspace.browse.BrowseEngine;
 import org.dspace.browse.BrowseException;
 import org.dspace.browse.BrowseIndex;
@@ -73,7 +73,7 @@ public class BrowseEntryLinkRepository extends AbstractDSpaceRestRepository
         BrowseEngine be = new BrowseEngine(context);
         BrowserScope bs = new BrowserScope(context);
 
-        BrowsableDSpaceObject scopeObj = scopeResolver.resolveScope(context, scope);
+        BrowsableObject scopeObj = scopeResolver.resolveScope(context, scope);
 
         // process the input, performing some inline validation
         final BrowseIndex bi;

@@ -10,7 +10,7 @@ package org.dspace.discovery;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.dspace.browse.BrowsableDSpaceObject;
+import org.dspace.browse.BrowsableObject;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.discovery.configuration.DiscoveryMoreLikeThisConfiguration;
@@ -49,7 +49,7 @@ public interface SearchService {
      * @return discovery search result object
      * @throws SearchServiceException if search error
      */
-    DiscoverResult search(Context context, BrowsableDSpaceObject dso, DiscoverQuery query)
+    DiscoverResult search(Context context, BrowsableObject dso, DiscoverQuery query)
         throws SearchServiceException;
 
     /**
@@ -73,10 +73,10 @@ public interface SearchService {
      * @return discovery search result object
      * @throws SearchServiceException if search error
      */
-    DiscoverResult search(Context context, BrowsableDSpaceObject dso, DiscoverQuery query, boolean includeWithdrawn)
+    DiscoverResult search(Context context, BrowsableObject dso, DiscoverQuery query, boolean includeWithdrawn)
         throws SearchServiceException;
 
-    List<BrowsableDSpaceObject> search(Context context, String query, String orderfield, boolean ascending, int offset,
+    List<BrowsableObject> search(Context context, String query, String orderfield, boolean ascending, int offset,
             int max, String... filterquery);
 
     /**
@@ -129,7 +129,7 @@ public interface SearchService {
      */
     String escapeQueryChars(String query);
 
-    FacetYearRange getFacetYearRange(Context context, BrowsableDSpaceObject scope, DiscoverySearchFilterFacet facet,
+    FacetYearRange getFacetYearRange(Context context, BrowsableObject scope, DiscoverySearchFilterFacet facet,
             List<String> filterQueries, DiscoverQuery parentQuery)
                     throws SearchServiceException;
 
