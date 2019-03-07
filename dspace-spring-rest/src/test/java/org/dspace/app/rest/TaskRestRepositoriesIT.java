@@ -544,8 +544,15 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
 
         String reviewer1Token = getAuthToken(reviewer1.getEmail(), password);
         String reviewer2Token = getAuthToken(reviewer2.getEmail(), password);
+        String adminToken = getAuthToken(admin.getEmail(), password);
 
         getClient(reviewer2Token).perform(post("/api/workflow/claimedtasks/" + claimedTask.getID())
+                .param("submit_approve", "true")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED))
+            .andExpect(status().isForbidden());
+
+        // nor the administrator can approve a task that he doesn't own
+        getClient(adminToken).perform(post("/api/workflow/claimedtasks/" + claimedTask.getID())
                 .param("submit_approve", "true")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED))
             .andExpect(status().isForbidden());
@@ -712,9 +719,17 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
 
         String reviewer1Token = getAuthToken(reviewer1.getEmail(), password);
         String reviewer2Token = getAuthToken(reviewer2.getEmail(), password);
+        String adminToken = getAuthToken(admin.getEmail(), password);
 
         // try to reject with reviewer2
         getClient(reviewer2Token).perform(post("/api/workflow/claimedtasks/" + claimedTask.getID())
+                .param("submit_reject", "true")
+                .param("reason", "I need to test the reject")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED))
+            .andExpect(status().isForbidden());
+
+        // nor the administrator can approve a task that he doesn't own
+        getClient(adminToken).perform(post("/api/workflow/claimedtasks/" + claimedTask.getID())
                 .param("submit_reject", "true")
                 .param("reason", "I need to test the reject")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED))
