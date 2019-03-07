@@ -236,7 +236,7 @@ jQuery(document).ready(function() {
 		    ".instFeeLevel2"      : amountsByCurrency[currencyCode].instFeeLevel2,
 		    ".instFeeLevel3"      : amountsByCurrency[currencyCode].instFeeLevel3
                 };
-		jQuery.each(['.msg-less_than_10_million', '.msg-greater_than_10_million', '.msg-advocate-all-organizations', '.msg-inst-level1', '.msg-inst-level2', '.msg-inst-level3'], function(i,klass) {
+		jQuery.each(['.msg-less_than_10_million', '.msg-greater_than_10_million', '.msg-advocate-all-organizations', '.msg-inst_level1', '.msg-inst_level2', '.msg-inst_level3'], function(i,klass) {
                     var $elt = jQuery(klass);
                     if ($elt.length === 0) return;
                     jQuery.each(replacements, function(prop, val) {

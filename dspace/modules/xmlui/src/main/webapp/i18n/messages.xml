@@ -3403,9 +3403,9 @@
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.errors.org_inst_size_currency">Currency selection is required</message>
 
     <!-- Checkbox options for org_annual_revenue -->
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_inst_size.level3"><span class="msg-inst-level3"><b>Level III</b>: annual membership dues <span class="instFeeLevel3">$13,000</span></span></message>
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_inst_size.level2"><span class="msg-inst-level2"><b>Level II</b>: annual membership dues <span class="instFeeLevel2">$7,500</span></span></message>
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_inst_size.level1"><span class="msg-inst-level1"><b>Level I</b>: annual membership dues <span class="instFeeLevel1">$3,000</span></span></message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_inst_size.inst_level3"><span class="msg-inst_level3"><b>Level III</b>: annual membership dues <span class="instFeeLevel3">$13,000</span></span></message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_inst_size.inst_level2"><span class="msg-inst_level2"><b>Level II</b>: annual membership dues <span class="instFeeLevel2">$7,500</span></span></message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_inst_size.inst_level1"><span class="msg-inst_level1"><b>Level I</b>: annual membership dues <span class="instFeeLevel1">$3,000</span></span></message>
     
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.errors.org_annual_revenue">Membership level is required, either for publisher or institution</message>
 

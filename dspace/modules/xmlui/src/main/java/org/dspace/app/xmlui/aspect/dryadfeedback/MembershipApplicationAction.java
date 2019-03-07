@@ -57,13 +57,11 @@ public class MembershipApplicationAction extends AbstractAction
         Context context = ContextUtil.obtainContext(objectModel);
 
         if(     (org_name == null) || (org_name.equals("")) ||
-                (org_annual_revenue == null) || (org_annual_revenue.equals("")) ||
+                (((org_annual_revenue == null) || (org_annual_revenue.equals(""))) && ((org_inst_size == null) || (org_inst_size.equals("")))) ||
                 (org_annual_revenue_currency == null) || (org_annual_revenue_currency.equals("")) ||
                 (billing_contact_name == null) || (billing_contact_name.equals("")) ||
                 (billing_address == null) || (billing_address.equals("")) ||
                 (billing_email == null) || (billing_email.equals("")) ||
-                // (membership_year_start == null) ||
-                // (membership_length == null) ||
                 (rep_name == null) || (rep_name.equals("")) ||
                 (rep_email == null) || (rep_email.equals(""))
                 ) {
@@ -75,19 +73,12 @@ public class MembershipApplicationAction extends AbstractAction
             map.put("org_inst_size", org_inst_size);
             map.put("org_annual_revenue_currency", org_annual_revenue_currency);
             map.put("org_legalname", org_legalname);
-            //map.put("org_type", org_type);
-
             map.put("billing_contact_name", billing_contact_name);
             map.put("billing_email", billing_email);
-            map.put("billing_address", billing_address);
-            
+            map.put("billing_address", billing_address);            
             map.put("publications", publications);
-            //map.put("membership_year_start", membership_year_start);
-            //map.put("membership_length", membership_length);
-
             map.put("rep_name", rep_name);
             map.put("rep_email", rep_email);
-
             map.put("comments", comments);
 
             // Handle error fields on submission
@@ -96,12 +87,9 @@ public class MembershipApplicationAction extends AbstractAction
             if((org_name != null) && org_name.equals("")) {
                 errorFieldNames.add("org_name");
             }
-            /*
-              if((org_type != null) && org_type.equals("")) {
-                errorFieldNames.add("org_type");
-            }
-            */
-            if((submittedOnce != null) && ((org_annual_revenue == null) || org_annual_revenue.equals(""))) {
+            if((submittedOnce != null) &&
+               ((org_annual_revenue == null) || org_annual_revenue.equals("")) &&
+               ((org_inst_size == null) || org_inst_size.equals(""))) {
                 errorFieldNames.add("org_annual_revenue");
             }
             if((submittedOnce != null) && ((org_annual_revenue_currency == null) || org_annual_revenue_currency.equals(""))) {
