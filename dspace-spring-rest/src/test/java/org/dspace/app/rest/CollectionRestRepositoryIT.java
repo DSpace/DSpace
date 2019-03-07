@@ -641,13 +641,9 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         context.turnOffAuthorisationSystem();
         parentCommunity = CommunityBuilder.createCommunity(context).withName("Community").build();
         Collection col = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection").build();
+        context.restoreAuthSystemState();
         String token = getAuthToken(asUser.getEmail(), password);
 
-        try {
-            new MetadataPatchSuite().runWith(getClient(token), "/api/core/collections/"
-                    + col.getID(), expectedStatus);
-        } finally {
-            context.restoreAuthSystemState();
-        }
+        new MetadataPatchSuite().runWith(getClient(token), "/api/core/collections/" + col.getID(), expectedStatus);
     }
 }

@@ -866,13 +866,10 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
     private void runPatchMetadataTests(EPerson asUser, int expectedStatus) throws Exception {
         context.turnOffAuthorisationSystem();
         parentCommunity = CommunityBuilder.createCommunity(context).withName("Community").build();
+        context.restoreAuthSystemState();
         String token = getAuthToken(asUser.getEmail(), password);
 
-        try {
-            new MetadataPatchSuite().runWith(getClient(token), "/api/core/communities/"
-                    + parentCommunity.getID(), expectedStatus);
-        } finally {
-            context.restoreAuthSystemState();
-        }
+        new MetadataPatchSuite().runWith(getClient(token), "/api/core/communities/"
+                + parentCommunity.getID(), expectedStatus);
     }
 }
