@@ -1048,7 +1048,11 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         EPerson ePerson = EPersonBuilder.createEPerson(context).withEmail("user@test.com").build();
         String token = getAuthToken(asUser.getEmail(), password);
 
-        new MetadataPatchSuite().runWith(getClient(token), "/api/eperson/epersons/" + ePerson.getID(), expectedStatus);
+        try {
+            new MetadataPatchSuite().runWith(getClient(token), "/api/eperson/epersons/" + ePerson.getID(), expectedStatus);
+        } finally {
+            context.restoreAuthSystemState();
+        }
     }
 
 }

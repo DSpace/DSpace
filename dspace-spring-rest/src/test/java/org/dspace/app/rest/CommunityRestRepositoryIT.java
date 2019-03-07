@@ -868,7 +868,11 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
         parentCommunity = CommunityBuilder.createCommunity(context).withName("Community").build();
         String token = getAuthToken(asUser.getEmail(), password);
 
-        new MetadataPatchSuite().runWith(getClient(token), "/api/core/communities/"
-                + parentCommunity.getID(), expectedStatus);
+        try {
+            new MetadataPatchSuite().runWith(getClient(token), "/api/core/communities/"
+                    + parentCommunity.getID(), expectedStatus);
+        } finally {
+            context.restoreAuthSystemState();
+        }
     }
 }

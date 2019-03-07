@@ -606,7 +606,11 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                 .build();
         String token = getAuthToken(asUser.getEmail(), password);
 
-        new MetadataPatchSuite().runWith(getClient(token), "/api/core/bitstreams/"
-                + parentCommunity.getLogo().getID(), expectedStatus);
+        try {
+            new MetadataPatchSuite().runWith(getClient(token), "/api/core/bitstreams/"
+                    + parentCommunity.getLogo().getID(), expectedStatus);
+        } finally {
+            context.restoreAuthSystemState();
+        }
     }
 }
