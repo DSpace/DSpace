@@ -500,7 +500,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
                                     <a href="/pages/membershipOverview">Membership</a>
                                 </li> 
                                 <li>
-                                    <a href="/pages/Events">Events</a>
+                                    <a href="/pages/events">Events</a>
                                 </li>                            
                                 <li>
                                     <a href="/pages/paymentPlans">Payment plans</a>
