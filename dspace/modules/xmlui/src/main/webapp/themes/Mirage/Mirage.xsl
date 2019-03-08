@@ -202,7 +202,7 @@
 		      </a>
 		  -->
 		  <a href="https://zoom.us/webinar/register/WN_azsNMWU3QFWNhtcQivAdiA">
-		    <img class = 'display-box-img' src="/themes/Mirage/images/webinar2019-03.png" alt="Dryad's Webinar on the Institutional Membership Program"/>
+		    <img style="padding-top:20px;" class = 'display-box-img' src="/themes/Mirage/images/webinar2019-03.png" alt="Dryad's Webinar on the Institutional Membership Program"/>
                   </a>
 		  
                 </div>
