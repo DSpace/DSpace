@@ -17,6 +17,7 @@ import javax.servlet.jsp.tagext.TagSupport;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.dspace.eperson.EPerson;
+import org.dspace.core.Utils;
 
 /**
  * <p>
@@ -122,7 +123,7 @@ public class SelectEPersonTag extends TagSupport
                 for (int i = 0; i < epeople.length; i++)
                 {
                     out.print("<option value=\"" + epeople[i].getID() + "\">");
-                    out.print(epeople[i].getFullName() + " ("
+                    out.print(Utils.addEntities(epeople[i].getFullName()) + " ("
                             + epeople[i].getEmail() + ")");
                     out.println("</option>");
                 }

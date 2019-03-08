@@ -62,7 +62,7 @@
     for (int i = 0; i < groups.length; i++)
     {
 %>
-                <option value="<%= groups[i].getID() %>"><%= groups[i].getName() %></option>
+                <option value="<%= groups[i].getID() %>"><%= Utils.addEntities(groups[i].getName()) %></option>
 <%
     }
 %>

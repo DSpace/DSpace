@@ -15,15 +15,15 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authority.orcid.OrcidService;
-import org.dspace.authority.orcid.jaxb.email.EmailCtype;
-import org.dspace.authority.orcid.jaxb.email.Emails;
-import org.dspace.authority.orcid.jaxb.personaldetails.PersonalDetails;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Metadatum;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
+import org.orcid.jaxb.model.record_v2.EmailType;
+import org.orcid.jaxb.model.record_v2.Emails;
+import org.orcid.jaxb.model.record_v2.PersonalDetails;
 
 /**
  *
@@ -107,7 +107,7 @@ public class OAuthAuthenticationMethod implements AuthenticationMethod{
             if (emails != null)
             {
                 if(emails.getEmail() != null && !emails.getEmail().isEmpty()) {
-                    for(EmailCtype emailCType : emails.getEmail()) {
+                    for(EmailType emailCType : emails.getEmail()) {
                         if(emailCType.isVerified()) {
                             email = emailCType.getEmail();
                         }
