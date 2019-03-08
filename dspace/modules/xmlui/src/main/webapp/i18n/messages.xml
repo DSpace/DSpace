@@ -3360,7 +3360,7 @@
     <!-- Messages for Dryad Membership Application -->
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.title">Dryad Membership</message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.heading">Membership Application</message>
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.overview.p1">Any organization that supports the educational, scientific, and charitable mission of Dryad is eligible to become a member. Upon acceptance, a <a href="/themes/Mirage/docs/Membership_Agreement.pdf">Membership Agreement</a> and request for dues will be sent to the address given.</message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.overview.p1">Any organization that supports the educational, scientific, and charitable mission of Dryad is eligible to become a member. Upon acceptance, a membership agreement and request for dues will be sent to the address given.</message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.overview.p2">If you are unable to meet the Membership Fees, please contact <a href="mailto:director@datadryad.org">director@datadryad.org</a> to discuss alternative pricing. If your organization is in a position to support Dryad at a higher level than our posted fees, we would be happy to further discuss.</message>
 
 
