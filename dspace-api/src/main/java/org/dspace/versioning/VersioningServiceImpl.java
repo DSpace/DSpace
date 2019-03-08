@@ -104,31 +104,7 @@ public class VersioningServiceImpl implements VersioningService {
             // so we need to get the item now
             Item item = version.getItem();
 
-            VersionHistory history = version.getVersionHistory();
-            if (item != null) {
-                // take care of the item identifiers
-                provider.deleteVersionedItem(c, version, history);
-            }
-
-            // to keep version number stables, we do not delete versions,
-            // we set all fields null except versionnumber and versionhistory
-            version.setItem(null);
-            version.setSummary(null);
-            version.setVersionDate(null);
-            version.setePerson(null);
-            versionDAO.save(c, version);
-
-            // if all versions of a version history were deleted,
-            // we delete the version history.
-            if (this.getVersionsByHistory(c, history) == null
-                || this.getVersionsByHistory(c, history).isEmpty()) {
-                // hard delete the previously soft deleted versions
-                for (Version v : history.getVersions()) {
-                    versionDAO.delete(c, v);
-                }
-                // delete the version history
-                versionHistoryService.delete(c, history);
-            }
+            deleteVersion(c, item, version);
 
             // Completely delete the item
             if (item != null) {
@@ -160,6 +136,51 @@ public class VersioningServiceImpl implements VersioningService {
         Version version = versionDAO.findByItem(c, item);
         if (version != null) {
             removeVersion(c, version);
+        }
+    }
+
+    @Override
+    public void removeVersionFromItem(Context c, Item item) {
+        try{
+            Version version = versionDAO.findByItem(c, item);
+            if(version!=null){
+                // we will first delete the version and then the item
+                // after deletion of the version we cannot find the item anymore
+                // so we need to get the item now
+                deleteVersion(c, item, version);
+            }
+        }catch (Exception e) {
+            c.abort();
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
+    private void deleteVersion(Context c, Item item, Version version)
+        throws SQLException, org.dspace.authorize.AuthorizeException {
+        VersionHistory history = version.getVersionHistory();
+        if (item != null) {
+            // take care of the item identifiers
+            provider.deleteVersionedItem(c, version, history);
+        }
+
+        // to keep version number stables, we do not delete versions,
+        // we set all fields null except versionnumber and versionhistory
+        version.setItem(null);
+        version.setSummary(null);
+        version.setVersionDate(null);
+        version.setePerson(null);
+        versionDAO.save(c, version);
+
+        // if all versions of a version history were deleted,
+        // we delete the version history.
+        if (this.getVersionsByHistory(c, history) == null
+            || this.getVersionsByHistory(c, history).isEmpty()) {
+            // hard delete the previously soft deleted versions
+            for (Version v : history.getVersions()) {
+                versionDAO.delete(c, v);
+            }
+            // delete the version history
+            versionHistoryService.delete(c, history);
         }
     }
 
