@@ -45,4 +45,7 @@ public class JsonValueEvaluator implements LateObjectEvaluator {
         }
     }
 
+    public JsonNode getValueNode() {
+        return this.valueNode;
+    }
 }

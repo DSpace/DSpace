@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
  * Provides patch operations for eperson updates.
  */
 @Component
-public class EPersonPatch extends AbstractResourcePatch<EPersonRest> {
+public class EPersonPatch extends DSpaceObjectPatch<EPersonRest> {
 
     @Autowired
     EPersonOperationFactory patchFactory;
