@@ -31,7 +31,6 @@
 		</xsl:call-template>
 	  	
 	  	<xsl:call-template name="accessRightsAndEmbargo" >
-			<xsl:with-param name="liftDate" select="doc:element[@name='sedici']/doc:element[@name='embargo']/doc:element[@name='liftDate']/doc:element/doc:field/text()"/>
 			<xsl:with-param name="context-name" select="$context"/>
 		</xsl:call-template>
 		
