@@ -141,15 +141,15 @@ public class VersioningServiceImpl implements VersioningService {
 
     @Override
     public void removeVersionFromItem(Context c, Item item) {
-        try{
+        try {
             Version version = versionDAO.findByItem(c, item);
-            if(version!=null){
+            if (version != null) {
                 // we will first delete the version and then the item
                 // after deletion of the version we cannot find the item anymore
                 // so we need to get the item now
                 deleteVersion(c, item, version);
             }
-        }catch (Exception e) {
+        } catch (Exception e) {
             c.abort();
             throw new RuntimeException(e.getMessage(), e);
         }
