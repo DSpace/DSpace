@@ -133,6 +133,8 @@ public class BasicLinkChecker extends AbstractCurationTask {
             URL theURL = new URL(url);
             HttpURLConnection connection = (HttpURLConnection) theURL.openConnection();
             connection.setInstanceFollowRedirects(true);
+            connection.setConnectTimeout(10000);
+            connection.setReadTimeout(10000);
             int statusCode = connection.getResponseCode();
             connection.disconnect();
             if (statusCode != HttpURLConnection.HTTP_OK &&
