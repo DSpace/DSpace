@@ -3,36 +3,54 @@
         "revenueThreshold": "10 million US Dollars",
         "smallOrgFee": "USD $1,000",
         "largeOrgFee": "USD $5,000",
-        "advocateFee": "USD $500"
+        "advocateFee": "USD $500",
+	"instFeeLevel3": "USD $13,000",
+	"instFeeLevel2": "USD $7,500",
+	"instFeeLevel1": "USD $3,000"
     },
     "EUR": {
         "revenueThreshold": "7.8 million Euros",
         "smallOrgFee": "€780", 
         "largeOrgFee": "€3900",
-        "advocateFee": "€390"
+        "advocateFee": "€390",
+	"instFeeLevel3": "USD $13,000",
+	"instFeeLevel2": "USD $7,500",
+	"instFeeLevel1": "USD $3,000"
     },
     "GBP": {
         "revenueThreshold": "6.6 million GB Pounds",
         "smallOrgFee": "£660",
         "largeOrgFee": "£3300",
-        "advocateFee": "£330"
+        "advocateFee": "£330",
+	"instFeeLevel3": "USD $13,000",
+	"instFeeLevel2": "USD $7,500",
+	"instFeeLevel1": "USD $3,000"
     },
     "CAD": {
         "revenueThreshold": "10 million Canadian Dollars",
         "smallOrgFee": "CAD $1,000",
         "largeOrgFee": "CAD $5,000",
-        "advocateFee": "CAD $500"
+        "advocateFee": "CAD $500",
+	"instFeeLevel3": "USD $13,000",
+	"instFeeLevel2": "USD $7,500",
+	"instFeeLevel1": "USD $3,000"
     },
     "JPY": {
         "revenueThreshold": "950 billion Japanese Yen",
         "smallOrgFee": "¥95,000", 
         "largeOrgFee": "¥475,000",
-        "advocateFee": "¥47,500"
+        "advocateFee": "¥47,500",
+	"instFeeLevel3": "USD $13,000",
+	"instFeeLevel2": "USD $7,500",
+	"instFeeLevel1": "USD $3,000"
     },
     "AUD": {
         "revenueThreshold": "9.6 million Australian Dollars",
         "smallOrgFee": "AUD $960",
         "largeOrgFee": "AUD $4,800",
-        "advocateFee": "AUD $480"
+        "advocateFee": "AUD $480",
+	"instFeeLevel3": "USD $13,000",
+	"instFeeLevel2": "USD $7,500",
+	"instFeeLevel1": "USD $3,000"
     }
 }

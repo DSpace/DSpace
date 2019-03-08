@@ -3360,9 +3360,23 @@
     <!-- Messages for Dryad Membership Application -->
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.title">Dryad Membership</message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.heading">Membership Application</message>
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.overview.p1">Any organization that supports the educational, scientific, and charitable mission of Dryad is eligible to become a member. Applications will be reviewed by the Board of Directors. Upon acceptance, a <a href="/themes/Mirage/docs/Membership_Agreement.pdf">Membership Agreement</a> and request for dues will be sent to the address given. Membership is active once Dryad has received the signed agreement and dues.</message>
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.overview.p2">For more information on membership, please see the <a href="/pages/membershipOverview">membership page</a> or contact <a href="mailto:director@datadryad.org">director@datadryad.org</a>.</message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.overview.p1">Any organization that supports the educational, scientific, and charitable mission of Dryad is eligible to become a member. Upon acceptance, a <a href="/themes/Mirage/docs/Membership_Agreement.pdf">Membership Agreement</a> and request for dues will be sent to the address given.</message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.overview.p2">If you are unable to meet the Membership Fees, please contact <a href="mailto:director@datadryad.org">director@datadryad.org</a> to discuss alternative pricing. If your organization is in a position to support Dryad at a higher level than our posted fees, we would be happy to further discuss.</message>
 
+
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.institution.p1"><p>Dryad membership brings significant value to institutions as such we recognize that any metric for assessing fees we chose might not seem equitable to every institution. Therefore, we are asking institutions to <span style="text-decoration: underline">self-determine</span> your level of commitment. Below are some parameters you may use, but <em>you make the decision</em> about which level corresponds most closely to your institution’s resources.</p></message>
+
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.institution.p2">
+      <table>
+	<tr><td><b>Size of Institution</b></td><td><b>Suggested Examples for Determining Size</b></td></tr>
+	<tr><td>Level 1</td><td>R3 or FTE under 5K or less than $50M in research grant funding.</td></tr>
+	<tr><td>Level II</td><td>R2 or FTE 5K - 10K or  $50M - $300M in research grant funding.</td></tr>
+	<tr><td>Level III</td><td>RI or FTE +10K FTE or +$300M in research grant funding.</td></tr>
+      </table>
+    </message>
+    
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.overview.p3">For more information on membership, please see the <a href="/pages/membershipOverview">membership page</a> or contact <a href="mailto:director@datadryad.org">director@datadryad.org</a>.</message>
+    
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.markedfields"><span id="required-fields-note" class="required-mark">* Marked fields are required</span></message>
 
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_name.label1">1a. Name of member organization <span class="required-mark">*</span></message>
@@ -3372,34 +3386,52 @@
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_legalname.label1">1b. Legal name of organization</message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_legalname.label2">If different from above.</message>
 
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_type.label1">2. Type of organization <span class="required-mark">*</span></message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_type.label1">XXXX. Type of organization <span class="required-mark">*</span></message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_type.label2">Please briefly describe the nature of the organization and its interest in Dryad’s mission.</message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.errors.org_type">Organization type is required</message>
 
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_annual_revenue.label1">3. Membership level <span class="required-mark">*</span></message>
+    
+    <!-- Publisher Membership: Annual Revenue -->
+        <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_annual_revenue.label1">2. Membership level - Publisher<span class="required-mark">*</span></message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_annual_revenue.label2">Please specify currency.</message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.errors.org_annual_revenue_currency">Currency selection is required</message>
 
     <!-- Checkbox options for org_annual_revenue -->
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_annual_revenue.greater_than_10_million"><span class="msg-greater_than_10_million"><b>Sustainer</b>: annual membership dues <span class="largeOrgFee">&#x00A0;</span> (annual revenue greater than <span class="revenueThreshold">&#x00A0;</span> per year)</span></message>
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_annual_revenue.less_than_10_million"><span class="msg-less_than_10_million"><b>Supporter</b>: annual membership dues <span class="smallOrgFee">&#x00A0;</span> (annual revenue less than <span class="revenueThreshold">&#x00A0;</span> per year)</span></message>
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_annual_revenue.advocate_all_organizations"><span class="msg-advocate-all-organizations"><b>Advocate</b>: annual membership dues <span class="advocateFee">&#x00A0;</span> (open to all organizations, no journal discounts)</span></message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_annual_revenue.greater_than_10_million"><span class="msg-greater_than_10_million"><b>Sustainer</b>: annual membership dues USD $5,000 (annual revenue greater than 10 million US Dollars per year)</span></message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_annual_revenue.less_than_10_million"><span class="msg-less_than_10_million"><b>Supporter</b>: annual membership dues USD $1,000 (annual revenue less than 10 million US Dollars per year)</span></message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_annual_revenue.advocate_all_organizations"><span class="msg-advocate-all-organizations"><b>Advocate</b>: annual membership dues USD $500 (open to all organizations, no journal discounts)</span></message>
     
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.errors.org_annual_revenue">Annual revenue is required</message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.errors.org_annual_revenue">Membership level is required, either for publisher or institution</message>
 
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.billing_contact_name.label1">4. Billing contact name<span class="required-mark">*</span></message>
+    
+    <!-- Institutional Membership: Size -->
+        <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_inst_size.label1">2. Membership level - Institution<span class="required-mark">*</span></message>
+
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.errors.org_inst_size_currency">Currency selection is required</message>
+
+    <!-- Checkbox options for org_annual_revenue -->
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_inst_size.inst_level3"><span class="msg-inst_level3"><b>Level III</b>: annual membership dues $13,000</span></message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_inst_size.inst_level2"><span class="msg-inst_level2"><b>Level II</b>: annual membership dues $7,500</span></message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_inst_size.inst_level1"><span class="msg-inst_level1"><b>Level I</b>: annual membership dues $3,000</span></message>
+    
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.errors.org_annual_revenue">Membership level is required, either for publisher or institution</message>
+
+    
+    <!-- Billing Contact -->
+
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.billing_contact_name.label1">3. Billing contact name<span class="required-mark">*</span></message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.errors.billing_contact_name">Billing contact name is required</message>
 
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.billing_email.label1">5. Billing contact email address <span class="required-mark">*</span></message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.billing_email.label1">4. Billing contact email address <span class="required-mark">*</span></message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.errors.billing_email">Billing email address is required</message>
 
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.billing_address.label1">6. Billing contact postal address <span class="required-mark">*</span></message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.billing_address.label1">5. Billing contact postal address <span class="required-mark">*</span></message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.errors.billing_address">Billing address is required</message>
 
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.publications.label1">7. Publications</message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.publications.label1">XXX. Publications</message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.publications.label2">One benefit for Sustainer and Supporter members is a discount on payment plans for qualifying journals published by the member. Please list journals that your organization publishes. If too many to list here, please send to <a href="mailto:director@datadryad.org">director@datadryad.org</a>.</message>
 
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.membership_term.label1">8. Membership term <span class="required-mark">*</span></message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.membership_term.label1">XXX. Membership term <span class="required-mark">*</span></message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.membership_term.label2">Membership years run January&#x2013;December.  Membership may start in the current year or the following year, and may be selected for multiple years.<br/></message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.membership_year.starting_year.label">Membership term starting January of&#x00A0;</message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.membership_year.starting_year.current">current year</message>
@@ -3413,7 +3445,7 @@
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.errors.membership_length">Duration of membership is required.</message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.errors.membership_year_start">Membership term starting year is required.</message>
 
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.rep_org.label1">9. Organizational representative <span class="required-mark">*</span></message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.rep_org.label1">6. Organizational representative <span class="required-mark">*</span></message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.rep_org.label2">The organizational representative will receive all regular communications on behalf of the member organization, excepting those concerning dues. The representative may serve as the delegate at the Annual Meeting or appoint another delegate in his/her place. </message>
 
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.rep_name">Name</message>
@@ -3423,7 +3455,7 @@
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.rep_email">Email address</message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.errors.rep_email">Email address is required</message>
 
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.comments.label1">10. Comments</message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.comments.label1">7. Comments</message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.comments.label2">Please add any additional information, comments or questions here.</message>
 
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.submit">Submit</message>

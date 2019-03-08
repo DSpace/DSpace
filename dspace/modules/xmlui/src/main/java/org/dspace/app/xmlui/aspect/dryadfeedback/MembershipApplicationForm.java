@@ -27,11 +27,7 @@ import org.dspace.app.xmlui.wing.element.TextArea;
 import org.dspace.authorize.AuthorizeException;
 import org.xml.sax.SAXException;
 
-/**
- * Display to the user a simple form letting the user give feedback.
- * 
- * @author Scott Phillips
- */
+
 public class MembershipApplicationForm extends AbstractDSpaceTransformer implements CacheableProcessingComponent
 {
     /** Language Strings */
@@ -45,10 +41,12 @@ public class MembershipApplicationForm extends AbstractDSpaceTransformer impleme
      * This key must be unique inside the space of this component.
      */
     public Serializable getKey() {
+        String form_type = parameters.getParameter("form_type",""); // required
         String org_name = parameters.getParameter("org_name",""); // required
         String org_legalname = parameters.getParameter("org_legalname","");
         String org_type = parameters.getParameter("org_type","");
         String org_annual_revenue = parameters.getParameter("org_annual_revenue",""); // required
+        String org_inst_size = parameters.getParameter("org_inst_size",""); // required
         String org_annual_revenue_currency = parameters.getParameter("org_annual_revenue_currency",""); // required
         String billing_contact_name = parameters.getParameter("billing_contact_name",""); // required
         String billing_email = parameters.getParameter("billing_email",""); // required
@@ -60,7 +58,7 @@ public class MembershipApplicationForm extends AbstractDSpaceTransformer impleme
         String rep_email = parameters.getParameter("rep_email",""); // required
         String comments = parameters.getParameter("comments","");
 
-       return HashUtil.hash(org_name + "-" + org_name + "-" + org_legalname + "-" + 
+       return HashUtil.hash(form_type + "-" + org_name + "-" + org_name + "-" + org_legalname + "-" + 
                org_type + "-" + org_annual_revenue + "-" + org_annual_revenue_currency + "-" +
                billing_contact_name + "-" + billing_email + "-" + billing_address + "-" +
                publications + "-" + membership_year_start + "-" + membership_length + "-"+
@@ -98,6 +96,7 @@ public class MembershipApplicationForm extends AbstractDSpaceTransformer impleme
     public void addBody(Body body) throws SAXException, WingException,
             UIException, SQLException, IOException, AuthorizeException
     {
+        String form_type = parameters.getParameter("form_type","");
         Division membership = body.addInteractiveDivision("membership-form",
                 contextPath+"/membership",Division.METHOD_POST,"primary membership-form");
 
@@ -105,6 +104,13 @@ public class MembershipApplicationForm extends AbstractDSpaceTransformer impleme
 
         membership.addPara(message(message_prefix + "overview.p1"));
         membership.addPara(message(message_prefix + "overview.p2"));
+
+        if(form_type != null && form_type.equals("institution")) {
+            membership.addPara(message(message_prefix + "institution.p1"));
+            membership.addPara(message(message_prefix + "institution.p2"));
+        }
+        
+        membership.addPara(message(message_prefix + "overview.p3"));
         membership.addPara(message(message_prefix + "markedfields"));
 
         // Check for errors
@@ -134,43 +140,36 @@ public class MembershipApplicationForm extends AbstractDSpaceTransformer impleme
         orgLegalNameText.setHelp(message(message_prefix + "fields.org_legalname.label2"));
         orgLegalNameText.setValue(parameters.getParameter("org_legalname", ""));
 
-        // Org Type
-        Item orgType = form.addItem("org_type", "");
-        TextArea orgTypeTextArea = orgType.addTextArea("org_type");
-        orgTypeTextArea.setLabel(message(message_prefix + "fields.org_type.label1"));
-        orgTypeTextArea.setHelp(message(message_prefix + "fields.org_type.label2"));
-        orgTypeTextArea.setValue(parameters.getParameter("org_type", ""));
-        orgTypeTextArea.setRequired();
-        if(errorFieldList.contains("org_type")) {
-            orgTypeTextArea.addError(message(message_prefix + "errors.org_type"));
+        // Publisher Membership Level -- Annual Revenue
+        if(form_type == null || form_type.equals("") || form_type.equals("publisher")) {
+            Item orgAnnualRevenue = form.addItem("org_annual_revenue", "");
+            
+            Radio orgAnnualRevenueRadios = orgAnnualRevenue.addRadio("org_annual_revenue");
+            orgAnnualRevenueRadios.setLabel(message(message_prefix + "fields.org_annual_revenue.label1"));
+            orgAnnualRevenueRadios.addOption("greater_than_10_million", message(message_prefix + "fields.org_annual_revenue.greater_than_10_million"));
+            orgAnnualRevenueRadios.addOption("less_than_10_million", message(message_prefix + "fields.org_annual_revenue.less_than_10_million"));
+            orgAnnualRevenueRadios.addOption("advocate_all_organizations", message(message_prefix + "fields.org_annual_revenue.advocate_all_organizations"));        
+            orgAnnualRevenueRadios.setRequired();
+            orgAnnualRevenueRadios.setOptionSelected(parameters.getParameter("org_annual_revenue", ""));
+            if(errorFieldList.contains("org_annual_revenue")) {
+                orgAnnualRevenueRadios.addError(message(message_prefix + "errors.org_annual_revenue"));
+            }
         }
 
-        // Annual Revenue
-        Item orgAnnualRevenue = form.addItem("org_annual_revenue", "");
-
-        Select orgAnnualRevenueCurrencySelect = orgAnnualRevenue.addSelect("org_annual_revenue_currency");
-        orgAnnualRevenueCurrencySelect.setLabel(message(message_prefix + "fields.org_annual_revenue.label1"));
-        orgAnnualRevenueCurrencySelect.setHelp(message(message_prefix + "fields.org_annual_revenue.label2"));
-        orgAnnualRevenueCurrencySelect.addOption("USD", "$ USD");
-        orgAnnualRevenueCurrencySelect.addOption("GBP", "£ GBP");
-        orgAnnualRevenueCurrencySelect.addOption("CAD", "C$ CAD");
-        orgAnnualRevenueCurrencySelect.addOption("EUR", "€ EUR");
-        orgAnnualRevenueCurrencySelect.addOption("AUD", "$ AUD");
-    	orgAnnualRevenueCurrencySelect.addOption("JPY", "¥ JPY");
-        orgAnnualRevenueCurrencySelect.setOptionSelected(parameters.getParameter("org_annual_revenue_currency", "USD"));
-        orgAnnualRevenueCurrencySelect.setRequired();
-        if(errorFieldList.contains("org_annual_revenue_currency")) {
-            orgAnnualRevenueCurrencySelect.addError(message(message_prefix + "errors.org_annual_revenue_currency"));
-        }
-
-        Radio orgAnnualRevenueRadios = orgAnnualRevenue.addRadio("org_annual_revenue");
-        orgAnnualRevenueRadios.addOption("greater_than_10_million", message(message_prefix + "fields.org_annual_revenue.greater_than_10_million"));
-        orgAnnualRevenueRadios.addOption("less_than_10_million", message(message_prefix + "fields.org_annual_revenue.less_than_10_million"));
-        orgAnnualRevenueRadios.addOption("advocate_all_organizations", message(message_prefix + "fields.org_annual_revenue.advocate_all_organizations"));        
-        orgAnnualRevenueRadios.setRequired();
-        orgAnnualRevenueRadios.setOptionSelected(parameters.getParameter("org_annual_revenue", ""));
-        if(errorFieldList.contains("org_annual_revenue")) {
-            orgAnnualRevenueRadios.addError(message(message_prefix + "errors.org_annual_revenue"));
+        if(form_type.equals("institution")) {
+            // Institution Membership Level -- Size
+            Item orgInstSize = form.addItem("org_inst_size", "");
+            Radio orgInstSizeRadios = orgInstSize.addRadio("org_inst_size");
+            orgInstSizeRadios.setLabel(message(message_prefix + "fields.org_inst_size.label1"));
+            //orgInstSizeRadios.setHelp(message(message_prefix + "fields.org_inst_size.label2"));
+            orgInstSizeRadios.addOption("inst_level3", message(message_prefix + "fields.org_inst_size.inst_level3"));
+            orgInstSizeRadios.addOption("inst_level2", message(message_prefix + "fields.org_inst_size.inst_level2"));
+            orgInstSizeRadios.addOption("inst_level1", message(message_prefix + "fields.org_inst_size.inst_level1"));        
+            orgInstSizeRadios.setRequired();
+            orgInstSizeRadios.setOptionSelected(parameters.getParameter("org_inst_size", ""));
+            if(errorFieldList.contains("org_inst_size")) {
+                orgInstSizeRadios.addError(message(message_prefix + "errors.org_inst_size"));
+            }
         }
 
         // Billing Contact Name
@@ -205,45 +204,7 @@ public class MembershipApplicationForm extends AbstractDSpaceTransformer impleme
         if(errorFieldList.contains("billing_address")) {
             billingAddressTextArea.addError(message(message_prefix + "errors.billing_address"));
         }
-
-        // Publications
-        Item publications = form.addItem("publications","");
-        TextArea publicationsTextArea = publications.addTextArea("publications");
-
-        publicationsTextArea.setLabel(message(message_prefix + "fields.publications.label1"));
-        publicationsTextArea.setHelp(message(message_prefix + "fields.publications.label2"));
-        publicationsTextArea.setValue(parameters.getParameter("publications", ""));
-
-        // Membership Term, start and end
-        Item membershipTerm = form.addItem("membership_term","");
-
-        Composite membershipTermComposite = membershipTerm.addComposite("membership_term_group");
-        membershipTermComposite.setLabel(message(message_prefix + "fields.membership_term.label1"));
-        membershipTermComposite.setHelp(message(message_prefix + "fields.membership_term.label2"));
-
-        Select membershipYearStartSelect = membershipTermComposite.addSelect("membership_year_start","label-at-left");
-        membershipYearStartSelect.setLabel(message(message_prefix + "fields.membership_year.starting_year.label"));
-        membershipYearStartSelect.addOption("current", message(message_prefix + "fields.membership_year.starting_year.current"));
-        membershipYearStartSelect.addOption("following", message(message_prefix + "fields.membership_year.starting_year.following"));
-        membershipYearStartSelect.setOptionSelected(parameters.getParameter("membership_year_start", ""));
-        membershipYearStartSelect.setRequired();
-        if(errorFieldList.contains("membership_year_start")) {
-            membershipYearStartSelect.addError(message(message_prefix + "errors.membership_year_start"));
-        }
-
-        Select membershipLengthSelect = membershipTermComposite.addSelect("membership_length", "label-at-left");
-        membershipLengthSelect.setLabel(message(message_prefix + "fields.membership_length.label"));
-        membershipLengthSelect.addOption("1yr", message(message_prefix + "fields.membership_length.1"));
-        membershipLengthSelect.addOption("2yr", message(message_prefix + "fields.membership_length.2"));
-        membershipLengthSelect.addOption("3yr", message(message_prefix + "fields.membership_length.3"));
-        membershipLengthSelect.addOption("4yr", message(message_prefix + "fields.membership_length.4"));
-        membershipLengthSelect.addOption("5yr", message(message_prefix + "fields.membership_length.5"));
-        membershipLengthSelect.setOptionSelected(parameters.getParameter("membership_length", ""));
-        membershipLengthSelect.setRequired();
-        if(errorFieldList.contains("membership_length")) {
-            membershipLengthSelect.addError(message(message_prefix + "errors.membership_length"));
-    	}
-
+        
         // Organizational representative
         Item repOrg = form.addItem("rep_org","");
         Hidden repOrgHidden = repOrg.addHidden("rep_org");
@@ -286,7 +247,7 @@ public class MembershipApplicationForm extends AbstractDSpaceTransformer impleme
         TextArea commentsTextArea = comments.addTextArea("comments");
 
         commentsTextArea.setLabel(message(message_prefix + "fields.comments.label1"));
-        commentsTextArea.setHelp(message(message_prefix + "fields.comments.label2"));
+        //commentsTextArea.setHelp(message(message_prefix + "fields.comments.label2"));
         commentsTextArea.setValue(parameters.getParameter("comments", ""));
 
         // Hidden field for submitted once, lets the action know to check radios
