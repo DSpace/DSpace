@@ -32,7 +32,7 @@ import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.discovery.SearchService;
 import org.dspace.utils.DSpace;
-import org.orcid.ns.record.Record;
+import org.orcid.jaxb.model.record_v2.Record;
 
 public class ScriptCleanInvalidOrcidTokens {
 

@@ -31,7 +31,6 @@ import org.dspace.core.Context;
 import org.dspace.discovery.SearchService;
 import org.dspace.discovery.SearchServiceException;
 import org.dspace.utils.DSpace;
-import org.orcid.ns.record.Record;
 
 /**
  * Servlet to receive an ORCID WebHook callback

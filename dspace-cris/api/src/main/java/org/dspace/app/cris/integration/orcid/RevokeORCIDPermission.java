@@ -16,7 +16,7 @@ import org.dspace.authority.orcid.OrcidService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
-import org.orcid.ns.record.Record;
+import org.orcid.jaxb.model.record_v2.Record;
 
 public class RevokeORCIDPermission extends AORCIDWebHookCallbackProcessor {
 

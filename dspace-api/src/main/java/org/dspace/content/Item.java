@@ -1342,9 +1342,6 @@ public class Item extends DSpaceObject implements BrowsableDSpaceObject
         log.info(LogManager.getHeader(ourContext, "delete_item", "item_id="
                 + getID()));
 
-        // Remove from cache
-        ourContext.removeCached(this, getID());
-
         // Remove from browse indices, if appropriate
         /** XXX FIXME
          ** Although all other Browse index updates are managed through
@@ -1391,6 +1388,8 @@ public class Item extends DSpaceObject implements BrowsableDSpaceObject
         // remove version attached to the item
         removeVersion();
 
+        // Remove from cache
+        ourContext.removeCached(this, getID());
 
         // Finally remove item row
         DatabaseManager.delete(ourContext, itemRow);

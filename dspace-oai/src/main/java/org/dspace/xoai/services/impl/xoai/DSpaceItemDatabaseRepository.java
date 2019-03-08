@@ -68,13 +68,13 @@ public class DSpaceItemDatabaseRepository extends DSpaceItemRepository
         this.useCache = configurationService.getBooleanProperty("oai", "cache.enabled", true);
     }
     
-    private Metadata getMetadata (org.dspace.content.Item item) throws IOException {
+    private Metadata getMetadata (org.dspace.content.Item item) throws IOException, ContextServiceException {
         if (this.useCache) {
             if (!cacheService.hasCache(item))
-                cacheService.put(item, ItemUtils.retrieveMetadata(item));
+                cacheService.put(item, ItemUtils.retrieveMetadata(context.getContext(), item));
             
             return cacheService.get(item);
-        } else return ItemUtils.retrieveMetadata(item);
+        } else return ItemUtils.retrieveMetadata(context.getContext(), item);
     }
 
     private List<ReferenceSet> getSets(org.dspace.content.Item item)

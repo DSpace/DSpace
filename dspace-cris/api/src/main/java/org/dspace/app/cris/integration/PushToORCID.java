@@ -40,7 +40,6 @@ import org.apache.solr.common.SolrDocumentList;
 import org.dspace.app.cris.configuration.RelationPreferenceConfiguration;
 import org.dspace.app.cris.integration.orcid.WrapperEducation;
 import org.dspace.app.cris.integration.orcid.WrapperEmployment;
-import org.dspace.app.cris.model.ACrisObject;
 import org.dspace.app.cris.model.CrisConstants;
 import org.dspace.app.cris.model.OrganizationUnit;
 import org.dspace.app.cris.model.Project;
@@ -60,66 +59,6 @@ import org.dspace.app.cris.service.RelationPreferenceService;
 import org.dspace.app.cris.util.ResearcherPageUtils;
 import org.dspace.authority.orcid.OrcidExternalIdentifierType;
 import org.dspace.authority.orcid.OrcidService;
-import org.dspace.authority.orcid.jaxb.activities.Educations;
-import org.dspace.authority.orcid.jaxb.activities.Employments;
-import org.dspace.authority.orcid.jaxb.activities.FundingGroup;
-import org.dspace.authority.orcid.jaxb.activities.Fundings;
-import org.dspace.authority.orcid.jaxb.activities.WorkGroup;
-import org.dspace.authority.orcid.jaxb.activities.Works;
-import org.dspace.authority.orcid.jaxb.address.Address;
-import org.dspace.authority.orcid.jaxb.address.AddressCtype;
-import org.dspace.authority.orcid.jaxb.address.Addresses;
-import org.dspace.authority.orcid.jaxb.bulk.Bulk;
-import org.dspace.authority.orcid.jaxb.common.Amount;
-import org.dspace.authority.orcid.jaxb.common.CurrencyCode;
-import org.dspace.authority.orcid.jaxb.common.ElementSummary;
-import org.dspace.authority.orcid.jaxb.common.ExternalId;
-import org.dspace.authority.orcid.jaxb.common.ExternalIds;
-import org.dspace.authority.orcid.jaxb.common.FuzzyDate;
-import org.dspace.authority.orcid.jaxb.common.FuzzyDate.Day;
-import org.dspace.authority.orcid.jaxb.common.FuzzyDate.Month;
-import org.dspace.authority.orcid.jaxb.common.FuzzyDate.Year;
-import org.dspace.authority.orcid.jaxb.common.Iso3166Country;
-import org.dspace.authority.orcid.jaxb.common.LanguageCode;
-import org.dspace.authority.orcid.jaxb.common.OrcidId;
-import org.dspace.authority.orcid.jaxb.common.Organization;
-import org.dspace.authority.orcid.jaxb.common.OrganizationAddress;
-import org.dspace.authority.orcid.jaxb.common.RelationshipType;
-import org.dspace.authority.orcid.jaxb.common.TranslatedTitle;
-import org.dspace.authority.orcid.jaxb.common.Url;
-import org.dspace.authority.orcid.jaxb.education.Education;
-import org.dspace.authority.orcid.jaxb.education.EducationSummary;
-import org.dspace.authority.orcid.jaxb.employment.Employment;
-import org.dspace.authority.orcid.jaxb.employment.EmploymentSummary;
-import org.dspace.authority.orcid.jaxb.funding.Contributors;
-import org.dspace.authority.orcid.jaxb.funding.Funding;
-import org.dspace.authority.orcid.jaxb.funding.FundingSummary;
-import org.dspace.authority.orcid.jaxb.funding.FundingTitle;
-import org.dspace.authority.orcid.jaxb.funding.FundingType;
-import org.dspace.authority.orcid.jaxb.keyword.Keyword;
-import org.dspace.authority.orcid.jaxb.keyword.KeywordCtype;
-import org.dspace.authority.orcid.jaxb.keyword.Keywords;
-import org.dspace.authority.orcid.jaxb.othername.OtherName;
-import org.dspace.authority.orcid.jaxb.othername.OtherNameCtype;
-import org.dspace.authority.orcid.jaxb.othername.OtherNames;
-import org.dspace.authority.orcid.jaxb.person.externalidentifier.ExternalIdentifier;
-import org.dspace.authority.orcid.jaxb.person.externalidentifier.ExternalIdentifiers;
-import org.dspace.authority.orcid.jaxb.personaldetails.CreditName;
-import org.dspace.authority.orcid.jaxb.researcherurl.ResearcherUrl;
-import org.dspace.authority.orcid.jaxb.researcherurl.ResearcherUrlCtype;
-import org.dspace.authority.orcid.jaxb.researcherurl.ResearcherUrls;
-import org.dspace.authority.orcid.jaxb.work.Citation;
-import org.dspace.authority.orcid.jaxb.work.CitationType;
-import org.dspace.authority.orcid.jaxb.work.Contributor;
-import org.dspace.authority.orcid.jaxb.work.ContributorAttributes;
-import org.dspace.authority.orcid.jaxb.work.ContributorEmail;
-import org.dspace.authority.orcid.jaxb.work.ContributorRole;
-import org.dspace.authority.orcid.jaxb.work.ContributorSequence;
-import org.dspace.authority.orcid.jaxb.work.Work;
-import org.dspace.authority.orcid.jaxb.work.WorkContributors;
-import org.dspace.authority.orcid.jaxb.work.WorkSummary;
-import org.dspace.authority.orcid.jaxb.work.WorkTitle;
-import org.dspace.authority.orcid.jaxb.work.WorkType;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
@@ -131,6 +70,67 @@ import org.dspace.discovery.SearchServiceException;
 import org.dspace.handle.HandleManager;
 import org.dspace.util.SimpleMapConverter;
 import org.dspace.utils.DSpace;
+import org.orcid.jaxb.model.common_v2.Amount;
+import org.orcid.jaxb.model.common_v2.CurrencyCode;
+import org.orcid.jaxb.model.common_v2.ExternalId;
+import org.orcid.jaxb.model.common_v2.ExternalIds;
+import org.orcid.jaxb.model.common_v2.FuzzyDate;
+import org.orcid.jaxb.model.common_v2.FuzzyDate.Day;
+import org.orcid.jaxb.model.common_v2.FuzzyDate.Month;
+import org.orcid.jaxb.model.common_v2.FuzzyDate.Year;
+import org.orcid.jaxb.model.common_v2.Iso3166Country;
+import org.orcid.jaxb.model.common_v2.LanguageCode;
+import org.orcid.jaxb.model.common_v2.OrcidId;
+import org.orcid.jaxb.model.common_v2.Organization;
+import org.orcid.jaxb.model.common_v2.OrganizationAddress;
+import org.orcid.jaxb.model.common_v2.RelationshipType;
+import org.orcid.jaxb.model.common_v2.TranslatedTitle;
+import org.orcid.jaxb.model.common_v2.Url;
+import org.orcid.jaxb.model.record_v2.Address;
+import org.orcid.jaxb.model.record_v2.AddressType;
+import org.orcid.jaxb.model.record_v2.Addresses;
+import org.orcid.jaxb.model.record_v2.Citation;
+import org.orcid.jaxb.model.record_v2.CitationType;
+import org.orcid.jaxb.model.record_v2.Contributor;
+import org.orcid.jaxb.model.record_v2.ContributorAttributes;
+import org.orcid.jaxb.model.common_v2.ContributorEmail;
+import org.orcid.jaxb.model.common_v2.CreditName;
+import org.orcid.jaxb.model.record_v2.ContributorRole;
+import org.orcid.jaxb.model.record_v2.ContributorSequence;
+import org.orcid.jaxb.model.record_v2.Education;
+import org.orcid.jaxb.model.record_v2.EducationSummary;
+import org.orcid.jaxb.model.record_v2.Educations;
+import org.orcid.jaxb.model.record_v2.Employment;
+import org.orcid.jaxb.model.record_v2.EmploymentSummary;
+import org.orcid.jaxb.model.record_v2.Employments;
+import org.orcid.jaxb.model.record_v2.ExternalIdentifier;
+import org.orcid.jaxb.model.record_v2.ExternalIdentifiers;
+import org.orcid.jaxb.model.record_v2.Funding;
+import org.orcid.jaxb.model.record_v2.FundingContributor;
+import org.orcid.jaxb.model.record_v2.FundingContributorAttributes;
+import org.orcid.jaxb.model.record_v2.FundingContributorRole;
+import org.orcid.jaxb.model.record_v2.FundingContributors;
+import org.orcid.jaxb.model.record_v2.FundingGroup;
+import org.orcid.jaxb.model.record_v2.FundingSummary;
+import org.orcid.jaxb.model.record_v2.FundingTitle;
+import org.orcid.jaxb.model.record_v2.FundingType;
+import org.orcid.jaxb.model.record_v2.Fundings;
+import org.orcid.jaxb.model.record_v2.Keyword;
+import org.orcid.jaxb.model.record_v2.KeywordType;
+import org.orcid.jaxb.model.record_v2.Keywords;
+import org.orcid.jaxb.model.record_v2.OtherName;
+import org.orcid.jaxb.model.record_v2.OtherNameType;
+import org.orcid.jaxb.model.record_v2.OtherNames;
+import org.orcid.jaxb.model.record_v2.ResearcherUrl;
+import org.orcid.jaxb.model.record_v2.ResearcherUrlType;
+import org.orcid.jaxb.model.record_v2.ResearcherUrls;
+import org.orcid.jaxb.model.record_v2.Work;
+import org.orcid.jaxb.model.record_v2.WorkContributors;
+import org.orcid.jaxb.model.record_v2.WorkGroup;
+import org.orcid.jaxb.model.record_v2.WorkSummary;
+import org.orcid.jaxb.model.record_v2.WorkTitle;
+import org.orcid.jaxb.model.record_v2.WorkType;
+import org.orcid.jaxb.model.record_v2.Works;
 
 import it.cilea.osd.common.core.SingleTimeStampInfo;
 import it.cilea.osd.jdyna.value.BooleanValue;
@@ -1504,7 +1504,7 @@ public class PushToORCID
         }
         
         boolean buildFundingContributors = false;
-        Contributors fundingContributors = new Contributors();
+        FundingContributors fundingContributors = new FundingContributors();
         if (itemMetadata.getContributorsLead() != null)
         {
             for (String valContributor : itemMetadata.getContributorsLead())
@@ -1543,10 +1543,10 @@ public class PushToORCID
         return funding;
     }
 
-    private static void addFundingContributor(Contributors fundingContributors,
+    private static void addFundingContributor(FundingContributors fundingContributors,
             String valContributor, String type)
     {
-        org.dspace.authority.orcid.jaxb.funding.Contributor contributor = new org.dspace.authority.orcid.jaxb.funding.Contributor();
+    	FundingContributor contributor = new FundingContributor();
 
         Integer id = ResearcherPageUtils.getRealPersistentIdentifier(
                 valContributor, ResearcherPage.class);
@@ -1563,7 +1563,7 @@ public class PushToORCID
 
             if (StringUtils.isNotBlank(email))
             {
-                org.dspace.authority.orcid.jaxb.common.ContributorEmail contributorEmail = new org.dspace.authority.orcid.jaxb.common.ContributorEmail();
+                ContributorEmail contributorEmail = new ContributorEmail();
                 contributorEmail.setValue(email);
                 contributor.setContributorEmail(contributorEmail);
             }
@@ -1579,14 +1579,15 @@ public class PushToORCID
             }
         }
 
-        org.dspace.authority.orcid.jaxb.common.CreditName creditName = new org.dspace.authority.orcid.jaxb.common.CreditName();
+        CreditName creditName = new CreditName();
         creditName.setValue(name);
         contributor.setCreditName(creditName);
 
-        org.dspace.authority.orcid.jaxb.funding.ContributorAttributes attributes = new org.dspace.authority.orcid.jaxb.funding.ContributorAttributes();
+        FundingContributorAttributes attributes = new FundingContributorAttributes();
         attributes.setContributorRole(
-                org.dspace.authority.orcid.jaxb.funding.ContributorRole
+                FundingContributorRole
                         .fromValue(type));
+        contributor.setContributorAttributes(attributes);
         fundingContributors.getContributor().add(contributor);
     }
 
@@ -1833,7 +1834,7 @@ public class PushToORCID
 
                 if (StringUtils.isNotBlank(email))
                 {
-                    ContributorEmail contributorEmail = new ContributorEmail();
+                    org.orcid.jaxb.model.record_v2.ContributorEmail contributorEmail = new org.orcid.jaxb.model.record_v2.ContributorEmail();
                     contributorEmail.setValue(email);
                     contributor.setContributorEmail(contributorEmail);
                 }
@@ -1851,7 +1852,7 @@ public class PushToORCID
                 }
             }
 
-            org.dspace.authority.orcid.jaxb.common.CreditName creditName = new org.dspace.authority.orcid.jaxb.common.CreditName();
+            CreditName creditName = new CreditName();
             creditName.setValue(name);
             contributor.setCreditName(creditName);
 
@@ -2325,7 +2326,7 @@ public class PushToORCID
     {
         Keywords keywordsOrcid = orcidService.getKeywords(orcid, token);
         if(keywordsOrcid!=null) {
-            for(KeywordCtype nctype : keywordsOrcid.getKeyword()) {
+            for(KeywordType nctype : keywordsOrcid.getKeyword()) {
                 String orcidSourceName = nctype.getSource().getSourceName().getContent();
                 if(orcidSourceName.equals(currentSourceName)) {
                     String value = nctype.getContent();
@@ -2344,7 +2345,7 @@ public class PushToORCID
     {
         Addresses addressesOrcid = orcidService.getAddresses(orcid, token);
         if(addressesOrcid!=null) {
-            for(AddressCtype nctype : addressesOrcid.getAddress()) {
+            for(AddressType nctype : addressesOrcid.getAddress()) {
                 String orcidSourceName = nctype.getSource().getSourceName().getContent();
                 if(orcidSourceName.equals(currentSourceName)) {
                     String value = nctype.getCountry();
@@ -2382,7 +2383,7 @@ public class PushToORCID
     {
         ResearcherUrls researcherUrlsOrcid = orcidService.getResearcherUrls(orcid, token);
         if(researcherUrlsOrcid!=null) {
-            for(ResearcherUrlCtype nctype : researcherUrlsOrcid.getResearcherUrl()) {
+            for(ResearcherUrlType nctype : researcherUrlsOrcid.getResearcherUrl()) {
                 String orcidSourceName = nctype.getSource().getSourceName().getContent();
                 if(orcidSourceName.equals(currentSourceName)) {
                     String value = nctype.getUrl().getValue();
@@ -2401,7 +2402,7 @@ public class PushToORCID
     {
         OtherNames otherNamesOrcid = orcidService.getOtherNames(orcid, token);
         if(otherNamesOrcid!=null) {
-            for(OtherNameCtype nctype : otherNamesOrcid.getOtherName()) {
+            for(OtherNameType nctype : otherNamesOrcid.getOtherName()) {
                 String orcidSourceName = nctype.getSource().getSourceName().getContent();
                 if(orcidSourceName.equals(currentSourceName)) {
                     String value = nctype.getContent();

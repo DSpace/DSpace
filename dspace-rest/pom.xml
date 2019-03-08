@@ -3,7 +3,6 @@
     <groupId>org.dspace</groupId>
     <artifactId>dspace-rest</artifactId>
     <packaging>war</packaging>
-    <version>CRIS-5.10.0-SNAPSHOT</version>
     <name>DSpace REST :: API and Implementation</name>
     <description>DSpace RESTful Web Services API</description>
     <url>http://demo.dspace.org</url>
@@ -136,6 +135,10 @@
                 <exclusion>
                     <groupId>com.fasterxml.jackson.core</groupId>
                     <artifactId>jackson-annotations</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.glassfish.jersey.core</groupId>
+                    <artifactId>jersey-client</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
