@@ -27,11 +27,7 @@ import org.dspace.app.xmlui.wing.element.TextArea;
 import org.dspace.authorize.AuthorizeException;
 import org.xml.sax.SAXException;
 
-/**
- * Display to the user a simple form letting the user give feedback.
- * 
- * @author Scott Phillips
- */
+
 public class MembershipApplicationForm extends AbstractDSpaceTransformer implements CacheableProcessingComponent
 {
     /** Language Strings */
@@ -100,6 +96,7 @@ public class MembershipApplicationForm extends AbstractDSpaceTransformer impleme
     public void addBody(Body body) throws SAXException, WingException,
             UIException, SQLException, IOException, AuthorizeException
     {
+        String form_type = parameters.getParameter("form_type","");
         Division membership = body.addInteractiveDivision("membership-form",
                 contextPath+"/membership",Division.METHOD_POST,"primary membership-form");
 
@@ -107,6 +104,12 @@ public class MembershipApplicationForm extends AbstractDSpaceTransformer impleme
 
         membership.addPara(message(message_prefix + "overview.p1"));
         membership.addPara(message(message_prefix + "overview.p2"));
+
+        if(form_type != null && form_type.equals("institution")) {
+            membership.addPara(message(message_prefix + "institution.p1"));
+            membership.addPara(message(message_prefix + "institution.p2"));
+        }
+        
         membership.addPara(message(message_prefix + "overview.p3"));
         membership.addPara(message(message_prefix + "markedfields"));
 
@@ -138,7 +141,6 @@ public class MembershipApplicationForm extends AbstractDSpaceTransformer impleme
         orgLegalNameText.setValue(parameters.getParameter("org_legalname", ""));
 
         // Publisher Membership Level -- Annual Revenue
-        String form_type = parameters.getParameter("form_type",""); // required
         if(form_type == null || form_type.equals("") || form_type.equals("publisher")) {
             Item orgAnnualRevenue = form.addItem("org_annual_revenue", "");
             
@@ -157,10 +159,9 @@ public class MembershipApplicationForm extends AbstractDSpaceTransformer impleme
         if(form_type.equals("institution")) {
             // Institution Membership Level -- Size
             Item orgInstSize = form.addItem("org_inst_size", "");
-
             Radio orgInstSizeRadios = orgInstSize.addRadio("org_inst_size");
             orgInstSizeRadios.setLabel(message(message_prefix + "fields.org_inst_size.label1"));
-            orgInstSizeRadios.setHelp(message(message_prefix + "fields.org_inst_size.label2"));
+            //orgInstSizeRadios.setHelp(message(message_prefix + "fields.org_inst_size.label2"));
             orgInstSizeRadios.addOption("inst_level3", message(message_prefix + "fields.org_inst_size.inst_level3"));
             orgInstSizeRadios.addOption("inst_level2", message(message_prefix + "fields.org_inst_size.inst_level2"));
             orgInstSizeRadios.addOption("inst_level1", message(message_prefix + "fields.org_inst_size.inst_level1"));        
@@ -246,7 +247,7 @@ public class MembershipApplicationForm extends AbstractDSpaceTransformer impleme
         TextArea commentsTextArea = comments.addTextArea("comments");
 
         commentsTextArea.setLabel(message(message_prefix + "fields.comments.label1"));
-        commentsTextArea.setHelp(message(message_prefix + "fields.comments.label2"));
+        //commentsTextArea.setHelp(message(message_prefix + "fields.comments.label2"));
         commentsTextArea.setValue(parameters.getParameter("comments", ""));
 
         // Hidden field for submitted once, lets the action know to check radios

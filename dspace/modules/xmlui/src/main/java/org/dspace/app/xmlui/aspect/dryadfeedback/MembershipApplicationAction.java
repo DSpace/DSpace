@@ -58,7 +58,6 @@ public class MembershipApplicationAction extends AbstractAction
 
         if(     (org_name == null) || (org_name.equals("")) ||
                 (((org_annual_revenue == null) || (org_annual_revenue.equals(""))) && ((org_inst_size == null) || (org_inst_size.equals("")))) ||
-                (org_annual_revenue_currency == null) || (org_annual_revenue_currency.equals("")) ||
                 (billing_contact_name == null) || (billing_contact_name.equals("")) ||
                 (billing_address == null) || (billing_address.equals("")) ||
                 (billing_email == null) || (billing_email.equals("")) ||
@@ -88,14 +87,6 @@ public class MembershipApplicationAction extends AbstractAction
             if((org_name != null) && org_name.equals("")) {
                 errorFieldNames.add("org_name");
             }
-            if((submittedOnce != null) &&
-               ((org_annual_revenue == null) || org_annual_revenue.equals("")) &&
-               ((org_inst_size == null) || org_inst_size.equals(""))) {
-                errorFieldNames.add("org_annual_revenue");
-            }
-            if((submittedOnce != null) && ((org_annual_revenue_currency == null) || org_annual_revenue_currency.equals(""))) {
-                errorFieldNames.add("org_annual_revenue_currency");
-            }
             if((billing_contact_name != null) && billing_contact_name.equals("")) {
                 errorFieldNames.add("billing_contact_name");
             }
@@ -105,11 +96,6 @@ public class MembershipApplicationAction extends AbstractAction
             if((billing_address != null) && billing_address.equals("")) {
                 errorFieldNames.add("billing_address");
             }
-            /*
-              if((submittedOnce != null) && ((membership_year_start == null) || membership_year_start.equals(""))) {
-                errorFieldNames.add("membership_year_start");
-            }
-            */
             if((submittedOnce != null) && ((membership_length == null) || membership_length.equals(""))) {
                 errorFieldNames.add("membership_length");
             }

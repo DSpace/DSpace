@@ -3362,6 +3362,19 @@
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.heading">Membership Application</message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.overview.p1">Any organization that supports the educational, scientific, and charitable mission of Dryad is eligible to become a member. Upon acceptance, a <a href="/themes/Mirage/docs/Membership_Agreement.pdf">Membership Agreement</a> and request for dues will be sent to the address given.</message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.overview.p2">If you are unable to meet the Membership Fees, please contact <a href="mailto:director@datadryad.org">director@datadryad.org</a> to discuss alternative pricing. If your organization is in a position to support Dryad at a higher level than our posted fees, we would be happy to further discuss.</message>
+
+
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.institution.p1"><p>Dryad membership brings significant value to institutions as such we recognize that any metric for assessing fees we chose might not seem equitable to every institution. Therefore, we are asking institutions to <span style="text-decoration: underline">self-determine</span> your level of commitment. Below are some parameters you may use, but <em>you make the decision</em> about which level corresponds most closely to your institution’s resources.</p></message>
+
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.institution.p2">
+      <table>
+	<tr><td><b>Size of Institution</b></td><td><b>Suggested Examples for Determining Size</b></td></tr>
+	<tr><td>Level 1</td><td>R3 or FTE under 5K or less than $50M in research grant funding.</td></tr>
+	<tr><td>Level II</td><td>R2 or FTE 5K - 10K or  $50M - $300M in research grant funding.</td></tr>
+	<tr><td>Level III</td><td>RI or FTE +10K FTE or +$300M in research grant funding.</td></tr>
+      </table>
+    </message>
+    
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.overview.p3">For more information on membership, please see the <a href="/pages/membershipOverview">membership page</a> or contact <a href="mailto:director@datadryad.org">director@datadryad.org</a>.</message>
     
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.markedfields"><span id="required-fields-note" class="required-mark">* Marked fields are required</span></message>
@@ -3393,15 +3406,7 @@
     
     <!-- Institutional Membership: Size -->
         <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_inst_size.label1">2. Membership level - Institution<span class="required-mark">*</span></message>
-	<message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_inst_size.label2">Dryad membership brings significant value to institutions and therefore we don’t want interested organizations to not join due to pricing.  We recognize that any method Dryad chose for determining size of institution might not be applicable to every school. Therefore, we are asking institutions to self-determine the level of your commitment. Below are examples of parameters you might like to use, but <b>ultimately it is up to each institution to select their own level.</b>
-	<table>
-	  <tr><td>Size of Institution</td><td>Suggested Examples for Determining Size</td></tr>
-	  <tr><td>Level 1</td><td>R3 or FTE under 5K or less than $50M in research grant funding.</td></tr>
-	  <tr><td>Level II</td><td>R2 or FTE 5K - 10K or  $50M - $300M in research grant funding.</td></tr>
-	  <tr><td>Level III</td><td>RI or FTE +10K FTE or +$300M in research grant funding.</td></tr>
-	</table>
-	
-	</message>
+
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.errors.org_inst_size_currency">Currency selection is required</message>
 
     <!-- Checkbox options for org_annual_revenue -->
