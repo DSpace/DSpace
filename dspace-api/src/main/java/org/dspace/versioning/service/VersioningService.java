@@ -53,4 +53,6 @@ public interface VersioningService {
     Version getVersion(Context c, Item item) throws SQLException;
 
     Version createNewVersion(Context context, VersionHistory history, Item item, String summary, Date date, int versionNumber);
+
+    void removeVersionFromItem(Context context, Item item);
 }
