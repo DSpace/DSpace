@@ -14,7 +14,23 @@ import org.junit.Before;
 
 public class AbstractEntityIntegrationTest extends AbstractControllerIntegrationTest {
 
-
+    /**
+     * This method will call the setUp method from AbstractControllerIntegrationTest.
+     * Afterwards it will setUp the entity relation structure as defined in
+     * dspace-api/src/test/data/dspaceFolder/config/entities/relationship-types.xml
+     *
+     * This method will first build the following EntityTypes:
+     * - Publication
+     * - Person
+     * - Project
+     * - OrgUnit
+     * - Journal
+     * - JournalVolume
+     * - JournalIssue
+     *
+     * After the EntityTypes are created, RelationshipTypes are set up between the different EntityTypes as indicated
+     * in relationship-types.xml
+     */
     @Before
     public void setUp() throws Exception {
         super.setUp();
