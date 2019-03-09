@@ -85,7 +85,7 @@ public class DatabaseUtils
         if (argv.length < 1)
         {
             System.out.println("\nDatabase action argument is missing.");
-            System.out.println("Valid actions: 'test', 'info', 'migrate', 'repair', 'validate' "
+            System.out.println("Valid actions: 'test', 'info', 'migrate', 'repair', 'validate', "
                     + "'update-sequences' or 'clean'");
             System.out.println("\nOr, type 'database help' for more information.\n");
             System.exit(1);
