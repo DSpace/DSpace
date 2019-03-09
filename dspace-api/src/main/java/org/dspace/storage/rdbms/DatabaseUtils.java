@@ -10,6 +10,7 @@ package org.dspace.storage.rdbms;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -19,6 +20,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Locale;
 import javax.sql.DataSource;
+
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.core.ConfigurationManager;
@@ -76,7 +79,8 @@ public class DatabaseUtils
         if (argv.length < 1)
         {
             System.out.println("\nDatabase action argument is missing.");
-            System.out.println("Valid actions: 'test', 'info', 'migrate', 'repair' or 'clean'");
+            System.out.println("Valid actions: 'test', 'info', 'migrate', 'repair', "
+                    + "'update-sequences' or 'clean'");
             System.out.println("\nOr, type 'database help' for more information.\n");
             System.exit(1);
         }
@@ -225,16 +229,38 @@ public class DatabaseUtils
                     System.out.println("Done.");
                 }
             }
+            else if(argv[0].equalsIgnoreCase("update-sequences"))
+            {
+                try (Connection connection = dataSource.getConnection()) {
+                    String dbType = getDbType(connection);
+                    String sqlfile = "org/dspace/storage/rdbms/sqlmigration/" + dbType +
+                             "/update-sequences.sql";
+                    InputStream sqlstream = DatabaseUtils.class.getClassLoader().getResourceAsStream(sqlfile);
+                    if (sqlstream != null) {
+                        String s = IOUtils.toString(sqlstream, "UTF-8");
+                        if (!s.isEmpty()) {
+                            System.out.println("Running " + sqlfile);
+                            connection.createStatement().execute(s);
+                            System.out.println("update-sequences complete");
+                        } else {
+                            System.err.println(sqlfile + " contains no SQL to execute");
+                        }
+                    } else {
+                        System.err.println(sqlfile + " not found");
+                    }
+                }
+            }
             else
             {
                 System.out.println("\nUsage: database [action]");
-                System.out.println("Valid actions: 'test', 'info', 'migrate', 'repair' or 'clean'");
-                System.out.println(" - test    = Test database connection is OK");
-                System.out.println(" - info    = Describe basic info about database, including migrations run");
-                System.out.println(" - migrate = Migrate the Database to the latest version");
-                System.out.println("             Optionally, specify \"ignored\" to also run \"Ignored\" migrations");
-                System.out.println(" - repair  = Attempt to repair any previously failed database migrations");
-                System.out.println(" - clean   = DESTROY all data and tables in Database (WARNING there is no going back!)");
+                System.out.println("Valid actions: 'test', 'info', 'migrate', 'repair', 'update-sequences' or 'clean'");
+                System.out.println(" - test             = Test database connection is OK");
+                System.out.println(" - info             = Describe basic info about database, including migrations run");
+                System.out.println(" - migrate          = Migrate the Database to the latest version");
+                System.out.println("                      Optionally, specify \"ignored\" to also run \"Ignored\" migrations");
+                System.out.println(" - repair           = Attempt to repair any previously failed database migrations");
+                System.out.println(" - update-sequences = Update database sequences after running AIP ingest.");
+                System.out.println(" - clean            = DESTROY all data and tables in Database (WARNING there is no going back!)");
                 System.out.println("");
             }
 
