@@ -71,13 +71,13 @@ BEGIN
   updateseq('epersongroup_seq', 'epersongroup', 'eperson_group_id');
   updateseq('group2group_seq', 'group2group', 'id');
   updateseq('group2groupcache_seq', 'group2groupcache', 'id');
-  updateseq('item_seq item', 'item_id');
+  updateseq('item_seq', 'item', 'item_id');
   updateseq('bundle_seq', 'bundle', 'bundle_id');
   updateseq('item2bundle_seq', 'item2bundle', 'id');
   updateseq('bundle2bitstream_seq', 'bundle2bitstream', 'id');
   updateseq('dcvalue_seq', 'dcvalue', 'dc_value_id');
   updateseq('community_seq', 'community', 'community_id');
-  updateseq('community2community_seqvcommunity2community', 'id');
+  updateseq('community2community_seq', 'community2community', 'id');
   updateseq('collection_seq', 'collection', 'collection_id');
   updateseq('community2collection_seq', 'community2collection', 'id');
   updateseq('collection2item_seq', 'collection2item', 'id');
