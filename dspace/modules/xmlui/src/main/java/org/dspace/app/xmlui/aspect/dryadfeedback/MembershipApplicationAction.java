@@ -167,11 +167,11 @@ public class MembershipApplicationAction extends AbstractAction
         email.addArgument(org_legalname);
         email.addArgument(org_annual_revenue);
         email.addArgument(org_inst_size);
-        email.addArgument(org_annual_revenue_currency);
+        email.addArgument(org_annual_revenue_currency); // {6}, no longer used
         email.addArgument(billing_contact_name);
         email.addArgument(billing_email);
         email.addArgument(billing_address);
-        email.addArgument(publications);
+        email.addArgument(publications); // {10}, no longer used
         email.addArgument(rep_name);
         email.addArgument(rep_title);
         email.addArgument(rep_email);
