@@ -149,7 +149,7 @@ function disableEnterKey(e)
      else
           key = e.which;     //Firefox & Netscape
 
-     if(key == 13)  //if "Enter" pressed, then disable!
+     if(key == 13 && event.target.nodeName!='TEXTAREA')
           return false;
      else
           return true;
