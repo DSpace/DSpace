@@ -1,0 +1,22 @@
+<?xml version='1.0'  encoding='UTF-8'?>
+<!--
+Copyright 2019 Mark H. Wood.
+-->
+
+<xs:schema version="1.0"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           elementFormDefault="qualified">
+    <xs:element name="authority-dump">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name='r' minOccurs='0' maxOccurs='unbounded'>
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name='f' type='pcdata' minOccurs='0' maxOccurs='unbounded'/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>
