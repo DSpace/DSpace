@@ -65,7 +65,6 @@ BEGIN
   updateseq('harvested_item_seq', 'harvested_item', 'id');
   updateseq('webapp_seq', 'webapp', 'webapp_id');
   updateseq('requestitem_seq', 'requestitem', 'requestitem_id');
-  updateseq('handle_id_seq', 'handle', 'handle_id');
   updateseq('bitstream_seq', 'bitstream', 'bitstream_id');
   updateseq('eperson_seq', 'eperson', 'eperson_id');
   updateseq('epersongroup_seq', 'epersongroup', 'eperson_group_id');
@@ -75,7 +74,6 @@ BEGIN
   updateseq('bundle_seq', 'bundle', 'bundle_id');
   updateseq('item2bundle_seq', 'item2bundle', 'id');
   updateseq('bundle2bitstream_seq', 'bundle2bitstream', 'id');
-  updateseq('dcvalue_seq', 'dcvalue', 'dc_value_id');
   updateseq('community_seq', 'community', 'community_id');
   updateseq('community2community_seq', 'community2community', 'id');
   updateseq('collection_seq', 'collection', 'collection_id');
