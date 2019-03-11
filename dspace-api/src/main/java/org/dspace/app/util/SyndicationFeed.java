@@ -8,6 +8,7 @@
 package org.dspace.app.util;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -17,6 +18,9 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.*;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
@@ -90,6 +94,7 @@ public class SyndicationFeed
 
     private final ConfigurationService configurationService = 
             DSpaceServicesFactory.getInstance().getConfigurationService();
+    private final AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
 
     // metadata field for Item title in entry:
     protected String titleField = 
@@ -252,6 +257,18 @@ public class SyndicationFeed
                     continue;
                 }
                 Item item = (Item)itemDSO;
+                boolean authorization = true;
+                try {
+                    authorizeService.authorizeAction(context, item, Constants.READ);
+                } catch (AuthorizeException e) {
+                    authorization = false;
+                } catch (SQLException e) {
+                    log.error(e.getMessage(), e);
+                }
+                if (!authorization) {
+                    continue;
+                }
+
                 boolean hasDate = false;
                 SyndEntry entry = new SyndEntryImpl();
                 entries.add(entry);
