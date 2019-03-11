@@ -31,7 +31,7 @@
 	</xsl:template>
 	
 <!-- dc:rights - info-eu-repo AccessRights compliant-->
-<!-- Chequeo si es un doc embargado e imprimo la fecha de fin de embargo sedici.embargo.liftDate -->
+<!-- Chequeo si es un doc embargado e imprimo la fecha de fin de embargo -->
 	<xsl:template name="accessRightsAndEmbargo" >
 		<xsl:param name="context-name"/>
 

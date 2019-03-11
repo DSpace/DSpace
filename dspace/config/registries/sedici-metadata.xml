@@ -110,18 +110,6 @@
 		<scope_note>Fecha de creación del recurso. Creada automaticamente</scope_note>
 	</dc-type>
 	<dc-type>
-		<schema>sedici</schema>
-		<element>embargo</element>
-		<qualifier>period</qualifier>
-		<scope_note>Período de embargo en días</scope_note>
-	</dc-type>
-	<dc-type>
-		<schema>sedici</schema>
-		<element>embargo</element>
-		<qualifier>liftDate</qualifier>
-		<scope_note>Fecha de fin de embargo</scope_note>
-	</dc-type>
-	<dc-type>
 		<schema>mods</schema>
 		<element>location</element>
 		<!-- sin calificar -->

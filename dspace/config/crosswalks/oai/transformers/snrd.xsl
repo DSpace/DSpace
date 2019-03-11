@@ -46,7 +46,6 @@
 			segunda instancia. En el 'driver-commons.xsl' sólo se muestra alguna de las siguientes 2 fechas: dc.date.issued ó
 			sedici.date.exposure (si existe). Por lo tanto, el embargoDate siempre se mostrará segundo... -->
 			<xsl:call-template name="accessRightsAndEmbargo">
-				<xsl:with-param name="liftDate" select="doc:element[@name='sedici']/doc:element[@name='embargo']/doc:element[@name='liftDate']/doc:element/doc:field/text()"/>
 				<xsl:with-param name="context-name" select="$context"/>
 			</xsl:call-template>
 			
