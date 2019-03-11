@@ -21,11 +21,14 @@ import org.dspace.app.xmlui.objectmanager.ItemAdapter;
 import org.dspace.app.xmlui.objectmanager.RepositoryAdapter;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.app.xmlui.wing.WingException;
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.crosswalk.CrosswalkException;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.handle.HandleManager;
 import org.xml.sax.SAXException;
@@ -92,15 +95,25 @@ public class DSpaceMETSGenerator extends AbstractGenerator
             {
                 throw new ResourceNotFoundException("Unable to locate object.");
             }
-            
-            // Configure the adapter for this request.
-            configureAdapter(adapter);
-            
-			// Generate the METS document
-			contentHandler.startDocument();
-			adapter.renderMETS(contentHandler,lexicalHandler);
-			contentHandler.endDocument();
-			
+
+			boolean authorization = true;
+			if (adapter instanceof ItemAdapter) {
+				Item item = ((ItemAdapter) adapter).getItem();
+				try {
+					AuthorizeManager.authorizeAction(context, item, Constants.READ);
+				} catch (AuthorizeException e) {
+					authorization = false;
+				}
+			}
+
+			if (authorization) {
+				contentHandler.startDocument();
+				adapter.renderMETS(contentHandler, lexicalHandler);
+				// Generate the METS document
+				contentHandler.endDocument();
+			}
+
+
 		} catch (WingException we) {
 			throw new ProcessingException(we);
 		} catch (CrosswalkException ce) {
