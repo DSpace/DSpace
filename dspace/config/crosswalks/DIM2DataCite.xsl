@@ -14,16 +14,6 @@
                 xmlns="http://datacite.org/schema/kernel-4"
                 version="2.0">
     
-    <!-- CONFIGURATION -->
-    <!-- The parameters prefix, publisher, datamanager and hostinginstitution
-         moved to DSpace's configuration. They will be substituted automatically.
-         It is not necessary anymore to change this file.
-         Please take a look into the DSpace documentation for details on how to
-         change those. -->
-    <!-- DO NOT CHANGE ANYTHING BELOW THIS LINE EXCEPT YOU REALLY KNOW WHAT YOU ARE DOING! -->
-    
-    <!-- We need the prefix to determine DOIs that were minted by ourself. -->
-    <xsl:param name="prefix">10.5072/dspace-</xsl:param>
     <!-- The content of the following parameter will be used as element publisher. -->
     <xsl:param name="publisher">My University</xsl:param>
     <!-- The content of the following variable will be used as element contributor with contributorType datamanager. -->
