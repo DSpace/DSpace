@@ -346,7 +346,7 @@ public class DescribeStep extends AbstractProcessingStep
         ContentServiceFactory.getInstance().getInProgressSubmissionService(subInfo.getSubmissionItem()).update(context, subInfo.getSubmissionItem());
 
         // commit changes
-        context.commit();
+        context.dispatchEvents();
 
         // check for request for more input fields, first
         if (moreInput)
