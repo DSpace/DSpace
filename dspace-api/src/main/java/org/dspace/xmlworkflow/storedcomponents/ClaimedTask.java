@@ -129,18 +129,4 @@ public class ClaimedTask implements ReloadableEntity<Integer>, BrowsableObject<I
         return Constants.WORKFLOW_CLAIMED;
     }
 
-    @Override
-    public boolean isArchived() {
-        return false;
-    }
-
-    @Override
-    public boolean isDiscoverable() {
-        return false;
-    }
-
-    @Override
-    public String getHandle() {
-        return getType() + "-" + getID();
-    }
 }

@@ -276,14 +276,4 @@ public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
         return communityService;
     }
 
-    @Override
-    public boolean isArchived() {
-        return true;
-    }
-
-    @Override
-    public boolean isDiscoverable() {
-        return true;
-    }
-
 }

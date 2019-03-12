@@ -1884,7 +1884,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             } else if (dso instanceof Collection) {
                 discoveryQuery.addFilterQueries("location:l" + dso.getID());
             } else if (dso instanceof Item) {
-                discoveryQuery.addFilterQueries(HANDLE_FIELD + ":" + dso.getHandle());
+                discoveryQuery.addFilterQueries(HANDLE_FIELD + ":" + ((Item) dso).getHandle());
             }
         }
         return search(context, discoveryQuery, includeUnDiscoverable);
@@ -2228,11 +2228,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             o = (BrowsableObject) contentServiceFactory.getBrowsableObjectService(type).find(context, uid);
         }
 
-        if (o != null) {
-            for (String f : doc.getFieldNames()) {
-                o.getExtraInfo().put(f, doc.getFirstValue(f));
-            }
-        } else {
+        if (o == null) {
             log.warn("Not able to retrieve object RESOURCE_ID:" + id + " - RESOURCE_TYPE_ID:" + type + " - HANDLE:" +
                      handle);
         }

@@ -334,14 +334,4 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
         return Constants.typeText[Constants.COLLECTION];
     }
 
-    @Override
-    public boolean isArchived() {
-        return true;
-    }
-
-    @Override
-    public boolean isDiscoverable() {
-        return true;
-    }
-
 }

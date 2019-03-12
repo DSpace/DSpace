@@ -144,18 +144,4 @@ public class PoolTask implements ReloadableEntity<Integer>, BrowsableObject<Inte
         return Constants.WORKFLOW_POOL;
     }
 
-    @Override
-    public boolean isArchived() {
-        return false;
-    }
-
-    @Override
-    public boolean isDiscoverable() {
-        return false;
-    }
-
-    @Override
-    public String getHandle() {
-        return getType() + "-" + getID();
-    }
 }
