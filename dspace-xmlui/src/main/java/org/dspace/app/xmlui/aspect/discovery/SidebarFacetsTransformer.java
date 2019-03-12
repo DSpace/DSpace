@@ -292,7 +292,7 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
             parameters.add("sort_by=" + request.getParameter("sort_by"));
         }
         if(StringUtils.isNotBlank(request.getParameter("order"))){
-            parameters.add("order=" + request.getParameter("order"));
+            parameters.add("sort_order=" + request.getParameter("order"));
         }
         if(StringUtils.isNotBlank(request.getParameter("rpp"))){
             parameters.add("rpp=" + request.getParameter("rpp"));
