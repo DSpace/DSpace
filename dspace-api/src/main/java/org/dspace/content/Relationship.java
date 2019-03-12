@@ -77,11 +77,11 @@ public class Relationship implements ReloadableEntity<Integer> {
     private int rightPlace;
 
     /**
-     * Standard getter for the ID field
-     * @return  the ID
+     * Standard setter for the ID field
+     * @param id    The ID to be set
      */
-    public Integer getId() {
-        return id;
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     /**

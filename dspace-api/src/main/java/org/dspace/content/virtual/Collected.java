@@ -29,6 +29,18 @@ public class Collected implements VirtualBean {
     private ItemService itemService;
 
     /**
+     * This property determines whether this RelationshipMetadataValue should be used in place calculation or not.
+     * This is retrieved from Spring configuration when constructing RelationshipMetadataValues. This Spring
+     * configuration is located in the core-services.xml configuration file.
+     * Putting this property on true will imply that we're now mixing plain-text metadatavalues with the
+     * metadatavalues that are constructed through Relationships with regards to the place attribute.
+     * For example, currently the RelationshipMetadataValue dc.contributor.author that is constructed through a
+     * Relationship for a Publication will have its useForPlace set to true. This means that the place
+     * calculation will take both these RelationshipMetadataValues into account together with the normal
+     * plain text metadatavalues.
+     */
+    private boolean useForPlace;
+    /**
      * The fields for which the metadata will be retrieved
      */
     private List<String> fields;
@@ -48,7 +60,21 @@ public class Collected implements VirtualBean {
     public void setFields(List<String> fields) {
         this.fields = fields;
     }
+    /**
+     * Generic setter for the useForPlace property
+     * @param useForPlace   The boolean value that the useForPlace property will be set to
+     */
+    public void setUseForPlace(boolean useForPlace) {
+        this.useForPlace = useForPlace;
+    }
 
+    /**
+     * Generic getter for the useForPlace property
+     * @return  The useForPlace to be used by this bean
+     */
+    public boolean getUseForPlace() {
+        return useForPlace;
+    }
 
     /**
      * this method will retrieve the metadata values from the given item for all the metadata fields listed

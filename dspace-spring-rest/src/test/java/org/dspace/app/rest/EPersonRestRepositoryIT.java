@@ -69,7 +69,6 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                                         .content(mapper.writeValueAsBytes(data))
                                         .contentType(contentType))
                    .andExpect(status().isCreated())
-                   .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$", Matchers.allOf(
                                hasJsonPath("$.uuid", not(empty())),
                                // is it what you expect? EPerson.getName() returns the email...

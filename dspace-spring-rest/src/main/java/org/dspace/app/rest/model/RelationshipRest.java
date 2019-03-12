@@ -22,6 +22,7 @@ public class RelationshipRest extends BaseObjectRest<Integer> {
     public static final String CATEGORY = "core";
 
     private UUID leftId;
+    private int relationshipTypeId;
     private RelationshipTypeRest relationshipType;
     private UUID rightId;
     private int leftPlace;
@@ -81,4 +82,11 @@ public class RelationshipRest extends BaseObjectRest<Integer> {
         this.rightPlace = rightPlace;
     }
 
+    public int getRelationshipTypeId() {
+        return relationshipTypeId;
+    }
+
+    public void setRelationshipTypeId(int relationshipTypeId) {
+        this.relationshipTypeId = relationshipTypeId;
+    }
 }

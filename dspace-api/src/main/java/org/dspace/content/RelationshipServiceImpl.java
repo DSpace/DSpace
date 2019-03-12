@@ -22,6 +22,7 @@ import org.dspace.content.dao.RelationshipDAO;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.RelationshipService;
 import org.dspace.content.service.RelationshipTypeService;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -52,19 +53,22 @@ public class RelationshipServiceImpl implements RelationshipService {
     @Override
     public Relationship create(Context context, Relationship relationship) throws SQLException, AuthorizeException {
         if (isRelationshipValidToCreate(context, relationship)) {
-            if (!authorizeService.isAdmin(context)) {
+            if (authorizeService.authorizeActionBoolean(context, relationship.getLeftItem(), Constants.WRITE) ||
+                authorizeService.authorizeActionBoolean(context, relationship.getRightItem(), Constants.WRITE)) {
+                updatePlaceInRelationship(context, relationship);
+                return relationshipDAO.create(context, relationship);
+            } else {
                 throw new AuthorizeException(
-                    "Only administrators can modify relationship");
+                    "You do not have write rights on this relationship's items");
             }
-            updatePlaceInRelationship(context, relationship);
 
-            return relationshipDAO.create(context, relationship);
         } else {
             throw new IllegalArgumentException("The relationship given was not valid");
         }
     }
 
-    private void updatePlaceInRelationship(Context context, Relationship relationship) throws SQLException {
+    @Override
+    public void updatePlaceInRelationship(Context context, Relationship relationship) throws SQLException {
         List<Relationship> leftRelationships = findByItemAndRelationshipType(context,
                                                                              relationship.getLeftItem(),
                                                                              relationship.getRelationshipType(), true);
@@ -208,27 +212,31 @@ public class RelationshipServiceImpl implements RelationshipService {
 
     public void update(Context context, List<Relationship> relationships) throws SQLException, AuthorizeException {
         if (CollectionUtils.isNotEmpty(relationships)) {
-            // Check authorisation - only administrators can change formats
-            if (!authorizeService.isAdmin(context)) {
-                throw new AuthorizeException(
-                    "Only administrators can modify relationship");
-            }
-
             for (Relationship relationship : relationships) {
-                relationshipDAO.save(context, relationship);
+                if (authorizeService.authorizeActionBoolean(context, relationship.getLeftItem(), Constants.WRITE) ||
+                    authorizeService.authorizeActionBoolean(context, relationship.getRightItem(), Constants.WRITE)) {
+                    if (isRelationshipValidToCreate(context, relationship)) {
+                        relationshipDAO.save(context, relationship);
+                    }
+                } else {
+                    throw new AuthorizeException("You do not have write rights on this relationship's items");
+                }
             }
         }
     }
 
     public void delete(Context context, Relationship relationship) throws SQLException, AuthorizeException {
         if (isRelationshipValidToDelete(context, relationship)) {
-            if (!authorizeService.isAdmin(context)) {
+            // To delete a relationship, a user must have WRITE permissions on one of the related Items
+            if (authorizeService.authorizeActionBoolean(context, relationship.getLeftItem(), Constants.WRITE) ||
+                authorizeService.authorizeActionBoolean(context, relationship.getRightItem(), Constants.WRITE)) {
+                relationshipDAO.delete(context, relationship);
+                updatePlaceInRelationship(context, relationship);
+            } else {
                 throw new AuthorizeException(
-                    "Only administrators can delete relationship");
+                    "You do not have write rights on this relationship's items");
             }
-            relationshipDAO.delete(context, relationship);
 
-            updatePlaceInRelationship(context, relationship);
         } else {
             throw new IllegalArgumentException("The relationship given was not valid");
         }
@@ -239,12 +247,12 @@ public class RelationshipServiceImpl implements RelationshipService {
             log.warn("The relationship has been deemed invalid since the relation was null");
             return false;
         }
-        if (relationship.getId() == null) {
+        if (relationship.getID() == null) {
             log.warn("The relationship has been deemed invalid since the ID" +
                          " off the given relationship was null");
             return false;
         }
-        if (this.find(context, relationship.getId()) == null) {
+        if (this.find(context, relationship.getID()) == null) {
             log.warn("The relationship has been deemed invalid since the relationship" +
                          " is not present in the DB with the current ID");
             logRelationshipTypeDetails(relationship.getRelationshipType());

@@ -62,6 +62,11 @@ public class Related implements VirtualBean {
     private VirtualBean virtualBean;
 
     /**
+     * The boolean value indicating whether this field should be used for place or not
+     */
+    private boolean useForPlace = false;
+
+    /**
      * Generic getter for the relationshipTypeString property of this class
      * @return  The relationshipTypeString property
      */
@@ -110,6 +115,22 @@ public class Related implements VirtualBean {
     }
 
     /**
+     * Generic setter for the useForPlace property
+     * @param useForPlace   The boolean value that the useForPlace property will be set to
+     */
+    public void setUseForPlace(boolean useForPlace) {
+        this.useForPlace = useForPlace;
+    }
+
+    /**
+     * Generic getter for the useForPlace property
+     * @return  The useForPlace to be used by this bean
+     */
+    public boolean getUseForPlace() {
+        return useForPlace;
+    }
+
+    /**
      * This method will find the correct Relationship from the given item to retrieve the other item from it
      * and pass this along to the next VirtualBean that's stored in this class.
      * @param context   The relevant DSpace context
@@ -153,4 +174,5 @@ public class Related implements VirtualBean {
 
         return null;
     }
+
 }
