@@ -165,19 +165,4 @@ public class XmlWorkflowItem implements WorkflowItem, ReloadableEntity<Integer>,
         return Constants.WORKFLOWITEM;
     }
 
-    @Override
-    public boolean isArchived() {
-        return false;
-    }
-
-    @Override
-    public boolean isDiscoverable() {
-        return false;
-    }
-
-    @Override
-    public String getHandle() {
-        return null;
-    }
-
 }
