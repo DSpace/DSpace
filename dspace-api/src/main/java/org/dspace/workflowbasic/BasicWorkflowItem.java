@@ -207,8 +207,4 @@ public class BasicWorkflowItem implements WorkflowItem {
         return Constants.WORKFLOWITEM;
     }
 
-    @Override
-    public String getHandle() {
-        return null;
-    }
 }

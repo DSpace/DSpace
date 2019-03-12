@@ -260,23 +260,8 @@ public class WorkspaceItem
     }
 
     @Override
-    public String getHandle() {
-        return null;
-    }
-
-    @Override
     public int getType() {
         return Constants.WORKSPACEITEM;
-    }
-
-    @Override
-    public boolean isArchived() {
-        return false;
-    }
-
-    @Override
-    public boolean isDiscoverable() {
-        return false;
     }
 
 }

@@ -13,6 +13,7 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.browse.BrowsableObject;
+import org.dspace.content.DSpaceObject;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
@@ -52,8 +53,10 @@ public class DiscoveryConfigurationService {
         String name;
         if (dso == null) {
             name = "site";
+        } else if (dso instanceof DSpaceObject) {
+            name = ((DSpaceObject) dso).getHandle();
         } else {
-            name = dso.getHandle();
+            name = dso.getUniqueIndexID();
         }
 
         return getDiscoveryConfiguration(name);
