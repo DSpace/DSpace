@@ -7,6 +7,7 @@
  */
 package org.dspace.xmlworkflow;
 
+import org.dspace.content.Community;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
@@ -35,6 +36,7 @@ public class Role {
     public static enum Scope{
         REPOSITORY,
         COLLECTION,
+        COMM_ADMINS,
         ITEM
     }
 
@@ -87,6 +89,24 @@ public class Role {
                 return assignees;
             }
             return new RoleMembers();
+        }
+        if (scope == Scope.COMM_ADMINS) {
+        	/*
+    		 * This scope references to the first community with "admins" group.
+    		 */
+    		Community communityWithAdmins = null;
+    		for (Community pCommunity : wfi.getCollection().getCommunities()) {
+    			if(pCommunity.getAdministrators() != null) {
+    				//Break at first community administrator group found...
+    				communityWithAdmins = pCommunity;
+    				break;
+    			}
+    		}
+    		RoleMembers adminMembers = new RoleMembers();
+    		if(communityWithAdmins != null){
+    			adminMembers.addGroup(communityWithAdmins.getAdministrators());
+    		}
+    		return adminMembers;
         }else{
             WorkflowItemRole[] roles = WorkflowItemRole.find(context, wfi.getID(), id);
             RoleMembers assignees = new RoleMembers();
