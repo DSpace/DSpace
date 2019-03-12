@@ -42,6 +42,7 @@ public class DryadJournalConcept extends DryadOrganizationConcept {
     // Journal Concepts can also have the following fields:
     public static final String ISSN = "issn";
     public static final String MEMBERNAME = "memberName";
+    public static final String PAYMENT_PLAN = "paymentPlanType";
     public static final String COVER_IMAGE = "coverImage";
     public static final String RECENTLY_INTEGRATED = "recentlyIntegrated";
 
@@ -65,6 +66,7 @@ public class DryadJournalConcept extends DryadOrganizationConcept {
         metadataProperties.setProperty(PUBLICATION_BLACKOUT, "journal.publicationBlackout");
         metadataProperties.setProperty(ISSN, "journal.issn");
         metadataProperties.setProperty(MEMBERNAME, "journal.memberName");
+        metadataProperties.setProperty(PAYMENT_PLAN, "organization.paymentPlanType");
         metadataProperties.setProperty(HASJOURNALPAGE, "journal.hasJournalPage");
         metadataProperties.setProperty(COVER_IMAGE, "journal.coverImage");
         metadataProperties.setProperty(ALLOW_DATAFIRST_WORKFLOW, "journal.allowDataFirstWorkflow");
@@ -458,6 +460,10 @@ public class DryadJournalConcept extends DryadOrganizationConcept {
         return result;
     }
 
+    public String getPaymentPlanType() {
+        return getConceptMetadataValue(metadataProperties.getProperty(PAYMENT_PLAN));
+    }
+    
     public void setPublicationBlackout(String value) {
         setConceptMetadataValue(metadataProperties.getProperty(PUBLICATION_BLACKOUT), value);
     }

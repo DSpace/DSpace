@@ -26,6 +26,8 @@ public class Journal {
     public String issn = "";
     public String website = "";
     public String description = "";
+    public String paymentPlanType = "";
+    
     protected DryadJournalConcept dryadJournalConcept;
 
     public Journal() {
@@ -36,6 +38,7 @@ public class Journal {
         issn = dryadJournalConcept.getISSN();
         website = dryadJournalConcept.getWebsite();
         description = dryadJournalConcept.getDescription();
+        paymentPlanType = dryadJournalConcept.getPaymentPlanType();
         this.dryadJournalConcept = dryadJournalConcept;
     }
 
