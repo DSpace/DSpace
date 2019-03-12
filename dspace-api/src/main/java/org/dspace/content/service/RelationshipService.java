@@ -88,6 +88,19 @@ public interface RelationshipService extends DSpaceCRUDService<Relationship> {
         throws SQLException;
 
     /**
+     * This method will update the place for the Relationship and all other relationships found by the items and
+     * relationship type of the given Relatonship. It will give this Relationship the last place in both the
+     * left and right place determined by querying for the list of leftRelationships and rightRelationships
+     * by the leftItem, rightItem and relationshipType of the given Relationship.
+     * @param context           The relevant DSpace context
+     * @param relationship      The Relationship object that will have it's place updated and that will be used
+     *                          to retrieve the other relationships whose place might need to be updated
+     * @throws SQLException     If something goes wrong
+     */
+    public void updatePlaceInRelationship(Context context, Relationship relationship) throws SQLException;
+
+
+    /**
      * This method returns a list of Relationship objets for which the relationshipType property is equal to the given
      * RelationshipType object
      * @param context           The relevant DSpace context

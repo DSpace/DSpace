@@ -39,6 +39,11 @@ public class Concatenate implements VirtualBean {
     private String separator;
 
     /**
+     * The boolean value indicating whether this field should be used for place or not
+     */
+    private boolean useForPlace = false;
+
+    /**
      * Generic getter for the fields property
      * @return The list of fields to be used in this bean
      */
@@ -68,6 +73,22 @@ public class Concatenate implements VirtualBean {
      */
     public void setSeparator(String separator) {
         this.separator = separator;
+    }
+
+    /**
+     * Generic setter for the useForPlace property
+     * @param useForPlace   The boolean value that the useForPlace property will be set to
+     */
+    public void setUseForPlace(boolean useForPlace) {
+        this.useForPlace = useForPlace;
+    }
+
+    /**
+     * Generic getter for the useForPlace property
+     * @return  The useForPlace to be used by this bean
+     */
+    public boolean getUseForPlace() {
+        return useForPlace;
     }
 
     /**
@@ -114,4 +135,5 @@ public class Concatenate implements VirtualBean {
         listToReturn.add(result);
         return listToReturn;
     }
+
 }

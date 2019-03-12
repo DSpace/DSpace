@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -25,8 +26,10 @@ import org.dspace.content.authority.Choices;
 import org.dspace.content.authority.service.ChoiceAuthorityService;
 import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.dspace.content.service.DSpaceObjectService;
+import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.MetadataValueService;
+import org.dspace.content.service.RelationshipService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.handle.service.HandleService;
@@ -60,6 +63,10 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
     protected MetadataFieldService metadataFieldService;
     @Autowired(required = true)
     protected MetadataAuthorityService metadataAuthorityService;
+    @Autowired(required = true)
+    protected ItemService itemService;
+    @Autowired(required = true)
+    protected RelationshipService relationshipService;
 
     public DSpaceObjectServiceImpl() {
 
@@ -239,7 +246,7 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
         for (int i = 0; i < values.size(); i++) {
 
             if (authorities != null && authorities.size() >= i) {
-                if (StringUtils.equals(authorities.get(i), "virtual")) {
+                if (StringUtils.startsWith(authorities.get(i), Constants.VIRTUAL_AUTHORITY_PREFIX)) {
                     continue;
                 }
             }
@@ -546,10 +553,30 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
              */
             // A map created to store the latest place for each metadata field
             Map<MetadataField, Integer> fieldToLastPlace = new HashMap<>();
-            List<MetadataValue> metadataValues = dso.getMetadata();
+            List<MetadataValue> metadataValues = new LinkedList<>();
+            if (dso.getType() == Constants.ITEM) {
+                metadataValues = itemService.getMetadata((Item) dso, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
+            } else {
+                metadataValues = dso.getMetadata();
+            }
             for (MetadataValue metadataValue : metadataValues) {
                 //Retrieve & store the place for each metadata value
-                if (!StringUtils.equals(metadataValue.getAuthority(), "virtual")) {
+                if (StringUtils.startsWith(metadataValue.getAuthority(), Constants.VIRTUAL_AUTHORITY_PREFIX) &&
+                    ((RelationshipMetadataValue) metadataValue).isUseForPlace()) {
+                    int mvPlace = getMetadataValuePlace(fieldToLastPlace, metadataValue);
+                    metadataValue.setPlace(mvPlace);
+                    String authority = metadataValue.getAuthority();
+                    String relationshipId = StringUtils.split(authority, "::")[1];
+                    Relationship relationship = relationshipService.find(context, Integer.parseInt(relationshipId));
+                    if (relationship.getLeftItem() == (Item) dso) {
+                        relationship.setLeftPlace(mvPlace);
+                    } else {
+                        relationship.setRightPlace(mvPlace);
+                    }
+                    relationshipService.update(context, relationship);
+
+                } else if (!StringUtils.startsWith(metadataValue.getAuthority(),
+                                                   Constants.VIRTUAL_AUTHORITY_PREFIX)) {
                     int mvPlace = getMetadataValuePlace(fieldToLastPlace, metadataValue);
                     metadataValue.setPlace(mvPlace);
                 }
@@ -562,7 +589,7 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
      *
      * @param fieldToLastPlace the map containing the latest place of each metadata field
      * @param metadataValue    the metadata value that needs to get a place
-     * @return The new place for the metadata valu
+     * @return The new place for the metadata value
      */
     protected int getMetadataValuePlace(Map<MetadataField, Integer> fieldToLastPlace, MetadataValue metadataValue) {
         MetadataField metadataField = metadataValue.getMetadataField();

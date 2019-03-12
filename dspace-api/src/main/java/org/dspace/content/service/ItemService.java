@@ -23,7 +23,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
-import org.dspace.content.MetadataValue;
+import org.dspace.content.RelationshipMetadataValue;
 import org.dspace.content.Thumbnail;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.virtual.VirtualMetadataPopulator;
@@ -651,6 +651,6 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
      *                              VirtualMetadataPopulator functionality or not
      * @return      The list of MetadataValue objects constructed through the Relationships
      */
-    public List<MetadataValue> getRelationshipMetadata(Item item, boolean enableVirtualMetadata);
+    public List<RelationshipMetadataValue> getRelationshipMetadata(Item item, boolean enableVirtualMetadata);
 
 }

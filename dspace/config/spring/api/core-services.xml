@@ -170,13 +170,14 @@
         <property name="separator">
             <value>, </value>
         </property>
+        <property name="useForPlace" value="true"/>
     </bean>
 
     <!-- Config like this will tell our VirtualMetadataPopulator to include the virtual metadata field
      'dc.contributor.other' on the appropriate item with the values defined in the value-ref.
       This value-ref should be a bean of type VirtualBean -->
     <util:map id="isOrgUnitOfPublicationMap">
-        <entry key="dc_contributor_other" value-ref="publicationOrgUnit_name"/>
+        <entry key="dc.contributor.other" value-ref="publicationOrgUnit_name"/>
     </util:map>
     <bean class="org.dspace.content.virtual.Collected" id="publicationOrgUnit_name">
         <property name="fields">
@@ -187,7 +188,7 @@
     </bean>
 
     <util:map id="isPersonOfProjectMap">
-        <entry key="project_contributor_author" value-ref="projectPerson_author"/>
+        <entry key="project.contributor.author" value-ref="projectPerson_author"/>
     </util:map>
     <!--
      If the related item has:
@@ -208,7 +209,7 @@
     </bean>
 
     <util:map id="isOrgUnitOfProjectMap">
-        <entry key="project_contributor_other" value-ref="projectOrgUnit_other"/>
+        <entry key="project.contributor.other" value-ref="projectOrgUnit_other"/>
     </util:map>
     <!-- This Collected bean wil create a list of project.contributor.other virtual metadata fields that hold
          the value of orgunit.identifier.name, each of them in a separate metadatavalue
@@ -227,7 +228,7 @@
     </bean>
 
     <util:map id="isOrgUnitOfPersonMap">
-        <entry key="person_contributor_other" value-ref="personProject_other"/>
+        <entry key="person.contributor.other" value-ref="personProject_other"/>
     </util:map>
     <bean class="org.dspace.content.virtual.Collected" id="personProject_other">
         <property name="fields">
@@ -240,6 +241,7 @@
     <util:map id="isJournalVolumeOfIssueMap">
         <entry key="journalvolume.identifier.volume" value-ref="issueVolume_volume"/>
         <entry key="journal.identifier.issn" value-ref="volumeJournal_issn_related"/>
+        <entry key="journal.title" value-ref="volumeJournal_title_related"/>
     </util:map>
     <!-- This Collected bean will create a list of journalvolume.identifier.volume virtual metadata fields that hold
      the value of journalvolume.identifier.volume, each of them in a separate metadatavalue
@@ -273,6 +275,12 @@
         <property name="virtualBean" ref="volumeJournal_issn"/>
     </bean>
 
+    <bean class="org.dspace.content.virtual.Related" id="volumeJournal_title_related">
+        <property name="relationshipTypeString" value="isJournalOfVolume"/>
+        <property name="place" value="1"/>
+        <property name="virtualBean" ref="volumeJournal_title"/>
+    </bean>
+
     <util:map id="isJournalOfVolumeMap">
         <entry key="journal.identifier.issn" value-ref="volumeJournal_issn"/>
         <entry key="journal.title" value-ref="volumeJournal_title"/>
@@ -296,7 +304,7 @@
     </util:map>
 	
     <util:map id="isIssueOfJournalVolumeMap">
-        <entry key="journalissue_identifier_number" value-ref="journalIssue_number"/>
+        <entry key="journalissue.identifier.number" value-ref="journalIssue_number"/>
     </util:map>
     <bean class="org.dspace.content.virtual.Collected" id="journalIssue_number">
         <property name="fields">
@@ -308,6 +316,9 @@
 
     <util:map id="isJournalIssueOfPublicationMap">
         <entry key="journal.identifier.issn"  value-ref="issueVolumeJournal_issn_related"/>
+        <entry key="journal.title"  value-ref="issueVolumeJournal_title_related"/>
+        <entry key="journalvolume.identifier.name" value-ref="issueVolume_title_related"/>
+        <entry key="relation.isJournalOfPublication" value-ref="issueVolumeJournal_uuid_related"/>
     </util:map>
 
     <!-- This Related bean defines a relationship type that will be used on a publication.
@@ -321,10 +332,45 @@
      In this specific case, it'll call another Related bean to retrieve the journal for the journalvolume and it'll
      then retrieve the volume. This example has 2 Related beans chained to eachother to finally chain to a Collected
      bean to retrieve the final value -->
+    <bean class="org.dspace.content.virtual.Concatenate" id="issueVolume_title">
+        <property name="fields">
+            <util:list>
+                <value>journalvolume.identifier.name</value>
+            </util:list>
+        </property>
+        <property name="separator">
+            <value>, </value>
+        </property>
+    </bean>
     <bean class="org.dspace.content.virtual.Related" id="issueVolumeJournal_issn_related">
         <property name="relationshipTypeString" value="isJournalVolumeOfIssue"/>
         <property name="place" value="1"/>
         <property name="virtualBean" ref="volumeJournal_issn_related"/>
     </bean>
+
+    <bean class="org.dspace.content.virtual.Related" id="issueVolumeJournal_title_related">
+        <property name="relationshipTypeString" value="isJournalVolumeOfIssue"/>
+        <property name="place" value="1"/>
+        <property name="virtualBean" ref="volumeJournal_title_related"/>
+    </bean>
+
+    <bean class="org.dspace.content.virtual.Related" id="issueVolume_title_related">
+        <property name="relationshipTypeString" value="isJournalVolumeOfIssue"/>
+        <property name="place" value="1"/>
+        <property name="virtualBean" ref="issueVolume_title"/>
+    </bean>
+
+    <bean class="org.dspace.content.virtual.Related" id="issueVolumeJournal_uuid_related">
+        <property name="relationshipTypeString" value="isJournalVolumeOfIssue"/>
+        <property name="place" value="1"/>
+        <property name="virtualBean" ref="volumeJournal_uuid_related"/>
+    </bean>
+
+    <bean class="org.dspace.content.virtual.Related" id="volumeJournal_uuid_related">
+        <property name="relationshipTypeString" value="isJournalOfVolume"/>
+        <property name="place" value="1"/>
+        <property name="virtualBean" ref="volumeJournal_uuid"/>
+    </bean>
+    <bean class="org.dspace.content.virtual.UUIDValue" id="volumeJournal_uuid"/>
 </beans>
 
