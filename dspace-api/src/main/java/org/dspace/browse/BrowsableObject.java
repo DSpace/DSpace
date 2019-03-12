@@ -8,8 +8,6 @@
 package org.dspace.browse;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.dspace.core.Constants;
 
@@ -22,32 +20,6 @@ import org.dspace.core.Constants;
  *            the Class of the primary key
  */
 public interface BrowsableObject<PK extends Serializable> {
-    Map<String, Object> extraInfo = new HashMap<String, Object>();
-
-    /**
-     * A map of additional information exposed by the Entity to the browse/retrieve system
-     * 
-     * @return a map of extra information, by default an empty map is returned
-     */
-    default public Map<String, Object> getExtraInfo() {
-        return extraInfo;
-    }
-
-    /**
-     * 
-     * @return true if the Entity should be considered finalized (archived in terms of DSpace Item)
-     */
-    default public boolean isArchived() {
-        return false;
-    }
-
-    /**
-     * 
-     * @return true if the Entity should be included in the public discovery system (search/browse)
-     */
-    default public boolean isDiscoverable() {
-        return false;
-    }
 
     /**
      * 
@@ -77,9 +49,4 @@ public interface BrowsableObject<PK extends Serializable> {
         return Constants.typeText[getType()];
     };
 
-    /**
-     * 
-     * @return the handle, if any of the object
-     */
-    public String getHandle();
 }
