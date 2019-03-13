@@ -43,7 +43,6 @@ import org.dspace.discovery.SearchUtils;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.configuration.DiscoverySearchFilter;
 
-import org.springframework.boot.autoconfigure.web.ErrorController;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -60,7 +59,7 @@ import org.w3c.dom.Document;
  */
 @Controller
 @RequestMapping("/opensearch")
-public class OpenSearchController implements ErrorController {
+public class OpenSearchController {
 
     private static final Logger log = Logger.getLogger(ScopeResolver.class);
     private static final String errorpath = "/error";
@@ -190,16 +189,6 @@ public class OpenSearchController implements ErrorController {
             response.setContentLength(err.length());
             response.getWriter().write(err);
         }
-    }
-
-    @RequestMapping(value = errorpath)
-    public String error() {
-        return "Error handling";
-    }
-
-    @Override
-    public String getErrorPath() {
-        return errorpath;
     }
 
     /**

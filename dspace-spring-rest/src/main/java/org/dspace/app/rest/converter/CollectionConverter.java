@@ -25,6 +25,7 @@ import org.dspace.content.service.CollectionService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.services.RequestService;
+import org.dspace.services.model.Request;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -71,12 +72,17 @@ public class CollectionConverter
 
     private List<ResourcePolicyRest> getDefaultBitstreamPoliciesForCollection(UUID uuid) {
 
-        HttpServletRequest request = requestService.getCurrentRequest().getHttpServletRequest();
         Context context = null;
+        Request currentRequest = requestService.getCurrentRequest();
+        if (currentRequest != null) {
+            HttpServletRequest request = currentRequest.getHttpServletRequest();
+            context = ContextUtil.obtainContext(request);
+        } else {
+            context = new Context();
+        }
         Collection collection = null;
         List<ResourcePolicy> defaultCollectionPolicies = null;
         try {
-            context = ContextUtil.obtainContext(request);
             collection = collectionService.find(context, uuid);
             defaultCollectionPolicies = authorizeService.getPoliciesActionFilter(context, collection,
                                                                                  Constants.DEFAULT_BITSTREAM_READ);
