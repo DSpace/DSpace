@@ -15,7 +15,6 @@ import java.util.List;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.ItemRest;
-import org.dspace.app.rest.model.MetadataEntryRest;
 import org.dspace.app.rest.model.RelationshipRest;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
@@ -47,6 +46,8 @@ public class ItemConverter extends DSpaceObjectConverter<org.dspace.content.Item
     private RelationshipConverter relationshipConverter;
     @Autowired
     private ItemService itemService;
+    @Autowired(required = true)
+    private MetadataConverter metadataConverter;
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(ItemConverter.class);
 
@@ -98,8 +99,7 @@ public class ItemConverter extends DSpaceObjectConverter<org.dspace.content.Item
         fullList.addAll(obj.getMetadata());
         fullList.addAll(itemService.getRelationshipMetadata(obj, true));
 
-        List<MetadataEntryRest> metadata = super.convertMetadataToRest(fullList);
-        item.setMetadata(metadata);
+        item.setMetadata(metadataConverter.convert(fullList));
 
 
         return item;
