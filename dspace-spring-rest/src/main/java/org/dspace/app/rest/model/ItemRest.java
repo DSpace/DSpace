@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * The Item REST Resource
@@ -28,8 +29,6 @@ public class ItemRest extends DSpaceObjectRest {
     private CollectionRest owningCollection;
     @JsonIgnore
     private CollectionRest templateItemOf;
-    //private EPerson submitter;
-
     List<BitstreamRest> bitstreams;
 
     List<RelationshipRest> relationships;
@@ -40,6 +39,7 @@ public class ItemRest extends DSpaceObjectRest {
     }
 
     @Override
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     public String getType() {
         return NAME;
     }
