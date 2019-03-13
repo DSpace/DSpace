@@ -7,6 +7,8 @@
  */
 package org.dspace.app.webui.jsptag;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -36,9 +38,14 @@ import javax.servlet.jsp.tagext.TagSupport;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.Month;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import static ua.edu.sumdu.essuir.utils.EssuirUtils.getTypeLocalized;
 
@@ -401,9 +408,6 @@ public class ItemTag extends TagSupport
         while (st.hasMoreTokens())
         {
         	String field = st.nextToken().trim();
-        	if(request.getRequestURI().contains("display-item.jsp") && ("dc.speciality.id".equals(field) || "dc.date.presentation".equals(field))) {
-        	    continue;
-            }
             boolean isDate = false;
             boolean isLink = false;
             boolean isResolver = false;
@@ -527,6 +531,20 @@ public class ItemTag extends TagSupport
                                 }
                             }
                         }
+                        if (field.startsWith("dc.date.presentation")) {
+                            String year = values[j].value.split(" ")[1];
+                            String month = values[j].value.split(" ")[0];
+                            values[j].value = String.format("%02d.%s", Month.valueOf(month.toUpperCase()).getValue(), year);
+                        }
+
+                        if (field.startsWith("dc.speciality.id")) {
+                            JsonNode jsonNode = new ObjectMapper().readTree(values[j].value);
+                            values[j].value = StreamSupport
+                                    .stream(Spliterators.spliteratorUnknownSize(jsonNode.iterator(), Spliterator.ORDERED), false)
+                                    .map(item -> item.get("name").asText())
+                                    .collect(Collectors.joining("/"));
+                        }
+
                         if (field.startsWith("dc.type"))
                         {
                             String locale = sessionLocale.toString();
