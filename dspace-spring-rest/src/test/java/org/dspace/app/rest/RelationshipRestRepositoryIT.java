@@ -476,6 +476,7 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
 
         String adminToken = getAuthToken(admin.getEmail(), password);
 
+        context.restoreAuthSystemState();
         // Here we create our first Relationship to the Publication to give it a dc.contributor.author virtual
         // metadata field.
         MvcResult mvcResult = getClient(adminToken).perform(post("/api/core/relationships")
@@ -501,6 +502,7 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("leftPlace", is(0)));
 
+        context.turnOffAuthorisationSystem();
 
         // Make sure we grab the latest instance of the Item from the database
         publication = itemService.find(context, publication.getID());
@@ -526,6 +528,7 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
         assertEquals("plain text", author1MD.getValue());
 
 
+        context.restoreAuthSystemState();
         // Verfiy the leftPlace of our relationship is still 0.
         getClient(adminToken).perform(get("/api/core/relationships/" + firstRelationshipIdString))
                              .andExpect(status().isOk())
@@ -568,12 +571,14 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
         MetadataValue author2MD = list.get(2);
         assertEquals("Smith, Maria", author2MD.getValue());
 
+        context.turnOffAuthorisationSystem();
         // Ensure we have the latest instance of the Item from the database
         publication = itemService.find(context, publication.getID());
         // Add a fourth dc.contributor.author mdv
         itemService.addMetadata(context, publication, "dc", "contributor", "author", Item.ANY, "plain text two");
         itemService.update(context, publication);
 
+        context.restoreAuthSystemState();
         list = itemService.getMetadata(publication, "dc", "contributor", "author", Item.ANY);
 
         // Assert that the list of dc.contributor.author mdv is now of size 4 in the following order:
@@ -637,10 +642,13 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
         MetadataValue author4MD = list.get(4);
         assertEquals("Maybe, Maybe", author4MD.getValue());
 
+        context.turnOffAuthorisationSystem();
         // The following additions of Metadata will perform the same sequence of logic and tests as described above
         publication = itemService.find(context, publication.getID());
         itemService.addMetadata(context, publication, "dc", "contributor", "author", Item.ANY, "plain text three");
         itemService.update(context, publication);
+
+        context.restoreAuthSystemState();
 
         list = itemService.getMetadata(publication, "dc", "contributor", "author", Item.ANY);
 
@@ -664,6 +672,8 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
         MetadataValue author5MD = list.get(5);
         assertEquals("plain text three", author5MD.getValue());
 
+        context.turnOffAuthorisationSystem();
+
         publication = itemService.find(context, publication.getID());
         itemService.addMetadata(context, publication, "dc", "contributor", "author", Item.ANY, "plain text four");
         itemService.addMetadata(context, publication, "dc", "contributor", "author", Item.ANY, "plain text five");
@@ -671,6 +681,7 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
         itemService.addMetadata(context, publication, "dc", "contributor", "author", Item.ANY, "plain text seven");
         itemService.update(context, publication);
 
+        context.restoreAuthSystemState();
         list = itemService.getMetadata(publication, "dc", "contributor", "author", Item.ANY);
 
         assertEquals(10, list.size());
@@ -776,7 +787,7 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
         String adminToken = getAuthToken(admin.getEmail(), password);
 
         // First create the structure of 5 metadatavalues just like the additions test.
-
+        context.restoreAuthSystemState();
         MvcResult mvcResult = getClient(adminToken).perform(post("/api/core/relationships")
                                                                 .param("relationshipType",
                                                                        isAuthorOfPublicationRelationshipType.getID()
@@ -800,10 +811,11 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
                              .andExpect(jsonPath("leftPlace", is(0)));
 
 
+        context.turnOffAuthorisationSystem();
         publication = itemService.find(context, publication.getID());
         itemService.addMetadata(context, publication, "dc", "contributor", "author", Item.ANY, "plain text");
         itemService.update(context, publication);
-
+        context.restoreAuthSystemState();
         List<MetadataValue> list = itemService.getMetadata(publication, "dc", "contributor", "author", Item.ANY);
 
         for (MetadataValue mdv : list) {
@@ -836,11 +848,11 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
         getClient(adminToken).perform(get("/api/core/relationships/" + secondRelationshipIdString))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("leftPlace", is(2)));
-
+        context.turnOffAuthorisationSystem();
         publication = itemService.find(context, publication.getID());
         itemService.addMetadata(context, publication, "dc", "contributor", "author", Item.ANY, "plain text two");
         itemService.update(context, publication);
-
+        context.restoreAuthSystemState();
         list = itemService.getMetadata(publication, "dc", "contributor", "author", Item.ANY);
 
         for (MetadataValue mdv : list) {
@@ -871,10 +883,11 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("leftPlace", is(4)));
 
+        context.turnOffAuthorisationSystem();
         publication = itemService.find(context, publication.getID());
         itemService.addMetadata(context, publication, "dc", "contributor", "author", Item.ANY, "plain text three");
         itemService.update(context, publication);
-
+        context.restoreAuthSystemState();
         list = itemService.getMetadata(publication, "dc", "contributor", "author", Item.ANY);
 
         for (MetadataValue mdv : list) {
@@ -893,11 +906,13 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
             }
         }
 
+        context.turnOffAuthorisationSystem();
         // Remove the "plain text two" metadatavalue. Ensure that all mdvs prior to that in the list are unchanged
         // And ensure that the ones coming after this mdv have its place lowered by one.
         itemService.removeMetadataValues(context, publication, listToRemove);
 
         itemService.update(context, publication);
+        context.restoreAuthSystemState();
         list = itemService.getMetadata(publication, "dc", "contributor", "author", Item.ANY);
 
         for (MetadataValue mdv : list) {
@@ -979,6 +994,7 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
                                   entityTypeService.findByEntityType(context, "Person"),
                                   "isAuthorOfPublication", "isPublicationOfAuthor");
 
+        context.restoreAuthSystemState();
         String adminToken = getAuthToken(admin.getEmail(), password);
 
         // First create the structure of 5 metadatavalues just like the additions test.
@@ -1005,11 +1021,12 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("leftPlace", is(0)));
 
-
+        context.turnOffAuthorisationSystem();
         publication = itemService.find(context, publication.getID());
         itemService.addMetadata(context, publication, "dc", "contributor", "author", Item.ANY, "plain text");
         itemService.update(context, publication);
 
+        context.restoreAuthSystemState();
         List<MetadataValue> list = itemService.getMetadata(publication, "dc", "contributor", "author", Item.ANY);
 
         for (MetadataValue mdv : list) {
@@ -1043,10 +1060,11 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("leftPlace", is(2)));
 
+        context.turnOffAuthorisationSystem();
         publication = itemService.find(context, publication.getID());
         itemService.addMetadata(context, publication, "dc", "contributor", "author", Item.ANY, "plain text two");
         itemService.update(context, publication);
-
+        context.restoreAuthSystemState();
         list = itemService.getMetadata(publication, "dc", "contributor", "author", Item.ANY);
 
         for (MetadataValue mdv : list) {
@@ -1077,10 +1095,11 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("leftPlace", is(4)));
 
+        context.turnOffAuthorisationSystem();
         publication = itemService.find(context, publication.getID());
         itemService.addMetadata(context, publication, "dc", "contributor", "author", Item.ANY, "plain text three");
         itemService.update(context, publication);
-
+        context.restoreAuthSystemState();
         list = itemService.getMetadata(publication, "dc", "contributor", "author", Item.ANY);
 
         for (MetadataValue mdv : list) {
@@ -1186,7 +1205,7 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
             .findbyTypesAndLabels(context, entityTypeService.findByEntityType(context, "Person"),
                                   entityTypeService.findByEntityType(context, "OrgUnit"),
                                   "isOrgUnitOfPerson", "isPersonOfOrgUnit");
-
+        context.restoreAuthSystemState();
         String adminToken = getAuthToken(admin.getEmail(), password);
 
         // This is essentially a sequence of adding Relationships by POST and then checking with GET to see
@@ -1309,7 +1328,7 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
             .findbyTypesAndLabels(context, entityTypeService.findByEntityType(context, "Person"),
                                   entityTypeService.findByEntityType(context, "OrgUnit"),
                                   "isOrgUnitOfPerson", "isPersonOfOrgUnit");
-
+        context.restoreAuthSystemState();
         String adminToken = getAuthToken(admin.getEmail(), password);
 
         // This is essentially a sequence of adding Relationships by POST and then checking with GET to see
