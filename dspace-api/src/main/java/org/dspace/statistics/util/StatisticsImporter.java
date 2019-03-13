@@ -7,6 +7,8 @@
  */
 package org.dspace.statistics.util;
 
+import com.maxmind.geoip2.DatabaseReader;
+import com.maxmind.geoip2.model.CityResponse;
 import org.apache.commons.cli.*;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.log4j.Logger;
@@ -21,12 +23,10 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.statistics.SolrLogger;
 
+import java.net.InetAddress;
 import java.text.*;
 import java.io.*;
 import java.util.*;
-
-import com.maxmind.geoip.LookupService;
-import com.maxmind.geoip.Location;
 
 /**
  * Class to load intermediate statistics files (produced from log files by {@link ClassicDSpaceLogConverter}) into Solr.
@@ -46,7 +46,7 @@ public class StatisticsImporter
     private static HttpSolrServer solr;
 
     /** GEOIP lookup service */
-    private static LookupService geoipLookup;
+    private static DatabaseReader geoipLookup;
 
     /** Whether to skip the DNS reverse lookup or not */
     private static boolean skipReverseDNS = false;
@@ -170,8 +170,8 @@ public class StatisticsImporter
             String continent = "";
             String country = "";
             String countryCode = "";
-            float longitude = 0f;
-            float latitude = 0f;
+            double longitude = 0f;
+            double latitude = 0f;
             String city = "";
             String dns;
 
@@ -236,14 +236,14 @@ public class StatisticsImporter
                 }
 
                 // Get the geo information for the user
-                Location location;
                 try {
-                    location = geoipLookup.getLocation(ip);
-                    city = location.city;
-                    country = location.countryName;
-                    countryCode = location.countryCode;
-                    longitude = location.longitude;
-                    latitude = location.latitude;
+                    InetAddress ipAddress = InetAddress.getByName(ip);
+                    CityResponse cityResponse = geoipLookup.city(ipAddress);
+                    city = cityResponse.getCity().getName();
+                    countryCode = cityResponse.getCountry().getIsoCode();
+                    longitude = cityResponse.getLocation().getLongitude();
+                    latitude = cityResponse.getLocation().getLatitude();
+
                     if(verbose) {
                         data += (", country = " + country);
                         data += (", city = " + city);
@@ -453,7 +453,8 @@ public class StatisticsImporter
         String dbfile = ConfigurationManager.getProperty("usage-statistics", "dbfile");
         try
         {
-            geoipLookup = new LookupService(dbfile, LookupService.GEOIP_STANDARD);
+            File dbFile = new File(dbfile);
+            geoipLookup = new DatabaseReader.Builder(dbFile).build();
         }
         catch (FileNotFoundException fe)
         {

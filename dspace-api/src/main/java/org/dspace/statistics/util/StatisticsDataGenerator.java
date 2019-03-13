@@ -7,6 +7,8 @@
  */
 package org.dspace.statistics.util;
 
+import com.maxmind.geoip2.DatabaseReader;
+import com.maxmind.geoip2.model.CityResponse;
 import org.apache.commons.cli.*;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.solr.common.SolrInputDocument;
@@ -19,11 +21,12 @@ import org.dspace.content.Bitstream;
 import org.dspace.eperson.EPerson;
 import org.dspace.statistics.SolrLogger;
 
+import java.io.File;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Date;
 import java.text.SimpleDateFormat;
 
-import com.maxmind.geoip.LookupService;
-import com.maxmind.geoip.Location;
 
 /**
  * Test class to generate random statistics data.
@@ -195,16 +198,18 @@ public class StatisticsDataGenerator {
 
 		String prevIp = null;
 		String dbfile = ConfigurationManager.getProperty("usage-statistics", "dbfile");
-		LookupService cl = new LookupService(dbfile,
-				LookupService.GEOIP_STANDARD);
+		DatabaseReader  cl = null;
+		File dbFile = new File(dbfile);
+		cl = new DatabaseReader.Builder(dbFile).build();
+
 		int countryErrors = 0;
 		for (int i = 0; i < nrLogs; i++) {
 			String ip = "";
 			Date time;
 			String continent;
 			String countryCode;
-			float longitude;
-			float latitude;
+			double longitude;
+			double latitude;
 			String city;
 
 			// 1. Generate an ip for our user
@@ -219,13 +224,15 @@ public class StatisticsDataGenerator {
             ip = ipBuilder.toString();
             
 			// 2 Depending on our ip get all the location info
-			Location location;
+			InetAddress ipAddress = null;
 			try {
-				location = cl.getLocation(ip);
-			} catch (Exception e) {
-				location = null;
+				ipAddress = InetAddress.getByName(ip);
+			} catch (UnknownHostException ex) {
+				ipAddress = null;
 			}
-			if (location == null) {
+
+
+			if (ipAddress == null) {
 				// If we haven't got a prev ip this is pretty useless so move on
 				// to the next one
 				if (prevIp == null)
@@ -233,13 +240,15 @@ public class StatisticsDataGenerator {
                     continue;
                 }
 				ip = prevIp;
-				location = cl.getLocation(ip);
+				ipAddress = InetAddress.getByName(ip);
 			}
 
-			city = location.city;
-			countryCode = location.countryCode;
-			longitude = location.longitude;
-			latitude = location.latitude;
+			CityResponse cityResponse = cl.city(ipAddress);
+			city = cityResponse.getCity().getName();
+			countryCode = cityResponse.getCountry().getIsoCode();
+			longitude = cityResponse.getLocation().getLongitude();
+			latitude = cityResponse.getLocation().getLatitude();
+
 			try {
 				continent = LocationUtils.getContinentCode(countryCode);
 			} catch (Exception e) {

@@ -7,8 +7,8 @@
  */
 package org.dspace.statistics.util;
 
-import com.maxmind.geoip.Location;
-import com.maxmind.geoip.LookupService;
+import com.maxmind.geoip2.DatabaseReader;
+import com.maxmind.geoip2.model.CityResponse;
 import org.apache.commons.cli.*;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.log4j.Logger;
@@ -31,6 +31,7 @@ import org.elasticsearch.common.xcontent.XContentFactory;
 
 
 import java.io.*;
+import java.net.InetAddress;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -56,7 +57,7 @@ public class StatisticsImporterElasticSearch {
     //TODO ES Client
 
     /** GEOIP lookup service */
-    private static LookupService geoipLookup;
+    private static DatabaseReader geoipLookup;
 
     /** Metadata storage information */
     private static Map<String, String> metadataStorageInfo;
@@ -107,8 +108,8 @@ public class StatisticsImporterElasticSearch {
             String continent = "";
             String country = "";
             String countryCode = "";
-            float longitude = 0f;
-            float latitude = 0f;
+            double longitude = 0f;
+            double latitude = 0f;
             String city = "";
             String dns;
 
@@ -176,14 +177,16 @@ public class StatisticsImporterElasticSearch {
                 }
 
                 // Get the geo information for the user
-                Location location;
+
                 try {
-                    location = geoipLookup.getLocation(ip);
-                    city = location.city;
-                    country = location.countryName;
-                    countryCode = location.countryCode;
-                    longitude = location.longitude;
-                    latitude = location.latitude;
+                    InetAddress ipAddress = InetAddress.getByName(ip);
+                    CityResponse cityResponse = geoipLookup.city(ipAddress);
+                    city = cityResponse.getCity().getName();
+                    country = cityResponse.getCountry().getName();
+                    countryCode = cityResponse.getCountry().getIsoCode();
+                    longitude = cityResponse.getLocation().getLongitude();
+                    latitude = cityResponse.getLocation().getLatitude();
+
                     if(verbose) {
                         data += (", country = " + country);
                         data += (", city = " + city);
@@ -389,7 +392,9 @@ public class StatisticsImporterElasticSearch {
         String dbfile = ConfigurationManager.getProperty("usage-statistics", "dbfile");
         try
         {
-            geoipLookup = new LookupService(dbfile, LookupService.GEOIP_STANDARD);
+            File dbFile = new File(dbfile);
+            geoipLookup = new DatabaseReader.Builder(dbFile).build();
+
         }
         catch (FileNotFoundException fe)
         {

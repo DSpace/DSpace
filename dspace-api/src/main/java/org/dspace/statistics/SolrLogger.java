@@ -9,8 +9,9 @@ package org.dspace.statistics;
 
 import au.com.bytecode.opencsv.CSVReader;
 import au.com.bytecode.opencsv.CSVWriter;
-import com.maxmind.geoip.Location;
-import com.maxmind.geoip.LookupService;
+import com.maxmind.geoip2.DatabaseReader;
+import com.maxmind.geoip2.exception.GeoIp2Exception;
+import com.maxmind.geoip2.model.CityResponse;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
@@ -50,9 +51,11 @@ import org.dspace.statistics.util.DnsLookup;
 import org.dspace.statistics.util.LocationUtils;
 import org.dspace.statistics.util.SpiderDetector;
 import org.dspace.usage.UsageWorkflowEvent;
+import sun.management.resources.agent;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.*;
+import java.net.InetAddress;
 import java.net.URLEncoder;
 import java.sql.SQLException;
 import java.text.DateFormat;
@@ -81,7 +84,7 @@ public class SolrLogger
 
     public static final String DATE_FORMAT_DCDATE = "yyyy-MM-dd'T'HH:mm:ss'Z'";
 
-    private static final LookupService locationService;
+    private static final DatabaseReader locationService;
 
     private static final boolean useProxies;
 
@@ -149,15 +152,15 @@ public class SolrLogger
         // Read in the file so we don't have to do it all the time
         //spiderIps = SpiderDetector.getSpiderIpAddresses();
 
-        LookupService service = null;
+        DatabaseReader service = null;
         // Get the db file for the location
         String dbfile = ConfigurationManager.getProperty("usage-statistics", "dbfile");
         if (dbfile != null)
         {
             try
             {
-                service = new LookupService(dbfile,
-                        LookupService.GEOIP_STANDARD);
+                File dbFile = new File(dbfile);
+                service = new DatabaseReader.Builder(dbFile).build();
             }
             catch (FileNotFoundException fe)
             {
@@ -342,29 +345,31 @@ public class SolrLogger
             // location information if not valid
             if(locationService != null)
             {
-                Location location = locationService.getLocation(ip);
-                if (location != null
-                        && !("--".equals(location.countryCode)
-                        && location.latitude == -180 && location.longitude == -180))
-                {
-                    try
-                    {
-                        doc1.addField("continent", LocationUtils
-                                .getContinentCode(location.countryCode));
-                    }
-                    catch (Exception e)
-                    {
-                        System.out
-                                .println("COUNTRY ERROR: " + location.countryCode);
-                    }
-                    doc1.addField("countryCode", location.countryCode);
-                    doc1.addField("city", location.city);
-                    doc1.addField("latitude", location.latitude);
-                    doc1.addField("longitude", location.longitude);
-                    
+               try {
+                   InetAddress ipAddress = InetAddress.getByName(ip);
+                   CityResponse location = locationService.city(ipAddress);
+                   String countryCode = location.getCountry().getIsoCode();
+                   double latitude = location.getLocation().getLatitude();
+                   double longitude = location.getLocation().getLongitude();
+
+                   if (!("--".equals(countryCode) && latitude == -180 && longitude == -180)) {
+                       try {
+                           doc1.addField("continent", LocationUtils
+                                   .getContinentCode(countryCode));
+                       } catch (Exception e) {
+                           System.out
+                                   .println("COUNTRY ERROR: " + countryCode);
+                       }
+                       doc1.addField("countryCode", countryCode);
+                       doc1.addField("city", location.getCity().getName());
+                       doc1.addField("latitude", latitude);
+                       doc1.addField("longitude", longitude);
 
 
-                }
+                   }
+               } catch(IOException | GeoIp2Exception e) {
+                   log.error("Unable to get location of request:  {}", e);
+               }
             }
         }
 
@@ -428,28 +433,31 @@ public class SolrLogger
             // location information if not valid
             if(locationService != null)
             {
-                Location location = locationService.getLocation(ip);
-                if (location != null
-                        && !("--".equals(location.countryCode)
-                        && location.latitude == -180 && location.longitude == -180))
-                {
-                    try
-                    {
-                        doc1.addField("continent", LocationUtils
-                                .getContinentCode(location.countryCode));
-                    }
-                    catch (Exception e)
-                    {
-                        System.out
-                                .println("COUNTRY ERROR: " + location.countryCode);
-                    }
-                    doc1.addField("countryCode", location.countryCode);
-                    doc1.addField("city", location.city);
-                    doc1.addField("latitude", location.latitude);
-                    doc1.addField("longitude", location.longitude);
-                    
+
+                try {
+                    InetAddress ipAddress = InetAddress.getByName(ip);
+                    CityResponse location = locationService.city(ipAddress);
+                    String countryCode = location.getCountry().getIsoCode();
+                    double latitude = location.getLocation().getLatitude();
+                    double longitude = location.getLocation().getLongitude();
+
+                    if (!("--".equals(countryCode) && latitude == -180 && longitude == -180)) {
+                        try {
+                            doc1.addField("continent", LocationUtils
+                                    .getContinentCode(countryCode));
+                        } catch (Exception e) {
+                            System.out
+                                    .println("COUNTRY ERROR: " + countryCode);
+                        }
+                        doc1.addField("countryCode", countryCode);
+                        doc1.addField("city", location.getCity().getName());
+                        doc1.addField("latitude", latitude);
+                        doc1.addField("longitude", longitude);
 
 
+                    }
+                } catch(IOException | GeoIp2Exception e) {
+                    log.error("Unable to get location of request:  {}", e);
                 }
             }
         }

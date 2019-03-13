@@ -93,7 +93,7 @@ Common usage:
     </tstamp>
 
     <!-- Default location of GeoLiteCity.dat.gz to download. This may be overridden, if URL path changes. -->
-    <property name="geolite" value="http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz" />
+    <property name="geolite" value="https://geolite.maxmind.com/download/geoip/database/GeoLite2-City.tar.gz" />
     
     <!-- Default location of lucene-core JAR to download (for update_solr_indexes). This may be overridden, if URL path changes. -->
     <!-- NOTE: this URL should have the version of the JAR replaced with "[version]" -->

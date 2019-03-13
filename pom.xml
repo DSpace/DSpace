@@ -41,7 +41,7 @@
         <commons-cli.version>1.3.1</commons-cli.version>
         <commons-codec.version>1.10</commons-codec.version>
         <persistence-api.version>1.0.2</persistence-api.version>
-        <jackson.version>2.5.1</jackson.version>
+        <jackson.version>2.8.2</jackson.version>
         <hibernate.version>5.2.17.Final</hibernate.version>
 
         <!-- 'root.basedir' is the path to the root [dspace-src] dir. It must be redefined by each child POM,
