@@ -58,7 +58,7 @@ public class CuratorTest
 
         // Get and configure a Curator.
         Curator instance = new Curator();
-        instance.setReporter("-"); // Send any report to standard out. FIXME when DS-3989 is merged
+        instance.setReporter(System.out); // Send any report to standard out.
         instance.addTask(TASK_NAME);
 
         // Configure the run.

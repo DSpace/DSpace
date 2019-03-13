@@ -22,7 +22,10 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 public class PatchBadRequestException extends RuntimeException {
 
     public PatchBadRequestException(String message) {
-        super(message);
+        this(message, null);
     }
 
+    public PatchBadRequestException(String message, Exception e) {
+        super(message, e);
+    }
 }

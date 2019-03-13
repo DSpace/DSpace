@@ -79,6 +79,57 @@ install, upgrade, customize or host DSpace, then we recommend getting in touch w
 
 The DSpace Issue Tracker can be found at: https://jira.duraspace.org/projects/DS/summary
 
+## Testing
+
+### Running Tests
+
+By default, in DSpace, Unit Tests and Integration Tests are disabled. However, they are
+run automatically by [Travis CI](https://travis-ci.org/DSpace/DSpace/) for all Pull Requests and code commits.
+
+* How to run both Unit Tests (via `maven-surefire-plugin`) and Integration Tests (via `maven-failsafe-plugin`):
+  ```
+  # NOTE: while "mvn test" runs Unit Tests,
+  # Integration Tests only run for "verify" or "install" phases
+  mvn clean install -Dmaven.test.skip=false -DskipITs=false
+  ```
+* How to run just Unit Tests:
+  ```
+  mvn clean test -Dmaven.test.skip=false
+  ```
+* How to run a *single* Unit Test
+  ```
+  # Run all tests in a specific test class
+  # NOTE: testClassName is just the class name, do not include package
+  mvn clean test -Dmaven.test.skip=false -Dtest=[testClassName]
+  
+  # Run one test method in a specific test class
+  mvn clean test -Dmaven.test.skip=false -Dtest=[testClassName]#[testMethodName]
+  ```
+* How to run Integration Tests (requires running Unit tests too)
+  ```
+  mvn clean verify -Dmaven.test.skip=false -DskipITs=false
+  ```
+* How to run a *single* Integration Test (requires running Unit tests too)
+  ```
+  # Run all integration tests in a specific test class
+  # NOTE: Integration Tests only run for "verify" or "install" phases
+  # NOTE: testClassName is just the class name, do not include package
+  mvn clean verify -Dmaven.test.skip=false -DskipITs=false -Dit.test=[testClassName]
+  
+  # Run one test method in a specific test class
+  mvn clean verify -Dmaven.test.skip=false -DskipITs=false -Dit.test=[testClassName]#[testMethodName]
+  ```
+* How to run only tests of a specific DSpace module
+  ```
+  # Before you can run only one module's tests, other modules may need installing into your ~/.m2
+  cd [dspace-src]
+  mvn clean install
+  
+  # Then, move into a module subdirectory, and run the test command
+  cd [dspace-src]/dspace-spring-rest
+  # Choose your test command from the lists above
+  ```
+
 ## License
 
 DSpace source code is freely available under a standard [BSD 3-Clause license](https://opensource.org/licenses/BSD-3-Clause).

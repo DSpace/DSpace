@@ -569,16 +569,6 @@ Common usage:
             <fileset dir="lib" />
         </copy>
 
-        <move todir="${dspace.dir}/etc.bak-${build.date}" failonerror="no">
-            <fileset dir="${dspace.dir}/etc">
-                <include name="**/*" />
-            </fileset>
-        </move>
-
-        <copy todir="${dspace.dir}/etc" preservelastmodified="true">
-            <fileset dir="etc" />
-        </copy>
-
     	<copy todir="${dspace.dir}/solr" preservelastmodified="true">
     	     <fileset dir="solr"/>
     	</copy>
@@ -592,10 +582,6 @@ Common usage:
  ${dspace.dir}/lib was backed up to
 
  ${dspace.dir}/lib.bak-${build.date}
-
- ${dspace.dir}/etc was backed up to
-
- ${dspace.dir}/etc.bak-${build.date}
 
  Please review these directories and delete if no longer needed.
 ====================================================================
@@ -728,8 +714,6 @@ Common usage:
 
         <mkdir dir="${dspace.dir}/lib" />
 
-        <mkdir dir="${dspace.dir}/etc" />
-
         <mkdir dir="${dspace.dir}/webapps" />
 
         <mkdir dir="${dspace.dir}/triplestore" />
@@ -819,17 +803,6 @@ Common usage:
 
         <copy todir="${dspace.dir}/lib" preservelastmodified="true">
             <fileset dir="lib" />
-        </copy>
-
-        <!-- NB: no regular use is made of etc/ files in an installed
-        - system, so this step is 'deprecated', and will eventually
-        - be removed.  -->
-        <delete failonerror="no">
-            <fileset dir="${dspace.dir}/etc" includes="**/*" />
-        </delete>
-
-        <copy todir="${dspace.dir}/etc" preservelastmodified="true">
-            <fileset dir="etc" />
         </copy>
 
     	<copy todir="${dspace.dir}/solr" preservelastmodified="true">
