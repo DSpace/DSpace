@@ -32,6 +32,11 @@ public class EPersonBuilder extends AbstractDSpaceObjectBuilder<EPerson> {
         return ePersonService;
     }
 
+    @Override
+    protected int getPriority() {
+        return 100;
+    }
+
     public EPerson build() {
         try {
             ePersonService.update(context, ePerson);
