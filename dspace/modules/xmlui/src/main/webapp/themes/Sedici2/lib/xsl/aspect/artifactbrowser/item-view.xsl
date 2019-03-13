@@ -307,7 +307,14 @@
 					<xsl:for-each select="dim:field[@element='description' and @qualifier='abstract']">
 						<!-- Indicador del idioma (solo si hay multiples abstracts) -->
 						<xsl:if test="$show_language_indicator = 1">
-							<span class="metadata-lang"><i18n:text>xmlui.dri2xhtml.METS-1.0.item-lang-<xsl:value-of select="@language"/></i18n:text></span>
+							<xsl:choose>
+								<xsl:when test="@language != ''">
+									<span class="metadata-lang"><i18n:text>xmlui.dri2xhtml.METS-1.0.item-lang-<xsl:value-of select="@language"/></i18n:text></span>
+								</xsl:when>
+								<xsl:otherwise>
+									<span class="metadata-lang"><i18n:text>xmlui.dri2xhtml.METS-1.0.item-lang-other</i18n:text></span>
+								</xsl:otherwise>
+							</xsl:choose>
 						</xsl:if>
 						<p>
 							<xsl:value-of select="node()" disable-output-escaping="yes"/>
