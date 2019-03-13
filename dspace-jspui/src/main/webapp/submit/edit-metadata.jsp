@@ -1726,10 +1726,13 @@
        if (repeatable && !readonly)
        {
          fieldCountIncr = 1;
-         if (si.getMoreBoxesFor() != null && si.getMoreBoxesFor().equals(fieldName))
-             {
-           fieldCountIncr = 2;
-         }
+         boolean getMoreBox = ConfigurationManager.getBooleanProperty("webui.submission.getmoreboxes.enabled." + fieldName, true);
+         if(getMoreBox) {
+	         if (si.getMoreBoxesFor() != null && si.getMoreBoxesFor().equals(fieldName))
+	         {
+	           fieldCountIncr = 2;
+	         }
+	     }
        }
 
        String inputType = inputs[z].getInputType();

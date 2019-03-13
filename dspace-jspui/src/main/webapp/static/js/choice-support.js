@@ -76,7 +76,8 @@ function DSpaceSetupAutocomplete(formID, args)
     						return {
     							authority : jQuery(this).attr('authority'),
     							label : jQuery('span.label',this).text(),
-    							value : jQuery('span.value',this).text()
+    							value : jQuery('span.value',this).text(),
+    							extra : jQuery(this).data()
     						};
     					}));
     				}
@@ -86,6 +87,56 @@ function DSpaceSetupAutocomplete(formID, args)
     			input.data('previousData', ui.item);
     			var authority = ui.item.authority;
 				var authValue = authority;
+				var extra = ui.item.extra;
+				
+				//manage extra information to copy value::authority into related field (boxed into the key map)
+				jQuery.each(extra, function( key, row ) {
+					//'key' example: dc_related_example
+					//'row' example: Test::rp00001
+		            var re = /(.*)::(.*)/;
+		            var valsubst = '$1';
+		            var authsubst = '$2';		            
+		            		         
+		            var srow = String(row);
+		            var valExtra = srow.replace(re, valsubst);
+		            var authExtra = srow.replace(re, authsubst);
+		            //calculate from the current input
+		            var inputExtra = args.inputName.replace(args.metadataField, key);
+		            var inputAuthorityExtra = dspace_makeFieldInput(inputExtra,'_authority');
+		            
+		            if(srow.indexOf("::")==-1) {
+		            	authExtra = null;
+		            }
+		            
+		            jQuery('#'+formID + ' input[name=\''+ inputExtra +'\']').val(valExtra);
+					if (authExtra != null) {
+						jQuery('#'+formID + ' input[name=\''+ inputAuthorityExtra + '\']').val(authExtra);
+												
+						var confExtraName = dspace_makeFieldInput(inputExtra,'_confidence');
+	                    var confExtraInput = jQuery('#'+formID + ' input[name=\''+ confExtraName +'\']');
+	                    if (confExtraInput != null)
+	                	{
+	                    	if (authExtra != '')
+	                    	{
+	                    		confExtraInput.val('accepted');
+	                    	}
+	                    	else
+	                		{
+	                    		confExtraInput.val('');
+	                    	}
+	                	}
+					}
+					else {
+						jQuery('#'+formID + ' input[name=\''+ inputAuthorityExtra + '\']').val("");
+					}
+                    var confIDExtraName = inputExtra + "_confidence_indicator_id";
+					// make indicator blank if no authority value
+	                DSpaceUpdateConfidence(document, confIDExtraName,
+	                		authExtra == null || authExtra == '' ? 'blank' :'accepted');
+	                
+				});
+				
+				
 				if (authInput != null)
                 {
 					authInput.val(authValue);
@@ -297,6 +348,10 @@ function DSpaceChoicesLoad(form)
             var result = oauthority.replace(re, subst);
             var option = new Option(olabel + '(' + result +')', ovalue);
             option.authority = opt.getAttributeNode('authority').value;
+            
+            //transfer all data attributes on the option element 
+			option.data = jQuery(opt).data();
+			
             select.add(option, null);
             if (value == ovalue)
                 selectedByValue = select.options.length - 1;
@@ -352,7 +407,7 @@ function DSpaceChoicesSelectOnChange ()
     var select = form.elements['chooser'];
     var so = select.options[select.selectedIndex];
     var isName = form.elements['paramIsName'].value == 'true';
-
+    
     if (isName)
     {
         form.elements['text1'].value = lastNameOf(so.value);
@@ -373,7 +428,8 @@ function DSpaceChoicesAcceptOnClick ()
     var authorityInput = this.form.elements['paramAuthorityInput'].value;
     var formID = this.form.elements['paramFormID'].value;
     var confIndicatorID = this.form.elements['paramConfIndicatorID'] == null?null:this.form.elements['paramConfIndicatorID'].value;
-
+    var field = this.form.elements['paramField'].value;
+    
     // default the authority input if not supplied.
     if (authorityInput.length == 0)
         authorityInput = dspace_makeFieldInput(valueInput,'_authority');
@@ -417,6 +473,63 @@ function DSpaceChoicesAcceptOnClick ()
                     authValue == null || authValue == '' ? 'blank' :'accepted');
         }
 
+        if (select.selectedIndex >= 0 && select.options[select.selectedIndex].data != null)
+        {
+			var extra = select.options[select.selectedIndex].data;
+			
+			//manage extra information to copy value::authority into related field (boxed into the key map)
+			jQuery.each(extra, function( key, row ) {
+				//'key' example: dc_related_example
+				//'row' example: Test::rp00001
+	            var re = /(.*)::(.*)/;
+	            var valsubst = '$1';
+	            var authsubst = '$2';		            
+
+	            var srow = String(row);
+	            var valExtra = srow.replace(re, valsubst);
+	            var authExtra = srow.replace(re, authsubst);
+	            //calculate from the current input
+	            var inputExtra = valueInput.replace(field, key);
+	            var inputAuthorityExtra = dspace_makeFieldInput(inputExtra,'_authority');
+	            
+	            if(srow.indexOf("::")==-1) {
+	            	authExtra = null;
+	            }
+	            	            
+	            if(of.elements[inputExtra]!=null) {
+	            	of.elements[inputExtra].value = valExtra;
+	            }
+	            
+	            if(of.elements[inputAuthorityExtra]!=null) {
+					if (authExtra != null) {					
+						of.elements[inputAuthorityExtra].value = authExtra;
+												
+						var confExtraName = dspace_makeFieldInput(inputExtra,'_confidence');
+						
+			            if (of.elements[confExtraName] != null) {		                
+	                    	if (authExtra != '')
+	                    	{
+	                    		of.elements[confExtraName].value = 'accepted';
+	                    	}
+	                    	else
+	                		{
+	                    		of.elements[confExtraName].value = '';
+	                    	}
+	                	}
+					}
+					else {
+						of.elements[inputAuthorityExtra].value = '';
+					}
+	            }
+                var confIDExtraName = inputExtra + "_confidence_indicator_id";
+				// make indicator blank if no authority value
+                DSpaceUpdateConfidence(window.opener.document, confIDExtraName,
+                		authExtra == null || authExtra == '' ? 'blank' :'accepted');
+                
+			});
+			
+        }
+        
         // force the submit button -- if there is an "add"
         if (isRepeating)
         {
