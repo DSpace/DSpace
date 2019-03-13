@@ -50,7 +50,7 @@
 					<label>Tipo de documento (*)</label>
 					<input-type value-pairs-name="common_types">dropdown</input-type>
 					<hint>Seleccione el Tipo de Documento que desea cargar</hint>
-					<required-on-group>BibliotecariosAndAnonymous</required-on-group>
+					<required>Debe indicar el tipo de documento</required>
 				</field>
 
 				<!-- 
@@ -220,9 +220,7 @@
 					<label>Autor (*)</label>
 					<input-type>onebox</input-type>
 					<hint>Autores de la obra</hint>
-                                        <!-- TODO Buscar solución a esto, ya que no se permite multiples required-on-group -->
-					<!-- NOTE me esta tomando el !SeDiCIAdmin por el problema puesto arriba -->
-					<required-on-group>BibliotecariosAndAnonymous</required-on-group>
+					<required>Debe indicarse el/los autores de la obra</required>
 					<required-on-group>!SeDiCIAdmin</required-on-group>
 					<type-bind>!Objeto Fisico</type-bind>
 				</field>
@@ -255,7 +253,7 @@
 					<label>Título (*)</label>
 					<input-type>textarea</input-type>
 					<hint>El título principal de la obra </hint>
-					<required-on-group>BibliotecariosAndAnonymous</required-on-group>
+					<required>Debe indicar el título principal de la obra</required>
 					<i18n>true</i18n>
 				</field>
 
@@ -471,7 +469,7 @@
 					<label>Entidad de origen (*)</label>
 					<input-type>onebox</input-type>
 					<hint>Institución donde el documento fue creado</hint>
-					<required-on-group>BibliotecariosAndAnonymous</required-on-group>
+					<required>Debe indicar la entidad donde el documento fue creado</required>
 				</field>
 			<!-- Abstract -->
 				<field>
@@ -495,7 +493,7 @@
 					<input-type>textarea</input-type>
 					<hint>Resumen de la obra</hint>
 					<i18n>true</i18n>
-					<required-on-group>BibliotecariosAndAnonymous</required-on-group>
+					<required>Debe indicar un resumen para la obra</required>
 					<type-bind>Tesis</type-bind>
 				</field>
 
@@ -676,7 +674,7 @@
 					<label>ISBN</label>
 					<input-type>onebox</input-type>
 					<hint>El código ISBN correspondiente al libro</hint>
-					<required-on-group>BibliotecariosAndAnonymous</required-on-group>
+					<required>Debe indicar el código ISBN al libro</required>
 					<type-bind>Libro</type-bind>
 				</field>
 
@@ -782,7 +780,7 @@
 					<input-type>date</input-type>
 					<hint>Fecha en la que se expuso el trabajo para su aprobación</hint>
 					<type-bind>Tesis,Objeto de conferencia, Audio</type-bind>
-					<required-on-group>BibliotecariosAndAnonymous</required-on-group>
+					<required>Debe indicar la fecha de presentación del trabajo</required>
 				</field>
 
 
@@ -795,7 +793,7 @@
 					<input-type>textarea</input-type>
 					<hint>Nombre del congreso o conferencia en el que este objeto fue presentado</hint>
 					<type-bind>Objeto de conferencia</type-bind>
-					<required-on-group>BibliotecariosAndAnonymous</required-on-group>
+					<required>Debe indicar el nombre del evento donde el objeto fue presentado</required>
 				</field>
 
 				<!-- Nombre del evento (Opcional para articulos y Publicacion Seriada) -->
@@ -867,7 +865,7 @@
 					<label>Grado alcanzado (*)</label>
 					<input-type>onebox</input-type>
 					<hint>Grado al que el tesista accede</hint>
-					<required-on-group>BibliotecariosAndAnonymous</required-on-group>
+					<required>Debe indicar el grado alcanzado por el tesista</required>
 					<type-bind>Tesis</type-bind>
 				</field>
 
@@ -879,7 +877,7 @@
 					<label>Institución garante (*)</label>
 					<input-type>onebox</input-type>
 					<hint>Institución que otorga el título</hint>
-					<required-on-group>BibliotecariosAndAnonymous</required-on-group>
+					<required>Debe indicar la Institución que otorga el título</required>
 					<type-bind>Tesis</type-bind>
 				</field>
 
@@ -1101,7 +1099,7 @@
 					<input-type>onebox</input-type>
 					<hint>Autores de la obra</hint>
 					<required-on-group>!SeDiCIAdmin</required-on-group>
-					<required-on-group>BibliotecariosAndAnonymous</required-on-group>
+					<required>Debe indicar el/los autores de la obra</required>
 				</field>
 				
 				<!-- Director de tesis -->
@@ -1134,7 +1132,7 @@
 					<label>Fecha de presentación (*)</label>
 					<input-type>date</input-type>
 					<hint>Fecha en la que se expuso el trabajo para su aprobación</hint>
-					<required-on-group>BibliotecariosAndAnonymous</required-on-group>
+					<required>Debe indicar la fecha de presentación del trabajo</required>
 				</field>
 				
 				<!-- Nro de Acta - TESIS (opcional) -->
@@ -1144,7 +1142,7 @@
 					<label>Nro de acta (*)</label>
 					<input-type>onebox</input-type>
 					<hint>Número de acta de aprobación de la Tesis</hint>
-					<required-on-group>BibliotecariosAndAnonymous</required-on-group>
+					<required>Debe indicar el número de acta</required>
 				</field>			
 				
 			</page>
