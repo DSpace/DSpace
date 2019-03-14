@@ -1,7 +1,10 @@
-/*
- * Copyright 2019 Mark H. Wood.
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
  */
-
 package org.dspace.app.authority;
 
 import java.io.IOException;
@@ -64,9 +67,12 @@ public class Commands {
         final String OPT_HELP    = "h";
 
         OptionGroup verbs = new OptionGroup();
-        verbs.addOption(new Option(OPT_DUMP,    "dump", false, "Export all records as XML on standard out"));
-        verbs.addOption(new Option(OPT_RESTORE, "restore", false, "Import records from XML on standard in"));
-        verbs.addOption(new Option(OPT_HELP,    "help", false, "Describe all options"));
+        verbs.addOption(new Option(OPT_DUMP, "dump", false,
+                "Export all records as XML on standard out"));
+        verbs.addOption(new Option(OPT_RESTORE, "restore", false,
+                "Import records from XML on standard in"));
+        verbs.addOption(new Option(OPT_HELP, "help", false,
+                "Describe all options"));
 
         Options options = new Options();
         options.addOptionGroup(verbs);
@@ -263,7 +269,7 @@ public class Commands {
         @Override
         public void error(SAXParseException e)
                 throws SAXException {
-            throw new SAXException(String.format("At line %d column %d:  %s",
+            throw new SAXException(String.format("Error at line %d column %d:  %s",
                     locator.getLineNumber(), locator.getColumnNumber(),
                     e.getMessage()));
         }
@@ -271,7 +277,7 @@ public class Commands {
         @Override
         public void fatalError(SAXParseException e)
                 throws SAXException {
-            throw new SAXException(String.format("At line %d column %d:  %s",
+            throw new SAXException(String.format("Fatal error at line %d column %d:  %s",
                     locator.getLineNumber(), locator.getColumnNumber(),
                     e.getMessage()));
         }
@@ -279,7 +285,7 @@ public class Commands {
         @Override
         public void warning(SAXParseException e)
                 throws SAXException {
-            throw new SAXException(String.format("At line %d column %d:  %s",
+            throw new SAXException(String.format("Warning at line %d column %d:  %s",
                     locator.getLineNumber(), locator.getColumnNumber(),
                     e.getMessage()));
         }
