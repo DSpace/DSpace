@@ -1,18 +1,33 @@
 <?xml version='1.0'  encoding='UTF-8'?>
 <!--
-Copyright 2019 Mark H. Wood.
--->
 
+    The contents of this file are subject to the license and copyright
+    detailed in the LICENSE and NOTICE files at the root of the source
+    tree and available online at
+
+    http://www.dspace.org/license/
+
+-->
 <xs:schema version="1.0"
            xmlns:xs="http://www.w3.org/2001/XMLSchema"
            elementFormDefault="qualified">
     <xs:element name="authority-dump">
+        <xs:annotation>
+            <xs:documentation>Snapshot of the content of a DSpace instance's authority records.</xs:documentation>
+        </xs:annotation>
         <xs:complexType>
             <xs:sequence>
                 <xs:element name='r' minOccurs='0' maxOccurs='unbounded'>
+                    <xs:annotation>
+                        <xs:documentation>Record (a Solr document)</xs:documentation>
+                    </xs:annotation>
                     <xs:complexType>
                         <xs:sequence>
-                            <xs:element name='f' type='pcdata' minOccurs='0' maxOccurs='unbounded'/>
+                            <xs:element name='f' type='xs:string' minOccurs='0' maxOccurs='unbounded'>
+                                <xs:annotation>
+                                    <xs:documentation>Field within a Solr document</xs:documentation>
+                                </xs:annotation>
+                            </xs:element>
                         </xs:sequence>
                     </xs:complexType>
                 </xs:element>
