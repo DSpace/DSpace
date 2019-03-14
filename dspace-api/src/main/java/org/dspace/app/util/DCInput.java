@@ -536,35 +536,55 @@ public class DCInput
     	return group;
     }
     
+    /**
+     * Evaluates all conditions in visibility-on-group. If any is true, then the all expression is true.
+     */
     public boolean isVisibleOnGroup(Context context) throws SQLException, AuthorizeException {
     	
     	if(!hasVisibilityOnGroup())
     		return true;
     	
-    	boolean isVisible = false;
     	for(String groupName : getVisibilityRestrictions()) {
     		Group group = findGroup(context, groupName);
         	if( group == null) {
         		throw new AuthorizeException("Group "+groupName+ " does not exist, check your input_forms.xml");
         	}
-        	isVisible = isVisible || !(Group.isMember(context, group.getID()) ^ isVisibilityPositiveRestriction(groupName)); 
+            if(isVisibilityPositiveRestriction(groupName)) {
+                if(Group.isMember(context, group.getID())) {
+                    return true;
+                }
+            } else { //if not positive
+                if(!Group.isMember(context, group.getID())) {
+                    return true;
+                }
+            }
     	}
-		return isVisible;
+		return false;
     }
 
+    /**
+     * Evaluates all conditions in required-on-group. If any is true, then the all expression is true.
+     */
     public boolean isRequiredOnGroup(Context context) throws SQLException, AuthorizeException {
 	    if(!isGroupBased()) {
 	        return true;
 	    }
-	    boolean isRequired = false;
 	    for(String groupName : getRequiredRestrictions()) {
 	        Group group = findGroup(context, groupName);
 	        if( group == null) {
 	            throw new AuthorizeException("Group "+groupName+ " does not exist, check your input_forms.xml");
 	        }
-	        isRequired = isRequired || !(Group.isMember(context, group.getID()) ^ isRequiredPositiveRestriction(groupName)); 
+	        if(isRequiredPositiveRestriction(groupName)) {
+	            if(Group.isMember(context, group.getID())) {
+	                return true;
+	            }
+	        } else { //if not positive
+	            if(!Group.isMember(context, group.getID())) {
+                    return true;
+                }
+	        }
 	    }
-	    return isRequired;
+	    return false;
     }
 	
     /* SEDICI-END */
