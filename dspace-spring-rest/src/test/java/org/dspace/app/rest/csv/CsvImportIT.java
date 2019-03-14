@@ -15,7 +15,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.sql.SQLException;
@@ -23,8 +22,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.dspace.app.bulkedit.DSpaceCSV;
-import org.dspace.app.bulkedit.MetadataImport;
 import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.builder.ItemBuilder;
@@ -79,6 +76,7 @@ public class CsvImportIT extends AbstractEntityIntegrationTest {
             itemService.delete(context, item);
         }
 
+        context.restoreAuthSystemState();
         super.destroy();
 
         indexingService.cleanIndex(true);
@@ -103,6 +101,7 @@ public class CsvImportIT extends AbstractEntityIntegrationTest {
                                   .withIssueDate("2017-10-17")
                                   .withRelationshipType("Publication")
                                   .build();
+        context.restoreAuthSystemState();
 
         Item itemB = validateSpecificItemRelationCreationCsvImport(col1, article, "TestItemB", "Person",
                                                                    "isPublicationOfAuthor",
@@ -273,9 +272,6 @@ public class CsvImportIT extends AbstractEntityIntegrationTest {
         out.close();
         out = null;
 
-        DSpaceCSV dspaceCsv = new DSpaceCSV(new File(filename), context);
-
-        MetadataImport importer = new MetadataImport(context, dspaceCsv);
-        importer.runImport(true, false, false, false);
+        runDSpaceScript("metadata-import", "-f", "test.csv", "-e", "admin@email.com", "-s");
     }
 }

@@ -10,9 +10,14 @@ package org.dspace.app.rest.test;
 import org.dspace.app.rest.builder.EntityTypeBuilder;
 import org.dspace.app.rest.builder.RelationshipTypeBuilder;
 import org.dspace.content.EntityType;
+import org.dspace.content.service.EntityTypeService;
 import org.junit.Before;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class AbstractEntityIntegrationTest extends AbstractControllerIntegrationTest {
+
+    @Autowired
+    private EntityTypeService entityTypeService;
 
     /**
      * This method will call the setUp method from AbstractControllerIntegrationTest.
@@ -34,6 +39,11 @@ public class AbstractEntityIntegrationTest extends AbstractControllerIntegration
     @Before
     public void setUp() throws Exception {
         super.setUp();
+
+        if (entityTypeService.findAll(context).size() > 0) {
+            //Don't initialize the setup more than once
+            return;
+        }
 
         context.turnOffAuthorisationSystem();
 
@@ -87,6 +97,8 @@ public class AbstractEntityIntegrationTest extends AbstractControllerIntegration
                                                               "isPublicationOfJournalIssue",
                                                               "isJournalIssueOfPublication", 0, Integer.MAX_VALUE, 0,
                                                               1).build();
+
+        context.restoreAuthSystemState();
     }
 
 
