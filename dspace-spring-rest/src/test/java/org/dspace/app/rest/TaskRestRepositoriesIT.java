@@ -24,6 +24,7 @@ import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.builder.EPersonBuilder;
 import org.dspace.app.rest.builder.PoolTaskBuilder;
 import org.dspace.app.rest.builder.WorkflowItemBuilder;
+import org.dspace.app.rest.matcher.EPersonMatcher;
 import org.dspace.app.rest.matcher.PoolTaskMatcher;
 import org.dspace.app.rest.matcher.WorkflowItemMatcher;
 import org.dspace.app.rest.matcher.WorkspaceItemMatcher;
@@ -344,6 +345,8 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                     Matchers.allOf(
                             hasJsonPath("$._links.self.href", Matchers.containsString("/api/workflow/claimedtasks/")),
                             hasJsonPath("$.type", Matchers.is("claimedtask")),
+                            hasJsonPath("$._embedded.owner",
+                                    Matchers.is(EPersonMatcher.matchEPersonOnEmail(reviewer.getEmail()))),
                             hasJsonPath("$._embedded.workflowitem",
                                      Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
                                              witem, "Workflow Item 1", "2017-10-17", "ExtraEntry")))

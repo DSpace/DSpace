@@ -372,7 +372,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
             log.error(LogManager.getHeader(context, "setWorkflowGroup",
                     "collection_id=" + collection.getID() + " " + e.getMessage()), e);
         }
-        if (!StringUtils.equals("default", workflow.getID())) {
+        if (!StringUtils.equals(XmlWorkflowFactory.LEGACY_WORKFLOW_NAME, workflow.getID())) {
             throw new IllegalArgumentException(
                     "setWorkflowGroup can be used only on collection with the default basic dspace workflow. "
                     + "Instead, the collection: "
