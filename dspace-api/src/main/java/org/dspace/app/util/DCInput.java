@@ -82,12 +82,12 @@ public class DCInput
     /** if the field is internationalizable */
     private boolean i18nable = false;
         
-    /**  
+    /**
      * Group-based mandatory attribute
-     * if hasToBeMember is true, the this field is madantory if the user is member of <code>requiredOnGroup</code>
+     * Saves a Map containing the list of groups on wich this field's obligatoriness is restricted on.
+     * Map's keys are group names and map's values determine whether there is a NOT modifier for that group 
      */
-    private String requiredOnGroup = null;
-    private boolean hasToBeMember = true;
+    private Map<String, Boolean> requirementOnGroup = null;
     
     /**
      * Group-based visibility restriction
@@ -176,14 +176,20 @@ public class DCInput
                 || "yes".equalsIgnoreCase(i18nableStr);
         
         // Is it a group-based field?
+        requirementOnGroup = new HashMap<String, Boolean>();
         String requiredOnGroupDef = fieldMap.get("required-on-group");
         if(requiredOnGroupDef != null && requiredOnGroupDef.trim().length() > 0) {
-        	//Determina si el usuario debe o no pertenecer al grupo (usa el signo de admiración como negación: !)
-        	if(requiredOnGroupDef.startsWith("!")) {
-        		this.hasToBeMember = false;
-        		requiredOnGroupDef = requiredOnGroupDef.substring(1);
-        	}
-        	requiredOnGroup = requiredOnGroupDef;
+            // Splits the field's content and parses them individually
+            for(String restriction : requiredOnGroupDef.split(",")) {
+                restriction = restriction.trim();
+                Boolean isPositiveRestriction = true;
+                if(restriction.startsWith("!")) {
+                    isPositiveRestriction = false;
+                    restriction = restriction.substring(1);
+                }
+                // Register the restriction
+                requirementOnGroup.put(restriction, isPositiveRestriction);
+            }
         }
         
         // Has it a group-based visibility restriction?
@@ -479,25 +485,24 @@ public class DCInput
         /* SEDICI-BEGIN */
 	/**
 	 * Returns true if this field has a group-based mandatory restriction
-	 * @return
+	 * @return true
 	 */
 	public boolean isGroupBased() {
-		return (requiredOnGroup != null);
+	    return !(requirementOnGroup.size() == 0);
+	}
+	/**
+	 * Get the names of the groups in the required-on-group clause.
+	 * @return an String array of group names
+	 */
+	public String[] getRequiredRestrictions() {
+	    return requirementOnGroup.keySet().toArray( new String[requirementOnGroup.size()] );
 	}
 	
 	/**
-	 * Returns the group name for which this field is mandatory.
-	 * Null when there is no group-based restriction
+	 * Returns @true if the specified group is negated or not in required-on-group configuration.
 	 */
-	public String getGroup() {
-		return requiredOnGroup;
-	}
-	
-	/**
-	 * Returns the hasToBeMember flag
-	 */
-	public boolean hasToBeMemeber() {
-		return hasToBeMember;
+	public boolean isRequiredPositiveRestriction(String groupName) {
+	    return requirementOnGroup.get(groupName);
 	}
 	
 	public boolean isI18nable() {
@@ -545,6 +550,21 @@ public class DCInput
         	isVisible = isVisible || !(Group.isMember(context, group.getID()) ^ isVisibilityPositiveRestriction(groupName)); 
     	}
 		return isVisible;
+    }
+
+    public boolean isRequiredOnGroup(Context context) throws SQLException, AuthorizeException {
+	    if(!isGroupBased()) {
+	        return true;
+	    }
+	    boolean isRequired = false;
+	    for(String groupName : getRequiredRestrictions()) {
+	        Group group = findGroup(context, groupName);
+	        if( group == null) {
+	            throw new AuthorizeException("Group "+groupName+ " does not exist, check your input_forms.xml");
+	        }
+	        isRequired = isRequired || !(Group.isMember(context, group.getID()) ^ isRequiredPositiveRestriction(groupName)); 
+	    }
+	    return isRequired;
     }
 	
     /* SEDICI-END */
