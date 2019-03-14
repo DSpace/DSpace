@@ -147,7 +147,7 @@
 			<xsl:when test="$subtype='Imagen fija'">
 				fotografía
 			</xsl:when> 
- 			<xsl:when test="$subtype='Imagen en movimiento'">
+			<xsl:when test="$subtype='Video'">
 				videograbación
 			</xsl:when>
  			<xsl:when test="$subtype='Audio'">
