@@ -1,7 +1,10 @@
-/*
- * Copyright 2019 Mark H. Wood.
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
  */
-
 package org.dspace.app.authority;
 
 import java.io.IOException;
@@ -22,7 +25,8 @@ import org.apache.solr.common.params.SolrParams;
  *
  * @author mhwood
  */
-class SolrQueryWindow implements Iterable<SolrDocument>, Iterator<SolrDocument> {
+class SolrQueryWindow
+        implements Iterable<SolrDocument>, Iterator<SolrDocument> {
     /** Fetch this many results at a time. */
     private static final int WINDOW_SIZE = 100;
 
@@ -33,7 +37,7 @@ class SolrQueryWindow implements Iterable<SolrDocument>, Iterator<SolrDocument> 
     private final ModifiableSolrParams params;
 
     /** Current offset of the window within the total result set. */
-    private int windowStart = 0;
+    private int windowStart;
 
     /** Current position within the results window. */
     private int windowPos;
@@ -54,7 +58,7 @@ class SolrQueryWindow implements Iterable<SolrDocument>, Iterator<SolrDocument> 
         this.params = new ModifiableSolrParams(params);
 
         // Initialize the results window.
-        this.params.set("start", windowStart);
+        windowStart = -WINDOW_SIZE; // first refill() will advance it to zero.
         this.params.set("rows", WINDOW_SIZE);
         refill();
     }
@@ -62,17 +66,25 @@ class SolrQueryWindow implements Iterable<SolrDocument>, Iterator<SolrDocument> 
     /** Position the window, perform partial query, advance the window. */
     private void refill()
             throws SolrServerException, IOException {
+        windowStart += WINDOW_SIZE;
         params.set("start", windowStart);
         QueryResponse response = solr.query(params);
         results = response.getResults();
-        windowStart += WINDOW_SIZE;
         windowPos = 0;
     }
+
+    /*
+     * Iterable
+     */
 
     @Override
     public Iterator<SolrDocument> iterator() {
         return this;
     }
+
+    /*
+     * Iterator
+     */
 
     @Override
     public boolean hasNext() {
@@ -88,7 +100,8 @@ class SolrQueryWindow implements Iterable<SolrDocument>, Iterator<SolrDocument> 
             try {
                 refill();
             } catch (SolrServerException | IOException ex) {
-                throw new NoSuchElementException("Unable to refill window:  " + ex.getMessage());
+                throw new NoSuchElementException("Unable to refill window:  "
+                        + ex.getMessage());
             }
         }
         return results.get(windowPos++);
