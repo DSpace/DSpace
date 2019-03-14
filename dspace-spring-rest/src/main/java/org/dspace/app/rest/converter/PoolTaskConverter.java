@@ -25,8 +25,6 @@ import org.springframework.stereotype.Component;
 public class PoolTaskConverter
     extends BrowsableDSpaceObjectConverter<PoolTask, org.dspace.app.rest.model.PoolTaskRest> {
 
-    private static final Logger log = Logger.getLogger(PoolTaskConverter.class);
-
     @Autowired
     private WorkflowItemConverter workflowItemConverter;
 
