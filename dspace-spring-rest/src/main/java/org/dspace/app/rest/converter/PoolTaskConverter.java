@@ -7,7 +7,6 @@
  */
 package org.dspace.app.rest.converter;
 
-import org.apache.log4j.Logger;
 import org.dspace.app.rest.model.PoolTaskRest;
 import org.dspace.browse.BrowsableObject;
 import org.dspace.xmlworkflow.storedcomponents.PoolTask;
