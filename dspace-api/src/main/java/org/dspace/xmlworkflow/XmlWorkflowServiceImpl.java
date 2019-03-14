@@ -668,6 +668,8 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
             removeUserItemPolicies(c, wi.getItem(), task.getOwner());
             claimedTaskService.delete(c, task);
         }
+        c.addEvent(new Event(Event.MODIFY, Constants.ITEM, wi.getItem().getID(), null,
+                itemService.getIdentifiers(c, wi.getItem())));
     }
 
     /*
@@ -1058,17 +1060,10 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
     }
 
     protected void revokeReviewerPolicies(Context context, Item item) throws SQLException, AuthorizeException {
-        // get bundle "ORIGINAL"
-        Bundle originalBundle;
-        try {
-            originalBundle = itemService.getBundles(item, "ORIGINAL").get(0);
-        } catch (IndexOutOfBoundsException ex) {
-            originalBundle = null;
-        }
+        List<Bundle> bundles = item.getBundles();
 
-        // remove bitstream and bundle level policies
-        if (originalBundle != null) {
-            // We added policies for Bitstreams of the bundle "original" only
+        for (Bundle originalBundle : bundles) {
+            // remove bitstream and bundle level policies
             for (Bitstream bitstream : originalBundle.getBitstreams()) {
                 authorizeService.removeAllPoliciesByDSOAndType(context, bitstream, ResourcePolicy.TYPE_WORKFLOW);
             }

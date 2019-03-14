@@ -7,9 +7,6 @@
  */
 package org.dspace.xmlworkflow.storedcomponents;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -20,7 +17,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 
 import org.dspace.browse.BrowsableObject;
 import org.dspace.core.Constants;
@@ -39,9 +35,6 @@ import org.dspace.eperson.EPerson;
 @Entity
 @Table(name = "cwf_claimtask")
 public class ClaimedTask implements ReloadableEntity<Integer>, BrowsableObject<Integer> {
-
-    @Transient
-    public transient Map<String, Object> extraInfo = new HashMap<String, Object>();
 
     @Id
     @Column(name = "claimtask_id")

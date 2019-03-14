@@ -240,26 +240,6 @@ public interface DSpaceObjectService<T extends DSpaceObject> extends BrowsableOb
             List<String> authorities, List<Integer> confidences) throws SQLException;
 
     /**
-     * Add metadata fields. These are appended to existing values.
-     * Use <code>clearDC</code> to remove values. The values are insert in the
-     * positions passed in the places argument.
-     *
-     * @param context       DSpace context
-     * @param dso           DSpaceObject
-     * @param metadataField the metadata field to which the value is to be set
-     * @param lang          the ISO639 language code, optionally followed by an underscore
-     *                      and the ISO3166 country code. <code>null</code> means the
-     *                      value has no language (for example, a date).
-     * @param values        the values to add.
-     * @param authorities   the external authority key for this value (or null)
-     * @param confidences   the authority confidence (default 0)
-     * @param places        the places to use for the supplied values
-     * @throws SQLException if database error
-     */
-    public void addMetadata(Context context, T dso, MetadataField metadataField, String lang, List<String> values,
-            List<String> authorities, List<Integer> confidences, List<Integer> places) throws SQLException;
-
-    /**
      * Shortcut for {@link #addMetadata(Context, DSpaceObject, MetadataField, String, List, List, List)} when a single
      * value need to be added
      * 
@@ -274,23 +254,6 @@ public interface DSpaceObjectService<T extends DSpaceObject> extends BrowsableOb
      */
     public void addMetadata(Context context, T dso, MetadataField metadataField, String language, String value,
             String authority, int confidence) throws SQLException;
-
-    /**
-     * Shortcut for {@link #addMetadata(Context, DSpaceObject, MetadataField, String, List, List, List, List)} when a
-     * single value need to be added
-     * 
-     * @param context
-     * @param dso
-     * @param metadataField
-     * @param language
-     * @param value
-     * @param authority
-     * @param confidence
-     * @param place
-     * @throws SQLException
-     */
-    public void addMetadata(Context context, T dso, MetadataField metadataField, String language, String value,
-            String authority, int confidence, int place) throws SQLException;
 
     public void addMetadata(Context context, T dso, MetadataField metadataField, String language, String value)
         throws SQLException;

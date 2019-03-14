@@ -28,11 +28,9 @@ import org.dspace.app.rest.model.PoolTaskRest;
 import org.dspace.app.rest.model.hateoas.ClaimedTaskResource;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.service.ItemService;
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.service.EPersonService;
-import org.dspace.event.Event;
 import org.dspace.workflow.WorkflowException;
 import org.dspace.xmlworkflow.WorkflowConfigurationException;
 import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
@@ -136,10 +134,6 @@ public class ClaimedTaskRestRepository extends DSpaceRestRepository<ClaimedTaskR
                 throw new UnprocessableEntityException(
                         "Missing required fields: " + StringUtils.join(Action.getErrorFields(request), ","));
             }
-            // workflowRequirementsService.removeClaimedUser(context, task.getWorkflowItem(), task.getOwner(), task
-            // .getStepID());
-            context.addEvent(new Event(Event.MODIFY, Constants.ITEM, task.getWorkflowItem().getItem().getID(), null,
-                itemService.getIdentifiers(context, task.getWorkflowItem().getItem())));
         } catch (AuthorizeException e) {
             throw new RESTAuthorizationException(e);
         } catch (WorkflowException e) {
@@ -164,8 +158,6 @@ public class ClaimedTaskRestRepository extends DSpaceRestRepository<ClaimedTaskR
             XmlWorkflowItem workflowItem = task.getWorkflowItem();
             workflowService.deleteClaimedTask(context, workflowItem, task);
             workflowRequirementsService.removeClaimedUser(context, workflowItem, task.getOwner(), task.getStepID());
-            context.addEvent(new Event(Event.MODIFY, Constants.ITEM, workflowItem.getItem().getID(), null,
-                itemService.getIdentifiers(context, workflowItem.getItem())));
         } catch (AuthorizeException e) {
             throw new RESTAuthorizationException(e);
         } catch (SQLException | IOException | WorkflowConfigurationException e) {
