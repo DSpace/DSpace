@@ -38,6 +38,10 @@ public class OrcidSingleEmploymentAuthorityMetadataGenerator
         if(employment != null) {
             extras.put("data-" + getRelatedInputformMetadata(), employment.getOrganization().getName());    
         }
+        else {
+            //manage value to empty html element
+            extras.put("data-" + getRelatedInputformMetadata(), "");
+        }
         return extras;
     }
 

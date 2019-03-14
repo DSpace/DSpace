@@ -28,6 +28,10 @@ public class RPSingleOrgUnitAuthorityMetadataGenerator
             }
             break;
         }
+        //manage value to empty html element
+        if(metadatas==null || metadatas.isEmpty()) {
+            extras.put("data-" + getRelatedInputformMetadata(), "");
+        }
         return extras;
     }
 
