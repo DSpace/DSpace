@@ -30,7 +30,7 @@ public abstract class AbstractResourcePatch<R extends RestModel> {
      * @throws UnprocessableEntityException
      * @throws PatchBadRequestException
      */
-    public RestModel patch(R restModel, List<Operation> operations) {
+    public R patch(R restModel, List<Operation> operations) {
 
         // Note: the list of possible operations is taken from JsonPatchConverter class. Does not implement
         // test https://tools.ietf.org/html/rfc6902#section-4.6
