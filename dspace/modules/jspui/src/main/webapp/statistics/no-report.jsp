@@ -74,7 +74,7 @@
 
 		 <div class="row"> 
 		 	<div class="col-6 col-md-6" >
-		    	<h4 style="color: #401410;">Usuarios</h4>  	
+		    	<h4 style="color: #401410;">Visitantes</h4>  	
 		    </div>
     		<div class="col-6 col-md-6" style="text-align: right; padding-right: 1%;">
     		</div>
@@ -120,8 +120,16 @@
 		    </div>
     		<div class="col-6 col-md-6" style="text-align: left; padding-right: 1%;">
     			<div class="row">
-	    			<h3 style="color: #401410; text-align: center;">Visitantes por estado</h3> 
-	    			<div id="Visitasdonut" style="height: 200px;"></div>	
+    				<div class="col-6 col-md-6">
+    					<h3 style="color: #401410; text-align: center;">Visitantes por Pais</h3> 
+	    				<div id="PaisesDonut" style="height: 200px;"></div>	
+    				</div>
+
+    				<div class="col-6 col-md-6">
+    					<h3 style="color: #401410; text-align: center;">Visitantes por estado</h3> 
+	    				<div id="EstadosDonut" style="height: 200px;"></div>
+    				</div>
+	    			
     			</div>
     		</div>
 		 </div> 
@@ -297,8 +305,8 @@
 	  resize: true, behaveLikeLine: false, hideHover: 'always', parseTime: false, gridTextColor: "#fff", fillOpacity: 0.2, lineColors: ['#410401'], pointSize: 0, pointStrokeColors: '#410401'
 	});
 
-	Morris.Donut({
-	  element: 'Visitasdonut',
+	new Morris.Donut({
+	  element: 'EstadosDonut',
 	  data: [
 	    {label: "Puebla", value: 10000},
 	    {label: "Oaxaca", value: 35000},
@@ -308,7 +316,21 @@
 	  ],
 	  resize: true,
 	  colors: ['#bc514a', '#88615e', '#70302c', '#bc8683', '#3d1a18']
-});
+	});
+
+	new Morris.Donut({
+	  element: 'PaisesDonut',
+	  data: [
+	    {label: "Brasil", value: 10000},
+	    {label: "México", value: 35000},
+	    {label: "Argentina", value: 15000},
+	    {label: "Colombia", value: 20000},
+	    {label: "Ecuador", value: 20000},
+	  ],
+	  resize: true,
+	  colors: ['#bc514a', '#88615e', '#70302c', '#bc8683', '#3d1a18']
+	});
+
 
 </script>
 
@@ -316,6 +338,7 @@
 Para el jueves
 descripcion de la tesis, una cuartilla arial 10 espacioado de 1
 tabla (resumen del protocolo)
+
 presentación y en la última diapositiva con los objetivos con el procentaje de avance
 un calendario de entregas (30 de abril, entrega del producto)
 
