@@ -217,7 +217,7 @@
 			<xsl:when test="$subtype='Imagen fija'">
 				info:eu-repo/semantics/other
 			</xsl:when> 
- 			<xsl:when test="$subtype='Imagen en movimiento'">
+			<xsl:when test="$subtype='Video'">
 				info:eu-repo/semantics/other
 			</xsl:when>
  			<xsl:when test="$subtype='Audio'">
@@ -303,7 +303,7 @@
 			<xsl:when test="$subtype='Imagen fija'">
 				info:eu-repo/semantics/publishedVersion
 			</xsl:when> 
- 			<xsl:when test="$subtype='Imagen en movimiento'">
+			<xsl:when test="$subtype='Video'">
 				info:eu-repo/semantics/publishedVersion
 			</xsl:when>
  			<xsl:when test="$subtype='Audio'">
