@@ -7,10 +7,6 @@
  */
 package org.dspace.app.rest.model;
 
-import java.util.List;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.dspace.app.rest.converter.MetadataConverter;
 
 /**
  * An embeddable representation of the Metadata to use in with DSpace REST
@@ -28,17 +24,6 @@ public class MetadataValueRest {
 
     int confidence;
 
-    /**
-     * The order of this metadata value with respect to others in the same DSO with the same key.
-     *
-     * In the REST representation, all values of the same key are given as a json array that expresses
-     * their relative order, so there is no need to expose the exact numeric value publicly. The numeric
-     * value is only used at this level to ensure the intended order is respected when converting to/from json.
-     *
-     * @see MetadataConverter#convert(List)
-     * @see MetadataRest#put(String, MetadataValueRest...)
-     */
-    @JsonIgnore
     int place = -1;
 
     public MetadataValueRest() {
