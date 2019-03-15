@@ -116,7 +116,8 @@ public class JsonPatchConverter implements PatchConverter<JsonNode> {
             Object value = operation.getValue();
 
             if (value != null) {
-                opNode.set("value", mapper.valueToTree(value));
+                opNode.set("value", value instanceof JsonValueEvaluator ? ((JsonValueEvaluator) value).getValueNode()
+                        : mapper.valueToTree(value));
             }
 
             patchNode.add(opNode);

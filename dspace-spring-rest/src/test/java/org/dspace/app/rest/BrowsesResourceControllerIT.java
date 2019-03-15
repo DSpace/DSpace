@@ -7,10 +7,10 @@
  */
 package org.dspace.app.rest;
 
+import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
@@ -31,6 +31,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.eperson.Group;
+import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
@@ -380,14 +381,10 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                                                                                             "An embargoed publication",
                                                                                             "2017-08-10"))))
 
-                   //The private item must not be present
-                   .andExpect(jsonPath("$._embedded.items[*].metadata[?(@.key=='dc.title')].value",
-                                       not(hasItem("This is a private item"))))
-
-                   //The internal item must not be present
-                   .andExpect(jsonPath("$._embedded.items[*].metadata[?(@.key=='dc.title')].value",
-                                       not(hasItem("Internal publication"))))
-        ;
+                   //The private and internal items must not be present
+                   .andExpect(jsonPath("$._embedded.items[*].metadata", Matchers.allOf(
+                           not(matchMetadata("dc.title", "This is a private item")),
+                           not(matchMetadata("dc.title", "Internal publication")))));
     }
 
     @Test
