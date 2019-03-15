@@ -1048,6 +1048,33 @@ public class RestResourceController implements InitializingBean {
     }
 
     /**
+     * Execute a PUT request for an entity with id of type UUID;
+     *
+     * curl -X PUT http://<dspace.restUrl>/api/{apiCategory}/{model}/{uuid}
+     *
+     * Example:
+     * <pre>
+     * {@code
+     *      curl -X PUT http://<dspace.restUrl>/api/core/collection/8b632938-77c2-487c-81f0-e804f63e68e6
+     * }
+     * </pre>
+     *
+     * @param request     the http request
+     * @param apiCategory the API category e.g. "core"
+     * @param model       the DSpace model e.g. "collection"
+     * @param uuid        the ID of the target REST object
+     * @param jsonNode    the part of the request body representing the updated rest object
+     * @return the relevant REST resource
+     */
+    @RequestMapping(method = RequestMethod.PUT, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID)
+    public DSpaceResource<RestAddressableModel> put(HttpServletRequest request,
+                                                    @PathVariable String apiCategory, @PathVariable String model,
+                                                    @PathVariable UUID uuid,
+                                                    @RequestBody JsonNode jsonNode) {
+        return putOneJsonInternal(request, apiCategory, model, uuid, jsonNode);
+    }
+
+    /**
      * Execute a PUT request for an entity with id of type Integer;
      *
      * curl -X PUT -H "Content-Type:application/json" http://<dspace.url>/dspace-spring-rest/api/{apiCategory}/{model}/{id}
