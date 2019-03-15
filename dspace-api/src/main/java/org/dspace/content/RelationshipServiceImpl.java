@@ -9,6 +9,7 @@ package org.dspace.content;
 
 import java.sql.SQLException;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -22,6 +23,7 @@ import org.dspace.content.dao.RelationshipDAO;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.RelationshipService;
 import org.dspace.content.service.RelationshipTypeService;
+import org.dspace.content.virtual.VirtualMetadataPopulator;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +44,9 @@ public class RelationshipServiceImpl implements RelationshipService {
     @Autowired(required = true)
     protected RelationshipTypeService relationshipTypeService;
 
+    @Autowired
+    private VirtualMetadataPopulator virtualMetadataPopulator;
+
     public Relationship create(Context context) throws SQLException, AuthorizeException {
         if (!authorizeService.isAdmin(context)) {
             throw new AuthorizeException(
@@ -55,7 +60,7 @@ public class RelationshipServiceImpl implements RelationshipService {
         if (isRelationshipValidToCreate(context, relationship)) {
             if (authorizeService.authorizeActionBoolean(context, relationship.getLeftItem(), Constants.WRITE) ||
                 authorizeService.authorizeActionBoolean(context, relationship.getRightItem(), Constants.WRITE)) {
-                updatePlaceInRelationship(context, relationship);
+                updatePlaceInRelationship(context, relationship, true);
                 return relationshipDAO.create(context, relationship);
             } else {
                 throw new AuthorizeException(
@@ -68,33 +73,94 @@ public class RelationshipServiceImpl implements RelationshipService {
     }
 
     @Override
-    public void updatePlaceInRelationship(Context context, Relationship relationship) throws SQLException {
+    public void updatePlaceInRelationship(Context context, Relationship relationship, boolean isCreation)
+        throws SQLException, AuthorizeException {
+        Item leftItem = relationship.getLeftItem();
         List<Relationship> leftRelationships = findByItemAndRelationshipType(context,
-                                                                             relationship.getLeftItem(),
+                                                                             leftItem,
                                                                              relationship.getRelationshipType(), true);
+        Item rightItem = relationship.getRightItem();
         List<Relationship> rightRelationships = findByItemAndRelationshipType(context,
-                                                                              relationship.getRightItem(),
+                                                                              rightItem,
                                                                               relationship.getRelationshipType(),
                                                                               false);
 
-        if (!leftRelationships.isEmpty()) {
-            leftRelationships.sort((o1, o2) -> o2.getLeftPlace() - o1.getLeftPlace());
-            for (int i = 0; i < leftRelationships.size(); i++) {
-                leftRelationships.get(leftRelationships.size() - 1 - i).setLeftPlace(i + 1);
+        context.turnOffAuthorisationSystem();
+        //If useForPlace for the leftlabel is false for the relationshipType,
+        // we need to sort the relationships here based on leftplace.
+        if (!virtualMetadataPopulator.isUseForPlaceTrueForRelationshipType(relationship.getRelationshipType(), true)) {
+            if (!leftRelationships.isEmpty()) {
+                leftRelationships.sort(Comparator.comparingInt(Relationship::getLeftPlace));
+                for (int i = 0; i < leftRelationships.size(); i++) {
+                    leftRelationships.get(i).setLeftPlace(i);
+                }
+                relationship.setLeftPlace(leftRelationships.size());
+            } else {
+                relationship.setLeftPlace(0);
             }
+        } else {
+            updateItem(context, leftItem);
+
+        }
+
+        //If useForPlace for the rightLabel is false for the relationshipType,
+        // we need to sort the relationships here based on the rightplace.
+        if (!virtualMetadataPopulator.isUseForPlaceTrueForRelationshipType(relationship.getRelationshipType(), false)) {
+            if (!rightRelationships.isEmpty()) {
+                rightRelationships.sort(Comparator.comparingInt(Relationship::getRightPlace));
+                for (int i = 0; i < rightRelationships.size(); i++) {
+                    rightRelationships.get(i).setRightPlace(i);
+                }
+                relationship.setRightPlace(rightRelationships.size());
+            } else {
+                relationship.setRightPlace(0);
+            }
+
+        } else {
+            updateItem(context, rightItem);
+
+        }
+
+        if (isCreation) {
+            handleCreationPlaces(context, relationship);
+        }
+        context.restoreAuthSystemState();
+
+    }
+
+    @Override
+    public void updateItem(Context context, Item relatedItem)
+        throws SQLException, AuthorizeException {
+        relatedItem.setMetadataModified();
+        itemService.update(context, relatedItem);
+    }
+
+
+    //Sets the places for the Relationship properly if the updatePlaceInRelationship was called for a new creation
+    //of this Relationship
+    private void handleCreationPlaces(Context context, Relationship relationship) throws SQLException {
+        List<Relationship> leftRelationships;
+        List<Relationship> rightRelationships;
+        leftRelationships = findByItemAndRelationshipType(context,
+                                                          relationship.getLeftItem(),
+                                                          relationship.getRelationshipType(), true);
+        rightRelationships = findByItemAndRelationshipType(context,
+                                                           relationship.getRightItem(),
+                                                           relationship.getRelationshipType(),
+                                                           false);
+        leftRelationships.sort((o1, o2) -> o2.getLeftPlace() - o1.getLeftPlace());
+        rightRelationships.sort((o1, o2) -> o2.getRightPlace() - o1.getRightPlace());
+
+        if (!leftRelationships.isEmpty()) {
             relationship.setLeftPlace(leftRelationships.get(0).getLeftPlace() + 1);
         } else {
-            relationship.setLeftPlace(1);
+            relationship.setLeftPlace(0);
         }
 
         if (!rightRelationships.isEmpty()) {
-            rightRelationships.sort((o1, o2) -> o2.getRightPlace() - o1.getRightPlace());
-            for (int i = 0; i < rightRelationships.size(); i++) {
-                rightRelationships.get(rightRelationships.size() - 1 - i).setRightPlace(i + 1);
-            }
             relationship.setRightPlace(rightRelationships.get(0).getRightPlace() + 1);
         } else {
-            relationship.setRightPlace(1);
+            relationship.setRightPlace(0);
         }
     }
 
@@ -231,7 +297,7 @@ public class RelationshipServiceImpl implements RelationshipService {
             if (authorizeService.authorizeActionBoolean(context, relationship.getLeftItem(), Constants.WRITE) ||
                 authorizeService.authorizeActionBoolean(context, relationship.getRightItem(), Constants.WRITE)) {
                 relationshipDAO.delete(context, relationship);
-                updatePlaceInRelationship(context, relationship);
+                updatePlaceInRelationship(context, relationship, false);
             } else {
                 throw new AuthorizeException(
                     "You do not have write rights on this relationship's items");

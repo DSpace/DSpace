@@ -10,6 +10,7 @@ package org.dspace.content;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -26,7 +27,6 @@ import org.dspace.content.authority.Choices;
 import org.dspace.content.authority.service.ChoiceAuthorityService;
 import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.dspace.content.service.DSpaceObjectService;
-import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.MetadataValueService;
 import org.dspace.content.service.RelationshipService;
@@ -63,8 +63,6 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
     protected MetadataFieldService metadataFieldService;
     @Autowired(required = true)
     protected MetadataAuthorityService metadataAuthorityService;
-    @Autowired(required = true)
-    protected ItemService itemService;
     @Autowired(required = true)
     protected RelationshipService relationshipService;
 
@@ -251,6 +249,9 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
                 }
             }
             MetadataValue metadataValue = metadataValueService.create(context, dso, metadataField);
+            //Set place to list length
+            metadataValue.setPlace(this.getMetadata(dso, Item.ANY, Item.ANY, Item.ANY, Item.ANY).size());
+
             metadataValue.setLanguage(lang == null ? null : lang.trim());
 
             // Logic to set Authority and Confidence:
@@ -555,10 +556,27 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
             Map<MetadataField, Integer> fieldToLastPlace = new HashMap<>();
             List<MetadataValue> metadataValues = new LinkedList<>();
             if (dso.getType() == Constants.ITEM) {
-                metadataValues = itemService.getMetadata((Item) dso, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
+                metadataValues = getMetadata(dso, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
             } else {
                 metadataValues = dso.getMetadata();
             }
+            //This inline sort function will sort the MetadataValues based on their place in ascending order
+            //If two places are the same then the MetadataValue instance will be placed before the
+            //RelationshipMetadataValue instance.
+            //This is done to ensure that the order is correct.
+            metadataValues.sort(new Comparator<MetadataValue>() {
+                public int compare(MetadataValue o1, MetadataValue o2) {
+                    int compare = o1.getPlace() - o2.getPlace();
+                    if (compare == 0) {
+                        if (o1 instanceof RelationshipMetadataValue) {
+                            return 1;
+                        } else if (o2 instanceof  RelationshipMetadataValue) {
+                            return -1;
+                        }
+                    }
+                    return compare;
+                }
+            });
             for (MetadataValue metadataValue : metadataValues) {
                 //Retrieve & store the place for each metadata value
                 if (StringUtils.startsWith(metadataValue.getAuthority(), Constants.VIRTUAL_AUTHORITY_PREFIX) &&

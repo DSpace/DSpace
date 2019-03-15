@@ -30,6 +30,7 @@ import org.dspace.content.service.RelationshipService;
 import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -104,15 +105,26 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
             RelationshipType relationshipType = relationshipTypeService
                 .find(context, Integer.parseInt(req.getParameter("relationshipType")));
 
-            relationship.setLeftItem(leftItem);
-            relationship.setRightItem(rightItem);
-            relationship.setRelationshipType(relationshipType);
-            try {
+            EPerson ePerson = context.getCurrentUser();
+            if (authorizeService.authorizeActionBoolean(context, leftItem, Constants.WRITE) ||
+                authorizeService.authorizeActionBoolean(context, rightItem, Constants.WRITE)) {
+                relationship.setLeftItem(leftItem);
+                relationship.setRightItem(rightItem);
+                relationship.setRelationshipType(relationshipType);
                 relationship = relationshipService.create(context, relationship);
-            } catch (AuthorizeException e) {
+                // The above if check deals with the case that a Relationship can be created if the user has write
+                // rights on one of the two items. The following updateItem calls can however call the
+                // ItemService.update() functions which would fail if the user doesn't have permission on both items.
+                // Since we allow this creation to happen under these circumstances, we need to turn off the
+                // authorization system here so that this failure doesn't happen when the items need to be update
+                context.turnOffAuthorisationSystem();
+                relationshipService.updateItem(context, relationship.getLeftItem());
+                relationshipService.updateItem(context, relationship.getRightItem());
+                context.restoreAuthSystemState();
+                return relationshipConverter.fromModel(relationship);
+            } else {
                 throw new AccessDeniedException("You do not have write rights on this relationship's items");
             }
-            return relationshipConverter.fromModel(relationship);
         } else {
             throw new UnprocessableEntityException("The given items in the request were not valid items");
         }
@@ -139,7 +151,7 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
                 relationship.setLeftItem(leftItem);
                 relationship.setRightItem(rightItem);
 
-                relationshipService.updatePlaceInRelationship(context, relationship);
+                relationshipService.updatePlaceInRelationship(context, relationship, false);
                 relationshipService.update(context, relationship);
 
                 return relationshipConverter.fromModel(relationship);

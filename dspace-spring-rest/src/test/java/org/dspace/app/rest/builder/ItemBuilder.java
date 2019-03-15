@@ -64,6 +64,14 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return addMetadataValue(item, MetadataSchemaEnum.DC.getName(), "contributor", "author", authorName);
     }
 
+    public ItemBuilder withPersonIdentifierFirstName(final String personIdentifierFirstName) {
+        return addMetadataValue(item, "person", "identifier", "firstname", personIdentifierFirstName);
+    }
+
+    public ItemBuilder withPersonIdentifierLastName(final String personIdentifierLastName) {
+        return addMetadataValue(item, "person", "identifier", "lastname", personIdentifierLastName);
+    }
+
     public ItemBuilder withSubject(final String subject) {
         return addMetadataValue(item, MetadataSchemaEnum.DC.getName(), "subject", null, subject);
     }
