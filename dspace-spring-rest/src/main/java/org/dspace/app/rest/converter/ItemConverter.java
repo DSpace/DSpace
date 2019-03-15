@@ -46,7 +46,7 @@ public class ItemConverter extends DSpaceObjectConverter<org.dspace.content.Item
     private RelationshipConverter relationshipConverter;
     @Autowired
     private ItemService itemService;
-    @Autowired(required = true)
+    @Autowired
     private MetadataConverter metadataConverter;
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(ItemConverter.class);
@@ -96,8 +96,7 @@ public class ItemConverter extends DSpaceObjectConverter<org.dspace.content.Item
         item.setRelationships(relationshipRestList);
 
         List<MetadataValue> fullList = new LinkedList<>();
-        fullList.addAll(obj.getMetadata());
-        fullList.addAll(itemService.getRelationshipMetadata(obj, true));
+        fullList = itemService.getMetadata(obj, Item.ANY, Item.ANY, Item.ANY, Item.ANY, true);
 
         item.setMetadata(metadataConverter.convert(fullList));
 

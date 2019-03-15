@@ -320,6 +320,16 @@
         <entry key="journalvolume.identifier.name" value-ref="issueVolume_title_related"/>
         <entry key="relation.isJournalOfPublication" value-ref="issueVolumeJournal_uuid_related"/>
     </util:map>
+    <bean class="org.dspace.content.virtual.Concatenate" id="issueVolume_title">
+        <property name="fields">
+            <util:list>
+                <value>journalvolume.identifier.name</value>
+            </util:list>
+        </property>
+        <property name="separator">
+            <value>, </value>
+        </property>
+    </bean>
 
     <!-- This Related bean defines a relationship type that will be used on a publication.
         The publication will receive 1 virtual metadata value namely the journal.identifier.issn to which it belongs
@@ -332,16 +342,6 @@
      In this specific case, it'll call another Related bean to retrieve the journal for the journalvolume and it'll
      then retrieve the volume. This example has 2 Related beans chained to eachother to finally chain to a Collected
      bean to retrieve the final value -->
-    <bean class="org.dspace.content.virtual.Concatenate" id="issueVolume_title">
-        <property name="fields">
-            <util:list>
-                <value>journalvolume.identifier.name</value>
-            </util:list>
-        </property>
-        <property name="separator">
-            <value>, </value>
-        </property>
-    </bean>
     <bean class="org.dspace.content.virtual.Related" id="issueVolumeJournal_issn_related">
         <property name="relationshipTypeString" value="isJournalVolumeOfIssue"/>
         <property name="place" value="1"/>
