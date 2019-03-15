@@ -250,6 +250,9 @@ public class WorkflowFactory {
             if(roleScope.equalsIgnoreCase("repository"))
                 scope = Role.Scope.REPOSITORY;
             else
+            	if(roleScope.equalsIgnoreCase("comm_admins"))
+            		scope = Role.Scope.COMM_ADMINS;
+            else
                 throw new WorkflowConfigurationException("An invalid role scope has been specified it must either be item or collection.");
 
             Role role = new Role(roleID, roleName, roleDescription,internal, scope);
