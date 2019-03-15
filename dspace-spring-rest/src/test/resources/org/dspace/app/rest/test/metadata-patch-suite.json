@@ -23,7 +23,7 @@
       ],
       "expect": {
         "dc.title": [
-          { "value": "title 1", "language": null, "authority": null, "confidence": -1 }
+          { "value": "title 1", "language": null, "authority": null, "confidence": -1, "place": 0}
         ]
       }
     },
@@ -38,8 +38,8 @@
       ],
       "expect": {
         "dc.title": [
-          { "value": "title 1", "language": null, "authority": null, "confidence": -1 },
-          { "value": "最後のタイトル", "language": "ja_JP", "authority": null, "confidence": -1 }
+          { "value": "title 1", "language": null, "authority": null, "confidence": -1,"place": 0 },
+          { "value": "最後のタイトル", "language": "ja_JP", "authority": null, "confidence": -1 ,"place": 1}
         ]
       }
     },
@@ -56,9 +56,9 @@
       ],
       "expect": {
         "dc.title": [
-          { "value": "title 0", "language": null, "authority": null, "confidence": -1 },
-          { "value": "title 1", "language": null, "authority": null, "confidence": -1 },
-          { "value": "最後のタイトル", "language": "ja_JP", "authority": null, "confidence": -1 }
+          { "value": "title 0", "language": null, "authority": null, "confidence": -1 ,"place": 0 },
+          { "value": "title 1", "language": null, "authority": null, "confidence": -1 ,"place": 1 },
+          { "value": "最後のタイトル", "language": "ja_JP", "authority": null, "confidence": -1 ,"place": 2 }
         ]
       }
     },
@@ -73,9 +73,9 @@
       ],
       "expect": {
         "dc.title": [
-          { "value": "title 0", "language": null, "authority": null, "confidence": -1 },
-          { "value": "最後のタイトル", "language": "ja_JP", "authority": null, "confidence": -1 },
-          { "value": "title 1", "language": null, "authority": null, "confidence": -1 }
+          { "value": "title 0", "language": null, "authority": null, "confidence": -1 ,"place": 0 },
+          { "value": "最後のタイトル", "language": "ja_JP", "authority": null, "confidence": -1 ,"place": 1 },
+          { "value": "title 1", "language": null, "authority": null, "confidence": -1 ,"place": 2 }
         ]
       }
     },
@@ -95,9 +95,9 @@
       ],
       "expect": {
         "dc.title": [
-          { "value": "title 0", "language": null, "authority": null, "confidence": -1 },
-          { "value": "title A", "language": "en_US", "authority": null, "confidence": -1 },
-          { "value": "title 1", "language": null, "authority": null, "confidence": -1 }
+          { "value": "title 0", "language": null, "authority": null, "confidence": -1 ,"place": 0 },
+          { "value": "title A", "language": "en_US", "authority": null, "confidence": -1 ,"place": 1 },
+          { "value": "title 1", "language": null, "authority": null, "confidence": -1 ,"place": 2 }
         ]
       }
     },
@@ -112,10 +112,10 @@
       ],
       "expect": {
         "dc.title": [
-          { "value": "title 0", "language": null, "authority": null, "confidence": -1 },
-          { "value": "title A", "language": "en_US", "authority": null, "confidence": -1 },
-          { "value": "title 1", "language": null, "authority": null, "confidence": -1 },
-          { "value": "title A", "language": "en_US", "authority": null, "confidence": -1 }
+          { "value": "title 0", "language": null, "authority": null, "confidence": -1 ,"place": 0 },
+          { "value": "title A", "language": "en_US", "authority": null, "confidence": -1 ,"place": 1 },
+          { "value": "title 1", "language": null, "authority": null, "confidence": -1 ,"place": 2 },
+          { "value": "title A", "language": "en_US", "authority": null, "confidence": -1 ,"place": 3 }
         ]
       }
     },
@@ -133,8 +133,8 @@
       ],
       "expect": {
         "dc.title": [
-          { "value": "title 0", "language": null, "authority": null, "confidence": -1 },
-          { "value": "title 1", "language": null, "authority": null, "confidence": -1 }
+          { "value": "title 0", "language": null, "authority": null, "confidence": -1 ,"place": 0 },
+          { "value": "title 1", "language": null, "authority": null, "confidence": -1 ,"place": 1 }
         ]
       }
     },
