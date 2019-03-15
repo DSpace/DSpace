@@ -68,7 +68,7 @@ public class ResearcherPageUtils
 {
 	
 	/** Maximum query results*/
-	private static final int MAX_RESULTS = 20;
+	public static final int MAX_RESULTS = 20;
 	
 	/** Handler dspace service */
 	private static DSpace dspace = new DSpace();
@@ -419,7 +419,7 @@ return decorator.generateDisplayValue(alternativeName, rp);
     }
     
     
-	private static Map<String, String> buildExtra(ResearcherPage rp)
+	public static Map<String, String> buildExtra(ResearcherPage rp)
     {
 	    Map<String, String> extras = new HashMap<String,String>();
 	    List<RPAuthorityExtraMetadataGenerator> generators = dspace.getServiceManager().getServicesByType(RPAuthorityExtraMetadataGenerator.class);

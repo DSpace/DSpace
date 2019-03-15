@@ -9,6 +9,8 @@ package org.dspace.app.cris.integration;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -22,6 +24,7 @@ import org.dspace.app.cris.model.VisibilityConstants;
 import org.dspace.app.cris.service.ApplicationService;
 import org.dspace.app.cris.service.RelationPreferenceService;
 import org.dspace.app.cris.util.ResearcherPageUtils;
+import org.dspace.content.DCPersonName;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.authority.AuthorityVariantsSupport;
 import org.dspace.content.authority.Choice;
@@ -33,26 +36,26 @@ import org.dspace.core.LogManager;
 import org.dspace.discovery.DiscoverQuery;
 import org.dspace.discovery.DiscoverResult;
 import org.dspace.discovery.SearchService;
+import org.dspace.discovery.DiscoverQuery.SORT_ORDER;
 import org.dspace.services.ConfigurationService;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.utils.DSpace;
 
 /**
- * This class is the main point of integration beetween the Researcher Pages and
- * DSpace. It implements the contract of the Authority Control Framework
- * providing full support for the variants facility. It implements also the
- * callback interface to "record" rejection of potential matches.
  * 
- * @author cilea
+ * Authority to aggregate "extra" value to single choice 
+ * 
+ * @author Pascarelli Luigi Andrea
+ *
  */
-public class RPAuthority extends CRISAuthority implements
-        AuthorityVariantsSupport, NotificableAuthority
+public class RPMultiAuthority extends CRISAuthority
+        implements AuthorityVariantsSupport, NotificableAuthority
 {
     public static final String PUBLICATIONS_RELATION_NAME = "publications";
 
-	/** The logger */
-    private static Logger log = Logger.getLogger(RPAuthority.class);
+    /** The logger */
+    private static Logger log = Logger.getLogger(RPMultiAuthority.class);
 
     /** The name as this ChoiceAuthority MUST be configurated */
     public final static String RP_AUTHORITY_NAME = "RPAuthority";
@@ -67,6 +70,12 @@ public class RPAuthority extends CRISAuthority implements
 
     private RelationPreferenceService relationPreferenceService;
 
+    private List<String> metadataAuth;
+
+    private List<RPAuthorityExtraMetadataGenerator> generators = new DSpace()
+            .getServiceManager()
+            .getServicesByType(RPAuthorityExtraMetadataGenerator.class);
+    
     /**
      * Make sure that the class is fully initialized before use it
      */
@@ -84,8 +93,7 @@ public class RPAuthority extends CRISAuthority implements
                     "org.dspace.services.ConfigurationService",
                     ConfigurationService.class);
 
-            relationPreferenceService = dspace
-                    .getServiceManager()
+            relationPreferenceService = dspace.getServiceManager()
                     .getServiceByName(
                             "org.dspace.app.cris.service.RelationPreferenceService",
                             RelationPreferenceService.class);
@@ -95,7 +103,7 @@ public class RPAuthority extends CRISAuthority implements
     /**
      * Empty constructor needed by the DSpace plugin facility.
      */
-    public RPAuthority()
+    public RPMultiAuthority()
     {
         // nothing to do, initialization is provided by the IoC Spring Frameword
     }
@@ -127,13 +135,94 @@ public class RPAuthority extends CRISAuthority implements
     public Choices getMatches(String field, String query, int collection,
             int start, int limit, String locale)
     {
+
         try
         {
             init();
             ConfigurationService _configurationService = this.configurationService;
             SearchService _searchService = this.searchService;
-            Choices choicesResult = ResearcherPageUtils.doGetMatches(field, query, _configurationService, _searchService);
-            
+
+            Choices choicesResult = null;
+            if (query != null && query.length() > 1)
+            {
+                DCPersonName tmpPersonName = new DCPersonName(
+                        query.toLowerCase());
+
+                String luceneQuery = "";
+                if (StringUtils.isNotBlank(tmpPersonName.getLastName()))
+                {
+                    luceneQuery += ClientUtils.escapeQueryChars(
+                            tmpPersonName.getLastName().trim())
+                            + (StringUtils.isNotBlank(
+                                    tmpPersonName.getFirstNames()) ? "" : "*");
+                }
+
+                if (StringUtils.isNotBlank(tmpPersonName.getFirstNames()))
+                {
+                    luceneQuery += (luceneQuery.length() > 0 ? " " : "")
+                            + ClientUtils.escapeQueryChars(
+                                    tmpPersonName.getFirstNames().trim())
+                            + "*";
+                }
+                luceneQuery = luceneQuery.replaceAll("\\\\ ", " ");
+                DiscoverQuery discoverQuery = new DiscoverQuery();
+                ResearcherPageUtils.applyCustomFilter(field, discoverQuery,
+                        _configurationService);
+                discoverQuery.setSortField("crisrp.fullName_sort",
+                        SORT_ORDER.asc);
+                discoverQuery.setDSpaceObjectFilter(CrisConstants.RP_TYPE_ID);
+                String surnameQuery = "{!lucene q.op=AND df=rpsurnames}("
+                        + luceneQuery + ") OR ("
+                        // no need for a phrase search, the default operator is
+                        // now AND and we want to match surnames in any order
+                        + luceneQuery.substring(0, luceneQuery.length() - 1)
+                        + ")";
+
+                discoverQuery.setQuery(surnameQuery);
+                discoverQuery.setMaxResults(ResearcherPageUtils.MAX_RESULTS);
+
+                DiscoverResult result = _searchService.search(null,
+                        discoverQuery, true);
+                List<Choice> choiceList = new LinkedList<Choice>();
+                for (DSpaceObject dso : result.getDspaceObjects())
+                {
+                    ResearcherPage rp = (ResearcherPage) dso;
+                    choiceList.addAll(buildAggregateByExtra(rp));
+                }
+                
+                int surnamesResult = choiceList.size();
+                
+                if (surnamesResult<ResearcherPageUtils.MAX_RESULTS){
+                    int difference = ResearcherPageUtils.MAX_RESULTS - surnamesResult;
+                    discoverQuery.setMaxResults(difference);
+                    String crisauthoritylookup = "{!lucene q.op=AND df=crisauthoritylookup}("
+                                                 + luceneQuery
+                                                 + ") OR (\""
+                                                 + luceneQuery.substring(0,luceneQuery.length() - 1) + "\")";
+                    
+                    discoverQuery.setQuery(crisauthoritylookup);
+                    String negativeFilters = "-rpsurnames:(" + luceneQuery.substring(0,luceneQuery.length() - 1) + ")";
+                    String negativeFiltersStar = "-rpsurnames:(" + luceneQuery + ")";
+                    discoverQuery.addFilterQueries(negativeFilters);
+                    discoverQuery.addFilterQueries(negativeFiltersStar);
+                    result = _searchService.search(null, discoverQuery, true);
+                    for (DSpaceObject dso : result.getDspaceObjects())
+                    {
+                        ResearcherPage rp = (ResearcherPage) dso;
+                        choiceList.addAll(buildAggregateByExtra(rp));
+                    }
+                }
+                int foundSize = choiceList.size();
+                Choice[] results = new Choice[foundSize];
+                results = choiceList.toArray(results);
+                choicesResult = new Choices(results, 0, foundSize,
+                        Choices.CF_AMBIGUOUS, false, 0);
+            }
+            else
+            {
+                choicesResult = new Choices(false);
+            }
+
             return choicesResult;
         }
         catch (Exception e)
@@ -143,9 +232,23 @@ public class RPAuthority extends CRISAuthority implements
         }
     }
 
-	protected String generateDisplayValue(String value, ResearcherPage rp) {
-		return ResearcherPageUtils.getLabel(value, rp);
-	}
+    private List<Choice> buildAggregateByExtra(ResearcherPage rp)
+    {
+        List<Choice> choiceList = new LinkedList<Choice>();
+        if (generators != null)
+        {
+            for (RPAuthorityExtraMetadataGenerator gg : generators)
+            {
+                choiceList.addAll(gg.buildAggregate(rp));
+            }
+        }
+        return choiceList;
+    }
+
+    protected String generateDisplayValue(String value, ResearcherPage rp)
+    {
+        return ResearcherPageUtils.getLabel(value, rp);
+    }
 
     /**
      * Return a list of choices performing an exact query on the RP names (full,
@@ -153,7 +256,7 @@ public class RPAuthority extends CRISAuthority implements
      * choices for every variants form, the default choice will be which that
      * match with the "query" string. This method is used by unattended
      * submssion only, interactive submission will use the
-     * {@link RPAuthority#getMatches(String, String, int, int, int, String)}.
+     * {@link RPMultiAuthority#getMatches(String, String, int, int, int, String)}.
      * The confidence value of the returned Choices will be
      * {@link Choices#CF_UNCERTAIN} if there is only a RP that match with the
      * lookup string or {@link Choices#CF_AMBIGUOUS} if there are more RPs.
@@ -183,10 +286,11 @@ public class RPAuthority extends CRISAuthority implements
             int totalResult = 0;
             if (text != null && text.length() > 2)
             {
-				text = text.replaceAll("\\.", "");
+                text = text.replaceAll("\\.", "");
                 DiscoverQuery discoverQuery = new DiscoverQuery();
                 discoverQuery.setDSpaceObjectFilter(CrisConstants.RP_TYPE_ID);
-				ResearcherPageUtils.applyCustomFilter(field, discoverQuery, configurationService);
+                ResearcherPageUtils.applyCustomFilter(field, discoverQuery,
+                        configurationService);
 
                 discoverQuery
                         .setQuery("{!lucene q.op=AND df=crisauthoritylookup}\""
@@ -199,10 +303,7 @@ public class RPAuthority extends CRISAuthority implements
                 for (DSpaceObject dso : result.getDspaceObjects())
                 {
                     ResearcherPage rp = (ResearcherPage) dso;
-                    Map<String, String> extras = ResearcherPageUtils.buildExtra(rp);
-                    choiceList
-                            .add(new Choice(rp.getCrisID(), rp.getFullName(),
-                                    generateDisplayValue(rp.getFullName(), rp), extras));
+                    buildAggregateByExtra(rp);
                 }
             }
 
@@ -258,8 +359,8 @@ public class RPAuthority extends CRISAuthority implements
         ResearcherPage rp = applicationService.get(ResearcherPage.class, id);
         List<String> publicNames = new ArrayList<String>();
         publicNames.add(rp.getFullName());
-        if (rp.getTranslatedName() != null
-                && rp.getTranslatedName().getVisibility() == VisibilityConstants.PUBLIC)
+        if (rp.getTranslatedName() != null && rp.getTranslatedName()
+                .getVisibility() == VisibilityConstants.PUBLIC)
         {
             String value = rp.getTranslatedName().getValue();
             if (StringUtils.isNotBlank(value))
@@ -268,8 +369,8 @@ public class RPAuthority extends CRISAuthority implements
             }
         }
 
-        if (rp.getPreferredName() != null
-                && rp.getPreferredName().getVisibility() == VisibilityConstants.PUBLIC)
+        if (rp.getPreferredName() != null && rp.getPreferredName()
+                .getVisibility() == VisibilityConstants.PUBLIC)
         {
             String value = rp.getPreferredName().getValue();
             if (StringUtils.isNotBlank(value))
@@ -308,7 +409,7 @@ public class RPAuthority extends CRISAuthority implements
      */
     public void reject(int itemID, String authorityKey)
     {
-        int[] itemIDs = {itemID};
+        int[] itemIDs = { itemID };
         reject(itemIDs, authorityKey);
     }
 
@@ -332,14 +433,17 @@ public class RPAuthority extends CRISAuthority implements
             context = new Context();
             context.turnOffAuthorisationSystem();
             List<String> list = new ArrayList<String>();
-            for(int itemID : itemIDs) {
-                list.add(String.valueOf(itemID));    
+            for (int itemID : itemIDs)
+            {
+                list.add(String.valueOf(itemID));
                 DatabaseManager.updateQuery(context,
                         "delete from potentialmatches where rp like ? and item_id = ?",
                         cris.getCrisID(), itemID);
             }
-            
-            String defaultRelation = configurationService.getPropertyAsType(RP_AUTHORITY_NAME + ".relation.name", PUBLICATIONS_RELATION_NAME, true);
+
+            String defaultRelation = configurationService.getPropertyAsType(
+                    RP_AUTHORITY_NAME + ".relation.name",
+                    PUBLICATIONS_RELATION_NAME, true);
             relationPreferenceService.unlink(context, cris, defaultRelation,
                     list);
             context.commit();
@@ -351,19 +455,19 @@ public class RPAuthority extends CRISAuthority implements
         }
         finally
         {
-            if(context!=null && context.isValid()) {
+            if (context != null && context.isValid())
+            {
                 context.abort();
             }
         }
-        
+
     }
 
-    
     @Override
     public int getCRISTargetTypeID()
-        {
+    {
         return CrisConstants.RP_TYPE_ID;
-        }
+    }
 
     @Override
     public Class<ResearcherPage> getCRISTargetClass()
@@ -371,59 +475,70 @@ public class RPAuthority extends CRISAuthority implements
         return ResearcherPage.class;
     }
 
-    public String getPublicPath() {
-    	return "rp";
+    public String getPublicPath()
+    {
+        return "rp";
     }
 
     @Override
-	public void accept(int itemID, String authorityKey, int confidence)
+    public void accept(int itemID, String authorityKey, int confidence)
     {
-		init();
+        init();
         Context context = null;
         try
         {
-			context = new Context();
-			context.turnOffAuthorisationSystem();
-			if (confidence != Choices.CF_ACCEPTED) {
-				if (DatabaseManager
-						.updateQuery(
-								context,
-								"update potentialmatches set pending=1 where rp like ? and item_id = ?",
-								authorityKey, itemID) != 1) {
-					TableRow row = DatabaseManager.create(context,
-							"potentialmatches");
-					row.setColumn("pending", true);
-					row.setColumn("rp", authorityKey);
-					row.setColumn("item_id", itemID);
-					DatabaseManager.update(context, row);
-				}
-			} else {
-				DatabaseManager
-						.updateQuery(
-								context,
-								"delete from potentialmatches where rp like ? and item_id = ?",
-								authorityKey, itemID);
-			}
-			context.commit();
+            context = new Context();
+            context.turnOffAuthorisationSystem();
+            if (confidence != Choices.CF_ACCEPTED)
+            {
+                if (DatabaseManager.updateQuery(context,
+                        "update potentialmatches set pending=1 where rp like ? and item_id = ?",
+                        authorityKey, itemID) != 1)
+                {
+                    TableRow row = DatabaseManager.create(context,
+                            "potentialmatches");
+                    row.setColumn("pending", true);
+                    row.setColumn("rp", authorityKey);
+                    row.setColumn("item_id", itemID);
+                    DatabaseManager.update(context, row);
+                }
+            }
+            else
+            {
+                DatabaseManager.updateQuery(context,
+                        "delete from potentialmatches where rp like ? and item_id = ?",
+                        authorityKey, itemID);
+            }
+            context.commit();
 
-			ResearcherPage rp = applicationService.getResearcherByAuthorityKey(authorityKey);
-			List<String> list = new ArrayList<String>();
-			list.add(String.valueOf(itemID));
-			String defaultRelation = configurationService.getPropertyAsType(RP_AUTHORITY_NAME + ".relation.name", PUBLICATIONS_RELATION_NAME, true);
-			relationPreferenceService.active(context, rp, defaultRelation, list);
-			context.restoreAuthSystemState();
-		} catch (SQLException e) {
-			log.error(e.getMessage(), e);
-		} finally {
-            if(context!=null && context.isValid()) {
+            ResearcherPage rp = applicationService
+                    .getResearcherByAuthorityKey(authorityKey);
+            List<String> list = new ArrayList<String>();
+            list.add(String.valueOf(itemID));
+            String defaultRelation = configurationService.getPropertyAsType(
+                    RP_AUTHORITY_NAME + ".relation.name",
+                    PUBLICATIONS_RELATION_NAME, true);
+            relationPreferenceService.active(context, rp, defaultRelation,
+                    list);
+            context.restoreAuthSystemState();
+        }
+        catch (SQLException e)
+        {
+            log.error(e.getMessage(), e);
+        }
+        finally
+        {
+            if (context != null && context.isValid())
+            {
                 context.abort();
             }
         }
-        
+
     }
 
-	@Override
-	public ResearcherPage getNewCrisObject() {
-		return new ResearcherPage();
-	}
+    @Override
+    public ResearcherPage getNewCrisObject()
+    {
+        return new ResearcherPage();
+    }
 }
