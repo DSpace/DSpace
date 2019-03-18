@@ -91,6 +91,7 @@ public class AuthorAuthority extends AdvancedSPARQLAuthorityProvider {
 					+ "} \n"); // end 3er optional
 		pqs.append("	}\n"); //end del 2do optional
 		if (!"".equals(text)) {
+			text = normalizeTextForParserSPARQL10(text);
 			String[] tokens = text.split(",");
 			if (tokens.length > 1 && tokens[0].trim().length() > 0 && tokens[1].trim().length() > 0) {
 				pqs.append("FILTER(REGEX(?name, ?text2, \"i\") && REGEX(?surname, ?text1, \"i\"))\n");
