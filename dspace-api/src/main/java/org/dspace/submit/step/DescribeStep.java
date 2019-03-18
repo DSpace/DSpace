@@ -346,12 +346,7 @@ public class DescribeStep extends AbstractProcessingStep
                 // Group-based restriction validation
                 if(inputs[i].isGroupBased()) 
                 {
-                	Group group = findGroup(context, inputs[i].getGroup());
-                	if( group == null) 
-                	{
-                		log.warn("Group "+inputs[i].getGroup()+ " does not exist, check your input_forms.xml" );
-                	}
-                	else if (!(Group.isMember(context, group.getID()) ^ inputs[i].hasToBeMemeber()) && values.length == 0 ) 
+                    if (inputs[i].isRequiredOnGroup(context) && values.length == 0 )
                 	{
                 		// agrega el campo faltante a la lista de errores 
                         addErrorField(request, getFieldName(inputs[i]));
