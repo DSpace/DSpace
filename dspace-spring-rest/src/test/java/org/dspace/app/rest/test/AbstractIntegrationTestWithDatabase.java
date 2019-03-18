@@ -11,6 +11,10 @@ import static org.junit.Assert.fail;
 
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.persistence.metamodel.EntityType;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -19,13 +23,19 @@ import org.dspace.app.rest.builder.AbstractBuilder;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Community;
 import org.dspace.core.Context;
+import org.dspace.core.HibernateTestUtil;
 import org.dspace.core.I18nUtil;
+import org.dspace.core.ReloadableEntity;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
+import org.dspace.handle.Handle;
+import org.dspace.identifier.DOI;
 import org.dspace.storage.rdbms.DatabaseUtils;
+import org.hibernate.Session;
+import org.hibernate.query.Query;
 import org.jdom.Document;
 import org.junit.After;
 import org.junit.Before;
@@ -40,6 +50,16 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
      */
     private static final Logger log = LogManager
             .getLogger(AbstractIntegrationTestWithDatabase.class);
+
+    /**
+     * Set of database types that should be ignored when counting the number of records in the database
+     */
+    private static Set<Class<? extends ReloadableEntity>> ignoredDatabaseTypes = new HashSet<>();
+
+    /**
+     * The number of records present in the database before the test started
+     */
+    protected int beforeDatabaseRecordCount;
 
     /**
      * Context mock object to use in the tests.
@@ -91,6 +111,9 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
             fail("Error initializing database: " + se.getMessage()
                      + (se.getCause() == null ? "" : ": " + se.getCause().getMessage()));
         }
+
+        ignoredDatabaseTypes.add(Handle.class);
+        ignoredDatabaseTypes.add(DOI.class);
     }
 
     /**
@@ -156,6 +179,8 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
             log.error(ex.getMessage(), ex);
             fail("SQL Error on AbstractUnitTest init()");
         }
+
+        beforeDatabaseRecordCount = countTotalNumberOfRecordsInDatabase(context);
     }
 
     /**
@@ -172,6 +197,13 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
             AbstractBuilder.cleanupObjects();
             parentCommunity = null;
             cleanupContext();
+
+            //Check if no records are left
+            int afterCount = countTotalNumberOfRecordsInDatabase();
+            if (afterCount > beforeDatabaseRecordCount) {
+                throw new IllegalStateException("Leftover database records were found which need to be cleaned up. " +
+                        "The total number of extra records is " + (afterCount - beforeDatabaseRecordCount));
+            }
 
             // NOTE: we explicitly do NOT destroy our default eperson & admin as they
             // are cached and reused for all tests. This speeds up all tests.
@@ -222,5 +254,27 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
         if (!context.isValid()) {
             setUp();
         }
+    }
+
+    private int countTotalNumberOfRecordsInDatabase() throws SQLException {
+        try (Context c = new Context()) {
+            return countTotalNumberOfRecordsInDatabase(c);
+        }
+    }
+
+    private int countTotalNumberOfRecordsInDatabase(Context c) throws SQLException {
+        int count = 0;
+        Session session = HibernateTestUtil.getHibernateSession(c);
+        Set<EntityType<?>> entities = HibernateTestUtil.getHibernateSessionFactory(c)
+                .getMetamodel().getEntities();
+
+        for (EntityType entityType : entities) {
+            if (!ignoredDatabaseTypes.contains(entityType.getJavaType())) {
+                Query query = session.createQuery("select count(*) from "
+                        + entityType.getJavaType().getSimpleName());
+                count += ((Long) query.getSingleResult()).intValue();
+            }
+        }
+        return count;
     }
 }

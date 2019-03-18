@@ -82,6 +82,7 @@ public abstract class AbstractBuilder<T, S> {
     protected Context context;
 
     private static List<AbstractBuilder> builders = new LinkedList<>();
+
     /**
      * log4j category
      */
@@ -194,7 +195,8 @@ public abstract class AbstractBuilder<T, S> {
 
     protected <B> B handleException(final Exception e) {
         log.error(e.getMessage(), e);
-        return null;
+        //if anything goes wrong -> fail fast
+        throw new RuntimeException(e.getMessage(), e);
     }
 
     /**

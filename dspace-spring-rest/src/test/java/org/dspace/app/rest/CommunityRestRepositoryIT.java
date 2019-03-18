@@ -18,6 +18,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -31,10 +32,15 @@ import org.dspace.app.rest.model.MetadataEntryRest;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.service.CommunityService;
 import org.hamcrest.Matchers;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest {
+
+    @Autowired
+    private CommunityService communityService;
 
     @Test
     public void createTest() throws Exception {
@@ -100,6 +106,13 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                                            "Title Text")
                                )))));
 
+        //Clean up community
+        context.turnOffAuthorisationSystem();
+        List<Community> communities = communityService.findAll(context);
+        for (Community community : communities) {
+            communityService.delete(context, community);
+        }
+        context.restoreAuthSystemState();
     }
 
     @Test

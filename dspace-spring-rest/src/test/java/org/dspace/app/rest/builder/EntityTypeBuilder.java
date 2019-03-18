@@ -44,7 +44,7 @@ public class EntityTypeBuilder extends AbstractBuilder<EntityType, EntityTypeSer
 
             indexingService.commit();
         } catch (SearchServiceException | SQLException | AuthorizeException e) {
-            log.error(e);
+            handleException(e);
         }
         return entityType;
     }
@@ -74,7 +74,7 @@ public class EntityTypeBuilder extends AbstractBuilder<EntityType, EntityTypeSer
             this.entityType = entityTypeService.create(context, entityType);
 
         } catch (SQLException | AuthorizeException e) {
-            e.printStackTrace();
+            handleException(e);
         }
 
         return this;

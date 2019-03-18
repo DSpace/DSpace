@@ -41,12 +41,17 @@ import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.service.EPersonService;
 import org.hamcrest.Matchers;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 
 public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
+
+    @Autowired
+    private EPersonService ePersonService;
 
     @Test
     public void createTest() throws Exception {
@@ -83,7 +88,11 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                                    EPersonMetadataMatcher.matchFirstName("John"),
                                    EPersonMetadataMatcher.matchLastName("Doe")
                                )))));
-        // TODO cleanup the context!!!
+
+        //Clean up EPerson
+        context.turnOffAuthorisationSystem();
+        EPerson ePerson = ePersonService.findByEmail(context, "createtest@fake-email.com");
+        ePersonService.delete(context, ePerson);
     }
 
     @Test

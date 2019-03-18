@@ -23,14 +23,19 @@ import org.dspace.app.rest.matcher.GroupMatcher;
 import org.dspace.app.rest.model.GroupRest;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.eperson.Group;
+import org.dspace.eperson.service.GroupService;
 import org.hamcrest.Matchers;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author Jonas Van Goolen - (jonas@atmire.com)
  */
 
 public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
+
+    @Autowired
+    private GroupService groupService;
 
     @Test
     public void createTest()
@@ -56,6 +61,11 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
                            GroupMatcher.matchGroupWithName("Administrator"),
                            GroupMatcher.matchGroupWithName("Anonymous"))));
 
+        //Clean up group
+        context.turnOffAuthorisationSystem();
+        Group group = groupService.findByName(context, groupName);
+        groupService.delete(context, group);
+        context.restoreAuthSystemState();
     }
 
     @Test

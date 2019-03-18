@@ -45,7 +45,7 @@ public class RelationshipTypeBuilder extends AbstractBuilder<RelationshipType, R
 
             indexingService.commit();
         } catch (SearchServiceException | SQLException | AuthorizeException e) {
-            log.error(e);
+            handleException(e);
         }
         return relationshipType;
     }
@@ -94,7 +94,7 @@ public class RelationshipTypeBuilder extends AbstractBuilder<RelationshipType, R
 
             relationshipTypeService.create(context, this.relationshipType);
         } catch (SQLException | AuthorizeException e) {
-            e.printStackTrace();
+            handleException(e);
         }
 
         return this;

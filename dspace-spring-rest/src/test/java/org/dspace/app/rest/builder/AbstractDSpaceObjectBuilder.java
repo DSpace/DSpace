@@ -47,12 +47,6 @@ public abstract class AbstractDSpaceObjectBuilder<T extends DSpaceObject>
     protected abstract DSpaceObjectService<T> getService();
 
 
-    protected <B> B handleException(final Exception e) {
-        log.error(e.getMessage(), e);
-        return null;
-    }
-
-
     protected <B extends AbstractDSpaceObjectBuilder<T>> B addMetadataValue(final T dso, final String schema,
                                                                             final String element,
                                                                             final String qualifier,
