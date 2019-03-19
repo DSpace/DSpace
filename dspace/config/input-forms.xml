@@ -1418,6 +1418,10 @@
 				<displayed-value>Convenio</displayed-value>
 				<stored-value>Convenio</stored-value>
 			</pair>
+			<pair>
+				<displayed-value>Proyecto</displayed-value>
+				<stored-value>Proyecto</stored-value>
+			</pair>
 		</value-pairs>
 
 		<value-pairs value-pairs-name="common_subtypes_imagen_fija" dc-term="type">
