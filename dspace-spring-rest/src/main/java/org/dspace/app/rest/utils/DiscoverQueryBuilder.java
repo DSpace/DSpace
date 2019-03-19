@@ -10,11 +10,14 @@ package org.dspace.app.rest.utils;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
+import org.apache.solr.client.solrj.util.ClientUtils;
 import org.dspace.app.rest.converter.query.SearchQueryConverter;
 import org.dspace.app.rest.exception.InvalidDSpaceObjectTypeException;
 import org.dspace.app.rest.exception.InvalidRequestException;
@@ -181,7 +184,7 @@ public class DiscoverQueryBuilder implements InitializingBean {
 
         //Set search query
         if (StringUtils.isNotBlank(query)) {
-            queryArgs.setQuery(query);
+            queryArgs.setQuery(escapeQueryChars(query));
         }
 
         //Limit results to DSO type
@@ -327,6 +330,85 @@ public class DiscoverQueryBuilder implements InitializingBean {
         }
 
         return queryArgs;
+    }
+    /**
+     * Escape some solr special characters from the user's query.
+     *
+     * 1 - when a query ends with one of solr's special characters (^, \,!, +, -,:, ||, && (,),{,},[,])
+     *     (a space in between or not) (e.g. "keyword3 :") the user gets
+     *     an erroneous notification or the search doesn't produce results.
+     *     Those characters at the end of the query should be escaped.
+     *
+     * 2 - escape every colon, followed by a space (e.g. "title: subtitle")
+     *     in a user's query. This is intended to let end users to pass
+     *     in a title containing colon-space without requiring them to escape the colon.
+     *
+     * @param query user-entered query string
+     * @return query escaping some of solr's special characters at the end and
+     *         with a colon in colon-space sequence escaped if they occur.
+     */
+    public String escapeQueryChars(String query) {
+        query = query.trim();
+
+        // [+\\-&|!()\\s{}\\[\\]\\^\"\\\\:]:    Śome of the solr's special characters that need to be escaped for
+        //                                      regex as well as for string.
+        //                                      Regex representation of \ is \\. Therefore the string
+        //                                      representation of \\ is \\\\).
+        //                                      \\s is in case withespaces is in between the characters.
+        // + : Match or more of the preceding token
+        // (?=\s+$|$):  Matches all solr's special characters at the end of a string independently of
+        //              any whitespace characters
+        //            - ?= is a positive lookahead. Matches a group after the main expression without
+        //              including it in the result
+        //            - \s: Matches any whitespace character (spaces, tabs, line breaks )
+        //            - $: Matches the end of a string
+        String regx = "[+\\-&|!()\\s{}\\[\\]\\^\"\\\\:]+(?=\\s+$|$)";
+        Pattern pattern = Pattern.compile(regx);
+        Matcher matcher = pattern.matcher(query);
+
+        if (matcher.find()) {
+            String matcherGroup = matcher.group();
+            String escapedMatcherGroup = ClientUtils.escapeQueryChars(matcherGroup);
+
+            // Do not escape brackets if they are properly opened and closed.
+            if (matcherGroup.equals(")") ||
+                matcherGroup.equals("]") ||
+                matcherGroup.equals("}") ||
+                matcherGroup.equals("\"")) {
+                String closingBracket = matcher.group();
+                String openingBracket = new String();
+
+                switch (closingBracket) {
+                    case "}":
+                        openingBracket = "{";
+                        break;
+                    case ")":
+                        openingBracket = "(";
+                        break;
+                    case "]":
+                        openingBracket = "[";
+                        break;
+                    case "\"":
+                        openingBracket = "\"";
+                        break;
+                    default:
+                        break;
+                }
+
+                String bracketsRegex = "\\".concat(openingBracket)
+                                           .concat("(.*?)\\")
+                                           .concat(closingBracket);
+
+                if (!Pattern.compile(bracketsRegex).matcher(query).find()) {
+                    query = StringUtils.replace(query, matcherGroup, escapedMatcherGroup);
+                }
+            } else {
+                query = StringUtils.replace(query, matcherGroup, escapedMatcherGroup);
+            }
+        }
+
+        query = StringUtils.replace(query, ": ", "\\:");
+        return query;
     }
 
 }
