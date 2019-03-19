@@ -2855,6 +2855,7 @@
 <message key="xmlui.XMLWorkflow.autoarchive.SeDiCILevelReview.editaction">SEDICI Review</message>
 <message key="xmlui.XMLWorkflow.autoarchive.SeDiCILevelReview.selectcollectionaction">Select collection</message>
 <message key="xmlui.XMLWorkflow.default.CollectionLevelReview.skipadminclaimaction">Local review</message>
+<message key="xmlui.XMLWorkflow.default.CollectionLevelReview.acceptRoleOrNotAdmin">Local review</message>
 
 <message key="sedici.Submission.submit.SelectCollection.collection_help">Select the collection for install this item</message>
 

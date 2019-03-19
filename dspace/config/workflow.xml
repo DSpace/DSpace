@@ -41,12 +41,12 @@
     <workflow start="CollectionLevelReview" id="default">
 
         <roles>
-            <role id="CommAdmin" name="CommAdmin" scope="comm_admins" description="Este paso le permite a un administrador de una Comunidad padre, editar los metadatos y aceptar o rechazar el envío"/>
+            <role id="Admin" name="Admin" scope="community" description="Este paso le permite a un administrador de una Comunidad padre, editar los metadatos y aceptar o rechazar el envío"/>
             <role id="SeDiCIAdmin" name="SeDiCIAdmin" scope="repository" description="Este paso le permite a los administradores de SeDiCI editar los metadatos, aceptar o rechazar el envío"/>
         </roles>
 
 		<!-- PASO 1: Revisión a nivel de colección (aplicable por colección) -->
-        <step id="CollectionLevelReview" role="CommAdmin" userSelectionMethod="acceptRoleOrNotAdmin">
+        <step id="CollectionLevelReview" role="Admin" userSelectionMethod="acceptRoleOrNotAdmin">
             <outcomes>
                 <step status="0">SeDiCILevelReview</step>
             </outcomes>

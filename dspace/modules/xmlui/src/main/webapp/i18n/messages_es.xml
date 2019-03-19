@@ -3037,6 +3037,7 @@ Cuando se usa QDC para los elementos de DSpace se recomienda el uso de crosswalk
 <message key="xmlui.XMLWorkflow.autoarchive.SeDiCILevelReview.editaction">Revisión SEDICI</message>
 <message key="xmlui.XMLWorkflow.autoarchive.SeDiCILevelReview.selectcollectionaction">Asignación de colección</message>
 <message key="xmlui.XMLWorkflow.default.CollectionLevelReview.skipadminclaimaction">Revisión Local</message>
+<message key="xmlui.XMLWorkflow.default.CollectionLevelReview.acceptRoleOrNotAdmin">Revisión Local</message>
 <message key="sedici.Submission.submit.SelectCollection.collection_help">Seleccione la colección en la que se instalará el documento</message>
 
 <message key="xmlui.XMLWorkflow.workflow.EditMetadataAction.delete_help">Si usted revisó el item y encontró que <strong>NO</strong> es correcta su inclusión y desea eliminarlo permanentemente del repositorio, seleccione "Eliminar". Esto removerá el item totalmente del repositorio sin darle al depositante la opción de modificación y resubida.</message>

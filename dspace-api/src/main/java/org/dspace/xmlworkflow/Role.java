@@ -36,7 +36,7 @@ public class Role {
     public static enum Scope{
         REPOSITORY,
         COLLECTION,
-        COMM_ADMINS,
+        COMMUNITY,
         ITEM
     }
 
@@ -90,7 +90,7 @@ public class Role {
             }
             return new RoleMembers();
         }
-        if (scope == Scope.COMM_ADMINS) {
+        if (scope == Scope.COMMUNITY) {
         	/*
     		 * This scope references to the first community with "admins" group.
     		 */
