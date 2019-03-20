@@ -207,6 +207,22 @@
 			 		</img>
 			 	</a>
 		 	</div>
+			<div>
+				<a>
+					<xsl:attribute name="href">
+						<xsl:value-of select="$context-path"/>
+						<xsl:text>/pages/ayudaInvestigadores</xsl:text>
+					</xsl:attribute>
+					<img title="sedici.home.ayuda_investigadores.linktext" i18n:attr="title">
+			            <xsl:attribute name="src">
+			                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
+			                <xsl:text>/themes/</xsl:text>
+			                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
+			                <xsl:text>/images/ayuda_investigadores_home.png</xsl:text>
+			            </xsl:attribute>&#160;
+					</img>
+				</a>
+			</div>
 		 </div>
 	</xsl:template>
 	

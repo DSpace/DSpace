@@ -3776,6 +3776,34 @@ background-repeat:no-repeat;
 background-position:top left;
 }
 
+.pagina_ayudaInvestigadores{
+	text-align: center;
+}
+
+.page_ayuda_investigadores {
+	display: inline-grid;
+	width: 30%;
+	margin-bottom: 10px;
+}
+
+.page_ayuda_investigadores p{
+	font-size: 15px;
+	text-align: center;
+}
+
+.page_ayuda_investigadores a{
+	color: #3886AA;
+}
+
+.page_ayuda_investigadores a:hover {
+	text-decoration: underline;
+}
+
+.page_ayuda_investigadores img{
+	display: block;
+	margin: auto;
+}
+
 .view_more {}
 
 #accordion h3 span.topCommunity{

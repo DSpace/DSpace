@@ -1,0 +1,64 @@
+<document xmlns="http://di.tamu.edu/DRI/1.0/"
+xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
+
+<meta>
+	<pageMeta>
+		<metadata element="title">SEDICI - Cómo agregar trabajos</metadata>
+	</pageMeta>
+</meta>
+
+<body>
+<div>
+
+	<head>Ayuda para investigadores</head>
+
+	<div id='pagina_estatica' class="pagina_ayudaInvestigadores">
+
+		<div class="page_ayuda_investigadores">
+			<a href="bitstream/handle/10915/72209/Póster__1_p._.pdf-PDFA.pdf?sequence=1" target="_blank">
+				<img src="static/resources/que_puedo_depositar.png" />
+				<p>¿Qué puedo depositar?</p>
+			</a>
+		</div>
+
+		<div class="page_ayuda_investigadores">
+			<a href="bitstream/handle/10915/72208/Póster__1_p._.pdf-PDFA.pdf?sequence=1" target="_blank">
+				<img src="static/resources/orcid.png"/>
+				<p>Obtener un código OrcID</p>
+			</a>
+		</div>
+
+		<div class="page_ayuda_investigadores">
+			<a href="bitstream/handle/10915/72821/Póster__1_p._.pdf-PDFA.pdf?sequence=1" target="_blank">
+				<img src="static/resources/que_deben_hacer.png"/>
+				<p>¿Qué deben hacer los investigadores?</p>
+			</a>
+		</div>
+
+		<div class="page_ayuda_investigadores">
+			<a href="bitstream/handle/10915/72212/Póster__1_p._.pdf-PDFA.pdf?sequence=1" target="_blank">
+				<img src="static/resources/como_citar.png"/>
+				<p>¿Cómo citar documentos en redes sociales y web institucionales?</p>
+			</a>
+		</div>
+
+		<div class="page_ayuda_investigadores">
+			<a href="bitstream/handle/10915/72210/Póster__1_p._.pdf-PDFA.pdf?sequence=2" target="_blank">
+				<img src="static/resources/sherpa.png"/>
+				<p>Sherpa/Romeo</p>
+			</a>
+		</div>
+
+		<div class="page_ayuda_investigadores">
+			<a href="bitstream/handle/10915/72211/Póster__1_p._.pdf-PDFA.pdf?sequence=1" target="_blank">
+				<img src="static/resources/generar_cita.png"/>
+				<p>¿Cómo generar una cita para un recurso en línea?</p>
+			</a>
+		</div>
+
+	</div>
+</div>
+</body>
+
+</document>
+
