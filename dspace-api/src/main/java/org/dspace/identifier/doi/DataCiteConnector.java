@@ -60,6 +60,7 @@ implements DOIConnector
     // Configuration property names
     static final String CFG_USER = "identifier.doi.user";
     static final String CFG_PASSWORD = "identifier.doi.password";
+    static final String CFG_NAMESPACE = "crosswalk.dissemination.DataCite.namespace";
     
     /**
      * Stores the scheme used to connect to the DataCite server. It will be set
@@ -99,6 +100,11 @@ implements DOIConnector
     
     protected String USERNAME;
     protected String PASSWORD;
+    
+    /**
+     * DataCite Namespace used with programmatic xml element 
+     */
+    protected String NAMESPACE;
     
     public DataCiteConnector()
     {
@@ -1036,12 +1042,30 @@ implements DOIConnector
         {
             return root;
         }
-        Element identifier = new Element("identifier", "http://datacite.org/schema/kernel-2.2");
+        Element identifier = new Element("identifier", getNamespace());
         identifier.setAttribute("identifierType", "DOI");
         identifier.addContent(doi.substring(DOI.SCHEME.length()));
         return root.addContent(0, identifier);
     }
 
+    public String getNamespace() {
+        if (null == this.NAMESPACE)
+        {
+            this.NAMESPACE = this.configurationService.getProperty(CFG_NAMESPACE);
+            if (null == this.NAMESPACE)
+            {
+                throw new RuntimeException("Unable to load namespace from "
+                        + "configuration. Cannot find property " +
+                        CFG_NAMESPACE + ".");
+            }
+        }
+        return this.NAMESPACE;
+    }
+
+    public void setNAMESPACE(String nAMESPACE) {
+        NAMESPACE = nAMESPACE;
+    }
+    
     protected class DataCiteResponse
     {
         private final int statusCode;
