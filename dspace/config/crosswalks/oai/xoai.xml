@@ -516,6 +516,7 @@
 					<string>Conjunto de datos</string>
 					<string>Convenio</string>
 					<string>Proyecto</string>
+					<string>Informe</string>
                 </list>
             </Configuration>
         </CustomCondition>
