@@ -169,7 +169,9 @@
          	 <h2><i18n:text>sedici.home.buscar_material.title</i18n:text></h2>
          	 <p>
          	 	<i18n:text>sedici.home.buscar_material.info_pre</i18n:text>
-         	 	<span class="resource_count">55000</span>
+		        <span class="resource_count">
+			        <xsl:copy-of select="java:ar.edu.unlp.sedici.xmlui.xsl.XslExtensions.availableItemsCount()"/>
+		        </span>
          	 	<i18n:text>sedici.home.buscar_material.info_post</i18n:text>
          	 </p>
 	     <form>
