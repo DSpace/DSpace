@@ -4,7 +4,6 @@
         <name-map collection="default" workflow="default"/>
         <name-map collection="10915/50" workflow="autoarchive"/>
         <name-map collection="10915/28975" workflow="autoarchive"/>
-        <name-map collection="10915/46286" workflow="autoarchiveTesisDeGrado"/>
     </workflow-map>
 
     <!--Workflow modificado para SeDiCI-->
@@ -77,21 +76,6 @@
                 <action id="selectcollectionaction"/>
             </actions>
         </step>
-    </workflow>
-
-    <workflow id="autoarchiveTesisDeGrado" start="SeDiCILevelReview">
-        <roles>
-            <role id="SeDiCIAdmin" name="SeDiCIAdmin" scope="repository" description="Este paso le permite a los administradores de SeDiCI editar los metadatos, aceptar o rechazar el envío"/>
-        </roles>
-
-        <!-- PASO 1: Revisión a nivel de SeDiCI (aplicable a todos los ítems de todo el repositorio) -->
-        <step id="SeDiCILevelReview" role="SeDiCIAdmin" userSelectionMethod="claimaction">
-            <actions>
-                <action id="selectcollectionaction"/>
-                <action id="editaction"/>
-            </actions>
-        </step>
-
     </workflow>
 
 </wf-config>

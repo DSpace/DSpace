@@ -3017,10 +3017,6 @@ Cuando se usa QDC para los elementos de DSpace se recomienda el uso de crosswalk
 <message key="xmlui.XMLWorkflow.MuseoFisicaAdmin.SeDiCILevelReview.editaction">Revisión SEDICI</message>
 <message key="xmlui.XMLWorkflow.MuseoFisicaAdmin.SeDiCILevelReview.selectcollectionaction">Seleccione una colección</message>
 
-<message key="xmlui.XMLWorkflow.autoarchiveTesisDeGrado.SeDiCILevelReview">Revisión SEDICI</message>
-<message key="xmlui.XMLWorkflow.autoarchiveTesisDeGrado.SeDiCILevelReview.claimaction">Revisión SEDICI</message>
-<message key="xmlui.XMLWorkflow.autoarchiveTesisDeGrado.SeDiCILevelReview.editaction">Revisión SEDICI</message>
-<message key="xmlui.XMLWorkflow.autoarchiveTesisDeGrado.SeDiCILevelReview.selectcollectionaction">Seleccione una colección</message>
 <message key="xmlui.XMLWorkflow.MuseoAzzariniWF.SeDiCILevelReview.claimaction">Revisión SEDICI</message>
 <message key="xmlui.XMLWorkflow.MuseoAzzariniWF.SeDiCILevelReview.editaction">Revisión SEDICI</message>
 <message key="xmlui.XMLWorkflow.MuseoFisicaWF.SeDiCILevelReview.claimaction">Revisión SEDICI</message>
