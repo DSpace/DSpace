@@ -1,0 +1,304 @@
+<?xml version="1.0"?>
+<!DOCTYPE input-forms SYSTEM "input-forms.dtd">
+
+
+<input-forms>
+
+ <!-- The form-map maps collection handles to forms. DSpace does not       -->
+ <!-- require a collection name to be unique, not even within a community. -->
+ <!-- DSpace does however ensure that each collection's handle is unique.  -->
+ <!-- Form-map provides the means to associate a unique collection name    -->
+ <!-- with a form. The form-map also provides the special handle "default" -->
+ <!-- (which is never a collection), here mapped to "traditional". Any     -->
+ <!-- collection which does not appear in this map will be associated with -->
+ <!-- the mapping for handle "default".                                    -->
+
+ <form-map>
+   <name-map collection-handle="default" form-name="traditional" />
+ </form-map>
+
+
+ <!-- The form-definitions map lays out the detailed definition of all the -->
+ <!-- submission forms. Each separate form set has a unique name as an     -->
+ <!-- attribute. This name matches one of the names in the form-map. One   -->
+ <!-- named form set has the name "traditional"; as this name suggests,    -->
+ <!-- it is the old style and is also the default, which gets used when    -->
+ <!-- the specified collection has no correspondingly-named form set.      -->
+ <!--                                                                      -->
+ <!-- Each form set contains an ordered set of pages; each page defines    -->
+ <!-- one submission metadata entry screen. Each page has an ordered list  -->
+ <!-- of field definitions, Each field definition corresponds to one       -->
+ <!-- metadata entry (a so-called row), which has a DC element name, a    -->
+ <!-- displayed label, a text string prompt which is called a hint, and    -->
+ <!-- an input-type. Each field also may hold optional elements: DC        -->
+ <!-- qualifier name, a repeatable flag, and a text string whose presence  -->
+ <!-- serves as a 'this field is required' flag.                           -->
+
+ <form-definitions>
+
+   <form name="traditional">
+     <page number="1">
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>contributor</dc-element>
+         <dc-qualifier>author</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Autor Principal</label>
+         <input-type>name</input-type>
+         <hint></hint>
+         <required>Campo requerido</required>
+       </field>
+
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>creator</dc-element>
+         <dc-qualifier>adscription</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Área de adscripción</label>
+         <input-type>onebox</input-type>
+         <hint></hint>
+         <required></required>
+       </field>
+
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>creator</dc-element>
+         <dc-qualifier>email</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Correo Electrónico</label>
+         <input-type>onebox</input-type>
+         <hint></hint>
+         <required></required>
+       </field>
+
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>creator</dc-element>
+         <dc-qualifier>studiesP</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Programa de estudios</label>
+         <input-type>onebox</input-type>
+         <hint></hint>
+         <required></required>
+       </field>
+
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>creator</dc-element>
+         <dc-qualifier>orcid</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>ORCID</label>
+         <input-type>onebox</input-type>
+         <hint></hint>
+         <required></required>
+       </field>
+
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>creator</dc-element>
+         <dc-qualifier>dni</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>DNI</label>
+         <input-type>onebox</input-type>
+         <hint></hint>
+         <required></required>
+       </field>
+
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>creator</dc-element>
+         <dc-qualifier>cvu</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>CVU</label>
+         <input-type>onebox</input-type>
+         <hint></hint>
+         <required></required>
+       </field>
+
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>creator</dc-element>
+         <dc-qualifier>curp</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>CURP</label>
+         <input-type>onebox</input-type>
+         <hint></hint>
+         <required></required>
+       </field>
+
+      
+     </page>
+
+     <page number="2">
+
+        <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>title</dc-element>
+         <dc-qualifier></dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Título</label>
+         <input-type>onebox</input-type>
+         <hint></hint>
+         <required>Campo requerido</required>
+       </field>
+
+        <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>contributor</dc-element>
+         <dc-qualifier>other</dc-qualifier>
+         <repeatable>true</repeatable>
+         <label>Autoría</label>
+         <input-type>name</input-type>
+         <hint>Autores del documento</hint>
+         <required></required>
+       </field>
+
+        <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>description</dc-element>
+         <dc-qualifier>abstract</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Abstract</label>
+         <input-type>textarea</input-type>
+         <hint>Enter the abstract of the item. </hint>
+         <required></required>
+       </field>
+
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>identifier</dc-element>
+         <dc-qualifier>citation</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Fuente</label>
+         <input-type>textarea</input-type>
+         <hint>Forma de citación del documento </hint>
+         <required>campo requerido</required>
+       </field>
+
+        <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>date</dc-element>
+         <dc-qualifier>issued</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Fecha de publicación</label>
+         <input-type>date</input-type>
+         <hint>Se pueden dejar los campos de día y mes vacíos.</hint>
+         <required>Se debe incluir por lo menos el año</required>
+       </field>
+
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>creator</dc-element>
+         <dc-qualifier>knowledges</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Área de conocimiento</label>
+         <input-type>onebox</input-type>
+         <hint></hint>
+         <required>Campo requerido</required>
+       </field>
+
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>type</dc-element>
+         <dc-qualifier>document</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Tipo de documento</label>
+         <input-type value-pairs-name="document_types">dropdown</input-type>
+         <hint></hint>
+         <required>Campo requerido</required>
+       </field>
+
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>subject</dc-element>
+         <dc-qualifier></dc-qualifier>
+         <!-- An input-type of twobox MUST be marked as repeatable -->
+         <repeatable>true</repeatable>
+         <label>Keywords</label>
+         <input-type>twobox</input-type>
+         <hint>Palabras clave, de 3 a 5 palabras. </hint>
+         <required></required>
+       </field>
+
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>type</dc-element>
+         <dc-qualifier>status</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Estado del documento</label>
+         <input-type value-pairs-name="document_state">dropdown</input-type>
+         <hint></hint>
+         <required>Campo requerido</required>
+       </field>
+
+     </page>
+   </form>
+
+   <form name="one">
+     <page number="1">
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>contributor</dc-element>
+         <dc-qualifier>author</dc-qualifier>
+         <repeatable>true</repeatable>
+         <label>One: Authors</label>
+         <input-type>name</input-type>
+         <hint>Enter the names of the authors of this item.</hint>
+         <required></required>
+       </field>
+      </page>
+    </form>
+ </form-definitions>
+
+
+ <!-- form-value-pairs populate dropdown and qualdrop-value lists.          -->
+ <!-- The form-value-pairs element holds child elements named 'value-pairs' -->
+ <!-- A 'value-pairs' element has a value-pairs-name and a dc-term          -->
+ <!-- attribute. The dc-term attribute specifies which to which Dublin Core -->
+ <!-- Term this set of value-pairs applies.                                 -->
+ <!--     Current dc-terms are: identifier-pairs, type-pairs, and           -->
+ <!--     language_iso-pairs. The name attribute matches a name             -->
+ <!--     in the form-map, above.                                           -->
+ <!-- A value-pair contains one 'pair' for each value displayed in the list -->
+ <!-- Each pair contains a 'displayed-value' element and a 'stored-value'   -->
+ <!-- element. A UI list displays the displayed-values, but the program     -->
+ <!-- stores the associated stored-values in the database.                  -->
+
+ <form-value-pairs>
+   <value-pairs value-pairs-name="document_types" dc-term="type">
+     <pair>
+       <displayed-value>Artículos</displayed-value>
+       <stored-value>articulos</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>Libros</displayed-value>
+       <stored-value>libros</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>Revista TEMAS</displayed-value>
+       <stored-value>Revtemas</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>Tesis de Posgrado</displayed-value>
+       <stored-value>tesisPos</stored-value>
+     </pair>
+   </value-pairs>
+
+   <value-pairs value-pairs-name="document_state" dc-term="type">
+     <pair>
+       <displayed-value>Entregado y listo para publicar en RI</displayed-value>
+       <stored-value>entregado</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>Pendiente de envío</displayed-value>
+       <stored-value>pendEnvio</stored-value>
+      </pair>
+     <pair>
+       <displayed-value>Pendiente por fecha de expiración de embargo</displayed-value>
+       <stored-value>pendEmbargo</stored-value>
+     </pair>
+   </value-pairs>
+
+ </form-value-pairs>
+
+</input-forms>

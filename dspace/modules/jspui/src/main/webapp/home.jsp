@@ -105,6 +105,8 @@ var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga
 					<button type="submit" class="btn btn-primary" style="background-image: none; background-color:#6b6b6b; border-color: #414141;">Búsqueda Avanzada</button>
 				</div> 
 	        </form>
+
+				
     	</div>
 	<div class="col-md-3"></div>
 	</div> 
@@ -206,18 +208,68 @@ if (submissions != null && submissions.count() > 0)
 </div>
 
 <div class="row "  style="background-color: #eee;"> <!--container -->
+
  <div class="row " style="background-color: #fff; margin-top:2%; margin-right: 3%; margin-left: 3%;">
 
- 	<div style="background-color: #fff; padding-top: 1%; padding-bottom: 1%">
+ 	<!--<div style="background-color: #fff; padding-top: 1%; padding-bottom: 1%"> contenedor de la mision
 		<div class="container" style=" border-radius: 10px 10px 10px 10px; -moz-border-radius: 10px 10px 10px 10px;-webkit-border-radius: 10px 10px 10px 10px;border: 2px solid #410401;">
-			<h4 style="text-align: center; font-size: 14px; color: #4c000e;">Misión del repositorio</h4>
-			<p style="color: #6b6b6b; font-size: 12px; text-align: justify;">
-				Es una plataforma que emplea estándares internacionales y mecanismos de acceso abierto para albergar publicaciones e información académica, científica y tecnológica generada en nuestra institución. La visibilidad de esta producción se logra a través de la conexión con el Repositorio Nacional (RN) de CONACYT. 
+		</div>
+	</div>-->
 
-				El RI-UTM funcionará como una memoria institucional, difundiendo y preservando la producción científica evaluada por pares de la comunidad de manera libre, inmediata, gratuita y protegida. Gracias a esta difusión se fomentarán las discusiones académicas, se crearán comunidades de colaboración y se acelerará el desarrollo del conocimiento
-	        </p>
-        </div>
+	<!--modal-->
+	<div class="modal fade" id="misionModal" tabindex="-1" role="dialog" aria-labelledby="misionModalLabel" aria-hidden="true">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h4 class="modal-title" id="misionModalLabel" style="text-align: center; color: #4c000e;">Misión del repositorio</h4>
+				</div>
+				<div class="modal-body">			
+					<p style="color: #6b6b6b;  text-align: justify;">
+									Es una plataforma que emplea estándares internacionales y mecanismos de acceso abierto para albergar publicaciones e información académica, científica y tecnológica generada en nuestra institución. La visibilidad de esta producción se logra a través de la conexión con el Repositorio Nacional (RN) de CONACYT. 
+					</p>
+					<p style="color: #6b6b6b;  text-align: justify;">
+									El RI-UTM funcionará como una memoria institucional, difundiendo y preservando la producción científica evaluada por pares de la comunidad de manera libre, inmediata, gratuita y protegida. Gracias a esta difusión se fomentarán las discusiones académicas, se crearán comunidades de colaboración y se acelerará el desarrollo del conocimiento
+			        </p>
+     
+				</div>
+			</div>
+		</div>
 	</div>
+
+	<div class="modal fade" id="licenciaModal" tabindex="-1" role="dialog" aria-labelledby="licenciaModalLabel" aria-hidden="true">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h4 class="modal-title" id="licenciaModalLabel" style="text-align: center; color: #4c000e;">Licencia Creative Commons</h4>
+				</div>
+				<div class="modal-body">			
+					<p style="color: #6b6b6b;  text-align: justify;">
+						Descripción de la licencia Creative Commons 
+					</p>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="row" style= "padding: 1% 6%;">
+			 	<div class="col-md-6 col-sm-6" align="left" >
+					<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#misionModal" style="padding: 10px 26px; background-image: none; background-color:#70302c; border-color: #240200;">
+						MISIÓN
+					</button>
+				</div>
+				<div class="col-md-6 col-sm-6" align="right" style="padding-right: 1%" >
+					<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#licenciaModal" style="padding: 10px 20px; background-image: none; background-color:#70302c; border-color: #240200;"">
+						LICENCIA
+					</button>
+				</div>
+	</div>
+
 	<div class="container ">
 	<%
 	if (communities != null && communities.size() != 0)
@@ -237,7 +289,7 @@ if (submissions != null && submissions.count() > 0)
 							Bitstream logo = com.getLogo();
 							if (showLogos && logo != null) { %>
 							<div class="col-md-3">
-					        	<img alt="Logo" class="img-responsive" src="<%= request.getContextPath() %>/retrieve/<%= logo.getID() %>" /> 
+					        	<a href="<%= request.getContextPath() %>/handle/<%= com.getHandle() %>"><img alt="Logo" class="img-responsive" src="<%= request.getContextPath() %>/retrieve/<%= logo.getID() %>" /> </a>
 							</div>
 							<div class="col-md-9">
 							<% } else { %>
