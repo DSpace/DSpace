@@ -11,8 +11,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import javax.xml.XMLConstants;
 import javax.xml.parsers.ParserConfigurationException;
@@ -65,6 +63,7 @@ public class Commands {
         final String OPT_DUMP    = "d";
         final String OPT_RESTORE = "r";
         final String OPT_HELP    = "h";
+        final String OPT_CLEAR   = "c";
 
         OptionGroup verbs = new OptionGroup();
         verbs.addOption(new Option(OPT_DUMP, "dump", false,
@@ -73,9 +72,12 @@ public class Commands {
                 "Import records from XML on standard in"));
         verbs.addOption(new Option(OPT_HELP, "help", false,
                 "Describe all options"));
+        verbs.setRequired(true);
 
         Options options = new Options();
         options.addOptionGroup(verbs);
+        options.addOption(OPT_CLEAR, "clear", false,
+                "(only with --restore) delete all existing authority records.");
 
         CommandLine command = null;
         try {
@@ -86,33 +88,37 @@ public class Commands {
             System.exit(1);
         }
 
-        // Locate the 'authority' Solr core.
-        URI collectionURI = null;
-        try {
-            collectionURI = new URI(CFG.getProperty("solr.server")).resolve("authority");
-        } catch (URISyntaxException ex) {
-            System.err.format("Could not build URL for the authority index:  {}",
-                    ex.getMessage());
-            System.exit(1);
-        }
-
-        // Interpret command.
+        // Command is 'help'?
         if (command.hasOption(OPT_HELP)) {
             giveHelp(options);
             System.exit(0);
-        } else if (command.hasOption(OPT_DUMP)) {
+        }
+
+        // Locate the 'authority' Solr core.
+        String collectionURL = CFG.getProperty("solr.authority.server");
+
+        // Interpret command.
+        if (command.hasOption(OPT_DUMP)) {
+            if (command.hasOption(OPT_CLEAR)) {
+                System.err.println("--clear is ignored by --dump");
+            }
             try (
-                    HttpSolrClient solr = new HttpSolrClient.Builder(collectionURI.toString()).build();
+                    HttpSolrClient solr = new HttpSolrClient.Builder(collectionURL).build();
                     Writer output = new OutputStreamWriter(System.out, StandardCharsets.UTF_8);
                     ) {
                 dump(solr, output);
             }
         } else if (command.hasOption(OPT_RESTORE)) {
-            try ( HttpSolrClient solr = new HttpSolrClient.Builder(collectionURI.toString()).build(); ) {
+            try ( HttpSolrClient solr = new HttpSolrClient.Builder(collectionURL).build(); ) {
+                if (command.hasOption(OPT_CLEAR)) {
+                    System.err.println("Clearing all authority records");
+                    solr.deleteByQuery("*:*", 0);
+                }
                 restore(solr, System.in);
             }
         } else {
             System.err.println("Unknown command");
+            giveHelp(options);
             System.exit(1);
         }
 
@@ -137,24 +143,24 @@ public class Commands {
         // Set up to write XML.
         XMLStreamWriter xmlWriter = XMLOutputFactory.newInstance()
                 .createXMLStreamWriter(output);
-        xmlWriter.writeStartDocument("1.0", StandardCharsets.UTF_8.name());
-        xmlWriter.writeStartElement("authority-dump");
+        xmlWriter.writeStartDocument(StandardCharsets.UTF_8.name(), "1.0");
+        xmlWriter.writeStartElement(ParseEventHandler.ELEMENT_ROOT);
 
         // Set up the query
         ModifiableSolrParams params = new ModifiableSolrParams();
-        params.add("q", "*.*");
+        params.add("q", "*:*");
 
         // For all Solr records.
         for (SolrDocument document : new SolrQueryWindow(solr, params)) {
             //    Start a record element.
-            xmlWriter.writeStartElement("r");
+            xmlWriter.writeStartElement(ParseEventHandler.ELEMENT_RECORD);
             //    For all fields.
-            for (String field : document.getFieldNames()) {
-                //      For all values.
-                for (Object value : document.getFieldValues(field)) {
-                    xmlWriter.writeStartElement("f"); // Field
-                    xmlWriter.writeAttribute("name", field);
-                    xmlWriter.writeCharacters(value.toString());
+            for (String fieldName : document.getFieldNames()) {
+                //      For all field values.
+                for (Object fieldValue : document.getFieldValues(fieldName)) {
+                    xmlWriter.writeStartElement(ParseEventHandler.ELEMENT_FIELD);
+                    xmlWriter.writeAttribute(ParseEventHandler.ATTRIBUTE_NAME, fieldName);
+                    xmlWriter.writeCharacters(fieldValue.toString());
                     xmlWriter.writeEndElement(); // Field (f)
                 }
             }
@@ -163,15 +169,15 @@ public class Commands {
         }
 
         // Close up XML.
-        xmlWriter.writeEndElement(); // Document ("authority-dump")
+        xmlWriter.writeEndElement(); // Root
         xmlWriter.close();
 
         // Finished!
     }
 
     /**
-     * Read a valid authority dump document and create Solr records from it.
-     * Uses ContentHandler to update Solr.
+     * Read a valid authority dump document and create Solr documents from it.
+     * Uses {@link ParseEventHandler} to update Solr.
      *
      * @param solr connection to the authority core.
      * @param input the dump document.
@@ -187,16 +193,21 @@ public class Commands {
 
         // Configure a parser factory.
         SAXParserFactory parserFactory = SAXParserFactory.newInstance();
-        parserFactory.setSchema(schema);
-        parserFactory.setValidating(true);
+        parserFactory.setValidating(false); // No DTD validation
+        parserFactory.setSchema(schema); // XML Schema validation
+        parserFactory.setNamespaceAware(false); // No namespaces
+        parserFactory.setXIncludeAware(false); // No XInclude processing
 
         // Create and run a parser.  ContentHandler will update Solr.
         SAXParser parser = parserFactory.newSAXParser();
-        parser.parse(input, new ParseEventHandler(solr));
+        ParseEventHandler handler = new ParseEventHandler(solr);
+        parser.parse(input, handler);
+
+        System.out.format("%d authority records loaded.%n", handler.getNRecords());
     }
 
     /**
-     * Handle SAX content events and errors.
+     * Handle SAX content events and errors when parsing a dump document.
      */
     private static class ParseEventHandler
             extends DefaultHandler {
@@ -205,10 +216,12 @@ public class Commands {
         private Locator locator;
         private SolrInputDocument solrInputDocument;
         private String currentField;
+        private long nRecords = 0;
 
-        /*
-         * ContentHandler
-         */
+        private static final String ELEMENT_ROOT = "authority-dump";
+        private static final String ELEMENT_RECORD = "r";
+        private static final String ELEMENT_FIELD = "f";
+        private static final String ATTRIBUTE_NAME = "name";
 
         /**
          * Save a reference to a connection to a Solr core/collection.
@@ -219,6 +232,18 @@ public class Commands {
             this.solr = solr;
         }
 
+        /**
+         * Get the current record count.
+         * @return number of "records" (Solr documents) loaded so far.
+         */
+        long getNRecords() {
+            return nRecords;
+        }
+
+        /*
+         * ContentHandler
+         */
+
         @Override
         public void setDocumentLocator(Locator locator) {
             this.locator = locator;
@@ -226,24 +251,30 @@ public class Commands {
 
         @Override
         public void startElement(String uri, String localName, String qName, Attributes atts) {
-            if ("f".equals(localName)) {
-                currentField = atts.getValue("name");
+            if (ELEMENT_FIELD.equals(localName)) {
+                currentField = atts.getValue(ATTRIBUTE_NAME);
             }
         }
 
         @Override
         public void endElement(String uri, String localName, String qName)
                 throws SAXException {
-            if ("r".equals(localName)) {
+            if (ELEMENT_RECORD.equals(qName)) {
                 try {
                     solr.add(solrInputDocument);
+                    solrInputDocument.clear();
+                    nRecords++;
                 } catch (SolrServerException | IOException ex) {
                     throw new SAXException("Could not add a record", ex);
                 }
-            } else if ("f".equals(localName)) {
+            } else if (ELEMENT_FIELD.equals(qName)) {
                 solrInputDocument.addField(currentField, currentValue);
                 currentValue.delete(0, currentValue.length());
-                solrInputDocument.clear();
+            } else if (ELEMENT_ROOT.equals(qName)) {
+                // Do nothing
+            } else {
+                throw new SAXException(String.format("Unknown element '%s' at line %d column %d",
+                        qName, locator.getLineNumber(), locator.getColumnNumber()));
             }
         }
 
