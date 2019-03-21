@@ -219,7 +219,7 @@
 					<input-type>onebox</input-type>
 					<hint>Autores de la obra</hint>
 					<required>Debe indicarse el/los autores de la obra</required>
-					<required-on-group>!SeDiCIAdmin</required-on-group>
+					<required-on-group>!Bibliotecarios</required-on-group>
 					<type-bind>!Objeto Fisico</type-bind>
 				</field>
 				<field> <!-- Ok -->	<!-- Duplicado para Red de Museos -->
