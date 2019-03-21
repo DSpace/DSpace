@@ -162,6 +162,9 @@ public class OAIpmhIT extends AbstractControllerIntegrationTest {
                    // Expect adminEmail to be the same as "mail.admin" config
                    .andExpect(xpath("OAI-PMH/Identify/adminEmail")
                                   .string(configurationService.getProperty("mail.admin")))
+                   // Expect baseURL to be the same as our "oai.url" with the DEFAULT_CONTEXT_PATH appended
+                   .andExpect(xpath("OAI-PMH/Identify/baseURL")
+                                  .string(configurationService.getProperty("oai.url") + "/" + DEFAULT_CONTEXT_PATH))
                    // Expect earliestDatestamp to be "now", i.e. current date, (as mocked above)
                    .andExpect(xpath("OAI-PMH/Identify/earliestDatestamp")
                                   .string(baseDateProvider.format(now)))
