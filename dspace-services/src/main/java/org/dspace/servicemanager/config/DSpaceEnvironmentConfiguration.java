@@ -17,9 +17,10 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Bash does not allow environment variables that contain dots in their name.
- * This Configuration loads environment variables that contains two underlines after
- * each other and replaces those with dots. E.g.: dspace__baseUrl will be read as
- * dspace.baseUrl.
+ * This Configuration loads environment variables that contains two underlines 
+ * and replaces "__P__" -> "." and "__D__" -> "-" 
+ * E.g.: dspace__P__baseUrl will be read as dspace.baseUrl.
+ * E.g.: my__D__dspace__P__prop will be read as my-dspace.prop.
  *
  * Most of this file was copied from org.apache.commons.configuration2.EnvironmentConfiguration.
  *
@@ -47,8 +48,10 @@ public class DSpaceEnvironmentConfiguration extends MapConfiguration {
                 continue;
             }
 
-            // exchange any occurance of "__" with a single dot.
-            String lookup = StringUtils.replace(key, "__", ".");
+            // replace "__P__" with a single dot.
+            // replace "__D__" with a single dash.
+            String lookup = StringUtils.replace(key, "__P__", ".");
+            lookup = StringUtils.replace(lookup, "__D__", "-");
             if (System.getenv(key) != null) {
                 // store the new key with the old value in our new properties map.
                 env.put(lookup, System.getenv(key));
