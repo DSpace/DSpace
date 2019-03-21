@@ -55,6 +55,17 @@
 <%@page import="org.dspace.versioning.service.VersionHistoryService" %>
 <%@page import="org.dspace.versioning.factory.VersionServiceFactory" %>
 
+ <meta property="og:url"           content="https://www.your-domain.com/your-page.html" />
+  <meta property="og:type"          content="website" />
+  <meta property="og:title"         content="RepositorioUTM" />
+  <meta property="og:description"   content="Your description" />
+  <meta property="og:image"         content="https://www.your-domain.com/path/image.jpg" />
+
+  <div id="fb-root"></div>
+    <script async defer crossorigin="anonymous" src="https://connect.facebook.net/es_LA/sdk.js#xfbml=1&version=v3.2">
+    </script>
+
+
 <%
     // Attributes
     Boolean displayAllBoolean = (Boolean) request.getAttribute("display.all");
@@ -134,7 +145,7 @@
 		   {
 		%>
 		<div class="alert alert-warning"><b><fmt:message key="jsp.version.notice.new_version_head"/></b>
-		<fmt:message key="jsp.version.notice.new_version_help"/>holaaaaa <a href="<%= latestVersionIdentifier %>"><%= latestVersionIdentifier %></a>
+		<fmt:message key="jsp.version.notice.new_version_help"/> <a href="<%= latestVersionIdentifier %>"><%= latestVersionIdentifier %></a>
 		</div>
 		<%
 		    }
@@ -161,7 +172,7 @@
         if (admin_button)  // admin edit button
         { %>
         <dspace:sidebar>
-            <div class="panel panel-warning">
+            <div class="panel panel-warning" >
             	<div class="panel-heading"><fmt:message key="jsp.admintools"/></div>
             	<div class="panel-body">
                 <form method="get" action="<%= request.getContextPath() %>/tools/edit-item">
@@ -298,9 +309,18 @@
     <a class="statisticsLink  btn btn-primary" href="<%= request.getContextPath() %>/handle/<%= handle %>/statistics"><fmt:message key="jsp.display-item.display-statistics"/></a>
     </div> <!--col-6-->
     <div class="col-6 col-md-6" style="text-align: right;"><!--add-->
+   
     <!--redes sociales-->
-        <a class="btn" href="#" style="padding: 0.5%; padding-left: 1%" ><img src="../../image/facebook.png" alt="facebook"/></a>
-        <a class="btn " href="#" style="padding: 0.5% 0.3%"><img src="../../image/twitter.png" alt="facebook"/></a>
+    
+        <!--<a class="btn fb-share-button" data-href="<%=preferredIdentifier %>" data-layout="button_count" style="padding: 0.5%; padding-left: 1%" ><img src="../../image/facebook.png" alt="facebook"/> <div class="fb-share-button" data-href="<%=preferredIdentifier %>"></div></a>-->
+
+       <div class="fb-share-button" data-href="http://www.utm.mx/" data-layout="button" data-size="small"><a target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Fwww.utm.mx%2F&amp;src=sdkpreparse" class="fb-xfbml-parse-ignore">Compartir</a></div>
+
+
+     <!--    <a class="btn " href="#" style="padding: 0.5% 0.3%"><img src="../../image/twitter.png" alt="facebook"/></a>   -->
+        <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-show-count="false"><img src="../../image/twitter.png" alt="facebook"/></a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>    
+          
+
     </div>
 
     <%-- SFX Link --%>
