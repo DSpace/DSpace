@@ -111,8 +111,14 @@
         <!-- Needed to support Spring @Configuration classes (to register servlets/beans with Spring Boot webapp) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
+            <artifactId>spring-boot-starter</artifactId>
             <version>${spring-boot.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-logging</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- Templating Engine -->
@@ -121,7 +127,7 @@
             <artifactId>jtwig-spring-boot-starter</artifactId>
             <version>${jtwig.version}</version>
             <exclusions>
-                <!-- We specify our own version of spring-boot classes -->
+                <!-- We don't need spring-boot-starter-web, it is provided by our Spring Boot webapp -->
                 <exclusion>
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-starter-web</artifactId>
