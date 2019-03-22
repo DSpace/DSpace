@@ -302,7 +302,7 @@ public class Package {
             jGen.writeBooleanField("skipDataciteUpdate", true);
             jGen.writeBooleanField("skipEmails", true);
             jGen.writeBooleanField("loosenValidation", true);
-            jGen.writeBooleanField("merrittPreserveCurationStatus", true);
+            jGen.writeBooleanField("preserveCurationStatus", true);
             
             jGen.writeEndObject();
         }
