@@ -148,21 +148,21 @@
             </div>-->
         </div>
     </div>
-<!--<br/>-->
 
-<!--
-                <%-- Location bar --%>
+                <%-- Location bar/breadcrumb --%>
 <%
     if (locbar)
     {
 %>
-<div class="container">  //barra 
-    <dspace:include page="/layout/location-bar.jsp" />
+<div class="row" style="background-color: #f9efe8; color: #eee"> 
+    <div class="container">
+        <dspace:include page="/layout/location-bar.jsp" />
+    </div>
 </div>                
 <%
     }
 %>
--->
+
 
         <%-- Page contents --%>
 <div class="container">
@@ -171,3 +171,6 @@
     <hr>
     <div class="col-md-9">
 <% } %>	
+
+
+
