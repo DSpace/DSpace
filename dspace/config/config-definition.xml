@@ -28,8 +28,12 @@
         <system/>
         <!-- Load Environment variables (does not automatically reload) -->
         <env/>
-        <!-- Load Environment variables that contain two underlines in their names, and exchange those underlines with a
-             dot, as Bash does not allow variables that contains dots in their names.-->
+        <!-- 
+          Load Environment variables that contain two underlines in their names. 
+          Some DSpace configurations use special characters in their key (e.g. periods and dashes) 
+          which are not supported in Bash. This provider translates "___P___" to periods and "___D___" 
+          to dashes in environment variables.
+        -->
         <dspaceenv/>
 
         <!-- Allow user to override any configs in a local.cfg -->
