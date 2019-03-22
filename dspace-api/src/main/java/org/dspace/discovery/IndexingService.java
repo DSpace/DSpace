@@ -59,5 +59,5 @@ public interface IndexingService {
 
     void optimize() throws SearchServiceException;
 
-    void buildSpellCheck() throws SearchServiceException;
+    void buildSpellCheck() throws SearchServiceException, IOException;
 }
