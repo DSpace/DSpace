@@ -333,22 +333,3 @@
 
 
 </script>
-
-<!--
-Para el jueves
-descripcion de la tesis, una cuartilla arial 10 espacioado de 1
-tabla (resumen del protocolo)
-
-presentación y en la última diapositiva con los objetivos con el procentaje de avance
-un calendario de entregas (30 de abril, entrega del producto)
-
-escrito
-Experimental 
-Producto: aportación, estudios
-
-
-historiador que me ayude a definir la importancia de los personajes y así poder justificar porqué los incluí. O con un libro. 
-Averiguar culaes son los hitos más importantes y de ahí partir para elegir a los personajes. 
-
-josé luis pintor del mural de los arcos del palacio. Basarme en el mural 
-Manuel barragán- mureh-->

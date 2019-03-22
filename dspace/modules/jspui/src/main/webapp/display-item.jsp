@@ -61,10 +61,6 @@
   <meta property="og:description"   content="Your description" />
   <meta property="og:image"         content="https://www.your-domain.com/path/image.jpg" />
 
-  <div id="fb-root"></div>
-    <script async defer crossorigin="anonymous" src="https://connect.facebook.net/es_LA/sdk.js#xfbml=1&version=v3.2">
-    </script>
-
 
 <%
     // Attributes
@@ -314,10 +310,23 @@
     
         <!--<a class="btn fb-share-button" data-href="<%=preferredIdentifier %>" data-layout="button_count" style="padding: 0.5%; padding-left: 1%" ><img src="../../image/facebook.png" alt="facebook"/> <div class="fb-share-button" data-href="<%=preferredIdentifier %>"></div></a>-->
 
-       <div class="fb-share-button" data-href="http://www.utm.mx/" data-layout="button" data-size="small"><a target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Fwww.utm.mx%2F&amp;src=sdkpreparse" class="fb-xfbml-parse-ignore">Compartir</a></div>
+       <!--<div class="fb-share-button" data-href="http://www.utm.mx/" data-layout="button" data-size="small" >
+       <a target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Fwww.utm.mx%2F&amp;src=sdkpreparse" class="fb-xfbml-parse-ignore">Compartir</a></div>-->
 
-        <a class="btn " href="#" style="padding: 0.5% 0.3%"><img src="../../image/twitter.png" alt="facebook"/></a>      
-          
+        <!--<a class="btn " href="#" style="padding: 0.5% 0.3%"><img src="../../image/twitter.png" alt="facebook"/></a>   -->
+
+        <!--<a class="btn fb-share-button" href="https://www.facebook.com/sharer/sharer.php?u=<%=preferredIdentifier%>" data-layout="button" data-size="small" target="_blank"></a>-->
+
+        <a class="btn fb-share-button" href="javascript:fbshareCurrentPage()" target="_blank" alt="Share on Facebook"><img src="../../image/facebook.png" alt="facebook"/></a>
+
+         <!--<a class="btn fb-share-button" href="javascript:fbshareCurrentPage()" target="_blank" alt="Share on Facebook"><img src="https://assets.cobaltnitra.com/teams/repository/export/685/994e08a161005809f00505692530e/685994e08a161005809f00505692530e.png" style="width: 30px; alt=" alt="" /></a>-->
+
+        <script language="javascript">
+            function fbshareCurrentPage()
+            {window.open("https://www.facebook.com/sharer/sharer.php?u="+escape(window.location.href)+"&t="+document.title, '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=300,width=600');return false; }
+        </script>
+
+        <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-show-count="false"><img src="../../image/twitter.png" alt="twitter"/></a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>  
 
     </div>
 

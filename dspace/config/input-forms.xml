@@ -90,7 +90,7 @@
          <label>ORCID</label>
          <input-type>onebox</input-type>
          <hint></hint>
-         <required>Campo requerido</required>
+         <required></required>
        </field>
 
        <field>
@@ -101,7 +101,7 @@
          <label>DNI</label>
          <input-type>onebox</input-type>
          <hint></hint>
-         <required>Campo requerido</required>
+         <required></required>
        </field>
 
        <field>
@@ -112,7 +112,7 @@
          <label>CVU</label>
          <input-type>onebox</input-type>
          <hint></hint>
-         <required>Campo requerido</required>
+         <required></required>
        </field>
 
        <field>
@@ -123,7 +123,7 @@
          <label>CURP</label>
          <input-type>onebox</input-type>
          <hint></hint>
-         <required>Campo requerido</required>
+         <required></required>
        </field>
 
       
