@@ -316,9 +316,7 @@
 
        <div class="fb-share-button" data-href="http://www.utm.mx/" data-layout="button" data-size="small"><a target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Fwww.utm.mx%2F&amp;src=sdkpreparse" class="fb-xfbml-parse-ignore">Compartir</a></div>
 
-
-     <!--    <a class="btn " href="#" style="padding: 0.5% 0.3%"><img src="../../image/twitter.png" alt="facebook"/></a>   -->
-        <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-show-count="false"><img src="../../image/twitter.png" alt="facebook"/></a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>    
+        <a class="btn " href="#" style="padding: 0.5% 0.3%"><img src="../../image/twitter.png" alt="facebook"/></a>      
           
 
     </div>
