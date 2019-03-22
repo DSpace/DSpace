@@ -10,6 +10,7 @@ package org.dspace.xoai.tests.helpers.stubs;
 import static com.lyncode.xoai.dataprovider.core.Granularity.Second;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -23,13 +24,14 @@ import com.lyncode.xoai.dataprovider.exceptions.MetadataBindException;
 import com.lyncode.xoai.dataprovider.exceptions.WritingXmlException;
 import com.lyncode.xoai.dataprovider.xml.XmlOutputContext;
 import com.lyncode.xoai.dataprovider.xml.xoai.Metadata;
-import org.apache.solr.client.solrj.SolrServer;
+import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrInputDocument;
 
 public class ItemRepositoryBuilder {
-    private SolrServer solrServer;
+    private final SolrClient solrServer;
 
-    public ItemRepositoryBuilder(SolrServer solrServer) {
+    public ItemRepositoryBuilder(SolrClient solrServer) {
         this.solrServer = solrServer;
     }
 
@@ -37,7 +39,9 @@ public class ItemRepositoryBuilder {
         try {
             solrServer.add(index(builder));
             solrServer.commit();
-        } catch (Exception e) {
+        } catch (MetadataBindException | WritingXmlException | IOException
+                | SQLException | ParseException | XMLStreamException
+                | SolrServerException e) {
             throw new RuntimeException(e);
         }
         return this;
@@ -74,9 +78,9 @@ public class ItemRepositoryBuilder {
     }
 
     public static class DSpaceItemBuilder {
-        private List<String> collections = new ArrayList<String>();
-        private List<String> communities = new ArrayList<String>();
-        private MetadataBuilder metadataBuilder = new MetadataBuilder();
+        private final List<String> collections = new ArrayList<>();
+        private final List<String> communities = new ArrayList<>();
+        private final MetadataBuilder metadataBuilder = new MetadataBuilder();
         private String handle;
         private int id;
         private String submitter;

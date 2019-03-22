@@ -7,6 +7,7 @@
  */
 package org.dspace.statistics.content;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
 import java.text.ParseException;
@@ -117,7 +118,7 @@ public class StatisticsDataVisits extends StatisticsData {
 
     @Override
     public Dataset createDataset(Context context) throws SQLException,
-        SolrServerException, ParseException {
+        SolrServerException, ParseException, IOException {
         // Check if we already have one.
         // If we do then give it back.
         if (getDataset() != null) {
@@ -127,7 +128,7 @@ public class StatisticsDataVisits extends StatisticsData {
         ///////////////////////////
         // 1. DETERMINE OUR AXIS //
         ///////////////////////////
-        ArrayList<DatasetQuery> datasetQueries = new ArrayList<DatasetQuery>();
+        ArrayList<DatasetQuery> datasetQueries = new ArrayList<>();
         for (int i = 0; i < getDatasetGenerators().size(); i++) {
             DatasetGenerator dataSet = getDatasetGenerators().get(i);
             processAxis(context, dataSet, datasetQueries);
@@ -703,7 +704,8 @@ public class StatisticsDataVisits extends StatisticsData {
 
 
     protected ObjectCount[] queryFacetField(DatasetQuery dataset, String query,
-                                            String filterQuery) throws SolrServerException {
+                                            String filterQuery)
+            throws SolrServerException, IOException {
         String facetType = dataset.getFacetField() == null ? "id" : dataset
             .getFacetField();
         return solrLoggerService.queryFacetField(query, filterQuery, facetType,
