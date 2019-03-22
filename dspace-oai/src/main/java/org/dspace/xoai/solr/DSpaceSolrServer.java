@@ -10,29 +10,29 @@ package org.dspace.xoai.solr;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.solr.client.solrj.SolrServer;
+import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.HttpSolrServer;
+import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.dspace.core.ConfigurationManager;
 
 /**
  * @author Lyncode Development Team (dspace at lyncode dot com)
  */
 public class DSpaceSolrServer {
-    private static Logger log = LogManager.getLogger(DSpaceSolrServer.class);
+    private static final Logger log = LogManager.getLogger(DSpaceSolrServer.class);
 
-    private static SolrServer _server = null;
+    private static SolrClient _server = null;
 
     /**
      * Default constructor
      */
     private DSpaceSolrServer() { }
 
-    public static SolrServer getServer() throws SolrServerException {
+    public static SolrClient getServer() throws SolrServerException {
         if (_server == null) {
             try {
-                _server = new HttpSolrServer(
-                    ConfigurationManager.getProperty("oai", "solr.url"));
+                _server = new HttpSolrClient.Builder(
+                    ConfigurationManager.getProperty("oai", "solr.url")).build();
                 log.debug("Solr Server Initialized");
             } catch (Exception e) {
                 log.error(e.getMessage(), e);
