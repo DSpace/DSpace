@@ -12,7 +12,7 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
@@ -31,7 +31,7 @@ class SolrQueryWindow
     private static final int WINDOW_SIZE = 100;
 
     /** Where we send queries and whence we get results. */
-    private final HttpSolrClient solr;
+    private final HttpSolrServer solr;
 
     /** Caller's Solr query parameters, augmented with {@code start} and {@code rows}. */
     private final ModifiableSolrParams params;
@@ -52,7 +52,7 @@ class SolrQueryWindow
      * @param params description of the query.  Any {@code start} and
      *          {@code rows} parameters will be ignored.
      */
-    SolrQueryWindow(HttpSolrClient solr, SolrParams params)
+    SolrQueryWindow(HttpSolrServer solr, SolrParams params)
             throws SolrServerException, IOException {
         this.solr = solr;
         this.params = new ModifiableSolrParams(params);

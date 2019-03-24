@@ -30,7 +30,7 @@ import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.params.ModifiableSolrParams;
@@ -102,20 +102,19 @@ public class Commands {
             if (command.hasOption(OPT_CLEAR)) {
                 System.err.println("--clear is ignored by --dump");
             }
-            try (
-                    HttpSolrClient solr = new HttpSolrClient.Builder(collectionURL).build();
-                    Writer output = new OutputStreamWriter(System.out, StandardCharsets.UTF_8);
-                    ) {
+            HttpSolrServer solr = new HttpSolrServer(collectionURL);
+            try ( Writer output = new OutputStreamWriter(System.out, StandardCharsets.UTF_8); ) {
                 dump(solr, output);
             }
+            solr.shutdown();
         } else if (command.hasOption(OPT_RESTORE)) {
-            try ( HttpSolrClient solr = new HttpSolrClient.Builder(collectionURL).build(); ) {
-                if (command.hasOption(OPT_CLEAR)) {
-                    System.err.println("Clearing all authority records");
-                    solr.deleteByQuery("*:*", 0);
-                }
-                restore(solr, System.in);
+            HttpSolrServer solr = new HttpSolrServer(collectionURL);
+            if (command.hasOption(OPT_CLEAR)) {
+                System.err.println("Clearing all authority records");
+                solr.deleteByQuery("*:*", 0);
             }
+            restore(solr, System.in);
+            solr.shutdown();
         } else {
             System.err.println("Unknown command");
             giveHelp(options);
@@ -138,7 +137,7 @@ public class Commands {
      * @throws SolrServerException passed through.
      * @throws XMLStreamException passed through.
      */
-    static private void dump(HttpSolrClient solr, Writer output)
+    static private void dump(HttpSolrServer solr, Writer output)
             throws IOException, SolrServerException, XMLStreamException {
         // Set up to write XML.
         XMLStreamWriter xmlWriter = XMLOutputFactory.newInstance()
@@ -185,7 +184,7 @@ public class Commands {
      * @throws SAXException passed through.
      * @throws IOException passed through.
      */
-    private static void restore(HttpSolrClient solr, InputStream input)
+    private static void restore(HttpSolrServer solr, InputStream input)
             throws ParserConfigurationException, SAXException, IOException {
         // Load the schema.
         SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
@@ -211,7 +210,7 @@ public class Commands {
      */
     private static class ParseEventHandler
             extends DefaultHandler {
-        private final HttpSolrClient solr;
+        private final HttpSolrServer solr;
         private final StringBuilder currentValue = new StringBuilder();
         private Locator locator;
         private SolrInputDocument solrInputDocument;
@@ -228,7 +227,7 @@ public class Commands {
          *
          * @param solr Connection to Solr.
          */
-        ParseEventHandler(HttpSolrClient solr) {
+        ParseEventHandler(HttpSolrServer solr) {
             this.solr = solr;
         }
 
