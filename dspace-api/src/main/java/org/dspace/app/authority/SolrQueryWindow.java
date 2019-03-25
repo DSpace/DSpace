@@ -18,6 +18,8 @@ import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.params.ModifiableSolrParams;
 import org.apache.solr.common.params.SolrParams;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Wrap a Solr query in an Iterator, repeatedly executing the query while moving
@@ -27,6 +29,8 @@ import org.apache.solr.common.params.SolrParams;
  */
 class SolrQueryWindow
         implements Iterable<SolrDocument>, Iterator<SolrDocument> {
+    private static final Logger LOG = LoggerFactory.getLogger(SolrQueryWindow.class);
+
     /** Fetch this many results at a time. */
     private static final int WINDOW_SIZE = 100;
 
@@ -68,6 +72,7 @@ class SolrQueryWindow
             throws SolrServerException, IOException {
         windowStart += WINDOW_SIZE;
         params.set("start", windowStart);
+        LOG.debug("refill:  windowStart = {}", windowStart);
         QueryResponse response = solr.query(params);
         results = response.getResults();
         windowPos = 0;
@@ -88,7 +93,9 @@ class SolrQueryWindow
 
     @Override
     public boolean hasNext() {
-        return results.getNumFound() < windowStart + windowPos;
+        LOG.debug("hasNext:  results.getNumFound = {}; windowStart = {}; windowPos = {}",
+                results.getNumFound(), windowStart, windowPos);
+        return results.getNumFound() > windowStart + windowPos;
     }
 
     @Override
