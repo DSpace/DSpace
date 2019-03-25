@@ -29,6 +29,7 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.common.SolrDocument;
@@ -96,6 +97,10 @@ public class Commands {
 
         // Locate the 'authority' Solr core.
         String collectionURL = CFG.getProperty("solr.authority.server");
+        if (StringUtils.isBlank(collectionURL)) {
+            System.err.println("Cannot continue:  solr.authority.server is not configured.");
+            System.exit(1);
+        }
 
         // Interpret command.
         if (command.hasOption(OPT_DUMP)) {
