@@ -74,4 +74,24 @@ public interface RelationshipTypeService extends DSpaceCRUDService<RelationshipT
      * @throws SQLException If something goes wrong
      */
     List<RelationshipType> findByEntityType(Context context, EntityType entityType) throws SQLException;
+
+    /**
+     * This method will support the creation of a RelationshipType object with the given parameters
+     * @param context                       The relevant DSpace context
+     * @param leftEntityType                The leftEntityType EntityType object for this relationshipType
+     * @param rightEntityType               The rightEntityType EntityType object for this relationshipType
+     * @param leftLabel                     The leftLabel String object for this relationshipType
+     * @param rightLabel                    The rightLabel String object for this relationshipType
+     * @param leftCardinalityMinInteger     The leftCardinalityMinInteger Integer object for this relationshipType
+     * @param leftCardinalityMaxInteger     The leftCardinalityMaxInteger Integer object for this relationshipType
+     * @param rightCardinalityMinInteger    The rightCardinalityMinInteger Integer object for this relationshipType
+     * @param rightCardinalityMaxInteger    The rightCardinalityMaxInteger Integer object for this relationshipType
+     * @return                              The created RelationshipType object for these properties
+     * @throws SQLException                 If something goes wrong
+     * @throws AuthorizeException           If something goes wrong
+     */
+    RelationshipType create(Context context, EntityType leftEntityType, EntityType rightEntityType, String leftLabel,
+                            String rightLabel, Integer leftCardinalityMinInteger, Integer leftCardinalityMaxInteger,
+                            Integer rightCardinalityMinInteger, Integer rightCardinalityMaxInteger)
+        throws SQLException, AuthorizeException;
 }

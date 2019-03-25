@@ -55,8 +55,9 @@ CREATE TABLE relationship
 );
 
 CREATE INDEX entity_type_label_idx ON entity_type(label);
-CREATE INDEX relationship_type_by_types_and_labels_idx ON relationship_type(left_type, right_type, left_label, right_label);
 CREATE INDEX relationship_type_by_left_type_idx ON relationship_type(left_type);
 CREATE INDEX relationship_type_by_right_type_idx ON relationship_type(right_type);
 CREATE INDEX relationship_type_by_left_label_idx ON relationship_type(left_label);
 CREATE INDEX relationship_type_by_right_label_idx ON relationship_type(right_label);
+CREATE INDEX relationship_by_left_id_idx ON relationship(left_id);
+CREATE INDEX relationship_by_right_id_idx ON relationship(right_id);

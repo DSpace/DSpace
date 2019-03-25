@@ -51,18 +51,7 @@ public class RelationshipTypeConverter extends DSpaceConverter<RelationshipType,
      * @return      The RelationshipType model object that is made from the REST object
      */
     public RelationshipType toModel(RelationshipTypeRest obj) {
-        RelationshipType relationshipType = new RelationshipType();
 
-        relationshipType.setId(obj.getId());
-        relationshipType.setLeftLabel(obj.getLeftLabel());
-        relationshipType.setRightLabel(obj.getRightLabel());
-        relationshipType.setLeftMinCardinality(obj.getLeftMinCardinality());
-        relationshipType.setLeftMaxCardinality(obj.getLeftMaxCardinality());
-        relationshipType.setRightMinCardinality(obj.getRightMinCardinality());
-        relationshipType.setRightMaxCardinality(obj.getRightMaxCardinality());
-        relationshipType.setLeftType(entityTypeConverter.toModel(obj.getLeftType()));
-        relationshipType.setRightType(entityTypeConverter.toModel(obj.getRightType()));
-
-        return relationshipType;
+        return null;
     }
 }

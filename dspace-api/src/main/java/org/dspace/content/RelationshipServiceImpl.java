@@ -56,6 +56,18 @@ public class RelationshipServiceImpl implements RelationshipService {
     }
 
     @Override
+    public Relationship create(Context c, Item leftItem, Item rightItem, RelationshipType relationshipType,
+                               int leftPlace, int rightPlace) throws AuthorizeException, SQLException {
+        Relationship relationship = new Relationship();
+        relationship.setLeftItem(leftItem);
+        relationship.setRightItem(rightItem);
+        relationship.setRelationshipType(relationshipType);
+        relationship.setLeftPlace(leftPlace);
+        relationship.setRightPlace(rightPlace);
+        return create(c, relationship);
+    }
+
+    @Override
     public Relationship create(Context context, Relationship relationship) throws SQLException, AuthorizeException {
         if (isRelationshipValidToCreate(context, relationship)) {
             if (authorizeService.authorizeActionBoolean(context, relationship.getLeftItem(), Constants.WRITE) ||
@@ -180,33 +192,33 @@ public class RelationshipServiceImpl implements RelationshipService {
         if (!verifyEntityTypes(relationship.getLeftItem(), relationshipType.getLeftType())) {
             log.warn("The relationship has been deemed invalid since the leftItem" +
                          " and leftType do no match on entityType");
-            logRelationshipTypeDetails(relationshipType);
+            logRelationshipTypeDetailsForError(relationshipType);
             return false;
         }
         if (!verifyEntityTypes(relationship.getRightItem(), relationshipType.getRightType())) {
             log.warn("The relationship has been deemed invalid since the rightItem" +
                          " and rightType do no match on entityType");
-            logRelationshipTypeDetails(relationshipType);
+            logRelationshipTypeDetailsForError(relationshipType);
             return false;
         }
         if (!verifyMaxCardinality(context, relationship.getLeftItem(),
                                   relationshipType.getLeftMaxCardinality(), relationshipType)) {
             log.warn("The relationship has been deemed invalid since the left item has more" +
                          " relationships than the left max cardinality allows after we'd store this relationship");
-            logRelationshipTypeDetails(relationshipType);
+            logRelationshipTypeDetailsForError(relationshipType);
             return false;
         }
         if (!verifyMaxCardinality(context, relationship.getRightItem(),
                                   relationshipType.getRightMaxCardinality(), relationshipType)) {
             log.warn("The relationship has been deemed invalid since the right item has more" +
                          " relationships than the right max cardinality allows after we'd store this relationship");
-            logRelationshipTypeDetails(relationshipType);
+            logRelationshipTypeDetailsForError(relationshipType);
             return false;
         }
         return true;
     }
 
-    private void logRelationshipTypeDetails(RelationshipType relationshipType) {
+    private void logRelationshipTypeDetailsForError(RelationshipType relationshipType) {
         log.warn("The relationshipType's ID is: " + relationshipType.getID());
         log.warn("The relationshipType's left label is: " + relationshipType.getLeftLabel());
         log.warn("The relationshipType's right label is: " + relationshipType.getRightLabel());
@@ -219,10 +231,11 @@ public class RelationshipServiceImpl implements RelationshipService {
     }
 
     private boolean verifyMaxCardinality(Context context, Item itemToProcess,
-                                         int maxCardinality, RelationshipType relationshipType) throws SQLException {
+                                         Integer maxCardinality,
+                                         RelationshipType relationshipType) throws SQLException {
         List<Relationship> rightRelationships = findByItemAndRelationshipType(context, itemToProcess, relationshipType,
                                                                               false);
-        if (rightRelationships.size() >= maxCardinality && maxCardinality != 0) {
+        if (maxCardinality != null && rightRelationships.size() >= maxCardinality) {
             return false;
         }
         return true;
@@ -321,14 +334,14 @@ public class RelationshipServiceImpl implements RelationshipService {
         if (this.find(context, relationship.getID()) == null) {
             log.warn("The relationship has been deemed invalid since the relationship" +
                          " is not present in the DB with the current ID");
-            logRelationshipTypeDetails(relationship.getRelationshipType());
+            logRelationshipTypeDetailsForError(relationship.getRelationshipType());
             return false;
         }
         if (!checkMinCardinality(context, relationship.getLeftItem(),
                                  relationship, relationship.getRelationshipType().getLeftMinCardinality(), true)) {
             log.warn("The relationship has been deemed invalid since the leftMinCardinality" +
                          " constraint would be violated upon deletion");
-            logRelationshipTypeDetails(relationship.getRelationshipType());
+            logRelationshipTypeDetailsForError(relationship.getRelationshipType());
             return false;
         }
 
@@ -336,7 +349,7 @@ public class RelationshipServiceImpl implements RelationshipService {
                                  relationship, relationship.getRelationshipType().getRightMinCardinality(), false)) {
             log.warn("The relationship has been deemed invalid since the rightMinCardinality" +
                          " constraint would be violated upon deletion");
-            logRelationshipTypeDetails(relationship.getRelationshipType());
+            logRelationshipTypeDetailsForError(relationship.getRelationshipType());
             return false;
         }
         return true;
@@ -344,10 +357,10 @@ public class RelationshipServiceImpl implements RelationshipService {
 
     private boolean checkMinCardinality(Context context, Item item,
                                         Relationship relationship,
-                                        int minCardinality, boolean isLeft) throws SQLException {
+                                        Integer minCardinality, boolean isLeft) throws SQLException {
         List<Relationship> list = this
             .findByItemAndRelationshipType(context, item, relationship.getRelationshipType(), isLeft);
-        if (!(list.size() > minCardinality)) {
+        if (minCardinality != null && !(list.size() > minCardinality)) {
             return false;
         }
         return true;
@@ -395,4 +408,6 @@ public class RelationshipServiceImpl implements RelationshipService {
         throws SQLException {
         return relationshipDAO.findByRelationshipType(context, relationshipType);
     }
+
+
 }
