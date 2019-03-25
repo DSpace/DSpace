@@ -11,6 +11,8 @@
 # Step 1 - Run Maven Build
 FROM dspace/dspace-dependencies:dspace-7_x as build
 ARG TARGET_DIR=dspace-installer
+# The docker hub build will set the following environment variable
+ARG DOCKER_TAG=${DOCKER_TAG}
 WORKDIR /app
 
 # The dspace-install directory will be written to /install
@@ -23,6 +25,14 @@ USER dspace
 # Copy the DSpace source code into the workdir (excluding .dockerignore contents)
 ADD --chown=dspace . /app/
 COPY dspace/src/main/docker/local.cfg /app/local.cfg
+
+# if DOCKER_TAG is in the format prNNNN then merge code for that PR on top of the current branch
+RUN PRNUM=`echo ${DOCKER_TAG}| egrep "^pr([0-9]+)$" | sed -e s/pr//` && \
+    if [ -n $PRNUM ]; \ 
+    then echo "Merging $PRNUM"; \
+      curl -o /tmp/pr.patch -L https://github.com/DSpace/DSpace/pull/$PRNUM.diff; \
+      git apply /tmp/pr.patch; \
+    fi
 
 # Build DSpace.  Copy the dspace-install directory to /install.  Clean up the build to keep the docker image small
 RUN mvn package && \
