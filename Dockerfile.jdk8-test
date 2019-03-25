@@ -28,7 +28,7 @@ COPY dspace/src/main/docker/local.cfg /app/local.cfg
 
 # if DOCKER_TAG is in the format prNNNN then merge code for that PR on top of the current branch
 RUN PRNUM=`echo ${DOCKER_TAG}| egrep "^pr([0-9]+)$" | sed -e s/pr//` && \
-    if [ -n $PRNUM ]; \ 
+    if [ -n "$PRNUM" ]; \ 
     then echo "Merging $PRNUM"; \
       curl -o /tmp/pr.patch -L https://github.com/DSpace/DSpace/pull/$PRNUM.diff; \
       git apply /tmp/pr.patch; \
