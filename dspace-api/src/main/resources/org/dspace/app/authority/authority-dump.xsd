@@ -23,10 +23,17 @@
                     </xs:annotation>
                     <xs:complexType>
                         <xs:sequence>
-                            <xs:element name='f' type='xs:string' minOccurs='0' maxOccurs='unbounded'>
-                                <xs:annotation>
-                                    <xs:documentation>Field within a Solr document</xs:documentation>
-                                </xs:annotation>
+                            <xs:element name='f' minOccurs='0' maxOccurs='unbounded'>
+                                <xs:complexType>
+                                    <xs:simpleContent>
+                                        <xs:annotation>
+                                            <xs:documentation>Field within a Solr document</xs:documentation>
+                                        </xs:annotation>
+                                        <xs:extension base='xs:string'>
+                                            <xs:attribute name='name'/>
+                                        </xs:extension>
+                                    </xs:simpleContent>
+                                </xs:complexType>
                             </xs:element>
                         </xs:sequence>
                     </xs:complexType>
