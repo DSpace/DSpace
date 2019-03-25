@@ -22,10 +22,10 @@ public class RelationshipTypeRest extends BaseObjectRest<Integer> {
 
     private String leftLabel;
     private String rightLabel;
-    private int leftMinCardinality;
-    private int leftMaxCardinality;
-    private int rightMinCardinality;
-    private int rightMaxCardinality;
+    private Integer leftMinCardinality;
+    private Integer leftMaxCardinality;
+    private Integer rightMinCardinality;
+    private Integer rightMaxCardinality;
     private EntityTypeRest leftType;
     private EntityTypeRest rightType;
 
@@ -57,35 +57,35 @@ public class RelationshipTypeRest extends BaseObjectRest<Integer> {
         this.rightLabel = rightLabel;
     }
 
-    public int getLeftMinCardinality() {
+    public Integer getLeftMinCardinality() {
         return leftMinCardinality;
     }
 
-    public void setLeftMinCardinality(int leftMinCardinality) {
+    public void setLeftMinCardinality(Integer leftMinCardinality) {
         this.leftMinCardinality = leftMinCardinality;
     }
 
-    public int getLeftMaxCardinality() {
+    public Integer getLeftMaxCardinality() {
         return leftMaxCardinality;
     }
 
-    public void setLeftMaxCardinality(int leftMaxCardinality) {
+    public void setLeftMaxCardinality(Integer leftMaxCardinality) {
         this.leftMaxCardinality = leftMaxCardinality;
     }
 
-    public int getRightMinCardinality() {
+    public Integer getRightMinCardinality() {
         return rightMinCardinality;
     }
 
-    public void setRightMinCardinality(int rightMinCardinality) {
+    public void setRightMinCardinality(Integer rightMinCardinality) {
         this.rightMinCardinality = rightMinCardinality;
     }
 
-    public int getRightMaxCardinality() {
+    public Integer getRightMaxCardinality() {
         return rightMaxCardinality;
     }
 
-    public void setRightMaxCardinality(int rightMaxCardinality) {
+    public void setRightMaxCardinality(Integer rightMaxCardinality) {
         this.rightMaxCardinality = rightMaxCardinality;
     }
 

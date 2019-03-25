@@ -66,6 +66,25 @@ public class RelationshipTypeServiceImpl implements RelationshipTypeService {
         return relationshipTypeDAO.findByEntityType(context, entityType);
     }
 
+    @Override
+    public RelationshipType create(Context context, EntityType leftEntityType, EntityType rightEntityType,
+                                   String leftLabel, String rightLabel, Integer leftCardinalityMinInteger,
+                                   Integer leftCardinalityMaxInteger, Integer rightCardinalityMinInteger,
+                                   Integer rightCardinalityMaxInteger)
+        throws SQLException, AuthorizeException {
+        RelationshipType relationshipType = new RelationshipType();
+        relationshipType.setLeftType(leftEntityType);
+        relationshipType.setRightType(rightEntityType);
+        relationshipType.setLeftLabel(leftLabel);
+        relationshipType.setRightLabel(rightLabel);
+        relationshipType.setLeftMinCardinality(leftCardinalityMinInteger);
+        relationshipType.setLeftMaxCardinality(leftCardinalityMaxInteger);
+        relationshipType.setRightMinCardinality(rightCardinalityMinInteger);
+        relationshipType.setRightMaxCardinality(rightCardinalityMaxInteger);
+        return create(context, relationshipType);
+    }
+
+
     public RelationshipType find(Context context,int id) throws SQLException {
         return relationshipTypeDAO.findByID(context, RelationshipType.class, id);
     }

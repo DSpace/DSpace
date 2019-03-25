@@ -7,8 +7,6 @@
  */
 package org.dspace.content;
 
-import org.hibernate.proxy.HibernateProxyHelper;
-
 /**
  * This class is used as a representation of MetadataValues for the MetadataValues that are derived from the
  * Relationships that the item has. This includes the useForPlace property which we'll have to use to determine
@@ -46,8 +44,7 @@ public class RelationshipMetadataValue extends MetadataValue {
         if (obj == null) {
             return false;
         }
-        Class<?> objClass = HibernateProxyHelper.getClassWithoutInitializingProxy(obj);
-        if (getClass() != objClass) {
+        if (getClass() != RelationshipMetadataValue.class) {
             return false;
         }
         final RelationshipMetadataValue other = (RelationshipMetadataValue) obj;
