@@ -781,6 +781,7 @@ public class StatisticsDataVisits extends StatisticsData {
         public void setDso(DSpaceObject dso, int dsoType, int length) {
             this.dsoType = dsoType;
             this.dso = dso;
+            this.dsoLength = length;
         }
 
         public void setDsoType(int dsoType) {
