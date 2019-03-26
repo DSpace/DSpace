@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.response.QueryResponse;
@@ -18,8 +20,6 @@ import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.params.ModifiableSolrParams;
 import org.apache.solr.common.params.SolrParams;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Wrap a Solr query in an Iterator, repeatedly executing the query while moving
@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
  */
 class SolrQueryWindow
         implements Iterable<SolrDocument>, Iterator<SolrDocument> {
-    private static final Logger LOG = LoggerFactory.getLogger(SolrQueryWindow.class);
+    private static final Logger LOG = LogManager.getLogger(SolrQueryWindow.class);
 
     /** Fetch this many results at a time. */
     private static final int WINDOW_SIZE = 100;
@@ -94,7 +94,7 @@ class SolrQueryWindow
     @Override
     public boolean hasNext() {
         LOG.debug("hasNext:  results.getNumFound = {}; windowStart = {}; windowPos = {}",
-                results.getNumFound(), windowStart, windowPos);
+                ()->results.getNumFound(), ()->windowStart, ()->windowPos);
         return results.getNumFound() > windowStart + windowPos;
     }
 
