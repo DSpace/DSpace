@@ -103,7 +103,7 @@ class SolrQueryWindow
         if (!hasNext()) {
             throw new NoSuchElementException("All contents consumed.");
         }
-        if (windowPos > results.size()) {
+        if (windowPos >= results.size()) {
             try {
                 refill();
             } catch (SolrServerException | IOException ex) {
