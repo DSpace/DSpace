@@ -94,7 +94,7 @@ class SolrQueryWindow
     @Override
     public boolean hasNext() {
         LOG.debug("hasNext:  results.getNumFound = {}; windowStart = {}; windowPos = {}",
-                ()->results.getNumFound(), ()->windowStart, ()->windowPos);
+            () -> results.getNumFound(), () -> windowStart, () -> windowPos);
         return results.getNumFound() > windowStart + windowPos;
     }
 

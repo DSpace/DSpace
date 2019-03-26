@@ -177,7 +177,7 @@ public class Commands {
                 //      For all field values.
                 for (Object fieldValue : document.getFieldValues(fieldName)) {
                     LOG.debug("fieldValue is a {}",
-                            ()->fieldValue.getClass().getSimpleName());
+                        () -> fieldValue.getClass().getSimpleName());
                     xmlWriter.writeStartElement(ParseEventHandler.ELEMENT_FIELD);
                     xmlWriter.writeAttribute(ParseEventHandler.ATTRIBUTE_NAME, fieldName);
                     String valueString;
@@ -319,7 +319,7 @@ public class Commands {
         public void characters(char[] ch, int start, int length) {
             currentValue.append(ch, start, length);
             LOG.debug("characters:  ch = '{}'; start = {}; length = {}; currentValue = '{}'",
-                    ()->ch, ()->start, ()->length, ()->currentValue.toString());
+                () -> ch, () -> start, () -> length, () -> currentValue.toString());
         }
 
         @Override
