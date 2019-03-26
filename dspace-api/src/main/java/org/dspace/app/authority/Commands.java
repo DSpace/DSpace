@@ -237,19 +237,23 @@ public class Commands {
      */
     private static class ParseEventHandler
             extends DefaultHandler {
-        private final HttpSolrClient solr;
         Logger LOG = LogManager.getLogger(ParseEventHandler.class);
-
-        private final StringBuilder currentValue = new StringBuilder();
-        private final SolrInputDocument solrInputDocument = new SolrInputDocument();
-        private Locator locator;
-        private String currentField;
-        private long nRecords = 0;
 
         private static final String ELEMENT_ROOT = "authority-dump";
         private static final String ELEMENT_RECORD = "r";
         private static final String ELEMENT_FIELD = "f";
         private static final String ATTRIBUTE_NAME = "name";
+
+        private final HttpSolrClient solr;
+        private final SolrInputDocument solrInputDocument = new SolrInputDocument();
+        private Locator locator;
+        private long nRecords = 0;
+
+        /** Name of the field being parsed. */
+        private String currentField;
+
+        /** Value of the field being parsed. */
+        private final StringBuilder currentValue = new StringBuilder();
 
         /**
          * Save a reference to a connection to a Solr core/collection.
