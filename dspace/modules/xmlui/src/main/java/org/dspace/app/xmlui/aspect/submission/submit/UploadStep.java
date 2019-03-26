@@ -218,10 +218,7 @@ public class UploadStep extends AbstractSubmissionStep
             upload = div.addList("submit-upload-new", List.TYPE_FORM);
             upload.setHead(T_head);
 
-            File file = upload.addItem().addFile("file");
-            file.setLabel(T_file);
-            file.setHelp(T_file_help);
-            file.setRequired();
+            File file = addFileItem(upload, "file"); // Customization for LIBDRUM-581
 
             // if no files found error was thrown by processing class, display it!
             if (this.errorFlag==org.dspace.submit.step.UploadStep.STATUS_NO_FILES_ERROR)
@@ -533,5 +530,22 @@ public class UploadStep extends AbstractSubmissionStep
         result.append("?sequence=").append(String.valueOf(bitstream.getSequenceID()));
         return result.toString();
     }
+
+    // Customization for LIBDRUM-581
+    /**
+     * Adds a file item to the parent element
+     * 
+     * @param parent
+     *          The item to which the file item should be added
+     * @param name
+     *          Name of the file item
+     */
+    protected File addFileItem(List parent, String name) throws WingException {
+        File file = parent.addItem().addFile(name);
+        file.setLabel(T_file);
+        file.setHelp(T_file_help);
+        file.setRequired();
+        return file;
+    }
+    // End Customization for LIBDRUM-581
 }
-        

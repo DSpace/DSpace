@@ -333,10 +333,26 @@ function submissionControl(collectionHandle, workspaceID, initStepAndPage)
         // Only step forward to next page if no errors on this page
         if ((cocoon.request.get(AbstractProcessingStep.NEXT_BUTTON) || !stepHasUI(stepConfig))  && (response_flag==AbstractProcessingStep.STATUS_COMPLETE))
         {
-           	state.progressIterator++;
+          // Customization for LIBDRUM-581
+          var progressedToCorrectStep = false;
+
+          while (!progressedToCorrectStep) {
+            state.progressIterator++;
+            progressedToCorrectStep = true;
 
            	var totalSteps = stepsInSubmission.length;
-           	var inWorkflow = submissionInfo.isInWorkflow();
+            var inWorkflow = submissionInfo.isInWorkflow();
+             
+            if (state.progressIterator < totalSteps) {
+              state.stepAndPage = stepsInSubmission[state.progressIterator];
+              if (shouldSkipStep(workspaceID, state.stepAndPage.getStep())) {
+                progressedToCorrectStep = false;
+                cocoon.log.info('Skipping Step & Page=' + state.stepAndPage);
+              } else {
+                cocoon.log.info('Next Step & Page=' + state.stepAndPage);
+              }
+            }
+          }
 
            	//check if we've completed the submission
            	if(state.progressIterator >= totalSteps)
@@ -352,12 +368,8 @@ function submissionControl(collectionHandle, workspaceID, initStepAndPage)
            		{   //since in Workflow just break out of loop to return to Workflow process
            			break;
            		}
-           	}
-           	else
-           	{
-           		state.stepAndPage = stepsInSubmission[state.progressIterator];
-           		cocoon.log.debug("Next Step & Page=" + state.stepAndPage);
-        	}
+             }
+             // End Customization for LIBDRUM-581
         }//User clicked "<- Previous" button
         else if (cocoon.request.get(AbstractProcessingStep.PREVIOUS_BUTTON) && 
             (response_flag==AbstractProcessingStep.STATUS_COMPLETE || maxStepAndPage.equals(state.stepAndPage)))
@@ -764,3 +776,22 @@ function doWorkflowEditMetadata() {
         cocoon.exit();
     }
 }
+
+// Customization for LIBDRUM-581
+/**
+ * This method determines if the specified step should be
+ * skipped by the calling the 'canSkip' method of the step
+ * 
+ * @param {*} workspaceID 
+ * @param {*} step 
+ */
+function shouldSkipStep(workspaceID, step) {
+  var submissionInfo = getSubmissionInfo(workspaceID);
+  var stepConfig = submissionInfo.getSubmissionConfig().getStep(step);
+  var processingClassName = stepConfig.getProcessingClassName();
+  var loader = submissionInfo.getClass().getClassLoader();
+  var processingClass = loader.loadClass(processingClassName);
+  var stepClass = processingClass.newInstance();
+  return stepClass.canSkip(submissionInfo);
+}
+// End Customization for LIBDRUM-581

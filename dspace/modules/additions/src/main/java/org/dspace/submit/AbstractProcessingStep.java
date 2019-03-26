@@ -373,5 +373,18 @@ public abstract class AbstractProcessingStep
         // set info to request
         request.setAttribute("submission.page", Integer.valueOf(pageNumber));
     }
-
+    
+    // Customization for LIBDRUM-581
+    /**
+     * Determine if the step can be skipped. The default implementation
+     * returns false. A conditional step can override this method to return true
+     * or false based on a condition.
+     * 
+     * @param submissionInfo
+     *              SubmissionInfo object
+     */
+    public boolean canSkip(SubmissionInfo submissionInfo) throws SQLException {
+        return false;
+    }
+    // End Customization for LIBDRUM-581
 }

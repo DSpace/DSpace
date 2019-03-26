@@ -19,6 +19,7 @@ import org.apache.cocoon.ProcessingException;
 import org.apache.cocoon.environment.SourceResolver;
 import org.apache.log4j.Logger;
 import org.dspace.app.util.SubmissionInfo;
+import org.dspace.app.util.SubmissionStepConfig;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.utils.HandleUtil;
@@ -326,7 +327,7 @@ public abstract class AbstractStep extends AbstractDSpaceTransformer
         throws WingException
     {
         // Only add the button if we have button text and a valid step & page!
-        if(buttonText!=null && stepAndPage.isSet())
+        if(buttonText!=null && stepAndPage.isSet() && ! canSkipStep(stepAndPage.getStep())) // Customization for LIBDRUM-581
         {    
             // add a Jump To button for this section
             Button jumpButton = list.addItem("step_" + stepAndPage, renderJumpButton(stepAndPage))
@@ -430,18 +431,22 @@ public abstract class AbstractStep extends AbstractDSpaceTransformer
         String[] submissionPages = (String[]) submissionPagesSet.toArray(new String[submissionPagesSet.size()]);
         
         StepAndPage lastStepAndPage;
+        // Customization for LIBDRUM-581
+        int submissionPagesLength = submissionPages.length;
+        int lastPageIndex = submissionPagesLength - 1;
         
         if(!inWorkflow)
         {
             // If not in Workflow,
             // Last step is considered the one *before* the Complete Step
-            lastStepAndPage = new StepAndPage(submissionPages[submissionPages.length-2]);
+            lastPageIndex--;
         }
-        else
-        {   
-            lastStepAndPage = new StepAndPage(submissionPages[submissionPages.length-1]);
+        lastStepAndPage = new StepAndPage(submissionPages[lastPageIndex]);
+        while (canSkipStep(lastStepAndPage.getStep())) {
+            lastPageIndex--;
+            lastStepAndPage = new StepAndPage(submissionPages[lastPageIndex]);
         }
-
+        // End Customization for LIBDRUM-581
         return lastStepAndPage.equals(stepAndPage);
     }
 
@@ -541,7 +546,7 @@ public abstract class AbstractStep extends AbstractDSpaceTransformer
         {
             return null;
         }  
-	}
+    }
 	
     @Override
 	public void recycle() 
@@ -554,4 +559,27 @@ public abstract class AbstractStep extends AbstractDSpaceTransformer
 		this.errorFields = null;
 		super.recycle();
 	}
+    
+    // Customization for LIBDRUM-581
+    /**
+     * Returns true is the specified step can be skipped.
+     * 
+     * @param step
+     *          Number of the step to be checked
+     */
+    public boolean canSkipStep(int step) {
+        try {
+            SubmissionStepConfig stepConfig = submissionInfo.getSubmissionConfig().getStep(step);
+            String processingClassName = stepConfig.getProcessingClassName();
+            ClassLoader loader = submissionInfo.getClass().getClassLoader();
+            Class processingClass = loader.loadClass(processingClassName);
+            AbstractProcessingStep stepClass = (AbstractProcessingStep) processingClass.newInstance();
+            return stepClass.canSkip(submissionInfo);
+        } catch(Exception e) {
+            log.error("Error while evaluationg if a step can be skipped!");
+            log.error(e.getMessage());
+            return false;
+        }
+    }
+    // End Customization for LIBDRUM-581
 }
