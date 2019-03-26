@@ -119,7 +119,7 @@ public class ClaimedTask implements ReloadableEntity<Integer>, BrowsableObject<I
 
     @Override
     public int getType() {
-        return Constants.WORKFLOW_CLAIMED;
+        return Constants.CLAIMEDTASK;
     }
 
 }

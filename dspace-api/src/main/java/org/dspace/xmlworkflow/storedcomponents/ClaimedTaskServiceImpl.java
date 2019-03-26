@@ -39,7 +39,7 @@ public class ClaimedTaskServiceImpl implements ClaimedTaskService {
 
     @Override
     public int getSupportsTypeConstant() {
-        return Constants.WORKFLOW_CLAIMED;
+        return Constants.CLAIMEDTASK;
     }
 
     @Override

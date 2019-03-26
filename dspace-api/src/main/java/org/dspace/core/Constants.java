@@ -66,20 +66,20 @@ public class Constants {
     public static final int WORKFLOWITEM = 9;
 
     /**
-     * Type of pool task workflow objects
+     * Type of pool task objects
      */
-    public static final int WORKFLOW_POOL = 10;
+    public static final int POOLTASK = 10;
 
     /**
-     * Type of pool task workflow objects
+     * Type of claimed task objects
      */
-    public static final int WORKFLOW_CLAIMED = 11;
+    public static final int CLAIMEDTASK = 11;
 
     /**
      * lets you look up type names from the type IDs
      */
     public static final String[] typeText = { "BITSTREAM", "BUNDLE", "ITEM", "COLLECTION", "COMMUNITY", "SITE", "GROUP",
-        "EPERSON", "WORKSPACEITEM", "WORKFLOWITEM", "WORKFLOW POOL", "WORKFLOW CLAIMED" };
+        "EPERSON", "WORKSPACEITEM", "WORKFLOWITEM", "POOLTASK", "CLAIMEDTAKS" };
 
     /**
      * Special Bundle and Bitstream Names:
