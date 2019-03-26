@@ -171,6 +171,7 @@ public class ContentServiceFactoryImpl extends ContentServiceFactory {
         return entityTypeService;
     }
 
+    @Override
     public EntityService getEntityService() {
         return entityService;
     }

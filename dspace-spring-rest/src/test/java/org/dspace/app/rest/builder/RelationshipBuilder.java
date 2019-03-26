@@ -76,11 +76,7 @@ public class RelationshipBuilder extends AbstractBuilder<Relationship, Relations
         this.context = context;
 
         try {
-            relationship = new Relationship();
-            relationship.setLeftItem(leftItem);
-            relationship.setRightItem(rightItem);
-            relationship.setRelationshipType(relationshipType);
-            relationshipService.create(context, relationship);
+            relationship = relationshipService.create(context, leftItem, rightItem, relationshipType, 0, 0);
         } catch (SQLException | AuthorizeException e) {
             e.printStackTrace();
         }

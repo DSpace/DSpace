@@ -8,11 +8,13 @@
  */
 package org.dspace.app.rest;
 
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.isEmptyOrNullString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -247,16 +249,16 @@ public class RelationshipTypeRestRepositoryIT extends AbstractControllerIntegrat
             .findbyTypesAndLabels(context, entityTypeService.findByEntityType(context, "Publication"),
                                   entityTypeService.findByEntityType(context, "Person"), "isAuthorOfPublication",
                                   "isPublicationOfAuthor");
-        assertEquals(0, relationshipType.getLeftMinCardinality());
-        assertEquals(0, relationshipType.getRightMinCardinality());
-        assertEquals(Integer.MAX_VALUE, relationshipType.getLeftMaxCardinality());
-        assertEquals(Integer.MAX_VALUE, relationshipType.getRightMaxCardinality());
+        assertEquals(((Integer) 0), relationshipType.getLeftMinCardinality());
+        assertEquals(((Integer) 0), relationshipType.getRightMinCardinality());
+        assertNull(relationshipType.getLeftMaxCardinality());
+        assertNull(null, relationshipType.getRightMaxCardinality());
 
         getClient().perform(get("/api/core/relationshiptypes/" + relationshipType.getID()))
                    .andExpect(jsonPath("$.leftMinCardinality", is(0)))
                    .andExpect(jsonPath("$.rightMinCardinality", is(0)))
-                   .andExpect(jsonPath("$.leftMaxCardinality", is(Integer.MAX_VALUE)))
-                   .andExpect(jsonPath("$.rightMaxCardinality", is(Integer.MAX_VALUE)));
+                   .andExpect(jsonPath("$.leftMaxCardinality", isEmptyOrNullString()))
+                   .andExpect(jsonPath("$.rightMaxCardinality", isEmptyOrNullString()));
 
     }
 
@@ -292,15 +294,15 @@ public class RelationshipTypeRestRepositoryIT extends AbstractControllerIntegrat
             .findbyTypesAndLabels(context, entityTypeService.findByEntityType(context, "JournalVolume"),
                                   entityTypeService.findByEntityType(context, "JournalIssue"), "isIssueOfJournalVolume",
                                   "isJournalVolumeOfIssue");
-        assertEquals(0, relationshipType.getLeftMinCardinality());
-        assertEquals(1, relationshipType.getRightMinCardinality());
-        assertEquals(Integer.MAX_VALUE, relationshipType.getLeftMaxCardinality());
-        assertEquals(1, relationshipType.getRightMaxCardinality());
+        assertEquals(((Integer) 0), relationshipType.getLeftMinCardinality());
+        assertEquals(((Integer) 1), relationshipType.getRightMinCardinality());
+        assertNull(relationshipType.getLeftMaxCardinality());
+        assertEquals(((Integer) 1), relationshipType.getRightMaxCardinality());
 
         getClient().perform(get("/api/core/relationshiptypes/" + relationshipType.getID()))
                    .andExpect(jsonPath("$.leftMinCardinality", is(0)))
                    .andExpect(jsonPath("$.rightMinCardinality", is(1)))
-                   .andExpect(jsonPath("$.leftMaxCardinality", is(Integer.MAX_VALUE)))
+                   .andExpect(jsonPath("$.leftMaxCardinality", isEmptyOrNullString()))
                    .andExpect(jsonPath("$.rightMaxCardinality", is(1)));
 
     }

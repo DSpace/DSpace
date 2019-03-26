@@ -18,6 +18,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import org.dspace.core.Context;
 import org.dspace.core.ReloadableEntity;
 
 /**
@@ -76,6 +77,11 @@ public class Relationship implements ReloadableEntity<Integer> {
     @Column(name = "right_place")
     private int rightPlace;
 
+    /**
+     * Protected constructor, create object using:
+     * {@link org.dspace.content.service.RelationshipService#create(Context)} }
+     */
+    protected Relationship() {}
     /**
      * Standard setter for the ID field
      * @param id    The ID to be set
