@@ -50,7 +50,7 @@ public class PoolTaskServiceImpl implements PoolTaskService {
 
     @Override
     public int getSupportsTypeConstant() {
-        return Constants.WORKFLOW_POOL;
+        return Constants.POOLTASK;
     }
 
     @Override

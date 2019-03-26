@@ -24,6 +24,7 @@ import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.builder.EPersonBuilder;
 import org.dspace.app.rest.builder.PoolTaskBuilder;
 import org.dspace.app.rest.builder.WorkflowItemBuilder;
+import org.dspace.app.rest.matcher.ClaimedTaskMatcher;
 import org.dspace.app.rest.matcher.EPersonMatcher;
 import org.dspace.app.rest.matcher.PoolTaskMatcher;
 import org.dspace.app.rest.matcher.WorkflowItemMatcher;
@@ -58,6 +59,71 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
         context.turnOffAuthorisationSystem();
 
         //** GIVEN **
+        //1. create a normal user to use as reviewer
+        EPerson reviewer = EPersonBuilder.createEPerson(context)
+                .withEmail("reviewer@example.com")
+                .withPassword(password)
+                .build();
+
+        //2. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
+                .withWorkflowGroup(1, reviewer).build();
+
+        //3. create a normal user to use as submitter
+        EPerson submitter = EPersonBuilder.createEPerson(context)
+                .withEmail("submitter@example.com")
+                .withPassword(password)
+                .build();
+
+        context.setCurrentUser(submitter);
+
+        //3. a workflow item
+        PoolTask poolTask = PoolTaskBuilder.createPoolTask(context, col1, reviewer)
+                .withTitle("Workflow Item 1")
+                .withIssueDate("2017-10-17")
+                .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                .withSubject("ExtraEntry")
+                .build();
+
+        context.restoreAuthSystemState();
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        String reviewerToken = getAuthToken(reviewer.getEmail(), password);
+
+        // the reviewer and the administrator can access the pooltask
+        getClient(reviewerToken).perform(get("/api/workflow/pooltasks/" + poolTask.getID()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", Matchers.is(PoolTaskMatcher.matchPoolTask(poolTask, "reviewstep"))))
+                .andExpect(jsonPath("$._embedded.workflowitem",
+                        Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
+                                poolTask.getWorkflowItem(), "Workflow Item 1", "2017-10-17", "ExtraEntry"))))
+        ;
+
+        getClient(adminToken).perform(get("/api/workflow/pooltasks/" + poolTask.getID()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", Matchers.is(PoolTaskMatcher.matchPoolTask(poolTask, "reviewstep"))))
+                .andExpect(jsonPath("$._embedded.workflowitem",
+                        Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
+                                poolTask.getWorkflowItem(), "Workflow Item 1", "2017-10-17", "ExtraEntry"))))
+        ;
+    }
+
+    @Test
+    /**
+     * Verify that only authenticated user can retrieve a specific pooltask
+     * 
+     * @throws Exception
+     */
+    public void findOnePoolUnauthorizedTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
         //1. A community-collection structure with one parent community with sub-community and one collection.
         parentCommunity = CommunityBuilder.createCommunity(context)
                                           .withName("Parent Community")
@@ -86,9 +152,69 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
 
         context.restoreAuthSystemState();
 
-        String adminToken = getAuthToken(admin.getEmail(), password);
+        getClient().perform(get("/api/workflow/pooltasks/" + poolTask.getID()))
+                .andExpect(status().isUnauthorized());
+    }
 
-        getClient(adminToken).perform(get("/api/workflow/pooltasks/" + poolTask.getID()))
+    @Test
+    /**
+     * Verify that an other reviewer cannot access a pooltask of a colleague
+     * 
+     * @throws Exception
+     */
+    public void findOnePoolForbiddenTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. create two normal users to use as reviewers
+        EPerson reviewer = EPersonBuilder.createEPerson(context)
+                .withEmail("reviewer@example.com")
+                .withPassword(password)
+                .build();
+
+        EPerson reviewer2 = EPersonBuilder.createEPerson(context)
+                .withEmail("reviewer2@example.com")
+                .withPassword(password)
+                .build();
+
+        //2. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
+                .withWorkflowGroup(1, reviewer)
+                .withWorkflowGroup(2, reviewer2).build();
+
+        //3. create a normal user to use as submitter
+        EPerson submitter = EPersonBuilder.createEPerson(context)
+                .withEmail("submitter@example.com")
+                .withPassword(password)
+                .build();
+
+        context.setCurrentUser(submitter);
+
+        //3. a workflow item
+        PoolTask poolTask = PoolTaskBuilder.createPoolTask(context, col1, reviewer)
+                .withTitle("Workflow Item 1")
+                .withIssueDate("2017-10-17")
+                .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                .withSubject("ExtraEntry")
+                .build();
+
+        context.restoreAuthSystemState();
+
+        String reviewerToken = getAuthToken(reviewer.getEmail(), password);
+        String reviewer2Token = getAuthToken(reviewer2.getEmail(), password);
+
+        // the reviewer2 cannot access the pool task of reviewer1
+        getClient(reviewer2Token).perform(get("/api/workflow/pooltasks/" + poolTask.getID()))
+                .andExpect(status().isForbidden());
+
+        // verify that the task exists
+        getClient(reviewerToken).perform(get("/api/workflow/pooltasks/" + poolTask.getID()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", Matchers.is(PoolTaskMatcher.matchPoolTask(poolTask, "reviewstep"))))
                 .andExpect(jsonPath("$._embedded.workflowitem",
@@ -230,7 +356,106 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
             .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/workflow/pooltasks")))
             .andExpect(jsonPath("$.page.size", is(20)))
             .andExpect(jsonPath("$.page.totalElements", is(1)));
-        ;
+
+        // admins is also able to get the list of other users
+        // reviewer1 has three tasks
+        getClient(authAdmin).perform(get("/api/workflow/pooltasks/search/findByUser")
+                .param("uuid", reviewer1.getID().toString()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/workflow/pooltasks")))
+            .andExpect(jsonPath("$.page.size", is(20)))
+            .andExpect(jsonPath("$.page.totalElements", is(3)));
+
+        // reviewer2 has two tasks
+        getClient(authAdmin).perform(get("/api/workflow/pooltasks/search/findByUser")
+                .param("uuid", reviewer2.getID().toString()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/workflow/pooltasks")))
+            .andExpect(jsonPath("$.page.size", is(20)))
+            .andExpect(jsonPath("$.page.totalElements", is(2)));
+    }
+
+    @Test
+    public void findByUserForbiddenTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-subcommunity structure
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+
+        //2. define two reviewers
+        EPerson reviewer1 = EPersonBuilder.createEPerson(context)
+                .withEmail("reviewer1@example.com")
+                .withPassword(password)
+                .build();
+
+        EPerson reviewer2 = EPersonBuilder.createEPerson(context)
+                .withEmail("reviewer2@example.com")
+                .withPassword(password)
+                .build();
+
+        // 3. two collections at different level of our communities structure with different reviewers
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1")
+                .withWorkflowGroup(1, reviewer1, reviewer2).build();
+
+        // reviewer2 and admin are only in the wf of one colletion
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2")
+                .withWorkflowGroup(1, reviewer1, admin).build();
+
+        //4. create a normal user to use as submitter
+        EPerson submitter = EPersonBuilder.createEPerson(context)
+                .withEmail("submitter@example.com")
+                .withPassword(password)
+                .build();
+
+        context.setCurrentUser(submitter);
+
+        //5. our workflow items
+        XmlWorkflowItem witem1 = WorkflowItemBuilder.createWorkflowItem(context, col1)
+                .withTitle("Workflow Item 1")
+                .withIssueDate("2017-10-17")
+                .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                .withSubject("ExtraEntry")
+                .build();
+
+        XmlWorkflowItem witem2 = WorkflowItemBuilder.createWorkflowItem(context, col1)
+                .withTitle("Workflow Item 2")
+                .withIssueDate("2017-10-17")
+                .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                .withSubject("ExtraEntry")
+                .build();
+
+        XmlWorkflowItem witem3 = WorkflowItemBuilder.createWorkflowItem(context, col2)
+                .withTitle("Workflow Item 3")
+                .withIssueDate("2017-10-18")
+                .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                .withSubject("ExtraEntry")
+                .build();
+
+        context.restoreAuthSystemState();
+
+        String authReviewer1 = getAuthToken(reviewer1.getEmail(), password);
+        // reviewer1 tries to get the pooltask of reviewer2 and viceversa
+        getClient(authReviewer1).perform(get("/api/workflow/pooltasks/search/findByUser")
+                    .param("uuid", reviewer2.getID().toString()))
+                .andExpect(status().isForbidden());
+
+        String authReviewer2 = getAuthToken(reviewer2.getEmail(), password);
+        getClient(authReviewer2).perform(get("/api/workflow/pooltasks/search/findByUser")
+                .param("uuid", reviewer1.getID().toString()))
+            .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void findByUserUnauthorizedTest() throws Exception {
+        getClient().perform(get("/api/workflow/pooltasks/search/findByUser")
+                    .param("uuid", admin.getID().toString()))
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -354,7 +579,186 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
             .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/workflow/claimedtasks")))
             .andExpect(jsonPath("$.page.size", is(20)))
             .andExpect(jsonPath("$.page.totalElements", is(1)));
-        ;
+    }
+
+    @Test
+    /**
+     * Test retrieval of a claimed task
+     *
+     * @throws Exception
+     */
+    public void findOneClaimedTaskTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        //** GIVEN **
+        //1. a reviewer
+        EPerson reviewer = EPersonBuilder.createEPerson(context)
+                .withEmail("reviewer@example.com")
+                .withPassword(password)
+                .build();
+
+        //2. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
+                .withWorkflowGroup(1, reviewer).build();
+
+        //3. create a normal user to use as submitter
+        EPerson submitter = EPersonBuilder.createEPerson(context)
+                .withEmail("submitter@example.com")
+                .withPassword(password)
+                .build();
+
+        context.setCurrentUser(submitter);
+
+        //4. a claimed task
+        ClaimedTask claimedTask = ClaimedTaskBuilder.createClaimedTask(context, col1, reviewer)
+                .withTitle("Workflow Item 1")
+                .withIssueDate("2017-10-17")
+                .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                .withSubject("ExtraEntry")
+                .build();
+        XmlWorkflowItem witem = claimedTask.getWorkflowItem();
+
+        context.restoreAuthSystemState();
+
+        String reviewerToken = getAuthToken(reviewer.getEmail(), password);
+        String adminToken = getAuthToken(admin.getEmail(), password);
+
+        // get the claimed task as reviewer
+        getClient(reviewerToken).perform(get("/api/workflow/claimedtasks/" + claimedTask.getID()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", Matchers.is(ClaimedTaskMatcher.matchClaimedTask(claimedTask, "reviewstep"))))
+            .andExpect(jsonPath("$._embedded.workflowitem",
+                    Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
+                            witem, "Workflow Item 1", "2017-10-17", "ExtraEntry"))));
+
+        // get the claimed task as admin
+        getClient(adminToken).perform(get("/api/workflow/claimedtasks/" + claimedTask.getID()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", Matchers.is(ClaimedTaskMatcher.matchClaimedTask(claimedTask, "reviewstep"))))
+            .andExpect(jsonPath("$._embedded.workflowitem",
+                    Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
+                            witem, "Workflow Item 1", "2017-10-17", "ExtraEntry"))));
+
+    }
+
+    @Test
+    /**
+     * Test unauthorized retrieval of a claimed task
+     *
+     * @throws Exception
+     */
+    public void findOneClaimedTaskUnauthorizedTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        //** GIVEN **
+        //1. a reviewer
+        EPerson reviewer = EPersonBuilder.createEPerson(context)
+                .withEmail("reviewer@example.com")
+                .withPassword(password)
+                .build();
+
+        //2. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
+                .withWorkflowGroup(1, reviewer).build();
+
+        //3. create a normal user to use as submitter
+        EPerson submitter = EPersonBuilder.createEPerson(context)
+                .withEmail("submitter@example.com")
+                .withPassword(password)
+                .build();
+
+        context.setCurrentUser(submitter);
+
+        //4. a claimed task
+        ClaimedTask claimedTask = ClaimedTaskBuilder.createClaimedTask(context, col1, reviewer)
+                .withTitle("Workflow Item 1")
+                .withIssueDate("2017-10-17")
+                .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                .withSubject("ExtraEntry")
+                .build();
+        XmlWorkflowItem witem = claimedTask.getWorkflowItem();
+
+        context.restoreAuthSystemState();
+
+        // try to get the claimed task as anonymous
+        getClient().perform(get("/api/workflow/claimedtasks/" + claimedTask.getID()))
+            .andExpect(status().isUnauthorized());
+
+        // verify that the claimed task exists
+        String reviewerToken = getAuthToken(reviewer.getEmail(), password);
+        getClient(reviewerToken).perform(get("/api/workflow/claimedtasks/" + claimedTask.getID()))
+            .andExpect(status().isOk());
+    }
+
+    @Test
+    /**
+     * Test forbidden retrieval of a claimed task
+     *
+     * @throws Exception
+     */
+    public void findOneClaimedTaskForbiddenTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        //** GIVEN **
+        //1. two reviewers
+        EPerson reviewer = EPersonBuilder.createEPerson(context)
+                .withEmail("reviewer@example.com")
+                .withPassword(password)
+                .build();
+
+        EPerson reviewer2 = EPersonBuilder.createEPerson(context)
+                .withEmail("reviewer2@example.com")
+                .withPassword(password)
+                .build();
+
+        //2. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
+                .withWorkflowGroup(1, reviewer, reviewer2).build();
+
+        //3. create a normal user to use as submitter
+        EPerson submitter = EPersonBuilder.createEPerson(context)
+                .withEmail("submitter@example.com")
+                .withPassword(password)
+                .build();
+
+        context.setCurrentUser(submitter);
+
+        //4. a claimed task
+        ClaimedTask claimedTask = ClaimedTaskBuilder.createClaimedTask(context, col1, reviewer)
+                .withTitle("Workflow Item 1")
+                .withIssueDate("2017-10-17")
+                .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                .withSubject("ExtraEntry")
+                .build();
+        XmlWorkflowItem witem = claimedTask.getWorkflowItem();
+
+        context.restoreAuthSystemState();
+
+        String reviewerToken = getAuthToken(reviewer.getEmail(), password);
+        String reviewer2Token = getAuthToken(reviewer2.getEmail(), password);
+
+        // get the claimed task as reviewer
+        getClient(reviewer2Token).perform(get("/api/workflow/claimedtasks/" + claimedTask.getID()))
+            .andExpect(status().isForbidden());
+
+        // verify that the claimed task exists
+        getClient(reviewerToken).perform(get("/api/workflow/claimedtasks/" + claimedTask.getID()))
+            .andExpect(status().isOk());
     }
 
     @Test
@@ -421,7 +825,399 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
             .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/workflow/pooltasks")))
             .andExpect(jsonPath("$.page.size", is(20)))
             .andExpect(jsonPath("$.page.totalElements", is(1)));
-        ;
+    }
+
+    @Test
+    /**
+     * Test unclaiming a task as admin
+     *
+     * @throws Exception
+     */
+    public void unclaimTaskAdminTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        //** GIVEN **
+        //1. a reviewer
+        EPerson reviewer = EPersonBuilder.createEPerson(context)
+                .withEmail("reviewer@example.com")
+                .withPassword(password)
+                .build();
+
+        //2. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
+                .withWorkflowGroup(1, reviewer).build();
+
+        //3. create a normal user to use as submitter
+        EPerson submitter = EPersonBuilder.createEPerson(context)
+                .withEmail("submitter@example.com")
+                .withPassword(password)
+                .build();
+
+        context.setCurrentUser(submitter);
+
+        //4. a claimed task
+        ClaimedTask claimedTask = ClaimedTaskBuilder.createClaimedTask(context, col1, reviewer)
+                .withTitle("Workflow Item 1")
+                .withIssueDate("2017-10-17")
+                .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                .withSubject("ExtraEntry")
+                .build();
+        XmlWorkflowItem witem = claimedTask.getWorkflowItem();
+
+        context.restoreAuthSystemState();
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+
+        getClient(adminToken).perform(delete("/api/workflow/claimedtasks/" + claimedTask.getID()))
+            .andExpect(status().isNoContent());
+
+        // verify that the task has been unclaimed and it is back in the pool
+        getClient(adminToken).perform(get("/api/workflow/pooltasks/search/findByUser")
+                .param("uuid", reviewer.getID().toString()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.pooltasks", Matchers.contains(
+                    Matchers.allOf(
+                            hasJsonPath("$._links.self.href", Matchers.containsString("/api/workflow/pooltasks/")),
+                            hasJsonPath("$.type", Matchers.is("pooltask")),
+                            hasJsonPath("$._embedded.workflowitem",
+                                     Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
+                                             witem, "Workflow Item 1", "2017-10-17", "ExtraEntry")))
+                    ))))
+            .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/workflow/pooltasks")))
+            .andExpect(jsonPath("$.page.size", is(20)))
+            .andExpect(jsonPath("$.page.totalElements", is(1)));
+    }
+
+    @Test
+    public void unclaimTaskUnauthorizedTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        //** GIVEN **
+        //1. a reviewer
+        EPerson reviewer = EPersonBuilder.createEPerson(context)
+                .withEmail("reviewer@example.com")
+                .withPassword(password)
+                .build();
+
+        //2. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
+                .withWorkflowGroup(1, reviewer).build();
+
+        //3. create a normal user to use as submitter
+        EPerson submitter = EPersonBuilder.createEPerson(context)
+                .withEmail("submitter@example.com")
+                .withPassword(password)
+                .build();
+
+        context.setCurrentUser(submitter);
+
+        //4. a claimed task
+        ClaimedTask claimedTask = ClaimedTaskBuilder.createClaimedTask(context, col1, reviewer)
+                .withTitle("Workflow Item 1")
+                .withIssueDate("2017-10-17")
+                .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                .withSubject("ExtraEntry")
+                .build();
+        context.restoreAuthSystemState();
+
+        getClient().perform(delete("/api/workflow/claimedtasks/" + claimedTask.getID()))
+            .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void unclaimTaskForbiddenTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        //** GIVEN **
+        //1. two reviewers
+        EPerson reviewer = EPersonBuilder.createEPerson(context)
+                .withEmail("reviewer@example.com")
+                .withPassword(password)
+                .build();
+        EPerson reviewer2 = EPersonBuilder.createEPerson(context)
+                .withEmail("reviewer2@example.com")
+                .withPassword(password)
+                .build();
+
+        //2. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
+                .withWorkflowGroup(1, reviewer, reviewer2).build();
+
+        //3. create a normal user to use as submitter
+        EPerson submitter = EPersonBuilder.createEPerson(context)
+                .withEmail("submitter@example.com")
+                .withPassword(password)
+                .build();
+
+        context.setCurrentUser(submitter);
+
+        //4. a claimed task
+        ClaimedTask claimedTask = ClaimedTaskBuilder.createClaimedTask(context, col1, reviewer)
+                .withTitle("Workflow Item 1")
+                .withIssueDate("2017-10-17")
+                .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                .withSubject("ExtraEntry")
+                .build();
+        context.restoreAuthSystemState();
+
+        String reviewerToken = getAuthToken(reviewer.getEmail(), password);
+        String reviewer2Token = getAuthToken(reviewer2.getEmail(), password);
+
+        getClient(reviewer2Token).perform(delete("/api/workflow/claimedtasks/" + claimedTask.getID()))
+            .andExpect(status().isForbidden());
+
+        // verify that the task is still here
+        getClient(reviewerToken).perform(get("/api/workflow/claimedtasks/" + claimedTask.getID()))
+            .andExpect(status().isOk());
+    }
+
+    @Test
+    public void unclaimTaskNotExistingTest() throws Exception {
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        getClient(adminToken).perform(delete("/api/workflow/claimedtasks/" + Integer.MAX_VALUE))
+            .andExpect(status().isNotFound());
+    }
+
+    @Test
+    /**
+     * Test findByUser of claimed tasks
+     *
+     * @throws Exception
+     */
+    public void findClaimedByUserTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. two reviewers
+        EPerson reviewer1 = EPersonBuilder.createEPerson(context)
+                .withEmail("reviewer1@example.com")
+                .withPassword(password)
+                .build();
+
+        EPerson reviewer2 = EPersonBuilder.createEPerson(context)
+                .withEmail("reviewer2@example.com")
+                .withPassword(password)
+                .build();
+
+        //2. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
+                .withWorkflowGroup(1, reviewer1, reviewer2).build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2")
+                .withWorkflowGroup(1, reviewer2, admin).build();
+
+        //3. create a normal user to use as submitter
+        EPerson submitter = EPersonBuilder.createEPerson(context)
+                .withEmail("submitter@example.com")
+                .withPassword(password)
+                .build();
+
+        context.setCurrentUser(submitter);
+
+        //4. a pool task
+        ClaimedTask claimedTask1 = ClaimedTaskBuilder.createClaimedTask(context, col1, reviewer1)
+                .withTitle("Workflow Item 1")
+                .withIssueDate("2017-10-17")
+                .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                .withSubject("ExtraEntry")
+                .build();
+        ClaimedTask claimedTask2 = ClaimedTaskBuilder.createClaimedTask(context, col1, reviewer1)
+                .withTitle("Workflow Item 2")
+                .withIssueDate("2017-10-18")
+                .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                .withSubject("ExtraEntry2")
+                .build();
+        ClaimedTask claimedTask3 = ClaimedTaskBuilder.createClaimedTask(context, col2, reviewer2)
+                .withTitle("Workflow Item 3")
+                .withIssueDate("2017-10-19")
+                .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                .withSubject("ExtraEntry3")
+                .build();
+
+        XmlWorkflowItem witem1 = claimedTask1.getWorkflowItem();
+        XmlWorkflowItem witem2 = claimedTask2.getWorkflowItem();
+        XmlWorkflowItem witem3 = claimedTask3.getWorkflowItem();
+
+        context.restoreAuthSystemState();
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        String reviewer1Token = getAuthToken(reviewer1.getEmail(), password);
+        String reviewer2Token = getAuthToken(reviewer2.getEmail(), password);
+
+        // verify that each reviewer is able to get it own tasks
+        getClient(reviewer1Token).perform(get("/api/workflow/claimedtasks/search/findByUser")
+                .param("uuid", reviewer1.getID().toString()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.claimedtasks", Matchers.containsInAnyOrder(
+                    Matchers.allOf(
+                            hasJsonPath("$", ClaimedTaskMatcher.matchClaimedTask(claimedTask1, "reviewstep")),
+                            hasJsonPath("$._embedded.workflowitem",
+                                    Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
+                                            witem1, "Workflow Item 1", "2017-10-17", "ExtraEntry")))
+                    ),
+                    Matchers.allOf(
+                            hasJsonPath("$", ClaimedTaskMatcher.matchClaimedTask(claimedTask2, "reviewstep")),
+                            hasJsonPath("$._embedded.workflowitem",
+                                    Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
+                                            witem2, "Workflow Item 2", "2017-10-18", "ExtraEntry2")))
+                    )
+            )))
+            .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/workflow/claimedtasks")))
+            .andExpect(jsonPath("$.page.size", is(20)))
+            .andExpect(jsonPath("$.page.totalElements", is(2)));
+
+        getClient(reviewer2Token).perform(get("/api/workflow/claimedtasks/search/findByUser")
+                .param("uuid", reviewer2.getID().toString()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.claimedtasks", Matchers.contains(
+                    Matchers.allOf(
+                            hasJsonPath("$", ClaimedTaskMatcher.matchClaimedTask(claimedTask3, "reviewstep")),
+                            hasJsonPath("$._embedded.workflowitem",
+                                    Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
+                                            witem3, "Workflow Item 3", "2017-10-19", "ExtraEntry3")))
+                    ))))
+            .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/workflow/claimedtasks")))
+            .andExpect(jsonPath("$.page.size", is(20)))
+            .andExpect(jsonPath("$.page.totalElements", is(1)));
+
+        // verify that the admins is able the tasks list of both reviewers
+        getClient(adminToken).perform(get("/api/workflow/claimedtasks/search/findByUser")
+                .param("uuid", reviewer1.getID().toString()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.claimedtasks", Matchers.containsInAnyOrder(
+                    Matchers.allOf(
+                            hasJsonPath("$", ClaimedTaskMatcher.matchClaimedTask(claimedTask1, "reviewstep")),
+                            hasJsonPath("$._embedded.workflowitem",
+                                    Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
+                                            witem1, "Workflow Item 1", "2017-10-17", "ExtraEntry")))
+                    ),
+                    Matchers.allOf(
+                            hasJsonPath("$", ClaimedTaskMatcher.matchClaimedTask(claimedTask2, "reviewstep")),
+                            hasJsonPath("$._embedded.workflowitem",
+                                    Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
+                                            witem2, "Workflow Item 2", "2017-10-18", "ExtraEntry2")))
+                    )
+            )))
+            .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/workflow/claimedtasks")))
+            .andExpect(jsonPath("$.page.size", is(20)))
+            .andExpect(jsonPath("$.page.totalElements", is(2)));
+
+        getClient(adminToken).perform(get("/api/workflow/claimedtasks/search/findByUser")
+                .param("uuid", reviewer2.getID().toString()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.claimedtasks", Matchers.contains(
+                    Matchers.allOf(
+                            hasJsonPath("$", ClaimedTaskMatcher.matchClaimedTask(claimedTask3, "reviewstep")),
+                            hasJsonPath("$._embedded.workflowitem",
+                                    Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
+                                            witem3, "Workflow Item 3", "2017-10-19", "ExtraEntry3")))
+                    ))))
+            .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/workflow/claimedtasks")))
+            .andExpect(jsonPath("$.page.size", is(20)))
+            .andExpect(jsonPath("$.page.totalElements", is(1)));
+    }
+
+    @Test
+    public void findClaimedByUserForbiddenTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. two reviewers
+        EPerson reviewer1 = EPersonBuilder.createEPerson(context)
+                .withEmail("reviewer1@example.com")
+                .withPassword(password)
+                .build();
+
+        EPerson reviewer2 = EPersonBuilder.createEPerson(context)
+                .withEmail("reviewer2@example.com")
+                .withPassword(password)
+                .build();
+
+        //2. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
+                .withWorkflowGroup(1, reviewer1, reviewer2).build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2")
+                .withWorkflowGroup(1, reviewer2, admin).build();
+
+        //3. create a normal user to use as submitter
+        EPerson submitter = EPersonBuilder.createEPerson(context)
+                .withEmail("submitter@example.com")
+                .withPassword(password)
+                .build();
+
+        context.setCurrentUser(submitter);
+
+        //4. some claimed tasks
+        ClaimedTask claimedTask1 = ClaimedTaskBuilder.createClaimedTask(context, col1, reviewer1)
+                .withTitle("Workflow Item 1")
+                .withIssueDate("2017-10-17")
+                .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                .withSubject("ExtraEntry")
+                .build();
+        ClaimedTask claimedTask2 = ClaimedTaskBuilder.createClaimedTask(context, col1, reviewer1)
+                .withTitle("Workflow Item 2")
+                .withIssueDate("2017-10-18")
+                .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                .withSubject("ExtraEntry2")
+                .build();
+        ClaimedTask claimedTask3 = ClaimedTaskBuilder.createClaimedTask(context, col2, reviewer2)
+                .withTitle("Workflow Item 3")
+                .withIssueDate("2017-10-19")
+                .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                .withSubject("ExtraEntry3")
+                .build();
+
+        XmlWorkflowItem witem1 = claimedTask1.getWorkflowItem();
+        XmlWorkflowItem witem2 = claimedTask2.getWorkflowItem();
+        XmlWorkflowItem witem3 = claimedTask3.getWorkflowItem();
+
+        context.restoreAuthSystemState();
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        String reviewer1Token = getAuthToken(reviewer1.getEmail(), password);
+        String reviewer2Token = getAuthToken(reviewer2.getEmail(), password);
+
+        // verify that a reviewer is not able to get the list of the other one
+        getClient(reviewer2Token).perform(get("/api/workflow/claimedtasks/search/findByUser")
+                .param("uuid", reviewer1.getID().toString()))
+            .andExpect(status().isForbidden());
+
+        getClient(reviewer1Token).perform(get("/api/workflow/claimedtasks/search/findByUser")
+                .param("uuid", reviewer2.getID().toString()))
+            .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void findClaimedByUserUnauthorizedTest() throws Exception {
+        getClient().perform(get("/api/workflow/claimedtasks/search/findByUser")
+                .param("uuid", admin.getID().toString()))
+            .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -638,7 +1434,6 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                 .param("uuid", reviewer.getID().toString()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.page.totalElements", is(0)));
-        ;
 
         // verify that the task is send back to the user and not to the pool
         String submitterToken = getAuthToken(submitter.getEmail(), password);
@@ -742,6 +1537,73 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
         getClient(reviewer1Token).perform(get("/api/workflow/claimedtasks/" + claimedTask.getID()))
             .andExpect(status().isOk());
 
+    }
+
+    @Test
+    /**
+     * Test an undefined action on a claimed task
+     *
+     * @throws Exception
+     */
+    public void undefinedActionTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        //** GIVEN **
+        //1. a reviewer
+        EPerson reviewer = EPersonBuilder.createEPerson(context)
+                .withEmail("reviewer@example.com")
+                .withPassword(password)
+                .build();
+
+        //2. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
+                .withWorkflowGroup(1, reviewer).build();
+
+        //3. create a normal user to use as submitter
+        EPerson submitter = EPersonBuilder.createEPerson(context)
+                .withEmail("submitter@example.com")
+                .withPassword(password)
+                .build();
+
+        context.setCurrentUser(submitter);
+
+        //4. a claimed task
+        ClaimedTask claimedTask = ClaimedTaskBuilder.createClaimedTask(context, col1, reviewer)
+                .withTitle("Workflow Item 1")
+                .withIssueDate("2017-10-17")
+                .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                .withSubject("ExtraEntry")
+                .build();
+        XmlWorkflowItem witem = claimedTask.getWorkflowItem();
+        Item item = witem.getItem();
+
+        context.restoreAuthSystemState();
+
+        String reviewerToken = getAuthToken(reviewer.getEmail(), password);
+
+        // try an undefined action
+        getClient(reviewerToken).perform(post("/api/workflow/claimedtasks/" + claimedTask.getID())
+                .param("submit_undefinedaction", "true")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED))
+            .andExpect(status().isUnprocessableEntity());
+
+        // verify that the task has not been processed and is still available
+        getClient(reviewerToken).perform(get("/api/workflow/claimedtasks/" + claimedTask.getID()))
+            .andExpect(status().isOk());
+    }
+
+    @Test
+    public void actionOnNotExistingClaimedTaskTest() throws Exception {
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        getClient(adminToken).perform(post("/api/workflow/claimedtasks/" + Integer.MAX_VALUE)
+                .param("submit_approve", "true")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED))
+            .andExpect(status().isNotFound());
     }
 
     @Test

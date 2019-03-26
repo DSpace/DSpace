@@ -315,6 +315,11 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
             Step currentStep = currentActionConfig.getStep();
             if (currentActionConfig.getProcessingAction().isAuthorized(c, request, wi)) {
                 ActionResult outcome = currentActionConfig.getProcessingAction().execute(c, wi, currentStep, request);
+                // the cancel action is the default when the request is not understood or a "back to mydspace" was
+                // pressed in the old UI
+                if (outcome.getType() == ActionResult.TYPE.TYPE_CANCEL) {
+                    throw new WorkflowException("Unprocessable request for the action " + currentStep.getId());
+                }
                 c.addEvent(new Event(Event.MODIFY, Constants.ITEM, wi.getItem().getID(), null,
                         itemService.getIdentifiers(c, wi.getItem())));
                 return processOutcome(c, user, workflow, currentStep, currentActionConfig, outcome, wi, false);

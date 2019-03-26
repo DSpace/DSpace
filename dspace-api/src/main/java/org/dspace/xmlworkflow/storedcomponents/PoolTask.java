@@ -134,7 +134,7 @@ public class PoolTask implements ReloadableEntity<Integer>, BrowsableObject<Inte
 
     @Override
     public int getType() {
-        return Constants.WORKFLOW_POOL;
+        return Constants.POOLTASK;
     }
 
 }
