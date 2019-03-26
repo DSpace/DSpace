@@ -26,9 +26,6 @@ USER dspace
 ADD --chown=dspace . /app/
 COPY dspace/src/main/docker/local.cfg /app/local.cfg
 
-RUN env
-RUN zzzz #force fail
-
 # if DOCKER_TAG is in the format prNNNN then merge code for that PR on top of the current branch
 RUN PRNUM=`echo ${DOCKER_TAG}| egrep "^pr([0-9]+)$" | sed -e s/pr//` && \
     if [ -n "$PRNUM" ]; \ 
