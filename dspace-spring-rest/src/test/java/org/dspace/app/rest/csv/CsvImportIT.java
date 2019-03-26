@@ -188,7 +188,9 @@ public class CsvImportIT extends AbstractControllerIntegrationTest {
     private void assertArticleRelationships(Item article, Item itemB, Item itemC, Item itemF) throws SQLException {
         List<Relationship> relationshipsForArticle = relationshipService
             .findByItemAndRelationshipType(context, article, relationshipTypeService
-                .findByLeftOrRightLabel(context,"isPublicationOfAuthor").get(0));
+                .findbyTypesAndLabels(context, entityTypeService.findByEntityType(context, "Publication"),
+                                      entityTypeService.findByEntityType(context, "Person"), "isAuthorOfPublication",
+                                      "isPublicationOfAuthor"));
         assertThat(relationshipsForArticle.size(), is(3));
         List<Item> expectedRelationshipsItemsForArticle = new ArrayList<>();
         expectedRelationshipsItemsForArticle.add(itemC);

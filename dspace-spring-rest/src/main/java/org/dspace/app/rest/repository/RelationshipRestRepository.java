@@ -98,7 +98,6 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
 
         HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
 
-        Relationship relationship = new Relationship();
         if (list.size() == 2 && list.get(0).getType() == Constants.ITEM && list.get(1).getType() == Constants.ITEM) {
             Item leftItem = (Item) list.get(0);
             Item rightItem = (Item) list.get(1);
@@ -108,10 +107,8 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
             EPerson ePerson = context.getCurrentUser();
             if (authorizeService.authorizeActionBoolean(context, leftItem, Constants.WRITE) ||
                 authorizeService.authorizeActionBoolean(context, rightItem, Constants.WRITE)) {
-                relationship.setLeftItem(leftItem);
-                relationship.setRightItem(rightItem);
-                relationship.setRelationshipType(relationshipType);
-                relationship = relationshipService.create(context, relationship);
+                Relationship relationship = relationshipService.create(context, leftItem, rightItem,
+                                                                       relationshipType, 0, 0);
                 // The above if check deals with the case that a Relationship can be created if the user has write
                 // rights on one of the two items. The following updateItem calls can however call the
                 // ItemService.update() functions which would fail if the user doesn't have permission on both items.

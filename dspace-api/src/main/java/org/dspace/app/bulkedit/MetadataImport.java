@@ -756,19 +756,21 @@ public class MetadataImport {
     private void buildRelationObject(Context c, Item item, String value, boolean left,
                                      List<RelationshipType> acceptableRelationshipTypes)
         throws SQLException, AuthorizeException {
-        Relationship relationship = new Relationship();
+        Item leftItem = null;
+        Item rightItem = null;
         RelationshipType acceptedRelationshipType = acceptableRelationshipTypes.get(0);
         if (left) {
-            relationship.setLeftItem(item);
-            relationship.setRightItem(itemService.findByIdOrLegacyId(c, value));
+            leftItem = item;
+            rightItem = itemService.findByIdOrLegacyId(c, value);
         } else {
-            relationship.setRightItem(item);
-            relationship.setLeftItem(itemService.findByIdOrLegacyId(c, value));
+            rightItem = item;
+            leftItem = itemService.findByIdOrLegacyId(c, value);
         }
-        relationship.setRelationshipType(acceptedRelationshipType);
-        relationship.setLeftPlace(relationshipService.findLeftPlaceByLeftItem(c, relationship.getLeftItem()) + 1);
-        relationship.setRightPlace(relationshipService.findRightPlaceByRightItem(c, relationship.getRightItem()) + 1);
-        Relationship persistedRelationship = relationshipService.create(c, relationship);
+        RelationshipType relationshipType = acceptedRelationshipType;
+        int leftPlace = relationshipService.findLeftPlaceByLeftItem(c, leftItem) + 1;
+        int rightPlace = relationshipService.findRightPlaceByRightItem(c, rightItem) + 1;
+        Relationship persistedRelationship = relationshipService.create(c, leftItem, rightItem,
+                                                                        relationshipType, leftPlace, rightPlace);
         relationshipService.update(c, persistedRelationship);
     }
 
