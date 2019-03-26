@@ -12,6 +12,9 @@ import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.TimeZone;
 import javax.xml.XMLConstants;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -34,9 +37,12 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
+import org.apache.solr.common.params.CommonParams;
 import org.apache.solr.common.params.ModifiableSolrParams;
 import org.dspace.services.ConfigurationService;
 import org.dspace.utils.DSpace;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
@@ -49,6 +55,8 @@ import org.xml.sax.helpers.DefaultHandler;
  * @author mhwood
  */
 public class Commands {
+    private static final Logger LOG = LoggerFactory.getLogger(Commands.class);
+
     private static final ConfigurationService CFG = new DSpace().getConfigurationService();
 
     /** Null constructor for a CLI class. */
@@ -152,7 +160,12 @@ public class Commands {
 
         // Set up the query
         ModifiableSolrParams params = new ModifiableSolrParams();
-        params.add("q", "*:*");
+        params.add(CommonParams.Q, "*:*");
+
+        // Format Date the Solr way
+        SimpleDateFormat dateFormatter
+                = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        dateFormatter.setTimeZone(TimeZone.getTimeZone("UTC"));
 
         // For all Solr records.
         for (SolrDocument document : new SolrQueryWindow(solr, params)) {
@@ -162,9 +175,16 @@ public class Commands {
             for (String fieldName : document.getFieldNames()) {
                 //      For all field values.
                 for (Object fieldValue : document.getFieldValues(fieldName)) {
+                    LOG.debug("fieldValue is a {}", fieldValue.getClass().getSimpleName());
                     xmlWriter.writeStartElement(ParseEventHandler.ELEMENT_FIELD);
                     xmlWriter.writeAttribute(ParseEventHandler.ATTRIBUTE_NAME, fieldName);
-                    xmlWriter.writeCharacters(fieldValue.toString());
+                    String valueString;
+                    if (fieldValue instanceof Date) {
+                        valueString = dateFormatter.format((Date) fieldValue);
+                    } else {
+                        valueString = fieldValue.toString();
+                    }
+                    xmlWriter.writeCharacters(valueString);
                     xmlWriter.writeEndElement(); // Field (f)
                 }
             }
@@ -215,10 +235,12 @@ public class Commands {
      */
     private static class ParseEventHandler
             extends DefaultHandler {
+        Logger LOG = LoggerFactory.getLogger(ParseEventHandler.class);
+
         private final HttpSolrServer solr;
         private final StringBuilder currentValue = new StringBuilder();
+        private final SolrInputDocument solrInputDocument = new SolrInputDocument();
         private Locator locator;
-        private SolrInputDocument solrInputDocument;
         private String currentField;
         private long nRecords = 0;
 
@@ -255,14 +277,17 @@ public class Commands {
 
         @Override
         public void startElement(String uri, String localName, String qName, Attributes atts) {
-            if (ELEMENT_FIELD.equals(localName)) {
+            LOG.debug("startElement:  localName '{}'; qName '{}'", localName, qName);
+            if (ELEMENT_FIELD.equals(qName)) {
                 currentField = atts.getValue(ATTRIBUTE_NAME);
+                LOG.debug("startElement:  currentField = {}", currentField);
             }
         }
 
         @Override
         public void endElement(String uri, String localName, String qName)
                 throws SAXException {
+            LOG.debug("endElement:  localName '{}'; qName '{}'", localName, qName);
             if (ELEMENT_RECORD.equals(qName)) {
                 try {
                     solr.add(solrInputDocument);
@@ -272,7 +297,9 @@ public class Commands {
                     throw new SAXException("Could not add a record", ex);
                 }
             } else if (ELEMENT_FIELD.equals(qName)) {
-                solrInputDocument.addField(currentField, currentValue);
+                LOG.debug("endElement:  currentField '{}'; currentValue '{}'",
+                        currentField, currentValue);
+                solrInputDocument.addField(currentField, currentValue.toString());
                 currentValue.delete(0, currentValue.length());
             } else if (ELEMENT_ROOT.equals(qName)) {
                 // Do nothing
@@ -285,11 +312,14 @@ public class Commands {
         @Override
         public void characters(char[] ch, int start, int length) {
             currentValue.append(ch, start, length);
+            LOG.debug("characters:  ch = '{}'; start = {}; length = {}; currentValue = '{}'",
+                    ch, start, length, currentValue.toString());
         }
 
         @Override
         public void endDocument()
                 throws SAXException {
+            LOG.debug("endDocument");
             try {
                 solr.commit();
             } catch (SolrServerException | IOException ex) {
