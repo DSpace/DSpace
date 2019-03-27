@@ -28,6 +28,8 @@ import org.dspace.xmlworkflow.state.actions.WorkflowActionConfig;
  */
 public interface XmlWorkflowFactory {
 
+    public final String LEGACY_WORKFLOW_NAME = "default";
+
     public Workflow getWorkflow(Collection collection) throws IOException, WorkflowConfigurationException, SQLException;
 
     public Step createStep(Workflow workflow, String stepID) throws WorkflowConfigurationException, IOException;

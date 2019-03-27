@@ -31,7 +31,7 @@ import org.springframework.stereotype.Component;
  * This {@link RestPermissionEvaluatorPlugin} implements that requirement by validating the group membership.
  */
 @Component
-public class GroupRestPermissionEvaluatorPlugin extends DSpaceObjectPermissionEvaluatorPlugin {
+public class GroupRestPermissionEvaluatorPlugin extends RestObjectPermissionEvaluatorPlugin {
 
     private static final Logger log = LoggerFactory.getLogger(GroupRestPermissionEvaluatorPlugin.class);
 

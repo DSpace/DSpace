@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.service.BrowsableObjectService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.service.DSpaceCRUDService;
@@ -24,7 +25,8 @@ import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
  *
  * @author kevinvandevelde at atmire.com
  */
-public interface ClaimedTaskService extends DSpaceCRUDService<ClaimedTask> {
+public interface ClaimedTaskService extends DSpaceCRUDService<ClaimedTask>,
+    BrowsableObjectService<ClaimedTask, Integer> {
 
     public List<ClaimedTask> findByWorkflowItem(Context context, XmlWorkflowItem workflowItem) throws SQLException;
 

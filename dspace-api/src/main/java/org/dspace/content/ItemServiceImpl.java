@@ -27,6 +27,7 @@ import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.authority.Choices;
 import org.dspace.content.dao.ItemDAO;
+import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.BundleService;
@@ -49,6 +50,7 @@ import org.dspace.identifier.service.IdentifierService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.versioning.service.VersioningService;
 import org.dspace.workflow.WorkflowItemService;
+import org.dspace.workflow.factory.WorkflowServiceFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -1109,6 +1111,16 @@ prevent the generation of resource policy entry values with null dspace_object a
         if (ownCollection != null) {
             return ownCollection;
         } else {
+            InProgressSubmission inprogress = ContentServiceFactory.getInstance().getWorkspaceItemService()
+                                                                   .findByItem(context,
+                                                                               item);
+            if (inprogress == null) {
+                inprogress = WorkflowServiceFactory.getInstance().getWorkflowItemService().findByItem(context, item);
+            }
+
+            if (inprogress != null) {
+                return inprogress.getCollection();
+            }
             // is a template item?
             return item.getTemplateItemOf();
         }
@@ -1238,6 +1250,12 @@ prevent the generation of resource policy entry values with null dspace_object a
     }
 
     @Override
+    public int countArchivedItems(Context context) throws SQLException {
+        // return count of items in archive and also not withdrawn
+        return itemDAO.countItems(context, true, false);
+    }
+
+    @Override
     public int countWithdrawnItems(Context context) throws SQLException {
         // return count of items that are not in archive and withdrawn
         return itemDAO.countItems(context, false, true);
@@ -1257,4 +1275,5 @@ prevent the generation of resource policy entry values with null dspace_object a
 
         return false;
     }
+
 }

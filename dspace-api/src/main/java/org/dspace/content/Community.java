@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
 import javax.persistence.Cacheable;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -252,6 +253,11 @@ public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
     }
 
     @Override
+    public String getTypeText() {
+        return Constants.typeText[Constants.COMMUNITY];
+    }
+
+    @Override
     public String getName() {
         String value = getCommunityService()
             .getMetadataFirstValue(this, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY);
@@ -269,4 +275,5 @@ public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
         }
         return communityService;
     }
+
 }

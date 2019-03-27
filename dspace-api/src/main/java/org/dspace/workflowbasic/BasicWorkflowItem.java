@@ -8,6 +8,7 @@
 package org.dspace.workflowbasic;
 
 import java.sql.SQLException;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -22,6 +23,7 @@ import javax.persistence.Table;
 
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.workflow.WorkflowItem;
@@ -145,7 +147,7 @@ public class BasicWorkflowItem implements WorkflowItem {
         return collection;
     }
 
-    void setCollection(Collection collection) {
+    public void setCollection(Collection collection) {
         this.collection = collection;
     }
 
@@ -183,4 +185,10 @@ public class BasicWorkflowItem implements WorkflowItem {
     public void setPublishedBefore(boolean b) {
         this.publishedBefore = b;
     }
+
+    @Override
+    public int getType() {
+        return Constants.WORKFLOWITEM;
+    }
+
 }
