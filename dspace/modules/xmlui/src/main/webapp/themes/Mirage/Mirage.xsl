@@ -194,18 +194,12 @@
 
             <!-- START TOP LEFT DISPLAY BOX (was carousel) -->
             <div class="home-col-1">
-                <div  id="dryad-home-top-left-display-box" class="ds-static-div primary">
-		  
-		  <!--
-		      <a href="/pages/institutionalMembership">
-                      <img class = 'display-box-img' src="/themes/Mirage/images/homepage_inst_member.png" alt="Dryad's Institutional Membership Program"/>
-		      </a>
-		  -->
-		  <a href="https://zoom.us/webinar/register/WN_azsNMWU3QFWNhtcQivAdiA">
-		    <img style="padding-top:20px;" class = 'display-box-img' src="/themes/Mirage/images/webinar2019-03.png" alt="Dryad's Webinar on the Institutional Membership Program"/>
-                  </a>
-		  
-                </div>
+              <div  id="dryad-home-top-left-display-box" class="ds-static-div primary">		  
+		<a href="/pages/institutionalMembership">
+                <img class = 'display-box-img' src="/themes/Mirage/images/homepage_inst_member.png" alt="Dryad's Institutional Membership Program"/>
+	       </a>
+		
+              </div>
             </div>
 
             <!-- START NEWS -->
