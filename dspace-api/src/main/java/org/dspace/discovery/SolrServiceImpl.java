@@ -2640,6 +2640,17 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         return null;
     }
 
+    /**
+     * Add the necessary fields to the SOLR document to support a Discover Facet on resourcetypename (archived item,
+     * workspace item, workflow item, etc)
+     *
+     * @param document
+     *            the solr document
+     * @param acvalue
+     *            the authority value
+     * @param fvalue
+     *            the human readable value
+     */
     private void addNamedResourceTypeIndex(SolrInputDocument document, String acvalue, String fvalue) {
 
         document.addField("namedresourcetype_filter", acvalue);
