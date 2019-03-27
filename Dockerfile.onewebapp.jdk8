@@ -54,4 +54,4 @@ EXPOSE 8080 8009
 
 ENV JAVA_OPTS=-Xmx2000m
 
-RUN ln -s $DSPACE_INSTALL/webapps/ROOT   /usr/local/tomcat/webapps/spring-rest
+RUN ln -s $DSPACE_INSTALL/webapps/spring-rest   /usr/local/tomcat/webapps/ROOT
