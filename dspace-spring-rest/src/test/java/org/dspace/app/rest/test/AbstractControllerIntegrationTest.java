@@ -28,6 +28,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.support.ErrorPageFilter;
+import org.springframework.data.rest.webmvc.RestMediaTypes;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -73,6 +74,7 @@ public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWi
     protected MediaType contentType = new MediaType(MediaTypes.HAL_JSON.getType(),
                                                     MediaTypes.HAL_JSON.getSubtype(), Charsets.UTF_8);
 
+    protected MediaType textUriContentType = RestMediaTypes.TEXT_URI_LIST;
 
     protected HttpMessageConverter mappingJackson2HttpMessageConverter;
 

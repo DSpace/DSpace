@@ -27,6 +27,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
+import org.dspace.event.Event;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,7 +61,12 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
     }
 
     @Override
-    public WorkspaceItem find(Context context, int id) throws SQLException {
+    public int getSupportsTypeConstant() {
+        return Constants.WORKSPACEITEM;
+    }
+
+    @Override
+    public WorkspaceItem find(Context context, Integer id) throws SQLException {
         WorkspaceItem workspaceItem = workspaceItemDAO.findByID(context, WorkspaceItem.class, id);
 
         if (workspaceItem == null) {
@@ -129,6 +135,9 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
                                       "workspace_item_id=" + workspaceItem.getID()
                                           + "item_id=" + item.getID() + "collection_id="
                                           + collection.getID()));
+
+        context.addEvent(new Event(Event.MODIFY, Constants.ITEM, item.getID(), null,
+                itemService.getIdentifiers(context, item)));
 
         return workspaceItem;
     }
