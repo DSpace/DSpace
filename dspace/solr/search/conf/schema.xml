@@ -536,6 +536,10 @@
    <field name="discoverable" type="string" indexed="true" stored="true" omitNorms="true" docValues="true" />
       
    <field name="read" type="string" indexed="true" stored="true" omitNorms="true" multiValued="true" docValues="true" />
+
+   <field name="submitter" type="string" indexed="true" stored="true" omitNorms="true" multiValued="true" docValues="true" />
+
+   <field name="taskfor" type="string" indexed="true" stored="true" omitNorms="true" multiValued="true" docValues="true" />
    
    <field name="has_content_in_original_bundle" type="string" indexed="true" stored="true" omitNorms="true" multiValued="true" docValues="true" />
    
