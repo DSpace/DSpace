@@ -173,7 +173,7 @@
 
           <li class="dropdown">
             <a href="" class="dropdown-toggle" data-toggle="dropdown">
-              <span class="glyphicon glyphicon-question-sign"></span> Manuales para RI <b class="caret"></b></a>
+              <span class="glyphicon glyphicon-question-sign"></span> Más información <b class="caret"></b></a>
 
               <ul class="dropdown-menu">
                 <li><a href="#">Información para los depositarios</a></li>
@@ -191,9 +191,10 @@
     {
 		%>
 		<a href="#" class="dropdown-toggle" style="color: #fff" data-toggle="dropdown"><span class="glyphicon glyphicon-user"></span> 
-         <fmt:message key="jsp.layout.navbar-default.loggedin">
+         <!--<fmt:message key="jsp.layout.navbar-default.loggedin">
 		      <fmt:param><%= StringUtils.abbreviate(navbarEmail, 13) %></fmt:param>
-		  </fmt:message> 
+		  </fmt:message> -->
+      <%= StringUtils.abbreviate(navbarEmail, 20) %>
       <b class="caret"></b></a>
 		<%
     } else {
@@ -235,7 +236,7 @@
 	<form method="get" action="<%= request.getContextPath() %>/simple-search" class="navbar-form navbar-right">
 	    <div class="form-group">
           <!--<input type="text" class="form-control" placeholder="<fmt:message key="jsp.layout.navbar-default.search"/>" name="query" id="tequery" size="25"/>-->
-          <input type="text" class="form-control" placeholder="Buscar en RI" name="query" id="tequery" size="25"/>
+          <input type="text" class="form-control" placeholder="<fmt:message key="jsp.layout.navbar-default.search"/>" name="query" id="tequery" size="25"/>
         </div>
         <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-search"></span></button>
 

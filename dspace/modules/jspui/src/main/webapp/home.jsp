@@ -102,7 +102,7 @@ var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga
 		        
 
 		        <div class="row" align="center" style="padding: 2% 2%;">
-					<button type="submit" class="btn btn-primary" style="background-image: none; background-color:#6b6b6b; border-color: #414141;">Búsqueda Avanzada</button>
+					<button type="submit" class="btn btn-primary" style="background-image: none; background-color:#6b6b6b; border-color: #414141;"><fmt:message key="jsp.layout.navbar-default.search"/></button>
 				</div> 
 	        </form>
 
