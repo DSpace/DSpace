@@ -70,7 +70,7 @@ public class DiscoverResultConverter {
             SearchResultEntryRest resultEntry = new SearchResultEntryRest();
 
             //Convert the DSpace Object to its REST model
-            resultEntry.setRObject(convertDSpaceObject(dspaceObject));
+            resultEntry.setIndexableObject(convertDSpaceObject(dspaceObject));
 
             //Add hit highlighting for this DSO if present
             DiscoverResult.IndexableObjectHighlightResult highlightedResults = searchResult

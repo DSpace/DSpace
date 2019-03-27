@@ -3207,25 +3207,25 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
                         Matchers.allOf(
                                 SearchResultMatcher.match("submission", "workspaceitem", "workspaceitems"),
-                                JsonPathMatchers.hasJsonPath("$._embedded.rObject",
+                                JsonPathMatchers.hasJsonPath("$._embedded.indexableObject",
                                         is(WorkspaceItemMatcher.matchItemWithTitleAndDateIssued(wsItem1,
                                                 "Workspace Item 1", "2010-07-23")))
                                 ),
                         Matchers.allOf(
                                 SearchResultMatcher.match("submission", "workspaceitem", "workspaceitems"),
-                                JsonPathMatchers.hasJsonPath("$._embedded.rObject",
+                                JsonPathMatchers.hasJsonPath("$._embedded.indexableObject",
                                         is(WorkspaceItemMatcher.matchItemWithTitleAndDateIssued(
                                                 wsItem2, "Workspace Item 2", "2010-11-03")))
                                 ),
                         Matchers.allOf(
                                 SearchResultMatcher.match("workflow", "workflowitem", "workflowitems"),
-                                JsonPathMatchers.hasJsonPath("$._embedded.rObject",
+                                JsonPathMatchers.hasJsonPath("$._embedded.indexableObject",
                                         is(WorkflowItemMatcher.matchItemWithTitleAndDateIssued(
                                                 wfItem1, "Workflow Item 1", "2010-11-03")))
                                 ),
                         Matchers.allOf(
                                 SearchResultMatcher.match("workflow", "workflowitem", "workflowitems"),
-                                JsonPathMatchers.hasJsonPath("$._embedded.rObject",
+                                JsonPathMatchers.hasJsonPath("$._embedded.indexableObject",
                                         is(WorkflowItemMatcher.matchItemWithTitleAndDateIssued(
                                                 cTask.getWorkflowItem(), "Claimed Item","2010-11-03")))
                                 )
@@ -3259,19 +3259,19 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
                         Matchers.allOf(
                                 SearchResultMatcher.match("submission", "workspaceitem", "workspaceitems"),
-                                JsonPathMatchers.hasJsonPath("$._embedded.rObject",
+                                JsonPathMatchers.hasJsonPath("$._embedded.indexableObject",
                                         is(WorkspaceItemMatcher.matchItemWithTitleAndDateIssued(
                                                 wsItem1Admin, "Admin Workspace Item 1", "2010-07-23")))
                                 ),
                         Matchers.allOf(
                                 SearchResultMatcher.match("submission", "workspaceitem", "workspaceitems"),
-                                JsonPathMatchers.hasJsonPath("$._embedded.rObject",
+                                JsonPathMatchers.hasJsonPath("$._embedded.indexableObject",
                                         is(WorkspaceItemMatcher.matchItemWithTitleAndDateIssued(
                                                 wsItem2Admin, "Admin Workspace Item 2", "2010-11-03")))
                                 ),
                         Matchers.allOf(
                                 SearchResultMatcher.match("workflow", "workflowitem", "workflowitems"),
-                                JsonPathMatchers.hasJsonPath("$._embedded.rObject",
+                                JsonPathMatchers.hasJsonPath("$._embedded.indexableObject",
                                         is(WorkflowItemMatcher.matchItemWithTitleAndDateIssued(
                                                 wfItem1Admin, "Admin Workflow Item 1", "2010-11-03")))
                                 )
@@ -3433,13 +3433,13 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
                         Matchers.allOf(
                                 SearchResultMatcher.match("workflow", "pooltask", "pooltasks"),
-                                JsonPathMatchers.hasJsonPath("$._embedded.rObject._embedded.workflowitem",
+                                JsonPathMatchers.hasJsonPath("$._embedded.indexableObject._embedded.workflowitem",
                                         is(WorkflowItemMatcher.matchItemWithTitleAndDateIssued(
                                                 null, "Workflow Item 1", "2010-11-03")))
                                 ),
                         Matchers.allOf(
                                 SearchResultMatcher.match("workflow", "pooltask", "pooltasks"),
-                                JsonPathMatchers.hasJsonPath("$._embedded.rObject._embedded.workflowitem",
+                                JsonPathMatchers.hasJsonPath("$._embedded.indexableObject._embedded.workflowitem",
                                         is(WorkflowItemMatcher.matchItemWithTitleAndDateIssued(
                                                 null, "Admin Workflow Item 1", "2010-11-03")))
                                 )
@@ -3476,19 +3476,19 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
                         Matchers.allOf(
                                 SearchResultMatcher.match("workflow", "pooltask", "pooltasks"),
-                                JsonPathMatchers.hasJsonPath("$._embedded.rObject._embedded.workflowitem",
+                                JsonPathMatchers.hasJsonPath("$._embedded.indexableObject._embedded.workflowitem",
                                         is(WorkflowItemMatcher.matchItemWithTitleAndDateIssued(
                                                 null, "Workflow Item 1", "2010-11-03")))
                                 ),
                         Matchers.allOf(
                                 SearchResultMatcher.match("workflow", "pooltask", "pooltasks"),
-                                JsonPathMatchers.hasJsonPath("$._embedded.rObject._embedded.workflowitem",
+                                JsonPathMatchers.hasJsonPath("$._embedded.indexableObject._embedded.workflowitem",
                                         is(WorkflowItemMatcher.matchItemWithTitleAndDateIssued(
                                                 null, "Admin Workflow Item 1", "2010-11-03")))
                                 ),
                         Matchers.allOf(
                                 SearchResultMatcher.match("workflow", "claimedtask", "claimedtask"),
-                                JsonPathMatchers.hasJsonPath("$._embedded.rObject._embedded.workflowitem",
+                                JsonPathMatchers.hasJsonPath("$._embedded.indexableObject._embedded.workflowitem",
                                         is(WorkflowItemMatcher.matchItemWithTitleAndDateIssued(
                                                 null, "Claimed Item", "2010-11-03")))
                                 )
@@ -3525,7 +3525,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
                         Matchers.allOf(
                                 SearchResultMatcher.match("workflow", "pooltask", "pooltasks"),
-                                JsonPathMatchers.hasJsonPath("$._embedded.rObject._embedded.workflowitem",
+                                JsonPathMatchers.hasJsonPath("$._embedded.indexableObject._embedded.workflowitem",
                                         is(WorkflowItemMatcher.matchItemWithTitleAndDateIssued(
                                                 null, "Pool Step2 Item", "2010-11-04")))
                                 )
