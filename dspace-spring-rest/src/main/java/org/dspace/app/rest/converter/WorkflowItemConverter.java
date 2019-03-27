@@ -21,7 +21,7 @@ import org.dspace.app.rest.submit.SubmissionService;
 import org.dspace.app.util.SubmissionConfigReader;
 import org.dspace.app.util.SubmissionConfigReaderException;
 import org.dspace.app.util.SubmissionStepConfig;
-import org.dspace.browse.BrowsableObject;
+import org.dspace.browse.IndexableObject;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.eperson.EPerson;
@@ -38,7 +38,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class WorkflowItemConverter
-    extends BrowsableDSpaceObjectConverter<XmlWorkflowItem, org.dspace.app.rest.model.WorkflowItemRest> {
+    extends IndexableDSpaceObjectConverter<XmlWorkflowItem, org.dspace.app.rest.model.WorkflowItemRest> {
 
     private static final Logger log = Logger.getLogger(WorkflowItemConverter.class);
 
@@ -155,7 +155,7 @@ public class WorkflowItemConverter
     }
 
     @Override
-    public boolean supportsModel(BrowsableObject object) {
+    public boolean supportsModel(IndexableObject object) {
         return object instanceof XmlWorkflowItem;
     }
 }

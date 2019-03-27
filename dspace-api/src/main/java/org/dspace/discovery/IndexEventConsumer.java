@@ -11,7 +11,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.logging.log4j.Logger;
-import org.dspace.browse.BrowsableObject;
+import org.dspace.browse.IndexableObject;
 import org.dspace.content.Bundle;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Constants;
@@ -34,7 +34,7 @@ public class IndexEventConsumer implements Consumer {
     private static Logger log = org.apache.logging.log4j.LogManager.getLogger(IndexEventConsumer.class);
 
     // collect Items, Collections, Communities that need indexing
-    private Set<BrowsableObject> objectsToUpdate = null;
+    private Set<IndexableObject> objectsToUpdate = null;
 
     // unique search IDs to delete
     private Set<String> uniqueIdsToDelete = null;
@@ -59,7 +59,7 @@ public class IndexEventConsumer implements Consumer {
     public void consume(Context ctx, Event event) throws Exception {
 
         if (objectsToUpdate == null) {
-            objectsToUpdate = new HashSet<BrowsableObject>();
+            objectsToUpdate = new HashSet<IndexableObject>();
             uniqueIdsToDelete = new HashSet<String>();
         }
 
@@ -108,7 +108,7 @@ public class IndexEventConsumer implements Consumer {
                                  + ", perhaps it has been deleted.");
                 } else {
                     log.debug("consume() adding event to update queue: " + event.toString());
-                    objectsToUpdate.add((BrowsableObject)subject);
+                    objectsToUpdate.add((IndexableObject)subject);
                 }
                 break;
 
@@ -121,7 +121,7 @@ public class IndexEventConsumer implements Consumer {
                                  + ", perhaps it has been deleted.");
                 } else {
                     log.debug("consume() adding event to update queue: " + event.toString());
-                    objectsToUpdate.add((BrowsableObject)object);
+                    objectsToUpdate.add((IndexableObject)object);
                 }
                 break;
 
@@ -155,7 +155,7 @@ public class IndexEventConsumer implements Consumer {
         if (objectsToUpdate != null && uniqueIdsToDelete != null) {
 
             // update the changed Items not deleted because they were on create list
-            for (BrowsableObject iu : objectsToUpdate) {
+            for (IndexableObject iu : objectsToUpdate) {
                 /* we let all types through here and
                  * allow the search indexer to make
                  * decisions on indexing and/or removal

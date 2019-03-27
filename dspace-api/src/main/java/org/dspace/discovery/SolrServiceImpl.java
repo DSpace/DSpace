@@ -69,7 +69,7 @@ import org.apache.solr.handler.extraction.ExtractingParams;
 import org.dspace.app.util.Util;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
-import org.dspace.browse.BrowsableObject;
+import org.dspace.browse.IndexableObject;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
@@ -244,7 +244,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
      * @throws SQLException if error
      */
     @Override
-    public void indexContent(Context context, BrowsableObject dso)
+    public void indexContent(Context context, IndexableObject dso)
         throws SQLException {
         indexContent(context, dso, false);
     }
@@ -260,7 +260,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
      * @throws SQLException if error
      */
     @Override
-    public void indexContent(Context context, BrowsableObject dso,
+    public void indexContent(Context context, IndexableObject dso,
                              boolean force) throws SQLException {
 
         try {
@@ -320,7 +320,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
      * @throws IOException  if IO error
      */
     @Override
-    public void unIndexContent(Context context, BrowsableObject dso)
+    public void unIndexContent(Context context, IndexableObject dso)
         throws SQLException, IOException {
         unIndexContent(context, dso, false);
     }
@@ -335,7 +335,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
      * @throws IOException  if IO error
      */
     @Override
-    public void unIndexContent(Context context, BrowsableObject dso, boolean commit)
+    public void unIndexContent(Context context, IndexableObject dso, boolean commit)
         throws SQLException, IOException {
         try {
             if (dso == null) {
@@ -401,7 +401,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
      * @param dso     object to re-index
      */
     @Override
-    public void reIndexContent(Context context, BrowsableObject dso)
+    public void reIndexContent(Context context, IndexableObject dso)
         throws SQLException, IOException {
         try {
             indexContent(context, dso);
@@ -591,7 +591,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
                     String uniqueID = (String) doc.getFieldValue(RESOURCE_UNIQUE_ID);
 
-                    BrowsableObject o = findDSpaceObject(context, doc);
+                    IndexableObject o = findIndexableObject(context, doc);
 
                     if (o == null) {
                         log.info("Deleting: " + uniqueID);
@@ -1869,14 +1869,14 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     }
 
     @Override
-    public DiscoverResult search(Context context, BrowsableObject dso,
+    public DiscoverResult search(Context context, IndexableObject dso,
                                  DiscoverQuery query)
         throws SearchServiceException {
         return search(context, dso, query, false);
     }
 
     @Override
-    public DiscoverResult search(Context context, BrowsableObject dso, DiscoverQuery discoveryQuery,
+    public DiscoverResult search(Context context, IndexableObject dso, DiscoverQuery discoveryQuery,
                                  boolean includeUnDiscoverable) throws SearchServiceException {
         if (dso != null) {
             if (dso instanceof Community) {
@@ -2054,10 +2054,10 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
             List<String> searchFields = query.getSearchFields();
             for (SolrDocument doc : solrQueryResponse.getResults()) {
-                BrowsableObject dso = findDSpaceObject(context, doc);
+                IndexableObject dso = findIndexableObject(context, doc);
 
                 if (dso != null) {
-                    result.addDSpaceObject(dso);
+                    result.addIndexableObject(dso);
                 } else {
                     log.error(LogManager.getHeader(context, "Error while retrieving DSpace object from discovery index",
                                                    "Handle: " + doc.getFirstValue(HANDLE_FIELD)));
@@ -2096,7 +2096,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                         }
 
                         result.addHighlightedResult(dso,
-                            new DiscoverResult.DSpaceObjectHighlightResult(dso, resultMap, resultMapWithAuthority));
+                            new DiscoverResult.IndexableObjectHighlightResult(dso, resultMap, resultMapWithAuthority));
                     }
                 }
             }
@@ -2197,18 +2197,18 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     }
 
     /**
-     * Find DSpace object by type and UUID or by handle from given Solr document
+     * Find the indexable object by type and UUID
      *
      * @param context The relevant DSpace Context.
      * @param doc     the solr document
-     * @return DSpace object
+     * @return an IndexableObject
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
-    protected BrowsableObject findDSpaceObject(Context context, SolrDocument doc) throws SQLException {
+    protected IndexableObject findIndexableObject(Context context, SolrDocument doc) throws SQLException {
         Integer type = (Integer) doc.getFirstValue(RESOURCE_TYPE_FIELD);
         Object id = doc.getFirstValue(RESOURCE_ID_FIELD);
         String handle = (String) doc.getFirstValue(HANDLE_FIELD);
-        BrowsableObject o = null;
+        IndexableObject o = null;
         Serializable uid = null;
         if (type != null && id != null) {
             switch (type) {
@@ -2225,7 +2225,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         }
 
         if (uid != null) {
-            o = (BrowsableObject) contentServiceFactory.getBrowsableObjectService(type).find(context, uid);
+            o = (IndexableObject) contentServiceFactory.getIndexableObjectService(type).find(context, uid);
         }
 
         if (o == null) {
@@ -2235,13 +2235,13 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         return o;
     }
 
-    public List<BrowsableObject> search(Context context, String query, int offset, int max,
+    public List<IndexableObject> search(Context context, String query, int offset, int max,
             String... filterquery) {
         return search(context, query, null, true, offset, max, filterquery);
     }
 
     @Override
-    public List<BrowsableObject> search(Context context, String query, String orderfield, boolean ascending,
+    public List<IndexableObject> search(Context context, String query, String orderfield, boolean ascending,
             int offset, int max, String... filterquery) {
 
         try {
@@ -2265,12 +2265,12 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             SolrDocumentList docs = rsp.getResults();
 
             Iterator iter = docs.iterator();
-            List<BrowsableObject> result = new ArrayList<BrowsableObject>();
+            List<IndexableObject> result = new ArrayList<IndexableObject>();
             while (iter.hasNext()) {
                 SolrDocument doc = (SolrDocument) iter.next();
 
-                BrowsableObject o = (BrowsableObject)contentServiceFactory
-                    .getBrowsableObjectService((Integer) doc.getFirstValue(RESOURCE_TYPE_FIELD))
+                IndexableObject o = (IndexableObject)contentServiceFactory
+                    .getIndexableObjectService((Integer) doc.getFirstValue(RESOURCE_TYPE_FIELD))
                     .find(context, UUID.fromString((String) doc.getFirstValue(RESOURCE_ID_FIELD)));
 
                 if (o != null) {
@@ -2282,7 +2282,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             // Any acception that we get ignore it.
             // We do NOT want any crashed to shown by the user
             log.error(LogManager.getHeader(context, "Error while quering solr", "Query: " + query), e);
-            return new ArrayList<BrowsableObject>(0);
+            return new ArrayList<IndexableObject>(0);
         }
     }
 
@@ -2375,7 +2375,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 SolrDocumentList relatedDocs = (SolrDocumentList) mltResults.get(item.getType() + "-" + item.getID());
                 for (Object relatedDoc : relatedDocs) {
                     SolrDocument relatedDocument = (SolrDocument) relatedDoc;
-                    BrowsableObject relatedItem = findDSpaceObject(context, relatedDocument);
+                    IndexableObject relatedItem = findIndexableObject(context, relatedDocument);
                     if (relatedItem.getType() == Constants.ITEM) {
                         results.add((Item) relatedItem);
                     }
@@ -2536,7 +2536,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     }
 
     @Override
-    public void indexContent(Context context, BrowsableObject dso, boolean force,
+    public void indexContent(Context context, IndexableObject dso, boolean force,
                              boolean commit) throws SearchServiceException, SQLException {
         indexContent(context, dso, force);
         if (commit) {
@@ -2565,7 +2565,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     }
 
     @Override
-    public FacetYearRange getFacetYearRange(Context context, BrowsableObject scope,
+    public FacetYearRange getFacetYearRange(Context context, IndexableObject scope,
                                             DiscoverySearchFilterFacet facet, List<String> filterQueries,
                                             DiscoverQuery parentQuery) throws SearchServiceException {
         FacetYearRange result = new FacetYearRange(facet);
@@ -2587,9 +2587,9 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         maxQuery.setSortField(sortField, sortOrder);
         maxQuery.addSearchField(valueField);
         DiscoverResult maxResult = this.search(context,maxQuery);
-        if (0 < maxResult.getDspaceObjects().size()) {
+        if (0 < maxResult.getIndexableObjects().size()) {
             List<DiscoverResult.SearchDocument> searchDocuments = maxResult
-                .getSearchDocument(maxResult.getDspaceObjects().get(0));
+                .getSearchDocument(maxResult.getIndexableObjects().get(0));
             if (0 < searchDocuments.size() && 0 < searchDocuments.get(0).getSearchFieldValues
                 (valueField).size()) {
                 return searchDocuments.get(0).getSearchFieldValues(valueField).get(0);

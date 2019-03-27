@@ -21,7 +21,7 @@ import org.dspace.app.rest.submit.SubmissionService;
 import org.dspace.app.util.SubmissionConfigReader;
 import org.dspace.app.util.SubmissionConfigReaderException;
 import org.dspace.app.util.SubmissionStepConfig;
-import org.dspace.browse.BrowsableObject;
+import org.dspace.browse.IndexableObject;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
@@ -38,7 +38,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class WorkspaceItemConverter
         extends
-        BrowsableDSpaceObjectConverter<org.dspace.content.WorkspaceItem, org.dspace.app.rest.model.WorkspaceItemRest> {
+        IndexableDSpaceObjectConverter<org.dspace.content.WorkspaceItem, org.dspace.app.rest.model.WorkspaceItemRest> {
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(WorkspaceItemConverter.class);
 
@@ -155,7 +155,7 @@ public class WorkspaceItemConverter
     }
 
     @Override
-    public boolean supportsModel(BrowsableObject object) {
+    public boolean supportsModel(IndexableObject object) {
         return object instanceof WorkspaceItem;
     }
 }

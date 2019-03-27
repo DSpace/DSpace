@@ -7,7 +7,7 @@
  */
 package org.dspace.app.rest.converter;
 
-import org.dspace.browse.BrowsableObject;
+import org.dspace.browse.IndexableObject;
 import org.dspace.content.DSpaceObject;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -21,7 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public abstract class DSpaceObjectConverter<M extends DSpaceObject, R extends org.dspace.app.rest.model
     .DSpaceObjectRest>
-    extends BrowsableDSpaceObjectConverter<M, R> {
+    extends IndexableDSpaceObjectConverter<M, R> {
 
     @Autowired(required = true)
     private MetadataConverter metadataConverter;
@@ -43,7 +43,7 @@ public abstract class DSpaceObjectConverter<M extends DSpaceObject, R extends or
         return null;
     }
 
-    public boolean supportsModel(BrowsableObject object) {
+    public boolean supportsModel(IndexableObject object) {
         return object != null && object.getClass().equals(getModelClass());
     }
 
