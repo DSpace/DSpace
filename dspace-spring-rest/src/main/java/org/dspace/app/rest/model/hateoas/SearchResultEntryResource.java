@@ -17,7 +17,7 @@ import org.dspace.app.rest.utils.Utils;
  */
 public class SearchResultEntryResource extends HALResource<SearchResultEntryRest> {
 
-    public static final String R_OBJECT_LINK = "rObject";
+    public static final String INDEXABLE_OBJECT_LINK = "indexableObject";
 
     public SearchResultEntryResource(final SearchResultEntryRest data, final Utils utils) {
         super(data);
@@ -27,12 +27,12 @@ public class SearchResultEntryResource extends HALResource<SearchResultEntryRest
 
     private void addEmbeds(final SearchResultEntryRest data, final Utils utils) {
 
-        RestAddressableModel dspaceObject = data.getRObject();
+        RestAddressableModel dspaceObject = data.getIndexableObject();
 
         if (dspaceObject != null) {
             DSpaceRestRepository resourceRepository = utils
                 .getResourceRepository(dspaceObject.getCategory(), dspaceObject.getType());
-            embedResource(R_OBJECT_LINK, resourceRepository.wrapResource(dspaceObject));
+            embedResource(INDEXABLE_OBJECT_LINK, resourceRepository.wrapResource(dspaceObject));
         }
 
     }

@@ -23,9 +23,9 @@ public class SearchResultMatcher {
     public static Matcher<? super Object> match(String category, String type, String typePlural) {
         return allOf(
             hasJsonPath("$.type", is("discover")),
-            hasJsonPath("$._links.rObject.href", containsString("/api/" + category + "/" + typePlural)),
+            hasJsonPath("$._links.indexableObject.href", containsString("/api/" + category + "/" + typePlural)),
             hasJsonPath("$._embedded", notNullValue()),
-            hasJsonPath("$._embedded.rObject", is(
+            hasJsonPath("$._embedded.indexableObject", is(
                 matchEmbeddedObject(type)
             ))
         );
@@ -53,9 +53,9 @@ public class SearchResultMatcher {
     public static Matcher<? super Object> matchOnItemName(String type, String typePlural, String itemName) {
         return allOf(
             hasJsonPath("$.type", is("discover")),
-            hasJsonPath("$._links.rObject.href", containsString("/api/core/" + typePlural)),
+            hasJsonPath("$._links.indexableObject.href", containsString("/api/core/" + typePlural)),
             hasJsonPath("$._embedded", notNullValue()),
-            hasJsonPath("$._embedded.rObject", is(
+            hasJsonPath("$._embedded.indexableObject", is(
                 matchEmbeddedObjectOnItemName(type, itemName)
             ))
         );
@@ -76,9 +76,9 @@ public class SearchResultMatcher {
             hasJsonPath("$.type", is("discover")),
             hasJsonPath("$.hitHighlights", is(
                 HitHighlightMatcher.entry(hitHighlightQuery, expectedFieldInHitHighlightning))),
-            hasJsonPath("$._links.rObject.href", containsString("/api/core/" + typePlural)),
+            hasJsonPath("$._links.indexableObject.href", containsString("/api/core/" + typePlural)),
             hasJsonPath("$._embedded", notNullValue()),
-            hasJsonPath("$._embedded.rObject", is(
+            hasJsonPath("$._embedded.indexableObject", is(
                 matchEmbeddedObjectOnItemName(type, itemName)
             ))
         );
