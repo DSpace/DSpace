@@ -84,7 +84,7 @@ public class ClaimedTaskRestRepository extends DSpaceRestRepository<ClaimedTaskR
     AuthorizeService authorizeService;
 
     @Override
-    @PreAuthorize("hasPermission(#id, 'CLAIMEDTAKS', 'READ')")
+    @PreAuthorize("hasPermission(#id, 'CLAIMEDTASK', 'READ')")
     public ClaimedTaskRest findOne(Context context, Integer id) {
         ClaimedTask task = null;
         try {
@@ -135,7 +135,7 @@ public class ClaimedTaskRestRepository extends DSpaceRestRepository<ClaimedTaskR
     }
 
     @Override
-    @PreAuthorize("hasPermission(#id, 'CLAIMEDTAKS', 'WRITE')")
+    @PreAuthorize("hasPermission(#id, 'CLAIMEDTASK', 'WRITE')")
     protected ClaimedTaskRest action(Context context, HttpServletRequest request, Integer id)
         throws SQLException, IOException {
         ClaimedTask task = null;
@@ -174,7 +174,7 @@ public class ClaimedTaskRestRepository extends DSpaceRestRepository<ClaimedTaskR
      * enough other claimed tasks for the same workflowitem.
      * 
      */
-    @PreAuthorize("hasPermission(#id, 'CLAIMEDTAKS', 'DELETE')")
+    @PreAuthorize("hasPermission(#id, 'CLAIMEDTASK', 'DELETE')")
     protected void delete(Context context, Integer id) {
         ClaimedTask task = null;
         try {
