@@ -8,7 +8,7 @@
 package org.dspace.app.cris.integration;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -21,15 +21,22 @@ import org.dspace.content.authority.Choice;
 import org.dspace.content.authority.Choices;
 import org.dspace.utils.DSpace;
 
-public class ORCIDAuthority extends RPAuthority {
+/**
+ * 
+ * Authority to aggregate "extra" value to single choice 
+ * 
+ * @author Pascarelli Luigi Andrea
+ *
+ */
+public class ORCIDMultiAuthority extends RPMultiAuthority {
 
 	private static final int DEFAULT_MAX_ROWS = 10;
 
-	private static Logger log = Logger.getLogger(ORCIDAuthority.class);
+	private static Logger log = Logger.getLogger(ORCIDMultiAuthority.class);
 
 	private OrcidService source = new DSpace().getServiceManager().getServiceByName("OrcidSource", OrcidService.class);
 
-	private List<OrcidAuthorityExtraMetadataGenerator> generators = new DSpace().getServiceManager().getServicesByType(OrcidAuthorityExtraMetadataGenerator.class);
+	public List<OrcidAuthorityExtraMetadataGenerator> generators = new DSpace().getServiceManager().getServicesByType(OrcidAuthorityExtraMetadataGenerator.class);
 	
 	@Override
 	public Choices getMatches(String field, String query, int collection, int start, int limit, String locale) {
@@ -49,8 +56,7 @@ public class ORCIDAuthority extends RPAuthority {
 						Map<String, String> extras = ((OrcidAuthorityValue)val).choiceSelectMap();
 						extras.put("insolr", "false");
 						extras.put("link", getLink((OrcidAuthorityValue)val));
-						extras.putAll(buildExtra(val.getValue()));
-						results.add(new Choice(val.generateString(), val.getValue(), val.getValue(), extras));
+						results.addAll(buildAggregateByExtra(val));
 						added++;
 					}
 				}
@@ -64,19 +70,17 @@ public class ORCIDAuthority extends RPAuthority {
 		return choices.values;
 	}
 
-	private Map<String, String> buildExtra(String value)
+    public List<Choice> buildAggregateByExtra(AuthorityValue value)
     {
-        Map<String, String> extras = new HashMap<String,String>();
-        
+        List<Choice> choiceList = new LinkedList<Choice>();
         if(generators!=null) {
             for(OrcidAuthorityExtraMetadataGenerator gg : generators) {
-                Map<String, String> extrasTmp = gg.build(source, value);
-                extras.putAll(extrasTmp);
+                choiceList.addAll(gg.buildAggregate(source, value));
             }
         }
-        return extras;
+        return choiceList;
     }
-
+	
     private String getLink(OrcidAuthorityValue val) {
 		return source.getBaseURL() + val.getOrcid_id();
 	}

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    The contents of this file are subject to the license and copyright
+    detailed in the LICENSE and NOTICE files at the root of the source
+    tree and available online at
+
+    http://www.dspace.org/license/
+
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                  http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+                  http://www.springframework.org/schema/context
+                  http://www.springframework.org/schema/context/spring-context-2.5.xsd
+                  http://www.springframework.org/schema/util
+    			  http://www.springframework.org/schema/util/spring-util-2.5.xsd">
+
+    <context:annotation-config /> <!-- allows us to use spring annotations in beans -->
+
+<!-- USE WITH RPAuthority TO RETRIEVE EXTRA METADATA (NESTED AND SIMPLE METADATA) BY CONFIGURATION -->  
+<!-- 
+	<bean id="org.dspace.app.cris.integration.RPExtraAuthorityMetadataGenerator" 
+    	class="org.dspace.app.cris.integration.RPExtraAuthorityMetadataGenerator">
+    	<property name="relatedInputformMetadata" value="dc_contributor_department"/>
+    	<property name="schema" value="affiliation"/>
+    	<property name="element" value="affiliationorgunit"/>
+		<property name="qualifier" value="name"/>
+
+		USE THE FOLLOW PROPERTY WITH RPMultiAuthority implementation (see RPMultiAuthority) 
+		<property name="singleResultOnAggregate" value="false"/>
+     </bean>
+-->    
+    
+<!-- OR USE DEDICATED IMPLEMENTATION TO FORCE THE USE OF ResearcherPage.getOrgUnit() LOGIC (see researcherpage.pdef.orgunit parameter on cris.cfg) --> 
+<!-- 
+	<bean id="org.dspace.app.cris.integration.RPExtraOrgUnitAuthorityMetadataGenerator" 
+    	class="org.dspace.app.cris.integration.RPExtraOrgUnitAuthorityMetadataGenerator">
+    	<property name="relatedInputformMetadata" value="dc_contributor_department"/>
+    </bean>
+    
+    NOTE THE ABOVE BEAN CONFIGURATION (RPExtraOrgUnitAuthorityMetadataGenerator) COULD BE REPLACED BY (RPExtraOrgUnitAuthorityMetadataGenerator) WITH THE FOLLOW CONFIGURATION 
+    
+    <bean id="org.dspace.app.cris.integration.RPExtraOrgUnitAuthorityMetadataGenerator" 
+    	class="org.dspace.app.cris.integration.RPExtraAuthorityMetadataGenerator">
+    	<property name="relatedInputformMetadata" value="dc_contributor_department"/>
+    	<property name="schema" value="crisrp"/>
+    	<property name="element" value="dept"/>
+    	
+    	USE THE FOLLOW PROPERTY WITH RPMultiAuthority implementation (see RPMultiAuthority)
+		<property name="singleResultOnAggregate" value="false"/>
+     </bean>
+-->
+
+<!-- USE WITH ORCIDAuthority TO RETRIEVE EXTRA METADATA FOR EMPLOYMENT -->
+<!-- 
+	<bean id="org.dspace.app.cris.integration.OrcidExtraEmploymentAuthorityMetadataGenerator" 
+    	class="org.dspace.app.cris.integration.OrcidExtraEmploymentAuthorityMetadataGenerator">
+    	<property name="relatedInputformMetadata" value="dc_contributor_department"/>
+    	USE THE FOLLOW PROPERTY WITH ORCIDMultiAuthority implementation to aggregate "extra" result (see ORCIDMultiAuthority)
+    	<property name="singleResultOnAggregate" value="false"/>
+    </bean> 
+-->
+
+</beans>
