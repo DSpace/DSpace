@@ -23,11 +23,13 @@ import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.BundleService;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
+import org.dspace.content.service.EntityTypeService;
 import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.MetadataSchemaService;
 import org.dspace.content.service.RelationshipService;
+import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.content.service.SiteService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Context;
@@ -74,6 +76,8 @@ public abstract class AbstractBuilder<T, S> {
     static MetadataSchemaService metadataSchemaService;
     static SiteService siteService;
     static RelationshipService relationshipService;
+    static RelationshipTypeService relationshipTypeService;
+    static EntityTypeService entityTypeService;
 
     protected Context context;
 
@@ -110,6 +114,8 @@ public abstract class AbstractBuilder<T, S> {
         metadataSchemaService = ContentServiceFactory.getInstance().getMetadataSchemaService();
         siteService = ContentServiceFactory.getInstance().getSiteService();
         relationshipService = ContentServiceFactory.getInstance().getRelationshipService();
+        relationshipTypeService = ContentServiceFactory.getInstance().getRelationshipTypeService();
+        entityTypeService = ContentServiceFactory.getInstance().getEntityTypeService();
 
         // Temporarily disabled
         // TODO find a way to be able to test the XML and "default" workflow at the same time
@@ -143,6 +149,9 @@ public abstract class AbstractBuilder<T, S> {
         metadataFieldService = null;
         metadataSchemaService = null;
         siteService = null;
+        relationshipService = null;
+        relationshipTypeService = null;
+        entityTypeService = null;
     }
 
     public static void cleanupObjects() throws Exception {
