@@ -28,7 +28,7 @@ import org.dspace.core.Context;
  * @param <T> class type
  * @author kevinvandevelde at atmire.com
  */
-public interface DSpaceObjectService<T extends DSpaceObject> extends BrowsableObjectService<T, UUID> {
+public interface DSpaceObjectService<T extends DSpaceObject> extends IndexableObjectService<T, UUID> {
 
     /**
      * Get a proper name for the object. This may return <code>null</code>.

@@ -37,7 +37,7 @@ import com.sun.syndication.io.SyndFeedOutput;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
-import org.dspace.browse.BrowsableObject;
+import org.dspace.browse.IndexableObject;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
@@ -185,7 +185,7 @@ public class SyndicationFeed {
      * @param labels  label map
      */
     public void populate(HttpServletRequest request, Context context, DSpaceObject dso,
-                         List<BrowsableObject> items, Map<String, String> labels) {
+                         List<IndexableObject> items, Map<String, String> labels) {
         String logoURL = null;
         String objectURL = null;
         String defaultTitle = null;
@@ -248,11 +248,11 @@ public class SyndicationFeed {
         // add entries for items
         if (items != null) {
             List<SyndEntry> entries = new ArrayList<SyndEntry>();
-            for (BrowsableObject itemDSO : items) {
-                if (itemDSO.getType() != Constants.ITEM) {
+            for (IndexableObject idxObj : items) {
+                if (idxObj.getType() != Constants.ITEM) {
                     continue;
                 }
-                Item item = (Item) itemDSO;
+                Item item = (Item) idxObj;
                 boolean hasDate = false;
                 SyndEntry entry = new SyndEntryImpl();
                 entries.add(entry);

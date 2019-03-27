@@ -12,7 +12,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 
-import org.dspace.browse.BrowsableObject;
+import org.dspace.browse.IndexableObject;
 import org.dspace.core.Context;
 
 /**
@@ -24,19 +24,19 @@ import org.dspace.core.Context;
  */
 public interface IndexingService {
 
-    void indexContent(Context context, BrowsableObject dso)
+    void indexContent(Context context, IndexableObject dso)
         throws SQLException;
 
-    void indexContent(Context context, BrowsableObject dso,
+    void indexContent(Context context, IndexableObject dso,
                       boolean force) throws SQLException;
 
-    void indexContent(Context context, BrowsableObject dso,
+    void indexContent(Context context, IndexableObject dso,
                       boolean force, boolean commit) throws SQLException, SearchServiceException;
 
-    void unIndexContent(Context context, BrowsableObject dso)
+    void unIndexContent(Context context, IndexableObject dso)
         throws SQLException, IOException;
 
-    void unIndexContent(Context context, BrowsableObject dso, boolean commit)
+    void unIndexContent(Context context, IndexableObject dso, boolean commit)
         throws SQLException, IOException;
 
     void unIndexContent(Context context, String uniqueSearchID)
@@ -45,7 +45,7 @@ public interface IndexingService {
     void unIndexContent(Context context, String uniqueSearchID, boolean commit)
         throws IOException;
 
-    void reIndexContent(Context context, BrowsableObject dso)
+    void reIndexContent(Context context, IndexableObject dso)
         throws SQLException, IOException;
 
     void createIndex(Context context) throws SQLException, IOException;

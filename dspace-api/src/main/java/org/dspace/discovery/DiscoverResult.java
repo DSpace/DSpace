@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.collections4.ListUtils;
-import org.dspace.browse.BrowsableObject;
+import org.dspace.browse.IndexableObject;
 import org.dspace.discovery.configuration.DiscoveryConfigurationParameters;
 import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
 
@@ -28,35 +28,35 @@ public class DiscoverResult {
 
     private long totalSearchResults;
     private int start;
-    private List<BrowsableObject> dspaceObjects;
+    private List<IndexableObject> indexableObjects;
     private Map<String, List<FacetResult>> facetResults;
     private Map<String, List<FacetResult>> facetQueryResults;
     private Map<String, List<FacetResult>> facetFieldResults;
 
     /**
-     * A map that contains all the documents sougth after, the key is a string representation of the DSpace object
+     * A map that contains all the documents sougth after, the key is a string representation of the Indexable Object
      */
     private Map<String, List<SearchDocument>> searchDocuments;
     private int maxResults = -1;
     private int searchTime;
-    private Map<String, DSpaceObjectHighlightResult> highlightedResults;
+    private Map<String, IndexableObjectHighlightResult> highlightedResults;
     private String spellCheckQuery;
 
     public DiscoverResult() {
-        dspaceObjects = new ArrayList<BrowsableObject>();
+        indexableObjects = new ArrayList<IndexableObject>();
         facetResults = new LinkedHashMap<String, List<FacetResult>>();
         facetQueryResults = new LinkedHashMap<String, List<FacetResult>>();
         facetFieldResults = new LinkedHashMap<String, List<FacetResult>>();
         searchDocuments = new LinkedHashMap<String, List<SearchDocument>>();
-        highlightedResults = new HashMap<String, DSpaceObjectHighlightResult>();
+        highlightedResults = new HashMap<String, IndexableObjectHighlightResult>();
     }
 
-    public void addDSpaceObject(BrowsableObject dso) {
-        this.dspaceObjects.add(dso);
+    public void addIndexableObject(IndexableObject idxObj) {
+        this.indexableObjects.add(idxObj);
     }
 
-    public List<BrowsableObject> getDspaceObjects() {
-        return dspaceObjects;
+    public List<IndexableObject> getIndexableObjects() {
+        return indexableObjects;
     }
 
     public long getTotalSearchResults() {
@@ -151,11 +151,11 @@ public class DiscoverResult {
         return ListUtils.emptyIfNull(facetValues);
     }
 
-    public DSpaceObjectHighlightResult getHighlightedResults(BrowsableObject dso) {
+    public IndexableObjectHighlightResult getHighlightedResults(IndexableObject dso) {
         return highlightedResults.get(dso.getUniqueIndexID());
     }
 
-    public void addHighlightedResult(BrowsableObject dso, DSpaceObjectHighlightResult highlightedResult) {
+    public void addHighlightedResult(IndexableObject dso, IndexableObjectHighlightResult highlightedResult) {
         this.highlightedResults.put(dso.getUniqueIndexID(), highlightedResult);
     }
 
@@ -218,20 +218,20 @@ public class DiscoverResult {
         this.spellCheckQuery = spellCheckQuery;
     }
 
-    public static final class DSpaceObjectHighlightResult {
-        private BrowsableObject dso;
+    public static final class IndexableObjectHighlightResult {
+        private IndexableObject indexableObject;
         private Map<String, List<String>> highlightResults;
         private Map<String, List<String[]>> highlightResultsWithAuthority;
 
-        public DSpaceObjectHighlightResult(BrowsableObject dso, Map<String, List<String>> highlightResults,
+        public IndexableObjectHighlightResult(IndexableObject idxObj, Map<String, List<String>> highlightResults,
                 Map<String, List<String[]>> highlightResultsWithAuthority) {
-            this.dso = dso;
+            this.indexableObject = idxObj;
             this.highlightResults = highlightResults;
             this.highlightResultsWithAuthority = highlightResultsWithAuthority;
         }
 
-        public BrowsableObject getDso() {
-            return dso;
+        public IndexableObject getIndexableObject() {
+            return indexableObject;
         }
 
         public List<String> getHighlightResults(String metadataKey) {
@@ -247,8 +247,8 @@ public class DiscoverResult {
         }
     }
 
-    public void addSearchDocument(BrowsableObject dso, SearchDocument searchDocument) {
-        String dsoString = SearchDocument.getDspaceObjectStringRepresentation(dso);
+    public void addSearchDocument(IndexableObject dso, SearchDocument searchDocument) {
+        String dsoString = SearchDocument.getIndexableObjectStringRepresentation(dso);
         List<SearchDocument> docs = searchDocuments.get(dsoString);
         if (docs == null) {
             docs = new ArrayList<SearchDocument>();
@@ -260,12 +260,12 @@ public class DiscoverResult {
     /**
      * Returns all the sought after search document values
      *
-     * @param dso
-     *            the dspace object we want our search documents for
+     * @param idxObj
+     *            the indexable object we want our search documents for
      * @return the search documents list
      */
-    public List<SearchDocument> getSearchDocument(BrowsableObject dso) {
-        String dsoString = SearchDocument.getDspaceObjectStringRepresentation(dso);
+    public List<SearchDocument> getSearchDocument(IndexableObject idxObj) {
+        String dsoString = SearchDocument.getIndexableObjectStringRepresentation(idxObj);
         List<SearchDocument> result = searchDocuments.get(dsoString);
         if (result == null) {
             return new ArrayList<SearchDocument>();
@@ -305,8 +305,8 @@ public class DiscoverResult {
             }
         }
 
-        public static String getDspaceObjectStringRepresentation(BrowsableObject dso) {
-            return dso.getType() + ":" + dso.getID();
+        public static String getIndexableObjectStringRepresentation(IndexableObject idxObj) {
+            return idxObj.getType() + ":" + idxObj.getID();
         }
     }
 }

@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.dspace.browse.BrowsableObject;
+import org.dspace.browse.IndexableObject;
 import org.dspace.core.Context;
 import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
 
@@ -46,7 +46,7 @@ public class FacetYearRange {
         return oldestYear != -1 && newestYear != -1;
     }
 
-    public void calculateRange(Context context, List<String> filterQueries, BrowsableObject scope,
+    public void calculateRange(Context context, List<String> filterQueries, IndexableObject scope,
                                SearchService searchService, DiscoverQuery parentQuery) throws SearchServiceException {
         dateFacet = facet.getIndexFieldName() + ".year";
         //Get a range query so we can create facet queries ranging from our first to our last date
@@ -94,7 +94,7 @@ public class FacetYearRange {
     }
 
     private void calculateNewRangeBasedOnSearchIndex(Context context, List<String> filterQueries,
-                                                     BrowsableObject scope, SearchService searchService,
+                                                     IndexableObject scope, SearchService searchService,
                                                      DiscoverQuery parentQuery) throws SearchServiceException {
         DiscoverQuery yearRangeQuery = new DiscoverQuery();
         yearRangeQuery.setDiscoveryConfigurationName(parentQuery.getDiscoveryConfigurationName());
@@ -107,9 +107,9 @@ public class FacetYearRange {
         yearRangeQuery.addSearchField(dateFacet);
         DiscoverResult lastYearResult = searchService.search(context, scope, yearRangeQuery);
 
-        if (0 < lastYearResult.getDspaceObjects().size()) {
+        if (0 < lastYearResult.getIndexableObjects().size()) {
             List<DiscoverResult.SearchDocument> searchDocuments = lastYearResult
-                .getSearchDocument(lastYearResult.getDspaceObjects().get(0));
+                .getSearchDocument(lastYearResult.getIndexableObjects().get(0));
             if (0 < searchDocuments.size() && 0 < searchDocuments.get(0).getSearchFieldValues(dateFacet).size()) {
                 oldestYear = Integer.parseInt(searchDocuments.get(0).getSearchFieldValues(dateFacet).get(0));
             }
@@ -117,9 +117,9 @@ public class FacetYearRange {
         //Now get the first year
         yearRangeQuery.setSortField(dateFacet + "_sort", DiscoverQuery.SORT_ORDER.desc);
         DiscoverResult firstYearResult = searchService.search(context, scope, yearRangeQuery);
-        if (0 < firstYearResult.getDspaceObjects().size()) {
+        if (0 < firstYearResult.getIndexableObjects().size()) {
             List<DiscoverResult.SearchDocument> searchDocuments = firstYearResult
-                .getSearchDocument(firstYearResult.getDspaceObjects().get(0));
+                .getSearchDocument(firstYearResult.getIndexableObjects().get(0));
             if (0 < searchDocuments.size() && 0 < searchDocuments.get(0).getSearchFieldValues(dateFacet).size()) {
                 newestYear = Integer.parseInt(searchDocuments.get(0).getSearchFieldValues(dateFacet).get(0));
             }

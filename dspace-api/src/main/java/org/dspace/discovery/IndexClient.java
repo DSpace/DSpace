@@ -24,7 +24,7 @@ import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
 import org.apache.logging.log4j.Logger;
-import org.dspace.browse.BrowsableObject;
+import org.dspace.browse.IndexableObject;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
@@ -177,7 +177,7 @@ public class IndexClient {
             String[] identifiers = optionValue.split("\\s*,\\s*");
             for (String id : identifiers) {
                 if (id.startsWith(ConfigurationManager.getProperty("handle.prefix")) || id.startsWith("123456789/")) {
-                    BrowsableObject dso = (BrowsableObject) HandleServiceFactory.getInstance()
+                    IndexableObject dso = (IndexableObject) HandleServiceFactory.getInstance()
                             .getHandleService().resolveToObject(context, id);
                     indexer.indexContent(context, dso, line.hasOption("f"));
                 }
@@ -215,7 +215,7 @@ public class IndexClient {
             }
         } else if (line.hasOption('i')) {
             final String handle = line.getOptionValue('i');
-            final BrowsableObject dso = (BrowsableObject) HandleServiceFactory.getInstance()
+            final IndexableObject dso = (IndexableObject) HandleServiceFactory.getInstance()
                     .getHandleService().resolveToObject(context, handle);
             if (dso == null) {
                 throw new IllegalArgumentException("Cannot resolve " + handle + " to a DSpace object");
@@ -249,7 +249,7 @@ public class IndexClient {
     private static long indexAll(final IndexingService indexingService,
                                  final ItemService itemService,
                                  final Context context,
-                                 final BrowsableObject dso)
+                                 final IndexableObject dso)
         throws IOException, SearchServiceException, SQLException {
         long count = 0;
 

@@ -10,19 +10,19 @@ package org.dspace.content.factory;
 import java.io.Serializable;
 import java.util.List;
 
-import org.dspace.browse.BrowsableObject;
+import org.dspace.browse.IndexableObject;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
-import org.dspace.content.service.BrowsableObjectService;
 import org.dspace.content.service.BundleService;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.DSpaceObjectLegacySupportService;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.content.service.InProgressSubmissionService;
+import org.dspace.content.service.IndexableObjectService;
 import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataFieldService;
@@ -42,7 +42,12 @@ import org.dspace.workflow.factory.WorkflowServiceFactory;
  */
 public abstract class ContentServiceFactory {
 
-    public abstract List<BrowsableObjectService> getBrowsableObjectServices();
+    /**
+     * Return the list of all the available implementation of the IndexableObjectService interface
+     * 
+     * @return the list of IndexableObjectService
+     */
+    public abstract List<IndexableObjectService> getIndexableObjectServices();
 
     public abstract List<DSpaceObjectService<? extends DSpaceObject>> getDSpaceObjectServices();
 
@@ -103,12 +108,12 @@ public abstract class ContentServiceFactory {
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends BrowsableObject<PK>, PK extends Serializable> BrowsableObjectService<T, PK>
-        getBrowsableObjectService(int type) {
-        for (int i = 0; i < getBrowsableObjectServices().size(); i++) {
-            BrowsableObjectService objectService = getBrowsableObjectServices().get(i);
+    public <T extends IndexableObject<PK>, PK extends Serializable> IndexableObjectService<T, PK>
+        getIndexableObjectService(int type) {
+        for (int i = 0; i < getIndexableObjectServices().size(); i++) {
+            IndexableObjectService objectService = getIndexableObjectServices().get(i);
             if (objectService.getSupportsTypeConstant() == type) {
-                return (BrowsableObjectService<T, PK>) objectService;
+                return (IndexableObjectService<T, PK>) objectService;
             }
         }
         throw new UnsupportedOperationException("Unknown Browsable DSpace type: " + type);

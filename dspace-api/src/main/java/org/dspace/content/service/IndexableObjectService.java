@@ -10,23 +10,22 @@ package org.dspace.content.service;
 import java.io.Serializable;
 import java.sql.SQLException;
 
-import org.dspace.browse.BrowsableObject;
+import org.dspace.browse.IndexableObject;
 import org.dspace.core.Context;
 
 /**
- * Service interface class for any BrowsableObject.
- * All BrowsableObject service classes should implement this class since it offers some basic methods which all
- * BrowsableObjects are required to have.
+ * Service interface class for any IndexableObject.
+ * All IndexableObject service classes should implement this class since it offers some basic methods which all
+ * IndexableObjects are required to have.
  *
  * @param <T> class type
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
-public interface BrowsableObjectService<T extends BrowsableObject<PK>, PK extends Serializable> {
+public interface IndexableObjectService<T extends IndexableObject<PK>, PK extends Serializable> {
 
 
     /**
-     * Generic find for when the precise type of a BDSO is not known, just the
-     * a pair of type number and database ID.
+     * Generic find for when the precise type of an IndexableObject is not known
      *
      * @param context - the context
      * @param id      - id within table of type'd objects
@@ -38,7 +37,7 @@ public interface BrowsableObjectService<T extends BrowsableObject<PK>, PK extend
     /**
      * Returns the Constants which this service supports
      *
-     * @return a org.dspace.core.Constants that represents a BrowsableObject type
+     * @return a org.dspace.core.Constants that represents a IndexableObject type
      */
     public int getSupportsTypeConstant();
 }

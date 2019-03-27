@@ -18,7 +18,7 @@ import org.dspace.app.rest.model.RestAddressableModel;
 import org.dspace.app.rest.model.SearchResultEntryRest;
 import org.dspace.app.rest.model.SearchResultsRest;
 import org.dspace.app.rest.parameter.SearchFilter;
-import org.dspace.browse.BrowsableObject;
+import org.dspace.browse.IndexableObject;
 import org.dspace.core.Context;
 import org.dspace.discovery.DiscoverResult;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
@@ -36,7 +36,7 @@ public class DiscoverResultConverter {
     private static final Logger log = Logger.getLogger(DiscoverResultConverter.class);
 
     @Autowired
-    private List<BrowsableDSpaceObjectConverter> converters;
+    private List<IndexableDSpaceObjectConverter> converters;
     @Autowired
     private DiscoverFacetsConverter facetConverter;
     @Autowired
@@ -66,14 +66,14 @@ public class DiscoverResultConverter {
     }
 
     private void addSearchResults(final DiscoverResult searchResult, final SearchResultsRest resultsRest) {
-        for (BrowsableObject dspaceObject : CollectionUtils.emptyIfNull(searchResult.getDspaceObjects())) {
+        for (IndexableObject dspaceObject : CollectionUtils.emptyIfNull(searchResult.getIndexableObjects())) {
             SearchResultEntryRest resultEntry = new SearchResultEntryRest();
 
             //Convert the DSpace Object to its REST model
             resultEntry.setRObject(convertDSpaceObject(dspaceObject));
 
             //Add hit highlighting for this DSO if present
-            DiscoverResult.DSpaceObjectHighlightResult highlightedResults = searchResult
+            DiscoverResult.IndexableObjectHighlightResult highlightedResults = searchResult
                 .getHighlightedResults(dspaceObject);
             if (highlightedResults != null && MapUtils.isNotEmpty(highlightedResults.getHighlightResults())) {
                 for (Map.Entry<String, List<String>> metadataHighlight : highlightedResults.getHighlightResults()
@@ -86,8 +86,8 @@ public class DiscoverResultConverter {
         }
     }
 
-    private RestAddressableModel convertDSpaceObject(final BrowsableObject dspaceObject) {
-        for (BrowsableDSpaceObjectConverter<BrowsableObject, RestAddressableModel> converter : converters) {
+    private RestAddressableModel convertDSpaceObject(final IndexableObject dspaceObject) {
+        for (IndexableDSpaceObjectConverter<IndexableObject, RestAddressableModel> converter : converters) {
             if (converter.supportsModel(dspaceObject)) {
                 return converter.convert(dspaceObject);
             }
