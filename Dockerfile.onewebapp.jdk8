@@ -6,7 +6,7 @@
 # - ANT 1.10.5
 # - maven:3-jdk-8
 # - note: 
-# - default tag for branch: dspace/dspace: dspace/dspace:dspace-7_x-jdk8-test
+# - default tag for branch: dspace/dspace: dspace/dspace:dspace-7_x-jdk8
 
 # Step 1 - Run Maven Build
 FROM dspace/dspace-dependencies:dspace-7_x as build
@@ -54,9 +54,4 @@ EXPOSE 8080 8009
 
 ENV JAVA_OPTS=-Xmx2000m
 
-RUN ln -s $DSPACE_INSTALL/webapps/spring-rest   /usr/local/tomcat/webapps/spring-rest   && \
-    ln -s $DSPACE_INSTALL/webapps/rest          /usr/local/tomcat/webapps/rest
-
-COPY dspace/src/main/docker/test/rest_web.xml $DSPACE_INSTALL/webapps/rest/WEB-INF/web.xml
-
-RUN sed -i -e "s|\${dspace.dir}|$DSPACE_INSTALL|" $DSPACE_INSTALL/webapps/rest/WEB-INF/web.xml
+RUN ln -s $DSPACE_INSTALL/webapps/ROOT   /usr/local/tomcat/webapps/spring-rest
