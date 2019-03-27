@@ -35,6 +35,7 @@ import org.dspace.app.rest.builder.WorkspaceItemBuilder;
 import org.dspace.app.rest.matcher.AppliedFilterMatcher;
 import org.dspace.app.rest.matcher.FacetEntryMatcher;
 import org.dspace.app.rest.matcher.FacetValueMatcher;
+import org.dspace.app.rest.matcher.ItemMatcher;
 import org.dspace.app.rest.matcher.PageMatcher;
 import org.dspace.app.rest.matcher.SearchFilterMatcher;
 import org.dspace.app.rest.matcher.SearchResultMatcher;
@@ -3127,7 +3128,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                                 .withWorkflowGroup(1, admin)
                                 .build();
 
-        // 2. Three public items that are readable by Anonymous with different subjects
+        // 2. Three public items that are readable by Anonymous
         Item publicItem1 = ItemBuilder.createItem(context, col1)
                 .withTitle("Test")
                 .withIssueDate("2010-10-17")
@@ -3142,8 +3143,12 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .withSubject("TestingForMore").withSubject("ExtraEntry")
                 .build();
 
+        EPerson submitter = EPersonBuilder.createEPerson(context).withEmail("submitter@example.com")
+                .withPassword(password).build();
+        context.setCurrentUser(submitter);
+        // a public item from our submitter
         Item publicItem3 = ItemBuilder.createItem(context, col2)
-                .withTitle("Public item 2")
+                .withTitle("Public item from submitter")
                 .withIssueDate("2010-02-13")
                 .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("test,test")
                 .withAuthor("test2, test2").withAuthor("Maybe, Maybe")
@@ -3151,8 +3156,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .withSubject("ExtraEntry")
                 .build();
 
-        //3. three inprogress submission from a normal user (2 ws, 1 wf that will produce also a pooltask)
-        context.setCurrentUser(eperson);
+        //3. three inprogress submission from our submitter user (2 ws, 1 wf that will produce also a pooltask)
         WorkspaceItem wsItem1 = WorkspaceItemBuilder.createWorkspaceItem(context, col1).withTitle("Workspace Item 1")
                 .withIssueDate("2010-07-23")
                 .build();
@@ -3187,10 +3191,10 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         context.restoreAuthSystemState();
         //** WHEN **
         // each submitter, including the administrator should see only her submission
-        String epersonToken = getAuthToken(eperson.getEmail(), password);
+        String submitterToken = getAuthToken(submitter.getEmail(), password);
         String adminToken = getAuthToken(admin.getEmail(), password);
 
-        getClient(epersonToken).perform(get("/api/discover/search/objects").param("configuration", "workspace"))
+        getClient(submitterToken).perform(get("/api/discover/search/objects").param("configuration", "workspace"))
                 //** THEN **
                 //The status has to be 200 OK
                 .andExpect(status().isOk())
@@ -3199,12 +3203,19 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 //There needs to be a page object that shows the total pages and total elements as well as the
                 // size and the current page (number)
                 .andExpect(jsonPath("$._embedded.searchResult.page", is(
-                        PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 4)
+                        PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 5)
                 )))
-                // These search results have to be shown in the embedded.objects section two workspaceitems and two
-                // worfklowitems submitted by the standard user as by the structure defined above.
-                //Seeing as everything fits onto one page, they have to all be present
+                // These search results have to be shown in the embedded.objects section
+                // one public item, two workspaceitems and two worfklowitems submitted by our submitter user
+                // as by the structure defined above.
+                // Seeing as everything fits onto one page, they have to all be present
                 .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
+                        Matchers.allOf(
+                                SearchResultMatcher.match("core", "item", "items"),
+                                JsonPathMatchers.hasJsonPath("$._embedded.indexableObject",
+                                        is(ItemMatcher.matchItemWithTitleAndDateIssued(publicItem3,
+                                                "Public item from submitter", "2010-02-13")))
+                                ),
                         Matchers.allOf(
                                 SearchResultMatcher.match("submission", "workspaceitem", "workspaceitems"),
                                 JsonPathMatchers.hasJsonPath("$._embedded.indexableObject",

@@ -103,8 +103,10 @@ import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
 import org.dspace.discovery.configuration.DiscoverySortConfiguration;
 import org.dspace.discovery.configuration.DiscoverySortFieldConfiguration;
 import org.dspace.discovery.configuration.HierarchicalSidebarFacetConfiguration;
+import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.GroupService;
 import org.dspace.handle.service.HandleService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.storage.rdbms.DatabaseUtils;
@@ -143,6 +145,16 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class SolrServiceImpl implements SearchService, IndexingService {
+
+    /**
+     * The name of the discover configuration used to search for workflow tasks in the mydspace
+     */
+    public static final String DISCOVER_WORKFLOW_CONFIGURATION_NAME = "workflow";
+
+    /**
+     * The name of the discover configuration used to search for inprogress submission in the mydspace
+     */
+    public static final String DISCOVER_WORKSPACE_CONFIGURATION_NAME = "workspace";
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(SolrServiceImpl.class);
 
@@ -186,6 +198,8 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     protected PoolTaskService poolTaskService;
     @Autowired(required = true)
     protected XmlWorkflowFactory workflowFactory;
+    @Autowired(required = true)
+    protected GroupService groupService;
 
     /**
      * Non-Static SolrServer for processing indexing events.
@@ -1616,7 +1630,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
             doc.addField("lastModified", item.getLastModified());
             if (workspaceItem.getSubmitter() != null) {
-                doc.addField("read", "ws" + workspaceItem.getSubmitter().getID());
+                doc.addField("submitter", workspaceItem.getSubmitter().getID().toString());
             }
 
             List<DiscoveryConfiguration> discoveryConfigurations = SearchUtils
@@ -1660,13 +1674,10 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 for (ClaimedTask claimedTask : claimedTasks) {
                     SolrInputDocument claimDoc = doc.deepCopy();
                     addBasicInfoToDocument(claimDoc, Constants.WORKFLOW_CLAIMED, claimedTask.getID(), null, locations);
-                    claimDoc.addField("workflow.action", claimedTask.getActionID());
-                    claimDoc.addField("workflow.step", claimedTask.getStepID());
-                    claimDoc.addField("workflow.owner", claimedTask.getOwner().getID());
-                    claimDoc.addField("read", "we" + claimedTask.getOwner().getID().toString());
-
                     addFacetIndex(claimDoc, "action", claimedTask.getActionID(), claimedTask.getActionID());
-                    addFacetIndex(claimDoc, "task", claimedTask.getStepID(), claimedTask.getStepID());
+                    addFacetIndex(claimDoc, "step", claimedTask.getStepID(), claimedTask.getStepID());
+
+                    claimDoc.addField("taskfor", "e" + claimedTask.getOwner().getID().toString());
 
                     String acvalue = DSpaceServicesFactory.getInstance().getConfigurationService()
                             .getProperty("discovery.facet.namedtype.workflow.claimed");
@@ -1684,18 +1695,14 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 for (PoolTask poolTask : pools) {
                     SolrInputDocument claimDoc = doc.deepCopy();
                     addBasicInfoToDocument(claimDoc, Constants.WORKFLOW_POOL, poolTask.getID(), null, locations);
-                    claimDoc.addField("workflow.action", poolTask.getActionID());
-                    claimDoc.addField("workflow.step", poolTask.getStepID());
                     addFacetIndex(claimDoc, "action", poolTask.getActionID(), poolTask.getActionID());
-                    addFacetIndex(claimDoc, "task", poolTask.getStepID(), poolTask.getStepID());
+                    addFacetIndex(claimDoc, "step", poolTask.getStepID(), poolTask.getStepID());
 
                     if (poolTask.getEperson() != null) {
-                        claimDoc.addField("workflow.owner", poolTask.getEperson().getID());
-                        claimDoc.addField("read", "we" + poolTask.getEperson().getID().toString());
+                        claimDoc.addField("taskfor", "e" + poolTask.getEperson().getID().toString());
                     }
                     if (poolTask.getGroup() != null) {
-                        claimDoc.addField("workflow.group", poolTask.getGroup().getID());
-                        claimDoc.addField("read", "wg" + poolTask.getGroup().getID().toString());
+                        claimDoc.addField("taskfor", "g" + poolTask.getGroup().getID().toString());
                     }
 
                     String acvalue = DSpaceServicesFactory.getInstance().getConfigurationService()
@@ -1719,7 +1726,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
             addBasicInfoToDocument(doc, Constants.WORKFLOWITEM, workflowItem.getID(), null, locations);
             if (workflowItem.getSubmitter() != null) {
-                doc.addField("read", "ws" + workflowItem.getSubmitter().getID());
+                doc.addField("submitter", workflowItem.getSubmitter().getID().toString());
             }
             docs.add(doc);
 
@@ -1911,7 +1918,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     }
 
     protected SolrQuery resolveToSolrQuery(Context context, DiscoverQuery discoveryQuery,
-                                           boolean includeUnDiscoverable) {
+                                           boolean includeUnDiscoverable) throws SearchServiceException {
         SolrQuery solrQuery = new SolrQuery();
 
         String query = "*:*";
@@ -2031,6 +2038,40 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
         }
 
+        boolean isWorkspace = StringUtils.startsWith(discoveryQuery.getDiscoveryConfigurationName(),
+                DISCOVER_WORKSPACE_CONFIGURATION_NAME);
+        boolean isWorkflow = StringUtils.startsWith(discoveryQuery.getDiscoveryConfigurationName(),
+                DISCOVER_WORKFLOW_CONFIGURATION_NAME);
+        EPerson currentUser = context.getCurrentUser();
+        // Retrieve all the groups the current user is a member of !
+        Set<Group> groups;
+        try {
+            groups = groupService.allMemberGroupsSet(context, currentUser);
+        } catch (SQLException e) {
+            throw new org.dspace.discovery.SearchServiceException(e.getMessage(), e);
+        }
+
+        // extra security check to avoid the possibility that an anonymous user
+        // get access to workspace or workflow
+        if (currentUser == null && (isWorkflow || isWorkspace)) {
+            throw new IllegalStateException("An anonymous user cannot perform a workspace or workflow search");
+        }
+        if (isWorkspace) {
+            // insert filter by submitter
+            solrQuery
+                .addFilterQuery("submitter:(" + currentUser.getID() + ")");
+        } else if (isWorkflow) {
+            // insert filter by controllers
+            StringBuilder controllerQuery = new StringBuilder();
+            controllerQuery.append("taskfor:(e" + currentUser.getID());
+            for (Group group : groups) {
+                controllerQuery.append(" OR g").append(group.getID());
+            }
+            controllerQuery.append(")");
+            solrQuery.addFilterQuery(controllerQuery.toString());
+        }
+
+
         //Add any configured search plugins !
         List<SolrServiceSearchPlugin> solrServiceSearchPlugins = DSpaceServicesFactory.getInstance().getServiceManager()
                                                                                       .getServicesByType(
@@ -2039,6 +2080,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         for (SolrServiceSearchPlugin searchPlugin : solrServiceSearchPlugins) {
             searchPlugin.additionalSearchParameters(context, discoveryQuery, solrQuery);
         }
+
         return solrQuery;
     }
 
