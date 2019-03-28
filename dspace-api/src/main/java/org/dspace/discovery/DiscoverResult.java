@@ -30,8 +30,6 @@ public class DiscoverResult {
     private int start;
     private List<IndexableObject> indexableObjects;
     private Map<String, List<FacetResult>> facetResults;
-    private Map<String, List<FacetResult>> facetQueryResults;
-    private Map<String, List<FacetResult>> facetFieldResults;
 
     /**
      * A map that contains all the documents sougth after, the key is a string representation of the Indexable Object
@@ -45,8 +43,6 @@ public class DiscoverResult {
     public DiscoverResult() {
         indexableObjects = new ArrayList<IndexableObject>();
         facetResults = new LinkedHashMap<String, List<FacetResult>>();
-        facetQueryResults = new LinkedHashMap<String, List<FacetResult>>();
-        facetFieldResults = new LinkedHashMap<String, List<FacetResult>>();
         searchDocuments = new LinkedHashMap<String, List<SearchDocument>>();
         highlightedResults = new HashMap<String, IndexableObjectHighlightResult>();
     }
@@ -102,40 +98,6 @@ public class DiscoverResult {
 
     public Map<String, List<FacetResult>> getFacetResults() {
         return facetResults;
-    }
-
-    public List<FacetResult> getFacetQueryResult(String facet) {
-        return facetQueryResults.get(facet) == null ? new ArrayList<FacetResult>() : facetQueryResults.get(facet);
-    }
-
-    public void addFacetQueryResult(String facetField, FacetResult... facetResults) {
-        List<FacetResult> facetValues = this.facetQueryResults.get(facetField);
-        if (facetValues == null) {
-            facetValues = new ArrayList<FacetResult>();
-        }
-        facetValues.addAll(Arrays.asList(facetResults));
-        this.facetQueryResults.put(facetField, facetValues);
-    }
-
-    public Map<String, List<FacetResult>> getFacetQueryResults() {
-        return facetQueryResults;
-    }
-
-    public List<FacetResult> getFacetFieldResult(String facet) {
-        return facetFieldResults.get(facet) == null ? new ArrayList<FacetResult>() : facetFieldResults.get(facet);
-    }
-
-    public void addFacetFieldResult(String facetField, FacetResult... facetResults) {
-        List<FacetResult> facetValues = this.facetFieldResults.get(facetField);
-        if (facetValues == null) {
-            facetValues = new ArrayList<FacetResult>();
-        }
-        facetValues.addAll(Arrays.asList(facetResults));
-        this.facetFieldResults.put(facetField, facetValues);
-    }
-
-    public Map<String, List<FacetResult>> getFacetFieldResults() {
-        return facetFieldResults;
     }
 
     public List<FacetResult> getFacetResult(String facet) {
