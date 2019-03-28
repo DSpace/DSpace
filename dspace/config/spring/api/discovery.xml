@@ -345,16 +345,6 @@
 				<value>search.resourcetype:2 OR search.resourcetype:[8 TO 9]</value>
 			</list>
 		</property>
-        <!--The configuration for the recent submissions-->
-        <property name="recentSubmissionConfiguration">
-            <bean class="org.dspace.discovery.configuration.DiscoveryRecentSubmissionsConfiguration">
-                <property name="metadataSortField" value="dc.date.accessioned" />
-                <property name="type" value="date"/>
-                <property name="max" value="20"/>
-                <!-- If enabled the collection home page will not display metadata but show a pageable list of recent submissions -->
-                <property name="useAsHomePage" value="false"/>
-            </bean>
-        </property>
         <!--Default result per page  -->
         <property name="defaultRpp" value="10" />
         <property name="hitHighlightingConfiguration">
@@ -381,26 +371,6 @@
                         </bean>
                     </list>
                 </property>
-            </bean>
-        </property>
-        <property name="moreLikeThisConfiguration">
-            <bean class="org.dspace.discovery.configuration.DiscoveryMoreLikeThisConfiguration">
-                <!--When altering this list also alter the "xmlui.Discovery.RelatedItems.help" key as it describes
-                the metadata fields below-->
-                <property name="similarityMetadataFields">
-                    <list>
-                        <value>dc.title</value>
-                        <value>dc.contributor.author</value>
-                        <value>dc.creator</value>
-                        <value>dc.subject</value>
-                    </list>
-                </property>
-                <!--The minimum number of matching terms across the metadata fields above before an item is found as related -->
-                <property name="minTermFrequency" value="5"/>
-                <!--The maximum number of related items displayed-->
-                <property name="max" value="3"/>
-                <!--The minimum word length below which words will be ignored-->
-                <property name="minWordLength" value="5"/>
             </bean>
         </property>
         <!-- When true a "did you mean" example will be displayed, value can be true or false -->
@@ -452,16 +422,6 @@
 				<value>search.resourcetype:[10 TO 11]</value>
 			</list>
 		</property>
-        <!--The configuration for the recent submissions-->
-        <property name="recentSubmissionConfiguration">
-            <bean class="org.dspace.discovery.configuration.DiscoveryRecentSubmissionsConfiguration">
-                <property name="metadataSortField" value="dc.date.accessioned" />
-                <property name="type" value="date"/>
-                <property name="max" value="20"/>
-                <!-- If enabled the collection home page will not display metadata but show a pageable list of recent submissions -->
-                <property name="useAsHomePage" value="false"/>
-            </bean>
-        </property>
         <!--Default result per page  -->
         <property name="defaultRpp" value="10" />
         <property name="hitHighlightingConfiguration">
@@ -488,26 +448,6 @@
                         </bean>
                     </list>
                 </property>
-            </bean>
-        </property>
-        <property name="moreLikeThisConfiguration">
-            <bean class="org.dspace.discovery.configuration.DiscoveryMoreLikeThisConfiguration">
-                <!--When altering this list also alter the "xmlui.Discovery.RelatedItems.help" key as it describes
-                the metadata fields below-->
-                <property name="similarityMetadataFields">
-                    <list>
-                        <value>dc.title</value>
-                        <value>dc.contributor.author</value>
-                        <value>dc.creator</value>
-                        <value>dc.subject</value>
-                    </list>
-                </property>
-                <!--The minimum number of matching terms across the metadata fields above before an item is found as related -->
-                <property name="minTermFrequency" value="5"/>
-                <!--The maximum number of related items displayed-->
-                <property name="max" value="3"/>
-                <!--The minimum word length below which words will be ignored-->
-                <property name="minWordLength" value="5"/>
             </bean>
         </property>
         <!-- When true a "did you mean" example will be displayed, value can be true or false -->
