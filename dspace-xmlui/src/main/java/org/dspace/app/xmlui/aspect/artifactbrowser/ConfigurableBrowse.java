@@ -609,6 +609,11 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
         parameters.putAll(params.getCommonParametersEncoded());
         parameters.putAll(params.getControlParameters());
 
+        // do not add starts_with parameter if jumping along the index
+        if(info.getBrowseIndex().isItemIndex()) {
+            parameters.remove(BrowseParams.STARTS_WITH);
+        }
+
         if (info.hasPrevPage())
         {
             parameters.put(BrowseParams.OFFSET, encodeForURL(String.valueOf(info.getPrevOffset())));
@@ -636,6 +641,11 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
         Map<String, String> parameters = new HashMap<String, String>();
         parameters.putAll(params.getCommonParametersEncoded());
         parameters.putAll(params.getControlParameters());
+
+        // do not add starts_with parameter if jumping along the index
+        if(info.getBrowseIndex().isItemIndex()) {
+            parameters.remove(BrowseParams.STARTS_WITH);
+        }
 
         if (info.hasNextPage())
         {
