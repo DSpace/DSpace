@@ -38,7 +38,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class WorkflowItemConverter
-    extends IndexableDSpaceObjectConverter<XmlWorkflowItem, org.dspace.app.rest.model.WorkflowItemRest> {
+    implements IndexableDSpaceObjectConverter<XmlWorkflowItem, org.dspace.app.rest.model.WorkflowItemRest> {
 
     private static final Logger log = Logger.getLogger(WorkflowItemConverter.class);
 

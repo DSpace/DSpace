@@ -19,6 +19,7 @@ import org.dspace.app.rest.model.ResourcePolicyRest;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.browse.IndexableObject;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.service.CollectionService;
@@ -37,7 +38,8 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class CollectionConverter
-    extends DSpaceObjectConverter<org.dspace.content.Collection, org.dspace.app.rest.model.CollectionRest> {
+    extends DSpaceObjectConverter<org.dspace.content.Collection, org.dspace.app.rest.model.CollectionRest>
+    implements IndexableDSpaceObjectConverter<Collection, CollectionRest> {
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(CollectionConverter.class);
 
@@ -109,5 +111,10 @@ public class CollectionConverter
     @Override
     protected Class<org.dspace.content.Collection> getModelClass() {
         return org.dspace.content.Collection.class;
+    }
+
+    @Override
+    public boolean supportsModel(IndexableObject idxo) {
+        return idxo instanceof Collection;
     }
 }

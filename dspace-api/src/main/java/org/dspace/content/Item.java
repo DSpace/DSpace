@@ -13,6 +13,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -29,6 +30,7 @@ import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
 import org.apache.log4j.Logger;
+import org.dspace.browse.IndexableObject;
 import org.dspace.content.comparator.NameAscendingComparator;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
@@ -53,7 +55,7 @@ import org.hibernate.proxy.HibernateProxyHelper;
  */
 @Entity
 @Table(name = "item")
-public class Item extends DSpaceObject implements DSpaceObjectLegacySupport {
+public class Item extends DSpaceObject implements DSpaceObjectLegacySupport, IndexableObject<UUID> {
 
     /**
      * log4j logger

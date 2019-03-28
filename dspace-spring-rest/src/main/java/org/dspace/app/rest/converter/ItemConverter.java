@@ -13,6 +13,7 @@ import java.util.List;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.ItemRest;
+import org.dspace.browse.IndexableObject;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
@@ -27,7 +28,10 @@ import org.springframework.stereotype.Component;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @Component
-public class ItemConverter extends DSpaceObjectConverter<org.dspace.content.Item, org.dspace.app.rest.model.ItemRest> {
+public class ItemConverter
+    extends DSpaceObjectConverter<org.dspace.content.Item, org.dspace.app.rest.model.ItemRest>
+    implements IndexableDSpaceObjectConverter<Item, ItemRest> {
+
     @Autowired(required = true)
     private CollectionConverter collectionConverter;
     @Autowired(required = true)
@@ -85,4 +89,8 @@ public class ItemConverter extends DSpaceObjectConverter<org.dspace.content.Item
         return Item.class;
     }
 
+    @Override
+    public boolean supportsModel(IndexableObject idxo) {
+        return idxo instanceof Item;
+    }
 }

@@ -23,7 +23,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class PoolTaskConverter
-    extends IndexableDSpaceObjectConverter<PoolTask, org.dspace.app.rest.model.PoolTaskRest> {
+    implements IndexableDSpaceObjectConverter<PoolTask, org.dspace.app.rest.model.PoolTaskRest> {
 
     private static final Logger log = Logger.getLogger(PoolTaskConverter.class);
 

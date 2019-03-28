@@ -23,7 +23,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class ClaimedTaskConverter
-    extends IndexableDSpaceObjectConverter<ClaimedTask, org.dspace.app.rest.model.ClaimedTaskRest> {
+    implements IndexableDSpaceObjectConverter<ClaimedTask, org.dspace.app.rest.model.ClaimedTaskRest> {
 
     private static final Logger log = Logger.getLogger(ClaimedTaskConverter.class);
 

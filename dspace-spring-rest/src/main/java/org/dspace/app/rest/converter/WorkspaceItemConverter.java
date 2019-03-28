@@ -37,7 +37,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class WorkspaceItemConverter
-        extends
+        implements
         IndexableDSpaceObjectConverter<org.dspace.content.WorkspaceItem, org.dspace.app.rest.model.WorkspaceItemRest> {
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(WorkspaceItemConverter.class);

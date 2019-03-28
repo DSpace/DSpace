@@ -2230,7 +2230,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         }
 
         if (uid != null) {
-            o = (IndexableObject) contentServiceFactory.getIndexableObjectService(type).find(context, uid);
+            o = (IndexableObject) contentServiceFactory.getFindableObjectService(type).find(context, uid);
         }
 
         if (o == null) {
@@ -2275,7 +2275,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 SolrDocument doc = (SolrDocument) iter.next();
 
                 IndexableObject o = (IndexableObject)contentServiceFactory
-                    .getIndexableObjectService((Integer) doc.getFirstValue(RESOURCE_TYPE_FIELD))
+                    .getFindableObjectService((Integer) doc.getFirstValue(RESOURCE_TYPE_FIELD))
                     .find(context, UUID.fromString((String) doc.getFirstValue(RESOURCE_ID_FIELD)));
 
                 if (o != null) {
