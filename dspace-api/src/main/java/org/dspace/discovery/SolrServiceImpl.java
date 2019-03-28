@@ -66,7 +66,6 @@ import org.apache.solr.common.params.MoreLikeThisParams;
 import org.apache.solr.common.params.SpellingParams;
 import org.apache.solr.common.util.NamedList;
 import org.apache.solr.handler.extraction.ExtractingParams;
-import org.dspace.app.util.Util;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.browse.IndexableObject;
@@ -472,23 +471,21 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     }
 
 
-    public void updateIndex(Context context, List<UUID> ids, boolean force, int type) {
-        if (type != Constants.ITEM) {
-            throw new RuntimeException("Only ITEM is supported in this mode - type founded: " + type);
-        }
-        try {
-            startMultiThreadIndex(context, force, ids);
-        } catch (SQLException e) {
-            log.error(e.getMessage(), e);
-        }
-    }
-
     @Override
     public void updateIndex(Context context, boolean force, int type) {
         try {
             switch (type) {
                 case Constants.ITEM:
-                    startMultiThreadIndex(context, force, null);
+                    Iterator<Item> items = itemService.findAllUnfiltered(context);
+                    for (Item item : ImmutableList.copyOf(items)) {
+                        indexContent(context, item, force);
+                    }
+                    for (WorkspaceItem wsi : workspaceItemService.findAll(context)) {
+                        indexContent(context, wsi.getItem(), force);
+                    }
+                    for (WorkflowItem wfi : workflowItemService.findAll(context)) {
+                        indexContent(context, wfi.getItem(), force);
+                    }
                     break;
                 case Constants.COLLECTION:
                     List<Collection> collections = collectionService.findAll(context);
@@ -512,40 +509,6 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-        }
-    }
-
-    private void startMultiThreadIndex(Context context, boolean force, List<UUID> ids) throws SQLException {
-        int numThreads = ConfigurationManager.getIntProperty("discovery", "indexer.items.threads", 5);
-
-        if (ids == null) {
-            ids = new ArrayList<>();
-            Iterator<Item> items = itemService.findAllUnfiltered(context);
-            for (Item item : ImmutableList.copyOf(items)) {
-                ids.add(item.getID());
-            }
-
-            for (WorkspaceItem wsi : workspaceItemService.findAll(context)) {
-                ids.add(wsi.getItem().getID());
-            }
-
-            for (WorkflowItem wfi : workflowItemService.findAll(context)) {
-                ids.add(wfi.getItem().getID());
-            }
-        }
-        List<UUID>[] arrayIDList = Util.splitList(ids, numThreads);
-        List<IndexerThread> threads = new ArrayList<IndexerThread>();
-        for (List<UUID> hl : arrayIDList) {
-            IndexerThread thread = new IndexerThread(hl, force);
-            thread.start();
-            threads.add(thread);
-        }
-        boolean finished = false;
-        while (!finished) {
-            finished = true;
-            for (IndexerThread thread : threads) {
-                finished = finished && !thread.isAlive();
-            }
         }
     }
 
@@ -2672,42 +2635,4 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         document.addField("namedresourcetype_keyword", fvalue);
     }
 
-    class IndexerThread extends Thread {
-        private boolean force;
-        private List<UUID> itemids;
-
-        public IndexerThread(List<UUID> itemids, boolean force) {
-            this.force = force;
-            this.itemids = itemids;
-        }
-
-        @Override
-        public void run() {
-            Context context = null;
-            try {
-                context = new Context();
-                context.turnOffAuthorisationSystem();
-                int idx = 1;
-                final String head = this.getName() + "#" + this.getId();
-                final int size = itemids.size();
-                for (UUID id : itemids) {
-                    try {
-                        Item item = itemService.find(context, id);
-                        indexContent(context, item, force);
-                        context.uncacheEntity(item);
-                    } catch (Exception ex) {
-                        log.error("ERROR: identifier item:" + id + " identifier thread:" + head);
-                    }
-                    System.out.println(head + ":" + (idx++) + " / " + size);
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-                log.error(e.getMessage(), e);
-            } finally {
-                if (context != null) {
-                    context.abort();
-                }
-            }
-        }
-    }
 }
