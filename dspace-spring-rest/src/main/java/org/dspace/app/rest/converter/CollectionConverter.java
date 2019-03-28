@@ -19,12 +19,12 @@ import org.dspace.app.rest.model.ResourcePolicyRest;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.AuthorizeService;
-import org.dspace.browse.IndexableObject;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.service.CollectionService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.discovery.IndexableObject;
 import org.dspace.services.RequestService;
 import org.dspace.services.model.Request;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +39,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class CollectionConverter
     extends DSpaceObjectConverter<org.dspace.content.Collection, org.dspace.app.rest.model.CollectionRest>
-    implements IndexableDSpaceObjectConverter<Collection, CollectionRest> {
+    implements IndexableObjectConverter<Collection, CollectionRest> {
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(CollectionConverter.class);
 

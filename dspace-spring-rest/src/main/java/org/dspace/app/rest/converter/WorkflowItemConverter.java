@@ -9,7 +9,7 @@ package org.dspace.app.rest.converter;
 
 import org.dspace.app.rest.model.WorkflowItemRest;
 import org.dspace.app.util.SubmissionConfigReaderException;
-import org.dspace.browse.IndexableObject;
+import org.dspace.discovery.IndexableObject;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.springframework.stereotype.Component;
 

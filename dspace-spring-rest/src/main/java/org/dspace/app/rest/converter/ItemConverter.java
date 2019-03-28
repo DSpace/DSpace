@@ -13,11 +13,11 @@ import java.util.List;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.ItemRest;
-import org.dspace.browse.IndexableObject;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.discovery.IndexableObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -30,7 +30,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class ItemConverter
     extends DSpaceObjectConverter<org.dspace.content.Item, org.dspace.app.rest.model.ItemRest>
-    implements IndexableDSpaceObjectConverter<Item, ItemRest> {
+    implements IndexableObjectConverter<Item, ItemRest> {
 
     @Autowired(required = true)
     private CollectionConverter collectionConverter;

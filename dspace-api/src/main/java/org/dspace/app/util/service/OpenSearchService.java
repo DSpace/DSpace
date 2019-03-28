@@ -12,9 +12,9 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
-import org.dspace.browse.IndexableObject;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
+import org.dspace.discovery.IndexableObject;
 import org.w3c.dom.Document;
 
 /**

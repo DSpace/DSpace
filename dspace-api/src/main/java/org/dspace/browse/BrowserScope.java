@@ -11,6 +11,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
+import org.dspace.discovery.IndexableObject;
 import org.dspace.sort.SortException;
 import org.dspace.sort.SortOption;
 

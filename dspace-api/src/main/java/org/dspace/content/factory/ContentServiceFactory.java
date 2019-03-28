@@ -10,7 +10,6 @@ package org.dspace.content.factory;
 import java.io.Serializable;
 import java.util.List;
 
-import org.dspace.browse.IndexableObject;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.content.WorkspaceItem;
@@ -31,6 +30,7 @@ import org.dspace.content.service.MetadataValueService;
 import org.dspace.content.service.SiteService;
 import org.dspace.content.service.SupervisedItemService;
 import org.dspace.content.service.WorkspaceItemService;
+import org.dspace.discovery.IndexableObject;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.workflow.factory.WorkflowServiceFactory;
 

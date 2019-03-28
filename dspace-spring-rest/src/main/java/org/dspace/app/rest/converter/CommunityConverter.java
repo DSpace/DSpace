@@ -12,10 +12,10 @@ import java.util.List;
 
 import org.dspace.app.rest.model.CollectionRest;
 import org.dspace.app.rest.model.CommunityRest;
-import org.dspace.browse.IndexableObject;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.discovery.IndexableObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -28,7 +28,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class CommunityConverter
     extends DSpaceObjectConverter<org.dspace.content.Community, org.dspace.app.rest.model.CommunityRest>
-    implements IndexableDSpaceObjectConverter<Community, CommunityRest> {
+    implements IndexableObjectConverter<Community, CommunityRest> {
 
     @Autowired
     private BitstreamConverter bitstreamConverter;

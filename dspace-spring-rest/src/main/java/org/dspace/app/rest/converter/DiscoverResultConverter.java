@@ -18,9 +18,9 @@ import org.dspace.app.rest.model.RestAddressableModel;
 import org.dspace.app.rest.model.SearchResultEntryRest;
 import org.dspace.app.rest.model.SearchResultsRest;
 import org.dspace.app.rest.parameter.SearchFilter;
-import org.dspace.browse.IndexableObject;
 import org.dspace.core.Context;
 import org.dspace.discovery.DiscoverResult;
+import org.dspace.discovery.IndexableObject;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -36,7 +36,7 @@ public class DiscoverResultConverter {
     private static final Logger log = Logger.getLogger(DiscoverResultConverter.class);
 
     @Autowired
-    private List<IndexableDSpaceObjectConverter> converters;
+    private List<IndexableObjectConverter> converters;
     @Autowired
     private DiscoverFacetsConverter facetConverter;
     @Autowired
@@ -87,7 +87,7 @@ public class DiscoverResultConverter {
     }
 
     private RestAddressableModel convertDSpaceObject(final IndexableObject dspaceObject) {
-        for (IndexableDSpaceObjectConverter<IndexableObject, RestAddressableModel> converter : converters) {
+        for (IndexableObjectConverter<IndexableObject, RestAddressableModel> converter : converters) {
             if (converter.supportsModel(dspaceObject)) {
                 return converter.convert(dspaceObject);
             }

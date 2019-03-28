@@ -12,8 +12,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.dspace.browse.IndexableObject;
 import org.dspace.content.DSpaceObject;
+import org.dspace.discovery.IndexableObject;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**

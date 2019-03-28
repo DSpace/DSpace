@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.dspace.browse.IndexableObject;
 import org.dspace.core.Context;
 import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
 

@@ -10,7 +10,7 @@ package org.dspace.content;
 import java.io.Serializable;
 import java.sql.SQLException;
 
-import org.dspace.browse.IndexableObject;
+import org.dspace.discovery.IndexableObject;
 import org.dspace.eperson.EPerson;
 
 /**

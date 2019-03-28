@@ -23,10 +23,10 @@ import com.sun.syndication.io.FeedException;
 
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.service.OpenSearchService;
-import org.dspace.browse.IndexableObject;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.discovery.IndexableObject;
 import org.dspace.handle.service.HandleService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
