@@ -460,22 +460,11 @@ public class OrcidService extends RestSource
         }
 
         Builder builder = target.request().accept(APPLICATION_ORCID_XML);
-        List<Result> reader = null;
-        try
-        {
-            reader = builder.get().readEntity(Search.class).getResult();
-        }
-        catch (ForbiddenException | MessageBodyProviderNotFoundException e1)
-        {
-            builder = builder.header(HttpHeaders.AUTHORIZATION,
-                    "Bearer " + getMemberSearchToken().getAccess_token());
-            reader = builder.get().readEntity(Search.class).getResult();
-        }
-        catch (Exception e2)
-        {
-            log.info("Problem unmarshalling return value " + e2);
-            throw new IOException(e2);
-        }
+        builder = builder.header(HttpHeaders.AUTHORIZATION,
+                "Bearer " + getMemberSearchToken().getAccess_token());
+        Search search = builder.get().readEntity(Search.class);
+        List<Result> reader = search.getResult();
+        reader = search.getResult();
         return reader;
     }
 
