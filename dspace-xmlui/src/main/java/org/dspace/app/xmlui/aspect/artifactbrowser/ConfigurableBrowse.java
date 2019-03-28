@@ -121,7 +121,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
     private Message titleMessage = null;
     private Message trailMessage = null;
 
-    protected ChoiceAuthorityService choicheAuthorityService = ContentAuthorityServiceFactory.getInstance().getChoiceAuthorityService();
+    protected ChoiceAuthorityService choiceAuthorityService = ContentAuthorityServiceFactory.getInstance().getChoiceAuthorityService();
 
     @Override
     public void setup(SourceResolver resolver, Map objectModel, String src, Parameters parameters) throws ProcessingException, SAXException, IOException {
@@ -311,7 +311,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
             //results.setSimplePagination(itemsTotal, firstItemIndex, lastItemIndex, previousPage, nextPage)
             results.setSimplePagination(itemsTotal, browseInfo.getOverallPosition() + 1,
                     browseInfo.getOverallPosition() + browseInfo.getResultCount(), getPreviousPageURL(
-                            params, info), getNextPageURL(params, info));
+                            params, info), getNextPageURL(params, info), params.scope.getStartsWith());
 
             // Reference all the browsed items
             ReferenceSet referenceSet = results.addReferenceSet("browse-by-" + type,
@@ -925,7 +925,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
                 if (bix.isAuthorityIndex())
                 {
                     String fk = bix.getMetadata(0).replace(".", "_");
-                    value = "\""+choicheAuthorityService.getLabel(fk, info.getValue(), null)+"\"";
+                    value = "\""+ choiceAuthorityService.getLabel(fk, info.getValue(), null)+"\"";
                 }
                 else
                 {

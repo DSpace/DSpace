@@ -2180,6 +2180,7 @@
 
 	<message key="xmlui.dri2xhtml.structural.pagination-previous">Previous Page</message>
 	<message key="xmlui.dri2xhtml.structural.pagination-info">Now showing items {0}-{1} of {2}</message>
+	<message key="xmlui.dri2xhtml.structural.pagination-info.starts-with">Now showing items {0}-{1} of {2} starting with {3}</message>
 	<message key="xmlui.dri2xhtml.structural.pagination-next">Next Page</message>
 
 	<message key="xmlui.dri2xhtml.structural.link_cc">Creative Commons</message>
