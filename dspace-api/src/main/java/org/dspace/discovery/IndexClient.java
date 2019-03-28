@@ -156,6 +156,9 @@ public class IndexClient {
         } else if (line.hasOption("item_uuid")) {
             String itemUUID = line.getOptionValue("item_uuid");
             Item item = ContentServiceFactory.getInstance().getItemService().find(context, UUID.fromString(itemUUID));
+            if (item == null) {
+                throw new IllegalArgumentException("Cannot resolve " + itemUUID + " to an Item");
+            }
             indexer.indexContent(context, item, line.hasOption("f"));
         } else if (line.hasOption('i')) {
             final String handle = line.getOptionValue('i');
