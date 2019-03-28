@@ -499,7 +499,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                     }
                     break;
                 default:
-                    throw new RuntimeException("No type known: " + type);
+                    throw new IllegalArgumentException("No type known: " + type);
             }
 
             if (getSolr() != null) {
