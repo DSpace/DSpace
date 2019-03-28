@@ -9,14 +9,12 @@ package org.dspace.discovery;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.List;
-import java.util.UUID;
 
 import org.dspace.browse.IndexableObject;
 import org.dspace.core.Context;
 
 /**
- * Interface used for indexing BrowsableObject into discovery
+ * Interface used for indexing IndexableObject into discovery
  *
  * @author Kevin Van de Velde (kevin at atmire dot com)
  * @author Mark Diggory (markd at atmire dot com)
@@ -55,8 +53,6 @@ public interface IndexingService {
     void updateIndex(Context context, boolean force);
 
     void updateIndex(Context context, boolean force, int type);
-
-    void updateIndex(Context context, List<UUID> ids, boolean force, int type);
 
     void cleanIndex(boolean force) throws IOException,
         SQLException, SearchServiceException;
