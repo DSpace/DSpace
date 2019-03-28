@@ -26,14 +26,16 @@
         <java.version>1.8</java.version>
         <poi-version>3.17</poi-version>
         <postgresql.driver.version>42.2.1</postgresql.driver.version>
-        <solr.version>4.10.4</solr.version>
-	<jena.version>2.13.0</jena.version>
-	<log4j.version>2.6.2</log4j.version>
+        <jena.version>2.13.0</jena.version>
+        <log4j.version>2.6.2</log4j.version>
         <slf4j.version>1.7.22</slf4j.version>
         <jackson.version>2.8.11</jackson.version>
         <jersey.version>2.26</jersey.version>
         <hibernate.version>5.2.8.Final</hibernate.version>
         <hibernate-validator.version>5.4.2.Final</hibernate-validator.version>
+        <!-- PIN Solr to 7.3.x until SOLR-12858 is fixed. This bug affects all integration tests that use Solr
+             https://issues.apache.org/jira/browse/SOLR-12858 -->
+        <solr.client.version>7.3.1</solr.client.version>
         <spring.version>4.3.6.RELEASE</spring.version>
         <!-- 'root.basedir' is the path to the root [dspace-src] dir. It must be redefined by each child POM,
              as it is used to reference the LICENSE_HEADER and *.properties file(s) in that directory. -->
@@ -802,21 +804,6 @@
 
 
         <!--
-           Builds SOLR WAR for DSpace
-        -->
-        <profile>
-            <id>dspace-solr</id>
-            <activation>
-                <file>
-                    <exists>dspace-solr/pom.xml</exists>
-                </file>
-            </activation>
-            <modules>
-                <module>dspace-solr</module>
-            </modules>
-        </profile>
-
-        <!--
            Builds SWORDv2 WAR for DSpace
         -->
         <profile>
@@ -862,7 +849,6 @@
                 <module>dspace-rdf</module>
                 <module>dspace-rest</module>
                 <module>dspace-services</module>
-                <module>dspace-solr</module>
                 <module>dspace-sword</module>
                 <module>dspace-swordv2</module>
                 <module>dspace-spring-rest</module>
@@ -1019,20 +1005,6 @@
                 <artifactId>dspace-spring-rest</artifactId>
                 <version>7.0-SNAPSHOT</version>
                 <type>war</type>
-            </dependency>
-            <dependency>
-                <groupId>org.dspace</groupId>
-                <artifactId>dspace-solr</artifactId>
-                <version>7.0-SNAPSHOT</version>
-                <type>jar</type>
-                <classifier>classes</classifier>
-            </dependency>
-            <dependency>
-                <groupId>org.dspace</groupId>
-                <artifactId>dspace-solr</artifactId>
-                <version>7.0-SNAPSHOT</version>
-                <type>war</type>
-                <classifier>skinny</classifier>
             </dependency>
             <!-- DSpace Localization Packages -->
             <dependency>
@@ -1219,7 +1191,7 @@
             <dependency>
                 <groupId>commons-io</groupId>
                 <artifactId>commons-io</artifactId>
-                <version>2.4</version>
+                <version>2.6</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
@@ -1277,7 +1249,7 @@
             <dependency>
                 <groupId>org.apache.logging.log4j</groupId>
                 <artifactId>log4j-api</artifactId>
-		<version>${log4j.version}</version>
+                <version>${log4j.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.logging.log4j</groupId>
@@ -1286,8 +1258,8 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.logging.log4j</groupId>
-		<artifactId>log4j-core</artifactId>
-		<version>${log4j.version}</version>
+                <artifactId>log4j-core</artifactId>
+                <version>${log4j.version}</version>
             </dependency>
 	    <dependency>
                 <groupId>org.apache.logging.log4j</groupId>
@@ -1403,10 +1375,11 @@
                 <artifactId>axis-saaj</artifactId>
                 <version>1.4</version>
             </dependency>
+            <!-- Keep icu4j synced with version used by lucene-analyzers-icu (Solr) -->
             <dependency>
                 <groupId>com.ibm.icu</groupId>
                 <artifactId>icu4j</artifactId>
-                <version>56.1</version>
+                <version>59.1</version>
             </dependency>
             <dependency>
                 <groupId>com.oracle</groupId>
@@ -1591,6 +1564,11 @@
                 <groupId>org.jboss.logging</groupId>
                 <artifactId>jboss-logging</artifactId>
                 <version>3.3.0.Final</version>
+            </dependency>
+            <dependency>
+                <groupId>org.codehaus.woodstox</groupId>
+                <artifactId>woodstox-core-asl</artifactId>
+                <version>4.4.1</version>
             </dependency>
             <dependency>
                 <groupId>xom</groupId>

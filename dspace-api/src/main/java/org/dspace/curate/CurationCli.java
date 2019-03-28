@@ -9,6 +9,10 @@ package org.dspace.curate;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintStream;
+import java.io.Writer;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -18,6 +22,7 @@ import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
+import org.apache.commons.io.output.NullOutputStream;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.core.Context;
 import org.dspace.core.factory.CoreServiceFactory;
@@ -57,7 +62,9 @@ public class CurationCli {
         options.addOption("e", "eperson", true,
                           "email address of curating eperson");
         options.addOption("r", "reporter", true,
-                          "reporter to manage results - use '-' to report to console. If absent, no reporting");
+                "relative or absolute path to the desired report file.  "
+                        + "Use '-' to report to console.  "
+                        + "If absent, no reporting");
         options.addOption("s", "scope", true,
                           "transaction scope to impose: use 'object', 'curation', or 'open'. If absent, 'open' " +
                               "applies");
@@ -165,9 +172,17 @@ public class CurationCli {
         }
 
         Curator curator = new Curator();
-        if (reporterName != null) {
-            curator.setReporter(reporterName);
+        OutputStream reporter;
+        if (null == reporterName) {
+            reporter = new NullOutputStream();
+        } else if ("-".equals(reporterName)) {
+            reporter = System.out;
+        } else {
+            reporter = new PrintStream(reporterName);
         }
+        Writer reportWriter = new OutputStreamWriter(reporter);
+        curator.setReporter(reportWriter);
+
         if (scope != null) {
             Curator.TxScope txScope = Curator.TxScope.valueOf(scope.toUpperCase());
             curator.setTransactionScope(txScope);

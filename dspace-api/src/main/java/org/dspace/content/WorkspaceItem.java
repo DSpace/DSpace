@@ -27,9 +27,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.dspace.authorize.AuthorizeException;
 import org.dspace.browse.IndexableObject;
-import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.ReloadableEntity;
@@ -243,20 +241,6 @@ public class WorkspaceItem
 
     void addSupervisorGroup(Group group) {
         supervisorGroups.add(group);
-    }
-
-    @Override
-    public void update() throws SQLException, AuthorizeException {
-
-        Context context = null;
-        try {
-            context = new Context();
-            ContentServiceFactory.getInstance().getWorkspaceItemService().update(context, this);
-        } finally {
-            if (context != null && context.isValid()) {
-                context.abort();
-            }
-        }
     }
 
     @Override

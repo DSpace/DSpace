@@ -43,6 +43,7 @@ import org.dspace.app.rest.model.MetadataValueRest;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.ReplaceOperation;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.app.rest.test.MetadataPatchSuite;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -919,7 +920,6 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     }
 
-
     @Test
     public void useStringForBooleanTest() throws Exception {
         context.turnOffAuthorisationSystem();
@@ -1744,7 +1744,28 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         //Delete public item
         getClient(token).perform(delete("/api/core/items/" + parentCommunity.getID()))
                         .andExpect(status().is(404));
+    }
 
+    public void patchItemMetadataAuthorized() throws Exception {
+        runPatchMetadataTests(admin, 200);
+    }
+
+    @Test
+    public void patchItemMetadataUnauthorized() throws Exception {
+        runPatchMetadataTests(eperson, 403);
+    }
+
+    private void runPatchMetadataTests(EPerson asUser, int expectedStatus) throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context).withName("Parent Community").build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community").build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Item item = ItemBuilder.createItem(context, col1).build();
+        context.restoreAuthSystemState();
+        String token = getAuthToken(asUser.getEmail(), password);
+
+        new MetadataPatchSuite().runWith(getClient(token), "/api/core/items/" + item.getID(), expectedStatus);
     }
 
 }

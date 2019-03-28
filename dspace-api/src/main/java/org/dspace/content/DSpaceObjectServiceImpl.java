@@ -231,7 +231,7 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
 
     @Override
     public void addMetadata(Context context, T dso, MetadataField metadataField, String lang, List<String> values,
-                            List<String> authorities, List<Integer> confidences, List<Integer> places)
+                            List<String> authorities, List<Integer> confidences)
         throws SQLException {
         boolean authorityControlled = metadataAuthorityService.isAuthorityControlled(metadataField);
         boolean authorityRequired = metadataAuthorityService.isAuthorityRequired(metadataField);
@@ -703,15 +703,4 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
         }
     }
 
-    @Override
-    public void addMetadata(Context context, T dso, MetadataField metadataField, String lang, List<String> values,
-            List<String> authorities, List<Integer> confidences) throws SQLException {
-        addMetadata(context, dso, metadataField, lang, values, authorities, confidences, null);
-    }
-
-    @Override
-    public void addMetadata(Context context, T dso, MetadataField metadataField, String language, String value,
-            String authority, int confidence, int place) throws SQLException {
-        addMetadata(context, dso, metadataField, language, value, authority, confidence);
-    }
 }

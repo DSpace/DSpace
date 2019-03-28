@@ -23,12 +23,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.rest.converter.ItemConverter;
 import org.dspace.app.rest.converter.MetadataConverter;
-import org.dspace.app.rest.exception.PatchBadRequestException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.hateoas.ItemResource;
-import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.repository.patch.ItemPatch;
 import org.dspace.authorize.AuthorizeException;
@@ -56,15 +54,11 @@ import org.springframework.stereotype.Component;
  */
 
 @Component(ItemRest.CATEGORY + "." + ItemRest.NAME)
-public class ItemRestRepository extends DSpaceRestRepository<ItemRest, UUID> {
+public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRest> {
 
     private static final Logger log = Logger.getLogger(ItemRestRepository.class);
 
-    @Autowired
-    ItemService is;
-
-    @Autowired
-    ItemConverter converter;
+    private final ItemService is;
 
     @Autowired
     MetadataConverter metadataConverter;
@@ -84,8 +78,11 @@ public class ItemRestRepository extends DSpaceRestRepository<ItemRest, UUID> {
     @Autowired
     InstallItemService installItemService;
 
-    public ItemRestRepository() {
-        System.out.println("Repository initialized by Spring");
+    public ItemRestRepository(ItemService dsoService,
+                              ItemConverter dsoConverter,
+                              ItemPatch dsoPatch) {
+        super(dsoService, dsoConverter, dsoPatch);
+        this.is = dsoService;
     }
 
     @Override
@@ -100,7 +97,7 @@ public class ItemRestRepository extends DSpaceRestRepository<ItemRest, UUID> {
         if (item == null) {
             return null;
         }
-        return converter.fromModel(item);
+        return dsoConverter.fromModel(item);
     }
 
     @Override
@@ -119,55 +116,33 @@ public class ItemRestRepository extends DSpaceRestRepository<ItemRest, UUID> {
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<ItemRest> page = new PageImpl<Item>(items, pageable, total).map(converter);
+        Page<ItemRest> page = new PageImpl<Item>(items, pageable, total).map(dsoConverter);
         return page;
     }
 
     @Override
-    public void patch(Context context, HttpServletRequest request, String apiCategory, String model, UUID uuid,
-                      Patch patch)
-            throws UnprocessableEntityException, PatchBadRequestException, SQLException, AuthorizeException,
-            ResourceNotFoundException {
-
-        Item item = is.find(context, uuid);
-
-        if (item == null) {
-            throw new ResourceNotFoundException(apiCategory + "." + model + " with id: " + uuid + " not found");
-        }
-
-        List<Operation> operations = patch.getOperations();
-        ItemRest itemRest = findOne(uuid);
-
-        ItemRest patchedModel = (ItemRest) itemPatch.patch(itemRest, operations);
-        updatePatchedValues(context, patchedModel, item);
+    @PreAuthorize("hasPermission(#id, 'ITEM', 'WRITE')")
+    protected void patch(Context context, HttpServletRequest request, String apiCategory, String model, UUID id,
+                         Patch patch) throws AuthorizeException, SQLException {
+        patchDSpaceObject(apiCategory, model, id, patch);
     }
 
-    /**
-     * Persists changes to the rest model.
-     * @param context
-     * @param itemRest the updated item rest resource
-     * @param item the item content object
-     * @throws SQLException
-     * @throws AuthorizeException
-     */
-    private void updatePatchedValues(Context context, ItemRest itemRest, Item item)
-            throws SQLException, AuthorizeException {
+    @Override
+    protected void updateDSpaceObject(Item item, ItemRest itemRest)
+            throws AuthorizeException, SQLException  {
+        super.updateDSpaceObject(item, itemRest);
 
-        try {
-            if (itemRest.getWithdrawn() != item.isWithdrawn()) {
-                if (itemRest.getWithdrawn()) {
-                    is.withdraw(context, item);
-                } else {
-                    is.reinstate(context, item);
-                }
+        Context context = obtainContext();
+        if (itemRest.getWithdrawn() != item.isWithdrawn()) {
+            if (itemRest.getWithdrawn()) {
+                is.withdraw(context, item);
+            } else {
+                is.reinstate(context, item);
             }
-            if (itemRest.getDiscoverable() != item.isDiscoverable()) {
-                item.setDiscoverable(itemRest.getDiscoverable());
-                is.update(context, item);
-            }
-        } catch (SQLException | AuthorizeException e) {
-            e.printStackTrace();
-            throw e;
+        }
+        if (itemRest.getDiscoverable() != item.isDiscoverable()) {
+            item.setDiscoverable(itemRest.getDiscoverable());
+            is.update(context, item);
         }
     }
 
@@ -242,7 +217,7 @@ public class ItemRestRepository extends DSpaceRestRepository<ItemRest, UUID> {
 
         Item itemToReturn = installItemService.installItem(context, workspaceItem);
 
-        return converter.fromModel(itemToReturn);
+        return dsoConverter.fromModel(itemToReturn);
     }
 
     @Override
@@ -271,6 +246,6 @@ public class ItemRestRepository extends DSpaceRestRepository<ItemRest, UUID> {
                                                    + uuid + ", "
                                                    + itemRest.getId());
         }
-        return converter.fromModel(item);
+        return dsoConverter.fromModel(item);
     }
 }
