@@ -10,22 +10,20 @@ package org.dspace.content.service;
 import java.io.Serializable;
 import java.sql.SQLException;
 
-import org.dspace.browse.IndexableObject;
 import org.dspace.core.Context;
 
 /**
- * Service interface class for any IndexableObject.
- * All IndexableObject service classes should implement this class since it offers some basic methods which all
- * IndexableObjects are required to have.
+ * Base Service interface class for any Persistent Entity findable by a primary key.
  *
- * @param <T> class type
+ * @param <T> class type of the persistent entity
+ * @param <PK> class type of the primary key
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
-public interface IndexableObjectService<T extends IndexableObject<PK>, PK extends Serializable> {
+public interface FindableObjectService<T, PK extends Serializable> {
 
 
     /**
-     * Generic find for when the precise type of an IndexableObject is not known
+     * Generic find for when the precise type of an Entity is not known
      *
      * @param context - the context
      * @param id      - id within table of type'd objects

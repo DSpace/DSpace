@@ -11,6 +11,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -26,7 +27,6 @@ import javax.persistence.Transient;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.dspace.authorize.ResourcePolicy;
-import org.dspace.browse.IndexableObject;
 import org.dspace.core.ReloadableEntity;
 import org.dspace.handle.Handle;
 import org.hibernate.annotations.GenericGenerator;
@@ -37,8 +37,7 @@ import org.hibernate.annotations.GenericGenerator;
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "dspaceobject")
-public abstract class DSpaceObject implements Serializable, ReloadableEntity<java.util.UUID>,
-    IndexableObject<UUID> {
+public abstract class DSpaceObject implements Serializable, ReloadableEntity<java.util.UUID> {
     @Id
     @GeneratedValue(generator = "system-uuid")
     @GenericGenerator(name = "system-uuid", strategy = "uuid2")

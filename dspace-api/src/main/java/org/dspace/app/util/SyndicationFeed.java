@@ -180,11 +180,11 @@ public class SyndicationFeed {
      *
      * @param request request
      * @param context context
-     * @param dso     DSpaceObject
+     * @param dso     the scope
      * @param items   array of objects
      * @param labels  label map
      */
-    public void populate(HttpServletRequest request, Context context, DSpaceObject dso,
+    public void populate(HttpServletRequest request, Context context, IndexableObject dso,
                          List<IndexableObject> items, Map<String, String> labels) {
         String logoURL = null;
         String objectURL = null;
@@ -209,6 +209,7 @@ public class SyndicationFeed {
                 if (cols != null && cols.length() > 1 && cols.contains(col.getHandle())) {
                     podcastFeed = true;
                 }
+                objectURL = resolveURL(request, col);
             } else if (dso.getType() == Constants.COMMUNITY) {
                 Community comm = (Community) dso;
                 defaultTitle = comm.getName();
@@ -218,8 +219,9 @@ public class SyndicationFeed {
                 if (comms != null && comms.length() > 1 && comms.contains(comm.getHandle())) {
                     podcastFeed = true;
                 }
+                objectURL = resolveURL(request, comm);
             }
-            objectURL = resolveURL(request, dso);
+
             if (logo != null) {
                 logoURL = urlOfBitstream(request, logo);
             }

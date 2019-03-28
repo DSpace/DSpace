@@ -28,7 +28,7 @@ import org.dspace.core.Context;
  * @param <T> class type
  * @author kevinvandevelde at atmire.com
  */
-public interface DSpaceObjectService<T extends DSpaceObject> extends IndexableObjectService<T, UUID> {
+public interface DSpaceObjectService<T extends DSpaceObject> extends FindableObjectService<T, UUID> {
 
     /**
      * Get a proper name for the object. This may return <code>null</code>.
@@ -397,7 +397,6 @@ public interface DSpaceObjectService<T extends DSpaceObject> extends IndexableOb
     public void update(Context context, T dso) throws SQLException, AuthorizeException;
 
     public void delete(Context context, T dso) throws SQLException, AuthorizeException, IOException;
-
 
     void addAndShiftRightMetadata(Context context, T dso, String schema, String element, String qualifier, String lang,
                                   String value, String authority, int confidence, int index) throws SQLException;
