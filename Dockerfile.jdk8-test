@@ -54,7 +54,9 @@ EXPOSE 8080 8009
 
 ENV JAVA_OPTS=-Xmx2000m
 
-RUN ln -s $DSPACE_INSTALL/webapps/spring-rest   /usr/local/tomcat/webapps/spring-rest   && \
+RUN mv /usr/local/tomcat/webapps/ROOT /usr/local/tomcat/webapps/ROOT.bk && \
+    ln -s $DSPACE_INSTALL/webapps/spring-rest   /usr/local/tomcat/webapps/ROOT && \
+    ln -s $DSPACE_INSTALL/webapps/spring-rest   /usr/local/tomcat/webapps/spring-rest   && \
     ln -s $DSPACE_INSTALL/webapps/rest          /usr/local/tomcat/webapps/rest
 
 COPY dspace/src/main/docker/test/rest_web.xml $DSPACE_INSTALL/webapps/rest/WEB-INF/web.xml
