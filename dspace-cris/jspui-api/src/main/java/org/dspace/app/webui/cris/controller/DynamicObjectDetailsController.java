@@ -203,6 +203,8 @@ public class DynamicObjectDetailsController
         mvc.getModel().putAll(model);
         mvc.getModel().put("isAdmin", isAdmin);
         mvc.getModel().put("entity", dyn);
+        request.setAttribute("components", super.getComponents());
+        request.setAttribute("entity", dyn);
         return mvc;
     }
 

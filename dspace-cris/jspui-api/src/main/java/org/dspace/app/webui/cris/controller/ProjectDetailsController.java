@@ -194,6 +194,8 @@ public class ProjectDetailsController
         mvc.getModel().putAll(model);
         mvc.getModel().put("isAdmin", isAdmin);
         mvc.getModel().put("project", grant);
+        request.setAttribute("components", super.getComponents());
+        request.setAttribute("entity", grant);
         return mvc;
     }
 

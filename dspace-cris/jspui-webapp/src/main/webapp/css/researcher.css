@@ -1169,5 +1169,7 @@ div.subscription-current {
 .undefinedstaff {
 	   color: gray;
 }
-	
-}
+
+.badge-pill {
+    background-color: white;
+}	
