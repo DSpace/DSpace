@@ -279,6 +279,7 @@ public class DescribeStep extends AbstractProcessingStep
                 }
             }
             else if ((inputType.equals("onebox"))
+                    || (inputType.equals("onebox_url")) // Customization for LIBDRUM-582
                     || (inputType.equals("twobox"))
                     || (inputType.equals("textarea")))
             {

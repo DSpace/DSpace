@@ -104,7 +104,9 @@ public abstract class Field extends AbstractWingElement implements
     public static final String TYPE_SELECT = "select";
 
     public static final String TYPE_TEXT = "text";
-
+    
+    public static final String TYPE_TEXT_URL = "url"; // Customization for LIBDRUM-582
+    
     public static final String TYPE_TEXTAREA = "textarea";
     
     public static final String TYPE_COMPOSITE = "composite";
@@ -112,7 +114,7 @@ public abstract class Field extends AbstractWingElement implements
     /** All the possible field types collected into one array. */
     public static final String[] TYPES = { TYPE_BUTTON, TYPE_CHECKBOX,
             TYPE_FILE, TYPE_HIDDEN, TYPE_PASSWORD, TYPE_RADIO, TYPE_SELECT,
-            TYPE_TEXT, TYPE_TEXTAREA, TYPE_COMPOSITE };
+            TYPE_TEXT, TYPE_TEXT_URL, TYPE_TEXTAREA, TYPE_COMPOSITE }; // Customization for LIBDRUM-582
     
     /** Possible field behavioral operations */
     public static final String OPERATION_ADD = "add";

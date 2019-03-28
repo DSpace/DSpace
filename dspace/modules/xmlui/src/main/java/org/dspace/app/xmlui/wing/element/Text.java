@@ -7,6 +7,10 @@
  */
 package org.dspace.app.xmlui.wing.element;
 
+import java.util.Arrays;
+
+import org.apache.jena.atlas.logging.Log;
+
 /**
  * A class representing a text input control. The text input control allows the
  * user to enter one-line of text.
@@ -55,6 +59,21 @@ public class Text extends Field
     {
         this.params.setSize(size);
     }
+
+    // Customization for LIBDRUM-582// Customization for LIBDRUM-582
+    /**
+     * Set the type of the text field.
+     *
+     * @param size
+     *            Must be one of Field.TYPES values.
+     */
+    public void setType(String type)
+    {
+        if (Arrays.asList(Field.TYPES).contains(type)) {
+            this.type = type;
+        }
+    }
+    // End Customization for LIBDRUM-582
 
     /**
      * Set the size and maximum size of the text field.
