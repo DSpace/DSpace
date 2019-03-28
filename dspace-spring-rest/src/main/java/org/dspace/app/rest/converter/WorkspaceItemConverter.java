@@ -9,8 +9,8 @@ package org.dspace.app.rest.converter;
 
 import org.dspace.app.rest.model.WorkspaceItemRest;
 import org.dspace.app.util.SubmissionConfigReaderException;
-import org.dspace.browse.IndexableObject;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.discovery.IndexableObject;
 import org.springframework.stereotype.Component;
 
 /**

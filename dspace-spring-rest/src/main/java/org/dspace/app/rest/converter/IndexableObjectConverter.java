@@ -7,7 +7,7 @@
  */
 package org.dspace.app.rest.converter;
 
-import org.dspace.browse.IndexableObject;
+import org.dspace.discovery.IndexableObject;
 
 /**
  * This is the base converter from/to objects in the DSpace API data model and
@@ -17,7 +17,7 @@ import org.dspace.browse.IndexableObject;
  * @param <R> the Class in the DSpace REST data model
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
-public interface IndexableDSpaceObjectConverter<M extends IndexableObject,
+public interface IndexableObjectConverter<M extends IndexableObject,
     R extends org.dspace.app.rest.model.RestAddressableModel> extends DSpaceConverter<M, R> {
 
     /**

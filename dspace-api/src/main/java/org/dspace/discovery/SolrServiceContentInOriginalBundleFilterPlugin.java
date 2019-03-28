@@ -10,7 +10,6 @@ package org.dspace.discovery;
 import java.util.List;
 
 import org.apache.solr.common.SolrInputDocument;
-import org.dspace.browse.IndexableObject;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Item;

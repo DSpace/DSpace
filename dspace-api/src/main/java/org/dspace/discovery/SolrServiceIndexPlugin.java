@@ -8,7 +8,6 @@
 package org.dspace.discovery;
 
 import org.apache.solr.common.SolrInputDocument;
-import org.dspace.browse.IndexableObject;
 import org.dspace.core.Context;
 
 /**

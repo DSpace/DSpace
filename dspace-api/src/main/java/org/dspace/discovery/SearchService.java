@@ -10,7 +10,6 @@ package org.dspace.discovery;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.dspace.browse.IndexableObject;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.discovery.configuration.DiscoveryMoreLikeThisConfiguration;

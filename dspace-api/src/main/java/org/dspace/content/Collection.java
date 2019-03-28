@@ -27,12 +27,12 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.browse.IndexableObject;
 import org.dspace.content.comparator.NameAscendingComparator;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.discovery.IndexableObject;
 import org.dspace.eperson.Group;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.proxy.HibernateProxyHelper;

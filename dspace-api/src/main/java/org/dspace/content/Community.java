@@ -27,12 +27,12 @@ import javax.persistence.Transient;
 
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.logging.log4j.Logger;
-import org.dspace.browse.IndexableObject;
 import org.dspace.content.comparator.NameAscendingComparator;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CommunityService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.discovery.IndexableObject;
 import org.dspace.eperson.Group;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.proxy.HibernateProxyHelper;

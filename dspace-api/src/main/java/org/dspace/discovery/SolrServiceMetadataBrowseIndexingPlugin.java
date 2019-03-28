@@ -17,7 +17,6 @@ import org.apache.logging.log4j.Logger;
 import org.apache.solr.common.SolrInputDocument;
 import org.dspace.browse.BrowseException;
 import org.dspace.browse.BrowseIndex;
-import org.dspace.browse.IndexableObject;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.authority.service.ChoiceAuthorityService;

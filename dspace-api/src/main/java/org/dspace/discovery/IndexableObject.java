@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.browse;
+package org.dspace.discovery;
 
 import java.io.Serializable;
 

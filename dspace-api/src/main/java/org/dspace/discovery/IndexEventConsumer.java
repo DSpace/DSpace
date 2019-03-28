@@ -11,7 +11,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.logging.log4j.Logger;
-import org.dspace.browse.IndexableObject;
 import org.dspace.content.Bundle;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Constants;

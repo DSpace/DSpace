@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.collections4.ListUtils;
-import org.dspace.browse.IndexableObject;
 import org.dspace.discovery.configuration.DiscoveryConfigurationParameters;
 import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
 
