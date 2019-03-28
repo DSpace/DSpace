@@ -46,11 +46,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.commons.validator.routines.UrlValidator;
 import org.apache.logging.log4j.Logger;
+import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrRequest;
-import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.HttpSolrServer;
+import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.request.AbstractUpdateRequest;
 import org.apache.solr.client.solrj.request.ContentStreamUpdateRequest;
 import org.apache.solr.client.solrj.response.FacetField;
@@ -203,14 +203,14 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     /**
      * Non-Static SolrServer for processing indexing events.
      */
-    protected SolrServer solr = null;
+    protected SolrClient solr = null;
 
 
     protected SolrServiceImpl() {
 
     }
 
-    protected SolrServer getSolr() {
+    protected SolrClient getSolr() {
         if (solr == null) {
             String solrService = DSpaceServicesFactory.getInstance().getConfigurationService()
                                                       .getProperty("discovery.search.server");
@@ -220,7 +220,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 .getBooleanProperty("discovery", "solr.url.validation.enabled", true)) {
                 try {
                     log.debug("Solr URL: " + solrService);
-                    HttpSolrServer solrServer = new HttpSolrServer(solrService);
+                    HttpSolrClient solrServer = new HttpSolrClient.Builder(solrService).build();
 
                     solrServer.setBaseURL(solrService);
                     solrServer.setUseMultiPartPost(true);
@@ -236,7 +236,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                     DatabaseUtils.checkReindexDiscovery(this);
 
                     solr = solrServer;
-                } catch (SolrServerException e) {
+                } catch (SolrServerException | IOException e) {
                     log.error("Error while initializing solr server", e);
                 }
             } else {
@@ -526,7 +526,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         if (force) {
             try {
                 getSolr().deleteByQuery(
-                    "search.resourcetype:[" + Constants.ITEM + " TO " + Constants.WORKFLOW_CLAIMED + "]");
+                    "search.resourcetype:[" + Constants.ITEM + " TO " + Constants.CLAIMEDTASK + "]");
             } catch (Exception e) {
                 throw new SearchServiceException(e.getMessage(), e);
             }
@@ -535,8 +535,8 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             cleanIndex(false, Constants.COLLECTION);
             cleanIndex(false, Constants.COMMUNITY);
             cleanIndex(false, Constants.WORKSPACEITEM);
-            cleanIndex(false, Constants.WORKFLOW_POOL);
-            cleanIndex(false, Constants.WORKFLOW_CLAIMED);
+            cleanIndex(false, Constants.POOLTASK);
+            cleanIndex(false, Constants.CLAIMEDTASK);
             cleanIndex(false, Constants.WORKFLOWITEM);
         }
     }
@@ -613,7 +613,8 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     }
 
     @Override
-    public void buildSpellCheck() throws SearchServiceException {
+    public void buildSpellCheck()
+            throws SearchServiceException, IOException {
         try {
             if (getSolr() == null) {
                 return;
@@ -1636,7 +1637,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             if (claimedTasks != null) {
                 for (ClaimedTask claimedTask : claimedTasks) {
                     SolrInputDocument claimDoc = doc.deepCopy();
-                    addBasicInfoToDocument(claimDoc, Constants.WORKFLOW_CLAIMED, claimedTask.getID(), null, locations);
+                    addBasicInfoToDocument(claimDoc, Constants.CLAIMEDTASK, claimedTask.getID(), null, locations);
                     addFacetIndex(claimDoc, "action", claimedTask.getActionID(), claimedTask.getActionID());
                     addFacetIndex(claimDoc, "step", claimedTask.getStepID(), claimedTask.getStepID());
 
@@ -1657,7 +1658,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             if (pools != null) {
                 for (PoolTask poolTask : pools) {
                     SolrInputDocument claimDoc = doc.deepCopy();
-                    addBasicInfoToDocument(claimDoc, Constants.WORKFLOW_POOL, poolTask.getID(), null, locations);
+                    addBasicInfoToDocument(claimDoc, Constants.POOLTASK, poolTask.getID(), null, locations);
                     addFacetIndex(claimDoc, "action", poolTask.getActionID(), poolTask.getActionID());
                     addFacetIndex(claimDoc, "step", poolTask.getStepID(), poolTask.getStepID());
 
@@ -1939,7 +1940,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 order = SolrQuery.ORDER.desc;
             }
 
-            solrQuery.addSortField(discoveryQuery.getSortField(), order);
+            solrQuery.addSort(discoveryQuery.getSortField(), order);
         }
 
         for (String property : discoveryQuery.getProperties().keySet()) {
@@ -2219,8 +2220,8 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             switch (type) {
                 case Constants.WORKSPACEITEM:
                 case Constants.WORKFLOWITEM:
-                case Constants.WORKFLOW_POOL:
-                case Constants.WORKFLOW_CLAIMED:
+                case Constants.POOLTASK:
+                case Constants.CLAIMEDTASK:
                     uid = Integer.parseInt((String) id);
                     break;
                 default:
@@ -2261,7 +2262,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             solrQuery.setStart(offset);
             solrQuery.setRows(max);
             if (orderfield != null) {
-                solrQuery.setSortField(orderfield, ascending ? SolrQuery.ORDER.asc : SolrQuery.ORDER.desc);
+                solrQuery.addSort(orderfield, ascending ? SolrQuery.ORDER.asc : SolrQuery.ORDER.desc);
             }
             if (filterquery != null) {
                 solrQuery.addFilterQuery(filterquery);

@@ -14,7 +14,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.sql.SQLException;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -27,7 +26,6 @@ import java.util.UUID;
 import javax.xml.stream.XMLStreamException;
 
 import com.lyncode.xoai.dataprovider.exceptions.ConfigurationException;
-import com.lyncode.xoai.dataprovider.exceptions.MetadataBindException;
 import com.lyncode.xoai.dataprovider.exceptions.WritingXmlException;
 import com.lyncode.xoai.dataprovider.xml.XmlOutputContext;
 import org.apache.commons.cli.CommandLine;
@@ -36,9 +34,9 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrQuery.ORDER;
-import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
@@ -148,7 +146,7 @@ public class XOAI {
             } else {
                 SolrQuery solrParams = new SolrQuery("*:*")
                     .addField("item.lastmodified")
-                    .addSortField("item.lastmodified", ORDER.desc).setRows(1);
+                    .addSort("item.lastmodified", ORDER.desc).setRows(1);
 
                 SolrDocumentList results = DSpaceSolrSearch.query(solrServerResolver.getServer(), solrParams);
                 if (results.getNumFound() == 0) {
@@ -176,7 +174,7 @@ public class XOAI {
         }
     }
 
-    private int index(Date last) throws DSpaceSolrIndexerException {
+    private int index(Date last) throws DSpaceSolrIndexerException, IOException {
         System.out
             .println("Incremental import. Searching for documents modified after: "
                          + last.toString());
@@ -202,14 +200,14 @@ public class XOAI {
      * due to an embargo. Only consider those which haven't been modified
      * anyways since the last update, so they aren't updated twice in one import
      * run.
-     * 
+     *
      * @param last
      *            maximum date for an item to be considered for an update
      * @return Iterator over list of items which might have changed their
      *         visibility since the last update.
      * @throws DSpaceSolrIndexerException
      */
-    private Iterator<Item> getItemsWithPossibleChangesBefore(Date last) throws DSpaceSolrIndexerException {
+    private Iterator<Item> getItemsWithPossibleChangesBefore(Date last) throws DSpaceSolrIndexerException, IOException {
         try {
             SolrQuery params = new SolrQuery("item.willChangeStatus:true").addField("item.id");
             SolrDocumentList documents = DSpaceSolrSearch.query(solrServerResolver.getServer(), params);
@@ -246,12 +244,12 @@ public class XOAI {
     /**
      * Check if an item is already indexed. Using this, it is possible to check
      * if withdrawn or nondiscoverable items have to be indexed at all.
-     * 
+     *
      * @param item
      *            Item that should be checked for its presence in the index.
      * @return has it been indexed?
      */
-    private boolean checkIfIndexed(Item item) {
+    private boolean checkIfIndexed(Item item) throws IOException {
         SolrQuery params = new SolrQuery("item.id:" + item.getID().toString()).addField("item.id");
         try {
             SolrDocumentList documents = DSpaceSolrSearch.query(solrServerResolver.getServer(), params);
@@ -262,12 +260,12 @@ public class XOAI {
     }
      /**
      * Check if an item is flagged visible in the index.
-     * 
+     *
      * @param item
      *            Item that should be checked for its presence in the index.
      * @return has it been indexed?
      */
-    private boolean checkIfVisibleInOAI(Item item) {
+    private boolean checkIfVisibleInOAI(Item item) throws IOException {
         SolrQuery params = new SolrQuery("item.id:" + item.getID().toString()).addField("item.public");
         try {
             SolrDocumentList documents = DSpaceSolrSearch.query(solrServerResolver.getServer(), params);
@@ -286,7 +284,7 @@ public class XOAI {
         try {
             int i = 0;
             int batchSize = configurationService.getIntProperty("oai.import.batch.size", 1000);
-            SolrServer server = solrServerResolver.getServer();
+            SolrClient server = solrServerResolver.getServer();
             ArrayList<SolrInputDocument> list = new ArrayList<>();
             while (iterator.hasNext()) {
                 try {
@@ -299,8 +297,7 @@ public class XOAI {
                     //Uncache the item to keep memory consumption low
                     context.uncacheEntity(item);
 
-                } catch (SQLException | MetadataBindException | ParseException
-                    | XMLStreamException | WritingXmlException ex) {
+                } catch (SQLException | IOException | XMLStreamException | WritingXmlException ex) {
                     log.error(ex.getMessage(), ex);
                 }
                 i++;
@@ -363,9 +360,9 @@ public class XOAI {
     }
 
     private SolrInputDocument index(Item item)
-            throws SQLException, MetadataBindException, ParseException, XMLStreamException, WritingXmlException {
+            throws SQLException, IOException, XMLStreamException, WritingXmlException {
         SolrInputDocument doc = new SolrInputDocument();
-        doc.addField("item.id", item.getID());
+        doc.addField("item.id", item.getID().toString());
 
         String handle = item.getHandle();
         doc.addField("item.handle", handle);

@@ -718,6 +718,50 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
         }
     }
 
+    @Test
+    /**
+     * Test invalid attempts to create workflowitem POSTing to the resource workflowitems collection endpoint an not
+     * existing workspaceitem (as uri-list) or an empty list. This should result in a 422 error
+     *
+     * @throws Exception
+     */
+    public void unvalidCreateWorkflowItemTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community with one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1")
+                .withWorkflowGroup(1, admin).build();
+
+        //2. create a normal user to use as submitter
+        EPerson submitter = EPersonBuilder.createEPerson(context)
+                .withEmail("submitter@example.com")
+                .withPassword("dspace")
+                .build();
+
+        context.setCurrentUser(submitter);
+
+        // get the submitter auth token
+        String authToken = getAuthToken(submitter.getEmail(), "dspace");
+
+        // submit a not existing workspaceitem
+        getClient(authToken)
+                .perform(post(BASE_REST_SERVER_URL + "/api/workflow/workflowitems")
+                        .content("/api/submission/workspaceitems/" + UUID.randomUUID().toString())
+                        .contentType(textUriContentType))
+                .andExpect(status().isUnprocessableEntity());
+
+        // submit an invalid URL
+        getClient(authToken)
+                .perform(post(BASE_REST_SERVER_URL + "/api/workflow/workflowitems")
+                        .content("")
+                        .contentType(textUriContentType))
+                .andExpect(status().isUnprocessableEntity());
+    }
+
     /**
      * Test the exposition of validation error for missing required metadata
      *

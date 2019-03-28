@@ -7,7 +7,6 @@
  */
 package org.dspace.app.rest.converter;
 
-import org.apache.log4j.Logger;
 import org.dspace.app.rest.model.ClaimedTaskRest;
 import org.dspace.browse.IndexableObject;
 import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
@@ -25,10 +24,11 @@ import org.springframework.stereotype.Component;
 public class ClaimedTaskConverter
     implements IndexableDSpaceObjectConverter<ClaimedTask, org.dspace.app.rest.model.ClaimedTaskRest> {
 
-    private static final Logger log = Logger.getLogger(ClaimedTaskConverter.class);
-
     @Autowired
     private WorkflowItemConverter workflowItemConverter;
+
+    @Autowired
+    private EPersonConverter epersonConverter;
 
     @Override
     public ClaimedTaskRest fromModel(ClaimedTask obj) {
@@ -39,6 +39,7 @@ public class ClaimedTaskConverter
         taskRest.setWorkflowitem(workflowItemConverter.convert(witem));
         taskRest.setAction(obj.getActionID());
         taskRest.setStep(obj.getStepID());
+        taskRest.setOwner(epersonConverter.convert(obj.getOwner()));
         return taskRest;
     }
 

@@ -10,7 +10,6 @@ package org.dspace.content;
 import java.io.Serializable;
 import java.sql.SQLException;
 
-import org.dspace.authorize.AuthorizeException;
 import org.dspace.browse.IndexableObject;
 import org.dspace.eperson.EPerson;
 
@@ -28,11 +27,6 @@ public interface InProgressSubmission<ID extends Serializable> extends Indexable
      * @return the internal identifier
      */
     ID getID();
-
-    /**
-     * Update the submission, including the unarchived item.
-     */
-    void update() throws SQLException, AuthorizeException;
 
     /**
      * Get the incomplete item object

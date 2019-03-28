@@ -7,9 +7,6 @@
  */
 package org.dspace.xmlworkflow.storedcomponents;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -21,7 +18,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 
 import org.dspace.browse.IndexableObject;
 import org.dspace.core.Constants;
@@ -41,9 +37,6 @@ import org.dspace.eperson.Group;
 @Entity
 @Table(name = "cwf_pooltask")
 public class PoolTask implements ReloadableEntity<Integer>, IndexableObject<Integer> {
-
-    @Transient
-    public transient Map<String, Object> extraInfo = new HashMap<String, Object>();
 
     @Id
     @Column(name = "pooltask_id")
@@ -141,7 +134,7 @@ public class PoolTask implements ReloadableEntity<Integer>, IndexableObject<Inte
 
     @Override
     public int getType() {
-        return Constants.WORKFLOW_POOL;
+        return Constants.POOLTASK;
     }
 
 }

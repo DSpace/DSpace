@@ -12,7 +12,6 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-
 import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -21,25 +20,21 @@ import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.EPersonConverter;
 import org.dspace.app.rest.converter.MetadataConverter;
-import org.dspace.app.rest.exception.PatchBadRequestException;
 import org.dspace.app.rest.exception.RESTAuthorizationException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.EPersonRest;
 import org.dspace.app.rest.model.hateoas.EPersonResource;
-import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.repository.patch.EPersonPatch;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
-import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
@@ -51,20 +46,25 @@ import org.springframework.stereotype.Component;
  */
 
 @Component(EPersonRest.CATEGORY + "." + EPersonRest.NAME)
-public class EPersonRestRepository extends DSpaceRestRepository<EPersonRest, UUID> {
-    EPersonService es = EPersonServiceFactory.getInstance().getEPersonService();
+public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, EPersonRest> {
 
     @Autowired
     AuthorizeService authorizeService;
 
-    @Autowired
-    EPersonConverter converter;
+    private final EPersonService es;
 
     @Autowired
     MetadataConverter metadataConverter;
 
     @Autowired
     EPersonPatch epersonPatch;
+
+    public EPersonRestRepository(EPersonService dsoService,
+                                 EPersonConverter dsoConverter,
+                                 EPersonPatch dsoPatch) {
+        super(dsoService, dsoConverter, dsoPatch);
+        this.es = dsoService;
+    }
 
     @Override
     protected EPersonRest createAndReturn(Context context)
@@ -97,7 +97,7 @@ public class EPersonRestRepository extends DSpaceRestRepository<EPersonRest, UUI
             throw new RuntimeException(e.getMessage(), e);
         }
 
-        return converter.convert(eperson);
+        return dsoConverter.convert(eperson);
     }
 
     @Override
@@ -112,7 +112,7 @@ public class EPersonRestRepository extends DSpaceRestRepository<EPersonRest, UUI
         if (eperson == null) {
             return null;
         }
-        return converter.fromModel(eperson);
+        return dsoConverter.fromModel(eperson);
     }
 
     @Override
@@ -130,7 +130,7 @@ public class EPersonRestRepository extends DSpaceRestRepository<EPersonRest, UUI
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<EPersonRest> page = new PageImpl<EPerson>(epersons, pageable, total).map(converter);
+        Page<EPersonRest> page = new PageImpl<EPerson>(epersons, pageable, total).map(dsoConverter);
         return page;
     }
 
@@ -156,7 +156,7 @@ public class EPersonRestRepository extends DSpaceRestRepository<EPersonRest, UUI
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<EPersonRest> page = new PageImpl<EPerson>(epersons, pageable, total).map(converter);
+        Page<EPersonRest> page = new PageImpl<EPerson>(epersons, pageable, total).map(dsoConverter);
         return page;
     }
 
@@ -182,42 +182,22 @@ public class EPersonRestRepository extends DSpaceRestRepository<EPersonRest, UUI
         if (eperson == null) {
             return null;
         }
-        return converter.fromModel(eperson);
+        return dsoConverter.fromModel(eperson);
     }
 
     @Override
     @PreAuthorize("hasAuthority('ADMIN')")
-    public void patch(Context context, HttpServletRequest request, String apiCategory, String model, UUID uuid,
-                      Patch patch)
-            throws UnprocessableEntityException, PatchBadRequestException, AuthorizeException,
-            ResourceNotFoundException {
-
-        try {
-            EPerson eperson = es.find(context, uuid);
-            if (eperson == null) {
-                throw new ResourceNotFoundException(apiCategory + "." + model + " with id: " + uuid + " not found");
-            }
-            List<Operation> operations = patch.getOperations();
-            EPersonRest ePersonRest = findOne(context, uuid);
-            EPersonRest patchedModel = (EPersonRest) epersonPatch.patch(ePersonRest, operations);
-            updatePatchedValues(context, patchedModel, eperson);
-
-        } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage(), e);
-        }
+    protected void patch(Context context, HttpServletRequest request, String apiCategory, String model, UUID uuid,
+                         Patch patch) throws AuthorizeException, SQLException {
+        patchDSpaceObject(apiCategory, model, uuid, patch);
     }
 
-    /**
-     * Applies changes in the rest model.
-     * @param context
-     * @param ePersonRest the updated eperson rest
-     * @param ePerson the eperson content object
-     * @throws SQLException
-     * @throws AuthorizeException
-     */
-    private void updatePatchedValues(Context context, EPersonRest ePersonRest, EPerson ePerson)
-            throws SQLException, AuthorizeException {
+    @Override
+    protected void updateDSpaceObject(EPerson ePerson, EPersonRest ePersonRest)
+            throws AuthorizeException, SQLException {
+        super.updateDSpaceObject(ePerson, ePersonRest);
 
+        Context context = obtainContext();
         if (ePersonRest.getPassword() != null) {
             es.setPassword(ePerson, ePersonRest.getPassword());
         }
@@ -232,7 +212,6 @@ public class EPersonRestRepository extends DSpaceRestRepository<EPersonRest, UUI
         }
 
         es.update(context, ePerson);
-
     }
 
     @Override

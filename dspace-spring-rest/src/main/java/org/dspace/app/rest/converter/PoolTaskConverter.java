@@ -7,7 +7,6 @@
  */
 package org.dspace.app.rest.converter;
 
-import org.apache.log4j.Logger;
 import org.dspace.app.rest.model.PoolTaskRest;
 import org.dspace.browse.IndexableObject;
 import org.dspace.xmlworkflow.storedcomponents.PoolTask;
@@ -24,8 +23,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class PoolTaskConverter
     implements IndexableDSpaceObjectConverter<PoolTask, org.dspace.app.rest.model.PoolTaskRest> {
-
-    private static final Logger log = Logger.getLogger(PoolTaskConverter.class);
 
     @Autowired
     private WorkflowItemConverter workflowItemConverter;

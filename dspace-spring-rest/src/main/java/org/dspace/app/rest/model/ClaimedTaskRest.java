@@ -25,6 +25,9 @@ public class ClaimedTaskRest extends BaseObjectRest<Integer> {
     private String action;
 
     @JsonIgnore
+    private EPersonRest owner;
+
+    @JsonIgnore
     private WorkflowItemRest workflowitem;
 
     @Override
@@ -64,6 +67,18 @@ public class ClaimedTaskRest extends BaseObjectRest<Integer> {
 
     public void setAction(String action) {
         this.action = action;
+    }
+
+    /**
+     * @see ClaimedTaskRest#getOwner()
+     * @return the owner of the task
+     */
+    public EPersonRest getOwner() {
+        return owner;
+    }
+
+    public void setOwner(EPersonRest owner) {
+        this.owner = owner;
     }
 
     /**

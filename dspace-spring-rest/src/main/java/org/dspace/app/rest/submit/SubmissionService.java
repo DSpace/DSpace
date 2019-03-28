@@ -213,19 +213,28 @@ public class SubmissionService {
             char[] arr = new char[1024];
             StringBuilder buffer = new StringBuilder();
             int numCharsRead = reader.read(arr, 0, arr.length);
-            buffer.append(arr, 0, numCharsRead);
+            if (numCharsRead > 0) {
+                buffer.append(arr, 0, numCharsRead);
+            }
             if (numCharsRead == arr.length) {
-                throw new RuntimeException("Malformed body... too long");
+                throw new UnprocessableEntityException("Malformed body... too long");
             }
             String regex = "\\/api\\/" + WorkspaceItemRest.CATEGORY + "\\/" + English.plural(WorkspaceItemRest.NAME)
                     + "\\/";
             String[] split = buffer.toString().split(regex, 2);
             if (split.length != 2) {
-                throw new RuntimeException("Malformed body..." + buffer);
+                throw new UnprocessableEntityException("Malformed body..." + buffer);
             }
             // END FIXME
-            WorkspaceItem wsi = workspaceItemService.find(context, Integer.parseInt(split[1]));
-
+            WorkspaceItem wsi = null;
+            try {
+                wsi = workspaceItemService.find(context, Integer.parseInt(split[1]));
+            } catch (NumberFormatException e) {
+                throw new UnprocessableEntityException("The provided workspaceitem URI is not valid");
+            }
+            if (wsi == null) {
+                throw new UnprocessableEntityException("Workspace item is not found");
+            }
             if (!workspaceItemConverter.convert(wsi).getErrors().isEmpty()) {
                 throw new UnprocessableEntityException(
                         "Start workflow failed due to validation error on workspaceitem");

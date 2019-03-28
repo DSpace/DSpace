@@ -27,12 +27,11 @@ import org.dspace.app.rest.model.ClaimedTaskRest;
 import org.dspace.app.rest.model.PoolTaskRest;
 import org.dspace.app.rest.model.hateoas.ClaimedTaskResource;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.service.ItemService;
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.service.EPersonService;
-import org.dspace.event.Event;
 import org.dspace.workflow.WorkflowException;
 import org.dspace.xmlworkflow.WorkflowConfigurationException;
 import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
@@ -48,6 +47,8 @@ import org.dspace.xmlworkflow.storedcomponents.service.ClaimedTaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 /**
@@ -79,7 +80,11 @@ public class ClaimedTaskRestRepository extends DSpaceRestRepository<ClaimedTaskR
     @Autowired
     WorkflowRequirementsService workflowRequirementsService;
 
+    @Autowired
+    AuthorizeService authorizeService;
+
     @Override
+    @PreAuthorize("hasPermission(#id, 'CLAIMEDTASK', 'READ')")
     public ClaimedTaskRest findOne(Context context, Integer id) {
         ClaimedTask task = null;
         try {
@@ -94,12 +99,24 @@ public class ClaimedTaskRestRepository extends DSpaceRestRepository<ClaimedTaskR
     }
 
     @SearchRestMethod(name = "findByUser")
-    public Page<ClaimedTaskRest> findByUser(@Parameter(value = "uuid") UUID userID, Pageable pageable) {
+    public Page<ClaimedTaskRest> findByUser(@Parameter(value = "uuid", required = true) UUID userID,
+            Pageable pageable) {
+        //FIXME this should be secured with annotation but they are currently ignored by search methods
         List<ClaimedTask> tasks = null;
         try {
             Context context = obtainContext();
-            EPerson ep = epersonService.find(context, userID);
-            tasks = claimedTaskService.findByEperson(context, ep);
+            EPerson currentUser = context.getCurrentUser();
+            if (currentUser == null) {
+                throw new RESTAuthorizationException(
+                    "This endpoint is available only to logged-in user to search for their"
+                    + " own claimed tasks or the admins");
+            }
+            if (authorizeService.isAdmin(context) || userID.equals(currentUser.getID())) {
+                EPerson ep = epersonService.find(context, userID);
+                tasks = claimedTaskService.findByEperson(context, ep);
+            } else {
+                throw new RESTAuthorizationException("Only administrators can search for claimed tasks of other users");
+            }
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -118,10 +135,14 @@ public class ClaimedTaskRestRepository extends DSpaceRestRepository<ClaimedTaskR
     }
 
     @Override
+    @PreAuthorize("hasPermission(#id, 'CLAIMEDTASK', 'WRITE')")
     protected ClaimedTaskRest action(Context context, HttpServletRequest request, Integer id)
         throws SQLException, IOException {
         ClaimedTask task = null;
         task = claimedTaskService.find(context, id);
+        if (task == null) {
+            throw new ResourceNotFoundException("ClaimedTask ID " + id + " not found");
+        }
         XmlWorkflowServiceFactory factory = (XmlWorkflowServiceFactory) XmlWorkflowServiceFactory.getInstance();
         Workflow workflow;
         try {
@@ -136,10 +157,6 @@ public class ClaimedTaskRestRepository extends DSpaceRestRepository<ClaimedTaskR
                 throw new UnprocessableEntityException(
                         "Missing required fields: " + StringUtils.join(Action.getErrorFields(request), ","));
             }
-            // workflowRequirementsService.removeClaimedUser(context, task.getWorkflowItem(), task.getOwner(), task
-            // .getStepID());
-            context.addEvent(new Event(Event.MODIFY, Constants.ITEM, task.getWorkflowItem().getItem().getID(), null,
-                itemService.getIdentifiers(context, task.getWorkflowItem().getItem())));
         } catch (AuthorizeException e) {
             throw new RESTAuthorizationException(e);
         } catch (WorkflowException e) {
@@ -157,15 +174,17 @@ public class ClaimedTaskRestRepository extends DSpaceRestRepository<ClaimedTaskR
      * enough other claimed tasks for the same workflowitem.
      * 
      */
+    @PreAuthorize("hasPermission(#id, 'CLAIMEDTASK', 'DELETE')")
     protected void delete(Context context, Integer id) {
         ClaimedTask task = null;
         try {
             task = claimedTaskService.find(context, id);
+            if (task == null) {
+                throw new ResourceNotFoundException("ClaimedTask ID " + id + " not found");
+            }
             XmlWorkflowItem workflowItem = task.getWorkflowItem();
             workflowService.deleteClaimedTask(context, workflowItem, task);
             workflowRequirementsService.removeClaimedUser(context, workflowItem, task.getOwner(), task.getStepID());
-            context.addEvent(new Event(Event.MODIFY, Constants.ITEM, workflowItem.getItem().getID(), null,
-                itemService.getIdentifiers(context, workflowItem.getItem())));
         } catch (AuthorizeException e) {
             throw new RESTAuthorizationException(e);
         } catch (SQLException | IOException | WorkflowConfigurationException e) {

@@ -24,6 +24,7 @@ import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.PoolTaskRest;
 import org.dspace.app.rest.model.hateoas.PoolTaskResource;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
@@ -41,6 +42,7 @@ import org.dspace.xmlworkflow.storedcomponents.service.PoolTaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 /**
@@ -72,7 +74,11 @@ public class PoolTaskRestRepository extends DSpaceRestRepository<PoolTaskRest, I
     @Autowired
     WorkflowRequirementsService workflowRequirementsService;
 
+    @Autowired
+    AuthorizeService authorizeService;
+
     @Override
+    @PreAuthorize("hasPermission(#id, 'POOLTASK', 'READ')")
     public PoolTaskRest findOne(Context context, Integer id) {
         PoolTask task = null;
         try {
@@ -91,8 +97,19 @@ public class PoolTaskRestRepository extends DSpaceRestRepository<PoolTaskRest, I
         List<PoolTask> tasks = null;
         try {
             Context context = obtainContext();
-            EPerson ep = epersonService.find(context, userID);
-            tasks = poolTaskService.findByEperson(context, ep);
+            //FIXME this should be secured with annotation but they are currently ignored by search methods
+            EPerson currentUser = context.getCurrentUser();
+            if (currentUser == null) {
+                throw new RESTAuthorizationException(
+                    "This endpoint is available only to logged-in user"
+                    + " to search for their own pool tasks or the admins");
+            }
+            if (authorizeService.isAdmin(context) || userID.equals(currentUser.getID())) {
+                EPerson ep = epersonService.find(context, userID);
+                tasks = poolTaskService.findByEperson(context, ep);
+            } else {
+                throw new RESTAuthorizationException("Only administrators can search for pool tasks of other users");
+            }
         } catch (AuthorizeException e) {
             throw new RESTAuthorizationException(e);
         } catch (SQLException | IOException e) {
@@ -113,6 +130,7 @@ public class PoolTaskRestRepository extends DSpaceRestRepository<PoolTaskRest, I
     }
 
     @Override
+    @PreAuthorize("hasPermission(#id, 'POOLTASK', 'WRITE')")
     protected PoolTaskRest action(Context context, HttpServletRequest request, Integer id)
         throws SQLException, IOException {
         PoolTask task = null;
