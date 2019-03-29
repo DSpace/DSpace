@@ -19,6 +19,10 @@ echo "Writing simple Handle server configuration"
 # Read parameters from DSpace config
 dshostname=`$BINDIR/dspace dsprop --property dspace.hostname`
 dshostip=`host $dshostname | awk '/has address/ { print $4; exit }'`
+if [ "$dshostip" = "127.0.0.1" ]; then
+  # Just use default. SimpleSetup will fail when trying to bind to localhost addresses.
+  dshostip=""
+fi
 dsname=`$BINDIR/dspace dsprop --property dspace.name`
 handle=`$BINDIR/dspace dsprop --property handle.prefix`
 handledir=`$BINDIR/dspace dsprop --property handle.dir`
@@ -46,7 +50,7 @@ echo "n" >>$tempfile  # Do not encrypt admin private key
                       # OR do not overwrite old admin private key
 
 # Now run Handle server config tool, and pipe our config in
-$BINDIR/dspace dsrun net.handle.server.SimpleSetup $handledir < $tempfile >/dev/null
+$BINDIR/dspace dsrun net.handle.server.SimpleSetup $handledir < $tempfile >/dev/null 2>&1
 
 # Remove temp file
 rm -f $tempfile
