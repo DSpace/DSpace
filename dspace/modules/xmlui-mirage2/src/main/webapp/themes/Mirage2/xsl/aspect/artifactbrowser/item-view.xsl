@@ -116,6 +116,7 @@
                             <xsl:call-template name="itemSummaryView-DIM-file-section"/>
                         </div>
                     </div>
+                    <xsl:call-template name="itemSummaryView-DIM-description-uris"/> <!-- Customization for LIBDRUM-583 -->
                     <xsl:call-template name="itemSummaryView-DIM-date"/>
                     <xsl:call-template name="itemSummaryView-DIM-authors"/>
                     <!-- Begin UMD Customization -->
@@ -130,6 +131,7 @@
                 </div>
                 <div class="col-sm-8">
                     <xsl:call-template name="itemSummaryView-DIM-abstract"/>
+                    <xsl:call-template name="itemSummaryView-DIM-description"/> <!-- Customization for LIBDRUM-583 -->
                     <xsl:call-template name="itemSummaryView-DIM-URI"/>
                     <xsl:call-template name="itemSummaryView-collections"/>
                     <!-- Begin UMD Customization -->
@@ -286,6 +288,34 @@
         </div>
     </xsl:template>
 
+    <!-- Customization for LIBDRUM-583 -->
+    <!-- Template to display Description -->
+    <xsl:template name="itemSummaryView-DIM-description">
+        <xsl:if test="dim:field[@element='description'][not(@qualifier)]">
+            <div class="simple-item-view-doi item-page-field-wrapper table">
+                <h5><i18n:text>xmlui.dri2xhtml.METS-1.0.item-description</i18n:text></h5>
+                <div>
+                    <xsl:for-each select="dim:field[@element='description'][not(@qualifier)]">
+                        <xsl:choose>
+                            <xsl:when test="node()">
+                                <!-- Make URLS clickable -->
+                                <xsl:call-template name="hyperlink">
+                                    <xsl:with-param name="text">
+                                        <xsl:copy-of select="./node()"/>
+                                    </xsl:with-param>
+                                </xsl:call-template>
+                            </xsl:when>
+                        </xsl:choose>
+                        <xsl:if test="count(following-sibling::dim:field[@element='description'][not(@qualifier)]) != 0">
+                            <div class="spacer">&#160;</div>
+                        </xsl:if>
+                    </xsl:for-each>
+                </div>
+            </div>
+        </xsl:if>
+    </xsl:template>
+    <!-- End Customization for LIBDRUM-583 -->
+
     <xsl:template name="itemSummaryView-DIM-URI">
         <xsl:if test="dim:field[@element='identifier' and @qualifier='uri' and descendant::text()]">
             <div class="simple-item-view-uri item-page-field-wrapper table">
@@ -306,6 +336,26 @@
             </div>
         </xsl:if>
     </xsl:template>
+
+    <!-- Customization for LIBDRUM-583 -->
+    <xsl:template name="itemSummaryView-DIM-description-uris">
+        <xsl:if test="dim:field[@element='description' and @qualifier='uri' and descendant::text()]">
+            <div class="simple-item-view-uri item-page-field-wrapper table">
+                <h5><i18n:text>xmlui.dri2xhtml.METS-1.0.item-description-uri</i18n:text></h5>
+                <span>
+                    <xsl:for-each select="dim:field[@element='description' and @qualifier='uri']">
+                        <xsl:call-template name="hyperlinkword">
+                            <xsl:with-param name="text" select="./node()"/>
+                        </xsl:call-template>
+                        <xsl:if test="count(following-sibling::dim:field[@element='description' and @qualifier='uri']) != 0">
+                          <br/>
+                        </xsl:if>
+                    </xsl:for-each>
+                </span>
+            </div>
+        </xsl:if>
+    </xsl:template>
+    <!-- End Customization for LIBDRUM-583 -->
 
     <xsl:template name="itemSummaryView-DIM-date">
         <xsl:if test="dim:field[@element='date' and @qualifier='issued' and descendant::text()]">
@@ -878,7 +928,7 @@
     <xsl:template name="hyperlink">
 		    <xsl:param name="text"/>
 		    <xsl:choose>
-			      <xsl:when test="(contains($text,'http://') or contains($text,'https://'))">
+			      <xsl:when test="(contains($text,'http://') or contains($text,'HTTP://') or contains($text,'https://') or contains($text,'HTTPS://'))">
                 <xsl:choose>
 					          <xsl:when test="contains($text,' ')">
                         <xsl:call-template name="hyperlinkword">
@@ -906,11 +956,14 @@
     <xsl:template name="hyperlinkword">
         <xsl:param name="text"/>
         <xsl:choose>
-            <xsl:when test="(contains($text,'http://') and string-length($text)>7)">
-                <a href="http://{normalize-space(substring-after($text, 'http://'))}">http://<xsl:value-of select="normalize-space(substring-after($text, 'http://'))" /></a>
+            <xsl:when test="((starts-with($text,'doi:') or starts-with($text,'DOI:')) and string-length($text)>4)">
+                <a href="https://dx.doi.org/{normalize-space(substring($text, 5))}" target="_blank"><xsl:value-of select="normalize-space($text)" /></a>
             </xsl:when>
-            <xsl:when test="(contains($text,'https://') and string-length($text)>8)">
-                <a href="https://{normalize-space(substring-after($text, 'https://'))}">https://<xsl:value-of select="normalize-space(substring-after($text, 'https://'))" /></a>
+            <xsl:when test="((starts-with($text,'http://') or starts-with($text,'HTTP://')) and string-length($text)>7)">
+                <a href="http://{normalize-space(substring($text, 8))}" target="_blank"><xsl:value-of select="normalize-space($text)" /></a>
+            </xsl:when>
+            <xsl:when test="((starts-with($text,'https://') or starts-with($text,'HTTPS://')) and string-length($text)>8)">
+                <a href="https://{normalize-space(substring($text, 9))}" target="_blank"><xsl:value-of select="normalize-space($text)" /></a>
             </xsl:when>
             <xsl:otherwise>
                 <xsl:value-of select="$text" />
