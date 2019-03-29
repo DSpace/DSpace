@@ -13,8 +13,10 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrQuery.ORDER;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.dspace.app.cris.discovery.CrisSearchService;
@@ -65,12 +67,12 @@ public abstract class AWSServices <T> implements
 	@Override
 	public Element marshall(String query, String paginationStart,
 			String paginationLimit, String[] splitProjection, String type,
-			Element root, User userWS, String nameRoot)
+			Element root, User userWS, String nameRoot, String sort, String sortOrder, String parent)
 			throws SearchServiceException, IOException {
 
 		SolrQuery solrQuery = buildQuery(query, 
 				paginationStart.trim(), paginationLimit.trim(),
-				userWS, type, splitProjection);
+				userWS, type, sort, sortOrder, parent, splitProjection);
 		QueryResponse response = searchServices.search(solrQuery);
 		List<T> results = getWSObject(response);
 			root = getMarshaller()
@@ -81,8 +83,8 @@ public abstract class AWSServices <T> implements
 		return root;
 	}
 
-	private SolrQuery buildQuery(String query, String start,
-			String limit, User userWS, String type,
+	protected SolrQuery buildQuery(String query, String start,
+			String limit, User userWS, String type, String sort, String sortOrder, String parent,
 			String... projection) {
 
 		SolrQuery solrQuery = new SolrQuery();
@@ -91,7 +93,20 @@ public abstract class AWSServices <T> implements
 		solrQuery.setQuery(query);
 		solrQuery.setStart(Integer.parseInt(start));
 		solrQuery.setRows(Integer.parseInt(limit));
-
+		
+		if(StringUtils.isNotBlank(sort)) {
+			
+	        if (sortOrder == null || "DESC".equalsIgnoreCase(sortOrder))
+	        {
+	            solrQuery.setSort(sort, ORDER.desc);
+	        }
+	        else
+	        {
+	        	solrQuery.setSort(sort, ORDER.asc);
+	        }
+			
+		}
+		
 		internalBuildFieldList(solrQuery, projection);
 
 		solrQuery.addFilterQuery("search.resourcetype:" + resource_type);

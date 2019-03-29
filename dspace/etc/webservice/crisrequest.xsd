@@ -4,10 +4,16 @@
 	xmlns:reqitem="http://4science.github.io/dspace-cris/publications/listmetadata/schemas"
 	xmlns:reqrp="http://4science.github.io/dspace-cris/researcherpage/listmetadata/schemas"
 	xmlns:reqou="http://4science.github.io/dspace-cris/orgunit/listmetadata/schemas"
+	xmlns:reqrpnested="http://4science.github.io/dspace-cris/rpnested/listmetadata/schemas"
+	xmlns:reqpjnested="http://4science.github.io/dspace-cris/pjnested/listmetadata/schemas"
+	xmlns:reqounested="http://4science.github.io/dspace-cris/ounested/listmetadata/schemas"
 	xmlns:grant="http://4science.github.io/dspace-cris/grant/schemas" 
 	xmlns:rp="http://4science.github.io/dspace-cris/researcherpage/schemas"
 	xmlns:orgunit="http://4science.github.io/dspace-cris/orgunit/schemas"
 	xmlns:item="http://4science.github.io/dspace-cris/publications/schemas"
+	xmlns:rpnested="http://4science.github.io/dspace-cris/rpnested/schemas"
+	xmlns:pjnested="http://4science.github.io/dspace-cris/pjnested/schemas"
+	xmlns:ounested="http://4science.github.io/dspace-cris/ounested/schemas"
 	xmlns:cris="http://4science.github.io/dspace-cris/schemas" elementFormDefault="qualified"
 	targetNamespace="http://4science.github.io/dspace-cris/schemas">
 
@@ -23,11 +29,29 @@
 	<xs:import namespace="http://4science.github.io/dspace-cris/researcherpage/listmetadata/schemas"
 		schemaLocation="xsd/requestresearcherpage.xsd">
 	</xs:import>
+	<xs:import namespace="http://4science.github.io/dspace-cris/rpnested/listmetadata/schemas"
+		schemaLocation="xsd/requestrpnested.xsd">
+	</xs:import>
+	<xs:import namespace="http://4science.github.io/dspace-cris/pjnested/listmetadata/schemas"
+		schemaLocation="xsd/requestpjnested.xsd">
+	</xs:import>
+	<xs:import namespace="http://4science.github.io/dspace-cris/ounested/listmetadata/schemas"
+		schemaLocation="xsd/requestounested.xsd">
+	</xs:import>	
 	<xs:import namespace="http://4science.github.io/dspace-cris/grant/schemas"
 		schemaLocation="xsd/responseresearchergrants.xsd">
 	</xs:import>
 	<xs:import namespace="http://4science.github.io/dspace-cris/researcherpage/schemas"
 		schemaLocation="xsd/responseresearcherpage.xsd">
+	</xs:import>
+	<xs:import namespace="http://4science.github.io/dspace-cris/rpnested/schemas"
+		schemaLocation="xsd/responserpnested.xsd">
+	</xs:import>	
+	<xs:import namespace="http://4science.github.io/dspace-cris/pjnested/schemas"
+		schemaLocation="xsd/responsepjnested.xsd">
+	</xs:import>
+	<xs:import namespace="http://4science.github.io/dspace-cris/ounested/schemas"
+		schemaLocation="xsd/responseounested.xsd">
 	</xs:import>
 	<xs:import namespace="http://4science.github.io/dspace-cris/orgunit/schemas"
 		schemaLocation="xsd/responseorgunits.xsd">
@@ -45,6 +69,9 @@
 				<xs:element ref="grant:crisobjects"/>
 				<xs:element ref="orgunit:crisobjects"/>
 				<xs:element ref="item:crisobjects"/>
+				<xs:element ref="rpnested:crisobjects"/>
+				<xs:element ref="pjnested:crisobjects"/>
+				<xs:element ref="ounested:crisobjects"/>
 			</xs:choice>	
 			<xs:attribute name="hit" type="xs:int"/>
 			<xs:attribute name="start" type="xs:int"/>
@@ -60,6 +87,9 @@
 				<xs:element ref="grant:crisobjects"/>
 				<xs:element ref="orgunit:crisobjects"/>
 				<xs:element ref="item:crisobjects"/>
+				<xs:element ref="rpnested:crisobjects"/>
+				<xs:element ref="pjnested:crisobjects"/>
+				<xs:element ref="ounested:crisobjects"/>
 			</xs:choice>
 			<xs:attribute name="hit" type="xs:int"/>
 			<xs:attribute name="start" type="xs:int"/>
@@ -97,6 +127,7 @@
 			<xs:element name="Token" type="xs:string" />
 		</xs:sequence>
 	</xs:complexType>
+	
 	<xs:complexType name="QueryType">
 		<xs:sequence>
 			<xs:element name="Query" type="xs:string" />
@@ -104,14 +135,24 @@
 			<xs:element name="PaginationStart" type="xs:int" default="0" />
 			<xs:element name="Projection" type="cris:ProjectionType" />
 			<xs:element name="Type" type="cris:TType" />
+			<xs:element minOccurs="0" name="Sort" type="cris:SortType" />
+			<xs:element minOccurs="0" name="ParentCrisID" type="xs:string" />
 		</xs:sequence>
 	</xs:complexType>
+	
+	<xs:complexType name="SortType">
+			<xs:simpleContent><xs:extension base="xs:string"><xs:attribute name="SortOrder" type="xs:string"/></xs:extension></xs:simpleContent>
+	</xs:complexType>
+		
 	<xs:complexType name="ProjectionType">
 		<xs:choice minOccurs="1" maxOccurs="1">
 			<xs:element name="publicationProjection" type="cris:ProjectionPublicationsType" />
 			<xs:element name="researcherProjection" type="cris:ProjectionResearchersType" />
 			<xs:element name="grantProjection" type="cris:ProjectionGrantsType" />
 			<xs:element name="orgunitProjection" type="cris:ProjectionOrgUnitsType" />
+			<xs:element name="rpnestedProjection" type="cris:ProjectionRPNestedType" />
+			<xs:element name="pjnestedProjection" type="cris:ProjectionPJNestedType" />
+			<xs:element name="ounestedProjection" type="cris:ProjectionOUNestedType" />
 		</xs:choice>
 	</xs:complexType>
 
@@ -127,6 +168,9 @@
 			<xs:enumeration value="researcherPages" />
 			<xs:enumeration value="grants" />
 			<xs:enumeration value="orgunits" />
+			<xs:enumeration value="rpnested" />
+			<xs:enumeration value="pjnested" />
+			<xs:enumeration value="ounested" />
 		</xs:restriction>
 	</xs:simpleType>
 
@@ -146,4 +190,14 @@
 	<xs:simpleType name="ProjectionOrgUnitsType">
 		<xs:list itemType="reqou:OUmetadata" />
 	</xs:simpleType>
-</xs:schema>
+	
+	<xs:simpleType name="ProjectionRPNestedType">
+		<xs:list itemType="reqrpnested:NESTEDmetadata" />
+	</xs:simpleType>
+	<xs:simpleType name="ProjectionPJNestedType">
+		<xs:list itemType="reqpjnested:NESTEDmetadata" />
+	</xs:simpleType>
+	<xs:simpleType name="ProjectionOUNestedType">
+		<xs:list itemType="reqounested:NESTEDmetadata" />
+	</xs:simpleType>
+</xs:schema>
