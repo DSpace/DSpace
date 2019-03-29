@@ -277,6 +277,12 @@ public class DescribeStep extends AbstractSubmissionStep
             {
                 renderOneboxField(form, fieldName, dcInput, dcValues, readonly);
             }
+            // Customization for LIBDRUM-582
+            else if (inputType.equals("onebox_url"))
+            {
+                renderOneboxUrlField(form, fieldName, dcInput, dcValues, readonly);
+            }
+            // End Customization for LIBDRUM-582
             else
             {
                 form.addItem(T_unknown_field);
@@ -1179,6 +1185,30 @@ public class DescribeStep extends AbstractSubmissionStep
         // }
         // End UMD Customization
 
+        setupOneboxTextField(text, fieldName, dcInput, dcValues, readonly);
+    }
+
+    /**
+     * Render a simple text field to the DRI document
+     *
+     * @param form
+     *                      The form list to add the field to
+     * @param fieldName
+     *                      The field's name.
+     * @param dcInput
+     *                      The field's input definition
+     * @param dcValues
+     *                      The field's pre-existing values.
+     */
+    private void renderOneboxUrlField(List form, String fieldName, DCInput dcInput, java.util.List<MetadataValue> dcValues, boolean readonly) throws WingException
+    {
+        org.dspace.app.xmlui.wing.element.Item item = form.addItem();
+        Text text = item.addText(fieldName, "submit-text");
+        setupOneboxTextField(text, fieldName, dcInput, dcValues, readonly);
+        text.setType(Field.TYPE_TEXT_URL);
+    }
+
+    private void setupOneboxTextField(Text text, String fieldName, DCInput dcInput, java.util.List<MetadataValue> dcValues, boolean readonly) throws WingException {
         // Setup the select field
         text.setLabel(dcInput.getLabel());
         text.setHelp(cleanHints(dcInput.getHints()));
