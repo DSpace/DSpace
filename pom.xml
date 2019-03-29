@@ -1126,7 +1126,7 @@
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>handle</artifactId>
-                <version>6.2</version>
+                <version>9.1.0</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
@@ -1289,13 +1289,13 @@
             </dependency>
             <dependency>
 	        <groupId>org.bouncycastle</groupId>
-	        <artifactId>bcprov-jdk15</artifactId>
-	        <version>1.46</version>
+            <artifactId>bcprov-jdk15on</artifactId>
+            <version>1.59</version>
 	    </dependency>
 	    <dependency>
 	        <groupId>org.bouncycastle</groupId>
-	        <artifactId>bcmail-jdk15</artifactId>
-	        <version>1.46</version>
+            <artifactId>bcmail-jdk15on</artifactId>
+   	        <version>1.59</version>
 	    </dependency>
             <dependency>
                 <groupId>org.apache.poi</groupId>
