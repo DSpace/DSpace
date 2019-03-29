@@ -396,9 +396,9 @@
           <dc-element>description</dc-element>
           <dc-qualifier>uri</dc-qualifier>
           <repeatable>true</repeatable>
-          <label>External Link</label>
+          <label>External Link(s)</label>
           <input-type>onebox_url</input-type>
-          <hint>If applicable, enter the URL(s) for the item located elsewhere on the Internet.  If available, please use the DOI (Digital Object Identifier) for the file.</hint>
+          <hint>If applicable, enter the URL(s) for the item located elsewhere on the Internet. If available, please use the DOI (Digital Object Identifier) for the file. Examples: https://drum.lib.umd.edu/, https://doi.org/10.13016/yhab-ufvn, or DOI:10.13016/yhab-ufvn.</hint>
           <required></required>
         </field>
 
