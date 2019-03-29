@@ -1129,6 +1129,17 @@
                 <version>9.1.0</version>
             </dependency>
             <dependency>
+                <groupId>org.eclipse.jetty.aggregate</groupId>
+                <artifactId>jetty-all</artifactId>
+                <version>8.1.22.v20160922</version>
+                <exclusions>
+                    <exclusion>
+                        <artifactId>javax.servlet</artifactId>
+                        <groupId>org.eclipse.jetty.orbit</groupId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>jargon</artifactId>
                 <version>1.4.25</version>
