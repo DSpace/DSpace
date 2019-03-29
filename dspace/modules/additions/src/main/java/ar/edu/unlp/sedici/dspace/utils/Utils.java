@@ -1,15 +1,20 @@
 package ar.edu.unlp.sedici.dspace.utils;
 
 import java.sql.SQLException;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.dspace.core.Context;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Utils {
 	
+	protected static Logger log = LoggerFactory.getLogger(Utils.class);
+
 	public static boolean isEmail(String correo) {
         Pattern pat = null;
         Matcher mat = null;
@@ -29,13 +34,26 @@ public class Utils {
 	 * redondeado hacia abajo a la unidad de centena inferior mas cercana.
 	 * Es decir, si hay 67160 items redondea a 67100.
 	 */
-	public static int countAvailableItems(Context context) throws SQLException
+	public static int countAvailableItems() throws SQLException
 	{
+		Context context;
+		try {
+			context = new Context();
+		} catch (SQLException e) {
+			log.error("No se pudo instanciar el Context", e);
+			throw new RuntimeException(e);
+		}
 		String myQuery = "SELECT count(*) / 100 * 100 as total FROM item WHERE in_archive='1' and withdrawn='0'";
 
 		TableRow row = DatabaseManager.querySingle(context, myQuery);
 
 		int count = Integer.valueOf(row.getIntColumn("total"));
+		try {
+			context.complete();
+		} catch (SQLException e) {
+			log.error("No se pudo cerrar el Context", e);
+			throw new RuntimeException(e);
+		}
 		return count;
 	}
 

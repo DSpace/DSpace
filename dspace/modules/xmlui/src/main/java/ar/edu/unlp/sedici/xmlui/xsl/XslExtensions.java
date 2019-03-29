@@ -170,7 +170,7 @@ public class XslExtensions {
 	}
 
 	public static int availableItemsCount() throws SQLException {
-		return Utils.countAvailableItems(new Context());
+		return Utils.countAvailableItems();
 	}
 	
 }
