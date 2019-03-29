@@ -954,13 +954,13 @@
         <xsl:param name="text"/>
         <xsl:choose>
             <xsl:when test="((starts-with($text,'doi:') or starts-with($text,'DOI:')) and string-length($text)>4)">
-                <a href="https://dx.doi.org/{normalize-space(substring($text, 5))}"><xsl:value-of select="normalize-space($text)" /></a>
+                <a href="https://dx.doi.org/{normalize-space(substring($text, 5))}" target="_blank"><xsl:value-of select="normalize-space($text)" /></a>
             </xsl:when>
             <xsl:when test="((starts-with($text,'http://') or starts-with($text,'HTTP://')) and string-length($text)>7)">
-                <a href="http://{normalize-space(substring($text, 8))}"><xsl:value-of select="normalize-space($text)" /></a>
+                <a href="http://{normalize-space(substring($text, 8))}" target="_blank"><xsl:value-of select="normalize-space($text)" /></a>
             </xsl:when>
             <xsl:when test="((starts-with($text,'https://') or starts-with($text,'HTTPS://')) and string-length($text)>8)">
-                <a href="https://{normalize-space(substring($text, 9))}"><xsl:value-of select="normalize-space($text)" /></a>
+                <a href="https://{normalize-space(substring($text, 9))}" target="_blank"><xsl:value-of select="normalize-space($text)" /></a>
             </xsl:when>
             <xsl:otherwise>
                 <xsl:value-of select="$text" />
