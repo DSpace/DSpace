@@ -128,7 +128,7 @@
 					<input class="btn btn-danger pull-right" type="submit" name="submit_remove_<%= bitstream.getID() %>" value="<fmt:message key="jsp.submit.show-uploaded-file.click2.button"/>" />
                 </td>
                 <td headers="t2" class="evenRowEvenCol"><fmt:message key="jsp.submit.show-uploaded-file.size-in-bytes">
-                    <fmt:param><fmt:formatNumber><%= bitstream.getSize() %></fmt:formatNumber></fmt:param>
+                    <fmt:param><fmt:formatNumber><%= bitstream.getSizeBytes() %></fmt:formatNumber></fmt:param>
                 </fmt:message></td>
                 <td headers="t3" class="evenRowOddCol">
                     <%= bitstream.getFormatDescription(context) %>

@@ -7,18 +7,19 @@
  */
 package org.dspace.browse;
 
-import java.sql.SQLException;
-import java.util.List;
-import java.util.ArrayList;
-
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
-import org.dspace.sort.SortOption;
 import org.dspace.sort.OrderFormat;
+import org.dspace.sort.SortOption;
+
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class does most of the actual grunt work of preparing a browse
@@ -408,7 +409,7 @@ public class BrowseEngine
             // get the table name that we are going to be getting our data from
             // this is the distinct table constrained to either community or collection
             dao.setTable(browseIndex.getDistinctTableName());
-
+            dao.setStartsWith(StringUtils.lowerCase(scope.getStartsWith()));
             // remind the DAO that this is a distinct value browse, so it knows what sort
             // of query to build
             dao.setDistinct(true);
@@ -463,15 +464,8 @@ public class BrowseEngine
             String rawFocusValue = null;
             if (offset < 1 && scope.hasJumpToValue() || scope.hasStartsWith())
             {
-                String focusValue = getJumpToValue();
-
                 // store the value to tell the Browse Info object which value we are browsing on
-                rawFocusValue = focusValue;
-
-                // make sure the incoming value is normalised
-                focusValue = normalizeJumpToValue(focusValue);
-
-                offset = getOffsetForDistinctValue(focusValue);
+                rawFocusValue = getJumpToValue();
             }
 
 

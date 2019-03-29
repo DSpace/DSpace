@@ -74,7 +74,7 @@ public class Bitstream extends DSpaceObject {
 
         description = bitstream.getDescription();
         format = bitstreamService.getFormatDescription(context, bitstream);
-        sizeBytes = bitstream.getSize();
+        sizeBytes = bitstream.getSizeBytes();
         String path = new DSpace().getRequestService().getCurrentRequest().getHttpServletRequest().getContextPath();
         retrieveLink = path + "/bitstreams/" + bitstream.getID() + "/retrieve";
         mimeType = bitstreamService.getFormat(context, bitstream).getMIMEType();

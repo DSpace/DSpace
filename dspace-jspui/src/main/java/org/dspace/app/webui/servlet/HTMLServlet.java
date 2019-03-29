@@ -241,7 +241,7 @@ public class HTMLServlet extends DSpaceServlet
 
             // Response length
             response.setHeader("Content-Length", String.valueOf(bitstream
-                    .getSize()));
+                    .getSizeBytes()));
 
             // Pipe the bits
             InputStream is = bitstreamService.retrieve(context, bitstream);

@@ -157,7 +157,7 @@ public class DiscoverySearchRequestProcessor implements SearchRequestProcessor
         }
         DiscoverQuery queryArgs = DiscoverUtility.getDiscoverQuery(context,
                 request, container, false);
-        String query = queryArgs.getQuery();
+        String query = request.getParameter("query");
 
         // Perform the search
         DiscoverResult qResults = null;
@@ -283,7 +283,7 @@ public class DiscoverySearchRequestProcessor implements SearchRequestProcessor
 
         request.setAttribute("etal", etal);
 
-        String query = queryArgs.getQuery();
+        String query = request.getParameter("query");
         request.setAttribute("query", query);
         request.setAttribute("queryArgs", queryArgs);
         List<DiscoverySearchFilter> availableFilters = discoveryConfiguration
@@ -426,19 +426,30 @@ public class DiscoverySearchRequestProcessor implements SearchRequestProcessor
             }
             catch (SQLException e)
             {
-                throw new SearchProcessorException(e.getMessage(), e);            }
 
-            if ("submit_export_metadata".equals(UIUtil.getSubmitButton(request,
-                    "submit")))
-            {
-                exportMetadata(context, response, resultsListItem);
+            }
+
+            if ("submit_export_metadata".equals(UIUtil.getSubmitButton(request,"submit"))) {
+                try {
+                    if (authorizeService.isAdmin(context)) {
+                        exportMetadata(context, response, resultsListItem);
+                    }
+                    else {
+                        JSPManager.showJSP(request, response, "/error/authorize.jsp");
+                    }
+                }
+                catch (SQLException e)
+                {
+                    throw new SearchProcessorException(e.getMessage(), e);
+                }
+
             }
         }
         catch (SearchServiceException e)
         {
             log.error(
                     LogManager.getHeader(context, "search", "query="
-                            + queryArgs.getQuery() + ",scope=" + scope
+                            + query + ",scope=" + scope
                             + ",error=" + e.getMessage()), e);
             request.setAttribute("search.error", true);
             request.setAttribute("search.error.message", e.getMessage());

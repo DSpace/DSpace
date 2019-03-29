@@ -278,7 +278,7 @@ public class UploadStep extends AbstractSubmissionStep
                 UUID id = bitstream.getID();
                 String name = bitstream.getName();
                 String url = makeBitstreamLink(item, bitstream);
-                long bytes = bitstream.getSize();
+                long bytes = bitstream.getSizeBytes();
                 String desc = bitstream.getDescription();
                 String algorithm = bitstream.getChecksumAlgorithm();
                 String checksum = bitstream.getChecksum();

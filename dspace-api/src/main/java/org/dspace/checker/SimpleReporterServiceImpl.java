@@ -352,7 +352,7 @@ public class SimpleReporterServiceImpl implements SimpleReporterService
                     info.getInternalId()).append("\n");
             buf.append(msg("name")).append(" = ").append(info.getName())
                     .append("\n");
-            buf.append(msg("size")).append(" = ").append(info.getSize())
+            buf.append(msg("size")).append(" = ").append(info.getSizeBytes())
                     .append("\n");
             buf.append(msg("source")).append(" = ").append(info.getSource())
                     .append("\n");

@@ -947,7 +947,7 @@ public class ItemTag extends TagSupport
             		}
 
             		out.print("</td><td headers=\"t3\" class=\"standard\">");
-                    out.print(UIUtil.formatFileSize(primaryBitstream.getSize()));
+                    out.print(UIUtil.formatFileSize(primaryBitstream.getSizeBytes()));
                     out.print("</td><td headers=\"t4\" class=\"standard\">");
             		out.print(primaryBitstream.getFormatDescription(context));
             		out
@@ -1104,7 +1104,7 @@ public class ItemTag extends TagSupport
 
             					out
                                     .print("</td><td headers=\"t3\" class=\"standard\">");
-                                out.print(UIUtil.formatFileSize(b.getSize()));
+                                out.print(UIUtil.formatFileSize(b.getSizeBytes()));
             					out
                                 .print("</td><td headers=\"t4\" class=\"standard\">");
             					out.print(b.getFormatDescription(context));

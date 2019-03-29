@@ -39,9 +39,7 @@
         <!--
             Driver Guidelines:
 
-            - http://www.driver-support.eu/documents/DRIVER_Guidelines_v2_Final_2008-11-13.pdf
-
-            Page 57 - 58
+            - https://guidelines.openaire.eu/en/latest/literature/use_of_oai_pmh.html
          -->
         <Context baseurl="driver" name="Driver Context">
             <!-- Date format, field prefixes, etc are ensured by the transformer -->

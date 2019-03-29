@@ -101,7 +101,7 @@ public class ResultsLogger implements ChecksumResultsCollector
         LOG.info(msg("internal-id") + ": " + bitstream.getInternalId());
         LOG.info(msg("name") + ": " + bitstream.getName());
         LOG.info(msg("store-number") + ": " + bitstream.getStoreNumber());
-        LOG.info(msg("size") + ": " + bitstream.getSize());
+        LOG.info(msg("size") + ": " + bitstream.getSizeBytes());
         LOG.info(msg("bitstream-format") + ": " + (bitstream.getFormat(context) != null ? bitstream.getFormat(context).getID() : "-1"));
         LOG.info(msg("user-format-description") + ": "
                 + bitstream.getUserFormatDescription());

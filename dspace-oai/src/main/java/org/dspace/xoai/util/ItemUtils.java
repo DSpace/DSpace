@@ -239,7 +239,7 @@ public class ItemUtils
                             createValue("format", bit.getFormat(context)
                                     .getMIMEType()));
                     bitstream.getField().add(
-                            createValue("size", "" + bit.getSize()));
+                            createValue("size", "" + bit.getSizeBytes()));
                     bitstream.getField().add(createValue("url", url));
                     bitstream.getField().add(
                             createValue("checksum", cks));

@@ -1522,3 +1522,9 @@ div.vocabulary-container li.error{
     border: 1px solid #cccccc;
     margin-right: 3px;
 }
+
+/* DS-3705 fix bottom pagination covering the whole list in /recent-submissions?themepath=Reference/ */
+.pagination.bottom {
+    display: flow-root;
+}
+

@@ -104,9 +104,10 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
         // Set the internal identifier, file size, checksum, and 
         // checksum algorithm as same as the given bitstream. 
         clonedBitstream.setInternalId(bitstream.getInternalId());
-        clonedBitstream.setSizeBytes(bitstream.getSize());
+        clonedBitstream.setSizeBytes(bitstream.getSizeBytes());
         clonedBitstream.setChecksum(bitstream.getChecksum());
         clonedBitstream.setChecksumAlgorithm(bitstream.getChecksumAlgorithm());
+        clonedBitstream.setFormat(bitstream.getBitstreamFormat());
 
         try 
         {

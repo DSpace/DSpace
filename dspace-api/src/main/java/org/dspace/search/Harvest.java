@@ -97,17 +97,28 @@ public class Harvest
 
         if (scope != null)
         {
-            discoverQuery.addFieldPresentQueries("location:" + scope.getID());
+            if (scope instanceof Community) 
+            {
+                discoverQuery.addFilterQueries("location:m" + scope.getID());
+            } 
+            else if (scope instanceof Collection) 
+            {
+                discoverQuery.addFilterQueries("location:l" + scope.getID());
+            }
         }
-
-        if (startDate != null)
+        
+        if (startDate != null && endDate != null)
         {
-            discoverQuery.addFilterQueries("lastModified => " + new DCDate(startDate).toString());
+            discoverQuery.addFilterQueries("lastModified:[" + new DCDate(startDate).toString() 
+                                                   + " TO " + new DCDate(endDate).toString()+ "]");
         }
-
-        if (endDate != null)
+        else if (startDate != null)
         {
-            discoverQuery.addFilterQueries("lastModified <= " + new DCDate(startDate).toString());
+            discoverQuery.addFilterQueries("lastModified:[" + new DCDate(startDate).toString() + " TO *]");
+        }
+        else if (endDate != null)
+        {
+            discoverQuery.addFilterQueries("lastModified:[* TO " + new DCDate(endDate).toString()+ " ]");
         }
 
         if (!withdrawn)

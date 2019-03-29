@@ -124,6 +124,10 @@
          <includes>
             <include>org.dspace.modules:*:war:*</include>
          </includes>
+         <!-- Exclude Mirage2, as it is copied into the XMLUI WAR when enabled -->
+         <excludes>
+            <exclude>org.dspace.modules:xmlui-mirage2:war:*</exclude>
+         </excludes>
          <binaries>
             <includeDependencies>false</includeDependencies>
             <outputDirectory>webapps/${module.artifactId}</outputDirectory>

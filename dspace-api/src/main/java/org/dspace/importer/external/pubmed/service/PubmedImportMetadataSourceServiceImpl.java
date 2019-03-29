@@ -114,7 +114,7 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
      */
     @Override
     public String getImportSource() {
-        return "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/";
+        return "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/";
     }
 
     /** Finds records based on an item

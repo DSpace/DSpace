@@ -88,7 +88,7 @@ public class SubscriptionDAOImpl extends AbstractHibernateDAO<Subscription> impl
     @Override
     public List<Subscription> findAllOrderedByEPerson(Context context) throws SQLException {
         Criteria criteria = createCriteria(context, Subscription.class);
-        criteria.addOrder(Order.asc("eperson.id"));
+        criteria.addOrder(Order.asc("ePerson"));
         return list(criteria);
     }
 }

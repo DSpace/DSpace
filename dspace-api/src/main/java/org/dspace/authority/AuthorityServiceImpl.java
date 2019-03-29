@@ -47,15 +47,10 @@ public class AuthorityServiceImpl implements AuthorityService{
         }
 
         for (AuthorityIndexerInterface indexerInterface : indexers) {
-
-            indexerInterface.init(context , item);
-            while (indexerInterface.hasMore()) {
-                AuthorityValue authorityValue = indexerInterface.nextValue();
-                if(authorityValue != null)
-                    indexingService.indexContent(authorityValue, true);
+            List<AuthorityValue> authorityValues = indexerInterface.getAuthorityValues(context , item);
+            for (AuthorityValue authorityValue : authorityValues) {
+                indexingService.indexContent(authorityValue);
             }
-            //Close up
-            indexerInterface.close();
         }
         //Commit to our server
         indexingService.commit();

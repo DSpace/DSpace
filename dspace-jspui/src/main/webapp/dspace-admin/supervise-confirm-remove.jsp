@@ -82,7 +82,7 @@
 <div class="row">
 <label class="col-md-2"><fmt:message key="jsp.dspace-admin.supervise-confirm-remove.supervisorgroupheader"/>:</label>
 <span>
-<%= group.getName() %>
+<%= Utils.addEntities(group.getName()) %>
 </span>
 </div>
 <br/>

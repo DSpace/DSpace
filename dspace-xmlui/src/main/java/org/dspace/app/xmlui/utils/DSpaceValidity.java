@@ -329,7 +329,7 @@ public class DSpaceValidity implements SourceValidity
             validityKey.append(bitstream.getDescription());
             validityKey.append(bitstream.getChecksum());
             validityKey.append(bitstream.getChecksumAlgorithm());
-            validityKey.append(bitstream.getSize());
+            validityKey.append(bitstream.getSizeBytes());
             validityKey.append(bitstream.getUserFormatDescription());
             validityKey.append(bitstream.getFormat(context).getDescription());
         }

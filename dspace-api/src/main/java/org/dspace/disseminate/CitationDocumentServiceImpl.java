@@ -82,6 +82,11 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
     protected String[] fields;
     protected String footer;
 
+    /**
+     * Citation page format
+     */
+    protected PDRectangle citationPageFormat = PDRectangle.LETTER;
+
     @Autowired(required = true)
     protected AuthorizeService authorizeService;
     @Autowired(required = true)
@@ -183,6 +188,16 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
             footer = "Downloaded from DSpace Repository, DSpace Institution's institutional repository";
         }
 
+        String pageformatCfg = configurationService.getProperty("citation-page.page_format");
+
+        if (pageformatCfg != null) {
+            if (pageformatCfg.equalsIgnoreCase("A4")) {
+                citationPageFormat = PDRectangle.A4;
+            } else if (!pageformatCfg.equalsIgnoreCase("LETTER")) {
+                log.info("Citation-page: Unknown page format ' " + pageformatCfg + "', using LETTER.");
+            }
+        }
+
         //Ensure a temp directory is available
         String tempDirString = configurationService.getProperty("dspace.dir") + File.separator + "temp";
         tempDir = new File(tempDirString);
@@ -280,7 +295,7 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
         try {
             Item item = (Item) bitstreamService.getParentObject(context, bitstream);
             sourceDocument = sourceDocument.load(bitstreamService.retrieve(context, bitstream));
-            PDPage coverPage = new PDPage(PDRectangle.LETTER); // TODO: needs to be configurable
+            PDPage coverPage = new PDPage(citationPageFormat);
             generateCoverPage(context, document, coverPage, item);
             addCoverPageToDocument(document, sourceDocument, coverPage);
 

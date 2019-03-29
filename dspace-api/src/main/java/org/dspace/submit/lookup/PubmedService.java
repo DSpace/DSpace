@@ -108,7 +108,7 @@ public class PubmedService
                 client.getParams().setIntParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, timeout);
 
                 URIBuilder uriBuilder = new URIBuilder(
-                        "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi");
+                        "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi");
                 uriBuilder.addParameter("db", "pubmed");
                 uriBuilder.addParameter("datetype", "edat");
                 uriBuilder.addParameter("retmax", "10");
@@ -226,7 +226,7 @@ public class PubmedService
 
             try {
                 URIBuilder uriBuilder = new URIBuilder(
-                        "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi");
+                        "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi");
                 uriBuilder.addParameter("db", "pubmed");
                 uriBuilder.addParameter("retmode", "xml");
                 uriBuilder.addParameter("rettype", "full");

@@ -175,7 +175,7 @@ function clearGroups()
 	if (multiple) { %><fmt:message key="jsp.tools.general.add"/><% }
 	else {          %><fmt:message key="jsp.tools.general.select"/><% } %>" onclick="javascript:<%= clearList %>addGroup('<%= g.getID() %>', '<%= Utils.addEntities(fullname) %>');<%= closeWindow %>"/></td>
 			<td headers="t2" class=""><%= g.getID() %></td>
-			<td headers="t3" class=""> <%= g.getName()%></td>
+			<td headers="t3" class=""> <%= Utils.addEntities(g.getName())%></td>
         </tr>
 <%
         row = (row.equals("odd") ? "even" : "odd");
