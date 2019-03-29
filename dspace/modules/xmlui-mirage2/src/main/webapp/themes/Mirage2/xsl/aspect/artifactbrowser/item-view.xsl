@@ -346,7 +346,10 @@
                     <xsl:for-each select="dim:field[@element='description' and @qualifier='uri']">
                         <xsl:call-template name="hyperlinkword">
                             <xsl:with-param name="text" select="./node()"/>
-                        </xsl:call-template><xsl:if test="count(following-sibling::dim:field[@element='description' and @qualifier='uri']) != 0">; </xsl:if>
+                        </xsl:call-template>
+                        <xsl:if test="count(following-sibling::dim:field[@element='description' and @qualifier='uri']) != 0">
+                          <br/>
+                        </xsl:if>
                     </xsl:for-each>
                 </span>
             </div>

@@ -2369,7 +2369,7 @@
 	<message key="xmlui.dri2xhtml.METS-1.0.item-abstract">Abstract</message>
   <!-- Customization for LIBDRUM-583 -->
 	<message key="xmlui.dri2xhtml.METS-1.0.item-description">Notes</message>
-	<message key="xmlui.dri2xhtml.METS-1.0.item-description-uri">External Link</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.item-description-uri">External Link(s)</message>
   <!-- End Customization for LIBDRUM-583 -->
 	<message key="xmlui.dri2xhtml.METS-1.0.item-uri">URI</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-rights">Rights</message>
