@@ -313,7 +313,9 @@ public class XOAI {
             }
             System.out.println("Total: " + i + " items");
             if (i > 0) {
-                server.add(list);
+                if (!list.isEmpty()) {
+                    server.add(list);
+                }
                 server.commit(true, true);
                 list.clear();
             }
