@@ -56,6 +56,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.util.SolrUtils;
 import org.dspace.xoai.exceptions.CompilingException;
 import org.dspace.xoai.services.api.CollectionsService;
 import org.dspace.xoai.services.api.cache.XOAICacheService;
@@ -415,7 +416,8 @@ public class XOAI {
          * relevant policy dates and the standard lastModified date and take the
          * most recent of those which have already passed.
          */
-        doc.addField("item.lastmodified", this.getMostRecentModificationDate(item));
+        doc.addField("item.lastmodified", SolrUtils.getDateFormatter()
+                .format(this.getMostRecentModificationDate(item)));
 
         if (item.getSubmitter() != null) {
             doc.addField("item.submitter", item.getSubmitter().getEmail());
