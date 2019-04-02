@@ -19,83 +19,26 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.io.File;
 import java.sql.SQLException;
-import java.util.Iterator;
 import java.util.List;
 
 import org.dspace.app.rest.matcher.EntityTypeMatcher;
 import org.dspace.app.rest.matcher.RelationshipTypeMatcher;
-import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
-import org.dspace.content.EntityType;
-import org.dspace.content.Relationship;
+import org.dspace.app.rest.test.AbstractEntityIntegrationTest;
 import org.dspace.content.RelationshipType;
 import org.dspace.content.service.EntityTypeService;
-import org.dspace.content.service.RelationshipService;
 import org.dspace.content.service.RelationshipTypeService;
-import org.dspace.services.ConfigurationService;
 import org.h2.util.StringUtils;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-@Ignore
-public class RelationshipTypeRestRepositoryIT extends AbstractControllerIntegrationTest {
+public class RelationshipTypeRestRepositoryIT extends AbstractEntityIntegrationTest {
 
     @Autowired
     private RelationshipTypeService relationshipTypeService;
 
     @Autowired
     private EntityTypeService entityTypeService;
-
-    @Autowired
-    private RelationshipService relationshipService;
-
-    @Autowired
-    private ConfigurationService configurationService;
-
-    @Before
-    public void setup() throws Exception {
-
-        //Set up the database for the next test
-        String pathToFile = configurationService.getProperty("dspace.dir") +
-            File.separator + "config" + File.separator + "entities" + File.separator + "relationship-types.xml";
-        runDSpaceScript("initialize-entities", "-f", pathToFile);
-    }
-
-    @After
-    public void destroy() throws Exception {
-        //Clean up the database for the next test
-        context.turnOffAuthorisationSystem();
-        List<RelationshipType> relationshipTypeList = relationshipTypeService.findAll(context);
-        List<EntityType> entityTypeList = entityTypeService.findAll(context);
-        List<Relationship> relationships = relationshipService.findAll(context);
-
-        Iterator<Relationship> relationshipIterator = relationships.iterator();
-        while (relationshipIterator.hasNext()) {
-            Relationship relationship = relationshipIterator.next();
-            relationshipIterator.remove();
-            relationshipService.delete(context, relationship);
-        }
-
-        Iterator<RelationshipType> relationshipTypeIterator = relationshipTypeList.iterator();
-        while (relationshipTypeIterator.hasNext()) {
-            RelationshipType relationshipType = relationshipTypeIterator.next();
-            relationshipTypeIterator.remove();
-            relationshipTypeService.delete(context, relationshipType);
-        }
-
-        Iterator<EntityType> entityTypeIterator = entityTypeList.iterator();
-        while (entityTypeIterator.hasNext()) {
-            EntityType entityType = entityTypeIterator.next();
-            entityTypeIterator.remove();
-            entityTypeService.delete(context, entityType);
-        }
-
-        super.destroy();
-    }
 
     @Test
     public void findAllRelationshipTypesTest() throws SQLException {
