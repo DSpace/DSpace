@@ -2,13 +2,19 @@ pipeline {
     agent any
 
     environment {
-        VERSION = "${env.BRANCH_NAME}".replaceAll('/','_').toLowerCase()
+        VERSION = "${env.BRANCH_NAME}".replaceAll('/', '_').toLowerCase()
     }
 
     stages {
         stage('Maven Build') {
             steps {
-                sh 'mvn package -Dmirage2.on=true'
+                sh 'mvn package -Dmirage2.on=true -P !dspace-lni,!dspace-sword,!dspace-jspui,!dspace-rdf'
+            }
+        }
+        stage('Copy files to server') {
+            steps {
+                sh 'echo "Copying files to server"'
+                sh 'pwd'
             }
         }
     }
