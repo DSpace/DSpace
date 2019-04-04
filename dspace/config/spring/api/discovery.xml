@@ -654,6 +654,7 @@
     <bean id="searchFilterObjectNamedType"
         class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
         <property name="indexFieldName" value="namedresourcetype" />
+        <property name="type" value="authority" />
         <property name="metadataFields">
             <list>
                 <value>placeholder.placeholder.placeholder</value>
