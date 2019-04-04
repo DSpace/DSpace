@@ -10,6 +10,7 @@ package org.dspace.discovery;
 import java.io.Serializable;
 
 import org.dspace.core.Constants;
+import org.dspace.core.ReloadableEntity;
 
 /**
  * This is the basic interface that a data model entity need to implement to be indexable in Discover
@@ -19,19 +20,13 @@ import org.dspace.core.Constants;
  * @param <PK>
  *            the Class of the primary key
  */
-public interface IndexableObject<PK extends Serializable> {
+public interface IndexableObject<PK extends Serializable> extends ReloadableEntity<PK> {
 
     /**
      * 
      * @return the integer constant representing the Entity Type, @see {@link Constants}
      */
     public int getType();
-
-    /**
-     * 
-     * @return the primary key of the Entity instance
-     */
-    public PK getID();
 
     /**
      * 
