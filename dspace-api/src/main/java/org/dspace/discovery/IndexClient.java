@@ -71,14 +71,11 @@ public class IndexClient {
                                   "remove an Item, Collection or Community from index based on its handle")
                               .create("r"));
 
-        options.addOption(OptionBuilder.withArgName("item uuid to index").hasArg(true)
-                .withDescription("add an Item based on its uuid").create("item_uuid"));
-
         options.addOption(OptionBuilder
-                              .withArgName("handle to add or update")
+                              .withArgName("handle or uuid to add or update")
                               .hasArg(true)
                               .withDescription(
-                                  "add or update an Item, Collection or Community based on its handle")
+                                  "add or update an Item, Collection or Community based on its handle or uuid")
                               .create("i"));
 
         options.addOption(OptionBuilder
@@ -153,25 +150,37 @@ public class IndexClient {
             indexer.optimize();
         } else if (line.hasOption('s')) {
             checkRebuildSpellCheck(line, indexer);
-        } else if (line.hasOption("item_uuid")) {
-            String itemUUID = line.getOptionValue("item_uuid");
-            Item item = ContentServiceFactory.getInstance().getItemService().find(context, UUID.fromString(itemUUID));
-            if (item == null) {
-                throw new IllegalArgumentException("Cannot resolve " + itemUUID + " to an Item");
-            }
-            indexer.indexContent(context, item, line.hasOption("f"));
         } else if (line.hasOption('i')) {
-            final String handle = line.getOptionValue('i');
-            final IndexableObject dso = (IndexableObject) HandleServiceFactory.getInstance()
-                    .getHandleService().resolveToObject(context, handle);
-            if (dso == null) {
-                throw new IllegalArgumentException("Cannot resolve " + handle + " to a DSpace object");
+            final String param = line.getOptionValue('i');
+            UUID uuid = null;
+            try {
+                uuid = UUID.fromString(param);
+            } catch (Exception e) {
+                // nothing to do, it should be an handle
             }
-            log.info("Forcibly Indexing " + handle);
+            IndexableObject dso = null;
+            if (uuid != null) {
+                dso = ContentServiceFactory.getInstance().getItemService().find(context, uuid);
+                if (dso == null) {
+                    // it could be a community
+                    dso = ContentServiceFactory.getInstance().getCommunityService().find(context, uuid);
+                    if (dso == null) {
+                        // it could be a collection
+                        dso = ContentServiceFactory.getInstance().getCollectionService().find(context, uuid);
+                    }
+                }
+            } else {
+                dso = (IndexableObject) HandleServiceFactory.getInstance()
+                                .getHandleService().resolveToObject(context, param);
+            }
+            if (dso == null) {
+                throw new IllegalArgumentException("Cannot resolve " + param + " to a DSpace object");
+            }
+            log.info("Indexing " + param + " force " + line.hasOption("f"));
             final long startTimeMillis = System.currentTimeMillis();
             final long count = indexAll(indexer, ContentServiceFactory.getInstance().getItemService(), context, dso);
             final long seconds = (System.currentTimeMillis() - startTimeMillis) / 1000;
-            log.info("Indexed " + count + " DSpace object" + (count > 1 ? "s" : "") + " in " + seconds + " seconds");
+            log.info("Indexed " + count + " object" + (count > 1 ? "s" : "") + " in " + seconds + " seconds");
         } else {
             log.info("Updating and Cleaning Index");
             indexer.cleanIndex(line.hasOption("f"));
