@@ -379,10 +379,21 @@ public class DiscoverQuery {
         return (int) (Math.ceil((float) (newestYear) / gap) * gap);
     }
 
+    /**
+     * Return the name of discovery configuration used by this query
+     * 
+     * @return the discovery configuration name used
+     */
     public String getDiscoveryConfigurationName() {
         return discoveryConfigurationName;
     }
 
+    /**
+     * Set the name of discovery configuration to use to run this query
+     * 
+     * @param discoveryConfigurationName
+     *            the name of the discovery configuration to use to run this query
+     */
     public void setDiscoveryConfigurationName(String discoveryConfigurationName) {
         this.discoveryConfigurationName = discoveryConfigurationName;
     }

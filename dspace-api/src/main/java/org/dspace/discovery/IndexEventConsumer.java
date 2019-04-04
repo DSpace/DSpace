@@ -159,7 +159,7 @@ public class IndexEventConsumer implements Consumer {
                  * allow the search indexer to make
                  * decisions on indexing and/or removal
                  */
-                // iu = ctx.reloadEntity(o);
+                iu = ctx.reloadEntity(iu);
                 String uniqueIndexID = iu.getUniqueIndexID();
                 if (uniqueIndexID != null && !uniqueIdsToDelete.contains(uniqueIndexID)) {
                     try {

@@ -179,6 +179,10 @@ public class DiscoverResult {
         this.spellCheckQuery = spellCheckQuery;
     }
 
+    /**
+     * An utility class to represent the highlighting section of a Discovery Search
+     *
+     */
     public static final class IndexableObjectHighlightResult {
         private IndexableObject indexableObject;
         private Map<String, List<String>> highlightResults;
@@ -191,18 +195,42 @@ public class DiscoverResult {
             this.highlightResultsWithAuthority = highlightResultsWithAuthority;
         }
 
+        /**
+         * Return the indexable object that the highlighting snippets refer to
+         * 
+         * @return the indexable object
+         */
         public IndexableObject getIndexableObject() {
             return indexableObject;
         }
 
+        /**
+         * The matching snippets for a specific metadata ignoring any authority value
+         * 
+         * @param metadataKey
+         *            the metadata where the snippets have been found
+         * @return the matching snippets
+         */
         public List<String> getHighlightResults(String metadataKey) {
             return highlightResults.get(metadataKey);
         }
 
+        /**
+         * The matching snippets for a specific metadata including the authority value if any
+         * 
+         * @param metadataKey
+         *            the metadata where the snippets have been found
+         * @return the matching snippets
+         */
         public List<String[]> getHighlightResultsWithAuthority(String metadataKey) {
             return highlightResultsWithAuthority.get(metadataKey);
         }
 
+        /**
+         * All the matching snippets in whatever metadata ignoring any authority value
+         * 
+         * @return All the matching snippets
+         */
         public Map<String, List<String>> getHighlightResults() {
             return highlightResults;
         }

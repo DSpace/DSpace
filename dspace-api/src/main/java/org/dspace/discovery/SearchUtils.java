@@ -58,6 +58,16 @@ public class SearchUtils {
         return getDiscoveryConfiguration(null, dso);
     }
 
+    /**
+     * Return the discovery configuration to use in a specific scope for the king of search identified by the prefix. A
+     * null prefix mean the normal query, other predefined values are workspace or workflow
+     * 
+     * @param prefix
+     *            the namespace of the configuration to lookup if any
+     * @param dso
+     *            the DSpaceObject
+     * @return the discovery configuration for the specified scope
+     */
     public static DiscoveryConfiguration getDiscoveryConfiguration(String prefix, DSpaceObject dso) {
         if (prefix != null) {
             return getDiscoveryConfigurationByName(dso != null ? prefix + "." + dso.getHandle() : prefix);
@@ -96,12 +106,24 @@ public class SearchUtils {
         return getAllDiscoveryConfigurations(null, collections, item);
     }
 
+    /**
+     * Return all the discovery configuration applicable to the provided workspace item
+     * @param witem a workspace item
+     * @return a list of discovery configuration
+     * @throws SQLException
+     */
     public static List<DiscoveryConfiguration> getAllDiscoveryConfigurations(WorkspaceItem witem) throws SQLException {
         List<Collection> collections = new ArrayList<Collection>();
         collections.add(witem.getCollection());
         return getAllDiscoveryConfigurations("workspace", collections, witem.getItem());
     }
 
+    /**
+     * Return all the discovery configuration applicable to the provided workflow item
+     * @param witem a workflow item
+     * @return a list of discovery configuration
+     * @throws SQLException
+     */
     public static List<DiscoveryConfiguration> getAllDiscoveryConfigurations(WorkflowItem witem) throws SQLException {
         List<Collection> collections = new ArrayList<Collection>();
         collections.add(witem.getCollection());

@@ -33,8 +33,6 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.UUID;
 import java.util.Vector;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import com.google.common.collect.ImmutableList;
 
@@ -169,8 +167,6 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     public static final String STORE_SEPARATOR = "\n|||\n";
 
     public static final String VARIANTS_STORE_SEPARATOR = "###";
-
-    private static final String REGEX = "\\S+(?:\\s*\\|\\|\\|(\\s*\\S+))+";
 
     @Autowired(required = true)
     protected ContentServiceFactory contentServiceFactory;
@@ -478,12 +474,18 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                     Iterator<Item> items = itemService.findAllUnfiltered(context);
                     for (Item item : ImmutableList.copyOf(items)) {
                         indexContent(context, item, force);
+                        //To prevent memory issues, discard an object from the cache after processing
+                        context.uncacheEntity(item);
                     }
                     for (WorkspaceItem wsi : workspaceItemService.findAll(context)) {
                         indexContent(context, wsi.getItem(), force);
+                        //To prevent memory issues, discard an object from the cache after processing
+                        context.uncacheEntity(wsi);
                     }
                     for (WorkflowItem wfi : workflowItemService.findAll(context)) {
                         indexContent(context, wfi.getItem(), force);
+                        //To prevent memory issues, discard an object from the cache after processing
+                        context.uncacheEntity(wfi);
                     }
                     break;
                 case Constants.COLLECTION:
@@ -525,7 +527,9 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         if (force) {
             try {
                 getSolr().deleteByQuery(
-                    "search.resourcetype:[" + Constants.ITEM + " TO " + Constants.CLAIMEDTASK + "]");
+                    "search.resourcetype:[" + Constants.ITEM + " TO " + Constants.COMMUNITY + "]" +
+                    " AND " +
+                    "search.resourcetype:[" + Constants.WORKSPACEITEM + " TO " + Constants.CLAIMEDTASK + "]");
             } catch (Exception e) {
                 throw new SearchServiceException(e.getMessage(), e);
             }
@@ -1066,16 +1070,16 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 "discovery.facet.namedtype." + typeText,
                 typeText + SolrServiceImpl.AUTHORITY_SEPARATOR + typeText);
         if (StringUtils.isNotBlank(acvalue)) {
-            String fvalue = acvalue;
-            addNamedResourceTypeIndex(doc, acvalue, fvalue);
+            addNamedResourceTypeIndex(doc, acvalue);
         }
 
         // write the index and close the inputstreamreaders
         try {
             writeDocument(doc, new FullTextContentStreams(context, item));
-            log.info("Wrote Item: " + handle + " to Index");
+            log.info("Wrote Item: " + item.getUniqueIndexID() + " to Index");
         } catch (RuntimeException e) {
-            log.error("Error while writing item to discovery index: " + handle + " message:" + e.getMessage(), e);
+            log.error("Error while writing item to discovery index: " + item.getUniqueIndexID() + " message:"
+                    + e.getMessage(), e);
         }
     }
 
@@ -1484,7 +1488,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 if (hitHighlightingFields.contains(field) || hitHighlightingFields
                     .contains("*") || hitHighlightingFields.contains(unqualifiedField + "." + Item.ANY)) {
                     if (authority != null) {
-                        doc.addField(field + "_hl", value + "###" + authority);
+                        doc.addField(field + "_hl", value + AUTHORITY_SEPARATOR + authority);
                     } else {
                         doc.addField(field + "_hl", value);
                     }
@@ -1606,8 +1610,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             if (StringUtils.isBlank(acvalue)) {
                 acvalue = workspaceItem.getTypeText();
             }
-            String fvalue = acvalue;
-            addNamedResourceTypeIndex(doc, acvalue, fvalue);
+            addNamedResourceTypeIndex(doc, acvalue);
             doc.addField("inprogress.item", item.getUniqueIndexID());
 
             getSolr().add(doc);
@@ -1647,8 +1650,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                     if (StringUtils.isBlank(acvalue)) {
                         acvalue = claimedTask.getTypeText();
                     }
-                    String fvalue = acvalue;
-                    addNamedResourceTypeIndex(claimDoc, acvalue, fvalue);
+                    addNamedResourceTypeIndex(claimDoc, acvalue);
 
                     docs.add(claimDoc);
                 }
@@ -1673,8 +1675,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                     if (StringUtils.isBlank(acvalue)) {
                         acvalue = poolTask.getTypeText();
                     }
-                    String fvalue = acvalue;
-                    addNamedResourceTypeIndex(claimDoc, acvalue, fvalue);
+                    addNamedResourceTypeIndex(claimDoc, acvalue);
                     docs.add(claimDoc);
                 }
             }
@@ -1684,8 +1685,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             if (StringUtils.isBlank(acvalue)) {
                 acvalue = workflowItem.getTypeText();
             }
-            String fvalue = acvalue;
-            addNamedResourceTypeIndex(doc, acvalue, fvalue);
+            addNamedResourceTypeIndex(doc, acvalue);
 
             addBasicInfoToDocument(doc, Constants.WORKFLOWITEM, workflowItem.getID(), null, locations);
             if (workflowItem.getSubmitter() != null) {
@@ -2006,13 +2006,6 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         boolean isWorkflow = StringUtils.startsWith(discoveryQuery.getDiscoveryConfigurationName(),
                 DISCOVER_WORKFLOW_CONFIGURATION_NAME);
         EPerson currentUser = context.getCurrentUser();
-        // Retrieve all the groups the current user is a member of !
-        Set<Group> groups;
-        try {
-            groups = groupService.allMemberGroupsSet(context, currentUser);
-        } catch (SQLException e) {
-            throw new org.dspace.discovery.SearchServiceException(e.getMessage(), e);
-        }
 
         // extra security check to avoid the possibility that an anonymous user
         // get access to workspace or workflow
@@ -2024,6 +2017,14 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             solrQuery
                 .addFilterQuery("submitter:(" + currentUser.getID() + ")");
         } else if (isWorkflow) {
+            // Retrieve all the groups the current user is a member of !
+            Set<Group> groups;
+            try {
+                groups = groupService.allMemberGroupsSet(context, currentUser);
+            } catch (SQLException e) {
+                throw new org.dspace.discovery.SearchServiceException(e.getMessage(), e);
+            }
+
             // insert filter by controllers
             StringBuilder controllerQuery = new StringBuilder();
             controllerQuery.append("taskfor:(e" + currentUser.getID());
@@ -2185,20 +2186,6 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         }
 
         return result;
-    }
-
-    public DiscoverResult.FacetResult getDiscoveryFacet(Context context, FacetField facetField,
-            FacetField.Count facetValue, String facetType) throws SQLException {
-        String displayedValue = transformDisplayedValue(context, facetField.getName(), facetValue.getName());
-        String authorityValue = transformAuthorityValue(context, facetField.getName(), facetValue.getName());
-        String sortValue = transformSortValue(context, facetField.getName(), facetValue.getName());
-        String filterValue = displayedValue;
-        if (StringUtils.isNotBlank(authorityValue)) {
-            filterValue = authorityValue;
-        }
-        DiscoverResult.FacetResult facetResult = new DiscoverResult.FacetResult(filterValue, displayedValue,
-                authorityValue, sortValue, facetValue.getCount(), facetType);
-        return facetResult;
     }
 
     /**
@@ -2609,30 +2596,38 @@ public class SolrServiceImpl implements SearchService, IndexingService {
      *
      * @param document
      *            the solr document
-     * @param acvalue
-     *            the authority value
-     * @param fvalue
-     *            the human readable value
+     * @param filterValue
+     *            the filter value (i.e. <sort_value>\n|||\n<display_value>###<authority_value>
      */
-    private void addNamedResourceTypeIndex(SolrInputDocument document, String acvalue, String fvalue) {
+    private void addNamedResourceTypeIndex(SolrInputDocument document, String filterValue) {
 
-        document.addField("namedresourcetype_filter", acvalue);
+        document.addField("namedresourcetype_filter", filterValue);
 
-        String[] avalues = acvalue.split(SolrServiceImpl.AUTHORITY_SEPARATOR);
-        acvalue = avalues[0];
-
-        String avalue = avalues[1];
-        document.addField("namedresourcetype_authority", avalue);
-        document.addField("namedresourcetype_group", avalue);
-        document.addField("namedresourcetype_ac", acvalue);
-
-        Pattern pattern = Pattern.compile(REGEX);
-        Matcher matcher = pattern.matcher(acvalue);
-        if (matcher.matches()) {
-            fvalue = matcher.group(1);
+        // the separator for the filter can be eventually configured
+        String separator = DSpaceServicesFactory.getInstance().getConfigurationService()
+                .getProperty("discovery.solr.facets.split.char");
+        if (separator == null) {
+            separator = FILTER_SEPARATOR;
         }
 
-        document.addField("namedresourcetype_keyword", fvalue);
+        // split the authority part from the sort/display
+        String[] avalues = filterValue.split(SolrServiceImpl.AUTHORITY_SEPARATOR);
+
+        String sortDisplayValues = avalues[0];
+        String authorityValue = avalues.length == 2 ? avalues[1] : filterValue;
+
+        // get the display value
+        int idxSeparator = sortDisplayValues.indexOf(separator);
+        String displayValue = idxSeparator != -1 ? sortDisplayValues.substring(idxSeparator + separator.length())
+                : sortDisplayValues;
+
+        document.addField("namedresourcetype_authority", authorityValue);
+        // build the solr fields used for the autocomplete
+        document.addField("namedresourcetype_ac", displayValue.toLowerCase() + separator + displayValue);
+        document.addField("namedresourcetype_acid", displayValue.toLowerCase() + separator + displayValue
+                + SolrServiceImpl.AUTHORITY_SEPARATOR + authorityValue);
+        // build the solr field used for the keyword search
+        document.addField("namedresourcetype_keyword", displayValue);
     }
 
 }
