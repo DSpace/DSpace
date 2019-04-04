@@ -8,7 +8,7 @@ pipeline {
     stages {
         stage('Maven Build') {
             steps {
-                sh 'mvn -U clean package'
+                sh 'mvn package -Dmirage2.on=true'
             }
         }
     }
