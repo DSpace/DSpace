@@ -59,7 +59,7 @@ public class FacetEntryMatcher {
     public static Matcher<? super Object> submitterFacet(boolean hasNext) {
         return allOf(
             hasJsonPath("$.name", is("submitter")),
-            hasJsonPath("$.facetType", is("text")),
+            hasJsonPath("$.facetType", is("authority")),
             hasJsonPath("$.facetLimit", any(Integer.class)),
             hasJsonPath("$._links.self.href", containsString("api/discover/facets/submitter")),
             hasJsonPath("$._links", matchNextLink(hasNext, "api/discover/facets/submitter"))
@@ -127,7 +127,7 @@ public class FacetEntryMatcher {
     public static Matcher<? super Object> resourceTypeFacet(boolean b) {
         return allOf(
                 hasJsonPath("$.name", is("namedresourcetype")),
-                hasJsonPath("$.facetType", is("text")),
+                hasJsonPath("$.facetType", is("authority")),
                 hasJsonPath("$.facetLimit", any(Integer.class)),
                 hasJsonPath("$._links.self.href", containsString("api/discover/facets/namedresourcetype")),
                 hasJsonPath("$._links", matchNextLink(b, "api/discover/facets/namedresourcetype"))

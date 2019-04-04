@@ -159,6 +159,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     protected static final String RESOURCE_UNIQUE_ID = "search.uniqueid";
     protected static final String RESOURCE_TYPE_FIELD = "search.resourcetype";
     protected static final String RESOURCE_ID_FIELD = "search.resourceid";
+    protected static final String NAMED_RESOURCE_TYPE = "namedresourcetype";
 
     public static final String FILTER_SEPARATOR = "\n|||\n";
 
@@ -1057,8 +1058,10 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         doc.addField("discoverable", item.isDiscoverable());
         doc.addField("lastModified", item.getLastModified());
 
-        if (item.getSubmitter() != null) {
-            doc.addField("submitter", item.getSubmitter().getID());
+        EPerson submitter = item.getSubmitter();
+        if (submitter != null) {
+            addFacetIndex(doc, "submitter", submitter.getID().toString(),
+                    submitter.getFullName());
         }
 
         List<DiscoveryConfiguration> discoveryConfigurations = SearchUtils.getAllDiscoveryConfigurations(item);
@@ -1575,11 +1578,28 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     }
 
     private void addFacetIndex(SolrInputDocument document, String field, String authority, String fvalue) {
+        addFacetIndex(document, field, fvalue, authority, fvalue);
+    }
 
-        String acvalue = fvalue + SolrServiceImpl.AUTHORITY_SEPARATOR + authority;
+    private void addFacetIndex(SolrInputDocument document, String field, String sortValue, String authority,
+            String fvalue) {
+        // the separator for the filter can be eventually configured
+        String separator = DSpaceServicesFactory.getInstance().getConfigurationService()
+                .getProperty("discovery.solr.facets.split.char");
+        if (separator == null) {
+            separator = FILTER_SEPARATOR;
+        }
+        String acvalue = sortValue + separator + fvalue + SolrServiceImpl.AUTHORITY_SEPARATOR + authority;
         document.addField(field + "_filter", acvalue);
-        document.addField(field + "_authority", authority);
-        document.addField(field + "_ac", fvalue);
+        // build the solr field used for the keyword search
+        document.addField(field + "_keyword", fvalue);
+        // build the solr fields used for the autocomplete
+        document.addField(field + "_ac", fvalue.toLowerCase() + separator + fvalue);
+        if (StringUtils.isNotBlank(authority)) {
+            document.addField(field + "_acid", fvalue.toLowerCase() + separator + fvalue
+                    + SolrServiceImpl.AUTHORITY_SEPARATOR + authority);
+            document.addField(field + "_authority", authority);
+        }
     }
 
     private void indexInProgressSubmissionItem(Context context, Item item)
@@ -1596,8 +1616,10 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             SolrInputDocument doc = new SolrInputDocument();
 
             doc.addField("lastModified", item.getLastModified());
-            if (workspaceItem.getSubmitter() != null) {
-                doc.addField("submitter", workspaceItem.getSubmitter().getID().toString());
+            EPerson submitter = workspaceItem.getSubmitter();
+            if (submitter != null) {
+                addFacetIndex(doc, "submitter", submitter.getID().toString(),
+                        submitter.getFullName());
             }
 
             List<DiscoveryConfiguration> discoveryConfigurations = SearchUtils
@@ -1622,9 +1644,10 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
             doc.addField("inprogress.item", item.getUniqueIndexID());
             doc.addField("lastModified", item.getLastModified());
-            if (workflowItem.getSubmitter() != null) {
-                addFacetIndex(doc, "submitter", workflowItem.getSubmitter().getID().toString(),
-                        workflowItem.getSubmitter().getFullName());
+            EPerson submitter = workflowItem.getSubmitter();
+            if (submitter != null) {
+                addFacetIndex(doc, "submitter", submitter.getID().toString(),
+                        submitter.getFullName());
             }
 
             List<DiscoveryConfiguration> discoveryConfigurations = SearchUtils
@@ -1688,9 +1711,6 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             addNamedResourceTypeIndex(doc, acvalue);
 
             addBasicInfoToDocument(doc, Constants.WORKFLOWITEM, workflowItem.getID(), null, locations);
-            if (workflowItem.getSubmitter() != null) {
-                doc.addField("submitter", workflowItem.getSubmitter().getID().toString());
-            }
             docs.add(doc);
 
             if (docs.size() > 0) {
@@ -2015,7 +2035,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         if (isWorkspace) {
             // insert filter by submitter
             solrQuery
-                .addFilterQuery("submitter:(" + currentUser.getID() + ")");
+                .addFilterQuery("submitter_authority:(" + currentUser.getID() + ")");
         } else if (isWorkflow) {
             // Retrieve all the groups the current user is a member of !
             Set<Group> groups;
@@ -2601,8 +2621,6 @@ public class SolrServiceImpl implements SearchService, IndexingService {
      */
     private void addNamedResourceTypeIndex(SolrInputDocument document, String filterValue) {
 
-        document.addField("namedresourcetype_filter", filterValue);
-
         // the separator for the filter can be eventually configured
         String separator = DSpaceServicesFactory.getInstance().getConfigurationService()
                 .getProperty("discovery.solr.facets.split.char");
@@ -2613,21 +2631,15 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         // split the authority part from the sort/display
         String[] avalues = filterValue.split(SolrServiceImpl.AUTHORITY_SEPARATOR);
 
-        String sortDisplayValues = avalues[0];
+        String sortValue = avalues[0];
         String authorityValue = avalues.length == 2 ? avalues[1] : filterValue;
 
         // get the display value
-        int idxSeparator = sortDisplayValues.indexOf(separator);
-        String displayValue = idxSeparator != -1 ? sortDisplayValues.substring(idxSeparator + separator.length())
-                : sortDisplayValues;
+        int idxSeparator = sortValue.indexOf(separator);
+        String displayValue = idxSeparator != -1 ? sortValue.substring(idxSeparator + separator.length())
+                : sortValue;
 
-        document.addField("namedresourcetype_authority", authorityValue);
-        // build the solr fields used for the autocomplete
-        document.addField("namedresourcetype_ac", displayValue.toLowerCase() + separator + displayValue);
-        document.addField("namedresourcetype_acid", displayValue.toLowerCase() + separator + displayValue
-                + SolrServiceImpl.AUTHORITY_SEPARATOR + authorityValue);
-        // build the solr field used for the keyword search
-        document.addField("namedresourcetype_keyword", displayValue);
+        addFacetIndex(document, NAMED_RESOURCE_TYPE, sortValue, authorityValue, displayValue);
     }
 
 }

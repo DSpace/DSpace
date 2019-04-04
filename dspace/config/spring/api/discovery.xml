@@ -666,6 +666,7 @@
     <bean id="searchFilterSubmitter"
         class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
         <property name="indexFieldName" value="submitter" />
+        <property name="type" value="authority" />
         <property name="metadataFields">
             <list>
                 <value>placeholder.placeholder.placeholder</value>
