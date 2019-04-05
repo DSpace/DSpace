@@ -76,6 +76,13 @@ public class SearchUtils {
         }
     }
 
+    /**
+     * Return the discovery configuration identified by the specified name
+     * 
+     * @param configurationName the configuration name assigned to the bean in the
+     *                          discovery.xml
+     * @return the discovery configuration
+     */
     public static DiscoveryConfiguration getDiscoveryConfigurationByName(
         String configurationName) {
         DiscoveryConfigurationService configurationService = getConfigurationService();

@@ -50,6 +50,19 @@ public class DiscoverFacetsConverter {
         return searchResultsRest;
     }
 
+    /**
+     * Fill the facet values information in the SearchResultsRest using the information in the api DiscoverResult object
+     * according to the configuration applied to the discovery query
+     * 
+     * @param context
+     *            The relevant DSpace context
+     * @param searchResult
+     *            The DiscoverResult containing the discovery result
+     * @param resultsRest
+     *            The SearchResultsRest that need to be filled in
+     * @param configuration
+     *            The DiscoveryConfiguration applied to the query
+     */
     public void addFacetValues(Context context, final DiscoverResult searchResult, final SearchResultsRest resultsRest,
             final DiscoveryConfiguration configuration) {
 
