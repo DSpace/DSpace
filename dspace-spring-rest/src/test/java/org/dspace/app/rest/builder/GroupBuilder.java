@@ -7,6 +7,11 @@
  */
 package org.dspace.app.rest.builder;
 
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.UUID;
+
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
@@ -81,6 +86,32 @@ public class GroupBuilder extends AbstractDSpaceObjectBuilder<Group> {
             return handleException(e);
         }
         return this;
+    }
+
+    public static void deleteGroup(UUID uuid) throws SQLException, IOException {
+        try (Context c = new Context()) {
+            c.turnOffAuthorisationSystem();
+            Group group = groupService.find(c, uuid);
+            if (group != null) {
+                try {
+                    groupService.delete(c, group);
+                } catch (AuthorizeException e) {
+                    // cannot occur, just wrap it to make the compiler happy
+                    throw new RuntimeException(e.getMessage(), e);
+                }
+            }
+            c.complete();
+        }
+    }
+
+    /**
+     * Set a lower custom priority for the Group. It could be referenced in several places. It needs to go first than
+     * EPersonBuilder
+     * 
+     */
+    @Override
+    protected int getPriority() {
+        return 80;
     }
 
 }

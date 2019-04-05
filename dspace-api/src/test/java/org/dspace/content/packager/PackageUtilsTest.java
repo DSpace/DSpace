@@ -157,7 +157,7 @@ public class PackageUtilsTest extends AbstractUnitTest {
     @Test
     public void testCrosswalkGroupNameWithoutUnderscore() throws Exception {
         Collection testCollection = (Collection) handleService.resolveToObject(context, testCollectionHandle);
-        Group originalFirstStepWorkflowGroup = testCollection.getWorkflowStep1();
+        Group originalFirstStepWorkflowGroup = testCollection.getWorkflowStep1(context);
 
         GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
         Group testGroup = groupService.create(context);
@@ -179,7 +179,7 @@ public class PackageUtilsTest extends AbstractUnitTest {
     @Test
     public void testCrosswalkGroupNameUnderscoresNoDSO() throws Exception {
         Collection testCollection = (Collection) handleService.resolveToObject(context, testCollectionHandle);
-        Group originalFirstStepWorkflowGroup = testCollection.getWorkflowStep1();
+        Group originalFirstStepWorkflowGroup = testCollection.getWorkflowStep1(context);
 
         GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
         Group testGroup = groupService.create(context);
@@ -201,7 +201,7 @@ public class PackageUtilsTest extends AbstractUnitTest {
     @Test
     public void testCrosswalkGroupNameUnderscoresAndDSO() throws Exception {
         Collection testCollection = (Collection) handleService.resolveToObject(context, testCollectionHandle);
-        Group originalFirstStepWorkflowGroup = testCollection.getWorkflowStep1();
+        Group originalFirstStepWorkflowGroup = testCollection.getWorkflowStep1(context);
 
         Group group = collectionService.createWorkflowGroup(context, testCollection, 1);
 

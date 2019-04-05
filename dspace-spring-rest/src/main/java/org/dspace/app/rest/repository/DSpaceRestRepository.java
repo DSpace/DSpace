@@ -413,6 +413,18 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
         throw new RepositoryMethodNotImplementedException(apiCategory, model);
     }
 
+    public T action(HttpServletRequest request, ID id) throws SQLException, IOException {
+        Context context = obtainContext();
+        T entity = action(context, request, id);
+        context.commit();
+        return entity;
+    }
+
+    protected T action(Context context, HttpServletRequest request, ID id)
+        throws SQLException, IOException {
+        throw new RuntimeException("No implementation found; Method not allowed!");
+    }
+
     /**
      * Bulk create object instances from an uploaded file
      *
