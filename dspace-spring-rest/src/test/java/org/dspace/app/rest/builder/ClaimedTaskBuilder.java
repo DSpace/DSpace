@@ -14,7 +14,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.DCDate;
 import org.dspace.content.Item;
 import org.dspace.content.LicenseUtils;
-import org.dspace.content.MetadataSchema;
+import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -175,19 +175,19 @@ public class ClaimedTaskBuilder extends AbstractBuilder<ClaimedTask, ClaimedTask
     }
 
     public ClaimedTaskBuilder withTitle(final String title) {
-        return setMetadataSingleValue(MetadataSchema.DC_SCHEMA, "title", null, title);
+        return setMetadataSingleValue(MetadataSchemaEnum.DC.getName(), "title", null, title);
     }
 
     public ClaimedTaskBuilder withIssueDate(final String issueDate) {
-        return addMetadataValue(MetadataSchema.DC_SCHEMA, "date", "issued", new DCDate(issueDate).toString());
+        return addMetadataValue(MetadataSchemaEnum.DC.getName(), "date", "issued", new DCDate(issueDate).toString());
     }
 
     public ClaimedTaskBuilder withAuthor(final String authorName) {
-        return addMetadataValue(MetadataSchema.DC_SCHEMA, "contributor", "author", authorName);
+        return addMetadataValue(MetadataSchemaEnum.DC.getName(), "contributor", "author", authorName);
     }
 
     public ClaimedTaskBuilder withSubject(final String subject) {
-        return addMetadataValue(MetadataSchema.DC_SCHEMA, "subject", null, subject);
+        return addMetadataValue(MetadataSchemaEnum.DC.getName(), "subject", null, subject);
     }
 
     public ClaimedTaskBuilder grantLicense() {
