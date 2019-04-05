@@ -398,7 +398,7 @@ public class DashService {
         JsonNode curationActivities = getCurationActivity(pkg);
         // if the only curation activity is the default "in_progress," delete it
         if (curationActivities.size() == 1) {
-            if (curationActivities.get(0).get("status").textValue().equals("in_progress")) {
+            if (curationActivities.get(0).get("status").textValue().equals("In Progress")) {
                 int unsubmittedID = curationActivities.get(0).get("id").intValue();
                 try {
                     URL url = new URL(dashServer + "/api/curation_activity/" + unsubmittedID);
