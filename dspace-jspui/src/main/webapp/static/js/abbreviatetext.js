@@ -17,8 +17,8 @@ function abbreviate(el, count) {
 		let $a = j("<a></a>");
 		$a.toggleClass("fa fa-plus");
 		$a.click(function () {
-			if($el.is(":visible")) $el.stop().slideUp("fast");
-			else $el.stop().slideDown("fast");
+			if($el.is(":visible")) $el.stop().slideUp(0);
+			else $el.stop().slideDown(0);
 
 			$a.toggleClass("fa-plus");
 			$a.toggleClass("fa-minus");
