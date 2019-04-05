@@ -40,6 +40,16 @@ public interface DSpaceObjectService<T extends DSpaceObject> extends BrowsableOb
      */
     public abstract String getName(T dso);
 
+    /**
+     * Generic find for when the precise type of a BDSO is not known, just the
+     * a pair of type number and database ID.
+     *
+     * @param context - the context
+     * @param id      - id within table of type'd objects
+     * @return the object found, or null if it does not exist.
+     * @throws SQLException only upon failure accessing the database.
+     */
+    public T find(Context context, UUID id) throws SQLException;
 
     /**
      * Tries to lookup all Identifiers of this DSpaceObject.
