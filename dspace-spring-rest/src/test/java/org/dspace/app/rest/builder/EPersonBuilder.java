@@ -32,11 +32,6 @@ public class EPersonBuilder extends AbstractDSpaceObjectBuilder<EPerson> {
         return ePersonService;
     }
 
-    @Override
-    protected int getPriority() {
-        return 100;
-    }
-
     public EPerson build() {
         try {
             ePersonService.update(context, ePerson);
@@ -92,5 +87,14 @@ public class EPersonBuilder extends AbstractDSpaceObjectBuilder<EPerson> {
         ePerson.setCanLogIn(true);
         ePersonService.setPassword(ePerson, password);
         return this;
+    }
+
+    @Override
+    /**
+     * Set a lower custom priority for the EPerson. It is one of the last object to delete to reduced the risk of
+     * pending references
+     */
+    protected int getPriority() {
+        return 50;
     }
 }

@@ -12,6 +12,7 @@ import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
@@ -30,6 +31,8 @@ import org.dspace.core.Context;
  * @author kevinvandevelde at atmire.com
  */
 public interface BitstreamService extends DSpaceObjectService<Bitstream>, DSpaceObjectLegacySupportService<Bitstream> {
+
+    public Bitstream find(Context context, UUID id) throws SQLException;
 
     public List<Bitstream> findAll(Context context) throws SQLException;
 

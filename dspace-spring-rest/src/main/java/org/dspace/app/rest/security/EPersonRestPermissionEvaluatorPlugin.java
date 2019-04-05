@@ -29,7 +29,7 @@ import org.springframework.stereotype.Component;
  * implemenents that requirement.
  */
 @Component
-public class EPersonRestPermissionEvaluatorPlugin extends DSpaceObjectPermissionEvaluatorPlugin {
+public class EPersonRestPermissionEvaluatorPlugin extends RestObjectPermissionEvaluatorPlugin {
 
     private static final Logger log = LoggerFactory.getLogger(EPersonRestPermissionEvaluatorPlugin.class);
 
