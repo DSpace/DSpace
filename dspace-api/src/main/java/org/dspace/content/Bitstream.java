@@ -573,7 +573,7 @@ public class Bitstream extends DSpaceObject
      *
      * @return true if the bitstream has been deleted
      */
-    boolean isDeleted() throws SQLException
+    public boolean isDeleted() throws SQLException
     {
         String query = "select count(*) as mycount from Bitstream where deleted = '1' and bitstream_id = ? ";
         TableRowIterator tri = DatabaseManager.query(bContext, query, bRow.getIntColumn("bitstream_id"));

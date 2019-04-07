@@ -240,8 +240,15 @@ public class Package {
             jGen.writeStringField("abstract", dataPackage.getAbstract());
             jGen.writeObjectField("authors", dataPackage.getAuthorList());
 
-            if (dataPackage.getKeywords().size() > 0) {
-                jGen.writeObjectField("keywords", dataPackage.getKeywords());
+            // spatial coverage, temporal coverage, and scientific names are lumped in with keywords for now
+
+            Set<String> keywordsToWrite = new HashSet<String>();
+            keywordsToWrite.addAll(ddp.getKeywords());
+            keywordsToWrite.addAll(ddp.getCoverageSpatial());
+            keywordsToWrite.addAll(ddp.getCoverageTemporal());
+            keywordsToWrite.addAll(ddp.getScientificNames());
+            if (keywordsToWrite.size() > 0) {
+                jGen.writeObjectField("keywords", keywordsToWrite);
             }
             
             //TODO: replace this with a real epersonID OR DASH user ID
