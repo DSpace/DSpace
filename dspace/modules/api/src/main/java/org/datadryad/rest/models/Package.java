@@ -240,16 +240,8 @@ public class Package {
             jGen.writeStringField("abstract", dataPackage.getAbstract());
             jGen.writeObjectField("authors", dataPackage.getAuthorList());
 
-            // spatial coverage, temporal coverage, and scientific names are lumped in with keywords for now
-
+            // keywordsToWrite will include both package- and file-level keywords
             Set<String> keywordsToWrite = new HashSet<String>();
-            keywordsToWrite.addAll(ddp.getKeywords());
-            keywordsToWrite.addAll(ddp.getCoverageSpatial());
-            keywordsToWrite.addAll(ddp.getCoverageTemporal());
-            keywordsToWrite.addAll(ddp.getScientificNames());
-            if (keywordsToWrite.size() > 0) {
-                jGen.writeObjectField("keywords", keywordsToWrite);
-            }
             
             //TODO: replace this with a real epersonID OR DASH user ID
             jGen.writeStringField("userID", "1");
@@ -274,6 +266,14 @@ public class Package {
                         if(fileDescription != null) {
                             fileListString = fileListString + "<p>" + fileDescription + "</p>";
                         }
+
+                        // file-level keywords
+                        // spatial coverage, temporal coverage, and scientific names are lumped in with keywords for now
+                        keywordsToWrite.addAll(ddfs.getKeywords());
+                        keywordsToWrite.addAll(ddfs.getCoverageSpatial());
+                        keywordsToWrite.addAll(ddfs.getCoverageTemporal());
+                        keywordsToWrite.addAll(ddfs.getScientificNames());
+                        
                         // bitstreams
                         fileListString = fileListString + "<p>";
                         String previousBitstreamFilename = "";
@@ -293,6 +293,15 @@ public class Package {
                 }
             } catch(Exception e) {
                 throw new IOException("Unable to serialize data files", e);
+            }
+            
+            // spatial coverage, temporal coverage, and scientific names are lumped in with keywords for now
+            keywordsToWrite.addAll(ddp.getKeywords());
+            keywordsToWrite.addAll(ddp.getCoverageSpatial());
+            keywordsToWrite.addAll(ddp.getCoverageTemporal());
+            keywordsToWrite.addAll(ddp.getScientificNames());
+            if (keywordsToWrite.size() > 0) {
+                jGen.writeObjectField("keywords", keywordsToWrite);
             }
             
             // write citation for article:
