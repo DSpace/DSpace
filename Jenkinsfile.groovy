@@ -16,7 +16,7 @@ pipeline {
 
                     dir('config') {
                         //configVars = checkout scm
-                        git url: 'https://github.com/BIBSYSDEV/2019-03-05_FaaSPresentation.git'
+                        git url: 'git@github.com:BIBSYSDEV/Brage6-environment.git'
                     }
                 }
             }
