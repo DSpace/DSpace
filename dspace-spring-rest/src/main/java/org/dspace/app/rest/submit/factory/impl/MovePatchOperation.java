@@ -9,7 +9,7 @@ package org.dspace.app.rest.submit.factory.impl;
 
 import org.dspace.app.rest.model.patch.MoveOperation;
 import org.dspace.app.rest.model.patch.Operation;
-import org.dspace.content.WorkspaceItem;
+import org.dspace.content.InProgressSubmission;
 import org.dspace.core.Context;
 import org.dspace.services.model.Request;
 
@@ -22,12 +22,12 @@ import org.dspace.services.model.Request;
 public abstract class MovePatchOperation<T extends Object> extends PatchOperation<T> {
 
     @Override
-    public void perform(Context context, Request currentRequest, WorkspaceItem source, Operation operation)
+    public void perform(Context context, Request currentRequest, InProgressSubmission source, Operation operation)
         throws Exception {
         move(context, currentRequest, source, operation.getPath(), ((MoveOperation) operation).getFrom());
     }
 
-    abstract void move(Context context, Request currentRequest, WorkspaceItem source, String path, String from)
+    abstract void move(Context context, Request currentRequest, InProgressSubmission source, String path, String from)
         throws Exception;
 
 }

@@ -51,7 +51,6 @@ import org.dspace.app.rest.repository.LinkRestRepository;
 import org.dspace.app.rest.utils.RestRepositoryUtils;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.DSpaceObject;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -474,9 +473,9 @@ public class RestResourceController implements InitializingBean {
         checkModelPluralForm(apiCategory, model);
         DSpaceRestRepository<RestAddressableModel, ID> repository = utils.getResourceRepository(apiCategory, model);
         RestAddressableModel modelObject = null;
-        List<DSpaceObject> dSpaceObjectList = utils.getdSpaceObjectsFromRequest(request);
+        List<String> stringListFromRequest = utils.getStringListFromRequest(request);
         try {
-            modelObject = repository.createAndReturn(dSpaceObjectList);
+            modelObject = repository.createAndReturn(stringListFromRequest);
         } catch (ClassCastException e) {
             log.error("Something went wrong whilst creating the object for apiCategory: " + apiCategory +
                           " and model: " + model, e);
@@ -491,6 +490,46 @@ public class RestResourceController implements InitializingBean {
         return ControllerUtils.toResponseEntity(HttpStatus.CREATED, null, result);
     }
 
+
+    /**
+     * Called in POST, with a x-www-form-urlencoded, execute an action on a resource
+     *
+     * Note that the regular expression in the request mapping accept a number as identifier;
+     *
+     * @param request
+     * @param apiCategory
+     * @param model
+     * @param id
+     * @return
+     * @throws HttpRequestMethodNotSupportedException
+     * @throws IOException
+     * @throws SQLException
+     */
+    @RequestMapping(method = RequestMethod.POST, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_DIGIT, headers =
+        "content-type=application/x-www-form-urlencoded")
+    public ResponseEntity<ResourceSupport> action(HttpServletRequest request, @PathVariable String apiCategory,
+                                                  @PathVariable String model, @PathVariable Integer id)
+        throws HttpRequestMethodNotSupportedException, SQLException, IOException {
+        checkModelPluralForm(apiCategory, model);
+        DSpaceRestRepository<RestAddressableModel, Integer> repository =
+            utils.getResourceRepository(apiCategory, model);
+
+        RestAddressableModel modelObject = null;
+        try {
+            modelObject = repository.action(request, id);
+        } catch (UnprocessableEntityException e) {
+            log.error(e.getMessage(), e);
+            return ControllerUtils.toEmptyResponse(HttpStatus.UNPROCESSABLE_ENTITY);
+        }
+
+        if (modelObject != null) {
+            DSpaceResource result = repository.wrapResource(modelObject);
+            linkService.addLinks(result);
+            return ControllerUtils.toResponseEntity(HttpStatus.CREATED, null, result);
+        } else {
+            return ControllerUtils.toEmptyResponse(HttpStatus.NO_CONTENT);
+        }
+    }
 
     /**
      *  Called in POST, multipart, upload to a specific rest resource the file passed as "file" request parameter
@@ -1167,8 +1206,8 @@ public class RestResourceController implements InitializingBean {
         checkModelPluralForm(apiCategory, model);
         DSpaceRestRepository<RestAddressableModel, ID> repository = utils.getResourceRepository(apiCategory, model);
         RestAddressableModel modelObject = null;
-        List<DSpaceObject> dSpaceObjectList = utils.getdSpaceObjectsFromRequest(request);
-        modelObject = repository.put(request, apiCategory, model, id, dSpaceObjectList);
+        List<String> stringList = utils.getStringListFromRequest(request);
+        modelObject = repository.put(request, apiCategory, model, id, stringList);
         if (modelObject == null) {
             throw new ResourceNotFoundException(apiCategory + "." + model + " with id: " + id + " not found");
         }

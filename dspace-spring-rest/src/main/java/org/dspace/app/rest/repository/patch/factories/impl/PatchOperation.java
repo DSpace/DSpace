@@ -13,8 +13,8 @@ import java.util.List;
 import org.apache.commons.lang3.BooleanUtils;
 import org.dspace.app.rest.exception.PatchBadRequestException;
 import org.dspace.app.rest.model.RestModel;
+import org.dspace.app.rest.model.patch.LateObjectEvaluator;
 import org.dspace.app.rest.model.patch.Operation;
-import org.springframework.data.rest.webmvc.json.patch.LateObjectEvaluator;
 
 /**
  * Base class for all resource patch operations.

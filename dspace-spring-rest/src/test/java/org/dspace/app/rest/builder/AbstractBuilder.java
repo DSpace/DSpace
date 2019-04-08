@@ -7,12 +7,11 @@
  */
 package org.dspace.app.rest.builder;
 
-import java.util.Comparator;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.rest.builder.util.AbstractBuilderCleanupUtil;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.authorize.service.ResourcePolicyService;
@@ -41,10 +40,13 @@ import org.dspace.eperson.service.RegistrationDataService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.versioning.factory.VersionServiceFactory;
 import org.dspace.versioning.service.VersionHistoryService;
+import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
+import org.dspace.xmlworkflow.service.XmlWorkflowService;
 import org.dspace.xmlworkflow.storedcomponents.service.ClaimedTaskService;
 import org.dspace.xmlworkflow.storedcomponents.service.InProgressUserService;
 import org.dspace.xmlworkflow.storedcomponents.service.PoolTaskService;
 import org.dspace.xmlworkflow.storedcomponents.service.WorkflowItemRoleService;
+import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
 
 /**
  * Abstract builder class that holds references to all available services
@@ -58,6 +60,8 @@ public abstract class AbstractBuilder<T, S> {
     static ItemService itemService;
     static InstallItemService installItemService;
     static WorkspaceItemService workspaceItemService;
+    static XmlWorkflowItemService workflowItemService;
+    static XmlWorkflowService workflowService;
     static EPersonService ePersonService;
     static GroupService groupService;
     static BundleService bundleService;
@@ -81,7 +85,11 @@ public abstract class AbstractBuilder<T, S> {
 
     protected Context context;
 
-    private static List<AbstractBuilder> builders = new LinkedList<>();
+    /**
+     * This static class will make sure that the objects built with the builders are disposed of in a foreign-key
+     * constraint safe manner by predefining an order
+     */
+    private static AbstractBuilderCleanupUtil abstractBuilderCleanupUtil = new AbstractBuilderCleanupUtil();
     /**
      * log4j category
      */
@@ -89,7 +97,8 @@ public abstract class AbstractBuilder<T, S> {
 
     protected AbstractBuilder(Context context) {
         this.context = context;
-        builders.add(this);
+        //Register this specific builder to be deleted later on
+        abstractBuilderCleanupUtil.addToMap(this);
     }
 
     public static void init() {
@@ -98,6 +107,8 @@ public abstract class AbstractBuilder<T, S> {
         itemService = ContentServiceFactory.getInstance().getItemService();
         installItemService = ContentServiceFactory.getInstance().getInstallItemService();
         workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
+        workflowItemService = XmlWorkflowServiceFactory.getInstance().getXmlWorkflowItemService();
+        workflowService = XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService();
         ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
         groupService = EPersonServiceFactory.getInstance().getGroupService();
         bundleService = ContentServiceFactory.getInstance().getBundleService();
@@ -118,11 +129,10 @@ public abstract class AbstractBuilder<T, S> {
         entityTypeService = ContentServiceFactory.getInstance().getEntityTypeService();
 
         // Temporarily disabled
-        // TODO find a way to be able to test the XML and "default" workflow at the same time
-        //claimedTaskService = XmlWorkflowServiceFactoryImpl.getInstance().getClaimedTaskService();
-        //inProgressUserService = XmlWorkflowServiceFactoryImpl.getInstance().getInProgressUserService();
-        //poolTaskService = XmlWorkflowServiceFactoryImpl.getInstance().getPoolTaskService();
-        //workflowItemRoleService = XmlWorkflowServiceFactoryImpl.getInstance().getWorkflowItemRoleService();
+        claimedTaskService = XmlWorkflowServiceFactory.getInstance().getClaimedTaskService();
+        inProgressUserService = XmlWorkflowServiceFactory.getInstance().getInProgressUserService();
+        poolTaskService = XmlWorkflowServiceFactory.getInstance().getPoolTaskService();
+        workflowItemRoleService = XmlWorkflowServiceFactory.getInstance().getWorkflowItemRoleService();
     }
 
 
@@ -155,15 +165,9 @@ public abstract class AbstractBuilder<T, S> {
     }
 
     public static void cleanupObjects() throws Exception {
-        builders.sort(new Comparator<AbstractBuilder>() {
-            @Override
-            public int compare(AbstractBuilder o1, AbstractBuilder o2) {
-                return o1.getPriority() - o2.getPriority();
-            }
-        });
-        for (AbstractBuilder builder : builders) {
-            builder.cleanup();
-        }
+
+        // This call will make sure that the map with AbstractBuilders will be cleaned up
+        abstractBuilderCleanupUtil.cleanupBuilders();
 
         // Bitstreams still leave a trace when deleted, so we need to fully "expunge" them
         try (Context c = new Context()) {
@@ -180,11 +184,11 @@ public abstract class AbstractBuilder<T, S> {
         }
     }
 
-    protected int getPriority() {
-        return 0;
-    }
-
-    protected abstract void cleanup() throws Exception;
+    /**
+     * This method will ensure that the DSpaceObject contained within the Builder will be cleaned up properly
+     * @throws Exception    If something goes wrong
+     */
+    public abstract void cleanup() throws Exception;
 
     public abstract T build();
 

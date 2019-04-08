@@ -7,20 +7,20 @@
  */
 package org.dspace.app.rest.security;
 
-import org.dspace.app.rest.model.DSpaceObjectRest;
+import org.dspace.app.rest.model.BaseObjectRest;
 import org.springframework.security.core.Authentication;
 
 /**
  * Abstract {@link RestPermissionEvaluatorPlugin} class that contains utility methods to
- * evaluate permissions for a DSpace Object.
+ * evaluate permissions for a Rest Object.
 */
-public abstract class DSpaceObjectPermissionEvaluatorPlugin  implements RestPermissionEvaluatorPlugin {
+public abstract class RestObjectPermissionEvaluatorPlugin  implements RestPermissionEvaluatorPlugin {
 
     /**
-     * Utility implementation to make the implementation of DSpace Object Permission evaluator plugins more easy.
+     * Utility implementation to make the implementation of Rest Object Permission evaluator plugins more easy.
      *
      * @param authentication represents the user in question. Should not be null.
-     * @param targetDomainObject the DSpace object for which permissions should be
+     * @param targetDomainObject the domain object for which permissions should be
      * checked. May be null in which case implementations should return false, as the null
      * condition can be checked explicitly in the expression.
      * @param permission a representation of the DSpace action as supplied by the
@@ -29,9 +29,8 @@ public abstract class DSpaceObjectPermissionEvaluatorPlugin  implements RestPerm
      */
     public boolean hasPermission(Authentication authentication, Object targetDomainObject,
                                  Object permission) {
-
-        DSpaceObjectRest dSpaceObject = (DSpaceObjectRest) targetDomainObject;
-        return hasPermission(authentication, dSpaceObject.getId(), dSpaceObject.getType(), permission);
+        BaseObjectRest restObject = (BaseObjectRest) targetDomainObject;
+        return hasPermission(authentication, restObject.getId(), restObject.getType(), permission);
     }
 
 
