@@ -247,14 +247,7 @@ public class Utils {
      * @param request   The request out of which we'll create the List of DSpaceObjects
      * @return          The resulting list of DSpaceObjects that we parsed out of the request
      */
-    private List<DSpaceObject> constructDSpaceObjectList(Context context, HttpServletRequest request) {
-        List<String> list = null;
-        try {
-            list = readFromRequest(request);
-        } catch (IOException e) {
-            log.error("Something went wrong with reading in the inputstream from the request", e);
-        }
-
+    public List<DSpaceObject> constructDSpaceObjectList(Context context, List<String> list) {
         List<DSpaceObject> dSpaceObjects = new LinkedList<>();
         for (String string : list) {
             if (string.endsWith("/")) {
@@ -312,7 +305,13 @@ public class Utils {
      * @return              The list of DSpaceObjects that we could find in the InputStream
      * @throws IOException  If something goes wrong
      */
-    public List<DSpaceObject> getdSpaceObjectsFromRequest(HttpServletRequest request) {
-        return constructDSpaceObjectList(ContextUtil.obtainContext(request), request);
+    public List<String> getStringListFromRequest(HttpServletRequest request) {
+        List<String> list = null;
+        try {
+            list = readFromRequest(request);
+        } catch (IOException e) {
+            log.error("Something went wrong with reading in the inputstream from the request", e);
+        }
+        return list;
     }
 }
