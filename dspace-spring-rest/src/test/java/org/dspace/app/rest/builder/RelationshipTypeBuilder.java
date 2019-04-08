@@ -35,7 +35,8 @@ public class RelationshipTypeBuilder extends AbstractBuilder<RelationshipType, R
         return relationshipTypeService;
     }
 
-    protected void cleanup() throws Exception {
+    @Override
+    public void cleanup() throws Exception {
         context.turnOffAuthorisationSystem();
         List<Relationship> byRelationshipType = relationshipService.findByRelationshipType(context, relationshipType);
         for (Relationship relationship : byRelationshipType) {
@@ -102,10 +103,5 @@ public class RelationshipTypeBuilder extends AbstractBuilder<RelationshipType, R
         }
 
         return this;
-    }
-
-    @Override
-    protected int getPriority() {
-        return -2 ;
     }
 }

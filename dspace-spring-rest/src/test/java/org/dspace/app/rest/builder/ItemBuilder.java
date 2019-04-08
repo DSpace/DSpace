@@ -129,7 +129,8 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         }
     }
 
-    protected void cleanup() throws Exception {
+    @Override
+    public void cleanup() throws Exception {
         delete(item);
     }
 

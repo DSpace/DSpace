@@ -26,12 +26,6 @@ public class MetadataFieldBuilder extends AbstractBuilder<MetadataField, Metadat
 
     private MetadataField metadataField;
 
-    @Override
-    protected int getPriority() {
-        return 9998;
-    }
-
-
     protected MetadataFieldBuilder(Context context) {
         super(context);
     }
@@ -42,7 +36,7 @@ public class MetadataFieldBuilder extends AbstractBuilder<MetadataField, Metadat
     }
 
     @Override
-    protected void cleanup() throws Exception {
+    public void cleanup() throws Exception {
         delete(metadataField);
     }
 

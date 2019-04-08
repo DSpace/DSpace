@@ -69,7 +69,7 @@ public class WorkspaceItemBuilder extends AbstractBuilder<WorkspaceItem, Workspa
     }
 
     @Override
-    protected void cleanup() throws Exception {
+    public void cleanup() throws Exception {
         delete(workspaceItem);
     }
 
@@ -141,13 +141,5 @@ public class WorkspaceItemBuilder extends AbstractBuilder<WorkspaceItem, Workspa
             handleException(e);
         }
         return this;
-    }
-
-    @Override
-    /**
-     * Set a slightly lower priority for the workspaceitem has it can be generated "deleting" a workflowitem
-     */
-    protected int getPriority() {
-        return 150;
     }
 }
