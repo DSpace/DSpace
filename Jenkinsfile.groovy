@@ -10,7 +10,7 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                println("Running build #${env.BUILD_ID} of job ${env.JOB_NAME}, git branch: ${env.BRANCH_NAME}" as java.lang.Object)
+                println(" --- Running build #${env.BUILD_ID} of job ${env.JOB_NAME}, git branch: ${env.BRANCH_NAME}" as java.lang.Object)
                 script {
                     brageVars = checkout scm
 
@@ -24,14 +24,14 @@ pipeline {
 
         stage('Maven Build') {
             steps {
-                sh 'echo "Pretending to build with maven"'
+                sh 'echo " --- Pretending to build with maven"'
 //              sh 'mvn package -Dmirage2.on=true -P !dspace-lni,!dspace-sword,!dspace-jspui,!dspace-rdf'
             }
         }
 
         stage('Doing stuff in workspace') {
             steps {
-                sh 'echo "Doing stuff"'
+                sh 'echo " --- Doing stuff"'
                 sh 'pwd'
             }
         }
