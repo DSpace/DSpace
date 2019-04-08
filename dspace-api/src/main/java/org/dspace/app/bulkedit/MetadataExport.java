@@ -18,6 +18,7 @@ import org.dspace.core.Context;
 import org.dspace.handle.factory.HandleServiceFactory;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
@@ -101,7 +102,7 @@ public class MetadataExport
     {
         // Add all the collections
         List<Collection> collections = community.getCollections();
-        Iterator<Item> result = null;
+        Iterator<Item> result = Collections.<Item>emptyIterator();
         for (Collection collection : collections)
         {
             for (int i = 0; i < indent; i++)
@@ -122,9 +123,7 @@ public class MetadataExport
                 System.out.print(" ");
             }
             Iterator<Item> items = buildFromCommunity(context, subCommunity, indent + 1);
-            if (items != null) {
-                result = addItemsToResult(result,items);
-            }
+            result = addItemsToResult(result,items);
         }
 
         return result;
