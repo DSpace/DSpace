@@ -108,7 +108,7 @@ public class WorkflowItemBuilder extends AbstractBuilder<XmlWorkflowItem, XmlWor
 
 
     @Override
-    protected void cleanup() throws Exception {
+    public void cleanup() throws Exception {
         if (workspaceItem != null) {
             deleteWsi(workspaceItem);
         }
@@ -214,11 +214,4 @@ public class WorkflowItemBuilder extends AbstractBuilder<XmlWorkflowItem, XmlWor
         indexingService.commit();
     }
 
-    @Override
-    /**
-     * Set a higher priority for the workflowitem has it holds lot of reference
-     */
-    protected int getPriority() {
-        return 200;
-    }
 }

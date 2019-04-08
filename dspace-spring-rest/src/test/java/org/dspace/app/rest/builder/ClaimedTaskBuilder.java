@@ -136,7 +136,7 @@ public class ClaimedTaskBuilder extends AbstractBuilder<ClaimedTask, ClaimedTask
 
 
     @Override
-    protected void cleanup() throws Exception {
+    public void cleanup() throws Exception {
         if (workspaceItem != null) {
             deleteWsi(workspaceItem);
         }
@@ -215,13 +215,5 @@ public class ClaimedTaskBuilder extends AbstractBuilder<ClaimedTask, ClaimedTask
             handleException(e);
         }
         return this;
-    }
-
-    @Override
-    /**
-     * Set a higher priority than workflowitem for the pooltask has it holds a reference to it
-     */
-    protected int getPriority() {
-        return 300;
     }
 }

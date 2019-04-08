@@ -32,7 +32,8 @@ public class EntityTypeBuilder extends AbstractBuilder<EntityType, EntityTypeSer
         return entityTypeService;
     }
 
-    protected void cleanup() throws Exception {
+    @Override
+    public void cleanup() throws Exception {
         delete(entityType);
     }
 
@@ -78,10 +79,5 @@ public class EntityTypeBuilder extends AbstractBuilder<EntityType, EntityTypeSer
         }
 
         return this;
-    }
-
-    @Override
-    protected int getPriority() {
-        return -1 ;
     }
 }

@@ -112,7 +112,7 @@ public class PoolTaskBuilder extends AbstractBuilder<PoolTask, PoolTaskService> 
 
 
     @Override
-    protected void cleanup() throws Exception {
+    public void cleanup() throws Exception {
         if (workspaceItem != null) {
             deleteWsi(workspaceItem);
         }
@@ -191,13 +191,5 @@ public class PoolTaskBuilder extends AbstractBuilder<PoolTask, PoolTaskService> 
             handleException(e);
         }
         return this;
-    }
-
-    @Override
-    /**
-     * Set a higher priority than workflowitem for the pooltask has it holds a reference to it
-     */
-    protected int getPriority() {
-        return 300;
     }
 }

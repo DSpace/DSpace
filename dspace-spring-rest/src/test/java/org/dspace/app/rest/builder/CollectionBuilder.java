@@ -94,7 +94,8 @@ public class CollectionBuilder extends AbstractDSpaceObjectBuilder<Collection> {
         return collection;
     }
 
-    protected void cleanup() throws Exception {
+    @Override
+    public void cleanup() throws Exception {
         deleteWorkflowGroups(collection);
         delete(collection);
     }
@@ -122,13 +123,5 @@ public class CollectionBuilder extends AbstractDSpaceObjectBuilder<Collection> {
     @Override
     protected DSpaceObjectService<Collection> getService() {
         return collectionService;
-    }
-
-    @Override
-    /**
-     * Collection must be deleted before community
-     */
-    protected int getPriority() {
-        return 150;
     }
 }
