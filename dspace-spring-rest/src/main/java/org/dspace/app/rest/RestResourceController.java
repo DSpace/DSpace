@@ -51,7 +51,6 @@ import org.dspace.app.rest.repository.LinkRestRepository;
 import org.dspace.app.rest.utils.RestRepositoryUtils;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.DSpaceObject;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -474,9 +473,9 @@ public class RestResourceController implements InitializingBean {
         checkModelPluralForm(apiCategory, model);
         DSpaceRestRepository<RestAddressableModel, ID> repository = utils.getResourceRepository(apiCategory, model);
         RestAddressableModel modelObject = null;
-        List<DSpaceObject> dSpaceObjectList = utils.getdSpaceObjectsFromRequest(request);
+        List<String> stringListFromRequest = utils.getStringListFromRequest(request);
         try {
-            modelObject = repository.createAndReturn(dSpaceObjectList);
+            modelObject = repository.createAndReturn(stringListFromRequest);
         } catch (ClassCastException e) {
             log.error("Something went wrong whilst creating the object for apiCategory: " + apiCategory +
                           " and model: " + model, e);
@@ -1207,8 +1206,8 @@ public class RestResourceController implements InitializingBean {
         checkModelPluralForm(apiCategory, model);
         DSpaceRestRepository<RestAddressableModel, ID> repository = utils.getResourceRepository(apiCategory, model);
         RestAddressableModel modelObject = null;
-        List<DSpaceObject> dSpaceObjectList = utils.getdSpaceObjectsFromRequest(request);
-        modelObject = repository.put(request, apiCategory, model, id, dSpaceObjectList);
+        List<String> stringList = utils.getStringListFromRequest(request);
+        modelObject = repository.put(request, apiCategory, model, id, stringList);
         if (modelObject == null) {
             throw new ResourceNotFoundException(apiCategory + "." + model + " with id: " + id + " not found");
         }

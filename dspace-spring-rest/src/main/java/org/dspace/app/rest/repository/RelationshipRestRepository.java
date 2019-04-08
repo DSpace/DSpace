@@ -93,11 +93,11 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
     }
 
     @Override
-    protected RelationshipRest createAndReturn(Context context, List<DSpaceObject> list)
+    protected RelationshipRest createAndReturn(Context context, List<String> stringList)
         throws AuthorizeException, SQLException, RepositoryMethodNotImplementedException {
 
         HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
-
+        List<DSpaceObject> list = utils.constructDSpaceObjectList(context, stringList);
         if (list.size() == 2 && list.get(0).getType() == Constants.ITEM && list.get(1).getType() == Constants.ITEM) {
             Item leftItem = (Item) list.get(0);
             Item rightItem = (Item) list.get(1);
@@ -131,14 +131,14 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
 
     @Override
     protected RelationshipRest put(Context context, HttpServletRequest request, String apiCategory, String model,
-                                   Integer id, List<DSpaceObject> dSpaceObjects)
+                                   Integer id, List<String> stringList)
         throws RepositoryMethodNotImplementedException, SQLException, AuthorizeException {
 
         Relationship relationship = relationshipService.find(context, id);
         if (relationship == null) {
             throw new ResourceNotFoundException(apiCategory + "." + model + " with id: " + id + " not found");
         }
-
+        List<DSpaceObject> dSpaceObjects = utils.constructDSpaceObjectList(context, stringList);
         if (dSpaceObjects.size() == 2 && dSpaceObjects.get(0).getType() == Constants.ITEM
             && dSpaceObjects.get(1).getType() == Constants.ITEM) {
             Item leftItem = (Item) dSpaceObjects.get(0);

@@ -17,6 +17,7 @@ import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.builder.ItemBuilder;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -74,7 +75,8 @@ public class UriListParsingIT extends AbstractControllerIntegrationTest {
             "https://localhost:8080/spring-rest/api/core/items/" + publicItem2.getID();
         mockRequest.setContentType("text/uri-list");
         mockRequest.setContent(uriListString.getBytes());
-        List<DSpaceObject> dSpaceObjectList = utils.getdSpaceObjectsFromRequest(mockRequest);
+        List<DSpaceObject> dSpaceObjectList = utils.constructDSpaceObjectList(
+            ContextUtil.obtainContext(mockRequest), utils.getStringListFromRequest(mockRequest));
         assertThat("DSpaceObject List is of size 2" ,dSpaceObjectList.size(), equalTo(2));
         assertThat("DSpaceObject 1 is an item", dSpaceObjectList.get(0).getType(), equalTo(Constants.ITEM));
         assertThat("DSpaceObject 2 is an item", dSpaceObjectList.get(1).getType(), equalTo(Constants.ITEM));
