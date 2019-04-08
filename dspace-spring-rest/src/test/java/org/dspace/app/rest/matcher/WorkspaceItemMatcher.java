@@ -31,7 +31,7 @@ public class WorkspaceItemMatcher {
      * in the traditionalpageone section as by the default configuration (form-submission.xml)
      * 
      * @param witem
-     *            the workspaceitem
+     *            the workspaceitem, if null only the presence of the generic properties will be verified
      * @param title
      *            the dc.title
      * @param dateIssued
@@ -56,7 +56,7 @@ public class WorkspaceItemMatcher {
      * configuration (form-submission.xml)
      * 
      * @param witem
-     *            the workspaceitem
+     *            the workspaceitem, if null only the presence of the generic properties will be verified
      * @param title
      *            the dc.title
      * @param dateIssued
@@ -85,14 +85,21 @@ public class WorkspaceItemMatcher {
      * Check that the id and type are exposed
      * 
      * @param witem
-     *            the workspaceitem
+     *            the workspaceitem, if null only the presence of the generic properties will be verified
      * @return
      */
     public static Matcher<? super Object> matchProperties(WorkspaceItem witem) {
-        return allOf(
-                hasJsonPath("$.id", is(witem.getID())),
-                hasJsonPath("$.type", is("workspaceitem"))
-        );
+        if (witem != null) {
+            return allOf(
+                    hasJsonPath("$.id", is(witem.getID())),
+                    hasJsonPath("$.type", is("workspaceitem"))
+            );
+        } else {
+            return allOf(
+                    hasJsonPath("$.id"),
+                    hasJsonPath("$.type", is("workspaceitem"))
+            );
+        }
     }
 
     /**
@@ -103,11 +110,21 @@ public class WorkspaceItemMatcher {
      * @return
      */
     public static Matcher<? super Object> matchLinks(WorkspaceItem witem) {
-        return allOf(
-                hasJsonPath("$._links.self.href", is(REST_SERVER_URL + "submission/workspaceitems/" + witem.getID())),
-                hasJsonPath("$._links.item.href", startsWith(REST_SERVER_URL)),
-                hasJsonPath("$._links.collection.href", startsWith(REST_SERVER_URL)),
-                hasJsonPath("$._links.submitter.href", startsWith(REST_SERVER_URL)),
-                hasJsonPath("$._links.submissionDefinition.href", startsWith(REST_SERVER_URL)));
+        if (witem != null) {
+            return allOf(
+                    hasJsonPath("$._links.self.href",
+                            is(REST_SERVER_URL + "submission/workspaceitems/" + witem.getID())),
+                    hasJsonPath("$._links.item.href", startsWith(REST_SERVER_URL)),
+                    hasJsonPath("$._links.collection.href", startsWith(REST_SERVER_URL)),
+                    hasJsonPath("$._links.submitter.href", startsWith(REST_SERVER_URL)),
+                    hasJsonPath("$._links.submissionDefinition.href", startsWith(REST_SERVER_URL)));
+        } else {
+            return allOf(
+                    hasJsonPath("$._links.self.href"),
+                    hasJsonPath("$._links.item.href", startsWith(REST_SERVER_URL)),
+                    hasJsonPath("$._links.collection.href", startsWith(REST_SERVER_URL)),
+                    hasJsonPath("$._links.submitter.href", startsWith(REST_SERVER_URL)),
+                    hasJsonPath("$._links.submissionDefinition.href", startsWith(REST_SERVER_URL)));
+        }
     }
 }

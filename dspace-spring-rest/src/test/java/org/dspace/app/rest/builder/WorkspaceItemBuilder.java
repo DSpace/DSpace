@@ -69,7 +69,7 @@ public class WorkspaceItemBuilder extends AbstractBuilder<WorkspaceItem, Workspa
     }
 
     @Override
-    protected void cleanup() throws Exception {
+    public void cleanup() throws Exception {
         delete(workspaceItem);
     }
 

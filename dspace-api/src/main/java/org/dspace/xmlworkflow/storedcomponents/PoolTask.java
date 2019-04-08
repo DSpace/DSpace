@@ -7,7 +7,6 @@
  */
 package org.dspace.xmlworkflow.storedcomponents;
 
-import java.sql.SQLException;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -20,6 +19,8 @@ import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import org.dspace.browse.BrowsableObject;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.ReloadableEntity;
 import org.dspace.eperson.EPerson;
@@ -35,7 +36,7 @@ import org.dspace.eperson.Group;
  */
 @Entity
 @Table(name = "cwf_pooltask")
-public class PoolTask implements ReloadableEntity<Integer> {
+public class PoolTask implements ReloadableEntity<Integer>, BrowsableObject<Integer> {
 
     @Id
     @Column(name = "pooltask_id")
@@ -119,7 +120,7 @@ public class PoolTask implements ReloadableEntity<Integer> {
         this.stepId = stepID;
     }
 
-    public String getStepID() throws SQLException {
+    public String getStepID() {
         return stepId;
     }
 
@@ -130,4 +131,10 @@ public class PoolTask implements ReloadableEntity<Integer> {
     public String getActionID() {
         return this.actionId;
     }
+
+    @Override
+    public int getType() {
+        return Constants.POOLTASK;
+    }
+
 }

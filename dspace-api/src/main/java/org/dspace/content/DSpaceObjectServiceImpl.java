@@ -146,7 +146,7 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
     public List<MetadataValue> getMetadataByMetadataString(T dso, String mdString) {
         StringTokenizer dcf = new StringTokenizer(mdString, ".");
 
-        String[] tokens = {"", "", ""};
+        String[] tokens = { "", "", "" };
         int i = 0;
         while (dcf.hasMoreTokens()) {
             tokens[i] = dcf.nextToken().trim();
@@ -236,7 +236,8 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
 
     @Override
     public void addMetadata(Context context, T dso, MetadataField metadataField, String lang, List<String> values,
-                            List<String> authorities, List<Integer> confidences) throws SQLException {
+                            List<String> authorities, List<Integer> confidences)
+        throws SQLException {
         boolean authorityControlled = metadataAuthorityService.isAuthorityControlled(metadataField);
         boolean authorityRequired = metadataAuthorityService.isAuthorityRequired(metadataField);
         // We will not verify that they are valid entries in the registry
@@ -532,7 +533,7 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
     protected String[] getMDValueByField(String field) {
         StringTokenizer dcf = new StringTokenizer(field, ".");
 
-        String[] tokens = {"", "", ""};
+        String[] tokens = { "", "", "" };
         int i = 0;
         while (dcf.hasMoreTokens()) {
             tokens[i] = dcf.nextToken().trim();
@@ -752,4 +753,5 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
             idx++;
         }
     }
+
 }

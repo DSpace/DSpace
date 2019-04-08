@@ -83,7 +83,8 @@ public class CommunityBuilder extends AbstractDSpaceObjectBuilder<Community> {
         return community;
     }
 
-    protected void cleanup() throws Exception {
+    @Override
+    public void cleanup() throws Exception {
         delete(community);
     }
 

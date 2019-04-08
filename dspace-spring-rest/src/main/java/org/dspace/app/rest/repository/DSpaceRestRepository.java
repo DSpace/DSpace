@@ -26,7 +26,6 @@ import org.dspace.app.rest.model.hateoas.DSpaceResource;
 import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.DSpaceObject;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -264,10 +263,10 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
      * Create and return a new instance. Data is recovered from the thread bound HTTP request and the list
      * of DSpaceObjects provided in the parameter
      *
-     * @param list  The list of DSpaceObjects to be used in the createAndReturn method
+     * @param list  The list of Strings to be used in the createAndReturn method
      * @return  The created REST object
      */
-    public T createAndReturn(List<DSpaceObject> list) {
+    public T createAndReturn(List<String> list) {
         Context context = null;
         try {
             context = obtainContext();
@@ -307,14 +306,14 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
      * @param context
      *            the dspace context
      * @param list
-     *            The list of DSpaceObjects that will be used as data for the object that's to be created
+     *            The list of Strings that will be used as data for the object that's to be created
      * @return the created REST object
      * @throws AuthorizeException
      * @throws SQLException
      * @throws RepositoryMethodNotImplementedException
      *             returned by the default implementation when the operation is not supported for the entity
      */
-    protected T createAndReturn(Context context, List<DSpaceObject> list)
+    protected T createAndReturn(Context context, List<String> list)
             throws AuthorizeException, SQLException, RepositoryMethodNotImplementedException {
         throw new RepositoryMethodNotImplementedException("No implementation found; Method not allowed!", "");
     }
@@ -413,6 +412,18 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
         throw new RepositoryMethodNotImplementedException(apiCategory, model);
     }
 
+    public T action(HttpServletRequest request, ID id) throws SQLException, IOException {
+        Context context = obtainContext();
+        T entity = action(context, request, id);
+        context.commit();
+        return entity;
+    }
+
+    protected T action(Context context, HttpServletRequest request, ID id)
+        throws SQLException, IOException {
+        throw new RuntimeException("No implementation found; Method not allowed!");
+    }
+
     /**
      * Bulk create object instances from an uploaded file
      *
@@ -486,14 +497,14 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
      * @param apiCategory   the API category e.g. "api"
      * @param model         the DSpace model e.g. "metadatafield"
      * @param id            the ID of the target REST object
-     * @param dSpaceObjects The list of DSpaceObjects that will be used as data for the put
+     * @param stringList    The list of Strings that will be used as data for the put
      * @return the updated REST object
      */
     public T put(HttpServletRequest request, String apiCategory, String model, ID id,
-                 List<DSpaceObject> dSpaceObjects) {
+                 List<String> stringList) {
         Context context = obtainContext();
         try {
-            thisRepository.put(context, request, apiCategory, model, id, dSpaceObjects);
+            thisRepository.put(context, request, apiCategory, model, id, stringList);
             context.commit();
         } catch (SQLException | AuthorizeException e) {
             throw new RuntimeException(e.getMessage(), e);
@@ -528,7 +539,7 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
      * @param apiCategory       the API category e.g. "api"
      * @param model             the DSpace model e.g. "metadatafield"
      * @param id                the ID of the target REST object
-     * @param dSpaceObjects     The list of DSpaceObjects that will be used as data for the put
+     * @param stringList    The list of Strings that will be used as data for the put
      * @return the updated REST object
      * @throws AuthorizeException if the context user is not authorized to perform this operation
      * @throws SQLException when the database returns an error
@@ -536,7 +547,7 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
      *             returned by the default implementation when the operation is not supported for the entity
      */
     protected T put(Context context, HttpServletRequest request, String apiCategory, String model, ID id,
-                    List<DSpaceObject> dSpaceObjects)
+                    List<String> stringList)
         throws RepositoryMethodNotImplementedException, SQLException, AuthorizeException {
         throw new RepositoryMethodNotImplementedException(apiCategory, model);
     }

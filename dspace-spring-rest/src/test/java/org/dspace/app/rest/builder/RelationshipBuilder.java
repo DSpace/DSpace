@@ -34,7 +34,8 @@ public class RelationshipBuilder extends AbstractBuilder<Relationship, Relations
         return relationshipService;
     }
 
-    protected void cleanup() throws Exception {
+    @Override
+    public void cleanup() throws Exception {
         delete(relationship);
     }
 

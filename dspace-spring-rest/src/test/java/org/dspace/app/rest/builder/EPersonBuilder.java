@@ -24,17 +24,13 @@ public class EPersonBuilder extends AbstractDSpaceObjectBuilder<EPerson> {
         super(context);
     }
 
-    protected void cleanup() throws Exception {
+    @Override
+    public void cleanup() throws Exception {
         delete(ePerson);
     }
 
     protected DSpaceObjectService<EPerson> getService() {
         return ePersonService;
-    }
-
-    @Override
-    protected int getPriority() {
-        return 100;
     }
 
     public EPerson build() {
