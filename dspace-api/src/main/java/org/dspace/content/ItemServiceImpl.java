@@ -159,6 +159,15 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     }
 
     @Override
+    /**
+     * This method is an alias of the find method needed to avoid ambiguity between the IndexableObjectService interface
+     * and the DSpaceObjectService interface
+     */
+    public Item findIndexableObject(Context context, UUID id) throws SQLException {
+        return find(context, id);
+    }
+
+    @Override
     public Item create(Context context, WorkspaceItem workspaceItem) throws SQLException, AuthorizeException {
         if (workspaceItem.getItem() != null) {
             throw new IllegalArgumentException(
@@ -642,6 +651,15 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     @Override
     public int getSupportsTypeConstant() {
         return Constants.ITEM;
+    }
+
+    @Override
+    /**
+     * This method is an alias of the getSupportsTypeConstant method needed to avoid ambiguity between the
+     * IndexableObjectService interface and the DSpaceObjectService interface
+     */
+    public int getSupportsIndexableObjectTypeConstant() {
+        return getSupportsTypeConstant();
     }
 
     protected void rawDelete(Context context, Item item) throws AuthorizeException, SQLException, IOException {

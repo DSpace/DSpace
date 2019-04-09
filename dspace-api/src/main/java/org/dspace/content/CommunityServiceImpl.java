@@ -138,6 +138,15 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
     }
 
     @Override
+    /**
+     * This method is an alias of the find method needed to avoid ambiguity between the IndexableObjectService interface
+     * and the DSpaceObjectService interface
+     */
+    public Community findIndexableObject(Context context, UUID id) throws SQLException {
+        return find(context, id);
+    }
+
+    @Override
     public List<Community> findAll(Context context) throws SQLException {
         MetadataField sortField = metadataFieldService.findByElement(context, MetadataSchema.DC_SCHEMA, "title", null);
         if (sortField == null) {
@@ -508,6 +517,14 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
         return Constants.COMMUNITY;
     }
 
+    @Override
+    /**
+     * This method is an alias of the getSupportsTypeConstant method needed to avoid ambiguity between the
+     * IndexableObjectService interface and the DSpaceObjectService interface
+     */
+    public int getSupportsIndexableObjectTypeConstant() {
+        return getSupportsTypeConstant();
+    }
 
     /**
      * Internal method to remove the community and all its children from the

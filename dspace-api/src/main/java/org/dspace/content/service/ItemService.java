@@ -36,7 +36,8 @@ import org.dspace.eperson.Group;
  *
  * @author kevinvandevelde at atmire.com
  */
-public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLegacySupportService<Item> {
+public interface ItemService
+        extends DSpaceObjectService<Item>, DSpaceObjectLegacySupportService<Item>, IndexableObjectService<Item, UUID> {
 
     public Thumbnail getThumbnail(Context context, Item item, boolean requireOriginal) throws SQLException;
 
