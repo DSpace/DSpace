@@ -2244,7 +2244,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     protected String transformDisplayedValue(Context context, String field, String value) throws SQLException {
         if(field.equals("location.comm") || field.equals("location.coll"))
         {
-            value = locationToName(context, field, value);
+            return value;
         }
         else if (field.endsWith("_filter") || field.endsWith("_ac")
           || field.endsWith("_acid"))
@@ -2312,7 +2312,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     protected String transformSortValue(Context context, String field, String value) throws SQLException {
         if(field.equals("location.comm") || field.equals("location.coll"))
         {
-            value = locationToName(context, field, value);
+            return value;
         }
         else if (field.endsWith("_filter") || field.endsWith("_ac")
                 || field.endsWith("_acid"))
