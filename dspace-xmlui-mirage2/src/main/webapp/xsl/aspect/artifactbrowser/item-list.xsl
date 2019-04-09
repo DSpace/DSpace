@@ -152,9 +152,20 @@
                 <xsl:if test="dim:field[@element='date' and @qualifier='issued']">
 	                <span class="publisher-date h4">  <small>
 	                    <xsl:text>(</xsl:text>
-	                    <xsl:if test="dim:field[@element='publisher']">
+                        <xsl:if test="dim:field[@element='relation' and @qualifier='ispartofseries']">
+                            <span class="ispartofseries">
+                                <xsl:value-of select="dim:field[@element='relation' and @qualifier='ispartofseries']"/>
+                            </span>
+                            <xsl:text>, </xsl:text>
+                        </xsl:if>
+	                    <xsl:if test="dim:field[@element='type']">
 	                        <span class="publisher">
-	                            <xsl:copy-of select="dim:field[@element='publisher']/node()"/>
+                            <xsl:for-each select="dim:field[@element='type']">
+                                <xsl:value-of select="./node()"/>
+                                <xsl:if test="count(following-sibling::dim:field[@element='type']) != 0">
+                                    <xsl:text>; </xsl:text>
+                                </xsl:if>
+                            </xsl:for-each>
 	                        </span>
 	                        <xsl:text>, </xsl:text>
 	                    </xsl:if>
