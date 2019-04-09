@@ -15,13 +15,15 @@ function abbreviate(el, count) {
 		$el.before($shortText);
 
 		let $a = j("<a></a>");
-		$a.toggleClass("fa fa-plus");
+		$a.toggleClass("fa fa-chevron-down");
+        $a.css("cursor", "pointer");
+        $a.css("text-decoration", "none");
 		$a.click(function () {
 			if($el.is(":visible")) $el.stop().slideUp(0);
 			else $el.stop().slideDown(0);
 
-			$a.toggleClass("fa-plus");
-			$a.toggleClass("fa-minus");
+			$a.toggleClass("fa-chevron-down");
+			$a.toggleClass("fa-chevron-up");
 
 			$shortText.toggle();
 		});
