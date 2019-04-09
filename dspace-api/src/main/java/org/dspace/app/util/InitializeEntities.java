@@ -124,7 +124,6 @@ public class InitializeEntities {
                 relationshipTypeService.update(context, relationshipTypeFromDb);
             }
         }
-        context.commit();
         context.complete();
     }
 
@@ -187,7 +186,7 @@ public class InitializeEntities {
             }
             return relationshipTypes;
         } catch (ParserConfigurationException | SAXException | IOException | SQLException e) {
-            log.error(e, e);
+            log.error("An error occurred while parsing the XML file to relations", e);
         }
         return null;
     }

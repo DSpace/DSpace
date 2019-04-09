@@ -730,17 +730,16 @@ public class MetadataImport {
         }
 
         if (acceptableRelationshipTypes.size() > 1) {
-            System.out.println("Ambiguous relationship_types were found");
             log.error("Ambiguous relationship_types were found");
             return;
         }
         if (acceptableRelationshipTypes.size() == 0) {
-            System.out.println("no relationship_types were found");
             log.error("no relationship_types were found");
             return;
         }
 
-        buildRelationObject(c, item, value, left, acceptableRelationshipTypes);
+        //There is exactly one
+        buildRelationObject(c, item, value, left, acceptableRelationshipTypes.get(0));
     }
 
     /**
@@ -749,16 +748,15 @@ public class MetadataImport {
      * @param item      The item for which this relationship will be constructed
      * @param value    The value for the relationship
      * @param left      A boolean indicating whether the item is the leftItem or the rightItem
-     * @param acceptableRelationshipTypes   The acceptable relationship types
+     * @param acceptedRelationshipType   The acceptable relationship type
      * @throws SQLException If something goes wrong
      * @throws AuthorizeException   If something goes wrong
      */
     private void buildRelationObject(Context c, Item item, String value, boolean left,
-                                     List<RelationshipType> acceptableRelationshipTypes)
+                                     RelationshipType acceptedRelationshipType)
         throws SQLException, AuthorizeException {
         Item leftItem = null;
         Item rightItem = null;
-        RelationshipType acceptedRelationshipType = acceptableRelationshipTypes.get(0);
         if (left) {
             leftItem = item;
             rightItem = itemService.findByIdOrLegacyId(c, value);

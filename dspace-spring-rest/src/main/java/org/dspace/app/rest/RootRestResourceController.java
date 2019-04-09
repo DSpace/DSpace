@@ -41,8 +41,6 @@ public class RootRestResourceController {
     @Autowired
     RootRestRepository rootRestRepository;
 
-    private static Logger log = LogManager.getLogger();
-
     @RequestMapping(method = RequestMethod.GET)
     public RootResource listDefinedEndpoint(HttpServletRequest request) {
 
