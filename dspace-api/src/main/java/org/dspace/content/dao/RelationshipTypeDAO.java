@@ -34,7 +34,7 @@ public interface RelationshipTypeDAO extends GenericDAO<RelationshipType> {
      * @return              The RelationshipType object that matches all the given parameters
      * @throws SQLException If something goes wrong
      */
-    RelationshipType findbyTypesAndLabels(Context context,
+    RelationshipType findByTypesAndLabels(Context context,
                                           EntityType leftType,EntityType rightType,String leftLabel,String rightLabel)
                                                 throws SQLException;
 
