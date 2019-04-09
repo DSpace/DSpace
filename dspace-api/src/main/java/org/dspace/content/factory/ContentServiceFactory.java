@@ -20,8 +20,8 @@ import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.DSpaceObjectLegacySupportService;
 import org.dspace.content.service.DSpaceObjectService;
-import org.dspace.content.service.FindableObjectService;
 import org.dspace.content.service.InProgressSubmissionService;
+import org.dspace.content.service.IndexableObjectService;
 import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataFieldService;
@@ -43,11 +43,11 @@ import org.dspace.workflow.factory.WorkflowServiceFactory;
 public abstract class ContentServiceFactory {
 
     /**
-     * Return the list of all the available implementation of the FindableObjectService interface
+     * Return the list of all the available implementations of the IndexableObjectService interface
      * 
-     * @return the list of FindableObjectService
+     * @return the list of IndexableObjectService
      */
-    public abstract List<FindableObjectService> getFindableObjectServices();
+    public abstract List<IndexableObjectService> getIndexableObjectServices();
 
     public abstract List<DSpaceObjectService<? extends DSpaceObject>> getDSpaceObjectServices();
 
@@ -108,12 +108,12 @@ public abstract class ContentServiceFactory {
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends IndexableObject<PK>, PK extends Serializable> FindableObjectService<T, PK>
-        getFindableObjectService(int type) {
-        for (int i = 0; i < getFindableObjectServices().size(); i++) {
-            FindableObjectService objectService = getFindableObjectServices().get(i);
-            if (objectService.getSupportsTypeConstant() == type) {
-                return (FindableObjectService<T, PK>) objectService;
+    public <T extends IndexableObject<PK>, PK extends Serializable> IndexableObjectService<T, PK>
+        getIndexableObjectService(int type) {
+        for (int i = 0; i < getIndexableObjectServices().size(); i++) {
+            IndexableObjectService objectService = getIndexableObjectServices().get(i);
+            if (objectService.getSupportsIndexableObjectTypeConstant() == type) {
+                return (IndexableObjectService<T, PK>) objectService;
             }
         }
         throw new UnsupportedOperationException("Unknown Findable Object type: " + type);
