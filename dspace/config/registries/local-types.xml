@@ -37,4 +37,10 @@
     <scope_note>Enable the user to add notes about his claiming request</scope_note>
   </dc-type>
 
+  <dc-type>
+    <schema>local</schema>
+    <element>fakeitem</element>
+    <scope_note>Set to true/yes/on to flag the item for deletation upon
+	deposit by the DeleteFakeItem consumer</scope_note>
+  </dc-type>
 </dspace-dc-types>

@@ -21,10 +21,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.lucene.index.Term;
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.ScoreDoc;
-import org.apache.lucene.search.TermQuery;
 import org.apache.solr.common.util.NamedList;
 import org.apache.solr.core.SolrCore;
 import org.apache.solr.core.SolrEventListener;
@@ -238,7 +236,7 @@ public class CrisMetricsUpdateListener implements SolrEventListener
 		                dbprops.get("database.username"),
 		                dbprops.get("database.password"));
 		        ps = conn.prepareStatement(
-		                "select resourceid, resourcetypeid, metrictype, remark, metriccount,timestampcreated from cris_metrics where last = true");
+		                "select resourceid, resourcetypeid, metrictype, remark, metriccount, timestampcreated, startdate, enddate from cris_metrics where last = true");
 		        rs = ps.executeQuery();
 		        log.debug("QUERY TIME:" + (new Date().getTime()-startQuery.getTime()));
 		        
@@ -253,6 +251,8 @@ public class CrisMetricsUpdateListener implements SolrEventListener
 		            String type = rs.getString(3);
 		            String remark = rs.getString(4);
 		            Date acqTime = rs.getDate(6);
+		            Date startTime = rs.getDate(7);
+		            Date endTime = rs.getDate(8);
 		            Integer docId = searchIDCache.get(resourceTypeId+"-"+resourceId);
 		            if (docId != null) {
 		                String key = new StringBuffer("crismetrics_").append(type.toLowerCase()).toString();
@@ -270,7 +270,7 @@ public class CrisMetricsUpdateListener implements SolrEventListener
 		                }
 		            
 		                tmpSubMap.put(docId, count);
-		                tmpSubRemarkMap.put(docId, new ExtraInfo(remark, acqTime));
+		                tmpSubRemarkMap.put(docId, new ExtraInfo(remark, acqTime, startTime, endTime));
 		
 		                if(add) {
 		                    metricsCopy.put(key, tmpSubMap);

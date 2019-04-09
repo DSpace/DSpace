@@ -17,6 +17,6 @@ public interface IWSService
 {
     public Element marshall(String query, String paginationStart,
             String paginationLimit, String[] splitProjection, String type,
-            Element root, User userWS, String nameRoot)
+            Element root, User userWS, String nameRoot, String sort, String sortOrder, String parent)
             throws SearchServiceException, IOException;
 }

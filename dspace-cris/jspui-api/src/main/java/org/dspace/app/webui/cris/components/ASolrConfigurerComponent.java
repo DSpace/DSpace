@@ -660,7 +660,7 @@ public abstract class ASolrConfigurerComponent<T extends DSpaceObject, IBC exten
 
     }
 
-    protected String getType(HttpServletRequest request, Integer id)
+    public String getType(HttpServletRequest request, Integer id)
     {
         String type = request.getParameter("open");
         if (type == null)

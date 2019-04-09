@@ -10,6 +10,7 @@ package org.dspace.app.cris.ws.marshaller;
 
 import java.util.List;
 
+import org.dspace.app.cris.metrics.common.model.ConstantMetrics;
 import org.dspace.app.cris.util.UtilsXSD;
 import org.dspace.app.cris.ws.marshaller.bean.WSItem;
 import org.dspace.app.cris.ws.marshaller.bean.WSMetadata;
@@ -100,42 +101,88 @@ public class MarshallerPublications implements Marshaller<WSItem>
             List<WSMetadata> fieldsName = doc.getMetadata();
             for (WSMetadata field : fieldsName)
             {
-
-                Element metadata = new Element("metadata", echoNamespace);
-
-                Element term = new Element("term", echoNamespace);
-                term.addContent(field.getName());
-
-                Element values = new Element("values", echoNamespace);
-
-                for (WSMetadataValue mValue : field.getValues())
+                if (!field.getName().startsWith(ConstantMetrics.PREFIX_FIELD))
                 {
+                    Element metadata = new Element("metadata", echoNamespace);
 
-                    Element value = new Element("value", echoNamespace);
-                    if (mValue.getAuthority() != null
-                            && !mValue.getAuthority().isEmpty())
+                    Element term = new Element("term", echoNamespace);
+                    term.addContent(field.getName());
+
+                    Element values = new Element("values", echoNamespace);
+
+                    for (WSMetadataValue mValue : field.getValues())
                     {
-                        value.setAttribute("authority", mValue.getAuthority());
+
+                        Element value = new Element("value", echoNamespace);
+                        if (mValue.getAuthority() != null
+                                && !mValue.getAuthority().isEmpty())
+                        {
+                            value.setAttribute("authority", mValue.getAuthority());
+                        }
+
+                        value.setAttribute("place", "" + mValue.getPlace());
+                        if (mValue.getShare() != null)
+                        {
+                            value.setAttribute("share", "" + mValue.getShare());
+                        }
+
+                        value.addContent(mValue.getValue());
+
+                        values.addContent(value);
+
                     }
 
-                    value.setAttribute("place", "" + mValue.getPlace());
-                    if (mValue.getShare() != null)
-                    {
-                        value.setAttribute("share", "" + mValue.getShare());
-                    }
-
-                    value.addContent(mValue.getValue());
-
-                    values.addContent(value);
-
+                    metadata.addContent(term);
+                    metadata.addContent(values);
+                    metadataItem.addContent(metadata);
                 }
-
-                metadata.addContent(term);
-                metadata.addContent(values);
-                metadataItem.addContent(metadata);
-               
             }
             row.addContent(metadataItem);
+
+            Element metrics = new Element("metrics", echoNamespace);
+            for (WSMetadata field : fieldsName)
+            {
+                String fieldMetadataName = field.getName();
+                if (fieldMetadataName.startsWith(ConstantMetrics.PREFIX_FIELD)
+                        && !fieldMetadataName.endsWith(ConstantMetrics.STATS_INDICATOR_TYPE_TIME)
+                        && !fieldMetadataName.endsWith(ConstantMetrics.STATS_INDICATOR_TYPE_STARTTIME)
+                        && !fieldMetadataName.endsWith(ConstantMetrics.STATS_INDICATOR_TYPE_ENDTIME))
+                {
+                    Element metric = new Element("metric", echoNamespace);
+                    String metricName = fieldMetadataName.replace(ConstantMetrics.PREFIX_FIELD, "");
+                    metric.setAttribute("type", metricName);
+
+                    Element value = new Element("value", echoNamespace);
+                    value.addContent(field.getValues().get(0).getValue());
+                    metric.addContent(value);
+
+                    for (WSMetadata subField : fieldsName)
+                    {
+                        String subFieldMetadataName = subField.getName();
+                        if (subFieldMetadataName.equals(ConstantMetrics.PREFIX_FIELD + metricName + ConstantMetrics.STATS_INDICATOR_TYPE_TIME))
+                        {
+                            Element subValue = new Element("observation_time", echoNamespace);
+                            subValue.addContent(subField.getValues().get(0).getValue());
+                            metric.addContent(subValue);
+                        }
+                        else if (subFieldMetadataName.equals(ConstantMetrics.PREFIX_FIELD + metricName + ConstantMetrics.STATS_INDICATOR_TYPE_STARTTIME))
+                        {
+                            Element subValue = new Element("start_time", echoNamespace);
+                            subValue.addContent(subField.getValues().get(0).getValue());
+                            metric.addContent(subValue);
+                        }
+                        else if (subFieldMetadataName.equals(ConstantMetrics.PREFIX_FIELD + metricName + ConstantMetrics.STATS_INDICATOR_TYPE_ENDTIME))
+                        {
+                            Element subValue = new Element("end_time", echoNamespace);
+                            subValue.addContent(subField.getValues().get(0).getValue());
+                            metric.addContent(subValue);
+                        }
+                    }
+                    metrics.addContent(metric);
+                }
+            }
+            row.addContent(metrics);
+
             child.addContent(row);
         }
         root.addContent(child);

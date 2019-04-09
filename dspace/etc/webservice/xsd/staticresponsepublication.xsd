@@ -20,6 +20,8 @@
 					maxOccurs="1"></xs:element>
 				<xs:element name="metadataitem" type="item:wsMetadata"
 					nillable="true" minOccurs="0" maxOccurs="1"></xs:element>
+				<xs:element name="metrics" type="item:metric"
+					nillable="true" minOccurs="0" maxOccurs="unbounded"></xs:element>
 			</xs:sequence>
 			<xs:attribute name="itemID" type="xs:int" use="required" />
 			<xs:attribute name="handle" type="xs:string" />
@@ -84,12 +86,22 @@
 						<xs:extension base="xs:string">
 							<xs:attribute name="authority" type="xs:string" />
 							<xs:attribute name="place" type="xs:int" />
-							<xs:attribute name="share" type="xs:int" />	
+							<xs:attribute name="share" type="xs:int" />
 						</xs:extension>
-					</xs:simpleContent>				
+					</xs:simpleContent>
 				</xs:complexType>
 			</xs:element>
 		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="metric">
+		<xs:sequence>
+			<xs:element name="start_time" type="xs:string"></xs:element>
+			<xs:element name="end_time" type="xs:string"></xs:element>
+			<xs:element name="value" type="xs:string"></xs:element>
+			<xs:element name="observation_time" type="xs:string"></xs:element>
+		</xs:sequence>
+		<xs:attribute name="type" type="xs:string" use="required" />
 	</xs:complexType>
 
 </xs:schema>

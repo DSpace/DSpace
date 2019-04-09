@@ -11,13 +11,17 @@ import java.util.Date;
 
 public class ExtraInfo
 {
-    public ExtraInfo(String remark, Date acquisitionTime)
+    public ExtraInfo(String remark, Date acquisitionTime, Date startTime, Date endTime)
     {
         super();
         this.remark = remark;
         this.acquisitionTime = acquisitionTime;
+        this.startTime = startTime;
+        this.endTime = endTime;
     }
     
     public String remark;
     public Date acquisitionTime;
+    public Date startTime;
+    public Date endTime;
 }

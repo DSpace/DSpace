@@ -197,6 +197,8 @@ public class OUDetailsController
         mvc.getModel().putAll(model);
         mvc.getModel().put("isAdmin", isAdmin);
         mvc.getModel().put("ou", ou);
+        request.setAttribute("components", super.getComponents());
+        request.setAttribute("entity", ou);
         return mvc;
     }
 

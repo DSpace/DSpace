@@ -14,8 +14,22 @@ public class AuthorizationWS
 {
     public static boolean authorize(User userWS, String type)
     {
-        for (Criteria criteria : userWS.getCriteria())
+    	for (Criteria criteria : userWS.getCriteria())
         {
+        	//remap nested type to the parent object type
+        	switch (type) {
+			case "rpnested":
+				type = "researcherPages";
+				break;
+			case "pjnested":
+				type = "grants";
+				break;
+			case "ounested":
+				type = "orgunits";
+				break;
+			default:
+				break;
+			}
             if (type.equals(criteria.getCriteria()))
             {
                 return criteria.isEnabled();

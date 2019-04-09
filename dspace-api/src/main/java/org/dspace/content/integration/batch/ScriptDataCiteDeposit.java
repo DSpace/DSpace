@@ -106,7 +106,12 @@ public class ScriptDataCiteDeposit
                 "a",
                 "all",
                 false,
-                "Work on new inserted row, with last_modified equals to null or item update recently");
+                "Work on new inserted row, with last_modified equals to null or item update recently (see only-new parameter to disable recenty update)");
+        options.addOption(
+                "n",
+                "only-new",
+                false,
+                "Used with -a parameter to enable only new inserted rows (with last_modified equals to null)");
         options.addOption(
                 "s",
                 "single",
@@ -120,7 +125,7 @@ public class ScriptDataCiteDeposit
             HelpFormatter myhelp = new HelpFormatter();
             myhelp.printHelp("ScriptDataCiteDOIRegister \n", options);
             System.out
-                    .println("\n\nUSAGE:\n ScriptDataCiteDOIRegister -a|-s <item_id>] \n");
+                    .println("\n\nUSAGE:\n ScriptDataCiteDOIRegister -a [-n]|-s <item_id>] \n");
 
             System.exit(0);
         }
@@ -128,12 +133,21 @@ public class ScriptDataCiteDeposit
         if (line.hasOption('s') && line.hasOption('a'))
         {
             System.out
-                    .println("\n\nUSAGE:\n ScriptDataCiteDOIRegister -a|-s <item_id>] \n");
+                    .println("\n\nUSAGE:\n ScriptDataCiteDOIRegister -a [-n]|-s <item_id>] \n");
             System.out.println("Insert either a or s like parameters");
             log.error("Either a or s like parameters");
             System.exit(1);
         }
 
+        if (!line.hasOption('s') && !line.hasOption('a'))
+        {
+            System.out
+                    .println("\n\nUSAGE:\n ScriptDataCiteDOIRegister -a [-n]|-s <item_id>] \n");
+            System.out.println("Please insert a [-n] or s parameters");
+            log.error("Please insert a [-n] or s parameters");
+            System.exit(1);
+        }
+        
         // create xsd validator
         SchemaFactory factory = SchemaFactory
                 .newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
@@ -169,6 +183,10 @@ public class ScriptDataCiteDeposit
             if (line.hasOption('a'))
             {
 
+                boolean onlyNew = false;
+                if(line.hasOption('n')) {
+                    onlyNew = true;
+                }
                 int limit = 100;
 
                 TableRowIterator rows = null;
@@ -179,7 +197,7 @@ public class ScriptDataCiteDeposit
                             .query(context,
                                     "select * from "
                                             + TABLE_NAME_DOI2ITEM
-                                            + " d2i left join item i on d2i.item_id = i.item_id where (d2i.last_modified is null OR d2i.last_modified < i.last_modified)"
+                                            + " d2i left join item i on d2i.item_id = i.item_id where (d2i.last_modified is null" + (onlyNew?")":(" OR d2i.last_modified < i.last_modified)"))
                                             + " AND ROWNUM <= " + limit);
                 }
                 else
@@ -188,7 +206,7 @@ public class ScriptDataCiteDeposit
                             .query(context,
                                     "select * from "
                                             + TABLE_NAME_DOI2ITEM
-                                            + " d2i left join item i on d2i.item_id = i.item_id where (d2i.last_modified is null OR d2i.last_modified < i.last_modified)"
+                                            + " d2i left join item i on d2i.item_id = i.item_id where (d2i.last_modified is null"+ (onlyNew?")":(" OR d2i.last_modified < i.last_modified)"))
                                             + " LIMIT " + limit);
                 }
                 int offset = 0;

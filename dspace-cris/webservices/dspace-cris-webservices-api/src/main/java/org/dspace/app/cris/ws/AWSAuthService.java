@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.cris.discovery.CrisSearchService;
 import org.dspace.app.cris.model.ws.User;
@@ -42,6 +43,12 @@ public abstract class AWSAuthService extends AbstractJDomPayloadEndpoint
 
     protected XPath xsdRPExpression;
 
+    protected XPath sortExpression;
+    
+    protected XPath sortOrderExpression;
+    
+    protected XPath parentCRISIDExpression;
+    
     protected CrisSearchService searchService;
 
     protected AuthenticationWS authenticationWS;
@@ -60,7 +67,12 @@ public abstract class AWSAuthService extends AbstractJDomPayloadEndpoint
         paginationStartExpression.addNamespace(namespace);
         paginationLimitExpression = XPath.newInstance("//cris:PaginationRows");
         paginationLimitExpression.addNamespace(namespace);
-
+        sortExpression = XPath.newInstance("//cris:Sort");
+        sortExpression.addNamespace(namespace);
+        sortOrderExpression = XPath.newInstance("//cris:Sort/@SortOrder");
+        sortOrderExpression.addNamespace(namespace);
+        parentCRISIDExpression = XPath.newInstance("//cris:ParentCrisID");
+        parentCRISIDExpression.addNamespace(namespace);
     }
 
     public void setSearchService(CrisSearchService searchService)
@@ -80,6 +92,9 @@ public abstract class AWSAuthService extends AbstractJDomPayloadEndpoint
         String projection = projectionExpression.valueOf(arg0);
         String paginationStart = paginationStartExpression.valueOf(arg0);
         String paginationLimit = paginationLimitExpression.valueOf(arg0);
+        String sort = sortExpression.valueOf(arg0);
+        String sortOrder = sortOrderExpression.valueOf(arg0);
+        String parent = parentCRISIDExpression.valueOf(arg0); 
 
         String[] splitProjection = projection.trim().split(" ");
 
@@ -101,6 +116,19 @@ public abstract class AWSAuthService extends AbstractJDomPayloadEndpoint
 
         String type = typeExpression.valueOf(arg0);
         type = type.trim();
+        if(type.endsWith("nested")) {
+        	if(stringList.size()>1) {
+        		throw new IOException("Nested endpoint require a single value on projection");
+        	}
+        	if(StringUtils.isBlank(parent)) {
+        		throw new IOException("ParentCrisID is mandatory for the nested endpoint");
+        	}
+        	else {
+        		if("*:*".equals(query)) {
+        			query = "";
+        		}
+            }
+        }
         String typeCapitalizedFirst = (type.substring(0, 1).toUpperCase() + type
                 .substring(1)).trim();
 
@@ -109,7 +137,7 @@ public abstract class AWSAuthService extends AbstractJDomPayloadEndpoint
         Element root = null;
 
         root = plugin.marshall(query, paginationStart, paginationLimit,
-                splitProjection, type, root, userWS, nameRoot);
+                splitProjection, type, root, userWS, nameRoot, sort, sortOrder, parent);
 
         return root;
 

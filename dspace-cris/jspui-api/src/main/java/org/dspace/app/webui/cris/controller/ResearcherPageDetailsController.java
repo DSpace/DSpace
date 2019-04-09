@@ -281,7 +281,8 @@ public class ResearcherPageDetailsController
         extraTotal.put("metricTypes",metricsTypes );
         extraTotal.put("metrics", metricsTotal);
         request.setAttribute("extra", extraTotal);  
-        
+        request.setAttribute("components", super.getComponents());
+        request.setAttribute("entity", researcher);        
         mvc.getModel().put("researcher", researcher);
         mvc.getModel().put("exportscitations",
                 ConfigurationManager.getProperty("exportcitation.options"));

@@ -109,6 +109,14 @@ public class CrisMetricsExtractComponent extends SearchComponent
                     {
                         sdoc.addField(metric+"_time", extraInfo.acquisitionTime);
                     }
+                    if (extraInfo != null && extraInfo.startTime != null)
+                    {
+                        sdoc.addField(metric+"_starttime", extraInfo.startTime);
+                    }
+                    if (extraInfo != null && extraInfo.endTime != null)
+                    {
+                        sdoc.addField(metric+"_endtime", extraInfo.endTime);
+                    }
                 }
                 rl.add(sdoc);
             }

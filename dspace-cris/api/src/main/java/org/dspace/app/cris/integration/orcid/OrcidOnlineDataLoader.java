@@ -102,6 +102,7 @@ public class OrcidOnlineDataLoader extends NetworkSubmissionLookupDataLoader
                         workgroup: for (WorkGroup orcidGroup : orcidWorks.getGroup())
                         {
                             int higher = orcidService.higherDisplayIndex(orcidGroup);
+                            // take the Work with highest display index value (the preferred item)
                             worksummary : for (WorkSummary orcidSummary : orcidGroup
                                     .getWorkSummary())
                             {
@@ -133,6 +134,9 @@ public class OrcidOnlineDataLoader extends NetworkSubmissionLookupDataLoader
                                                         orcidSummary
                                                                 .getPutCode()
                                                                 .toString())));
+                                        // in the case of more equal display index value take the first
+                                        // (for example import from API setup display index to 0, see https://members.orcid.org/api/tutorial/reading-xml#display-index)
+                                        break;
                                     }
                                     catch (Exception e)
                                     {
