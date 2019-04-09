@@ -734,7 +734,7 @@
                                 <i18n:text>xmlui.dri2xhtml.structural.link_dspace</i18n:text>&#160;<a href="http://www.dspace.org/" target="_blank">DSpace software</a>
                             </div>
                             <br/>
-                            <span class="theme-by"><i18n:text>xmlui.dri2xhtml.structural.link_bibsys</i18n:text>&#160;</span>
+                            <span class="theme-by"><i18n:text>xmlui.dri2xhtml.structural.link_unit</i18n:text>&#160;</span>
                             <a title="Unit" target="_blank" href="http://www.unit.no" id="ds-footer-logo-link2">
                                 <img alt="Unit" src="{concat($theme-path, 'images/unit_product.png')}"/>
                             </a>

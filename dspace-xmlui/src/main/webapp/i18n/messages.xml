@@ -115,6 +115,8 @@
 
    <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_ANY">Full Text</message>
 
+	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_doctype">Filter by Document Type</message>
+
 	<!-- org.dspace.app.xmlui.artifactbrowser.ConfigureableBrowse.java -->
 	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.general.starts_with">Or enter first few letters:</message>
 	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.general.starts_with_help">Browse for items that begin with these letters</message>
@@ -2186,7 +2188,9 @@
 
 	<message key="xmlui.dri2xhtml.structural.link_cc">Creative Commons</message>
 	<message key="xmlui.dri2xhtml.structural.link_original_license">Original License</message>
-
+	<message key="xmlui.dri2xhtml.structural.link_dspace">Powered by</message>
+	<message key="xmlui.dri2xhtml.structural.link_unit">Service from</message>
+	<message key="xmlui.dri2xhtml.structural.link_gdpr">Privacy policy</message>
 
 	<!-- DS-METS-1.0-MODS.xsl -->
 	<!-- DS-METS-1.0-DIM.xsl -->
