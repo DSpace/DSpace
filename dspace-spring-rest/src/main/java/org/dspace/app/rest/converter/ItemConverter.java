@@ -86,7 +86,7 @@ public class ItemConverter extends DSpaceObjectConverter<org.dspace.content.Item
         try {
             relationships = relationshipService.findByItem(new Context(), obj);
         } catch (SQLException e) {
-            log.error(e, e);
+            log.error("Error retrieving relationships for item " + item.getHandle(), e);
         }
         List<RelationshipRest> relationshipRestList = new LinkedList<>();
         for (Relationship relationship : relationships) {

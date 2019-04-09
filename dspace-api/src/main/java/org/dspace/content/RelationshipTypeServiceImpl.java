@@ -48,7 +48,7 @@ public class RelationshipTypeServiceImpl implements RelationshipTypeService {
     @Override
     public RelationshipType findbyTypesAndLabels(Context context,EntityType leftType,EntityType rightType,
                                                  String leftLabel,String rightLabel) throws SQLException {
-        return relationshipTypeDAO.findbyTypesAndLabels(context, leftType, rightType, leftLabel, rightLabel);
+        return relationshipTypeDAO.findByTypesAndLabels(context, leftType, rightType, leftLabel, rightLabel);
     }
 
     @Override
