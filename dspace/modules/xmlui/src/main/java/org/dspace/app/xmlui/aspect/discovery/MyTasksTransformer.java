@@ -100,6 +100,7 @@ public class MyTasksTransformer extends DiscoverySubmissions{
 
     @Override
     public void addPageMeta(PageMeta pageMeta) throws WingException, SQLException {
+        log.debug("addPageMeta");
         pageMeta.addMetadata("title").addContent(T_title);
 
         pageMeta.addTrailLink(contextPath + "/",T_dspace_home);
@@ -111,11 +112,13 @@ public class MyTasksTransformer extends DiscoverySubmissions{
     }
 
     protected Message getNoResultsMessage() {
+        log.debug("noResultMessage");
         return T_no_results;
     }
 
 @Override
     protected void buildSearchResultsDivision(Division search) throws IOException, SQLException, WingException, SearchServiceException {
+        log.debug("buildSearchResultsDiviosion");
         try {
 
             DSpaceObject scope = getScope();
@@ -123,7 +126,7 @@ public class MyTasksTransformer extends DiscoverySubmissions{
 
             //We need to show the first x tasks for each available to facet on task !
             solrQuery.addFacetField("WorkflowstepTask_filter");
-
+            log.debug("query is " + solrQuery + " | " + solrQuery.getQuery());
             this.queryResults = this.performSearch(solrQuery);
         }
         catch (RuntimeException e) {
@@ -134,11 +137,6 @@ public class MyTasksTransformer extends DiscoverySubmissions{
             log.error(e.getMessage(), e);
             queryResults = null;
         }
-
-//        if (queryResults != null) {
-//            search.addPara("result-query", "result-query")
-//                    .addContent(T_result_query.parameterize(getQuery(), queryResults.getResults().getNumFound()));
-//        }
 
         Division results = search.addDivision("search-results", "primary");
 
@@ -152,6 +150,7 @@ public class MyTasksTransformer extends DiscoverySubmissions{
                 if(workflowSteps != null){
                     for (String taskName : taskDisplayOrder) {
                         for (FacetField.Count workflowStep : workflowSteps) {
+                            log.debug("step = " + workflowStep + ", " + workflowStep.getName());
                             if (0 < workflowStep.getCount() && workflowStep.getName().equals(taskName)) {
                                 renderResultBlock(results, workflowStep);
                             }
@@ -172,6 +171,7 @@ public class MyTasksTransformer extends DiscoverySubmissions{
     public void addBody(Body body) throws SAXException, WingException, UIException, SQLException, IOException, AuthorizeException {
         String itemIDString = ObjectModelHelper.getRequest(objectModel).getParameter("itemID");
         if(itemIDString != null) {
+            log.debug("adding body for item " + itemIDString);
             try {
                 int itemID = Integer.valueOf(itemIDString);
                 // after submission
@@ -234,15 +234,17 @@ public class MyTasksTransformer extends DiscoverySubmissions{
 
 
     protected void renderResultBlock(Division results, FacetField.Count count) throws SearchServiceException, WingException, SQLException {
+        log.debug("renderResultBlock " + count.getName());
         //Perform a query for each of these workflow steps.
         SolrQuery solrQuery = getDefaultQueryArgs();
         solrQuery.addFilterQuery("WorkflowstepTask:" + count.getName());
         //Perform a search with our workflow step filter in place !
+        log.debug("sorQuery = " + solrQuery);
+        log.debug("queryArgs = " + queryArgs);
         QueryResponse queryResults = performSearch(queryArgs);
 
         Division workflowResultsDiv  = results.addDivision("search-results-" + count.getName());
         workflowResultsDiv.setHead(message("xmlui.Submission.Submissions.step.head." + count.getName()));
-
 
         SolrDocumentList solrResults = queryResults.getResults();
 	if(solrResults.size() <= 0) {
@@ -255,11 +257,13 @@ public class MyTasksTransformer extends DiscoverySubmissions{
             int itemsTotal = (int) solrResults.getNumFound();
             int firstItemIndex = (int) solrResults.getStart() + 1;
             int lastItemIndex = (int) solrResults.getStart() + solrResults.size();
-
-//                if (itemsTotal < lastItemIndex)
-//                    lastItemIndex = itemsTotal;
             int currentPage = (int) (solrResults.getStart() / this.queryArgs.getRows()) + 1;
             int pagesTotal = (int) ((solrResults.getNumFound() - 1) / this.queryArgs.getRows()) + 1;
+            log.debug("itemsTotal = " + itemsTotal);
+            log.debug("firstIndex = " + firstItemIndex);
+            log.debug("lastIndex = " + lastItemIndex);
+            log.debug("currentPage = " + currentPage);
+            log.debug("pagesTotal = " + pagesTotal);
             Map<String, String> parameters = new HashMap<String, String>();
             parameters.put("page", "{pageNum}");
             String pageURLMask = generateURL(parameters);
@@ -272,6 +276,7 @@ public class MyTasksTransformer extends DiscoverySubmissions{
                 }
 
                 pageURLMask = maskBuilder.toString();
+                log.debug("pageURLMask = " + pageURLMask);
             }
 
             workflowResultsDiv.setMaskedPagination(itemsTotal, firstItemIndex,
@@ -280,6 +285,7 @@ public class MyTasksTransformer extends DiscoverySubmissions{
 
 
 	Table resultTable = workflowResultsDiv.addTable("results", solrResults.size(), 2);
+        log.debug("solrResultsSize = " + solrResults.size());
 
         boolean showMoreUrl = false;
         if(solrResults.size() < solrResults.getNumFound()){
@@ -292,6 +298,10 @@ public class MyTasksTransformer extends DiscoverySubmissions{
         headerRow.addCell().addContent(message("xmlui.Submission.result-table.head.datafiles"));
 
         for (SolrDocument doc : solrResults) {
+            Integer did = (Integer) doc.getFirstValue("search.resourceid");
+            String dhandle = (String) doc.getFirstValue("handle");
+            log.debug("rendering result item: " + did + ", " + dhandle);
+            
             DSpaceObject resultDSO = SearchUtils.findDSpaceObject(context, doc);
 
             if (resultDSO instanceof Item) {
@@ -299,6 +309,7 @@ public class MyTasksTransformer extends DiscoverySubmissions{
 
                 try {
                     WorkflowItem workflowItem = WorkflowItem.findByItemId(context, item.getID());
+                    log.debug("workflowItem = " + workflowItem.getID());
                     if(workflowItem == null){
                         continue;
                     }
@@ -307,18 +318,19 @@ public class MyTasksTransformer extends DiscoverySubmissions{
                     Message taskMessage = null;
                     PoolTask poolTask = PoolTask.findByWorkflowIdAndEPerson(context, workflowItem.getID(),context.getCurrentUser().getID());
                     if(poolTask != null){
+                        log.debug("it's a poolTask ");
                         stepId = poolTask.getStepID();
                         actionId = poolTask.getActionID();
                     }else{
                         ClaimedTask claimedTask = ClaimedTask.findByWorkflowIdAndEPerson(context, workflowItem.getID(), context.getCurrentUser().getID());
                         if(claimedTask != null){
+                            log.debug("it's a claimedTask ");
                             stepId = claimedTask.getStepID();
                             actionId = claimedTask.getActionID();
                         }
                     }
 
                     Row itemRow = resultTable.addRow();
-
 
                     String url = contextPath+"/handle/"+ workflowItem.getCollection().getHandle()+"/workflow?" +
                             "workflowID="+workflowItem.getID()+"&" +

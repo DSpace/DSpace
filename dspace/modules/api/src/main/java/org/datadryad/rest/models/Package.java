@@ -269,10 +269,10 @@ public class Package {
 
                         // file-level keywords
                         // spatial coverage, temporal coverage, and scientific names are lumped in with keywords for now
-                        keywordsToWrite.addAll(ddfs.getKeywords());
-                        keywordsToWrite.addAll(ddfs.getCoverageSpatial());
-                        keywordsToWrite.addAll(ddfs.getCoverageTemporal());
-                        keywordsToWrite.addAll(ddfs.getScientificNames());
+                        keywordsToWrite.addAll(dryadFile.getKeywords());
+                        keywordsToWrite.addAll(dryadFile.getCoverageSpatial());
+                        keywordsToWrite.addAll(dryadFile.getCoverageTemporal());
+                        keywordsToWrite.addAll(dryadFile.getScientificNames());
                         
                         // bitstreams
                         fileListString = fileListString + "<p>";
