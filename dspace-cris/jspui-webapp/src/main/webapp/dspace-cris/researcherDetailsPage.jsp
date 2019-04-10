@@ -71,6 +71,7 @@
     boolean networkModuleEnabled = ConfigurationManager.getBooleanProperty(NetworkPlugin.CFG_MODULE,"network.enabled");
     boolean changeStatusAdmin = ConfigurationManager.getBooleanProperty("cris","rp.changestatus.admin");
     boolean claimEnabled = ConfigurationManager.getBooleanProperty("cris","rp.claim.enabled");
+    String fieldFeed = ConfigurationManager.getProperty("cris","rp.feed.field");
 %>
 <c:set var="admin" scope="request"><%=isAdmin%></c:set>
 <c:set var="statusAdmin" scope="request"><%=changeStatusAdmin%></c:set>
@@ -78,6 +79,7 @@
 <c:set var="req" value="${pageContext.request}" />
 <c:set var="baseURL" value="${fn:replace(req.requestURL, fn:substring(req.requestURI, 0, fn:length(req.requestURI)), req.contextPath)}" />
 <c:set var="metaprofilename"><c:choose><c:when test="${!empty entity.preferredName.value}">${entity.preferredName.value}</c:when><c:otherwise>${entity.fullName}</c:otherwise></c:choose></c:set>
+<c:set var="fieldRSS" scope="request"><%= fieldFeed %></c:set>
 
 <c:set var="dspace.cris.navbar" scope="request">
 
@@ -305,7 +307,7 @@
                 				<a class="btn btn-default" href="<%= request.getContextPath() %>/cris/tools/subscription/unsubscribe?uuid=${researcher.uuid}"><i class="fa fa-stop"></i> <fmt:message key="jsp.cris.detail.link.email.alert.remove" /> </a>
         					</c:otherwise>
 					</c:choose>
-	  				<a class="btn btn-default" href="<%= request.getContextPath() %>/open-search?query=author_authority:${authority}&amp;format=rss"><i class="fa fa-rss"></i> <fmt:message key="jsp.cris.detail.link.rssfeed" /></a>
+	  				<a class="btn btn-default" href="<%= request.getContextPath() %>/open-search?query=${fieldRSS}:${authority}&amp;format=rss"><i class="fa fa-rss"></i> <fmt:message key="jsp.cris.detail.link.rssfeed" /></a>
 				</div>
 				<c:if test="${(researcher_page_menu || canEdit) && !empty researcher}">
 				<div class="btn-group">
