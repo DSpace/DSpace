@@ -303,6 +303,22 @@ public class DryadDataFile extends DryadObject {
         return size;
     }
 
+    public List<String> getCoverageSpatial() {
+        return getMultipleMetadataValues("dc", "coverage", "spatial");
+    }
+
+    public List<String> getCoverageTemporal() {
+        return getMultipleMetadataValues("dc", "coverage", "temporal");
+    }
+
+    public List<String> getScientificNames() {
+        return getMultipleMetadataValues("dwc", "ScientificName", null);
+    }
+
+    public List<String> getKeywords() {
+        return getMultipleMetadataValues("dc", "subject", null);
+    }
+    
     public String getDescription() throws SQLException {
         String theAbstract = getSingleMetadataValue("dc", "description", null);
         String extraAbstract = getSingleMetadataValue("dc", "description", "abstract");

@@ -396,6 +396,18 @@ public class DryadDataPackage extends DryadObject {
         }
     }
 
+    public List<String> getCoverageSpatial() {
+        return getMultipleMetadataValues("dc", "coverage", "spatial");
+    }
+
+    public List<String> getCoverageTemporal() {
+        return getMultipleMetadataValues("dc", "coverage", "temporal");
+    }
+
+    public List<String> getScientificNames() {
+        return getMultipleMetadataValues("dwc", "ScientificName", null);
+    }
+
     public List<String> getKeywords() {
         if (getItem() != null) {
             return getMultipleMetadataValues(KEYWORD_SCHEMA, KEYWORD_ELEMENT, null);

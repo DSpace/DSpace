@@ -297,6 +297,9 @@ public class DashService {
                 String fileDescription = dryadFile.getDescription();
                 String previousBitstreamFilename = "";
                 for(Bitstream dspaceBitstream : dryadFile.getAllBitstreams()) {
+                    if(dspaceBitstream.isDeleted()) {
+                        continue;
+                    }
                     log.debug("transferring bitstream " + dspaceBitstream.getName());
                     DryadBitstream dryadBitstream = new DryadBitstream(dspaceBitstream);
                     dryadBitstream.setFileDescription(fileDescription);
