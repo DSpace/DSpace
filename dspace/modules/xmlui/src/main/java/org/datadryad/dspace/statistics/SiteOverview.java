@@ -71,7 +71,7 @@ public class SiteOverview extends AbstractDSpaceTransformer implements
         }
 
         Division overviewStats = body.addDivision("front-page-stats");
-        org.dspace.app.xmlui.wing.element.Table infoTable = overviewStats.addTable("list-table",5,3);
+        org.dspace.app.xmlui.wing.element.Table infoTable = overviewStats.addTable("list-table",4,3);
         
         Row headerRow = infoTable.addRow(Row.ROLE_HEADER);
         headerRow.addCell().addContent(T_type);
@@ -93,10 +93,10 @@ public class SiteOverview extends AbstractDSpaceTransformer implements
         row.addCell("data").addContent(stats.getJournalCount());
         row.addCell("data").addContent(stats.getJournalCount_30day());
 
-        row = infoTable.addRow();
-        row.addCell("data").addContent(T_authors);
-        row.addCell("data").addContent(stats.getUniqAuthors());
-        row.addCell("data").addContent(stats.getUniqAuthors_30day());
+        //row = infoTable.addRow();
+        //row.addCell("data").addContent(T_authors);
+        //row.addCell("data").addContent(stats.getUniqAuthors());
+        //row.addCell("data").addContent(stats.getUniqAuthors_30day());
 
         row = infoTable.addRow();
         row.addCell("data").addContent(T_downloads);
