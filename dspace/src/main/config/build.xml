@@ -575,6 +575,10 @@ Common usage:
     	     <fileset dir="solr"/>
     	</copy>
 
+        <copy todir="${dspace.dir}/ws-xsd" preservelastmodified="true">
+            <fileset dir="etc/webservice" />
+        </copy>
+    	
         <echo>
 ====================================================================
  ${dspace.dir}/bin was backed up to

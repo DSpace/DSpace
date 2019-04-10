@@ -160,6 +160,15 @@
 						postfunction();
 					},
 					error : function(data) {
+					},
+					complete: function(data) {
+						
+						j('#' + id).dataTable({
+									searching: false, 
+									info: false, 
+									paging: false,
+									ordering : true
+						});
 					}
 				});
 			});

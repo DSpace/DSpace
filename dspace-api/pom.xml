@@ -210,7 +210,7 @@
                             </execution>
                         </executions>
                     </plugin>
-                    
+
                     <!-- FileWeaver plugin is in charge of initializing & "weaving" together
                          the dspace.cfg file to be used by the Unit Testing environment.
                          It weaves two files, the default 'dspace.cfg' and 'dspace.cfg.more',
@@ -608,7 +608,7 @@
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
         </dependency>
-		
+
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
@@ -626,7 +626,7 @@
             <artifactId>im4java</artifactId>
             <version>1.4.0</version>
         </dependency>
-        
+
         <!-- Flyway DB API (flywaydb.org) is used to manage DB upgrades automatically. -->
         <dependency>
             <groupId>org.flywaydb</groupId>
@@ -702,6 +702,12 @@
 			<version>2.18</version>
 		</dependency>
 		
+		<dependency>
+		    <groupId>org.glassfish.jersey.media</groupId>
+		    <artifactId>jersey-media-jaxb</artifactId>
+		    <version>2.18</version>
+		</dependency>
+		
 		<!-- S3 -->
         <dependency>
             <groupId>com.amazonaws</groupId>
@@ -732,6 +738,18 @@
             <artifactId>jackson-annotations</artifactId>
         </dependency>
 
+        <!-- For ORCID v2 integration -->
+        <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>orcid-jaxb-api</artifactId>
+            <version>2.1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20180130</version>
+        </dependency>
+
 		<dependency>
 			<groupId>org.apache.oltu.oauth2</groupId>
 			<artifactId>org.apache.oltu.oauth2.client</artifactId>
@@ -753,9 +771,5 @@
         	<groupId>com.fasterxml.jackson.jaxrs</groupId>
         	<artifactId>jackson-jaxrs-json-provider</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>it.4science</groupId>
-			<artifactId>tools-orcid-jaxb</artifactId>
-		</dependency>							
     </dependencies>
 </project>

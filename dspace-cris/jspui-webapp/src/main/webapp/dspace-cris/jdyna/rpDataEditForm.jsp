@@ -960,8 +960,24 @@
 						  <div>
 						<c:forEach
 							items="${propertiesDefinitionsInHolder[holder.shortName]}"
-							var="tipologiaDaVisualizzareNoI18n">
+							var="tipologiaDaVisualizzareNoI18n" varStatus="status">
 							<c:set var="tipologiaDaVisualizzare" value="${researcher:getPropertyDefinitionI18N(tipologiaDaVisualizzareNoI18n,currLocale)}" />
+							
+							<c:set var="statuscount" value="${status.count}" scope="request" />
+							<%!public URL fileFieldURL;%>
+
+							<c:set var="urljspcustomfield"
+								value="/dspace-cris/jdyna/custom/field/edit${tipologiaDaVisualizzare.shortName}.jsp" scope="request" />
+
+							<%
+							String fileFieldPath = (String)pageContext.getRequest().getAttribute("urljspcustomfield");
+							fileFieldURL = pageContext.getServletContext().getResource(fileFieldPath);
+							%>
+
+							<%
+							if (fileFieldURL == null) {
+							%>
+							
 							<c:set var="hideLabel">${fn:length(propertiesDefinitionsInHolder[holder.shortName]) le 1}</c:set>
 							<c:set var="disabled" value=" readonly='readonly'"/>
 														
@@ -1027,7 +1043,10 @@
 									validationParams="${parameters}" visibility="${visibility}" lock="true"/>								
 									
 							</c:if>
-
+							<% } else { %>
+									<c:set var="tipologiaDaVisualizzare" value="${tipologiaDaVisualizzare}" scope="request" />
+									<c:import url="${urljspcustomfield}" />
+							<% } %>
 						</c:forEach>
 		</div>	
 </div>	

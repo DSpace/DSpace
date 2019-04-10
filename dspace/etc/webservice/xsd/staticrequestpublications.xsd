@@ -61,6 +61,41 @@
 			<xs:enumeration value="dc.contributor.inventor" />
 			<xs:enumeration value="dc.contributor.editor" />
 			<xs:enumeration value="dc.contributor.author" />
+
+			<xs:enumeration value="crismetrics_pubmed" />
+			<xs:enumeration value="crismetrics_pubmed_last1" />
+			<xs:enumeration value="crismetrics_pubmed_last2" />
+			<xs:enumeration value="crismetrics_pubmed_aggregate" />
+			<xs:enumeration value="crismetrics_pubmed_count" />
+			<xs:enumeration value="crismetrics_pubmed_ranking" />
+
+			<xs:enumeration value="crismetrics_scopus" />
+			<xs:enumeration value="crismetrics_scopus_last1" />
+			<xs:enumeration value="crismetrics_scopus_last2" />
+			<xs:enumeration value="crismetrics_scopus_aggregate" />
+			<xs:enumeration value="crismetrics_scopus_count" />
+			<xs:enumeration value="crismetrics_scopus_ranking" />
+
+			<xs:enumeration value="crismetrics_wos" />
+			<xs:enumeration value="crismetrics_wos_last1" />
+			<xs:enumeration value="crismetrics_wos_last2" />
+			<xs:enumeration value="crismetrics_wos_aggregate" />
+			<xs:enumeration value="crismetrics_wos_count" />
+			<xs:enumeration value="crismetrics_wos_ranking" />
+
+			<xs:enumeration value="crismetrics_view" />
+			<xs:enumeration value="crismetrics_view_last1" />
+			<xs:enumeration value="crismetrics_view_last2" />
+			<xs:enumeration value="crismetrics_view_aggregate" />
+			<xs:enumeration value="crismetrics_view_count" />
+			<xs:enumeration value="crismetrics_view_ranking" />
+
+			<xs:enumeration value="crismetrics_download" />
+			<xs:enumeration value="crismetrics_download_last1" />
+			<xs:enumeration value="crismetrics_download_last2" />
+			<xs:enumeration value="crismetrics_download_aggregate" />
+			<xs:enumeration value="crismetrics_download_count" />
+			<xs:enumeration value="crismetrics_download_ranking" />
 		</xs:restriction>
 	</xs:simpleType>
 

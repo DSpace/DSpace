@@ -40,6 +40,9 @@
 				<entry key="researcherPages" value-ref="wsServicesRP" />
 				<entry key="grants" value-ref="wsServicesProjects" />
 				<entry key="orgunits" value-ref="wsServicesOrgUnits" />
+				<entry key="rpnested" value-ref="wsServicesRPNested" />
+				<entry key="pjnested" value-ref="wsServicesPJNested" />
+				<entry key="ounested" value-ref="wsServicesOUNested" />
 			</map>
 		</property>
 	</bean>
@@ -109,7 +112,28 @@
         <property name="searchServices" ref="crisSearchService" />
         <property name="supportedType"><util:constant static-field="org.dspace.app.cris.model.CrisConstants.RP_TYPE_ID"/></property>
     </bean>
-        
+
+	<bean id="wsServicesRPNested" class="org.dspace.app.cris.ws.WSServicesCRISNested">		
+		<property name="marshaller" ref="dynamicMarshallerRPNested" />
+        <property name="searchServices" ref="crisSearchService" />
+        <property name="supportedType"><util:constant static-field="org.dspace.app.cris.model.CrisConstants.NRP_TYPE_ID"/></property>
+        <property name="supportedClazz" value="org.dspace.app.cris.model.jdyna.RPNestedObject"/>
+    </bean>
+
+	<bean id="wsServicesPJNested" class="org.dspace.app.cris.ws.WSServicesCRISNested">		
+		<property name="marshaller" ref="dynamicMarshallerPJNested" />
+        <property name="searchServices" ref="crisSearchService" />
+        <property name="supportedType"><util:constant static-field="org.dspace.app.cris.model.CrisConstants.NPROJECT_TYPE_ID"/></property>
+        <property name="supportedClazz" value="org.dspace.app.cris.model.jdyna.ProjectNestedObject"/>
+    </bean>
+
+	<bean id="wsServicesOUNested" class="org.dspace.app.cris.ws.WSServicesCRISNested">		
+		<property name="marshaller" ref="dynamicMarshallerOUNested" />
+        <property name="searchServices" ref="crisSearchService" />
+        <property name="supportedType"><util:constant static-field="org.dspace.app.cris.model.CrisConstants.NOU_TYPE_ID"/></property>
+        <property name="supportedClazz" value="org.dspace.app.cris.model.jdyna.OUNestedObject"/>
+    </bean>
+                    
 	<bean id="wsServicesProjects" class="org.dspace.app.cris.ws.WSServicesCRIS">		
 		<property name="marshaller" ref="dynamicMarshallerPJ" />
         <property name="searchServices" ref="crisSearchService" />
@@ -129,7 +153,28 @@
      	<property name="namespacePrefix"><util:constant static-field="org.dspace.app.cris.ws.WSConstants.NAMESPACE_PREFIX_RP"/></property>
      	<property name="tpClazz" value="org.dspace.app.cris.model.jdyna.RPPropertiesDefinition"/>
      </bean>
+     
+	<bean id="dynamicMarshallerRPNested" class="org.dspace.app.cris.ws.marshaller.MarshallerDynamicNestedObject">
+     	<property name="applicationService" ref="applicationService" />
+     	<property name="namespace"><util:constant static-field="org.dspace.app.cris.ws.WSConstants.NAMESPACE_RPNESTED"/></property>
+     	<property name="namespacePrefix"><util:constant static-field="org.dspace.app.cris.ws.WSConstants.NAMESPACE_PREFIX_RPNESTED"/></property>
+     	<property name="tpClazz" value="org.dspace.app.cris.model.jdyna.RPNestedPropertiesDefinition"/>
+     </bean>     
 
+	<bean id="dynamicMarshallerPJNested" class="org.dspace.app.cris.ws.marshaller.MarshallerDynamicNestedObject">
+     	<property name="applicationService" ref="applicationService" />
+     	<property name="namespace"><util:constant static-field="org.dspace.app.cris.ws.WSConstants.NAMESPACE_PJNESTED"/></property>
+     	<property name="namespacePrefix"><util:constant static-field="org.dspace.app.cris.ws.WSConstants.NAMESPACE_PREFIX_PJNESTED"/></property>
+     	<property name="tpClazz" value="org.dspace.app.cris.model.jdyna.ProjectNestedPropertiesDefinition"/>
+     </bean>
+
+	<bean id="dynamicMarshallerOUNested" class="org.dspace.app.cris.ws.marshaller.MarshallerDynamicNestedObject">
+     	<property name="applicationService" ref="applicationService" />
+     	<property name="namespace"><util:constant static-field="org.dspace.app.cris.ws.WSConstants.NAMESPACE_OUNESTED"/></property>
+     	<property name="namespacePrefix"><util:constant static-field="org.dspace.app.cris.ws.WSConstants.NAMESPACE_PREFIX_OUNESTED"/></property>
+     	<property name="tpClazz" value="org.dspace.app.cris.model.jdyna.OUNestedPropertiesDefinition"/>
+     </bean>
+          
     <bean id="dynamicMarshallerPJ" class="org.dspace.app.cris.ws.marshaller.MarshallerDynamicObject">
      	<property name="applicationService" ref="applicationService" />
      	<property name="namespace"><util:constant static-field="org.dspace.app.cris.ws.WSConstants.NAMESPACE_PJ"/></property>

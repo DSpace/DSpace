@@ -161,9 +161,23 @@ public abstract class ACrisObject<P extends Property<TP>, TP extends PropertiesD
 		return result;
 	}
 
+    public Metadatum getMetadatumFirstValue(String schema, String element, String qualifier, String language){
+        Metadatum[] dcvalues = internalGetMetadata(schema, element, qualifier, true);
+        if(dcvalues.length>0){
+            return dcvalues[0];
+        }
+        return null;
+    }
+    
 	@Override
 	public Metadatum[] getMetadata(String schema, String element, String qualifier, String lang) {
-		Map<Integer, Object> mapResultsVal = new HashMap<Integer, Object>();
+		return internalGetMetadata(schema, element, qualifier, false);
+	}
+
+    private Metadatum[] internalGetMetadata(String schema, String element,
+            String qualifier, boolean singleValue)
+    {
+        Map<Integer, Object> mapResultsVal = new HashMap<Integer, Object>();
 		Map<Integer, String> mapResultsAuth = new HashMap<Integer, String>();
 	    String authority = null;
 		if ("crisdo".equals(schema) && "name".equals(element)) {
@@ -179,6 +193,12 @@ public abstract class ACrisObject<P extends Property<TP>, TP extends PropertiesD
 				List<ACNO> listNestedObject = ResearcherPageUtils
 						.getNestedObjectsByParentIDAndShortname(this.getClassNested(), this.getID(), schema);
 				for (ACNO nestedObject : listNestedObject) {
+				    
+				    if(singleValue) {
+				        if(nestedObject.getPreferred()==null || !nestedObject.getPreferred()) {
+				            continue;
+				        }
+				    }
 					List<NP> nProprieties = nestedObject.getAnagrafica4view().get(element);
 
 					if (nProprieties != null) {
@@ -284,6 +304,9 @@ public abstract class ACrisObject<P extends Property<TP>, TP extends PropertiesD
 			}
 		}
 		Metadatum[] result = new Metadatum[mapResultsVal.keySet().size()];
+		if(singleValue) {
+		    result = new Metadatum[1];
+		}
 		int idx = 0;
 		for (Integer key : mapResultsVal.keySet()) {
 			result[idx] = new Metadatum();
@@ -303,10 +326,13 @@ public abstract class ACrisObject<P extends Property<TP>, TP extends PropertiesD
 			else {
 			    result[idx].value = "";
 			}
+            if(singleValue) {
+                break;
+            }
 			idx++;
 		}
 		return result;
-	}
+    }
 
 	private String getCompatibleJDynAShortName(ACrisObject aCrisObject, String element) {
 		Set<String> keys = aCrisObject.getAnagrafica4view().keySet();

@@ -14,16 +14,6 @@
                 xmlns="http://datacite.org/schema/kernel-4"
                 version="2.0">
     
-    <!-- CONFIGURATION -->
-    <!-- The parameters prefix, publisher, datamanager and hostinginstitution
-         moved to DSpace's configuration. They will be substituted automatically.
-         It is not necessary anymore to change this file.
-         Please take a look into the DSpace documentation for details on how to
-         change those. -->
-    <!-- DO NOT CHANGE ANYTHING BELOW THIS LINE EXCEPT YOU REALLY KNOW WHAT YOU ARE DOING! -->
-    
-    <!-- We need the prefix to determine DOIs that were minted by ourself. -->
-    <xsl:param name="prefix">10.5072/dspace-</xsl:param>
     <!-- The content of the following parameter will be used as element publisher. -->
     <xsl:param name="publisher">My University</xsl:param>
     <!-- The content of the following variable will be used as element contributor with contributorType datamanager. -->
@@ -65,7 +55,7 @@
                 company as well. We have to ensure to use URIs of our prefix
                 as primary identifiers only.
             -->
-            <xsl:apply-templates select="//dspace:field[@mdschema='dc' and @element='identifier' and starts-with(., concat('http://dx.doi.org/', $prefix))]" />
+            <xsl:apply-templates select="//dspace:field[@mdschema='dc' and @element='identifier' and starts-with(., 'http://dx.doi.org/')]" />
 
             <!--
                 DataCite (2)
@@ -245,9 +235,9 @@
                 Occ: 0-n
                 Required Attribute: alternateIdentifierType (free format)
             -->
-            <xsl:if test="//dspace:field[@mdschema='dc' and @element='identifier' and @qualifier and not(starts-with(., concat('http://dx.doi.org/', $prefix)))]">
+            <xsl:if test="//dspace:field[@mdschema='dc' and @element='identifier' and @qualifier and not(starts-with(., 'http://dx.doi.org/'))]">
                 <xsl:element name="alternateIdentifiers">
-                    <xsl:apply-templates select="//dspace:field[@mdschema='dc' and @element='identifier' and @qualifier and not(starts-with(., concat('http://dx.doi.org/', $prefix)))]" />
+                    <xsl:apply-templates select="//dspace:field[@mdschema='dc' and @element='identifier' and @qualifier and not(starts-with(., 'http://dx.doi.org/'))]" />
                 </xsl:element>
             </xsl:if>
 
@@ -319,7 +309,7 @@
         company as well. We have to ensure to use URIs of our prefix
         as primary identifiers only.
     -->
-    <xsl:template match="dspace:field[@mdschema='dc' and @element='identifier' and @qualifier and starts-with(., concat('http://dx.doi.org/', $prefix))]">
+    <xsl:template match="dspace:field[@mdschema='dc' and @element='identifier' and @qualifier and starts-with(., 'http://dx.doi.org/')]">
         <identifier identifierType="DOI">
             <xsl:value-of select="substring(., 19)"/>
         </identifier>
@@ -534,7 +524,7 @@
         resolveUrlToHandle(context, altId) until one is recognized or all have
         been tested.
     -->
-    <xsl:template match="//dspace:field[@mdschema='dc' and @element='identifier' and @qualifier and not(starts-with(., concat('http://dx.doi.org/', $prefix)))]">
+    <xsl:template match="//dspace:field[@mdschema='dc' and @element='identifier' and @qualifier and not(starts-with(., 'http://dx.doi.org/'))]">
         <xsl:element name="alternateIdentifier">
             <xsl:if test="@qualifier">
                 <xsl:attribute name="alternateIdentifierType"><xsl:value-of select="@qualifier" /></xsl:attribute>

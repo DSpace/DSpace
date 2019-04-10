@@ -18,12 +18,16 @@
 <%@ taglib uri="jdynatags" prefix="dyna"%>
 <%@ taglib uri="researchertags" prefix="researcher"%>
 
-<%@page import="org.dspace.app.webui.cris.dto.ComponentInfoDTO"%>
+<%@page import="it.cilea.osd.jdyna.components.IComponent"%>
+<%@page import="org.dspace.app.webui.cris.components.ASolrConfigurerComponent"%>
 <%@page import="java.util.Map" %>
 <%@page import="org.dspace.core.ConfigurationManager" %>
+<%@page import="org.dspace.app.cris.model.ACrisObject" %>	
+<%@page import="it.cilea.osd.jdyna.components.IComponent"%>
 
 <% 
-	Map<String, ComponentInfoDTO> mapInfo = ((Map<String, ComponentInfoDTO>)(request.getAttribute("componentinfomap"))); 
+	ACrisObject entity = (ACrisObject)request.getAttribute("entity");
+	Map<String, IComponent> mapInfo = ((Map<String, IComponent>)(request.getAttribute("components"))); 
 	boolean showBadgeCount = ConfigurationManager.getBooleanProperty("cris", "webui.tab.show.count.for.firstcomponent", false);
 %>
 	
@@ -63,14 +67,14 @@
 									for(String key : mapInfo.keySet()) {
 								%>
 								<c:set var="key"><%= key %></c:set>
-								<c:if test="${box.externalJSP eq key && !firstComponentFound}">
-								<%									    
-								        ComponentInfoDTO iii = (ComponentInfoDTO)(mapInfo.get(key));
+								<c:if test="${box.getShortName() eq key && !firstComponentFound}">
+								<%			
+										ASolrConfigurerComponent iii = (ASolrConfigurerComponent)(mapInfo.get(key));
+										String type = (String)iii.getType(request, entity.getId());
+									    long count = iii.count(request, type, entity.getId());
+										if(count>0) {
 								%>
-								<%								        
-										if(iii.getTotal()>0) {
-								%>
-										<span class="badge badge-primary badge-pill"><%= iii.getTotal() %></span>
+										<span class="badge badge-primary badge-pill"><%= count %></span>
 										<c:set var="firstComponentFound" value="true"/>
 							    <% 		
 										} %>
@@ -103,14 +107,14 @@
 									for(String key : mapInfo.keySet()) {
 								%>
 								<c:set var="key"><%= key %></c:set>
-								<c:if test="${box.externalJSP eq key && !firstComponentFound}">
-								<%									    
-								        ComponentInfoDTO iii = (ComponentInfoDTO)(mapInfo.get(key));
+								<c:if test="${box.getShortName() eq key && !firstComponentFound}">
+								<%			
+										ASolrConfigurerComponent iii = (ASolrConfigurerComponent)(mapInfo.get(key));
+										String type = (String)iii.getType(request, entity.getId());
+									    long count = iii.count(request, type, entity.getId());
+										if(count>0) {
 								%>
-								<%								        
-										if(iii.getTotal()>0) {
-								%>
-										<span class="badge badge-primary badge-pill"><%= iii.getTotal() %></span>
+										<span class="badge badge-primary badge-pill"><%= count %></span>
 										<c:set var="firstComponentFound" value="true"/>
 							    <% 		
 										} %>

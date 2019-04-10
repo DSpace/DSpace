@@ -666,6 +666,7 @@ public class CrisSearchService extends SolrServiceImpl
         doc.addField("search.parentfk", parent.getType() + "-" + parent.getID());
         String confName = "ncris" + parent.getPublicPath();
         String schema = confName + dso.getTypo().getShortName();
+        doc.addField("search.schema_s", schema);
         String uuid = dso.getUuid();
         Boolean status = dso.getStatus();
         Integer position = dso.getPositionDef();

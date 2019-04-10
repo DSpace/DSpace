@@ -15,31 +15,31 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpException;
 import org.dspace.app.itemimport.BTEBatchImportService;
 import org.dspace.authority.orcid.OrcidService;
-import org.dspace.authority.orcid.jaxb.activities.WorkGroup;
-import org.dspace.authority.orcid.jaxb.activities.Works;
-import org.dspace.authority.orcid.jaxb.common.CreditName;
-import org.dspace.authority.orcid.jaxb.common.ExternalId;
-import org.dspace.authority.orcid.jaxb.common.ExternalIds;
-import org.dspace.authority.orcid.jaxb.common.FuzzyDate;
-import org.dspace.authority.orcid.jaxb.common.LanguageCode;
-import org.dspace.authority.orcid.jaxb.common.OrcidId;
-import org.dspace.authority.orcid.jaxb.common.SourceType;
-import org.dspace.authority.orcid.jaxb.common.Url;
-import org.dspace.authority.orcid.jaxb.personaldetails.NameCtype;
-import org.dspace.authority.orcid.jaxb.personaldetails.NameCtype.GivenNames;
-import org.dspace.authority.orcid.jaxb.personaldetails.PersonalDetails;
-import org.dspace.authority.orcid.jaxb.work.Citation;
-import org.dspace.authority.orcid.jaxb.work.CitationType;
-import org.dspace.authority.orcid.jaxb.work.Contributor;
-import org.dspace.authority.orcid.jaxb.work.Work;
-import org.dspace.authority.orcid.jaxb.work.WorkContributors;
-import org.dspace.authority.orcid.jaxb.work.WorkSummary;
-import org.dspace.authority.orcid.jaxb.work.WorkTitle;
-import org.dspace.authority.orcid.jaxb.work.WorkType;
 import org.dspace.core.Context;
 import org.dspace.submit.lookup.NetworkSubmissionLookupDataLoader;
 import org.dspace.submit.util.SubmissionLookupPublication;
 import org.dspace.utils.DSpace;
+import org.orcid.jaxb.model.common_v2.CreditName;
+import org.orcid.jaxb.model.common_v2.ExternalId;
+import org.orcid.jaxb.model.common_v2.ExternalIds;
+import org.orcid.jaxb.model.common_v2.FuzzyDate;
+import org.orcid.jaxb.model.common_v2.LanguageCode;
+import org.orcid.jaxb.model.common_v2.OrcidId;
+import org.orcid.jaxb.model.common_v2.SourceType;
+import org.orcid.jaxb.model.common_v2.Url;
+import org.orcid.jaxb.model.record_v2.Citation;
+import org.orcid.jaxb.model.record_v2.CitationType;
+import org.orcid.jaxb.model.record_v2.Contributor;
+import org.orcid.jaxb.model.record_v2.NameType;
+import org.orcid.jaxb.model.record_v2.NameType.GivenNames;
+import org.orcid.jaxb.model.record_v2.PersonalDetails;
+import org.orcid.jaxb.model.record_v2.Work;
+import org.orcid.jaxb.model.record_v2.WorkContributors;
+import org.orcid.jaxb.model.record_v2.WorkGroup;
+import org.orcid.jaxb.model.record_v2.WorkSummary;
+import org.orcid.jaxb.model.record_v2.WorkTitle;
+import org.orcid.jaxb.model.record_v2.WorkType;
+import org.orcid.jaxb.model.record_v2.Works;
 
 import com.google.api.client.util.Charsets;
 import com.google.common.io.Files;
@@ -102,6 +102,7 @@ public class OrcidOnlineDataLoader extends NetworkSubmissionLookupDataLoader
                         workgroup: for (WorkGroup orcidGroup : orcidWorks.getGroup())
                         {
                             int higher = orcidService.higherDisplayIndex(orcidGroup);
+                            // take the Work with highest display index value (the preferred item)
                             worksummary : for (WorkSummary orcidSummary : orcidGroup
                                     .getWorkSummary())
                             {
@@ -133,6 +134,9 @@ public class OrcidOnlineDataLoader extends NetworkSubmissionLookupDataLoader
                                                         orcidSummary
                                                                 .getPutCode()
                                                                 .toString())));
+                                        // in the case of more equal display index value take the first
+                                        // (for example import from API setup display index to 0, see https://members.orcid.org/api/tutorial/reading-xml#display-index)
+                                        break;
                                     }
                                     catch (Exception e)
                                     {
@@ -237,7 +241,7 @@ public class OrcidOnlineDataLoader extends NetworkSubmissionLookupDataLoader
         }
         if (authNames.isEmpty())
         {
-            NameCtype name = personalDetails.getName();
+            NameType name = personalDetails.getName();
             if (name != null)
             {
             	String value = "Undefined";

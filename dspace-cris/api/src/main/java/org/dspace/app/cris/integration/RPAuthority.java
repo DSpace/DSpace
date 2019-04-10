@@ -10,6 +10,7 @@ package org.dspace.app.cris.integration;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -66,7 +67,6 @@ public class RPAuthority extends CRISAuthority implements
 
     private RelationPreferenceService relationPreferenceService;
 
-    private List<String> metadataAuth;
     /**
      * Make sure that the class is fully initialized before use it
      */
@@ -199,9 +199,10 @@ public class RPAuthority extends CRISAuthority implements
                 for (DSpaceObject dso : result.getDspaceObjects())
                 {
                     ResearcherPage rp = (ResearcherPage) dso;
+                    Map<String, String> extras = ResearcherPageUtils.buildExtra(rp);
                     choiceList
                             .add(new Choice(rp.getCrisID(), rp.getFullName(),
-                                    generateDisplayValue(rp.getFullName(), rp)));
+                                    generateDisplayValue(rp.getFullName(), rp), extras));
                 }
             }
 

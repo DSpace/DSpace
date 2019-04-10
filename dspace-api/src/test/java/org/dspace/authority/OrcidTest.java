@@ -16,19 +16,19 @@ import javax.xml.bind.JAXBException;
 
 import org.apache.log4j.Logger;
 import org.dspace.authority.orcid.OrcidService;
-import org.dspace.authority.orcid.jaxb.common.ExternalId;
-import org.dspace.authority.orcid.jaxb.common.ExternalIds;
-import org.dspace.authority.orcid.jaxb.work.Citation;
-import org.dspace.authority.orcid.jaxb.work.CitationType;
-import org.dspace.authority.orcid.jaxb.work.Work;
-import org.dspace.authority.orcid.jaxb.work.WorkTitle;
-import org.dspace.authority.orcid.jaxb.work.WorkType;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
 import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.crosswalk.StreamDisseminationCrosswalk;
 import org.dspace.core.Context;
 import org.dspace.core.PluginManager;
+import org.orcid.jaxb.model.common_v2.ExternalId;
+import org.orcid.jaxb.model.common_v2.ExternalIds;
+import org.orcid.jaxb.model.record_v2.Citation;
+import org.orcid.jaxb.model.record_v2.CitationType;
+import org.orcid.jaxb.model.record_v2.Work;
+import org.orcid.jaxb.model.record_v2.WorkTitle;
+import org.orcid.jaxb.model.record_v2.WorkType;
 import org.restlet.resource.ResourceException;
 
 public class OrcidTest {

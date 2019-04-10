@@ -36,42 +36,42 @@ import org.apache.commons.cli.PosixParser;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authority.AuthorityValue;
-import org.dspace.authority.orcid.jaxb.activities.Educations;
-import org.dspace.authority.orcid.jaxb.activities.Employments;
-import org.dspace.authority.orcid.jaxb.activities.Fundings;
-import org.dspace.authority.orcid.jaxb.activities.WorkGroup;
-import org.dspace.authority.orcid.jaxb.activities.Works;
-import org.dspace.authority.orcid.jaxb.address.Address;
-import org.dspace.authority.orcid.jaxb.address.Addresses;
-import org.dspace.authority.orcid.jaxb.bulk.Bulk;
-import org.dspace.authority.orcid.jaxb.common.SourceType;
-import org.dspace.authority.orcid.jaxb.education.Education;
-import org.dspace.authority.orcid.jaxb.education.EducationSummary;
-import org.dspace.authority.orcid.jaxb.email.Emails;
-import org.dspace.authority.orcid.jaxb.employment.Employment;
-import org.dspace.authority.orcid.jaxb.employment.EmploymentSummary;
-import org.dspace.authority.orcid.jaxb.funding.Funding;
-import org.dspace.authority.orcid.jaxb.keyword.Keyword;
-import org.dspace.authority.orcid.jaxb.keyword.Keywords;
-import org.dspace.authority.orcid.jaxb.othername.OtherName;
-import org.dspace.authority.orcid.jaxb.othername.OtherNames;
-import org.dspace.authority.orcid.jaxb.person.Person;
-import org.dspace.authority.orcid.jaxb.person.externalidentifier.ExternalIdentifier;
-import org.dspace.authority.orcid.jaxb.person.externalidentifier.ExternalIdentifiers;
-import org.dspace.authority.orcid.jaxb.personaldetails.PersonalDetails;
-import org.dspace.authority.orcid.jaxb.researcherurl.ResearcherUrl;
-import org.dspace.authority.orcid.jaxb.researcherurl.ResearcherUrls;
-import org.dspace.authority.orcid.jaxb.work.Work;
-import org.dspace.authority.orcid.jaxb.work.WorkSummary;
+import org.orcid.jaxb.model.record_v2.Educations;
+import org.orcid.jaxb.model.record_v2.Employments;
+import org.orcid.jaxb.model.record_v2.Fundings;
+import org.orcid.jaxb.model.record_v2.WorkGroup;
+import org.orcid.jaxb.model.record_v2.Works;
+import org.orcid.jaxb.model.record_v2.Address;
+import org.orcid.jaxb.model.record_v2.Addresses;
+import org.orcid.jaxb.model.record_v2.WorkBulk;
+import org.orcid.jaxb.model.record_v2.SourceReference;
+import org.orcid.jaxb.model.record_v2.Education;
+import org.orcid.jaxb.model.record_v2.EducationSummary;
+import org.orcid.jaxb.model.record_v2.Emails;
+import org.orcid.jaxb.model.record_v2.Employment;
+import org.orcid.jaxb.model.record_v2.EmploymentSummary;
+import org.orcid.jaxb.model.record_v2.Funding;
+import org.orcid.jaxb.model.record_v2.Keyword;
+import org.orcid.jaxb.model.record_v2.Keywords;
+import org.orcid.jaxb.model.record_v2.OtherName;
+import org.orcid.jaxb.model.record_v2.OtherNames;
+import org.orcid.jaxb.model.record_v2.Person;
+import org.orcid.jaxb.model.record_v2.ExternalIdentifier;
+import org.orcid.jaxb.model.record_v2.ExternalIdentifiers;
+import org.orcid.jaxb.model.record_v2.PersonalDetails;
+import org.orcid.jaxb.model.record_v2.ResearcherUrl;
+import org.orcid.jaxb.model.record_v2.ResearcherUrls;
+import org.orcid.jaxb.model.record_v2.Work;
+import org.orcid.jaxb.model.record_v2.WorkSummary;
 import org.dspace.authority.rest.RestSource;
 import org.dspace.content.DCPersonName;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.utils.DSpace;
 import org.glassfish.jersey.message.internal.MessageBodyProviderNotFoundException;
-import org.orcid.ns.record.Record;
-import org.orcid.ns.search.Result;
-import org.orcid.ns.search.Search;
+import org.orcid.jaxb.model.record_v2.Record;
+import org.orcid.jaxb.model.search_v2.Result;
+import org.orcid.jaxb.model.search_v2.Search;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -460,22 +460,11 @@ public class OrcidService extends RestSource
         }
 
         Builder builder = target.request().accept(APPLICATION_ORCID_XML);
-        List<Result> reader = null;
-        try
-        {
-            reader = builder.get().readEntity(Search.class).getResult();
-        }
-        catch (ForbiddenException | MessageBodyProviderNotFoundException e1)
-        {
-            builder = builder.header(HttpHeaders.AUTHORIZATION,
-                    "Bearer " + getMemberSearchToken().getAccess_token());
-            reader = builder.get().readEntity(Search.class).getResult();
-        }
-        catch (Exception e2)
-        {
-            log.info("Problem unmarshalling return value " + e2);
-            throw new IOException(e2);
-        }
+        builder = builder.header(HttpHeaders.AUTHORIZATION,
+                "Bearer " + getMemberSearchToken().getAccess_token());
+        Search search = builder.get().readEntity(Search.class);
+        List<Result> reader = search.getResult();
+        reader = search.getResult();
         return reader;
     }
 
@@ -657,7 +646,7 @@ public class OrcidService extends RestSource
     }
 
     /* Bulks */
-    public Bulk appendWorks(String id, String token, Bulk bulk)
+    public WorkBulk appendWorks(String id, String token, WorkBulk bulk)
     {
         String endpoint = id + WORKS_ENDPOINT;
         Response response = null;
@@ -665,7 +654,7 @@ public class OrcidService extends RestSource
         {
             response = post(endpoint, token,
                     Entity.entity(bulk, MediaType.APPLICATION_XML_TYPE));
-            return response.readEntity(Bulk.class);
+            return response.readEntity(WorkBulk.class);
         }
         finally
         {

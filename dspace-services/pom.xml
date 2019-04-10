@@ -10,6 +10,7 @@
         <groupId>org.dspace</groupId>
         <artifactId>dspace-parent</artifactId>
         <version>CRIS-5.10.0-SNAPSHOT</version>
+        <relativePath>..</relativePath>
     </parent>
     <properties>
         <!-- This is the path to the root [dspace-src] directory. -->

@@ -7,7 +7,11 @@
  */
 package org.dspace.app.cris.ws;
 
+import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -15,6 +19,7 @@ import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
+import org.dspace.app.cris.metrics.common.model.ConstantMetrics;
 import org.dspace.app.cris.ws.discovery.CrisWebservicesExtraIndexPlugin;
 import org.dspace.app.cris.ws.marshaller.bean.WSItem;
 import org.dspace.app.cris.ws.marshaller.bean.WSMetadata;
@@ -25,7 +30,8 @@ public class WSServicesPublications extends AWSServices<WSItem>
 {
 
     private static Logger log = Logger.getLogger(WSServicesPublications.class);
-
+    private final static DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+    
     @Override
     protected List<WSItem> getWSObject(QueryResponse response)
     {
@@ -51,6 +57,12 @@ public class WSServicesPublications extends AWSServices<WSItem>
 
         for (int j = 0; j < projection.length; j++)
         {
+            if (projection[j].startsWith(ConstantMetrics.PREFIX_FIELD))
+            {
+                solrQuery.addField(projection[j] + ConstantMetrics.STATS_INDICATOR_TYPE_TIME);
+                solrQuery.addField(projection[j] + ConstantMetrics.STATS_INDICATOR_TYPE_STARTTIME);
+                solrQuery.addField(projection[j] + ConstantMetrics.STATS_INDICATOR_TYPE_ENDTIME);
+            }
             solrQuery.addField(projection[j]);
         }
 
@@ -78,7 +90,7 @@ public class WSServicesPublications extends AWSServices<WSItem>
 
         for (String m : sd.getFieldNames())
         {
-            if (!m.startsWith("dc."))
+            if (!m.startsWith("dc.") && !m.startsWith(ConstantMetrics.PREFIX_FIELD))
             {
                 continue;
             }
@@ -87,7 +99,15 @@ public class WSServicesPublications extends AWSServices<WSItem>
             int place = 1;
             for (Object v : sd.getFieldValues(m))
             {
-                String value = (String) v;
+            	
+            	String value = String.valueOf(v);
+            	if(m.startsWith(ConstantMetrics.PREFIX_FIELD)) {
+            		if(m.endsWith("time")) {
+            			Date vv = (Date)v;
+            			value = dateFormat.format(vv);
+            		}
+            	}
+                
                 String[] mv = value.split("\\|\\|\\|");
                 WSMetadataValue mvalue = new WSMetadataValue();
                 mvalue.setValue(mv[0]);

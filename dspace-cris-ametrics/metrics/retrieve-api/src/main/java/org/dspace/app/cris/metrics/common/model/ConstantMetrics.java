@@ -25,6 +25,10 @@ public class ConstantMetrics
     public static final String STATS_INDICATOR_TYPE_SCOPUS = "scopus";
     public static final String STATS_INDICATOR_TYPE_VIEW = "view";
     public static final String STATS_INDICATOR_TYPE_DOWNLOAD = "download";
+
+    public static final String STATS_INDICATOR_TYPE_TIME = "_time";
+    public static final String STATS_INDICATOR_TYPE_STARTTIME = "_starttime";
+    public static final String STATS_INDICATOR_TYPE_ENDTIME = "_endtime";
     
     public static final String STATS_INDICATOR_TYPE_ERROR = "ERROR";
 }

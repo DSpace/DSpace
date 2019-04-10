@@ -56,6 +56,11 @@ public class ChoicesXMLGenerator
                 {
                     va.addAttribute("", "selected", "selected", "boolean", "");
                 }
+                if(mdav.extras != null){
+                    for(String extraLabel : mdav.extras.keySet()){
+                        va.addAttribute("", extraLabel, extraLabel, "string", mdav.extras.get(extraLabel));
+                    }
+                }
                 contentHandler.startElement(NS_URI, NS_NAME, "option", va);
                   contentHandler.characters(mdav.label.toCharArray(), 0, mdav.label.length());
                 contentHandler.endElement(NS_URI, NS_NAME, "option");
@@ -79,6 +84,11 @@ public class ChoicesXMLGenerator
                 if (result.defaultSelected == i)
                 {
                     va.addAttribute("", "selected", "selected", "boolean", "");
+                }
+                if(mdav.extras != null){
+                    for(String extraLabel : mdav.extras.keySet()){
+                        va.addAttribute("", extraLabel, extraLabel, "string", mdav.extras.get(extraLabel));
+                    }
                 }
                 contentHandler.startElement(NS_URI, NS_NAME, "li", va);
                   contentHandler.startElement(NS_URI, NS_NAME, "span", classLabel);

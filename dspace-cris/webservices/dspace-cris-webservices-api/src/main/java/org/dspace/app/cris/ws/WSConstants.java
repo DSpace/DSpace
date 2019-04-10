@@ -32,4 +32,17 @@ public class WSConstants
     public static final String NAMESPACE_ITEM = UtilsXSD.NAMESPACE_ITEM;
 
     public static final String NAMESPACE_PREFIX_ITEM = UtilsXSD.NAMESPACE_PREFIX_ITEM;
+    
+    public static final String NAMESPACE_RPNESTED = UtilsXSD.NAMESPACE_RPNESTED;
+
+    public static final String NAMESPACE_PREFIX_RPNESTED = UtilsXSD.NAMESPACE_PREFIX_RPNESTED;
+    
+    public static final String NAMESPACE_PJNESTED = UtilsXSD.NAMESPACE_PJNESTED;
+
+    public static final String NAMESPACE_PREFIX_PJNESTED = UtilsXSD.NAMESPACE_PREFIX_PJNESTED;
+
+    public static final String NAMESPACE_OUNESTED = UtilsXSD.NAMESPACE_OUNESTED;
+
+    public static final String NAMESPACE_PREFIX_OUNESTED = UtilsXSD.NAMESPACE_PREFIX_OUNESTED;
+
 }

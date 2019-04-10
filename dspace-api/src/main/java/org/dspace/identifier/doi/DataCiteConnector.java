@@ -7,17 +7,21 @@
  */
 package org.dspace.identifier.doi;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.util.Iterator;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.methods.HttpDelete;
+import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
@@ -60,6 +64,7 @@ implements DOIConnector
     // Configuration property names
     static final String CFG_USER = "identifier.doi.user";
     static final String CFG_PASSWORD = "identifier.doi.password";
+    static final String CFG_NAMESPACE = "crosswalk.dissemination.DataCite.namespace";
     
     /**
      * Stores the scheme used to connect to the DataCite server. It will be set
@@ -99,6 +104,11 @@ implements DOIConnector
     
     protected String USERNAME;
     protected String PASSWORD;
+    
+    /**
+     * DataCite Namespace used with programmatic xml element 
+     */
+    protected String NAMESPACE;
     
     public DataCiteConnector()
     {
@@ -879,41 +889,38 @@ implements DOIConnector
                 content = EntityUtils.toString(entity, "UTF-8");
             }
 
-            /* While debugging it can be useful to see whitch requests are send:
-             *
-             * log.debug("Going to send HTTP request of type " + req.getMethod() + ".");
-             * log.debug("Will be send to " + req.getURI().toString() + ".");
-             * if (req instanceof HttpEntityEnclosingRequestBase)
-             * {
-             *     log.debug("Request contains entity!");
-             *     HttpEntityEnclosingRequestBase reqee = (HttpEntityEnclosingRequestBase) req;
-             *     if (reqee.getEntity() instanceof StringEntity)
-             *     {
-             *         StringEntity se = (StringEntity) reqee.getEntity();
-             *         try {
-             *             BufferedReader br = new BufferedReader(new InputStreamReader(se.getContent()));
-             *             String line = null;
-             *             while ((line = br.readLine()) != null)
-             *             {
-             *                 log.debug(line);
-             *             }
-             *             log.info("----");
-             *         } catch (IOException ex) {
-             *             
-             *         }
-             *     }
-             * } else {
-             *     log.debug("Request contains no entity!");
-             * }
-             * log.debug("The request got http status code {}.", Integer.toString(statusCode));
-             * if (null == content)
-             * {
-             *     log.debug("The response did not contain any answer.");
-             * } else {
-             *     log.debug("DataCite says: {}", content);
-             * }
-             * 
-             */
+            if (log.isDebugEnabled()) {
+
+                /* While debugging it can be useful to see whitch requests are send: */
+
+                log.debug("Going to send HTTP request of type " + req.getMethod() + ".");
+                log.debug("Will be send to " + req.getURI().toString() + ".");
+                if (req instanceof HttpEntityEnclosingRequestBase) {
+                    log.debug("Request contains entity!");
+                    HttpEntityEnclosingRequestBase reqee = (HttpEntityEnclosingRequestBase) req;
+                    if (reqee.getEntity() instanceof StringEntity) {
+                        StringEntity se = (StringEntity) reqee.getEntity();
+                        try {
+                            BufferedReader br = new BufferedReader(new InputStreamReader(se.getContent()));
+                            String line = null;
+                            while ((line = br.readLine()) != null) {
+                                log.debug(line);
+                            }
+                            log.debug("----");
+                        } catch (IOException ex) {
+
+                        }
+                    }
+                } else {
+                    log.debug("Request contains no entity!");
+                }
+                log.debug("The request got http status code {}.", Integer.toString(statusCode));
+                if (null == content) {
+                    log.debug("The response did not contain any answer.");
+                } else {
+                    log.debug("DataCite says: {}", content);
+                }
+            }
 
             // We can handle some status codes here, others have to be handled above
             switch (statusCode)
@@ -1036,12 +1043,30 @@ implements DOIConnector
         {
             return root;
         }
-        Element identifier = new Element("identifier", "http://datacite.org/schema/kernel-2.2");
+        Element identifier = new Element("identifier", getNamespace());
         identifier.setAttribute("identifierType", "DOI");
         identifier.addContent(doi.substring(DOI.SCHEME.length()));
         return root.addContent(0, identifier);
     }
 
+    public String getNamespace() {
+        if (null == this.NAMESPACE)
+        {
+            this.NAMESPACE = this.configurationService.getProperty(CFG_NAMESPACE);
+            if (null == this.NAMESPACE)
+            {
+                throw new RuntimeException("Unable to load namespace from "
+                        + "configuration. Cannot find property " +
+                        CFG_NAMESPACE + ".");
+            }
+        }
+        return this.NAMESPACE;
+    }
+
+    public void setNAMESPACE(String nAMESPACE) {
+        NAMESPACE = nAMESPACE;
+    }
+    
     protected class DataCiteResponse
     {
         private final int statusCode;

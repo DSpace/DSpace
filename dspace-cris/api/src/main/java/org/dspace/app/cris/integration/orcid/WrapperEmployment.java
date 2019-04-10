@@ -1,6 +1,6 @@
 package org.dspace.app.cris.integration.orcid;
 
-import org.dspace.authority.orcid.jaxb.employment.Employment;
+import org.orcid.jaxb.model.record_v2.Employment;
 
 public class WrapperEmployment
 {

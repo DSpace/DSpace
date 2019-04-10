@@ -22,12 +22,15 @@ import org.dspace.app.cris.model.Project;
 import org.dspace.app.cris.model.ResearcherPage;
 import org.dspace.app.cris.model.export.ExportConstants;
 import org.dspace.app.cris.model.jdyna.ACrisNestedObject;
+import org.dspace.app.cris.model.jdyna.OUNestedObject;
 import org.dspace.app.cris.model.jdyna.OUNestedPropertiesDefinition;
 import org.dspace.app.cris.model.jdyna.OUPropertiesDefinition;
 import org.dspace.app.cris.model.jdyna.OUTypeNestedObject;
+import org.dspace.app.cris.model.jdyna.ProjectNestedObject;
 import org.dspace.app.cris.model.jdyna.ProjectNestedPropertiesDefinition;
 import org.dspace.app.cris.model.jdyna.ProjectPropertiesDefinition;
 import org.dspace.app.cris.model.jdyna.ProjectTypeNestedObject;
+import org.dspace.app.cris.model.jdyna.RPNestedObject;
 import org.dspace.app.cris.model.jdyna.RPNestedPropertiesDefinition;
 import org.dspace.app.cris.model.jdyna.RPPropertiesDefinition;
 import org.dspace.app.cris.model.jdyna.RPTypeNestedObject;
@@ -69,7 +72,13 @@ public class CustomRequestPayloadValidatingInterceptor extends
         buildXML("requestresearchergrants.xsd", Project.class, ProjectPropertiesDefinition.class, ProjectNestedPropertiesDefinition.class, ProjectTypeNestedObject.class,
                 UtilsXSD.GRANT_DEFAULT_ELEMENT, false);
         buildXML("requestorgunits.xsd", OrganizationUnit.class, OUPropertiesDefinition.class, OUNestedPropertiesDefinition.class, OUTypeNestedObject.class,
-                UtilsXSD.OU_DEFAULT_ELEMENT, false); 
+                UtilsXSD.OU_DEFAULT_ELEMENT, false);
+        buildNestedXML("requestrpnested.xsd", RPNestedObject.class, RPPropertiesDefinition.class, RPNestedPropertiesDefinition.class, RPTypeNestedObject.class,
+                UtilsXSD.NESTED_DEFAULT_ELEMENT, false);
+        buildNestedXML("requestpjnested.xsd", ProjectNestedObject.class, ProjectPropertiesDefinition.class, ProjectNestedPropertiesDefinition.class, ProjectTypeNestedObject.class,
+                UtilsXSD.NESTED_DEFAULT_ELEMENT, false);
+        buildNestedXML("requestounested.xsd", OUNestedObject.class, OUPropertiesDefinition.class, OUNestedPropertiesDefinition.class, OUTypeNestedObject.class,
+                UtilsXSD.NESTED_DEFAULT_ELEMENT, false);
         buildXML("responseresearcherpage.xsd", ResearcherPage.class, RPPropertiesDefinition.class, RPNestedPropertiesDefinition.class, RPTypeNestedObject.class,
                 new String[] { "crisobjects","crisobject" }, true);
         buildXML("responseresearchergrants.xsd", Project.class,
@@ -78,8 +87,13 @@ public class CustomRequestPayloadValidatingInterceptor extends
         buildXML("responseorgunits.xsd", OrganizationUnit.class,
                 OUPropertiesDefinition.class, OUNestedPropertiesDefinition.class, OUTypeNestedObject.class,
                 new String[] { "crisobjects","crisobject" }, true);
-        // buildXML("responserepublications.xsd", null,
-        // new String[] { "crisobjects","item" }, true);
+        buildNestedXML("responserpnested.xsd", RPNestedObject.class, RPPropertiesDefinition.class, RPNestedPropertiesDefinition.class, RPTypeNestedObject.class,
+                new String[] { "crisobjects","crisobject" }, true);
+        buildNestedXML("responsepjnested.xsd", ProjectNestedObject.class, ProjectPropertiesDefinition.class, ProjectNestedPropertiesDefinition.class, ProjectTypeNestedObject.class,
+                new String[] { "crisobjects","crisobject" }, true);
+        buildNestedXML("responseounested.xsd", OUNestedObject.class, OUPropertiesDefinition.class, OUNestedPropertiesDefinition.class, OUTypeNestedObject.class,
+                new String[] { "crisobjects","crisobject" }, true);
+        // buildXML("responserepublications.xsd", null, new String[] { "crisobjects","item" }, true);
         super.setSchema(schema);
     }
 
@@ -243,6 +257,169 @@ public class CustomRequestPayloadValidatingInterceptor extends
         }
 
     }
+    
+    private <ACO extends ACrisNestedObject<NP, NTP, P, TP>, P extends Property<TP>, TP extends PropertiesDefinition, NP extends ANestedProperty<NTP>, NTP extends ANestedPropertiesDefinition, ACNO extends ACrisNestedObject<NP, NTP, P, TP>, ATNO extends ATypeNestedObject<NTP>> void buildNestedXML(String name,
+            Class<ACO> clazzACO, Class<TP> clazz, Class<NTP> clazzNTP, Class<ATNO> clazzTypeNested, String[] elementsRoot, boolean response)
+    {
+        File dir = new File(PATH_DIR);
+        File filexsd = null;
+        String nameXSD = name;
+        filexsd = new File(dir, nameXSD);
+        if (filexsd.exists())
+        {
+            filexsd.delete();
+        }
+        try
+        {
+            filexsd.createNewFile();
+        }
+        catch (IOException e)
+        {
+            log.error(e.getMessage(), e);
+
+        }
+        FileWriter writer = null;
+        try
+        {
+            writer = new FileWriter(filexsd);
+        }
+        catch (IOException e)
+        {
+            log.error(e.getMessage(), e);
+
+        }
+        List<IContainable> metadataALL = null;
+        List<IContainable> metadataNestedLevel = null;
+        try
+        {
+            metadataALL = applicationService.newFindAllContainables(clazzNTP);
+            List<ATNO> ttps = applicationService.getList(clazzTypeNested);
+            metadataNestedLevel = new LinkedList<IContainable>();
+            for (ATNO ttp : ttps) {
+                IContainable ic = applicationService.findContainableByDecorable(ttp.getDecoratorClass(), ttp.getId());
+                if (ic != null) {
+                    metadataNestedLevel.add(ic);
+                }
+            }
+
+        }
+        catch (InstantiationException e)
+        {
+            log.error(e.getMessage(), e);
+
+        }
+        catch (IllegalAccessException e)
+        {
+            log.error(e.getMessage(), e);
+
+        }
+        try
+        {
+            if (response)
+            {
+                try
+                {
+                	DSpace dspace = new DSpace();
+                    IBulkChangesService importer = dspace.getServiceManager().getServiceByName("XMLBulkChangesService", IBulkChangesService.class);
+                    
+                	String[] namespace = UtilsXSD.getNamespace(clazzNTP);
+                    filexsd = importer.generateTemplate(
+                            writer,
+                            dir,
+                            metadataNestedLevel, metadataALL,
+                            filexsd,
+                            elementsRoot,
+                            namespace[0]+":",
+                            namespace[1],
+                            namespace[1],
+                            new String[] {
+                                    ExportConstants.NAME_PUBLICID_ATTRIBUTE,
+                                    ExportConstants.NAME_BUSINESSID_ATTRIBUTE,
+                                    ExportConstants.NAME_ID_ATTRIBUTE,
+                                    ExportConstants.NAME_TYPE_ATTRIBUTE },
+                            new boolean[] { true, false, false,
+                                    true });
+
+                }
+                
+                catch (SecurityException e)
+                {
+                    log.error(e.getMessage(), e);
+
+                }
+                catch (IOException e)
+                {
+                    log.error(e.getMessage(), e);
+
+                }
+                catch (NoSuchFieldException e)
+                {
+                    log.error(e.getMessage(), e);
+                }
+                catch (InstantiationException e)
+                {
+                    log.error(e.getMessage(), e);
+                }
+                catch (IllegalAccessException e)
+                {
+                    log.error(e.getMessage(), e);
+                }
+            }
+            else
+            {
+
+                if (clazzNTP.isAssignableFrom(ProjectNestedPropertiesDefinition.class))
+                {
+                    filexsd = ImportExportUtils
+                            .generateSimpleTypeWithListOfAllMetadata(
+                                    writer,
+                                    metadataNestedLevel,
+                                    filexsd,
+                                    "reqpjnested:",
+                                    "http://4science.github.io/dspace-cris/pjnested/listmetadata/schemas",
+                                    "NESTEDmetadata");
+                }
+                else if (clazzNTP.isAssignableFrom(RPNestedPropertiesDefinition.class))
+                {
+                    filexsd = ImportExportUtils
+                            .generateSimpleTypeWithListOfAllMetadata(
+                                    writer,
+                                    metadataNestedLevel,
+                                    filexsd,
+                                    "reqrpnested:",
+                                    "http://4science.github.io/dspace-cris/rpnested/listmetadata/schemas",
+                                    "NESTEDmetadata");
+                }
+                else if (clazzNTP.isAssignableFrom(OUNestedPropertiesDefinition.class))
+                {
+                    filexsd = ImportExportUtils
+                            .generateSimpleTypeWithListOfAllMetadata(
+                                    writer,
+                                    metadataNestedLevel,
+                                    filexsd,
+                                    "reqounested:",
+                                    "http://4science.github.io/dspace-cris/ounested/listmetadata/schemas",
+                                    "NESTEDmetadata");
+                }
+                
+            }
+        }
+        catch (SecurityException e)
+        {
+            log.error(e.getMessage(), e);
+
+        }
+        catch (IOException e)
+        {
+            log.error(e.getMessage(), e);
+
+        }
+        catch (NoSuchFieldException e)
+        {
+            log.error(e.getMessage(), e);
+        }
+
+    }    
 
     public ApplicationService getApplicationService()
     {

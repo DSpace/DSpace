@@ -138,7 +138,33 @@
 	    </property>
 	</bean>
 
-	<bean name="org.dspace.submit.lookup.SubmissionLookupOutputGenerator" class="org.dspace.submit.lookup.SubmissionLookupOutputGenerator" scope="prototype"/>
+	<bean name="org.dspace.submit.lookup.SubmissionLookupOutputGenerator" class="org.dspace.submit.lookup.SubmissionLookupOutputGenerator" scope="prototype">
+	<property name="identifiersMap">
+		<map>
+			<entry key="pubmed">
+				<value>pubmedID</value>
+			</entry>
+			<entry key="crossref">
+				<value>doi</value>
+			</entry>
+			<entry key="arxiv">
+				<value>url</value>
+			</entry>
+			<entry key="cinii">
+				<value>ncid</value>
+			</entry>
+			<entry key="scopus">
+				<value>eid</value>
+			</entry>
+			<entry key="wos">
+				<value>isiId</value>
+			</entry>
+			<entry key="ads">
+				<value>adsbibcode</value>
+			</entry>
+		</map>
+	</property>
+    </bean>
 	
 	<!-- Specify here any filters or modifiers to run before the output -->
 	<bean name="phase1LinearWorkflow" class="gr.ekt.bte.core.LinearWorkflow" scope="prototype">

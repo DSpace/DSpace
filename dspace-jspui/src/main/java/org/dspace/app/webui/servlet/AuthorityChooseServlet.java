@@ -13,23 +13,24 @@ package org.dspace.app.webui.servlet;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.Properties;
 import java.sql.SQLException;
+import java.util.Properties;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.xml.sax.SAXException;
+
+import org.apache.xml.serializer.Method;
+import org.apache.xml.serializer.OutputPropertiesFactory;
+import org.apache.xml.serializer.Serializer;
+import org.apache.xml.serializer.SerializerFactory;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.authority.ChoiceAuthorityManager;
 import org.dspace.content.authority.Choices;
 import org.dspace.content.authority.ChoicesXMLGenerator;
 import org.dspace.core.Context;
-
-import org.apache.xml.serializer.SerializerFactory;
-import org.apache.xml.serializer.Serializer;
-import org.apache.xml.serializer.OutputPropertiesFactory;
-import org.apache.xml.serializer.Method;
+import org.xml.sax.SAXException;
 
 
 
@@ -77,9 +78,27 @@ public class AuthorityChooseServlet extends DSpaceServlet {
         int limit = UIUtil.getIntParameter(request, "limit");
 
         Choices result = cam.getMatches(field, query, collection, start, limit, null);
+//        USE FOR TEST SCOPE        
+//        Map<String, String> extras = new HashMap<String,String>();
+//        extras.put("link", "www.google.com");
+//        extras.put("insolr", "false");
+//        extras.put("data-dc_description_sponsorship", "Test sponsorship::ou00001");
+//        extras.put("data-dc_relation_ispartof", "Test ispartof::journal00001");
+//        extras.put("data-dc_title", "Test 1");
+//        extras.put("data-dc_identifier_citation", "111111");
+//        extras.put("data-dc_publisher", "Test Publisher 1::rp00001");
+//        
+//        Map<String, String> extras2 = new HashMap<String,String>();
+//        extras2.put("link", "www.yahoo.com");
+//        extras2.put("insolr", "false");
+//        extras2.put("data-dc_description_sponsorship", "Test 2 sponsorship");
+//        extras2.put("data-dc_relation_ispartof", "Test 2 ispartof");
+//        extras2.put("data-dc_title", "Test 2");
+//        extras2.put("data-dc_identifier_citation", "222222");
+//        extras2.put("data-dc_publisher", "Test Publisher 2");
 //        Choice[] testValues = {
-//            new Choice("rp0001", "VALUE1","TEST LABEL1"),
-//            new Choice("rp0002", "VALUE2","TEST LABEL2"),
+//            new Choice("rp0001", "VALUE1","TEST LABEL1", extras),
+//            new Choice("rp0002", "VALUE2","TEST LABEL2", extras2),
 //            new Choice("rp0003", "VALUE3","TEST LABEL3"),
 //            new Choice("rp0004", "VALUE COGN, LABEL1","TEST COGN, LABEL1"),
 //            new Choice("rp0005", "VALUE COGN, LABEL2","TEST COGN, LABEL2"),
@@ -87,6 +106,7 @@ public class AuthorityChooseServlet extends DSpaceServlet {
 //        };
 //
 //        Choices result = new Choices(testValues,start,testValues.length,Choices.CF_ACCEPTED,false);
+//      END TEST
         response.setContentType("text/xml; charset=\"utf-8\"");
         Writer writer = response.getWriter();
         // borrow xalan's serializer to let us use SAX choice menu generator
