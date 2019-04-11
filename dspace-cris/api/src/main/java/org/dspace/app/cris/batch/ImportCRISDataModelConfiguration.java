@@ -894,7 +894,7 @@ public class ImportCRISDataModelConfiguration
             Boolean bnewLine = false;
             if (StringUtils.isNotBlank(newLine))
             {
-                bnewLine = bnewLine.equals("y") ? true : false;
+                bnewLine = newLine.equals("y") ? true : false;
             }
 			System.out.println("Writing  " + target + "/" + shortName);
 
