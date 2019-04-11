@@ -77,6 +77,40 @@
 			</div>
 		</div>
      
+        <div id="home_obligacion_deposito_button">
+            <a title="Acceder a las políticas de obligación de depósito.">
+                <xsl:attribute name="href">
+                    <xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>
+                    <xsl:text>handle/10915/74049</xsl:text>
+                </xsl:attribute>
+                <img>
+                    <xsl:attribute name="src">
+                        <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
+                        <xsl:text>/themes/</xsl:text>
+                        <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
+                        <xsl:text>/images/home_obligacion_deposito_button.png</xsl:text>
+                    </xsl:attribute>&#160;
+                </img>
+            </a>
+        </div>
+
+        <div id="home_pagina_estadisticas_button">
+            <a title="Acceder a las estadísticas de contenidos en el repositorio.">
+                <xsl:attribute name="href">
+                    <xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>
+                    <xsl:text>/pages/estadisticasContenidoRepositorio</xsl:text>
+                </xsl:attribute>
+                <img>
+                    <xsl:attribute name="src">
+                        <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
+                        <xsl:text>/themes/</xsl:text>
+                        <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
+                        <xsl:text>/images/home_statistics_button.png</xsl:text>
+                    </xsl:attribute>&#160;
+                </img>
+            </a>
+        </div>
+
 	     <div id='home_feed'>
 	         <xsl:apply-templates select="dri:div[@id='ar.edu.unlp.sedici.aspect.news.ShowNews.div.feed']"/>
 	     </div>

@@ -4054,3 +4054,26 @@ table.dropdown-table.ui-accordion tr:hover td{
   .share-bar>div#import_mendeley a span {
     background: url("../../images/icon_mendeley_24x24.png") no-repeat scroll left top;
   }
+  
+  
+#home_obligacion_deposito_button {
+    line-height: 1.5;
+	width: 49%;
+	float: left;
+	margin-right: 10px;
+	padding-top: 9px;
+}
+
+#home_pagina_estadisticas_button {
+    line-height: 1.5;
+	width: 49%;
+	float: left;
+	margin-left: 3px;
+	padding: 10px 0 0;
+	margin-bottom: 10px;
+}
+
+#home_obligacion_deposito_button img, #home_pagina_estadisticas_button img {
+	width: 97%;
+}
+ 

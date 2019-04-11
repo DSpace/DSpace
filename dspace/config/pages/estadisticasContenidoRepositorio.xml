@@ -1,0 +1,34 @@
+<document xmlns="http://di.tamu.edu/DRI/1.0/"
+xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
+
+<meta>
+    <pageMeta>
+        <metadata element="title">SEDICI - Estadísticas de crecimiento del repositorio</metadata>
+    </pageMeta>
+</meta>
+
+<body>
+    <div>
+        <head>Estadisticas de crecimiento de contenidos en el repositorio</head>
+        
+        <div id='pagina_estatica' class="pagina_reportesContenido">
+            <div id="crecimiento_mensual_año_actual">
+                <iframe width="600" height="371" frameborder="0" scrolling="no" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRPMopBammb_n5yXOZ-c7uTlEUTQG9VNis9EzFxm4FtQWWu-1obDFqufyA7hQVSBQPpivSVsHugvmki/pubchart?oid=813404645&amp;format=interactive">Gráfico mensual</iframe>
+                <p> 
+                    Gráfico interactivo donde se visualiza el crecimiento mensual en el contenido del repositorio para el año vigente.
+                </p>
+            </div>
+            
+            <div id="crecimiento_anual">
+                <iframe width="708" height="335" frameborder="0" scrolling="no" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRPMopBammb_n5yXOZ-c7uTlEUTQG9VNis9EzFxm4FtQWWu-1obDFqufyA7hQVSBQPpivSVsHugvmki/pubchart?oid=84460176&amp;format=interactive">Gráfico anual</iframe>
+                <p> 
+                    Gráfico interactivo donde se visualiza el crecimiento anual, mes a mes, en el contenido del repositorio, desde sus orígenes en el año 2003 hasta la actualidad.
+                </p>
+            </div>
+        </div>
+    </div>
+</body>
+
+</document>
+
+
