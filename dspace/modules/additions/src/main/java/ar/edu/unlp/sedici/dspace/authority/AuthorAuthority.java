@@ -85,11 +85,19 @@ public class AuthorAuthority extends AdvancedSPARQLAuthorityProvider {
 		pqs.append("?person a foaf:Person ; foaf:givenName ?name; foaf:surname ?surname. \n");
 		pqs.append("	OPTIONAL { ?person foaf:mbox ?mail . } . \n"); 
 		pqs.append("	OPTIONAL { " // begin 2do optional
-				+ "?person cerif:linksToOrganisationUnit ?link . ?link cerif:startDate ?inicio; cerif:endDate ?fin; foaf:Organization ?org . ?org foaf:name ?affiliation. OPTIONAL { ?org sioc:id ?id }. "
-					+ "  OPTIONAL { ?org skos:broader ?parent. ?parent foaf:name ?parentName . OPTIONAL {?parent sioc:id ?idParent} . " //begin 3er optional
-					+ "    OPTIONAL { ?parent skos:broader ?gParent. ?gParent foaf:name ?gParentName . OPTIONAL {?gParent sioc:id ?idGParent} . } "
-					+ "} \n"); // end 3er optional
-		pqs.append("	}\n"); //end del 2do optional
+				+ "	OPTIONAL { ?person cerif:linksToOrganisationUnit ?link . " // begin link
+					+ " OPTIONAL { ?link cerif:startDate ?inicio; cerif:endDate ?fin . } ."
+					+ " OPTIONAL { ?link foaf:Organization ?org . ?org foaf:name ?affiliation. " // begin org
+						+ " OPTIONAL { ?org sioc:id ?id }. "
+						+ " OPTIONAL { ?org skos:broader ?parent. ?parent foaf:name ?parentName . " //begin parent
+						+ "		OPTIONAL {?parent sioc:id ?idParent} . "
+							+ " OPTIONAL { ?parent skos:broader ?gParent. ?gParent foaf:name ?gParentName . " //begin gparent
+								+ "    OPTIONAL {?gParent sioc:id ?idGParent} . "
+							+ "} " // end gparent
+						+ "} " // end parent
+					+ "} " // end org
+			+ "} \n"); // end link
+		pqs.append("	}\n"); 
 		if (!"".equals(text)) {
 			text = normalizeTextForParserSPARQL10(text);
 			String[] tokens = text.split(",");
@@ -115,24 +123,27 @@ public class AuthorAuthority extends AdvancedSPARQLAuthorityProvider {
 			Statement link = links.next();
 			
 			Resource affiliation = link.getObject().asResource();
-			Resource org = affiliation.getProperty(organization).getObject().asResource();			
-			String name = org.getProperty(orgName).getString();
-			String id = org.getProperty(siocId).getString();
-			if (org.hasProperty(skosBroader)){
-				Resource orgParent = org.getProperty(skosBroader).getObject().asResource();
-				if (orgParent.hasProperty(skosBroader)){
-					string += this.getParentToString(orgParent.getProperty(skosBroader).getObject().asResource());					
+			if (affiliation.hasProperty(organization)){
+					
+				Resource org = affiliation.getProperty(organization).getObject().asResource();			
+				String name = org.getProperty(orgName).getString();
+				String id = org.getProperty(siocId).getString();
+				if (org.hasProperty(skosBroader)){
+					Resource orgParent = org.getProperty(skosBroader).getObject().asResource();
+					if (orgParent.hasProperty(skosBroader)){
+						string += this.getParentToString(orgParent.getProperty(skosBroader).getObject().asResource());					
+					}
+					string += this.getParentToString(orgParent);
 				}
-				string += this.getParentToString(orgParent);
+				string += (!"".equals(id)) ? id : name;
+				String start = affiliation.getProperty(startDate).getString();
+				String end = affiliation.getProperty(endDate).getString();
+				if(!"".equals(start) || !"".equals(end)){
+					string += getPeriodForFiliation(start, end);
+				}
+	
+				if (links.hasNext()) string += ", ";
 			}
-			string += (!"".equals(id)) ? id : name;
-			String start = affiliation.getProperty(startDate).getString();
-			String end = affiliation.getProperty(endDate).getString();
-			if(!"".equals(start) || !"".equals(end)){
-				string += getPeriodForFiliation(start, end);
-			}
-
-			if (links.hasNext()) string += ", ";
 		};
 		return string += ")";
 	}
