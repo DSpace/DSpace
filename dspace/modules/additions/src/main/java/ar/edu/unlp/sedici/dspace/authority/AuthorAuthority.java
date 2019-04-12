@@ -2,6 +2,9 @@ package ar.edu.unlp.sedici.dspace.authority;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.dspace.content.authority.Choice;
 import com.hp.hpl.jena.query.ParameterizedSparqlString;
@@ -9,11 +12,13 @@ import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
+import com.hp.hpl.jena.sparql.engine.http.QueryEngineHTTP;
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.ResIterator;
 //FIXME cambiar  los queries para que levanten autores
-public class AuthorAuthority extends AdvancedSPARQLAuthorityProvider {
+public class AuthorAuthority extends SPARQLAuthorityProvider {
 
 	protected static final Resource person = ResourceFactory.createResource(NS_FOAF + "Person");
 	protected static final Property surname = ResourceFactory.createProperty(NS_FOAF + "surname");
@@ -27,8 +32,7 @@ public class AuthorAuthority extends AdvancedSPARQLAuthorityProvider {
 	protected static final Property skosBroader = ResourceFactory.createProperty(NS_SKOS + "broader");
 	protected static final Property startDate = ResourceFactory.createProperty(NS_CERIF + "startDate");
 	protected static final Property endDate = ResourceFactory.createProperty(NS_CERIF + "endDate");
-			
-	@Override
+
 	protected ResIterator getRDFResources(Model model) {
 		return model.listSubjectsWithProperty(type, person);
 	}
@@ -46,7 +50,34 @@ public class AuthorAuthority extends AdvancedSPARQLAuthorityProvider {
 		return new Choice(key, value, label);
 	}
 
+	protected Choice[] extractChoicesfromQuery(QueryEngineHTTP httpQuery) {
+		List<Choice> choices = new LinkedList<Choice>();
+
+		Model model = httpQuery.execConstruct(ModelFactory.createDefaultModel());
+		ResIterator RDFResources = getRDFResources(model);
+		while (RDFResources.hasNext()){
+			choices.add(this.extractChoice(RDFResources.next()));
+		};
+		choices.sort(new Comparator<Choice>() {
+		    @Override
+		    public int compare(Choice m1, Choice m2) {
+		        if(m1.label == m2.label){
+		            return 0;
+		        }
+		        return m1.label.compareTo(m2.label) < 0 ? -1 : 1;
+		     }
+		});
+		return choices.toArray(new Choice[0]);
+	}
+
 	@Override
+	protected ParameterizedSparqlString getSparqlSearch(String field, String filter, String locale, boolean idSearch) {
+		if (idSearch)
+			return this.getSparqlSearchByIdQuery(field, filter, locale);
+		else
+			return this.getSparqlSearchByTextQuery(field, filter, locale);
+	}
+
 	protected ParameterizedSparqlString getSparqlSearchByIdQuery(String field,
 			String key, String locale) {
 		ParameterizedSparqlString pqs = new ParameterizedSparqlString();
@@ -68,7 +99,6 @@ public class AuthorAuthority extends AdvancedSPARQLAuthorityProvider {
 		return pqs;
 	}
 
-	@Override
 	protected ParameterizedSparqlString getSparqlSearchByTextQuery(
 			String field, String text, String locale) {
 		ParameterizedSparqlString pqs = new ParameterizedSparqlString();

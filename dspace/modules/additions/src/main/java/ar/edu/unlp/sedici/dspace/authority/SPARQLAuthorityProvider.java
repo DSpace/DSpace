@@ -54,8 +54,8 @@ public abstract class SPARQLAuthorityProvider implements ChoiceAuthority {
 		else 
 			text = text.replace("\"", "");
 
-		ParameterizedSparqlString query = this.getSparqlSearchByTextQuery(
-				field, text, locale);
+		ParameterizedSparqlString query = this.getSparqlSearch(
+				field, text, locale, false);
 		Choice[] choices = this.evalSparql(query, start, limit);
 		log.trace(choices.length + "matches found for text " + text);
 		return new Choices(choices, start, limit, Choices.CF_ACCEPTED, false);
@@ -70,8 +70,8 @@ public abstract class SPARQLAuthorityProvider implements ChoiceAuthority {
 	@Override
 	public String getLabel(String field, String key, String locale) {
 
-		ParameterizedSparqlString query = this.getSparqlSearchByIdQuery(field,
-				key, locale);
+		ParameterizedSparqlString query = this.getSparqlSearch(field,
+				key, locale, true);
 		Choice[] choices = this.evalSparql(query, 0,0);
 		if (choices.length == 0)
 			return null;
@@ -79,11 +79,7 @@ public abstract class SPARQLAuthorityProvider implements ChoiceAuthority {
 			return choices[0].label;
 	}
 
-	protected abstract ParameterizedSparqlString getSparqlSearchByIdQuery(
-			String field, String key, String locale);
-
-	protected abstract ParameterizedSparqlString getSparqlSearchByTextQuery(
-			String field, String text, String locale);
+	protected abstract ParameterizedSparqlString getSparqlSearch(String field, String filter, String locale,boolean idSearch);
 
 	protected abstract Choice[] extractChoicesfromQuery(QueryEngineHTTP httpQuery);
 
