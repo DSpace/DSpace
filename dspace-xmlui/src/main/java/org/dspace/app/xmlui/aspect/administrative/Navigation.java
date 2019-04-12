@@ -61,6 +61,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
     private static final Message T_context_create_subcommunity 	= message("xmlui.administrative.Navigation.context_create_subcommunity");
     private static final Message T_context_create_community 	= message("xmlui.administrative.Navigation.context_create_community");
     private static final Message T_context_export_metadata      = message("xmlui.administrative.Navigation.context_export_metadata");
+    private static final Message T_context_generate_certificate      = message("xmlui.administrative.Navigation.context_generate_certificate");
     private static final Message T_administrative_batch_import      = message("xmlui.administrative.Navigation.administrative_batch_import");
     private static final Message T_administrative_import_metadata       = message("xmlui.administrative.Navigation.administrative_import_metadata");
     private static final Message T_administrative_head 				= message("xmlui.administrative.Navigation.administrative_head");
@@ -223,7 +224,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
                     {
                         context.addItem().addXref(contextPath+"/admin/export?itemID="+item.getID(), T_context_export_item );
                         context.addItem().addXref(contextPath+ "/csv/handle/"+dso.getHandle(),T_context_export_metadata );
-                    }
+                        context.addItem().addXref(contextPath+ "/certificate/handle/"+dso.getHandle(),T_context_generate_certificate );                    }
                 }
     	}
     	else if (dso instanceof Collection)

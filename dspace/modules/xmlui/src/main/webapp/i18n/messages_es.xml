@@ -1061,6 +1061,7 @@
 <message key="xmlui.administrative.Navigation.context_create_subcommunity">Crear subcomunidad</message>
 <message key="xmlui.administrative.Navigation.context_create_community">Crear comunidad</message>
 <message key="xmlui.administrative.Navigation.context_export_item">Exportar ítem</message>
+<message key="xmlui.administrative.Navigation.context_generate_certificate">Generar certificado de depósito</message>
 <message key="xmlui.administrative.Navigation.context_export_collection">Exportar colección</message>
 <message key="xmlui.administrative.Navigation.context_export_community">Exportar comunidad</message>
 <message key="xmlui.administrative.Navigation.context_export_metadata">Exportar metadatos</message>
