@@ -709,15 +709,6 @@
                                 <xsl:attribute name="href">
                                     <xsl:value-of
                                             select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
-                                    <xsl:text>/contact</xsl:text>
-                                </xsl:attribute>
-                                <i18n:text>xmlui.dri2xhtml.structural.contact-link</i18n:text>
-                            </a>
-                            <xsl:text> | </xsl:text>
-                            <a>
-                                <xsl:attribute name="href">
-                                    <xsl:value-of
-                                            select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
                                     <xsl:text>/feedback</xsl:text>
                                 </xsl:attribute>
                                 <i18n:text>xmlui.dri2xhtml.structural.feedback-link</i18n:text>
