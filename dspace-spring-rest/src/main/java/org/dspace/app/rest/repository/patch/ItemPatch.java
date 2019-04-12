@@ -7,7 +7,7 @@
  */
 package org.dspace.app.rest.repository.patch;
 
-import org.dspace.app.rest.exception.PatchBadRequestException;
+import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.patch.Operation;
@@ -32,7 +32,7 @@ public class ItemPatch extends DSpaceObjectPatch<ItemRest> {
      * @param item the rest representation of the item
      * @param operation the replace operation
      * @throws UnprocessableEntityException
-     * @throws PatchBadRequestException
+     * @throws DSpaceBadRequestException
      */
     protected ItemRest replace(ItemRest item, Operation operation) {
 

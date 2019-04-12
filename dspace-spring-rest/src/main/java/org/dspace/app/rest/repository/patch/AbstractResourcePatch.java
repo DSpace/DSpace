@@ -9,7 +9,7 @@ package org.dspace.app.rest.repository.patch;
 
 import java.util.List;
 
-import org.dspace.app.rest.exception.PatchBadRequestException;
+import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.patch.Operation;
@@ -28,7 +28,7 @@ public abstract class AbstractResourcePatch<R extends RestModel> {
      * @param restModel the rest resource to patch
      * @param operations list of patch operations
      * @throws UnprocessableEntityException
-     * @throws PatchBadRequestException
+     * @throws DSpaceBadRequestException
      */
     public R patch(R restModel, List<Operation> operations) {
 
@@ -53,7 +53,7 @@ public abstract class AbstractResourcePatch<R extends RestModel> {
                     continue ops;
                 default:
                     // JsonPatchConverter should have thrown error before this point.
-                    throw new PatchBadRequestException("Missing or illegal patch operation: " + op.getOp());
+                    throw new DSpaceBadRequestException("Missing or illegal patch operation: " + op.getOp());
             }
         }
 
@@ -63,14 +63,14 @@ public abstract class AbstractResourcePatch<R extends RestModel> {
     // The default patch methods throw an error when no sub-class implementation is provided.
 
     protected R add(R restModel, Operation operation)
-            throws UnprocessableEntityException, PatchBadRequestException {
+            throws UnprocessableEntityException, DSpaceBadRequestException {
         throw new UnprocessableEntityException(
                 "The add operation is not supported."
         );
     }
 
     protected R replace(R restModel, Operation operation)
-            throws UnprocessableEntityException, PatchBadRequestException {
+            throws UnprocessableEntityException, DSpaceBadRequestException {
         throw new UnprocessableEntityException(
                 "The replace operation is not supported."
         );
@@ -78,21 +78,21 @@ public abstract class AbstractResourcePatch<R extends RestModel> {
 
     protected R remove(R restModel, Operation operation)
 
-            throws UnprocessableEntityException, PatchBadRequestException {
+            throws UnprocessableEntityException, DSpaceBadRequestException {
         throw new UnprocessableEntityException(
                 "The remove operation is not supported."
         );
     }
 
     protected R copy(R restModel, Operation operation)
-            throws UnprocessableEntityException, PatchBadRequestException {
+            throws UnprocessableEntityException, DSpaceBadRequestException {
         throw new UnprocessableEntityException(
                 "The copy operation is not supported."
         );
     }
 
     protected R move(R restModel, Operation operation)
-            throws UnprocessableEntityException, PatchBadRequestException {
+            throws UnprocessableEntityException, DSpaceBadRequestException {
         throw new UnprocessableEntityException(
                 "The move operation is not supported."
         );
