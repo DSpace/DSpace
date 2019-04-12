@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.logging.log4j.Logger;
-import org.dspace.app.rest.exception.PatchBadRequestException;
+import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.RESTAuthorizationException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
@@ -369,10 +369,10 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
      * @return
      * @throws HttpRequestMethodNotSupportedException
      * @throws UnprocessableEntityException
-     * @throws PatchBadRequestException
+     * @throws DSpaceBadRequestException
      */
     public T patch(HttpServletRequest request, String apiCategory, String model, ID id, Patch patch)
-        throws HttpRequestMethodNotSupportedException, UnprocessableEntityException, PatchBadRequestException {
+        throws HttpRequestMethodNotSupportedException, UnprocessableEntityException, DSpaceBadRequestException {
         Context context = obtainContext();
 
         try {
@@ -401,7 +401,7 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
      * @return the full new state of the REST object after patching
      * @throws HttpRequestMethodNotSupportedException
      * @throws UnprocessableEntityException
-     * @throws PatchBadRequestException
+     * @throws DSpaceBadRequestException
      * @throws RepositoryMethodNotImplementedException
      *             returned by the default implementation when the operation is not supported for the entity
      *

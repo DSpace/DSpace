@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.UUID;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.BadRequestException;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -23,6 +22,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.rest.converter.ItemConverter;
 import org.dspace.app.rest.converter.MetadataConverter;
+import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.ItemRest;
@@ -199,12 +199,12 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
         }
 
         if (itemRest.getInArchive() == false) {
-            throw new BadRequestException("InArchive attribute should not be set to false for the create");
+            throw new DSpaceBadRequestException("InArchive attribute should not be set to false for the create");
         }
         UUID owningCollectionUuid = UUIDUtils.fromString(owningCollectionUuidString);
         Collection collection = collectionService.find(context, owningCollectionUuid);
         if (collection == null) {
-            throw new BadRequestException("The given owningCollection parameter is invalid: "
+            throw new DSpaceBadRequestException("The given owningCollection parameter is invalid: "
                                               + owningCollectionUuid);
         }
         WorkspaceItem workspaceItem = workspaceItemService.create(context, collection, false);

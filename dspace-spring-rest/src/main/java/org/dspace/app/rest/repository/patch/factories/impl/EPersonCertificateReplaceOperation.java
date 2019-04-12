@@ -7,7 +7,7 @@
  */
 package org.dspace.app.rest.repository.patch.factories.impl;
 
-import org.dspace.app.rest.exception.PatchBadRequestException;
+import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.model.EPersonRest;
 import org.dspace.app.rest.model.patch.Operation;
 import org.springframework.stereotype.Component;
@@ -42,7 +42,7 @@ public class EPersonCertificateReplaceOperation extends ReplacePatchOperation<EP
         // So perhaps the error to throw in this case is different...IllegalStateException?
         // Or perhaps do nothing (no check is required).
         if ((Object) resource.isRequireCertificate() == null) {
-            throw new PatchBadRequestException("Attempting to replace a non-existent value.");
+            throw new DSpaceBadRequestException("Attempting to replace a non-existent value.");
         }
     }
 
