@@ -886,10 +886,10 @@ public class SolrLogger
      * </p>
      */
     public static void markRobots() {
-        log.info("Marking robots by IP starting now...");
-        SolrLogger.markRobotsByIP();
         log.info("Marking robots by User Agent starting now...");
         SolrLogger.markRobotsByUserAgent();
+        log.info("Marking robots by IP starting now...");
+        SolrLogger.markRobotsByIP();
         log.info("Marking robots by Domain starting now...");
         SolrLogger.markRobotsByDomain();
     }
@@ -958,13 +958,13 @@ public class SolrLogger
      */
     public static void deleteRobots()
     {
-        log.info("Delete robots by IP starting now...");
-        for(String ip : SpiderDetector.getSpiderIpAddresses()){
-            deleteBy("ip:" + ip + "*");
-        }
         log.info("Delete robots by User Agent starting now...");
         for(String agent : SpiderDetector.getSpiderAgents()) {
             deleteBy("userAgent:/" + buildSolrRegex(agent) + "/");
+        }
+        log.info("Delete robots by IP starting now...");
+        for(String ip : SpiderDetector.getSpiderIpAddresses()){
+            deleteBy("ip:" + ip + "*");
         }
         log.info("Delete robots by Domain starting now...");
         for(String domain : SpiderDetector.getSpiderDomains()) {

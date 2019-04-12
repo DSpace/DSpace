@@ -1,42 +1,42 @@
 Mozilla\/5\.0 \(compatible; PRTG Network Monitor \(www\.paessler\.com\); Windows\)
 Mozilla\/5\.0 \(compatible; monitis \- premium monitoring service; http:\/\/www\.monitis\.com\)
 Pingdom\.com_bot_version_1\.4_\(http:\/\/www\.pingdom\.com\/\)
-Alexandria(\s|\+)prototype(\s|\+)project
+Alexandria(\ |\+)prototype(\ |\+)project
 AllenTrack
 Arachmo
 Brutus\/AET
-China\sLocal\sBrowse\s2\.6
-Code\sSample\sWeb\sClient
+China\ Local\ Browse\ 2\.6
+Code\ Sample\ Web\ Client
 ContentSmartz
 DSurf
 DataCha0s\/2\.0
-Demo\sBot
+Demo\ Bot
 EmailSiphon
 EmailWolf
-FDM(\s|\+)1
-Fetch(\s|\+)API(\s|\+)Request
+FDM(\ |\+)1
+Fetch(\ |\+)API(\ |\+)Request
 GetRight
-Goldfire(\s|\+)Server
+Goldfire(\ |\+)Server
 Googlebot
 HTTrack
 LOCKSS
 LWP\:\:Simple
 MSNBot
-Microsoft(\s|\+)URL(\s|\+)Control
+Microsoft(\ |\+)URL(\ |\+)Control
 Milbot
 MuscatFerre
 NABOT
 NaverBot
-Offline(\s|\+)Navigator
+Offline(\ |\+)Navigator
 OurBrowser
 Python\-urllib
 Readpaper
 Strider
 T\-H\-U\-N\-D\-E\-R\-S\-T\-O\-N\-E
-Teleport(\s|\+)Pro
+Teleport(\ |\+)Pro
 Teoma
 Wanadoo
-Web(\s|\+)Downloader
+Web(\ |\+)Downloader
 WebCloner
 WebCopier
 WebReaper
@@ -45,8 +45,8 @@ WebZIP
 Webinator
 Webmetrics
 Wget
-Xenu(\s|\+)Link(\s|\+)Sleuth
-#[+:,\.\;\/\\-]bot
+Xenu(\ |\+)Link(\ |\+)Sleuth
+#[+\:,\.\;\/\\\-]bot
 [^a]fish
 ^voyager\/
 acme\.spider
@@ -71,7 +71,7 @@ blogpulse
 boitho\.com\-dc
 bookmark\-manager
 bot
-#bot[+:,\.\;\/\\-]
+#bot[+\:,\.\;\/\\\-]
 bspider
 bwh3_user_agent
 celestial
