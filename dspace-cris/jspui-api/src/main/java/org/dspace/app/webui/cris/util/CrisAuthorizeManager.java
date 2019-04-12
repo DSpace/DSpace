@@ -127,6 +127,13 @@ public class CrisAuthorizeManager
     public static <T extends ACrisObject> boolean isAdmin(
             Context context, T crisObject) throws SQLException 
     {
+    	String crisObjectTypeText = crisObject.getTypeText();
+    	return isAdmin(context,crisObjectTypeText);
+    }
+
+    public static <T extends ACrisObject> boolean isAdmin(
+            Context context, String crisObjectTypeText) throws SQLException 
+    {
         EPerson currUser = context.getCurrentUser();
         if(currUser==null) 
         {
@@ -139,9 +146,7 @@ public class CrisAuthorizeManager
             return true;
         }
 
-        String crisObjectTypeText = crisObject.getTypeText();
-        
-        String groupName = ConfigurationManager.getProperty("cris", "admin" + crisObjectTypeText);
+        String groupName = ConfigurationManager.getProperty("cris", crisObjectTypeText + ".admin");
         if(StringUtils.isBlank(groupName)) {
             groupName = "Administrator "+crisObjectTypeText;
         }
@@ -154,7 +159,7 @@ public class CrisAuthorizeManager
             }
         }
         return false;
-    }
+    }    
     
     public static <T extends ACrisObject> boolean canEdit(
             Context context, ITabService as, Class<? extends AbstractEditTab> classT, T crisObject) throws SQLException 
