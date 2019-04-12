@@ -7,7 +7,7 @@
  */
 package org.dspace.app.rest.repository.patch.factories;
 
-import org.dspace.app.rest.exception.PatchBadRequestException;
+import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.repository.patch.factories.impl.ItemDiscoverableReplaceOperation;
 import org.dspace.app.rest.repository.patch.factories.impl.ItemWithdrawReplaceOperation;
@@ -37,7 +37,7 @@ public class ItemOperationFactory {
      *
      * @param path the operation path
      * @return the patch operation implementation
-     * @throws PatchBadRequestException
+     * @throws DSpaceBadRequestException
      */
     public ResourcePatchOperation<ItemRest> getReplaceOperationForPath(String path) {
 
@@ -47,7 +47,7 @@ public class ItemOperationFactory {
             case OPERATION_PATH_WITHDRAW:
                 return itemWithdrawReplaceOperation;
             default:
-                throw new PatchBadRequestException("Missing patch operation for: " + path);
+                throw new DSpaceBadRequestException("Missing patch operation for: " + path);
         }
     }
 }
