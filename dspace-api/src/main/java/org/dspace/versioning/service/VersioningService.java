@@ -56,4 +56,6 @@ public interface VersioningService {
 
     Version createNewVersion(Context context, VersionHistory history, Item item, String summary, Date date,
                              int versionNumber);
+
+    void removeVersionFromItem(Context context, Item item);
 }

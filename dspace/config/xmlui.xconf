@@ -4,7 +4,7 @@
     <!--
         Aspects are the chainable pipeline of features of that can be enabled for XMLUI
 
-        This section configures the Aspect "chain". An Aspect provides a set 
+        This section configures the Aspect "chain". An Aspect provides a set
         of coupled features for the system. All Aspects are chained together
         such that together they form the complete DSpace website. This is where
         the chain is defined, the order in which each aspect is declared 
@@ -21,6 +21,12 @@
              Item Level Versioning
              Disabled by default due to DS-1382 and DS-1349
              ===================== -->
+        <!--
+             To enable Item Level Versioning features, uncomment this aspect.
+             This is currently disabled by default because of one known issue:
+             DS-1382. Please, review them to see whether they apply
+             to you before enabling versioning.
+        -->
         <!--<aspect name="Versioning Aspect" path="resource://aspects/Versioning/" />-->
         
         <!-- =====================
@@ -81,13 +87,13 @@
         REGEX
             - matches text in the url. regex and handle in the same rule would AND together
 
-        If either the regex or handle attribute is left off then the only the 
+        If either the regex or handle attribute is left off then the only the
         other component is used to determine matching. 
- 
+
         Keep in mind that the order of <theme> elements matters in the case of 
         overlapping matching rules. For example, a theme rule with a very broad
         matching rule (like regex=".*") will override a more specific theme 
-        declaration (like handle="1234/23") if placed before it. 
+        declaration (like handle="1234/23") if placed before it.
      -->
     <themes>
         <!-- <theme name="Test Theme 1" handle="123456789/1" path="theme1/"/>    -->

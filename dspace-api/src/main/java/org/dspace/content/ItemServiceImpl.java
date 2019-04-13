@@ -702,7 +702,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
     protected void removeVersion(Context context, Item item) throws AuthorizeException, SQLException {
         if (versioningService.getVersion(context, item) != null) {
-            versioningService.removeVersion(context, item);
+            versioningService.removeVersionFromItem(context, item);
         } else {
             try {
                 identifierService.delete(context, item);
