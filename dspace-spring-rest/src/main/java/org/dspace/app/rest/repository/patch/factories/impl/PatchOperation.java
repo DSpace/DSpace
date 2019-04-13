@@ -10,7 +10,6 @@ package org.dspace.app.rest.repository.patch.factories.impl;
 import org.apache.commons.lang3.BooleanUtils;
 import org.dspace.app.rest.exception.PatchBadRequestException;
 import org.dspace.app.rest.model.RestModel;
-import org.dspace.app.rest.model.patch.LateObjectEvaluator;
 import org.dspace.app.rest.model.patch.Operation;
 
 /**
