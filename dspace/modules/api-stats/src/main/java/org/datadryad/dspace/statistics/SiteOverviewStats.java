@@ -103,8 +103,9 @@ public class SiteOverviewStats  {
         // TODO: rewrite these to use xpaths and remove getCollectionCount(), getSolrResponseCount
         this.dataFileCount          = getCollectionCount("stats.datafiles.coll", null);
         this.dataFileCount_30day    = getCollectionCount("stats.datafiles.coll", formattedThirtyDayPrior);
-        this.dataPackageCount       = getSolrResponseCount(SolrUtils.solrSearchUrlBase, "location:l2 AND DSpaceStatus:Archived", null);
-        this.dataPackageCount_30day = getSolrResponseCount(SolrUtils.solrSearchUrlBase, "location:l2 AND DSpaceStatus:Archived", "dc.date.issued_dt:[NOW-30DAY TO NOW]");
+        this.dataPackageCount       = getCollectionCount("stats.datapkgs.coll", null);
+        this.dataPackageCount_30day = getCollectionCount("stats.datapkgs.coll", formattedThirtyDayPrior);
+            
         // /TODO
         this.journalCount           = getSolrXPathResult(SolrUtils.solrSearchUrlBase, PUB_SEARCH, PUB_COUNTER);
         this.journalCount_30day     = getSolrXPathResult(SolrUtils.solrSearchUrlBase, PUB_SEARCH_30DAY, PUB_COUNTER);
