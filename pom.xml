@@ -626,6 +626,7 @@
         <profile>
             <id>dspace-jspui</id>
             <activation>
+                <activeByDefault>false</activeByDefault>
                 <file>
                     <exists>dspace-jspui/pom.xml</exists>
                 </file>
@@ -641,6 +642,7 @@
         <profile>
             <id>dspace-rdf</id>
             <activation>
+                <activeByDefault>false</activeByDefault>
                 <file>
                     <exists>dspace-rdf/pom.xml</exists>
                 </file>
@@ -654,6 +656,7 @@
        <profile>
            <id>dspace-rest</id>
            <activation>
+               <activeByDefault>false</activeByDefault>
                <file>
                    <exists>dspace-rest/pom.xml</exists>
                </file>
@@ -670,6 +673,7 @@
         <profile>
             <id>dspace-sword</id>
             <activation>
+                <activeByDefault>false</activeByDefault>
                 <file>
                     <exists>dspace-sword/pom.xml</exists>
                 </file>
@@ -701,6 +705,7 @@
         <profile>
             <id>dspace-swordv2</id>
             <activation>
+                <activeByDefault>false</activeByDefault>
                 <file>
                     <exists>dspace-swordv2/pom.xml</exists>
                 </file>
@@ -755,14 +760,14 @@
                  as it does not include any Java source code to release. -->
             <modules>
                 <module>dspace-api</module>
-                <module>dspace-jspui</module>
+<!--                <module>dspace-jspui</module>-->
                 <module>dspace-oai</module>
-                <module>dspace-rdf</module>
-                <module>dspace-rest</module>
+<!--                <module>dspace-rdf</module>-->
+<!--                <module>dspace-rest</module>-->
                 <module>dspace-services</module>
                 <module>dspace-solr</module>
-                <module>dspace-sword</module>
-                <module>dspace-swordv2</module>
+<!--                <module>dspace-sword</module>-->
+<!--                <module>dspace-swordv2</module>-->
                 <module>dspace-xmlui-mirage2</module>
                 <module>dspace-xmlui</module>
             </modules>
