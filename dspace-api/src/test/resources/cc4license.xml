@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<result>
+    <license-uri>http://creativecommons.org/licenses/by/4.0/</license-uri>
+    <license-name>Navngivelse 4.0 Internasjonal</license-name>
+    <deprecated>false</deprecated>
+    <rdf>
+        <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://creativecommons.org/ns#">
+            <Work xmlns:dc="http://purl.org/dc/elements/1.1/" rdf:about="">
+                <license rdf:resource="http://creativecommons.org/licenses/by/4.0/" />
+            </Work>
+            <License rdf:about="http://creativecommons.org/licenses/by/4.0/">
+            <permits rdf:resource="http://creativecommons.org/ns#DerivativeWorks" />
+            <permits rdf:resource="http://creativecommons.org/ns#Distribution" />
+            <permits rdf:resource="http://creativecommons.org/ns#Reproduction" />
+            <requires rdf:resource="http://creativecommons.org/ns#Attribution" />
+            <requires rdf:resource="http://creativecommons.org/ns#Notice" />
+        </License>
+        </rdf:RDF>
+    </rdf>
+    <licenserdf>
+        <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://creativecommons.org/ns#">
+            <License rdf:about="http://creativecommons.org/licenses/by/4.0/">
+                <permits rdf:resource="http://creativecommons.org/ns#DerivativeWorks" />
+                <permits rdf:resource="http://creativecommons.org/ns#Distribution" />
+                <permits rdf:resource="http://creativecommons.org/ns#Reproduction" />
+                <requires rdf:resource="http://creativecommons.org/ns#Attribution" />
+                <requires rdf:resource="http://creativecommons.org/ns#Notice" />
+            </License>
+        </rdf:RDF>
+    </licenserdf>
+    <html>
+        <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">
+            <img alt="Creative Commons-lisens" style="border-width:0" src="http://i.creativecommons.org/l/by/4.0/88x31.png" />
+        </a>
+        <br />
+        Dette verk er lisensieret under en <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">
+        Creative Commons Navngivelse 4.0 Internasjonal lisens</a>.
+    </html>
+</result>
