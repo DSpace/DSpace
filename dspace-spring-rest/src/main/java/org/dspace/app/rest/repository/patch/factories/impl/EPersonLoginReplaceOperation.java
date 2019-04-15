@@ -36,7 +36,7 @@ public class EPersonLoginReplaceOperation extends ReplacePatchOperation<EPersonR
     }
 
     @Override
-    void checkModelForExistingValue(EPersonRest resource) {
+    void checkModelForExistingValue(EPersonRest resource, Operation operation) {
         if ((Object) resource.isCanLogIn() == null) {
             throw new PatchBadRequestException("Attempting to replace a non-existent value.");
         }

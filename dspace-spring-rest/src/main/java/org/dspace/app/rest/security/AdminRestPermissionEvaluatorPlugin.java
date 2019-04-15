@@ -43,8 +43,8 @@ public class AdminRestPermissionEvaluatorPlugin extends RestObjectPermissionEval
     private EPersonService ePersonService;
 
     @Override
-    public boolean hasPermission(Authentication authentication, Serializable targetId, String targetType,
-                                 Object permission) {
+    public boolean hasDSpacePermission(Authentication authentication, Serializable targetId, String targetType,
+                                       DSpaceRestPermission permission) {
 
         //We do not check the "permission" object here because administrators are allowed to do everything
 
