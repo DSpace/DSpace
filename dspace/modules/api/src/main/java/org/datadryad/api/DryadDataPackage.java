@@ -636,6 +636,7 @@ public class DryadDataPackage extends DryadObject {
                 node.put("created_at", withdrawn.group(1));
             } else {
                 node.put("status", currentStatus);
+                node.put("created_at", 
             }
             resultNode.add(node);
         }
