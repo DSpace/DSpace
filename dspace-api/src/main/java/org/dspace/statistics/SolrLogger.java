@@ -322,9 +322,7 @@ public class SolrLogger
         // Save our basic info that we already have
 
         if(request != null){
-            //String ip = request.getRemoteAddr();
-            //IP que devolvía "Unknown Continent"...
-            String ip = "216.151.180.100";
+            String ip = request.getRemoteAddr();
             
             if (isUseProxies() && request.getHeader("X-Forwarded-For") != null) {
                 /* This header is a comma delimited list */
