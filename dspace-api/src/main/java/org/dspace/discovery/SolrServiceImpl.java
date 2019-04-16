@@ -2107,7 +2107,6 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                     if (MapUtils.isNotEmpty(highlightedFields)) {
                         //We need to remove all the "_hl" appendix strings from our keys
                         Map<String, List<String>> resultMap = new HashMap<String, List<String>>();
-                        Map<String, List<String[]>> resultMapWithAuthority = new HashMap<String, List<String[]>>();
                         for (String key : highlightedFields.keySet()) {
                             List<String> highlightOriginalValue = highlightedFields.get(key);
                             List<String[]> resultHighlightOriginalValue = new ArrayList<String[]>();
@@ -2117,12 +2116,10 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
                             }
                             resultMap.put(key.substring(0, key.lastIndexOf("_hl")), highlightedFields.get(key));
-                            resultMapWithAuthority
-                                .put(key.substring(0, key.lastIndexOf("_hl")), resultHighlightOriginalValue);
                         }
 
                         result.addHighlightedResult(dso,
-                            new DiscoverResult.IndexableObjectHighlightResult(dso, resultMap, resultMapWithAuthority));
+                            new DiscoverResult.IndexableObjectHighlightResult(dso, resultMap));
                     }
                 }
             }
