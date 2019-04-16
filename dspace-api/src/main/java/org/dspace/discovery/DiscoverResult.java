@@ -186,13 +186,10 @@ public class DiscoverResult {
     public static final class IndexableObjectHighlightResult {
         private IndexableObject indexableObject;
         private Map<String, List<String>> highlightResults;
-        private Map<String, List<String[]>> highlightResultsWithAuthority;
 
-        public IndexableObjectHighlightResult(IndexableObject idxObj, Map<String, List<String>> highlightResults,
-                Map<String, List<String[]>> highlightResultsWithAuthority) {
+        public IndexableObjectHighlightResult(IndexableObject idxObj, Map<String, List<String>> highlightResults) {
             this.indexableObject = idxObj;
             this.highlightResults = highlightResults;
-            this.highlightResultsWithAuthority = highlightResultsWithAuthority;
         }
 
         /**
@@ -213,17 +210,6 @@ public class DiscoverResult {
          */
         public List<String> getHighlightResults(String metadataKey) {
             return highlightResults.get(metadataKey);
-        }
-
-        /**
-         * The matching snippets for a specific metadata including the authority value if any
-         * 
-         * @param metadataKey
-         *            the metadata where the snippets have been found
-         * @return the matching snippets
-         */
-        public List<String[]> getHighlightResultsWithAuthority(String metadataKey) {
-            return highlightResultsWithAuthority.get(metadataKey);
         }
 
         /**
