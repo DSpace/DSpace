@@ -772,17 +772,31 @@ else
 <% } %>
 <dspace:sidebar>
 
+<%
+		DiscoverySearchFilterFacet facetGlobalConf = (DiscoverySearchFilterFacet) request.getAttribute("facetGlobalConfig");
+		String fGlobal = null; 
+		List<FacetResult> facetGlobal = null;
+		boolean showGlobalFacet = false;
+		if(facetGlobalConf!=null) {			
+			fGlobal = facetGlobalConf.getIndexFieldName();
+			if(qResults!=null) {
+				facetGlobal = qResults.getFacetResult(fGlobal);
+				if (facetGlobal != null && facetGlobal.size() > 0) {
+					showGlobalFacet = true;
+				}
+			}
+		}
+%>
 
+<%
+if((showGlobalFacet) || (brefine)) {
+%>
 <h3 class="facets"><fmt:message key="jsp.search.facet.refine" /></h3>
 
 <%
-		DiscoverySearchFilterFacet facetGlobalConf = (DiscoverySearchFilterFacet) request.getAttribute("facetGlobalConfig");
-		if(facetGlobalConf!=null) {
-		    String fGlobal = facetGlobalConf.getIndexFieldName();
-			if(qResults!=null) {
-		    List<FacetResult> facetGlobal = qResults.getFacetResult(fGlobal);
+}
+		if(showGlobalFacet) {
 		    String fkeyGlobal = "jsp.search.facet.refine."+fGlobal;
-		    if (facetGlobal != null && facetGlobal.size() > 0) {
 		    %>
 		    <div id="globalFacet" class="facetsBox">
 		    <div id="facet_<%= fkeyGlobal %>" class="panel panel-primary">
@@ -805,8 +819,6 @@ else
 		    }
 		    %></ul></div>
 		    </div><%
-			} 
-			}
 		}
 %>
 
