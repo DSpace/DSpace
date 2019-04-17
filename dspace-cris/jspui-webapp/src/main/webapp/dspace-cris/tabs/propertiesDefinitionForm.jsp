@@ -307,6 +307,12 @@
 								labelKey="jsp.layout.hku.label.propertiesdefinition.rendering.text.size" helpKey="help.jdyna.message.rendering.text.size"/>
 					<div class="dynaClear">
 					&nbsp;
+					<dyna:boolean propertyPath="real.rendering.multilinea"
+								labelKey="jsp.layout.hku.label.propertiesdefinition.rendering.text.multiline" helpKey="help.jdyna.message.rendering.text.multiline"/>
+					<dyna:text visibility="false" propertyPath="real.rendering.dimensione.row"
+								labelKey="jsp.layout.hku.label.propertiesdefinition.rendering.text.row" helpKey="help.jdyna.message.rendering.text.row"/>
+					<div class="dynaClear">
+					&nbsp;
 					</div>			
 					<dyna:text visibility="false" propertyPath="real.rendering.regex"
 								labelKey="jsp.layout.hku.label.propertiesdefinition.rendering.text.regex" helpKey="help.jdyna.message.rendering.text.regex"/>

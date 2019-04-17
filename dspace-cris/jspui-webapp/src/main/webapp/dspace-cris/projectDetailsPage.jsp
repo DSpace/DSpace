@@ -15,6 +15,7 @@
 <%@ taglib uri="http://displaytag.sf.net" prefix="display"%>
 
 <%@ page import="org.dspace.app.webui.util.UIUtil" %>
+<%@ page import="org.dspace.core.ConfigurationManager" %>
 
 <%@ taglib uri="jdynatags" prefix="dyna"%>
 <%@ taglib uri="researchertags" prefix="researcher"%>
@@ -51,9 +52,10 @@
     {
         currentPage = currentPage.substring( 0, c );
     }
-
+    String fieldFeed = ConfigurationManager.getProperty("cris","pj.feed.field");
 %>
 <c:set var="admin" scope="request"><%= isAdmin %></c:set>
+<c:set var="fieldRSS" scope="request"><%= fieldFeed %></c:set>
 <c:set var="dspace.layout.head.last" scope="request">
 
     <script type="text/javascript"><!--
@@ -198,7 +200,7 @@
 	                	<a class="btn btn-default" href="<%= request.getContextPath() %>/cris/tools/subscription/unsubscribe?uuid=${entity.uuid}"><i class="fa fa-bell-o"></i> <fmt:message key="jsp.cris.detail.link.email.alert.remove" /></a>
 	        		</c:otherwise>      
 			  </c:choose>
-			 	<a class="btn btn-default" href="<%= request.getContextPath() %>/open-search?query=dc.relation_authority:${authority}&amp;format=rss"><i class="fa fa-rss"></i> <fmt:message key="jsp.cris.detail.link.rssfeed" /></a>
+			 	<a class="btn btn-default" href="<%= request.getContextPath() %>/open-search?query=${fieldRSS}:${authority}&amp;format=rss"><i class="fa fa-rss"></i> <fmt:message key="jsp.cris.detail.link.rssfeed" /></a>
 		 	 </div>
 		 
 		 <c:if test="${(grant_page_menu || canEdit) && !empty project}"> 
