@@ -103,31 +103,10 @@ public class InitializeEntities {
     private void run(String fileLocation) throws SQLException, AuthorizeException {
         Context context = new Context();
         context.turnOffAuthorisationSystem();
-        List<RelationshipType> relationshipTypes = this.parseXMLToRelations(context, fileLocation);
-        this.saveRelations(context, relationshipTypes);
+        this.parseXMLToRelations(context, fileLocation);
     }
 
-    private void saveRelations(Context context, List<RelationshipType> list) throws SQLException, AuthorizeException {
-        for (RelationshipType relationshipType : list) {
-            RelationshipType relationshipTypeFromDb = relationshipTypeService.findbyTypesAndLabels(context,
-                                                                               relationshipType.getLeftType(),
-                                                                               relationshipType.getRightType(),
-                                                                               relationshipType.getLeftLabel(),
-                                                                               relationshipType.getRightLabel());
-            if (relationshipTypeFromDb == null) {
-                relationshipTypeService.create(context, relationshipType);
-            } else {
-                relationshipTypeFromDb.setLeftMinCardinality(relationshipType.getLeftMinCardinality());
-                relationshipTypeFromDb.setLeftMaxCardinality(relationshipType.getLeftMaxCardinality());
-                relationshipTypeFromDb.setRightMinCardinality(relationshipType.getRightMinCardinality());
-                relationshipTypeFromDb.setRightMaxCardinality(relationshipType.getRightMaxCardinality());
-                relationshipTypeService.update(context, relationshipTypeFromDb);
-            }
-        }
-        context.complete();
-    }
-
-    private List<RelationshipType> parseXMLToRelations(Context context, String fileLocation) throws AuthorizeException {
+    private void parseXMLToRelations(Context context, String fileLocation) throws AuthorizeException {
         try {
             File fXmlFile = new File(fileLocation);
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
@@ -174,21 +153,17 @@ public class InitializeEntities {
                         rightCardinalityMax = getString(rightCardinalityMax,(Element) node, "max");
 
                     }
-                    RelationshipType relationshipType = populateRelationshipType(context,leftType,rightType,leftLabel,
-                                                                                 rightLabel,leftCardinalityMin,
+                    populateRelationshipType(context,leftType,rightType,leftLabel, rightLabel,leftCardinalityMin,
                                                                                  leftCardinalityMax,
                                                                                  rightCardinalityMin,
                                                                                  rightCardinalityMax);
 
 
-                    relationshipTypes.add(relationshipType);
                 }
             }
-            return relationshipTypes;
         } catch (ParserConfigurationException | SAXException | IOException | SQLException e) {
             log.error("An error occurred while parsing the XML file to relations", e);
         }
-        return null;
     }
 
     private String getString(String leftCardinalityMin,Element node, String minOrMax) {
@@ -198,7 +173,7 @@ public class InitializeEntities {
         return leftCardinalityMin;
     }
 
-    private RelationshipType populateRelationshipType(Context context,String leftType,String rightType,String leftLabel,
+    private void populateRelationshipType(Context context,String leftType,String rightType,String leftLabel,
                                                       String rightLabel,String leftCardinalityMin,
                                                       String leftCardinalityMax,String rightCardinalityMin,
                                                       String rightCardinalityMax)
@@ -236,8 +211,18 @@ public class InitializeEntities {
         } else {
             rightCardinalityMaxInteger = null;
         }
-        return relationshipTypeService.create(context, leftEntityType, rightEntityType, leftLabel, rightLabel,
-                                              leftCardinalityMinInteger, leftCardinalityMaxInteger,
-                                              rightCardinalityMinInteger, rightCardinalityMaxInteger);
+        RelationshipType relationshipType = relationshipTypeService
+            .findbyTypesAndLabels(context, leftEntityType, rightEntityType, leftLabel, rightLabel);
+        if (relationshipType == null) {
+            relationshipTypeService.create(context, leftEntityType, rightEntityType, leftLabel, rightLabel,
+                                           leftCardinalityMinInteger, leftCardinalityMaxInteger,
+                                           rightCardinalityMinInteger, rightCardinalityMaxInteger);
+        } else {
+            relationshipType.setLeftMinCardinality(leftCardinalityMinInteger);
+            relationshipType.setLeftMaxCardinality(leftCardinalityMaxInteger);
+            relationshipType.setRightMinCardinality(rightCardinalityMinInteger);
+            relationshipType.setRightMaxCardinality(rightCardinalityMaxInteger);
+            relationshipTypeService.update(context, relationshipType);
+        }
     }
 }
