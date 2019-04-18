@@ -19,6 +19,7 @@ import org.dspace.content.Bitstream;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.identifier.DOIIdentifierProvider;
+import org.dspace.paymentsystem.ShoppingCart;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.IOException;
@@ -240,11 +241,20 @@ public class Package {
             jGen.writeStringField("abstract", dataPackage.getAbstract());
             jGen.writeObjectField("authors", dataPackage.getAuthorList());
 
+            if(ddp.getItem().isArchived()) {
+                ShoppingCart sc = ddp.getShoppingCart();
+                if(sc == null) {
+                    jGen.writeStringField("invoiceId", "classic-dryad:old-item-" + ddp.getItem().getID());
+                } else {
+                    jGen.writeStringField("invoiceId", "classic-dryad:" + sc.getID());
+                }
+            }
+            
             // keywordsToWrite will include both package- and file-level keywords
             Set<String> keywordsToWrite = new HashSet<String>();
             
             //TODO: replace this with a real epersonID OR DASH user ID
-            jGen.writeStringField("userID", "1");
+            jGen.writeStringField("userId", "1");
 
             // Data Files
             // for each file, write the

@@ -34,10 +34,13 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.identifier.IdentifierException;
+import org.dspace.paymentsystem.ShoppingCart;
+import org.dspace.paymentsystem.PaymentSystemService;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.workflow.*;
 import org.dspace.workflow.actions.WorkflowActionConfig;
+import org.dspace.utils.DSpace;
 
 /**
  *
@@ -254,6 +257,21 @@ public class DryadDataPackage extends DryadObject {
 
     public void setJournalConcept(DryadJournalConcept concept) {
         journalConcept = concept;
+    }
+
+    public ShoppingCart getShoppingCart() {
+        Context c = null;
+        ShoppingCart shoppingCart = null;
+        try {
+            c = new Context();
+
+            PaymentSystemService paymentSystemService = new DSpace().getSingletonService(PaymentSystemService.class);
+            shoppingCart = paymentSystemService.getShoppingCartByItemId(c,getItem().getID());
+        } catch (Exception e) {
+            log.fatal("Can't retrieve shopping cart", e);
+        }
+
+        return shoppingCart;
     }
 
     public String getManuscriptNumber() {
@@ -572,6 +590,7 @@ public class DryadDataPackage extends DryadObject {
             Matcher withdrawn = Pattern.compile("Item withdrawn by .+ on (\\d+-\\d+-\\d+T\\d+:\\d+:\\d+Z).*").matcher(provenance);
             Matcher approved = Pattern.compile("Step: dryadAcceptEditReject - action:dryadAcceptEditRejectAction " +
                                                "Approved for entry into archive by .+ on (\\d+-\\d+-\\d+T\\d+:\\d+:\\d+Z).*").matcher(provenance);
+            Matcher genericProvWithTimestamp = Pattern.compile(".+ (\\d+-\\d+-\\d+T\\d+:\\d+:\\d+Z*).*").matcher(provenance);
 
             ObjectNode node = mapper.createObjectNode();
             node.put("note", provenance);
@@ -634,8 +653,12 @@ public class DryadDataPackage extends DryadObject {
                 currentStatus = "withdrawn";
                 node.put("status", currentStatus);
                 node.put("created_at", withdrawn.group(1));
+            } else if (genericProvWithTimestamp.matches()) {
+                node.put("status", currentStatus);
+                node.put("created_at", genericProvWithTimestamp.group(1));
             } else {
                 node.put("status", currentStatus);
+                node.put("created_at", getNowString());
             }
             resultNode.add(node);
         }
@@ -1089,11 +1112,15 @@ public class DryadDataPackage extends DryadObject {
         return dataPackageList;
     }
 
+    private String getNowString() {
+        Date now = new Date();
+        SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-dd'T'HH:mm:ss.SSSZ");
+        return sdf.format(now);
+    }
+    
     public void addDashTransferDate() {
         if (getItem() != null) {
-            Date now = new Date();
-            SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-dd'T'HH:mm:ss.SSSZ");
-            String transferDate = sdf.format(now);
+            String transferDate = getNowString();
             addSingleMetadataValue(Boolean.FALSE, DASH_TRANSFER_SCHEMA, DASH_TRANSFER_ELEMENT, null, transferDate);
         }
     }

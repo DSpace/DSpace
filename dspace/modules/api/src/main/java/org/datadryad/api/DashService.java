@@ -400,7 +400,7 @@ public class DashService {
         // get curationActivities from Dash package
         JsonNode curationActivities = getCurationActivity(pkg);
         // if the only curation activity is the default "in_progress," delete it
-        if (curationActivities.size() == 1) {
+        if (curationActivities != null && curationActivities.size() == 1) {
             if (curationActivities.get(0).get("status").textValue().equals("In Progress")) {
                 int unsubmittedID = curationActivities.get(0).get("id").intValue();
                 try {
