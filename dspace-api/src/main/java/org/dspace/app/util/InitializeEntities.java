@@ -153,10 +153,9 @@ public class InitializeEntities {
                         rightCardinalityMax = getString(rightCardinalityMax,(Element) node, "max");
 
                     }
-                    populateRelationshipType(context,leftType,rightType,leftLabel, rightLabel,leftCardinalityMin,
-                                                                                 leftCardinalityMax,
-                                                                                 rightCardinalityMin,
-                                                                                 rightCardinalityMax);
+                    populateRelationshipType(context, leftType, rightType, leftLabel, rightLabel,
+                                             leftCardinalityMin, leftCardinalityMax,
+                                             rightCardinalityMin, rightCardinalityMax);
 
 
                 }
@@ -173,10 +172,9 @@ public class InitializeEntities {
         return leftCardinalityMin;
     }
 
-    private void populateRelationshipType(Context context,String leftType,String rightType,String leftLabel,
-                                                      String rightLabel,String leftCardinalityMin,
-                                                      String leftCardinalityMax,String rightCardinalityMin,
-                                                      String rightCardinalityMax)
+    private void populateRelationshipType(Context context, String leftType, String rightType, String leftLabel,
+                                          String rightLabel, String leftCardinalityMin, String leftCardinalityMax,
+                                          String rightCardinalityMin, String rightCardinalityMax)
         throws SQLException, AuthorizeException {
 
         EntityType leftEntityType = entityTypeService.findByEntityType(context,leftType);
