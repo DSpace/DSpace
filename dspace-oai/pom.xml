@@ -108,6 +108,13 @@
             </exclusions>
         </dependency>
 
+        <!-- Java Injection -->
+        <dependency>
+            <groupId>javax.inject</groupId>
+            <artifactId>javax.inject</artifactId>
+            <version>1</version>
+        </dependency>
+
         <!-- Needed to support Spring @Configuration classes (to register servlets/beans with Spring Boot webapp) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
