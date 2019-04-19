@@ -80,19 +80,14 @@ public class GoogleBitstreamComparator implements Comparator<Bitstream>{
         int priority1 = getPriorityFromBitstream(b1);
         int priority2 = getPriorityFromBitstream(b2);
 
-        if(priority1 > priority2){
-            return 1;
-        }
-        else if(priority1 == priority2){
-            if(b1.getSize() <= b2.getSize()){
-                return 1;
+        if(priority1 == priority2){
+            if(b1.getSize() == b2.getSize()){
+                return 0;
+            } else {
+                return ((b1.getSize() < b2.getSize()) ?  1 :  -1);
             }
-            else {
-                return -1;
-            }
-        }
-        else {
-            return -1;
+        } else {
+            return ((priority1 > priority2) ?  1 :  -1);
         }
     }
 
