@@ -116,6 +116,7 @@ import it.cilea.osd.jdyna.util.AnagraficaUtils;
 import it.cilea.osd.jdyna.value.EmbeddedFile;
 import it.cilea.osd.jdyna.web.Box;
 import it.cilea.osd.jdyna.web.Tab;
+import it.cilea.osd.jdyna.widget.Size;
 import it.cilea.osd.jdyna.widget.WidgetBoolean;
 import it.cilea.osd.jdyna.widget.WidgetCheckRadio;
 import it.cilea.osd.jdyna.widget.WidgetCustomPointer;
@@ -1956,7 +1957,7 @@ public class ImportExportUtils {
         for (String pDefHeader : new String[]{
         		"TARGET", "SHORTNAME", "LABEL", "REPEATABLE", "PRIORITY", "HELP",
 				"ACCESS LEVEL", "MANDATORY", "WIDGET", "POINTER CLASS", "RENDERING", "LABEL-SIZE", "FIELD-WIDTH",   
-				"FIELD-HEIGHT", "NEW-LINE", "NONE" }) {
+				"FIELD-HEIGHT", "NEW-LINE","TEXTROWS","TEXTCOLS", "NONE" }) {
         	propertiesdefinitionSheet.addCell(new Label(colIdx, 0, pDefHeader));
         	colIdx++;
         }
@@ -1964,7 +1965,7 @@ public class ImportExportUtils {
         colIdx = 0;
 		for (String pDefHeader : new String[] { "TARGET", "SHORTNAME", "LABEL", "REPEATABLE", "PRIORITY", "HELP",
 				"ACCESS LEVEL", "MANDATORY", "WIDGET", "POINTER CLASS", "ANCESTOR", "RENDERING", "LABEL-SIZE",
-				"FIELD-WIDTH", "FIELD-HEIGHT", "NEW-LINE", "NONE" }) {
+				"FIELD-WIDTH", "FIELD-HEIGHT", "NEW-LINE","TEXTROWS","TEXTCOLS", "NONE" }) {
 			nesteddefinitionSheet.addCell(new Label(colIdx, 0, pDefHeader));
         	colIdx++;
         }
@@ -2069,7 +2070,12 @@ public class ImportExportUtils {
 	            		propertiesdefinitionSheet.addCell(new Label(13, rowIdx, propDef.getFieldMinSize().getRow()+""));
 	            	}
 	            	propertiesdefinitionSheet.addCell(new Label(14, rowIdx, propDef.isNewline()?"y":"n"));
-	            	propertiesdefinitionSheet.addCell(new Label(15, rowIdx, "#"));
+	            	
+	            	propertiesdefinitionSheet.addCell(new Label(15,rowIdx,getWidgetTextSizeRow(propDef.getRendering())));
+	            	
+	            	propertiesdefinitionSheet.addCell(new Label(16,rowIdx,getWidgetTextSizeCol(propDef.getRendering())));
+	            	
+	            	propertiesdefinitionSheet.addCell(new Label(17, rowIdx, "#"));
 	            	
 	            	if (propDef.getRendering() instanceof WidgetCheckRadio) {
 	            		WidgetCheckRadio widget = (WidgetCheckRadio) propDef.getRendering();
@@ -2121,7 +2127,9 @@ public class ImportExportUtils {
 //	            		propertiesdefinitionSheet.addCell(new Label(13, rowIdx, propDef.getFieldMinSize().getRow()+""));
 //	            	}
 	            	propertiesdefinitionSheet.addCell(new Label(14, rowIdx, propDef.isNewline()?"y":"n"));
-	            	propertiesdefinitionSheet.addCell(new Label(15, rowIdx, "#"));
+	            	propertiesdefinitionSheet.addCell(new Label(15,rowIdx,getWidgetTextSizeRow(propDef.getRendering())));
+	            	propertiesdefinitionSheet.addCell(new Label(16,rowIdx,getWidgetTextSizeCol(propDef.getRendering())));	            	
+	            	propertiesdefinitionSheet.addCell(new Label(17, rowIdx, "#"));
 	            	rowIdx++;
 	            	
 					List<? extends PropertiesDefinition> nestedpropDefs = applicationService
@@ -2153,7 +2161,12 @@ public class ImportExportUtils {
 	    	            		nesteddefinitionSheet.addCell(new Label(14, rowNestedIdx, npropDef.getFieldMinSize().getRow()+""));
 	    	            	}
 	    	            	nesteddefinitionSheet.addCell(new Label(15, rowNestedIdx, npropDef.isNewline()?"y":"n"));
-	    	            	nesteddefinitionSheet.addCell(new Label(16, rowNestedIdx, "#"));
+	    	            	
+	    	            	nesteddefinitionSheet.addCell(new Label(16,rowNestedIdx,getWidgetTextSizeRow(npropDef.getRendering())));
+	    	            	
+	    	            	nesteddefinitionSheet.addCell(new Label(17,rowNestedIdx,getWidgetTextSizeCol(npropDef.getRendering())));
+	    	            	
+	    	            	nesteddefinitionSheet.addCell(new Label(18, rowNestedIdx, "#"));
 	    	            	
 	    	            	if (npropDef.getRendering() instanceof WidgetCheckRadio) {
 	    	            		WidgetCheckRadio widget = (WidgetCheckRadio) npropDef.getRendering();
@@ -2360,7 +2373,9 @@ public class ImportExportUtils {
 	            		propertiesdefinitionSheet.addCell(new Label(13, rowIdx, propDef.getFieldMinSize().getRow()+""));
 	            	}
 	            	propertiesdefinitionSheet.addCell(new Label(14, rowIdx, propDef.isNewline()?"y":"n"));
-	            	propertiesdefinitionSheet.addCell(new Label(15, rowIdx, "#"));
+	            	propertiesdefinitionSheet.addCell(new Label(15,rowIdx,getWidgetTextSizeRow(propDef.getRendering())));
+	            	propertiesdefinitionSheet.addCell(new Label(16,rowIdx,getWidgetTextSizeCol(propDef.getRendering())));
+	            	propertiesdefinitionSheet.addCell(new Label(17, rowIdx, "#"));
 	            	
 	            	if (propDef.getRendering() instanceof WidgetCheckRadio) {
 	            		WidgetCheckRadio widget = (WidgetCheckRadio) propDef.getRendering();
@@ -2413,7 +2428,9 @@ public class ImportExportUtils {
 //	            		propertiesdefinitionSheet.addCell(new Label(13, rowIdx, propDef.getFieldMinSize().getRow()+""));
 //	            	}
 	            	propertiesdefinitionSheet.addCell(new Label(14, rowIdx, propDef.isNewline()?"y":"n"));
-	            	propertiesdefinitionSheet.addCell(new Label(15, rowIdx, "#"));
+	            	propertiesdefinitionSheet.addCell(new Label(15,rowIdx,getWidgetTextSizeRow(propDef.getRendering())));
+	            	propertiesdefinitionSheet.addCell(new Label(16,rowIdx,getWidgetTextSizeCol(propDef.getRendering())));
+	            	propertiesdefinitionSheet.addCell(new Label(17, rowIdx, "#"));
 	            	rowIdx++;
 	            	
 					List<? extends PropertiesDefinition> nestedpropDefs = applicationService
@@ -2445,8 +2462,10 @@ public class ImportExportUtils {
 	    	            		nesteddefinitionSheet.addCell(new Label(14, rowNestedIdx, npropDef.getFieldMinSize().getRow()+""));
 	    	            	}
 	    	            	nesteddefinitionSheet.addCell(new Label(15, rowNestedIdx, npropDef.isNewline()?"y":"n"));
-	    	            	nesteddefinitionSheet.addCell(new Label(16, rowNestedIdx, "#"));
-	    	            	
+	    	            	nesteddefinitionSheet.addCell(new Label(16,rowNestedIdx,getWidgetTextSizeRow(npropDef.getRendering())));
+	    	            	nesteddefinitionSheet.addCell(new Label(17,rowNestedIdx,getWidgetTextSizeCol(npropDef.getRendering())));
+	    	            	nesteddefinitionSheet.addCell(new Label(18, rowNestedIdx, "#"));
+
 	    	            	if (npropDef.getRendering() instanceof WidgetCheckRadio) {
 	    	            		WidgetCheckRadio widget = (WidgetCheckRadio) npropDef.getRendering();
 	    	            		String[] cLists = widget.getStaticValues().split("\\|\\|\\|");
@@ -2573,6 +2592,25 @@ public class ImportExportUtils {
 		return "";
 	}
 
+	private static String getWidgetTextSizeCol(AWidget widget) {
+		if (widget instanceof WidgetTesto) {
+			Integer col = ((WidgetTesto) widget).getDimensione().getCol();
+			if(col != null) {
+				return Integer.toString(col);
+			}
+		}
+		return "";
+	}
+	private static String getWidgetTextSizeRow(AWidget widget) {
+		if (widget instanceof WidgetTesto) {
+			Integer row = ((WidgetTesto) widget).getDimensione().getRow();
+			if(row != null) {
+				return Integer.toString(row);
+			}
+		}
+		return "";
+	}	
+	
 	private static String getWidgetDescription(AWidget widget, boolean repeatable) {
 		if (widget instanceof WidgetTesto) return "text";
 		else if (widget instanceof WidgetDate) return "date";

@@ -94,6 +94,7 @@ import it.cilea.osd.jdyna.model.PropertiesDefinition;
 import it.cilea.osd.jdyna.web.Box;
 import it.cilea.osd.jdyna.web.IPropertyHolder;
 import it.cilea.osd.jdyna.web.Tab;
+import it.cilea.osd.jdyna.widget.Size;
 import it.cilea.osd.jdyna.widget.WidgetBoolean;
 import it.cilea.osd.jdyna.widget.WidgetCheckRadio;
 import it.cilea.osd.jdyna.widget.WidgetDate;
@@ -203,7 +204,6 @@ public class ImportCRISDataModelConfiguration
 
 			buildResearchObject(workbook, "utilsdata", applicationService, transactionManager, status);
 			
-			// per ogni target chiama il metodo con i corretti parametri
             for (String key : widgetMap.keySet())
             {
 				List<List<String>> meta = widgetMap.get(key);
@@ -896,6 +896,22 @@ public class ImportCRISDataModelConfiguration
             {
                 bnewLine = newLine.equals("y") ? true : false;
             }
+            
+            int rows=1;
+            String rowsStr = list.get(fieldIndex++);
+            if(StringUtils.isNotBlank(rowsStr)) {
+            	Integer row = Integer.parseInt(rowsStr);
+            	rows = row >0 ? row.intValue(): rows;
+            }
+            boolean multiline = rows>1 ? true: false;
+            
+            int cols=30;
+            String colsStr = list.get(fieldIndex++);
+            if(StringUtils.isNotBlank(colsStr)) {
+            	Integer col = Integer.parseInt(colsStr);
+            	cols = col >0 ? col.intValue(): cols;
+            }
+            
 			System.out.println("Writing  " + target + "/" + shortName);
 
 			GenericXmlApplicationContext ctx = new GenericXmlApplicationContext();
@@ -1020,6 +1036,10 @@ public class ImportCRISDataModelConfiguration
         Integer ifieldWidth = null;
         Integer ifieldHeight = null;
         Boolean bnewLine = false;
+        Boolean multilinea=false;
+        Integer rows= 1;
+        Integer cols= 30;
+        
         if (reserved)
         {
             String reservedCell = metadata.get(10);
@@ -1051,6 +1071,23 @@ public class ImportCRISDataModelConfiguration
             {
                 bnewLine = newLine.equals("y") ? true : false;
             }
+            
+            String rowsStr = metadata.get(16);
+            if(StringUtils.isNotBlank(rowsStr)) {
+            	Integer r = Integer.parseInt(rowsStr);
+            	if(r>1) {
+            		rows = r.intValue();
+            		multilinea = true;
+            	}
+            }
+            
+            String colsStr = metadata.get(17);
+            if(StringUtils.isNotBlank(colsStr)) {
+            	Integer c = Integer.parseInt(colsStr);
+            	if(c>1) {
+            		cols = c.intValue();
+            	}
+            }
         }
         else {
             renderingText = metadata.get(10);
@@ -1077,7 +1114,23 @@ public class ImportCRISDataModelConfiguration
             if (StringUtils.isNotBlank(newLine))
             {
                 bnewLine = newLine.equals("y") ? true : false;
-            }            
+            }
+            String rowsStr = metadata.get(15);
+            if(StringUtils.isNotBlank(rowsStr)) {
+            	Integer r = Integer.parseInt(rowsStr);
+            	if(r>1) {
+            		rows = r.intValue();
+            		multilinea = true;
+            	}
+            }
+            String colsStr = metadata.get(16);
+            if(StringUtils.isNotBlank(colsStr)) {
+            	Integer c = Integer.parseInt(colsStr);
+            	if(c>1) {
+            		cols = c.intValue();
+            	}
+            }
+            
         }
 		BeanDefinitionBuilder builderW = null;
 
@@ -1088,6 +1141,14 @@ public class ImportCRISDataModelConfiguration
             if (StringUtils.isNotBlank(renderingText)) {
                 builderW.addPropertyValue("displayFormat", renderingText);
             }
+            
+            if(multilinea) {
+            	builderW.addPropertyValue("multilinea", true);
+            }
+            Size s = new Size();
+            s.setCol(cols);
+            s.setRow(rows);
+            builderW.addPropertyValue("dimensione", s);
         }
         else if (widget.equals("boolean"))
         {
