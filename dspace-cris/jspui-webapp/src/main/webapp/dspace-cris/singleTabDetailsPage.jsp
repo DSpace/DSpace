@@ -88,7 +88,7 @@
         												</a>
       												</h4>
     										</div>
-										    <div id="collapseOne${holder.shortName}" class="panel-collapse collapse in">
+										    <div id="collapseOne${holder.shortName}" class="panel-collapse collapse<c:if test="${holder.collapsed==false}"> in</c:if>">
 												<div class="panel-body">
 											      <c:set var="hideLabel">${fn:length(propertiesDefinitionsInHolder[holder.shortName]) le 1}</c:set>
 													<c:forEach

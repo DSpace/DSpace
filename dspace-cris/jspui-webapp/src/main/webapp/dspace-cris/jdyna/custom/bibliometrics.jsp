@@ -30,7 +30,7 @@ jQuery(document).ready(function() {
         												</a>
       												</h4>
     										</div>
-										    <div id="collapseOne${holder.shortName}" class="panel-collapse collapse in">
+										    <div id="collapseOne${holder.shortName}" class="panel-collapse collapse<c:if test="${holder.collapsed==false}"> in</c:if>">
 												<div class="panel-body">
 <c:set var="root"><%=request.getContextPath()%></c:set>
 <c:set var="metrics" value="${extra['metrics']}" />
