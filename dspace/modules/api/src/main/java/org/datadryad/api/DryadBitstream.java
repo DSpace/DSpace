@@ -55,10 +55,20 @@ public class DryadBitstream {
       original README file that is stored in the DSpace bitstream.
     */
     public void setReadmeFilename(String baseFilename) {
-        String origReadmeName = bitstream.getName();
-        String readmeExtension = origReadmeName.substring(origReadmeName.lastIndexOf('.'), origReadmeName.length());
-        baseFilename = baseFilename.substring(0, baseFilename.lastIndexOf('.'));
-        readmeFilename = "README_for_" + baseFilename + readmeExtension;
+        if(baseFilename == null || baseFilename.length() == 0) {
+            readmeFilename = "README.txt";
+        } else {
+            String origReadmeName = bitstream.getName();
+
+            if(origReadmeName.lastIndexOf('.') < 0) {
+                // if there is no dot, assume .txt
+                readmeFilename = "README_for_" + baseFilename + ".txt";
+            } else {
+                String readmeExtension = origReadmeName.substring(origReadmeName.lastIndexOf('.'), origReadmeName.length());
+                baseFilename = baseFilename.substring(0, baseFilename.lastIndexOf('.'));
+                readmeFilename = "README_for_" + baseFilename + readmeExtension;
+            }
+        }
     }
 
     public String getReadmeFilename() {
