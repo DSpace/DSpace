@@ -80,6 +80,7 @@ public class GoogleBitstreamComparator implements Comparator<Bitstream>{
         int priority1 = getPriorityFromBitstream(b1);
         int priority2 = getPriorityFromBitstream(b2);
 
+        // Customization for LIBDRUM-587
         if(priority1 == priority2){
             if(b1.getSize() == b2.getSize()){
                 return 0;
@@ -89,6 +90,7 @@ public class GoogleBitstreamComparator implements Comparator<Bitstream>{
         } else {
             return ((priority1 > priority2) ?  1 :  -1);
         }
+        // End customization for LIBDRUM-587
     }
 
     private int getPriorityFromBitstream(Bitstream bitstream) {
