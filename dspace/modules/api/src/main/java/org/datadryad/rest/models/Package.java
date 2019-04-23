@@ -250,8 +250,9 @@ public class Package {
                 }
             }
             
-            // keywordsToWrite will include both package- and file-level keywords
+            // keywordsToWrite and spatialToWrite will include both package- and file-level keywords
             Set<String> keywordsToWrite = new HashSet<String>();
+            Set<String> spatialToWrite = new HashSet<String>();
             
             //TODO: replace this with a real epersonID OR DASH user ID
             jGen.writeStringField("userId", "1");
@@ -278,11 +279,12 @@ public class Package {
                         }
 
                         // file-level keywords
-                        // spatial coverage, temporal coverage, and scientific names are lumped in with keywords for now
+                        // temporal coverage, and scientific names are lumped in with keywords for now
                         keywordsToWrite.addAll(dryadFile.getKeywords());
-                        keywordsToWrite.addAll(dryadFile.getCoverageSpatial());
                         keywordsToWrite.addAll(dryadFile.getCoverageTemporal());
                         keywordsToWrite.addAll(dryadFile.getScientificNames());
+
+                        spatialToWrite.addAll(dryadFile.getCoverageSpatial());
                         
                         // bitstreams
                         fileListString = fileListString + "<p>";
@@ -305,13 +307,23 @@ public class Package {
                 throw new IOException("Unable to serialize data files", e);
             }
             
-            // spatial coverage, temporal coverage, and scientific names are lumped in with keywords for now
+            // temporal coverage, and scientific names are lumped in with keywords for now
             keywordsToWrite.addAll(ddp.getKeywords());
-            keywordsToWrite.addAll(ddp.getCoverageSpatial());
             keywordsToWrite.addAll(ddp.getCoverageTemporal());
             keywordsToWrite.addAll(ddp.getScientificNames());
             if (keywordsToWrite.size() > 0) {
                 jGen.writeObjectField("keywords", keywordsToWrite);
+            }
+
+            spatialToWrite.addAll(ddp.getCoverageSpatial());
+            if (spatialToWrite.size() > 0) {
+                jGen.writeArrayFieldStart("locations");
+                for(String spatialItem : spatialToWrite) {
+                    jGen.writeStartObject();
+                    jGen.writeStringField("place", spatialItem);
+                    jGen.writeEndObject();
+                }
+                jGen.writeEndArray();
             }
             
             // write citation for article:
