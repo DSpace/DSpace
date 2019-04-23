@@ -307,7 +307,7 @@ public class Package {
                 throw new IOException("Unable to serialize data files", e);
             }
             
-            // spatial coverage, temporal coverage, and scientific names are lumped in with keywords for now
+            // temporal coverage, and scientific names are lumped in with keywords for now
             keywordsToWrite.addAll(ddp.getKeywords());
             keywordsToWrite.addAll(ddp.getCoverageTemporal());
             keywordsToWrite.addAll(ddp.getScientificNames());
