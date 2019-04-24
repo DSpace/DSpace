@@ -104,6 +104,7 @@ public class InitializeEntities {
         Context context = new Context();
         context.turnOffAuthorisationSystem();
         this.parseXMLToRelations(context, fileLocation);
+        context.complete();
     }
 
     private void parseXMLToRelations(Context context, String fileLocation) throws AuthorizeException {
