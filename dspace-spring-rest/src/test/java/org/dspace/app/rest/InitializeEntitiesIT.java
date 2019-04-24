@@ -46,6 +46,9 @@ public class InitializeEntitiesIT extends AbstractControllerIntegrationTest {
     @Autowired
     private ConfigurationService configurationService;
 
+    /**
+     * Build the relationships using the standard test XML with the initialize-entities script
+     */
     @Before
     public void setup() throws Exception {
 
@@ -88,22 +91,22 @@ public class InitializeEntitiesIT extends AbstractControllerIntegrationTest {
         super.destroy();
     }
 
+    /**
+     * Verify whether the initialize-entities script can update the relationship types correctly
+     */
     @Test
     public void test() throws Exception {
-
-
-
         List<RelationshipType> relationshipTypes = relationshipTypeService.findAll(context);
 
         getClient().perform(get("/api/core/relationshiptypes"))
 
                    //We expect a 200 OK status
                    .andExpect(status().isOk())
-                   //The type has to be 'discover'
+                   //10 relationship types should be created
                    .andExpect(jsonPath("$.page.totalElements", is(10)))
                    //There needs to be a self link to this endpoint
                    .andExpect(jsonPath("$._links.self.href", containsString("api/core/relationshiptypes")))
-                   //We have 4 facets in the default configuration, they need to all be present in the embedded section
+                   //We have 10 relationship types, they need to all be present in the embedded section
                    .andExpect(jsonPath("$._embedded.relationshiptypes", containsInAnyOrder(
                        RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipTypes.get(0)),
                        RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipTypes.get(1)),
@@ -117,24 +120,29 @@ public class InitializeEntitiesIT extends AbstractControllerIntegrationTest {
                        RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipTypes.get(9)))
                    ));
 
+        //Verify the left min cardinality of the first relationship type (isAuthorOfPublication) is 0
         getClient().perform(get("/api/core/relationshiptypes/" + relationshipTypes.get(0).getID()))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.leftMinCardinality", is(0)));
+
+        //Update the relationships using a different test XML with the initialize-entities script
         String pathToFile = configurationService.getProperty("dspace.dir") +
             File.separator + "config" + File.separator + "entities" + File.separator + "relationship-types-update.xml";
         runDSpaceScript("initialize-entities", "-f", pathToFile);
 
+        //This is a helper object to compare whether the update was successful
         RelationshipType alteredRelationshipType = relationshipTypes.get(0);
         alteredRelationshipType.setLeftMinCardinality(10);
         getClient().perform(get("/api/core/relationshiptypes"))
 
                    //We expect a 200 OK status
                    .andExpect(status().isOk())
-                   //The type has to be 'discover'
+                   //10 relationship types should remain present (no duplicates created)
                    .andExpect(jsonPath("$.page.totalElements", is(10)))
                    //There needs to be a self link to this endpoint
                    .andExpect(jsonPath("$._links.self.href", containsString("api/core/relationshiptypes")))
-                   //We have 4 facets in the default configuration, they need to all be present in the embedded section
+                   //We have 10 relationship types, they need to all be present in the embedded section
+                   //Verify the left min cardinality of the isAuthorOfPublication has been updated to 10
                    .andExpect(jsonPath("$._embedded.relationshiptypes", containsInAnyOrder(
                        RelationshipTypeMatcher.matchRelationshipTypeEntry(alteredRelationshipType),
                        RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipTypes.get(1)),
@@ -148,6 +156,7 @@ public class InitializeEntitiesIT extends AbstractControllerIntegrationTest {
                        RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipTypes.get(9)))
                    ));
 
+        //Verify the left min cardinality of the first relationship type (isAuthorOfPublication) has been updated to 10
         getClient().perform(get("/api/core/relationshiptypes/" + relationshipTypes.get(0).getID()))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.leftMinCardinality", is(10)));
