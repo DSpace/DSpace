@@ -42,6 +42,7 @@ import org.dspace.xmlworkflow.storedcomponents.service.PoolTaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
@@ -136,6 +137,9 @@ public class PoolTaskRestRepository extends DSpaceRestRepository<PoolTaskRest, I
         PoolTask task = null;
         try {
             task = poolTaskService.find(context, id);
+            if (task == null) {
+                throw new ResourceNotFoundException("PoolTask ID " + id + " not found");
+            }
             XmlWorkflowServiceFactory factory = (XmlWorkflowServiceFactory) XmlWorkflowServiceFactory.getInstance();
             Workflow workflow = factory.getWorkflowFactory().getWorkflow(task.getWorkflowItem().getCollection());
             Step step = workflow.getStep(task.getStepID());

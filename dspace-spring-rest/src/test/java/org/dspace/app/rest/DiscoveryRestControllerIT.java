@@ -13,35 +13,49 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.io.InputStream;
 import java.util.UUID;
 
+import com.jayway.jsonpath.matchers.JsonPathMatchers;
 import org.apache.commons.codec.CharEncoding;
 import org.apache.commons.io.IOUtils;
 import org.dspace.app.rest.builder.BitstreamBuilder;
+import org.dspace.app.rest.builder.ClaimedTaskBuilder;
 import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
+import org.dspace.app.rest.builder.EPersonBuilder;
 import org.dspace.app.rest.builder.GroupBuilder;
 import org.dspace.app.rest.builder.ItemBuilder;
+import org.dspace.app.rest.builder.WorkflowItemBuilder;
+import org.dspace.app.rest.builder.WorkspaceItemBuilder;
 import org.dspace.app.rest.matcher.AppliedFilterMatcher;
 import org.dspace.app.rest.matcher.FacetEntryMatcher;
 import org.dspace.app.rest.matcher.FacetValueMatcher;
+import org.dspace.app.rest.matcher.ItemMatcher;
 import org.dspace.app.rest.matcher.PageMatcher;
 import org.dspace.app.rest.matcher.SearchFilterMatcher;
 import org.dspace.app.rest.matcher.SearchResultMatcher;
 import org.dspace.app.rest.matcher.SortOptionMatcher;
+import org.dspace.app.rest.matcher.WorkflowItemMatcher;
+import org.dspace.app.rest.matcher.WorkspaceItemMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
+import org.dspace.content.WorkspaceItem;
+import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
+import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.hamcrest.Matchers;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.springframework.http.MediaType;
 
 public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest {
 
@@ -898,14 +912,14 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 // given in the structure defined above.
                 //Seeing as everything fits onto one page, they have to all be present
                 .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
-                        SearchResultMatcher.match("community", "communities"),
-                        SearchResultMatcher.match("community", "communities"),
+                        SearchResultMatcher.match("core", "community", "communities"),
+                        SearchResultMatcher.match("core", "community", "communities"),
                         //This has to be like this because collections don't have anything else
                         SearchResultMatcher.match(),
                         SearchResultMatcher.match(),
-                        SearchResultMatcher.match("item", "items"),
-                        SearchResultMatcher.match("item", "items"),
-                        SearchResultMatcher.match("item", "items")
+                        SearchResultMatcher.match("core", "item", "items"),
+                        SearchResultMatcher.match("core", "item", "items"),
+                        SearchResultMatcher.match("core", "item", "items")
                 )))
                 //These facets have to show up in the embedded.facets section as well with the given hasMore
                 // property because we don't exceed their default limit for a hasMore true (the default is 10)
@@ -979,15 +993,15 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 //All elements have to be present in the embedded.objects section, these are the ones we made in
                 // the structure defined above
                 .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
-                        SearchResultMatcher.match("community", "communities"),
-                        SearchResultMatcher.match("community", "communities"),
+                        SearchResultMatcher.match("core", "community", "communities"),
+                        SearchResultMatcher.match("core", "community", "communities"),
                         //Match without any parameters because collections don't have anything special to check in the
                         // json
                         SearchResultMatcher.match(),
                         SearchResultMatcher.match(),
-                        SearchResultMatcher.match("item", "items"),
-                        SearchResultMatcher.match("item", "items"),
-                        SearchResultMatcher.match("item", "items")
+                        SearchResultMatcher.match("core", "item", "items"),
+                        SearchResultMatcher.match("core", "item", "items"),
+                        SearchResultMatcher.match("core", "item", "items")
                 )))
                 //These facets have to show up in the embedded.facets section as well with the given hasMore
                 // property because we don't exceed their default limit for a hasMore true (the default is 10)
@@ -1067,14 +1081,14 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 )))
                 //All the elements created in the structure above have to be present in the embedded.objects section
                 .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
-                        SearchResultMatcher.match("community", "communities"),
-                        SearchResultMatcher.match("community", "communities"),
+                        SearchResultMatcher.match("core", "community", "communities"),
+                        SearchResultMatcher.match("core", "community", "communities"),
                         //Collections are specified like this because they don't have any special properties
                         SearchResultMatcher.match(),
                         SearchResultMatcher.match(),
-                        SearchResultMatcher.match("item", "items"),
-                        SearchResultMatcher.match("item", "items"),
-                        SearchResultMatcher.match("item", "items")
+                        SearchResultMatcher.match("core", "item", "items"),
+                        SearchResultMatcher.match("core", "item", "items"),
+                        SearchResultMatcher.match("core", "item", "items")
                 )))
                 //These facets have to show up in the embedded.facets section as well with the given hasMore
                 // property because we don't exceed their default limit for a hasMore true (the default is 10)
@@ -1148,8 +1162,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 //Only the two item elements match the query, therefore those are the only ones that can be in the
                 // embedded.objects section
                 .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
-                        SearchResultMatcher.match("item", "items"),
-                        SearchResultMatcher.match("item", "items")
+                        SearchResultMatcher.match("core", "item", "items"),
+                        SearchResultMatcher.match("core", "item", "items")
                 )))
                 //We need to display the appliedFilters object that contains the query that we've ran
                 .andExpect(jsonPath("$.appliedFilters", contains(
@@ -1227,14 +1241,14 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .andExpect(jsonPath("$.scope", is("test")))
                 //All the elements created in the structure above have to be present in the embedded.objects section
                 .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
-                        SearchResultMatcher.match("community", "communities"),
-                        SearchResultMatcher.match("community", "communities"),
+                        SearchResultMatcher.match("core", "community", "communities"),
+                        SearchResultMatcher.match("core", "community", "communities"),
                         //Collections are specified like this because they don't have any special properties
                         SearchResultMatcher.match(),
                         SearchResultMatcher.match(),
-                        SearchResultMatcher.match("item", "items"),
-                        SearchResultMatcher.match("item", "items"),
-                        SearchResultMatcher.match("item", "items")
+                        SearchResultMatcher.match("core", "item", "items"),
+                        SearchResultMatcher.match("core", "item", "items"),
+                        SearchResultMatcher.match("core", "item", "items")
                 )))
                 //These facets have to show up in the embedded.facets section as well with the given hasMore
                 // property because we don't exceed their default limit for a hasMore true (the default is 10)
@@ -1308,9 +1322,9 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 //Only the three items can be present in the embedded.objects section as that's what we specified
                 // in the dsoType parameter
                 .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
-                        SearchResultMatcher.match("item", "items"),
-                        SearchResultMatcher.match("item", "items"),
-                        SearchResultMatcher.match("item", "items")
+                        SearchResultMatcher.match("core", "item", "items"),
+                        SearchResultMatcher.match("core", "item", "items"),
+                        SearchResultMatcher.match("core", "item", "items")
                 )))
                 //These facets have to show up in the embedded.facets section as well with the given hasMore
                 // property because we don't exceed their default limit for a hasMore true (the default is 10)
@@ -1385,9 +1399,9 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 //Only the three items can be present in the embedded.objects section as that's what we specified
                 // in the dsoType parameter
                 .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
-                        SearchResultMatcher.match("item", "items"),
-                        SearchResultMatcher.match("item", "items"),
-                        SearchResultMatcher.match("item", "items")
+                        SearchResultMatcher.match("core", "item", "items"),
+                        SearchResultMatcher.match("core", "item", "items"),
+                        SearchResultMatcher.match("core", "item", "items")
                 )))
                 //Here we want to match on the item name in a certain specified order because we want to check the
                 // sort properly
@@ -1765,8 +1779,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 )))
                 //These are the items that aren't set to private
                 .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
-                        SearchResultMatcher.match("community", "communities"),
-                        SearchResultMatcher.match("community", "communities"),
+                        SearchResultMatcher.match("core", "community", "communities"),
+                        SearchResultMatcher.match("core", "community", "communities"),
                         //Collections are specified like this because they don't have any special properties
                         SearchResultMatcher.match(),
                         SearchResultMatcher.match(),
@@ -2955,4 +2969,589 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         ;
 
     }
+
+    @Test
+    /**
+     * This test is intent to verify that inprogress submission (workspaceitem, workflowitem, pool task and claimed
+     * tasks) don't interfers with the standard search
+     * 
+     * @throws Exception
+     */
+    public void discoverSearchObjectsWithInProgressSubmissionTest() throws Exception {
+
+        //We turn off the authorization system in order to create the structure defined below
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        // 1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                                .withName("Collection 1")
+                                .build();
+        // the second collection has a workflow active
+        Collection col2 = CollectionBuilder.createCollection(context, child1)
+                                .withName("Collection 2")
+                                .withWorkflowGroup(1, admin)
+                                .build();
+
+        // 2. Three public items that are readable by Anonymous with different subjects
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                .withTitle("Test")
+                .withIssueDate("2010-10-17")
+                .withAuthor("Smith, Donald").withAuthor("Testing, Works")
+                .withSubject("ExtraEntry")
+                .build();
+
+        Item publicItem2 = ItemBuilder.createItem(context, col2)
+                .withTitle("Test 2")
+                .withIssueDate("1990-02-13")
+                .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("Testing, Works")
+                .withSubject("TestingForMore").withSubject("ExtraEntry")
+                .build();
+
+        Item publicItem3 = ItemBuilder.createItem(context, col2)
+                .withTitle("Public item 2")
+                .withIssueDate("2010-02-13")
+                .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("test,test")
+                .withAuthor("test2, test2").withAuthor("Maybe, Maybe")
+                .withSubject("AnotherTest").withSubject("TestingForMore")
+                .withSubject("ExtraEntry")
+                .build();
+
+        //3. three inprogress submission from a normal user (2 ws, 1 wf that will produce also a pooltask)
+        context.setCurrentUser(eperson);
+        WorkspaceItem wsItem1 = WorkspaceItemBuilder.createWorkspaceItem(context, col1).withTitle("Workspace Item 1")
+                .build();
+
+        WorkspaceItem wsItem2 = WorkspaceItemBuilder.createWorkspaceItem(context, col2).withTitle("Workspace Item 2")
+                .build();
+
+        XmlWorkflowItem wfItem1 = WorkflowItemBuilder.createWorkflowItem(context, col2).withTitle("Workflow Item 1")
+                .build();
+
+        // 4. a claimed task from the administrator
+        ClaimedTask cTask = ClaimedTaskBuilder.createClaimedTask(context, col2, admin).withTitle("Claimed Item")
+                .build();
+
+        // 5. other inprogress submissions made by the administrator
+        context.setCurrentUser(admin);
+        WorkspaceItem wsItem1Admin = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+                .withTitle("Admin Workspace Item 1").build();
+
+        WorkspaceItem wsItem2Admin = WorkspaceItemBuilder.createWorkspaceItem(context, col2)
+                .withTitle("Admin Workspace Item 2").build();
+
+        XmlWorkflowItem wfItem1Admin = WorkflowItemBuilder.createWorkflowItem(context, col2)
+                .withTitle("Admin Workflow Item 1").build();
+
+        //** WHEN **
+        // An anonymous user, the submitter and the admin that browse this endpoint to find the public objects in the
+        // system should not retrieve the inprogress submissions and related objects
+        String[] tokens = new String[] {
+            null,
+            getAuthToken(eperson.getEmail(), password),
+            getAuthToken(admin.getEmail(), password),
+        };
+
+        for (String token : tokens) {
+            getClient(token).perform(get("/api/discover/search/objects"))
+                    //** THEN **
+                    //The status has to be 200 OK
+                    .andExpect(status().isOk())
+                    //The type has to be 'discover'
+                    .andExpect(jsonPath("$.type", is("discover")))
+                    //There needs to be a page object that shows the total pages and total elements as well as the
+                    // size and the current page (number)
+                    .andExpect(jsonPath("$._embedded.searchResult.page", is(
+                            PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 7)
+                    )))
+                    //These search results have to be shown in the embedded.objects section as these are the items
+                    // given in the structure defined above.
+                    //Seeing as everything fits onto one page, they have to all be present
+                    .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
+                            SearchResultMatcher.match("core", "community", "communities"),
+                            SearchResultMatcher.match("core", "community", "communities"),
+                            SearchResultMatcher.match("core", "item", "items"),
+                            SearchResultMatcher.match("core", "item", "items"),
+                            SearchResultMatcher.match("core", "item", "items"),
+                            //This has to be like this because collections don't have anything else
+                            // these matchers also need to be the last otherwise they will be potentially consumed for
+                            // other staff
+                            SearchResultMatcher.match(),
+                            SearchResultMatcher.match()
+                    )))
+                    //These facets have to show up in the embedded.facets section as well with the given hasMore
+                    // property because we don't exceed their default limit for a hasMore true (the default is 10)
+                    .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
+                            FacetEntryMatcher.authorFacet(false),
+                            FacetEntryMatcher.subjectFacet(false),
+                            FacetEntryMatcher.dateIssuedFacet(false),
+                            FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
+                    )))
+                    //There always needs to be a self link
+                    .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
+            ;
+        }
+    }
+
+    @Test
+    /**
+     * This test is intent to verify that workspaceitem are only visible to the submitter
+     * 
+     * @throws Exception
+     */
+    public void discoverSearchObjectsWorkspaceConfigurationTest() throws Exception {
+
+        //We turn off the authorization system in order to create the structure defined below
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        // 1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                                .withName("Collection 1")
+                                .build();
+        // the second collection has a workflow active
+        Collection col2 = CollectionBuilder.createCollection(context, child1)
+                                .withName("Collection 2")
+                                .withWorkflowGroup(1, admin)
+                                .build();
+
+        // 2. Three public items that are readable by Anonymous
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                .withTitle("Test")
+                .withIssueDate("2010-10-17")
+                .withAuthor("Smith, Donald").withAuthor("Testing, Works")
+                .withSubject("ExtraEntry")
+                .build();
+
+        Item publicItem2 = ItemBuilder.createItem(context, col2)
+                .withTitle("Test 2")
+                .withIssueDate("1990-02-13")
+                .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("Testing, Works")
+                .withSubject("TestingForMore").withSubject("ExtraEntry")
+                .build();
+
+        EPerson submitter = EPersonBuilder.createEPerson(context).withEmail("submitter@example.com")
+                .withPassword(password).build();
+        context.setCurrentUser(submitter);
+        // a public item from our submitter
+        Item publicItem3 = ItemBuilder.createItem(context, col2)
+                .withTitle("Public item from submitter")
+                .withIssueDate("2010-02-13")
+                .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("test,test")
+                .withAuthor("test2, test2").withAuthor("Maybe, Maybe")
+                .withSubject("AnotherTest").withSubject("TestingForMore")
+                .withSubject("ExtraEntry")
+                .build();
+
+        //3. three inprogress submission from our submitter user (2 ws, 1 wf that will produce also a pooltask)
+        WorkspaceItem wsItem1 = WorkspaceItemBuilder.createWorkspaceItem(context, col1).withTitle("Workspace Item 1")
+                .withIssueDate("2010-07-23")
+                .build();
+
+        WorkspaceItem wsItem2 = WorkspaceItemBuilder.createWorkspaceItem(context, col2).withTitle("Workspace Item 2")
+                .withIssueDate("2010-11-03")
+                .build();
+
+        XmlWorkflowItem wfItem1 = WorkflowItemBuilder.createWorkflowItem(context, col2).withTitle("Workflow Item 1")
+                .withIssueDate("2010-11-03")
+                .build();
+
+        // 4. a claimed task from the administrator
+        ClaimedTask cTask = ClaimedTaskBuilder.createClaimedTask(context, col2, admin).withTitle("Claimed Item")
+                .withIssueDate("2010-11-03")
+                .build();
+
+        // 5. other inprogress submissions made by the administrator
+        context.setCurrentUser(admin);
+        WorkspaceItem wsItem1Admin = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+                .withIssueDate("2010-07-23")
+                .withTitle("Admin Workspace Item 1").build();
+
+        WorkspaceItem wsItem2Admin = WorkspaceItemBuilder.createWorkspaceItem(context, col2)
+                .withIssueDate("2010-11-03")
+                .withTitle("Admin Workspace Item 2").build();
+
+        XmlWorkflowItem wfItem1Admin = WorkflowItemBuilder.createWorkflowItem(context, col2)
+                .withIssueDate("2010-11-03")
+                .withTitle("Admin Workflow Item 1").build();
+
+        context.restoreAuthSystemState();
+        //** WHEN **
+        // each submitter, including the administrator should see only her submission
+        String submitterToken = getAuthToken(submitter.getEmail(), password);
+        String adminToken = getAuthToken(admin.getEmail(), password);
+
+        getClient(submitterToken).perform(get("/api/discover/search/objects").param("configuration", "workspace"))
+                //** THEN **
+                //The status has to be 200 OK
+                .andExpect(status().isOk())
+                //The type has to be 'discover'
+                .andExpect(jsonPath("$.type", is("discover")))
+                //There needs to be a page object that shows the total pages and total elements as well as the
+                // size and the current page (number)
+                .andExpect(jsonPath("$._embedded.searchResult.page", is(
+                        PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 5)
+                )))
+                // These search results have to be shown in the embedded.objects section
+                // one public item, two workspaceitems and two worfklowitems submitted by our submitter user
+                // as by the structure defined above.
+                // Seeing as everything fits onto one page, they have to all be present
+                .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
+                        Matchers.allOf(
+                                SearchResultMatcher.match("core", "item", "items"),
+                                JsonPathMatchers.hasJsonPath("$._embedded.indexableObject",
+                                        is(ItemMatcher.matchItemWithTitleAndDateIssued(publicItem3,
+                                                "Public item from submitter", "2010-02-13")))
+                                ),
+                        Matchers.allOf(
+                                SearchResultMatcher.match("submission", "workspaceitem", "workspaceitems"),
+                                JsonPathMatchers.hasJsonPath("$._embedded.indexableObject",
+                                        is(WorkspaceItemMatcher.matchItemWithTitleAndDateIssued(wsItem1,
+                                                "Workspace Item 1", "2010-07-23")))
+                                ),
+                        Matchers.allOf(
+                                SearchResultMatcher.match("submission", "workspaceitem", "workspaceitems"),
+                                JsonPathMatchers.hasJsonPath("$._embedded.indexableObject",
+                                        is(WorkspaceItemMatcher.matchItemWithTitleAndDateIssued(
+                                                wsItem2, "Workspace Item 2", "2010-11-03")))
+                                ),
+                        Matchers.allOf(
+                                SearchResultMatcher.match("workflow", "workflowitem", "workflowitems"),
+                                JsonPathMatchers.hasJsonPath("$._embedded.indexableObject",
+                                        is(WorkflowItemMatcher.matchItemWithTitleAndDateIssued(
+                                                wfItem1, "Workflow Item 1", "2010-11-03")))
+                                ),
+                        Matchers.allOf(
+                                SearchResultMatcher.match("workflow", "workflowitem", "workflowitems"),
+                                JsonPathMatchers.hasJsonPath("$._embedded.indexableObject",
+                                        is(WorkflowItemMatcher.matchItemWithTitleAndDateIssued(
+                                                cTask.getWorkflowItem(), "Claimed Item","2010-11-03")))
+                                )
+                )))
+                //These facets have to show up in the embedded.facets section as well with the given hasMore
+                // property because we don't exceed their default limit for a hasMore true (the default is 10)
+                .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
+                        FacetEntryMatcher.resourceTypeFacet(false),
+                        FacetEntryMatcher.typeFacet(false),
+                        FacetEntryMatcher.dateIssuedFacet(false)
+                )))
+                //There always needs to be a self link
+                .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
+        ;
+
+        getClient(adminToken).perform(get("/api/discover/search/objects").param("configuration", "workspace"))
+                //** THEN **
+                //The status has to be 200 OK
+                .andExpect(status().isOk())
+                //The type has to be 'discover'
+                .andExpect(jsonPath("$.type", is("discover")))
+                //There needs to be a page object that shows the total pages and total elements as well as the
+                // size and the current page (number)
+                .andExpect(jsonPath("$._embedded.searchResult.page", is(
+                        PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 3)
+                )))
+                // These search results have to be shown in the embedded.objects section two workspaceitems and one
+                // worfklowitem submitted by the admin user as by the structure defined above. Please note that the
+                // claimedTask should be not visible here as this is the workspace configuration
+                //Seeing as everything fits onto one page, they have to all be present
+                .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
+                        Matchers.allOf(
+                                SearchResultMatcher.match("submission", "workspaceitem", "workspaceitems"),
+                                JsonPathMatchers.hasJsonPath("$._embedded.indexableObject",
+                                        is(WorkspaceItemMatcher.matchItemWithTitleAndDateIssued(
+                                                wsItem1Admin, "Admin Workspace Item 1", "2010-07-23")))
+                                ),
+                        Matchers.allOf(
+                                SearchResultMatcher.match("submission", "workspaceitem", "workspaceitems"),
+                                JsonPathMatchers.hasJsonPath("$._embedded.indexableObject",
+                                        is(WorkspaceItemMatcher.matchItemWithTitleAndDateIssued(
+                                                wsItem2Admin, "Admin Workspace Item 2", "2010-11-03")))
+                                ),
+                        Matchers.allOf(
+                                SearchResultMatcher.match("workflow", "workflowitem", "workflowitems"),
+                                JsonPathMatchers.hasJsonPath("$._embedded.indexableObject",
+                                        is(WorkflowItemMatcher.matchItemWithTitleAndDateIssued(
+                                                wfItem1Admin, "Admin Workflow Item 1", "2010-11-03")))
+                                )
+                )))
+                //These facets have to show up in the embedded.facets section as well with the given hasMore
+                // property because we don't exceed their default limit for a hasMore true (the default is 10)
+                .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
+                        FacetEntryMatcher.resourceTypeFacet(false),
+                        FacetEntryMatcher.typeFacet(false),
+                        FacetEntryMatcher.dateIssuedFacet(false)
+                )))
+                //There always needs to be a self link
+                .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
+        ;
+    }
+
+    @Test
+    /**
+     * This test is intent to verify that tasks are only visible to the appropriate users (reviewers)
+     * 
+     * @throws Exception
+     */
+    public void discoverSearchObjectsWorkflowConfigurationTest() throws Exception {
+
+        //We turn off the authorization system in order to create the structure defined below
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        // 1. Two reviewers
+        EPerson reviewer1 = EPersonBuilder.createEPerson(context).withEmail("reviewer1@example.com")
+                .withPassword(password).build();
+        EPerson reviewer2 = EPersonBuilder.createEPerson(context).withEmail("reviewer2@example.com")
+                .withPassword(password).build();
+
+        // 2. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                                .withName("Collection 1")
+                                .build();
+        // the second collection has two workflow steps active
+        Collection col2 = CollectionBuilder.createCollection(context, child1)
+                                .withName("Collection 2")
+                                .withWorkflowGroup(1, admin, reviewer1)
+                                .withWorkflowGroup(2, reviewer2)
+                                .build();
+
+        // 2. Three public items that are readable by Anonymous with different subjects
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                .withTitle("Test")
+                .withIssueDate("2010-10-17")
+                .withAuthor("Smith, Donald").withAuthor("Testing, Works")
+                .withSubject("ExtraEntry")
+                .build();
+
+        Item publicItem2 = ItemBuilder.createItem(context, col2)
+                .withTitle("Test 2")
+                .withIssueDate("1990-02-13")
+                .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("Testing, Works")
+                .withSubject("TestingForMore").withSubject("ExtraEntry")
+                .build();
+
+        Item publicItem3 = ItemBuilder.createItem(context, col2)
+                .withTitle("Public item 2")
+                .withIssueDate("2010-02-13")
+                .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("test,test")
+                .withAuthor("test2, test2").withAuthor("Maybe, Maybe")
+                .withSubject("AnotherTest").withSubject("TestingForMore")
+                .withSubject("ExtraEntry")
+                .build();
+
+        //3. three inprogress submission from a normal user (2 ws, 1 wf that will produce also a pooltask)
+        context.setCurrentUser(eperson);
+        WorkspaceItem wsItem1 = WorkspaceItemBuilder.createWorkspaceItem(context, col1).withTitle("Workspace Item 1")
+                .withIssueDate("2010-07-23")
+                .build();
+
+        WorkspaceItem wsItem2 = WorkspaceItemBuilder.createWorkspaceItem(context, col2).withTitle("Workspace Item 2")
+                .withIssueDate("2010-11-03")
+                .build();
+
+        XmlWorkflowItem wfItem1 = WorkflowItemBuilder.createWorkflowItem(context, col2).withTitle("Workflow Item 1")
+                .withIssueDate("2010-11-03")
+                .build();
+
+        // 4. a claimed task from the administrator
+        ClaimedTask cTask = ClaimedTaskBuilder.createClaimedTask(context, col2, admin).withTitle("Claimed Item")
+                .withIssueDate("2010-11-03")
+                .build();
+
+        // 5. other inprogress submissions made by the administrator
+        context.setCurrentUser(admin);
+        WorkspaceItem wsItem1Admin = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+                .withIssueDate("2010-07-23")
+                .withTitle("Admin Workspace Item 1").build();
+
+        WorkspaceItem wsItem2Admin = WorkspaceItemBuilder.createWorkspaceItem(context, col2)
+                .withIssueDate("2010-11-03")
+                .withTitle("Admin Workspace Item 2").build();
+
+        XmlWorkflowItem wfItem1Admin = WorkflowItemBuilder.createWorkflowItem(context, col2)
+                .withIssueDate("2010-11-03")
+                .withTitle("Admin Workflow Item 1").build();
+
+        // 6. a pool taks in the second step of the workflow
+        ClaimedTask cTask2 = ClaimedTaskBuilder.createClaimedTask(context, col2, admin).withTitle("Pool Step2 Item")
+                .withIssueDate("2010-11-04")
+                .build();
+
+        String epersonToken = getAuthToken(eperson.getEmail(), password);
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        String reviewer1Token = getAuthToken(reviewer1.getEmail(), password);
+        String reviewer2Token = getAuthToken(reviewer2.getEmail(), password);
+
+        getClient(adminToken).perform(post("/api/workflow/claimedtasks/" + cTask2.getID())
+                .param("submit_approve", "true")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED))
+            .andExpect(status().isNoContent());
+
+        context.restoreAuthSystemState();
+        //** WHEN **
+        // the submitter should not see anything in the workfow configuration
+        getClient(epersonToken).perform(get("/api/discover/search/objects").param("configuration", "workflow"))
+                //** THEN **
+                //The status has to be 200 OK
+                .andExpect(status().isOk())
+                //The type has to be 'discover'
+                .andExpect(jsonPath("$.type", is("discover")))
+                //There needs to be a page object that shows the total pages and total elements as well as the
+                // size and the current page (number)
+                .andExpect(jsonPath("$._embedded.searchResult.page", is(
+                        PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 0, 0)
+                )))
+                //There always needs to be a self link
+                .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
+        ;
+
+        // reviewer1 should see two pool items one from the submitter and one from the administrator
+        // the other task in step1 is claimed by the adminstrator so it should be not visible to the reviewer1
+        getClient(reviewer1Token).perform(get("/api/discover/search/objects").param("configuration", "workflow"))
+                //** THEN **
+                //The status has to be 200 OK
+                .andExpect(status().isOk())
+                //The type has to be 'discover'
+                .andExpect(jsonPath("$.type", is("discover")))
+                //There needs to be a page object that shows the total pages and total elements as well as the
+                // size and the current page (number)
+                .andExpect(jsonPath("$._embedded.searchResult.page", is(
+                        PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 2)
+                )))
+                // These search results have to be shown in the embedded.objects section two workspaceitems and one
+                // worfklowitem submitted by the admin user as by the structure defined above. Please note that the
+                // claimedTask should be not visible here as this is the workspace configuration
+                //Seeing as everything fits onto one page, they have to all be present
+                .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
+                        Matchers.allOf(
+                                SearchResultMatcher.match("workflow", "pooltask", "pooltasks"),
+                                JsonPathMatchers.hasJsonPath("$._embedded.indexableObject._embedded.workflowitem",
+                                        is(WorkflowItemMatcher.matchItemWithTitleAndDateIssued(
+                                                null, "Workflow Item 1", "2010-11-03")))
+                                ),
+                        Matchers.allOf(
+                                SearchResultMatcher.match("workflow", "pooltask", "pooltasks"),
+                                JsonPathMatchers.hasJsonPath("$._embedded.indexableObject._embedded.workflowitem",
+                                        is(WorkflowItemMatcher.matchItemWithTitleAndDateIssued(
+                                                null, "Admin Workflow Item 1", "2010-11-03")))
+                                )
+                )))
+                //These facets have to show up in the embedded.facets section as well with the given hasMore
+                // property because we don't exceed their default limit for a hasMore true (the default is 10)
+                .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
+                        FacetEntryMatcher.resourceTypeFacet(false),
+                        FacetEntryMatcher.typeFacet(false),
+                        FacetEntryMatcher.dateIssuedFacet(false),
+                        FacetEntryMatcher.submitterFacet(false)
+                )))
+                //There always needs to be a self link
+                .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
+        ;
+
+        // admin should see two pool items one from the submitter and one from herself
+        // and a claimed task
+        getClient(adminToken).perform(get("/api/discover/search/objects").param("configuration", "workflow"))
+                //** THEN **
+                //The status has to be 200 OK
+                .andExpect(status().isOk())
+                //The type has to be 'discover'
+                .andExpect(jsonPath("$.type", is("discover")))
+                //There needs to be a page object that shows the total pages and total elements as well as the
+                // size and the current page (number)
+                .andExpect(jsonPath("$._embedded.searchResult.page", is(
+                        PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 3)
+                )))
+                // These search results have to be shown in the embedded.objects section two workspaceitems and one
+                // worfklowitem submitted by the admin user as by the structure defined above. Please note that the
+                // claimedTask should be not visible here as this is the workspace configuration
+                //Seeing as everything fits onto one page, they have to all be present
+                .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
+                        Matchers.allOf(
+                                SearchResultMatcher.match("workflow", "pooltask", "pooltasks"),
+                                JsonPathMatchers.hasJsonPath("$._embedded.indexableObject._embedded.workflowitem",
+                                        is(WorkflowItemMatcher.matchItemWithTitleAndDateIssued(
+                                                null, "Workflow Item 1", "2010-11-03")))
+                                ),
+                        Matchers.allOf(
+                                SearchResultMatcher.match("workflow", "pooltask", "pooltasks"),
+                                JsonPathMatchers.hasJsonPath("$._embedded.indexableObject._embedded.workflowitem",
+                                        is(WorkflowItemMatcher.matchItemWithTitleAndDateIssued(
+                                                null, "Admin Workflow Item 1", "2010-11-03")))
+                                ),
+                        Matchers.allOf(
+                                SearchResultMatcher.match("workflow", "claimedtask", "claimedtask"),
+                                JsonPathMatchers.hasJsonPath("$._embedded.indexableObject._embedded.workflowitem",
+                                        is(WorkflowItemMatcher.matchItemWithTitleAndDateIssued(
+                                                null, "Claimed Item", "2010-11-03")))
+                                )
+                )))
+                //These facets have to show up in the embedded.facets section as well with the given hasMore
+                // property because we don't exceed their default limit for a hasMore true (the default is 10)
+                .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
+                        FacetEntryMatcher.resourceTypeFacet(false),
+                        FacetEntryMatcher.typeFacet(false),
+                        FacetEntryMatcher.dateIssuedFacet(false),
+                        FacetEntryMatcher.submitterFacet(false)
+                )))
+                //There always needs to be a self link
+                .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
+        ;
+
+        // admin should see two pool items one from the submitter and one from herself
+        // and a claimed task
+        getClient(reviewer2Token).perform(get("/api/discover/search/objects").param("configuration", "workflow"))
+                //** THEN **
+                //The status has to be 200 OK
+                .andExpect(status().isOk())
+                //The type has to be 'discover'
+                .andExpect(jsonPath("$.type", is("discover")))
+                //There needs to be a page object that shows the total pages and total elements as well as the
+                // size and the current page (number)
+                .andExpect(jsonPath("$._embedded.searchResult.page", is(
+                        PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 1)
+                )))
+                // These search results have to be shown in the embedded.objects section two workspaceitems and one
+                // worfklowitem submitted by the admin user as by the structure defined above. Please note that the
+                // claimedTask should be not visible here as this is the workspace configuration
+                //Seeing as everything fits onto one page, they have to all be present
+                .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
+                        Matchers.allOf(
+                                SearchResultMatcher.match("workflow", "pooltask", "pooltasks"),
+                                JsonPathMatchers.hasJsonPath("$._embedded.indexableObject._embedded.workflowitem",
+                                        is(WorkflowItemMatcher.matchItemWithTitleAndDateIssued(
+                                                null, "Pool Step2 Item", "2010-11-04")))
+                                )
+                )))
+                //These facets have to show up in the embedded.facets section as well with the given hasMore
+                // property because we don't exceed their default limit for a hasMore true (the default is 10)
+                .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
+                        FacetEntryMatcher.resourceTypeFacet(false),
+                        FacetEntryMatcher.typeFacet(false),
+                        FacetEntryMatcher.dateIssuedFacet(false),
+                        FacetEntryMatcher.submitterFacet(false)
+                )))
+                //There always needs to be a self link
+                .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
+        ;
+
+    }
+
 }

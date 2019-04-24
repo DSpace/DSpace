@@ -72,6 +72,8 @@ public class WorkflowItemBuilder extends AbstractBuilder<XmlWorkflowItem, XmlWor
         try {
             workflowItem = workflowService.start(context, workspaceItem);
             workspaceItem = null;
+            context.dispatchEvents();
+            indexingService.commit();
             return workflowItem;
         } catch (Exception e) {
             return handleException(e);
