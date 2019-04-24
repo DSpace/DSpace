@@ -220,19 +220,19 @@
 	<message key="xmlui.ArtifactBrowser.Contact.email">Email</message>
 
 	<!-- org.dspace.app.xmlui.artifactbrowser.FeedbackForm.java -->
-	<message key="xmlui.ArtifactBrowser.FeedbackForm.title">Contact us</message>
-	<message key="xmlui.ArtifactBrowser.FeedbackForm.trail">Contact us</message>
-	<message key="xmlui.ArtifactBrowser.FeedbackForm.head">Contact us</message>
-	<message key="xmlui.ArtifactBrowser.FeedbackForm.para1"></message>
+	<message key="xmlui.ArtifactBrowser.FeedbackForm.title">Give feedback</message>
+	<message key="xmlui.ArtifactBrowser.FeedbackForm.trail">Give feedback</message>
+	<message key="xmlui.ArtifactBrowser.FeedbackForm.head">Give feedback</message>
+	<message key="xmlui.ArtifactBrowser.FeedbackForm.para1">Thanks for sharing your feedback about Brage. Your comments are appreciated!</message>
 	<message key="xmlui.ArtifactBrowser.FeedbackForm.email">Your Email</message>
-	<message key="xmlui.ArtifactBrowser.FeedbackForm.email_help">This address will be used to follow up on your comments.</message>
+	<message key="xmlui.ArtifactBrowser.FeedbackForm.email_help">This address will be used to follow up on your feedback.</message>
 	<message key="xmlui.ArtifactBrowser.FeedbackForm.comments">Comments</message>
-	<message key="xmlui.ArtifactBrowser.FeedbackForm.submit">Send Comments</message>
+	<message key="xmlui.ArtifactBrowser.FeedbackForm.submit">Send Feedback</message>
 
 	<!-- org.dspace.app.xmlui.artifactbrowser.FeedbackSent.java -->
-	<message key="xmlui.ArtifactBrowser.FeedbackSent.title">Contact us</message>
-	<message key="xmlui.ArtifactBrowser.FeedbackSent.trail">Contact us</message>
-	<message key="xmlui.ArtifactBrowser.FeedbackSent.head">Comments sent</message>
+	<message key="xmlui.ArtifactBrowser.FeedbackSent.title">Give feedback</message>
+	<message key="xmlui.ArtifactBrowser.FeedbackSent.trail">Give feedback</message>
+	<message key="xmlui.ArtifactBrowser.FeedbackSent.head">Feedback sent</message>
 	<message key="xmlui.ArtifactBrowser.FeedbackSent.para1">Your comments have been received.</message>
 
 	<!-- org.dspace.app.xmlui.artifactbrowser.ItemViewer.java -->
@@ -2168,8 +2168,8 @@
 			<a href="http://dspace.org">http://dspace.org</a>
 		</p>
 	</message>
-<!--	<message key="xmlui.dri2xhtml.structural.contact-link">Contact Us</message>-->
-	<message key="xmlui.dri2xhtml.structural.feedback-link">Contact Us</message>
+	<message key="xmlui.dri2xhtml.structural.contact-link">Contact Us</message>
+	<message key="xmlui.dri2xhtml.structural.feedback-link">Send Feedback</message>
 
 	<message key="xmlui.dri2xhtml.structural.head-subtitle">Brage Repository</message>
 
