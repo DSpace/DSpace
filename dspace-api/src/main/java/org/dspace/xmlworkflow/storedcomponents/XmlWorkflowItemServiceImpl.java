@@ -64,7 +64,7 @@ public class XmlWorkflowItemServiceImpl implements XmlWorkflowItemService {
     }
 
     @Override
-    public int getSupportsTypeConstant() {
+    public int getSupportsIndexableObjectTypeConstant() {
         return Constants.WORKFLOWITEM;
     }
 
@@ -78,9 +78,8 @@ public class XmlWorkflowItemServiceImpl implements XmlWorkflowItemService {
     }
 
     @Override
-    public XmlWorkflowItem find(Context context, Integer id) throws SQLException {
+    public XmlWorkflowItem find(Context context, int id) throws SQLException {
         XmlWorkflowItem workflowItem = xmlWorkflowItemDAO.findByID(context, XmlWorkflowItem.class, id);
-
 
         if (workflowItem == null) {
             if (log.isDebugEnabled()) {
@@ -94,6 +93,14 @@ public class XmlWorkflowItemServiceImpl implements XmlWorkflowItemService {
             }
         }
         return workflowItem;
+    }
+
+    @Override
+    public XmlWorkflowItem findIndexableObject(Context context, Integer id) throws SQLException {
+        if (id != null) {
+            return find(context, id);
+        }
+        return null;
     }
 
     @Override

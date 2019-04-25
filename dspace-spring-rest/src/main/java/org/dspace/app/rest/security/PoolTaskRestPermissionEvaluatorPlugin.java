@@ -48,8 +48,8 @@ public class PoolTaskRestPermissionEvaluatorPlugin extends RestObjectPermissionE
     private EPersonService ePersonService;
 
     @Override
-    public boolean hasPermission(Authentication authentication, Serializable targetId,
-                                 String targetType, Object permission) {
+    public boolean hasDSpacePermission(Authentication authentication, Serializable targetId,
+                                 String targetType, DSpaceRestPermission permission) {
 
         if (Constants.getTypeID(targetType) != Constants.POOLTASK) {
             return false;

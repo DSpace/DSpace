@@ -59,7 +59,7 @@ public class EntityServiceImpl implements EntityService {
         List<Relationship> fullList = this.getAllRelations(context, entity);
         List<Relationship> listToReturn = new LinkedList<>();
         for (Relationship relationship : fullList) {
-            if (relationship.getLeftItem() == entity.getItem()) {
+            if (relationship.getLeftItem().getID() == entity.getItem().getID()) {
                 listToReturn.add(relationship);
             }
         }
@@ -70,7 +70,7 @@ public class EntityServiceImpl implements EntityService {
         List<Relationship> fullList = this.getAllRelations(context, entity);
         List<Relationship> listToReturn = new LinkedList<>();
         for (Relationship relationship : fullList) {
-            if (relationship.getRightItem() == entity.getItem()) {
+            if (relationship.getRightItem().getID() == entity.getItem().getID()) {
                 listToReturn.add(relationship);
             }
         }
@@ -94,8 +94,8 @@ public class EntityServiceImpl implements EntityService {
         EntityType entityType = this.getType(context, entity);
         List<RelationshipType> listToReturn = new LinkedList<>();
         for (RelationshipType relationshipType : relationshipTypeService.findAll(context)) {
-            if (relationshipType.getLeftType() == entityType ||
-                relationshipType.getRightType() == entityType) {
+            if (relationshipType.getLeftType().getID() == entityType.getID() ||
+                relationshipType.getRightType().getID() == entityType.getID()) {
                 listToReturn.add(relationshipType);
             }
         }
@@ -106,7 +106,7 @@ public class EntityServiceImpl implements EntityService {
         EntityType entityType = this.getType(context, entity);
         List<RelationshipType> listToReturn = new LinkedList<>();
         for (RelationshipType relationshipType : relationshipTypeService.findAll(context)) {
-            if (relationshipType.getLeftType() == entityType) {
+            if (relationshipType.getLeftType().getID() == entityType.getID()) {
                 listToReturn.add(relationshipType);
             }
         }
@@ -117,7 +117,7 @@ public class EntityServiceImpl implements EntityService {
         EntityType entityType = this.getType(context, entity);
         List<RelationshipType> listToReturn = new LinkedList<>();
         for (RelationshipType relationshipType : relationshipTypeService.findAll(context)) {
-            if (relationshipType.getRightType() == entityType) {
+            if (relationshipType.getRightType().getID() == entityType.getID()) {
                 listToReturn.add(relationshipType);
             }
         }

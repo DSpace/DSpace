@@ -39,7 +39,9 @@ CREATE TABLE relationship_type
     right_min_cardinality   INTEGER,
     right_max_cardinality   INTEGER,
     FOREIGN KEY (left_type)   REFERENCES entity_type(id),
-    FOREIGN KEY (right_type)  REFERENCES entity_type(id)
+    FOREIGN KEY (right_type)  REFERENCES entity_type(id),
+    CONSTRAINT u_relationship_type_constraint UNIQUE (left_type, right_type, left_label, right_label)
+
 );
 
 CREATE TABLE relationship

@@ -18,7 +18,7 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
  * representation of an Relationship and vice versa
  */
 @Component
-public class RelationshipConverter extends DSpaceConverter<Relationship, RelationshipRest> {
+public class RelationshipConverter implements DSpaceConverter<Relationship, RelationshipRest> {
 
     @Autowired
     private RelationshipTypeConverter relationshipTypeConverter;
