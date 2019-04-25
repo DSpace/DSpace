@@ -25,16 +25,16 @@ import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * A bean implementing the {@link VirtualMetadataPopularConfiguration} interface to achieve the generation of
+ * A bean implementing the {@link VirtualMetadataConfiguration} interface to achieve the generation of
  * Virtual metadata by traversing the path of relation specified in the config for this bean
  * The Related bean will find the relationshiptype defined in the relationshipTypeString property on
  * the current item and it'll use the related item from that relationship to pass it along to the
- * virtualMetadataPopularConfiguration property which in turn refers to another VirtualBean instance and it continues
+ * virtualMetadataConfiguration property which in turn refers to another VirtualBean instance and it continues
  * the chain until it reaches either a Concatenate or Collected bean to retrieve the values. It will then return
  * that value through the chain again and it'll fill the values into the virtual metadata fields that are defined
  * in the map for the first Related bean.
  */
-public class Related implements VirtualMetadataPopularConfiguration {
+public class Related implements VirtualMetadataConfiguration {
 
     @Autowired
     private RelationshipTypeService relationshipTypeService;
@@ -59,7 +59,7 @@ public class Related implements VirtualMetadataPopularConfiguration {
     /**
      * The next bean to call its getValues() method on
      */
-    private VirtualMetadataPopularConfiguration virtualMetadataPopularConfiguration;
+    private VirtualMetadataConfiguration virtualMetadataConfiguration;
 
     /**
      * The boolean value indicating whether this field should be used for place or not
@@ -99,21 +99,21 @@ public class Related implements VirtualMetadataPopularConfiguration {
     }
 
     /**
-     * Generic getter for the virtualMetadataPopularConfiguration property of this class
-     * @return  The virtualMetadataPopularConfiguration property
+     * Generic getter for the virtualMetadataConfiguration property of this class
+     * @return  The virtualMetadataConfiguration property
      */
-    public VirtualMetadataPopularConfiguration getVirtualMetadataPopularConfiguration() {
-        return virtualMetadataPopularConfiguration;
+    public VirtualMetadataConfiguration getVirtualMetadataConfiguration() {
+        return virtualMetadataConfiguration;
     }
 
     /**
-     * Generic setter for the virtualMetadataPopularConfiguration property of this class
-     * @param virtualMetadataPopularConfiguration   The VirtualBean to which the
-     *                                             virtualMetadataPopularConfiguration property will be set to
+     * Generic setter for the virtualMetadataConfiguration property of this class
+     * @param virtualMetadataConfiguration   The VirtualBean to which the
+     *                                             virtualMetadataConfiguration property will be set to
      */
-    public void setVirtualMetadataPopularConfiguration(VirtualMetadataPopularConfiguration
-                                                               virtualMetadataPopularConfiguration) {
-        this.virtualMetadataPopularConfiguration = virtualMetadataPopularConfiguration;
+    public void setVirtualMetadataConfiguration(VirtualMetadataConfiguration
+                                                        virtualMetadataConfiguration) {
+        this.virtualMetadataConfiguration = virtualMetadataConfiguration;
     }
 
     /**
@@ -164,12 +164,12 @@ public class Related implements VirtualMetadataPopularConfiguration {
             if (relationship.getRelationshipType().getLeftType() == entityType) {
                 if (relationship.getLeftPlace() == place) {
                     Item otherItem = relationship.getRightItem();
-                    return virtualMetadataPopularConfiguration.getValues(context, otherItem);
+                    return virtualMetadataConfiguration.getValues(context, otherItem);
                 }
             } else if (relationship.getRelationshipType().getRightType() == entityType) {
                 if (relationship.getRightPlace() == place) {
                     Item otherItem = relationship.getLeftItem();
-                    return virtualMetadataPopularConfiguration.getValues(context, otherItem);
+                    return virtualMetadataConfiguration.getValues(context, otherItem);
                 }
             }
         }
