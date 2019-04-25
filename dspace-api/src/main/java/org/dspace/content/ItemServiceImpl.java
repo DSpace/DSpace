@@ -1460,8 +1460,7 @@ prevent the generation of resource policy entry values with null dspace_object a
     //hashmaps parameter. The beans will be used to retrieve the values for the RelationshipMetadataValue objects
     //and the keys of the hashmap will be used to construct the RelationshipMetadataValue object.
     private List<RelationshipMetadataValue> handleRelationshipTypeMetadataMapping(Context context, Item item,
-                                                                                  HashMap<String, VirtualMetadataPopularConfiguration>
-                                                                                      hashMaps,
+                                                HashMap<String, VirtualMetadataPopularConfiguration> hashMaps,
                                                                                   Item otherItem, String relationName,
                                                                                   Integer relationshipId, int place)
         throws SQLException {
