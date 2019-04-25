@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
 @Component
-public class ResourcePolicyConverter extends DSpaceConverter<ResourcePolicy, ResourcePolicyRest> {
+public class ResourcePolicyConverter implements DSpaceConverter<ResourcePolicy, ResourcePolicyRest> {
 
     @Autowired
     ResourcePolicyService resourcePolicyService;

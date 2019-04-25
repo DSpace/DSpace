@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.function.Consumer;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
@@ -25,8 +26,8 @@ import org.dspace.browse.BrowseException;
 import org.dspace.browse.BrowseIndex;
 import org.dspace.browse.BrowseInfo;
 import org.dspace.browse.BrowserScope;
-import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
+import org.dspace.discovery.IndexableObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -73,7 +74,7 @@ public class BrowseEntryLinkRepository extends AbstractDSpaceRestRepository
         BrowseEngine be = new BrowseEngine(context);
         BrowserScope bs = new BrowserScope(context);
 
-        DSpaceObject scopeObj = scopeResolver.resolveScope(context, scope);
+        IndexableObject scopeObj = scopeResolver.resolveScope(context, scope);
 
         // process the input, performing some inline validation
         final BrowseIndex bi;
