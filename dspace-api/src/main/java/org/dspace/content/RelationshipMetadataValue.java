@@ -30,6 +30,10 @@ public class RelationshipMetadataValue extends MetadataValue {
      * Relationship for a Publication will have its useForPlace set to true. This means that the place
      * calculation will take both these RelationshipMetadataValues into account together with the normal
      * plain text metadatavalues.
+     * On the other hand, the journal name, volume and issue number which are constructed through a
+     * Relationship from a Publication to a journal issue will have its useForPlace set to false.
+     * This would typically be set to false for any singular metadata, and for any relationship where no mixing
+     * with plain text variables is applicable
      */
     public boolean isUseForPlace() {
         return useForPlace;
