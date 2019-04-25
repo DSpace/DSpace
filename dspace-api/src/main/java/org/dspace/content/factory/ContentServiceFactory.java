@@ -10,13 +10,11 @@ package org.dspace.content.factory;
 import java.io.Serializable;
 import java.util.List;
 
-import org.dspace.browse.BrowsableObject;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
-import org.dspace.content.service.BrowsableObjectService;
 import org.dspace.content.service.BundleService;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
@@ -25,6 +23,7 @@ import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.content.service.EntityService;
 import org.dspace.content.service.EntityTypeService;
 import org.dspace.content.service.InProgressSubmissionService;
+import org.dspace.content.service.IndexableObjectService;
 import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataFieldService;
@@ -35,6 +34,7 @@ import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.content.service.SiteService;
 import org.dspace.content.service.SupervisedItemService;
 import org.dspace.content.service.WorkspaceItemService;
+import org.dspace.discovery.IndexableObject;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.workflow.factory.WorkflowServiceFactory;
 
@@ -46,7 +46,12 @@ import org.dspace.workflow.factory.WorkflowServiceFactory;
  */
 public abstract class ContentServiceFactory {
 
-    public abstract List<BrowsableObjectService> getBrowsableDSpaceObjectServices();
+    /**
+     * Return the list of all the available implementations of the IndexableObjectService interface
+     * 
+     * @return the list of IndexableObjectService
+     */
+    public abstract List<IndexableObjectService> getIndexableObjectServices();
 
     public abstract List<DSpaceObjectService<? extends DSpaceObject>> getDSpaceObjectServices();
 
@@ -115,15 +120,15 @@ public abstract class ContentServiceFactory {
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends BrowsableObject<PK>, PK extends Serializable> BrowsableObjectService<T, PK>
-        getBrowsableDSpaceObjectService(int type) {
-        for (int i = 0; i < getBrowsableDSpaceObjectServices().size(); i++) {
-            BrowsableObjectService objectService = getBrowsableDSpaceObjectServices().get(i);
-            if (objectService.getSupportsTypeConstant() == type) {
-                return (BrowsableObjectService<T, PK>) objectService;
+    public <T extends IndexableObject<PK>, PK extends Serializable> IndexableObjectService<T, PK>
+        getIndexableObjectService(int type) {
+        for (int i = 0; i < getIndexableObjectServices().size(); i++) {
+            IndexableObjectService objectService = getIndexableObjectServices().get(i);
+            if (objectService.getSupportsIndexableObjectTypeConstant() == type) {
+                return (IndexableObjectService<T, PK>) objectService;
             }
         }
-        throw new UnsupportedOperationException("Unknown Browsable DSpace type: " + type);
+        throw new UnsupportedOperationException("Unknown Findable Object type: " + type);
     }
 
     public DSpaceObjectLegacySupportService<? extends DSpaceObject> getDSpaceLegacyObjectService(int type) {

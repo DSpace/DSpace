@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
  * representation about the filter query that has to be used for the given EntityType
  */
 @Component
-public class FilteredDiscoveryPageConverter extends DSpaceConverter<org.dspace.content.EntityType,
+public class FilteredDiscoveryPageConverter implements DSpaceConverter<org.dspace.content.EntityType,
                                                                     FilteredDiscoveryPageRest> {
     @Autowired
     private EntityTypeToFilterQueryService entityTypeToFilterQueryService;

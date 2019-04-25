@@ -5,33 +5,28 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.browse;
+package org.dspace.discovery;
 
 import java.io.Serializable;
 
 import org.dspace.core.Constants;
+import org.dspace.core.ReloadableEntity;
 
 /**
- * This is the basic interface that a data model entity need to implement to support browsing/retrieval
+ * This is the basic interface that a data model entity need to implement to be indexable in Discover
  * 
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
  * @param <PK>
  *            the Class of the primary key
  */
-public interface BrowsableObject<PK extends Serializable> {
+public interface IndexableObject<PK extends Serializable> extends ReloadableEntity<PK> {
 
     /**
      * 
      * @return the integer constant representing the Entity Type, @see {@link Constants}
      */
     public int getType();
-
-    /**
-     * 
-     * @return the primary key of the Entity instance
-     */
-    public PK getID();
 
     /**
      * 

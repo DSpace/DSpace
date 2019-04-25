@@ -51,7 +51,14 @@ public class WorkspaceItemBuilder extends AbstractBuilder<WorkspaceItem, Workspa
 
     @Override
     public WorkspaceItem build() {
+        try {
+            context.dispatchEvents();
+            indexingService.commit();
             return workspaceItem;
+        } catch (Exception e) {
+            return handleException(e);
+        }
+
     }
 
     @Override

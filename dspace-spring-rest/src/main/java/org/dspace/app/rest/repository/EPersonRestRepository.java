@@ -186,7 +186,7 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
     }
 
     @Override
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasPermission(#uuid, 'EPERSON', #patch)")
     protected void patch(Context context, HttpServletRequest request, String apiCategory, String model, UUID uuid,
                          Patch patch) throws AuthorizeException, SQLException {
         patchDSpaceObject(apiCategory, model, uuid, patch);
@@ -206,6 +206,9 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
         }
         if (ePersonRest.isCanLogIn() != ePerson.canLogIn()) {
             ePerson.setCanLogIn(ePersonRest.isCanLogIn());
+        }
+        if (!Objects.equals(ePersonRest.getEmail(), ePerson.getEmail())) {
+            ePerson.setEmail(ePersonRest.getEmail());
         }
         if (!Objects.equals(ePersonRest.getNetid(), ePerson.getNetid())) {
             ePerson.setNetid(ePersonRest.getNetid());
