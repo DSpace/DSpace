@@ -27,14 +27,17 @@ public class EntityTypeServiceImpl implements EntityTypeService {
     @Autowired(required = true)
     protected AuthorizeService authorizeService;
 
+    @Override
     public EntityType findByEntityType(Context context,String entityType) throws SQLException {
         return entityTypeDAO.findByEntityType(context, entityType);
     }
 
+    @Override
     public List<EntityType> findAll(Context context) throws SQLException {
         return entityTypeDAO.findAll(context, EntityType.class);
     }
 
+    @Override
     public EntityType create(Context context) throws SQLException, AuthorizeException {
         if (!authorizeService.isAdmin(context)) {
             throw new AuthorizeException(
@@ -43,6 +46,7 @@ public class EntityTypeServiceImpl implements EntityTypeService {
         return entityTypeDAO.create(context, new EntityType());
     }
 
+    @Override
     public EntityType create(Context context, String entityTypeString) throws SQLException, AuthorizeException {
         if (!authorizeService.isAdmin(context)) {
             throw new AuthorizeException(
@@ -53,15 +57,18 @@ public class EntityTypeServiceImpl implements EntityTypeService {
         return entityTypeDAO.create(context, entityType);
     }
 
+    @Override
     public EntityType find(Context context,int id) throws SQLException {
         EntityType entityType = entityTypeDAO.findByID(context, EntityType.class, id);
         return entityType;
     }
 
+    @Override
     public void update(Context context,EntityType entityType) throws SQLException, AuthorizeException {
         update(context,Collections.singletonList(entityType));
     }
 
+    @Override
     public void update(Context context,List<EntityType> entityTypes) throws SQLException, AuthorizeException {
         if (CollectionUtils.isNotEmpty(entityTypes)) {
             // Check authorisation - only administrators can change formats
@@ -76,6 +83,7 @@ public class EntityTypeServiceImpl implements EntityTypeService {
         }
     }
 
+    @Override
     public void delete(Context context,EntityType entityType) throws SQLException, AuthorizeException {
         if (!authorizeService.isAdmin(context)) {
             throw new AuthorizeException(
