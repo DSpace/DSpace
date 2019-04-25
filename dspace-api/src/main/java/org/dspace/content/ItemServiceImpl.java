@@ -44,7 +44,7 @@ import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataSchemaService;
 import org.dspace.content.service.RelationshipService;
 import org.dspace.content.service.WorkspaceItemService;
-import org.dspace.content.virtual.VirtualMetadataPopularConfiguration;
+import org.dspace.content.virtual.VirtualMetadataConfiguration;
 import org.dspace.content.virtual.VirtualMetadataPopulator;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -1424,7 +1424,7 @@ prevent the generation of resource policy entry values with null dspace_object a
         throws SQLException {
         List<RelationshipMetadataValue> resultingMetadataValueList = new LinkedList<>();
         RelationshipType relationshipType = relationship.getRelationshipType();
-        HashMap<String, VirtualMetadataPopularConfiguration> hashMaps;
+        HashMap<String, VirtualMetadataConfiguration> hashMaps;
         String relationName = "";
         Item otherItem = null;
         int place = 0;
@@ -1460,14 +1460,14 @@ prevent the generation of resource policy entry values with null dspace_object a
     //hashmaps parameter. The beans will be used to retrieve the values for the RelationshipMetadataValue objects
     //and the keys of the hashmap will be used to construct the RelationshipMetadataValue object.
     private List<RelationshipMetadataValue> handleRelationshipTypeMetadataMapping(Context context, Item item,
-                                                HashMap<String, VirtualMetadataPopularConfiguration> hashMaps,
+                                                HashMap<String, VirtualMetadataConfiguration> hashMaps,
                                                                                   Item otherItem, String relationName,
                                                                                   Integer relationshipId, int place)
         throws SQLException {
         List<RelationshipMetadataValue> resultingMetadataValueList = new LinkedList<>();
-        for (Map.Entry<String, VirtualMetadataPopularConfiguration> entry : hashMaps.entrySet()) {
+        for (Map.Entry<String, VirtualMetadataConfiguration> entry : hashMaps.entrySet()) {
             String key = entry.getKey();
-            VirtualMetadataPopularConfiguration virtualBean = entry.getValue();
+            VirtualMetadataConfiguration virtualBean = entry.getValue();
 
             for (String value : virtualBean.getValues(context, otherItem)) {
                 RelationshipMetadataValue metadataValue = constructMetadataValue(context, key);
