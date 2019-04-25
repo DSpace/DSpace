@@ -47,6 +47,7 @@ public class RelationshipServiceImpl implements RelationshipService {
     @Autowired
     private VirtualMetadataPopulator virtualMetadataPopulator;
 
+    @Override
     public Relationship create(Context context) throws SQLException, AuthorizeException {
         if (!authorizeService.isAdmin(context)) {
             throw new AuthorizeException(
@@ -284,11 +285,13 @@ public class RelationshipServiceImpl implements RelationshipService {
         return relationshipDAO.findAll(context, Relationship.class);
     }
 
+    @Override
     public void update(Context context, Relationship relationship) throws SQLException, AuthorizeException {
         update(context, Collections.singletonList(relationship));
 
     }
 
+    @Override
     public void update(Context context, List<Relationship> relationships) throws SQLException, AuthorizeException {
         if (CollectionUtils.isNotEmpty(relationships)) {
             for (Relationship relationship : relationships) {
@@ -304,6 +307,7 @@ public class RelationshipServiceImpl implements RelationshipService {
         }
     }
 
+    @Override
     public void delete(Context context, Relationship relationship) throws SQLException, AuthorizeException {
         if (isRelationshipValidToDelete(context, relationship)) {
             // To delete a relationship, a user must have WRITE permissions on one of the related Items
