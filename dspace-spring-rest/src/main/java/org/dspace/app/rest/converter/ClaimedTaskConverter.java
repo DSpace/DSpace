@@ -8,7 +8,7 @@
 package org.dspace.app.rest.converter;
 
 import org.dspace.app.rest.model.ClaimedTaskRest;
-import org.dspace.browse.BrowsableObject;
+import org.dspace.discovery.IndexableObject;
 import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +22,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class ClaimedTaskConverter
-    extends BrowsableDSpaceObjectConverter<ClaimedTask, org.dspace.app.rest.model.ClaimedTaskRest> {
+    implements IndexableObjectConverter<ClaimedTask, org.dspace.app.rest.model.ClaimedTaskRest> {
 
     @Autowired
     private WorkflowItemConverter workflowItemConverter;
@@ -49,7 +49,7 @@ public class ClaimedTaskConverter
     }
 
     @Override
-    public boolean supportsModel(BrowsableObject object) {
+    public boolean supportsModel(IndexableObject object) {
         return object instanceof ClaimedTask;
     }
 

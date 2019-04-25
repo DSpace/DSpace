@@ -61,12 +61,12 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
     }
 
     @Override
-    public int getSupportsTypeConstant() {
+    public int getSupportsIndexableObjectTypeConstant() {
         return Constants.WORKSPACEITEM;
     }
 
     @Override
-    public WorkspaceItem find(Context context, Integer id) throws SQLException {
+    public WorkspaceItem find(Context context, int id) throws SQLException {
         WorkspaceItem workspaceItem = workspaceItemDAO.findByID(context, WorkspaceItem.class, id);
 
         if (workspaceItem == null) {
@@ -81,6 +81,14 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
             }
         }
         return workspaceItem;
+    }
+
+    @Override
+    public WorkspaceItem findIndexableObject(Context context, Integer id) throws SQLException {
+        if (id != null) {
+            return find(context, id);
+        }
+        return null;
     }
 
     @Override

@@ -38,7 +38,7 @@ public class ClaimedTaskServiceImpl implements ClaimedTaskService {
     }
 
     @Override
-    public int getSupportsTypeConstant() {
+    public int getSupportsIndexableObjectTypeConstant() {
         return Constants.CLAIMEDTASK;
     }
 
@@ -53,7 +53,7 @@ public class ClaimedTaskServiceImpl implements ClaimedTaskService {
     }
 
     @Override
-    public ClaimedTask find(Context context, Integer id) throws SQLException {
+    public ClaimedTask findIndexableObject(Context context, Integer id) throws SQLException {
         if (id == null) {
             return null;
         }

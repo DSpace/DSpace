@@ -25,6 +25,7 @@ import org.dspace.content.Relationship;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.RelationshipService;
 import org.dspace.core.Context;
+import org.dspace.discovery.IndexableObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -35,7 +36,10 @@ import org.springframework.stereotype.Component;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @Component
-public class ItemConverter extends DSpaceObjectConverter<org.dspace.content.Item, org.dspace.app.rest.model.ItemRest> {
+public class ItemConverter
+    extends DSpaceObjectConverter<org.dspace.content.Item, org.dspace.app.rest.model.ItemRest>
+    implements IndexableObjectConverter<Item, ItemRest> {
+
     @Autowired(required = true)
     private CollectionConverter collectionConverter;
     @Autowired(required = true)
@@ -120,4 +124,8 @@ public class ItemConverter extends DSpaceObjectConverter<org.dspace.content.Item
         return Item.class;
     }
 
+    @Override
+    public boolean supportsModel(IndexableObject idxo) {
+        return idxo instanceof Item;
+    }
 }

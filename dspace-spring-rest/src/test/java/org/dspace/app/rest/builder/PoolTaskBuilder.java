@@ -76,6 +76,8 @@ public class PoolTaskBuilder extends AbstractBuilder<PoolTask, PoolTaskService> 
             workflowItem = workflowService.start(context, workspaceItem);
             workspaceItem = null;
             poolTask = getService().findByWorkflowIdAndEPerson(context, workflowItem, user);
+            context.dispatchEvents();
+            indexingService.commit();
             return poolTask;
         } catch (Exception e) {
             return handleException(e);
