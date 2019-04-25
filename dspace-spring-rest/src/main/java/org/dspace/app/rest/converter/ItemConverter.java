@@ -16,6 +16,7 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.RelationshipRest;
+import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
@@ -26,8 +27,12 @@ import org.dspace.content.service.ItemService;
 import org.dspace.content.service.RelationshipService;
 import org.dspace.core.Context;
 import org.dspace.discovery.IndexableObject;
+import org.dspace.services.RequestService;
+import org.dspace.services.model.Request;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * This is the converter from/to the Item in the DSpace API data model and the
@@ -44,6 +49,8 @@ public class ItemConverter
     private CollectionConverter collectionConverter;
     @Autowired(required = true)
     private BitstreamConverter bitstreamConverter;
+    @Autowired
+    private RequestService requestService;
     @Autowired
     private RelationshipService relationshipService;
     @Autowired
@@ -88,7 +95,15 @@ public class ItemConverter
         item.setBitstreams(bitstreams);
         List<Relationship> relationships = new LinkedList<>();
         try {
-            relationships = relationshipService.findByItem(new Context(), obj);
+            Context context;
+            Request currentRequest = requestService.getCurrentRequest();
+            if (currentRequest != null) {
+                HttpServletRequest request = currentRequest.getHttpServletRequest();
+                context = ContextUtil.obtainContext(request);
+            } else {
+                context = new Context();
+            }
+            relationships = relationshipService.findByItem(context, obj);
         } catch (SQLException e) {
             log.error("Error retrieving relationships for item " + item.getHandle(), e);
         }
