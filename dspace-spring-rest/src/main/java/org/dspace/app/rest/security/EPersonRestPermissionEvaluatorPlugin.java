@@ -9,9 +9,14 @@ package org.dspace.app.rest.security;
 
 import java.io.Serializable;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.UUID;
 
+import org.dspace.app.rest.model.patch.Operation;
+import org.dspace.app.rest.model.patch.Patch;
+import org.dspace.app.rest.repository.patch.factories.EPersonOperationFactory;
 import org.dspace.app.rest.utils.ContextUtil;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
@@ -34,15 +39,18 @@ public class EPersonRestPermissionEvaluatorPlugin extends RestObjectPermissionEv
     private static final Logger log = LoggerFactory.getLogger(EPersonRestPermissionEvaluatorPlugin.class);
 
     @Autowired
+    AuthorizeService authorizeService;
+
+    @Autowired
     private RequestService requestService;
 
     @Autowired
     private EPersonService ePersonService;
 
     @Override
-    public boolean hasPermission(Authentication authentication, Serializable targetId,
-                                 String targetType, Object permission) {
-        //For now this plugin only evaluates READ access
+    public boolean hasDSpacePermission(Authentication authentication, Serializable targetId,
+                                 String targetType, DSpaceRestPermission permission) {
+
         DSpaceRestPermission restPermission = DSpaceRestPermission.convert(permission);
         if (!DSpaceRestPermission.READ.equals(restPermission)
                 && !DSpaceRestPermission.WRITE.equals(restPermission)
@@ -55,10 +63,17 @@ public class EPersonRestPermissionEvaluatorPlugin extends RestObjectPermissionEv
 
         Request request = requestService.getCurrentRequest();
         Context context = ContextUtil.obtainContext(request.getServletRequest());
+
         EPerson ePerson = null;
+
         try {
             ePerson = ePersonService.findByEmail(context, (String) authentication.getPrincipal());
             UUID dsoId = UUID.fromString(targetId.toString());
+
+            // anonymous user
+            if (ePerson == null) {
+                return false;
+            }
 
             if (dsoId.equals(ePerson.getID())) {
                 return true;
@@ -70,4 +85,32 @@ public class EPersonRestPermissionEvaluatorPlugin extends RestObjectPermissionEv
 
         return false;
     }
+
+    @Override
+    public boolean hasPatchPermission(Authentication authentication, Serializable targetId, String targetType,
+                                      Patch patch) {
+
+        /**
+         * First verify that the user has write permission on the eperson.
+         */
+        if (!hasPermission(authentication, targetId, targetType, "WRITE")) {
+            return false;
+        }
+
+        List<Operation> operations = patch.getOperations();
+
+        /**
+         * The entire Patch request should be denied if it contains operations that are
+         * restricted to Dspace administrators. The authenticated user is currently allowed to
+         * update their own password.
+         */
+        for (Operation op: operations) {
+            if (!op.getPath().contentEquals(EPersonOperationFactory.OPERATION_PASSWORD_CHANGE)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
 }

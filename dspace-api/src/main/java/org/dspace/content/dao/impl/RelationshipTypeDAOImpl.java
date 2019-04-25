@@ -23,7 +23,7 @@ import org.dspace.core.Context;
 public class RelationshipTypeDAOImpl extends AbstractHibernateDAO<RelationshipType> implements RelationshipTypeDAO {
 
     @Override
-    public RelationshipType findbyTypesAndLabels(Context context, EntityType leftType, EntityType rightType,
+    public RelationshipType findByTypesAndLabels(Context context, EntityType leftType, EntityType rightType,
                                                  String leftLabel, String rightLabel)
         throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);

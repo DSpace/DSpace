@@ -74,6 +74,24 @@ public class EPersonBuilder extends AbstractDSpaceObjectBuilder<EPerson> {
         return this;
     }
 
+    public EPersonBuilder withLanguage(String lang) throws SQLException {
+        ePerson.setLanguage(context, lang);
+        return this;
+    }
+
+    public EPersonBuilder withPhone(String phone) throws SQLException {
+        ePersonService.setMetadataSingleValue(
+                context,
+                ePerson,
+                "eperson",
+                "phone",
+                null,
+                null,
+                phone
+        );
+        return this;
+    }
+
     public EPersonBuilder withGroupMembership(Group group) {
         groupService.addMember(context, group, ePerson);
         return this;

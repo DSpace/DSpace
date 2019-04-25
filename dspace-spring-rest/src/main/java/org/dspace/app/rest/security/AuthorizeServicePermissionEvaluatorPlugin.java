@@ -52,8 +52,8 @@ public class AuthorizeServicePermissionEvaluatorPlugin extends RestObjectPermiss
     private ContentServiceFactory contentServiceFactory;
 
     @Override
-    public boolean hasPermission(Authentication authentication, Serializable targetId, String targetType,
-                                 Object permission) {
+    public boolean hasDSpacePermission(Authentication authentication, Serializable targetId, String targetType,
+                                       DSpaceRestPermission permission) {
 
         DSpaceRestPermission restPermission = DSpaceRestPermission.convert(permission);
         if (restPermission == null) {
@@ -94,4 +94,5 @@ public class AuthorizeServicePermissionEvaluatorPlugin extends RestObjectPermiss
 
         return false;
     }
+
 }

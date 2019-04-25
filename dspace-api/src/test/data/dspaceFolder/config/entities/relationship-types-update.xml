@@ -8,7 +8,7 @@
         <leftLabel>isAuthorOfPublication</leftLabel>
         <rightLabel>isPublicationOfAuthor</rightLabel>
         <leftCardinality>
-            <min>0</min>
+            <min>10</min>
         </leftCardinality>
         <rightCardinality>
             <min>0</min>

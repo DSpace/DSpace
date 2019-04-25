@@ -66,4 +66,17 @@ public interface ResourcePolicyDAO extends GenericDAO<ResourcePolicy> {
     public void deleteByDsoEPersonPolicies(Context context, DSpaceObject dso, EPerson ePerson) throws SQLException;
 
     public void deleteByDsoAndTypeNotEqualsTo(Context c, DSpaceObject o, String type) throws SQLException;
+
+    /**
+     * Return a list of policies for an object that match the action except the record labeled with the rpType
+     *
+     * @param c        context
+     * @param o        DSpaceObject policies relate to
+     * @param actionID action (defined in class Constants)
+     * @param rpType   the resource policy type
+     * @return list of resource policies
+     * @throws SQLException if there's a database problem
+     */
+    public List<ResourcePolicy> findByDSoAndActionExceptRpType(Context c, DSpaceObject o, int actionID,
+            String rpType) throws SQLException;
 }

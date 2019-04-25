@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
  * representation of an RelationshipType and vice versa
  */
 @Component
-public class RelationshipTypeConverter extends DSpaceConverter<RelationshipType, RelationshipTypeRest>  {
+public class RelationshipTypeConverter implements DSpaceConverter<RelationshipType, RelationshipTypeRest>  {
 
     @Autowired
     private EntityTypeConverter entityTypeConverter;

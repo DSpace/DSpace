@@ -12,7 +12,6 @@ import java.util.List;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
-import org.dspace.content.service.BrowsableObjectService;
 import org.dspace.content.service.BundleService;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
@@ -20,6 +19,7 @@ import org.dspace.content.service.DSpaceObjectLegacySupportService;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.content.service.EntityService;
 import org.dspace.content.service.EntityTypeService;
+import org.dspace.content.service.IndexableObjectService;
 import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataFieldService;
@@ -83,8 +83,8 @@ public class ContentServiceFactoryImpl extends ContentServiceFactory {
     private EntityService entityService;
 
     @Override
-    public List<BrowsableObjectService> getBrowsableDSpaceObjectServices() {
-        return new DSpace().getServiceManager().getServicesByType(BrowsableObjectService.class);
+    public List<IndexableObjectService> getIndexableObjectServices() {
+        return new DSpace().getServiceManager().getServicesByType(IndexableObjectService.class);
     }
 
     @Override

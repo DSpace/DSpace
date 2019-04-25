@@ -373,9 +373,11 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
     public T patch(HttpServletRequest request, String apiCategory, String model, ID id, Patch patch)
         throws HttpRequestMethodNotSupportedException, UnprocessableEntityException, PatchBadRequestException {
         Context context = obtainContext();
+
         try {
             thisRepository.patch(context, request, apiCategory, model, id, patch);
             context.commit();
+
         } catch (AuthorizeException ae) {
             throw new RESTAuthorizationException(ae);
         } catch (SQLException | DCInputsReaderException e) {
