@@ -54,7 +54,6 @@ public class EditItemBitstreamsForm extends AbstractDSpaceTransformer {
 	private static final Message T_column4 = message("xmlui.administrative.item.EditItemBitstreamsForm.column4");
 	private static final Message T_column5 = message("xmlui.administrative.item.EditItemBitstreamsForm.column5");
 	private static final Message T_column6 = message("xmlui.administrative.item.EditItemBitstreamsForm.column6");
-	private static final Message T_column7 = message("xmlui.administrative.item.EditItemBitstreamsForm.column7");
 	private static final Message T_bundle_label = message("xmlui.administrative.item.EditItemBitstreamsForm.bundle_label");
 	private static final Message T_primary_label = message("xmlui.administrative.item.EditItemBitstreamsForm.primary_label");
 	private static final Message T_view_link = message("xmlui.administrative.item.EditItemBitstreamsForm.view_link");
@@ -116,7 +115,6 @@ public class EditItemBitstreamsForm extends AbstractDSpaceTransformer {
 		header.addCellContent(T_column4);
 		header.addCellContent(T_column5);
 		header.addCellContent(T_column6);
-		header.addCellContent(T_column7);
 
 		java.util.List<Bundle> bundles = item.getBundles();
 

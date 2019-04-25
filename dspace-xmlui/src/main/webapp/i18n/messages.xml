@@ -1566,7 +1566,6 @@
 	<message key="xmlui.administrative.item.EditItemBitstreamsForm.column4">Format</message>
 	<message key="xmlui.administrative.item.EditItemBitstreamsForm.column5">View</message>
 	<message key="xmlui.administrative.item.EditItemBitstreamsForm.column6">Order</message>
-	<message key="xmlui.administrative.item.EditItemBitstreamsForm.column7"> </message>
 	<message key="xmlui.administrative.item.EditItemBitstreamsForm.bundle_label"><strong>Bundle: {0}</strong></message>
 	<message key="xmlui.administrative.item.EditItemBitstreamsForm.primary_label"> (primary) </message>
 	<message key="xmlui.administrative.item.EditItemBitstreamsForm.view_link">view</message>
