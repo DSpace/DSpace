@@ -30,6 +30,17 @@ import org.dspace.workflow.WorkflowItem;
 public interface WorkspaceItemService extends InProgressSubmissionService<WorkspaceItem, Integer> {
 
     /**
+     * Get a workspace item from the database. The item, collection and
+     * submitter are loaded into memory.
+     *
+     * @param context DSpace context object
+     * @param id      ID of the workspace item
+     * @return the workspace item, or null if the ID is invalid.
+     * @throws SQLException if database error
+     */
+    public WorkspaceItem find(Context context, int id) throws SQLException;
+
+    /**
      * Create a new workspace item, with a new ID. An Item is also created. The
      * submitter is the current user in the context.
      *

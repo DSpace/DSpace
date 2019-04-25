@@ -46,8 +46,8 @@ public class ClaimedTaskRestPermissionEvaluatorPlugin extends RestObjectPermissi
     private EPersonService ePersonService;
 
     @Override
-    public boolean hasPermission(Authentication authentication, Serializable targetId,
-                                 String targetType, Object permission) {
+    public boolean hasDSpacePermission(Authentication authentication, Serializable targetId,
+                                 String targetType, DSpaceRestPermission permission) {
 
         if (Constants.getTypeID(targetType) != Constants.CLAIMEDTASK) {
             return false;
@@ -77,4 +77,5 @@ public class ClaimedTaskRestPermissionEvaluatorPlugin extends RestObjectPermissi
         }
         return false;
     }
+
 }

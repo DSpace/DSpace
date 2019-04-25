@@ -23,7 +23,7 @@ import org.springframework.stereotype.Component;
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
 @Component
-public class AuthorityRestConverter extends DSpaceConverter<ChoiceAuthority, AuthorityRest> {
+public class AuthorityRestConverter implements DSpaceConverter<ChoiceAuthority, AuthorityRest> {
 
     @Override
     public AuthorityRest fromModel(ChoiceAuthority step) {

@@ -54,7 +54,7 @@ public class BasicWorkflowItemServiceImpl implements BasicWorkflowItemService {
     }
 
     @Override
-    public int getSupportsTypeConstant() {
+    public int getSupportsIndexableObjectTypeConstant() {
         return Constants.WORKFLOWITEM;
     }
 
@@ -73,7 +73,7 @@ public class BasicWorkflowItemServiceImpl implements BasicWorkflowItemService {
     }
 
     @Override
-    public BasicWorkflowItem find(Context context, Integer id) throws SQLException {
+    public BasicWorkflowItem find(Context context, int id) throws SQLException {
         BasicWorkflowItem workflowItem = workflowItemDAO.findByID(context, BasicWorkflowItem.class, id);
 
         if (workflowItem == null) {
@@ -88,6 +88,14 @@ public class BasicWorkflowItemServiceImpl implements BasicWorkflowItemService {
             }
         }
         return workflowItem;
+    }
+
+    @Override
+    public BasicWorkflowItem findIndexableObject(Context context, Integer id) throws SQLException {
+        if (id != null) {
+            return find(context, id);
+        }
+        return null;
     }
 
     @Override

@@ -42,7 +42,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public abstract class AInprogressItemConverter<T extends InProgressSubmission<ID>,
                             R extends AInprogressSubmissionRest<ID>, ID extends Serializable>
-        extends BrowsableDSpaceObjectConverter<T, R> {
+        implements IndexableObjectConverter<T, R> {
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(AInprogressItemConverter.class);
 

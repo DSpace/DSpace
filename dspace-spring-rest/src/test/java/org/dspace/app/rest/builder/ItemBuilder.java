@@ -138,5 +138,4 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
     protected DSpaceObjectService<Item> getService() {
         return itemService;
     }
-
 }

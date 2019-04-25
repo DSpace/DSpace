@@ -31,6 +31,16 @@ public interface WorkflowItemService<T extends WorkflowItem> extends InProgressS
     public T create(Context context, Item item, Collection collection) throws SQLException, AuthorizeException;
 
     /**
+     * Get a workflow item from the database.
+     *
+     * @param context The relevant DSpace Context.
+     * @param id      ID of the workflow item
+     * @return the workflow item, or null if the ID is invalid.
+     * @throws SQLException An exception that provides information on a database access error or other errors.
+     */
+    public T find(Context context, int id) throws SQLException;
+
+    /**
      * return all workflowitems
      *
      * @param context The relevant DSpace Context.

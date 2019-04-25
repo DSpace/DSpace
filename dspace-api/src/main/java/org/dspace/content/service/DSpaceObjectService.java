@@ -28,7 +28,17 @@ import org.dspace.core.Context;
  * @param <T> class type
  * @author kevinvandevelde at atmire.com
  */
-public interface DSpaceObjectService<T extends DSpaceObject> extends BrowsableObjectService<T, UUID> {
+public interface DSpaceObjectService<T extends DSpaceObject> {
+
+    /**
+     * Generic find for when the precise type of an Entity is not known
+     *
+     * @param context - the context
+     * @param uuid      - uuid within table of type'd dspace objects
+     * @return the dspace object found, or null if it does not exist.
+     * @throws SQLException only upon failure accessing the database.
+     */
+    public T find(Context context, UUID uuid) throws SQLException;
 
     /**
      * Get a proper name for the object. This may return <code>null</code>.
@@ -39,17 +49,6 @@ public interface DSpaceObjectService<T extends DSpaceObject> extends BrowsableOb
      * one
      */
     public abstract String getName(T dso);
-
-    /**
-     * Generic find for when the precise type of a BDSO is not known, just the
-     * a pair of type number and database ID.
-     *
-     * @param context - the context
-     * @param id      - id within table of type'd objects
-     * @return the object found, or null if it does not exist.
-     * @throws SQLException only upon failure accessing the database.
-     */
-    public T find(Context context, UUID id) throws SQLException;
 
     /**
      * Tries to lookup all Identifiers of this DSpaceObject.
@@ -371,7 +370,6 @@ public interface DSpaceObjectService<T extends DSpaceObject> extends BrowsableOb
 
     public void delete(Context context, T dso) throws SQLException, AuthorizeException, IOException;
 
-
     void addAndShiftRightMetadata(Context context, T dso, String schema, String element, String qualifier, String lang,
                                   String value, String authority, int confidence, int index) throws SQLException;
 
@@ -380,4 +378,11 @@ public interface DSpaceObjectService<T extends DSpaceObject> extends BrowsableOb
 
     void moveMetadata(Context context, T dso, String schema, String element, String qualifier, int from, int to)
         throws SQLException;
+
+    /**
+     * Returns the Constants which this service supports
+     *
+     * @return a org.dspace.core.Constants that represents a IndexableObject type
+     */
+    public int getSupportsTypeConstant();
 }

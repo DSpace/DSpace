@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
  * representation of an EntityType and vice versa
  */
 @Component
-public class EntityTypeConverter extends DSpaceConverter<org.dspace.content.EntityType, EntityTypeRest> {
+public class EntityTypeConverter implements DSpaceConverter<org.dspace.content.EntityType, EntityTypeRest> {
 
     /**
      * This method converts the EntityType model object that is passed along in the params to the
