@@ -108,9 +108,11 @@ public class Related implements VirtualMetadataPopularConfiguration {
 
     /**
      * Generic setter for the virtualMetadataPopularConfiguration property of this class
-     * @param virtualMetadataPopularConfiguration   The VirtualBean to which the virtualMetadataPopularConfiguration property will be set to
+     * @param virtualMetadataPopularConfiguration   The VirtualBean to which the
+     *                                             virtualMetadataPopularConfiguration property will be set to
      */
-    public void setVirtualMetadataPopularConfiguration(VirtualMetadataPopularConfiguration virtualMetadataPopularConfiguration) {
+    public void setVirtualMetadataPopularConfiguration(VirtualMetadataPopularConfiguration
+                                                               virtualMetadataPopularConfiguration) {
         this.virtualMetadataPopularConfiguration = virtualMetadataPopularConfiguration;
     }
 
