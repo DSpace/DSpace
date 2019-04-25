@@ -18,7 +18,7 @@ import org.dspace.core.Context;
  * This class is used by the VirtualMetadataPopulator. It will simply take the ID of the item that's passed along
  * to this and return that as it's value
  */
-public class UUIDValue implements VirtualBean {
+public class UUIDValue implements VirtualMetadataPopularConfiguration {
 
     private boolean useForPlace;
 
