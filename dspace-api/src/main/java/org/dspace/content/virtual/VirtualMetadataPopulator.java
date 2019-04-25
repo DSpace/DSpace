@@ -22,13 +22,13 @@ public class VirtualMetadataPopulator {
     /**
      * The map that holds this representation
      */
-    private Map<String, HashMap<String, VirtualBean>> map;
+    private Map<String, HashMap<String, VirtualMetadataPopularConfiguration>> map;
 
     /**
      * Standard setter for the map
      * @param map   The map to be used in the VirtualMetadataPopulator
      */
-    public void setMap(Map<String, HashMap<String, VirtualBean>> map) {
+    public void setMap(Map<String, HashMap<String, VirtualMetadataPopularConfiguration>> map) {
         this.map = map;
     }
 
@@ -36,7 +36,7 @@ public class VirtualMetadataPopulator {
      * Standard getter for the map
      * @return  The map that is used in the VirtualMetadataPopulator
      */
-    public Map<String, HashMap<String, VirtualBean>> getMap() {
+    public Map<String, HashMap<String, VirtualMetadataPopularConfiguration>> getMap() {
         return map;
     }
 
@@ -48,15 +48,15 @@ public class VirtualMetadataPopulator {
      * @return                  A boolean indicating whether the useForPlace is true or not for the given parameters
      */
     public boolean isUseForPlaceTrueForRelationshipType(RelationshipType relationshipType, boolean isLeft) {
-        HashMap<String, VirtualBean> hashMaps;
+        HashMap<String, VirtualMetadataPopularConfiguration> hashMaps;
         if (isLeft) {
             hashMaps = this.getMap().get(relationshipType.getLeftLabel());
         } else {
             hashMaps = this.getMap().get(relationshipType.getRightLabel());
         }
         if (hashMaps != null) {
-            for (Map.Entry<String, VirtualBean> entry : hashMaps.entrySet()) {
-                VirtualBean virtualBean = entry.getValue();
+            for (Map.Entry<String, VirtualMetadataPopularConfiguration> entry : hashMaps.entrySet()) {
+                VirtualMetadataPopularConfiguration virtualBean = entry.getValue();
                 boolean useForPlace = virtualBean.getUseForPlace();
                 if (useForPlace) {
                     return true;

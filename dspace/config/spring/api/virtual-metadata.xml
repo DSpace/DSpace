@@ -37,7 +37,7 @@
 
     <!-- Config like this will tell our VirtualMetadataPopulator to include the virtual metadata field
          'dc.contributor.author' on the appropriate item with the values defined in the value-ref.
-          This value-ref should be a bean of type VirtualBean -->
+          This value-ref should be a bean of type VirtualMetadataPopularConfiguration -->
     <util:map id="isAuthorOfPublicationMap">
         <entry key="dc.contributor.author" value-ref="publicationAuthor_author"/>
     </util:map>
@@ -62,7 +62,7 @@
 
     <!-- Config like this will tell our VirtualMetadataPopulator to include the virtual metadata field
      'dc.contributor.other' on the appropriate item with the values defined in the value-ref.
-      This value-ref should be a bean of type VirtualBean -->
+      This value-ref should be a bean of type VirtualMetadataPopularConfiguration -->
     <util:map id="isOrgUnitOfPublicationMap">
         <entry key="dc.contributor.other" value-ref="publicationOrgUnit_name"/>
     </util:map>
@@ -154,18 +154,18 @@
          alone, we need to pass this call higher up the chain to the journalvolume's relationships to find the journal.
          Therefore we've created this Related bean which will look at the journalvolume's relationships with type
          'isJournalOfVolume' to find the journal that this journalvolume is related to and it'll then call the next
-         VirtualBean with that journal to retrieve the value. This will leave the retrieving of the values to the
-         next bean in the chain -->
+         VirtualMetadataPopularConfiguration with that journal to retrieve the value. This will leave the retrieving
+         of the values to the next bean in the chain -->
     <bean class="org.dspace.content.virtual.Related" id="volumeJournal_issn_related">
         <property name="relationshipTypeString" value="isJournalOfVolume"/>
         <property name="place" value="1"/>
-        <property name="virtualBean" ref="volumeJournal_issn"/>
+        <property name="virtualMetadataPopularConfiguration" ref="volumeJournal_issn"/>
     </bean>
 
     <bean class="org.dspace.content.virtual.Related" id="volumeJournal_title_related">
         <property name="relationshipTypeString" value="isJournalOfVolume"/>
         <property name="place" value="1"/>
-        <property name="virtualBean" ref="volumeJournal_title"/>
+        <property name="virtualMetadataPopularConfiguration" ref="volumeJournal_title"/>
     </bean>
 
     <util:map id="isJournalOfVolumeMap">
@@ -224,39 +224,39 @@
      alone, we need to pass this call higher up the chain to the journalissue's relationships to find the journal.
      Therefore we've created this Related bean which will look at the journalissue's relationships with type
      'isJournalVolumeOfIssue' to find the journalvolume that this journalissue is related to and it'll then call the next
-     VirtualBean with that journalvolume to retrieve the value. This will leave the retrieving of the values to the
-     next bean in the chain.
+     VirtualMetadataPopularConfiguration with that journalvolume to retrieve the value. This will leave the retrieving
+     of the values to the next bean in the chain.
      In this specific case, it'll call another Related bean to retrieve the journal for the journalvolume and it'll
      then retrieve the volume. This example has 2 Related beans chained to eachother to finally chain to a Collected
      bean to retrieve the final value -->
     <bean class="org.dspace.content.virtual.Related" id="issueVolumeJournal_issn_related">
         <property name="relationshipTypeString" value="isJournalVolumeOfIssue"/>
         <property name="place" value="1"/>
-        <property name="virtualBean" ref="volumeJournal_issn_related"/>
+        <property name="virtualMetadataPopularConfiguration" ref="volumeJournal_issn_related"/>
     </bean>
 
     <bean class="org.dspace.content.virtual.Related" id="issueVolumeJournal_title_related">
         <property name="relationshipTypeString" value="isJournalVolumeOfIssue"/>
         <property name="place" value="1"/>
-        <property name="virtualBean" ref="volumeJournal_title_related"/>
+        <property name="virtualMetadataPopularConfiguration" ref="volumeJournal_title_related"/>
     </bean>
 
     <bean class="org.dspace.content.virtual.Related" id="issueVolume_title_related">
         <property name="relationshipTypeString" value="isJournalVolumeOfIssue"/>
         <property name="place" value="1"/>
-        <property name="virtualBean" ref="issueVolume_title"/>
+        <property name="virtualMetadataPopularConfiguration" ref="issueVolume_title"/>
     </bean>
 
     <bean class="org.dspace.content.virtual.Related" id="issueVolumeJournal_uuid_related">
         <property name="relationshipTypeString" value="isJournalVolumeOfIssue"/>
         <property name="place" value="1"/>
-        <property name="virtualBean" ref="volumeJournal_uuid_related"/>
+        <property name="virtualMetadataPopularConfiguration" ref="volumeJournal_uuid_related"/>
     </bean>
 
     <bean class="org.dspace.content.virtual.Related" id="volumeJournal_uuid_related">
         <property name="relationshipTypeString" value="isJournalOfVolume"/>
         <property name="place" value="1"/>
-        <property name="virtualBean" ref="volumeJournal_uuid"/>
+        <property name="virtualMetadataPopularConfiguration" ref="volumeJournal_uuid"/>
     </bean>
     <bean class="org.dspace.content.virtual.UUIDValue" id="volumeJournal_uuid"/>
 </beans>
