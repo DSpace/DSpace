@@ -720,6 +720,23 @@
             <artifactId>json</artifactId>
             <version>20180130</version>
         </dependency>
+
+        <!-- BIBSYS handle server -->
+        <dependency>
+            <groupId>no.bibsys</groupId>
+            <artifactId>agora-handle</artifactId>
+            <version>1.0.14</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>logback-classic</artifactId>
+                    <groupId>ch.qos.logback</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>postgresql</artifactId>
+                    <groupId>postgresql</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
     </dependencies>
 
 </project>
