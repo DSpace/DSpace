@@ -757,6 +757,14 @@
             <artifactId>json</artifactId>
             <version>20180130</version>
         </dependency>
+
+        <!-- Used for Solr core export/import -->
+        <dependency>
+            <groupId>com.opencsv</groupId>
+            <artifactId>opencsv</artifactId>
+            <version>4.5</version>
+        </dependency>
+
     </dependencies>
 
 </project>
