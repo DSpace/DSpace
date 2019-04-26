@@ -18,7 +18,7 @@ import org.dspace.core.Context;
  * The config is located in core-services.xml whilst the actual code implementation is located in
  * {@link org.dspace.content.ItemServiceImpl}
  */
-public interface VirtualBean {
+public interface VirtualMetadataConfiguration {
 
     /**
      * This method will return a list filled with String values which will be determine by the bean that's responsible

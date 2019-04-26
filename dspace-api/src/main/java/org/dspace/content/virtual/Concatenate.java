@@ -18,13 +18,14 @@ import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * A bean implementing the {@link VirtualBean} interface to achieve the generation of Virtual metadata
+ * A bean implementing the {@link VirtualMetadataConfiguration} interface to achieve the generation of Virtual
+ * metadata
  * The Concatenate bean will take all the values of each metadata field configured in the list
  * and it will join all of these together with the separator defined in this bean. This means that whichever
  * entry this bean belongs to, that metadata field will have the value of the related item's metadata values
  * joined together with this separator. Only one value will be returned
  */
-public class Concatenate implements VirtualBean {
+public class Concatenate implements VirtualMetadataConfiguration {
 
     @Autowired
     private ItemService itemService;

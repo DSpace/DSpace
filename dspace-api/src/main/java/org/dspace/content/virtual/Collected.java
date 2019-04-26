@@ -18,12 +18,13 @@ import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * A bean implementing the {@link VirtualBean} interface to achieve the generation of Virtual metadata
+ * A bean implementing the {@link VirtualMetadataConfiguration} interface to achieve the generation of Virtual
+ * metadata
  * The Collected bean will take all the values of each metadata field defined in the list and it'll
  * create a list of virtual metadata fields defined by the map in which it's defined.
  * All values from the metadata fields will returned as separate elements
  */
-public class Collected implements VirtualBean {
+public class Collected implements VirtualMetadataConfiguration {
 
     @Autowired
     private ItemService itemService;
