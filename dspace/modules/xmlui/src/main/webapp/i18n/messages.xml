@@ -3369,7 +3369,7 @@
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.institution.p2">
       <table>
 	<tr><td><b>Size of Institution</b></td><td><b>Suggested Examples for Determining Size</b></td></tr>
-	<tr><td>Level 1</td><td>R3 or FTE under 5K or less than $50M in research grant funding.</td></tr>
+	<tr><td>Level I</td><td>R3 or FTE under 5K or less than $50M in research grant funding.</td></tr>
 	<tr><td>Level II</td><td>R2 or FTE 5K - 10K or  $50M - $300M in research grant funding.</td></tr>
 	<tr><td>Level III</td><td>RI or FTE +10K FTE or +$300M in research grant funding.</td></tr>
       </table>
@@ -3409,10 +3409,18 @@
 
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.errors.org_inst_size_currency">Currency selection is required</message>
 
-    <!-- Checkbox options for org_annual_revenue -->
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_inst_size.inst_level3"><span class="msg-inst_level3"><b>Level III</b>: annual membership dues $13,000</span></message>
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_inst_size.inst_level2"><span class="msg-inst_level2"><b>Level II</b>: annual membership dues $7,500</span></message>
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_inst_size.inst_level1"><span class="msg-inst_level1"><b>Level I</b>: annual membership dues $3,000</span></message>
+        <!-- Checkbox options for org_annual_revenue -->
+        <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_inst_size.inst_level3">
+            <span class="msg-inst_level3"><b>Level III</b>: annual membership dues $13,000</span></message>
+
+        <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_inst_size.inst_level2">
+            <span class="msg-inst_level2"><b>Level II</b>: annual membership dues $7,500</span></message>
+
+        <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_inst_size.inst_level1">
+            <span class="msg-inst_level1"><b>Level I</b>: annual membership dues $3,000</span></message>
+
+        <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_inst_size.inst_level0">
+            <span class="msg-inst_level0"><b>Other</b> (leave comment below)</span></message>
     
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.errors.org_annual_revenue">Membership level is required, either for publisher or institution</message>
 
