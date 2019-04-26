@@ -85,30 +85,30 @@ public abstract class ContentServiceFactory {
     public abstract SiteService getSiteService();
 
     /**
-     * Return the list of all the available implementations of the RelationshipTypeService interface
+     * Return the implementation of the RelationshipTypeService interface
      *
-     * @return the list of RelationshipTypeService
+     * @return the RelationshipTypeService
      */
     public abstract RelationshipTypeService getRelationshipTypeService();
 
     /**
-     * Return the list of all the available implementations of the RelationshipService interface
+     * Return the implementation of the RelationshipService interface
      *
-     * @return the list of RelationshipService
+     * @return the RelationshipService
      */
     public abstract RelationshipService getRelationshipService();
 
     /**
-     * Return the list of all the available implementations of the EntityTypeService interface
+     * Return the implementation of the EntityTypeService interface
      *
-     * @return the list of EntityTypeService
+     * @return the EntityTypeService
      */
     public abstract EntityTypeService getEntityTypeService();
 
     /**
-     * Return the list of all the available implementations of the EntityService interface
+     * Return the implementation of the EntityService interface
      *
-     * @return the list of EntityService
+     * @return the EntityService
      */
     public abstract EntityService getEntityService();
 
