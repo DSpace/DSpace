@@ -164,7 +164,8 @@ public class MembershipApplicationForm extends AbstractDSpaceTransformer impleme
             //orgInstSizeRadios.setHelp(message(message_prefix + "fields.org_inst_size.label2"));
             orgInstSizeRadios.addOption("inst_level3", message(message_prefix + "fields.org_inst_size.inst_level3"));
             orgInstSizeRadios.addOption("inst_level2", message(message_prefix + "fields.org_inst_size.inst_level2"));
-            orgInstSizeRadios.addOption("inst_level1", message(message_prefix + "fields.org_inst_size.inst_level1"));        
+            orgInstSizeRadios.addOption("inst_level1", message(message_prefix + "fields.org_inst_size.inst_level1"));
+            orgInstSizeRadios.addOption("inst_level0", message(message_prefix + "fields.org_inst_size.inst_level0"));        
             orgInstSizeRadios.setRequired();
             orgInstSizeRadios.setOptionSelected(parameters.getParameter("org_inst_size", ""));
             if(errorFieldList.contains("org_inst_size")) {
