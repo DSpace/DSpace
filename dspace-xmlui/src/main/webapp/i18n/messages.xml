@@ -751,8 +751,8 @@
 	<message key="xmlui.Submission.submit.DescribeStep.day">Day</message>
 	<message key="xmlui.Submission.submit.DescribeStep.series_name">Series Name</message>
 	<message key="xmlui.Submission.submit.DescribeStep.report_no">Report or paper No.</message>
-	<message key="xmlui.Submission.submit.DescribeStep.controlledvocabulary.link">Subject Categories</message>
-	<message key="xmlui.Submission.submit.DescribeStep.controlledvocabulary.title">Subject Categories</message>
+	<message key="xmlui.Submission.submit.DescribeStep.controlledvocabulary.link">Norwegian classification of scientific diciplines</message>
+	<message key="xmlui.Submission.submit.DescribeStep.controlledvocabulary.title">Norwegian scientific diciplines</message>
 	<message key="xmlui.Submission.submit.DescribeStep.controlledvocabulary.filter.label">Filter subjects</message>
 	<message key="xmlui.Submission.submit.DescribeStep.controlledvocabulary.filter.button">Filter</message>
 	<message key="xmlui.Submission.submit.DescribeStep.controlledvocabulary.loading">Please wait while the controlled vocabulary is loading.</message>
@@ -2214,7 +2214,14 @@
 	<message key="xmlui.dri2xhtml.METS-1.0.item-date">Date</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-publisher">Publisher</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-subject">Subject</message>
-
+    <message key="xmlui.dri2xhtml.METS-1.0.item-doi">DOI</message>
+    <message key="xmlui.dri2xhtml.METS-1.0.item-journal">Journal</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.item-series">Series</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.item-citation">Original version</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.item-haspart">Has parts</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.item-files-handle">Perm. link</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.item-copyright">Copyright</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.item-area">Geographical area</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-files-head">Files in this item</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-files-file">Files</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-files-name">Name</message>
@@ -2223,6 +2230,7 @@
 	<message key="xmlui.dri2xhtml.METS-1.0.item-files-view">View</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-files-description">Description</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-files-viewOpen">View/<wbr/>Open</message>
+    <message key="xmlui.dri2xhtml.METS-1.0.item-files-access-rights">Read access available for</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-no-files">There are no files associated with this item.</message>
 
 	<message key="xmlui.dri2xhtml.METS-1.0.size-bytes">bytes</message>
