@@ -48,14 +48,6 @@ public interface EntityService {
     EntityType getType(Context context, Entity entity) throws SQLException;
 
     /**
-     * Returns the list of relations for the given Entity object
-     * @param context   The relevant DSpace context
-     * @param entity    The Entity object for which the list of relationships will be returned
-     * @return The list of relationships for the given Entity object
-     */
-    List<Relationship> getAllRelations(Context context, Entity entity);
-
-    /**
      * Retrieves the list of relationships, which are attached to the Entity object that is passed along, where the
      * left item object of each relationship is equal to the Item object of the Entity object that is passed along
      * @param context   The relevant DSpace context
