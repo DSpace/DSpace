@@ -27,6 +27,7 @@ public class RelationshipTypeServiceImpl implements RelationshipTypeService {
     @Autowired(required = true)
     protected AuthorizeService authorizeService;
 
+    @Override
     public RelationshipType create(Context context) throws SQLException, AuthorizeException {
         if (!authorizeService.isAdmin(context)) {
             throw new AuthorizeException(
@@ -84,15 +85,17 @@ public class RelationshipTypeServiceImpl implements RelationshipTypeService {
         return create(context, relationshipType);
     }
 
-
+    @Override
     public RelationshipType find(Context context,int id) throws SQLException {
         return relationshipTypeDAO.findByID(context, RelationshipType.class, id);
     }
 
+    @Override
     public void update(Context context,RelationshipType relationshipType) throws SQLException, AuthorizeException {
         update(context,Collections.singletonList(relationshipType));
     }
 
+    @Override
     public void update(Context context,List<RelationshipType> relationshipTypes)
         throws SQLException, AuthorizeException {
         if (CollectionUtils.isNotEmpty(relationshipTypes)) {
@@ -109,6 +112,7 @@ public class RelationshipTypeServiceImpl implements RelationshipTypeService {
 
     }
 
+    @Override
     public void delete(Context context,RelationshipType relationshipType) throws SQLException, AuthorizeException {
         if (!authorizeService.isAdmin(context)) {
             throw new AuthorizeException(

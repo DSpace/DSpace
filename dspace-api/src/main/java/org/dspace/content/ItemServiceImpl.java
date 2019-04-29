@@ -1355,6 +1355,7 @@ prevent the generation of resource policy entry values with null dspace_object a
         return fullMetadataValueList;
     }
 
+    @Override
     public List<MetadataValue> getMetadata(Item item, String schema, String element, String qualifier, String lang,
                                            boolean enableVirtualMetadata) {
         //Fields of the relation schema are virtual metadata
