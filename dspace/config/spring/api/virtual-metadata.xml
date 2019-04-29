@@ -52,6 +52,7 @@
             <util:list>
                 <value>person.identifier.lastname</value>
                 <value>person.identifier.firstname</value>
+                <value>orgunit.identifier.name</value>
             </util:list>
         </property>
         <property name="separator">
