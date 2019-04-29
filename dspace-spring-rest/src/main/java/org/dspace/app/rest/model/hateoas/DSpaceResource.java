@@ -118,8 +118,8 @@ public abstract class DSpaceResource<T extends RestAddressableModel> extends HAL
                                             DSpaceRestRepository<RestAddressableModel, ?> resourceRepository = utils
                                                 .getResourceRepository(linkedRMList.get(0).getCategory(),
                                                                        linkedRMList.get(0).getType());
-                                            // TODO should we force pagination also of embedded resource?
-                                            // This will force pagination with size 10 for embedded collections as well
+                                            // force pagination also of embedded resource
+                                            // This will force pagination with size 20 for embedded collections as well
                                             int pageSize = 20;
                                             PageImpl<RestAddressableModel> page = new PageImpl(
                                                 linkedRMList.subList(0,
