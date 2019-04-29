@@ -307,6 +307,7 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
      *            the dspace context
      * @param list
      *            The list of Strings that will be used as data for the object that's to be created
+     *            This list is retrieved from the uri-list body
      * @return the created REST object
      * @throws AuthorizeException
      * @throws SQLException
