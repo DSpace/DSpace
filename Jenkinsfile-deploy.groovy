@@ -65,14 +65,9 @@ pipeline {
             }
         }
 
-
         stage('Maven Build') {
             steps {
-                echo "Pretending to build with maven"
-//                sh 'mkdir -p dspace/target'
-//                sh 'mkdir -p dspace/target/dspace-installer'
-//                sh 'touch dspace/target/dspace-installer/tullefil.txt'
-//                sh 'ls dspace/target/dspace-installer/'
+                echo "Building with maven"
                 sh 'mvn package -Dmirage2.on=true -P !dspace-lni,!dspace-sword,!dspace-jspui,!dspace-rdf'
             }
         }
@@ -111,7 +106,7 @@ pipeline {
                 emailext(
                         subject: "FAILURE: ${currentBuild.fullDisplayName}",
                         body: "${message}\n Open: ${env.BUILD_URL}",
-                        to: 'pcb@unit.no',
+                        to: 'teamrosa@bibsys.no',
                         attachlog: true,
                         compresslog: true,
                         recipientProviders: [[$class: 'CulpritsRecipientProvider']]
