@@ -312,14 +312,16 @@
 						<ref local="crisIndexerListener" />
 						<ref local="nestedIndexerListener" />
 						<ref local="ORCIDListener" />
-						<ref local="rpAutoSubscriberListener" />								
+						<ref local="rpAutoSubscriberListener" />
+						<ref local="crisDedupIndexerListener" />
 					</list>
 				</property>
 				<property name="listenerOnPostDelete">
 					<list>
 						<ref local="crisIndexerListener" />
 						<ref local="nestedIndexerListener" />
-						<ref local="ORCIDListener" />		
+						<ref local="ORCIDListener" />
+						<ref local="crisDedupIndexerListener" />
 					</list>
 				</property>
 				<property name="listenerOnPreInsert">
@@ -1659,6 +1661,10 @@
 		<property name="configLocation" value="classpath:hibernate/hibernate-cris.cfg.xml" />
 		<property name="hibernateProperties" ref="hibernateProperties" />
 		
+	</bean>
+
+	<bean id="crisDedupIndexerListener" class="org.dspace.app.cris.deduplication.CrisDedupListenerSolrIndexer">
+		<property name="dedupService" ref="org.dspace.app.cris.deduplication.service.DedupService" />
 	</bean>
 
 	<bean id="crisIndexerListener" class="org.dspace.app.cris.discovery.NativeCrisListenerSolrIndexer">
