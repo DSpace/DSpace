@@ -257,6 +257,7 @@ min-width:500px;
 #home_search span.resource_count {
 	color: #F49717;
 	font-weight: bold;
+	font-size: 16px;
 }
 #home_search input.ds-text-field, 
 .discover-search-box input.ds-text-field,
