@@ -186,6 +186,7 @@ public class RelationshipTypeRestControllerIT extends AbstractEntityIntegrationT
         Relationship relationship4 = RelationshipBuilder
             .createRelationshipBuilder(context, publication2, author3, isAuthorOfPublicationRelationshipType).build();
 
+        context.restoreAuthSystemState();
         getClient().perform(get("/api/core/relationships/isAuthorOfPublication"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$._embedded.relationships", containsInAnyOrder(

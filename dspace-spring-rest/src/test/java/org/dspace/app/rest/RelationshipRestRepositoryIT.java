@@ -25,6 +25,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
+import org.dspace.app.rest.builder.EPersonBuilder;
 import org.dspace.app.rest.builder.ItemBuilder;
 import org.dspace.app.rest.builder.RelationshipBuilder;
 import org.dspace.app.rest.matcher.PageMatcher;
@@ -160,6 +161,19 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                        RelationshipMatcher.matchRelationship(relationship3)
                    )))
         ;
+
+        getClient().perform(get("/api/core/relationships").param("size", "2"))
+
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.page",
+                                       is(PageMatcher.pageEntryWithTotalPagesAndElements(0, 2, 2, 3))))
+                   .andExpect(jsonPath("$._embedded.relationships", containsInAnyOrder(
+                       RelationshipMatcher.matchRelationship(relationship1),
+                       RelationshipMatcher.matchRelationship(relationship2)
+                   )))
+        ;
+
+
     }
 
     @Test
@@ -197,16 +211,8 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                                   "isAuthorOfPublication", "isPublicationOfAuthor");
 
 
-
-        EPerson user = ePersonService.create(context);
-        user.setFirstName(context, "first");
-        user.setLastName(context, "last");
-        user.setEmail("testaze@email.com");
-        user.setCanLogIn(true);
-        user.setLanguage(context, I18nUtil.getDefaultLocale().getLanguage());
-        ePersonService.setPassword(user, password);
-        // actually save the eperson to unit testing DB
-        ePersonService.update(context, user);
+        EPerson user = EPersonBuilder.createEPerson(context).withEmail("testaze@email.com")
+                      .withNameInMetadata("first", "last").withPassword(password).build();
         context.setCurrentUser(user);
 
         authorizeService.addPolicy(context, publication, Constants.WRITE, user);
@@ -227,6 +233,17 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                                                                    "https://localhost:8080/spring-rest/api/core/items/" + author1.getID()))
                                               .andExpect(status().isCreated())
                                               .andReturn();
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        Map<String, Object> map = mapper.readValue(content, Map.class);
+        String firstRelationshipIdString = String.valueOf(map.get("id"));
+
+        getClient().perform(get("/api/core/relationships/" + firstRelationshipIdString))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.leftId", is(publication.getID().toString())))
+                   .andExpect(jsonPath("$.rightId", is(author1.getID().toString())));
 
     }
 
@@ -266,15 +283,8 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
 
 
 
-        EPerson user = ePersonService.create(context);
-        user.setFirstName(context, "first");
-        user.setLastName(context, "last");
-        user.setEmail("testazhfhdfhe@email.com");
-        user.setCanLogIn(true);
-        user.setLanguage(context, I18nUtil.getDefaultLocale().getLanguage());
-        ePersonService.setPassword(user, password);
-        // actually save the eperson to unit testing DB
-        ePersonService.update(context, user);
+        EPerson user = EPersonBuilder.createEPerson(context).withEmail("testaze@email.com")
+                                     .withNameInMetadata("first", "last").withPassword(password).build();
         context.setCurrentUser(user);
 
         authorizeService.addPolicy(context, author1, Constants.WRITE, user);
@@ -295,6 +305,16 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                                               .andExpect(status().isCreated())
                                               .andReturn();
 
+        ObjectMapper mapper = new ObjectMapper();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        Map<String, Object> map = mapper.readValue(content, Map.class);
+        String firstRelationshipIdString = String.valueOf(map.get("id"));
+
+        getClient().perform(get("/api/core/relationships/" + firstRelationshipIdString))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.leftId", is(publication.getID().toString())))
+                   .andExpect(jsonPath("$.rightId", is(author1.getID().toString())));
     }
 
 
@@ -334,15 +354,8 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
 
 
 
-        EPerson user = ePersonService.create(context);
-        user.setFirstName(context, "first");
-        user.setLastName(context, "last");
-        user.setEmail("testazeazeazezae@email.com");
-        user.setCanLogIn(true);
-        user.setLanguage(context, I18nUtil.getDefaultLocale().getLanguage());
-        ePersonService.setPassword(user, password);
-        // actually save the eperson to unit testing DB
-        ePersonService.update(context, user);
+        EPerson user = EPersonBuilder.createEPerson(context).withEmail("testaze@email.com")
+                                     .withNameInMetadata("first", "last").withPassword(password).build();
         context.setCurrentUser(user);
         context.restoreAuthSystemState();
 
