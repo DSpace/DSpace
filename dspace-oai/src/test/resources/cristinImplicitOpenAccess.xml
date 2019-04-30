@@ -1,0 +1,214 @@
+<metadata xmlns="http://www.lyncode.com/xoai" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://www.lyncode.com/xoai http://www.lyncode.com/xsd/xoai.xsd">
+    <element name="dc">
+        <element name="contributor">
+            <element name="author">
+                <element name="none">
+                    <field name="value">Arntzen, Magnus</field>
+                    <field name="value">Thiede, Bernd</field>
+                </element>
+            </element>
+        </element>
+        <element name="date">
+            <element name="accessioned">
+                <element name="none">
+                    <field name="value">2016-11-16T11:04:11Z</field>
+                </element>
+            </element>
+            <element name="available">
+                <element name="none">
+                    <field name="value">2016-11-16T11:04:11Z</field>
+                </element>
+            </element>
+            <element name="created">
+                <element name="none">
+                    <field name="value">2012-05-02T09:01:05Z</field>
+                </element>
+            </element>
+            <element name="issued">
+                <element name="none">
+                    <field name="value">2012</field>
+                </element>
+            </element>
+        </element>
+        <element name="identifier">
+            <element name="citation">
+                <element name="none">
+                    <field name="value">Arntzen, Magnus, Thiede, Bernd. ApoptoProteomics, an Integrated Database for
+                        Analysis of Proteomics Data Obtained from Apoptotic Cells. Molecular &amp; Cellular Proteomics
+                        11(2)
+                    </field>
+                </element>
+            </element>
+            <element name="issn">
+                <element name="none">
+                    <field name="value">1535-9476</field>
+                    <field name="value">1122-3345</field>
+                </element>
+            </element>
+            <element name="uri">
+                <element name="none">
+                    <field name="value">http://hdl.handle.net/11250.1/12615</field>
+                </element>
+            </element>
+            <element name="cristin">
+                <element name="none">
+                    <field name="value">922422</field>
+                </element>
+            </element>
+            <element name="doi">
+                <element name="none">
+                    <field name="value">10.1074/mcp.M111.010447</field>
+                </element>
+            </element>
+        </element>
+        <element name="description">
+            <element name="provenance">
+                <element name="en">
+                    <field name="value">Submitted by Alle Arkiv (brage@bibsys.no) on 2016-08-30T05:36:22Z workflow
+                        start=Step: bitstreamstep - action:claimaction
+                        No. of bitstreams: 2
+                        ApoptoProteomics.pdf: 5287404 bytes, checksum: 52514f2e7be9f2c58d38b0611d70f85a (MD5)
+                        cristin-922422.xml: 8863 bytes, checksum: 8a31890d503dbf70960856def00ee023 (MD5)
+                    </field>
+                    <field name="value">Item created via OAI harvest from source:
+                        https://oarkiv.cristin.no/dspace/oai/request on 2016-08-30T05:36:22Z (GMT). Item's OAI Record
+                        identifier: oai:oarkiv.cristin.no:123456789/82
+                    </field>
+                    <field name="value">Step: editstep - action:editaction Approved for entry into archive by Mats
+                        Karlsen(mats.goran.karlsen@bibsys.no) on 2016-11-16T11:01:02Z (GMT)
+                    </field>
+                    <field name="value">Made available in DSpace on 2016-11-16T11:04:11Z (GMT). No. of bitstreams: 3
+                        ApoptoProteomics.pdf: 5287404 bytes, checksum: 52514f2e7be9f2c58d38b0611d70f85a (MD5)
+                        cristin-922422.xml: 8863 bytes, checksum: 8a31890d503dbf70960856def00ee023 (MD5) ORE.xml: 4089
+                        bytes, checksum: 88712c322b17b66923410fc2b31d1d9f (MD5) Previous issue date: 2012
+                    </field>
+                </element>
+            </element>
+            <element name="version">
+                <element name="none">
+                    <field name="value">publishedVersion</field>
+                </element>
+            </element>
+        </element>
+        <element name="language">
+            <element name="none">
+                <field name="value">EN</field>
+            </element>
+        </element>
+        <element name="publisher">
+            <element name="none">
+                <field name="value">American Society for Biochemistry and Molecular Biology</field>
+            </element>
+        </element>
+        <element name="title">
+            <element name="none">
+                <field name="value">ApoptoProteomics, an Integrated Database for Analysis of Proteomics Data Obtained
+                    from Apoptotic Cells
+                </field>
+            </element>
+        </element>
+        <element name="type">
+            <element name="none">
+                <field name="value">Peer reviewed</field>
+                <field name="value">Journal article</field>
+            </element>
+        </element>
+        <element name="source">
+            <element name="journal">
+                <element name="none">
+                    <field name="value">Molecular &amp; Cellular Proteomics</field>
+                </element>
+            </element>
+            <element name="volume">
+                <element name="none">
+                    <field name="value">11</field>
+                </element>
+            </element>
+            <element name="issue">
+                <element name="none">
+                    <field name="value">2</field>
+                </element>
+            </element>
+            <element name="pagenumber">
+                <element name="none">
+                    <field name="value">15</field>
+                </element>
+            </element>
+        </element>
+    </element>
+    <element name="cristin">
+        <element name="ispublished">
+            <element name="none">
+                <field name="value">true</field>
+            </element>
+        </element>
+        <element name="fulltext">
+            <element name="none">
+                <field name="value">original</field>
+            </element>
+        </element>
+        <element name="qualitycode">
+            <element name="none">
+                <field name="value">2</field>
+            </element>
+        </element>
+    </element>
+    <element name="bundles">
+        <element name="bundle">
+            <field name="name">ORIGINAL</field>
+            <element name="bitstreams">
+                <element name="bitstream">
+                    <field name="name">ApoptoProteomics.pdf</field>
+                    <field name="format">application/pdf</field>
+                    <field name="size">5287404</field>
+                    <field name="url">http://localhost:8080/xmlui/bitstream/11250.1/12615/1/ApoptoProteomics.pdf</field>
+                    <field name="checksum">52514f2e7be9f2c58d38b0611d70f85a</field>
+                    <field name="checksumAlgorithm">MD5</field>
+                    <field name="sid">1</field>
+                </element>
+            </element>
+        </element>
+        <element name="bundle">
+            <field name="name">METADATA</field>
+            <element name="bitstreams">
+                <element name="bitstream">
+                    <field name="name">cristin-922422.xml</field>
+                    <field name="format">application/octet-stream</field>
+                    <field name="size">8863</field>
+                    <field name="url">http://localhost:8080/xmlui/bitstream/11250.1/12615/2/cristin-922422.xml</field>
+                    <field name="checksum">8a31890d503dbf70960856def00ee023</field>
+                    <field name="checksumAlgorithm">MD5</field>
+                    <field name="sid">2</field>
+                </element>
+            </element>
+        </element>
+        <element name="bundle">
+            <field name="name">DELETED</field>
+            <element name="bitstreams"/>
+        </element>
+        <element name="bundle">
+            <field name="name">ORE</field>
+            <element name="bitstreams">
+                <element name="bitstream">
+                    <field name="name">ORE.xml</field>
+                    <field name="format">application/atom+xml; type=entry</field>
+                    <field name="size">4089</field>
+                    <field name="url">http://localhost:8080/xmlui/bitstream/11250.1/12615/3/ORE.xml</field>
+                    <field name="checksum">88712c322b17b66923410fc2b31d1d9f</field>
+                    <field name="checksumAlgorithm">MD5</field>
+                    <field name="sid">3</field>
+                </element>
+            </element>
+        </element>
+    </element>
+    <element name="others">
+        <field name="handle">11250.1/12615</field>
+        <field name="identifier">oai:localhost:11250.1/12615</field>
+        <field name="lastModifyDate">2016-11-16 12:04:11.526</field>
+    </element>
+    <element name="repository">
+        <field name="name">BIBSYS Brage</field>
+        <field name="mail">support@bibsys.no</field>
+    </element>
+</metadata>
