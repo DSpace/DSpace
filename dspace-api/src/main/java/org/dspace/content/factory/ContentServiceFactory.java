@@ -84,12 +84,32 @@ public abstract class ContentServiceFactory {
 
     public abstract SiteService getSiteService();
 
+    /**
+     * Return the implementation of the RelationshipTypeService interface
+     *
+     * @return the RelationshipTypeService
+     */
     public abstract RelationshipTypeService getRelationshipTypeService();
 
+    /**
+     * Return the implementation of the RelationshipService interface
+     *
+     * @return the RelationshipService
+     */
     public abstract RelationshipService getRelationshipService();
 
+    /**
+     * Return the implementation of the EntityTypeService interface
+     *
+     * @return the EntityTypeService
+     */
     public abstract EntityTypeService getEntityTypeService();
 
+    /**
+     * Return the implementation of the EntityService interface
+     *
+     * @return the EntityService
+     */
     public abstract EntityService getEntityService();
 
     public InProgressSubmissionService getInProgressSubmissionService(InProgressSubmission inProgressSubmission) {

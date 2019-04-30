@@ -48,7 +48,7 @@ public class RelationshipMetadataValue extends MetadataValue {
         if (obj == null) {
             return false;
         }
-        if (getClass() != RelationshipMetadataValue.class) {
+        if (! (obj instanceof RelationshipMetadataValue)) {
             return false;
         }
         final RelationshipMetadataValue other = (RelationshipMetadataValue) obj;
