@@ -11,10 +11,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.dspace.app.cris.model.ResearcherPage;
 import org.dspace.app.cris.model.dto.SimpleViewEntityDTO;
-import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
@@ -28,27 +27,32 @@ public class CrisRPViewResolver implements ISimpleViewResolver
     @Override
     public void fillDTO(Context context, SimpleViewEntityDTO dto, DSpaceObject dso)
     {
-        String email = dso.getMetadata("email");
-        if (StringUtils.isNotBlank(email))
+        if (!(dso instanceof ResearcherPage)) {
+            return;
+        }
+
+        ResearcherPage rp = (ResearcherPage) dso;
+
+        Integer epersonId = rp.getEpersonID();
+
+        if (epersonId != null)
         {
             List<String> epersonInformations = new ArrayList<String>();
             try
             {
-                EPerson eperson = EPerson.findByEmail(context, email);
+                EPerson eperson = EPerson.find(context, epersonId);
                 if (eperson != null)
                 {
                     String id = "" + eperson.getID();
                     String fullName = eperson.getFullName();
+                    String email = eperson.getEmail();
 
                     epersonInformations.add(id);
                     epersonInformations.add(email);
-                    if (!fullName.equals(email))
-                    {
-                        epersonInformations.add(fullName);
-                    }
+                    epersonInformations.add(fullName);
                 }
             }
-            catch (SQLException | AuthorizeException e)
+            catch (SQLException e)
             {
                 log.error(e.getMessage(), e);
             }
