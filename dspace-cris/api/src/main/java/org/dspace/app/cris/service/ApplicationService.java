@@ -31,6 +31,7 @@ import org.dspace.app.cris.dao.ResearcherPageDao;
 import org.dspace.app.cris.dao.StatSubscriptionDao;
 import org.dspace.app.cris.dao.UserWSDao;
 import org.dspace.app.cris.model.ACrisObject;
+import org.dspace.app.cris.model.CrisConstants;
 import org.dspace.app.cris.model.CrisSubscription;
 import org.dspace.app.cris.model.OrganizationUnit;
 import org.dspace.app.cris.model.Project;
