@@ -20,6 +20,7 @@ import org.dspace.core.Context;
 
 public class EntityTypeDAOImpl extends AbstractHibernateDAO<EntityType> implements EntityTypeDAO {
 
+    @Override
     public EntityType findByEntityType(Context context, String entityType) throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, EntityType.class);
