@@ -44,8 +44,6 @@ public class RelationshipTypeRestControllerIT extends AbstractEntityIntegrationT
     @Test
     public void findAllEntityTypes() throws Exception {
 
-        context.turnOffAuthorisationSystem();
-
         getClient().perform(get("/api/core/entitytypes"))
 
                    .andExpect(status().isOk())
@@ -67,7 +65,6 @@ public class RelationshipTypeRestControllerIT extends AbstractEntityIntegrationT
     @Test
     public void findAllRelationshipTypesForPublications() throws Exception {
 
-        context.turnOffAuthorisationSystem();
         EntityType publicationEntityType = entityTypeService.findByEntityType(context, "Publication");
         EntityType personEntityType = entityTypeService.findByEntityType(context, "Person");
         EntityType projectEntityType = entityTypeService.findByEntityType(context, "Project");
@@ -186,6 +183,7 @@ public class RelationshipTypeRestControllerIT extends AbstractEntityIntegrationT
         Relationship relationship4 = RelationshipBuilder
             .createRelationshipBuilder(context, publication2, author3, isAuthorOfPublicationRelationshipType).build();
 
+        context.restoreAuthSystemState();
         getClient().perform(get("/api/core/relationships/isAuthorOfPublication"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$._embedded.relationships", containsInAnyOrder(
