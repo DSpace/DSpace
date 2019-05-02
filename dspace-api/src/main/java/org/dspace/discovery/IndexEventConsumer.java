@@ -76,12 +76,12 @@ public class IndexEventConsumer implements Consumer {
         DSpaceObject object = event.getObject(ctx);
 
 
-        // If event subject is a Bundle and event was Add or Remove,
+        // If event subject is a Bundle or an Item and event was Add or Remove,
         // transform the event to be a Modify on the owning Item.
         // It could be a new bitstream in the TEXT bundle which
         // would change the index.
         int et = event.getEventType();
-        if (st == Constants.BUNDLE) {
+        if (st == Constants.BUNDLE || st == Constants.ITEM) {
             if ((et == Event.ADD || et == Event.REMOVE) && subject != null
                 && ((Bundle) subject).getName().equals("TEXT")) {
                 st = Constants.ITEM;
