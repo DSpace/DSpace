@@ -72,6 +72,23 @@ public class CollectionBuilder extends AbstractDSpaceObjectBuilder<Collection> {
         return this;
     }
 
+    /**
+     * Create a submitter group for the collection with the specified members
+     *
+     * @param members epersons to add to the submitter group
+     * @return this builder
+     * @throws SQLException
+     * @throws AuthorizeException
+     */
+    public CollectionBuilder withSubmitterGroup(EPerson... members) throws SQLException, AuthorizeException {
+        Group g = collectionService.createSubmitters(context, collection);
+        for (EPerson e : members) {
+            groupService.addMember(context, g, e);
+        }
+        groupService.update(context, g);
+        return this;
+    }
+
     public CollectionBuilder withWorkflowGroup(int step, EPerson... members) throws SQLException, AuthorizeException {
         Group g = collectionService.createWorkflowGroup(context, collection, step);
         for (EPerson e : members) {
