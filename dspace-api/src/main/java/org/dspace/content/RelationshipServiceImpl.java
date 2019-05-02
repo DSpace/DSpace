@@ -248,10 +248,7 @@ public class RelationshipServiceImpl implements RelationshipService {
             return false;
         }
         String leftEntityType = list.get(0).getValue();
-        if (!StringUtils.equals(leftEntityType, entityTypeToProcess.getLabel())) {
-            return false;
-        }
-        return true;
+        return StringUtils.equals(leftEntityType, entityTypeToProcess.getLabel());
     }
 
     public Relationship find(Context context, int id) throws SQLException {

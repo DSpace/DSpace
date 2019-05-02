@@ -1500,17 +1500,16 @@ prevent the generation of resource policy entry values with null dspace_object a
     }
 
     private String getEntityTypeStringFromMetadata(List<MetadataValue> list) {
-        String entityType = null;
         for (MetadataValue mdv : list) {
             if (StringUtils.equals(mdv.getMetadataField().getMetadataSchema().getName(),
                                    "relationship")
                 && StringUtils.equals(mdv.getMetadataField().getElement(),
                                       "type")) {
 
-                entityType = mdv.getValue();
+                return mdv.getValue();
             }
         }
-        return entityType;
+        return null;
     }
 
     private RelationshipMetadataValue constructResultingMetadataValue(Item item, String value,
