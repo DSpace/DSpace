@@ -76,7 +76,7 @@
     <!-- Removing unwanted dc.identifier.* -->
     <xsl:template match="/doc:metadata/doc:element[@name='dc']/doc:element[@name='identifier']/doc:element[@name!='uri']"/>
     <xsl:template match="/doc:metadata/doc:element[@name='dc']/doc:element[@name='identifier']/doc:element[@name='uri']/doc:element/doc:field/text()">
-        <xsl:if test="starts-with(., 'http://hdl.handle.net/')">
+        <xsl:if test="starts-with(., 'http://hdl.handle.net/') or starts-with(., 'https://hdl.handle.net/')">
             <xsl:value-of select="."/>
         </xsl:if>
     </xsl:template>
