@@ -1450,7 +1450,7 @@ prevent the generation of resource policy entry values with null dspace_object a
                                                                                     relationship.getID(), place));
         }
         RelationshipMetadataValue relationMetadataFromOtherItem =
-            getRelationMetadataFromOtherItem(context, otherItem, relationName, relationship.getID());
+            getRelationMetadataFromOtherItem(context, otherItem, relationName, relationship.getID(), place);
         if (relationMetadataFromOtherItem != null) {
             resultingMetadataValueList.add(relationMetadataFromOtherItem);
         }
@@ -1487,13 +1487,14 @@ prevent the generation of resource policy entry values with null dspace_object a
 
     private RelationshipMetadataValue getRelationMetadataFromOtherItem(Context context, Item otherItem,
                                                                        String relationName,
-                                                                       Integer relationshipId) {
+                                                                       Integer relationshipId, int place) {
         RelationshipMetadataValue metadataValue = constructMetadataValue(context,
                                                                          MetadataSchemaEnum.RELATION
                                                                              .getName() + "." + relationName);
         if (metadataValue != null) {
             metadataValue.setAuthority(Constants.VIRTUAL_AUTHORITY_PREFIX + relationshipId);
             metadataValue.setValue(otherItem.getID().toString());
+            metadataValue.setPlace(place);
             return metadataValue;
         }
         return null;

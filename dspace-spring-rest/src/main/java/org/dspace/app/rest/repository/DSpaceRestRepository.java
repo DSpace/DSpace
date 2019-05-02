@@ -261,7 +261,7 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
 
     /**
      * Create and return a new instance. Data is recovered from the thread bound HTTP request and the list
-     * of DSpaceObjects provided in the parameter
+     * of DSpaceObjects provided in the uri-list body
      *
      * @param list  The list of Strings to be used in the createAndReturn method
      * @return  The created REST object
@@ -307,6 +307,7 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
      *            the dspace context
      * @param list
      *            The list of Strings that will be used as data for the object that's to be created
+     *            This list is retrieved from the uri-list body
      * @return the created REST object
      * @throws AuthorizeException
      * @throws SQLException
