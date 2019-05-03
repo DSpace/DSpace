@@ -13,7 +13,7 @@
 		- http://www.driver-support.eu/managers.html#guidelines
 
 
-	BIBSYS OpenAIRE 3.0 transformer.
+	OpenAIRE 3.0 transformer.
 
  -->
 <xsl:stylesheet version="1.0"
