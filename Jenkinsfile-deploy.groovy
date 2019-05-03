@@ -13,7 +13,7 @@ pipeline {
 
     environment {
         VERSION = "${env.BRANCH_NAME}".replaceAll('/', '_').toLowerCase()
-       // TARGET_HOST = "${params.Destination}"
+        // TARGET_HOST = "${params.Destination}"
         TARGET_HOST = "brage-utvikle.bibsys.no"
         ENV_FOLDER = "brage6_environment"
         //The rest of the parameters is imported from env.properties"
@@ -21,6 +21,8 @@ pipeline {
 
 
     stages {
+
+
 //        stage('Confirm deploy') {
 //            steps {
 //                script {
@@ -37,7 +39,7 @@ pipeline {
 //            }
 //        }
 
-        stage('Checkout') {
+        stage('Checkout Brage6-environment.git') {
             steps {
 
                 println("Running build #${env.BUILD_ID} of job ${env.JOB_NAME}, git branch: ${env.BRANCH_NAME}" as java.lang.Object)
@@ -50,6 +52,26 @@ pipeline {
                 }
             }
         }
+
+        stage('Select Institution') {
+            steps {
+                script {
+                    env.WORKSPACE = pwd();
+                    def file = readFile "${ENV_FOLDER}/env/inst.txt"
+                    try {
+                        timeout(activity: true, time: 120, unit: 'SECONDS') {
+                            input(id: 'kundeInput', message: 'Choose institution', parameters: [
+                                    choice(choices: file,name: 'kunde')
+                            ])
+                        }
+                    } catch (err) {
+                        println("Release aborted")
+                        throw err
+                    }
+                }
+            }
+        }
+
 
         stage('Pre-build scripts') {
             steps {
@@ -99,21 +121,21 @@ pipeline {
         }
     }
 
-    post {
-        failure {
-            script {
-                def message = "${currentBuild.fullDisplayName} - Failure after ${currentBuild.durationString.replaceFirst(" and counting", "")}"
-                emailext(
-                        subject: "FAILURE: ${currentBuild.fullDisplayName}",
-                        body: "${message}\n Open: ${env.BUILD_URL}",
-                        to: 'teamrosa@bibsys.no',
-                        attachlog: true,
-                        compresslog: true,
-                        recipientProviders: [[$class: 'CulpritsRecipientProvider']]
-                )
-
-            }
-        }
-    }
+//    post {
+//        failure {
+//            script {
+//                def message = "${currentBuild.fullDisplayName} - Failure after ${currentBuild.durationString.replaceFirst(" and counting", "")}"
+//                emailext(
+//                        subject: "FAILURE: ${currentBuild.fullDisplayName}",
+//                        body: "${message}\n Open: ${env.BUILD_URL}",
+//                        to: 'teamrosa@bibsys.no',
+//                        attachlog: true,
+//                        compresslog: true,
+//                        recipientProviders: [[$class: 'CulpritsRecipientProvider']]
+//                )
+//
+//            }
+//        }
+//    }
 }
 
