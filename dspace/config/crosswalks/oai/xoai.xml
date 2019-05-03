@@ -173,12 +173,10 @@
         <Transformer id="driverTransformer">
             <XSLT>transformers/driver.xsl</XSLT>
         </Transformer>
-        <!-- BIBSYS modification -->
-        <!-- Brage complies with the OpenAIRE 3.0 Standard. Driver is not used by Brage -->
+        <!-- dSpace/Brage complies with the OpenAIRE 3.0 Standard. Driver is not used by dSpaceBrage -->
         <Transformer id="openaireTransformer">
             <XSLT>transformers/openaire30.xsl</XSLT>
         </Transformer>
-        <!-- /BIBSYS modification -->
     </Transformers>
 
 
@@ -260,7 +258,7 @@
                             <LeftCondition>
                                 <Not>
                                     <Condition>
-                                        <Custom ref="bibsysRestrictedAccessCondition"/>
+                                        <Custom ref="restrictedAccessCondition"/>
                                     </Condition>
                                 </Not>
                     </LeftCondition>
@@ -376,12 +374,11 @@
         </CustomCondition>
 
 
-        <!-- BIBSYS modification
-             This condition determines if an Item has a "dc.rights.accessrights" field
-             specifying "restricted items", Brage should only expose open access items.
+        <!-- This condition determines if an Item has a "dc.rights.accessrights" field
+             specifying "restricted items", dspace should only expose open access items.
              The filter is combined with the not filter in order to specify an item as openAccess
              -->
-        <CustomCondition id="bibsysRestrictedAccessCondition">
+        <CustomCondition id="restrictedAccessCondition">
             <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
             <Configuration>
                 <string name="field">dc.rights.accessrights</string>
@@ -426,8 +423,7 @@
         </CustomCondition>
 
         <!-- This condition determines if an Item has a "dc.relation" field
-             which specifies the openAIRE project ID. -->
-        <!-- BIBSYS modification check if we have documents which are EC funded -->
+             which specifies the openAIRE project ID. and if the documents which are EC funded -->
         <CustomCondition id="openaireRelationCondition">
             <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
             <Configuration>
