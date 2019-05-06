@@ -1,0 +1,196 @@
+<metadata xmlns="http://www.lyncode.com/xoai" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://www.lyncode.com/xoai http://www.lyncode.com/xsd/xoai.xsd">
+    <element name="dc">
+        <element name="contributor">
+            <element name="author">
+                <element name="none">
+                    <field name="value">Jonassen, Simon</field>
+                    <field name="value">Cambazoglu, B. Barla</field>
+                    <field name="value">Silvestri, Fabrizio</field>
+                </element>
+            </element>
+        </element>
+        <element name="date">
+            <element name="accessioned">
+                <element name="none">
+                    <field name="value">2013-01-12T15:22:51Z</field>
+                    <field name="value">2016-06-23T10:56:52Z</field>
+                    <field name="value">2017-04-19T10:37:37Z</field>
+                </element>
+            </element>
+            <element name="available">
+                <element name="none">
+                    <field name="value">2013-01-12T15:22:51Z</field>
+                    <field name="value">2016-06-23T10:56:52Z</field>
+                    <field name="value">2017-04-19T10:37:37Z</field>
+                </element>
+            </element>
+            <element name="issued">
+                <element name="none">
+                    <field name="value">2012</field>
+                </element>
+            </element>
+            <element name="updated">
+                <element name="none">
+                    <field name="value">2013-01-12T15:22:51Z</field>
+                </element>
+            </element>
+        </element>
+        <element name="identifier">
+            <element name="citation">
+                <element name="nb_NO">
+                    <field name="value">Hersh, William R. [Eds.] The 35th International ACM SIGIR conference on research
+                        and development in Information Retrieval, SIGIR '12, Portland, OR, USA, August 12-16, 2012 p.
+                        631-640
+                    </field>
+                </element>
+            </element>
+            <element name="isbn">
+                <element name="none">
+                    <field name="value">978-1-4503-1472-5</field>
+                </element>
+            </element>
+            <element name="uri">
+                <element name="none">
+                    <field name="value">http://hdl.handle.net/11250/2393863</field>
+                </element>
+            </element>
+            <element name="cristin">
+                <element name="none">
+                    <field name="value">986632</field>
+                </element>
+            </element>
+            <element name="doi">
+                <element name="none">
+                    <field name="value">http://dx.doi.org/10.1145/2348283.2348368</field>
+                </element>
+            </element>
+        </element>
+        <element name="description">
+            <element name="abstract">
+                <element name="nb_NO">
+                    <field name="value">We investigate the impact of query result prefetching on the efficiency and
+                        effectiveness of web search engines. We propose offline and online strategies for selecting and
+                        ordering queries whose results are to be prefetched. The offline strategies rely on query log
+                        analysis and the queries are selected from the queries issued on the previous day. The online
+                        strategies select the queries from the result cache, relying on a machine learning model that
+                        estimates the arrival times of queries. We carefully evaluate the proposed prefetching
+                        techniques via simulation on a query log obtained from Yahoo! web search. We demonstrate that
+                        our strategies are able to improve various performance metrics, including the hit rate, query
+                        response time, result freshness, and query degradation rate, relative to a state-of-the-art
+                        baseline.
+                    </field>
+                </element>
+            </element>
+            <element name="provenance">
+                <element name="en">
+                    <field name="value">Submitted by Tore Vatnan (torev) on 2013-01-12T15:22:51Z No. of bitstreams: 1
+                        paper.pdf: 570695 bytes, checksum: 40eb9514e9ec88d84c56879a7cfec142 (MD5)
+                    </field>
+                    <field name="value">Made available in DSpace on 2013-01-12T15:22:51Z (GMT). No. of bitstreams: 1
+                        paper.pdf: 570695 bytes, checksum: 40eb9514e9ec88d84c56879a7cfec142 (MD5) Previous issue date:
+                        2012
+                    </field>
+                    <field name="value">Submitted by Administrator Alle arkiv (brage@bibsys.no) on 2015-01-06T15:00:17Z
+                        workflow start=Step: editstep - action:claimaction No. of bitstreams: 3 paper.pdf: 570695 bytes,
+                        checksum: 40eb9514e9ec88d84c56879a7cfec142 (MD5) license.txt: 1748 bytes, checksum:
+                        8a4605be74aa9ea9d79846c1fba20a33 (MD5) mets.zip: 543303 bytes, checksum:
+                        57465ac7b0fca59afecf210f7f18b5cf (MD5)
+                    </field>
+                    <field name="value">Item created via OAI harvest from source:
+                        https://oarkiv.cristin.no/dspace/oai/request on 2015-01-06T15:00:17Z (GMT). Item's OAI Record
+                        identifier: oai:oarkiv.cristin.no:123456789/126
+                    </field>
+                    <field name="value">Step: editstep - action:editaction Approved for entry into archive by Renate
+                        Kvaal(renate.kvaal@ntnu.no) on 2016-06-23T10:55:03Z (GMT)
+                    </field>
+                    <field name="value">Made available in DSpace on 2016-06-23T10:56:52Z (GMT). No. of bitstreams: 4
+                        ORE.xml: 3520 bytes, checksum: a0e156dcfd0ef78a7bc64ce2034a8bf3 (MD5) mets.zip: 543303 bytes,
+                        checksum: 57465ac7b0fca59afecf210f7f18b5cf (MD5) license.txt: 1748 bytes, checksum:
+                        8a4605be74aa9ea9d79846c1fba20a33 (MD5) paper.pdf: 570695 bytes, checksum:
+                        40eb9514e9ec88d84c56879a7cfec142 (MD5) Previous issue date: 2012
+                    </field>
+                    <field name="value">Made available in DSpace on 2017-04-19T10:37:37Z (GMT). No. of bitstreams: 0
+                        Previous issue date: 2012
+                    </field>
+                    <field name="value">Item created via OAI harvest from source: https://brage.bibsys.no/oai/request on
+                        2017-04-19T10:37:37Z (GMT). Item's OAI Record identifier: oai:brage.bibsys.no:11250/2393863
+                    </field>
+                </element>
+            </element>
+            <element name="localcode">
+                <element name="nb_NO">
+                    <field name="value">© Jonassen, Cambazoglu &amp; Silvestri | ACM 2012. This is the author's version
+                        of the work. It is posted here for your personal use. Not for redistribution. The definitive
+                        Version of Record was published in SIGIR '12 Proceedings of the 35th international ACM SIGIR
+                        conference on Research and development in information retrieval,
+                        http://dx.doi.org/10.1145/2348283.2348368
+                    </field>
+                </element>
+            </element>
+        </element>
+        <element name="language">
+            <element name="iso">
+                <element name="nb_NO">
+                    <field name="value">eng</field>
+                </element>
+            </element>
+        </element>
+        <element name="publisher">
+            <element name="nb_NO">
+                <field name="value">Association for Computing Machinery (ACM)</field>
+            </element>
+        </element>
+        <element name="relation">
+            <element name="project">
+                <element name="nb_NO">
+                    <field name="value">EC/FP7/123444</field>
+                </element>
+            </element>
+        </element>
+        <element name="title">
+            <element name="nb_NO">
+                <field name="value">Prefetching query results and its impact on search engines</field>
+            </element>
+        </element>
+        <element name="type">
+            <element name="nb_NO">
+                <field name="value">Chapter</field>
+                <field name="value">Conference object</field>
+                <field name="value">Peer reviewed</field>
+            </element>
+        </element>
+        <element name="source">
+            <element name="pagenumber">
+                <element name="nb_NO">
+                    <field name="value">631-640</field>
+                </element>
+            </element>
+        </element>
+    </element>
+    <element name="bundles">
+        <element name="bundle">
+            <field name="name">ORE</field>
+            <element name="bitstreams">
+                <element name="bitstream">
+                    <field name="name">ORE.xml</field>
+                    <field name="format">application/atom+xml; type=entry</field>
+                    <field name="size">3956</field>
+                    <field name="url">http://localhost:8080/xmlui/bitstream/11250/2393863/1/ORE.xml</field>
+                    <field name="checksum">f81df21f64efa581bef278a8d4631125</field>
+                    <field name="checksumAlgorithm">MD5</field>
+                    <field name="sid">1</field>
+                </element>
+            </element>
+        </element>
+    </element>
+    <element name="others">
+        <field name="handle">11250/2393863</field>
+        <field name="identifier">oai:localhost:11250/2393863</field>
+        <field name="lastModifyDate">2017-04-19 12:37:37.975</field>
+    </element>
+    <element name="repository">
+        <field name="name">BIBSYS Brage</field>
+        <field name="mail">support@bibsys.no</field>
+    </element>
+</metadata>

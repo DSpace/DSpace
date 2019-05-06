@@ -1,0 +1,275 @@
+<metadata xmlns="http://www.lyncode.com/xoai" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://www.lyncode.com/xoai http://www.lyncode.com/xsd/xoai.xsd">
+    <element name="dc">
+        <element name="contributor">
+            <element name="advisor">
+                <element name="none">
+                    <field name="value">Hansen, Bjørg</field>
+                </element>
+            </element>
+            <element name="author">
+                <element name="none">
+                    <field name="value">Knutsdotter, Kari</field>
+                    <field name="value">Nordmann, Hans</field>
+                </element>
+            </element>
+            <element name="editor">
+                <element name="none">
+                    <field name="value">Olsen, Ole</field>
+                </element>
+            </element>
+        </element>
+        <element name="coverage">
+            <element name="spatial">
+                <element name="nb_NO">
+                    <field name="value">Norge, Trondheim</field>
+                </element>
+            </element>
+        </element>
+        <element name="date">
+            <element name="accessioned">
+                <element name="none">
+                    <field name="value">2016-11-15T08:33:24Z</field>
+                </element>
+            </element>
+            <element name="available">
+                <element name="none">
+                    <field name="value">2016-11-15T08:33:24Z</field>
+                </element>
+            </element>
+            <element name="issued">
+                <element name="none">
+                    <field name="value">2016-11-01</field>
+                </element>
+            </element>
+        </element>
+        <element name="identifier">
+            <element name="citation">
+                <element name="nb_NO">
+                    <field name="value">Acta Orthopaedica. 2014, 85 (5), 463-469)</field>
+                </element>
+            </element>
+            <element name="issn">
+                <element name="none">
+                    <field name="value">1476-4687</field>
+                </element>
+            </element>
+            <element name="uri">
+                <element name="none">
+                    <field name="value">http://hdl.handle.net/11250.1/70</field>
+                </element>
+            </element>
+            <element name="doi">
+                <element name="none">
+                    <field name="value">10.1016/j.erss.2015.11.003</field>
+                </element>
+            </element>
+        </element>
+        <element name="description">
+            <element name="nb_NO">
+                <field name="value">Dette er en beskrivelse.</field>
+            </element>
+            <element name="abstract">
+                <element name="nb_NO">
+                    <field name="value">Dette er et sammendrag.</field>
+                </element>
+            </element>
+            <element name="provenance">
+                <element name="en">
+                    <field name="value">Made available in DSpace on 2016-11-15T08:33:24Z (GMT). No. of bitstreams: 2 publikasjonen.pdf: 84038 bytes, checksum: faff05c42669bebc40f32804b2c6dabd (MD5) license_rdf: 1382 bytes, checksum: 84d2eb395232e83b818865661ce7c7ac (MD5) Previous issue date: 2016-11-01</field>
+                </element>
+            </element>
+            <element name="sponsorship">
+                <element name="nb_NO">
+                    <field name="value">Sonset av vaffelelskernes landsforening</field>
+                </element>
+            </element>
+        </element>
+        <element name="language">
+            <element name="iso">
+                <element name="nb_NO">
+                    <field name="value">nob</field>
+                </element>
+            </element>
+        </element>
+        <element name="publisher">
+            <element name="nb_NO">
+                <field name="value">Tapir akademiske forlag</field>
+            </element>
+        </element>
+        <element name="relation">
+            <element name="ispartofseries">
+                <element name="none">
+                    <field name="value">Vaffelserie;9</field>
+                </element>
+            </element>
+            <element name="haspart">
+                <element name="nb_NO">
+                    <field name="value">Dette er første del av dokumentet.</field>
+                    <field name="value">Dette er andre del av dokumentet.</field>
+                </element>
+            </element>
+            <element name="project">
+                <element name="nb_NO">
+                    <field name="value">EC/H2020/641918</field>
+                </element>
+            </element>
+        </element>
+        <element name="rights">
+            <element name="*">
+                <field name="value">Navngivelse 4.0 Internasjonal</field>
+            </element>
+            <element name="uri">
+                <element name="*">
+                    <field name="value">http://creativecommons.org/licenses/by/4.0/deed.no</field>
+                </element>
+            </element>
+            <element name="holder">
+                <element name="nb_NO">
+                    <field name="value">Forfattelen har alle rettigheter til å smake alle vaffler som lages basert på egene oppskrifter.</field>
+                </element>
+            </element>
+        </element>
+        <element name="subject">
+            <element name="nb_NO">
+                <field name="value">baking</field>
+                <field name="value">vaffeljern</field>
+            </element>
+            <element name="nsi">
+                <element name="nb_NO">
+                    <field name="value">VDP::Samfunnsvitenskap: 200::Demografi: 300</field>
+                </element>
+            </element>
+        </element>
+        <element name="title">
+            <element name="nb_NO">
+                <field name="value">Min beste vaffeloppskrift</field>
+            </element>
+            <element name="alternative">
+                <element name="nb_NO">
+                    <field name="value">Alternativ tittel</field>
+                </element>
+            </element>
+        </element>
+        <element name="type">
+            <element name="nb_NO">
+                <field name="value">Journal article</field>
+                <field name="value">Research report</field>
+            </element>
+        </element>
+        <element name="source">
+            <element name="journal">
+                <element name="nb_NO">
+                    <field name="value">Vaffeltidsskriftet</field>
+                </element>
+            </element>
+            <element name="volume">
+                <element name="nb_NO">
+                    <field name="value">99</field>
+                </element>
+            </element>
+            <element name="issue">
+                <element name="nb_NO">
+                    <field name="value">9</field>
+                </element>
+            </element>
+            <element name="pagenumber">
+                <element name="nb_NO">
+                    <field name="value">9-99</field>
+                </element>
+            </element>
+        </element>
+    </element>
+    <element name="bundles">
+        <element name="bundle">
+            <field name="name">THUMBNAIL</field>
+            <element name="bitstreams">
+                <element name="bitstream">
+                    <field name="name">publikasjonen.pdf.jpg</field>
+                    <field name="originalName">publikasjonen.pdf.jpg</field>
+                    <field name="description">IM Thumbnail</field>
+                    <field name="format">image/jpeg</field>
+                    <field name="size">23076</field>
+                    <field name="url">https://brage-utvikle.bibsys.no/xmlui/bitstream/11250.1/70/5/publikasjonen.pdf.jpg</field>
+                    <field name="checksum">ea542bfeee68515bd9f3693b810c9560</field>
+                    <field name="checksumAlgorithm">MD5</field>
+                    <field name="sid">5</field>
+                </element>
+            </element>
+        </element>
+        <element name="bundle">
+            <field name="name">TEXT</field>
+            <element name="bitstreams">
+                <element name="bitstream">
+                    <field name="name">publikasjonen.pdf.txt</field>
+                    <field name="originalName">publikasjonen.pdf.txt</field>
+                    <field name="description">Extracted text</field>
+                    <field name="format">text/plain</field>
+                    <field name="size">1</field>
+                    <field name="url">https://brage-utvikle.bibsys.no/xmlui/bitstream/11250.1/70/4/publikasjonen.pdf.txt</field>
+                    <field name="checksum">68b329da9893e34099c7d8ad5cb9c940</field>
+                    <field name="checksumAlgorithm">MD5</field>
+                    <field name="sid">4</field>
+                </element>
+            </element>
+        </element>
+        <element name="bundle">
+            <field name="name">LICENSE</field>
+            <element name="bitstreams">
+                <element name="bitstream">
+                    <field name="name">license.txt</field>
+                    <field name="originalName">license.txt</field>
+                    <field name="format">text/plain; charset=utf-8</field>
+                    <field name="size">102</field>
+                    <field name="url">https://brage-utvikle.bibsys.no/xmlui/bitstream/11250.1/70/3/license.txt</field>
+                    <field name="checksum">81b6aa314a49e800e23f340c6eaf001f</field>
+                    <field name="checksumAlgorithm">MD5</field>
+                    <field name="sid">3</field>
+                </element>
+            </element>
+        </element>
+        <element name="bundle">
+            <field name="name">CC-LICENSE</field>
+            <element name="bitstreams">
+                <element name="bitstream">
+                    <field name="name">license_rdf</field>
+                    <field name="originalName">license_rdf</field>
+                    <field name="format">application/rdf+xml; charset=utf-8</field>
+                    <field name="size">1382</field>
+                    <field name="url">https://brage-utvikle.bibsys.no/xmlui/bitstream/11250.1/70/2/license_rdf</field>
+                    <field name="checksum">84d2eb395232e83b818865661ce7c7ac</field>
+                    <field name="checksumAlgorithm">MD5</field>
+                    <field name="sid">2</field>
+                </element>
+            </element>
+        </element>
+        <element name="bundle">
+            <field name="name">ORIGINAL</field>
+            <element name="bitstreams">
+                <element name="bitstream">
+                    <field name="name">publikasjonen.pdf</field>
+                    <field name="originalName">publikasjonen.pdf</field>
+                    <field name="description">Oppskriftshefte</field>
+                    <field name="format">application/pdf</field>
+                    <field name="size">84038</field>
+                    <field name="url">https://brage-utvikle.bibsys.no/xmlui/bitstream/11250.1/70/1/publikasjonen.pdf</field>
+                    <field name="checksum">faff05c42669bebc40f32804b2c6dabd</field>
+                    <field name="checksumAlgorithm">MD5</field>
+                    <field name="sid">1</field>
+                </element>
+            </element>
+        </element>
+    </element>
+    <element name="others">
+        <field name="handle">11250.1/70</field>
+        <field name="identifier">oai:brage-utvikle.bibsys.no:11250.1/70</field>
+        <field name="lastModifyDate">2016-12-08 10:51:34.539</field>
+    </element>
+    <element name="repository">
+        <field name="name">BIBSYS Brage</field>
+        <field name="mail">support@bibsys.no</field>
+    </element>
+    <element name="license">
+        <field name="bin">Ck5PVEU6IFBMQUNFIFlPVVIgT1dOIExJQ0VOU0UgSEVSRSBUaGlzIHNhbXBsZSBsaWNlbnNlIGlzIHByb3ZpZGVkIGZvciBpbmZvcm1hdGlvbmFsIHB1cnBvc2VzIG9ubHkuCgoK</field>
+    </element>
+</metadata>

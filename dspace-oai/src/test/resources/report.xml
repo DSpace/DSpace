@@ -1,0 +1,251 @@
+<metadata xmlns="http://www.lyncode.com/xoai" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.lyncode.com/xoai http://www.lyncode.com/xsd/xoai.xsd">
+    <element name="dc">
+        <element name="contributor">
+            <element name="author">
+                <element name="none">
+                    <field name="value">Fjæraa, Ann Mari</field>
+                </element>
+            </element>
+        </element>
+        <element name="date">
+            <element name="accessioned">
+                <element name="none">
+                    <field name="value">2015-11-24T10:27:54Z</field>
+                    <field name="value">2016-03-29T13:29:10Z</field>
+                </element>
+            </element>
+            <element name="available">
+                <element name="none">
+                    <field name="value">2015-11-24T10:27:54Z</field>
+                    <field name="value">2016-03-29T13:29:10Z</field>
+                </element>
+            </element>
+            <element name="issued">
+                <element name="none">
+                    <field name="value">2015</field>
+                </element>
+            </element>
+            <element name="updated">
+                <element name="none">
+                    <field name="value">2015-11-24T10:27:54Z</field>
+                </element>
+            </element>
+        </element>
+        <element name="identifier">
+            <element name="citation">
+                <element name="nb_NO">
+                    <field name="value">Fjæraa, Ann Mari. (2015) Final report for ESA Validation Data Centre, EVDC.
+                        Kjeller, NILU (NILU OR, 09/2015).
+                    </field>
+                </element>
+            </element>
+            <element name="isbn">
+                <element name="none">
+                    <field name="value">978‐82‐425‐2761‐5</field>
+                </element>
+            </element>
+            <element name="uri">
+                <element name="none">
+                    <field name="value">http://hdl.handle.net/11250/2382891</field>
+                </element>
+            </element>
+            <element name="cristin">
+                <element name="none">
+                    <field name="value">1292597</field>
+                </element>
+            </element>
+        </element>
+        <element name="description">
+            <element name="abstract">
+                <element name="nb_NO">
+                    <field name="value">Final project report.</field>
+                </element>
+            </element>
+            <element name="provenance">
+                <element name="en">
+                    <field name="value">Submitted by Tore Vatnan (torev) on 2015-11-24T10:27:54Z
+                        No. of bitstreams: 3
+                        cristin-1292597.zip: 489056 bytes, checksum: 6f6f39df7ffc459f12f1fba67aa9bda9 (MD5)
+                        sword-2015-11-24T11:27:54.original.xml: 1042 bytes, checksum: 75dc48c7a354715390c21830a3523aa3
+                        (MD5)
+                        9-2015_EVDC_AMF.pdf: 602795 bytes, checksum: 12e265e3a4633df996a1a48b8170ab19 (MD5)
+                    </field>
+                    <field name="value">Made available in DSpace on 2015-11-24T10:27:54Z (GMT). No. of bitstreams: 3
+                        cristin-1292597.zip: 489056 bytes, checksum: 6f6f39df7ffc459f12f1fba67aa9bda9 (MD5)
+                        sword-2015-11-24T11:27:54.original.xml: 1042 bytes, checksum: 75dc48c7a354715390c21830a3523aa3
+                        (MD5)
+                        9-2015_EVDC_AMF.pdf: 602795 bytes, checksum: 12e265e3a4633df996a1a48b8170ab19 (MD5)
+                        Previous issue date: 2015
+                    </field>
+                    <field name="value">Submitted by Administrator Alle arkiv (brage@bibsys.no) on 2015-11-24T15:01:17Z
+                        workflow start=Step: editstep - action:claimaction
+                        No. of bitstreams: 3
+                        cristin-1292597.zip: 489056 bytes, checksum: 6f6f39df7ffc459f12f1fba67aa9bda9 (MD5)
+                        sword-2015-11-24T11:27:54.original.xml: 1042 bytes, checksum: 75dc48c7a354715390c21830a3523aa3
+                        (MD5)
+                        9-2015_EVDC_AMF.pdf: 602795 bytes, checksum: 12e265e3a4633df996a1a48b8170ab19 (MD5)
+                    </field>
+                    <field name="value">Item created via OAI harvest from source:
+                        https://oarkiv.cristin.no/dspace/oai/request on 2015-11-24T15:01:17Z (GMT). Item's OAI Record
+                        identifier: oai:oarkiv.cristin.no:123456789/13022
+                    </field>
+                    <field name="value">Step: editstep - action:editaction Approved for entry into archive by Hildegunn
+                        Hammer(hha@nilu.no) on 2016-03-29T13:28:53Z (GMT)
+                    </field>
+                    <field name="value">Made available in DSpace on 2016-03-29T13:29:10Z (GMT). No. of bitstreams: 4
+                        ORE.xml: 3558 bytes, checksum: 07ad632063f24a88aeb4475a723e5cd8 (MD5)
+                        9-2015_EVDC_AMF.pdf: 602795 bytes, checksum: 12e265e3a4633df996a1a48b8170ab19 (MD5)
+                        cristin-1292597.zip: 489056 bytes, checksum: 6f6f39df7ffc459f12f1fba67aa9bda9 (MD5)
+                        sword-2015-11-24T11:27:54.original.xml: 1042 bytes, checksum: 75dc48c7a354715390c21830a3523aa3
+                        (MD5)
+                        Previous issue date: 2015
+                    </field>
+                </element>
+            </element>
+        </element>
+        <element name="language">
+            <element name="iso">
+                <element name="nb_NO">
+                    <field name="value">eng</field>
+                </element>
+            </element>
+        </element>
+        <element name="relation">
+            <element name="ispartofseries">
+                <element name="none">
+                    <field name="value">NILU OR;9/2015</field>
+                </element>
+            </element>
+            <element name="project">
+                <element name="nb_NO">
+                    <field name="value">European Space Agency: 103045</field>
+                </element>
+            </element>
+        </element>
+        <element name="title">
+            <element name="nb_NO">
+                <field name="value">Final report for ESA Validation Data Centre, EVDC. 5 May 2015.</field>
+            </element>
+            <element name="alternative">
+                <element name="none">
+                    <field name="value">Sluttrapport for ESA Validation Centre, EVDC.</field>
+                </element>
+            </element>
+        </element>
+        <element name="type">
+            <element name="nb_NO">
+                <field name="value">Research report</field>
+            </element>
+        </element>
+        <element name="rights">
+            <element name="holder">
+                <element name="nb_NO">
+                    <field name="value">© NILU – Norwegian Institute for Air Research. The publication may be freely
+                        cited where the source is acknowledged.
+                    </field>
+                </element>
+            </element>
+        </element>
+    </element>
+    <element name="bundles">
+        <element name="bundle">
+            <field name="name">THUMBNAIL</field>
+            <element name="bitstreams">
+                <element name="bitstream">
+                    <field name="name">9-2015_EVDC_AMF.pdf.jpg</field>
+                    <field name="originalName">9-2015_EVDC_AMF.pdf.jpg</field>
+                    <field name="description">IM Thumbnail</field>
+                    <field name="format">image/jpeg</field>
+                    <field name="size">14922</field>
+                    <field name="url">https://brage.bibsys.no/xmlui/bitstream/11250/2382891/6/9-2015_EVDC_AMF.pdf.jpg
+                    </field>
+                    <field name="checksum">3bddbe112d8381c819abf8d5c4f3b839</field>
+                    <field name="checksumAlgorithm">MD5</field>
+                    <field name="sid">6</field>
+                </element>
+            </element>
+        </element>
+        <element name="bundle">
+            <field name="name">SWORD</field>
+            <element name="bitstreams">
+                <element name="bitstream">
+                    <field name="name">cristin-1292597.zip</field>
+                    <field name="format">application/octet-stream</field>
+                    <field name="size">489056</field>
+                    <field name="url">https://brage.bibsys.no/xmlui/bitstream/11250/2382891/1/cristin-1292597.zip
+                    </field>
+                    <field name="checksum">6f6f39df7ffc459f12f1fba67aa9bda9</field>
+                    <field name="checksumAlgorithm">MD5</field>
+                    <field name="sid">1</field>
+                </element>
+                <element name="bitstream">
+                    <field name="name">sword-2015-11-24T11:27:54.original.xml</field>
+                    <field name="format">application/octet-stream</field>
+                    <field name="size">1042</field>
+                    <field name="url">
+                        https://brage.bibsys.no/xmlui/bitstream/11250/2382891/2/sword-2015-11-24T11%3a27%3a54.original.xml
+                    </field>
+                    <field name="checksum">75dc48c7a354715390c21830a3523aa3</field>
+                    <field name="checksumAlgorithm">MD5</field>
+                    <field name="sid">2</field>
+                </element>
+            </element>
+        </element>
+        <element name="bundle">
+            <field name="name">ORIGINAL</field>
+            <element name="bitstreams">
+                <element name="bitstream">
+                    <field name="name">9-2015_EVDC_AMF.pdf</field>
+                    <field name="format">application/pdf</field>
+                    <field name="size">602795</field>
+                    <field name="url">https://brage.bibsys.no/xmlui/bitstream/11250/2382891/3/9-2015_EVDC_AMF.pdf
+                    </field>
+                    <field name="checksum">12e265e3a4633df996a1a48b8170ab19</field>
+                    <field name="checksumAlgorithm">MD5</field>
+                    <field name="sid">3</field>
+                </element>
+            </element>
+        </element>
+        <element name="bundle">
+            <field name="name">ORE</field>
+            <element name="bitstreams">
+                <element name="bitstream">
+                    <field name="name">ORE.xml</field>
+                    <field name="format">text/xml</field>
+                    <field name="size">3558</field>
+                    <field name="url">https://brage.bibsys.no/xmlui/bitstream/11250/2382891/4/ORE.xml</field>
+                    <field name="checksum">07ad632063f24a88aeb4475a723e5cd8</field>
+                    <field name="checksumAlgorithm">MD5</field>
+                    <field name="sid">4</field>
+                </element>
+            </element>
+        </element>
+        <element name="bundle">
+            <field name="name">TEXT</field>
+            <element name="bitstreams">
+                <element name="bitstream">
+                    <field name="name">9-2015_EVDC_AMF.pdf.txt</field>
+                    <field name="originalName">9-2015_EVDC_AMF.pdf.txt</field>
+                    <field name="description">Extracted text</field>
+                    <field name="format">text/plain</field>
+                    <field name="size">27806</field>
+                    <field name="url">https://brage.bibsys.no/xmlui/bitstream/11250/2382891/5/9-2015_EVDC_AMF.pdf.txt
+                    </field>
+                    <field name="checksum">f63a1a6290fd68115c48f726f403635a</field>
+                    <field name="checksumAlgorithm">MD5</field>
+                    <field name="sid">5</field>
+                </element>
+            </element>
+        </element>
+    </element>
+    <element name="others">
+        <field name="handle">11250/2382891</field>
+        <field name="identifier">oai:brage.bibsys.no:11250/2382891</field>
+        <field name="lastModifyDate">2016-12-17 00:48:11.321</field>
+    </element>
+    <element name="repository">
+        <field name="name">BIBSYS Brage</field>
+        <field name="mail">support@bibsys.no</field>
+    </element>
+</metadata>
