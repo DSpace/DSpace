@@ -27,6 +27,7 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.xpath.XPathAPI;
@@ -129,18 +130,27 @@ public class StructBuilder {
     public static void main(String[] argv)
             throws ParserConfigurationException, SQLException,
             FileNotFoundException, IOException, TransformerException {
-        // Parse the command line.
-        CommandLineParser parser = new DefaultParser();
-
+        // Define command line options.
         Options options = new Options();
 
         options.addOption("h", "help", false, "Print this help message.");
         options.addOption("?", "help");
-        options.addOption("f", "file", true, "File of new structure information.");
-        options.addOption("e", "eperson", true, "User who is manipulating the repository's structure.");
-        options.addOption("o", "output", true, "File to receive the structure map.");
         options.addOption("x", "export", false, "Export the current structure as XML.");
 
+        options.addOption(Option.builder("e").longOpt("eperson")
+                .desc("User who is manipulating the repository's structure.")
+                .hasArg().argName("eperson").required().build());
+
+        options.addOption(Option.builder("f").longOpt("file")
+                .desc("File of new structure information.")
+                .hasArg().argName("input").build());
+
+        options.addOption(Option.builder("o").longOpt("output")
+                .desc("File to receive the structure map ('-' for standard out).")
+                .hasArg().argName("output").required().build());
+
+        // Parse the command line.
+        CommandLineParser parser = new DefaultParser();
         CommandLine line = null;
         try {
             line = parser.parse(options, argv);
@@ -163,29 +173,8 @@ public class StructBuilder {
             System.exit(1);
         }
 
-        String input = null;
-        String eperson = null;
-        String output = null;
-
-        if (line.hasOption('f')) {
-            input = line.getOptionValue('f');
-        }
-
-        if (line.hasOption('e')) {
-            eperson = line.getOptionValue('e');
-        } else { // EPerson is required
-            usage(options);
-            System.exit(1);
-        }
-
-        if (line.hasOption('o')) {
-            output = line.getOptionValue('o');
-        } else { // output is required
-            usage(options);
-            System.exit(1);
-        }
-
         // Open the output stream.
+        String output = line.getOptionValue('o');
         OutputStream outputStream;
         if ("-".equals(output)) {
             outputStream = System.out;
@@ -196,7 +185,8 @@ public class StructBuilder {
         // create a context
         Context context = new Context();
 
-        // set the context
+        // set the context.
+        String eperson = line.getOptionValue('e');
         try {
             context.setCurrentUser(ePersonService.findByEmail(context, eperson));
         } catch (SQLException ex) {
@@ -208,12 +198,19 @@ public class StructBuilder {
         if (line.hasOption('x')) { // export
             exportStructure(context, outputStream);
         } else { // Must be import
+            String input = line.getOptionValue('f');
+            if (null == input) {
+                usage(options);
+                System.exit(1);
+            }
+
             InputStream inputStream;
             if ("-".equals(input)) {
                 inputStream = System.in;
             } else {
                 inputStream = new FileInputStream(input);
             }
+
             importStructure(context, inputStream, outputStream);
         }
         System.exit(0);
@@ -421,8 +418,10 @@ public class StructBuilder {
      */
     private static void usage(Options options) {
         HelpFormatter helper = new HelpFormatter();
-        helper.printUsage(new PrintWriter(System.out), 80/* FIXME Magic */,
-                "structure-builder", options);
+        try (PrintWriter writer = new PrintWriter(System.out);) {
+            helper.printUsage(writer, 80/* FIXME Magic */,
+                    "structure-builder", options);
+        }
     }
 
     /**
