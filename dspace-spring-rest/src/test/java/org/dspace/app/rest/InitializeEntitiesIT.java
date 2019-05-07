@@ -153,7 +153,7 @@ public class InitializeEntitiesIT extends AbstractControllerIntegrationTest {
      * @throws Exception
      */
     @Test
-    public void getAllRelationshipTypesTest() throws Exception{
+    public void getAllRelationshipTypesTest() throws Exception {
         List<RelationshipType> relationshipTypes = relationshipTypeService.findAll(context);
 
         getClient().perform(get("/api/core/relationshiptypes"))
