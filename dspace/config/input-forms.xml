@@ -1424,6 +1424,14 @@
 				<displayed-value>Conjunto de datos</displayed-value>
 				<stored-value>Conjunto de datos</stored-value>
 			</pair>
+			<pair>
+				<displayed-value>Placa espectrográfica</displayed-value>
+				<stored-value>Placa espectrografica</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Placa fotográfica</displayed-value>
+				<stored-value>Placa fotografica</stored-value>
+			</pair>
 		</value-pairs>
 
 
