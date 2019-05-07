@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest;
 
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
@@ -173,6 +174,15 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                    )))
         ;
 
+        getClient().perform(get("/api/core/relationships").param("size", "2").param("page", "1"))
+
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.page",
+                                       is(PageMatcher.pageEntryWithTotalPagesAndElements(1, 2, 2, 3))))
+                   .andExpect(jsonPath("$._embedded.relationships", contains(
+                       RelationshipMatcher.matchRelationship(relationship3)
+                   )))
+        ;
 
     }
 
