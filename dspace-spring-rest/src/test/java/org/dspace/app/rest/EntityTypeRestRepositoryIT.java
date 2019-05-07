@@ -55,7 +55,6 @@ public class EntityTypeRestRepositoryIT extends AbstractEntityIntegrationTest {
 
     @Test
     public void getAllEntityTypeEndpointWithPaging() throws Exception {
-        //When we call this facets endpoint
         getClient().perform(get("/api/core/entitytypes").param("size", "5"))
 
                    //We expect a 200 OK status
@@ -74,6 +73,25 @@ public class EntityTypeRestRepositoryIT extends AbstractEntityIntegrationTest {
                        EntityTypeMatcher.matchEntityTypeEntry(entityTypeService.findByEntityType(context, "Project")),
                        EntityTypeMatcher.matchEntityTypeEntry(entityTypeService.findByEntityType(context, "OrgUnit")),
                        EntityTypeMatcher.matchEntityTypeEntry(entityTypeService.findByEntityType(context, "Journal"))
+                   )));
+
+        getClient().perform(get("/api/core/entitytypes").param("size", "5").param("page", "1"))
+
+                   //We expect a 200 OK status
+                   .andExpect(status().isOk())
+                   //The type has to be 'discover'
+                   .andExpect(jsonPath("$.page.size", is(5)))
+                   .andExpect(jsonPath("$.page.totalElements", is(7)))
+                   .andExpect(jsonPath("$.page.totalPages", is(2)))
+                   .andExpect(jsonPath("$.page.number", is(1)))
+                   //There needs to be a self link to this endpoint
+                   .andExpect(jsonPath("$._links.self.href", containsString("api/core/entitytypes")))
+                   //We have 4 facets in the default configuration, they need to all be present in the embedded section
+                   .andExpect(jsonPath("$._embedded.entitytypes", containsInAnyOrder(
+                       EntityTypeMatcher
+                           .matchEntityTypeEntry(entityTypeService.findByEntityType(context, "JournalVolume")),
+                       EntityTypeMatcher
+                           .matchEntityTypeEntry(entityTypeService.findByEntityType(context, "JournalIssue"))
                    )));
     }
 
