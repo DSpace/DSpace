@@ -129,6 +129,8 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
 
     }
 
+    /*
+     * Disabled the put until https://jira.duraspace.org/browse/DS-4230 is discussed
     @Override
     protected RelationshipRest put(Context context, HttpServletRequest request, String apiCategory, String model,
                                    Integer id, List<String> stringList)
@@ -160,6 +162,7 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
         }
 
     }
+    */
 
     /**
      * This method will check with the current user has write rights on both one of the original items and one of the
