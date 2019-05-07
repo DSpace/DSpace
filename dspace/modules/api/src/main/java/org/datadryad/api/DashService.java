@@ -250,6 +250,10 @@ public class DashService {
         if (ddp.getJournalConcept() != null) {
             setPublicationISSN(pkg, ddp.getJournalConcept().getISSN());
         }
+
+        if (ddp.getPublicationDOI() != null && ddp.getPublicationDOI().length() > 0) {
+            setPublicationDOI(pkg, ddp.getPublicationDOI());
+        }
         
         if (ddp.getFormerManuscriptNumbers().size() > 0) {
             List<String> prevFormerMSIDs = getFormerManuscriptNumbers(pkg);
@@ -728,6 +732,10 @@ public class DashService {
 
     public int setManuscriptNumber(Package pkg, String msid) {
         return postInternalDatum(pkg, "set", "manuscriptNumber", msid);
+    }
+
+    public int setPublicationDOI(Package pkg, String doi) {
+        return postInternalDatum(pkg, "set", "publicationDOI", doi);
     }
 
     public String getManuscriptNumber(Package pkg) {
