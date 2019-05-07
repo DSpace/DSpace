@@ -44,6 +44,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.I18nUtil;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.service.EPersonService;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -1392,7 +1393,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
 
     }
 
-    @Test
+    @Ignore
     public void putRelationshipAdminAccess() throws Exception {
 
         context.turnOffAuthorisationSystem();
@@ -1478,7 +1479,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
      * Change it to a relationship between publication 1 and author 2
      * Verify this is possible for a user with WRITE permissions on author 1 and author 2
      */
-    @Test
+    @Ignore
     public void putRelationshipWriteAccessOnAuthors() throws Exception {
 
         context.turnOffAuthorisationSystem();
@@ -1574,7 +1575,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
      * Change it to a relationship between publication 1 and author 2
      * Verify this is possible for a user with WRITE permissions on publication 1
      */
-    @Test
+    @Ignore
     public void putRelationshipWriteAccessOnPublication() throws Exception {
 
         context.turnOffAuthorisationSystem();
@@ -1670,7 +1671,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
      * Change it to a relationship between publication 2 and author 1
      * Verify this is possible for a user with WRITE permissions on publication 1 and publication 2
      */
-    @Test
+    @Ignore
     public void putRelationshipWriteAccessOnPublications() throws Exception {
 
         context.turnOffAuthorisationSystem();
@@ -1773,7 +1774,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
      * Change it to a relationship between publication 2 and author 1
      * Verify this is possible for a user with WRITE permissions on author 1
      */
-    @Test
+    @Ignore
     public void putRelationshipWriteAccessOnAuthor() throws Exception {
 
         context.turnOffAuthorisationSystem();
@@ -1877,7 +1878,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
      * Change it to a relationship between publication 1 and author 2
      * Verify this is NOT possible for a user without WRITE permissions
      */
-    @Test
+    @Ignore
     public void putRelationshipNoAccess() throws Exception {
 
         context.turnOffAuthorisationSystem();
@@ -1967,7 +1968,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
      * Change it to a relationship between publication 1 and author 2
      * Verify this is NOT possible for a user with WRITE permissions on author 1
      */
-    @Test
+    @Ignore
     public void putRelationshipOnlyAccessOnOneAuthor() throws Exception {
 
         context.turnOffAuthorisationSystem();
@@ -2059,7 +2060,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
      * Change it to a relationship between publication 2 and author 1
      * Verify this is NOT possible for a user with WRITE permissions on publication 1
      */
-    @Test
+    @Ignore
     public void putRelationshipOnlyAccessOnOnePublication() throws Exception {
 
         context.turnOffAuthorisationSystem();
