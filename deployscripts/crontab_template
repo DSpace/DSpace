@@ -1,0 +1,88 @@
+#start crontab for ${CONSORTIUM_MEMBER}
+# Do not touch the line above! - delimiter for jenkins manipulation of crontab file
+#
+#  ____ _____ ____   _______     _______   ____  _____            _____ ______
+# |  _ \_   _|  _ \ / ____\ \   / / ____| |  _ \|  __ \     /\   / ____|  ____|
+# | |_) || | | |_) | (___  \ \_/ / (___   | |_) | |__) |   /  \ | |  __| |__
+# |  _ < | | |  _ < \___ \  \   / \___ \  |  _ <|  _  /   / /\ \| | |_ |  __|
+# | |_) || |_| |_) |____) |  | |  ____) | | |_) | | \ \  / ____ \ |__| | |____
+# |____/_____|____/|_____/   |_| |_____/  |____/|_|  \_\/_/    \_\_____|______|
+#
+#  crontab for bruker webservutv/webserv (avhengig av fase)
+#
+# !!!This crontab is managed by jenkins. Changes you make directly to crontab will not stick!!!
+#
+#
+# Regenerate DSpace Sitemaps (Sitemaps ensure that your content is more findable in Google,
+# Google Scholar, and other major search engines
+00 0,8,16 * * * ${DSPACE_DIR}/bin/dspace generate-sitemaps > /tmp${DSPACE_DIR}/brageGenerateSitemaps.log 2>&1
+#
+# Reindeksere OAI og toemme cachen hver natt til onsdag:
+00 21 * * 2   ${DSPACE_DIR}/bin/dspace oai import -c > /tmp${DSPACE_DIR}/BrageClearIndexOAI.log 2>&1
+#
+# Run the checksum checker once a week
+# By default it runs through every file (-l) and also prunes old results (-p)
+# (This re-verifies the checksums of all files stored in DSpace. If any files have been changed/corrupted, checksums will differ.)
+# check all the content it can within *one hour*. The next week it would start again where it left off.
+00 23 * * 0   ${DSPACE_DIR}/bin/dspace checker -d 1h -p > /tmp${DSPACE_DIR}/brageChecksumChecker.log 2>&1
+#
+# Rotering av natt-jobb-logger og sletting etter en uke:
+58 23 * * *   ${DSPACE_DIR}/bibsys-scripts/roter_nattjobb_logger.sh ${DSPACE_DIR} > /tmp${DSPACE_DIR}/roter_nattjobb_logger.log 2>&1
+#
+# Cleanup Web Spiders from DSpace Statistics Solr Index at 01:00 every day
+# (This removes any known web spiders from your usage statistics by IP Address)
+00 01 * * *   ${DSPACE_DIR}/bin/dspace stats-util -i > /tmp${DSPACE_DIR}/brageCleanWebSpiders.log 2>&1
+#
+# SOLR core backup
+#
+30 01 * * *   ${DSPACE_DIR}/bibsys-scripts/backup_solr.sh ${DSPACE_DIR} ${CONSORTIUM_MEMBER} oai > /tmp${DSPACE_DIR}/backup_solr_oai.log 2>&1
+40 01 * * *   ${DSPACE_DIR}/bibsys-scripts/backup_solr.sh  ${DSPACE_DIR} ${CONSORTIUM_MEMBER} statistics > /tmp${DSPACE_DIR}/backup_solr_statistics.log 2>&1
+50 01 * * *   ${DSPACE_DIR}/bibsys-scripts/backup_solr.sh  ${DSPACE_DIR} ${CONSORTIUM_MEMBER} search > /tmp${DSPACE_DIR}/backup_solr_search.log 2>&1
+
+# Update the OAI-PMH index with the newest content (and re-optimize that index)
+00 02 * * *   ${DSPACE_DIR}/bin/dspace oai import -o > /tmp${DSPACE_DIR}/brageOaiRefreshSolrIndex.log 2>&1
+#
+# Clean and Update the Discovery indexes
+# (This ensures that any deleted documents are cleaned from the Discovery search/browse index)
+30 03 * * *  ${DSPACE_DIR}/bin/dspace index-discovery > /tmp${DSPACE_DIR}/brageDiscoveryCleanUpdate.log 2>&1
+#
+# Re-Optimize DSpace Statistics Solr Index
+# (This ensures that the Statistics Solr Index is re-optimized for better performance)
+00 04 * * *  ${DSPACE_DIR}/bin/dspace index-discovery -o > /tmp${DSPACE_DIR}/brageDiscoveryMaintenance.log 2>&1
+#
+# Sletter div. brage-logger (boer ikke kjoere samtidig med backup-skriptet som gaar kl. 3 (pga. TSM-backup
+#                            av loggfiler)).
+30 04 * * * ${DSPACE_DIR}/bibsys-scripts/slette_filer_brage.sh ${DSPACE_DIR} ${CONSORTIUM_MEMBER} > /tmp${DSPACE_DIR}/slette_filer_brage.log 2>&1
+#
+# Fullteksindeksering av Brage-databaser: Trekker ut fulltekst fra /brage/${CONSORTIUM_MEMBER}/data
+#                                         (dvs. dokumentene)
+#                                          og lager thumbnails for PDF-filer.
+#                                         Forventet kjoeretid: 7-16 min.
+00 05 * * *   ${DSPACE_DIR}/bibsys-scripts/fulltekstindeksering.sh  ${DSPACE_DIR} > /tmp${DSPACE_DIR}/bragefiltermedia.log 2>&1
+#
+# Sjekk om CPU-loekke for gs-prosessen (under filter-media-jobben):
+* 5-6 * * * ${DSPACE_DIR}/bibsys-scripts/sjekk_gs_CPU_loekke.sh ${DSPACE_DIR} > /tmp${DSPACE_DIR}/sjekk_gs_CPU_loekke.log 2>&1
+#
+# Vedlikehold solr-index (unngå at servletkontainer går tom for minne)
+# Re-Optimize DSpace Statistics Solr Index
+# (This ensures that the Statistics Solr Index is re-optimized for better performance)
+00 06 * * *  ${DSPACE_DIR}/bin/dspace stats-util -o > /tmp${DSPACE_DIR}/brageSolrOptimizeIndex.log 2>&1
+#
+# Sletter evt. gs_-filer i /tmp fra filter-media-jobben
+05 07 * * * ${DSPACE_DIR}/bibsys-scripts/slett_gs_filer_tmp.sh ${DSPACE_DIR} > /tmp${DSPACE_DIR}/slett_gs_filer_tmp.log 2>&1
+#
+# Daglig sjekk av Bragejobber
+00 08 * * *  ${DSPACE_DIR}/bibsys-scripts/daglig_sjekk.sh ${DSPACE_DIR} ${CONSORTIUM_MEMBER} arne.midtun@unit.no > /tmp${DSPACE_DIR}/brageDagligSjekk.log 2>&1
+#
+#
+# Hoeste Cristin-arkivenee og alle andre samlinger som er satt opp for hoesting (f.eks. DAIM for NTNU).
+00 16 * * *  ${DSPACE_DIR}/bin/dspace harvest -H -e brage@bibsys.no > /tmp${DSPACE_DIR}/brageharvest.log 2>&1
+#
+#
+@daily find /tmp/hsperfdata_$(whoami) -exec touch {} \;
+#
+# Monitor the jstatd daemon used for remote JVM Monitoring & Management
+* * * * * ~/bin/jstatd_cron.sh cron > /tmp/jstatd_cron.sh.log 2>&1
+#
+# Do not touch the line below! - delimiter for jenkins manipulation of crontab file
+#end crontab for ${CONSORTIUM_MEMBER}
