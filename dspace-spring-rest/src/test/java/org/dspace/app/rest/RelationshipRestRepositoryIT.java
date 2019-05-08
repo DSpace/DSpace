@@ -1329,7 +1329,8 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                              .andExpect(jsonPath("rightPlace", is(2)));
 
         // Here we will delete the secondRelationship and then verify that the others have their place handled properly
-        getClient(adminToken).perform(delete("/api/core/relationships/" + secondRelationshipIdString));
+        getClient(adminToken).perform(delete("/api/core/relationships/" + secondRelationshipIdString))
+                             .andExpect(status().isNoContent());
 
         getClient(adminToken).perform(get("/api/core/relationships/" + firstRelationshipIdString))
                              .andExpect(status().isOk())
