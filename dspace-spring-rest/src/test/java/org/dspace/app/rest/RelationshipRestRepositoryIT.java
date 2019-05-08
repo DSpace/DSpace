@@ -25,6 +25,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
+import org.dspace.app.rest.builder.EPersonBuilder;
 import org.dspace.app.rest.builder.ItemBuilder;
 import org.dspace.app.rest.builder.RelationshipBuilder;
 import org.dspace.app.rest.matcher.PageMatcher;
@@ -43,7 +44,6 @@ import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.core.Constants;
 import org.dspace.core.I18nUtil;
 import org.dspace.eperson.EPerson;
-import org.dspace.eperson.service.EPersonService;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -56,9 +56,6 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
 
     @Autowired
     private EntityTypeService entityTypeService;
-
-    @Autowired
-    private EPersonService ePersonService;
 
     @Autowired
     private AuthorizeService authorizeService;
@@ -198,15 +195,12 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
 
 
 
-        EPerson user = ePersonService.create(context);
-        user.setFirstName(context, "first");
-        user.setLastName(context, "last");
-        user.setEmail("testaze@email.com");
-        user.setCanLogIn(true);
-        user.setLanguage(context, I18nUtil.getDefaultLocale().getLanguage());
-        ePersonService.setPassword(user, password);
-        // actually save the eperson to unit testing DB
-        ePersonService.update(context, user);
+        EPerson user = EPersonBuilder.createEPerson(context)
+                                    .withNameInMetadata("first", "last")
+                                    .withEmail("testaze@gmail.com")
+                                    .withPassword(password)
+                                    .withLanguage(I18nUtil.getDefaultLocale().getLanguage())
+                                    .build();
         context.setCurrentUser(user);
 
         authorizeService.addPolicy(context, publication, Constants.WRITE, user);
@@ -266,15 +260,12 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
 
 
 
-        EPerson user = ePersonService.create(context);
-        user.setFirstName(context, "first");
-        user.setLastName(context, "last");
-        user.setEmail("testazhfhdfhe@email.com");
-        user.setCanLogIn(true);
-        user.setLanguage(context, I18nUtil.getDefaultLocale().getLanguage());
-        ePersonService.setPassword(user, password);
-        // actually save the eperson to unit testing DB
-        ePersonService.update(context, user);
+        EPerson user = EPersonBuilder.createEPerson(context)
+                                     .withNameInMetadata("first", "last")
+                                     .withEmail("testaze@gmail.com")
+                                     .withPassword(password)
+                                     .withLanguage(I18nUtil.getDefaultLocale().getLanguage())
+                                     .build();
         context.setCurrentUser(user);
 
         authorizeService.addPolicy(context, author1, Constants.WRITE, user);
@@ -334,15 +325,12 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
 
 
 
-        EPerson user = ePersonService.create(context);
-        user.setFirstName(context, "first");
-        user.setLastName(context, "last");
-        user.setEmail("testazeazeazezae@email.com");
-        user.setCanLogIn(true);
-        user.setLanguage(context, I18nUtil.getDefaultLocale().getLanguage());
-        ePersonService.setPassword(user, password);
-        // actually save the eperson to unit testing DB
-        ePersonService.update(context, user);
+        EPerson user = EPersonBuilder.createEPerson(context)
+                                     .withNameInMetadata("first", "last")
+                                     .withEmail("testaze@gmail.com")
+                                     .withPassword(password)
+                                     .withLanguage(I18nUtil.getDefaultLocale().getLanguage())
+                                     .build();
         context.setCurrentUser(user);
         context.restoreAuthSystemState();
 
@@ -1482,15 +1470,12 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
 
 
 
-        EPerson user = ePersonService.create(context);
-        user.setFirstName(context, "first");
-        user.setLastName(context, "last");
-        user.setEmail("rrarz@email.com");
-        user.setCanLogIn(true);
-        user.setLanguage(context, I18nUtil.getDefaultLocale().getLanguage());
-        ePersonService.setPassword(user, password);
-        // actually save the eperson to unit testing DB
-        ePersonService.update(context, user);
+        EPerson user = EPersonBuilder.createEPerson(context)
+                                     .withNameInMetadata("first", "last")
+                                     .withEmail("testaze@gmail.com")
+                                     .withPassword(password)
+                                     .withLanguage(I18nUtil.getDefaultLocale().getLanguage())
+                                     .build();
         context.setCurrentUser(user);
 
         authorizeService.addPolicy(context, author1, Constants.WRITE, user);
@@ -1578,15 +1563,12 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
 
 
 
-        EPerson user = ePersonService.create(context);
-        user.setFirstName(context, "first");
-        user.setLastName(context, "last");
-        user.setEmail("uiytirthery@email.com");
-        user.setCanLogIn(true);
-        user.setLanguage(context, I18nUtil.getDefaultLocale().getLanguage());
-        ePersonService.setPassword(user, password);
-        // actually save the eperson to unit testing DB
-        ePersonService.update(context, user);
+        EPerson user = EPersonBuilder.createEPerson(context)
+                                     .withNameInMetadata("first", "last")
+                                     .withEmail("testaze@gmail.com")
+                                     .withPassword(password)
+                                     .withLanguage(I18nUtil.getDefaultLocale().getLanguage())
+                                     .build();
         context.setCurrentUser(user);
 
         authorizeService.addPolicy(context, publication, Constants.WRITE, user);
@@ -1680,15 +1662,12 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
 
 
 
-        EPerson user = ePersonService.create(context);
-        user.setFirstName(context, "first");
-        user.setLastName(context, "last");
-        user.setEmail("tturturu@email.com");
-        user.setCanLogIn(true);
-        user.setLanguage(context, I18nUtil.getDefaultLocale().getLanguage());
-        ePersonService.setPassword(user, password);
-        // actually save the eperson to unit testing DB
-        ePersonService.update(context, user);
+        EPerson user = EPersonBuilder.createEPerson(context)
+                                     .withNameInMetadata("first", "last")
+                                     .withEmail("testaze@gmail.com")
+                                     .withPassword(password)
+                                     .withLanguage(I18nUtil.getDefaultLocale().getLanguage())
+                                     .build();
         context.setCurrentUser(user);
 
         authorizeService.addPolicy(context, publication1, Constants.WRITE, user);
@@ -1784,15 +1763,12 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
 
 
 
-        EPerson user = ePersonService.create(context);
-        user.setFirstName(context, "first");
-        user.setLastName(context, "last");
-        user.setEmail("tryhrtureery@email.com");
-        user.setCanLogIn(true);
-        user.setLanguage(context, I18nUtil.getDefaultLocale().getLanguage());
-        ePersonService.setPassword(user, password);
-        // actually save the eperson to unit testing DB
-        ePersonService.update(context, user);
+        EPerson user = EPersonBuilder.createEPerson(context)
+                                     .withNameInMetadata("first", "last")
+                                     .withEmail("testaze@gmail.com")
+                                     .withPassword(password)
+                                     .withLanguage(I18nUtil.getDefaultLocale().getLanguage())
+                                     .build();
         context.setCurrentUser(user);
 
         authorizeService.addPolicy(context, author1, Constants.WRITE, user);
@@ -1881,15 +1857,12 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
 
 
 
-        EPerson user = ePersonService.create(context);
-        user.setFirstName(context, "first");
-        user.setLastName(context, "last");
-        user.setEmail("erertertgrdgf@email.com");
-        user.setCanLogIn(true);
-        user.setLanguage(context, I18nUtil.getDefaultLocale().getLanguage());
-        ePersonService.setPassword(user, password);
-        // actually save the eperson to unit testing DB
-        ePersonService.update(context, user);
+        EPerson user = EPersonBuilder.createEPerson(context)
+                                     .withNameInMetadata("first", "last")
+                                     .withEmail("testaze@gmail.com")
+                                     .withPassword(password)
+                                     .withLanguage(I18nUtil.getDefaultLocale().getLanguage())
+                                     .build();
         context.setCurrentUser(user);
 
         context.restoreAuthSystemState();
@@ -1971,15 +1944,12 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
 
 
 
-        EPerson user = ePersonService.create(context);
-        user.setFirstName(context, "first");
-        user.setLastName(context, "last");
-        user.setEmail("tjyhrgefdg@email.com");
-        user.setCanLogIn(true);
-        user.setLanguage(context, I18nUtil.getDefaultLocale().getLanguage());
-        ePersonService.setPassword(user, password);
-        // actually save the eperson to unit testing DB
-        ePersonService.update(context, user);
+        EPerson user = EPersonBuilder.createEPerson(context)
+                                     .withNameInMetadata("first", "last")
+                                     .withEmail("testaze@gmail.com")
+                                     .withPassword(password)
+                                     .withLanguage(I18nUtil.getDefaultLocale().getLanguage())
+                                     .build();
         context.setCurrentUser(user);
 
         authorizeService.addPolicy(context, author1, Constants.WRITE, user);
@@ -2069,15 +2039,12 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
 
 
 
-        EPerson user = ePersonService.create(context);
-        user.setFirstName(context, "first");
-        user.setLastName(context, "last");
-        user.setEmail("tyerzergt@email.com");
-        user.setCanLogIn(true);
-        user.setLanguage(context, I18nUtil.getDefaultLocale().getLanguage());
-        ePersonService.setPassword(user, password);
-        // actually save the eperson to unit testing DB
-        ePersonService.update(context, user);
+        EPerson user = EPersonBuilder.createEPerson(context)
+                                     .withNameInMetadata("first", "last")
+                                     .withEmail("testaze@gmail.com")
+                                     .withPassword(password)
+                                     .withLanguage(I18nUtil.getDefaultLocale().getLanguage())
+                                     .build();
         context.setCurrentUser(user);
 
         authorizeService.addPolicy(context, publication1, Constants.WRITE, user);
