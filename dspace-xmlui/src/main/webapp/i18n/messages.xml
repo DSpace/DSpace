@@ -2036,6 +2036,11 @@
 	<message key="xmlui.administrative.ControlPanel.tabs.Harvesting">Harvesting</message>
 	<message key="xmlui.administrative.ControlPanel.tabs.Current Activity">Current Activity</message>
 
+	<message key="xmlui.administrative.ControlPanel.jenkins_url">Jenkins build server</message>
+	<message key="xmlui.administrative.ControlPanel.jenkins_tag">Jenkins build tag</message>
+	<message key="xmlui.administrative.ControlPanel.git_branch">Git branch</message>
+	<message key="xmlui.administrative.ControlPanel.git_commit">Git version</message>
+
 	<!-- org.dspace.app.xmlui.administrative.SystemwideAlerts -->
 	<message key="xmlui.administrative.SystemwideAlerts.countdown"><strong>In {0} minutes</strong>: </message>
 
