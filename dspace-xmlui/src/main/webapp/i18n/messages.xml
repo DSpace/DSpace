@@ -1877,6 +1877,12 @@
 	<message key="xmlui.administrative.ControlPanel.harvest_label_oai_source">ORE source</message>
 	<message key="xmlui.administrative.ControlPanel.harvest_head_harvester_settings">Harvester Settings</message>
 
+
+	<message key="xmlui.administrative.ControlPanel.brage_jenkins_url">Jenkins build server</message>
+	<message key="xmlui.administrative.ControlPanel.brage_jenkins_tag">Jenkins build tag</message>
+	<message key="xmlui.administrative.ControlPanel.brage_git_branch">Git branch</message>
+	<message key="xmlui.administrative.ControlPanel.brage_git_commit">Git version</message>
+
 	<!-- General tags for community management -->
 	<message key="xmlui.administrative.community.general.community_trail">Communities</message>
 	<message key="xmlui.administrative.community.general.options_metadata">Edit Metadata</message>
