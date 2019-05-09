@@ -20,6 +20,7 @@ import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Component;
 
 /**
@@ -36,7 +37,11 @@ public class EntityTypeRestRepository extends DSpaceRestRepository<EntityTypeRes
 
     public EntityTypeRest findOne(Context context, Integer integer) {
         try {
-            return entityTypeConverter.fromModel(entityTypeService.find(context, integer));
+            EntityType entityType = entityTypeService.find(context, integer);
+            if (entityType == null) {
+                throw new ResourceNotFoundException("The entityType for ID: " + integer + " could not be found");
+            }
+            return entityTypeConverter.fromModel(entityType);
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
