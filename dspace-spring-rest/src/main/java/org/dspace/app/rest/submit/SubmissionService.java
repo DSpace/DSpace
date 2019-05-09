@@ -8,7 +8,6 @@
 package org.dspace.app.rest.submit;
 
 import java.io.IOException;
-import java.io.Reader;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -196,63 +195,48 @@ public class SubmissionService {
      * 
      * @param context
      *            the dspace context
-     * @param currentRequest
-     *            the request containing the details about the workspace to create
+     * @param requestUriListString
+     *            the id of the workspaceItem
      * @return
      * @throws SQLException
      * @throws AuthorizeException
      * @throws WorkflowException
      */
-    public XmlWorkflowItem createWorkflowItem(Context context, Request currentRequest)
+    public XmlWorkflowItem createWorkflowItem(Context context, String requestUriListString)
             throws SQLException, AuthorizeException, WorkflowException {
-        Reader reader = null;
         XmlWorkflowItem wi = null;
-        try {
-            //FIXME use utility method to extract the ID from the text/uri-list body
-            reader = currentRequest.getHttpServletRequest().getReader();
-            char[] arr = new char[1024];
-            StringBuilder buffer = new StringBuilder();
-            int numCharsRead = reader.read(arr, 0, arr.length);
-            if (numCharsRead > 0) {
-                buffer.append(arr, 0, numCharsRead);
-            }
-            if (numCharsRead == arr.length) {
-                throw new UnprocessableEntityException("Malformed body... too long");
-            }
-            String regex = "\\/api\\/" + WorkspaceItemRest.CATEGORY + "\\/" + English.plural(WorkspaceItemRest.NAME)
-                    + "\\/";
-            String[] split = buffer.toString().split(regex, 2);
-            if (split.length != 2) {
-                throw new UnprocessableEntityException("Malformed body..." + buffer);
-            }
-            // END FIXME
-            WorkspaceItem wsi = null;
-            try {
-                wsi = workspaceItemService.find(context, Integer.parseInt(split[1]));
-            } catch (NumberFormatException e) {
-                throw new UnprocessableEntityException("The provided workspaceitem URI is not valid");
-            }
-            if (wsi == null) {
-                throw new UnprocessableEntityException("Workspace item is not found");
-            }
-            if (!workspaceItemConverter.convert(wsi).getErrors().isEmpty()) {
-                throw new UnprocessableEntityException(
-                        "Start workflow failed due to validation error on workspaceitem");
-            }
-
-            wi = workflowService.start(context, wsi);
-
-        } catch (IOException e) {
-            throw new RuntimeException(e.getMessage(), e);
-        } finally {
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (IOException e) {
-                    throw new RuntimeException(e.getMessage(), e);
-                }
-            }
+        if (StringUtils.isBlank(requestUriListString)) {
+            throw new UnprocessableEntityException("Malformed body..." + requestUriListString);
         }
+        String regex = "\\/api\\/" + WorkspaceItemRest.CATEGORY + "\\/" + English.plural(WorkspaceItemRest.NAME)
+                + "\\/";
+        String[] split = requestUriListString.split(regex, 2);
+        if (split.length != 2) {
+            throw new UnprocessableEntityException("Malformed body..." + requestUriListString);
+        }
+        WorkspaceItem wsi = null;
+        int id = 0;
+        try {
+            id = Integer.parseInt(split[1]);
+            wsi = workspaceItemService.find(context, id);
+        } catch (NumberFormatException e) {
+            throw new UnprocessableEntityException("The provided workspaceitem URI is not valid");
+        }
+        if (wsi == null) {
+            throw new UnprocessableEntityException("Workspace item is not found");
+        }
+        if (!workspaceItemConverter.convert(wsi).getErrors().isEmpty()) {
+            throw new UnprocessableEntityException(
+                    "Start workflow failed due to validation error on workspaceitem");
+        }
+
+        try {
+            wi = workflowService.start(context, wsi);
+        } catch (IOException e) {
+            throw new RuntimeException("The workflow could not be started for workspaceItem with" +
+                                           "id:  " + id);
+        }
+
         return wi;
     }
 

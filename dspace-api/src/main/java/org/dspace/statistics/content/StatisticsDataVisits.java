@@ -354,13 +354,13 @@ public class StatisticsDataVisits extends StatisticsData {
                     /*
                     for (int j = 0; j < topCounts2.length; j++) {
                         ObjectCount count2 = topCounts2[j];
-                        String query = firsDataset.getFacetField() + ":" + count1.getValue();
+                        String query = firsDataset.getFacetField() + ":" + count1.getValues();
                         // Check if we also have a type present (if so this should be put into the query
                         if ("id".equals(firsDataset.getFacetField()) && firsDataset.getQueries().get(0).getDsoType()
                         != -1)
                             query += " AND type:" + firsDataset.getQueries().get(0).getDsoType();
 
-                        query += " AND " + secondDataSet.getFacetField() + ":" + count2.getValue();
+                        query += " AND " + secondDataSet.getFacetField() + ":" + count2.getValues();
                         // Check if we also have a type present (if so this should be put into the query
                         if ("id".equals(secondDataSet.getFacetField()) && secondDataSet.getQueries().get(0)
                         .getDsoType() != -1)
@@ -372,8 +372,8 @@ public class StatisticsDataVisits extends StatisticsData {
                         // No need to add this many times
                         // TODO: dit vervangen door te displayen value
                         if (i == 0) {
-                            dataset.setRowLabel(j, getResultName(count2.getValue(), secondDataSet, context));
-                            dataset.setRowLabelAttr(j, getAttributes(count2.getValue(), secondDataSet, context));
+                            dataset.setRowLabel(j, getResultName(count2.getValues(), secondDataSet, context));
+                            dataset.setRowLabelAttr(j, getAttributes(count2.getValues(), secondDataSet, context));
 
                         }
 

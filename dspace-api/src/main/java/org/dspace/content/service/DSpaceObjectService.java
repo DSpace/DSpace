@@ -50,7 +50,6 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
      */
     public abstract String getName(T dso);
 
-
     /**
      * Tries to lookup all Identifiers of this DSpaceObject.
      *

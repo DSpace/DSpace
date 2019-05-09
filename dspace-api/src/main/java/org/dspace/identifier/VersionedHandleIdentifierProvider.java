@@ -19,7 +19,7 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.content.MetadataSchema;
+import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.ConfigurationManager;
@@ -417,9 +417,9 @@ public class VersionedHandleIdentifierProvider extends IdentifierProvider {
         // load all identifiers, clear the metadata field, re add all
         // identifiers which are not from type handle and add the new handle.
         List<MetadataValue> identifiers = itemService.getMetadata(item,
-                                                                  MetadataSchema.DC_SCHEMA, "identifier", "uri",
+                                                                  MetadataSchemaEnum.DC.getName(), "identifier", "uri",
                                                                   Item.ANY);
-        itemService.clearMetadata(context, item, MetadataSchema.DC_SCHEMA,
+        itemService.clearMetadata(context, item, MetadataSchemaEnum.DC.getName(),
                                   "identifier", "uri", Item.ANY);
         for (MetadataValue identifier : identifiers) {
             if (this.supports(identifier.getValue())) {
@@ -439,7 +439,8 @@ public class VersionedHandleIdentifierProvider extends IdentifierProvider {
 
         // Add handle as identifier.uri DC value.
         if (StringUtils.isNotBlank(handleref)) {
-            itemService.addMetadata(context, item, MetadataSchema.DC_SCHEMA, "identifier", "uri", null, handleref);
+            itemService.addMetadata(context, item, MetadataSchemaEnum.DC.getName(),
+                                    "identifier", "uri", null, handleref);
         }
         itemService.update(context, item);
     }
