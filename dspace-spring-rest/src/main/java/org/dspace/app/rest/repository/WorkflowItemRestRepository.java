@@ -146,8 +146,8 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
     @Override
     protected WorkflowItemRest createAndReturn(Context context, List<String> stringList) {
         XmlWorkflowItem source;
-        if (stringList.isEmpty()) {
-            throw new UnprocessableEntityException("The given URI list could not be parsed and is empty as a result");
+        if (stringList == null || stringList.isEmpty() || stringList.size() > 1) {
+            throw new UnprocessableEntityException("The given URI list could not be properly parsed to one result");
         }
         try {
             source = submissionService.createWorkflowItem(context, stringList.get(0));
