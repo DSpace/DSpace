@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest;
 
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
@@ -158,6 +159,28 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                        RelationshipMatcher.matchRelationship(relationship3)
                    )))
         ;
+
+        getClient().perform(get("/api/core/relationships").param("size", "2"))
+
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.page",
+                                       is(PageMatcher.pageEntryWithTotalPagesAndElements(0, 2, 2, 3))))
+                   .andExpect(jsonPath("$._embedded.relationships", containsInAnyOrder(
+                       RelationshipMatcher.matchRelationship(relationship1),
+                       RelationshipMatcher.matchRelationship(relationship2)
+                   )))
+        ;
+
+        getClient().perform(get("/api/core/relationships").param("size", "2").param("page", "1"))
+
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.page",
+                                       is(PageMatcher.pageEntryWithTotalPagesAndElements(1, 2, 2, 3))))
+                   .andExpect(jsonPath("$._embedded.relationships", contains(
+                       RelationshipMatcher.matchRelationship(relationship3)
+                   )))
+        ;
+
     }
 
     @Test
@@ -194,8 +217,6 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                                   entityTypeService.findByEntityType(context, "Person"),
                                   "isAuthorOfPublication", "isPublicationOfAuthor");
 
-
-
         EPerson user = EPersonBuilder.createEPerson(context)
                                     .withNameInMetadata("first", "last")
                                     .withEmail("testaze@gmail.com")
@@ -222,6 +243,17 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                                                                    "https://localhost:8080/spring-rest/api/core/items/" + author1.getID()))
                                               .andExpect(status().isCreated())
                                               .andReturn();
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        Map<String, Object> map = mapper.readValue(content, Map.class);
+        String firstRelationshipIdString = String.valueOf(map.get("id"));
+
+        getClient().perform(get("/api/core/relationships/" + firstRelationshipIdString))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.leftId", is(publication.getID().toString())))
+                   .andExpect(jsonPath("$.rightId", is(author1.getID().toString())));
 
     }
 
@@ -259,8 +291,6 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                                   entityTypeService.findByEntityType(context, "Person"),
                                   "isAuthorOfPublication", "isPublicationOfAuthor");
 
-
-
         EPerson user = EPersonBuilder.createEPerson(context)
                                      .withNameInMetadata("first", "last")
                                      .withEmail("testaze@gmail.com")
@@ -287,6 +317,16 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                                               .andExpect(status().isCreated())
                                               .andReturn();
 
+        ObjectMapper mapper = new ObjectMapper();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        Map<String, Object> map = mapper.readValue(content, Map.class);
+        String firstRelationshipIdString = String.valueOf(map.get("id"));
+
+        getClient().perform(get("/api/core/relationships/" + firstRelationshipIdString))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.leftId", is(publication.getID().toString())))
+                   .andExpect(jsonPath("$.rightId", is(author1.getID().toString())));
     }
 
 
@@ -323,8 +363,6 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
             .findbyTypesAndLabels(context, entityTypeService.findByEntityType(context, "Publication"),
                                   entityTypeService.findByEntityType(context, "Person"),
                                   "isAuthorOfPublication", "isPublicationOfAuthor");
-
-
 
         EPerson user = EPersonBuilder.createEPerson(context)
                                      .withNameInMetadata("first", "last")
