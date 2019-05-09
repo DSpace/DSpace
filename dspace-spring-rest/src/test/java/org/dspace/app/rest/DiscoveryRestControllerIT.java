@@ -93,6 +93,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 //We have 4 facets in the default configuration, they need to all be present in the embedded section
                 .andExpect(jsonPath("$._embedded.facets", containsInAnyOrder(
                         FacetEntryMatcher.authorFacet(false),
+                       FacetEntryMatcher.entityTypeFacet(false),
                         FacetEntryMatcher.dateIssuedFacet(false),
                         FacetEntryMatcher.subjectFacet(false),
                         FacetEntryMatcher.hasContentInOriginalBundleFacet(false)))
@@ -843,7 +844,13 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                        SearchFilterMatcher.dateIssuedFilter(),
                        SearchFilterMatcher.hasContentInOriginalBundleFilter(),
                        SearchFilterMatcher.hasFileNameInOriginalBundleFilter(),
-                       SearchFilterMatcher.hasFileDescriptionInOriginalBundleFilter()
+                       SearchFilterMatcher.hasFileDescriptionInOriginalBundleFilter(),
+                       SearchFilterMatcher.entityTypeFilter(),
+                       SearchFilterMatcher.isAuthorOfPublicationRelation(),
+                       SearchFilterMatcher.isProjectOfPublicationRelation(),
+                       SearchFilterMatcher.isOrgUnitOfPublicationRelation(),
+                       SearchFilterMatcher.isPublicationOfJournalIssueRelation(),
+                       SearchFilterMatcher.isJournalOfPublicationRelation()
                    )))
                    //These sortOptions need to be present as it's the default in the configuration
                    .andExpect(jsonPath("$.sortOptions", containsInAnyOrder(
@@ -925,6 +932,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 // property because we don't exceed their default limit for a hasMore true (the default is 10)
                 .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
                         FacetEntryMatcher.authorFacet(false),
+                        FacetEntryMatcher.entityTypeFacet(false),
                         FacetEntryMatcher.subjectFacet(false),
                         FacetEntryMatcher.dateIssuedFacet(false),
                         FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
@@ -1009,6 +1017,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 // facet
                 .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
                         FacetEntryMatcher.authorFacet(true),
+                        FacetEntryMatcher.entityTypeFacet(false),
                         FacetEntryMatcher.subjectFacet(false),
                         FacetEntryMatcher.dateIssuedFacet(false),
                         FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
@@ -1096,6 +1105,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 // facet
                 .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
                         FacetEntryMatcher.authorFacet(false),
+                        FacetEntryMatcher.entityTypeFacet(false),
                         FacetEntryMatcher.subjectFacet(true),
                         FacetEntryMatcher.dateIssuedFacet(false),
                         FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
@@ -1173,6 +1183,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 // property because we don't exceed their default limit for a hasMore true (the default is 10)
                 .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
                         FacetEntryMatcher.authorFacet(false),
+                        FacetEntryMatcher.entityTypeFacet(false),
                         FacetEntryMatcher.subjectFacet(false),
                         FacetEntryMatcher.dateIssuedFacet(false),
                         FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
@@ -1254,6 +1265,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 // property because we don't exceed their default limit for a hasMore true (the default is 10)
                 .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
                         FacetEntryMatcher.authorFacet(false),
+                        FacetEntryMatcher.entityTypeFacet(false),
                         FacetEntryMatcher.subjectFacet(false),
                         FacetEntryMatcher.dateIssuedFacet(false),
                         FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
@@ -1330,6 +1342,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 // property because we don't exceed their default limit for a hasMore true (the default is 10)
                 .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
                         FacetEntryMatcher.authorFacet(false),
+                        FacetEntryMatcher.entityTypeFacet(false),
                         FacetEntryMatcher.subjectFacet(false),
                         FacetEntryMatcher.dateIssuedFacet(false),
                         FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
@@ -1415,6 +1428,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 // property because we don't exceed their default limit for a hasMore true (the default is 10)
                 .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
                         FacetEntryMatcher.authorFacet(false),
+                        FacetEntryMatcher.entityTypeFacet(false),
                         FacetEntryMatcher.subjectFacet(false),
                         FacetEntryMatcher.dateIssuedFacet(false),
                         FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
@@ -1624,7 +1638,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                         FacetEntryMatcher.authorFacet(true),
                         FacetEntryMatcher.subjectFacet(true),
                         FacetEntryMatcher.dateIssuedFacet(false),
-                        FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
+                        FacetEntryMatcher.hasContentInOriginalBundleFacet(false),
+                        FacetEntryMatcher.entityTypeFacet(false)
                 )))
                 //There always needs to be a self link available
                 .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
@@ -1709,6 +1724,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 // property because we don't exceed their default limit for a hasMore true (the default is 10)
                 .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
                         FacetEntryMatcher.authorFacet(false),
+                        FacetEntryMatcher.entityTypeFacet(false),
                         FacetEntryMatcher.subjectFacet(false),
                         FacetEntryMatcher.dateIssuedFacet(false),
                         FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
@@ -1794,6 +1810,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 // property because we don't exceed their default limit for a hasMore true (the default is 10)
                 .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
                         FacetEntryMatcher.authorFacet(false),
+                        FacetEntryMatcher.entityTypeFacet(false),
                         FacetEntryMatcher.subjectFacet(false),
                         FacetEntryMatcher.dateIssuedFacet(false),
                         FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
@@ -1954,6 +1971,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 // property because we don't exceed their default limit for a hasMore true (the default is 10)
                 .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
                         FacetEntryMatcher.authorFacet(false),
+                        FacetEntryMatcher.entityTypeFacet(false),
                         FacetEntryMatcher.subjectFacet(false),
                         FacetEntryMatcher.dateIssuedFacet(false),
                         FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
@@ -2036,6 +2054,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 // property because we don't exceed their default limit for a hasMore true (the default is 10)
                 .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
                         FacetEntryMatcher.authorFacet(false),
+                        FacetEntryMatcher.entityTypeFacet(false),
                         FacetEntryMatcher.subjectFacet(false),
                         FacetEntryMatcher.dateIssuedFacet(false),
                         FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
@@ -2110,6 +2129,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 // property because we don't exceed their default limit for a hasMore true (the default is 10)
                 .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
                         FacetEntryMatcher.authorFacet(false),
+                        FacetEntryMatcher.entityTypeFacet(false),
                         FacetEntryMatcher.subjectFacet(false),
                         FacetEntryMatcher.dateIssuedFacet(false),
                         FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
@@ -2250,6 +2270,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 // because we don't exceed their default limit for a hasMore true (the default is 10)
                 .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
                         FacetEntryMatcher.authorFacet(false),
+                        FacetEntryMatcher.entityTypeFacet(false),
                         FacetEntryMatcher.subjectFacet(false),
                         FacetEntryMatcher.dateIssuedFacet(false),
                         FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
@@ -2321,6 +2342,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 // because we don't exceed their default limit for a hasMore true (the default is 10)
                 .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
                         FacetEntryMatcher.authorFacet(false),
+                        FacetEntryMatcher.entityTypeFacet(false),
                         FacetEntryMatcher.subjectFacet(false),
                         FacetEntryMatcher.dateIssuedFacet(false),
                         FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
@@ -2403,6 +2425,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 )))
                 .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
                         FacetEntryMatcher.authorFacetWithMinMax(true, "Doe, Jane", "Testing, Works"),
+                        FacetEntryMatcher.entityTypeFacet(false),
                         FacetEntryMatcher.subjectFacet(true),
                         FacetEntryMatcher.dateIssuedFacetWithMinMax(false, "1990-02-13", "2010-10-17"),
                         FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
@@ -2469,6 +2492,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .andExpect(jsonPath("$.type", is("discover")))
                 .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
                         FacetEntryMatcher.authorFacetWithMinMax(true, "Doe, Jane", "Testing, Works"),
+                        FacetEntryMatcher.entityTypeFacet(false),
                         FacetEntryMatcher.subjectFacet(true),
                         FacetEntryMatcher.dateIssuedFacetWithMinMax(false, "1990-02-13", "2010-10-17"),
                         FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
@@ -2540,6 +2564,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 // because we don't exceed their default limit for a hasMore true (the default is 10)
                 .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
                         FacetEntryMatcher.authorFacet(false),
+                        FacetEntryMatcher.entityTypeFacet(false),
                         FacetEntryMatcher.subjectFacet(false),
                         FacetEntryMatcher.dateIssuedFacet(false),
                         FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
@@ -2612,6 +2637,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 // because we don't exceed their default limit for a hasMore true (the default is 10)
                 .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
                         FacetEntryMatcher.authorFacet(false),
+                        FacetEntryMatcher.entityTypeFacet(false),
                         FacetEntryMatcher.subjectFacet(false),
                         FacetEntryMatcher.dateIssuedFacet(false),
                         FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
@@ -2683,6 +2709,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 // because we don't exceed their default limit for a hasMore true (the default is 10)
                 .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
                         FacetEntryMatcher.authorFacet(false),
+                        FacetEntryMatcher.entityTypeFacet(false),
                         FacetEntryMatcher.subjectFacet(false),
                         FacetEntryMatcher.dateIssuedFacet(false),
                         FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
@@ -2974,7 +3001,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
     /**
      * This test is intent to verify that inprogress submission (workspaceitem, workflowitem, pool task and claimed
      * tasks) don't interfers with the standard search
-     * 
+     *
      * @throws Exception
      */
     public void discoverSearchObjectsWithInProgressSubmissionTest() throws Exception {
@@ -3091,7 +3118,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                             FacetEntryMatcher.authorFacet(false),
                             FacetEntryMatcher.subjectFacet(false),
                             FacetEntryMatcher.dateIssuedFacet(false),
-                            FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
+                            FacetEntryMatcher.hasContentInOriginalBundleFacet(false),
+                            FacetEntryMatcher.entityTypeFacet(false)
                     )))
                     //There always needs to be a self link
                     .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
@@ -3102,7 +3130,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
     @Test
     /**
      * This test is intent to verify that workspaceitem are only visible to the submitter
-     * 
+     *
      * @throws Exception
      */
     public void discoverSearchObjectsWorkspaceConfigurationTest() throws Exception {
@@ -3301,7 +3329,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
     @Test
     /**
      * This test is intent to verify that tasks are only visible to the appropriate users (reviewers)
-     * 
+     *
      * @throws Exception
      */
     public void discoverSearchObjectsWorkflowConfigurationTest() throws Exception {
