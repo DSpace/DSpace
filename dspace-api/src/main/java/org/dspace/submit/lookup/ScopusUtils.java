@@ -118,7 +118,7 @@ public class ScopusUtils
         String pmid = XMLUtils.getElementValue(article,
                 "pubmed-id");
         if (pmid != null){
-            record.addValue("pmid", new StringValue(volume));
+            record.addValue("pmid", new StringValue(pmid));
         }
         String pubID = XMLUtils.getElementValue(article,
                 "pii");
