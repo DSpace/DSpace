@@ -699,6 +699,13 @@
             <artifactId>json</artifactId>
             <version>20180130</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.xmlunit</groupId>
+            <artifactId>xmlunit-core</artifactId>
+            <version>2.6.1</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
 </project>
