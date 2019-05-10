@@ -241,6 +241,9 @@ public class Package {
             jGen.writeStringField("abstract", dataPackage.getAbstract());
             jGen.writeObjectField("authors", dataPackage.getAuthorList());
 
+            //WORKING date
+            //jGen.writeStringField("date-available", dataPackage.getDateAccessioned());
+            
             if(ddp.getItem().isArchived()) {
                 ShoppingCart sc = ddp.getShoppingCart();
                 if(sc == null) {
