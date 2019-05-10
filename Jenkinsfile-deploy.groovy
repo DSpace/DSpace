@@ -119,7 +119,7 @@ pipeline {
                 sh "scp -r deployscripts/${INSTALLER_SCRIPT} ${TARGET_HOST}:${TARGET_FOLDER}/"
 
                 echo "Executing ${TARGET_FOLDER}/installer.sh on ${TARGET_HOST}"
-                sh "ssh ${TARGET_HOST} 'source ~/.profile; sh ${TARGET_FOLDER}/${INSTALLER_SCRIPT};'"
+                sh "ssh ${TARGET_HOST} 'source ~/.profile; sh ${TARGET_FOLDER}/${INSTALLER_SCRIPT} unit;'"
             }
         }
 
