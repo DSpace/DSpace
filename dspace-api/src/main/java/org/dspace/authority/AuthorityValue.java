@@ -59,6 +59,11 @@ public class AuthorityValue {
      * represents the last time that DSpace got updated information from its external source
      */
     private Date lastModified;
+    
+    
+    private String serviceId;
+    
+    private Map<String, List<String>> otherMetadata = new HashMap<String, List<String>>();
 
     public AuthorityValue() {
     }
@@ -296,4 +301,29 @@ public class AuthorityValue {
 
         return true;
     }
+    
+    
+    public Map<String, List<String>> getOtherMetadata() {
+        if(otherMetadata==null) {
+            otherMetadata = new HashMap<String, List<String>>();
+        }
+        return otherMetadata;
+    }
+
+    public void addOtherMetadata(String label, String data) {
+        List<String> strings = otherMetadata.get(label);
+        if (strings == null) {
+            strings = new ArrayList<String>();
+        }
+        strings.add(data);
+        otherMetadata.put(label, strings);
+    }
+
+	public String getServiceId() {
+		return serviceId;
+	}
+
+	public void setServiceId(String serviceId) {
+		this.serviceId = serviceId;
+	}
 }
