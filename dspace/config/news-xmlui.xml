@@ -2,8 +2,8 @@
 <document xmlns="http://di.tamu.edu/DRI/1.0/" xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 <body>
 <div id="file.news.div.news" n="news" rend="primary">
-<head>DSpace Repository</head>
-<h2>Hi CLDAWS 230!!!</h2>
+<head>Hi CLDAWS 230!!!</head>
+************************************ Hi CLDAWS 230!!!*********************************************
 </div>
 </body>
 <options/>
