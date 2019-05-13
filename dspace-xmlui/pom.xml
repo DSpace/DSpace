@@ -257,6 +257,12 @@
             <scope>provided</scope>
         </dependency>
 
+        <dependency>
+            <groupId>no.bibsys</groupId>
+            <artifactId>feidelib-jar</artifactId>
+            <version>1.0.28</version>
+        </dependency>
+
     </dependencies>
 
 </project>
