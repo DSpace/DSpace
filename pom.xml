@@ -40,7 +40,7 @@
         <!-- PIN Solr to 7.3.x until SOLR-12858 is fixed. This bug affects all integration tests that use Solr
              https://issues.apache.org/jira/browse/SOLR-12858 -->
         <solr.client.version>7.3.1</solr.client.version>
-        <spring.version>4.3.6.RELEASE</spring.version>
+        <spring.version>4.3.24.RELEASE</spring.version>
         <spring-boot.version>1.4.4.RELEASE</spring-boot.version>
         <!-- 'root.basedir' is the path to the root [dspace-src] dir. It must be redefined by each child POM,
              as it is used to reference the LICENSE_HEADER and *.properties file(s) in that directory. -->
