@@ -94,6 +94,10 @@ public class PDFFilter extends MediaFilter {
 
             try {
                 pdfDoc = PDDocument.load(source);
+                if (pdfDoc.isEncrypted()) {
+                    log.error("PDF is encrypted. Cannot extract text (item: " + currentItem.getHandle() + ")");
+                    return null;
+                }
                 pts.writeText(pdfDoc, writer);
             } finally {
                 try {

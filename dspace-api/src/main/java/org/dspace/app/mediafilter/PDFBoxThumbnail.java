@@ -11,6 +11,7 @@ import java.awt.image.BufferedImage;
 import java.io.InputStream;
 import javax.imageio.ImageIO;
 
+import org.apache.logging.log4j.Logger;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.PDFRenderer;
 import org.dspace.content.Item;
@@ -26,6 +27,8 @@ import org.dspace.content.Item;
  * @author Jason Sherman jsherman@usao.edu
  */
 public class PDFBoxThumbnail extends MediaFilter implements SelfRegisterInputFormats {
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(PDFBoxThumbnail.class);
+
     @Override
     public String getFilteredName(String oldFilename) {
         return oldFilename + ".jpg";
@@ -66,6 +69,10 @@ public class PDFBoxThumbnail extends MediaFilter implements SelfRegisterInputFor
     public InputStream getDestinationStream(Item currentItem, InputStream source, boolean verbose)
         throws Exception {
         PDDocument doc = PDDocument.load(source);
+        if (doc.isEncrypted()) {
+            log.error("PDF is encrypted. Cannot create thumbnail (item: " + currentItem.getHandle() + ")");
+            return null;
+        }
         PDFRenderer renderer = new PDFRenderer(doc);
         BufferedImage buf = renderer.renderImage(0);
 //        ImageIO.write(buf, "PNG", new File("custom-render.png"));
