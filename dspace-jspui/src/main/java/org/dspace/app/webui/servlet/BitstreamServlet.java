@@ -7,6 +7,8 @@
  */
 package org.dspace.app.webui.servlet;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
@@ -16,7 +18,9 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.apache.pdfbox.exceptions.COSVisitorException;
 import org.dspace.app.util.IViewer;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
@@ -24,6 +28,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
+import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
@@ -32,6 +37,8 @@ import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.core.PluginManager;
 import org.dspace.core.Utils;
+import org.dspace.disseminate.CitationDocument;
+import org.dspace.disseminate.CoverPageService;
 import org.dspace.handle.HandleManager;
 import org.dspace.plugin.BitstreamHomeProcessor;
 import org.dspace.usage.UsageEvent;
@@ -222,15 +229,41 @@ public class BitstreamServlet extends DSpaceServlet
         
         preProcessBitstreamHome(context, request, response, bitstream);
         
-        // Pipe the bits
-        InputStream is = bitstream.retrieve();
-     
+    	InputStream is =null;
+    	
+    	CoverPageService coverService = new DSpace().getSingletonService(CoverPageService.class);
+    	Collection owningColl = item.getOwningCollection();
+    	String collHandle="";
+    	if(owningColl != null) {
+    		collHandle= owningColl.getHandle();
+    	}
+    	String configFile =coverService.getConfigFile(collHandle);
+        if(StringUtils.isNotBlank(configFile) && coverService.isValidType(bitstream)){
+        	// Pipe the bits
+        	
+        	try {
+        		CitationDocument citationDocument = new CitationDocument(configFile);
+				File citedDoc = citationDocument.makeCitedDocument(context,bitstream,configFile);
+				is = new FileInputStream(citedDoc);
+		        response.setHeader("Content-Length", String
+		                .valueOf(citedDoc.length()));
+
+			} catch (COSVisitorException e) {
+				is =  bitstream.retrieve();
+		        response.setHeader("Content-Length", String
+		                .valueOf(bitstream.getSize()));
+
+				log.error(e.getMessage(), e);
+			}
+        }else{
+        	 is = bitstream.retrieve();
+             response.setHeader("Content-Length", String
+                     .valueOf(bitstream.getSize()));
+
+        }
 		// Set the response MIME type
         response.setContentType(bitstream.getFormat().getMIMEType());
 
-        // Response length
-        response.setHeader("Content-Length", String
-                .valueOf(bitstream.getSize()));
 
 		if(threshold != -1 && bitstream.getSize() >= threshold)
 		{
