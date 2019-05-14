@@ -62,7 +62,7 @@ import org.datadryad.api.DryadJournalConcept;
  * @author Ryan Scherle
  */
 @Suspendable
-public class DataPackageStats extends AbstractCurationTask {
+public class DashMigrationList extends AbstractCurationTask {
 
     private static Logger log = Logger.getLogger(DataPackageStats.class);
     private IdentifierService identifierService = null;
@@ -142,7 +142,7 @@ public class DataPackageStats extends AbstractCurationTask {
 
 
                 // skip if it's already migrated to Dash
-                DCValue[] vals = item.getMetadata("dryad.dashTransferDate");
+                vals = item.getMetadata("dryad.dashTransferDate");
 		if (vals.length > 0) {
 		    log.info("Skipping -- this item has already been transferred to DASH " + handle);
                     context.abort();
@@ -164,7 +164,6 @@ public class DataPackageStats extends AbstractCurationTask {
 		    context.abort();
 		    return Curator.CURATE_SKIP;
 		} else {
-		    numberOfFiles = "" + dataFiles.length;
 		    packageSize = 0;
 		    
 		    // for each data file in the package
