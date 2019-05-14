@@ -6,15 +6,15 @@ pipeline {
     }
 
 
-//    parameters {
-//        choice(name: 'Destination', choices: ['brage-utvikle.bibsys.no', 'brage-test.bibsys.no']
-//                , description: 'Where do you want to deploy to?')
-//    }
+    parameters {
+        choice(name: 'Destination', choices: ['brage-utvikle.bibsys.no', 'brage-test.bibsys.no']
+                , description: 'Where do you want to deploy to?')
+    }
 
     environment {
         VERSION = "${env.BRANCH_NAME}".replaceAll('/', '_').toLowerCase()
-        // TARGET_HOST = "${params.Destination}"
-        TARGET_HOST = "brage-utvikle.bibsys.no"
+         TARGET_HOST = "${params.Destination}"
+//        TARGET_HOST = "brage-utvikle.bibsys.no"
         ENV_FOLDER = "brage6_environment"
         //The rest of the parameters is imported from env.properties"
     }
