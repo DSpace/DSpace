@@ -68,7 +68,13 @@
             <transport-guarantee>CONFIDENTIAL</transport-guarantee>
         </user-data-constraint>
     </security-constraint>
-    
+
+    <!-- Feide lib config -->
+    <context-param>
+        <param-name>feide.configuration</param-name>
+        <param-value>${dspace.dir}/config</param-value>
+    </context-param>
+
     <!-- ConfigurationService initialization for dspace.dir -->
     <context-param>
         <description>
