@@ -1,0 +1,17 @@
+- name: Copy VirtualHost configuration file
+  template:
+    src: virtualhost.conf.j2
+    dest: /etc/httpd/conf/vhosts/active/brage/{{ kunde }}.conf
+
+- name: Publish SAML metadata
+  template:
+    src: feide-metadata.j2.xml
+    dest: /home/httpd/domains/brage.unit.no/saml-metadata/{{ kunde }}.xml
+
+- name: Notify Slack
+  slack:
+    channel: "{{ SlackConfig.channel }}"
+    icon_emoji: "{{ SlackConfig.icon }}"
+    msg: "`[{{kunde}}]` Webserver {{inventory_hostname_short|upper}} konfigurert."
+    token: "{{ SlackConfig.token }}"
+    username: "{{ SlackConfig.sender }}"

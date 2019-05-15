@@ -1,0 +1,11 @@
+databaseServerName = {{ HandleServerConfig[fase]["hostname"] }}
+databaseName = handle
+user = handle
+password = handle
+portNumber = 5432
+handle_prefix = {{ HandleServerConfig[fase]["prefix"] }}
+handlePrefix = {{ HandleServerConfig[fase]["prefix"] }}
+use_agora=false
+maxConnections = 40
+# Definert for testformål, vår lokale LHS (Local Handle Server)
+HANDLESERVICE_LOCAL_RESOLVER = http://{{ HandleServerConfig[fase]["hostname"] }}:8000/

@@ -1,0 +1,32 @@
+dspace.dir = /brage/{{ kunde }}/app
+dspace.hostname = {{ kundedata[kunde]["virtualhost"] | default(bragevirtualhost) }}
+dspace.baseUrl = {{ (fase == "produksjon") | ternary("https:","http:") }}//${dspace.hostname}{{ (fase == "produksjon") | ternary("",":8080") }}
+dspace.ui = {{ kunde }}-xmlui
+dspace.url = ${dspace.baseUrl}/${dspace.ui}
+dspace.name = {{ kundedata[kunde]["arkivnavn"] | default('Brage') }}
+
+assetstore.dir = /brage/{{ kunde }}/data
+
+solr.server = http://localhost:9080/{{ kunde }}-solr
+
+db.url = jdbc:postgresql://{{ DatabaseHost[fase] }}:5432/brage-{{ kunde }}
+
+mail.server = mailhub.bibsys.no
+mail.from.address = noreply@unit.no
+mail.feedback.recipient = support@bibsys.no
+mail.admin = support@bibsys.no
+
+# CNRI Handle prefix
+handle.prefix = {{ HandleServerConfig[fase]["prefix"] }}
+handle.canonical.prefix = https://hdl.handle.net/
+
+# BIBSYS agora-handle configuration
+handleservice.configuration = ${dspace.dir}/config/handleservice.properties
+
+###########################
+#        BUILD INFO       #
+###########################
+jenkins.url = {{ lookup('env', "JENKINS_URL") }}
+jenkins.tag = {{ lookup('env', "BUILD_TAG") }}
+git.branch = {{ lookup('env', "GIT_BRANCH") }}
+git.commit = {{ lookup('env', "GIT_COMMIT") }}

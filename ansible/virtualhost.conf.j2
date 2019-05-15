@@ -1,0 +1,11 @@
+<VirtualHost *:80>
+ServerName {{ kundedata[kunde]["virtualhost"] | default(bragevirtualhost) }}
+ServerAdmin webmaster@unit.no
+DocumentRoot /home/httpd/domains/brage.unit.no
+ErrorLog logs/{{ appserver }}_error_log
+CustomLog logs/{{ appserver }}_access_log combined
+RedirectMatch ^/$ https://{{ kundedata[kunde]["virtualhost"] | default(bragevirtualhost) }}/{{ kunde }}-xmlui/
+RedirectMatch ^/{{ kunde }}-xmlui$ https://{{ kundedata[kunde]["virtualhost"] | default(bragevirtualhost) }}/{{ kunde }}-xmlui/
+JkMount /{{ kunde }}-oai/* {{ appserver }}
+JkMount /{{ kunde }}-xmlui/* {{ appserver }}
+</VirtualHost>

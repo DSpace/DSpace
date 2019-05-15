@@ -1,0 +1,114 @@
+- name: Notify Slack
+  slack:
+    channel: "{{ SlackConfig.channel }}"
+    icon_emoji: "{{ SlackConfig.icon }}"
+    msg: "`[{{kunde}}]` Bygging ferdig. Starter deployment."
+    token: "{{ SlackConfig.token }}"
+    username: "{{ SlackConfig.sender }}"
+  when: fase == "produksjon"
+
+- name: Create target paths
+  file:
+    mode: "755"
+    path: "{{item}}"
+    state: directory
+  with_items:
+    - /brage/{{ kunde }}
+    - /brage/{{ kunde }}/app
+    - /brage/{{ kunde }}/data
+    - /brage/{{ kunde }}/install
+    - /brage/{{ kunde }}/tmp
+
+- name: Deploy DSpace Installer
+  synchronize:
+    delete: yes
+    dest: /brage/{{ kunde }}/install/dspace-installer/
+    src: "{{ jenkins_workspace }}/dspace/target/dspace-installer/"
+
+#- name: Customize theme for customer
+#  shell: "sed 's#../images/logo.png#../../{{kundedata[kunde]['bibkode']}}/images/logo.png#g' < /brage/{{ kunde }}/install/dspace-installer/webapps/xmlui/WEB-INF/classes/bibsys-themes/{{ kundedata[kunde]['bibkode'] }}/style.css >> /brage/{{ kunde }}/install/dspace-installer/webapps/xmlui/themes/brage/styles/main.css"
+
+#- name: Check custom favicon
+#  stat:
+#    path: /brage/{{ kunde }}/install/dspace-installer/webapps/xmlui/WEB-INF/classes/bibsys-themes/{{ kundedata[kunde]["bibkode"] }}/overlay/images/favicon.ico
+#  register: favicon
+
+#- name: Custom favicon for customer
+#  copy:
+#    src: /brage/{{ kunde }}/install/dspace-installer/webapps/xmlui/WEB-INF/classes/bibsys-themes/{{ kundedata[kunde]["bibkode"] }}/overlay/images/favicon.ico
+#    dest: /brage/{{ kunde }}/install/dspace-installer/webapps/xmlui/themes/brage/images/favicon.ico
+#    remote_src: true
+#  when: favicon.stat.exists
+
+- name: Make sure brage-{{ kunde }} database is present
+  postgresql_db:
+    lc_collate: nb_NO.utf8
+    lc_ctype: nb_NO.utf8
+    login_host: "{{ DatabaseHost[fase] }}"
+    login_user: dspace
+    login_password: dspace
+    name: brage-{{ kunde }}
+    template: template0
+  when: fase == "produksjon"
+    
+- name: Notify Slack
+  slack:
+    channel: "{{ SlackConfig.channel }}"
+    icon_emoji: "{{ SlackConfig.icon }}"
+    msg: "`[{{kunde}}]` Deployment ferdig. Starter installasjon."
+    token: "{{ SlackConfig.token }}"
+    username: "{{ SlackConfig.sender }}"
+  when: fase == "produksjon"
+
+- name: Install application
+  shell: "ant -buildfile /brage/{{ kunde }}/install/dspace-installer/build.xml fresh_install"
+
+- name: Update configs
+  shell: "ant -buildfile /brage/{{ kunde }}/install/dspace-installer/build.xml update_configs"
+
+- name: Undeploy Apps
+  shell: "curl -s -n 'http://localhost:8080/manager/text/undeploy?path=/{{kunde}}-{{item}}'"
+  with_items:
+    - xmlui
+    - oai
+
+- name: Undeploy SOLR
+  shell: "curl -s -n 'http://localhost:9080/manager/text/undeploy?path=/{{kunde}}-solr'"
+
+- name: Deploy SOLR
+  synchronize:
+    delete: yes
+    dest: /srv/tomcat-solr/webapps/{{ kunde }}-solr/
+    src: /brage/{{ kunde }}/app/webapps/solr/
+  delegate_to: "{{inventory_hostname}}"
+  
+- name: Deploy Apps
+  synchronize:
+    delete: yes
+    dest: /srv/tomcat-xmlui-oai/webapps/{{ kunde }}-{{item}}/
+    src: /brage/{{ kunde }}/app/webapps/{{item}}/
+  delegate_to: "{{inventory_hostname}}"
+  with_items:
+    - oai
+    - xmlui
+  
+- name: Deploy FEIDE authentication properties
+  copy:
+    dest: /brage/{{ kunde }}/app/config/feide.properties
+    content: |
+      SP_ENTITY_ID={{ FeideEntityID }}
+      IDP_BASEPATH=https://{{ FeideConfig[fase]["IDP"] }}
+
+- name: Deploy handle server properties
+  template:
+    dest: /brage/{{ kunde }}/app/config/handleserver.properties
+    src: handleserver.properties.j2
+
+- name: Notify Slack
+  slack:
+    channel: "{{ SlackConfig.channel }}"
+    icon_emoji: "{{ SlackConfig.icon }}"
+    msg: "`[{{kunde}}]` Installasjon utført. Konfigurerer webserver."
+    token: "{{ SlackConfig.token }}"
+    username: "{{ SlackConfig.sender }}"
+  when: fase == "produksjon"
