@@ -31,6 +31,7 @@ import org.dspace.app.cris.dao.ResearcherPageDao;
 import org.dspace.app.cris.dao.StatSubscriptionDao;
 import org.dspace.app.cris.dao.UserWSDao;
 import org.dspace.app.cris.model.ACrisObject;
+import org.dspace.app.cris.model.CrisConstants;
 import org.dspace.app.cris.model.CrisSubscription;
 import org.dspace.app.cris.model.OrganizationUnit;
 import org.dspace.app.cris.model.Project;
@@ -667,6 +668,27 @@ public class ApplicationService extends ExtendedTabService
             }
         }
         return dso;
+    }
+
+    public <T extends ACrisObject> T getEntityById(int id, int type)
+    {
+        T crisObject = null;
+        switch (type)
+        {
+        case CrisConstants.RP_TYPE_ID:
+            crisObject = (T)get(ResearcherPage.class, id);
+            break;
+        case CrisConstants.PROJECT_TYPE_ID:
+            crisObject = (T)get(Project.class, id);
+            break;
+        case CrisConstants.OU_TYPE_ID:
+            crisObject = (T)get(OrganizationUnit.class, id);
+            break;
+        default:
+            crisObject = (T)get(ResearchObject.class, id);
+            break;
+        }
+        return crisObject;
     }
     
     public <T extends ACrisObject> T getEntityBySourceId(String sourceRef, String sourceID,

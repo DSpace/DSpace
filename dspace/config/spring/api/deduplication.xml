@@ -22,6 +22,42 @@
 		<property name="resourceTypeID" value="2" />
 	</bean>
  	
+	<bean class="org.dspace.app.cris.deduplication.utils.MD5ValueSignature" name="RPOrcidSignature">
+		<property name="signatureType" value="identifier" />
+		<property name="metadata" value="orcid" />
+		<property name="resourceTypeID" value="9" />
+	</bean>
+
+	<bean class="org.dspace.app.cris.deduplication.utils.MD5ValueSignature" name="RPFullNameSignature">
+		<property name="signatureType" value="fullName" />
+		<property name="metadata" value="fullName" />
+		<property name="resourceTypeID" value="9" />
+	</bean>
+
+	<bean class="org.dspace.app.cris.deduplication.utils.MD5ValueSignature" name="RPVariantsSignature">
+		<property name="signatureType" value="fullName" />
+		<property name="metadata" value="variants" />
+		<property name="resourceTypeID" value="9" />
+	</bean>
+
+	<bean class="org.dspace.app.cris.deduplication.utils.MD5ValueSignature" name="RPEmailSignature">
+		<property name="signatureType" value="email" />
+		<property name="metadata" value="email" />
+		<property name="resourceTypeID" value="9" />
+	</bean>
+
+	<bean class="org.dspace.app.cris.deduplication.utils.MD5ValueSignature" name="PJNameSignature">
+		<property name="signatureType" value="name" />
+		<property name="metadata" value="name" />
+		<property name="resourceTypeID" value="10" />
+	</bean>
+
+	<bean class="org.dspace.app.cris.deduplication.utils.MD5ValueSignature" name="OUNameSignature">
+		<property name="signatureType" value="name" />
+		<property name="metadata" value="name" />
+		<property name="resourceTypeID" value="11" />
+	</bean>
+
  	<bean class="org.dspace.app.cris.deduplication.utils.MD5ValueSignature" name="ArXivSignature">
  		<property name="signatureType" value="identifier" />
 		<property name="metadata" value="dc.identifier.arxiv" />
@@ -119,7 +155,33 @@
 		</property>
 		<property name="field" value="dc.identifier_s"/>
 	</bean>
-	
+
+	<bean class="org.dspace.app.cris.deduplication.service.SearchDeduplication" name="CRISRPSearchDeduplication">
+		<property name="solrIndexPlugin">
+			<list>
+				<ref bean="CrisObjectInactiveDedupServiceIndexPlugin"/>
+			</list>
+		</property>
+	</bean>
+
+	<bean class="org.dspace.app.cris.deduplication.service.SearchDeduplication" name="CRISPJSearchDeduplication">
+		<property name="solrIndexPlugin">
+			<list>
+				<ref bean="CrisObjectInactiveDedupServiceIndexPlugin"/>
+			</list>
+		</property>
+	</bean>
+
+	<bean class="org.dspace.app.cris.deduplication.service.SearchDeduplication" name="CRISOUSearchDeduplication">
+		<property name="solrIndexPlugin">
+			<list>
+				<ref bean="CrisObjectInactiveDedupServiceIndexPlugin"/>
+			</list>
+		</property>
+	</bean>
+
+	<bean class="org.dspace.app.cris.deduplication.service.impl.CrisObjectInactiveDedupServiceIndexPlugin" id="CrisObjectInactiveDedupServiceIndexPlugin"/>
+
 		<bean class="org.dspace.app.cris.configuration.ViewResolver" name="itemViewResolver">
 		<property name="metadata">
 			<list>
@@ -146,5 +208,54 @@
 	</bean>
 	
 	<bean class="org.dspace.app.cris.configuration.SimpleItemViewResolver" id="itemViewResolverDefaultPlugin"/>
+
+	<bean class="org.dspace.app.cris.configuration.ViewResolver" name="crisrpViewResolver">
+		<property name="metadata">
+			<list>
+				<value>dept</value>
+				<value>email</value>
+				<value>fullName</value>
+				<value>preferredName</value>
+				<value>scopusid</value>
+				<value>translatedName</value>
+				<value>variants</value>
+			</list>
+		</property>
+		<property name="plugins">
+			<list>
+				<ref bean="crisrpViewResolverDefaultPlugin"/>
+			</list>
+		</property>
+	</bean>
+
+	<bean class="org.dspace.app.cris.configuration.CrisRPViewResolver" id="crisrpViewResolverDefaultPlugin"/>
+
+	<bean class="org.dspace.app.cris.configuration.ViewResolver" name="crispjViewResolver">
+		<property name="metadata">
+			<list>
+				<value>awardURL</value>
+				<value>funder</value>
+				<value>fundingProgram</value>
+				<value>organization</value>
+				<value>principalinvestigator</value>
+				<value>projectURL</value>
+				<value>startdate</value>
+				<value>status</value>
+				<value>title</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean class="org.dspace.app.cris.configuration.ViewResolver" name="crisouViewResolver">
+		<property name="metadata">
+			<list>
+				<value>city</value>
+				<value>date</value>
+				<value>description</value>
+				<value>director</value>
+				<value>name</value>
+			</list>
+		</property>
+	</bean>
 	
 </beans>
