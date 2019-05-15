@@ -13,7 +13,6 @@ import org.dspace.app.cris.deduplication.service.SolrDedupServiceIndexPlugin;
 import org.dspace.app.cris.model.CrisConstants;
 import org.dspace.app.cris.service.ApplicationService;
 import org.dspace.core.Context;
-import org.dspace.utils.DSpace;
 
 public class CrisObjectInactiveDedupServiceIndexPlugin
         implements SolrDedupServiceIndexPlugin
@@ -22,29 +21,36 @@ public class CrisObjectInactiveDedupServiceIndexPlugin
     private static final Logger log = Logger
             .getLogger(CrisObjectInactiveDedupServiceIndexPlugin.class);
 
+    private ApplicationService applicationService;
+        
     @Override
     public void additionalIndex(Context context, Integer firstId,
             Integer secondId, Integer type, SolrInputDocument document)
     {
         if (type >= CrisConstants.CRIS_TYPE_ID_START)
         {
-            internal(context, firstId, type, document);
-            if (firstId != secondId)
+            boolean isWithdrawn = internal(context, firstId, type, document);
+            if (!isWithdrawn && (firstId != secondId))
             {
                 internal(context, secondId, type, document);
             }
         }
     }
 
-    private void internal(Context context, Integer id, Integer type,
+    private boolean internal(Context context, Integer id, Integer type,
             SolrInputDocument document)
     {
-        ApplicationService applicationService = new DSpace().getServiceManager()
-                .getServiceByName("applicationService", ApplicationService.class);
         if (!applicationService.getEntityById(id, type).getStatus())
         {
             document.addField(SolrDedupServiceImpl.RESOURCE_WITHDRAWN_FIELD, true);
+            return true;
         }
+        return false;
+    }
+
+    public void setApplicationService(ApplicationService applicationService)
+    {
+        this.applicationService = applicationService;
     }
 
 }

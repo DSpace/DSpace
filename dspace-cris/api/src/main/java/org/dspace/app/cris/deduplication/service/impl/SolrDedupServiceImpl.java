@@ -421,7 +421,8 @@ public class SolrDedupServiceImpl implements DedupService
         
         String dedupID = sortedIds[0] + "-" + sortedIds[1];
 
-        doc.addField(UNIQUE_ID_FIELD, type + "-" + dedupID + "-" + flag.getDescription());
+        String uniqueId = type + "-" + dedupID + "-" + flag.getDescription();
+        doc.addField(UNIQUE_ID_FIELD, uniqueId);
         doc.addField(RESOURCE_ID_FIELD, dedupID);
         doc.addField(RESOURCE_IDS_FIELD, sortedIds[0]);
         if (!firstId.equals(secondId))
@@ -461,17 +462,17 @@ public class SolrDedupServiceImpl implements DedupService
         try
         {
             writeDocument(doc);
-            log.info("Wrote " + flag.description + " duplicate: " + dedupID + " to Index");
+            log.info("Wrote " + flag.description + " duplicate: " + uniqueId + " to Index");
         }
         catch (RuntimeException e)
         {
             log.error("Error while writing a " + flag.description + " to deduplication index: "
-                    + dedupID + " message:" + e.getMessage(), e);
+                    + uniqueId + " message:" + e.getMessage(), e);
         }
         catch (IOException e)
         {
             log.error("Error while writing a " + flag.description + " to deduplication index: "
-                    + dedupID + " message:" + e.getMessage(), e);
+                    + uniqueId + " message:" + e.getMessage(), e);
         }
     }
 

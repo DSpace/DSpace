@@ -180,7 +180,9 @@
 		</property>
 	</bean>
 
-	<bean class="org.dspace.app.cris.deduplication.service.impl.CrisObjectInactiveDedupServiceIndexPlugin" id="CrisObjectInactiveDedupServiceIndexPlugin"/>
+	<bean class="org.dspace.app.cris.deduplication.service.impl.CrisObjectInactiveDedupServiceIndexPlugin" id="CrisObjectInactiveDedupServiceIndexPlugin">
+		<property name="applicationService" ref="applicationService" />
+	</bean>
 
 		<bean class="org.dspace.app.cris.configuration.ViewResolver" name="itemViewResolver">
 		<property name="metadata">

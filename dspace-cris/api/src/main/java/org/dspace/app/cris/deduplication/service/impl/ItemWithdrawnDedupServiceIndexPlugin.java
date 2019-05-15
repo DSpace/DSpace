@@ -31,15 +31,15 @@ public class ItemWithdrawnDedupServiceIndexPlugin
 
         if (type == Constants.ITEM)
         {
-            internal(context, firstId, document);
-            if(firstId!=secondId) {
+            boolean isWithdrawn = internal(context, firstId, document);
+            if(!isWithdrawn && (firstId != secondId)) {
                 internal(context, secondId, document);
             }
         }
 
     }
 
-    private void internal(Context context, Integer itemId,
+    private boolean internal(Context context, Integer itemId,
             SolrInputDocument document)
     {
         try
@@ -50,12 +50,14 @@ public class ItemWithdrawnDedupServiceIndexPlugin
             if (status == 3)
             {
                 document.addField(SolrDedupServiceImpl.RESOURCE_WITHDRAWN_FIELD, true);
+                return true;
             }
         }
         catch (SQLException e)
         {
             log.error(e.getMessage(), e);
         }
+        return false;
     }
 
 }
