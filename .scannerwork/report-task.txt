@@ -1,5 +1,0 @@
-projectKey=DSpace
-serverUrl=http://localhost:9000
-dashboardUrl=http://localhost:9000/dashboard/index/DSpace
-ceTaskId=AWq5RT9Wh69oHI8afZrJ
-ceTaskUrl=http://localhost:9000/api/ce/task?id=AWq5RT9Wh69oHI8afZrJ
