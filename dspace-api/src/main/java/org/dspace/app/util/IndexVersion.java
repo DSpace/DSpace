@@ -252,10 +252,6 @@ public class IndexVersion {
             return GREATER_THAN;
         } else if (firstMinor < secondMinor) {
             return LESS_THAN;
-        } else {
-            // This is an impossible scenario.
-            // This 'else' should never be triggered since we've checked for equality above already
-            return EQUAL;
         }
     }
 
