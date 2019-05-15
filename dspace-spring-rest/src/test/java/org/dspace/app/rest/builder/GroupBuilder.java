@@ -32,7 +32,8 @@ public class GroupBuilder extends AbstractDSpaceObjectBuilder<Group> {
 
     }
 
-    protected void cleanup() throws Exception {
+    @Override
+    public void cleanup() throws Exception {
         delete(group);
     }
 
@@ -102,16 +103,6 @@ public class GroupBuilder extends AbstractDSpaceObjectBuilder<Group> {
             }
             c.complete();
         }
-    }
-
-    /**
-     * Set a lower custom priority for the Group. It could be referenced in several places. It needs to go first than
-     * EPersonBuilder
-     * 
-     */
-    @Override
-    protected int getPriority() {
-        return 80;
     }
 
 }

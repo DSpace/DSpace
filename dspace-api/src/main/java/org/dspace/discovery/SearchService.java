@@ -7,11 +7,9 @@
  */
 package org.dspace.discovery;
 
-import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.discovery.configuration.DiscoveryMoreLikeThisConfiguration;
@@ -50,7 +48,7 @@ public interface SearchService {
      * @return discovery search result object
      * @throws SearchServiceException if search error
      */
-    DiscoverResult search(Context context, DSpaceObject dso, DiscoverQuery query)
+    DiscoverResult search(Context context, IndexableObject dso, DiscoverQuery query)
         throws SearchServiceException;
 
     /**
@@ -74,19 +72,11 @@ public interface SearchService {
      * @return discovery search result object
      * @throws SearchServiceException if search error
      */
-    DiscoverResult search(Context context, DSpaceObject dso, DiscoverQuery query, boolean includeWithdrawn)
+    DiscoverResult search(Context context, IndexableObject dso, DiscoverQuery query, boolean includeWithdrawn)
         throws SearchServiceException;
 
-
-    InputStream searchJSON(Context context, DiscoverQuery query, String jsonIdentifier) throws SearchServiceException;
-
-    InputStream searchJSON(Context context, DiscoverQuery query, DSpaceObject dso, String jsonIdentifier)
-        throws SearchServiceException;
-
-
-    List<DSpaceObject> search(Context context, String query, String orderfield, boolean ascending, int offset, int max,
-                              String... filterquery);
-
+    List<IndexableObject> search(Context context, String query, String orderfield, boolean ascending, int offset,
+            int max, String... filterquery);
 
     /**
      * Transforms the given string field and value into a filter query
@@ -138,8 +128,9 @@ public interface SearchService {
      */
     String escapeQueryChars(String query);
 
-    FacetYearRange getFacetYearRange(Context context, DSpaceObject scope, DiscoverySearchFilterFacet facet,
-                                     List<String> filterQueries) throws SearchServiceException;
+    FacetYearRange getFacetYearRange(Context context, IndexableObject scope, DiscoverySearchFilterFacet facet,
+            List<String> filterQueries, DiscoverQuery parentQuery)
+                    throws SearchServiceException;
 
     /**
      * This method returns us either the highest or lowest value for the field that we give to it

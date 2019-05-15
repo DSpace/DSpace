@@ -9,8 +9,8 @@ package org.dspace.app.rest.converter;
 
 import org.dspace.app.rest.model.WorkspaceItemRest;
 import org.dspace.app.util.SubmissionConfigReaderException;
-import org.dspace.browse.BrowsableObject;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.discovery.IndexableObject;
 import org.springframework.stereotype.Component;
 
 /**
@@ -41,7 +41,7 @@ public class WorkspaceItemConverter
     }
 
     @Override
-    public boolean supportsModel(BrowsableObject object) {
+    public boolean supportsModel(IndexableObject object) {
         return object instanceof WorkspaceItem;
     }
 }

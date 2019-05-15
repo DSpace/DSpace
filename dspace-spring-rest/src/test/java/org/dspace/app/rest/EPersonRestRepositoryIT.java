@@ -48,6 +48,7 @@ import org.junit.Test;
 
 public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
+
     @Test
     public void createTest() throws Exception {
         context.turnOffAuthorisationSystem();
@@ -69,9 +70,9 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient(authToken).perform(post("/api/eperson/epersons")
                                         .content(mapper.writeValueAsBytes(data))
                                         .contentType(contentType))
-                   .andExpect(status().isCreated())
-                   .andExpect(content().contentType(contentType))
-                   .andExpect(jsonPath("$", Matchers.allOf(
+                            .andExpect(status().isCreated())
+                            .andExpect(content().contentType(contentType))
+                            .andExpect(jsonPath("$", Matchers.allOf(
                                hasJsonPath("$.uuid", not(empty())),
                                // is it what you expect? EPerson.getName() returns the email...
                                //hasJsonPath("$.name", is("Doe John")),
@@ -555,7 +556,6 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         ReplaceOperation replaceOperation = new ReplaceOperation("/netid", "newNetId");
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
-
         // should be unauthorized.
         getClient().perform(patch("/api/eperson/epersons/" + ePerson.getID())
                 .content(patchBody)
@@ -879,7 +879,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         EPerson ePerson = EPersonBuilder.createEPerson(context)
                                         .withNameInMetadata("John", "Doe")
                                         .withEmail("Johndoe@fake-email.com")
-                                        .withPassword("7Testpass")
+                                        .withPassword(password)
                                         .build();
 
         String newPassword = "newpassword";
@@ -901,6 +901,134 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         token = getAuthToken(ePerson.getEmail(), newPassword);
         getClient(token).perform(get("/api/"))
                         .andExpect(status().isOk());
+
+    }
+
+    @Test
+    public void patchPasswordIsForbidden() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        EPerson ePerson1 = EPersonBuilder.createEPerson(context)
+                                        .withNameInMetadata("John", "Doe")
+                                        .withEmail("Johndoe@fake-email.com")
+                                        .withPassword(password)
+                                        .build();
+
+        EPerson ePerson2 = EPersonBuilder.createEPerson(context)
+                                          .withNameInMetadata("Jane", "Doe")
+                                          .withEmail("Janedoe@fake-email.com")
+                                          .withPassword(password)
+                                          .build();
+
+        String newPassword = "newpassword";
+
+        List<Operation> ops = new ArrayList<Operation>();
+        ReplaceOperation replaceOperation = new ReplaceOperation("/password", newPassword);
+        ops.add(replaceOperation);
+        String patchBody = getPatchContent(ops);
+
+        // eperson one
+        String token = getAuthToken(ePerson1.getEmail(), password);
+
+        // should not be able to update the password of eperson two
+        getClient(token).perform(patch("/api/eperson/epersons/" + ePerson2.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                        .andExpect(status().isForbidden());
+
+        // login with old password
+        token = getAuthToken(ePerson2.getEmail(), password);
+        getClient(token).perform(get("/api/"))
+                        .andExpect(status().isOk());
+
+    }
+    @Test
+    public void patchPasswordForNonAdminUser() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        EPerson ePerson = EPersonBuilder.createEPerson(context)
+                                        .withNameInMetadata("John", "Doe")
+                                        .withEmail("Johndoe@fake-email.com")
+                                        .withPassword(password)
+                                        .build();
+
+        String newPassword = "newpassword";
+
+        context.restoreAuthSystemState();
+
+        List<Operation> ops = new ArrayList<Operation>();
+        ReplaceOperation replaceOperation = new ReplaceOperation("/password", newPassword);
+        ops.add(replaceOperation);
+        String patchBody = getPatchContent(ops);
+
+        String token = getAuthToken(ePerson.getEmail(), password);
+
+        // updates password
+        getClient(token).perform(patch("/api/eperson/epersons/" + ePerson.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                        .andExpect(status().isOk());
+
+        // login with new password
+        token = getAuthToken(ePerson.getEmail(), newPassword);
+        getClient(token).perform(get("/api/"))
+                        .andExpect(status().isOk());
+
+    }
+
+    @Test
+    public void patchCanLoginNonAdminUser() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson ePerson = EPersonBuilder.createEPerson(context)
+                                        .withNameInMetadata("John", "Doe")
+                                        .withEmail("CanLogin@fake-email.com")
+                                        .withPassword(password)
+                                        .build();
+
+        context.restoreAuthSystemState();
+
+        ReplaceOperation replaceOperation = new ReplaceOperation("/canLogin", true);
+        List<Operation> ops = new ArrayList<Operation>();
+        ops.add(replaceOperation);
+        String patchBody = getPatchContent(ops);
+
+        String token = getAuthToken(ePerson.getEmail(), password);
+
+        // should return
+        getClient(token).perform(patch("/api/eperson/epersons/" + ePerson.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                        .andExpect(status().isForbidden());
+
+    }
+
+    @Test
+    public void patchCertificateNonAdminUser() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson ePerson = EPersonBuilder.createEPerson(context)
+                                        .withNameInMetadata("John", "Doe")
+                                        .withEmail("CanLogin@fake-email.com")
+                                        .withPassword(password)
+                                        .build();
+
+        context.restoreAuthSystemState();
+
+        ReplaceOperation replaceOperation = new ReplaceOperation("/certificate", true);
+        List<Operation> ops = new ArrayList<Operation>();
+        ops.add(replaceOperation);
+        String patchBody = getPatchContent(ops);
+
+        String token = getAuthToken(ePerson.getEmail(), password);
+
+        // should return
+        getClient(token).perform(patch("/api/eperson/epersons/" + ePerson.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                        .andExpect(status().isForbidden());
 
     }
 
@@ -944,6 +1072,100 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         // login with original password
         token = getAuthToken(ePerson.getEmail(), newPassword);
+        getClient(token).perform(get("/api/"))
+                        .andExpect(status().isOk());
+
+    }
+
+    @Test
+    public void patchEmail() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        EPerson ePerson = EPersonBuilder.createEPerson(context)
+                                        .withNameInMetadata("John", "Doe")
+                                        .withEmail("Johndoe@fake-email.com")
+                                        .withPassword(password)
+                                        .build();
+
+        String newEmail = "janedoe@real-email.com";
+
+        List<Operation> ops = new ArrayList<Operation>();
+        ReplaceOperation replaceOperation = new ReplaceOperation("/email", newEmail);
+        ops.add(replaceOperation);
+        String patchBody = getPatchContent(ops);
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        // updates email
+        getClient(token).perform(patch("/api/eperson/epersons/" + ePerson.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                        .andExpect(jsonPath("$.email", Matchers.is(newEmail)))
+                        .andExpect(status().isOk());
+
+        // login with new email address
+        token = getAuthToken(newEmail, password);
+        getClient(token).perform(get("/api/"))
+                        .andExpect(status().isOk());
+
+    }
+
+    @Test
+    public void patchEmailNonAdminUser() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson ePerson = EPersonBuilder.createEPerson(context)
+                                        .withNameInMetadata("John", "Doe")
+                                        .withEmail("Johndoe@fake-email.com")
+                                        .withPassword(password)
+                                        .build();
+
+        context.restoreAuthSystemState();
+
+        String newEmail = "new@email.com";
+
+        ReplaceOperation replaceOperation = new ReplaceOperation("/email", newEmail);
+        List<Operation> ops = new ArrayList<Operation>();
+        ops.add(replaceOperation);
+        String patchBody = getPatchContent(ops);
+
+        String token = getAuthToken(ePerson.getEmail(), password);
+
+        // returns 403
+        getClient(token).perform(patch("/api/eperson/epersons/" + ePerson.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                        .andExpect(status().isForbidden());
+
+    }
+
+    @Test
+    public void patchEmailMissingValue() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        EPerson ePerson = EPersonBuilder.createEPerson(context)
+                                        .withNameInMetadata("John", "Doe")
+                                        .withEmail("Johndoe@fake-email.com")
+                                        .withPassword(password)
+                                        .build();
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        List<Operation> ops = new ArrayList<Operation>();
+        ReplaceOperation replaceOperation2 = new ReplaceOperation("/email", null);
+        ops.add(replaceOperation2);
+        String patchBody = getPatchContent(ops);
+
+        // should return bad request
+        getClient(token).perform(patch("/api/eperson/epersons/" + ePerson.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                        .andExpect(status().isBadRequest());
+
+        // login with original password
+        token = getAuthToken(ePerson.getEmail(), password);
         getClient(token).perform(get("/api/"))
                         .andExpect(status().isOk());
 

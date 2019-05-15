@@ -10,7 +10,7 @@ package org.dspace.content;
 import java.io.Serializable;
 import java.sql.SQLException;
 
-import org.dspace.browse.BrowsableObject;
+import org.dspace.discovery.IndexableObject;
 import org.dspace.eperson.EPerson;
 
 /**
@@ -20,7 +20,7 @@ import org.dspace.eperson.EPerson;
  * @author Robert Tansley
  * @version $Revision$
  */
-public interface InProgressSubmission<ID extends Serializable> extends BrowsableObject<ID> {
+public interface InProgressSubmission<ID extends Serializable> extends IndexableObject<ID> {
     /**
      * Get the internal ID of this submission
      *

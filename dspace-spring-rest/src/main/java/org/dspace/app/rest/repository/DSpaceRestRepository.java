@@ -11,6 +11,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Serializable;
 import java.sql.SQLException;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -259,6 +260,27 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
     public abstract DSpaceResource<T> wrapResource(T model, String... rels);
 
     /**
+     * Create and return a new instance. Data is recovered from the thread bound HTTP request and the list
+     * of DSpaceObjects provided in the uri-list body
+     *
+     * @param list  The list of Strings to be used in the createAndReturn method
+     * @return  The created REST object
+     */
+    public T createAndReturn(List<String> list) {
+        Context context = null;
+        try {
+            context = obtainContext();
+            T entity = thisRepository.createAndReturn(context, list);
+            context.commit();
+            return entity;
+        } catch (AuthorizeException e) {
+            throw new RESTAuthorizationException(e);
+        } catch (SQLException ex) {
+            throw new RuntimeException(ex.getMessage(), ex);
+        }
+    }
+
+    /**
      * Create and return a new instance. Data are usually retrieved from the thread bound http request
      *
      * @return the created REST object
@@ -283,6 +305,26 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
      *
      * @param context
      *            the dspace context
+     * @param list
+     *            The list of Strings that will be used as data for the object that's to be created
+     *            This list is retrieved from the uri-list body
+     * @return the created REST object
+     * @throws AuthorizeException
+     * @throws SQLException
+     * @throws RepositoryMethodNotImplementedException
+     *             returned by the default implementation when the operation is not supported for the entity
+     */
+    protected T createAndReturn(Context context, List<String> list)
+            throws AuthorizeException, SQLException, RepositoryMethodNotImplementedException {
+        throw new RepositoryMethodNotImplementedException("No implementation found; Method not allowed!", "");
+    }
+
+    /**
+     * Method to implement to support the creation of a new instance. Usually require to retrieve the http request from
+     * the thread bound attribute
+     *
+     * @param context
+     *            the dspace context
      * @return the created REST object
      * @throws AuthorizeException
      * @throws SQLException
@@ -290,7 +332,7 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
      *             returned by the default implementation when the operation is not supported for the entity
      */
     protected T createAndReturn(Context context)
-            throws AuthorizeException, SQLException, RepositoryMethodNotImplementedException {
+        throws AuthorizeException, SQLException, RepositoryMethodNotImplementedException {
         throw new RepositoryMethodNotImplementedException("No implementation found; Method not allowed!", "");
     }
 
@@ -332,9 +374,11 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
     public T patch(HttpServletRequest request, String apiCategory, String model, ID id, Patch patch)
         throws HttpRequestMethodNotSupportedException, UnprocessableEntityException, PatchBadRequestException {
         Context context = obtainContext();
+
         try {
             thisRepository.patch(context, request, apiCategory, model, id, patch);
             context.commit();
+
         } catch (AuthorizeException ae) {
             throw new RESTAuthorizationException(ae);
         } catch (SQLException | DCInputsReaderException e) {
@@ -450,12 +494,31 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
     }
 
     /**
-     * Implement this method in the subclass to support the PUT functionality for a REST object.
-     * This PUT functionality will fully replace the REST object with the given UUID with the REST object that is
-     * described in the JsonNode parameter
+     * Method to support updating a DSpace instance.
+     *
+     * @param request       the http request
+     * @param apiCategory   the API category e.g. "api"
+     * @param model         the DSpace model e.g. "metadatafield"
+     * @param id            the ID of the target REST object
+     * @param stringList    The list of Strings that will be used as data for the put
+     * @return the updated REST object
+     */
+    public T put(HttpServletRequest request, String apiCategory, String model, ID id,
+                 List<String> stringList) {
+        Context context = obtainContext();
+        try {
+            thisRepository.put(context, request, apiCategory, model, id, stringList);
+            context.commit();
+        } catch (SQLException | AuthorizeException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+        return findOne(id);
+    }
+
+    /**
+     * Implement this method in the subclass to support updating a REST object.
      *
      * @param context     the dspace context
-     * @param request     the http request
      * @param apiCategory the API category e.g. "api"
      * @param model       the DSpace model e.g. "metadatafield"
      * @param id          the ID of the target REST object
@@ -467,8 +530,29 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
      *             returned by the default implementation when the operation is not supported for the entity
      */
     protected T put(Context context, HttpServletRequest request, String apiCategory, String model, ID id,
-                         JsonNode jsonNode)
+                    JsonNode jsonNode)
         throws RepositoryMethodNotImplementedException, SQLException, AuthorizeException {
         throw new RepositoryMethodNotImplementedException(apiCategory, model);
     }
+
+    /**
+     * Implement this method in the subclass to support updating a DSpace instance.
+     *
+     * @param context           the dspace context
+     * @param apiCategory       the API category e.g. "api"
+     * @param model             the DSpace model e.g. "metadatafield"
+     * @param id                the ID of the target REST object
+     * @param stringList    The list of Strings that will be used as data for the put
+     * @return the updated REST object
+     * @throws AuthorizeException if the context user is not authorized to perform this operation
+     * @throws SQLException when the database returns an error
+     * @throws RepositoryMethodNotImplementedException
+     *             returned by the default implementation when the operation is not supported for the entity
+     */
+    protected T put(Context context, HttpServletRequest request, String apiCategory, String model, ID id,
+                    List<String> stringList)
+        throws RepositoryMethodNotImplementedException, SQLException, AuthorizeException {
+        throw new RepositoryMethodNotImplementedException(apiCategory, model);
+    }
+
 }

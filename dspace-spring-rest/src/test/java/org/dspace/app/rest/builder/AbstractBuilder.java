@@ -7,12 +7,11 @@
  */
 package org.dspace.app.rest.builder;
 
-import java.util.Comparator;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.rest.builder.util.AbstractBuilderCleanupUtil;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.authorize.service.ResourcePolicyService;
@@ -23,10 +22,13 @@ import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.BundleService;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
+import org.dspace.content.service.EntityTypeService;
 import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.MetadataSchemaService;
+import org.dspace.content.service.RelationshipService;
+import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.content.service.SiteService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Context;
@@ -77,10 +79,17 @@ public abstract class AbstractBuilder<T, S> {
     static MetadataFieldService metadataFieldService;
     static MetadataSchemaService metadataSchemaService;
     static SiteService siteService;
+    static RelationshipService relationshipService;
+    static RelationshipTypeService relationshipTypeService;
+    static EntityTypeService entityTypeService;
 
     protected Context context;
 
-    private static List<AbstractBuilder> builders = new LinkedList<>();
+    /**
+     * This static class will make sure that the objects built with the builders are disposed of in a foreign-key
+     * constraint safe manner by predefining an order
+     */
+    private static AbstractBuilderCleanupUtil abstractBuilderCleanupUtil = new AbstractBuilderCleanupUtil();
     /**
      * log4j category
      */
@@ -88,7 +97,8 @@ public abstract class AbstractBuilder<T, S> {
 
     protected AbstractBuilder(Context context) {
         this.context = context;
-        builders.add(this);
+        //Register this specific builder to be deleted later on
+        abstractBuilderCleanupUtil.addToMap(this);
     }
 
     public static void init() {
@@ -114,6 +124,9 @@ public abstract class AbstractBuilder<T, S> {
         metadataFieldService = ContentServiceFactory.getInstance().getMetadataFieldService();
         metadataSchemaService = ContentServiceFactory.getInstance().getMetadataSchemaService();
         siteService = ContentServiceFactory.getInstance().getSiteService();
+        relationshipService = ContentServiceFactory.getInstance().getRelationshipService();
+        relationshipTypeService = ContentServiceFactory.getInstance().getRelationshipTypeService();
+        entityTypeService = ContentServiceFactory.getInstance().getEntityTypeService();
 
         // Temporarily disabled
         claimedTaskService = XmlWorkflowServiceFactory.getInstance().getClaimedTaskService();
@@ -146,19 +159,15 @@ public abstract class AbstractBuilder<T, S> {
         metadataFieldService = null;
         metadataSchemaService = null;
         siteService = null;
+        relationshipService = null;
+        relationshipTypeService = null;
+        entityTypeService = null;
     }
 
     public static void cleanupObjects() throws Exception {
-        builders.sort(new Comparator<AbstractBuilder>() {
-            @Override
-            public int compare(AbstractBuilder o1, AbstractBuilder o2) {
-                // we want descending order, hight priority first
-                return o2.getPriority() - o1.getPriority();
-            }
-        });
-        for (AbstractBuilder builder : builders) {
-            builder.cleanup();
-        }
+
+        // This call will make sure that the map with AbstractBuilders will be cleaned up
+        abstractBuilderCleanupUtil.cleanupBuilders();
 
         // Bitstreams still leave a trace when deleted, so we need to fully "expunge" them
         try (Context c = new Context()) {
@@ -176,16 +185,10 @@ public abstract class AbstractBuilder<T, S> {
     }
 
     /**
-     * Return the priority to give to the builder during the cleanup phase. It MUST be a positive integer. High values
-     * mean that the builder will be invoked soon during the cleanup phase
-     * 
-     * @return
+     * This method will ensure that the DSpaceObject contained within the Builder will be cleaned up properly
+     * @throws Exception    If something goes wrong
      */
-    protected int getPriority() {
-        return 100;
-    }
-
-    protected abstract void cleanup() throws Exception;
+    public abstract void cleanup() throws Exception;
 
     public abstract T build();
 
