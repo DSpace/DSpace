@@ -108,7 +108,15 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
         clonedBitstream.setChecksum(bitstream.getChecksum());
         clonedBitstream.setChecksumAlgorithm(bitstream.getChecksumAlgorithm());
         clonedBitstream.setFormat(bitstream.getBitstreamFormat());
-
+        clonedBitstream.setStoreNumber(bitstream.getStoreNumber());
+        List<MetadataValue> metadataValues = getMetadata(bitstream, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
+        for (MetadataValue metadataValue : metadataValues) 
+        {
+            addMetadata(context, clonedBitstream, metadataValue.getMetadataField(), 
+                        metadataValue.getLanguage(), metadataValue.getValue(), 
+                        metadataValue.getAuthority(), metadataValue.getConfidence());
+        }
+        
         try 
         {
             //Update our bitstream but turn off the authorization system since permissions haven't been set at this point in time.

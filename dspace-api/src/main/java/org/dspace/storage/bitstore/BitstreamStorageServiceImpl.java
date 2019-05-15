@@ -342,18 +342,7 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
     @Override
     public Bitstream clone(Context context, Bitstream bitstream) throws SQLException, IOException, AuthorizeException 
     {
-        Bitstream clonedBitstream = bitstreamService.clone(context, bitstream);
-        clonedBitstream.setStoreNumber(bitstream.getStoreNumber());
-        
-        List<MetadataValue> metadataValues = bitstreamService.getMetadata(bitstream, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
-        
-        for (MetadataValue metadataValue : metadataValues) 
-        {
-            bitstreamService.addMetadata(context, clonedBitstream, metadataValue.getMetadataField(), metadataValue.getLanguage(), metadataValue.getValue(), metadataValue.getAuthority(), metadataValue.getConfidence());
-        }
-        bitstreamService.update(context, clonedBitstream);
-        return clonedBitstream;
-
+        return bitstreamService.clone(context, bitstream);
     }
 
     /**
