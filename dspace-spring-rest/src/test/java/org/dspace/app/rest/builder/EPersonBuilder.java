@@ -24,7 +24,8 @@ public class EPersonBuilder extends AbstractDSpaceObjectBuilder<EPerson> {
         super(context);
     }
 
-    protected void cleanup() throws Exception {
+    @Override
+    public void cleanup() throws Exception {
         delete(ePerson);
     }
 
@@ -73,6 +74,24 @@ public class EPersonBuilder extends AbstractDSpaceObjectBuilder<EPerson> {
         return this;
     }
 
+    public EPersonBuilder withLanguage(String lang) throws SQLException {
+        ePerson.setLanguage(context, lang);
+        return this;
+    }
+
+    public EPersonBuilder withPhone(String phone) throws SQLException {
+        ePersonService.setMetadataSingleValue(
+                context,
+                ePerson,
+                "eperson",
+                "phone",
+                null,
+                null,
+                phone
+        );
+        return this;
+    }
+
     public EPersonBuilder withGroupMembership(Group group) {
         groupService.addMember(context, group, ePerson);
         return this;
@@ -87,14 +106,5 @@ public class EPersonBuilder extends AbstractDSpaceObjectBuilder<EPerson> {
         ePerson.setCanLogIn(true);
         ePersonService.setPassword(ePerson, password);
         return this;
-    }
-
-    @Override
-    /**
-     * Set a lower custom priority for the EPerson. It is one of the last object to delete to reduced the risk of
-     * pending references
-     */
-    protected int getPriority() {
-        return 50;
     }
 }

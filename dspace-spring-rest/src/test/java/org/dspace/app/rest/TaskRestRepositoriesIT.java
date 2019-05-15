@@ -583,6 +583,135 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
 
     @Test
     /**
+     * Test unauthorized claiming of a pool task
+     *
+     * @throws Exception
+     */
+    public void claimTaskUnauthorizedTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. a reviewer
+        EPerson reviewer = EPersonBuilder.createEPerson(context)
+                .withEmail("reviewer@example.com")
+                .withPassword(password)
+                .build();
+
+        //2. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
+                .withWorkflowGroup(1, reviewer).build();
+
+        //3. create a normal user to use as submitter
+        EPerson submitter = EPersonBuilder.createEPerson(context)
+                .withEmail("submitter@example.com")
+                .withPassword(password)
+                .build();
+
+        context.setCurrentUser(submitter);
+
+        //4. a pool task
+        PoolTask poolTask = PoolTaskBuilder.createPoolTask(context, col1, reviewer)
+                .withTitle("Workflow Item 1")
+                .withIssueDate("2017-10-17")
+                .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                .withSubject("ExtraEntry")
+                .build();
+        XmlWorkflowItem witem = poolTask.getWorkflowItem();
+
+        context.restoreAuthSystemState();
+
+        String reviewerToken = getAuthToken(reviewer.getEmail(), password);
+
+        // try to claim the task with an anonymous user
+        getClient().perform(post("/api/workflow/pooltasks/" + poolTask.getID())
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED))
+            .andExpect(status().isUnauthorized());
+
+        // verify that the pool task is still here
+        getClient(reviewerToken).perform(get("/api/workflow/pooltasks/" + poolTask.getID()))
+            .andExpect(status().isOk());
+    }
+
+    @Test
+    /**
+     * Test claiming of another user pool task
+     *
+     * @throws Exception
+     */
+    public void claimTaskForbiddenTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. two reviewers
+        EPerson reviewer = EPersonBuilder.createEPerson(context)
+                .withEmail("reviewer@example.com")
+                .withPassword(password)
+                .build();
+
+        EPerson reviewer2 = EPersonBuilder.createEPerson(context)
+                .withEmail("reviewer2@example.com")
+                .withPassword(password)
+                .build();
+
+        //2. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
+                .withWorkflowGroup(1, reviewer)
+                .withWorkflowGroup(2, reviewer2).build();
+
+        //3. create a normal user to use as submitter
+        EPerson submitter = EPersonBuilder.createEPerson(context)
+                .withEmail("submitter@example.com")
+                .withPassword(password)
+                .build();
+
+        context.setCurrentUser(submitter);
+
+        //4. a pool task
+        PoolTask poolTask = PoolTaskBuilder.createPoolTask(context, col1, reviewer)
+                .withTitle("Workflow Item 1")
+                .withIssueDate("2017-10-17")
+                .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                .withSubject("ExtraEntry")
+                .build();
+        XmlWorkflowItem witem = poolTask.getWorkflowItem();
+
+        context.restoreAuthSystemState();
+
+        String reviewerToken = getAuthToken(reviewer.getEmail(), password);
+        String reviewer2Token = getAuthToken(reviewer2.getEmail(), password);
+
+        // reviewer2 try to claim a task that is only available for reviewer1
+        getClient(reviewer2Token).perform(post("/api/workflow/pooltasks/" + poolTask.getID())
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED))
+            .andExpect(status().isForbidden());
+
+        // verify that the pool task is still here
+        getClient(reviewerToken).perform(get("/api/workflow/pooltasks/" + poolTask.getID()))
+            .andExpect(status().isOk());
+    }
+
+    @Test
+    public void claimTaskNotExistingTest() throws Exception {
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        getClient(adminToken).perform(post("/api/workflow/pooltasks/" + Integer.MAX_VALUE)
+            .contentType(MediaType.APPLICATION_FORM_URLENCODED))
+            .andExpect(status().isNotFound());
+    }
+
+    @Test
+    /**
      * Test retrieval of a claimed task
      *
      * @throws Exception

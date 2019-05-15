@@ -14,7 +14,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.DCDate;
 import org.dspace.content.Item;
 import org.dspace.content.LicenseUtils;
-import org.dspace.content.MetadataSchema;
+import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Context;
@@ -51,7 +51,14 @@ public class WorkspaceItemBuilder extends AbstractBuilder<WorkspaceItem, Workspa
 
     @Override
     public WorkspaceItem build() {
+        try {
+            context.dispatchEvents();
+            indexingService.commit();
             return workspaceItem;
+        } catch (Exception e) {
+            return handleException(e);
+        }
+
     }
 
     @Override
@@ -69,7 +76,7 @@ public class WorkspaceItemBuilder extends AbstractBuilder<WorkspaceItem, Workspa
     }
 
     @Override
-    protected void cleanup() throws Exception {
+    public void cleanup() throws Exception {
         delete(workspaceItem);
     }
 
@@ -101,19 +108,19 @@ public class WorkspaceItemBuilder extends AbstractBuilder<WorkspaceItem, Workspa
     }
 
     public WorkspaceItemBuilder withTitle(final String title) {
-        return setMetadataSingleValue(MetadataSchema.DC_SCHEMA, "title", null, title);
+        return setMetadataSingleValue(MetadataSchemaEnum.DC.getName(), "title", null, title);
     }
 
     public WorkspaceItemBuilder withIssueDate(final String issueDate) {
-        return addMetadataValue(MetadataSchema.DC_SCHEMA, "date", "issued", new DCDate(issueDate).toString());
+        return addMetadataValue(MetadataSchemaEnum.DC.getName(), "date", "issued", new DCDate(issueDate).toString());
     }
 
     public WorkspaceItemBuilder withAuthor(final String authorName) {
-        return addMetadataValue(MetadataSchema.DC_SCHEMA, "contributor", "author", authorName);
+        return addMetadataValue(MetadataSchemaEnum.DC.getName(), "contributor", "author", authorName);
     }
 
     public WorkspaceItemBuilder withSubject(final String subject) {
-        return addMetadataValue(MetadataSchema.DC_SCHEMA, "subject", null, subject);
+        return addMetadataValue(MetadataSchemaEnum.DC.getName(), "subject", null, subject);
     }
 
     public WorkspaceItemBuilder grantLicense() {
@@ -141,13 +148,5 @@ public class WorkspaceItemBuilder extends AbstractBuilder<WorkspaceItem, Workspa
             handleException(e);
         }
         return this;
-    }
-
-    @Override
-    /**
-     * Set a slightly lower priority for the workspaceitem has it can be generated "deleting" a workflowitem
-     */
-    protected int getPriority() {
-        return 150;
     }
 }

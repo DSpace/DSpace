@@ -36,7 +36,7 @@ import org.springframework.stereotype.Component;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @Component
-public class SubmissionFormConverter extends DSpaceConverter<DCInputSet, SubmissionFormRest> {
+public class SubmissionFormConverter implements DSpaceConverter<DCInputSet, SubmissionFormRest> {
 
     private static final String INPUT_TYPE_ONEBOX = "onebox";
     private static final String INPUT_TYPE_NAME = "name";

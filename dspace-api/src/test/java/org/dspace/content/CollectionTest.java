@@ -1838,16 +1838,16 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
     public void testGetCommunities() throws Exception {
         context.turnOffAuthorisationSystem();
         Community community = communityService.create(null, context);
-        communityService.setMetadataSingleValue(context, community, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY,
-                                                "community 3");
+        communityService.setMetadataSingleValue(context, community, MetadataSchemaEnum.DC.getName(),
+                                                "title", null, Item.ANY, "community 3");
         this.collection.addCommunity(community);
         community = communityService.create(null, context);
-        communityService.setMetadataSingleValue(context, community, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY,
-                                                "community 1");
+        communityService.setMetadataSingleValue(context, community, MetadataSchemaEnum.DC.getName(),
+                                                "title", null, Item.ANY, "community 1");
         this.collection.addCommunity(community);
         community = communityService.create(null, context);
-        communityService.setMetadataSingleValue(context, community, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY,
-                                                "community 2");
+        communityService.setMetadataSingleValue(context, community, MetadataSchemaEnum.DC.getName(),
+                                                "title", null, Item.ANY, "community 2");
         this.collection.addCommunity(community);
         context.restoreAuthSystemState();
         assertTrue("testGetCommunities 0", collection.getCommunities().size() == 4);

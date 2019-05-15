@@ -112,7 +112,7 @@ public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWi
 
         if (StringUtils.isNotBlank(authToken)) {
             mockMvcBuilder.defaultRequest(
-                    get("").header(AUTHORIZATION_HEADER, AUTHORIZATION_TYPE + authToken));
+                get("").header(AUTHORIZATION_HEADER, AUTHORIZATION_TYPE + authToken));
         }
 
         return mockMvcBuilder
@@ -128,8 +128,8 @@ public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWi
 
     public String getAuthToken(String user, String password) throws Exception {
         return StringUtils.substringAfter(
-                getAuthResponse(user, password).getHeader(AUTHORIZATION_HEADER),
-                AUTHORIZATION_TYPE);
+            getAuthResponse(user, password).getHeader(AUTHORIZATION_HEADER),
+            AUTHORIZATION_TYPE);
     }
 
     public String getPatchContent(List<Operation> ops) {
@@ -149,4 +149,3 @@ public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWi
         };
     }
 }
-
