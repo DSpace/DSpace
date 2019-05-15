@@ -235,9 +235,9 @@ public class DashMigrationList extends AbstractCurationTask {
 	try {
 	    dspaceItem = (Item)identifierService.resolve(context, itemID);  
         } catch (IdentifierNotFoundException e) {
-	    log.fatal("Unable to get DSpace Item for " + itemID, e);
+            // ignore the error for purposes of making a list
 	} catch (IdentifierNotResolvableException e) {
-	    log.fatal("Unable to get DSpace Item for " + itemID, e);
+            // ignore the error for purposes of making a list
 	}
 
 	return dspaceItem;
