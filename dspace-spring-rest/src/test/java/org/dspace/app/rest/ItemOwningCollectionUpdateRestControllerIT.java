@@ -8,6 +8,8 @@
 package org.dspace.app.rest;
 
 import static org.hamcrest.Matchers.is;
+import static org.springframework.data.rest.webmvc.RestMediaTypes.TEXT_URI_LIST_VALUE;
+import static org.springframework.http.MediaType.parseMediaType;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -52,11 +54,14 @@ public class ItemOwningCollectionUpdateRestControllerIT extends AbstractControll
 
 
         //When we call this owningCollection/move endpoint
-        getClient().perform(put("/api/core/items/" + publicItem1.getID() + "/owningCollection?collection="
-                                         + col2.getID()))
-
-                   //We expect a 401 Unauthorized status when performed by anonymous
-                   .andExpect(status().isUnauthorized());
+        getClient().perform(
+                put("/api/core/items/" + publicItem1.getID() + "/owningCollection/")
+                        .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
+                        .content(
+                                "https://localhost:8080/spring-rest/api/core/collections/" + col2.getID()
+                        ))
+                //We expect a 401 Unauthorized status when performed by anonymous
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -85,8 +90,11 @@ public class ItemOwningCollectionUpdateRestControllerIT extends AbstractControll
 
         //When we call this owningCollection/move endpoint
         getClient(token)
-                .perform(put("/api/core/items/" + publicItem1.getID() + "/owningCollection?collection="
-                                      + col2.getID()))
+                .perform(put("/api/core/items/" + publicItem1.getID() + "/owningCollection/")
+                        .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
+                        .content(
+                                "https://localhost:8080/spring-rest/api/core/collections/" + col2.getID()
+                        ))
 
                 //We expect a 401 Unauthorized status when performed by anonymous
                 .andExpect(status().isOk());
@@ -135,8 +143,11 @@ public class ItemOwningCollectionUpdateRestControllerIT extends AbstractControll
         String token = getAuthToken(itemMoveEperson.getEmail(), "test");
 
         getClient(token)
-                .perform(put("/api/core/items/" + publicItem1.getID() + "/owningCollection?collection="
-                                      + col2.getID()))
+                .perform(put("/api/core/items/" + publicItem1.getID() + "/owningCollection/")
+                        .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
+                        .content(
+                                "https://localhost:8080/spring-rest/api/core/collections/" + col2.getID()
+                        ))
 
                 //We expect a 401 Unauthorized status when performed by anonymous
                 .andExpect(status().isOk());
@@ -178,8 +189,11 @@ public class ItemOwningCollectionUpdateRestControllerIT extends AbstractControll
 
         String token = getAuthToken(itemMoveEperson.getEmail(), "test");
 
-        getClient(token).perform(put("/api/core/items/" + publicItem1.getID() + "/owningCollection?collection="
-                                              + col2.getID()))
+        getClient(token).perform(put("/api/core/items/" + publicItem1.getID() + "/owningCollection/")
+                .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
+                .content(
+                        "https://localhost:8080/spring-rest/api/core/collections/" + col2.getID()
+                ))
 
                         //We expect a 401 Unauthorized status when performed by anonymous
                         .andExpect(status().isForbidden());
@@ -216,8 +230,11 @@ public class ItemOwningCollectionUpdateRestControllerIT extends AbstractControll
 
         String token = getAuthToken(itemMoveEperson.getEmail(), "test");
 
-        getClient(token).perform(put("/api/core/items/" + publicItem1.getID() + "/owningCollection?collection="
-                                              + col2.getID()))
+        getClient(token).perform(put("/api/core/items/" + publicItem1.getID() + "/owningCollection/")
+                .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
+                .content(
+                        "https://localhost:8080/spring-rest/api/core/collections/" + col2.getID()
+                ))
 
                         //We expect a 401 Unauthorized status when performed by anonymous
                         .andExpect(status().isForbidden());
@@ -254,8 +271,11 @@ public class ItemOwningCollectionUpdateRestControllerIT extends AbstractControll
 
         String token = getAuthToken(itemMoveEperson.getEmail(), "test");
 
-        getClient(token).perform(put("/api/core/items/" + publicItem1.getID() + "/owningCollection?collection="
-                                              + col2.getID()))
+        getClient(token).perform(put("/api/core/items/" + publicItem1.getID() + "/owningCollection/")
+                .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
+                .content(
+                        "https://localhost:8080/spring-rest/api/core/collections/" + col2.getID()
+                ))
 
                         //We expect a 401 Unauthorized status when performed by anonymous
                         .andExpect(status().isForbidden());
