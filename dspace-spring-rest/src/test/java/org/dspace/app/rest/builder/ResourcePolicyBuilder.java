@@ -25,11 +25,6 @@ public class ResourcePolicyBuilder extends AbstractBuilder<ResourcePolicy, Resou
 
     private ResourcePolicy resourcePolicy;
 
-    @Override
-    protected int getPriority() {
-        return Integer.MAX_VALUE;
-    }
-
     protected ResourcePolicyBuilder(Context context) {
         super(context);
     }
@@ -40,7 +35,7 @@ public class ResourcePolicyBuilder extends AbstractBuilder<ResourcePolicy, Resou
     }
 
     @Override
-    protected void cleanup() throws Exception {
+    public void cleanup() throws Exception {
         delete(resourcePolicy);
     }
 

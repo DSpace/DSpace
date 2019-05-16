@@ -7,8 +7,11 @@
  */
 package org.dspace.app.rest;
 
+import static org.dspace.core.Constants.COLLECTION;
+
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -16,9 +19,11 @@ import javax.servlet.http.HttpServletResponse;
 import org.dspace.app.rest.converter.CollectionConverter;
 import org.dspace.app.rest.model.CollectionRest;
 import org.dspace.app.rest.utils.ContextUtil;
+import org.dspace.app.rest.utils.Utils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Collection;
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.ItemService;
@@ -31,7 +36,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -52,15 +56,24 @@ public class ItemOwningCollectionUpdateRestController {
     @Autowired
     CollectionConverter converter;
 
-    @RequestMapping(method = RequestMethod.PUT)
-    @PreAuthorize("hasPermission(#itemUuid, 'ITEM','WRITE') && hasPermission(#targetUuid,'COLLECTION','ADD')")
+    @Autowired
+    Utils utils;
+
+    @RequestMapping(method = RequestMethod.PUT, consumes = {"text/uri-list"})
+    @PreAuthorize("hasPermission(#itemUuid, 'ITEM','WRITE')")
     @PostAuthorize("returnObject != null")
     public CollectionRest move(@PathVariable UUID itemUuid, HttpServletResponse response,
-                               HttpServletRequest request, @RequestParam(name = "collection") UUID targetUuid)
+                               HttpServletRequest request)
             throws SQLException, IOException, AuthorizeException {
         Context context = ContextUtil.obtainContext(request);
 
-        Collection targetCollection = performItemMove(context, itemUuid, targetUuid);
+        List<DSpaceObject> dsoList = utils.constructDSpaceObjectList(context, utils.getStringListFromRequest(request));
+
+        if (dsoList.size() != 1 || dsoList.get(0).getType() != COLLECTION) {
+            throw new IllegalArgumentException("exactly one owning collection is provided not");
+        }
+
+        Collection targetCollection = performItemMove(context, itemUuid, (Collection) dsoList.get(0));
 
         if (targetCollection == null) {
             return null;
@@ -78,7 +91,7 @@ public class ItemOwningCollectionUpdateRestController {
         return context.reloadEntity(targetCollection);
     }
 
-    private Collection performItemMove(final Context context, final UUID itemUuid, final UUID targetUuid)
+    private Collection performItemMove(final Context context, final UUID itemUuid, final Collection targetCollection)
             throws SQLException, IOException, AuthorizeException {
 
         Item item = itemService.find(context, itemUuid);
@@ -90,7 +103,7 @@ public class ItemOwningCollectionUpdateRestController {
         Collection currentCollection = item.getOwningCollection();
 
         if (authorizeService.authorizeActionBoolean(context, currentCollection, Constants.ADMIN)) {
-            Collection targetCollection = collectionService.find(context, targetUuid);
+
             return moveItem(context, item, currentCollection, targetCollection);
         }
 
