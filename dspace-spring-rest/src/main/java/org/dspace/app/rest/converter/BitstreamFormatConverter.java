@@ -8,6 +8,7 @@
 package org.dspace.app.rest.converter;
 
 import org.dspace.app.rest.model.BitstreamFormatRest;
+import org.dspace.content.BitstreamFormat;
 import org.springframework.stereotype.Component;
 
 /**
@@ -17,9 +18,9 @@ import org.springframework.stereotype.Component;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @Component
-public class BitstreamFormatConverter extends DSpaceConverter<org.dspace.content.BitstreamFormat, BitstreamFormatRest> {
+public class BitstreamFormatConverter implements DSpaceConverter<BitstreamFormat, BitstreamFormatRest> {
     @Override
-    public BitstreamFormatRest fromModel(org.dspace.content.BitstreamFormat obj) {
+    public BitstreamFormatRest fromModel(BitstreamFormat obj) {
         BitstreamFormatRest bf = new BitstreamFormatRest();
         bf.setDescription(obj.getDescription());
         bf.setExtensions(bf.getExtensions());
@@ -31,7 +32,7 @@ public class BitstreamFormatConverter extends DSpaceConverter<org.dspace.content
     }
 
     @Override
-    public org.dspace.content.BitstreamFormat toModel(BitstreamFormatRest obj) {
+    public BitstreamFormat toModel(BitstreamFormatRest obj) {
         // TODO Auto-generated method stub
         return null;
     }

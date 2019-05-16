@@ -14,7 +14,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.sql.SQLException;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -27,7 +26,6 @@ import java.util.UUID;
 import javax.xml.stream.XMLStreamException;
 
 import com.lyncode.xoai.dataprovider.exceptions.ConfigurationException;
-import com.lyncode.xoai.dataprovider.exceptions.MetadataBindException;
 import com.lyncode.xoai.dataprovider.exceptions.WritingXmlException;
 import com.lyncode.xoai.dataprovider.xml.XmlOutputContext;
 import org.apache.commons.cli.CommandLine;
@@ -36,9 +34,9 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrQuery.ORDER;
-import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
@@ -54,15 +52,15 @@ import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.xoai.exceptions.CompilingException;
 import org.dspace.xoai.services.api.CollectionsService;
 import org.dspace.xoai.services.api.cache.XOAICacheService;
 import org.dspace.xoai.services.api.cache.XOAIItemCacheService;
 import org.dspace.xoai.services.api.cache.XOAILastCompilationCacheService;
-import org.dspace.xoai.services.api.config.ConfigurationService;
 import org.dspace.xoai.services.api.solr.SolrServerResolver;
 import org.dspace.xoai.solr.DSpaceSolrSearch;
 import org.dspace.xoai.solr.exceptions.DSpaceSolrException;
@@ -94,6 +92,8 @@ public class XOAI {
     private final AuthorizeService authorizeService;
     private final ItemService itemService;
 
+    private final static ConfigurationService configurationService = DSpaceServicesFactory
+            .getInstance().getConfigurationService();
 
     private List<String> getFileFormats(Item item) {
         List<String> formats = new ArrayList<>();
@@ -146,7 +146,7 @@ public class XOAI {
             } else {
                 SolrQuery solrParams = new SolrQuery("*:*")
                     .addField("item.lastmodified")
-                    .addSortField("item.lastmodified", ORDER.desc).setRows(1);
+                    .addSort("item.lastmodified", ORDER.desc).setRows(1);
 
                 SolrDocumentList results = DSpaceSolrSearch.query(solrServerResolver.getServer(), solrParams);
                 if (results.getNumFound() == 0) {
@@ -174,7 +174,7 @@ public class XOAI {
         }
     }
 
-    private int index(Date last) throws DSpaceSolrIndexerException {
+    private int index(Date last) throws DSpaceSolrIndexerException, IOException {
         System.out
             .println("Incremental import. Searching for documents modified after: "
                          + last.toString());
@@ -200,14 +200,14 @@ public class XOAI {
      * due to an embargo. Only consider those which haven't been modified
      * anyways since the last update, so they aren't updated twice in one import
      * run.
-     * 
+     *
      * @param last
      *            maximum date for an item to be considered for an update
      * @return Iterator over list of items which might have changed their
      *         visibility since the last update.
      * @throws DSpaceSolrIndexerException
      */
-    private Iterator<Item> getItemsWithPossibleChangesBefore(Date last) throws DSpaceSolrIndexerException {
+    private Iterator<Item> getItemsWithPossibleChangesBefore(Date last) throws DSpaceSolrIndexerException, IOException {
         try {
             SolrQuery params = new SolrQuery("item.willChangeStatus:true").addField("item.id");
             SolrDocumentList documents = DSpaceSolrSearch.query(solrServerResolver.getServer(), params);
@@ -244,12 +244,12 @@ public class XOAI {
     /**
      * Check if an item is already indexed. Using this, it is possible to check
      * if withdrawn or nondiscoverable items have to be indexed at all.
-     * 
+     *
      * @param item
      *            Item that should be checked for its presence in the index.
      * @return has it been indexed?
      */
-    private boolean checkIfIndexed(Item item) {
+    private boolean checkIfIndexed(Item item) throws IOException {
         SolrQuery params = new SolrQuery("item.id:" + item.getID().toString()).addField("item.id");
         try {
             SolrDocumentList documents = DSpaceSolrSearch.query(solrServerResolver.getServer(), params);
@@ -260,12 +260,12 @@ public class XOAI {
     }
      /**
      * Check if an item is flagged visible in the index.
-     * 
+     *
      * @param item
      *            Item that should be checked for its presence in the index.
      * @return has it been indexed?
      */
-    private boolean checkIfVisibleInOAI(Item item) {
+    private boolean checkIfVisibleInOAI(Item item) throws IOException {
         SolrQuery params = new SolrQuery("item.id:" + item.getID().toString()).addField("item.public");
         try {
             SolrDocumentList documents = DSpaceSolrSearch.query(solrServerResolver.getServer(), params);
@@ -283,29 +283,40 @@ public class XOAI {
         throws DSpaceSolrIndexerException {
         try {
             int i = 0;
-            SolrServer server = solrServerResolver.getServer();
+            int batchSize = configurationService.getIntProperty("oai.import.batch.size", 1000);
+            SolrClient server = solrServerResolver.getServer();
+            ArrayList<SolrInputDocument> list = new ArrayList<>();
             while (iterator.hasNext()) {
                 try {
                     Item item = iterator.next();
                     if (item.getHandle() == null) {
                         log.warn("Skipped item without handle: " + item.getID());
                     } else {
-                        server.add(this.index(item));
+                        list.add(this.index(item));
                     }
                     //Uncache the item to keep memory consumption low
                     context.uncacheEntity(item);
 
-                } catch (SQLException | MetadataBindException | ParseException
-                    | XMLStreamException | WritingXmlException ex) {
+                } catch (SQLException | IOException | XMLStreamException | WritingXmlException ex) {
                     log.error(ex.getMessage(), ex);
                 }
                 i++;
-                if (i % 100 == 0) {
+                if (i % 1000 == 0 && batchSize != 1000) {
                     System.out.println(i + " items imported so far...");
+                }
+                if (i % batchSize == 0) {
+                    System.out.println(i + " items imported so far...");
+                    server.add(list);
+                    server.commit();
+                    list.clear();
                 }
             }
             System.out.println("Total: " + i + " items");
-            server.commit();
+            if (i > 0) {
+                server.add(list);
+                server.commit(true, true);
+                list.clear();
+            }
             return i;
         } catch (SolrServerException | IOException ex) {
             throw new DSpaceSolrIndexerException(ex.getMessage(), ex);
@@ -334,6 +345,7 @@ public class XOAI {
                     dates.add(policy.getEndDate());
                 }
             }
+            context.uncacheEntity(policy);
         }
         dates.add(item.getLastModified());
         Collections.sort(dates);
@@ -348,9 +360,9 @@ public class XOAI {
     }
 
     private SolrInputDocument index(Item item)
-            throws SQLException, MetadataBindException, ParseException, XMLStreamException, WritingXmlException {
+            throws SQLException, IOException, XMLStreamException, WritingXmlException {
         SolrInputDocument doc = new SolrInputDocument();
-        doc.addField("item.id", item.getID());
+        doc.addField("item.id", item.getID().toString());
 
         String handle = item.getHandle();
         doc.addField("item.handle", handle);
@@ -458,6 +470,7 @@ public class XOAI {
                     return true;
                 }
             }
+            context.uncacheEntity(policy);
         }
         return false;
     }
@@ -477,8 +490,8 @@ public class XOAI {
     private static boolean getKnownExplanation(Throwable t) {
         if (t instanceof ConnectException) {
             System.err.println("Solr server ("
-                                   + ConfigurationManager.getProperty("oai", "solr.url")
-                                   + ") is down, turn it on.");
+                    + configurationService.getProperty("oai.solr.url", "")
+                    + ") is down, turn it on.");
             return true;
         }
 
@@ -525,7 +538,6 @@ public class XOAI {
             BasicConfiguration.class
         });
 
-        ConfigurationService configurationService = applicationContext.getBean(ConfigurationService.class);
         XOAICacheService cacheService = applicationContext.getBean(XOAICacheService.class);
         XOAIItemCacheService itemCacheService = applicationContext.getBean(XOAIItemCacheService.class);
 
@@ -547,7 +559,7 @@ public class XOAI {
 
 
             boolean solr = true; // Assuming solr by default
-            solr = !("database").equals(configurationService.getProperty("oai", "storage"));
+            solr = !("database").equals(configurationService.getProperty("oai.storage", "solr"));
 
 
             boolean run = false;
@@ -652,7 +664,7 @@ public class XOAI {
 
     private static void usage() {
         boolean solr = true; // Assuming solr by default
-        solr = !("database").equals(ConfigurationManager.getProperty("oai", "storage"));
+        solr = !("database").equals(configurationService.getProperty("oai.storage","solr"));
 
         if (solr) {
             System.out.println("OAI Manager Script");

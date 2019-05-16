@@ -27,7 +27,7 @@ import org.dspace.workflow.WorkflowItem;
  *
  * @author kevinvandevelde at atmire.com
  */
-public interface WorkspaceItemService extends InProgressSubmissionService<WorkspaceItem> {
+public interface WorkspaceItemService extends InProgressSubmissionService<WorkspaceItem, Integer> {
 
     /**
      * Get a workspace item from the database. The item, collection and
@@ -39,7 +39,6 @@ public interface WorkspaceItemService extends InProgressSubmissionService<Worksp
      * @throws SQLException if database error
      */
     public WorkspaceItem find(Context context, int id) throws SQLException;
-
 
     /**
      * Create a new workspace item, with a new ID. An Item is also created. The

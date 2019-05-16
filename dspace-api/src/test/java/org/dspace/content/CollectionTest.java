@@ -509,8 +509,9 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
         Group g = groupService.create(context);
         context.restoreAuthSystemState();
         collection.setWorkflowGroup(context, step, g);
-        assertThat("testSetWorkflowGroup 0", collectionService.getWorkflowGroup(collection, step), notNullValue());
-        assertThat("testSetWorkflowGroup 1", collectionService.getWorkflowGroup(collection, step), equalTo(g));
+        assertThat("testSetWorkflowGroup 0", collectionService.getWorkflowGroup(context, collection, step),
+                notNullValue());
+        assertThat("testSetWorkflowGroup 1", collectionService.getWorkflowGroup(context, collection, step), equalTo(g));
     }
 
     /**
@@ -528,8 +529,10 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
         context.restoreAuthSystemState();
         collection.setWorkflowGroup(context, step, g1);
         collection.setWorkflowGroup(context, step, g2);
-        assertThat("testSetWorkflowGroup 0", collectionService.getWorkflowGroup(collection, step), notNullValue());
-        assertThat("testSetWorkflowGroup 1", collectionService.getWorkflowGroup(collection, step), equalTo(g2));
+        assertThat("testSetWorkflowGroup 0", collectionService.getWorkflowGroup(context, collection, step),
+                notNullValue());
+        assertThat("testSetWorkflowGroup 1", collectionService.getWorkflowGroup(context, collection, step),
+                equalTo(g2));
     }
 
     /**
@@ -539,7 +542,8 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
     public void testGetWorkflowGroup() {
         //null by default
         int step = 1;
-        assertThat("testGetWorkflowGroup 0", collectionService.getWorkflowGroup(collection, step), nullValue());
+        assertThat("testGetWorkflowGroup 0", collectionService.getWorkflowGroup(context, collection, step),
+                nullValue());
     }
 
     /**
@@ -1834,16 +1838,16 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
     public void testGetCommunities() throws Exception {
         context.turnOffAuthorisationSystem();
         Community community = communityService.create(null, context);
-        communityService.setMetadataSingleValue(context, community, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY,
-                                                "community 3");
+        communityService.setMetadataSingleValue(context, community, MetadataSchemaEnum.DC.getName(),
+                                                "title", null, Item.ANY, "community 3");
         this.collection.addCommunity(community);
         community = communityService.create(null, context);
-        communityService.setMetadataSingleValue(context, community, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY,
-                                                "community 1");
+        communityService.setMetadataSingleValue(context, community, MetadataSchemaEnum.DC.getName(),
+                                                "title", null, Item.ANY, "community 1");
         this.collection.addCommunity(community);
         community = communityService.create(null, context);
-        communityService.setMetadataSingleValue(context, community, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY,
-                                                "community 2");
+        communityService.setMetadataSingleValue(context, community, MetadataSchemaEnum.DC.getName(),
+                                                "title", null, Item.ANY, "community 2");
         this.collection.addCommunity(community);
         context.restoreAuthSystemState();
         assertTrue("testGetCommunities 0", collection.getCommunities().size() == 4);

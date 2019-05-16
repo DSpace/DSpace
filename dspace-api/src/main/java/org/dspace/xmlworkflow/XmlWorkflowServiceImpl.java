@@ -18,6 +18,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.UUID;
+
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 
@@ -31,9 +32,12 @@ import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.DCDate;
 import org.dspace.content.Item;
-import org.dspace.content.MetadataSchema;
+import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.content.service.BitstreamFormatService;
+import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.BundleService;
 import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
@@ -46,6 +50,7 @@ import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
+import org.dspace.event.Event;
 import org.dspace.handle.service.HandleService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.usage.UsageWorkflowEvent;
@@ -112,6 +117,12 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
     protected XmlWorkflowItemService xmlWorkflowItemService;
     @Autowired(required = true)
     protected GroupService groupService;
+    @Autowired(required = true)
+    protected BundleService bundleService;
+    @Autowired(required = true)
+    protected BitstreamFormatService bitstreamFormatService;
+    @Autowired(required = true)
+    protected BitstreamService bitstreamService;
 
     protected XmlWorkflowServiceImpl() {
 
@@ -208,6 +219,8 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
             // remove the WorkspaceItem
             workspaceItemService.deleteWrapper(context, wsi);
             context.restoreAuthSystemState();
+            context.addEvent(new Event(Event.MODIFY, Constants.ITEM, wfi.getItem().getID(), null,
+                    itemService.getIdentifiers(context, wfi.getItem())));
             return wfi;
         } catch (WorkflowConfigurationException e) {
             throw new WorkflowException(e);
@@ -302,6 +315,13 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
             Step currentStep = currentActionConfig.getStep();
             if (currentActionConfig.getProcessingAction().isAuthorized(c, request, wi)) {
                 ActionResult outcome = currentActionConfig.getProcessingAction().execute(c, wi, currentStep, request);
+                // the cancel action is the default when the request is not understood or a "back to mydspace" was
+                // pressed in the old UI
+                if (outcome.getType() == ActionResult.TYPE.TYPE_CANCEL) {
+                    throw new WorkflowException("Unprocessable request for the action " + currentStep.getId());
+                }
+                c.addEvent(new Event(Event.MODIFY, Constants.ITEM, wi.getItem().getID(), null,
+                        itemService.getIdentifiers(c, wi.getItem())));
                 return processOutcome(c, user, workflow, currentStep, currentActionConfig, outcome, wi, false);
             } else {
                 throw new AuthorizeException("You are not allowed to to perform this task.");
@@ -573,7 +593,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
 
             // Get title
             List<MetadataValue> titles = itemService
-                .getMetadata(item, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY);
+                .getMetadata(item, MetadataSchemaEnum.DC.getName(), "title", null, Item.ANY);
             String title = "";
             try {
                 title = I18nUtil.getMessage("org.dspace.workflow.WorkflowManager.untitled");
@@ -653,6 +673,8 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
             removeUserItemPolicies(c, wi.getItem(), task.getOwner());
             claimedTaskService.delete(c, task);
         }
+        c.addEvent(new Event(Event.MODIFY, Constants.ITEM, wi.getItem().getID(), null,
+                itemService.getIdentifiers(c, wi.getItem())));
     }
 
     /*
@@ -672,7 +694,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
             task.setWorkflowItem(wi);
             poolTaskService.update(context, task);
             //Make sure this user has a task
-            grantUserAllItemPolicies(context, wi.getItem(), anEpa);
+            grantUserAllItemPolicies(context, wi.getItem(), anEpa, ResourcePolicy.TYPE_WORKFLOW);
         }
         for (Group group : assignees.getGroups()) {
             PoolTask task = poolTaskService.create(context);
@@ -683,7 +705,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
             task.setWorkflowItem(wi);
             poolTaskService.update(context, task);
             //Make sure this user has a task
-            grantGroupAllItemPolicies(context, wi.getItem(), group);
+            grantGroupAllItemPolicies(context, wi.getItem(), group, ResourcePolicy.TYPE_WORKFLOW);
         }
     }
 
@@ -701,10 +723,10 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
         task.setWorkflowID(step.getWorkflow().getID());
         claimedTaskService.update(context, task);
         //Make sure this user has a task
-        grantUserAllItemPolicies(context, wi.getItem(), e);
+        grantUserAllItemPolicies(context, wi.getItem(), e, ResourcePolicy.TYPE_WORKFLOW);
     }
 
-    public void grantUserAllItemPolicies(Context context, Item item, EPerson epa)
+    public void grantUserAllItemPolicies(Context context, Item item, EPerson epa, String policyType)
         throws AuthorizeException, SQLException {
         if (epa != null) {
             //A list of policies the user has for this item
@@ -719,24 +741,24 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
 
             //Make sure we don't add duplicate policies
             if (!userHasPolicies.contains(Constants.READ)) {
-                addPolicyToItem(context, item, Constants.READ, epa);
+                addPolicyToItem(context, item, Constants.READ, epa, policyType);
             }
             if (!userHasPolicies.contains(Constants.WRITE)) {
-                addPolicyToItem(context, item, Constants.WRITE, epa);
+                addPolicyToItem(context, item, Constants.WRITE, epa, policyType);
             }
             if (!userHasPolicies.contains(Constants.DELETE)) {
-                addPolicyToItem(context, item, Constants.DELETE, epa);
+                addPolicyToItem(context, item, Constants.DELETE, epa, policyType);
             }
             if (!userHasPolicies.contains(Constants.ADD)) {
-                addPolicyToItem(context, item, Constants.ADD, epa);
+                addPolicyToItem(context, item, Constants.ADD, epa, policyType);
             }
             if (!userHasPolicies.contains(Constants.REMOVE)) {
-                addPolicyToItem(context, item, Constants.REMOVE, epa);
+                addPolicyToItem(context, item, Constants.REMOVE, epa, policyType);
             }
         }
     }
 
-    protected void grantGroupAllItemPolicies(Context context, Item item, Group group)
+    protected void grantGroupAllItemPolicies(Context context, Item item, Group group, String policyType)
         throws AuthorizeException, SQLException {
         if (group != null) {
             //A list of policies the user has for this item
@@ -750,53 +772,48 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
             }
             //Make sure we don't add duplicate policies
             if (!groupHasPolicies.contains(Constants.READ)) {
-                addGroupPolicyToItem(context, item, Constants.READ, group);
+                addGroupPolicyToItem(context, item, Constants.READ, group, policyType);
             }
             if (!groupHasPolicies.contains(Constants.WRITE)) {
-                addGroupPolicyToItem(context, item, Constants.WRITE, group);
+                addGroupPolicyToItem(context, item, Constants.WRITE, group, policyType);
             }
             if (!groupHasPolicies.contains(Constants.DELETE)) {
-                addGroupPolicyToItem(context, item, Constants.DELETE, group);
+                addGroupPolicyToItem(context, item, Constants.DELETE, group, policyType);
             }
             if (!groupHasPolicies.contains(Constants.ADD)) {
-                addGroupPolicyToItem(context, item, Constants.ADD, group);
+                addGroupPolicyToItem(context, item, Constants.ADD, group, policyType);
             }
             if (!groupHasPolicies.contains(Constants.REMOVE)) {
-                addGroupPolicyToItem(context, item, Constants.REMOVE, group);
+                addGroupPolicyToItem(context, item, Constants.REMOVE, group, policyType);
             }
         }
     }
 
-    protected void addPolicyToItem(Context context, Item item, int type, EPerson epa)
-        throws AuthorizeException, SQLException {
-        addPolicyToItem(context, item, type, epa, null);
-    }
-
-    protected void addPolicyToItem(Context context, Item item, int type, EPerson epa, String policyType)
+    protected void addPolicyToItem(Context context, Item item, int action, EPerson epa, String policyType)
         throws AuthorizeException, SQLException {
         if (epa != null) {
-            authorizeService.addPolicy(context, item, type, epa, policyType);
+            authorizeService.addPolicy(context, item, action, epa, policyType);
             List<Bundle> bundles = item.getBundles();
             for (Bundle bundle : bundles) {
-                authorizeService.addPolicy(context, bundle, type, epa, policyType);
+                authorizeService.addPolicy(context, bundle, action, epa, policyType);
                 List<Bitstream> bits = bundle.getBitstreams();
                 for (Bitstream bit : bits) {
-                    authorizeService.addPolicy(context, bit, type, epa, policyType);
+                    authorizeService.addPolicy(context, bit, action, epa, policyType);
                 }
             }
         }
     }
 
-    protected void addGroupPolicyToItem(Context context, Item item, int type, Group group)
+    protected void addGroupPolicyToItem(Context context, Item item, int action, Group group, String policyType)
         throws AuthorizeException, SQLException {
         if (group != null) {
-            authorizeService.addPolicy(context, item, type, group);
+            authorizeService.addPolicy(context, item, action, group, policyType);
             List<Bundle> bundles = item.getBundles();
             for (Bundle bundle : bundles) {
-                authorizeService.addPolicy(context, bundle, type, group);
+                authorizeService.addPolicy(context, bundle, action, group, policyType);
                 List<Bitstream> bits = bundle.getBitstreams();
                 for (Bitstream bit : bits) {
-                    authorizeService.addPolicy(context, bit, type, group);
+                    authorizeService.addPolicy(context, bit, action, group, policyType);
                 }
             }
         }
@@ -874,7 +891,8 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
 
         // Add to item as a DC field
         itemService
-            .addMetadata(context, myitem, MetadataSchema.DC_SCHEMA, "description", "provenance", "en", provDescription);
+            .addMetadata(context, myitem, MetadataSchemaEnum.DC.getName(),
+                         "description", "provenance", "en", provDescription);
 
         //Clear any workflow schema related metadata
         itemService
@@ -885,6 +903,9 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
         // convert into personal workspace
         WorkspaceItem wsi = returnToWorkspace(context, wi);
 
+        // remove policy for controller
+        removeUserItemPolicies(context, myitem, e);
+        revokeReviewerPolicies(context, myitem);
         // notify that it's been rejected
         notifyOfReject(context, wi, e, rejection_message);
         log.info(LogManager.getHeader(context, "reject_workflow", "workflow_item_id="
@@ -916,6 +937,8 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
             + "collection_id=" + wi.getCollection().getID() + "eperson_id="
             + e.getID()));
 
+        c.addEvent(new Event(Event.MODIFY, Constants.ITEM, wsi.getItem().getID(), null,
+                itemService.getIdentifiers(c, wsi.getItem())));
 
         c.restoreAuthSystemState();
         return wsi;
@@ -947,7 +970,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
 
         Item myitem = wfi.getItem();
         //Restore permissions for the submitter
-        grantUserAllItemPolicies(c, myitem, myitem.getSubmitter());
+        grantUserAllItemPolicies(c, myitem, myitem.getSubmitter(), ResourcePolicy.TYPE_SUBMISSION);
 
         // FIXME: How should this interact with the workflow system?
         // FIXME: Remove license
@@ -1002,7 +1025,8 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
 
         // Add message to the DC
         itemService
-            .addMetadata(context, myitem, MetadataSchema.DC_SCHEMA, "description", "provenance", "en", provmessage);
+            .addMetadata(context, myitem, MetadataSchemaEnum.DC.getName(),
+                         "description", "provenance", "en", provmessage);
         itemService.update(context, myitem);
     }
 
@@ -1040,5 +1064,21 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
     @Override
     public String getMyDSpaceLink() {
         return ConfigurationManager.getProperty("dspace.url") + "/mydspace";
+    }
+
+    protected void revokeReviewerPolicies(Context context, Item item) throws SQLException, AuthorizeException {
+        List<Bundle> bundles = item.getBundles();
+
+        for (Bundle originalBundle : bundles) {
+            // remove bitstream and bundle level policies
+            for (Bitstream bitstream : originalBundle.getBitstreams()) {
+                authorizeService.removeAllPoliciesByDSOAndType(context, bitstream, ResourcePolicy.TYPE_WORKFLOW);
+            }
+
+            authorizeService.removeAllPoliciesByDSOAndType(context, originalBundle, ResourcePolicy.TYPE_WORKFLOW);
+        }
+
+        // remove item level policies
+        authorizeService.removeAllPoliciesByDSOAndType(context, item, ResourcePolicy.TYPE_WORKFLOW);
     }
 }
