@@ -7,6 +7,8 @@
  */
 package org.dspace.app.rest;
 
+import static org.dspace.core.Constants.COLLECTION;
+
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.LinkedList;
@@ -25,6 +27,7 @@ import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.ItemService;
@@ -38,7 +41,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/core/items/" +
-    "{uuid:[0-9a-fxA-FX]{8}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{12}}/mappingCollections")
+    "{uuid:[0-9a-fxA-FX]{8}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{12}}/mappedCollections")
 public class MappingCollectionRestController {
 
     private static final Logger log = Logger.getLogger(MappingCollectionRestController.class);
@@ -87,21 +90,25 @@ public class MappingCollectionRestController {
 
     }
 
-    @RequestMapping(method = RequestMethod.POST, value = "/{collectionUuid}")
-    public void createCollectionToItemRelation(@PathVariable UUID uuid, @PathVariable UUID collectionUuid,
+    @RequestMapping(method = RequestMethod.POST, consumes = {"text/uri-list"})
+    public void createCollectionToItemRelation(@PathVariable UUID uuid,
                                                HttpServletResponse response, HttpServletRequest request)
         throws SQLException, AuthorizeException {
 
         Context context = ContextUtil.obtainContext(request);
-        Collection collection = collectionService.find(context, collectionUuid);
-        Item item = itemService.find(context, uuid);
-        if (collection != null && item != null) {
-            collectionService.addItem(context, collection, item);
-            collectionService.update(context, collection);
-            itemService.update(context, item);
-            context.commit();
+
+        for (DSpaceObject dso : utils.constructDSpaceObjectList(context, utils.getStringListFromRequest(request))) {
+
+            Item item = itemService.find(context, uuid);
+            if (dso != null && dso.getType() == COLLECTION && item != null) {
+                Collection collection = (Collection) dso;
+                collectionService.addItem(context, collection, item);
+                collectionService.update(context, collection);
+                itemService.update(context, item);
+            }
         }
 
+        context.commit();
     }
 
     @RequestMapping(method = RequestMethod.DELETE, value = "/{collectionUuid}")

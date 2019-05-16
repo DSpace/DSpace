@@ -35,7 +35,7 @@ public class MappingCollectionResourceWrapper extends HALResource<MappingCollect
         }
 
 
-        embedResource("mappingCollections", collectionResources);
+        embedResource("mappedCollections", collectionResources);
 
     }
 
