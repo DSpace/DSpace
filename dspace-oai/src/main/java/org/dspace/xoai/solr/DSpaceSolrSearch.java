@@ -8,9 +8,11 @@
 
 package org.dspace.xoai.solr;
 
+import java.io.IOException;
+
+import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrQuery.ORDER;
-import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
@@ -28,10 +30,10 @@ public class DSpaceSolrSearch {
      */
     private DSpaceSolrSearch() { }
 
-    public static SolrDocumentList query(SolrServer server, SolrQuery solrParams)
-        throws DSpaceSolrException {
+    public static SolrDocumentList query(SolrClient server, SolrQuery solrParams)
+        throws DSpaceSolrException, IOException {
         try {
-            solrParams.addSortField("item.id", ORDER.asc);
+            solrParams.addSort("item.id", ORDER.asc);
             QueryResponse response = server.query(solrParams);
             return response.getResults();
         } catch (SolrServerException ex) {
@@ -39,10 +41,10 @@ public class DSpaceSolrSearch {
         }
     }
 
-    public static SolrDocument querySingle(SolrServer server, SolrQuery solrParams)
-        throws SolrSearchEmptyException {
+    public static SolrDocument querySingle(SolrClient server, SolrQuery solrParams)
+        throws SolrSearchEmptyException, IOException {
         try {
-            solrParams.addSortField("item.id", ORDER.asc);
+            solrParams.addSort("item.id", ORDER.asc);
             QueryResponse response = server.query(solrParams);
             if (response.getResults().getNumFound() > 0) {
                 return response.getResults().get(0);

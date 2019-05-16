@@ -10,6 +10,7 @@ package org.dspace.app.rest.model;
 import java.util.Date;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import org.dspace.app.rest.RestResourceController;
@@ -38,9 +39,6 @@ public class EPersonRest extends DSpaceObjectRest {
     @JsonProperty(access = Access.WRITE_ONLY)
     private String password;
 
-    // FIXME this should be annotated with @JsonIgnore but right now only simple
-    // rest resource can be embedded not list, see
-    // https://jira.duraspace.org/browse/DS-3483
     private List<GroupRest> groups;
 
     @Override
@@ -105,6 +103,8 @@ public class EPersonRest extends DSpaceObjectRest {
         this.password = password;
     }
 
+    @LinkRest(linkClass = GroupRest.class)
+    @JsonIgnore
     public List<GroupRest> getGroups() {
         return groups;
     }

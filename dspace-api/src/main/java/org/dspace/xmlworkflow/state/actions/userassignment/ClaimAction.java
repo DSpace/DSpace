@@ -60,17 +60,11 @@ public class ClaimAction extends UserSelectionAction {
 
     @Override
     public ActionResult execute(Context c, XmlWorkflowItem wfi, Step step, HttpServletRequest request)
-        throws SQLException, AuthorizeException, IOException {
-        //Check if we are accept this task, or accepting multiple tasks
-        if (request.getParameter("submit_take_task") != null || request.getParameter("submit_take_tasks") != null) {
-            //Add a claimed user to our task
-            XmlWorkflowServiceFactory.getInstance().getWorkflowRequirementsService()
-                                     .addClaimedUser(c, wfi, step, c.getCurrentUser());
-
-            return new ActionResult(ActionResult.TYPE.TYPE_OUTCOME, ActionResult.OUTCOME_COMPLETE);
-        } else {
-            return new ActionResult(ActionResult.TYPE.TYPE_CANCEL);
-        }
+            throws SQLException, AuthorizeException, IOException {
+        // accept task, or accepting multiple tasks
+        XmlWorkflowServiceFactory.getInstance().getWorkflowRequirementsService().addClaimedUser(c, wfi, step,
+                c.getCurrentUser());
+        return new ActionResult(ActionResult.TYPE.TYPE_OUTCOME, ActionResult.OUTCOME_COMPLETE);
     }
 
     @Override

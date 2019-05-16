@@ -20,7 +20,7 @@ public class SiteBuilder extends AbstractDSpaceObjectBuilder<Site> {
     }
 
     @Override
-    protected void cleanup() throws Exception {
+    public void cleanup() throws Exception {
         //Do nothing
     }
 

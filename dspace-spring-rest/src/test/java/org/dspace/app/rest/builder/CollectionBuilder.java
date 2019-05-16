@@ -16,9 +16,11 @@ import org.apache.commons.lang3.CharEncoding;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
-import org.dspace.content.MetadataSchema;
+import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
 
 /**
  * Builder to construct Collection objects
@@ -50,7 +52,7 @@ public class CollectionBuilder extends AbstractDSpaceObjectBuilder<Collection> {
     }
 
     public CollectionBuilder withName(final String name) {
-        return setMetadataSingleValue(collection, MetadataSchema.DC_SCHEMA, "title", null, name);
+        return setMetadataSingleValue(collection, MetadataSchemaEnum.DC.getName(), "title", null, name);
     }
 
     public CollectionBuilder withLogo(final String content) throws AuthorizeException, IOException, SQLException {
@@ -70,6 +72,15 @@ public class CollectionBuilder extends AbstractDSpaceObjectBuilder<Collection> {
         return this;
     }
 
+    public CollectionBuilder withWorkflowGroup(int step, EPerson... members) throws SQLException, AuthorizeException {
+        Group g = collectionService.createWorkflowGroup(context, collection, step);
+        for (EPerson e : members) {
+            groupService.addMember(context, g, e);
+        }
+        groupService.update(context, g);
+        return this;
+    }
+
     @Override
     public Collection build() {
         try {
@@ -83,8 +94,30 @@ public class CollectionBuilder extends AbstractDSpaceObjectBuilder<Collection> {
         return collection;
     }
 
-    protected void cleanup() throws Exception {
+    @Override
+    public void cleanup() throws Exception {
+        deleteWorkflowGroups(collection);
         delete(collection);
+    }
+
+    public void deleteWorkflowGroups(Collection collection) throws Exception {
+
+        try (Context c = new Context()) {
+            c.turnOffAuthorisationSystem();
+            for (int i = 1; i <= 3; i++) {
+                Group g = collectionService.getWorkflowGroup(c, collection, i);
+                if (g != null) {
+                    Group attachedDso = c.reloadEntity(g);
+                    if (attachedDso != null) {
+                        collectionService.setWorkflowGroup(c, collection, i, null);
+                        groupService.delete(c, attachedDso);
+                    }
+                }
+            }
+            c.complete();
+        }
+
+        indexingService.commit();
     }
 
     @Override

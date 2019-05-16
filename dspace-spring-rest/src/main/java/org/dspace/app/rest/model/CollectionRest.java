@@ -10,6 +10,7 @@ package org.dspace.app.rest.model;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * The Collection REST Resource
@@ -45,6 +46,7 @@ public class CollectionRest extends DSpaceObjectRest {
     }
 
     @Override
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     public String getType() {
         return NAME;
     }
@@ -58,4 +60,5 @@ public class CollectionRest extends DSpaceObjectRest {
     public void setDefaultAccessConditions(List<ResourcePolicyRest> defaultAccessConditions) {
         this.defaultAccessConditions = defaultAccessConditions;
     }
+
 }

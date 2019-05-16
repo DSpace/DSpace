@@ -14,11 +14,14 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
+import javax.servlet.http.HttpServletRequest;
 
 import org.dspace.app.rest.converter.BitstreamConverter;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.hateoas.BitstreamResource;
+import org.dspace.app.rest.model.patch.Patch;
+import org.dspace.app.rest.repository.patch.DSpaceObjectPatch;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.service.BitstreamService;
@@ -39,16 +42,15 @@ import org.springframework.stereotype.Component;
  */
 
 @Component(BitstreamRest.CATEGORY + "." + BitstreamRest.NAME)
-public class BitstreamRestRepository extends DSpaceRestRepository<BitstreamRest, UUID> {
+public class BitstreamRestRepository extends DSpaceObjectRestRepository<Bitstream, BitstreamRest> {
+
+    private final BitstreamService bs;
 
     @Autowired
-    BitstreamService bs;
-
-    @Autowired
-    BitstreamConverter converter;
-
-    public BitstreamRestRepository() {
-        System.out.println("Repository initialized by Spring");
+    public BitstreamRestRepository(BitstreamService dsoService,
+                                   BitstreamConverter dsoConverter) {
+        super(dsoService, dsoConverter, new DSpaceObjectPatch<BitstreamRest>() { });
+        this.bs = dsoService;
     }
 
     @Override
@@ -70,7 +72,7 @@ public class BitstreamRestRepository extends DSpaceRestRepository<BitstreamRest,
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        return converter.fromModel(bit);
+        return dsoConverter.fromModel(bit);
     }
 
     @Override
@@ -88,8 +90,15 @@ public class BitstreamRestRepository extends DSpaceRestRepository<BitstreamRest,
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<BitstreamRest> page = new PageImpl<Bitstream>(bit, pageable, total).map(converter);
+        Page<BitstreamRest> page = new PageImpl<Bitstream>(bit, pageable, total).map(dsoConverter);
         return page;
+    }
+
+    @Override
+    @PreAuthorize("hasPermission(#id, 'BITSTREAM', 'WRITE')")
+    protected void patch(Context context, HttpServletRequest request, String apiCategory, String model, UUID id,
+                         Patch patch) throws AuthorizeException, SQLException {
+        patchDSpaceObject(apiCategory, model, id, patch);
     }
 
     @Override

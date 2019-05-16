@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.dspace.content.Collection;
+import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.core.Context;
@@ -130,5 +131,18 @@ public interface ItemDAO extends DSpaceObjectLegacySupportDAO<Item> {
      * @throws SQLException if database error
      */
     int countItems(Context context, boolean includeArchived, boolean includeWithdrawn) throws SQLException;
+
+    /**
+     * Count number of items from the specified submitter based on specific status flags
+     *
+     * @param context          context
+     * @param submitter        the submitter
+     * @param includeArchived  whether to include archived items in count
+     * @param includeWithdrawn whether to include withdrawn items in count
+     * @return count of items
+     * @throws SQLException if database error
+     */
+    public int countItems(Context context, EPerson submitter, boolean includeArchived, boolean includeWithdrawn)
+        throws SQLException;
 
 }

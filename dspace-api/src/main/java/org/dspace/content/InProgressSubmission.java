@@ -7,8 +7,10 @@
  */
 package org.dspace.content;
 
+import java.io.Serializable;
 import java.sql.SQLException;
 
+import org.dspace.discovery.IndexableObject;
 import org.dspace.eperson.EPerson;
 
 /**
@@ -18,13 +20,13 @@ import org.dspace.eperson.EPerson;
  * @author Robert Tansley
  * @version $Revision$
  */
-public interface InProgressSubmission {
+public interface InProgressSubmission<ID extends Serializable> extends IndexableObject<ID> {
     /**
      * Get the internal ID of this submission
      *
      * @return the internal identifier
      */
-    Integer getID();
+    ID getID();
 
     /**
      * Get the incomplete item object

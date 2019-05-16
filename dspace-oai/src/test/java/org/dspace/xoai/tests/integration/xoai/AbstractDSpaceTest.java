@@ -19,7 +19,7 @@ import com.lyncode.xoai.dataprovider.services.api.ResourceResolver;
 import com.lyncode.xoai.dataprovider.services.impl.BaseDateProvider;
 import com.lyncode.xoai.dataprovider.xml.xoaiconfig.Configuration;
 import com.lyncode.xoai.dataprovider.xml.xoaiconfig.FormatConfiguration;
-import org.apache.solr.client.solrj.SolrServer;
+import org.apache.solr.client.solrj.SolrClient;
 import org.dspace.xoai.controller.DSpaceOAIDataProvider;
 import org.dspace.xoai.services.api.EarliestDateResolver;
 import org.dspace.xoai.services.api.FieldResolver;
@@ -51,7 +51,7 @@ import org.springframework.web.context.WebApplicationContext;
 @WebAppConfiguration
 @ContextConfiguration(classes = {DSpaceTestConfiguration.class, DSpaceOAIDataProvider.class})
 public abstract class AbstractDSpaceTest {
-    private static BaseDateProvider baseDateProvider = new BaseDateProvider();
+    private static final BaseDateProvider baseDateProvider = new BaseDateProvider();
     @Autowired
     WebApplicationContext wac;
     private MockMvc mockMvc;
@@ -62,7 +62,7 @@ public abstract class AbstractDSpaceTest {
     private StubbedEarliestDateResolver earliestDateResolver;
     private StubbedSetRepository setRepository;
     private StubbedResourceResolver resourceResolver;
-    private SolrServer solrServer;
+    private SolrClient solrServer;
 
     @Before
     public void setup() {

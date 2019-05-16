@@ -70,7 +70,7 @@ public class DiscoveryRestController implements InitializingBean {
     @RequestMapping(method = RequestMethod.GET)
     public SearchSupportResource getSearchSupport(@RequestParam(name = "scope", required = false) String dsoScope,
                                                   @RequestParam(name = "configuration", required = false) String
-                                                      configurationName)
+                                                  configuration)
         throws Exception {
 
         SearchSupportRest searchSupportRest = discoveryRestRepository.getSearchSupport();
@@ -82,14 +82,14 @@ public class DiscoveryRestController implements InitializingBean {
     @RequestMapping(method = RequestMethod.GET, value = "/search")
     public SearchConfigurationResource getSearchConfiguration(
         @RequestParam(name = "scope", required = false) String dsoScope,
-        @RequestParam(name = "configuration", required = false) String configurationName) throws Exception {
+        @RequestParam(name = "configuration", required = false) String configuration) throws Exception {
         if (log.isTraceEnabled()) {
             log.trace("Retrieving search configuration for scope " + StringUtils.trimToEmpty(dsoScope)
-                          + " and configuration name " + StringUtils.trimToEmpty(configurationName));
+                          + " and configuration name " + StringUtils.trimToEmpty(configuration));
         }
 
         SearchConfigurationRest searchConfigurationRest = discoveryRestRepository
-            .getSearchConfiguration(dsoScope, configurationName);
+            .getSearchConfiguration(dsoScope, configuration);
 
         SearchConfigurationResource searchConfigurationResource = new SearchConfigurationResource(
             searchConfigurationRest);
@@ -101,20 +101,20 @@ public class DiscoveryRestController implements InitializingBean {
     public FacetsResource getFacets(@RequestParam(name = "query", required = false) String query,
                                     @RequestParam(name = "dsoType", required = false) String dsoType,
                                     @RequestParam(name = "scope", required = false) String dsoScope,
-                                    @RequestParam(name = "configuration", required = false) String configurationName,
+                                    @RequestParam(name = "configuration", required = false) String configuration,
                                     List<SearchFilter> searchFilters,
                                     Pageable page) throws Exception {
 
         if (log.isTraceEnabled()) {
             log.trace("Searching with scope: " + StringUtils.trimToEmpty(dsoScope)
-                          + ", configuration name: " + StringUtils.trimToEmpty(configurationName)
+                          + ", configuration name: " + StringUtils.trimToEmpty(configuration)
                           + ", dsoType: " + StringUtils.trimToEmpty(dsoType)
                           + ", query: " + StringUtils.trimToEmpty(query)
                           + ", filters: " + Objects.toString(searchFilters));
         }
 
         SearchResultsRest searchResultsRest = discoveryRestRepository
-            .getAllFacets(query, dsoType, dsoScope, configurationName, searchFilters);
+            .getAllFacets(query, dsoType, dsoScope, configuration, searchFilters);
 
         FacetsResource facetsResource = new FacetsResource(searchResultsRest, page);
         halLinkService.addLinks(facetsResource, page);
@@ -129,12 +129,12 @@ public class DiscoveryRestController implements InitializingBean {
                                                   @RequestParam(name = "dsoType", required = false) String dsoType,
                                                   @RequestParam(name = "scope", required = false) String dsoScope,
                                                   @RequestParam(name = "configuration", required = false) String
-                                                      configurationName,
+                                                      configuration,
                                                   List<SearchFilter> searchFilters,
                                                   Pageable page) throws Exception {
         if (log.isTraceEnabled()) {
             log.trace("Searching with scope: " + StringUtils.trimToEmpty(dsoScope)
-                          + ", configuration name: " + StringUtils.trimToEmpty(configurationName)
+                          + ", configuration name: " + StringUtils.trimToEmpty(configuration)
                           + ", dsoType: " + StringUtils.trimToEmpty(dsoType)
                           + ", query: " + StringUtils.trimToEmpty(query)
                           + ", filters: " + Objects.toString(searchFilters)
@@ -144,7 +144,7 @@ public class DiscoveryRestController implements InitializingBean {
         //Get the Search results in JSON format
         SearchResultsRest searchResultsRest = null;
         searchResultsRest = discoveryRestRepository
-            .getSearchObjects(query, dsoType, dsoScope, configurationName, searchFilters, page);
+            .getSearchObjects(query, dsoType, dsoScope, configuration, searchFilters, page);
 
         //Convert the Search JSON results to paginated HAL resources
         SearchResultsResource searchResultsResource = new SearchResultsResource(searchResultsRest, utils, page);
@@ -155,15 +155,15 @@ public class DiscoveryRestController implements InitializingBean {
     @RequestMapping(method = RequestMethod.GET, value = "/facets")
     public FacetConfigurationResource getFacetsConfiguration(
         @RequestParam(name = "scope", required = false) String dsoScope,
-        @RequestParam(name = "configuration", required = false) String configurationName,
+        @RequestParam(name = "configuration", required = false) String configuration,
         Pageable pageable) throws Exception {
         if (log.isTraceEnabled()) {
             log.trace("Retrieving facet configuration for scope " + StringUtils.trimToEmpty(dsoScope)
-                          + " and configuration name " + StringUtils.trimToEmpty(configurationName));
+                          + " and configuration name " + StringUtils.trimToEmpty(configuration));
         }
 
         FacetConfigurationRest facetConfigurationRest = discoveryRestRepository
-            .getFacetsConfiguration(dsoScope, configurationName);
+            .getFacetsConfiguration(dsoScope, configuration);
         FacetConfigurationResource facetConfigurationResource = new FacetConfigurationResource(facetConfigurationRest);
 
         halLinkService.addLinks(facetConfigurationResource, pageable);
@@ -176,6 +176,8 @@ public class DiscoveryRestController implements InitializingBean {
                                           @RequestParam(name = "query", required = false) String query,
                                           @RequestParam(name = "dsoType", required = false) String dsoType,
                                           @RequestParam(name = "scope", required = false) String dsoScope,
+                                          @RequestParam(name = "configuration", required = false) String
+                                              configuration,
                                           List<SearchFilter> searchFilters,
                                           Pageable page) throws Exception {
         if (log.isTraceEnabled()) {
@@ -188,7 +190,7 @@ public class DiscoveryRestController implements InitializingBean {
         }
 
         FacetResultsRest facetResultsRest = discoveryRestRepository
-            .getFacetObjects(facetName, prefix, query, dsoType, dsoScope, searchFilters, page);
+            .getFacetObjects(facetName, prefix, query, dsoType, dsoScope, configuration, searchFilters, page);
 
         FacetResultsResource facetResultsResource = new FacetResultsResource(facetResultsRest);
 
