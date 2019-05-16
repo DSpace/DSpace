@@ -19,26 +19,19 @@
     - /brage/{{ kunde }}/install
     - /brage/{{ kunde }}/tmp
 
+- name: Customize theme for customer
+  shell: "cat {{ jenkins_workspace }}/customizations/themes/{{ kunde }}/style.css   >> {{ jenkins_workspace }}/dspace/target/dspace-installer/webapps/xmlui/themes/Mirage2/styles/main.css"
+  delegate_to: localhost
+
+- name: Adding logo, favicon and other images for customer
+  shell: "rsync -avh {{ jenkins_workspace }}/customizations/themes/{{ kunde }}/overlay/  {{ jenkins_workspace }}/dspace/target/dspace-installer/webapps/xmlui/themes/Mirage2/"
+  delegate_to: localhost
+
 - name: Deploy DSpace Installer
   synchronize:
     delete: yes
     dest: /brage/{{ kunde }}/install/dspace-installer/
     src: "{{ jenkins_workspace }}/dspace/target/dspace-installer/"
-
-#- name: Customize theme for customer
-#  shell: "sed 's#../images/logo.png#../../{{kundedata[kunde]['bibkode']}}/images/logo.png#g' < /brage/{{ kunde }}/install/dspace-installer/webapps/xmlui/WEB-INF/classes/bibsys-themes/{{ kundedata[kunde]['bibkode'] }}/style.css >> /brage/{{ kunde }}/install/dspace-installer/webapps/xmlui/themes/brage/styles/main.css"
-
-#- name: Check custom favicon
-#  stat:
-#    path: /brage/{{ kunde }}/install/dspace-installer/webapps/xmlui/WEB-INF/classes/bibsys-themes/{{ kundedata[kunde]["bibkode"] }}/overlay/images/favicon.ico
-#  register: favicon
-
-#- name: Custom favicon for customer
-#  copy:
-#    src: /brage/{{ kunde }}/install/dspace-installer/webapps/xmlui/WEB-INF/classes/bibsys-themes/{{ kundedata[kunde]["bibkode"] }}/overlay/images/favicon.ico
-#    dest: /brage/{{ kunde }}/install/dspace-installer/webapps/xmlui/themes/brage/images/favicon.ico
-#    remote_src: true
-#  when: favicon.stat.exists
 
 - name: Make sure brage-{{ kunde }} database is present
   postgresql_db:

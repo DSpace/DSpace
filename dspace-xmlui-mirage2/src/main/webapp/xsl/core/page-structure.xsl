@@ -343,7 +343,6 @@
                         </button>
 
                         <a href="{$context-path}/" class="navbar-brand">
-                            <img src="{$theme-path}images/brage_logo_124_51.png" />
                         </a>
 
 
