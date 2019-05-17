@@ -305,3 +305,8 @@ footer .container {
 .nav > .researcher-menu-item-hidden {
 	display:none;
 }
+
+.hr-metadata-separator {
+	background-image: -webkit-linear-gradient(left, rgba(15,157,88,.8), rgba(15, 157, 88,.6), rgba(0,0,0,0));
+	height: 2px;	
+}
