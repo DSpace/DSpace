@@ -34,8 +34,6 @@ import java.util.TimeZone;
 import java.util.UUID;
 import java.util.Vector;
 
-import com.google.common.collect.ImmutableList;
-
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.collections4.Transformer;
@@ -473,7 +471,8 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             switch (type) {
                 case Constants.ITEM:
                     Iterator<Item> items = itemService.findAllUnfiltered(context);
-                    for (Item item : ImmutableList.copyOf(items)) {
+                    while (items.hasNext()) {
+                        Item item = items.next();
                         indexContent(context, item, force);
                         //To prevent memory issues, discard an object from the cache after processing
                         context.uncacheEntity(item);
