@@ -164,14 +164,20 @@ public class DashService {
         return response;
     }
 
+    /**
+       Checks whether a dataset has been archived in DASH. First, checks whether the dryad.
+     **/
+    public boolean isDatasetArchived(Package pkg) {
+
+    }
 
     /**
        PUTs a DryadDataPackage to Dash, creating a new submission or updating an
        existing submission (using the DOI contained in the Data Package).
-
+       
        @return a HTTP response code
-    *
-     * @param pkg*/
+       @param pkg
+    **/
     public int putDataset(Package pkg) {
         log.info("Putting dataset " + pkg.getItemID() + ", " + pkg.getDryadDOI());
         String dashJSON = pkg.getDataPackage().getDashJSON();

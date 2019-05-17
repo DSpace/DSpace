@@ -88,7 +88,7 @@ public class DryadDataPackage extends DryadObject {
     private final static String PUBLICATION_DATE_ELEMENT = "date";
     private final static String PUBLICATION_DATE_QUALIFIER = "issued";
 
-    private static final String DASH_TRANSFER_SCHEMA = "dryad";
+
     private static final String DASH_TRANSFER_ELEMENT = "dashTransferDate";
 
     private final static String PUBLICATION_DOI = "dc.relation.isreferencedby";
@@ -1121,7 +1121,14 @@ public class DryadDataPackage extends DryadObject {
     public void addDashTransferDate() {
         if (getItem() != null) {
             String transferDate = getNowString();
-            addSingleMetadataValue(Boolean.FALSE, DASH_TRANSFER_SCHEMA, DASH_TRANSFER_ELEMENT, null, transferDate);
+            addSingleMetadataValue(Boolean.FALSE, "dryad", "dashTransferDate", null, transferDate);
+        }
+    }
+
+    public void addDashArchiveDate() {
+        if (getItem() != null) {
+            String archiveDate = getNowString();
+            addSingleMetadataValue(Boolean.FALSE, "dryad", "dashArchiveDate", null, archiveDate);
         }
     }
 
