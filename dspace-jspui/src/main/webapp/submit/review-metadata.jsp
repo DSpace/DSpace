@@ -141,7 +141,7 @@
 
              for (int i = 0; i < values.length; i++)
              {
-                boolean newline = true;
+                boolean newline = values.length>1;
                 if (inputType.equals("date"))
                 {
                    DCDate date = new DCDate(values[i].value);
@@ -186,7 +186,7 @@
                 }
                 else
                 {
-                   row.append(Utils.addEntities(values[i].value));
+                   row.append(Utils.addEntities(values[i].value).replace("&#x0A;", "<br/>"));
                 }
                                 if (isAuthorityControlled)
                 {
@@ -196,13 +196,15 @@
                 }
                 if (newline)
                 {
-                    row.append("<br />");
+                    if(i<values.length-1) {
+                    	row.append("<div class=\"hr-metadata-separator\"></div>");
+                    }
                 }
              }
           }
           row.append("</span>");
           row.append("</div>");
-   
+          row.append("<hr/>");
           out.write(row.toString());
        }
     }%>
