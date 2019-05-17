@@ -8,33 +8,33 @@
 
 //  @Author: Cornelius Matějka <cornelius.matejka@uni-bamberg.de>
 
-function abbreviate(el, count) {
-	var $el = j(el);
-	if ($el.html().length > (count + 300)) {
-		let $shortText = j("<div></div>").html(($el.html().substring(0, count)) + "...")
-		$el.before($shortText);
+function abbreviate(el, count, index) {
+	var elementToAbbreviate = j(el);
+	if (elementToAbbreviate.html().length > (count + 300)) {
+		let shortText = j("<div id=\"div_abbreviated_" +index+ "\"></div>").html((elementToAbbreviate.html().substring(0, count)) + "...")
+		elementToAbbreviate.before(shortText);
 
-		let $a = j("<a></a>");
-		$a.toggleClass("fa fa-chevron-down");
-        $a.css("cursor", "pointer");
-        $a.css("text-decoration", "none");
-		$a.click(function () {
-			if($el.is(":visible")) $el.stop().slideUp(0);
-			else $el.stop().slideDown(0);
+		let anchorElement = j("<a id=\"a_abbreviated_" +index+ "\"></a>");
+		anchorElement.toggleClass("fa fa-chevron-down");
+        anchorElement.css("cursor", "pointer");
+        anchorElement.css("text-decoration", "none");
+		anchorElement.click(function () {
+			if(elementToAbbreviate.is(":visible")) elementToAbbreviate.stop().slideUp(0);
+			else elementToAbbreviate.stop().slideDown(0);
 
-			$a.toggleClass("fa-chevron-down");
-			$a.toggleClass("fa-chevron-up");
+			anchorElement.toggleClass("fa-chevron-down");
+			anchorElement.toggleClass("fa-chevron-up");
 
-			$shortText.toggle();
+			shortText.toggle();
 		});
 
-		$el.after($a);
-		$el.hide();
+		elementToAbbreviate.after(anchorElement);
+		elementToAbbreviate.hide();
 	}
 }
 
 j(function () {
-	j(".abbreviate-me").each(function() {
-		abbreviate(this, 400);
+	j(".abbreviate-me").each(function(index) {
+		abbreviate(this, 400, index);
 	});
 });

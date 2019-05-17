@@ -9,6 +9,7 @@ package org.dspace.app.webui.util;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 public class AbbreviateTextDisplayStrategy extends AUniformDisplayStrategy {
@@ -16,11 +17,10 @@ public class AbbreviateTextDisplayStrategy extends AUniformDisplayStrategy {
     private static Logger log = Logger.getLogger(AbbreviateTextDisplayStrategy.class);
 
     protected String getDisplayForValue(HttpServletRequest hrq, String value, int itemid) {
-        if (value != null) {
+        if (StringUtils.isNotBlank(value)) {
             value = value.replaceAll("\\r\\n|\\n", "<br/>");
             return "<div class=\"abbreviate-me\">" + value + "</div>";
-        } else {
-            return "";
-        }
+        } 
+        return null;
     }
 }
