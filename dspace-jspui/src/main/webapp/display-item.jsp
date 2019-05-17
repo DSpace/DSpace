@@ -139,6 +139,8 @@
 	String crisID = (String)request.getAttribute("crisID");
 %>
 
+<script type='text/javascript' src='<%= request.getContextPath() %>/static/js/abbreviatetext.js'></script>
+
 <% if(pmcEnabled || scopusEnabled || wosEnabled || scholarEnabled || altMetricEnabled) { %>
 <c:set var="dspace.layout.head.last" scope="request">
 <% if(altMetricEnabled) { %> 
