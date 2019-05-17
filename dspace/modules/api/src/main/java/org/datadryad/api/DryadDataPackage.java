@@ -387,6 +387,14 @@ public class DryadDataPackage extends DryadObject {
         return result;
     }
 
+    public String getDashStoredDate() {
+        String result = null;
+        if (getItem() != null) {
+            result = getSingleMetadataValue("dryad", "dashStoredDate", null);
+        }
+        return result;
+    }
+    
     public String getAbstract() {
         if (getItem() != null) {
             String theAbstract = getSingleMetadataValue("dc", "description", null);
@@ -1125,10 +1133,10 @@ public class DryadDataPackage extends DryadObject {
         }
     }
 
-    public void addDashArchiveDate() {
+    public void addDashStoredDate() {
         if (getItem() != null) {
-            String archiveDate = getNowString();
-            addSingleMetadataValue(Boolean.FALSE, "dryad", "dashArchiveDate", null, archiveDate);
+            String storeDate = getNowString();
+            addSingleMetadataValue(Boolean.FALSE, "dryad", "dashStoredDate", null, storeDate);
         }
     }
 
