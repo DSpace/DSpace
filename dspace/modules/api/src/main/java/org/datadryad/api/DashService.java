@@ -164,14 +164,45 @@ public class DashService {
         return response;
     }
 
+    /**
+       Checks whether a dataset has been stored in DASH. First, checks whether the dryad.dashStoredDate is set.
+       If not, calls the DASH API to determine whether the dataset has been fully stored (Merritt status is 'submitted')
+     **/
+    public boolean isDatasetStored(Package pkg) {        
+        //is flag set in metadata already?
+        DryadDataPackage ddp = pkg.getDataPackage();
+        String storedDate = ddp.getDashStoredDate();
+        if(storedDate != null && storedDate.length() > 0) {
+            log.debug("dataset was previously stored");
+            return true;
+        }
+
+        // call dash API and get the versionStatus
+        String json = getDashJSON(pkg.getDryadDOI());
+        boolean isStored = false;
+        try {
+            ObjectNode jsonObj = (ObjectNode) mapper.readTree(json);
+            String merrittStatus = jsonObj.findValue("versionStatus").asText();
+            isStored = merrittStatus.equals("submitted");
+            log.debug("Merritt Status = " + merrittStatus + ", " +
+                      "isStored = " + isStored);
+        } catch (Exception e) {
+            log.error("can't parse DASH JSON", e);
+        }
+        if(isStored) {
+            ddp.addDashStoredDate();
+        }
+        
+        return isStored;
+    }
 
     /**
        PUTs a DryadDataPackage to Dash, creating a new submission or updating an
        existing submission (using the DOI contained in the Data Package).
-
+       
        @return a HTTP response code
-    *
-     * @param pkg*/
+       @param pkg
+    **/
     public int putDataset(Package pkg) {
         log.info("Putting dataset " + pkg.getItemID() + ", " + pkg.getDryadDOI());
         String dashJSON = pkg.getDataPackage().getDashJSON();
