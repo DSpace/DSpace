@@ -88,6 +88,8 @@ public class ItemOwningCollectionUpdateRestController {
                                 final Collection targetCollection)
             throws SQLException, IOException, AuthorizeException {
         itemService.move(context, item, currentCollection, targetCollection);
+        //Necessary because Controller does not pass through general RestResourceController, and as such does not do its
+        //  commit in DSpaceRestRepository.createAndReturn() or similar
         context.commit();
 
         return context.reloadEntity(targetCollection);
