@@ -75,6 +75,17 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
                           HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
     }
 
+    @ExceptionHandler( {UnprocessableEntityException.class})
+    protected void handleUnprocessableEntityException(HttpServletRequest request, HttpServletResponse response, Exception ex)
+            throws IOException {
+
+        //422 is not defined in HttpServletResponse.  Its meaning is "Unprocessable Entity".
+        //Using the value from HttpStatus.
+        sendErrorResponse(request, response, null,
+                ex.getMessage(),
+                HttpStatus.UNPROCESSABLE_ENTITY.value());
+    }
+
     @ExceptionHandler( {MissingParameterException.class, QueryMethodParameterConversionException.class})
     protected void ParameterConversionException(HttpServletRequest request, HttpServletResponse response, Exception ex)
         throws IOException {
