@@ -64,6 +64,7 @@
   with_items:
     - xmlui
     - oai
+    - rest
 
 - name: Undeploy SOLR
   shell: "curl -s -n 'http://localhost:9080/manager/text/undeploy?path=/{{kunde}}-solr'"
@@ -84,7 +85,8 @@
   with_items:
     - oai
     - xmlui
-  
+    - rest
+
 - name: Deploy FEIDE authentication properties
   copy:
     dest: /brage/{{ kunde }}/app/config/feide.properties
