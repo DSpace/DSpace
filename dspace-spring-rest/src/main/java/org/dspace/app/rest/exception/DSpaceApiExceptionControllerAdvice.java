@@ -76,8 +76,8 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
     }
 
     @ExceptionHandler( {UnprocessableEntityException.class})
-    protected void handleUnprocessableEntityException(HttpServletRequest request, HttpServletResponse response, Exception ex)
-            throws IOException {
+    protected void handleUnprocessableEntityException(HttpServletRequest request, HttpServletResponse response,
+                                                      Exception ex) throws IOException {
 
         //422 is not defined in HttpServletResponse.  Its meaning is "Unprocessable Entity".
         //Using the value from HttpStatus.
