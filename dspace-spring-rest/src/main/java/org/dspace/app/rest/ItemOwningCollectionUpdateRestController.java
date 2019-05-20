@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.dspace.app.rest.converter.CollectionConverter;
+import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.CollectionRest;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.rest.utils.Utils;
@@ -70,7 +71,8 @@ public class ItemOwningCollectionUpdateRestController {
         List<DSpaceObject> dsoList = utils.constructDSpaceObjectList(context, utils.getStringListFromRequest(request));
 
         if (dsoList.size() != 1 || dsoList.get(0).getType() != COLLECTION) {
-            throw new IllegalArgumentException("exactly one owning collection is provided not");
+            throw new UnprocessableEntityException("The collection doesn't exist " +
+                    "or the data cannot be resolved to a collection.");
         }
 
         Collection targetCollection = performItemMove(context, itemUuid, (Collection) dsoList.get(0));
