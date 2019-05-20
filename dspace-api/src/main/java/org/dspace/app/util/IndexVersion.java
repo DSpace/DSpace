@@ -253,6 +253,7 @@ public class IndexVersion {
         } else if (firstMinor < secondMinor) {
             return LESS_THAN;
         }
+        return EQUAL;
     }
 
     /**
