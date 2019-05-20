@@ -18,11 +18,6 @@ import org.dspace.app.cris.model.ResearchObject;
 public class DynamicAnagraficaObjectDTO extends CrisAnagraficaObjectWithTypeDTO
 {
 
-    /**
-     * The log4j category
-     */
-	private String sourceRef;
-	
     protected final Log log = LogFactory.getLog(getClass());
 
 
@@ -34,7 +29,6 @@ public class DynamicAnagraficaObjectDTO extends CrisAnagraficaObjectWithTypeDTO
                 .getLastModificationTime());
     }
 
- 
 
     /**
      * Decorate list for dynamic binding with spring mvc
@@ -51,18 +45,5 @@ public class DynamicAnagraficaObjectDTO extends CrisAnagraficaObjectWithTypeDTO
         return lazyList;
     }
 
-
-
-	public String getSourceRef() {
-		return sourceRef;
-	}
-
-
-
-	public void setSourceRef(String sourceRef) {
-		this.sourceRef = sourceRef;
-	}
-    
-     
 
 }

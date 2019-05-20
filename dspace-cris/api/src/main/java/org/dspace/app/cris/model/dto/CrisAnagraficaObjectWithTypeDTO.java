@@ -7,21 +7,26 @@
  */
 package org.dspace.app.cris.model.dto;
 
-import it.cilea.osd.jdyna.dto.AnagraficaObjectWithTypeDTO;
+import org.dspace.app.cris.model.ACrisObjectWithTypeSupport;
 
-import org.dspace.app.cris.model.ACrisObject;
+import it.cilea.osd.jdyna.dto.AnagraficaObjectWithTypeDTO;
 
 public class CrisAnagraficaObjectWithTypeDTO extends AnagraficaObjectWithTypeDTO 
 {
-
+    
     private Boolean status;
     private String sourceID;
+    private String sourceRef;
+    private String uuid;
     
-    public CrisAnagraficaObjectWithTypeDTO(ACrisObject object)
+    public CrisAnagraficaObjectWithTypeDTO(ACrisObjectWithTypeSupport object)
     {
         super();
         setSourceID(object.getSourceID());
+        setSourceRef(object.getSourceRef());
         setStatus(object.getStatus());
+        setUuid(object.getUuid());
+        setTipologiaId(object.getType());
     }
 
     public Boolean getStatus()
@@ -43,4 +48,21 @@ public class CrisAnagraficaObjectWithTypeDTO extends AnagraficaObjectWithTypeDTO
     {
         this.sourceID = souceID;
     }
+
+    public String getSourceRef() {
+        return sourceRef;
+    }
+
+    public void setSourceRef(String sourceRef) {
+        this.sourceRef = sourceRef;
+    }
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
+    }
+
 }
