@@ -250,10 +250,9 @@ public class IndexVersion {
         } else if (firstMinor > secondMinor) {
             // If we get here, major versions must be EQUAL. Now, time to check our minor versions
             return GREATER_THAN;
-        } else if (firstMinor < secondMinor) {
+        } else {
             return LESS_THAN;
         }
-        return EQUAL;
     }
 
     /**
