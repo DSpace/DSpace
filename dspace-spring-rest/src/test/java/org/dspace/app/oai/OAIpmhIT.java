@@ -40,7 +40,6 @@ import org.dspace.xoai.services.api.xoai.DSpaceFilterResolver;
 import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
@@ -71,13 +70,14 @@ public class OAIpmhIT extends AbstractControllerIntegrationTest {
     @MockBean
     private XOAICacheService xoaiCacheService;
 
-    // Mock for date-based testing below
-    @Mock
+    // Spy on the current EarliestDateResolver bean, to allow us to change behavior in tests below
+    @SpyBean
     private EarliestDateResolver earliestDateResolver;
+
     // XOAI's BaseDateProvider (used for date-based testing below)
     private static BaseDateProvider baseDateProvider = new BaseDateProvider();
 
-    // Spy on the current XOAIManagerResolver, to allow us to change behavior of XOAIManager in tests
+    // Spy on the current XOAIManagerResolver bean, to allow us to change behavior of XOAIManager in tests
     // See also: createMockXOAIManager() method
     @SpyBean
     private XOAIManagerResolver xoaiManagerResolver;
@@ -142,9 +142,10 @@ public class OAIpmhIT extends AbstractControllerIntegrationTest {
     @Test
     public void requestForIdentifyShouldReturnTheConfiguredValues() throws Exception {
 
-        // Mock EarliestDateResolver to return now for getEarliestDate()
+        // Get current date/time and store as "now"
         Date now = new Date();
-        when(earliestDateResolver.getEarliestDate(context)).thenReturn(now);
+        // Return "now" when "getEarliestDate()" is called for the currently loaded EarliestDateResolver bean
+        doReturn(now).when(earliestDateResolver).getEarliestDate(context);
 
         // Attempt to make an Identify request to root context
         getClient().perform(get(DEFAULT_CONTEXT).param("verb", "Identify"))
