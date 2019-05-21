@@ -19,6 +19,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.dspace.app.rest.converter.CollectionConverter;
+import org.dspace.app.rest.exception.MethodNotAllowedException;
+import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.link.HalLinkService;
 import org.dspace.app.rest.model.CollectionRest;
 import org.dspace.app.rest.model.MappingCollectionRestWrapper;
@@ -41,11 +43,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/core/items/" +
-    "{uuid:[0-9a-fxA-FX]{8}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{12}}/mappedCollections")
+        "{uuid:[0-9a-fxA-FX]{8}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{12}}" +
+        "/mappedCollections")
+
 public class MappingCollectionRestController {
 
     private static final Logger log = Logger.getLogger(MappingCollectionRestController.class);
-
 
     @Autowired
     private ItemService itemService;
@@ -65,7 +68,7 @@ public class MappingCollectionRestController {
     @RequestMapping(method = {RequestMethod.GET, RequestMethod.HEAD})
     public MappingCollectionResourceWrapper retrieve(@PathVariable UUID uuid, HttpServletResponse response,
                                                      HttpServletRequest request, Pageable pageable)
-        throws SQLException {
+            throws SQLException {
         Context context = ContextUtil.obtainContext(request);
         Item item = itemService.find(context, uuid);
         List<Collection> collections = item.getCollections();
@@ -81,7 +84,7 @@ public class MappingCollectionRestController {
         mappingCollectionRestWrapper.setMappingCollectionRestList(mappingCollectionRest);
         mappingCollectionRestWrapper.setItem(item);
         MappingCollectionResourceWrapper mappingCollectionResourceWrapper = new MappingCollectionResourceWrapper(
-            mappingCollectionRestWrapper, utils, pageable);
+                mappingCollectionRestWrapper, utils, pageable);
 
 
         halLinkService.addLinks(mappingCollectionResourceWrapper);
@@ -93,18 +96,30 @@ public class MappingCollectionRestController {
     @RequestMapping(method = RequestMethod.POST, consumes = {"text/uri-list"})
     public void createCollectionToItemRelation(@PathVariable UUID uuid,
                                                HttpServletResponse response, HttpServletRequest request)
-        throws SQLException, AuthorizeException {
+            throws SQLException, AuthorizeException {
 
         Context context = ContextUtil.obtainContext(request);
 
-        for (DSpaceObject dso : utils.constructDSpaceObjectList(context, utils.getStringListFromRequest(request))) {
+        List<DSpaceObject> listDsoFoundInRequest
+                = utils.constructDSpaceObjectList(context, utils.getStringListFromRequest(request));
+
+        if (listDsoFoundInRequest.size() < 1) {
+            throw new UnprocessableEntityException("Not a valid collection uuid.");
+        }
+
+        for (DSpaceObject dso : listDsoFoundInRequest) {
 
             Item item = itemService.find(context, uuid);
             if (dso != null && dso.getType() == COLLECTION && item != null) {
-                Collection collection = (Collection) dso;
-                collectionService.addItem(context, collection, item);
-                collectionService.update(context, collection);
+                this.checkIfItemIsTemplate(item);
+                Collection collectionToMapTo = (Collection) dso;
+                this.checkIfOwningCollection(item, collectionToMapTo.getID());
+
+                collectionService.addItem(context, collectionToMapTo, item);
+                collectionService.update(context, collectionToMapTo);
                 itemService.update(context, item);
+            } else {
+                throw new UnprocessableEntityException("Not a valid collection or item uuid.");
             }
         }
 
@@ -114,20 +129,36 @@ public class MappingCollectionRestController {
     @RequestMapping(method = RequestMethod.DELETE, value = "/{collectionUuid}")
     public void deleteCollectionToItemRelation(@PathVariable UUID uuid, @PathVariable UUID collectionUuid,
                                                HttpServletResponse response, HttpServletRequest request)
-        throws SQLException, AuthorizeException, IOException {
+            throws SQLException, AuthorizeException, IOException {
 
         Context context = ContextUtil.obtainContext(request);
         Collection collection = collectionService.find(context, collectionUuid);
         Item item = itemService.find(context, uuid);
         if (collection != null && item != null) {
+            this.checkIfItemIsTemplate(item);
             UUID owningCollectionUuid = item.getOwningCollection().getID();
+            this.checkIfOwningCollection(item, collectionUuid);
             if (collection.getID() != owningCollectionUuid && item.getCollections().contains(collection)) {
                 collectionService.removeItem(context, collection, item);
                 collectionService.update(context, collection);
                 itemService.update(context, item);
                 context.commit();
             }
+        } else {
+            throw new UnprocessableEntityException("Not a valid collection or item uuid.");
         }
 
+    }
+
+    private void checkIfItemIsTemplate(Item item) {
+        if (item.getTemplateItemOf() != null) {
+            throw new MethodNotAllowedException("Given item is a template item.");
+        }
+    }
+
+    private void checkIfOwningCollection(Item item, UUID collectionID) {
+        if (item.getOwningCollection().getID().equals(collectionID)) {
+            throw new UnprocessableEntityException("Collection given same as owningCollection of item.");
+        }
     }
 }
