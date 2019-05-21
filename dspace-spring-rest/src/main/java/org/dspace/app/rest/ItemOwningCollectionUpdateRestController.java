@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.dspace.app.rest.converter.CollectionConverter;
+import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.CollectionRest;
 import org.dspace.app.rest.utils.ContextUtil;
@@ -102,6 +103,12 @@ public class ItemOwningCollectionUpdateRestController {
 
         if (item == null) {
             throw new ResourceNotFoundException("Item with id: " + itemUuid + " not found");
+        }
+        if (!(item.isArchived() || item.isWithdrawn())) {
+            throw new DSpaceBadRequestException("Only archived or withdrawn items can be moved between collections");
+        }
+        if (targetCollection.equals(item.getOwningCollection())) {
+            throw new DSpaceBadRequestException("The provided collection is already the owning collection");
         }
 
         Collection currentCollection = item.getOwningCollection();
