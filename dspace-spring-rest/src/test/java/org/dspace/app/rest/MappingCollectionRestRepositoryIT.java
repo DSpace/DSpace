@@ -430,7 +430,6 @@ public class MappingCollectionRestRepositoryIT extends AbstractControllerIntegra
                     .content(
                             "https://localhost:8080/spring-rest/api/core/collections/" + col2.getID() + "\n" +
                             "https://localhost:8080/spring-rest/api/core/collections/" + col2.getID() + "\n" +
-                            "https://localhost:8080/spring-rest/api/core/collections/" + col1.getID() + "\n" +
                             "https://localhost:8080/spring-rest/api/core/collections/" + col3.getID() + "\n"
                     )
             );
