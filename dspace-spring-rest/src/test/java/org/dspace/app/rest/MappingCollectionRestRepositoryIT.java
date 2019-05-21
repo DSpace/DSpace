@@ -505,6 +505,160 @@ public class MappingCollectionRestRepositoryIT extends AbstractControllerIntegra
     }
 
     @Test
+    public void doNotAllowMappingCollectionIfGivenCollectionIsOwningCollectionOfGivenItemTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and a collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        //2. A public item that is readable by Anonymous
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                .withTitle("Public item 1")
+                .withIssueDate("2017-10-17")
+                .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                .withSubject("ExtraEntry")
+                .build();
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        getClient(adminToken)
+                .perform(post("/api/core/items/" + publicItem1.getID() + "/mappedCollections/")
+                        .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
+                        .content("https://localhost:8080/spring-rest/api/core/collections/" + col1.getID()                        )
+                )
+                .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void doNotAllowDeleteMappingCollectionIfGivenCollectionIsOwningCollectionOfGivenItemTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and a collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        //2. A public item that is readable by Anonymous
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                .withTitle("Public item 1")
+                .withIssueDate("2017-10-17")
+                .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                .withSubject("ExtraEntry")
+                .build();
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        getClient(adminToken)
+                .perform(delete("/api/core/items/" + publicItem1.getID() + "/mappedCollections/"
+                        + col1.getID())                )
+                .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void doNotAllowMappingCollectionWithATemplateItem() throws Exception {
+        context.turnOffAuthorisationSystem();
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
+                .withTemplateItem()
+                .build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2")
+                .build();
+
+        //2. A template item for the 1st collection
+        Item templateItem = col1.getTemplateItem();
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        getClient(adminToken)
+                .perform(post("/api/core/items/" + templateItem.getID() + "/mappedCollections/")
+                        .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
+                        .content("https://localhost:8080/spring-rest/api/core/collections/" + col2.getID()                        )
+                )
+                .andExpect(status().is(405));
+    }
+
+    @Test
+    public void doNotAllowDeleteMappingCollectionWithATemplateItem() throws Exception {
+        context.turnOffAuthorisationSystem();
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
+                .withTemplateItem()
+                .build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2")
+                .build();
+
+        //2. A template item for the 1st collection
+        Item templateItem = col1.getTemplateItem();
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        getClient(adminToken)
+                .perform(delete("/api/core/items/" + templateItem.getID() + "/mappedCollections/"
+                        + col2.getID()))
+                .andExpect(status().is(405));
+    }
+
+    @Test
+    public void mappingCollectionNeedsValidIDs() throws Exception {
+        context.turnOffAuthorisationSystem();
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
+                .build();
+
+        //2. A public item that is readable by Anonymous
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                .withTitle("Public item 1")
+                .withIssueDate("2017-10-17")
+                .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                .withSubject("ExtraEntry")
+                .build();
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        getClient(adminToken)
+                .perform(post("/api/core/items/" + publicItem1.getID() + "/mappedCollections/")
+                        .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
+                        .content("https://localhost:8080/spring-rest/api/core/collections/" + "badCollectionID")
+                )
+                .andExpect(status().isUnprocessableEntity());
+
+        getClient(adminToken)
+                .perform(post("/api/core/items/" + "badItemID" + "/mappedCollections/")
+                        .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
+                        .content("https://localhost:8080/spring-rest/api/core/collections/" + col1.getID())
+                )
+                .andExpect(status().is(405));
+    }
+
+    @Test
     public void itemHasNoExtraCollectionsCanBeRetrievedAnonymouslyTest() throws Exception {
 
         context.turnOffAuthorisationSystem();
