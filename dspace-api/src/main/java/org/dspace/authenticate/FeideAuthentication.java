@@ -101,10 +101,9 @@ public class FeideAuthentication implements AuthenticationMethod {
 
         List<String> allowedOrgNrsList = Arrays.asList(allowedOrgNrs.split(","));
 
-        boolean isUNITFeide = StringUtils.endsWith(eduPerson.getPrincipalName().trim(), UNIT_REALM);
         boolean isBIBSYSFeide = StringUtils.endsWith(eduPerson.getPrincipalName().trim(), BIBSYS_REALM);
 
-        if(isUNITFeide || isSystemAdmin(eduPerson)) {
+        if(isSystemAdmin(eduPerson)) {
 
             return true;
 
@@ -203,7 +202,7 @@ public class FeideAuthentication implements AuthenticationMethod {
      * SUCCESS, BAD_CREDENTIALS, CERT_REQUIRED, NO_SUCH_USER, BAD_ARGS
      * <p>Meaning:
      * <br>SUCCESS         - authenticated OK.
-     * <br>BAD_CREDENTIALS - user exists, but assword doesn't match
+     * <br>BAD_CREDENTIALS - user exists, but password doesn't match
      * <br>CERT_REQUIRED   - not allowed to login this way without X.509 cert.
      * <br>NO_SUCH_USER    - no EPerson with matching email address.
      * <br>BAD_ARGS        - missing username, or user matched but cannot login.
