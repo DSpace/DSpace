@@ -50,6 +50,7 @@ public class HarvestedCollection implements ReloadableEntity<Integer>
     @Column(name = "harvest_status")
     private int harvestStatus;
 
+
     @Column(name = "harvest_start_time", columnDefinition="timestamp with time zone")
     @Temporal(TemporalType.TIMESTAMP)
     private Date harvestStartTime;
@@ -57,6 +58,12 @@ public class HarvestedCollection implements ReloadableEntity<Integer>
     @Column(name = "last_harvested", columnDefinition="timestamp with time zone")
     @Temporal(TemporalType.TIMESTAMP)
     private Date lastHarvested;
+
+    @Column(name = "metadata_authority_type")
+    private String metadataAuthorityType;
+
+    @Column(name = "workflow_process")
+    private String workflowProcess;
 
     @Transient
 	public static final int TYPE_NONE = 0;
@@ -179,5 +186,15 @@ public class HarvestedCollection implements ReloadableEntity<Integer>
     
     public Date getHarvestStartTime() {
     	return harvestStartTime;
+    }
+
+    public String getMetadataAuthorityType()
+    {
+        return metadataAuthorityType;
+    }
+
+    public String getWorkflowProcess()
+    {
+        return workflowProcess;
     }
 }
