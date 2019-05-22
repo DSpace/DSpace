@@ -25,6 +25,10 @@ public class RootRest implements RestAddressableModel {
         return CATEGORY;
     }
 
+    public String getComment() {
+        return "Hello OR2019!";
+    }
+
     public String getType() {
         return NAME;
     }
