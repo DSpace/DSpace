@@ -15,6 +15,7 @@
 
     <form-map>
         <name-map collection-handle="default" form-name="traditional"/>
+        <name-map collection-handle="123456789/4404" form-name="cristin" />
     </form-map>
 
 
@@ -372,6 +373,314 @@
                     <label>One: Authors</label>
                     <input-type>name</input-type>
                     <hint>Enter the names of the authors of this item.</hint>
+                    <required></required>
+                </field>
+            </page>
+        </form>
+
+
+        <form name="cristin">
+            <page number="1">
+
+                <!-- title -->
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>title</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Title</label>
+                    <input-type>onebox</input-type>
+                    <hint>Enter the main title of the item.</hint>
+                    <required>You must enter a main title for this item.</required>
+                </field>
+
+                <!-- alternative title -->
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>title</dc-element>
+                    <dc-qualifier>alternative</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Alternative Title</label>
+                    <input-type>onebox</input-type>
+                    <hint>Enter an alternative title of the item.</hint>
+                    <required></required>
+                </field>
+
+                <!-- author -->
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>contributor</dc-element>
+                    <dc-qualifier>author</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Author</label>
+                    <input-type>name</input-type>
+                    <hint>Enter the author of the requirement</hint>
+                    <required>You must enter an author for the item</required>
+                </field>
+
+                <!-- abstract -->
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>description</dc-element>
+                    <dc-qualifier>abstract</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Abstract</label>
+                    <input-type>textarea</input-type>
+                    <hint>Enter an abstract for the item</hint>
+                    <required></required>
+                </field>
+
+                <!-- language -->
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>language</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Language</label>
+                    <input-type value-pairs-name="cristin_languages">dropdown</input-type>
+                    <hint>Enter the main language of the item</hint>
+                    <required></required>
+                </field>
+
+                <!-- publisher -->
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>publisher</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Publisher</label>
+                    <input-type>onebox</input-type>
+                    <hint>Enter the publisher of the item</hint>
+                    <required></required>
+                </field>
+
+                <!-- unit name -->
+                <field>
+                    <dc-schema>cristin</dc-schema>
+                    <dc-element>unitname</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Unit Name</label>
+                    <input-type>onebox</input-type>
+                    <hint>Unit Name of the primary author's unit</hint>
+                    <required></required>
+                </field>
+
+                <!-- unit code -->
+                <field>
+                    <dc-schema>cristin</dc-schema>
+                    <dc-element>unitcode</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Unit Code</label>
+                    <input-type>onebox</input-type>
+                    <hint>Unit Code of the primary author's unit (institution,department,group,sub-group)</hint>
+                    <required></required>
+                </field>
+
+                <!-- date created -->
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>date</dc-element>
+                    <dc-qualifier>created</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Date Created</label>
+                    <input-type>date</input-type>
+                    <hint>The date this record was created</hint>
+                    <required></required>
+                </field>
+
+                <!-- journal title -->
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>source</dc-element>
+                    <dc-qualifier>journal</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Journal Title</label>
+                    <input-type>onebox</input-type>
+                    <hint>Journal this item was published in</hint>
+                    <required></required>
+                </field>
+
+                <!-- volume -->
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>source</dc-element>
+                    <dc-qualifier>volume</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Journal Volume</label>
+                    <input-type>onebox</input-type>
+                    <hint>Journal Volume this item was published in</hint>
+                    <required></required>
+                </field>
+
+                <!-- issue -->
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>source</dc-element>
+                    <dc-qualifier>issue</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Journal Issue</label>
+                    <input-type>onebox</input-type>
+                    <hint>Journal Issue this item was published in</hint>
+                    <required></required>
+                </field>
+
+                <!-- start page -->
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>identifier</dc-element>
+                    <dc-qualifier>startpage</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Journal Start Page</label>
+                    <input-type>onebox</input-type>
+                    <hint>Journal Start Page for this item</hint>
+                    <required></required>
+                </field>
+
+                <!-- end page -->
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>identifier</dc-element>
+                    <dc-qualifier>endpage</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Journal End Page</label>
+                    <input-type>onebox</input-type>
+                    <hint>Journal End Page for this item</hint>
+                    <required></required>
+                </field>
+
+                <!-- page count -->
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>identifier</dc-element>
+                    <dc-qualifier>pagecount</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Page Count</label>
+                    <input-type>onebox</input-type>
+                    <hint>number of pages in this item</hint>
+                    <required></required>
+                </field>
+
+                <!-- isbn -->
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>identifier</dc-element>
+                    <dc-qualifier>isbn</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>ISBN</label>
+                    <input-type>onebox</input-type>
+                    <hint>ISBN</hint>
+                    <required></required>
+                </field>
+
+                <!-- issn -->
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>identifier</dc-element>
+                    <dc-qualifier>issn</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>ISSN</label>
+                    <input-type>onebox</input-type>
+                    <hint>ISSN</hint>
+                    <required></required>
+                </field>
+
+                <!-- doi -->
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>identifier</dc-element>
+                    <dc-qualifier>doi</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>DOI</label>
+                    <input-type>onebox</input-type>
+                    <hint>DOI</hint>
+                    <required></required>
+                </field>
+
+                <!-- is part of -->
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>relation</dc-element>
+                    <dc-qualifier>ispartof</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Is Part Of</label>
+                    <input-type>onebox</input-type>
+                    <hint>Any other work that this item is part of</hint>
+                    <required></required>
+                </field>
+
+                <!-- is part of series -->
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>relation</dc-element>
+                    <dc-qualifier>ispartofseries</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Is Part Of Series</label>
+                    <input-type>onebox</input-type>
+                    <hint>Any series that this item is part of</hint>
+                    <required></required>
+                </field>
+
+                <!-- cristin id -->
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>identifier</dc-element>
+                    <dc-qualifier>cristin</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>CRIStin ID</label>
+                    <input-type>onebox</input-type>
+                    <hint>CRISTtin ID for this item, as supplied by the national research information system</hint>
+                    <required>Every item in this collection must have a Cristin ID</required>
+                </field>
+
+
+
+                <!-- document type -->
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>type</dc-element>
+                    <dc-qualifier>document</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Document Type</label>
+                    <input-type value-pairs-name="cristin_document_types">dropdown</input-type>
+                    <hint>Select the document type which most closely describes this item (should be defined by Cristin)</hint>
+                    <required></required>
+                </field>
+
+                <!-- is published -->
+                <field>
+                    <dc-schema>cristin</dc-schema>
+                    <dc-element>ispublished</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Is Published?</label>
+                    <input-type value-pairs-name="is_published">dropdown</input-type>
+                    <hint>Is the item published?</hint>
+                    <required></required>
+                </field>
+
+                <!-- fulltext -->
+                <field>
+                    <dc-schema>cristin</dc-schema>
+                    <dc-element>fulltext</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Full Text?</label>
+                    <input-type value-pairs-name="full_text">dropdown</input-type>
+                    <hint>Does the item have full-text attached</hint>
+                    <required></required>
+                </field>
+
+                <!-- quality code -->
+                <field>
+                    <dc-schema>cristin</dc-schema>
+                    <dc-element>qualitycode</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Quality Code</label>
+                    <input-type>onebox</input-type>
+                    <hint>What is the quality code associated with this item</hint>
                     <required></required>
                 </field>
             </page>

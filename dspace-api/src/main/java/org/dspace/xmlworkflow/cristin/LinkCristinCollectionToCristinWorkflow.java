@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.xmlworkflow;
+package org.dspace.xmlworkflow.cristin;
 
 import org.apache.commons.io.IOUtils;
 import org.dspace.content.Collection;

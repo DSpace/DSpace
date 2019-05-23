@@ -25,6 +25,12 @@
     <bean id="noUserSelectionActionAPI" class="org.dspace.xmlworkflow.state.actions.userassignment.NoUserSelectionAction" scope="prototype"/>
     <bean id="assignoriginalsubmitteractionAPI" class="org.dspace.xmlworkflow.state.actions.userassignment.AssignOriginalSubmitterAction" scope="prototype"/>
 
+    <!-- cristin API bean definitions -->
+    <bean id="assignmentactionAPI" class="org.dspace.xmlworkflow.state.actions.processingaction.cristin.XmlUICollectionAssignment" scope="prototype"/>
+    <bean id="bitstreamactionAPI" class="org.dspace.xmlworkflow.state.actions.processingaction.cristin.XmlUIBitstreamReorder" scope="prototype"/>
+
+
+    <!-- action configurations -->
     <bean id="reviewaction" class="org.dspace.xmlworkflow.state.actions.WorkflowActionConfig" scope="prototype">
         <constructor-arg type="java.lang.String" value="reviewaction"/>
         <property name="processingAction" ref="reviewactionAPI"/>
@@ -43,6 +49,17 @@
         <property name="requiresUI" value="true"/>
     </bean>
 
+    <bean id="assignmentaction" class="org.dspace.xmlworkflow.state.actions.WorkflowActionConfig" scope="prototype">
+        <constructor-arg type="java.lang.String" value="assignmentaction"/>
+        <property name="processingAction" ref="assignmentactionAPI"/>
+        <property name="requiresUI" value="true"/>
+    </bean>
+
+    <bean id="bitstreamaction" class="org.dspace.xmlworkflow.state.actions.WorkflowActionConfig" scope="prototype">
+        <constructor-arg type="java.lang.String" value="bitstreamaction"/>
+        <property name="processingAction" ref="bitstreamactionAPI"/>
+        <property name="requiresUI" value="true"/>
+    </bean>
 
     <!--Action for the select single reviewer workflow -->
     <bean id="selectrevieweraction" class="org.dspace.xmlworkflow.state.actions.WorkflowActionConfig" scope="prototype">
