@@ -724,7 +724,7 @@
                         </div>
                         <br/>
                         <div id="ds-footer-left">
-                            <a href="https://www.unit.no/tjenester/brage-apent-vitenarkiv" target="_blank"><i18n:text>xmlui.dri2xhtml.structural.link_gdpr</i18n:text></a>
+                            <a href="https://www.unit.no/sites/default/files/media/filer/2019/04/Personvernerkl%C3%A6ring%20Brage%20NO_ENG.pdf" target="_blank"><i18n:text>xmlui.dri2xhtml.structural.link_gdpr</i18n:text></a>
                         </div>
                     </div>
                     <div class="col-xs-5 col-sm-4 hidden-print">
