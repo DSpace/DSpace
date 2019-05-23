@@ -54,10 +54,24 @@
   when: fase == "produksjon"
 
 - name: Install application
+  register: result
   shell: "ant -buildfile /brage/{{ kunde }}/install/dspace-installer/build.xml fresh_install"
+  ignore_errors: yes
+
+- name: Fail on ant failure
+  fail:
+    msg: "stderr: {{ result.stderr }} stdout: {{ result.stdout }}"
+  when: result.rc > 0
 
 - name: Update configs
+  register: result
   shell: "ant -buildfile /brage/{{ kunde }}/install/dspace-installer/build.xml update_configs"
+  ignore_errors: yes
+
+- name: Fail on ant failure
+  fail:
+    msg: "stderr: {{ result.stderr }} stdout: {{ result.stdout }}"
+  when: result.rc > 0
 
 - name: Undeploy Apps
   shell: "curl -s -n 'http://localhost:8080/manager/text/undeploy?path=/{{kunde}}-{{item}}'"
