@@ -216,6 +216,20 @@
         </step>
     </command>
     <command>
+        <name>remove-group</name>
+        <description>Removes a group from the database</description>
+        <step>
+            <class>org.dspace.administer.RemoveGroup</class>
+        </step>
+    </command>
+    <command>
+        <name>remove-legacy-groups</name>
+        <description>Removes legacy groups from the database</description>
+        <step>
+            <class>org.dspace.administer.RemoveLegacyGroups</class>
+        </step>
+    </command>
+    <command>
         <name>solr-export-statistics</name>
         <description>Export usage statistics data from Solr for back-up purposes</description>
         <step passuserargs="true">
