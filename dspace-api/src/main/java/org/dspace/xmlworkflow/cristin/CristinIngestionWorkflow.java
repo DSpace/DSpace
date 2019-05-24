@@ -5,7 +5,6 @@ import org.dspace.content.*;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.Email;
 import org.dspace.core.I18nUtil;
@@ -103,7 +102,7 @@ public class CristinIngestionWorkflow implements IngestionWorkflow {
         if (inarch) {
             // if the item is in the archive, check to see if we need to update
             // the bitstreams
-            docsChanged = this.haveDocsChanged(context, item, oreREM);
+            docsChanged = this.haveDocsChanged(item, oreREM);
             if (docsChanged) {
                 // if we need to update the bitstreams, then create a new
                 // workspace item and return it
@@ -276,7 +275,7 @@ public class CristinIngestionWorkflow implements IngestionWorkflow {
         return units;
     }
 
-    private boolean haveDocsChanged(Context context, Item item, Element oreREM)
+    private boolean haveDocsChanged(Item item, Element oreREM)
             throws IOException, SQLException {
         /*
         A set of documents can be said to have changed if:
@@ -292,51 +291,52 @@ public class CristinIngestionWorkflow implements IngestionWorkflow {
         doc.addContent(oreREM.detach());
 
         // get a list of the aggregated resources in the ORIGINAL bundle
-        FileManager fm = new FileManager();
-        List<IncomingBitstream> incomingBitstreams = fm.listBitstreamsInBundle(doc, "ORIGINAL");
-        List<Bitstream> existingBitstreams = fm.getExistingBitstreams(item, "ORIGINAL");
+        CristinFileManager fm = new CristinFileManager();
+        String bundleName = "ORIGINAL";
+        List<CristinBitstream> cristinBitstreams = fm.listBitstreamsInBundle(doc, bundleName);
+        List<Bitstream> existingBitstreams = fm.getExistingBitstreams(item, bundleName);
 
         // a/	There are more files than before in the incoming list
         // remember that there will be a metadata bitstream which we don't care
         // about couting
-        if (incomingBitstreams.size() > existingBitstreams.size()) {
+        if (cristinBitstreams.size() > existingBitstreams.size()) {
             return true;
         }
 
         // b/	There are fewer files than before in the incoming list
         // remember that there will be a metadata bitstream which we don't care
         // about couting
-        if (incomingBitstreams.size() < existingBitstreams.size()) {
+        if (cristinBitstreams.size() < existingBitstreams.size()) {
             return true;
         }
 
         // c/	The set of files contain different checksums than before
         // FIXME: we can't do this yet
-        if (this.checksumsChanged(incomingBitstreams, existingBitstreams)) {
+        if (this.checksumsChanged(cristinBitstreams, existingBitstreams)) {
             return true;
         }
 
         // d/	The set of files are in a different order than before
-        if (this.fileOrderChanged(context, incomingBitstreams, existingBitstreams)) {
+        if (this.fileOrderChanged(cristinBitstreams, existingBitstreams, item, bundleName)) {
             return true;
         }
 
         return false;
     }
 
-    private boolean fileOrderChanged(Context context, List<IncomingBitstream> incomingBitstreams, List<Bitstream> existingBitstreams)
+    private boolean fileOrderChanged(List<CristinBitstream> cristinBitstreams, List<Bitstream> existingBitstreams, Item item, String bundleName)
             throws SQLException {
         TreeMap<Integer, String> rawIncomingSeq = new TreeMap<Integer, String>();
         TreeMap<Integer, String> rawExistingSeq = new TreeMap<Integer, String>();
 
-        FileManager fm = new FileManager();
+        CristinFileManager fm = new CristinFileManager();
 
         // calculate the match map for the incoming items
         // we need to remember that in the incoming item, the metadata bitstream
         // is in the ORIGINAL bundle, but not in the existing item, so when determining
         // the order of the incoming files, we need to close the gap left by the
         // metadata bitstream
-        for (IncomingBitstream ib : incomingBitstreams) {
+        for (CristinBitstream ib : cristinBitstreams) {
             // FIXME: at the moment we do the matching on filename, but what we
             // really want is to do this by MD5.  This should be easy to sort out
             // by simply switching ib.getName() for ib.getMd5()
@@ -351,7 +351,7 @@ public class CristinIngestionWorkflow implements IngestionWorkflow {
             // FIXME: at the moment we do the matching on filename, but what we
             // really want is to do this by MD5.  This should be easy to sort out
             // by simply switching bitstream.getName() for bitstream.getChecksum()
-            int order = fm.getBitstreamOrder(context, bitstream);
+            int order = fm.getBitstreamOrder(bitstream, item, bundleName);
             rawExistingSeq.put(order, bitstream.getName());
         }
         TreeMap<Integer, String> existingSeq = this.normaliseSeq(rawExistingSeq);
@@ -387,7 +387,7 @@ public class CristinIngestionWorkflow implements IngestionWorkflow {
         return normSeq;
     }
 
-    private boolean checksumsChanged(List<IncomingBitstream> incomingBitstreams, List<Bitstream> existingBitstreams) {
+    private boolean checksumsChanged(List<CristinBitstream> cristinBitstreams, List<Bitstream> existingBitstreams) {
         // FIXME: we don't have enough information to do this yet
         return false;
 
@@ -395,7 +395,7 @@ public class CristinIngestionWorkflow implements IngestionWorkflow {
         List<String> incomingChecks = new ArrayList<String>();
         List<String> existingChecks = new ArrayList<String>();
 
-        for (IncomingBitstream ib : incomingBitstreams)
+        for (CristinBitstream ib : cristinBitstreams)
         {
             incomingChecks.add(ib.getMd5());
         }
