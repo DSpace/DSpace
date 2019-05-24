@@ -10,6 +10,10 @@ import org.dspace.core.HibernateDBConnection;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
+import org.dspace.harvest.HarvestedItem;
+import org.dspace.harvest.dao.HarvestedItemDAO;
+import org.dspace.harvest.factory.HarvestServiceFactory;
+import org.dspace.harvest.service.HarvestedItemService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.storage.rdbms.DatabaseManager;
@@ -28,6 +32,7 @@ import org.dspace.xmlworkflow.XmlWorkflowManager;
 import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
 import org.dspace.xmlworkflow.service.XmlWorkflowService;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
+import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
 import org.flywaydb.core.api.FlywayException;
 import org.hibernate.Query;
 
@@ -278,13 +283,9 @@ public class CristinWorkflowManager {
      */
     public static boolean isItemInXmlWorkflow(Context context, Item item)
             throws SQLException {
-        HibernateDBConnection dbc = (HibernateDBConnection.) CoreHelpers.getDBConnection(context);
-        Query qry = dbc.getSession().createSQLQuery(
-        String query = "SELECT workflowitem_id FROM cwf_workflowitem WHERE item_id = ?";
-        Object[] params = {item.getID()};
-        TableRowIterator tri = DatabaseManager.query(context, query, params);
-        if (tri.hasNext()) {
-            tri.close();
+        XmlWorkflowItemService xmlWorkflowItemService = XmlWorkflowServiceFactory.getInstance().getXmlWorkflowItemService();
+        XmlWorkflowItem xmlWorkflowItem = xmlWorkflowItemService.findByItem(context, item);
+        if (xmlWorkflowItem != null) {
             return true;
         }
         return false;
