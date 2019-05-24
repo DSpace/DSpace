@@ -2133,7 +2133,7 @@ public class ImportExportUtils {
 	            	rowIdx++;
 	            	
 					List<? extends PropertiesDefinition> nestedpropDefs = applicationService
-							.likePropertiesDefinitionsByShortName(nestedpropDefTypes.get(oType),
+							.findMaskByShortName(nestedDefTypes.get(oType),
 									propDef.getShortName());
 	                for (PropertiesDefinition npropDef : nestedpropDefs) {
 	    	        	try
@@ -2347,8 +2347,8 @@ public class ImportExportUtils {
         	utilsdataSheet.addCell(new Label(2, rowUtilsDataDynObjectsIdx, oType));
         	rowUtilsDataDynObjectsIdx++;
         	
-			List<? extends PropertiesDefinition> propDefs = applicationService
-					.likePropertiesDefinitionsByShortName(DynamicPropertiesDefinition.class, oType);
+			List<? extends PropertiesDefinition> propDefs = applicationService.findMaskByShortName(DynamicTypeNestedObject.class,
+                    oType);
             for (PropertiesDefinition propDef : propDefs) {
 	        	try
 	            {
