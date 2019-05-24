@@ -38,8 +38,8 @@
     lc_collate: nb_NO.utf8
     lc_ctype: nb_NO.utf8
     login_host: "{{ DatabaseHost[fase] }}"
-    login_user: dspace
-    login_password: dspace
+    login_user: "{{ lookup('hashi_vault', 'secret=secret/service/brage/' + fase + ':db_username auth_method=approle role_id=brage-client-' + fase + ' secret_id=' + vault_secret + ' url=https://vault.bibsys.no:8200')}}"
+    login_password: "{{ lookup('hashi_vault', 'secret=secret/service/brage/' + fase + ':db_password auth_method=approle role_id=brage-client-' + fase + ' secret_id=' + vault_secret + ' url=https://vault.bibsys.no:8200')}}"
     name: brage-{{ kunde }}
     template: template0
   when: fase == "produksjon"
@@ -54,10 +54,24 @@
   when: fase == "produksjon"
 
 - name: Install application
+  register: result
   shell: "ant -buildfile /brage/{{ kunde }}/install/dspace-installer/build.xml fresh_install"
+  ignore_errors: yes
+
+- name: Fail on ant failure
+  fail:
+    msg: "stderr: {{ result.stderr }} stdout: {{ result.stdout }}"
+  when: result.rc > 0
 
 - name: Update configs
+  register: result
   shell: "ant -buildfile /brage/{{ kunde }}/install/dspace-installer/build.xml update_configs"
+  ignore_errors: yes
+
+- name: Fail on ant failure
+  fail:
+    msg: "stderr: {{ result.stderr }} stdout: {{ result.stdout }}"
+  when: result.rc > 0
 
 - name: Undeploy Apps
   shell: "curl -s -n 'http://localhost:8080/manager/text/undeploy?path=/{{kunde}}-{{item}}'"

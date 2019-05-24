@@ -368,72 +368,72 @@ public class EditProfile extends AbstractDSpaceTransformer
        }
 
        // Subscriptions
-       if (!registering)
-       {
-           List subscribe = form.addList("subscriptions",List.TYPE_FORM);
-           subscribe.setHead(T_subscriptions);
-           
-           subscribe.addItem(T_subscriptions_help);
-           
-           java.util.List<Subscription> currentList = subscribeService.getSubscriptions(context, context.getCurrentUser());
-           java.util.List<Collection> possibleList = collectionService.findAll(context);
-           
-           Select subscriptions = subscribe.addItem().addSelect("subscriptions");
-           subscriptions.setLabel(T_email_subscriptions);
-           subscriptions.setHelp("");
-           subscriptions.enableAddOperation();
-           subscriptions.enableDeleteOperation();
-           
-           subscriptions.addOption(-1,T_select_collection);
-	       CollectionDropDown.CollectionPathEntry[] possibleEntries = CollectionDropDown.annotateWithPaths(context, possibleList);
-           for (CollectionDropDown.CollectionPathEntry possible : possibleEntries)
-           {
-               subscriptions.addOption(possible.collection.getID().toString(), possible.path);
-           }
-
-           for (Subscription subscription : currentList) {
-               subscriptions.addInstance().setOptionSelected(subscription.getCollection().getID().toString());
-           }
-       }
-       
-       
-       if (allowSetPassword)
-       {
-           List security = form.addList("security",List.TYPE_FORM);
-           security.setHead(T_head_security);
-           
-           if (registering)
-           {
-                   security.addItem().addContent(T_create_password_instructions);
-           }
-           else
-           {
-                   security.addItem().addContent(T_update_password_instructions);
-           }
-           
-           
-           Field password = security.addItem().addPassword("password");
-           password.setLabel(T_password);
-           if (registering)
-           {
-               password.setRequired();
-           }
-           if (errors.contains("password"))
-           {
-               password.addError(T_error_invalid_password);
-           }
-           
-           Field passwordConfirm = security.addItem().addPassword("password_confirm");
-           passwordConfirm.setLabel(T_confirm_password);
-           if (registering)
-           {
-               passwordConfirm.setRequired();
-           }
-           if (errors.contains("password_confirm"))
-           {
-               passwordConfirm.addError(T_error_unconfirmed_password);
-           }
-       }
+//       if (!registering)
+//       {
+//           List subscribe = form.addList("subscriptions",List.TYPE_FORM);
+//           subscribe.setHead(T_subscriptions);
+//
+//           subscribe.addItem(T_subscriptions_help);
+//
+//           java.util.List<Subscription> currentList = subscribeService.getSubscriptions(context, context.getCurrentUser());
+//           java.util.List<Collection> possibleList = collectionService.findAll(context);
+//
+//           Select subscriptions = subscribe.addItem().addSelect("subscriptions");
+//           subscriptions.setLabel(T_email_subscriptions);
+//           subscriptions.setHelp("");
+//           subscriptions.enableAddOperation();
+//           subscriptions.enableDeleteOperation();
+//
+//           subscriptions.addOption(-1,T_select_collection);
+//	       CollectionDropDown.CollectionPathEntry[] possibleEntries = CollectionDropDown.annotateWithPaths(context, possibleList);
+//           for (CollectionDropDown.CollectionPathEntry possible : possibleEntries)
+//           {
+//               subscriptions.addOption(possible.collection.getID().toString(), possible.path);
+//           }
+//
+//           for (Subscription subscription : currentList) {
+//               subscriptions.addInstance().setOptionSelected(subscription.getCollection().getID().toString());
+//           }
+//       }
+//
+//
+//       if (allowSetPassword)
+//       {
+//           List security = form.addList("security",List.TYPE_FORM);
+//           security.setHead(T_head_security);
+//
+//           if (registering)
+//           {
+//                   security.addItem().addContent(T_create_password_instructions);
+//           }
+//           else
+//           {
+//                   security.addItem().addContent(T_update_password_instructions);
+//           }
+//
+//
+//           Field password = security.addItem().addPassword("password");
+//           password.setLabel(T_password);
+//           if (registering)
+//           {
+//               password.setRequired();
+//           }
+//           if (errors.contains("password"))
+//           {
+//               password.addError(T_error_invalid_password);
+//           }
+//
+//           Field passwordConfirm = security.addItem().addPassword("password_confirm");
+//           passwordConfirm.setLabel(T_confirm_password);
+//           if (registering)
+//           {
+//               passwordConfirm.setRequired();
+//           }
+//           if (errors.contains("password_confirm"))
+//           {
+//               passwordConfirm.addError(T_error_unconfirmed_password);
+//           }
+//       }
        
        Button submit = form.addItem().addButton("submit");
        if (registering)

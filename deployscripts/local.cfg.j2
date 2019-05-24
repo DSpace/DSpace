@@ -11,6 +11,8 @@ assetstore.dir = /brage/{{ kunde }}/data
 solr.server = http://localhost:9080/{{ kunde }}-solr
 
 db.url = jdbc:postgresql://{{ DatabaseHost[fase] }}:5432/brage-{{ kunde }}
+db.password = {{ lookup('hashi_vault', 'secret=secret/service/brage/' + fase + ':db_password auth_method=approle role_id=brage-client-' + fase + ' secret_id=' + vault_secret + ' url=https://vault.bibsys.no:8200')}}
+db.username = {{ lookup('hashi_vault', 'secret=secret/service/brage/' + fase + ':db_username auth_method=approle role_id=brage-client-' + fase + ' secret_id=' + vault_secret + ' url=https://vault.bibsys.no:8200')}}
 
 mail.server = mailhub.bibsys.no
 mail.from.address = noreply@unit.no
@@ -23,6 +25,12 @@ handle.canonical.prefix = https://hdl.handle.net/
 
 # BIBSYS agora-handle configuration
 handleservice.configuration = ${dspace.dir}/config/handleserver.properties
+
+# XMLUI
+xmlui.user.registration=false
+
+# OAI
+oai.url = ${dspace.baseUrl}/{{ kunde }}-oai
 
 ###########################
 #        BUILD INFO       #
