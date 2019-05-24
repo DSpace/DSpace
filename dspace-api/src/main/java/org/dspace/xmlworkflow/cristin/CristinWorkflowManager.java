@@ -4,43 +4,25 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Context;
-import org.dspace.core.HibernateDBConnection;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
-import org.dspace.harvest.HarvestedItem;
-import org.dspace.harvest.dao.HarvestedItemDAO;
-import org.dspace.harvest.factory.HarvestServiceFactory;
-import org.dspace.harvest.service.HarvestedItemService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.dspace.storage.rdbms.DatabaseManager;
-import org.dspace.storage.rdbms.DatabaseUtils;
-import org.dspace.storage.rdbms.PostgresUtils;
-import org.dspace.storage.rdbms.TableRow;
-import org.dspace.storage.rdbms.TableRowIterator;
 import org.dspace.workflow.WorkflowException;
 import org.dspace.workflow.WorkflowItem;
-import org.dspace.workflow.WorkflowManager;
-import org.dspace.workflow.WorkflowService;
+import org.dspace.workflow.WorkflowItemService;
 import org.dspace.workflow.factory.WorkflowServiceFactory;
 import org.dspace.xmlworkflow.WorkflowConfigurationException;
-import org.dspace.xmlworkflow.WorkflowException;
-import org.dspace.xmlworkflow.XmlWorkflowManager;
 import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
-import org.dspace.xmlworkflow.service.XmlWorkflowService;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
-import org.flywaydb.core.api.FlywayException;
-import org.hibernate.Query;
 
 import javax.mail.MessagingException;
-import javax.sql.DataSource;
 import java.io.IOException;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
@@ -260,17 +242,10 @@ public class CristinWorkflowManager {
      * @throws SQLException
      */
     public static boolean isItemInOriginalWorkflow(Context context, Item item) throws SQLException {
-        String query = "SELECT workflow_id FROM workflowitem WHERE item_id = ?";
-        Object[] params = {item.getID()};
-        TableRowIterator tri = DatabaseManager.query(context, query, params);
-        if (tri.hasNext()) {
-            tri.close();
+        if (getOriginalWorkflowItem(context, item) != null) {
             return true;
         }
         return false;
-
-        DataSource dataSource = DatabaseUtils.getDataSource();
-
     }
 
     /**
@@ -281,17 +256,12 @@ public class CristinWorkflowManager {
      * @return
      * @throws SQLException
      */
-    public static boolean isItemInXmlWorkflow(Context context, Item item)
-            throws SQLException {
-        XmlWorkflowItemService xmlWorkflowItemService = XmlWorkflowServiceFactory.getInstance().getXmlWorkflowItemService();
-        XmlWorkflowItem xmlWorkflowItem = xmlWorkflowItemService.findByItem(context, item);
-        if (xmlWorkflowItem != null) {
+    public static boolean isItemInXmlWorkflow(Context context, Item item) throws SQLException {
+        if (getXmlWorkflowItem(context, item) != null) {
             return true;
         }
         return false;
     }
-
-    // FIXME: this may become useful when we have a proper treatment for licences
 
     /**
      * Is the item in the workspace
@@ -301,13 +271,8 @@ public class CristinWorkflowManager {
      * @return
      * @throws SQLException
      */
-    public static boolean isItemInWorkspace(Context context, Item item)
-            throws SQLException {
-        String query = "SELECT workspace_item_id FROM workspaceitem WHERE item_id = ?";
-        Object[] params = {item.getID()};
-        TableRowIterator tri = DatabaseManager.query(context, query, params);
-        if (tri.hasNext()) {
-            tri.close();
+    public static boolean isItemInWorkspace(Context context, Item item) throws SQLException {
+        if (getWorkspaceItem(context, item) != null) {
             return true;
         }
         return false;
@@ -339,20 +304,9 @@ public class CristinWorkflowManager {
      * @return
      * @throws SQLException
      */
-    public static XmlWorkflowItem getXmlWorkflowItem(Context context, Item item)
-            throws SQLException {
-        String query = "SELECT workflowitem_id FROM cwf_workflowitem WHERE item_id = ?";
-        Object[] params = {item.getID()};
-        TableRowIterator tri = DatabaseManager.query(context, query, params);
-        if (tri.hasNext()) {
-            TableRow row = tri.next();
-            int wfid = row.getIntColumn("workflowitem_id");
-            XmlWorkflowItem.find(context, wfid);
-            XmlWorkflowItem wfi = XmlWorkflowItem.find(context, wfid);
-            tri.close();
-            return wfi;
-        }
-        return null;
+    public static XmlWorkflowItem getXmlWorkflowItem(Context context, Item item) throws SQLException {
+        XmlWorkflowItemService xmlWorkflowItemService = XmlWorkflowServiceFactory.getInstance().getXmlWorkflowItemService();
+        return xmlWorkflowItemService.findByItem(context, item);
     }
 
     /**
@@ -363,19 +317,9 @@ public class CristinWorkflowManager {
      * @return
      * @throws SQLException
      */
-    public static WorkflowItem getOriginalWorkflowItem(Context context, Item item)
-            throws SQLException {
-        String query = "SELECT workflow_id FROM workflowitem WHERE item_id = ?";
-        Object[] params = {item.getID()};
-        TableRowIterator tri = DatabaseManager.query(context, query, params);
-        if (tri.hasNext()) {
-            TableRow row = tri.next();
-            int wfid = row.getIntColumn("workflow_id");
-            WorkflowItem wfi = WorkflowItem.find(context, wfid);
-            tri.close();
-            return wfi;
-        }
-        return null;
+    public static WorkflowItem getOriginalWorkflowItem(Context context, Item item) throws SQLException {
+        WorkflowItemService workflowItemService = WorkflowServiceFactory.getInstance().getWorkflowItemService();
+        return workflowItemService.findByItem(context, item);
     }
 
     /**
@@ -388,16 +332,7 @@ public class CristinWorkflowManager {
      */
     public static WorkspaceItem getWorkspaceItem(Context context, Item item)
             throws SQLException {
-        String query = "SELECT workspace_item_id FROM workspaceitem WHERE item_id = ?";
-        Object[] params = {item.getID()};
-        TableRowIterator tri = DatabaseManager.query(context, query, params);
-        if (tri.hasNext()) {
-            TableRow row = tri.next();
-            int wsid = row.getIntColumn("workspace_item_id");
-            WorkspaceItem wsi = WorkspaceItem.find(context, wsid);
-            tri.close();
-            return wsi;
-        }
-        return null;
+        WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
+        return workspaceItemService.findByItem(context, item);
     }
 }
