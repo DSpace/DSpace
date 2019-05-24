@@ -18,6 +18,15 @@ import org.dspace.services.CachingService;
 /**
  * List all EhCache CacheManager and Cache instances.
  *
+ * <p>This is a debugging tool, not used in the daily operation of DSpace.
+ * Just run it from the installed instance using
+ * {@code bin/dspace dsrun org.dspace.app.util.CacheSnooper}
+ * to check that the cache configuration is what you expect it to be,
+ * given your configuration.
+ *
+ * <p>This was created to prove a specific cache configuration patch,
+ * but I leave it here in the hope that it may be useful to others.
+ *
  * @author Mark H. Wood <mwood@iupui.edu>
  */
 public class CacheSnooper {
