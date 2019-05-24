@@ -139,7 +139,7 @@
                 url : window.location.href.replace("login.html", "") + 'api/authn/login',
                 type : 'POST',
                 async : false,
-                data : 'password='+$("#password").val()+'&user='+$("#username").val() ,
+                data : 'password='+encodeURIComponent($("#password").val())+'&user='+encodeURIComponent($("#username").val()),
                 headers : {
                     "Content-Type" : 'application/x-www-form-urlencoded',
                     "Accept:" : '*/*'
