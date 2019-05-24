@@ -38,8 +38,8 @@
     lc_collate: nb_NO.utf8
     lc_ctype: nb_NO.utf8
     login_host: "{{ DatabaseHost[fase] }}"
-    login_user: dspace
-    login_password: dspace
+    login_user: "{{ lookup('hashi_vault', 'secret=secret/service/brage/' + fase + ':db_username auth_method=approle role_id=brage-client-' + fase + ' secret_id=' + vault_secret + ' url=https://vault.bibsys.no:8200')}}"
+    login_password: "{{ lookup('hashi_vault', 'secret=secret/service/brage/' + fase + ':db_password auth_method=approle role_id=brage-client-' + fase + ' secret_id=' + vault_secret + ' url=https://vault.bibsys.no:8200')}}"
     name: brage-{{ kunde }}
     template: template0
   when: fase == "produksjon"
