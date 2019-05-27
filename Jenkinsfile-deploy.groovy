@@ -75,22 +75,25 @@ pipeline {
             }
         }
 
-		stage('Deploy Brage') {
-			steps {
-				println("Deploying branch $VERSION for ${inputResult.kunde} to ${inputResult.devstep}")
-				dir("${env.WORKSPACE}/deployscripts") {
-					ansiblePlaybook(
-					playbook: 'deploy-brage.yml',
-					inventory: 'hosts',
-					extraVars: [
-							fase: inputResult.devstep,
-							jenkins_workspace: env.WORKSPACE,
-							kunde: inputResult.kunde
-						]
-					)
-				}
-			}
-		}
+        stage('Deploy Brage') {
+            steps {
+                println("Deploying branch $VERSION for ${inputResult.kunde} to ${inputResult.devstep}")
+                dir("${env.WORKSPACE}/deployscripts") {
+                    withCredentials([string(credentialsId: 'brage_vault_' + inputResult.devstep, variable: 'VAULTSECRET')]) {
+                        ansiblePlaybook(
+                                playbook: 'deploy-brage.yml',
+                                inventory: 'hosts',
+                                extraVars: [
+                                        fase             : inputResult.devstep,
+                                        jenkins_workspace: env.WORKSPACE,
+                                        kunde            : inputResult.kunde,
+                                        vault_secret     : "$VAULTSECRET"
+                                ]
+                        )
+                    }
+                }
+            }
+        }
 
         stage('Cleanup') {
             steps {

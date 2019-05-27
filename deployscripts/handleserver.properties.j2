@@ -1,7 +1,7 @@
 databaseServerName = {{ HandleServerConfig[fase]["hostname"] }}
 databaseName = handle
-user = handle
-password = handle
+user = {{ lookup('hashi_vault', 'secret=secret/service/brage/' + fase + ':handle_username auth_method=approle role_id=brage-client-' + fase + ' secret_id=' + vault_secret + ' url=https://vault.bibsys.no:8200')}}
+password = {{ lookup('hashi_vault', 'secret=secret/service/brage/' + fase + ':handle_password auth_method=approle role_id=brage-client-' + fase + ' secret_id=' + vault_secret + ' url=https://vault.bibsys.no:8200')}}
 portNumber = 5432
 handle_prefix = {{ HandleServerConfig[fase]["prefix"] }}
 handlePrefix = {{ HandleServerConfig[fase]["prefix"] }}
