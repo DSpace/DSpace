@@ -3,6 +3,7 @@ package ua.edu.sumdu.essuir.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang3.tuple.Pair;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeManager;
 import org.json.simple.JSONArray;
@@ -12,7 +13,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
 import ua.edu.sumdu.essuir.entity.Faculty;
+import ua.edu.sumdu.essuir.entity.Metadatavalue;
 import ua.edu.sumdu.essuir.repository.FacultyRepository;
 import ua.edu.sumdu.essuir.service.ReportService;
 
@@ -21,10 +24,10 @@ import javax.servlet.http.HttpServletRequest;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Map;
+import java.util.*;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping(value = "/statistics")
@@ -92,4 +95,40 @@ public class ReportController {
         }
         return "";
     }
+
+    @RequestMapping(value = "/detailedReport", method = RequestMethod.GET)
+    public ModelAndView getDetailedReportForDepositor(@RequestParam("depositor") String depositor, ModelAndView model) {
+        Collection<Map<Integer, List<Metadatavalue>>> itemsInSpeciality;
+
+        if(depositor.equals("-")) {
+            itemsInSpeciality = reportService.getBacheoursWithoutSpeciality().values();
+        } else {
+            itemsInSpeciality = reportService.getItemsInSpeciality(depositor).values();
+        }
+
+
+        BiFunction<Map<Integer, List<Metadatavalue>>, Integer, String> extractItemDataByFieldId = (metadata, fieldId) -> metadata
+                .getOrDefault(fieldId, new ArrayList<>())
+                .stream()
+                .filter(item -> item.getPlace().equals(1))
+                .map(Metadatavalue::getTextValue)
+                .findAny()
+                .orElse("");
+
+
+        Function<Map<Integer, List<Metadatavalue>>, Pair<String, String>> extractItemNameAndLink = (metadata) ->
+                Pair.of(extractItemDataByFieldId.apply(metadata, 64), extractItemDataByFieldId.apply(metadata, 25));
+
+        List<String> collect = itemsInSpeciality
+                .stream()
+                .map(item -> extractItemNameAndLink.apply(item))
+                .map(item -> String.format("<a href = \"%s\">%s</a>", item.getRight(), item.getLeft()))
+                .collect(Collectors.toList());
+
+        model.setViewName("detailed-report");
+
+        model.addObject("data", collect);
+        return model;
+    }
 }
+

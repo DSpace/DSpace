@@ -9,6 +9,9 @@ import java.util.List;
 
 @Repository
 public interface MetadatavalueRepository extends JpaRepository<Metadatavalue, Integer> {
+
+    List<Metadatavalue> findDistinctByTextValueContaining(String speciality);
+
     @Query("select distinct(resourceId) from Metadatavalue where textValue = 'Bachelous paper'")
     List<Integer> selectBachelousWorkIds();
 

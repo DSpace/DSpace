@@ -41,7 +41,7 @@
 
     if (isAdmin || userEmail.equals("library_ssu@ukr.net") || userEmail.equals("libconsult@rambler.ru")) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
-        LocalDate from = request.getParameter("fromDate") == null ? LocalDate.MIN : LocalDate.parse(request.getParameter("fromDate"), formatter);
+        LocalDate from = request.getParameter("fromDate") == null ? LocalDate.of(2010, 1, 1) : LocalDate.parse(request.getParameter("fromDate"), formatter);
         LocalDate to = request.getParameter("endDate") == null ? LocalDate.MAX : LocalDate.parse(request.getParameter("endDate"), formatter);
 %>
 
@@ -79,7 +79,7 @@
                         header: ["<%= LocaleSupport.getLocalizedMessage(pageContext, "report.depositor") %>", {content: "textFilter"}],
                         width: 600,
                         sort: "string",
-                        template: "{common.treetable()} #name#"
+                        template: "{common.treetable()} <a href = \"/statistics/detailedReport?depositor=#name#\">#name#</a>"
                     },
                     {id: "submission_count", header: "<%= LocaleSupport.getLocalizedMessage(pageContext, "report.submissions-count") %>", width: 200, sort: "int"}
                 ],
@@ -98,11 +98,10 @@
             });
         });
 
-        $(document).ready(function () {
-            var today = new Date();
-            var day = today.getDate();
-            var month = today.getMonth() + 1;
-            var year = today.getFullYear();
+        function parseDate(date) {
+            var day = date.getDate();
+            var month = date.getMonth() + 1;
+            var year = date.getFullYear();
             if (day < 10) {
                 day = '0' + day
             }
@@ -110,8 +109,12 @@
             if (month < 10) {
                 month = '0' + month
             }
-
-            $('#endDate').val(day + '.' + month + '.' + year);
+            return day + '.' + month + '.' + year;
+        }
+        $(document).ready(function () {
+            var date = '<%= from %>';
+            $('#endDate').val(parseDate(new Date()));
+            $('#beginDate').val(parseDate(new Date(date)));
         });
 
         $(function () {
@@ -136,6 +139,8 @@
         }
 
     </script>
+    <br/>
+    <div class="text-center"><h4><a href = "/statistics/detailedReport?depositor=-">Роботи, для яких не вказана спеціальність та/або дата представлення</a></h4></div>
 </dspace:layout>
 
 <%
