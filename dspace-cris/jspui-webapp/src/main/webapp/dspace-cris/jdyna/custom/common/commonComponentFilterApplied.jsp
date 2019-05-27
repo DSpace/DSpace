@@ -120,7 +120,7 @@
 					    <b><%= showDisplay?displayAppliedFilters.get(filter[0]+"::"+filter[1]+"::"+filter[2]):filter[2] %></b>
 		  					<a class="a-filter-applied-remove" href="?open=<%=info.getType()							
 					                + httpFilters
-					                + "&amp;submit_filter_remove_"+ relationName + "_" + idx +"="+Utils.addEntities(filter[2]) %>#${holder.shortName}"><i class="remove fa fa-times"></i></a> 
+					                + "&amp;submit_filter_remove_"+ relationName + "_" + idx +"="+URLEncoder.encode(filter[2]) %>#${holder.shortName}"><i class="remove fa fa-times"></i></a> 
 					    
 					    </span>
 				    </div>
