@@ -16,8 +16,8 @@ db.username = {{ lookup('hashi_vault', 'secret=secret/service/brage/' + fase + '
 
 mail.server = mailhub.bibsys.no
 mail.from.address = noreply@unit.no
-mail.feedback.recipient = support@bibsys.no
-mail.admin = support@bibsys.no
+mail.feedback.recipient = support@unit.no
+mail.admin = support@unit.no
 
 # CNRI Handle prefix
 handle.prefix = {{ HandleServerConfig[fase]["prefix"] }}
