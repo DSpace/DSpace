@@ -32,8 +32,6 @@ import java.util.UUID;
  */
 public class XmlUICollectionAssignmentUI extends AbstractXMLUIAction {
 
-    protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
-    protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
 
 
     @Override
@@ -56,7 +54,7 @@ public class XmlUICollectionAssignmentUI extends AbstractXMLUIAction {
 
         div.addPara("The item is being submitted to the collection:" + collection.getName() + " (" + collection.getHandle() + ")");
         div.addPara("Select collections to add the item to:");
-
+        CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
         TreeNode root = buildTree(communityService.findAllTop(context));
         java.util.List<Collection> existingCollections = item.getCollections();
         java.util.List<UUID> existingIDs = new ArrayList<>();

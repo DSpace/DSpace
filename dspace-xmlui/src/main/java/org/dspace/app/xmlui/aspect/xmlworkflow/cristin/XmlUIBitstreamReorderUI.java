@@ -43,7 +43,7 @@ public class XmlUIBitstreamReorderUI extends AbstractXMLUIAction {
     private static final Message T_order_up = message("xmlui.administrative.item.EditItemBitstreamsForm.order_up");
     private static final Message T_order_down = message("xmlui.administrative.item.EditItemBitstreamsForm.order_down");
 
-    protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+//    protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
 
 
     @Override
@@ -132,7 +132,7 @@ public class XmlUIBitstreamReorderUI extends AbstractXMLUIAction {
                     }
                 }
                 moveCell.addButton("submit_move").setValue("Go");
-
+                AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
                 if (authorizeService.authorizeActionBoolean(context, bitstream, Constants.WRITE)) {
                     // The user can edit the bitstream give them a link.
                     Cell cell = row.addCell();
