@@ -31,7 +31,7 @@ public class BitstreamFormatBuilder extends AbstractCRUDBuilder<BitstreamFormat>
     }
 
     @Override
-    protected void cleanup() throws Exception {
+    public void cleanup() throws Exception {
         delete(bitstreamFormat);
     }
 

@@ -120,7 +120,7 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
     @Override
     public String getName() {
         String value = getCollectionService()
-            .getMetadataFirstValue(this, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY);
+            .getMetadataFirstValue(this, MetadataSchemaEnum.DC.getName(), "title", null, Item.ANY);
         return value == null ? "" : value;
     }
 

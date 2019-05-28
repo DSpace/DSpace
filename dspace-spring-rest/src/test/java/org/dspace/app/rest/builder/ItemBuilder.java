@@ -10,7 +10,7 @@ package org.dspace.app.rest.builder;
 import org.dspace.content.Collection;
 import org.dspace.content.DCDate;
 import org.dspace.content.Item;
-import org.dspace.content.MetadataSchema;
+import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.Context;
@@ -52,19 +52,32 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
     }
 
     public ItemBuilder withTitle(final String title) {
-        return setMetadataSingleValue(item, MetadataSchema.DC_SCHEMA, "title", null, title);
+        return setMetadataSingleValue(item, MetadataSchemaEnum.DC.getName(), "title", null, title);
     }
 
     public ItemBuilder withIssueDate(final String issueDate) {
-        return addMetadataValue(item, MetadataSchema.DC_SCHEMA, "date", "issued", new DCDate(issueDate).toString());
+        return addMetadataValue(item, MetadataSchemaEnum.DC.getName(),
+                                "date", "issued", new DCDate(issueDate).toString());
     }
 
     public ItemBuilder withAuthor(final String authorName) {
-        return addMetadataValue(item, MetadataSchema.DC_SCHEMA, "contributor", "author", authorName);
+        return addMetadataValue(item, MetadataSchemaEnum.DC.getName(), "contributor", "author", authorName);
+    }
+
+    public ItemBuilder withPersonIdentifierFirstName(final String personIdentifierFirstName) {
+        return addMetadataValue(item, "person", "identifier", "firstname", personIdentifierFirstName);
+    }
+
+    public ItemBuilder withPersonIdentifierLastName(final String personIdentifierLastName) {
+        return addMetadataValue(item, "person", "identifier", "lastname", personIdentifierLastName);
     }
 
     public ItemBuilder withSubject(final String subject) {
-        return addMetadataValue(item, MetadataSchema.DC_SCHEMA, "subject", null, subject);
+        return addMetadataValue(item, MetadataSchemaEnum.DC.getName(), "subject", null, subject);
+    }
+
+    public ItemBuilder withRelationshipType(final String relationshipType) {
+        return addMetadataValue(item, "relationship", "type", null, relationshipType);
     }
 
     public ItemBuilder makeUnDiscoverable() {
@@ -116,7 +129,8 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         }
     }
 
-    protected void cleanup() throws Exception {
+    @Override
+    public void cleanup() throws Exception {
         delete(item);
     }
 
