@@ -445,19 +445,22 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
         // create a workspaceitem explicitly in the col1
         getClient(authToken).perform(post("/api/submission/workspaceitems")
-                    .param("collection", col1.getID().toString()))
+                    .param("collection", col1.getID().toString())
+                    .contentType(org.springframework.http.MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$._embedded.collection.id", is(col1.getID().toString())));
 
         // create a workspaceitem explicitly in the col2
         getClient(authToken).perform(post("/api/submission/workspaceitems")
-                    .param("collection", col2.getID().toString()))
+                    .param("collection", col2.getID().toString())
+                    .contentType(org.springframework.http.MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$._embedded.collection.id", is(col2.getID().toString())));
 
         // create a workspaceitem without an explicit collection, this will go in the first valid collection for the
         // user: the col1
-        getClient(authToken).perform(post("/api/submission/workspaceitems"))
+        getClient(authToken).perform(post("/api/submission/workspaceitems")
+        .contentType(org.springframework.http.MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$._embedded.collection.id", is(col1.getID().toString())));
 
@@ -628,7 +631,8 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
         // create an empty workspaceitem explicitly in the col1, check validation on creation
         getClient(authToken).perform(post("/api/submission/workspaceitems")
-                    .param("collection", col1.getID().toString()))
+                    .param("collection", col1.getID().toString())
+                    .contentType(org.springframework.http.MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
                 // title and dateissued are required in the first panel
                 // the json path with a @ selector always return an array

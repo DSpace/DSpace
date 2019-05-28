@@ -10,12 +10,13 @@ package org.dspace.app.rest.builder;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.util.UUID;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.CharEncoding;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Community;
-import org.dspace.content.MetadataSchema;
+import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.Context;
 
@@ -59,7 +60,7 @@ public class CommunityBuilder extends AbstractDSpaceObjectBuilder<Community> {
     }
 
     public CommunityBuilder withName(final String communityName) {
-        return setMetadataSingleValue(community, MetadataSchema.DC_SCHEMA, "title", null, communityName);
+        return setMetadataSingleValue(community, MetadataSchemaEnum.DC.getName(), "title", null, communityName);
     }
 
     public CommunityBuilder withLogo(String content) throws AuthorizeException, IOException, SQLException {
@@ -83,12 +84,35 @@ public class CommunityBuilder extends AbstractDSpaceObjectBuilder<Community> {
         return community;
     }
 
-    protected void cleanup() throws Exception {
+    @Override
+    public void cleanup() throws Exception {
         delete(community);
     }
 
     @Override
     protected DSpaceObjectService<Community> getService() {
         return communityService;
+    }
+
+    /**
+     * Delete the Test Community referred to by the given UUID
+     * @param uuid UUID of Test Community to delete
+     * @throws SQLException
+     * @throws IOException
+     */
+    public static void deleteCommunity(UUID uuid) throws SQLException, IOException {
+        try (Context c = new Context()) {
+            c.turnOffAuthorisationSystem();
+            Community community = communityService.find(c, uuid);
+            if (community != null) {
+                try {
+                    communityService.delete(c, community);
+                } catch (AuthorizeException e) {
+                    // cannot occur, just wrap it to make the compiler happy
+                    throw new RuntimeException(e.getMessage(), e);
+                }
+            }
+            c.complete();
+        }
     }
 }

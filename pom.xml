@@ -26,6 +26,8 @@
         <java.version>1.8</java.version>
         <poi-version>3.17</poi-version>
         <postgresql.driver.version>42.2.1</postgresql.driver.version>
+        <!-- PIN Jena to 2.x until both RDF and SWORDv2 can be updated to Jena 3. Requires package renaming, see
+             https://jena.apache.org/documentation/migrate_jena2_jena3.html -->
         <jena.version>2.13.0</jena.version>
         <log4j.version>2.6.2</log4j.version>
         <slf4j.version>1.7.22</slf4j.version>
@@ -37,6 +39,7 @@
              https://issues.apache.org/jira/browse/SOLR-12858 -->
         <solr.client.version>7.3.1</solr.client.version>
         <spring.version>4.3.6.RELEASE</spring.version>
+        <spring-boot.version>1.4.4.RELEASE</spring-boot.version>
         <!-- 'root.basedir' is the path to the root [dspace-src] dir. It must be redefined by each child POM,
              as it is used to reference the LICENSE_HEADER and *.properties file(s) in that directory. -->
         <root.basedir>${basedir}</root.basedir>
@@ -941,40 +944,16 @@
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-sword</artifactId>
                 <version>7.0-SNAPSHOT</version>
-                <type>jar</type>
-                <classifier>classes</classifier>
-            </dependency>
-            <dependency>
-                <groupId>org.dspace</groupId>
-                <artifactId>dspace-sword</artifactId>
-                <version>7.0-SNAPSHOT</version>
-                <type>war</type>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-swordv2</artifactId>
                 <version>7.0-SNAPSHOT</version>
-                <type>jar</type>
-                <classifier>classes</classifier>
-            </dependency>
-            <dependency>
-                <groupId>org.dspace</groupId>
-                <artifactId>dspace-swordv2</artifactId>
-                <version>7.0-SNAPSHOT</version>
-                <type>war</type>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-oai</artifactId>
                 <version>7.0-SNAPSHOT</version>
-                <type>jar</type>
-                <classifier>classes</classifier>
-            </dependency>
-            <dependency>
-                <groupId>org.dspace</groupId>
-                <artifactId>dspace-oai</artifactId>
-                <version>7.0-SNAPSHOT</version>
-                <type>war</type>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
@@ -985,7 +964,6 @@
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-rdf</artifactId>
                 <version>7.0-SNAPSHOT</version>
-                <type>war</type>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>

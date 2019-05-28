@@ -378,38 +378,64 @@ public class RestResourceController implements InitializingBean {
     /**
      * Execute a POST request;
      *
-     * curl -X POST http://<dspace.url>/dspace-spring-rest/api/{apiCategory}/{model}
+     * curl -X POST -H "Content-Type:application/json" http://<dspace.url>/dspace-spring-rest/api/{apiCategory}/{model}
      *
      * Example:
      * <pre>
      * {@code
-     *      curl -X POST http://<dspace.url>/dspace-spring-rest/api/submission/workspaceitems
+     *      curl -X POST -H "Content-Type:application/json" http://<dspace.url>/dspace-spring-rest/api/submission/workspaceitems
      * }
      * </pre>
      *
-     * @param request
-     * @param apiCategory
-     * @param model
-     * @return
-     * @throws HttpRequestMethodNotSupportedException
+     * @param request       The relevant request
+     * @param apiCategory   The apiCategory to be used
+     * @param model         The model to be used
+     * @return              The relevant ResponseEntity for this request
+     * @throws HttpRequestMethodNotSupportedException   If something goes wrong
      */
-    @RequestMapping(method = RequestMethod.POST)
+    @RequestMapping(method = RequestMethod.POST, consumes = {"application/json", "application/hal+json"})
     public ResponseEntity<ResourceSupport> post(HttpServletRequest request, @PathVariable String apiCategory,
                                                 @PathVariable String model)
         throws HttpRequestMethodNotSupportedException {
-        return postInternal(request, apiCategory, model);
+        return postJsonInternal(request, apiCategory, model);
     }
 
     /**
-     * Internal method to execute POST;
+     * Execute a POST request;
      *
-     * @param request
-     * @param apiCategory
-     * @param model
-     * @return
-     * @throws HttpRequestMethodNotSupportedException
+     * curl -X POST -H "Content-Type:text/uri-list" http://<dspace.url>/dspace-spring-rest/api/{apiCategory}/{model}
+     *
+     * Example:
+     * <pre>
+     * {@code
+     *      curl -X POST -H "Content-Type:text/uri-list" http://<dspace.url>/dspace-spring-rest/api/submission/workspaceitems
+     * }
+     * </pre>
+     *
+     * @param request       The relevant request
+     * @param apiCategory   The apiCategory to be used
+     * @param model         The model to be used
+     * @return              The relevant ResponseEntity for this request
+     * @throws HttpRequestMethodNotSupportedException   If something goes wrong
      */
-    public <ID extends Serializable> ResponseEntity<ResourceSupport> postInternal(HttpServletRequest request,
+    @RequestMapping(method = RequestMethod.POST, consumes = {"text/uri-list"})
+    public ResponseEntity<ResourceSupport> postWithUriListContentType(HttpServletRequest request,
+                                                                      @PathVariable String apiCategory,
+                                                                      @PathVariable String model)
+        throws HttpRequestMethodNotSupportedException {
+        return postUriListInternal(request, apiCategory, model);
+    }
+
+    /**
+     * Internal method to execute POST with application/json MediaType;
+     *
+     * @param request       The relevant request
+     * @param apiCategory   The apiCategory to be used
+     * @param model         The model to be used
+     * @return              The relevant ResponseEntity for this request
+     * @throws HttpRequestMethodNotSupportedException   If something goes wrong
+     */
+    public <ID extends Serializable> ResponseEntity<ResourceSupport> postJsonInternal(HttpServletRequest request,
                                                                                   String apiCategory,
                                                                                   String model)
         throws HttpRequestMethodNotSupportedException {
@@ -424,6 +450,40 @@ public class RestResourceController implements InitializingBean {
         //TODO manage HTTPHeader
         return ControllerUtils.toResponseEntity(HttpStatus.CREATED, null, result);
     }
+
+    /**
+     * Internal method to execute POST with text/uri-list MediaType;
+     *
+     * @param request       The relevant request
+     * @param apiCategory   The apiCategory to be used
+     * @param model         The model to be used
+     * @return              The relevant ResponseEntity for this request
+     * @throws HttpRequestMethodNotSupportedException   If something goes wrong
+     */
+    public <ID extends Serializable> ResponseEntity<ResourceSupport> postUriListInternal(HttpServletRequest request,
+                                                                                  String apiCategory,
+                                                                                  String model)
+        throws HttpRequestMethodNotSupportedException {
+        checkModelPluralForm(apiCategory, model);
+        DSpaceRestRepository<RestAddressableModel, ID> repository = utils.getResourceRepository(apiCategory, model);
+        RestAddressableModel modelObject = null;
+        List<String> stringListFromRequest = utils.getStringListFromRequest(request);
+        try {
+            modelObject = repository.createAndReturn(stringListFromRequest);
+        } catch (ClassCastException e) {
+            log.error("Something went wrong whilst creating the object for apiCategory: " + apiCategory +
+                          " and model: " + model, e);
+            return ControllerUtils.toEmptyResponse(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        if (modelObject == null) {
+            throw new HttpRequestMethodNotSupportedException(RequestMethod.POST.toString());
+        }
+        DSpaceResource result = repository.wrapResource(modelObject);
+        linkService.addLinks(result);
+        //TODO manage HTTPHeader
+        return ControllerUtils.toResponseEntity(HttpStatus.CREATED, null, result);
+    }
+
 
     /**
      * Called in POST, with a x-www-form-urlencoded, execute an action on a resource
@@ -1020,35 +1080,6 @@ public class RestResourceController implements InitializingBean {
         return ControllerUtils.toEmptyResponse(HttpStatus.NO_CONTENT);
     }
 
-
-
-    /**
-     * Execute a PUT request for an entity with id of type Integer;
-     *
-     * curl -X PUT http://<dspace.restUrl>/api/{apiCategory}/{model}/{id}
-     *
-     * Example:
-     * <pre>
-     * {@code
-     *      curl -X PUT http://<dspace.restUrl>/api/core/metadatafield/1
-     * }
-     * </pre>
-     *
-     * @param request     the http request
-     * @param apiCategory the API category e.g. "core"
-     * @param model       the DSpace model e.g. "metadatafield"
-     * @param id          the ID of the target REST object
-     * @param jsonNode    the part of the request body representing the updated rest object
-     * @return the relevant REST resource
-     */
-    @RequestMapping(method = RequestMethod.PUT, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_DIGIT)
-    public DSpaceResource<RestAddressableModel> put(HttpServletRequest request,
-                                                    @PathVariable String apiCategory, @PathVariable String model,
-                                                    @PathVariable Integer id,
-                                                    @RequestBody JsonNode jsonNode) {
-        return putOneInternal(request, apiCategory, model, id, jsonNode);
-    }
-
     /**
      * Execute a PUT request for an entity with id of type UUID;
      *
@@ -1073,32 +1104,110 @@ public class RestResourceController implements InitializingBean {
                                                     @PathVariable String apiCategory, @PathVariable String model,
                                                     @PathVariable UUID uuid,
                                                     @RequestBody JsonNode jsonNode) {
-        return putOneInternal(request, apiCategory, model, uuid, jsonNode);
+        return putOneJsonInternal(request, apiCategory, model, uuid, jsonNode);
     }
 
     /**
-     * Internal method to update a single entity
+     * Execute a PUT request for an entity with id of type Integer;
+     *
+     * curl -X PUT -H "Content-Type:application/json" http://<dspace.url>/dspace-spring-rest/api/{apiCategory}/{model}/{id}
+     *
+     * Example:
+     * <pre>
+     * {@code
+     *      curl -X PUT -H "Content-Type:application/json" http://<dspace.url>/dspace-spring-rest/api/core/metadatafield/1
+     * }
+     * </pre>
      *
      * @param request     the http request
      * @param apiCategory the API category e.g. "api"
-     * @param model       the DSpace model e.g. "metadatafield"
-     * @param uuid        the ID of the target REST object
+     * @param model       the DSpace model e.g. "collection"
+     * @param id        the ID of the target REST object
      * @param jsonNode    the part of the request body representing the updated rest object
      * @return the relevant REST resource
      */
-    private <ID extends Serializable> DSpaceResource<RestAddressableModel> putOneInternal(HttpServletRequest request,
-                                                                                          String apiCategory,
-                                                                                          String model, ID uuid,
-                                                                                          JsonNode jsonNode) {
+    @RequestMapping(method = RequestMethod.PUT, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_DIGIT,
+        consumes = {"application/json", "application/hal+json"})
+    public DSpaceResource<RestAddressableModel> put(HttpServletRequest request,
+                                                    @PathVariable String apiCategory, @PathVariable String model,
+                                                    @PathVariable Integer id,
+                                                    @RequestBody(required = true) JsonNode jsonNode) {
+        return putOneJsonInternal(request, apiCategory, model, id, jsonNode);
+    }
+
+    /**
+     * Execute a PUT request for an entity with id of type Integer;
+     *
+     * curl -X PUT -H "Content-Type:text/uri-list" http://<dspace.url>/dspace-spring-rest/api/{apiCategory}/{model}/{id}
+     *
+     * Example:
+     * <pre>
+     * {@code
+     *      curl -X PUT -H "Content-Type:text/uri-list" http://<dspace.url>/dspace-spring-rest/api/core/metadatafield/1
+     * }
+     * </pre>
+     *
+     * @param request     the http request
+     * @param apiCategory the API category e.g. "api"
+     * @param model       the DSpace model e.g. "collection"
+     * @param id        the ID of the target REST object
+     * @return the relevant REST resource
+     */
+    @RequestMapping(method = RequestMethod.PUT, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_DIGIT,
+        consumes = {"text/uri-list"})
+    public DSpaceResource<RestAddressableModel> put(HttpServletRequest request,
+                                                    @PathVariable String apiCategory, @PathVariable String model,
+                                                    @PathVariable Integer id) throws IOException {
+        return putOneUriListInternal(request, apiCategory, model, id);
+    }
+
+    /**
+     * Internal method to execute PUT with application/json MediaType;
+     *
+     * @param request       The relevant request
+     * @param apiCategory   The apiCategory to be used
+     * @param model         The model to be used
+     * @param id            The ID for the resource to be altered by the PUT
+     * @param jsonNode      The relevant JsonNode to be used by the PUT
+     * @return              The relevant DSpaceResource for this request
+     */
+    private <ID extends Serializable> DSpaceResource<RestAddressableModel> putOneJsonInternal(
+        HttpServletRequest request, String apiCategory, String model, ID id, JsonNode jsonNode) {
         checkModelPluralForm(apiCategory, model);
         DSpaceRestRepository<RestAddressableModel, ID> repository = utils.getResourceRepository(apiCategory, model);
         RestAddressableModel modelObject = null;
-        modelObject = repository.put(request, apiCategory, model, uuid, jsonNode);
+        modelObject = repository.put(request, apiCategory, model, id, jsonNode);
         if (modelObject == null) {
-            throw new ResourceNotFoundException(apiCategory + "." + model + " with id: " + uuid + " not found");
+            throw new ResourceNotFoundException(apiCategory + "." + model + " with id: " + id + " not found");
         }
         DSpaceResource result = repository.wrapResource(modelObject);
         linkService.addLinks(result);
         return result;
+
+    }
+    /**
+     * Internal method to execute PUT with text/uri-list MediaType;
+     *
+     * @param request       The relevant request
+     * @param apiCategory   The apiCategory to be used
+     * @param model         The model to be used
+     * @param id            The ID for the resource to be altered by the PUT
+     * @return              The relevant DSpaceResource for this request
+     * @throws IOException  If something goes wrong
+     */
+    private <ID extends Serializable> DSpaceResource<RestAddressableModel> putOneUriListInternal(
+        HttpServletRequest request, String apiCategory, String model, ID id) throws IOException {
+        checkModelPluralForm(apiCategory, model);
+        DSpaceRestRepository<RestAddressableModel, ID> repository = utils.getResourceRepository(apiCategory, model);
+        RestAddressableModel modelObject = null;
+        List<String> stringList = utils.getStringListFromRequest(request);
+        modelObject = repository.put(request, apiCategory, model, id, stringList);
+        if (modelObject == null) {
+            throw new ResourceNotFoundException(apiCategory + "." + model + " with id: " + id + " not found");
+        }
+        DSpaceResource result = repository.wrapResource(modelObject);
+        linkService.addLinks(result);
+        return result;
+
     }
 }

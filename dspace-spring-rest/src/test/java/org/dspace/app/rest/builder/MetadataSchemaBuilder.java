@@ -24,11 +24,6 @@ public class MetadataSchemaBuilder extends AbstractBuilder<MetadataSchema, Metad
 
     private MetadataSchema metadataSchema;
 
-    @Override
-    protected int getPriority() {
-        return 1;
-    }
-
     protected MetadataSchemaBuilder(Context context) {
         super(context);
     }
@@ -39,7 +34,7 @@ public class MetadataSchemaBuilder extends AbstractBuilder<MetadataSchema, Metad
     }
 
     @Override
-    protected void cleanup() throws Exception {
+    public void cleanup() throws Exception {
         delete(metadataSchema);
     }
 
