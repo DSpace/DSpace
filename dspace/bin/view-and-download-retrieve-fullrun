@@ -1,0 +1,13 @@
+#!/bin/sh
+
+# Get the DSPACE/bin directory
+BINDIR=`dirname $0`
+
+$BINDIR/dspace dsrun org.dspace.app.cris.batch.ScriptStatsMetrics -s ItemStatsViewIndicatorsOptPlugin
+$BINDIR/dspace dsrun org.dspace.app.cris.batch.ScriptStatsMetrics -s RPStatsViewIndicatorsOptPlugin
+$BINDIR/dspace dsrun org.dspace.app.cris.batch.ScriptStatsMetrics -s OUStatsViewIndicatorsOptPlugin
+$BINDIR/dspace dsrun org.dspace.app.cris.batch.ScriptStatsMetrics -s PJStatsViewIndicatorsOptPlugin
+#$BINDIR/dspace dsrun org.dspace.app.cris.batch.ScriptStatsMetrics -s PercentileViewIndicatorsPlugin
+#$BINDIR/dspace dsrun org.dspace.app.cris.batch.ScriptStatsMetrics -s PercentileViewAggregateIndicatorsPlugin
+#$BINDIR/dspace dsrun org.dspace.app.cris.batch.ScriptStatsMetrics -s PercentileDownloadIndicatorsPlugin
+#$BINDIR/dspace dsrun org.dspace.app.cris.batch.ScriptStatsMetrics -s PercentileDownloadAggregateIndicatorsPlugin
