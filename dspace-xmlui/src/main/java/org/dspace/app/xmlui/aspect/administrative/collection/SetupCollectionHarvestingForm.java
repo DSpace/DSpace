@@ -257,13 +257,13 @@ public class SetupCollectionHarvestingForm extends AbstractDSpaceTransformer {
 		// Add a bundle versioning strategy option
 		harvestOptions.addLabel(T_label_bundle_versioning);
 		Select bundleVersioning = harvestOptions.addItem().addSelect("bundle_versioning");
-		String bundleVersioningString = "oai.harvester.bundle_versioning";
+		String bundleVersioningString = "oai.harvester.bundle_versioning.";
 		this.getOptions(bundleVersioningValue, bundleVersioning, bundleVersioningString);
 
 		// Add an ingest workflow setup option
 		harvestOptions.addLabel(T_label_ingest_workflow);
 		Select ingestWorkflow = harvestOptions.addItem().addSelect("ingest_workflow");
-		String ingestWorkflowString = "oai.harvester.ingest_workflow";
+		String ingestWorkflowString = "oai.harvester.ingest_workflow.";
 		this.getOptions(ingestWorkflowValue, ingestWorkflow, ingestWorkflowString);
 
 		Para buttonList = main.addPara();
