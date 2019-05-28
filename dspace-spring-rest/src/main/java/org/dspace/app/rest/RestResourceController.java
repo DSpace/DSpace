@@ -476,7 +476,7 @@ public class RestResourceController implements InitializingBean {
             return ControllerUtils.toEmptyResponse(HttpStatus.INTERNAL_SERVER_ERROR);
         }
         if (modelObject == null) {
-            throw new HttpRequestMethodNotSupportedException(RequestMethod.POST.toString());
+            return ControllerUtils.toEmptyResponse(HttpStatus.CREATED);
         }
         DSpaceResource result = repository.wrapResource(modelObject);
         linkService.addLinks(result);
