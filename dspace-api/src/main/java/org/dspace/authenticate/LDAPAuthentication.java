@@ -29,7 +29,6 @@ import javax.naming.ldap.StartTlsResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.collections.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authenticate.factory.AuthenticateServiceFactory;
@@ -79,7 +78,7 @@ public class LDAPAuthentication
     implements AuthenticationMethod {
 
     /** Logging category */
-    private static final Logger log = LogManager.getLogger();
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger();
 
     protected AuthenticationService authenticationService
             = AuthenticateServiceFactory.getInstance().getAuthenticationService();
