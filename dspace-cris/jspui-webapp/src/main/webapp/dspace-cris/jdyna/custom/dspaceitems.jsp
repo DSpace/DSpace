@@ -75,6 +75,7 @@
 	    }
 	}
 	
+	String query = request.getQueryString();
 	boolean globalShowFacets = false;
 	if (info!=null && info.getItems()!=null && info.getItems().length > 0) {
 	    
@@ -150,8 +151,8 @@
     StringBuilder sb = new StringBuilder();
 	sb.append("<div class=\"block text-center\"><ul class=\"pagination\">");
 	
-    String prevURL = info.buildPrevURL(); 
-    String nextURL = info.buildNextURL();
+    String prevURL = info.buildPrevURL(query); 
+    String nextURL = info.buildNextURL(query);
 
 
 if (info.getPagefirst() != info.getPagecurrent()) {
@@ -162,7 +163,7 @@ if (info.getPagefirst() != info.getPagecurrent()) {
 
 for( int q = info.getPagefirst(); q <= info.getPagelast(); q++ )
 {
-   	String myLink = info.buildMyLink(q);
+   	String myLink = info.buildMyLink(query,q);
     sb.append("<li");
     if (q == info.getPagecurrent()) {
     	sb.append(" class=\"active\"");	
