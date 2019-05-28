@@ -23,6 +23,50 @@
 		   particular java class.
 		-->
 
+	<!-- start keys used by Cristin -->
+	<message key="xmlui.administrative.collection.EditCollectionHarvestingForm.label_ingest_filter">Ingest Filter</message>
+	<message key="xmlui.administrative.collection.EditCollectionHarvestingForm.label_metadata_update">Metadata Removal Strategy</message>
+	<message key="xmlui.administrative.collection.EditCollectionHarvestingForm.label_bundle_versioning">Bundle Versioning Strategy</message>
+	<message key="xmlui.administrative.collection.EditCollectionHarvestingForm.label_ingest_workflow">Ingest Workflow</message>
+	<message key="xmlui.administrative.collection.SetupCollectionHarvestingForm.label_ingest_filter">Ingest Filter</message>
+	<message key="xmlui.administrative.collection.SetupCollectionHarvestingForm.label_metadata_update">Metadata Removal Strategy</message>
+	<message key="xmlui.administrative.collection.SetupCollectionHarvestingForm.label_bundle_versioning">Bundle Versioning Strategy</message>
+	<message key="xmlui.administrative.collection.SetupCollectionHarvestingForm.label_ingest_workflow">Ingest Workflow</message>
+	<message key="xmlui.administrative.collection.XmlUICollectionAssignmentUI.head">Koble innførselen til samlinger</message>
+	<message key="xmlui.administrative.collection.XmlUICollectionAssignmentUI.para1">Velg en eller flere samlinger innførselen fra CRIStin skal kobles til og publiseres i.</message>
+	<message key="xmlui.administrative.collection.XmlUICollectionAssignmentUI.para2">Innførsel er lagret i samlingen: {0} ({1})</message>
+	<message key="xmlui.administrative.collection.XmlUICollectionAssignmentUI.para3">Velg samling(er) innførselen skal kobles til:</message>
+	<message key="xmlui.administrative.collection.XmlUICollectionAssignmentUI.table.headerCol1">Arkiv/Samling</message>
+	<message key="xmlui.administrative.collection.XmlUICollectionAssignmentUI.table.headerCol2">Koblet?</message>
+	<message key="xmlui.administrative.collection.XmlUICollectionAssignmentUI.button.labelFinished">Lagre endringer og fullfør dette trinnet i arbeidsflyten</message>
+	<message key="xmlui.administrative.collection.XmlUICollectionAssignmentUI.button.finished">Lagre og avslutt</message>
+	<message key="xmlui.administrative.collection.XmlUICollectionAssignmentUI.button.labelSave">Lagre endringer uten å fullføre dette trinnet i arbeidsflyten</message>
+	<message key="xmlui.administrative.collection.XmlUICollectionAssignmentUI.button.save">Lagre</message>
+	<message key="xmlui.administrative.collection.XmlUICollectionAssignmentUI.button.return">Avbryt uten lagring</message>
+	<message key="xmlui.statistics.display.table.workflow.step.cristin.assignment.assignmentaction">CRIStin: Assign Collections Pool</message>
+	<message key="xmlui.statistics.display.table.workflow.step.cristin.assignment.claimaction">CRIStin: Assign Collections</message>
+	<message key="xmlui.statistics.display.table.workflow.step.cristin.bitstreamstep.bitstreamaction">CRIStin: Organise Bitstreams Pool</message>
+	<message key="xmlui.statistics.display.table.workflow.step.cristin.bitstreamstep.claimaction">CRIStin: Organise Bitstreams</message>
+	<message key="xmlui.statistics.display.table.workflow.step.cristin.editstep.claimaction">CRIStin: Accept/Reject/Edit Metadata Step Pool</message>
+	<message key="xmlui.statistics.display.table.workflow.step.cristin.editstep.editaction">CRIStin: Accept/Reject/Edit Metadata Step</message>
+	<message key="xmlui.XMLWorkflow.cristin.assignment">Koble til samlinger</message>
+	<message key="xmlui.XMLWorkflow.cristin.assignment.assignmentaction">Koble til samlinger</message>
+	<message key="xmlui.XMLWorkflow.cristin.assignment.claimaction">Koble til samlinger</message>
+	<message key="xmlui.XMLWorkflow.cristin.bitstreamstep">Organiser filer</message>
+	<message key="xmlui.XMLWorkflow.cristin.bitstreamstep.bitstreamaction">Organiser filer</message>
+	<message key="xmlui.XMLWorkflow.cristin.bitstreamstep.claimaction">Organiser filer</message>
+	<message key="xmlui.XMLWorkflow.cristin.editstep">Aksepter/Avvis/Endre</message>
+	<message key="xmlui.XMLWorkflow.cristin.editstep.claimaction">Aksepter/Avvis/Endre</message>
+	<message key="xmlui.XMLWorkflow.cristin.editstep.editaction">Aksepter/Avvis/Endre</message>
+	<message key="xmlui.XMLWorkflow.cristin.XmlUIBitstreamsReorderUI.head">Organiser innførselens filer</message>
+	<message key="xmlui.XMLWorkflow.cristin.XmlUIBitstreamsReorderUI.save_updates_and_finish">Lagre organiseringen av filer og fullfør dette trinnet i arbeidsflyten</message>
+	<message key="xmlui.XMLWorkflow.cristin.XmlUIBitstreamsReorderUI.save_updates_and_finish.button">Oppdater og fullfør</message>
+	<message key="xmlui.XMLWorkflow.cristin.XmlUIBitstreamsReorderUI.save_updates">Lagre organiseringen av filer uten å fullføre dette trinnet i arbeidsflyten</message>
+	<message key="xmlui.XMLWorkflow.cristin.XmlUIBitstreamsReorderUI.save_updates.button">Oppdater</message>
+	<message key="xmlui.XMLWorkflow.cristin.XmlUIBitstreamsReorderUI.return.button">Avbryt uten lagring</message>
+	<message key="xmlui.XMLWorkflow.default.bitstreamstep.claimaction">Tar Oppgave</message>
+	<!-- /keys used by CRIStin -->
+
 	<!-- General keys -->
 	<message key="xmlui.general.dspace_home">Home</message>
 	<message key="xmlui.general.search">Search</message>
