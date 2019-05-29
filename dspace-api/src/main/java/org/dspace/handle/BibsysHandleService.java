@@ -17,11 +17,7 @@ public class BibsysHandleService implements AutoCloseable {
     private static String instanceBaseUrl;
     private static HandleServiceClient handleServiceClient;
 
-    private BibsysHandleService() {
-    }
-
-    //TODO. The singelton pattern is considered an antipattern. We should strive to come up with a better solution
-    public HandleServiceClient getHandleServiceClient() {
+    public static BibsysHandleService getService() {
         if (handleServiceClient == null) {
             String configurationPath = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty(HANDLE_CONFIGURATION);
             try {
@@ -38,11 +34,11 @@ public class BibsysHandleService implements AutoCloseable {
                 e.printStackTrace();
             }
         }
-        return handleServiceClient;
+        return new BibsysHandleService();
     }
 
 
-    public Properties readProperties(String configurationPath) throws ConfigurationException {
+    public static Properties readProperties(String configurationPath) throws ConfigurationException {
         Properties handleProperties = new Properties();
         try {
             handleProperties.load(new FileInputStream(configurationPath));
@@ -66,7 +62,7 @@ public class BibsysHandleService implements AutoCloseable {
     private String createHandleId(String instanceBaseUrl) {
         String handle = "";
         try {
-            handle = getHandleServiceClient().createHandleAppendToEndpont(instanceBaseUrl);
+            handle = handleServiceClient.createHandleAppendToEndpont(instanceBaseUrl);
         } catch (IOException e) {
             log.error(e);
         }
