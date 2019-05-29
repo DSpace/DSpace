@@ -269,7 +269,7 @@ public class DashService {
 
 
     /**
-       Update the internal metadata for a Dash dataset.
+       Update the internal metadata in the Dash dataset for a given Package
     **/
     private void updateInternalMetadata(Package pkg) {
         DryadDataPackage ddp = pkg.getDataPackage();
@@ -286,7 +286,10 @@ public class DashService {
         if (ddp.getPublicationDOI() != null && ddp.getPublicationDOI().length() > 0) {
             setPublicationDOI(pkg, ddp.getPublicationDOI());
         }
-
+        
+        if (ddp.getPubmedID() != null && ddp.getPubmedID().length() > 0) {
+            setPubmedID(pkg, ddp.getPubmedID());
+        }
         
         if (ddp.getFormerManuscriptNumbers().size() > 0) {
             List<String> prevFormerMSIDs = getFormerManuscriptNumbers(pkg);
@@ -804,9 +807,15 @@ public class DashService {
         return result;
     }
 
+    public int setPubmedID(Package pkg, String pubmedID) {
+        return postInternalDatum(pkg, "set", "pubmedID", pubmedID);
+    }
+    
     public int addMismatchedDOI(Package pkg, String mismatchedDOI) {
         return postInternalDatum(pkg, "add", "mismatchedDOI", mismatchedDOI);
     }
+
+    
 
     public List<String> getMismatchedDOIs(Package pkg) {
         ArrayList<String> result = new ArrayList<>();

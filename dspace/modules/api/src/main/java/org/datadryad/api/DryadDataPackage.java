@@ -308,6 +308,18 @@ public class DryadDataPackage extends DryadObject {
         }
     }
 
+    public String getPubmedID() {
+        if (getItem() != null) {
+            List<String> relatedIDs = getMultipleMetadataValues("dc", "relation", "isreferencedby");
+            for(String relatedID :  relatedIDs) {
+                if(relatedID.startsWith("PMID:")) {
+                        return relatedID;
+                    }
+            }
+        }
+        return null;
+    }
+
     public List<String> getMismatchedDOIs() {
         if (getItem() != null) {
             return getMultipleMetadataValues(MISMATCHED_DOI_SCHEMA, MISMATCHED_DOI_ELEMENT, MISMATCHED_DOI_QUALIFIER);
