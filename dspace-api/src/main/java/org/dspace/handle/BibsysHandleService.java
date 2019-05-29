@@ -1,90 +1,83 @@
 package org.dspace.handle;
 
-import no.bibsys.agora.handle.HandleServiceException;
-import no.bibsys.services.handle.HandleResponse;
-import no.bibsys.services.handle.HandleServiceBuilder;
-import no.bibsys.services.handle.ResponseCode;
+import no.bibsys.dlr.integrations.no.bibsys.handle.HandleServiceClient;
 import org.apache.log4j.Logger;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
 import javax.naming.ConfigurationException;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.Properties;
 
 public class BibsysHandleService implements AutoCloseable {
 
 
     private static final Logger log = Logger.getLogger(BibsysHandleService.class);
     private static final String HANDLE_CONFIGURATION = "handleservice.configuration";
-    private static no.bibsys.services.handle.HandleService agoraInstance;
     private static String instanceBaseUrl;
+    private static HandleServiceClient handleServiceClient;
 
     private BibsysHandleService() {
     }
 
     //TODO. The singelton pattern is considered an antipattern. We should strive to come up with a better solution
-    public static BibsysHandleService getService() {
-        if (agoraInstance == null) {
+    public HandleServiceClient getHandleServiceClient() {
+        if (handleServiceClient == null) {
+            String configurationPath = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty(HANDLE_CONFIGURATION);
             try {
-                String configurationPath = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty(HANDLE_CONFIGURATION);
-                log.info(String.format("Configuring %s using configuration property %s=%s",
-                        BibsysHandleService.class.getSimpleName(), HANDLE_CONFIGURATION, configurationPath));
-                agoraInstance = HandleServiceBuilder.newInstance()
-                                .configuration(configurationPath)
-                                .build();
+                Properties handleProperties = readProperties(configurationPath);
+                String databaseConnectURI = handleProperties.getProperty("databaseServerName") + ":" + handleProperties.getProperty("portNumber") + "/" + handleProperties.getProperty("databaseName");
+                handleServiceClient = new HandleServiceClient(
+                        handleProperties.getProperty("handlePrefix"),
+                        databaseConnectURI,
+                        handleProperties.getProperty("user"),
+                        handleProperties.getProperty("password"),
+                        handleProperties.getProperty("HANDLESERVICE_LOCAL_RESOLVER")
+                );
             } catch (ConfigurationException e) {
-                throw new HandleServiceException(
-                        String.format("Failed to initialize %s using configuration property %s",
-                                BibsysHandleService.class.getSimpleName(), HANDLE_CONFIGURATION), e);
+                e.printStackTrace();
             }
         }
+        return handleServiceClient;
+    }
 
+
+    public Properties readProperties(String configurationPath) throws ConfigurationException {
+        Properties handleProperties = new Properties();
+        try {
+            handleProperties.load(new FileInputStream(configurationPath));
+        } catch (IOException | NullPointerException e) {
+            throw new ConfigurationException(
+                    configurationPath == null ?
+                            "configurationPath is null" :
+                            "Failed to load configuration from " + configurationPath);
+        }
+        return handleProperties;
+    }
+
+
+    public String createHandleId() {
         if (instanceBaseUrl == null) {
             instanceBaseUrl = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.url") + "/handle/";
         }
-        return new BibsysHandleService();
-    }
-
-    /**
-     * Create a new handle id. The implementation uses an external handle server to create handles.
-     * NB Requires that property dspace.url is set in build.properties
-     *
-     * @return A new handle id
-     * @throws HandleServiceException If handle url is malformed
-     */
-    public String createHandleId() {
         return createHandleId(instanceBaseUrl);
     }
 
-    /**
-     * Create a new handle id. The implementation uses an external handle server to create handles.
-     *
-     * @param instanceBaseUrl the base url of this dspace instance ex. https://brage-alfa.bibsys.no/xmlui
-     * @return A new handle id
-     * @throws HandleServiceException If instanceBaseUrl is malformed
-     */
     private String createHandleId(String instanceBaseUrl) {
+        String handle = "";
         try {
-            URL baseAddress;
-            baseAddress = new URL(instanceBaseUrl);
-            HandleResponse handleResponse = agoraInstance.createLinkAppendToEndpont(baseAddress);
-            if (handleResponse.getCode() == ResponseCode.RC_SUCCESS) {
-                return handleResponse.getHandle();
-            } else {
-                throw new HandleServiceException(handleResponse.getMessage());
-            }
-
-        } catch (MalformedURLException e) {
+            handle = getHandleServiceClient().createHandleAppendToEndpont(instanceBaseUrl);
+        } catch (IOException e) {
             log.error(e);
-            throw new HandleServiceException(e.getMessage());
         }
+        return handle;
     }
 
     @Override
     public void close() throws Exception {
-        if (agoraInstance != null) {
-            agoraInstance.close();
-            agoraInstance = null;
+        if (handleServiceClient != null) {
+            handleServiceClient.close();
+            handleServiceClient = null;
         }
     }
 }
