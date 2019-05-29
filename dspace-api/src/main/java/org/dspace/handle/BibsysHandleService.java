@@ -22,10 +22,11 @@ public class BibsysHandleService implements AutoCloseable {
             String configurationPath = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty(HANDLE_CONFIGURATION);
             try {
                 Properties handleProperties = readProperties(configurationPath);
-                String databaseConnectURI = handleProperties.getProperty("databaseServerName") + ":" + handleProperties.getProperty("portNumber") + "/" + handleProperties.getProperty("databaseName");
                 handleServiceClient = new HandleServiceClient(
                         handleProperties.getProperty("handlePrefix"),
-                        databaseConnectURI,
+                        handleProperties.getProperty("databaseServerName"),
+                        handleProperties.getProperty("databaseName"),
+                        handleProperties.getProperty("portNumber"),
                         handleProperties.getProperty("user"),
                         handleProperties.getProperty("password"),
                         handleProperties.getProperty("HANDLESERVICE_LOCAL_RESOLVER")
