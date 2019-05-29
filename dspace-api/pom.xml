@@ -726,6 +726,12 @@
             <groupId>no.bibsys.dlr</groupId>
             <artifactId>integration-no-bibsys-handle</artifactId>
             <version>1.0-SNAPSHOT</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>postgresql</artifactId>
+                    <groupId>postgresql</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- Feide authentication -->
