@@ -119,6 +119,13 @@ public interface BitstreamFormatService extends DSpaceCRUDService<BitstreamForma
     public int getSupportLevelID(String supportLevel);
 
     /**
+     * If you know the support level id, look up the corresponding type String constant
+     * @param supportLevelID    Support level id
+     * @return  The corresponding string or null if nothing corresponding is found
+     */
+    public String getSupportLevelString(int supportLevelID);
+
+    /**
      * Attempt to identify the format of a particular bitstream. If the format
      * is unknown, null is returned.
      *

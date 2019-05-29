@@ -234,6 +234,10 @@ public class BitstreamFormatServiceImpl implements BitstreamFormatService {
         return -1;
     }
 
+    public String getSupportLevelString(int id) {
+        return supportLevelText[id];
+    }
+
     @Override
     public BitstreamFormat guessFormat(Context context, Bitstream bitstream) throws SQLException {
         String filename = bitstream.getName();
