@@ -528,7 +528,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             try {
                 getSolr().deleteByQuery(
                     "search.resourcetype:[" + Constants.ITEM + " TO " + Constants.COMMUNITY + "]" +
-                    " AND " +
+                    " OR " +
                     "search.resourcetype:[" + Constants.WORKSPACEITEM + " TO " + Constants.CLAIMEDTASK + "]");
             } catch (Exception e) {
                 throw new SearchServiceException(e.getMessage(), e);
