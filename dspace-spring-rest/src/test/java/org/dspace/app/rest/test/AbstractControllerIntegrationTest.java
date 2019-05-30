@@ -22,6 +22,7 @@ import org.apache.commons.io.Charsets;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.Application;
 import org.dspace.app.rest.model.patch.Operation;
+import org.dspace.app.rest.utils.DSpaceConfigurationInitializer;
 import org.dspace.app.rest.utils.DSpaceKernelInitializer;
 import org.junit.Assert;
 import org.junit.runner.RunWith;
@@ -44,11 +45,18 @@ import org.springframework.test.web.servlet.setup.DefaultMockMvcBuilder;
 import org.springframework.web.context.WebApplicationContext;
 
 /**
- * Abstract controller integration test class that will take care of setting up the
- * Spring Boot environment to run the integration test
+ * Abstract integration test class that will take care of setting up the Spring Boot environment to run
+ * integration tests against @Controller classes (Spring Controllers).
+ * <P>
+ * This Abstract class uses Spring Boot's default mock environment testing scheme, which relies on MockMvc to "mock"
+ * a webserver and call Spring Controllers directly. This avoids the cost of starting a webserver.
+ * <P>
+ * If you need to test a Servlet (or something not a Spring Controller), you will NOT be able to use this class.
+ * Instead, please use the AbstractWebClientIntegrationTest in this same package.
  *
  * @author Tom Desair
  * @author Tim Donohue
+ * @see org.dspace.app.rest.test.AbstractWebClientIntegrationTest
  */
 // Run tests with JUnit 4 and Spring TestContext Framework
 @RunWith(SpringRunner.class)
@@ -56,8 +64,8 @@ import org.springframework.web.context.WebApplicationContext;
 // NOTE: By default, Spring caches and reuses ApplicationContext for each integration test (to speed up tests)
 // See: https://docs.spring.io/spring/docs/current/spring-framework-reference/testing.html#integration-testing
 @SpringBootTest(classes = Application.class)
-// Load DSpaceKernelInitializer in Spring ApplicationContext (to initialize DSpace Kernel)
-@ContextConfiguration(initializers = DSpaceKernelInitializer.class)
+// Load DSpace initializers in Spring ApplicationContext (to initialize DSpace Kernel & Configuration)
+@ContextConfiguration(initializers = { DSpaceKernelInitializer.class, DSpaceConfigurationInitializer.class })
 // Tell Spring to make ApplicationContext an instance of WebApplicationContext (for web-based tests)
 @WebAppConfiguration
 public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWithDatabase {
