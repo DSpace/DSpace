@@ -11,6 +11,7 @@ import java.io.File;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.kernel.DSpaceKernel;
 import org.dspace.kernel.DSpaceKernelManager;
 import org.dspace.servicemanager.DSpaceKernelImpl;
@@ -22,6 +23,7 @@ import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.event.ContextClosedEvent;
+import org.springframework.core.env.ConfigurableEnvironment;
 
 /**
  * Utility class that will initialize the DSpace Kernel on Spring Boot startup.
@@ -35,16 +37,16 @@ public class DSpaceKernelInitializer implements ApplicationContextInitializer<Co
 
     @Override
     public void initialize(final ConfigurableApplicationContext applicationContext) {
-
-        String dspaceHome = applicationContext.getEnvironment().getProperty("dspace.dir");
-
+        // Check if the kernel is already started
         this.dspaceKernel = DSpaceKernelManager.getDefaultKernel();
         if (this.dspaceKernel == null) {
             DSpaceKernelImpl kernelImpl = null;
             try {
+                // Load the kernel with default settings
                 kernelImpl = DSpaceKernelInit.getKernel(null);
                 if (!kernelImpl.isRunning()) {
-                    kernelImpl.start(getProvidedHome(dspaceHome)); // init the kernel
+                    // Determine configured DSpace home & init the Kernel
+                    kernelImpl.start(getDSpaceHome(applicationContext.getEnvironment()));
                 }
                 this.dspaceKernel = kernelImpl;
 
@@ -65,8 +67,8 @@ public class DSpaceKernelInitializer implements ApplicationContextInitializer<Co
         }
 
         if (applicationContext.getParent() == null) {
-            //Set the DSpace Kernel Application context as a parent of the Spring Boot context so that
-            //we can auto-wire all DSpace Kernel services
+            // Set the DSpace Kernel Application context as a parent of the Spring Boot context so that
+            // we can auto-wire all DSpace Kernel services
             applicationContext.setParent(dspaceKernel.getServiceManager().getApplicationContext());
 
             //Add a listener for Spring Boot application shutdown so that we can nicely cleanup the DSpace kernel.
@@ -75,29 +77,35 @@ public class DSpaceKernelInitializer implements ApplicationContextInitializer<Co
     }
 
     /**
-     * Find DSpace's "home" directory.
+     * Find DSpace's "home" directory (from current environment)
      * Initially look for JNDI Resource called "java:/comp/env/dspace.dir".
-     * If not found, look for "dspace.dir" initial context parameter.
+     * If not found, use value provided in "dspace.dir" in Spring Environment
      */
-    private String getProvidedHome(String dspaceHome) {
-        String providedHome = null;
+    private String getDSpaceHome(ConfigurableEnvironment environment) {
+        // Load the "dspace.dir" property from Spring Boot's Configuration (application.properties)
+        // This gives us the location of our DSpace configurations, necessary to start the kernel
+        String providedHome = environment.getProperty(DSpaceConfigurationService.DSPACE_HOME);
+
+        String dspaceHome = null;
         try {
+            // Allow ability to override home directory via JNDI
             Context ctx = new InitialContext();
-            providedHome = (String) ctx.lookup("java:/comp/env/" + DSpaceConfigurationService.DSPACE_HOME);
+            dspaceHome = (String) ctx.lookup("java:/comp/env/" + DSpaceConfigurationService.DSPACE_HOME);
         } catch (Exception e) {
             // do nothing
         }
 
-        if (providedHome == null) {
-            if (dspaceHome != null && !dspaceHome.equals("") &&
-                !dspaceHome.equals("${" + DSpaceConfigurationService.DSPACE_HOME + "}")) {
-                File test = new File(dspaceHome);
+        // Otherwise, verify the 'providedHome' value is non-empty, exists and includes DSpace configs
+        if (dspaceHome == null) {
+            if (StringUtils.isNotBlank(providedHome) &&
+                !providedHome.equals("${" + DSpaceConfigurationService.DSPACE_HOME + "}")) {
+                File test = new File(providedHome);
                 if (test.exists() && new File(test, DSpaceConfigurationService.DSPACE_CONFIG_PATH).exists()) {
-                    providedHome = dspaceHome;
+                    dspaceHome = providedHome;
                 }
             }
         }
-        return providedHome;
+        return dspaceHome;
     }
 
 
