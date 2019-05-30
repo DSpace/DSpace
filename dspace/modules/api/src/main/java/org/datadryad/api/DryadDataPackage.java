@@ -308,6 +308,18 @@ public class DryadDataPackage extends DryadObject {
         }
     }
 
+    public String getPubmedID() {
+        if (getItem() != null) {
+            List<String> relatedIDs = getMultipleMetadataValues("dc", "relation", "isreferencedby");
+            for(String relatedID :  relatedIDs) {
+                if(relatedID.startsWith("PMID:")) {
+                    return relatedID.substring("PMID:".length()).trim();
+                }
+            }
+        }
+        return null;
+    }
+
     public List<String> getMismatchedDOIs() {
         if (getItem() != null) {
             return getMultipleMetadataValues(MISMATCHED_DOI_SCHEMA, MISMATCHED_DOI_ELEMENT, MISMATCHED_DOI_QUALIFIER);
@@ -371,16 +383,18 @@ public class DryadDataPackage extends DryadObject {
     }
 
     /**
-     * Get the publication DOI. Does not account for pubmed IDs, assumes
-     * first dc.relation.isreferencedby is the publication DOI
-     * @return
+     * Get the publication DOI. This is assumed to be the first DOI in dc.relation.isreferencedby
      * @throws SQLException
      */
     public String getPublicationDOI() {
         String result = "";
         if (getItem() != null) {
-            result = getSingleMetadataValue(RELATION_SCHEMA, RELATION_ELEMENT, RELATION_ISREFERENCEDBY_QUALIFIER);
-            result = (result == null ? "" : result);
+            List<String> relatedIDs = getMultipleMetadataValues("dc", "relation", "isreferencedby");
+            for(String relatedID :  relatedIDs) {
+                if(relatedID.startsWith("doi:") || relatedID.startsWith("10.")) {
+                    return relatedID.trim();
+                }
+            }
         } else {
             result = this.publicationDOI;
         }
