@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest;
 
+import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -19,6 +20,7 @@ import org.dspace.app.rest.link.HalLinkService;
 import org.dspace.app.rest.model.RelationshipRest;
 import org.dspace.app.rest.model.RelationshipRestWrapper;
 import org.dspace.app.rest.model.hateoas.RelationshipResourceWrapper;
+import org.dspace.app.rest.repository.RelationshipRestRepository;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.content.Item;
@@ -52,8 +54,16 @@ public class RelationshipRestController {
     private static final String REGEX_REQUESTMAPPING_LABEL = "/{label:^(?!^\\d+$)" +
         "(?!^[0-9a-fxA-FX]{8}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{12}$)[\\w+\\-]+$+}";
 
+    /**
+     * Regular expression in the request mapping to accept number as identifier
+     */
+    private static final String REGEX_REQUESTMAPPING_IDENTIFIER_AS_DIGIT = "/{id:\\d+}";
+
     @Autowired
     private RelationshipTypeService relationshipTypeService;
+
+    @Autowired
+    private RelationshipRestRepository relationshipRestRepository;
 
     @Autowired
     private RelationshipService relationshipService;
@@ -130,4 +140,29 @@ public class RelationshipRestController {
         return relationshipResourceWrapper;
     }
 
+    /**
+     * Method to change the left item of a relationship with a given item in the body
+     * @return The modified relationship
+     */
+    @RequestMapping(method = RequestMethod.PUT, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_DIGIT + "/leftItem",
+            consumes = {"text/uri-list"})
+    public RelationshipRest updateRelationshipLeft(@PathVariable Integer id, HttpServletResponse response,
+                                                              HttpServletRequest request) throws SQLException {
+        Context context = ContextUtil.obtainContext(request);
+        return relationshipRestRepository.put(context,"/api/core/relationships/", id,
+                utils.getStringListFromRequest(request), false);
+    }
+
+    /**
+     * Method to change the right item of a relationship with a given item in the body
+     * @return The modified relationship
+     */
+    @RequestMapping(method = RequestMethod.PUT, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_DIGIT + "/rightItem",
+            consumes = {"text/uri-list"})
+    public RelationshipRest updateRelationshipRight(@PathVariable Integer id, HttpServletResponse response,
+                                                               HttpServletRequest request) throws SQLException {
+        Context context = ContextUtil.obtainContext(request);
+        return relationshipRestRepository.put(context,"/api/core/relationships/", id,
+                utils.getStringListFromRequest(request), true);
+    }
 }
