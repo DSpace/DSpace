@@ -401,6 +401,14 @@ public class DryadDataPackage extends DryadObject {
         return result;
     }
 
+    public String getFundingEntity() {
+        String result = null;
+        if (getItem() != null) {
+            result = getSingleMetadataValue("dryad", "fundingEntity", null);
+        } 
+        return result;
+    }
+    
     public String getDashStoredDate() {
         String result = null;
         if (getItem() != null) {

@@ -332,11 +332,24 @@ public class Package {
             // write citation for article:
             jGen.writeArrayFieldStart("relatedWorks");
             jGen.writeStartObject();
-            jGen.writeStringField("relationship", "iscitedby");
+            jGen.writeStringField("relationship", "issupplementto");
             jGen.writeStringField("identifierType", "DOI");
             jGen.writeStringField("identifier", dataPackage.getPublicationDOI());
             jGen.writeEndObject();
             jGen.writeEndArray();
+
+            // funder
+            String funder = ddp.getFundingEntity();
+            if(funder !=null && funder.contains("@National Sci")) {
+                int nsfIndex = funder.indexOf("@National Sci");
+                String award = funder.substring(0, nsfIndex);
+                jGen.writeArrayFieldStart("funders");
+                jGen.writeStartObject();
+                jGen.writeStringField("organization", "National Science Foundation");
+                jGen.writeStringField("awardNumber", award);
+                jGen.writeEndObject();
+                jGen.writeEndArray();
+            }
 
             // When working with Dryad Classic packages, we want to disable the
             // default DASH validation and interaction with DataCite
