@@ -178,7 +178,7 @@ public class DashService {
         }
 
         // call dash API and get the versionStatus
-        String json = getDashJSON(pkg.getDryadDOI());
+        String json = getDashJSON(pkg.getDataPackage().getVersionlessIdentifier());
         boolean isStored = false;
         try {
             ObjectNode jsonObj = (ObjectNode) mapper.readTree(json);
@@ -204,7 +204,7 @@ public class DashService {
        @param pkg
     **/
     public int putDataset(Package pkg) {
-        log.info("Putting dataset " + pkg.getItemID() + ", " + pkg.getDryadDOI());
+        log.info("Putting dataset " + pkg.getItemID() + ", " + pkg.getDataPackage().getVersionlessIdentifier());
         String dashJSON = pkg.getDataPackage().getDashJSON();
         log.debug("Got JSON object: " + dashJSON);
         int responseCode = 0;
@@ -831,7 +831,7 @@ public class DashService {
     public int addDuplicateItem(Package pkg, String duplicateItem) {
         Pattern itemIDPattern = Pattern.compile("\\d+");
         if (itemIDPattern.matcher(duplicateItem).matches()) {
-            duplicateItem = pkg.getDryadDOI();
+            duplicateItem = pkg.getDataPackage().getVersionlessIdentifier();
         }
         return postInternalDatum(pkg, "add", "duplicateItem", duplicateItem);
     }
@@ -853,7 +853,7 @@ public class DashService {
         BufferedReader reader = null;
 
         try {
-            String encodedDOI = URLEncoder.encode(pkg.getDryadDOI(), "UTF-8");
+            String encodedDOI = URLEncoder.encode(pkg.getDataPackage().getVersionlessIdentifier(), "UTF-8");
             URL url = new URL(dashServer + "/api/datasets/" + encodedDOI + "/" + requestType + "_internal_datum");
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
