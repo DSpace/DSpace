@@ -54,57 +54,61 @@ public class WosResponse {
 			Document inDoc = db.parse(xmlData);
 
 			Element xmlRoot = inDoc.getDocumentElement();
-			Element fnElement = XMLUtils.getSingleElement(xmlRoot, "fn");
-			Element mapElement = XMLUtils.getSingleElement(fnElement, "map");
-
-			List<Element> mapElements = XMLUtils.getElementList(mapElement, "map");
-			for (Element element : mapElements) {
-				if (element.hasAttribute("name")) {
-				    CrisMetrics wosCitation = new CrisMetrics();
-					String itemIdElementValue = element.getAttribute("name");
-					wosCitation.setResourceId(Integer.parseInt(itemIdElementValue));
-					wosCitation.setResourceTypeId(Constants.ITEM);
-					Element lastMapElement = XMLUtils.getSingleElement(element, "map");
-					
-					List<Element> valElements = XMLUtils.getElementList(lastMapElement, "val");
-					for (Element valElement : valElements) {
-						if (valElement.hasAttribute("name")) {
-							if ("ut".equalsIgnoreCase(valElement.getAttribute("name"))) {
-							    wosCitation.getTmpRemark().put("identifier", valElement.getTextContent());
-							}
-							if ("citingArticlesURL".equalsIgnoreCase(valElement.getAttribute("name"))) {
-								wosCitation.getTmpRemark().put("link", valElement.getTextContent());
-							}
-							if ("timesCited".equalsIgnoreCase(valElement.getAttribute("name"))) {								
-					            try {
-					                wosCitation.setMetricCount(Double.parseDouble(valElement.getTextContent()));
-					            }
-					            catch(NullPointerException ex) {
-					                log.error("try to parse timesCited:" + valElement.getTextContent());					                
-					                throw new Exception(ex);
-					            }
+			if(xmlRoot!=null) {
+				Element fnElement = XMLUtils.getSingleElement(xmlRoot, "fn");
+				if(fnElement!=null) {
+					Element mapElement = XMLUtils.getSingleElement(fnElement, "map");
+					if(mapElement!=null) {
+						List<Element> mapElements = XMLUtils.getElementList(mapElement, "map");
+						for (Element element : mapElements) {
+							if (element.hasAttribute("name")) {
+							    CrisMetrics wosCitation = new CrisMetrics();
+								String itemIdElementValue = element.getAttribute("name");
+								wosCitation.setResourceId(Integer.parseInt(itemIdElementValue));
+								wosCitation.setResourceTypeId(Constants.ITEM);
+								Element lastMapElement = XMLUtils.getSingleElement(element, "map");
+								
+								List<Element> valElements = XMLUtils.getElementList(lastMapElement, "val");
+								for (Element valElement : valElements) {
+									if (valElement.hasAttribute("name")) {
+										if ("ut".equalsIgnoreCase(valElement.getAttribute("name"))) {
+										    wosCitation.getTmpRemark().put("identifier", valElement.getTextContent());
+										}
+										if ("citingArticlesURL".equalsIgnoreCase(valElement.getAttribute("name"))) {
+											wosCitation.getTmpRemark().put("link", valElement.getTextContent());
+										}
+										if ("timesCited".equalsIgnoreCase(valElement.getAttribute("name"))) {								
+								            try {
+								                wosCitation.setMetricCount(Double.parseDouble(valElement.getTextContent()));
+								            }
+								            catch(NullPointerException ex) {
+								                log.error("try to parse timesCited:" + valElement.getTextContent());					                
+								                throw new Exception(ex);
+								            }
+										}
+									}
+								}
+								
+								wosCitation.setEndDate(new Date());
+								wosCitation.setRemark(wosCitation.buildMetricsRemark());
+								wosCitation.setMetricType(ConstantMetrics.STATS_INDICATOR_TYPE_WOS);
+				                if (log.isDebugEnabled())
+			                    {
+			                        DOMSource domSource = new DOMSource(element);
+			                        StringWriter writer = new StringWriter();
+			                        StreamResult result = new StreamResult(writer);
+			                        TransformerFactory tf = TransformerFactory
+			                                .newInstance();
+			                        Transformer transformer = tf.newTransformer();
+			                        transformer.transform(domSource, result);
+			                        log.debug(writer.toString());
+			                    }
+								this.wosCitations.add(wosCitation);
 							}
 						}
 					}
-					
-					wosCitation.setEndDate(new Date());
-					wosCitation.setRemark(wosCitation.buildMetricsRemark());
-					wosCitation.setMetricType(ConstantMetrics.STATS_INDICATOR_TYPE_WOS);
-	                if (log.isDebugEnabled())
-                    {
-                        DOMSource domSource = new DOMSource(element);
-                        StringWriter writer = new StringWriter();
-                        StreamResult result = new StreamResult(writer);
-                        TransformerFactory tf = TransformerFactory
-                                .newInstance();
-                        Transformer transformer = tf.newTransformer();
-                        transformer.transform(domSource, result);
-                        log.debug(writer.toString());
-                    }
-					this.wosCitations.add(wosCitation);
 				}
 			}
-
 		} catch (Exception e) {
 		    log.error(e.getMessage(), e);
 			error = true;

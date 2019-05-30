@@ -26,6 +26,7 @@ import org.dspace.app.cris.metrics.common.services.MetricsPersistenceService;
 import org.dspace.app.cris.model.ACrisObject;
 import org.dspace.app.cris.model.CrisConstants;
 import org.dspace.app.cris.model.ResearchObject;
+import org.dspace.app.cris.model.jdyna.DynamicObjectType;
 import org.dspace.app.cris.service.ApplicationService;
 import org.dspace.app.cris.statistics.CrisSolrLogger;
 import org.dspace.core.Context;
@@ -65,11 +66,24 @@ public class StatsAggregateIndicatorsPlugin<ACO extends ACrisObject>
 
         if (crisEntityTypeId > 1000)
         {
-            rs = (List<ACO>)applicationService.getResearchObjectByIDType(crisEntityTypeId);
+            DynamicObjectType dynamicType = applicationService.get(DynamicObjectType.class, crisEntityTypeId);
+        	long tot = applicationService.countResearchObjectByType(dynamicType);
+          	final int MAX_RESULT = 50;
+        	long numpages = (tot / MAX_RESULT) + 1;
+            for (int page = 1; page <= numpages; page++)
+            {
+        		rs.addAll((List<ACO>)applicationService.getResearchObjectPaginateListByType(dynamicType, "id", false, page, MAX_RESULT));
+        	}
         }
         else
         {
-            rs = applicationService.getList(crisEntityClazz);
+        	long tot = applicationService.count(crisEntityClazz);
+          	final int MAX_RESULT = 50;
+        	long numpages = (tot / MAX_RESULT) + 1;
+            for (int page = 1; page <= numpages; page++)
+            {
+        		rs.addAll(applicationService.getPaginateList(crisEntityClazz, "id", false, page, MAX_RESULT));
+        	}
         }
 
         for (ACO rp : rs)
