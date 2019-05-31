@@ -9,6 +9,7 @@ package org.dspace.app.rest.repository;
 
 import org.dspace.app.rest.converter.BitstreamFormatConverter;
 import org.dspace.app.rest.converter.MetadataConverter;
+import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.BitstreamFormatRest;
 import org.dspace.app.rest.model.hateoas.BitstreamFormatResource;
@@ -162,8 +163,12 @@ public class BitstreamFormatRestRepository extends DSpaceRestRepository<Bitstrea
         }
     }
 
-
-
+    /**
+     * Fill a bitstreamFormat in with all the values of the rest request bitstreamFormatRest object
+     * @param c
+     * @param bitstreamFormat       BitstreamFormat that will be filled with rest request values
+     * @param bitstreamFormatRest   BitstreamFormatRest object created, based on values in rest request
+     */
     private void setAllValuesOfRest
             (Context c, BitstreamFormat bitstreamFormat, BitstreamFormatRest bitstreamFormatRest) {
         try {
@@ -174,6 +179,9 @@ public class BitstreamFormatRestRepository extends DSpaceRestRepository<Bitstrea
         bitstreamFormat.setDescription(bitstreamFormatRest.getDescription());
         bitstreamFormat.setMIMEType(bitstreamFormatRest.getMimetype());
         int supportLevelID = bitstreamFormatService.getSupportLevelID(bitstreamFormatRest.getSupportLevel());
+        if (supportLevelID == -1) {
+            throw new DSpaceBadRequestException("Not a valid supportLevel: " + bitstreamFormatRest.getSupportLevel());
+        }
         bitstreamFormat.setSupportLevel(supportLevelID);
         bitstreamFormat.setInternal(bitstreamFormatRest.isInternal());
         bitstreamFormat.setExtensions(bitstreamFormatRest.getExtensions());

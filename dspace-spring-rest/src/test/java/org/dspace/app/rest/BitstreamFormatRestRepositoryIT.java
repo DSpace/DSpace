@@ -150,6 +150,18 @@ public class BitstreamFormatRestRepositoryIT extends AbstractControllerIntegrati
     }
 
     @Test
+    public void createNonValidSupportLevel() throws Exception {
+        ObjectMapper mapper = new ObjectMapper();
+        BitstreamFormatRest bitstreamFormatRest = this.createRandomMockBitstreamRest(false);
+        bitstreamFormatRest.setSupportLevel("NONVALID SUPPORT LVL");
+        //Attempt to create bitstream with a non-valid support lvl
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(post("/api/core/bitstreamformats/")
+                .content(mapper.writeValueAsBytes(bitstreamFormatRest)).contentType(contentType))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     public void createNoAccess() throws Exception {
         ObjectMapper mapper = new ObjectMapper();
         BitstreamFormatRest bitstreamFormatRest = this.createRandomMockBitstreamRest(false);
@@ -223,6 +235,27 @@ public class BitstreamFormatRestRepositoryIT extends AbstractControllerIntegrati
                 .andExpect(jsonPath("$._links.self.href", startsWith(REST_SERVER_URL)))
                 .andExpect(jsonPath("$._links.self.href",
                         endsWith("/api/core/bitstreamformats/" + bitstreamFormat.getID())));
+    }
+
+    @Test
+    public void updateNonValidSupportLevel() throws Exception {
+        ObjectMapper mapper = new ObjectMapper();
+        //Create bitstream format
+        context.turnOffAuthorisationSystem();
+        BitstreamFormat bitstreamFormat = BitstreamFormatBuilder.createBitstreamFormat(context)
+                .withMimeType("application/octet-stream")
+                .withDescription("Description - updateAdminAccess")
+                .build();
+        context.restoreAuthSystemState();
+
+        BitstreamFormatRest bitstreamFormatRest = converter.fromModel(bitstreamFormat);
+        String token = getAuthToken(admin.getEmail(), password);
+        //Update it
+        bitstreamFormatRest.setShortDescription("Test short UPDATED");
+        bitstreamFormatRest.setSupportLevel("NONVALID SUPPORT LEVEL");
+        getClient(token).perform(put("/api/core/bitstreamformats/" + bitstreamFormat.getID())
+                .content(mapper.writeValueAsBytes(bitstreamFormatRest)).contentType(contentType))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
