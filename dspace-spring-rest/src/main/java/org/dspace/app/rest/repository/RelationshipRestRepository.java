@@ -156,7 +156,6 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
         if (relationship == null) {
             throw new ResourceNotFoundException(contextPath + " with id: " + id + " not found");
         }
-
         List<DSpaceObject> dSpaceObjects = utils.constructDSpaceObjectList(context, stringList);
         if (dSpaceObjects.size() == 1 && dSpaceObjects.get(0).getType() == Constants.ITEM) {
 
@@ -191,6 +190,7 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
         } else {
             throw new UnprocessableEntityException("The given items in the request were not valid");
         }
+
     }
 
     /**
