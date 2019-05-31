@@ -723,14 +723,10 @@
 
         <!-- BIBSYS handle server -->
         <dependency>
-            <groupId>no.bibsys</groupId>
-            <artifactId>agora-handle</artifactId>
-            <version>1.0.14</version>
+            <groupId>no.bibsys.dlr</groupId>
+            <artifactId>integration-no-bibsys-handle</artifactId>
+            <version>1.0-SNAPSHOT</version>
             <exclusions>
-                <exclusion>
-                    <artifactId>logback-classic</artifactId>
-                    <groupId>ch.qos.logback</groupId>
-                </exclusion>
                 <exclusion>
                     <artifactId>postgresql</artifactId>
                     <groupId>postgresql</groupId>
