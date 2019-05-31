@@ -33,7 +33,11 @@ public class BitstreamFormatConverter implements DSpaceConverter<BitstreamFormat
         bf.setDescription(obj.getDescription());
         bf.setMimetype(obj.getMIMEType());
         bf.setInternal(obj.isInternal());
-        bf.setSupportLevel(bitstreamFormatService.getSupportLevelString(obj.getSupportLevel()));
+        if (obj.getSupportLevel() > 0) {
+            bf.setSupportLevel(bitstreamFormatService.getSupportLevelText(obj));
+        } else {
+            bf.setSupportLevel("UNKNOWN");
+        }
         bf.setExtensions(obj.getExtensions());
         return bf;
     }
@@ -41,9 +45,6 @@ public class BitstreamFormatConverter implements DSpaceConverter<BitstreamFormat
     @Override
     public BitstreamFormat toModel(BitstreamFormatRest obj) {
         // TODO Auto-generated method stub
-        //Creation of BitstreamFormats protected by bitstreamFormatService, which requires context (not all users are
-        //  authorized to create new BitstreamFormats), not sure if logic for that should be here;
-        //  currently in BitstreamFormatRestRepository
         return null;
     }
 }
