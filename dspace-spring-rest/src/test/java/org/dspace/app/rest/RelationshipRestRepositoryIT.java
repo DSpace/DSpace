@@ -390,7 +390,6 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
     /**
      * This method will test the addition of a mixture of plain-text metadatavalues and relationships to then
      * verify that the place property is still being handled correctly.
-     *
      * @throws Exception
      */
     @Test
@@ -701,7 +700,6 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
     /**
      * This method will test the deletion of a plain-text metadatavalue to then
      * verify that the place property is still being handled correctly.
-     *
      * @throws Exception
      */
     @Test
@@ -932,7 +930,6 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
     /**
      * This method will test the deletion of a Relationship to then
      * verify that the place property is still being handled correctly.
-     *
      * @throws Exception
      */
     @Test
@@ -1166,7 +1163,6 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
      * This test will simply add Relationships between Items with a useForPlace attribute set to false for the
      * RelationshipType. We want to test that the Relationships that are created will still have their place
      * attributes handled in a correct way
-     *
      * @throws Exception
      */
     @Test
@@ -1290,7 +1286,6 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
      * RelationshipType. We want to test that the Relationships that are created will still have their place
      * attributes handled in a correct way. It will then delete a Relationship and once again ensure that the place
      * attributes are being handled correctly.
-     *
      * @throws Exception
      */
     @Test
@@ -1476,8 +1471,9 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                         entityTypeService.findByEntityType(context, "Person"),
                         "isAuthorOfPublication", "isPublicationOfAuthor");
 
-        context.restoreAuthSystemState();
 
+
+        context.restoreAuthSystemState();
 
         String token = getAuthToken(admin.getEmail(), password);
 
@@ -1494,10 +1490,9 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                 .andExpect(status().isCreated())
                 .andReturn();
 
-
         ObjectMapper mapper = new ObjectMapper();
         String content = mvcResult.getResponse().getContentAsString();
-        Map<String, Object> map = mapper.readValue(content, Map.class);
+        Map<String,Object> map = mapper.readValue(content, Map.class);
         String id = String.valueOf(map.get("id"));
 
         //Modify the left item in the relationship publication > publication 2
@@ -1522,7 +1517,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                         (org.springframework.data.rest.webmvc.RestMediaTypes
                                 .TEXT_URI_LIST_VALUE))
                 .content(
-                        "https://localhost:8080/spring-rest/api/core/items/" + author2.getID()))
+                                "https://localhost:8080/spring-rest/api/core/items/" + author2.getID()))
                 .andExpect(status().isOk())
                 .andReturn();
 
@@ -1580,6 +1575,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                         "isAuthorOfPublication", "isPublicationOfAuthor");
 
 
+
         EPerson user = EPersonBuilder.createEPerson(context)
                 .withNameInMetadata("first", "last")
                 .withEmail("testaze@gmail.com")
@@ -1608,7 +1604,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
 
         ObjectMapper mapper = new ObjectMapper();
         String content = mvcResult.getResponse().getContentAsString();
-        Map<String, Object> map = mapper.readValue(content, Map.class);
+        Map<String,Object> map = mapper.readValue(content, Map.class);
         String id = String.valueOf(map.get("id"));
 
         //change right item from author 1 > author 2
@@ -1671,6 +1667,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                         "isAuthorOfPublication", "isPublicationOfAuthor");
 
 
+
         EPerson user = EPersonBuilder.createEPerson(context)
                 .withNameInMetadata("first", "last")
                 .withEmail("testaze@gmail.com")
@@ -1698,7 +1695,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
 
         ObjectMapper mapper = new ObjectMapper();
         String content = mvcResult.getResponse().getContentAsString();
-        Map<String, Object> map = mapper.readValue(content, Map.class);
+        Map<String,Object> map = mapper.readValue(content, Map.class);
         String id = String.valueOf(map.get("id"));
         //change rightItem from author1 > author2
         MvcResult mvcResult2 = getClient(token).perform(put("/api/core/relationships/" + id + "/rightItem")
@@ -1760,6 +1757,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                         "isAuthorOfPublication", "isPublicationOfAuthor");
 
 
+
         EPerson user = EPersonBuilder.createEPerson(context)
                 .withNameInMetadata("first", "last")
                 .withEmail("testaze@gmail.com")
@@ -1788,7 +1786,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
 
         ObjectMapper mapper = new ObjectMapper();
         String content = mvcResult.getResponse().getContentAsString();
-        Map<String, Object> map = mapper.readValue(content, Map.class);
+        Map<String,Object> map = mapper.readValue(content, Map.class);
         String id = String.valueOf(map.get("id"));
         //change leftItem
         MvcResult mvcResult2 = getClient(token).perform(put("/api/core/relationships/" + id + "/leftItem")
@@ -1850,6 +1848,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                         "isAuthorOfPublication", "isPublicationOfAuthor");
 
 
+
         EPerson user = EPersonBuilder.createEPerson(context)
                 .withNameInMetadata("first", "last")
                 .withEmail("testaze@gmail.com")
@@ -1878,7 +1877,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
 
         ObjectMapper mapper = new ObjectMapper();
         String content = mvcResult.getResponse().getContentAsString();
-        Map<String, Object> map = mapper.readValue(content, Map.class);
+        Map<String,Object> map = mapper.readValue(content, Map.class);
         String id = String.valueOf(map.get("id"));
         //change left item
         MvcResult mvcResult2 = getClient(token).perform(put("/api/core/relationships/" + id + "/leftItem")
@@ -1940,6 +1939,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                         "isAuthorOfPublication", "isPublicationOfAuthor");
 
 
+
         EPerson user = EPersonBuilder.createEPerson(context)
                 .withNameInMetadata("first", "last")
                 .withEmail("testaze@gmail.com")
@@ -1965,7 +1965,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
 
         ObjectMapper mapper = new ObjectMapper();
         String content = mvcResult.getResponse().getContentAsString();
-        Map<String, Object> map = mapper.readValue(content, Map.class);
+        Map<String,Object> map = mapper.readValue(content, Map.class);
         String id = String.valueOf(map.get("id"));
         token = getAuthToken(user.getEmail(), password);
         //attempt change, expect not allowed
@@ -2028,6 +2028,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                         "isAuthorOfPublication", "isPublicationOfAuthor");
 
 
+
         EPerson user = EPersonBuilder.createEPerson(context)
                 .withNameInMetadata("first", "last")
                 .withEmail("testaze@gmail.com")
@@ -2055,7 +2056,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
 
         ObjectMapper mapper = new ObjectMapper();
         String content = mvcResult.getResponse().getContentAsString();
-        Map<String, Object> map = mapper.readValue(content, Map.class);
+        Map<String,Object> map = mapper.readValue(content, Map.class);
         String id = String.valueOf(map.get("id"));
         token = getAuthToken(user.getEmail(), password);
         //attempt right item change, expect not allowed
@@ -2116,6 +2117,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                         "isAuthorOfPublication", "isPublicationOfAuthor");
 
 
+
         EPerson user = EPersonBuilder.createEPerson(context)
                 .withNameInMetadata("first", "last")
                 .withEmail("testaze@gmail.com")
@@ -2143,7 +2145,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
 
         ObjectMapper mapper = new ObjectMapper();
         String content = mvcResult.getResponse().getContentAsString();
-        Map<String, Object> map = mapper.readValue(content, Map.class);
+        Map<String,Object> map = mapper.readValue(content, Map.class);
         String id = String.valueOf(map.get("id"));
         //attempt left item change, expect not allowed
         MvcResult mvcResult2 = getClient(token).perform(put("/api/core/relationships/" + id + "/leftItem")
