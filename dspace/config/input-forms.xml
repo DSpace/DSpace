@@ -513,6 +513,17 @@
 
 				
 
+				<!-- Voc -->
+				<field>
+					<dc-schema>dc</dc-schema>
+					<dc-element>subject</dc-element>
+					<repeatable>true</repeatable>
+					<label>Palabras claves (*)</label>
+					<input-type>onebox</input-type>
+					<hint>Descriptores</hint>
+					<visibility-on-group>Bibliotecarios</visibility-on-group>
+				</field>
+
 				<!-- Materia (categoria 5 del Tesauro) -->
 				<field>
 					<dc-schema>sedici</dc-schema>

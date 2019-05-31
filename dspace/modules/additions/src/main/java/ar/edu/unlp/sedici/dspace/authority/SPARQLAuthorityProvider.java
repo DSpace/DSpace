@@ -27,6 +27,7 @@ public abstract class SPARQLAuthorityProvider implements ChoiceAuthority {
 	protected static final String NS_CERIF = "http://spi-fm.uca.es/neologism/cerif/1.3#";
 	protected static final String NS_SCHEMA = "http://schema.org/";
 	protected static final String NS_SEDICI = "http://sedici.unlp.edu.ar/";
+	protected static final String NS_OWL= "http://www.w3.org/2002/07/owl#";
 	
 	private QuerySolutionMap globalParameters;
 
