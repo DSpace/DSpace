@@ -39,6 +39,9 @@
                 <entry key="dc_contributor_editor">
                     <bean class="org.dspace.authority.PersonAuthorityValue"/>
                 </entry>
+                <entry key="dc_contributor_advisor">
+                    <bean class="org.dspace.authority.PersonAuthorityValue"/>
+                </entry>
             </map>
         </property>
     </bean>
