@@ -53,7 +53,6 @@ import edu.harvard.hul.ois.mets.helper.MetsException;
 import edu.harvard.hul.ois.mets.helper.MetsValidator;
 import edu.harvard.hul.ois.mets.helper.MetsWriter;
 import edu.harvard.hul.ois.mets.helper.PreformedXML;
-import org.apache.log4j.Logger;
 import org.dspace.app.util.Util;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
@@ -124,7 +123,8 @@ public abstract class AbstractMETSDisseminator
     /**
      * log4j category
      */
-    private static Logger log = Logger.getLogger(AbstractMETSDisseminator.class);
+    private static org.apache.logging.log4j.Logger log =
+            org.apache.logging.log4j.LogManager.getLogger(AbstractMETSDisseminator.class);
 
     // JDOM xml output writer - indented format for readability.
     protected static XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
@@ -442,7 +442,7 @@ public abstract class AbstractMETSDisseminator
                                 log.debug(new StringBuilder().append("Writing CONTENT stream of bitstream(")
                                                              .append(bitstream.getID()).append(") to Zip: ")
                                                              .append(zname).append(", size=")
-                                                             .append(bitstream.getSize()).toString());
+                                                             .append(bitstream.getSizeBytes()).toString());
                             }
                             if (lmTime != 0) {
                                 ze.setTime(lmTime);
@@ -451,7 +451,7 @@ public abstract class AbstractMETSDisseminator
                                 // contents are unchanged
                                 ze.setTime(DEFAULT_MODIFIED_DATE);
                             }
-                            ze.setSize(auth ? bitstream.getSize() : 0);
+                            ze.setSize(auth ? bitstream.getSizeBytes() : 0);
                             zip.putNextEntry(ze);
                             if (auth) {
                                 InputStream input = bitstreamService.retrieve(context, bitstream);
@@ -483,10 +483,12 @@ public abstract class AbstractMETSDisseminator
                 String zname = makeBitstreamURL(context, logoBs, params);
                 ZipEntry ze = new ZipEntry(zname);
                 if (log.isDebugEnabled()) {
-                    log.debug("Writing CONTENT stream of bitstream(" + String
-                        .valueOf(logoBs.getID()) + ") to Zip: " + zname + ", size=" + String.valueOf(logoBs.getSize()));
+                    log.debug("Writing CONTENT stream of bitstream({}) to Zip: {}, size={}",
+                            String.valueOf(logoBs.getID()),
+                            zname,
+                            String.valueOf(logoBs.getSizeBytes()));
                 }
-                ze.setSize(logoBs.getSize());
+                ze.setSize(logoBs.getSizeBytes());
                 //Set a default modified date so that checksum of Zip doesn't change if Zip contents are unchanged
                 ze.setTime(DEFAULT_MODIFIED_DATE);
                 zip.putNextEntry(ze);
@@ -921,7 +923,7 @@ public abstract class AbstractMETSDisseminator
                     }
                     file.setGROUPID(groupID);
                     file.setMIMETYPE(bitstream.getFormat(context).getMIMEType());
-                    file.setSIZE(auth ? bitstream.getSize() : 0);
+                    file.setSIZE(auth ? bitstream.getSizeBytes() : 0);
 
                     // Translate checksum and type to METS
                     String csType = bitstream.getChecksumAlgorithm();
@@ -1077,7 +1079,7 @@ public abstract class AbstractMETSDisseminator
         String fileID = gensym("logo");
         file.setID(fileID);
         file.setMIMETYPE(logoBs.getFormat(context).getMIMEType());
-        file.setSIZE(logoBs.getSize());
+        file.setSIZE(logoBs.getSizeBytes());
 
         // Translate checksum and type to METS
         String csType = logoBs.getChecksumAlgorithm();

@@ -10,7 +10,7 @@ package org.dspace.event;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.core.ConfigurationManager;
 
 /**
@@ -25,7 +25,7 @@ public class ConsumerProfile {
     /**
      * log4j category
      */
-    private static Logger log = Logger.getLogger(ConsumerProfile.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(ConsumerProfile.class);
 
     /**
      * Name matching the key in DSpace Configuration

@@ -9,17 +9,11 @@ package org.dspace.app.rest.security;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang3.StringUtils;
-import org.dspace.app.rest.utils.ContextUtil;
-import org.dspace.authenticate.AuthenticationMethod;
-import org.dspace.authenticate.service.AuthenticationService;
-import org.dspace.core.Context;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -77,31 +71,10 @@ public class StatelessLoginFilter extends AbstractAuthenticationProcessingFilter
                                               HttpServletResponse response, AuthenticationException failed)
             throws IOException, ServletException {
 
-        AuthenticationService authenticationService = restAuthenticationService.getAuthenticationService();
+        String authenticateHeaderValue = restAuthenticationService.getWwwAuthenticateHeaderValue(request, response);
 
-        Iterator<AuthenticationMethod> authenticationMethodIterator
-                = authenticationService.authenticationMethodIterator();
-        Context context = ContextUtil.obtainContext(request);
-
-        StringBuilder wwwAuthenticate = new StringBuilder();
-        while (authenticationMethodIterator.hasNext()) {
-            AuthenticationMethod authenticationMethod = authenticationMethodIterator.next();
-
-            if (wwwAuthenticate.length() > 0) {
-                wwwAuthenticate.append(", ");
-            }
-
-            wwwAuthenticate.append(authenticationMethod.getName()).append(" realm=\"DSpace REST API\"");
-
-            String loginPageURL = authenticationMethod.loginPageURL(context, request, response);
-            if (StringUtils.isNotBlank(loginPageURL)) {
-                // We cannot reply with a 303 code because may browsers handle 3xx response codes transparently. This
-                // means that the JavaScript client code is not aware of the 303 status and fails to react accordingly.
-                wwwAuthenticate.append(", location=\"").append(loginPageURL).append("\"");
-            }
-        }
-
-        response.setHeader("WWW-Authenticate", wwwAuthenticate.toString());
+        response.setHeader("WWW-Authenticate", authenticateHeaderValue);
         response.sendError(HttpServletResponse.SC_UNAUTHORIZED, failed.getMessage());
     }
+
 }

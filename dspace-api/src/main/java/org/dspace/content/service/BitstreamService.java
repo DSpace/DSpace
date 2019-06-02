@@ -12,6 +12,7 @@ import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
@@ -31,9 +32,27 @@ import org.dspace.core.Context;
  */
 public interface BitstreamService extends DSpaceObjectService<Bitstream>, DSpaceObjectLegacySupportService<Bitstream> {
 
+    public Bitstream find(Context context, UUID id) throws SQLException;
+
     public List<Bitstream> findAll(Context context) throws SQLException;
 
     public Iterator<Bitstream> findAll(Context context, int limit, int offset) throws SQLException;
+
+    /**
+     * Clone the given bitstream by firstly creating a new bitstream, with a new ID.
+     * Then set the internal identifier, file size, checksum, and
+     * checksum algorithm as same as the given bitstream.
+     * This allows multiple bitstreams to share the same internal identifier of assets .
+     * An example of such a use case scenario is versioning.
+     * 
+     * @param context
+     *            DSpace context object
+     * @param bitstream
+     *            Bitstream to be cloned
+     * @return the clone
+     * @throws SQLException if database error
+     */
+    public Bitstream clone(Context context, Bitstream bitstream) throws SQLException;
 
     /**
      * Create a new bitstream, with a new ID. The checksum and file size are

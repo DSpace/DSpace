@@ -16,7 +16,7 @@ import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.dspace.content.Item;
@@ -30,7 +30,7 @@ import org.dspace.core.ConfigurationManager;
  */
 public class PDFFilter extends MediaFilter {
 
-    private static Logger log = Logger.getLogger(PDFFilter.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(PDFFilter.class);
 
     @Override
     public String getFilteredName(String oldFilename) {

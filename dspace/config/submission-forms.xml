@@ -21,30 +21,34 @@
  <!-- serves as a 'this field is required' flag.                           -->
 
  <form-definitions>
-	<form name="bitstream-metadata">
-       <field>
-         <dc-schema>dc</dc-schema>
-         <dc-element>title</dc-element>
-         <dc-qualifier></dc-qualifier>
-         <repeatable>false</repeatable>
-         <label>Title</label>
-         <input-type>onebox</input-type>
-         <hint>Enter the name of the file.</hint>
-         <required>You must enter a main title for this file.</required>
-       </field>
+    <form name="bitstream-metadata">
+	<row>
+	       <field>
+	         <dc-schema>dc</dc-schema>
+	         <dc-element>title</dc-element>
+	         <dc-qualifier></dc-qualifier>
+	         <repeatable>false</repeatable>
+	         <label>Title</label>
+	         <input-type>onebox</input-type>
+	         <hint>Enter the name of the file.</hint>
+	         <required>You must enter a main title for this item.</required>
+	       </field>
+	</row>
+	<row>
+	       <field>
+	         <dc-schema>dc</dc-schema>
+	         <dc-element>description</dc-element>
+	         <repeatable>true</repeatable>
+	         <label>Description</label>
+	         <input-type>textarea</input-type>
+	         <hint>Enter a description for the file</hint>
+	         <required></required>
+	       </field>
+       </row>
+   </form>
 
-       <field>
-         <dc-schema>dc</dc-schema>
-         <dc-element>description</dc-element>
-         <repeatable>true</repeatable>
-         <label>Description</label>
-         <input-type>textarea</input-type>
-         <hint>Enter a description for the file</hint>
-         <required></required>
-       </field>
-   </form>    
-   
    <form name="traditionalpageone">
+     <row>
        <field>
          <dc-schema>dc</dc-schema>
          <dc-element>contributor</dc-element>
@@ -55,7 +59,8 @@
          <hint>Enter the names of the authors of this item.</hint>
          <required></required>
        </field>
-
+     </row>
+     <row>
        <field>
          <dc-schema>dc</dc-schema>
          <dc-element>title</dc-element>
@@ -65,8 +70,10 @@
          <input-type>onebox</input-type>
          <hint>Enter the main title of the item.</hint>
          <required>You must enter a main title for this item.</required>
+         <!--    <language value-pairs-name="common_iso_languages">true</language> -->
        </field>
-
+     </row>
+     <row>
        <field>
          <dc-schema>dc</dc-schema>
          <dc-element>title</dc-element>
@@ -77,13 +84,15 @@
          <hint>If the item has any alternative titles, please enter them here.</hint>
          <required></required>
        </field>
-
+     </row>
+     <row>
        <field>
          <dc-schema>dc</dc-schema>
          <dc-element>date</dc-element>
          <dc-qualifier>issued</dc-qualifier>
          <repeatable>false</repeatable>
          <label>Date of Issue</label>
+         <style>col-sm-4</style>
          <input-type>date</input-type>
          <hint>Please give the date of previous publication or public distribution.
                         You can leave out the day and/or month if they aren't
@@ -97,11 +106,13 @@
          <dc-qualifier></dc-qualifier>
          <repeatable>false</repeatable>
          <label>Publisher</label>
+         <style>col-sm-8</style>
          <input-type>onebox</input-type>
          <hint>Enter the name of the publisher of the previously issued instance of this item.</hint>
          <required></required>
        </field>
-
+     </row>
+     <row>
        <field>
          <dc-schema>dc</dc-schema>
          <dc-element>identifier</dc-element>
@@ -112,7 +123,8 @@
          <hint>Enter the standard citation for the previously issued instance of this item.</hint>
          <required></required>
        </field>
-
+     </row>
+     <row>
        <field>
          <dc-schema>dc</dc-schema>
          <dc-element>relation</dc-element>
@@ -123,7 +135,8 @@
          <hint>Enter the series and number assigned to this item by your community.</hint>
          <required></required>
        </field>
-
+     </row>
+     <row>
        <field>
          <dc-schema>dc</dc-schema>
          <dc-element>identifier</dc-element>
@@ -136,7 +149,8 @@
 it, please enter the types and the actual numbers or codes.</hint>
          <required></required>
        </field>
-
+     </row>
+     <row>
        <field>
          <dc-schema>dc</dc-schema>
          <dc-element>type</dc-element>
@@ -147,7 +161,8 @@ it, please enter the types and the actual numbers or codes.</hint>
          <hint>Select the type(s) of content of the item. To select more than one value in the list, you may have to hold down the "CTRL" or "Shift" key.</hint>
          <required></required>
        </field>
-
+     </row>
+     <row>
        <field>
          <dc-schema>dc</dc-schema>
          <dc-element>language</dc-element>
@@ -158,22 +173,25 @@ it, please enter the types and the actual numbers or codes.</hint>
          <hint>Select the language of the main content of the item.  If the language does not appear in the list, please select 'Other'.  If the content does not really have a language (for example, if it is a dataset or an image) please select 'N/A'.</hint>
          <required></required>
        </field>
+     </row>
 	</form>
-	
+
 	<form name="traditionalpagetwo">
+     <row>
        <field>
          <dc-schema>dc</dc-schema>
          <dc-element>subject</dc-element>
          <dc-qualifier></dc-qualifier>
-         <!-- An input-type of twobox MUST be marked as repeatable -->
+         <!-- An input-type of tag MUST be marked as repeatable -->
          <repeatable>true</repeatable>
          <label>Subject Keywords</label>
-         <input-type>twobox</input-type>
+         <input-type>tag</input-type>
          <hint>Enter appropriate subject keywords or phrases. </hint>
          <required></required>
          <vocabulary>srsc</vocabulary>
        </field>
-
+     </row>
+     <row>
        <field>
          <dc-schema>dc</dc-schema>
          <dc-element>description</dc-element>
@@ -184,7 +202,8 @@ it, please enter the types and the actual numbers or codes.</hint>
          <hint>Enter the abstract of the item. </hint>
          <required></required>
        </field>
-
+     </row>
+     <row>
        <field>
          <dc-schema>dc</dc-schema>
          <dc-element>description</dc-element>
@@ -195,7 +214,8 @@ it, please enter the types and the actual numbers or codes.</hint>
          <hint>Enter the names of any sponsors and/or funding codes in the box. </hint>
          <required></required>
        </field>
-
+     </row>
+     <row>
        <field>
          <dc-schema>dc</dc-schema>
          <dc-element>description</dc-element>
@@ -206,6 +226,389 @@ it, please enter the types and the actual numbers or codes.</hint>
          <hint>Enter any other description or comments in this box. </hint>
          <required></required>
        </field>
+     </row>
+   </form>
+
+   <form name="peopleStep">
+     <row>
+
+     <field>
+       <dc-schema>person</dc-schema>
+       <dc-element>identifier</dc-element>
+       <dc-qualifier>lastname</dc-qualifier>
+       <label>Last name</label>
+       <input-type>textarea</input-type>
+       <hint>Enter the last name of the person</hint>
+     </field>
+     </row>
+     <row>
+
+     <field>
+       <dc-schema>person</dc-schema>
+       <dc-element>identifier</dc-element>
+       <dc-qualifier>firstname</dc-qualifier>
+       <label>First name</label>
+       <input-type>textarea</input-type>
+       <hint>Enter the first name of the person</hint>
+     </field>
+     </row>
+     <row>
+
+     <field>
+       <dc-schema>person</dc-schema>
+       <dc-element>identifier</dc-element>
+       <dc-qualifier>email</dc-qualifier>
+       <label>Email</label>
+       <input-type>textarea</input-type>
+       <hint>Enter the email of the person</hint>
+     </field>
+     </row>
+     <row>
+
+     <field>
+       <dc-schema>person</dc-schema>
+       <dc-element>identifier</dc-element>
+       <dc-qualifier>orcid</dc-qualifier>
+       <label>Orcid</label>
+       <input-type>textarea</input-type>
+       <hint>Enter the orcid of the person</hint>
+     </field>
+     </row>
+     <row>
+
+     <field>
+       <dc-schema>person</dc-schema>
+       <dc-element>identifier</dc-element>
+       <dc-qualifier>birthdate</dc-qualifier>
+       <label>Birth date</label>
+       <input-type>date</input-type>
+       <hint>Enter the birth date of the person</hint>
+     </field>
+     </row>
+     <row>
+
+     <field>
+       <dc-schema>person</dc-schema>
+       <dc-element>identifier</dc-element>
+       <dc-qualifier>staffid</dc-qualifier>
+       <label>Staff ID</label>
+       <input-type>textarea</input-type>
+       <hint>Enter the staff id of the person</hint>
+     </field>
+     </row>
+     <row>
+
+     <field>
+       <dc-schema>person</dc-schema>
+       <dc-element>identifier</dc-element>
+       <dc-qualifier>jobtitle</dc-qualifier>
+       <label>Job title</label>
+       <input-type>textarea</input-type>
+       <hint>Enter the job title of the person</hint>
+     </field>
+     </row>
+   </form>
+
+
+
+
+   <form name="projectStep">
+       <row>
+
+       <field>
+       <dc-schema>project</dc-schema>
+       <dc-element>identifier</dc-element>
+       <dc-qualifier>name</dc-qualifier>
+       <label>Name</label>
+       <input-type>textarea</input-type>
+       <hint>Enter the name of the project</hint>
+     </field>
+       </row>
+       <row>
+
+       <field>
+       <dc-schema>project</dc-schema>
+       <dc-element>identifier</dc-element>
+       <dc-qualifier>id</dc-qualifier>
+       <label>ID</label>
+       <input-type>textarea</input-type>
+       <hint>Enter the id of the project</hint>
+     </field>
+       </row>
+       <row>
+
+       <field>
+       <dc-schema>project</dc-schema>
+       <dc-element>identifier</dc-element>
+       <dc-qualifier>status</dc-qualifier>
+       <label>Status</label>
+       <input-type>textarea</input-type>
+       <hint>Enter the status of the project</hint>
+     </field>
+       </row>
+       <row>
+
+       <field>
+       <dc-schema>project</dc-schema>
+       <dc-element>identifier</dc-element>
+       <dc-qualifier>startdate</dc-qualifier>
+       <label>Start date</label>
+       <input-type>date</input-type>
+       <hint>Enter the start date of the project</hint>
+     </field>
+       </row>
+       <row>
+     <field>
+       <dc-schema>project</dc-schema>
+       <dc-element>identifier</dc-element>
+       <dc-qualifier>expectedcompletion</dc-qualifier>
+       <label>Expected Completion</label>
+       <input-type>date</input-type>
+       <hint>Enter the expected completion date of the project</hint>
+     </field>
+       </row>
+       <row>
+     <field>
+       <dc-schema>project</dc-schema>
+       <dc-element>identifier</dc-element>
+       <dc-qualifier>keyword</dc-qualifier>
+       <label>Keywords</label>
+       <input-type>textarea</input-type>
+       <hint>Enter the keywords of the project</hint>
+     </field>
+       </row>
+       <row>
+     <field>
+       <dc-schema>project</dc-schema>
+       <dc-element>identifier</dc-element>
+       <dc-qualifier>description</dc-qualifier>
+       <label>Description</label>
+       <input-type>textarea</input-type>
+       <hint>Enter the description of the project</hint>
+     </field>
+       </row>
+   </form>
+
+   <form name="orgUnitStep">
+       <row>
+     <field>
+       <dc-schema>orgunit</dc-schema>
+       <dc-element>identifier</dc-element>
+       <dc-qualifier>name</dc-qualifier>
+       <label>Name</label>
+       <input-type>textarea</input-type>
+       <hint>Enter the name of the orgunit</hint>
+     </field>
+       </row>
+       <row>
+     <field>
+       <dc-schema>orgunit</dc-schema>
+       <dc-element>identifier</dc-element>
+       <dc-qualifier>id</dc-qualifier>
+       <label>ID</label>
+       <input-type>textarea</input-type>
+       <hint>Enter the id of the orgunit</hint>
+     </field>
+       </row>
+       <row>
+     <field>
+       <dc-schema>orgunit</dc-schema>
+       <dc-element>identifier</dc-element>
+       <dc-qualifier>dateestablished</dc-qualifier>
+       <label>Date established</label>
+       <input-type>date</input-type>
+       <hint>Enter the established date of the orgunit</hint>
+     </field>
+       </row>
+       <row>
+     <field>
+       <dc-schema>orgunit</dc-schema>
+       <dc-element>identifier</dc-element>
+       <dc-qualifier>city</dc-qualifier>
+       <label>City</label>
+       <input-type>textarea</input-type>
+       <hint>Enter the city of the orgunit</hint>
+     </field>
+       </row>
+       <row>
+     <field>
+       <dc-schema>orgunit</dc-schema>
+       <dc-element>identifier</dc-element>
+       <dc-qualifier>country</dc-qualifier>
+       <label>Country</label>
+       <input-type>textarea</input-type>
+       <hint>Enter the country of the orgunit</hint>
+     </field>
+       </row>
+       <row>
+     <field>
+       <dc-schema>orgunit</dc-schema>
+       <dc-element>identifier</dc-element>
+       <dc-qualifier>description</dc-qualifier>
+       <label>Description</label>
+       <input-type>textarea</input-type>
+       <hint>Enter the description of the orgunit</hint>
+     </field>
+       </row>
+   </form>
+
+   <form name="journalStep">
+    <row>
+     <field>
+       <dc-schema>journal</dc-schema>
+       <dc-element>identifier</dc-element>
+       <dc-qualifier>name</dc-qualifier>
+       <label>Name</label>
+       <input-type>textarea</input-type>
+       <hint>Enter the name of the journal</hint>
+     </field>
+    </row>
+       <row>
+
+     <field>
+       <dc-schema>journal</dc-schema>
+       <dc-element>contributor</dc-element>
+       <dc-qualifier>editor</dc-qualifier>
+       <label>Editor</label>
+       <input-type>textarea</input-type>
+       <hint>Enter the editor of the journal</hint>
+     </field>
+       </row>
+       <row>
+
+     <field>
+       <dc-schema>journal</dc-schema>
+       <dc-element>identifier</dc-element>
+       <dc-qualifier>issn</dc-qualifier>
+       <label>Name</label>
+       <input-type>textarea</input-type>
+       <hint>Enter the issn of the journal</hint>
+     </field>
+
+       </row>
+       <row>
+     <field>
+       <dc-schema>journal</dc-schema>
+       <dc-element>identifier</dc-element>
+       <dc-qualifier>description</dc-qualifier>
+       <label>Description</label>
+       <input-type>textarea</input-type>
+       <hint>Enter the description of the journal</hint>
+     </field>
+
+       </row>
+       <row>
+     <field>
+       <dc-schema>journal</dc-schema>
+       <dc-element>publisher</dc-element>
+       <label>Publisher</label>
+       <input-type>textarea</input-type>
+       <hint>Enter the publisher of the journal</hint>
+     </field>
+       </row>
+
+   </form>
+
+   <form name="journalVolumeStep">
+    <row>
+     <field>
+       <dc-schema>journalvolume</dc-schema>
+       <dc-element>identifier</dc-element>
+       <dc-qualifier>name</dc-qualifier>
+       <label>Name</label>
+       <input-type>textarea</input-type>
+       <hint>Enter the name of the journal volume</hint>
+     </field>
+
+    </row>
+       <row>
+     <field>
+       <dc-schema>journalvolume</dc-schema>
+       <dc-element>identifier</dc-element>
+       <dc-qualifier>volume</dc-qualifier>
+       <label>Volume</label>
+       <input-type>textarea</input-type>
+       <hint>Enter the volume of the journal volume</hint>
+     </field>
+
+       </row>
+       <row>
+     <field>
+       <dc-schema>journalvolume</dc-schema>
+       <dc-element>issuedate</dc-element>
+       <label>Issue date</label>
+       <input-type>date</input-type>
+       <hint>Enter the issue date of the journal volume</hint>
+     </field>
+       </row>
+       <row>
+
+     <field>
+       <dc-schema>journalvolume</dc-schema>
+       <dc-element>identifier</dc-element>
+       <dc-qualifier>description</dc-qualifier>
+       <label>Description</label>
+       <input-type>textarea</input-type>
+       <hint>Enter the description of the journal volume</hint>
+     </field>
+       </row>
+   </form>
+
+   <form name="journalIssueStep">
+    <row>
+     <field>
+       <dc-schema>journalissue</dc-schema>
+       <dc-element>identifier</dc-element>
+       <dc-qualifier>name</dc-qualifier>
+       <label>Name</label>
+       <input-type>textarea</input-type>
+       <hint>Enter the name of the journal issue</hint>
+     </field>
+    </row>
+       <row>
+
+     <field>
+       <dc-schema>journalissue</dc-schema>
+       <dc-element>identifier</dc-element>
+       <dc-qualifier>number</dc-qualifier>
+       <label>Number</label>
+       <input-type>textarea</input-type>
+       <hint>Enter the number of the journal issue</hint>
+     </field>
+       </row>
+       <row>
+
+     <field>
+       <dc-schema>journalissue</dc-schema>
+       <dc-element>issuedate</dc-element>
+       <label>Issue date</label>
+       <input-type>date</input-type>
+       <hint>Enter the issue date of the journal issue</hint>
+     </field>
+       </row>
+       <row>
+
+     <field>
+       <dc-schema>journalissue</dc-schema>
+       <dc-element>identifier</dc-element>
+       <dc-qualifier>description</dc-qualifier>
+       <label>Description</label>
+       <input-type>textarea</input-type>
+       <hint>Enter the description of the journal issue</hint>
+     </field>
+       </row>
+       <row>
+
+     <field>
+       <dc-schema>journalissue</dc-schema>
+       <dc-element>identifier</dc-element>
+       <dc-qualifier>keyword</dc-qualifier>
+       <label>Keywords</label>
+       <input-type>textarea</input-type>
+       <hint>Enter the keywords of the journal issue</hint>
+     </field>
+       </row>
+
    </form>
 
  </form-definitions>

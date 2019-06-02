@@ -15,12 +15,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
@@ -34,10 +34,11 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @EnableWebSecurity
 @Configuration
 @EnableConfigurationProperties(SecurityProperties.class)
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     public static final String ADMIN_GRANT = "ADMIN";
-    public static final String EPERSON_GRANT = "EPERSON";
+    public static final String AUTHENTICATED_GRANT = "AUTHENTICATED";
     public static final String ANONYMOUS_GRANT = "ANONYMOUS";
 
     @Autowired
@@ -69,9 +70,6 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         http
             //Tell Spring to not create Sessions
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-            //Return the login URL when having an access denied error
-            .exceptionHandling().authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/api/authn/login"))
-            .and()
             //Anonymous requests should have the "ANONYMOUS" security grant
             .anonymous().authorities(ANONYMOUS_GRANT).and()
             //Wire up the HttpServletRequest with the current SecurityContext values
@@ -79,6 +77,10 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
             //Disable CSRF as our API can be used by clients on an other domain, we are also protected against this,
             // since we pass the token in a header
             .csrf().disable()
+            //Return 401 on authorization failures with a correct WWWW-Authenticate header
+            .exceptionHandling().authenticationEntryPoint(
+                    new DSpace401AuthenticationEntryPoint(restAuthenticationService))
+            .and()
 
             //Logout configuration
             .logout()

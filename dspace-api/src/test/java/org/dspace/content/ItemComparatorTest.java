@@ -14,7 +14,7 @@ import static org.junit.Assert.fail;
 import java.io.IOException;
 import java.sql.SQLException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.AbstractUnitTest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.factory.ContentServiceFactory;
@@ -40,7 +40,7 @@ public class ItemComparatorTest extends AbstractUnitTest {
     /**
      * log4j category
      */
-    private static final Logger log = Logger.getLogger(ItemComparatorTest.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(ItemComparatorTest.class);
 
     protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
     protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();

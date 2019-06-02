@@ -16,9 +16,9 @@ import java.util.List;
 import java.util.MissingResourceException;
 import java.util.UUID;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authorize.AuthorizeConfiguration;
 import org.dspace.authorize.AuthorizeException;
@@ -51,7 +51,7 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
     /**
      * log4j category
      */
-    private static Logger log = Logger.getLogger(CommunityServiceImpl.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(CommunityServiceImpl.class);
 
     @Autowired(required = true)
     protected CommunityDAO communityDAO;
@@ -138,11 +138,21 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
     }
 
     @Override
+    /**
+     * This method is an alias of the find method needed to avoid ambiguity between the IndexableObjectService interface
+     * and the DSpaceObjectService interface
+     */
+    public Community findIndexableObject(Context context, UUID id) throws SQLException {
+        return find(context, id);
+    }
+
+    @Override
     public List<Community> findAll(Context context) throws SQLException {
-        MetadataField sortField = metadataFieldService.findByElement(context, MetadataSchema.DC_SCHEMA, "title", null);
+        MetadataField sortField = metadataFieldService.findByElement(context, MetadataSchemaEnum.DC.getName(),
+                                                                     "title", null);
         if (sortField == null) {
             throw new IllegalArgumentException(
-                "Required metadata field '" + MetadataSchema.DC_SCHEMA + ".title' doesn't exist!");
+                "Required metadata field '" + MetadataSchemaEnum.DC.getName() + ".title' doesn't exist!");
         }
 
         return communityDAO.findAll(context, sortField);
@@ -150,10 +160,11 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
 
     @Override
     public List<Community> findAll(Context context, Integer limit, Integer offset) throws SQLException {
-        MetadataField nameField = metadataFieldService.findByElement(context, MetadataSchema.DC_SCHEMA, "title", null);
+        MetadataField nameField = metadataFieldService.findByElement(context, MetadataSchemaEnum.DC.getName(),
+                                                                     "title", null);
         if (nameField == null) {
             throw new IllegalArgumentException(
-                "Required metadata field '" + MetadataSchema.DC_SCHEMA + ".title' doesn't exist!");
+                "Required metadata field '" + MetadataSchemaEnum.DC.getName() + ".title' doesn't exist!");
         }
 
         return communityDAO.findAll(context, nameField, limit, offset);
@@ -162,10 +173,11 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
     @Override
     public List<Community> findAllTop(Context context) throws SQLException {
         // get all communities that are not children
-        MetadataField sortField = metadataFieldService.findByElement(context, MetadataSchema.DC_SCHEMA, "title", null);
+        MetadataField sortField = metadataFieldService.findByElement(context, MetadataSchemaEnum.DC.getName(),
+                                                                     "title", null);
         if (sortField == null) {
             throw new IllegalArgumentException(
-                "Required metadata field '" + MetadataSchema.DC_SCHEMA + ".title' doesn't exist!");
+                "Required metadata field '" + MetadataSchemaEnum.DC.getName() + ".title' doesn't exist!");
         }
 
         return communityDAO.findAllNoParent(context, sortField);
@@ -257,7 +269,7 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
         if (community.isModified()) {
             context.addEvent(new Event(Event.MODIFY, Constants.COMMUNITY, community.getID(), null,
                                        getIdentifiers(context, community)));
-            community.setModified();
+            community.clearModified();
         }
         if (community.isMetadataModified()) {
             context.addEvent(
@@ -452,9 +464,6 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
 
         rawDelete(context, childCommunity);
 
-        childCommunity.removeParentCommunity(parentCommunity);
-        parentCommunity.removeSubCommunity(childCommunity);
-
         log.info(LogManager.getHeader(context, "remove_subcommunity",
                                       "parent_comm_id=" + parentCommunity.getID() + ",child_comm_id=" + childCommunity
                                           .getID()));
@@ -511,6 +520,14 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
         return Constants.COMMUNITY;
     }
 
+    @Override
+    /**
+     * This method is an alias of the getSupportsTypeConstant method needed to avoid ambiguity between the
+     * IndexableObjectService interface and the DSpaceObjectService interface
+     */
+    public int getSupportsIndexableObjectTypeConstant() {
+        return getSupportsTypeConstant();
+    }
 
     /**
      * Internal method to remove the community and all its children from the
@@ -552,6 +569,13 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
 
         // Remove any Handle
         handleService.unbindHandle(context, community);
+
+        // Remove the parent-child relationship for the community we want to delete
+        Community parent = (Community) getParentObject(context, community);
+        if (parent != null) {
+            community.removeParentCommunity(parent);
+            parent.removeSubCommunity(community);
+        }
 
         Group g = community.getAdministrators();
 

@@ -7,7 +7,7 @@
  */
 package org.dspace.statistics;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.eperson.EPerson;
 import org.dspace.services.model.Event;
 import org.dspace.statistics.service.SolrLoggerService;
@@ -26,7 +26,7 @@ import org.springframework.util.CollectionUtils;
  */
 public class SolrLoggerUsageEventListener extends AbstractUsageEventListener {
 
-    private static Logger log = Logger.getLogger(SolrLoggerUsageEventListener.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(SolrLoggerUsageEventListener.class);
 
     protected SolrLoggerService solrLoggerService;
 
@@ -69,7 +69,7 @@ public class SolrLoggerUsageEventListener extends AbstractUsageEventListener {
                 }
 
             } catch (Exception e) {
-                log.error(e.getMessage());
+                log.error("Error processing/logging UsageEvent {}", event.getName(), e);
             }
         }
 

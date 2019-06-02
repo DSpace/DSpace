@@ -27,8 +27,16 @@ public class SubmissionUploadsControllerIT extends AbstractControllerIntegration
 
     @Test
     public void findAll() throws Exception {
-        //When we call the root endpoint
+        //When we call the root endpoint as anonymous user
         getClient().perform(get("/api/config/submissionuploads"))
+                   //The status has to be 403 Not Authorized
+                   .andExpect(status().isUnauthorized());
+
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        //When we call the root endpoint
+        getClient(token).perform(get("/api/config/submissionuploads"))
                    //The status has to be 200 OK
                    .andExpect(status().isOk())
                    //We expect the content type to be "application/hal+json;charset=UTF-8"

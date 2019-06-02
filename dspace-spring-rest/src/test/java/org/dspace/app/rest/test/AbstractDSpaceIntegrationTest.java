@@ -15,7 +15,8 @@ import java.sql.SQLException;
 import java.util.Properties;
 import java.util.TimeZone;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.builder.AbstractBuilder;
 import org.dspace.servicemanager.DSpaceKernelImpl;
 import org.dspace.servicemanager.DSpaceKernelInit;
@@ -30,7 +31,8 @@ public class AbstractDSpaceIntegrationTest {
     /**
      * log4j category
      */
-    private static final Logger log = Logger.getLogger(AbstractDSpaceIntegrationTest.class);
+    private static final Logger log = LogManager
+            .getLogger(AbstractDSpaceIntegrationTest.class);
 
     /**
      * Test properties. These configure our general test environment
@@ -52,11 +54,10 @@ public class AbstractDSpaceIntegrationTest {
      * This method will be run before the first test as per @BeforeClass. It will
      * initialize shared resources required for all tests of this class.
      *
-     * This method loads our test properties to initialize our test environment,
-     * and then starts the DSpace Kernel (which allows access to services).
+     * This method loads our test properties for usage in test environment.
      */
     @BeforeClass
-    public static void initKernel() {
+    public static void initTestEnvironment() {
         try {
             //Stops System.exit(0) throws exception instead of exitting
             System.setSecurityManager(new NoExitSecurityManager());
@@ -70,12 +71,17 @@ public class AbstractDSpaceIntegrationTest {
                                                                 .getResource("test-config.properties");
             testProps.load(properties.openStream());
 
-            // Initialise the service manager kernel
+            // Get a reference to current Kernel
             kernelImpl = DSpaceKernelInit.getKernel(null);
+            // If somehow the kernel is NOT initialized, initialize it.
+            // NOTE: This is likely never going to occur, as Spring Boot initializes it
+            // See AbstractControllerIntegrationTest (where @SpringBootTest is defined)
             if (!kernelImpl.isRunning()) {
                 // NOTE: the "dspace.dir" system property MUST be specified via Maven
                 kernelImpl.start(getDspaceDir()); // init the kernel
             }
+
+            // Initialize our builder (by loading all DSpace services)
             AbstractBuilder.init();
         } catch (IOException ex) {
             log.error("Error initializing tests", ex);
@@ -88,20 +94,20 @@ public class AbstractDSpaceIntegrationTest {
      * will clean resources initialized by the @BeforeClass methods.
      */
     @AfterClass
-    public static void destroyKernel() throws SQLException {
+    public static void destroyTestEnvironment() throws SQLException {
         System.setSecurityManager(null);
 
-        //we clear the properties
+        // Clear our test properties
         testProps.clear();
         testProps = null;
 
+        // Unload DSpace services
         AbstractBuilder.destroy();
 
-        //Also clear out the kernel & nullify (so JUnit will clean it up)
-        if (kernelImpl != null) {
-            kernelImpl.destroy();
-        }
-        kernelImpl = null;
+        // NOTE: We explicitly do NOT stop/destroy the kernel, as it is cached
+        // in the Spring ApplicationContext. By default, to speed up tests,
+        // Spring caches & reuses its ApplicationContext for all tests. So,
+        // similarly, our kernel is being cached & reused for all tests.
     }
 
     public static String getDspaceDir() {

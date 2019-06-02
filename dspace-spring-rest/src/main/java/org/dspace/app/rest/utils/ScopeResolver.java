@@ -10,12 +10,12 @@ package org.dspace.app.rest.utils;
 import java.sql.SQLException;
 import java.util.UUID;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
-import org.dspace.content.DSpaceObject;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.core.Context;
+import org.dspace.discovery.IndexableObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -25,7 +25,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class ScopeResolver {
 
-    private static final Logger log = Logger.getLogger(ScopeResolver.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(ScopeResolver.class);
 
     @Autowired
     CollectionService collectionService;
@@ -33,8 +33,8 @@ public class ScopeResolver {
     @Autowired
     CommunityService communityService;
 
-    public DSpaceObject resolveScope(Context context, String scope) {
-        DSpaceObject scopeObj = null;
+    public IndexableObject<UUID> resolveScope(Context context, String scope) {
+        IndexableObject<UUID> scopeObj = null;
         if (StringUtils.isNotBlank(scope)) {
             try {
                 UUID uuid = UUID.fromString(scope);

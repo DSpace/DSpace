@@ -20,8 +20,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.log4j.Logger;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
@@ -30,7 +30,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.content.MetadataSchema;
+import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.factory.ContentServiceFactory;
@@ -65,7 +65,7 @@ public class PackageUtils {
     /**
      * log4j category
      */
-    private static final Logger log = Logger.getLogger(PackageUtils.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(PackageUtils.class);
 
     // Map of metadata elements for Communities and Collections
     // Format is alternating key/value in a straight array; use this
@@ -158,7 +158,7 @@ public class PackageUtils {
      */
     public static void checkItemMetadata(Item item)
         throws PackageValidationException {
-        List<MetadataValue> t = itemService.getMetadata(item, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY);
+        List<MetadataValue> t = itemService.getMetadata(item, MetadataSchemaEnum.DC.getName(), "title", null, Item.ANY);
         if (t == null || t.size() == 0) {
             throw new PackageValidationException("Item cannot be created without the required \"title\" DC metadata.");
         }

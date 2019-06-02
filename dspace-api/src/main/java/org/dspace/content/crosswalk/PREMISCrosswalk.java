@@ -13,9 +13,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
@@ -48,7 +48,7 @@ public class PREMISCrosswalk
     /**
      * log4j category
      */
-    private static Logger log = Logger.getLogger(PREMISCrosswalk.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(PREMISCrosswalk.class);
 
     private static final Namespace PREMIS_NS =
         Namespace.getNamespace("premis", "http://www.loc.gov/standards/premis");
@@ -108,9 +108,9 @@ public class PREMISCrosswalk
                     if (ssize != null) {
                         try {
                             int size = Integer.parseInt(ssize);
-                            if (bitstream.getSize() != size) {
+                            if (bitstream.getSizeBytes() != size) {
                                 throw new MetadataValidationException(
-                                    "Bitstream size (" + String.valueOf(bitstream.getSize()) +
+                                    "Bitstream size (" + String.valueOf(bitstream.getSizeBytes()) +
                                         ") does not match size in PREMIS (" + ssize + "), rejecting it.");
                             }
                         } catch (NumberFormatException ne) {
@@ -274,7 +274,7 @@ public class PREMISCrosswalk
 
         // size
         Element size = new Element("size", PREMIS_NS);
-        size.setText(String.valueOf(bitstream.getSize()));
+        size.setText(String.valueOf(bitstream.getSizeBytes()));
         ochar.addContent(size);
 
         //  Punt and set formatName to the MIME type; the best we can

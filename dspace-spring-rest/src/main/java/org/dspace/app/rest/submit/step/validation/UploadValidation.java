@@ -10,13 +10,13 @@ package org.dspace.app.rest.submit.step.validation;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.ErrorRest;
 import org.dspace.app.rest.repository.WorkspaceItemRestRepository;
 import org.dspace.app.rest.submit.SubmissionService;
 import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.app.util.SubmissionStepConfig;
-import org.dspace.content.WorkspaceItem;
+import org.dspace.content.InProgressSubmission;
 import org.dspace.content.service.ItemService;
 import org.dspace.submit.model.UploadConfiguration;
 import org.dspace.submit.model.UploadConfigurationService;
@@ -30,14 +30,14 @@ public class UploadValidation extends AbstractValidation {
 
     private static final String ERROR_VALIDATION_FILEREQUIRED = "error.validation.filerequired";
 
-    private static final Logger log = Logger.getLogger(UploadValidation.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(UploadValidation.class);
 
     private ItemService itemService;
 
     private UploadConfigurationService uploadConfigurationService;
 
     @Override
-    public List<ErrorRest> validate(SubmissionService submissionService, WorkspaceItem obj,
+    public List<ErrorRest> validate(SubmissionService submissionService, InProgressSubmission obj,
                                     SubmissionStepConfig config) throws DCInputsReaderException, SQLException {
         //TODO MANAGE METADATA
 

@@ -12,18 +12,22 @@ import static org.junit.Assert.fail;
 import java.sql.SQLException;
 import java.util.Arrays;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.launcher.ScriptLauncher;
 import org.dspace.app.rest.builder.AbstractBuilder;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Community;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
+import org.dspace.discovery.MockSolrServiceImpl;
+import org.dspace.discovery.SearchService;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.storage.rdbms.DatabaseUtils;
 import org.jdom.Document;
 import org.junit.After;
@@ -37,7 +41,8 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
     /**
      * log4j category
      */
-    private static final Logger log = Logger.getLogger(AbstractIntegrationTestWithDatabase.class);
+    private static final Logger log = LogManager
+            .getLogger(AbstractIntegrationTestWithDatabase.class);
 
     /**
      * Context mock object to use in the tests.
@@ -161,28 +166,26 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
      * clean resources initialized by the @Before methods.
      *
      * Other methods can be annotated with @After here or in subclasses
-     * but no execution order is guaranteed
+     * but no execution order is guaranteed.
+     *
+     * @throws java.lang.Exception passed through.
      */
     @After
     public void destroy() throws Exception {
         // Cleanup our global context object
         try {
             AbstractBuilder.cleanupObjects();
-            if (context == null || !context.isValid()) {
-                context = new Context();
-            }
-            eperson = context.reloadEntity(eperson);
-            admin = context.reloadEntity(admin);
-
-            context.turnOffAuthorisationSystem();
-            if (eperson != null) {
-                EPersonServiceFactory.getInstance().getEPersonService().delete(context, eperson);
-            }
-            if (admin != null) {
-                EPersonServiceFactory.getInstance().getEPersonService().delete(context, admin);
-            }
             parentCommunity = null;
             cleanupContext();
+
+            // Clear the search core.
+            MockSolrServiceImpl searchService = DSpaceServicesFactory.getInstance()
+                    .getServiceManager()
+                    .getServiceByName(SearchService.class.getName(), MockSolrServiceImpl.class);
+            searchService.reset();
+
+            // NOTE: we explicitly do NOT destroy our default eperson & admin as they
+            // are cached and reused for all tests. This speeds up all tests.
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

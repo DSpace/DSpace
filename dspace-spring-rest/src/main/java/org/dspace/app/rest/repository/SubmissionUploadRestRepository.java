@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.AccessConditionOptionRest;
 import org.dspace.app.rest.model.SubmissionUploadRest;
 import org.dspace.app.rest.model.hateoas.SubmissionUploadResource;
@@ -30,6 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 /**
@@ -42,7 +43,8 @@ import org.springframework.stereotype.Component;
 public class SubmissionUploadRestRepository extends DSpaceRestRepository<SubmissionUploadRest, String>
     implements LinkRestRepository<SubmissionUploadRest> {
 
-    private static final Logger log = Logger.getLogger(SubmissionUploadRestRepository.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager
+            .getLogger(SubmissionUploadRestRepository.class);
 
     private SubmissionConfigReader submissionConfigReader;
 
@@ -61,6 +63,7 @@ public class SubmissionUploadRestRepository extends DSpaceRestRepository<Submiss
         submissionConfigReader = new SubmissionConfigReader();
     }
 
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
     @Override
     public SubmissionUploadRest findOne(Context context, String submitName) {
         UploadConfiguration config = uploadConfigurationService.getMap().get(submitName);
@@ -72,6 +75,7 @@ public class SubmissionUploadRestRepository extends DSpaceRestRepository<Submiss
         return null;
     }
 
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
     @Override
     public Page<SubmissionUploadRest> findAll(Context context, Pageable pageable) {
         List<SubmissionConfig> subConfs = new ArrayList<SubmissionConfig>();

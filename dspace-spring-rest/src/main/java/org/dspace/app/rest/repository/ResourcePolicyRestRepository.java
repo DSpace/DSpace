@@ -20,6 +20,7 @@ import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 /**
@@ -39,6 +40,7 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
     @Autowired
     Utils utils;
 
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
     @Override
     public ResourcePolicyRest findOne(Context context, Integer id) {
         ResourcePolicy source = null;
@@ -53,6 +55,7 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
         return resourcePolicyConverter.convert(source);
     }
 
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
     @Override
     public Page<ResourcePolicyRest> findAll(Context context, Pageable pageable) {
         throw new RepositoryMethodNotImplementedException(ResourcePolicyRest.NAME, "findAll");

@@ -16,9 +16,9 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.core.SelfNamedPlugin;
 import org.dspace.services.ConfigurationService;
@@ -56,7 +56,7 @@ import org.xml.sax.InputSource;
 
 public class DSpaceControlledVocabulary extends SelfNamedPlugin implements ChoiceAuthority {
 
-    private static Logger log = Logger.getLogger(DSpaceControlledVocabulary.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(DSpaceControlledVocabulary.class);
     protected static String xpathTemplate = "//node[contains(translate(@label,'ABCDEFGHIJKLMNOPQRSTUVWXYZ'," +
         "'abcdefghijklmnopqrstuvwxyz'),'%s')]";
     protected static String idTemplate = "//node[@id = '%s']";
@@ -145,7 +145,11 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Choic
     public Choices getMatches(String field, String text, Collection collection, int start, int limit, String locale) {
         init();
         log.debug("Getting matches for '" + text + "'");
-        String xpathExpression = String.format(xpathTemplate, text.replaceAll("'", "&apos;").toLowerCase());
+        String xpathExpression = "";
+        String[] textHierarchy = text.split(hierarchyDelimiter, -1);
+        for (int i = 0; i < textHierarchy.length; i++) {
+            xpathExpression += String.format(xpathTemplate, textHierarchy[i].replaceAll("'", "&apos;").toLowerCase());
+        }
         XPath xpath = XPathFactory.newInstance().newXPath();
         Choice[] choices;
         try {

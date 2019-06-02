@@ -14,9 +14,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.ObjectUtils;
-import org.apache.log4j.Logger;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.dao.ResourcePolicyDAO;
 import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.DSpaceObject;
@@ -38,7 +38,7 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService {
     /**
      * log4j logger
      */
-    private static Logger log = Logger.getLogger(ResourcePolicyServiceImpl.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(ResourcePolicyServiceImpl.class);
 
     @Autowired(required = true)
     protected ContentServiceFactory contentServiceFactory;
@@ -306,5 +306,11 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService {
             }
             context.restoreAuthSystemState();
         }
+    }
+
+    @Override
+    public List<ResourcePolicy> findExceptRpType(Context c, DSpaceObject o, int actionID, String rpType)
+        throws SQLException {
+        return resourcePolicyDAO.findByDSoAndActionExceptRpType(c, o, actionID, rpType);
     }
 }

@@ -7,7 +7,7 @@
  */
 package org.dspace.app.rest.model;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -21,6 +21,11 @@ public class ErrorRest {
 
     private List<String> paths;
 
+    /**
+     * The error message as i18key
+     * 
+     * @return The message as i18key
+     */
     public String getMessage() {
         return message;
     }
@@ -29,9 +34,16 @@ public class ErrorRest {
         this.message = message;
     }
 
+    /**
+     * The json paths where the error message apply. They can be as detailed as a specific value in a multivalues
+     * attributes (i.e. sections.traditionalpageone['dc.contributor.author'][1] to identify the second author - 0 based)
+     * or generic to apply to a whole section (sections.license)
+     * 
+     * @return
+     */
     public List<String> getPaths() {
         if (this.paths == null) {
-            this.paths = new ArrayList<String>();
+            this.paths = new LinkedList<String>();
         }
         return paths;
     }

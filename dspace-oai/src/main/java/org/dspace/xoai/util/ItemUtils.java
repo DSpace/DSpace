@@ -16,8 +16,8 @@ import java.util.List;
 import com.lyncode.xoai.dataprovider.xml.xoai.Element;
 import com.lyncode.xoai.dataprovider.xml.xoai.Metadata;
 import com.lyncode.xoai.util.Base64Utils;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.factory.UtilServiceFactory;
 import org.dspace.app.util.service.MetadataExposureService;
 import org.dspace.authorize.AuthorizeException;
@@ -230,7 +230,7 @@ public class ItemUtils {
                         createValue("format", bit.getFormat(context)
                                                  .getMIMEType()));
                     bitstream.getField().add(
-                        createValue("size", "" + bit.getSize()));
+                        createValue("size", "" + bit.getSizeBytes()));
                     bitstream.getField().add(createValue("url", url));
                     bitstream.getField().add(
                         createValue("checksum", cks));

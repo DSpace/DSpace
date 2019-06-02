@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.app.util.Util;
 import org.dspace.authorize.AuthorizeException;
@@ -27,6 +27,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
+import org.dspace.event.Event;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +41,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class WorkspaceItemServiceImpl implements WorkspaceItemService {
 
-    private static final Logger log = Logger.getLogger(WorkspaceItemServiceImpl.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(WorkspaceItemServiceImpl.class);
 
     @Autowired(required = true)
     protected WorkspaceItemDAO workspaceItemDAO;
@@ -60,6 +61,11 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
     }
 
     @Override
+    public int getSupportsIndexableObjectTypeConstant() {
+        return Constants.WORKSPACEITEM;
+    }
+
+    @Override
     public WorkspaceItem find(Context context, int id) throws SQLException {
         WorkspaceItem workspaceItem = workspaceItemDAO.findByID(context, WorkspaceItem.class, id);
 
@@ -75,6 +81,14 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
             }
         }
         return workspaceItem;
+    }
+
+    @Override
+    public WorkspaceItem findIndexableObject(Context context, Integer id) throws SQLException {
+        if (id != null) {
+            return find(context, id);
+        }
+        return null;
     }
 
     @Override
@@ -130,6 +144,9 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
                                           + "item_id=" + item.getID() + "collection_id="
                                           + collection.getID()));
 
+        context.addEvent(new Event(Event.MODIFY, Constants.ITEM, item.getID(), null,
+                itemService.getIdentifiers(context, item)));
+
         return workspaceItem;
     }
 
@@ -145,6 +162,12 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
     @Override
     public List<WorkspaceItem> findByEPerson(Context context, EPerson ep) throws SQLException {
         return workspaceItemDAO.findByEPerson(context, ep);
+    }
+
+    @Override
+    public List<WorkspaceItem> findByEPerson(Context context, EPerson ep, Integer limit, Integer offset)
+        throws SQLException {
+        return workspaceItemDAO.findByEPerson(context, ep, limit, offset);
     }
 
     @Override
@@ -229,6 +252,11 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
     @Override
     public int countTotal(Context context) throws SQLException {
         return workspaceItemDAO.countRows(context);
+    }
+
+    @Override
+    public int countByEPerson(Context context, EPerson ep) throws SQLException {
+        return workspaceItemDAO.countRows(context, ep);
     }
 
     @Override

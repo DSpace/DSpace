@@ -10,6 +10,7 @@ package org.dspace.app.rest.model;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.dspace.app.rest.RestResourceController;
 
 /**
@@ -17,6 +18,7 @@ import org.dspace.app.rest.RestResourceController;
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class GroupRest extends DSpaceObjectRest {
     public static final String NAME = "group";
 
@@ -26,7 +28,6 @@ public class GroupRest extends DSpaceObjectRest {
 
     private boolean permanent;
 
-    @JsonIgnore
     private List<GroupRest> groups;
 
     @Override
@@ -55,6 +56,7 @@ public class GroupRest extends DSpaceObjectRest {
         this.permanent = permanent;
     }
 
+    @JsonIgnore
     @LinkRest(linkClass = GroupRest.class)
     public List<GroupRest> getGroups() {
         return groups;

@@ -12,18 +12,16 @@ import java.util.Map;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
-import org.apache.commons.lang.StringUtils;
-import org.dspace.app.rest.model.DSpaceObjectRest;
-import org.dspace.app.rest.model.SearchFacetEntryRest;
-import org.dspace.app.rest.model.SearchFacetValueRest;
+import org.apache.log4j.Logger;
+import org.dspace.app.rest.converter.query.SearchQueryConverter;
+import org.dspace.app.rest.model.RestAddressableModel;
 import org.dspace.app.rest.model.SearchResultEntryRest;
 import org.dspace.app.rest.model.SearchResultsRest;
 import org.dspace.app.rest.parameter.SearchFilter;
-import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 import org.dspace.discovery.DiscoverResult;
+import org.dspace.discovery.IndexableObject;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
-import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -35,10 +33,14 @@ import org.springframework.stereotype.Component;
 @Component
 public class DiscoverResultConverter {
 
-    @Autowired
-    private List<DSpaceObjectConverter> converters;
+    private static final Logger log = Logger.getLogger(DiscoverResultConverter.class);
 
-    private DiscoverFacetValueConverter facetValueConverter = new DiscoverFacetValueConverter();
+    @Autowired
+    private List<IndexableObjectConverter> converters;
+    @Autowired
+    private DiscoverFacetsConverter facetConverter;
+    @Autowired
+    private SearchFilterToAppliedFilterConverter searchFilterToAppliedFilterConverter;
 
     public SearchResultsRest convert(final Context context, final String query, final String dsoType,
                                      final String configurationName, final String scope,
@@ -51,56 +53,27 @@ public class DiscoverResultConverter {
 
         addSearchResults(searchResult, resultsRest);
 
-        addFacetValues(searchResult, resultsRest, configuration);
+        addFacetValues(context, searchResult, resultsRest, configuration);
 
         resultsRest.setTotalNumberOfResults(searchResult.getTotalSearchResults());
 
         return resultsRest;
     }
 
-    private void addFacetValues(final DiscoverResult searchResult, final SearchResultsRest resultsRest,
-                                final DiscoveryConfiguration configuration) {
-
-        List<DiscoverySearchFilterFacet> facets = configuration.getSidebarFacets();
-        for (DiscoverySearchFilterFacet field : CollectionUtils.emptyIfNull(facets)) {
-            List<DiscoverResult.FacetResult> facetValues = searchResult.getFacetResult(field);
-
-            SearchFacetEntryRest facetEntry = new SearchFacetEntryRest(field.getIndexFieldName());
-            int valueCount = 0;
-            facetEntry.setHasMore(false);
-            facetEntry.setFacetLimit(field.getFacetLimit());
-
-            for (DiscoverResult.FacetResult value : CollectionUtils.emptyIfNull(facetValues)) {
-                //The discover results contains max facetLimit + 1 values. If we reach the "+1", indicate that there are
-                //more results available.
-                if (valueCount < field.getFacetLimit()) {
-                    SearchFacetValueRest valueRest = facetValueConverter.convert(value);
-
-                    facetEntry.addValue(valueRest);
-                } else {
-                    facetEntry.setHasMore(true);
-                }
-
-                if (StringUtils.isBlank(facetEntry.getFacetType())) {
-                    facetEntry.setFacetType(value.getFieldType());
-                }
-
-                valueCount++;
-            }
-
-            resultsRest.addFacetEntry(facetEntry);
-        }
+    private void addFacetValues(Context context, final DiscoverResult searchResult, final SearchResultsRest resultsRest,
+            final DiscoveryConfiguration configuration) {
+        facetConverter.addFacetValues(context, searchResult, resultsRest, configuration);
     }
 
     private void addSearchResults(final DiscoverResult searchResult, final SearchResultsRest resultsRest) {
-        for (DSpaceObject dspaceObject : CollectionUtils.emptyIfNull(searchResult.getDspaceObjects())) {
+        for (IndexableObject dspaceObject : CollectionUtils.emptyIfNull(searchResult.getIndexableObjects())) {
             SearchResultEntryRest resultEntry = new SearchResultEntryRest();
 
             //Convert the DSpace Object to its REST model
-            resultEntry.setDspaceObject(convertDSpaceObject(dspaceObject));
+            resultEntry.setIndexableObject(convertDSpaceObject(dspaceObject));
 
             //Add hit highlighting for this DSO if present
-            DiscoverResult.DSpaceObjectHighlightResult highlightedResults = searchResult
+            DiscoverResult.IndexableObjectHighlightResult highlightedResults = searchResult
                 .getHighlightedResults(dspaceObject);
             if (highlightedResults != null && MapUtils.isNotEmpty(highlightedResults.getHighlightResults())) {
                 for (Map.Entry<String, List<String>> metadataHighlight : highlightedResults.getHighlightResults()
@@ -113,10 +86,10 @@ public class DiscoverResultConverter {
         }
     }
 
-    private DSpaceObjectRest convertDSpaceObject(final DSpaceObject dspaceObject) {
-        for (DSpaceObjectConverter converter : converters) {
+    private RestAddressableModel convertDSpaceObject(final IndexableObject dspaceObject) {
+        for (IndexableObjectConverter<IndexableObject, RestAddressableModel> converter : converters) {
             if (converter.supportsModel(dspaceObject)) {
-                return converter.fromModel(dspaceObject);
+                return converter.convert(dspaceObject);
             }
         }
         return null;
@@ -127,7 +100,7 @@ public class DiscoverResultConverter {
                                        final List<SearchFilter> searchFilters, final Pageable page,
                                        final SearchResultsRest resultsRest) {
         resultsRest.setQuery(query);
-        resultsRest.setConfigurationName(configurationName);
+        resultsRest.setConfiguration(configurationName);
         resultsRest.setDsoType(dsoType);
 
         resultsRest.setScope(scope);
@@ -136,12 +109,12 @@ public class DiscoverResultConverter {
             Sort.Order order = page.getSort().iterator().next();
             resultsRest.setSort(order.getProperty(), order.getDirection().name());
         }
-        SearchFilterToAppliedFilterConverter searchFilterToAppliedFilterConverter =
-            new SearchFilterToAppliedFilterConverter();
-        for (SearchFilter searchFilter : CollectionUtils.emptyIfNull(searchFilters)) {
+        SearchQueryConverter searchQueryConverter = new SearchQueryConverter();
+        List<SearchFilter> transformedFilters = searchQueryConverter.convert(searchFilters);
 
+        for (SearchFilter searchFilter : CollectionUtils.emptyIfNull(transformedFilters)) {
             resultsRest
-                .addAppliedFilter(searchFilterToAppliedFilterConverter.convertSearchFilter(context, searchFilter));
+                    .addAppliedFilter(searchFilterToAppliedFilterConverter.convertSearchFilter(context, searchFilter));
         }
     }
 }

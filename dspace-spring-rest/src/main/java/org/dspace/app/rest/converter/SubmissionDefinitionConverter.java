@@ -13,8 +13,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.lang.NotImplementedException;
-import org.apache.log4j.Logger;
+import org.apache.commons.lang3.NotImplementedException;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.CollectionRest;
 import org.dspace.app.rest.model.SubmissionDefinitionRest;
 import org.dspace.app.rest.model.SubmissionSectionRest;
@@ -35,9 +35,10 @@ import org.springframework.stereotype.Component;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @Component
-public class SubmissionDefinitionConverter extends DSpaceConverter<SubmissionConfig, SubmissionDefinitionRest> {
+public class SubmissionDefinitionConverter implements DSpaceConverter<SubmissionConfig, SubmissionDefinitionRest> {
 
-    private static final Logger log = Logger.getLogger(SubmissionDefinitionConverter.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager
+            .getLogger(SubmissionDefinitionConverter.class);
 
     @Autowired
     private SubmissionSectionConverter panelConverter;
@@ -79,6 +80,6 @@ public class SubmissionDefinitionConverter extends DSpaceConverter<SubmissionCon
 
     @Override
     public SubmissionConfig toModel(SubmissionDefinitionRest obj) {
-        throw new NotImplementedException();
+        throw new NotImplementedException("Method not implemented");
     }
 }

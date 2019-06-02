@@ -15,11 +15,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.content.MetadataSchema;
+import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.ConfigurationManager;
@@ -46,7 +46,7 @@ public class VersionedHandleIdentifierProvider extends IdentifierProvider {
     /**
      * log4j category
      */
-    private static Logger log = Logger.getLogger(VersionedHandleIdentifierProvider.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(VersionedHandleIdentifierProvider.class);
 
     /**
      * Prefix registered to no one
@@ -364,19 +364,6 @@ public class VersionedHandleIdentifierProvider extends IdentifierProvider {
         return prefix;
     }
 
-    protected static String getCanonicalForm(String handle) {
-
-        // Let the admin define a new prefix, if not then we'll use the
-        // CNRI default. This allows the admin to use "hdl:" if they want to or
-        // use a locally branded prefix handle.myuni.edu.
-        String handlePrefix = ConfigurationManager.getProperty("handle.canonical.prefix");
-        if (handlePrefix == null || handlePrefix.length() == 0) {
-            handlePrefix = "http://hdl.handle.net/";
-        }
-
-        return handlePrefix + handle;
-    }
-
     protected String createNewIdentifier(Context context, DSpaceObject dso, String handleId) throws SQLException {
         if (handleId == null) {
             return handleService.createHandle(context, dso);
@@ -425,14 +412,14 @@ public class VersionedHandleIdentifierProvider extends IdentifierProvider {
 
     protected void populateHandleMetadata(Context context, Item item, String handle)
         throws SQLException, IOException, AuthorizeException {
-        String handleref = getCanonicalForm(handle);
+        String handleref = handleService.getCanonicalForm(handle);
         // we want to remove the old handle and insert the new. To do so, we
         // load all identifiers, clear the metadata field, re add all
         // identifiers which are not from type handle and add the new handle.
         List<MetadataValue> identifiers = itemService.getMetadata(item,
-                                                                  MetadataSchema.DC_SCHEMA, "identifier", "uri",
+                                                                  MetadataSchemaEnum.DC.getName(), "identifier", "uri",
                                                                   Item.ANY);
-        itemService.clearMetadata(context, item, MetadataSchema.DC_SCHEMA,
+        itemService.clearMetadata(context, item, MetadataSchemaEnum.DC.getName(),
                                   "identifier", "uri", Item.ANY);
         for (MetadataValue identifier : identifiers) {
             if (this.supports(identifier.getValue())) {
@@ -452,7 +439,8 @@ public class VersionedHandleIdentifierProvider extends IdentifierProvider {
 
         // Add handle as identifier.uri DC value.
         if (StringUtils.isNotBlank(handleref)) {
-            itemService.addMetadata(context, item, MetadataSchema.DC_SCHEMA, "identifier", "uri", null, handleref);
+            itemService.addMetadata(context, item, MetadataSchemaEnum.DC.getName(),
+                                    "identifier", "uri", null, handleref);
         }
         itemService.update(context, item);
     }

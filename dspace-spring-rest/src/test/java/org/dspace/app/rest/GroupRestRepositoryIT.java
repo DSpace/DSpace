@@ -7,21 +7,29 @@
  */
 package org.dspace.app.rest;
 
+import static com.jayway.jsonpath.JsonPath.read;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.app.rest.builder.GroupBuilder;
 import org.dspace.app.rest.matcher.GroupMatcher;
+import org.dspace.app.rest.model.GroupRest;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.app.rest.test.MetadataPatchSuite;
+import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.hamcrest.Matchers;
 import org.junit.Test;
+
 
 /**
  * @author Jonas Van Goolen - (jonas@atmire.com)
@@ -30,9 +38,85 @@ import org.junit.Test;
 public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Test
+    public void createTest()
+        throws Exception {
+
+        // hold the id of the created workflow item
+        AtomicReference<UUID> idRef = new AtomicReference<UUID>();
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            GroupRest groupRest = new GroupRest();
+            String groupName = "testGroup1";
+
+            groupRest.setName(groupName);
+
+            String authToken = getAuthToken(admin.getEmail(), password);
+            getClient(authToken).perform(post("/api/eperson/groups")
+                    .content(mapper.writeValueAsBytes(groupRest)).contentType(contentType))
+                    .andExpect(status().isCreated())
+                    .andDo(result -> idRef
+                            .set(UUID.fromString(read(result.getResponse().getContentAsString(), "$.id"))));
+
+            getClient(authToken).perform(get("/api/eperson/groups"))
+                       //The status has to be 200 OK
+                       .andExpect(status().isOk())
+                       .andExpect(content().contentType(contentType))
+                       .andExpect(jsonPath("$._embedded.groups", Matchers.containsInAnyOrder(
+                               GroupMatcher.matchGroupWithName(groupName),
+                               GroupMatcher.matchGroupWithName("Administrator"),
+                               GroupMatcher.matchGroupWithName("Anonymous"))));
+        } finally {
+            // remove the created group if any
+            GroupBuilder.deleteGroup(idRef.get());
+        }
+    }
+
+    @Test
+    public void createUnauthauthorizedTest()
+            throws Exception {
+        ObjectMapper mapper = new ObjectMapper();
+        GroupRest groupRest = new GroupRest();
+        String groupName = "testGroupUnauth1";
+
+        groupRest.setName(groupName);
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+
+        getClient().perform(post("/api/eperson/groups")
+                .content(mapper.writeValueAsBytes(groupRest)).contentType(contentType))
+                .andExpect(status().isUnauthorized());
+
+    }
+
+    @Test
+    public void createForbiddenTest()
+            throws Exception {
+        ObjectMapper mapper = new ObjectMapper();
+        GroupRest groupRest = new GroupRest();
+        String groupName = "testGroupForbidden1";
+
+        groupRest.setName(groupName);
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+
+        authToken = getAuthToken(eperson.getEmail(), password);
+        getClient(authToken).perform(post("/api/eperson/groups")
+                .content(mapper.writeValueAsBytes(groupRest)).contentType(contentType))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
     public void findAllTest() throws Exception {
-        //When we call the root endpoint
+
         getClient().perform(get("/api/eperson/groups"))
+                   //The status has to be 403 Not Authorized
+                   .andExpect(status().isUnauthorized());
+
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        //When we call the root endpoint
+        getClient(token).perform(get("/api/eperson/groups"))
                    //The status has to be 200 OK
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
@@ -48,8 +132,16 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void findAllPaginationTest() throws Exception {
-        context.turnOffAuthorisationSystem();
+
         getClient().perform(get("/api/eperson/groups"))
+                   //The status has to be 403 Not Authorized
+                   .andExpect(status().isUnauthorized());
+
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        //When we call the root endpoint
+        getClient(token).perform(get("/api/eperson/groups"))
                    //The status has to be 200 OK
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
@@ -69,9 +161,11 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
                                   .withName(testGroupName)
                                   .build();
 
+        String token = getAuthToken(admin.getEmail(), password);
+
         String generatedGroupId = group.getID().toString();
         String groupIdCall = "/api/eperson/groups/" + generatedGroupId;
-        getClient().perform(get(groupIdCall))
+        getClient(token).perform(get(groupIdCall))
                    //The status has to be 200 OK
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
@@ -79,7 +173,7 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
                        GroupMatcher.matchGroupEntry(group.getID(), group.getName())
                    )))
         ;
-        getClient().perform(get("/api/eperson/groups"))
+        getClient(token).perform(get("/api/eperson/groups"))
                    //The status has to be 200 OK
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
@@ -89,7 +183,7 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
-    public void findOneRelsTest() throws Exception {
+    public void readGroupAuthorizationTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
         Group group = GroupBuilder.createGroup(context)
@@ -98,21 +192,42 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         Group group2 = GroupBuilder.createGroup(context)
                                    .withName("Group2")
+                                   .addMember(eperson)
                                    .build();
 
-        getClient().perform(get("/api/eperson/groups/" + group2.getID()))
-                   .andExpect(status().isOk())
-                   .andExpect(content().contentType(contentType))
-                   .andExpect(jsonPath("$", Matchers.is(
-                       GroupMatcher.matchGroupEntry(group2.getID(), group2.getName())
-                   )))
-                   .andExpect(jsonPath("$", Matchers.not(
-                       Matchers.is(
-                           GroupMatcher.matchGroupEntry(group.getID(), group.getName())
-                       )
-                   )))
-                   .andExpect(jsonPath("$._links.self.href",
-                                       Matchers.containsString("/api/eperson/groups/" + group2.getID())));
+        //Admin can access
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(get("/api/eperson/groups/" + group2.getID()))
+                        .andExpect(status().isOk())
+                        .andExpect(content().contentType(contentType))
+                        .andExpect(jsonPath("$", Matchers.is(
+                                GroupMatcher.matchGroupEntry(group2.getID(), group2.getName())
+                        )))
+                        .andExpect(jsonPath("$", Matchers.not(
+                                Matchers.is(
+                                        GroupMatcher.matchGroupEntry(group.getID(), group.getName())
+                                )
+                        )))
+                        .andExpect(jsonPath("$._links.self.href",
+                                        Matchers.containsString("/api/eperson/groups/" + group2.getID())));
+
+
+        //People in group should be able to access token
+        token = getAuthToken(eperson.getEmail(), password);
+
+        getClient(token).perform(get("/api/eperson/groups/" + group2.getID()))
+                        .andExpect(status().isOk())
+                        .andExpect(content().contentType(contentType))
+                        .andExpect(jsonPath("$", Matchers.is(
+                                GroupMatcher.matchGroupEntry(group2.getID(), group2.getName())
+                        )))
+                        .andExpect(jsonPath("$", Matchers.not(
+                                Matchers.is(
+                                        GroupMatcher.matchGroupEntry(group.getID(), group.getName())
+                                )
+                        )))
+                        .andExpect(jsonPath("$._links.self.href",
+                                        Matchers.containsString("/api/eperson/groups/" + group2.getID())));
     }
 
     @Test
@@ -132,4 +247,22 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
         ;
     }
 
+    @Test
+    public void patchGroupMetadataAuthorized() throws Exception {
+        runPatchMetadataTests(admin, 200);
+    }
+
+    @Test
+    public void patchGroupMetadataUnauthorized() throws Exception {
+        runPatchMetadataTests(eperson, 403);
+    }
+
+    private void runPatchMetadataTests(EPerson asUser, int expectedStatus) throws Exception {
+        context.turnOffAuthorisationSystem();
+        Group group = GroupBuilder.createGroup(context).withName("Group").build();
+        context.restoreAuthSystemState();
+        String token = getAuthToken(asUser.getEmail(), password);
+
+        new MetadataPatchSuite().runWith(getClient(token), "/api/eperson/groups/" + group.getID(), expectedStatus);
+    }
 }

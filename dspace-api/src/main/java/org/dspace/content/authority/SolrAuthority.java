@@ -12,8 +12,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
@@ -21,8 +21,8 @@ import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.params.CommonParams;
 import org.dspace.authority.AuthoritySearchService;
 import org.dspace.authority.AuthorityValue;
+import org.dspace.authority.SolrAuthorityInterface;
 import org.dspace.authority.factory.AuthorityServiceFactory;
-import org.dspace.authority.rest.RestSource;
 import org.dspace.authority.service.AuthorityValueService;
 import org.dspace.content.Collection;
 import org.dspace.core.ConfigurationManager;
@@ -36,9 +36,12 @@ import org.dspace.services.factory.DSpaceServicesFactory;
  */
 public class SolrAuthority implements ChoiceAuthority {
 
-    private static final Logger log = Logger.getLogger(SolrAuthority.class);
-    protected RestSource source = DSpaceServicesFactory.getInstance().getServiceManager()
-                                                       .getServiceByName("AuthoritySource", RestSource.class);
+    protected SolrAuthorityInterface source =
+        DSpaceServicesFactory.getInstance().getServiceManager()
+                             .getServiceByName("AuthoritySource", SolrAuthorityInterface.class);
+
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(SolrAuthority.class);
+
     protected boolean externalResults = false;
     protected final AuthorityValueService authorityValueService = AuthorityServiceFactory.getInstance()
                                                                                          .getAuthorityValueService();
@@ -86,9 +89,9 @@ public class SolrAuthority implements ChoiceAuthority {
         String localSortField = "";
         if (StringUtils.isNotBlank(locale)) {
             localSortField = sortField + "_" + locale;
-            queryArgs.setSortField(localSortField, SolrQuery.ORDER.asc);
+            queryArgs.addSort(localSortField, SolrQuery.ORDER.asc);
         } else {
-            queryArgs.setSortField(sortField, SolrQuery.ORDER.asc);
+            queryArgs.addSort(sortField, SolrQuery.ORDER.asc);
         }
 
         Choices result;
@@ -97,14 +100,14 @@ public class SolrAuthority implements ChoiceAuthority {
             boolean hasMore = false;
             QueryResponse searchResponse = getSearchService().search(queryArgs);
             SolrDocumentList authDocs = searchResponse.getResults();
-            ArrayList<Choice> choices = new ArrayList<Choice>();
+            ArrayList<Choice> choices = new ArrayList<>();
             if (authDocs != null) {
                 max = (int) searchResponse.getResults().getNumFound();
                 int maxDocs = authDocs.size();
                 if (limit < maxDocs) {
                     maxDocs = limit;
                 }
-                List<AuthorityValue> alreadyPresent = new ArrayList<AuthorityValue>();
+                List<AuthorityValue> alreadyPresent = new ArrayList<>();
                 for (int i = 0; i < maxDocs; i++) {
                     SolrDocument solrDocument = authDocs.get(i);
                     if (solrDocument != null) {

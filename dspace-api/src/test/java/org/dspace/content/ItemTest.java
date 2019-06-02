@@ -29,8 +29,8 @@ import java.util.List;
 import java.util.UUID;
 
 import mockit.NonStrictExpectations;
-import org.apache.commons.lang.time.DateUtils;
-import org.apache.log4j.Logger;
+import org.apache.commons.lang3.time.DateUtils;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
@@ -56,7 +56,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
     /**
      * log4j category
      */
-    private static final Logger log = Logger.getLogger(ItemTest.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(ItemTest.class);
 
     /**
      * Item instance for the tests
@@ -221,6 +221,124 @@ public class ItemTest extends AbstractDSpaceObjectTest {
 
         assertThat("testFindBySubmitter 2", all, notNullValue());
         assertFalse("testFindBySubmitter 3", all.hasNext());
+    }
+
+    /**
+     * Test of findInArchiveOrWithdrawnDiscoverableModifiedSince method, of class Item.
+     */
+    @Test
+    public void testFindInArchiveOrWithdrawnDiscoverableModifiedSince() throws Exception {
+        // Init item to be both withdrawn and discoverable
+        it.setWithdrawn(true);
+        it.setArchived(false);
+        it.setDiscoverable(true);
+         // Test 0: Using a future 'modified since' date, we should get non-null list, with no items
+        Iterator<Item> all = itemService.findInArchiveOrWithdrawnDiscoverableModifiedSince(context,
+                DateUtils.addDays(it.getLastModified(),1));
+        assertThat("Returned list should not be null", all, notNullValue());
+         boolean added = false;
+        while (all.hasNext()) {
+            Item tmp = all.next();
+            if (tmp.equals(it)) {
+                added = true;
+            }
+        }
+         // Test 1: we should NOT find our item in this list
+        assertFalse("List should not contain item when passing a date newer than item last-modified date", added);
+         // Test 2: Using a past 'modified since' date, we should get a non-null list containing our item
+        all = itemService.findInArchiveOrWithdrawnDiscoverableModifiedSince(context,
+                DateUtils.addDays(it.getLastModified(),-1));
+        assertThat("Returned list should not be null", all, notNullValue());
+         added = false;
+        while (all.hasNext()) {
+            Item tmp = all.next();
+            if (tmp.equals(it)) {
+                added = true;
+            }
+        }
+        // Test 3: we should find our item in this list
+        assertTrue("List should contain item when passing a date older than item last-modified date", added);
+         // Repeat Tests 2, 3 with withdrawn = false and archived = true as this should result in same behaviour
+        it.setWithdrawn(false);
+        it.setArchived(true);
+         // Test 4: Using a past 'modified since' date, we should get a non-null list containing our item
+        all = itemService.findInArchiveOrWithdrawnDiscoverableModifiedSince(context,
+                DateUtils.addDays(it.getLastModified(),-1));
+        assertThat("Returned list should not be null", all, notNullValue());
+         added = false;
+        while (all.hasNext()) {
+            Item tmp = all.next();
+            if (tmp.equals(it)) {
+                added = true;
+            }
+        }
+        // Test 5: We should find our item in this list
+        assertTrue("List should contain item when passing a date older than item last-modified date", added);
+         // Test 6: Make sure non-discoverable items are not returned, regardless of archived/withdrawn state
+        it.setDiscoverable(false);
+        all = itemService.findInArchiveOrWithdrawnDiscoverableModifiedSince(context,
+                DateUtils.addDays(it.getLastModified(),-1));
+        assertThat("Returned list should not be null", all, notNullValue());
+         added = false;
+        while (all.hasNext()) {
+            Item tmp = all.next();
+            if (tmp.equals(it)) {
+                added = true;
+            }
+        }
+        // Test 7: We should not find our item in this list
+        assertFalse("List should not contain non-discoverable items", added);
+     }
+     /**
+     * Test of findInArchiveOrWithdrawnNonDiscoverableModifiedSince method, of class Item.
+     */
+    @Test
+    public void testFindInArchiveOrWithdrawnNonDiscoverableModifiedSince() throws Exception {
+        // Init item to be both withdrawn and discoverable
+        it.setWithdrawn(true);
+        it.setArchived(false);
+        it.setDiscoverable(false);
+         // Test 0: Using a future 'modified since' date, we should get non-null list, with no items
+        Iterator<Item> all = itemService.findInArchiveOrWithdrawnNonDiscoverableModifiedSince(context,
+                DateUtils.addDays(it.getLastModified(),1));
+        assertThat("Returned list should not be null", all, notNullValue());
+         boolean added = false;
+        while (all.hasNext()) {
+            Item tmp = all.next();
+            if (tmp.equals(it)) {
+                added = true;
+            }
+        }
+         // Test 1: We should NOT find our item in this list
+        assertFalse("List should not contain item when passing a date newer than item last-modified date", added);
+         // Test 2: Using a past 'modified since' date, we should get a non-null list containing our item
+        all = itemService.findInArchiveOrWithdrawnNonDiscoverableModifiedSince(context,
+                DateUtils.addDays(it.getLastModified(),-1));
+        assertThat("Returned list should not be null", all, notNullValue());
+         added = false;
+        while (all.hasNext()) {
+            Item tmp = all.next();
+            if (tmp.equals(it)) {
+                added = true;
+            }
+        }
+         // Test 3: We should find our item in this list
+        assertTrue("List should contain item when passing a date older than item last-modified date", added);
+         // Repeat Tests 2, 3 with discoverable = true
+        it.setDiscoverable(true);
+         // Test 4: Now we should still get a non-null list with NO items since item is discoverable
+        all = itemService.findInArchiveOrWithdrawnNonDiscoverableModifiedSince(context,
+                DateUtils.addDays(it.getLastModified(),-1));
+        assertThat("Returned list should not be null", all, notNullValue());
+         added = false;
+        while (all.hasNext()) {
+            Item tmp = all.next();
+            if (tmp.equals(it)) {
+                added = true;
+            }
+        }
+         // Test 5: We should NOT find our item in this list
+        assertFalse("List should not contain discoverable items", added);
     }
 
     /**
@@ -619,12 +737,12 @@ public class ItemTest extends AbstractDSpaceObjectTest {
     public void testGetCollections() throws Exception {
         context.turnOffAuthorisationSystem();
         Collection collection = collectionService.create(context, owningCommunity);
-        collectionService.setMetadataSingleValue(context, collection, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY,
-                                                 "collection B");
+        collectionService.setMetadataSingleValue(context, collection, MetadataSchemaEnum.DC.getName(),
+                                                 "title", null, Item.ANY, "collection B");
         it.addCollection(collection);
         collection = collectionService.create(context, owningCommunity);
-        collectionService.setMetadataSingleValue(context, collection, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY,
-                                                 "collection A");
+        collectionService.setMetadataSingleValue(context, collection, MetadataSchemaEnum.DC.getName(),
+                                                 "title", null, Item.ANY, "collection A");
         it.addCollection(collection);
         context.restoreAuthSystemState();
         assertThat("testGetCollections 0", it.getCollections(), notNullValue());

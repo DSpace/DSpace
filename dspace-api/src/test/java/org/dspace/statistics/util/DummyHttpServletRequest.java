@@ -10,28 +10,46 @@ package org.dspace.statistics.util;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.security.Principal;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import javax.servlet.AsyncContext;
+import javax.servlet.DispatcherType;
 import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
 import javax.servlet.ServletInputStream;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpUpgradeHandler;
+import javax.servlet.http.Part;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.dspace.core.Utils;
 
 /**
  * A mock request for testing.
  *
  * @author mwood
  */
-class DummyHttpServletRequest implements HttpServletRequest {
+public class DummyHttpServletRequest implements HttpServletRequest {
     private String agent = null;
 
     private String address = null;
 
     private String remoteHost = null;
+
+    private Map<String, List<String>> headers = new HashMap<>();
 
     public void setAgent(String agent) {
         this.agent = agent;
@@ -43,6 +61,15 @@ class DummyHttpServletRequest implements HttpServletRequest {
 
     public void setRemoteHost(String host) {
         this.remoteHost = host;
+    }
+
+    /* (non-Javadoc)
+     * @see javax.servlet.http.HttpServletRequest#changeSessionId
+     */
+    @Override
+    public String changeSessionId() {
+        // TODO Auto-generated method stub
+        return null;
     }
 
     /* (non-Javadoc)
@@ -81,6 +108,24 @@ class DummyHttpServletRequest implements HttpServletRequest {
         return 0;
     }
 
+    /**
+     * Add a request header to this dummy request
+     * @param headerName The name of the header to add
+     * @param headerValue The value of the header
+     */
+    public void addHeader(String headerName, String headerValue) {
+        List<String> values = headers.computeIfAbsent(headerName, k -> new LinkedList<>());
+        values.add(headerValue);
+    }
+    /* (non-Javadoc)
+     * @see javax.servlet.http.HttpServletRequest#getDispatcherType()
+     */
+    @Override
+    public DispatcherType getDispatcherType() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
     /* (non-Javadoc)
      * @see javax.servlet.http.HttpServletRequest#getHeader(java.lang.String)
      */
@@ -89,7 +134,7 @@ class DummyHttpServletRequest implements HttpServletRequest {
         if ("User-Agent".equals(key)) {
             return agent;
         } else {
-            return null;
+            return CollectionUtils.isEmpty(headers.get(key)) ? null : headers.get(key).get(0);
         }
     }
 
@@ -98,8 +143,7 @@ class DummyHttpServletRequest implements HttpServletRequest {
      */
     @Override
     public Enumeration getHeaderNames() {
-        // TODO Auto-generated method stub
-        return null;
+        return Collections.enumeration(headers.keySet());
     }
 
     /* (non-Javadoc)
@@ -107,8 +151,7 @@ class DummyHttpServletRequest implements HttpServletRequest {
      */
     @Override
     public Enumeration getHeaders(String arg0) {
-        // TODO Auto-generated method stub
-        return null;
+        return Collections.enumeration(Utils.emptyIfNull(headers.get(arg0)));
     }
 
     /* (non-Javadoc)
@@ -116,8 +159,7 @@ class DummyHttpServletRequest implements HttpServletRequest {
      */
     @Override
     public int getIntHeader(String arg0) {
-        // TODO Auto-generated method stub
-        return 0;
+        return headers.containsKey(arg0) ? Integer.parseInt(getHeader(arg0)) : -1;
     }
 
     /* (non-Javadoc)
@@ -256,6 +298,55 @@ class DummyHttpServletRequest implements HttpServletRequest {
     }
 
     /* (non-Javadoc)
+     * @see javax.servlet.http.HttpServletRequest#authenticate(javax.servlet.http.HttpServletResponse)
+     */
+    @Override
+    public boolean authenticate(HttpServletResponse httpServletResponse) {
+        return false;
+    }
+
+    /* (non-Javadoc)
+     * @see javax.servlet.http.HttpServletRequest#login(java.lang.String,java.lang.String)
+     */
+    @Override
+    public void login(String s, String s1) {
+        return;
+    }
+
+    /* (non-Javadoc)
+     * @see javax.servlet.http.HttpServletRequest#logout()
+     */
+    @Override
+    public void logout() {
+        return;
+    }
+
+    /* (non-Javadoc)
+     * @see javax.servlet.http.HttpServletRequest#getPart(java.lang.String)
+     */
+    @Override
+    public Part getPart(String arg0) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    /* (non-Javadoc)
+     * @see javax.servlet.http.HttpServletRequest#getParts()
+     */
+    @Override
+    public Collection<Part> getParts() {
+        return null;
+    }
+
+    /* (non-Javadoc)
+     * @see javax.servlet.http.HttpServletRequest#upgrade(java.lang.Class<T>)
+     */
+    @Override
+    public <T extends HttpUpgradeHandler> T upgrade(Class<T> aClass) throws IOException, ServletException {
+        return null;
+    }
+
+    /* (non-Javadoc)
      * @see javax.servlet.http.HttpServletRequest#isRequestedSessionIdValid()
      */
     @Override
@@ -306,6 +397,14 @@ class DummyHttpServletRequest implements HttpServletRequest {
     @Override
     public int getContentLength() {
         // TODO Auto-generated method stub
+        return 0;
+    }
+
+    /* (non-Javadoc)
+     * @see javax.servlet.ServletRequest#getContentLengthLong()
+     */
+    @Override
+    public long getContentLengthLong() {
         return 0;
     }
 
@@ -490,8 +589,49 @@ class DummyHttpServletRequest implements HttpServletRequest {
      */
     @Override
     public void setCharacterEncoding(String arg0)
-        throws UnsupportedEncodingException {
+        throws UnsupportedOperationException {
         throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    /* (non-Javadoc)
+     * @see javax.servlet.ServletRequest#startAsync
+     */
+    @Override
+    public AsyncContext startAsync() throws IllegalStateException {
+        throw new IllegalStateException("Not supported yet.");
+    }
+
+    /* (non-Javadoc)
+     * @see javax.servlet.ServletRequest#startAsync(javax.servlet.ServletRequest,javax.servlet.ServletResponse)
+     */
+    @Override
+    public AsyncContext startAsync(ServletRequest servletRequest, ServletResponse servletResponse)
+        throws IllegalStateException {
+        throw new IllegalStateException("Not supported yet.");
+    }
+
+    /* (non-Javadoc)
+     * @see javax.servlet.ServletRequest#isAsyncStarted
+     */
+    @Override
+    public boolean isAsyncStarted() {
+        return false;
+    }
+
+    /* (non-Javadoc)
+     * @see javax.servlet.ServletRequest#isAsyncSupported
+     */
+    @Override
+    public boolean isAsyncSupported() {
+        return false;
+    }
+
+    /* (non-Javadoc)
+     * @see javax.servlet.ServletRequest#getAsyncContext
+     */
+    @Override
+    public AsyncContext getAsyncContext() {
+        return null;
     }
 
     @Override
@@ -512,6 +652,14 @@ class DummyHttpServletRequest implements HttpServletRequest {
     @Override
     public int getLocalPort() {
         throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    /* (non-Javadoc)
+     * @see javax.servlet.ServletRequest#getServletContext
+     */
+    @Override
+    public ServletContext getServletContext() {
+        return null;
     }
 
 }

@@ -16,7 +16,6 @@
     <properties>
         <!-- This is the path to the root [dspace-src] directory. -->
         <root.basedir>${basedir}/..</root.basedir>
-        <spring.version>3.2.5.RELEASE</spring.version>
         <xoai.version>3.2.10</xoai.version>
         <jtwig.version>2.0.1</jtwig.version>
     </properties>
@@ -81,8 +80,8 @@
             <artifactId>commons-io</artifactId>
         </dependency>
         <dependency>
-            <groupId>commons-lang</groupId>
-            <artifactId>commons-lang</artifactId>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
         </dependency>
 
         <!-- OAI Data Provider Framework -->
@@ -107,7 +106,15 @@
                 <exclusion>
                     <groupId>org.apache.commons</groupId>
                     <artifactId>commons-lang3</artifactId>
-                </exclusion>
+	        </exclusion>
+		<exclusion>
+		    <groupId>log4j</groupId>
+		    <artifactId>log4j</artifactId>
+	        </exclusion>
+		<exclusion>
+		    <groupId>org.slf4j</groupId>
+		    <artifactId>slf4j-log4j12</artifactId>
+		</exclusion>
             </exclusions>
         </dependency>
 
@@ -145,10 +152,6 @@
             <version>${jtwig.version}</version>
             <exclusions>
                 <exclusion>
-                    <groupId>org.ow2.asm</groupId>
-                    <artifactId>asm</artifactId>
-                </exclusion>
-                <exclusion>
                     <groupId>com.google.guava</groupId>
                     <artifactId>guava</artifactId>
                 </exclusion>
@@ -160,6 +163,18 @@
                     <groupId>org.apache.commons</groupId>
                     <artifactId>commons-lang3</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>javax.servlet</groupId>
+                    <artifactId>servlet-api</artifactId>
+                </exclusion>
+		<exclusion>
+		    <groupId>log4j</groupId>
+		    <artifactId>log4j</artifactId>
+	        </exclusion>
+		<exclusion>
+		    <groupId>org.slf4j</groupId>
+		    <artifactId>slf4j-log4j12</artifactId>
+	        </exclusion>
             </exclusions>
         </dependency>
 
@@ -173,7 +188,7 @@
         <dependency>
             <groupId>org.apache.solr</groupId>
             <artifactId>solr-solrj</artifactId>
-            <version>${solr.version}</version>
+            <version>${solr.client.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.codehaus.woodstox</groupId>
@@ -185,18 +200,26 @@
         <!-- Web API -->
         <dependency>
             <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
+            <artifactId>javax.servlet-api</artifactId>
             <scope>provided</scope>
         </dependency>
 
         <!-- Logging -->
         <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+        </dependency>
+	<dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-web</artifactId>
+	</dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-slf4j-impl</artifactId>
             <scope>runtime</scope>
         </dependency>
 
@@ -224,10 +247,12 @@
             <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
+        <!-- Note: XOAI requires hamcrest both for testing and runtime -->
+        <!-- As our Parent POM sets this to 'test' scope, we must override it -->
         <dependency>
             <groupId>org.hamcrest</groupId>
             <artifactId>hamcrest-all</artifactId>
-            <scope>test</scope>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>

@@ -32,8 +32,8 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import javax.mail.MessagingException;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.itemexport.service.ItemExportService;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
@@ -42,7 +42,7 @@ import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
-import org.dspace.content.MetadataSchema;
+import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.CommunityService;
@@ -98,7 +98,7 @@ public class ItemExportServiceImpl implements ItemExportService {
     /**
      * log4j logger
      */
-    private Logger log = Logger.getLogger(ItemExportServiceImpl.class);
+    private Logger log = org.apache.logging.log4j.LogManager.getLogger(ItemExportServiceImpl.class);
 
     protected ItemExportServiceImpl() {
 
@@ -214,7 +214,7 @@ public class ItemExportServiceImpl implements ItemExportService {
     protected void writeMetadata(Context c, String schema, Item i,
                                  File destDir, boolean migrate) throws Exception {
         String filename;
-        if (schema.equals(MetadataSchema.DC_SCHEMA)) {
+        if (schema.equals(MetadataSchemaEnum.DC.getName())) {
             filename = "dublin_core.xml";
         } else {
             filename = "metadata_" + schema + ".xml";
@@ -271,9 +271,8 @@ public class ItemExportServiceImpl implements ItemExportService {
                             ("date".equals(metadataField.getElement()) && "accessioned".equals(qualifier)) ||
                             ("date".equals(metadataField.getElement()) && "available".equals(qualifier)) ||
                             ("identifier".equals(metadataField.getElement()) && "uri".equals(qualifier) &&
-                                (dcv.getValue() != null && dcv.getValue().startsWith("http://hdl.handle.net/" +
-                                                                                         handleService
-                                                                                             .getPrefix() + "/"))) ||
+                                (dcv.getValue() != null && dcv.getValue().startsWith(
+                                    handleService.getCanonicalPrefix() + handleService.getPrefix() + "/"))) ||
                             ("description".equals(metadataField.getElement()) && "provenance".equals(qualifier)) ||
                             ("format".equals(metadataField.getElement()) && "extent".equals(qualifier)) ||
                             ("format".equals(metadataField.getElement()) && "mimetype".equals(qualifier))))) {
@@ -547,7 +546,7 @@ public class ItemExportServiceImpl implements ItemExportService {
                                 List<Bitstream> bitstreams = bundle.getBitstreams();
                                 for (Bitstream bitstream : bitstreams) {
                                     // add up the size
-                                    size += bitstream.getSize();
+                                    size += bitstream.getSizeBytes();
                                 }
                             }
                             items.add(item.getID());
@@ -574,7 +573,7 @@ public class ItemExportServiceImpl implements ItemExportService {
                             List<Bitstream> bitstreams = bundle.getBitstreams();
                             for (Bitstream bitstream : bitstreams) {
                                 // add up the size
-                                size += bitstream.getSize();
+                                size += bitstream.getSizeBytes();
                             }
                         }
                         items.add(item.getID());
@@ -593,7 +592,7 @@ public class ItemExportServiceImpl implements ItemExportService {
                     List<Bitstream> bitstreams = bundle.getBitstreams();
                     for (Bitstream bitstream : bitstreams) {
                         // add up the size
-                        size += bitstream.getSize();
+                        size += bitstream.getSizeBytes();
                     }
                 }
                 ArrayList<UUID> items = new ArrayList<>();

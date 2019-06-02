@@ -21,7 +21,8 @@ import gr.ekt.bte.core.RecordSet;
 import gr.ekt.bte.core.StringValue;
 import gr.ekt.bte.dataloader.FileDataLoader;
 import gr.ekt.bte.exceptions.MalformedSourceException;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.core.Context;
 
 /**
@@ -32,8 +33,7 @@ import org.dspace.core.Context;
  */
 public class MultipleSubmissionLookupDataLoader implements DataLoader {
 
-    private static Logger log = Logger
-        .getLogger(MultipleSubmissionLookupDataLoader.class);
+    private static Logger log = LogManager.getLogger(MultipleSubmissionLookupDataLoader.class);
 
     protected final String NOT_FOUND_DOI = "NOT-FOUND-DOI";
 

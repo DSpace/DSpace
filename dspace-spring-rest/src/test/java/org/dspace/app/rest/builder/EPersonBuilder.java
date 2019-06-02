@@ -14,6 +14,7 @@ import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.Context;
 import org.dspace.discovery.SearchServiceException;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
 
 public class EPersonBuilder extends AbstractDSpaceObjectBuilder<EPerson> {
 
@@ -23,7 +24,8 @@ public class EPersonBuilder extends AbstractDSpaceObjectBuilder<EPerson> {
         super(context);
     }
 
-    protected void cleanup() throws Exception {
+    @Override
+    public void cleanup() throws Exception {
         delete(ePerson);
     }
 
@@ -69,6 +71,40 @@ public class EPersonBuilder extends AbstractDSpaceObjectBuilder<EPerson> {
 
     public EPersonBuilder withEmail(String name) {
         ePerson.setEmail(name);
+        return this;
+    }
+
+    public EPersonBuilder withLanguage(String lang) throws SQLException {
+        ePerson.setLanguage(context, lang);
+        return this;
+    }
+
+    public EPersonBuilder withPhone(String phone) throws SQLException {
+        ePersonService.setMetadataSingleValue(
+                context,
+                ePerson,
+                "eperson",
+                "phone",
+                null,
+                null,
+                phone
+        );
+        return this;
+    }
+
+    public EPersonBuilder withGroupMembership(Group group) {
+        groupService.addMember(context, group, ePerson);
+        return this;
+    }
+
+    public EPersonBuilder withNetId(final String netId) {
+        ePerson.setNetid(netId);
+        return this;
+    }
+
+    public EPersonBuilder withPassword(final String password) {
+        ePerson.setCanLogIn(true);
+        ePersonService.setPassword(ePerson, password);
         return this;
     }
 }

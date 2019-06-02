@@ -19,7 +19,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.core.ConfigurationManager;
 import org.xml.sax.Attributes;
@@ -50,7 +50,7 @@ import org.xml.sax.helpers.DefaultHandler;
  * @see SHERPARoMEOJournalTitle
  */
 public abstract class SHERPARoMEOProtocol implements ChoiceAuthority {
-    private static final Logger log = Logger.getLogger(SHERPARoMEOProtocol.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(SHERPARoMEOProtocol.class);
 
     // contact URL from configuration
     private static String url = null;

@@ -9,7 +9,8 @@ package org.dspace.content;
 
 import static org.junit.Assert.assertTrue;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Test;
 
 /**
@@ -23,7 +24,8 @@ public class NonUniqueMetadataExceptionTest {
     /**
      * log4j category
      */
-    private static final Logger log = Logger.getLogger(NonUniqueMetadataExceptionTest.class);
+    private static final Logger log = LogManager
+            .getLogger(NonUniqueMetadataExceptionTest.class);
 
     /**
      * Dummy test to avoid initialization errors

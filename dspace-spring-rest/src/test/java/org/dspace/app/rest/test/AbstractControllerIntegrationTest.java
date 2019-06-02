@@ -16,27 +16,26 @@ import java.util.Arrays;
 import java.util.List;
 import javax.servlet.Filter;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.Charsets;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.Application;
-import org.dspace.app.rest.security.WebSecurityConfiguration;
-import org.dspace.app.rest.utils.ApplicationConfig;
+import org.dspace.app.rest.model.patch.Operation;
+import org.dspace.app.rest.utils.DSpaceKernelInitializer;
 import org.junit.Assert;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.support.ErrorPageFilter;
+import org.springframework.data.rest.webmvc.RestMediaTypes;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.mock.web.MockHttpServletResponse;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.TestExecutionListeners;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
-import org.springframework.test.context.support.DirtiesContextTestExecutionListener;
-import org.springframework.test.context.transaction.TransactionalTestExecutionListener;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
@@ -46,26 +45,36 @@ import org.springframework.web.context.WebApplicationContext;
 
 /**
  * Abstract controller integration test class that will take care of setting up the
- * environment to run the integration test
+ * Spring Boot environment to run the integration test
  *
- * @author Tom Desair (tom dot desair at atmire dot com)
+ * @author Tom Desair
+ * @author Tim Donohue
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringBootTest(classes = {Application.class, ApplicationConfig.class, WebSecurityConfiguration.class})
-@TestExecutionListeners( {DependencyInjectionTestExecutionListener.class, DirtiesContextTestExecutionListener.class,
-    TransactionalTestExecutionListener.class})
-@DirtiesContext
+// Run tests with JUnit 4 and Spring TestContext Framework
+@RunWith(SpringRunner.class)
+// Specify main class to use to load Spring ApplicationContext
+// NOTE: By default, Spring caches and reuses ApplicationContext for each integration test (to speed up tests)
+// See: https://docs.spring.io/spring/docs/current/spring-framework-reference/testing.html#integration-testing
+@SpringBootTest(classes = Application.class)
+// Load DSpaceKernelInitializer in Spring ApplicationContext (to initialize DSpace Kernel)
+@ContextConfiguration(initializers = DSpaceKernelInitializer.class)
+// Tell Spring to make ApplicationContext an instance of WebApplicationContext (for web-based tests)
 @WebAppConfiguration
 public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWithDatabase {
 
     protected static final String AUTHORIZATION_HEADER = "Authorization";
-    protected static final String AUTHORIZATION_TYPE = "Bearer";
+
+    //The Authorization header contains a value like "Bearer TOKENVALUE". This constant string represents the part that
+    //sits before the actual authentication token and can be used to easily compose or parse the Authorization header.
+    protected static final String AUTHORIZATION_TYPE = "Bearer ";
 
     public static final String REST_SERVER_URL = "http://localhost/api/";
+    public static final String BASE_REST_SERVER_URL = "http://localhost";
 
     protected MediaType contentType = new MediaType(MediaTypes.HAL_JSON.getType(),
                                                     MediaTypes.HAL_JSON.getSubtype(), Charsets.UTF_8);
 
+    protected MediaType textUriContentType = RestMediaTypes.TEXT_URI_LIST;
 
     protected HttpMessageConverter mappingJackson2HttpMessageConverter;
 
@@ -96,13 +105,14 @@ public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWi
 
         DefaultMockMvcBuilder mockMvcBuilder = webAppContextSetup(webApplicationContext)
             //Always log the response to debug
-            .alwaysDo(MockMvcResultHandlers.log())
+            .alwaysDo(MockMvcResultHandlers.print())
             //Add all filter implementations
             .addFilters(new ErrorPageFilter())
             .addFilters(requestFilters.toArray(new Filter[requestFilters.size()]));
 
         if (StringUtils.isNotBlank(authToken)) {
-            mockMvcBuilder.defaultRequest(get("").header(AUTHORIZATION_HEADER, AUTHORIZATION_TYPE + " " + authToken));
+            mockMvcBuilder.defaultRequest(
+                get("").header(AUTHORIZATION_HEADER, AUTHORIZATION_TYPE + authToken));
         }
 
         return mockMvcBuilder
@@ -117,7 +127,19 @@ public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWi
     }
 
     public String getAuthToken(String user, String password) throws Exception {
-        return getAuthResponse(user, password).getHeader(AUTHORIZATION_HEADER);
+        return StringUtils.substringAfter(
+            getAuthResponse(user, password).getHeader(AUTHORIZATION_HEADER),
+            AUTHORIZATION_TYPE);
+    }
+
+    public String getPatchContent(List<Operation> ops) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            return objectMapper.writeValueAsString(ops);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public static RequestPostProcessor ip(final String ipAddress) {
@@ -127,4 +149,3 @@ public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWi
         };
     }
 }
-
