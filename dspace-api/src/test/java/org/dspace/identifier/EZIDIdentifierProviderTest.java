@@ -466,7 +466,7 @@ public class EZIDIdentifierProviderTest
             PrintWriter pw = new PrintWriter(sw);
             ex.printStackTrace(pw);
             System.out.println(sw.toString());
-            org.apache.log4j.Logger.getLogger(EZIDIdentifierProviderTest.class).fatal("Caught NPE", ex);
+            org.apache.logging.log4j.LogManager.getLogger(EZIDIdentifierProviderTest.class).fatal("Caught NPE", ex);
             throw ex;
         }
     }

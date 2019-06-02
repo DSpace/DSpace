@@ -11,7 +11,8 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.common.SolrInputDocument;
 import org.dspace.authorize.ResourcePolicy;
@@ -39,7 +40,8 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class SolrServiceResourceRestrictionPlugin implements SolrServiceIndexPlugin, SolrServiceSearchPlugin {
 
-    private static final Logger log = Logger.getLogger(SolrServiceResourceRestrictionPlugin.class);
+    private static final Logger log =
+            org.apache.logging.log4j.LogManager.getLogger(SolrServiceResourceRestrictionPlugin.class);
 
     @Autowired(required = true)
     protected AuthorizeService authorizeService;
@@ -53,34 +55,44 @@ public class SolrServiceResourceRestrictionPlugin implements SolrServiceIndexPlu
     protected ResourcePolicyService resourcePolicyService;
 
     @Override
-    public void additionalIndex(Context context, DSpaceObject dso, SolrInputDocument document) {
-        try {
-            List<ResourcePolicy> policies = authorizeService.getPoliciesActionFilter(context, dso, Constants.READ);
-            for (ResourcePolicy resourcePolicy : policies) {
-                String fieldValue;
-                if (resourcePolicy.getGroup() != null) {
-                    //We have a group add it to the value
-                    fieldValue = "g" + resourcePolicy.getGroup().getID();
-                } else {
-                    //We have an eperson add it to the value
-                    fieldValue = "e" + resourcePolicy.getEPerson().getID();
+    public void additionalIndex(Context context, IndexableObject idxObj, SolrInputDocument document) {
+        if (idxObj instanceof DSpaceObject) {
+            DSpaceObject dso = (DSpaceObject) idxObj;
+            try {
+                List<ResourcePolicy> policies = authorizeService.getPoliciesActionFilter(context, dso, Constants.READ);
+                for (ResourcePolicy resourcePolicy : policies) {
+                    String fieldValue;
+                    if (resourcePolicy.getGroup() != null) {
+                        //We have a group add it to the value
+                        fieldValue = "g" + resourcePolicy.getGroup().getID();
+                    } else {
+                        //We have an eperson add it to the value
+                        fieldValue = "e" + resourcePolicy.getEPerson().getID();
 
+                    }
+
+                    document.addField("read", fieldValue);
+
+                    //remove the policy from the cache to save memory
+                    context.uncacheEntity(resourcePolicy);
                 }
-
-                document.addField("read", fieldValue);
-
-                //remove the policy from the cache to save memory
-                context.uncacheEntity(resourcePolicy);
+            } catch (SQLException e) {
+                log.error(LogManager.getHeader(context, "Error while indexing resource policies",
+                                               "DSpace object: (id " + dso.getID() + " type " + dso.getType() + ")"));
             }
-        } catch (SQLException e) {
-            log.error(LogManager.getHeader(context, "Error while indexing resource policies",
-                                           "DSpace object: (id " + dso.getID() + " type " + dso.getType() + ")"));
         }
     }
 
     @Override
     public void additionalSearchParameters(Context context, DiscoverQuery discoveryQuery, SolrQuery solrQuery) {
         try {
+            // skip workspace and workflow queries as security for it them is builtin in the SolrServiceImpl
+            if (StringUtils.startsWith(discoveryQuery.getDiscoveryConfigurationName(),
+                    SolrServiceImpl.DISCOVER_WORKSPACE_CONFIGURATION_NAME)
+                    || StringUtils.startsWith(discoveryQuery.getDiscoveryConfigurationName(),
+                            SolrServiceImpl.DISCOVER_WORKFLOW_CONFIGURATION_NAME)) {
+                return;
+            }
             if (!authorizeService.isAdmin(context)) {
                 StringBuilder resourceQuery = new StringBuilder();
                 //Always add the anonymous group id to the query

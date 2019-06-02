@@ -9,7 +9,7 @@ package org.dspace.app.rest.builder;
 
 import java.sql.SQLException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.MetadataSchema;
 import org.dspace.content.NonUniqueMetadataException;
@@ -20,14 +20,9 @@ import org.dspace.discovery.SearchServiceException;
 public class MetadataSchemaBuilder extends AbstractBuilder<MetadataSchema, MetadataSchemaService> {
 
     /* Log4j logger*/
-    private static final Logger log = Logger.getLogger(MetadataSchemaBuilder.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(MetadataSchemaBuilder.class);
 
     private MetadataSchema metadataSchema;
-
-    @Override
-    protected int getPriority() {
-        return Integer.MAX_VALUE;
-    }
 
     protected MetadataSchemaBuilder(Context context) {
         super(context);
@@ -39,7 +34,7 @@ public class MetadataSchemaBuilder extends AbstractBuilder<MetadataSchema, Metad
     }
 
     @Override
-    protected void cleanup() throws Exception {
+    public void cleanup() throws Exception {
         delete(metadataSchema);
     }
 

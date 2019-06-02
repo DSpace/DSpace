@@ -12,6 +12,7 @@ import java.net.URLEncoder;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -22,9 +23,8 @@ import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.collections.ListUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authenticate.factory.AuthenticateServiceFactory;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.MetadataField;
@@ -70,7 +70,7 @@ public class ShibAuthentication implements AuthenticationMethod {
     /**
      * log4j category
      */
-    private static Logger log = Logger.getLogger(ShibAuthentication.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(ShibAuthentication.class);
 
     /**
      * Additional metadata mappings
@@ -288,7 +288,7 @@ public class ShibAuthentication implements AuthenticationMethod {
             if (request == null ||
                 context.getCurrentUser() == null ||
                 request.getSession().getAttribute("shib.authenticated") == null) {
-                return ListUtils.EMPTY_LIST;
+                return Collections.EMPTY_LIST;
             }
 
             // If we have already calculated the special groups then return them.
@@ -404,7 +404,7 @@ public class ShibAuthentication implements AuthenticationMethod {
             return new ArrayList<>(groups);
         } catch (Throwable t) {
             log.error("Unable to validate any sepcial groups this user may belong too because of an exception.", t);
-            return ListUtils.EMPTY_LIST;
+            return Collections.EMPTY_LIST;
         }
     }
 

@@ -14,6 +14,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.dspace.app.rest.DiscoveryRestController;
+import org.dspace.discovery.configuration.DiscoverySearchFilter;
 
 /**
  * This class' purpose is to store the information that'll be shown on the /search endpoint.
@@ -25,7 +26,7 @@ public class SearchConfigurationRest extends BaseObjectRest<String> {
     @JsonIgnore
     private String scope;
     @JsonIgnore
-    private String configurationName;
+    private String configuration;
 
     private List<Filter> filters = new LinkedList<>();
     private List<SortOption> sortOptions = new LinkedList<>();
@@ -50,12 +51,12 @@ public class SearchConfigurationRest extends BaseObjectRest<String> {
         this.scope = scope;
     }
 
-    public String getConfigurationName() {
-        return configurationName;
+    public String getConfiguration() {
+        return configuration;
     }
 
-    public void setConfigurationName(String configurationName) {
-        this.configurationName = configurationName;
+    public void setConfiguration(String configurationName) {
+        this.configuration = configurationName;
     }
 
     public void addFilter(Filter filter) {
@@ -81,8 +82,8 @@ public class SearchConfigurationRest extends BaseObjectRest<String> {
                                .append(this.getType(), ((SearchConfigurationRest) object).getType())
                                .append(this.getController(), ((SearchConfigurationRest) object).getController())
                                .append(this.getScope(), ((SearchConfigurationRest) object).getScope())
-                               .append(this.getConfigurationName(),
-                                       ((SearchConfigurationRest) object).getConfigurationName())
+                               .append(this.getConfiguration(),
+                                       ((SearchConfigurationRest) object).getConfiguration())
                                .append(this.getFilters(), ((SearchConfigurationRest) object).getFilters())
                                .append(this.getSortOptions(), ((SearchConfigurationRest) object).getSortOptions())
                                .isEquals());
@@ -95,7 +96,7 @@ public class SearchConfigurationRest extends BaseObjectRest<String> {
             .append(this.getType())
             .append(this.getController())
             .append(this.getScope())
-            .append(this.getConfigurationName())
+            .append(this.getConfiguration())
             .append(this.getFilters())
             .append(this.getSortOptions())
             .toHashCode();
@@ -104,7 +105,11 @@ public class SearchConfigurationRest extends BaseObjectRest<String> {
 
     public static class Filter {
         private String filter;
+        private boolean hasFacets = false;
+        private String type;
+        private boolean isOpenByDefault = false;
         private List<Operator> operators = new LinkedList<>();
+        private int pageSize;
 
         public static final String OPERATOR_EQUALS = "equals";
         public static final String OPERATOR_NOTEQUALS = "notequals";
@@ -112,7 +117,61 @@ public class SearchConfigurationRest extends BaseObjectRest<String> {
         public static final String OPERATOR_NOTAUTHORITY = "notauthority";
         public static final String OPERATOR_CONTAINS = "contains";
         public static final String OPERATOR_NOTCONTAINS = "notcontains";
+        public static final String OPERATOR_QUERY = "query";
 
+        /**
+         * Specifies whether this filter has facets or not
+         * @return  A boolean indicating whether this filter has facets or not
+         */
+        public boolean isHasFacets() {
+            return hasFacets;
+        }
+
+        /**
+         * Sets the hasFacets property of the filter class to the given boolean
+         *
+         * @param hasFacets The boolean that the hasFacets property will be set to
+         */
+        public void setHasFacets(boolean hasFacets) {
+            this.hasFacets = hasFacets;
+        }
+
+        public int getPageSize() {
+            return pageSize;
+        }
+
+        public void setPageSize(int pageSize) {
+            this.pageSize = pageSize;
+        }
+
+        /**
+         * This is the same type as described in {@link DiscoverySearchFilter#getType()}
+         * @return  The type of this filter
+         */
+        public String getType() {
+            return type;
+        }
+
+        /**
+         * This is the same type as described in {@link org.dspace.discovery.configuration.DiscoverySearchFilter#setType(String)}
+         *
+         * @param type  The type for this Filter to be set to
+         */
+        public void setType(String type) {
+            this.type = type;
+        }
+        /**
+         * See documentantion at {@link DiscoverySearchFilter#isOpenByDefault()}
+         */
+        public boolean isOpenByDefault() {
+            return isOpenByDefault;
+        }
+        /**
+         * See documentantion at {@link DiscoverySearchFilter#setIsOpenByDefault(boolean)}
+         */
+        public void setOpenByDefault(boolean openByDefault) {
+            isOpenByDefault = openByDefault;
+        }
 
         public void setFilter(String filter) {
             this.filter = filter;
@@ -137,6 +196,7 @@ public class SearchConfigurationRest extends BaseObjectRest<String> {
             operators.add(new Operator(OPERATOR_NOTAUTHORITY));
             operators.add(new Operator(OPERATOR_CONTAINS));
             operators.add(new Operator(OPERATOR_NOTCONTAINS));
+            operators.add(new Operator(OPERATOR_QUERY));
         }
 
         @Override

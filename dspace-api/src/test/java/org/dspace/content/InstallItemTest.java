@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.TimeZone;
 
 import mockit.NonStrictExpectations;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.AbstractUnitTest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.factory.ContentServiceFactory;
@@ -60,7 +60,7 @@ public class InstallItemTest extends AbstractUnitTest {
     /**
      * log4j category
      */
-    private static final Logger log = Logger.getLogger(InstallItemTest.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(InstallItemTest.class);
 
     /**
      * Used to check/verify thrown exceptions in below tests
@@ -225,11 +225,11 @@ public class InstallItemTest extends AbstractUnitTest {
         // Create provenance description
         String testMessage = "No. of bitstreams: 2\n";
         testMessage += "one: "
-            + one.getSize() + " bytes, checksum: "
+            + one.getSizeBytes() + " bytes, checksum: "
             + one.getChecksum() + " ("
             + one.getChecksumAlgorithm() + ")\n";
         testMessage += "two: "
-            + two.getSize() + " bytes, checksum: "
+            + two.getSizeBytes() + " bytes, checksum: "
             + two.getChecksum() + " ("
             + two.getChecksumAlgorithm() + ")\n";
 

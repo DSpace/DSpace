@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.UUID;
 
 import mockit.NonStrictExpectations;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamFormatService;
@@ -43,7 +43,7 @@ public class BitstreamTest extends AbstractDSpaceObjectTest {
     /**
      * log4j category
      */
-    private static final Logger log = Logger.getLogger(BitstreamTest.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(BitstreamTest.class);
 
 
     protected BitstreamFormatService bitstreamFormatService = ContentServiceFactory.getInstance()
@@ -292,12 +292,12 @@ public class BitstreamTest extends AbstractDSpaceObjectTest {
     }
 
     /**
-     * Test of getSize method, of class Bitstream.
+     * Test of getSizeBytes method, of class Bitstream.
      */
     @Test
     public void testGetSize() {
         long size = 238413;  // yuck, hardcoded!
-        assertThat("testGetSize 0", bs.getSize(), equalTo(size));
+        assertThat("testGetSize 0", bs.getSizeBytes(), equalTo(size));
     }
 
     /**

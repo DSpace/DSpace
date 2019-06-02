@@ -17,7 +17,7 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 
 import com.hp.hpl.jena.rdf.model.Model;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
@@ -40,7 +40,7 @@ import org.dspace.workflow.factory.WorkflowServiceFactory;
  * @author Pascal-Nicolas Becker (dspace -at- pascal -hyphen- becker -dot- de)
  */
 public class RDFConsumer implements Consumer {
-    private static final Logger log = Logger.getLogger(RDFConsumer.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(RDFConsumer.class);
 
     protected Deque<DSOIdentifier> toConvert;
     protected Deque<DSOIdentifier> toDelete;

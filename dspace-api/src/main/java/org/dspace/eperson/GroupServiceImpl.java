@@ -17,13 +17,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.ObjectUtils;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.dspace.authorize.AuthorizeConfiguration;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.DSpaceObjectServiceImpl;
 import org.dspace.content.MetadataField;
@@ -39,6 +40,8 @@ import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.event.Event;
 import org.dspace.util.UUIDUtils;
+import org.dspace.xmlworkflow.storedcomponents.CollectionRole;
+import org.dspace.xmlworkflow.storedcomponents.service.CollectionRoleService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,6 +64,9 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
 
     @Autowired(required = true)
     protected CollectionService collectionService;
+
+    @Autowired(required = true)
+    protected CollectionRoleService collectionRoleService;
 
     @Autowired(required = true)
     protected EPersonService ePersonService;
@@ -376,7 +382,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
     public int searchResultCount(Context context, String groupIdentifier) throws SQLException {
         int result = 0;
         UUID uuid = UUIDUtils.fromString(groupIdentifier);
-        if (uuid == null && StringUtils.isNotBlank(groupIdentifier)) {
+        if (uuid == null) {
             //Search by group name
             result = groupDAO.countByNameLike(context, groupIdentifier);
         } else {
@@ -615,15 +621,6 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
             org.dspace.content.Collection collection = collectionService.findByGroup(context, group);
 
             if (collection != null) {
-                if ((group.equals(collection.getWorkflowStep1()) ||
-                    group.equals(collection.getWorkflowStep2()) ||
-                    group.equals(collection.getWorkflowStep3()))) {
-                    if (AuthorizeConfiguration.canCollectionAdminManageWorkflows()) {
-                        return collection;
-                    } else if (AuthorizeConfiguration.canCommunityAdminManageCollectionWorkflows()) {
-                        return collectionService.getParentObject(context, collection);
-                    }
-                }
                 if (group.equals(collection.getSubmitters())) {
                     if (AuthorizeConfiguration.canCollectionAdminManageSubmitters()) {
                         return collection;
@@ -638,10 +635,32 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
                         return collectionService.getParentObject(context, collection);
                     }
                 }
-            } else if (AuthorizeConfiguration.canCommunityAdminManageAdminGroup()) {
-                // is the group related to a community and community administrator allowed
-                // to manage it?
-                return communityService.findByAdminGroup(context, group);
+            } else {
+                if (AuthorizeConfiguration.canCollectionAdminManageWorkflows()
+                        || AuthorizeConfiguration.canCommunityAdminManageCollectionWorkflows()) {
+                    // if the group is used for one or more roles on a single collection,
+                    // admins can eventually manage it
+                    List<CollectionRole> collectionRoles = collectionRoleService.findByGroup(context, group);
+                    if (collectionRoles != null && collectionRoles.size() > 0) {
+                        Set<Collection> colls = new HashSet<Collection>();
+                        for (CollectionRole cr : collectionRoles) {
+                            colls.add(cr.getCollection());
+                        }
+                        if (colls.size() == 1) {
+                            collection = colls.iterator().next();
+                            if (AuthorizeConfiguration.canCollectionAdminManageWorkflows()) {
+                                return collection;
+                            } else {
+                                return collectionService.getParentObject(context, collection);
+                            }
+                        }
+                    }
+                }
+                if (AuthorizeConfiguration.canCommunityAdminManageAdminGroup()) {
+                    // is the group related to a community and community administrator allowed
+                    // to manage it?
+                    return communityService.findByAdminGroup(context, group);
+                }
             }
         }
         return null;
@@ -686,7 +705,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
 
     @Override
     public Group findByIdOrLegacyId(Context context, String id) throws SQLException {
-        if (org.apache.commons.lang.StringUtils.isNumeric(id)) {
+        if (org.apache.commons.lang3.StringUtils.isNumeric(id)) {
             return findByLegacyId(context, Integer.parseInt(id));
         } else {
             return find(context, UUIDUtils.fromString(id));

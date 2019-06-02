@@ -27,11 +27,13 @@ import org.dspace.app.rest.builder.ItemBuilder;
 import org.dspace.app.rest.matcher.BitstreamFormatMatcher;
 import org.dspace.app.rest.matcher.BitstreamMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.app.rest.test.MetadataPatchSuite;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.service.BitstreamService;
+import org.dspace.eperson.EPerson;
 import org.hamcrest.Matchers;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -88,15 +90,15 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                                          .build();
         }
 
-        getClient().perform(get("/api/core/bitstreams/"))
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token).perform(get("/api/core/bitstreams/"))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$._embedded.bitstreams", Matchers.containsInAnyOrder(
                        BitstreamMatcher.matchBitstreamEntry(bitstream),
                        BitstreamMatcher.matchBitstreamEntry(bitstream1)
-                   )))
-
-        ;
+                   )));
     }
 
     @Test
@@ -145,7 +147,9 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                                          .build();
         }
 
-        getClient().perform(get("/api/core/bitstreams/")
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token).perform(get("/api/core/bitstreams/")
                                 .param("size", "1"))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
@@ -160,7 +164,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
 
         ;
 
-        getClient().perform(get("/api/core/bitstreams/")
+        getClient(token).perform(get("/api/core/bitstreams/")
                                 .param("size", "1")
                                 .param("page", "1"))
                    .andExpect(status().isOk())
@@ -172,9 +176,10 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                        Matchers.contains(
                            BitstreamMatcher.matchBitstreamEntry(bitstream)
                        )
-                   )))
+                   )));
 
-        ;
+        getClient().perform(get("/api/core/bitstreams/"))
+                .andExpect(status().isUnauthorized());
     }
 
     //TODO Re-enable test after https://jira.duraspace.org/browse/DS-3774 is fixed
@@ -413,7 +418,9 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
 
-        getClient().perform(get("/api/core/bitstreams/" + UUID.randomUUID()))
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token).perform(get("/api/core/bitstreams/" + UUID.randomUUID()))
                    .andExpect(status().isNotFound())
         ;
 
@@ -462,7 +469,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                 .andExpect(status().is(204));
 
         // Verify 404 after delete
-        getClient().perform(get("/api/core/bitstreams/" + bitstream.getID()))
+        getClient(token).perform(get("/api/core/bitstreams/" + bitstream.getID()))
                 .andExpect(status().isNotFound());
     }
 
@@ -581,5 +588,26 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
         // 422 error when trying to DELETE collection logo
         getClient(token).perform(delete("/api/core/bitstreams/" + col.getLogo().getID()))
                    .andExpect(status().is(422));
+    }
+
+    @Test
+    public void patchBitstreamMetadataAuthorized() throws Exception {
+        runPatchMetadataTests(admin, 200);
+    }
+
+    @Test
+    public void patchBitstreamMetadataUnauthorized() throws Exception {
+        runPatchMetadataTests(eperson, 403);
+    }
+
+    private void runPatchMetadataTests(EPerson asUser, int expectedStatus) throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context).withName("Community").withLogo("logo_community")
+                .build();
+        context.restoreAuthSystemState();
+        String token = getAuthToken(asUser.getEmail(), password);
+
+        new MetadataPatchSuite().runWith(getClient(token), "/api/core/bitstreams/"
+                + parentCommunity.getLogo().getID(), expectedStatus);
     }
 }

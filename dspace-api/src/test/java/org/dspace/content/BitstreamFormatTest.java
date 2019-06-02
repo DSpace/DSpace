@@ -18,11 +18,11 @@ import static org.junit.Assert.fail;
 
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import mockit.NonStrictExpectations;
-import org.apache.commons.collections.ListUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.AbstractUnitTest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeServiceImpl;
@@ -45,7 +45,7 @@ public class BitstreamFormatTest extends AbstractUnitTest {
     /**
      * log4j category
      */
-    private final static Logger log = Logger.getLogger(BitstreamFormatTest.class);
+    private final static Logger log = org.apache.logging.log4j.LogManager.getLogger(BitstreamFormatTest.class);
 
     /**
      * Object to use in the tests
@@ -546,7 +546,7 @@ public class BitstreamFormatTest extends AbstractUnitTest {
         assertThat("setExtensions 4", bf.getExtensions().get(1), equalTo("2"));
         assertThat("setExtensions 5", bf.getExtensions().get(2), equalTo("3"));
 
-        bf.setExtensions(ListUtils.EMPTY_LIST);
+        bf.setExtensions(Collections.EMPTY_LIST);
         assertThat("setExtensions 6", bf.getExtensions(), notNullValue());
         assertTrue("setExtensions 7", bf.getExtensions().size() == 0);
         bf.setExtensions(backupExtensions);

@@ -72,9 +72,9 @@ public class FullTextContentStreamsTest {
         when(textBitstream2.getName()).thenReturn("Full Text 2");
         when(textBitstream3.getName()).thenReturn("Full Text 3");
 
-        when(textBitstream1.getSize()).thenReturn(1L);
-        when(textBitstream2.getSize()).thenReturn(2L);
-        when(textBitstream3.getSize()).thenReturn(3L);
+        when(textBitstream1.getSizeBytes()).thenReturn(1L);
+        when(textBitstream2.getSizeBytes()).thenReturn(2L);
+        when(textBitstream3.getSizeBytes()).thenReturn(3L);
 
         when(bitstreamService.retrieve(null, textBitstream1))
             .thenReturn(new ByteArrayInputStream("This is text 1".getBytes(Charsets.UTF_8)));

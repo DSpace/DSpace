@@ -35,4 +35,13 @@ public interface RestAuthenticationService {
     void invalidateAuthenticationData(HttpServletRequest request, Context context) throws Exception;
 
     AuthenticationService getAuthenticationService();
+
+    /**
+     * Return the value that should be passed in the WWWW-Authenticate header for 4xx responses to the client
+     * @param request The current client request
+     * @param response The response being build for the client
+     * @return A string value that should be set in the WWWW-Authenticate header
+     */
+    String getWwwAuthenticateHeaderValue(HttpServletRequest request, HttpServletResponse response);
+
 }

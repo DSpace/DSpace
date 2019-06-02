@@ -9,6 +9,7 @@ package org.dspace.discovery;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -67,6 +68,8 @@ public class DiscoverQuery {
      * Misc attributes can be implementation dependent
      **/
     private Map<String, List<String>> properties;
+
+    private String discoveryConfigurationName;
 
     public DiscoverQuery() {
         //Initialize all our lists
@@ -338,7 +341,8 @@ public class DiscoverQuery {
                 this.addFacetField(new DiscoverFacetField(facet.getIndexFieldName(), facet.getType(), 10,
                                                           facet.getSortOrderSidebar()));
             } else {
-                List<String> facetQueries = buildFacetQueriesWithGap(newestYear, oldestYear, dateFacet, gap, topYear);
+                List<String> facetQueries = buildFacetQueriesWithGap(newestYear, oldestYear, dateFacet, gap, topYear,
+                                                                     facet.getFacetLimit());
                 for (String facetQuery : CollectionUtils.emptyIfNull(facetQueries)) {
                     this.addFacetQuery(facetQuery);
                 }
@@ -347,10 +351,9 @@ public class DiscoverQuery {
     }
 
     private List<String> buildFacetQueriesWithGap(int newestYear, int oldestYear, String dateFacet, int gap,
-                                                  int topYear) {
+                                                  int topYear, int facetLimit) {
         List<String> facetQueries = new LinkedList<>();
-        //Create facet queries but limit them to 11 (11 == when we need to show a "show more" url)
-        for (int year = topYear; year > oldestYear && (facetQueries.size() < 11); year -= gap) {
+        for (int year = topYear; year > oldestYear && (facetQueries.size() < facetLimit); year -= gap) {
             //Add a filter to remove the last year only if we aren't the last year
             int bottomYear = year - gap;
             //Make sure we don't go below our last year found
@@ -368,10 +371,30 @@ public class DiscoverQuery {
             }
             facetQueries.add(dateFacet + ":[" + bottomYear + " TO " + currentTop + "]");
         }
+        Collections.reverse(facetQueries);
         return facetQueries;
     }
 
     private int getTopYear(int newestYear, int gap) {
         return (int) (Math.ceil((float) (newestYear) / gap) * gap);
+    }
+
+    /**
+     * Return the name of discovery configuration used by this query
+     * 
+     * @return the discovery configuration name used
+     */
+    public String getDiscoveryConfigurationName() {
+        return discoveryConfigurationName;
+    }
+
+    /**
+     * Set the name of discovery configuration to use to run this query
+     * 
+     * @param discoveryConfigurationName
+     *            the name of the discovery configuration to use to run this query
+     */
+    public void setDiscoveryConfigurationName(String discoveryConfigurationName) {
+        this.discoveryConfigurationName = discoveryConfigurationName;
     }
 }

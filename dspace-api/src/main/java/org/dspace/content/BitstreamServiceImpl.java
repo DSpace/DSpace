@@ -14,9 +14,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.dao.BitstreamDAO;
@@ -43,7 +43,7 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
     /**
      * log4j logger
      */
-    private static Logger log = Logger.getLogger(BitstreamServiceImpl.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(BitstreamServiceImpl.class);
 
 
     @Autowired(required = true)
@@ -90,6 +90,33 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
     @Override
     public List<Bitstream> findAll(Context context) throws SQLException {
         return bitstreamDAO.findAll(context, Bitstream.class);
+    }
+
+    @Override
+    public Bitstream clone(Context context, Bitstream bitstream)
+            throws SQLException {
+        // Create a new bitstream with a new ID.
+        Bitstream clonedBitstream = bitstreamDAO.create(context, new Bitstream());
+        // Set the internal identifier, file size, checksum, and
+        // checksum algorithm as same as the given bitstream.
+        clonedBitstream.setInternalId(bitstream.getInternalId());
+        clonedBitstream.setSizeBytes(bitstream.getSizeBytes());
+        clonedBitstream.setChecksum(bitstream.getChecksum());
+        clonedBitstream.setChecksumAlgorithm(bitstream.getChecksumAlgorithm());
+        clonedBitstream.setFormat(bitstream.getBitstreamFormat());
+
+        try {
+            //Update our bitstream but turn off the authorization system since permissions
+            //haven't been set at this point in time.
+            context.turnOffAuthorisationSystem();
+            update(context, clonedBitstream);
+        } catch (AuthorizeException e) {
+            log.error(e);
+            //Can never happen since we turn off authorization before we update
+        } finally {
+            context.restoreAuthSystemState();
+        }
+        return clonedBitstream;
     }
 
     @Override
@@ -178,7 +205,7 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
     @Override
     public void setUserFormatDescription(Context context, Bitstream bitstream, String desc) throws SQLException {
         setFormat(context, bitstream, null);
-        setMetadataSingleValue(context, bitstream, MetadataSchema.DC_SCHEMA, "format", null, null, desc);
+        setMetadataSingleValue(context, bitstream, MetadataSchemaEnum.DC.getName(), "format", null, null, desc);
     }
 
     @Override
@@ -208,7 +235,7 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
         }
 
         // Remove user type description
-        clearMetadata(context, bitstream, MetadataSchema.DC_SCHEMA, "format", null, Item.ANY);
+        clearMetadata(context, bitstream, MetadataSchemaEnum.DC.getName(), "format", null, Item.ANY);
 
         // Update the ID in the table row
         bitstream.setFormat(bitstreamFormat);

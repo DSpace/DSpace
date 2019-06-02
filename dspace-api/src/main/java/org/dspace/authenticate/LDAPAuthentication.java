@@ -10,6 +10,7 @@ package org.dspace.authenticate;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Hashtable;
 import java.util.List;
 import javax.naming.NamingEnumeration;
@@ -27,9 +28,8 @@ import javax.naming.ldap.StartTlsResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.collections.ListUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authenticate.factory.AuthenticateServiceFactory;
 import org.dspace.authenticate.service.AuthenticationService;
 import org.dspace.authorize.AuthorizeException;
@@ -61,7 +61,7 @@ public class LDAPAuthentication
     /**
      * log4j category
      */
-    private static Logger log = Logger.getLogger(LDAPAuthentication.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(LDAPAuthentication.class);
 
     protected AuthenticationService authenticationService = AuthenticateServiceFactory.getInstance()
                                                                                       .getAuthenticationService();
@@ -136,7 +136,7 @@ public class LDAPAuthentication
                         log.warn(LogManager.getHeader(context,
                                                       "ldap_specialgroup",
                                                       "Group defined in login.specialgroup does not exist"));
-                        return ListUtils.EMPTY_LIST;
+                        return Collections.EMPTY_LIST;
                     } else {
                         return Arrays.asList(ldapGroup);
                     }
@@ -145,7 +145,7 @@ public class LDAPAuthentication
         } catch (Exception npe) {
             // The user is not an LDAP user, so we don't need to worry about them
         }
-        return ListUtils.EMPTY_LIST;
+        return Collections.EMPTY_LIST;
     }
 
     /*

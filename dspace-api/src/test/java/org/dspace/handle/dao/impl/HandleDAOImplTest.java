@@ -13,7 +13,7 @@ import static org.junit.Assert.fail;
 import java.io.IOException;
 import java.sql.SQLException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.AbstractUnitTest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
@@ -46,7 +46,7 @@ public class HandleDAOImplTest extends AbstractUnitTest {
     /**
      * log4j category
      */
-    private static final Logger log = Logger.getLogger(HandleDAOImplTest.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(HandleDAOImplTest.class);
 
     /**
      * Item instances for the tests

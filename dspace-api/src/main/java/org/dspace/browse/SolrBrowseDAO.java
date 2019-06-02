@@ -15,10 +15,10 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
-import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -28,6 +28,7 @@ import org.dspace.discovery.DiscoverQuery.SORT_ORDER;
 import org.dspace.discovery.DiscoverResult;
 import org.dspace.discovery.DiscoverResult.FacetResult;
 import org.dspace.discovery.DiscoverResult.SearchDocument;
+import org.dspace.discovery.IndexableObject;
 import org.dspace.discovery.SearchService;
 import org.dspace.discovery.SearchServiceException;
 import org.dspace.discovery.configuration.DiscoveryConfigurationParameters;
@@ -67,7 +68,7 @@ public class SolrBrowseDAO implements BrowseDAO {
     /**
      * Log4j log
      */
-    private static final Logger log = Logger.getLogger(SolrBrowseDAO.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(SolrBrowseDAO.class);
 
     /**
      * The DSpace context
@@ -90,6 +91,8 @@ public class SolrBrowseDAO implements BrowseDAO {
      * value to start browse from in focus field
      */
     private String focusValue = null;
+
+    private String startsWith = null;
 
     /**
      * field to look for value in
@@ -177,9 +180,16 @@ public class SolrBrowseDAO implements BrowseDAO {
             addLocationScopeFilter(query);
             addStatusFilter(query);
             if (distinct) {
-                DiscoverFacetField dff = new DiscoverFacetField(facetField,
-                                                                DiscoveryConfigurationParameters.TYPE_TEXT, -1,
-                                                                DiscoveryConfigurationParameters.SORT.VALUE);
+                DiscoverFacetField dff;
+                if (StringUtils.isNotBlank(startsWith)) {
+                    dff = new DiscoverFacetField(facetField,
+                        DiscoveryConfigurationParameters.TYPE_TEXT, -1,
+                        DiscoveryConfigurationParameters.SORT.VALUE, startsWith);
+                } else {
+                    dff = new DiscoverFacetField(facetField,
+                        DiscoveryConfigurationParameters.TYPE_TEXT, -1,
+                        DiscoveryConfigurationParameters.SORT.VALUE);
+                }
                 query.addFacetField(dff);
                 query.setFacetMinCount(1);
                 query.setMaxResults(0);
@@ -298,7 +308,7 @@ public class SolrBrowseDAO implements BrowseDAO {
         DiscoverResult resp = getSolrResponse();
 
         List<Item> bitems = new ArrayList<>();
-        for (DSpaceObject solrDoc : resp.getDspaceObjects()) {
+        for (IndexableObject<UUID> solrDoc : resp.getIndexableObjects()) {
             // FIXME introduce project, don't retrieve Item immediately when
             // processing the query...
             Item item = (Item) solrDoc;
@@ -322,7 +332,7 @@ public class SolrBrowseDAO implements BrowseDAO {
         }
         if (resp.getTotalSearchResults() > 0) {
             SearchDocument doc = resp.getSearchDocument(
-                resp.getDspaceObjects().get(0)).get(0);
+                resp.getIndexableObjects().get(0)).get(0);
             return (String) doc.getSearchFieldValues(column).get(0);
         }
         return null;
@@ -445,7 +455,17 @@ public class SolrBrowseDAO implements BrowseDAO {
         return focusValue;
     }
 
-    /*
+    @Override
+    public void setStartsWith(String startsWith) {
+        this.startsWith = startsWith;
+    }
+
+    @Override
+    public String getStartsWith() {
+        return startsWith;
+    }
+
+     /*
      * (non-Javadoc)
      *
      * @see org.dspace.browse.BrowseDAO#getLimit()

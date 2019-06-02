@@ -32,8 +32,8 @@ public class CollectionMatcher {
             hasJsonPath("$.name", is(name)),
             hasJsonPath("$.handle", is(handle)),
             hasJsonPath("$.type", is("collection")),
-            hasJsonPath("$.metadata", Matchers.contains(
-                CollectionMetadataMatcher.matchTitle(name)
+            hasJsonPath("$.metadata", Matchers.allOf(
+                MetadataMatcher.matchMetadata("dc.title", name)
             )),
             matchLinks(uuid),
             matchLogo(logo)
@@ -53,7 +53,8 @@ public class CollectionMatcher {
                 hasJsonPath("$._embedded.logo", Matchers.not(Matchers.empty()))
             ) :
             allOf(
-                hasJsonPath("$._embedded.logo", BitstreamMatcher.matchBitstreamEntry(logo.getID(), logo.getSize()))
+                hasJsonPath("$._embedded.logo",
+                        BitstreamMatcher.matchBitstreamEntry(logo.getID(), logo.getSizeBytes()))
             );
     }
 

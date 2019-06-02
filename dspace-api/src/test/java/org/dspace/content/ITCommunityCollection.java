@@ -19,7 +19,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.UUID;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.AbstractIntegrationTest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.factory.ContentServiceFactory;
@@ -51,7 +51,7 @@ public class ITCommunityCollection extends AbstractIntegrationTest {
     /**
      * log4j category
      */
-    private static final Logger log = Logger.getLogger(ITCommunityCollection.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(ITCommunityCollection.class);
 
     protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
     protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
@@ -209,6 +209,7 @@ public class ITCommunityCollection extends AbstractIntegrationTest {
         // Create a hierachy of sub-Communities and Collections and Items.
         Community child = communityService.createSubcommunity(context, parentCom);
         Community child2 = communityService.createSubcommunity(context, parentCom);
+        Community child3 = communityService.createSubcommunity(context, parentCom);
         Community grandchild = communityService.createSubcommunity(context, child);
         Collection childCol = collectionService.create(context, child);
         Collection grandchildCol = collectionService.create(context, grandchild);
@@ -251,6 +252,13 @@ public class ITCommunityCollection extends AbstractIntegrationTest {
         communityService.delete(context, child2);
         assertThat("Community Admin unable to delete sub-Community",
                    communityService.find(context, commId), nullValue());
+
+        // Test deletion of single Sub-Community with own admin group
+        communityService.createAdministrators(context, child3);
+        commId = child3.getID();
+        communityService.delete(context, child3);
+        assertThat("Community Admin unable to delete sub-Community",
+                communityService.find(context, commId), nullValue());
 
         // Test deletion of Sub-Community Hierarchy as a Community Admin
         commId = child.getID();

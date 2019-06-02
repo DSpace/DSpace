@@ -11,8 +11,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.sherpa.SHERPAResponse;
 import org.dspace.app.sherpa.SHERPAService;
 import org.dspace.content.Item;
@@ -27,7 +27,7 @@ public class SHERPASubmitService {
     /**
      * log4j logger
      */
-    private static Logger log = Logger.getLogger(SHERPASubmitService.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(SHERPASubmitService.class);
 
     public void setConfiguration(SHERPASubmitConfigurationService configuration) {
         this.configuration = configuration;

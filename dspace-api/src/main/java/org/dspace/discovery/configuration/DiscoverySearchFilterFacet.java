@@ -21,7 +21,7 @@ public class DiscoverySearchFilterFacet extends DiscoverySearchFilter {
     private DiscoveryConfigurationParameters.SORT sortOrderSidebar = DiscoveryConfigurationParameters.SORT.COUNT;
     private DiscoveryConfigurationParameters.SORT sortOrderFilterPage = DiscoveryConfigurationParameters.SORT.COUNT;
     public static final String FILTER_TYPE_FACET = "facet";
-
+    private boolean exposeMinMax = false;
 
     public int getFacetLimit() {
         if (facetLimit == -1) {
@@ -54,5 +54,24 @@ public class DiscoverySearchFilterFacet extends DiscoverySearchFilter {
     @Override
     public String getFilterType() {
         return FILTER_TYPE_FACET;
+    }
+
+    /**
+     * This method returns whether or not the DiscoverySearchFilterFacet should return a
+     * min and max value.
+     *
+     * @return  A boolean indicating whether or not this DiscoverySearchFilterFacet should expose
+     *          a min and max value
+     */
+    public boolean exposeMinAndMaxValue() {
+        return exposeMinMax;
+    }
+
+    /**
+     * This method sets the boolean for {@link org.dspace.discovery.configuration.DiscoverySearchFilterFacet#exposeMinAndMaxValue}
+     * @param exposeMinMax A boolean value that will be set to return in the above mentioned link
+     */
+    public void setExposeMinAndMaxValue(boolean exposeMinMax) {
+        this.exposeMinMax = exposeMinMax;
     }
 }

@@ -33,10 +33,10 @@ import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
-import org.apache.commons.lang.time.DateFormatUtils;
-import org.apache.log4j.Logger;
+import org.apache.commons.lang3.time.DateFormatUtils;
+import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.HttpSolrServer;
+import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.common.SolrInputDocument;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
@@ -64,7 +64,7 @@ import org.dspace.statistics.service.SolrLoggerService;
  * @see ClassicDSpaceLogConverter
  */
 public class StatisticsImporter {
-    private static final Logger log = Logger.getLogger(StatisticsImporter.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(StatisticsImporter.class);
 
     /**
      * Date format (for solr)
@@ -80,7 +80,7 @@ public class StatisticsImporter {
     /**
      * Solr server connection
      */
-    private static HttpSolrServer solr;
+    private static HttpSolrClient solr;
 
     /**
      * GEOIP lookup service
@@ -468,7 +468,7 @@ public class StatisticsImporter {
         if (verbose) {
             System.out.println("Writing to solr server at: " + sserver);
         }
-        solr = new HttpSolrServer(sserver);
+        solr = new HttpSolrClient.Builder(sserver).build();
 
         String dbPath = ConfigurationManager.getProperty("usage-statistics", "dbfile");
         try {

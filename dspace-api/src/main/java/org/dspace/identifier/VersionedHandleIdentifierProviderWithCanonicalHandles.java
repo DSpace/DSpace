@@ -12,12 +12,12 @@ import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.content.MetadataSchema;
+import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.ConfigurationManager;
@@ -43,7 +43,8 @@ public class VersionedHandleIdentifierProviderWithCanonicalHandles extends Ident
     /**
      * log4j category
      */
-    private static Logger log = Logger.getLogger(VersionedHandleIdentifierProviderWithCanonicalHandles.class);
+    private static Logger log =
+            org.apache.logging.log4j.LogManager.getLogger(VersionedHandleIdentifierProviderWithCanonicalHandles.class);
 
     /**
      * Prefix registered to no one
@@ -411,19 +412,6 @@ public class VersionedHandleIdentifierProviderWithCanonicalHandles extends Ident
         return prefix;
     }
 
-    protected static String getCanonicalForm(String handle) {
-
-        // Let the admin define a new prefix, if not then we'll use the
-        // CNRI default. This allows the admin to use "hdl:" if they want to or
-        // use a locally branded prefix handle.myuni.edu.
-        String handlePrefix = ConfigurationManager.getProperty("handle.canonical.prefix");
-        if (handlePrefix == null || handlePrefix.length() == 0) {
-            handlePrefix = "http://hdl.handle.net/";
-        }
-
-        return handlePrefix + handle;
-    }
-
     protected String createNewIdentifier(Context context, DSpaceObject dso, String handleId) throws SQLException {
         if (handleId == null) {
             return handleService.createHandle(context, dso);
@@ -503,10 +491,10 @@ public class VersionedHandleIdentifierProviderWithCanonicalHandles extends Ident
         // we want to exchange the old handle against the new one. To do so, we
         // load all identifiers, clear the metadata field, re add all
         // identifiers which are not from type handle and add the new handle.
-        String handleref = getCanonicalForm(handle);
+        String handleref = handleService.getCanonicalForm(handle);
         List<MetadataValue> identifiers = itemService
-            .getMetadata(item, MetadataSchema.DC_SCHEMA, "identifier", "uri", Item.ANY);
-        itemService.clearMetadata(context, item, MetadataSchema.DC_SCHEMA, "identifier", "uri", Item.ANY);
+            .getMetadata(item, MetadataSchemaEnum.DC.getName(), "identifier", "uri", Item.ANY);
+        itemService.clearMetadata(context, item, MetadataSchemaEnum.DC.getName(), "identifier", "uri", Item.ANY);
         for (MetadataValue identifier : identifiers) {
             if (this.supports(identifier.getValue())) {
                 // ignore handles
@@ -521,7 +509,8 @@ public class VersionedHandleIdentifierProviderWithCanonicalHandles extends Ident
                                     identifier.getConfidence());
         }
         if (!StringUtils.isEmpty(handleref)) {
-            itemService.addMetadata(context, item, MetadataSchema.DC_SCHEMA, "identifier", "uri", null, handleref);
+            itemService.addMetadata(context, item, MetadataSchemaEnum.DC.getName(),
+                                    "identifier", "uri", null, handleref);
         }
         itemService.update(context, item);
     }

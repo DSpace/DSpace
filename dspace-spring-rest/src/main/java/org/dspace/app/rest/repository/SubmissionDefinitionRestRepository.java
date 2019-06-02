@@ -28,6 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 /**
@@ -48,6 +49,7 @@ public class SubmissionDefinitionRestRepository extends DSpaceRestRepository<Sub
         submissionConfigReader = new SubmissionConfigReader();
     }
 
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
     @Override
     public SubmissionDefinitionRest findOne(Context context, String submitName) {
         SubmissionConfig subConfig = submissionConfigReader.getSubmissionConfigByName(submitName);
@@ -57,6 +59,7 @@ public class SubmissionDefinitionRestRepository extends DSpaceRestRepository<Sub
         return converter.convert(subConfig);
     }
 
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
     @Override
     public Page<SubmissionDefinitionRest> findAll(Context context, Pageable pageable) {
         List<SubmissionConfig> subConfs = new ArrayList<SubmissionConfig>();
@@ -66,6 +69,7 @@ public class SubmissionDefinitionRestRepository extends DSpaceRestRepository<Sub
         return page;
     }
 
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
     @SearchRestMethod(name = "findByCollection")
     public SubmissionDefinitionRest findByCollection(@Parameter(value = "uuid", required = true) UUID collectionUuid)
             throws SQLException {

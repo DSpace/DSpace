@@ -9,9 +9,9 @@ package org.dspace.app.rest.converter;
 
 import org.springframework.core.convert.converter.Converter;
 
-public abstract class DSpaceConverter<M, R> implements Converter<M, R> {
+public interface DSpaceConverter<M, R> extends Converter<M, R> {
     @Override
-    public R convert(M source) {
+    public default R convert(M source) {
         return fromModel(source);
     }
 

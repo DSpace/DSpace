@@ -10,7 +10,7 @@ package org.dspace.services;
 import java.util.List;
 import java.util.Properties;
 
-import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration2.Configuration;
 
 
 /**
@@ -236,6 +236,16 @@ public interface ConfigurationService {
      * @return true if property exists, false if not
      */
     public boolean hasProperty(String name);
+
+    /**
+     * Add a value to a configuration property.
+     *
+     * @param name the property name.  May not be null.
+     * @param value the property value.  May not be null.
+     * @return true if a new property was created.
+     * @throws IllegalArgumentException if the name or value is null.
+     */
+    public boolean addPropertyValue(String name, Object value);
 
     /**
      * Set a configuration property (setting) in the system.

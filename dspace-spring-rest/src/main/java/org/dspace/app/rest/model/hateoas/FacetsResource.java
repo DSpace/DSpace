@@ -10,25 +10,35 @@ package org.dspace.app.rest.model.hateoas;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.collections4.CollectionUtils;
 import org.dspace.app.rest.model.SearchFacetEntryRest;
 import org.dspace.app.rest.model.SearchResultsRest;
 import org.dspace.app.rest.model.hateoas.annotations.RelNameDSpaceResource;
+import org.springframework.data.domain.Pageable;
 
 @RelNameDSpaceResource(SearchResultsRest.NAME)
 public class FacetsResource extends HALResource<SearchResultsRest> {
 
-    public FacetsResource(SearchResultsRest searchResultsRest) {
+    @JsonIgnore
+    private List<SearchFacetEntryResource> facetResources = new LinkedList<>();
+
+    public FacetsResource(SearchResultsRest searchResultsRest, Pageable page) {
         super(searchResultsRest);
 
-        embedFacetResults(searchResultsRest);
-
+        embedFacetResults(searchResultsRest, page);
     }
 
-    private void embedFacetResults(final SearchResultsRest data) {
-        List<SearchFacetEntryResource> facetResources = new LinkedList<>();
+    public List<SearchFacetEntryResource> getFacetResources() {
+        return facetResources;
+    }
+
+    private void embedFacetResults(SearchResultsRest data, Pageable page) {
+        int i = 0;
         for (SearchFacetEntryRest searchFacetEntryRest : CollectionUtils.emptyIfNull(data.getFacets())) {
-            facetResources.add(new SearchFacetEntryResource(searchFacetEntryRest, data));
+            if (i >= page.getOffset() && i < page.getOffset() + page.getPageSize()) {
+                facetResources.add(new SearchFacetEntryResource(searchFacetEntryRest, data));
+            }
         }
 
         embedResource("facets", facetResources);

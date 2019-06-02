@@ -18,7 +18,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.codec.binary.Base64;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
@@ -117,7 +117,7 @@ public class METSManifest {
     /**
      * log4j category
      */
-    private static final Logger log = Logger.getLogger(METSManifest.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(METSManifest.class);
 
     /**
      * Canonical filename of METS manifest within a package or as a bitstream.

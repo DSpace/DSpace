@@ -40,7 +40,9 @@ public abstract class HALResource<T> extends Resource<T> {
     public void embedResource(String relationship, HALResource resource) {
         embedded.put(relationship, resource);
     }
-
+    public void embedResource(String relationship, EmbeddedPage embeddedPage) {
+        embedded.put(relationship, embeddedPage);
+    }
     public void embedResource(String relationship, Collection<? extends HALResource> resource) {
         embedded.put(relationship, resource);
     }

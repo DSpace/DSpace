@@ -11,12 +11,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.solr.common.SolrInputDocument;
 import org.dspace.browse.BrowseException;
 import org.dspace.browse.BrowseIndex;
-import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.authority.service.ChoiceAuthorityService;
@@ -44,8 +44,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class SolrServiceMetadataBrowseIndexingPlugin implements SolrServiceIndexPlugin {
 
-    private static final Logger log = Logger
-        .getLogger(SolrServiceMetadataBrowseIndexingPlugin.class);
+    private static final Logger log = LogManager.getLogger(SolrServiceMetadataBrowseIndexingPlugin.class);
 
     @Autowired(required = true)
     protected ItemService itemService;
@@ -57,7 +56,7 @@ public class SolrServiceMetadataBrowseIndexingPlugin implements SolrServiceIndex
     protected ChoiceAuthorityService choiceAuthorityService;
 
     @Override
-    public void additionalIndex(Context context, DSpaceObject dso, SolrInputDocument document) {
+    public void additionalIndex(Context context, IndexableObject dso, SolrInputDocument document) {
         // Only works for Items
         if (!(dso instanceof Item)) {
             return;

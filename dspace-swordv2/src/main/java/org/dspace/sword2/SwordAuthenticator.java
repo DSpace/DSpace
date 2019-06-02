@@ -12,8 +12,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authenticate.AuthenticationMethod;
 import org.dspace.authenticate.factory.AuthenticateServiceFactory;
 import org.dspace.authenticate.service.AuthenticationService;
@@ -52,7 +52,7 @@ public class SwordAuthenticator {
     /**
      * logger
      */
-    private static Logger log = Logger.getLogger(SwordAuthenticator.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(SwordAuthenticator.class);
 
     protected AuthenticationService authenticationService =
         AuthenticateServiceFactory.getInstance().getAuthenticationService();
@@ -702,7 +702,7 @@ public class SwordAuthenticator {
                 }
 
                 // get the "ORIGINAL" bundle(s)
-                List<Bundle> bundles = item.getBundles();
+                List<Bundle> bundles = item.getBundles(Constants.CONTENT_BUNDLE_NAME);
 
                 // look up the READ policy on the community.  This will include determining if the user is an
                 // administrator
@@ -719,14 +719,11 @@ public class SwordAuthenticator {
                             Constants.ADD);
                     } else {
                         for (Bundle bundle : bundles) {
-                            if (Constants.CONTENT_BUNDLE_NAME
-                                .equals(bundle.getName())) {
-                                add = authorizeService.authorizeActionBoolean(
-                                    swordContext.getAuthenticatorContext(),
-                                    bundle, Constants.ADD);
-                                if (!add) {
-                                    break;
-                                }
+                            add = authorizeService.authorizeActionBoolean(
+                                swordContext.getAuthenticatorContext(),
+                                bundle, Constants.ADD);
+                            if (!add) {
+                                break;
                             }
                         }
                     }
@@ -874,19 +871,17 @@ public class SwordAuthenticator {
             boolean write = authorizeService
                 .authorizeActionBoolean(allowContext, item, Constants.WRITE);
 
-            List<Bundle> bundles = item.getBundles();
+            List<Bundle> bundles = item.getBundles(Constants.CONTENT_BUNDLE_NAME);
             boolean add = false;
             if (bundles.isEmpty()) {
                 add = authorizeService.authorizeActionBoolean(
                     allowContext, item, Constants.ADD);
             } else {
                 for (Bundle bundle : bundles) {
-                    if (Constants.CONTENT_BUNDLE_NAME.equals(bundle.getName())) {
-                        add = authorizeService.authorizeActionBoolean(
-                            allowContext, bundle, Constants.ADD);
-                        if (!add) {
-                            break;
-                        }
+                    add = authorizeService.authorizeActionBoolean(
+                        allowContext, bundle, Constants.ADD);
+                    if (!add) {
+                        break;
                     }
                 }
             }

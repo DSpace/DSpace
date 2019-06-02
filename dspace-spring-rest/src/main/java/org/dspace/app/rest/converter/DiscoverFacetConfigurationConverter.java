@@ -25,7 +25,7 @@ public class DiscoverFacetConfigurationConverter {
                                           DiscoveryConfiguration configuration) {
         FacetConfigurationRest facetConfigurationRest = new FacetConfigurationRest();
 
-        facetConfigurationRest.setConfigurationName(configurationName);
+        facetConfigurationRest.setConfiguration(configurationName);
         facetConfigurationRest.setScope(scope);
 
         if (configuration != null) {
@@ -41,6 +41,7 @@ public class DiscoverFacetConfigurationConverter {
 
             SearchFacetEntryRest facetEntry = new SearchFacetEntryRest(discoverySearchFilterFacet.getIndexFieldName());
             facetEntry.setFacetType(discoverySearchFilterFacet.getType());
+            facetEntry.setFacetLimit(discoverySearchFilterFacet.getFacetLimit());
 
             facetConfigurationRest.addSidebarFacet(facetEntry);
         }
