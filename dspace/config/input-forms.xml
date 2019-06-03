@@ -239,7 +239,7 @@
                     <hint>Select the type(s) of content of the item. To select more than one value in the list, you may
                         have to hold down the "CTRL" or "Shift" key.
                     </hint>
-                    <required></required>
+                    <required>You must choose at least one document type.</required>
                 </field>
 
                 <field>
