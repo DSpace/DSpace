@@ -37,7 +37,7 @@ public class EPersonCertificateReplaceOperation extends ReplacePatchOperation<EP
     }
 
     @Override
-    void checkModelForExistingValue(EPersonRest resource) {
+    void checkModelForExistingValue(EPersonRest resource, Operation operation) {
         // TODO: many (all?) boolean values on the rest model should never be null.
         // So perhaps the error to throw in this case is different...IllegalStateException?
         // Or perhaps do nothing (no check is required).

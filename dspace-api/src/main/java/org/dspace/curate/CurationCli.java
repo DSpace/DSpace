@@ -9,13 +9,20 @@ package org.dspace.curate;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintStream;
+import java.io.Writer;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
+import org.apache.commons.io.output.NullOutputStream;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.core.Context;
 import org.dspace.core.factory.CoreServiceFactory;
@@ -48,12 +55,16 @@ public class CurationCli {
                           "file containing curation task names");
         options.addOption("i", "id", true,
                           "Id (handle) of object to perform task on, or 'all' to perform on whole repository");
+        options.addOption("p", "parameter", true,
+                          "a task parameter 'NAME=VALUE'");
         options.addOption("q", "queue", true,
                           "name of task queue to process");
         options.addOption("e", "eperson", true,
                           "email address of curating eperson");
         options.addOption("r", "reporter", true,
-                          "reporter to manage results - use '-' to report to console. If absent, no reporting");
+                "relative or absolute path to the desired report file.  "
+                        + "Use '-' to report to console.  "
+                        + "If absent, no reporting");
         options.addOption("s", "scope", true,
                           "transaction scope to impose: use 'object', 'curation', or 'open'. If absent, 'open' " +
                               "applies");
@@ -71,6 +82,7 @@ public class CurationCli {
         String reporterName = null;
         String scope = null;
         boolean verbose = false;
+        final Map<String, String> parameters = new HashMap<>();
 
         if (line.hasOption('h')) {
             HelpFormatter help = new HelpFormatter();
@@ -104,6 +116,19 @@ public class CurationCli {
             ePersonName = line.getOptionValue('e');
         }
 
+        if (line.hasOption('p')) { // parameter
+            for (String parameter : line.getOptionValues('p')) {
+                String[] parts = parameter.split("=", 2);
+                String name = parts[0].trim();
+                String value;
+                if (parts.length > 1) {
+                    value = parts[1].trim();
+                } else {
+                    value = "true";
+                }
+                parameters.put(name, value);
+            }
+        }
         if (line.hasOption('r')) { // report file
             reporterName = line.getOptionValue('r');
         }
@@ -147,13 +172,22 @@ public class CurationCli {
         }
 
         Curator curator = new Curator();
-        if (reporterName != null) {
-            curator.setReporter(reporterName);
+        OutputStream reporter;
+        if (null == reporterName) {
+            reporter = new NullOutputStream();
+        } else if ("-".equals(reporterName)) {
+            reporter = System.out;
+        } else {
+            reporter = new PrintStream(reporterName);
         }
+        Writer reportWriter = new OutputStreamWriter(reporter);
+        curator.setReporter(reportWriter);
+
         if (scope != null) {
             Curator.TxScope txScope = Curator.TxScope.valueOf(scope.toUpperCase());
             curator.setTransactionScope(txScope);
         }
+        curator.addParameters(parameters);
         // we are operating in batch mode, if anyone cares.
         curator.setInvoked(Curator.Invoked.BATCH);
         // load curation tasks

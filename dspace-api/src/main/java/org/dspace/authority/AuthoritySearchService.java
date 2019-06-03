@@ -7,6 +7,7 @@
  */
 package org.dspace.authority;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.List;
 
@@ -24,7 +25,8 @@ import org.apache.solr.client.solrj.response.QueryResponse;
  */
 public interface AuthoritySearchService {
 
-    public QueryResponse search(SolrQuery query) throws SolrServerException, MalformedURLException;
+    public QueryResponse search(SolrQuery query)
+            throws SolrServerException, MalformedURLException, IOException;
 
     /**
      * Retrieves all the metadata fields which are indexed in the authority control.

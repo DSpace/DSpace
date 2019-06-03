@@ -76,6 +76,8 @@ public class V5_0_2014_11_04__Enable_XMLWorkflow_Migration
                     dbFileLocation = "postgres";
                 } else if (dbtype.toLowerCase().contains("oracle")) {
                     dbFileLocation = "oracle";
+                } else if (dbtype.toLowerCase().contains("h2")) {
+                    dbFileLocation = "h2";
                 }
 
 

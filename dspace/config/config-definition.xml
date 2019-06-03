@@ -8,6 +8,13 @@
      https://commons.apache.org/proper/commons-configuration/userguide/howto_combinedbuilder.html
 -->
 <configuration>
+    <header>
+        <providers>
+            <provider
+                    config-tag="dspaceenv"
+                    config-class="org.dspace.servicemanager.config.DSpaceEnvironmentConfigurationBuilderProvider" />
+        </providers>
+    </header>
     <!-- Configurations in this section override one another.
          Earlier values take precedence, and override any values in later config files -->
     <override>
@@ -21,6 +28,13 @@
         <system/>
         <!-- Load Environment variables (does not automatically reload) -->
         <env/>
+        <!-- 
+          Load Environment variables that contain two underlines in their names. 
+          Some DSpace configurations use special characters in their key (e.g. periods and dashes) 
+          which are not supported in Bash. This provider translates "___P___" to periods and "___D___" 
+          to dashes in environment variables.
+        -->
+        <dspaceenv/>
 
         <!-- Allow user to override any configs in a local.cfg -->
         <!-- Any properties in this config will override defaults in dspace.cfg (or any included *.cfg file) -->

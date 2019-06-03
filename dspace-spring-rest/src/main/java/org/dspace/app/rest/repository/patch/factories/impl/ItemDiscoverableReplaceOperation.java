@@ -40,7 +40,7 @@ public class ItemDiscoverableReplaceOperation extends ReplacePatchOperation<Item
     }
 
     @Override
-    void checkModelForExistingValue(ItemRest resource) {
+    void checkModelForExistingValue(ItemRest resource, Operation operation) {
         if ((Object) resource.getDiscoverable() == null) {
             throw new PatchBadRequestException("Attempting to replace a non-existent value.");
         }

@@ -52,6 +52,7 @@ import org.dspace.content.service.ItemService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.discovery.IndexableObject;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
@@ -179,12 +180,12 @@ public class SyndicationFeed {
      *
      * @param request request
      * @param context context
-     * @param dso     DSpaceObject
+     * @param dso     the scope
      * @param items   array of objects
      * @param labels  label map
      */
-    public void populate(HttpServletRequest request, Context context, DSpaceObject dso,
-                         List<? extends DSpaceObject> items, Map<String, String> labels) {
+    public void populate(HttpServletRequest request, Context context, IndexableObject dso,
+                         List<IndexableObject> items, Map<String, String> labels) {
         String logoURL = null;
         String objectURL = null;
         String defaultTitle = null;
@@ -208,6 +209,7 @@ public class SyndicationFeed {
                 if (cols != null && cols.length() > 1 && cols.contains(col.getHandle())) {
                     podcastFeed = true;
                 }
+                objectURL = resolveURL(request, col);
             } else if (dso.getType() == Constants.COMMUNITY) {
                 Community comm = (Community) dso;
                 defaultTitle = comm.getName();
@@ -217,8 +219,9 @@ public class SyndicationFeed {
                 if (comms != null && comms.length() > 1 && comms.contains(comm.getHandle())) {
                     podcastFeed = true;
                 }
+                objectURL = resolveURL(request, comm);
             }
-            objectURL = resolveURL(request, dso);
+
             if (logo != null) {
                 logoURL = urlOfBitstream(request, logo);
             }
@@ -247,11 +250,11 @@ public class SyndicationFeed {
         // add entries for items
         if (items != null) {
             List<SyndEntry> entries = new ArrayList<SyndEntry>();
-            for (DSpaceObject itemDSO : items) {
-                if (itemDSO.getType() != Constants.ITEM) {
+            for (IndexableObject idxObj : items) {
+                if (idxObj.getType() != Constants.ITEM) {
                     continue;
                 }
-                Item item = (Item) itemDSO;
+                Item item = (Item) idxObj;
                 boolean hasDate = false;
                 SyndEntry entry = new SyndEntryImpl();
                 entries.add(entry);

@@ -12,10 +12,10 @@ import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
-import org.dspace.content.DSpaceObject;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.core.Context;
+import org.dspace.discovery.IndexableObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -33,8 +33,8 @@ public class ScopeResolver {
     @Autowired
     CommunityService communityService;
 
-    public DSpaceObject resolveScope(Context context, String scope) {
-        DSpaceObject scopeObj = null;
+    public IndexableObject<UUID> resolveScope(Context context, String scope) {
+        IndexableObject<UUID> scopeObj = null;
         if (StringUtils.isNotBlank(scope)) {
             try {
                 UUID uuid = UUID.fromString(scope);

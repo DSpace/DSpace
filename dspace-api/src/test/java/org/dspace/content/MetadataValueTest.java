@@ -95,7 +95,7 @@ public class MetadataValueTest extends AbstractUnitTest {
             this.it = installItemService.installItem(context, workspaceItem);
 
             this.mf = metadataFieldService.findByElement(context,
-                                                         MetadataSchema.DC_SCHEMA, element, qualifier);
+                                                         MetadataSchemaEnum.DC.getName(), element, qualifier);
             this.mv = metadataValueService.create(context, it, mf);
             context.restoreAuthSystemState();
         } catch (AuthorizeException ex) {

@@ -11,10 +11,14 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import javax.servlet.http.HttpServletRequest;
 
 import org.dspace.app.rest.converter.SiteConverter;
 import org.dspace.app.rest.model.SiteRest;
 import org.dspace.app.rest.model.hateoas.SiteResource;
+import org.dspace.app.rest.model.patch.Patch;
+import org.dspace.app.rest.repository.patch.DSpaceObjectPatch;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Site;
 import org.dspace.content.service.SiteService;
 import org.dspace.core.Context;
@@ -22,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 /**
@@ -31,16 +36,15 @@ import org.springframework.stereotype.Component;
  */
 
 @Component(SiteRest.CATEGORY + "." + SiteRest.NAME)
-public class SiteRestRepository extends DSpaceRestRepository<SiteRest, UUID> {
+public class SiteRestRepository extends DSpaceObjectRestRepository<Site, SiteRest> {
+
+    private final SiteService sitesv;
 
     @Autowired
-    SiteService sitesv;
-
-    @Autowired
-    SiteConverter converter;
-
-
-    public SiteRestRepository() {
+    public SiteRestRepository(SiteService dsoService,
+                              SiteConverter dsoConverter) {
+        super(dsoService, dsoConverter, new DSpaceObjectPatch<SiteRest>() {});
+        this.sitesv = dsoService;
     }
 
     @Override
@@ -54,7 +58,7 @@ public class SiteRestRepository extends DSpaceRestRepository<SiteRest, UUID> {
         if (site == null) {
             return null;
         }
-        return converter.fromModel(site);
+        return dsoConverter.fromModel(site);
     }
 
     @Override
@@ -66,8 +70,15 @@ public class SiteRestRepository extends DSpaceRestRepository<SiteRest, UUID> {
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<SiteRest> page = new PageImpl<Site>(sites, pageable, total).map(converter);
+        Page<SiteRest> page = new PageImpl<Site>(sites, pageable, total).map(dsoConverter);
         return page;
+    }
+
+    @Override
+    @PreAuthorize("hasAuthority('ADMIN')")
+    protected void patch(Context context, HttpServletRequest request, String apiCategory, String model, UUID id,
+                         Patch patch) throws AuthorizeException, SQLException {
+        patchDSpaceObject(apiCategory, model, id, patch);
     }
 
     @Override

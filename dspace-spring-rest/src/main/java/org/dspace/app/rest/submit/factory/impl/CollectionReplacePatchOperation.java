@@ -11,6 +11,7 @@ import java.sql.SQLException;
 
 import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.content.Collection;
+import org.dspace.content.InProgressSubmission;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.ItemService;
@@ -35,13 +36,17 @@ public class CollectionReplacePatchOperation extends ReplacePatchOperation<Strin
     WorkspaceItemService workspaceItemService;
 
     @Override
-    void replace(Context context, Request currentRequest, WorkspaceItem source, String path, Object value)
+    void replace(Context context, Request currentRequest, InProgressSubmission source, String path, Object value)
         throws SQLException, DCInputsReaderException {
-        String uuid = (String) value;
 
+        if (!(source instanceof WorkspaceItem)) {
+            throw new IllegalArgumentException("the replace operation is only supported on workspaceitem");
+        }
+        WorkspaceItem wsi = (WorkspaceItem) source;
+        String uuid = (String) value;
         Collection fromCollection = source.getCollection();
         Collection toCollection = collectionService.find(context, UUIDUtils.fromString(uuid));
-        workspaceItemService.move(context, source, fromCollection, toCollection);
+        workspaceItemService.move(context, wsi, fromCollection, toCollection);
 
     }
 

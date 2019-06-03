@@ -74,6 +74,7 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
+import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
@@ -677,7 +678,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
         Node schemaAttr = metadata.item(0).getAttributes().getNamedItem(
             "schema");
         if (schemaAttr == null) {
-            schema = MetadataSchema.DC_SCHEMA;
+            schema = MetadataSchemaEnum.DC.getName();
         } else {
             schema = schemaAttr.getNodeValue();
         }

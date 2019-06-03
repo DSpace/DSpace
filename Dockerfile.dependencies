@@ -1,0 +1,24 @@
+# This image will be published as dspace/dspace-dependencies
+# The purpose of this image is to make the build for dspace/dspace run faster 
+
+# Step 1 - Run Maven Build
+FROM maven:3-jdk-8 as build
+ARG TARGET_DIR=dspace-installer
+WORKDIR /app
+
+RUN useradd dspace \
+    && mkdir /home/dspace \
+    && chown -Rv dspace: /home/dspace
+USER dspace
+
+# Copy the DSpace source code into the workdir (excluding .dockerignore contents)
+ADD --chown=dspace . /app/
+COPY dspace/src/main/docker/local.cfg /app/local.cfg
+
+# Trigger the installation of all maven dependencies
+# Clean up the built artifacts in the same step to keep the docker image small
+RUN mvn package && mvn clean
+
+# Clear the contents of the /app directory so no artifacts are left when dspace:dspace is built
+USER root
+RUN rm -rf /app/*

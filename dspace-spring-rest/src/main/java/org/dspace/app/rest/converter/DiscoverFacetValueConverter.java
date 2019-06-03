@@ -9,10 +9,12 @@ package org.dspace.app.rest.converter;
 
 import org.dspace.app.rest.model.SearchFacetValueRest;
 import org.dspace.discovery.DiscoverResult;
+import org.springframework.stereotype.Component;
 
 /**
  * This class' purpose is to convert a DiscoverResult.FacetResult object into a SearchFacetValueRest object
  */
+@Component
 public class DiscoverFacetValueConverter {
 
     public SearchFacetValueRest convert(final DiscoverResult.FacetResult value) {

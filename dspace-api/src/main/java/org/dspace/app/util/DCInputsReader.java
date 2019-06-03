@@ -21,7 +21,7 @@ import javax.xml.parsers.FactoryConfigurationError;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.content.Collection;
-import org.dspace.content.MetadataSchema;
+import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.core.Utils;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.w3c.dom.Document;
@@ -464,7 +464,7 @@ public class DCInputsReader {
         String elem = field.get("dc-element");
         String qual = field.get("dc-qualifier");
         if ((schema == null) || (schema.equals(""))) {
-            schema = MetadataSchema.DC_SCHEMA;
+            schema = MetadataSchemaEnum.DC.getName();
         }
         String schemaTest;
 
@@ -474,7 +474,7 @@ public class DCInputsReader {
                 Map<String, String> fld = pg.get(j);
                 if ((fld.get("dc-schema") == null) ||
                     ((fld.get("dc-schema")).equals(""))) {
-                    schemaTest = MetadataSchema.DC_SCHEMA;
+                    schemaTest = MetadataSchemaEnum.DC.getName();
                 } else {
                     schemaTest = fld.get("dc-schema");
                 }

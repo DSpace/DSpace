@@ -12,12 +12,13 @@ import java.util.Date;
 import java.util.List;
 
 import org.dspace.app.rest.model.ResourcePolicyRest;
+import org.dspace.app.rest.model.patch.LateObjectEvaluator;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
+import org.dspace.content.InProgressSubmission;
 import org.dspace.content.Item;
-import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
@@ -28,7 +29,6 @@ import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.services.model.Request;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.rest.webmvc.json.patch.LateObjectEvaluator;
 
 /**
  * Submission "add" operation to add resource policies in the Bitstream
@@ -52,7 +52,7 @@ public class ResourcePolicyAddPatchOperation extends AddPatchOperation<ResourceP
     EPersonService epersonService;
 
     @Override
-    void add(Context context, Request currentRequest, WorkspaceItem source, String path, Object value)
+    void add(Context context, Request currentRequest, InProgressSubmission source, String path, Object value)
         throws Exception {
         //"path": "/sections/upload/files/0/accessConditions"
         String[] split = getAbsolutePath(path).split("/");

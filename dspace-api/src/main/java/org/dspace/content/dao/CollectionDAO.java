@@ -35,6 +35,13 @@ public interface CollectionDAO extends DSpaceObjectLegacySupportDAO<Collection> 
 
     public Collection findByTemplateItem(Context context, Item item) throws SQLException;
 
+    /**
+     * 
+     * @param context DSpace Context
+     * @param group EPerson Group
+     * @return the collection, if any, that has the specified group as administrators or submitters
+     * @throws SQLException
+     */
     public Collection findByGroup(Context context, Group group) throws SQLException;
 
     public List<Collection> findAuthorized(Context context, EPerson ePerson, List<Integer> actions) throws SQLException;

@@ -8,8 +8,6 @@
 package org.dspace.app.rest;
 
 import static java.lang.Thread.sleep;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.is;
@@ -25,7 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.Base64;
 
 import org.dspace.app.rest.builder.GroupBuilder;
-import org.dspace.app.rest.matcher.GroupMatcher;
+import org.dspace.app.rest.matcher.EPersonMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.eperson.Group;
 import org.dspace.services.ConfigurationService;
@@ -72,9 +70,8 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                         .andExpect(jsonPath("$.type", is("status")))
 
                         .andExpect(jsonPath("$._links.eperson.href", startsWith(REST_SERVER_URL)))
-                        .andExpect(jsonPath("$._embedded.eperson.email", is(eperson.getEmail())))
-                        .andExpect(jsonPath("$._embedded.eperson.groups", contains(
-                                GroupMatcher.matchGroupWithName("Anonymous"))));
+                        .andExpect(jsonPath("$._embedded.eperson",
+                                EPersonMatcher.matchEPersonWithGroups(eperson.getEmail(), "Anonymous")));
     }
 
     @Test
@@ -113,7 +110,8 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                          .andExpect(jsonPath("$.type", is("status")))
 
                          .andExpect(jsonPath("$._links.eperson.href", startsWith(REST_SERVER_URL)))
-                         .andExpect(jsonPath("$._embedded.eperson.email", is(eperson.getEmail())));
+                         .andExpect(jsonPath("$._embedded.eperson",
+                                EPersonMatcher.matchEPersonOnEmail(eperson.getEmail())));
 
         getClient(token2).perform(get("/api/authn/status"))
 
@@ -126,7 +124,8 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                          .andExpect(jsonPath("$.type", is("status")))
 
                          .andExpect(jsonPath("$._links.eperson.href", startsWith(REST_SERVER_URL)))
-                         .andExpect(jsonPath("$._embedded.eperson.email", is(eperson.getEmail())));
+                         .andExpect(jsonPath("$._embedded.eperson",
+                                EPersonMatcher.matchEPersonOnEmail(eperson.getEmail())));
 
     }
 
@@ -379,9 +378,8 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                 .andExpect(jsonPath("$.authenticated", is(true)))
                 .andExpect(jsonPath("$.type", is("status")))
                 .andExpect(jsonPath("$._links.eperson.href", startsWith(REST_SERVER_URL)))
-                .andExpect(jsonPath("$._embedded.eperson.email", is(eperson.getEmail())))
-                .andExpect(jsonPath("$._embedded.eperson.groups", containsInAnyOrder(
-                        GroupMatcher.matchGroupWithName("Anonymous"), GroupMatcher.matchGroupWithName("Reviewers"))));
+                .andExpect(jsonPath("$._embedded.eperson",
+                        EPersonMatcher.matchEPersonWithGroups(eperson.getEmail(), "Anonymous", "Reviewers")));
     }
 
     @Test
@@ -415,10 +413,8 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                 .andExpect(jsonPath("$.authenticated", is(true)))
                 .andExpect(jsonPath("$.type", is("status")))
                 .andExpect(jsonPath("$._links.eperson.href", startsWith(REST_SERVER_URL)))
-                .andExpect(jsonPath("$._embedded.eperson.email", is(eperson.getEmail())))
-                .andExpect(jsonPath("$._embedded.eperson.groups", containsInAnyOrder(
-                        GroupMatcher.matchGroupWithName("Administrator"),
-                        GroupMatcher.matchGroupWithName("Anonymous"))));
+                .andExpect(jsonPath("$._embedded.eperson",
+                        EPersonMatcher.matchEPersonWithGroups(eperson.getEmail(), "Anonymous", "Administrator")));
 
         //Simulate that a new shibboleth authentication has happened from another IP
         token = getClient().perform(post("/api/authn/login")
@@ -437,9 +433,8 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                 .andExpect(jsonPath("$.authenticated", is(true)))
                 .andExpect(jsonPath("$.type", is("status")))
                 .andExpect(jsonPath("$._links.eperson.href", startsWith(REST_SERVER_URL)))
-                .andExpect(jsonPath("$._embedded.eperson.email", is(eperson.getEmail())))
-                .andExpect(jsonPath("$._embedded.eperson.groups", contains(
-                        GroupMatcher.matchGroupWithName("Anonymous"))));
+                .andExpect(jsonPath("$._embedded.eperson",
+                        EPersonMatcher.matchEPersonWithGroups(eperson.getEmail(), "Anonymous")));
     }
 
 }

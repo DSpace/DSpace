@@ -13,6 +13,7 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.content.DSpaceObject;
+import org.dspace.discovery.IndexableObject;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
@@ -39,12 +40,14 @@ public class DiscoveryConfigurationService {
         this.toIgnoreMetadataFields = toIgnoreMetadataFields;
     }
 
-    public DiscoveryConfiguration getDiscoveryConfiguration(DSpaceObject dso) {
+    public DiscoveryConfiguration getDiscoveryConfiguration(IndexableObject dso) {
         String name;
         if (dso == null) {
             name = "site";
+        } else if (dso instanceof DSpaceObject) {
+            name = ((DSpaceObject) dso).getHandle();
         } else {
-            name = dso.getHandle();
+            name = dso.getUniqueIndexID();
         }
 
         return getDiscoveryConfiguration(name);
@@ -64,7 +67,7 @@ public class DiscoveryConfigurationService {
     }
 
     public DiscoveryConfiguration getDiscoveryConfigurationByNameOrDso(final String configurationName,
-                                                                       final DSpaceObject dso) {
+                                                                       final IndexableObject dso) {
         if (StringUtils.isNotBlank(configurationName) && getMap().containsKey(configurationName)) {
             return getMap().get(configurationName);
         } else {

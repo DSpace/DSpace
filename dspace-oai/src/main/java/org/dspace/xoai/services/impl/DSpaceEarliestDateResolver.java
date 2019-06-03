@@ -10,6 +10,8 @@ package org.dspace.xoai.services.impl;
 import java.sql.SQLException;
 import java.util.Date;
 
+import javax.persistence.NoResultException;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.MetadataValue;
@@ -30,11 +32,16 @@ public class DSpaceEarliestDateResolver implements EarliestDateResolver {
 
     @Override
     public Date getEarliestDate(Context context) throws InvalidMetadataFieldException, SQLException {
-        String query = "SELECT MIN(text_value) as value FROM metadatavalue WHERE metadata_field_id = ?";
-
         MetadataValueService metadataValueService = ContentServiceFactory.getInstance().getMetadataValueService();
-        MetadataValue minimum = metadataValueService.getMinimum(context,
-                                                                fieldResolver.getFieldID(context, "dc.date.available"));
+        MetadataValue minimum = null;
+        try {
+            minimum = metadataValueService.getMinimum(context,
+                                                      fieldResolver.getFieldID(context, "dc.date.available"));
+        } catch (NoResultException e) {
+          // This error only occurs if no metadataFields of this type exist (i.e. no minimum exists)
+          // It can be safely ignored in this scenario, as it implies the DSpace is empty.
+        }
+
         if (null != minimum) {
             String str = minimum.getValue();
             try {

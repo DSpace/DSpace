@@ -19,6 +19,7 @@ import org.dspace.core.Context;
 import org.dspace.discovery.DiscoverResult;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
@@ -27,8 +28,11 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class DiscoverFacetResultsConverter {
+    @Autowired
+    private DiscoverFacetValueConverter facetValueConverter;
 
-    private DiscoverFacetValueConverter facetValueConverter = new DiscoverFacetValueConverter();
+    @Autowired
+    private SearchFilterToAppliedFilterConverter searchFilterToAppliedFilterConverter;
 
     public FacetResultsRest convert(Context context, String facetName, String prefix, String query, String dsoType,
                                     String dsoScope, List<SearchFilter> searchFilters, DiscoverResult searchResult,
@@ -80,8 +84,6 @@ public class DiscoverFacetResultsConverter {
 
         facetResultsRest.setSearchFilters(searchFilters);
 
-        SearchFilterToAppliedFilterConverter searchFilterToAppliedFilterConverter = new
-            SearchFilterToAppliedFilterConverter();
         for (SearchFilter searchFilter : CollectionUtils.emptyIfNull(searchFilters)) {
             facetResultsRest
                 .addAppliedFilter(searchFilterToAppliedFilterConverter.convertSearchFilter(context, searchFilter));

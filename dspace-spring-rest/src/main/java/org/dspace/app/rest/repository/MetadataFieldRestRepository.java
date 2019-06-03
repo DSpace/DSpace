@@ -7,22 +7,37 @@
  */
 package org.dspace.app.rest.repository;
 
+import static java.lang.Integer.parseInt;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Objects;
+import javax.servlet.http.HttpServletRequest;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.MetadataFieldConverter;
+import org.dspace.app.rest.exception.PatchBadRequestException;
+import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.MetadataFieldRest;
 import org.dspace.app.rest.model.hateoas.MetadataFieldResource;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
+import org.dspace.content.NonUniqueMetadataException;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.MetadataSchemaService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 /**
@@ -34,7 +49,7 @@ import org.springframework.stereotype.Component;
 public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFieldRest, Integer> {
 
     @Autowired
-    MetadataFieldService metaFieldService;
+    MetadataFieldService metadataFieldService;
 
     @Autowired
     MetadataSchemaService metadataSchemaService;
@@ -49,7 +64,7 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
     public MetadataFieldRest findOne(Context context, Integer id) {
         MetadataField metadataField = null;
         try {
-            metadataField = metaFieldService.find(context, id);
+            metadataField = metadataFieldService.find(context, id);
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -63,7 +78,7 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
     public Page<MetadataFieldRest> findAll(Context context, Pageable pageable) {
         List<MetadataField> metadataField = null;
         try {
-            metadataField = metaFieldService.findAll(context);
+            metadataField = metadataFieldService.findAll(context);
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -73,7 +88,7 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
 
     @SearchRestMethod(name = "bySchema")
     public Page<MetadataFieldRest> findBySchema(@Parameter(value = "schema", required = true) String schemaName,
-                                                          Pageable pageable) {
+                                                Pageable pageable) {
         Context context = obtainContext();
         List<MetadataField> metadataFields = null;
         try {
@@ -81,7 +96,7 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
             if (schema == null) {
                 return null;
             }
-            metadataFields = metaFieldService.findAllInSchema(context, schema);
+            metadataFields = metadataFieldService.findAllInSchema(context, schema);
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -97,5 +112,113 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
     @Override
     public MetadataFieldResource wrapResource(MetadataFieldRest bs, String... rels) {
         return new MetadataFieldResource(bs, utils, rels);
+    }
+
+    @Override
+    @PreAuthorize("hasAuthority('ADMIN')")
+    protected MetadataFieldRest createAndReturn(Context context)
+            throws AuthorizeException, SQLException {
+
+        // parse request body
+        MetadataFieldRest metadataFieldRest;
+        try {
+            metadataFieldRest = new ObjectMapper().readValue(
+                    getRequestService().getCurrentRequest().getHttpServletRequest().getInputStream(),
+                    MetadataFieldRest.class
+            );
+        } catch (IOException excIO) {
+            throw new PatchBadRequestException("error parsing request body", excIO);
+        }
+
+        // validate fields
+        String schemaId = getRequestService().getCurrentRequest().getHttpServletRequest().getParameter("schemaId");
+        if (isBlank(schemaId)) {
+            throw new UnprocessableEntityException("metadata schema ID cannot be blank");
+        }
+
+        MetadataSchema schema = metadataSchemaService.find(context, parseInt(schemaId));
+        if (schema == null) {
+            throw new UnprocessableEntityException("metadata schema with ID " + schemaId + " not found");
+        }
+
+        if (isBlank(metadataFieldRest.getElement())) {
+            throw new UnprocessableEntityException("metadata element (in request body) cannot be blank");
+        }
+
+        // create
+        MetadataField metadataField;
+        try {
+            metadataField = metadataFieldService.create(context, schema,
+                    metadataFieldRest.getElement(), metadataFieldRest.getQualifier(), metadataFieldRest.getScopeNote());
+            metadataFieldService.update(context, metadataField);
+        } catch (NonUniqueMetadataException e) {
+            throw new UnprocessableEntityException(
+                    "metadata field "
+                            + schema.getName() + "." + metadataFieldRest.getElement()
+                            + (metadataFieldRest.getQualifier() != null ? "." + metadataFieldRest.getQualifier() : "")
+                            + " already exists"
+            );
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        // return
+        return converter.convert(metadataField);
+    }
+
+    @Override
+    @PreAuthorize("hasAuthority('ADMIN')")
+    protected void delete(Context context, Integer id) throws AuthorizeException {
+
+        try {
+            MetadataField metadataField = metadataFieldService.find(context, id);
+
+            if (metadataField == null) {
+                throw new ResourceNotFoundException("metadata field with id: " + id + " not found");
+            }
+
+            metadataFieldService.delete(context, metadataField);
+        } catch (SQLException e) {
+            throw new RuntimeException("error while trying to delete " + MetadataFieldRest.NAME + " with id: " + id, e);
+        }
+    }
+
+    @Override
+    @PreAuthorize("hasAuthority('ADMIN')")
+    protected MetadataFieldRest put(Context context, HttpServletRequest request, String apiCategory, String model,
+                                    Integer id, JsonNode jsonNode) throws SQLException, AuthorizeException {
+
+        MetadataFieldRest metadataFieldRest = new Gson().fromJson(jsonNode.toString(), MetadataFieldRest.class);
+
+        if (isBlank(metadataFieldRest.getElement())) {
+            throw new UnprocessableEntityException("metadata element (in request body) cannot be blank");
+        }
+
+        if (!Objects.equals(id, metadataFieldRest.getId())) {
+            throw new UnprocessableEntityException("ID in request body doesn't match path ID");
+        }
+
+        MetadataField metadataField = metadataFieldService.find(context, id);
+        if (metadataField == null) {
+            throw new ResourceNotFoundException("metadata field with id: " + id + " not found");
+        }
+
+        metadataField.setElement(metadataFieldRest.getElement());
+        metadataField.setQualifier(metadataFieldRest.getQualifier());
+        metadataField.setScopeNote(metadataFieldRest.getScopeNote());
+
+        try {
+            metadataFieldService.update(context, metadataField);
+            context.commit();
+        } catch (NonUniqueMetadataException e) {
+            throw new UnprocessableEntityException("metadata field "
+                    + metadataField.getMetadataSchema().getName() + "." + metadataFieldRest.getElement()
+                    + (metadataFieldRest.getQualifier() != null ? "." + metadataFieldRest.getQualifier() : "")
+                    + " already exists");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        return converter.fromModel(metadataField);
     }
 }

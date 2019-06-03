@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
-import org.dspace.content.MetadataSchema;
+import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.MetadataValue;
 import org.dspace.core.Context;
 import org.dspace.workflow.WorkflowException;
@@ -66,8 +66,8 @@ public class ScoreEvaluationAction extends ProcessingAction {
 
             String provDescription = getProvenanceStartId() + " Approved for entry into archive with a score of: " +
                 scoreMean;
-            itemService.addMetadata(c, wfi.getItem(), MetadataSchema.DC_SCHEMA, "description", "provenance", "en",
-                                    provDescription);
+            itemService.addMetadata(c, wfi.getItem(), MetadataSchemaEnum.DC.getName(),
+                                    "description", "provenance", "en", provDescription);
             itemService.update(c, wfi.getItem());
         }
         if (hasPassed) {

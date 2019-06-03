@@ -20,7 +20,7 @@ import org.dspace.AbstractUnitTest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
-import org.dspace.content.MetadataSchema;
+import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
@@ -87,13 +87,14 @@ public class PackageUtilsTest extends AbstractUnitTest {
             //
             Community topCommunity = communityService.create(null, context);
             communityService
-                .addMetadata(context, topCommunity, MetadataSchema.DC_SCHEMA, "title", null, null, "Top Community");
+                .addMetadata(context, topCommunity, MetadataSchemaEnum.DC.getName(), "title", null, null,
+                             "Top Community");
             communityService.update(context, topCommunity);
             topCommunityHandle = topCommunity.getHandle();
 
             Community child = communityService.createSubcommunity(context, topCommunity);
             communityService
-                .addMetadata(context, child, MetadataSchema.DC_SCHEMA, "title", null, null, "Child Community");
+                .addMetadata(context, child, MetadataSchemaEnum.DC.getName(), "title", null, null, "Child Community");
             communityService.update(context, child);
 
             // Create our primary Test Collection
@@ -156,7 +157,7 @@ public class PackageUtilsTest extends AbstractUnitTest {
     @Test
     public void testCrosswalkGroupNameWithoutUnderscore() throws Exception {
         Collection testCollection = (Collection) handleService.resolveToObject(context, testCollectionHandle);
-        Group originalFirstStepWorkflowGroup = testCollection.getWorkflowStep1();
+        Group originalFirstStepWorkflowGroup = testCollection.getWorkflowStep1(context);
 
         GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
         Group testGroup = groupService.create(context);
@@ -178,7 +179,7 @@ public class PackageUtilsTest extends AbstractUnitTest {
     @Test
     public void testCrosswalkGroupNameUnderscoresNoDSO() throws Exception {
         Collection testCollection = (Collection) handleService.resolveToObject(context, testCollectionHandle);
-        Group originalFirstStepWorkflowGroup = testCollection.getWorkflowStep1();
+        Group originalFirstStepWorkflowGroup = testCollection.getWorkflowStep1(context);
 
         GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
         Group testGroup = groupService.create(context);
@@ -200,7 +201,7 @@ public class PackageUtilsTest extends AbstractUnitTest {
     @Test
     public void testCrosswalkGroupNameUnderscoresAndDSO() throws Exception {
         Collection testCollection = (Collection) handleService.resolveToObject(context, testCollectionHandle);
-        Group originalFirstStepWorkflowGroup = testCollection.getWorkflowStep1();
+        Group originalFirstStepWorkflowGroup = testCollection.getWorkflowStep1(context);
 
         Group group = collectionService.createWorkflowGroup(context, testCollection, 1);
 

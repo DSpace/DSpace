@@ -88,7 +88,8 @@ public class UUIDLookupRestController implements InitializingBean {
         Context context = null;
         try {
             context = ContextUtil.obtainContext(request);
-            for (DSpaceObjectService dSpaceObjectService : contentServiceFactory.getDSpaceObjectServices()) {
+            for (DSpaceObjectService<? extends DSpaceObject> dSpaceObjectService : contentServiceFactory
+                    .getDSpaceObjectServices()) {
                 DSpaceObject dso = dSpaceObjectService.find(context, uuid);
                 if (dso != null) {
                     DSpaceObjectRest dsor = converter.convert(dso);

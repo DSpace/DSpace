@@ -7,7 +7,7 @@
  */
 package org.dspace.app.rest.submit.factory.impl;
 
-import org.dspace.content.WorkspaceItem;
+import org.dspace.content.InProgressSubmission;
 import org.dspace.content.service.BundleService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
@@ -39,7 +39,7 @@ public class BitstreamMovePatchOperation extends MovePatchOperation<String> {
     }
 
     @Override
-    void move(Context context, Request currentRequest, WorkspaceItem source, String path, String from)
+    void move(Context context, Request currentRequest, InProgressSubmission source, String path, String from)
         throws Exception {
         // TODO Auto-generated method stub
 

@@ -13,18 +13,31 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Service;
 
 /**
- * Mock SOLR service for the Search Core
+ * Mock SOLR service for the Search Core.
+ *
+ * <p>
+ * <strong>NOTE:</strong>  this class overrides one <em>of the same name</em>
+ * defined in dspace-api and declared as a bean there.
+ * See {@code config/spring/api/Z-mock-services.xml}.  Some kind of classpath
+ * magic makes this work.
  */
 @Service
 public class MockSolrServiceImpl extends SolrServiceImpl implements InitializingBean, DisposableBean {
 
     private MockSolrServer mockSolrServer;
 
+    @Override
     public void afterPropertiesSet() throws Exception {
         mockSolrServer = new MockSolrServer("search");
         solr = mockSolrServer.getSolrServer();
     }
 
+    /** Clear all records from the search core. */
+    public void reset() {
+        mockSolrServer.reset();
+    }
+
+    @Override
     public void destroy() throws Exception {
         mockSolrServer.destroy();
     }

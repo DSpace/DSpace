@@ -120,7 +120,8 @@ public class BitstreamBuilder extends AbstractDSpaceObjectBuilder<Bitstream> {
         return bitstream;
     }
 
-    protected void cleanup() throws Exception {
+    @Override
+    public void cleanup() throws Exception {
         delete(bitstream);
     }
 

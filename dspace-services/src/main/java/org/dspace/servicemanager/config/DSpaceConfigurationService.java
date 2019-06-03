@@ -346,6 +346,26 @@ public final class DSpaceConfigurationService implements ConfigurationService {
         }
     }
 
+    @Override
+    public synchronized boolean addPropertyValue(String name, Object value) {
+        if (name == null) {
+            throw new IllegalArgumentException("name cannot be null for setting configuration");
+        }
+        if (value == null) {
+            throw new IllegalArgumentException("configuration value may not be null");
+        }
+
+        // If the value is a type of String, trim any leading/trailing spaces before saving it.
+        if (String.class.isInstance(value)) {
+            value = ((String) value).trim();
+        }
+
+        Configuration configuration = getConfiguration();
+        boolean isNew = !configuration.containsKey(name);
+        configuration.addProperty(name, value);
+        return isNew;
+    }
+
     /* (non-Javadoc)
      * @see org.dspace.services.ConfigurationService#setProperty(java.lang.String, java.lang.Object)
      */

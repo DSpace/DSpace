@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @Component
-public class MetadataSchemaConverter extends DSpaceConverter<org.dspace.content.MetadataSchema, MetadataSchemaRest> {
+public class MetadataSchemaConverter implements DSpaceConverter<org.dspace.content.MetadataSchema, MetadataSchemaRest> {
     @Override
     public MetadataSchemaRest fromModel(org.dspace.content.MetadataSchema obj) {
         MetadataSchemaRest schema = new MetadataSchemaRest();

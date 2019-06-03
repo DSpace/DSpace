@@ -307,4 +307,10 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService {
             context.restoreAuthSystemState();
         }
     }
+
+    @Override
+    public List<ResourcePolicy> findExceptRpType(Context c, DSpaceObject o, int actionID, String rpType)
+        throws SQLException {
+        return resourcePolicyDAO.findByDSoAndActionExceptRpType(c, o, actionID, rpType);
+    }
 }

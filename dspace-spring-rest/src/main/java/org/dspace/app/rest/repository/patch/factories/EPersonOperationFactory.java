@@ -10,6 +10,7 @@ package org.dspace.app.rest.repository.patch.factories;
 import org.dspace.app.rest.exception.PatchBadRequestException;
 import org.dspace.app.rest.model.EPersonRest;
 import org.dspace.app.rest.repository.patch.factories.impl.EPersonCertificateReplaceOperation;
+import org.dspace.app.rest.repository.patch.factories.impl.EPersonEmailReplaceOperation;
 import org.dspace.app.rest.repository.patch.factories.impl.EPersonLoginReplaceOperation;
 import org.dspace.app.rest.repository.patch.factories.impl.EPersonNetidReplaceOperation;
 import org.dspace.app.rest.repository.patch.factories.impl.EPersonPasswordReplaceOperation;
@@ -35,13 +36,16 @@ public class EPersonOperationFactory {
     EPersonCertificateReplaceOperation certificateReplaceOperation;
 
     @Autowired
-    EPersonNetidReplaceOperation netidReplaceOperation;
+    EPersonNetidReplaceOperation netIdReplaceOperation;
 
-    private static final String OPERATION_PASSWORD_CHANGE = "/password";
-    private static final String OPERATION_CAN_LOGIN = "/canLogin";
-    private static final String OPERATION_REQUIRE_CERTIFICATE = "/certificate";
-    private static final String OPERATION_SET_NETID = "/netid";
+    @Autowired
+    EPersonEmailReplaceOperation emailReplaceOperation;
 
+    public static final String OPERATION_PASSWORD_CHANGE = "/password";
+    public static final String OPERATION_CAN_LOGIN = "/canLogin";
+    public static final String OPERATION_REQUIRE_CERTIFICATE = "/certificate";
+    public static final String OPERATION_SET_NETID = "/netid";
+    public static final String OPERATION_SET_EMAIL = "/email";
     /**
      * Returns the patch instance for the replace operation (based on the operation path).
      *
@@ -59,7 +63,9 @@ public class EPersonOperationFactory {
             case OPERATION_REQUIRE_CERTIFICATE:
                 return certificateReplaceOperation;
             case OPERATION_SET_NETID:
-                return netidReplaceOperation;
+                return netIdReplaceOperation;
+            case OPERATION_SET_EMAIL:
+                return emailReplaceOperation;
             default:
                 throw new PatchBadRequestException("Missing patch operation for: " + path);
         }

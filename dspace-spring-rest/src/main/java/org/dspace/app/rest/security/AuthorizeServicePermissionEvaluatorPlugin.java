@@ -35,7 +35,7 @@ import org.springframework.stereotype.Component;
  * based on the resource policies attached to that DSpace object.
  */
 @Component
-public class AuthorizeServicePermissionEvaluatorPlugin extends DSpaceObjectPermissionEvaluatorPlugin {
+public class AuthorizeServicePermissionEvaluatorPlugin extends RestObjectPermissionEvaluatorPlugin {
 
     private static final Logger log = LoggerFactory.getLogger(AuthorizeServicePermissionEvaluatorPlugin.class);
 
@@ -52,8 +52,8 @@ public class AuthorizeServicePermissionEvaluatorPlugin extends DSpaceObjectPermi
     private ContentServiceFactory contentServiceFactory;
 
     @Override
-    public boolean hasPermission(Authentication authentication, Serializable targetId, String targetType,
-                                 Object permission) {
+    public boolean hasDSpacePermission(Authentication authentication, Serializable targetId, String targetType,
+                                       DSpaceRestPermission permission) {
 
         DSpaceRestPermission restPermission = DSpaceRestPermission.convert(permission);
         if (restPermission == null) {
@@ -64,11 +64,17 @@ public class AuthorizeServicePermissionEvaluatorPlugin extends DSpaceObjectPermi
         Context context = ContextUtil.obtainContext(request.getServletRequest());
         EPerson ePerson = null;
         try {
-            ePerson = ePersonService.findByEmail(context, (String) authentication.getPrincipal());
-
             UUID dsoId = UUIDUtils.fromString(targetId.toString());
-            DSpaceObjectService dSpaceObjectService =
-                    contentServiceFactory.getDSpaceObjectService(Constants.getTypeID(targetType));
+            DSpaceObjectService<DSpaceObject> dSpaceObjectService;
+            try {
+                dSpaceObjectService =
+                        contentServiceFactory.getDSpaceObjectService(Constants.getTypeID(targetType));
+            } catch (UnsupportedOperationException e) {
+                // ok not a dspace object
+                return false;
+            }
+
+            ePerson = ePersonService.findByEmail(context, (String) authentication.getPrincipal());
 
             if (dSpaceObjectService != null && dsoId != null) {
                 DSpaceObject dSpaceObject = dSpaceObjectService.find(context, dsoId);
@@ -88,4 +94,5 @@ public class AuthorizeServicePermissionEvaluatorPlugin extends DSpaceObjectPermi
 
         return false;
     }
+
 }

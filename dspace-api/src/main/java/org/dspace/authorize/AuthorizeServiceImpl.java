@@ -767,4 +767,10 @@ public class AuthorizeServiceImpl implements AuthorizeService {
         return policy;
     }
 
+    @Override
+    public List<ResourcePolicy> getPoliciesActionFilterExceptRpType(Context c, DSpaceObject o, int actionID,
+                                                                    String rpType) throws SQLException {
+        return resourcePolicyService.findExceptRpType(c, o, actionID, rpType);
+    }
+
 }

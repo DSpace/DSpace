@@ -299,7 +299,7 @@ public class RoleDisseminator implements PackageDisseminator {
         writer.writeAttribute(ID, String.valueOf(group.getID()));
         writer.writeAttribute(NAME, exportGroupName);
 
-        String groupType = getGroupType(relatedObject, group);
+        String groupType = getGroupType(context, relatedObject, group);
         if (groupType != null && !groupType.isEmpty()) {
             writer.writeAttribute(TYPE, groupType);
         }
@@ -349,7 +349,7 @@ public class RoleDisseminator implements PackageDisseminator {
      * @param group the group
      * @return a group type string or null
      */
-    protected String getGroupType(DSpaceObject dso, Group group) {
+    protected String getGroupType(Context context, DSpaceObject dso, Group group) {
         if (dso == null || group == null) {
             return null;
         }
@@ -370,13 +370,13 @@ public class RoleDisseminator implements PackageDisseminator {
             } else if (group.equals(collection.getSubmitters())) {
                 //Check if Submitters group
                 return GROUP_TYPE_SUBMIT;
-            } else if (group.equals(collection.getWorkflowStep1())) {
+            } else if (group.equals(collection.getWorkflowStep1(context))) {
                 //Check if workflow step 1 group
                 return GROUP_TYPE_WORKFLOW_STEP_1;
-            } else if (group.equals(collection.getWorkflowStep2())) {
+            } else if (group.equals(collection.getWorkflowStep2(context))) {
                 //check if workflow step 2 group
                 return GROUP_TYPE_WORKFLOW_STEP_2;
-            } else if (group.equals(collection.getWorkflowStep3())) {
+            } else if (group.equals(collection.getWorkflowStep3(context))) {
                 //check if workflow step 3 group
                 return GROUP_TYPE_WORKFLOW_STEP_3;
             }
@@ -521,16 +521,16 @@ public class RoleDisseminator implements PackageDisseminator {
                 list.add(collection.getSubmitters());
             }
             //check for workflow step 1 group
-            if (collection.getWorkflowStep1() != null) {
-                list.add(collection.getWorkflowStep1());
+            if (collection.getWorkflowStep1(context) != null) {
+                list.add(collection.getWorkflowStep1(context));
             }
             //check for workflow step 2 group
-            if (collection.getWorkflowStep2() != null) {
-                list.add(collection.getWorkflowStep2());
+            if (collection.getWorkflowStep2(context) != null) {
+                list.add(collection.getWorkflowStep2(context));
             }
             //check for workflow step 3 group
-            if (collection.getWorkflowStep3() != null) {
-                list.add(collection.getWorkflowStep3());
+            if (collection.getWorkflowStep3(context) != null) {
+                list.add(collection.getWorkflowStep3(context));
             }
 
             // FINAL CATCH-ALL -> Find any other groups where name begins with "COLLECTION_<ID>_"

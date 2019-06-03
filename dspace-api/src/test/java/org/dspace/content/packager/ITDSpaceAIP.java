@@ -36,7 +36,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.content.MetadataSchema;
+import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.factory.ContentServiceFactory;
@@ -164,17 +164,18 @@ public class ITDSpaceAIP extends AbstractUnitTest {
             //
             Community topCommunity = communityService.create(null, context);
             communityService
-                .addMetadata(context, topCommunity, MetadataSchema.DC_SCHEMA, "title", null, null, "Top Community");
+                .addMetadata(context, topCommunity, MetadataSchemaEnum.DC.getName(),
+                             "title", null, null, "Top Community");
             communityService.update(context, topCommunity);
             topCommunityHandle = topCommunity.getHandle();
 
             Community child = communityService.createSubcommunity(context, topCommunity);
             communityService
-                .addMetadata(context, child, MetadataSchema.DC_SCHEMA, "title", null, null, "Child Community");
+                .addMetadata(context, child, MetadataSchemaEnum.DC.getName(), "title", null, null, "Child Community");
             communityService.update(context, child);
 
             Community grandchild = communityService.createSubcommunity(context, child);
-            communityService.addMetadata(context, grandchild, MetadataSchema.DC_SCHEMA, "title", null, null,
+            communityService.addMetadata(context, grandchild, MetadataSchemaEnum.DC.getName(), "title", null, null,
                                          "Grandchild Community");
             communityService.update(context, grandchild);
 
@@ -558,8 +559,9 @@ public class ITDSpaceAIP extends AbstractUnitTest {
 
         // Change the Community name
         String newName = "This is NOT my Community name!";
-        communityService.clearMetadata(context, topCommunity, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY);
-        communityService.addMetadata(context, topCommunity, MetadataSchema.DC_SCHEMA, "title", null, null, newName);
+        communityService.clearMetadata(context, topCommunity, MetadataSchemaEnum.DC.getName(), "title", null, Item.ANY);
+        communityService.addMetadata(context, topCommunity, MetadataSchemaEnum.DC.getName(),
+                                     "title", null, null, newName);
 
         // Ensure name is changed
         assertEquals("testReplaceCommunityOnly() new name", topCommunity.getName(), newName);
@@ -781,8 +783,10 @@ public class ITDSpaceAIP extends AbstractUnitTest {
 
         // Change the Collection name
         String newName = "This is NOT my Collection name!";
-        collectionService.clearMetadata(context, testCollection, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY);
-        collectionService.addMetadata(context, testCollection, MetadataSchema.DC_SCHEMA, "title", null, null, newName);
+        collectionService.clearMetadata(context, testCollection, MetadataSchemaEnum.DC.getName(),
+                                        "title", null, Item.ANY);
+        collectionService.addMetadata(context, testCollection, MetadataSchemaEnum.DC.getName(),
+                                      "title", null, null, newName);
 
         // Ensure name is changed
         assertEquals("testReplaceCollectionOnly() new name", testCollection.getName(), newName);
@@ -1029,8 +1033,8 @@ public class ITDSpaceAIP extends AbstractUnitTest {
 
         // Change the Item name
         String newName = "This is NOT my Item name!";
-        itemService.clearMetadata(context, testItem, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY);
-        itemService.addMetadata(context, testItem, MetadataSchema.DC_SCHEMA, "title", null, null, newName);
+        itemService.clearMetadata(context, testItem, MetadataSchemaEnum.DC.getName(), "title", null, Item.ANY);
+        itemService.addMetadata(context, testItem, MetadataSchemaEnum.DC.getName(), "title", null, null, newName);
 
         // Ensure name is changed
         assertEquals("testReplaceItem() new name", testItem.getName(), newName);

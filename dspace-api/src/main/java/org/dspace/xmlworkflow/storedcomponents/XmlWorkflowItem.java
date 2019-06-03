@@ -8,6 +8,7 @@
 package org.dspace.xmlworkflow.storedcomponents;
 
 import java.sql.SQLException;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -22,8 +23,10 @@ import javax.persistence.Table;
 
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.ReloadableEntity;
+import org.dspace.discovery.IndexableObject;
 import org.dspace.eperson.EPerson;
 import org.dspace.workflow.WorkflowItem;
 
@@ -37,7 +40,7 @@ import org.dspace.workflow.WorkflowItem;
  */
 @Entity
 @Table(name = "cwf_workflowitem")
-public class XmlWorkflowItem implements WorkflowItem, ReloadableEntity<Integer> {
+public class XmlWorkflowItem implements WorkflowItem, ReloadableEntity<Integer>, IndexableObject<Integer> {
 
     @Id
     @Column(name = "workflowitem_id")
@@ -132,6 +135,18 @@ public class XmlWorkflowItem implements WorkflowItem, ReloadableEntity<Integer> 
     @Override
     public void setPublishedBefore(boolean b) {
         this.publishedBefore = b;
+    }
+
+    @Override
+    public int getState() {
+        // FIXME not used by the xml workflow, should be removed when the basic workflow is removed and the interfaces
+        // simplified
+        return 0;
+    }
+
+    @Override
+    public int getType() {
+        return Constants.WORKFLOWITEM;
     }
 
 }

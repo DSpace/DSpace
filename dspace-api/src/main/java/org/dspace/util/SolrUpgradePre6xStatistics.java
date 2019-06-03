@@ -24,10 +24,9 @@ import org.apache.commons.cli.PosixParser;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.HttpSolrServer;
+import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
@@ -92,7 +91,7 @@ public class SolrUpgradePre6xStatistics {
     private int numProcessed = 0;
     private long totalCache = 0;
     private long numUncache = 0;
-    private List<SolrInputDocument> docs = new ArrayList<SolrInputDocument>();
+    private final List<SolrInputDocument> docs = new ArrayList<>();
     private Context context;
 
     //Enum to identify the named SOLR statistics fields to update
@@ -122,7 +121,7 @@ public class SolrUpgradePre6xStatistics {
 
     // This code will operate on one shard at a time, therefore the SOLR web service will be accessed directly rather
     // than make use of the DSpace Solr Logger which only writes to the current shard
-    private HttpSolrServer server;
+    private final HttpSolrClient server;
 
     //Allows for smart use of hibernate cache
     private Item lastItem = null;
@@ -137,6 +136,7 @@ public class SolrUpgradePre6xStatistics {
      * Construct the utility class from the command line options
      * @param indexName name of the statistics shard to update
      * @param numRec    maximum number of records to process
+     * @param batchSize batch this many documents before updating.
      * @throws IOException
      * @throws SolrServerException
      */
@@ -145,8 +145,8 @@ public class SolrUpgradePre6xStatistics {
         String serverPath = configurationService.getProperty("solr-statistics.server");
         serverPath = serverPath.replaceAll("statistics$", indexName);
         System.out.println("Connecting to " + serverPath);
-        server = new HttpSolrServer(serverPath);
-        server.setMaxTotalConnections(1);
+        server = new HttpSolrClient.Builder(serverPath)
+                .build();
         this.numRec = numRec;
         this.batchSize = batchSize;
         refreshContext();
@@ -374,7 +374,7 @@ public class SolrUpgradePre6xStatistics {
     /*
      * Report on the existence of legacy id records within a shard
      */
-    private void runReport() throws SolrServerException {
+    private void runReport() throws SolrServerException, IOException {
         System.out.println();
         System.out.println("=================================================================");
         System.out.println("\t*** Statistics Records with Legacy Id ***\n");
@@ -388,10 +388,9 @@ public class SolrUpgradePre6xStatistics {
     /*
      * Report on the existence of specific legacy id records within a shard
      */
-    private long runReportQuery() throws SolrServerException {
-        StringBuilder sb = new StringBuilder(MIGQUERY);
+    private long runReportQuery() throws SolrServerException, IOException {
         SolrQuery sQ = new SolrQuery();
-        sQ.setQuery(sb.toString());
+        sQ.setQuery(MIGQUERY);
         sQ.setFacet(true);
         sQ.addFacetField("type");
         sQ.addFacetField("scopeType");
@@ -495,7 +494,10 @@ public class SolrUpgradePre6xStatistics {
 
         for (int i = 0; i < sdl.size() && (numProcessed < numRec); i++) {
             SolrDocument sd = sdl.get(i);
-            SolrInputDocument input = ClientUtils.toSolrInputDocument(sd);
+            SolrInputDocument input = new SolrInputDocument(); //ClientUtils.toSolrInputDocument(sd);
+            for (String name : sd.getFieldNames()) { // https://stackoverflow.com/a/38536843/2916377
+                input.addField(name, sd.getFieldValue(name));
+            }
             input.remove("_version_");
             for (FIELD col : FIELD.values()) {
                 mapField(input, col);

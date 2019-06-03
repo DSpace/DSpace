@@ -18,15 +18,17 @@ import org.springframework.stereotype.Component;
 
 /**
  * Provides PATCH operations for item updates.
+ *
+ * @author Michael Spalti
  */
 @Component
-public class ItemPatch extends AbstractResourcePatch<ItemRest> {
+public class ItemPatch extends DSpaceObjectPatch<ItemRest> {
 
     @Autowired
     ItemOperationFactory patchFactory;
 
     /**
-     * Peforms the replace operation.
+     * Performs the replace operation.
      * @param item the rest representation of the item
      * @param operation the replace operation
      * @throws UnprocessableEntityException

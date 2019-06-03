@@ -36,7 +36,7 @@ public class EPersonNetidReplaceOperation extends ReplacePatchOperation<EPersonR
 
 
     @Override
-    void checkModelForExistingValue(EPersonRest resource) {
+    void checkModelForExistingValue(EPersonRest resource, Operation operation) {
         if (resource.getNetid() == null) {
             throw new PatchBadRequestException("Attempting to replace a non-existent value.");
         }

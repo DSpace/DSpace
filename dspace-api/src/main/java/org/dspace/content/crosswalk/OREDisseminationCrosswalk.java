@@ -22,7 +22,7 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.content.MetadataSchema;
+import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
@@ -122,7 +122,7 @@ public class OREDisseminationCrosswalk
 
         Element aggLink;
         List<MetadataValue> uris = itemService
-            .getMetadata(item, MetadataSchema.DC_SCHEMA, "identifier", "uri", Item.ANY);
+            .getMetadata(item, MetadataSchemaEnum.DC.getName(), "identifier", "uri", Item.ANY);
         for (MetadataValue uri : uris) {
             aggLink = new Element("link", ATOM_NS);
             aggLink.setAttribute("rel", "alternate");
@@ -159,7 +159,8 @@ public class OREDisseminationCrosswalk
 
         // Information about the aggregation (item) itself
         Element aggTitle = new Element("title", ATOM_NS);
-        List<MetadataValue> titles = itemService.getMetadata(item, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY);
+        List<MetadataValue> titles = itemService.getMetadata(item, MetadataSchemaEnum.DC.getName(),
+                                                             "title", null, Item.ANY);
         if (titles != null && titles.size() > 0) {
             aggTitle.addContent(titles.get(0).getValue());
         } else {
@@ -170,7 +171,7 @@ public class OREDisseminationCrosswalk
         Element aggAuthor;
         Element aggAuthorName;
         List<MetadataValue> authors = itemService
-            .getMetadata(item, MetadataSchema.DC_SCHEMA, "contributor", "author", Item.ANY);
+            .getMetadata(item, MetadataSchemaEnum.DC.getName(), "contributor", "author", Item.ANY);
         for (MetadataValue author : authors) {
             aggAuthor = new Element("author", ATOM_NS);
             aggAuthorName = new Element("name", ATOM_NS);

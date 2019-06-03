@@ -41,7 +41,7 @@ public abstract class AbstractDSpaceObjectBuilder<T extends DSpaceObject>
         this.context = context;
     }
 
-    protected abstract void cleanup() throws Exception;
+    public abstract void cleanup() throws Exception;
 
 
     protected abstract DSpaceObjectService<T> getService();

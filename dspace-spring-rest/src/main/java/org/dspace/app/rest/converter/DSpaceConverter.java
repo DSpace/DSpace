@@ -14,9 +14,9 @@ import org.springframework.core.convert.converter.Converter;
  * @param <M> type of a DSpace model object (e.g. {@link org.dspace.content.Collection}).
  * @param <R> type of a REST model object (e.g. {@link org.dspace.app.rest.model.CollectionRest}).
  */
-public abstract class DSpaceConverter<M, R> implements Converter<M, R> {
+public interface DSpaceConverter<M, R> extends Converter<M, R> {
     @Override
-    public R convert(M source) {
+    public default R convert(M source) {
         return fromModel(source);
     }
 

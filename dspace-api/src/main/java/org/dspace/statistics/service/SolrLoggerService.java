@@ -88,11 +88,12 @@ public interface SolrLoggerService {
      * @throws IOException         A general class of exceptions produced by failed or interrupted I/O operations.
      * @throws SolrServerException Exception from the Solr server to the solrj Java client.
      */
-    public void removeIndex(String query) throws IOException,
-        SolrServerException;
+    public void removeIndex(String query)
+            throws IOException, SolrServerException;
 
     public Map<String, List<String>> queryField(String query,
-                                                List oldFieldVals, String field);
+                                                List oldFieldVals, String field)
+            throws IOException;
 
     public void markRobotsByIP();
 
@@ -115,7 +116,8 @@ public interface SolrLoggerService {
                        List<String> fieldNames, List<List<Object>> fieldValuesList)
         throws SolrServerException, IOException;
 
-    public void query(String query, int max) throws SolrServerException;
+    public void query(String query, int max)
+            throws SolrServerException, IOException;
 
     /**
      * Query used to get values grouped by the given facet field.
@@ -130,10 +132,12 @@ public interface SolrLoggerService {
      * @param facetQueries list of facet queries
      * @return an array containing our results
      * @throws SolrServerException Exception from the Solr server to the solrj Java client.
+     * @throws java.io.IOException passed through.
      */
     public ObjectCount[] queryFacetField(String query,
                                          String filterQuery, String facetField, int max, boolean showTotal,
-                                         List<String> facetQueries) throws SolrServerException;
+                                         List<String> facetQueries)
+            throws SolrServerException, IOException;
 
     /**
      * Query used to get values grouped by the date.
@@ -152,22 +156,24 @@ public interface SolrLoggerService {
      * @param context     The relevant DSpace Context.
      * @return and array containing our results
      * @throws SolrServerException Exception from the Solr server to the solrj Java client.
+     * @throws java.io.IOException passed through.
      */
     public ObjectCount[] queryFacetDate(String query,
                                         String filterQuery, int max, String dateType, String dateStart,
-                                        String dateEnd, boolean showTotal, Context context) throws SolrServerException;
+                                        String dateEnd, boolean showTotal, Context context)
+            throws SolrServerException, IOException;
 
     public Map<String, Integer> queryFacetQuery(String query,
                                                 String filterQuery, List<String> facetQueries)
-        throws SolrServerException;
+            throws SolrServerException, IOException;
 
     public ObjectCount queryTotal(String query, String filterQuery)
-        throws SolrServerException;
+            throws SolrServerException, IOException;
 
     public QueryResponse query(String query, String filterQuery,
                                String facetField, int rows, int max, String dateType, String dateStart,
                                String dateEnd, List<String> facetQueries, String sort, boolean ascending)
-        throws SolrServerException;
+            throws SolrServerException, IOException;
 
     /**
      * Returns in a filterQuery string all the ip addresses that should be ignored

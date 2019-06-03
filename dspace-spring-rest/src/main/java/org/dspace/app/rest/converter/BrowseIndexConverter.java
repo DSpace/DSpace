@@ -23,7 +23,7 @@ import org.springframework.stereotype.Component;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @Component
-public class BrowseIndexConverter extends DSpaceConverter<BrowseIndex, BrowseIndexRest> {
+public class BrowseIndexConverter implements DSpaceConverter<BrowseIndex, BrowseIndexRest> {
     @Override
     public BrowseIndexRest fromModel(BrowseIndex obj) {
         BrowseIndexRest bir = new BrowseIndexRest();

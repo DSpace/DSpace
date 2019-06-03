@@ -10,6 +10,7 @@ package org.dspace.discovery;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Iterator;
+import java.util.UUID;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.HelpFormatter;
@@ -19,7 +20,6 @@ import org.apache.commons.cli.PosixParser;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
-import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
@@ -59,7 +59,7 @@ public class IndexClient {
         context.turnOffAuthorisationSystem();
 
         String usage = "org.dspace.discovery.IndexClient [-cbhf] | [-r <handle>] | [-i <handle>] or nothing to " +
-            "update/clean an existing index.";
+                "update/clean an existing index.";
         Options options = new Options();
         HelpFormatter formatter = new HelpFormatter();
         CommandLine line = null;
@@ -72,10 +72,10 @@ public class IndexClient {
                               .create("r"));
 
         options.addOption(OptionBuilder
-                              .withArgName("handle to add or update")
+                              .withArgName("handle or uuid to add or update")
                               .hasArg(true)
                               .withDescription(
-                                  "add or update an Item, Collection or Community based on its handle")
+                                  "add or update an Item, Collection or Community based on its handle or uuid")
                               .create("i"));
 
         options.addOption(OptionBuilder
@@ -151,17 +151,36 @@ public class IndexClient {
         } else if (line.hasOption('s')) {
             checkRebuildSpellCheck(line, indexer);
         } else if (line.hasOption('i')) {
-            final String handle = line.getOptionValue('i');
-            final DSpaceObject dso = HandleServiceFactory.getInstance().getHandleService()
-                                                         .resolveToObject(context, handle);
-            if (dso == null) {
-                throw new IllegalArgumentException("Cannot resolve " + handle + " to a DSpace object");
+            final String param = line.getOptionValue('i');
+            UUID uuid = null;
+            try {
+                uuid = UUID.fromString(param);
+            } catch (Exception e) {
+                // nothing to do, it should be an handle
             }
-            log.info("Forcibly Indexing " + handle);
+            IndexableObject dso = null;
+            if (uuid != null) {
+                dso = ContentServiceFactory.getInstance().getItemService().find(context, uuid);
+                if (dso == null) {
+                    // it could be a community
+                    dso = ContentServiceFactory.getInstance().getCommunityService().find(context, uuid);
+                    if (dso == null) {
+                        // it could be a collection
+                        dso = ContentServiceFactory.getInstance().getCollectionService().find(context, uuid);
+                    }
+                }
+            } else {
+                dso = (IndexableObject) HandleServiceFactory.getInstance()
+                                .getHandleService().resolveToObject(context, param);
+            }
+            if (dso == null) {
+                throw new IllegalArgumentException("Cannot resolve " + param + " to a DSpace object");
+            }
+            log.info("Indexing " + param + " force " + line.hasOption("f"));
             final long startTimeMillis = System.currentTimeMillis();
             final long count = indexAll(indexer, ContentServiceFactory.getInstance().getItemService(), context, dso);
             final long seconds = (System.currentTimeMillis() - startTimeMillis) / 1000;
-            log.info("Indexed " + count + " DSpace object" + (count > 1 ? "s" : "") + " in " + seconds + " seconds");
+            log.info("Indexed " + count + " object" + (count > 1 ? "s" : "") + " in " + seconds + " seconds");
         } else {
             log.info("Updating and Cleaning Index");
             indexer.cleanIndex(line.hasOption("f"));
@@ -186,7 +205,7 @@ public class IndexClient {
     private static long indexAll(final IndexingService indexingService,
                                  final ItemService itemService,
                                  final Context context,
-                                 final DSpaceObject dso)
+                                 final IndexableObject dso)
         throws IOException, SearchServiceException, SQLException {
         long count = 0;
 
@@ -254,9 +273,10 @@ public class IndexClient {
      * @param line    the command line options
      * @param indexer the solr indexer
      * @throws SearchServiceException in case of a solr exception
+     * @throws java.io.IOException passed through
      */
     protected static void checkRebuildSpellCheck(CommandLine line, IndexingService indexer)
-        throws SearchServiceException {
+        throws SearchServiceException, IOException {
         if (line.hasOption("s")) {
             log.info("Rebuilding spell checker.");
             indexer.buildSpellCheck();

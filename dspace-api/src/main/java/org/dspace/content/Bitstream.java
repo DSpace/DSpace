@@ -11,6 +11,7 @@ import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -21,6 +22,7 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.apache.log4j.Logger;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.core.Constants;
@@ -40,6 +42,12 @@ import org.hibernate.proxy.HibernateProxyHelper;
 @Entity
 @Table(name = "bitstream")
 public class Bitstream extends DSpaceObject implements DSpaceObjectLegacySupport {
+
+    /**
+     * log4j logger
+     */
+    private static Logger log = Logger.getLogger(Bitstream.class);
+
     @Column(name = "bitstream_id", insertable = false, updatable = false)
     private Integer legacyId;
 
@@ -122,7 +130,8 @@ public class Bitstream extends DSpaceObject implements DSpaceObjectLegacySupport
      */
     @Override
     public String getName() {
-        return getBitstreamService().getMetadataFirstValue(this, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY);
+        return getBitstreamService().getMetadataFirstValue(this, MetadataSchemaEnum.DC.getName(),
+                                                           "title", null, Item.ANY);
     }
 
     /**
@@ -133,7 +142,8 @@ public class Bitstream extends DSpaceObject implements DSpaceObjectLegacySupport
      * @throws SQLException if database error
      */
     public void setName(Context context, String n) throws SQLException {
-        getBitstreamService().setMetadataSingleValue(context, this, MetadataSchema.DC_SCHEMA, "title", null, null, n);
+        getBitstreamService().setMetadataSingleValue(context, this, MetadataSchemaEnum.DC.getName(),
+                                                     "title", null, null, n);
     }
 
     /**
@@ -144,7 +154,8 @@ public class Bitstream extends DSpaceObject implements DSpaceObjectLegacySupport
      * @return the source of the bitstream
      */
     public String getSource() {
-        return getBitstreamService().getMetadataFirstValue(this, MetadataSchema.DC_SCHEMA, "source", null, Item.ANY);
+        return getBitstreamService().getMetadataFirstValue(this, MetadataSchemaEnum.DC.getName(),
+                                                           "source", null, Item.ANY);
     }
 
     /**
@@ -155,7 +166,8 @@ public class Bitstream extends DSpaceObject implements DSpaceObjectLegacySupport
      * @throws SQLException if database error
      */
     public void setSource(Context context, String n) throws SQLException {
-        getBitstreamService().setMetadataSingleValue(context, this, MetadataSchema.DC_SCHEMA, "source", null, null, n);
+        getBitstreamService().setMetadataSingleValue(context, this, MetadataSchemaEnum.DC.getName(),
+                                                     "source", null, null, n);
     }
 
     /**
@@ -166,7 +178,8 @@ public class Bitstream extends DSpaceObject implements DSpaceObjectLegacySupport
      */
     public String getDescription() {
         return getBitstreamService()
-            .getMetadataFirstValue(this, MetadataSchema.DC_SCHEMA, "description", null, Item.ANY);
+            .getMetadataFirstValue(this, MetadataSchemaEnum.DC.getName(), "description",
+                                   null, Item.ANY);
     }
 
     /**
@@ -178,7 +191,7 @@ public class Bitstream extends DSpaceObject implements DSpaceObjectLegacySupport
      */
     public void setDescription(Context context, String n) throws SQLException {
         getBitstreamService()
-            .setMetadataSingleValue(context, this, MetadataSchema.DC_SCHEMA, "description", null, null, n);
+            .setMetadataSingleValue(context, this, MetadataSchemaEnum.DC.getName(), "description", null, null, n);
     }
 
     /**
@@ -227,7 +240,8 @@ public class Bitstream extends DSpaceObject implements DSpaceObjectLegacySupport
      * @return the user's format description.
      */
     public String getUserFormatDescription() {
-        return getBitstreamService().getMetadataFirstValue(this, MetadataSchema.DC_SCHEMA, "format", null, Item.ANY);
+        return getBitstreamService().getMetadataFirstValue(this, MetadataSchemaEnum.DC.getName(),
+                                                           "format", null, Item.ANY);
     }
 
     protected BitstreamFormat getBitstreamFormat() {

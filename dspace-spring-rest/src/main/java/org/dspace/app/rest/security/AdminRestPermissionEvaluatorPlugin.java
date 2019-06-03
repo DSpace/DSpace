@@ -29,9 +29,9 @@ import org.springframework.stereotype.Component;
  * the authenticated EPerson is allowed to perform the requested action.
  */
 @Component
-public class AdminRestPermissionEvaluatorPlugin extends DSpaceObjectPermissionEvaluatorPlugin {
+public class AdminRestPermissionEvaluatorPlugin extends RestObjectPermissionEvaluatorPlugin {
 
-    private static final Logger log = LoggerFactory.getLogger(DSpaceObjectPermissionEvaluatorPlugin.class);
+    private static final Logger log = LoggerFactory.getLogger(RestObjectPermissionEvaluatorPlugin.class);
 
     @Autowired
     private AuthorizeService authorizeService;
@@ -43,8 +43,8 @@ public class AdminRestPermissionEvaluatorPlugin extends DSpaceObjectPermissionEv
     private EPersonService ePersonService;
 
     @Override
-    public boolean hasPermission(Authentication authentication, Serializable targetId, String targetType,
-                                 Object permission) {
+    public boolean hasDSpacePermission(Authentication authentication, Serializable targetId, String targetType,
+                                       DSpaceRestPermission permission) {
 
         //We do not check the "permission" object here because administrators are allowed to do everything
 

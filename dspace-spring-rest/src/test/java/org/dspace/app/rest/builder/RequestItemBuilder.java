@@ -39,7 +39,7 @@ public class RequestItemBuilder
     }
 
     @Override
-    protected void cleanup()
+    public void cleanup()
             throws Exception {
         LOG.debug("cleanup()");
         if (null != requestItem) {
@@ -87,7 +87,6 @@ public class RequestItemBuilder
         return requestItemService;
     }
 
-    @Override
     public int getPriority() {
         return -1; // Clean up before Item
     }

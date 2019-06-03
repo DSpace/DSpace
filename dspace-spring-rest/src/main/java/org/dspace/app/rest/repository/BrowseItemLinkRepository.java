@@ -8,7 +8,10 @@
 package org.dspace.app.rest.repository;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
@@ -22,9 +25,9 @@ import org.dspace.browse.BrowseException;
 import org.dspace.browse.BrowseIndex;
 import org.dspace.browse.BrowseInfo;
 import org.dspace.browse.BrowserScope;
-import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
+import org.dspace.discovery.IndexableObject;
 import org.dspace.sort.SortException;
 import org.dspace.sort.SortOption;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,17 +64,19 @@ public class BrowseItemLinkRepository extends AbstractDSpaceRestRepository
         String scope = null;
         String filterValue = null;
         String filterAuthority = null;
+        String startsWith = null;
 
         if (request != null) {
             scope = request.getParameter("scope");
             filterValue = request.getParameter("filterValue");
             filterAuthority = request.getParameter("filterAuthority");
+            startsWith = request.getParameter("startsWith");
         }
         Context context = obtainContext();
         BrowseEngine be = new BrowseEngine(context);
         BrowserScope bs = new BrowserScope(context);
 
-        DSpaceObject scopeObj = scopeResolver.resolveScope(context, scope);
+        IndexableObject scopeObj = scopeResolver.resolveScope(context, scope);
 
         // process the input, performing some inline validation
         BrowseIndex bi = null;
@@ -128,7 +133,7 @@ public class BrowseItemLinkRepository extends AbstractDSpaceRestRepository
         // bs.setJumpToItem(focus);
         // bs.setJumpToValue(valueFocus);
         // bs.setJumpToValueLang(valueFocusLang);
-        // bs.setStartsWith(startsWith);
+        bs.setStartsWith(startsWith);
         if (pageable != null) {
             bs.setOffset(pageable.getOffset());
             bs.setResultsPerPage(pageable.getPageSize());
@@ -145,10 +150,13 @@ public class BrowseItemLinkRepository extends AbstractDSpaceRestRepository
 
         BrowseInfo binfo = be.browse(bs);
 
-        Pageable pageResultInfo = new PageRequest((binfo.getStart() - 1) / binfo.getResultsPerPage(),
-                                                  binfo.getResultsPerPage());
-        Page<ItemRest> page = new PageImpl<Item>(binfo.getBrowseItemResults(), pageResultInfo, binfo.getTotal())
-            .map(converter);
+        Pageable pageResultInfo =
+                new PageRequest((binfo.getStart() - 1) / binfo.getResultsPerPage(), binfo.getResultsPerPage());
+        List<Item> tmpResult = new ArrayList<Item>();
+        for (IndexableObject bb : binfo.getBrowseItemResults()) {
+            tmpResult.add((Item) bb);
+        }
+        Page<ItemRest> page = new PageImpl<Item>(tmpResult, pageResultInfo, binfo.getTotal()).map(converter);
         return page;
     }
 

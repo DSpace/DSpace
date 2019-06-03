@@ -97,10 +97,7 @@ public class CollectionDAOImpl extends AbstractHibernateDSODAO<Collection> imple
         Root<Collection> collectionRoot = criteriaQuery.from(Collection.class);
         criteriaQuery.select(collectionRoot);
         criteriaQuery
-            .where(criteriaBuilder.or(criteriaBuilder.equal(collectionRoot.get(Collection_.workflowStep1), group),
-                                      criteriaBuilder.equal(collectionRoot.get(Collection_.workflowStep2), group),
-                                      criteriaBuilder.equal(collectionRoot.get(Collection_.workflowStep3), group),
-                                      criteriaBuilder.equal(collectionRoot.get(Collection_.submitters), group),
+            .where(criteriaBuilder.or(criteriaBuilder.equal(collectionRoot.get(Collection_.submitters), group),
                                       criteriaBuilder.equal(collectionRoot.get(Collection_.admins), group)
                    )
         );

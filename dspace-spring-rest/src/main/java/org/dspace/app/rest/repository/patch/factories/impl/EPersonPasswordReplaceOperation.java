@@ -33,7 +33,7 @@ public class EPersonPasswordReplaceOperation extends ReplacePatchOperation<EPers
     }
 
     @Override
-    void checkModelForExistingValue(EPersonRest resource) {
+    void checkModelForExistingValue(EPersonRest resource, Operation operation) {
         /*
          * FIXME: the password field in eperson rest model is always null because
          * the value is not set in the rest converter.
@@ -45,11 +45,13 @@ public class EPersonPasswordReplaceOperation extends ReplacePatchOperation<EPers
 
     @Override
     protected Class<String[]> getArrayClassForEvaluation() {
+
         return String[].class;
     }
 
     @Override
     protected Class<String> getClassForEvaluation() {
+
         return String.class;
     }
 }

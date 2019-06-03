@@ -117,7 +117,6 @@ public class AuthenticationRestController implements InitializingBean {
 
         context = ContextUtil.obtainContext(request);
 
-
         if (context == null || context.getCurrentUser() == null) {
             // Note that the actual HTTP status in this case is set by
             // org.dspace.app.rest.security.StatelessLoginFilter.unsuccessfulAuthentication()
@@ -128,4 +127,5 @@ public class AuthenticationRestController implements InitializingBean {
             return ResponseEntity.ok().build();
         }
     }
+
 }

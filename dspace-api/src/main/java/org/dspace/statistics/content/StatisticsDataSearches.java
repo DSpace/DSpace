@@ -59,7 +59,7 @@ public class StatisticsDataSearches extends StatisticsData {
         }
 
         List<StatisticsFilter> filters = getFilters();
-        List<String> defaultFilters = new ArrayList<String>();
+        List<String> defaultFilters = new ArrayList<>();
         for (StatisticsFilter statisticsFilter : filters) {
             defaultFilters.add(statisticsFilter.toQuery());
         }
@@ -221,7 +221,8 @@ public class StatisticsDataSearches extends StatisticsData {
         return query;
     }
 
-    protected ObjectCount getTotalPageViews(String query, String defaultFilterQuery) throws SolrServerException {
+    protected ObjectCount getTotalPageViews(String query, String defaultFilterQuery)
+            throws SolrServerException, IOException {
         StringBuilder fqBuffer;
         fqBuffer = new StringBuilder(defaultFilterQuery);
         if (0 < fqBuffer.length()) {

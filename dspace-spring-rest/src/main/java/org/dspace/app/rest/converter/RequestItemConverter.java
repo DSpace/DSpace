@@ -36,7 +36,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class RequestItemConverter
-        extends DSpaceConverter<RequestItem, RequestItemRest> {
+        implements DSpaceConverter<RequestItem, RequestItemRest> {
     private static final Logger LOG = LoggerFactory.getLogger(RequestItemConverter.class);
 
     @Autowired(required = true)

@@ -13,6 +13,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.ResourcePolicy;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
@@ -76,7 +77,7 @@ public class WorkflowRequirementsServiceImpl implements WorkflowRequirementsServ
         inProgressUserService.update(context, ipu);
 
         //Make sure the user has the necessary rights to update the item after the tasks is removed from the pool
-        xmlWorkflowService.grantUserAllItemPolicies(context, wfi.getItem(), user);
+        xmlWorkflowService.grantUserAllItemPolicies(context, wfi.getItem(), user, ResourcePolicy.TYPE_WORKFLOW);
 
         int totalUsers = inProgressUserService.getNumberOfInProgressUsers(context, wfi) + inProgressUserService
             .getNumberOfFinishedUsers(context, wfi);

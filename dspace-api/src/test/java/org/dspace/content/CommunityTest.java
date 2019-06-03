@@ -673,14 +673,17 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
 
         context.turnOffAuthorisationSystem();
         Collection collection = collectionService.create(context, c);
-        collectionService.setMetadataSingleValue(context, collection, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY,
-                                                 "collection B");
+        collectionService
+            .setMetadataSingleValue(context, collection, MetadataSchemaEnum.DC.getName(),
+                                    "title", null, Item.ANY, "collection B");
         collection = collectionService.create(context, c);
-        collectionService.setMetadataSingleValue(context, collection, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY,
-                                                 "collection C");
+        collectionService
+            .setMetadataSingleValue(context, collection, MetadataSchemaEnum.DC.getName(),
+                                    "title", null, Item.ANY, "collection C");
         collection = collectionService.create(context, c);
-        collectionService.setMetadataSingleValue(context, collection, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY,
-                                                 "collection A");
+        collectionService
+            .setMetadataSingleValue(context, collection, MetadataSchemaEnum.DC.getName(),
+                                    "title", null, Item.ANY, "collection A");
         //we need to commit the changes so we don't block the table for testing
         context.restoreAuthSystemState();
 
@@ -712,14 +715,17 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
 
         context.turnOffAuthorisationSystem();
         Community community = communityService.create(c, context);
-        communityService.setMetadataSingleValue(context, community, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY,
-                                                "subcommunity B");
+        communityService
+            .setMetadataSingleValue(context, community, MetadataSchemaEnum.DC.getName(),
+                                    "title", null, Item.ANY, "subcommunity B");
         community = communityService.create(c, context);
-        communityService.setMetadataSingleValue(context, community, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY,
-                                                "subcommunity A");
+        communityService
+            .setMetadataSingleValue(context, community, MetadataSchemaEnum.DC.getName(),
+                                    "title", null, Item.ANY, "subcommunity A");
         community = communityService.create(c, context);
-        communityService.setMetadataSingleValue(context, community, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY,
-                                                "subcommunity C");
+        communityService
+            .setMetadataSingleValue(context, community, MetadataSchemaEnum.DC.getName(),
+                                    "title", null, Item.ANY, "subcommunity C");
         //we need to commit the changes so we don't block the table for testing
         context.restoreAuthSystemState();
 

@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @Component
-public class MetadataFieldConverter extends DSpaceConverter<org.dspace.content.MetadataField, MetadataFieldRest> {
+public class MetadataFieldConverter implements DSpaceConverter<org.dspace.content.MetadataField, MetadataFieldRest> {
     @Autowired(required = true)
     private MetadataSchemaConverter metadataSchemaConverter;
 

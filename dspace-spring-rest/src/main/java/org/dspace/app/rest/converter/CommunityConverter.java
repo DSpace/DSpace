@@ -15,6 +15,7 @@ import org.dspace.app.rest.model.CommunityRest;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.discovery.IndexableObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -26,7 +27,9 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class CommunityConverter
-    extends DSpaceObjectConverter<org.dspace.content.Community, org.dspace.app.rest.model.CommunityRest> {
+    extends DSpaceObjectConverter<org.dspace.content.Community, org.dspace.app.rest.model.CommunityRest>
+    implements IndexableObjectConverter<Community, CommunityRest> {
+
     @Autowired
     private BitstreamConverter bitstreamConverter;
 
@@ -76,5 +79,10 @@ public class CommunityConverter
     @Override
     protected Class<org.dspace.content.Community> getModelClass() {
         return org.dspace.content.Community.class;
+    }
+
+    @Override
+    public boolean supportsModel(IndexableObject idxo) {
+        return idxo instanceof Community;
     }
 }

@@ -22,7 +22,7 @@ import org.springframework.stereotype.Component;
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
 @Component
-public class AuthorityEntryRestConverter extends DSpaceConverter<Choice, AuthorityEntryRest> {
+public class AuthorityEntryRestConverter implements DSpaceConverter<Choice, AuthorityEntryRest> {
 
     @Override
     public AuthorityEntryRest fromModel(Choice choice) {

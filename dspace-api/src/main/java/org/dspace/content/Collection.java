@@ -12,6 +12,8 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
+
 import javax.persistence.Cacheable;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -30,6 +32,7 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.discovery.IndexableObject;
 import org.dspace.eperson.Group;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.proxy.HibernateProxyHelper;
@@ -52,7 +55,7 @@ import org.hibernate.proxy.HibernateProxyHelper;
 @Table(name = "collection")
 @Cacheable
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE, include = "non-lazy")
-public class Collection extends DSpaceObject implements DSpaceObjectLegacySupport {
+public class Collection extends DSpaceObject implements DSpaceObjectLegacySupport, IndexableObject<UUID> {
 
     @Column(name = "collection_id", insertable = false, updatable = false)
     private Integer legacyId;
@@ -70,23 +73,6 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "template_item_id")
     private Item template;
-
-    /**
-     * Groups corresponding to workflow steps - NOTE these start from one, so
-     * workflowGroups[0] corresponds to workflow_step_1.
-     */
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "workflow_step_1")
-    private Group workflowStep1;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "workflow_step_2")
-    private Group workflowStep2;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "workflow_step_3")
-    private Group workflowStep3;
-
 
     @OneToOne
     @JoinColumn(name = "submitter")
@@ -134,7 +120,7 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
     @Override
     public String getName() {
         String value = getCollectionService()
-            .getMetadataFirstValue(this, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY);
+            .getMetadataFirstValue(this, MetadataSchemaEnum.DC.getName(), "title", null, Item.ANY);
         return value == null ? "" : value;
     }
 
@@ -202,31 +188,22 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
         setModified();
     }
 
-    public Group getWorkflowStep1() {
-        return workflowStep1;
+    // FIXME this should be moved to the collectionService or completely removed, see also
+    // https://jira.duraspace.org/browse/DS-3041
+    public Group getWorkflowStep1(Context context) {
+        return getCollectionService().getWorkflowGroup(context, this, 1);
     }
 
-    public Group getWorkflowStep2() {
-        return workflowStep2;
+    // FIXME this should be moved to the collectionService or completely removed, see also
+    // https://jira.duraspace.org/browse/DS-3041
+    public Group getWorkflowStep2(Context context) {
+        return getCollectionService().getWorkflowGroup(context, this, 2);
     }
 
-    public Group getWorkflowStep3() {
-        return workflowStep3;
-    }
-
-    void setWorkflowStep1(Group workflowStep1) {
-        this.workflowStep1 = workflowStep1;
-        setModified();
-    }
-
-    void setWorkflowStep2(Group workflowStep2) {
-        this.workflowStep2 = workflowStep2;
-        setModified();
-    }
-
-    void setWorkflowStep3(Group workflowStep3) {
-        this.workflowStep3 = workflowStep3;
-        setModified();
+    // FIXME this should be moved to the collectionService or completely removed, see also
+    // https://jira.duraspace.org/browse/DS-3041
+    public Group getWorkflowStep3(Context context) {
+        return getCollectionService().getWorkflowGroup(context, this, 3);
     }
 
     /**
@@ -353,4 +330,10 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
         }
         return collectionService;
     }
+
+    @Override
+    public String getTypeText() {
+        return Constants.typeText[Constants.COLLECTION];
+    }
+
 }

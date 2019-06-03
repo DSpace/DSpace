@@ -11,8 +11,8 @@ import java.util.List;
 
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
+import org.dspace.content.InProgressSubmission;
 import org.dspace.content.Item;
-import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.BundleService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
@@ -34,7 +34,7 @@ public class BitstreamRemovePatchOperation extends RemovePatchOperation<String> 
     BundleService bundleService;
 
     @Override
-    void remove(Context context, Request currentRequest, WorkspaceItem source, String path, Object value)
+    void remove(Context context, Request currentRequest, InProgressSubmission source, String path, Object value)
         throws Exception {
 
         String absPath = getAbsolutePath(path);

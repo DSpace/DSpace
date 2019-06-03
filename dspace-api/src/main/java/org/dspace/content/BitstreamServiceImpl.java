@@ -103,6 +103,8 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
         clonedBitstream.setSizeBytes(bitstream.getSizeBytes());
         clonedBitstream.setChecksum(bitstream.getChecksum());
         clonedBitstream.setChecksumAlgorithm(bitstream.getChecksumAlgorithm());
+        clonedBitstream.setFormat(bitstream.getBitstreamFormat());
+
         try {
             //Update our bitstream but turn off the authorization system since permissions
             //haven't been set at this point in time.
@@ -203,7 +205,7 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
     @Override
     public void setUserFormatDescription(Context context, Bitstream bitstream, String desc) throws SQLException {
         setFormat(context, bitstream, null);
-        setMetadataSingleValue(context, bitstream, MetadataSchema.DC_SCHEMA, "format", null, null, desc);
+        setMetadataSingleValue(context, bitstream, MetadataSchemaEnum.DC.getName(), "format", null, null, desc);
     }
 
     @Override
@@ -233,7 +235,7 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
         }
 
         // Remove user type description
-        clearMetadata(context, bitstream, MetadataSchema.DC_SCHEMA, "format", null, Item.ANY);
+        clearMetadata(context, bitstream, MetadataSchemaEnum.DC.getName(), "format", null, Item.ANY);
 
         // Update the ID in the table row
         bitstream.setFormat(bitstreamFormat);

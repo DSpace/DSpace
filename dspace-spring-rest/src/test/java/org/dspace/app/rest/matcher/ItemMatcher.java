@@ -8,9 +8,9 @@
 package org.dspace.app.rest.matcher;
 
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
+import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
 import static org.dspace.app.rest.test.AbstractControllerIntegrationTest.REST_SERVER_URL;
 import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.startsWith;
@@ -34,8 +34,9 @@ public class ItemMatcher {
             matchItemProperties(item),
 
             //Check core metadata (the JSON Path expression evaluates to a collection so we have to use contains)
-            hasJsonPath("$.metadata[?(@.key=='dc.title')].value", contains(title)),
-            hasJsonPath("$.metadata[?(@.key=='dc.date.issued')].value", contains(dateIssued)),
+            hasJsonPath("$.metadata", allOf(
+                    matchMetadata("dc.title", title),
+                    matchMetadata("dc.date.issued", dateIssued))),
 
             //Check links
             matchItemLinks(item)

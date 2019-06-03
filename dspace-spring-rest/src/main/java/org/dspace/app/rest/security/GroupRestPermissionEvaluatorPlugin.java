@@ -31,7 +31,7 @@ import org.springframework.stereotype.Component;
  * This {@link RestPermissionEvaluatorPlugin} implements that requirement by validating the group membership.
  */
 @Component
-public class GroupRestPermissionEvaluatorPlugin extends DSpaceObjectPermissionEvaluatorPlugin {
+public class GroupRestPermissionEvaluatorPlugin extends RestObjectPermissionEvaluatorPlugin {
 
     private static final Logger log = LoggerFactory.getLogger(GroupRestPermissionEvaluatorPlugin.class);
 
@@ -45,8 +45,8 @@ public class GroupRestPermissionEvaluatorPlugin extends DSpaceObjectPermissionEv
     private EPersonService ePersonService;
 
     @Override
-    public boolean hasPermission(Authentication authentication, Serializable targetId,
-                                 String targetType, Object permission) {
+    public boolean hasDSpacePermission(Authentication authentication, Serializable targetId,
+                                 String targetType, DSpaceRestPermission permission) {
 
         //This plugin only evaluates READ access
         DSpaceRestPermission restPermission = DSpaceRestPermission.convert(permission);

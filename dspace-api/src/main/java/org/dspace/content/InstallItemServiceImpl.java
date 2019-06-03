@@ -104,9 +104,10 @@ public class InstallItemServiceImpl implements InstallItemService {
 
         // If the item doesn't have a date.accessioned, set it to today
         List<MetadataValue> dateAccessioned = itemService
-            .getMetadata(item, MetadataSchema.DC_SCHEMA, "date", "accessioned", Item.ANY);
+            .getMetadata(item, MetadataSchemaEnum.DC.getName(), "date", "accessioned", Item.ANY);
         if (dateAccessioned.isEmpty()) {
-            itemService.addMetadata(c, item, MetadataSchema.DC_SCHEMA, "date", "accessioned", null, now.toString());
+            itemService.addMetadata(c, item, MetadataSchemaEnum.DC.getName(),
+                                    "date", "accessioned", null, now.toString());
         }
 
         // If issue date is set as "today" (literal string), then set it to current date
@@ -114,8 +115,8 @@ public class InstallItemServiceImpl implements InstallItemService {
         // replacing "today" with today's date.
         // NOTE: As of DSpace 4.0, DSpace no longer sets an issue date by default
         List<MetadataValue> currentDateIssued = itemService
-            .getMetadata(item, MetadataSchema.DC_SCHEMA, "date", "issued", Item.ANY);
-        itemService.clearMetadata(c, item, MetadataSchema.DC_SCHEMA, "date", "issued", Item.ANY);
+            .getMetadata(item, MetadataSchemaEnum.DC.getName(), "date", "issued", Item.ANY);
+        itemService.clearMetadata(c, item, MetadataSchemaEnum.DC.getName(), "date", "issued", Item.ANY);
         for (MetadataValue dcv : currentDateIssued) {
             if (dcv.getValue() != null && dcv.getValue().equalsIgnoreCase("today")) {
                 DCDate issued = new DCDate(now.getYear(), now.getMonth(), now.getDay(), -1, -1, -1);
@@ -127,7 +128,8 @@ public class InstallItemServiceImpl implements InstallItemService {
 
         // Record that the item was restored
         String provDescription = "Restored into DSpace on " + now + " (GMT).";
-        itemService.addMetadata(c, item, MetadataSchema.DC_SCHEMA, "description", "provenance", "en", provDescription);
+        itemService.addMetadata(c, item, MetadataSchemaEnum.DC.getName(),
+                                "description", "provenance", "en", provDescription);
 
         return finishItem(c, item, is);
     }
@@ -137,14 +139,16 @@ public class InstallItemServiceImpl implements InstallItemService {
         throws SQLException, AuthorizeException {
         // create accession date
         DCDate now = DCDate.getCurrent();
-        itemService.addMetadata(c, item, MetadataSchema.DC_SCHEMA, "date", "accessioned", null, now.toString());
+        itemService.addMetadata(c, item, MetadataSchemaEnum.DC.getName(),
+                                "date", "accessioned", null, now.toString());
 
         // add date available if not under embargo, otherwise it will
         // be set when the embargo is lifted.
         // this will flush out fatal embargo metadata
         // problems before we set inArchive.
         if (embargoService.getEmbargoTermsAsDate(c, item) == null) {
-            itemService.addMetadata(c, item, MetadataSchema.DC_SCHEMA, "date", "available", null, now.toString());
+            itemService.addMetadata(c, item, MetadataSchemaEnum.DC.getName(),
+                                    "date", "available", null, now.toString());
         }
 
         // If issue date is set as "today" (literal string), then set it to current date
@@ -152,8 +156,8 @@ public class InstallItemServiceImpl implements InstallItemService {
         // replacing "today" with today's date.
         // NOTE: As of DSpace 4.0, DSpace no longer sets an issue date by default
         List<MetadataValue> currentDateIssued = itemService
-            .getMetadata(item, MetadataSchema.DC_SCHEMA, "date", "issued", Item.ANY);
-        itemService.clearMetadata(c, item, MetadataSchema.DC_SCHEMA, "date", "issued", Item.ANY);
+            .getMetadata(item, MetadataSchemaEnum.DC.getName(), "date", "issued", Item.ANY);
+        itemService.clearMetadata(c, item, MetadataSchemaEnum.DC.getName(), "date", "issued", Item.ANY);
         for (MetadataValue dcv : currentDateIssued) {
             if (dcv.getValue() != null && dcv.getValue().equalsIgnoreCase("today")) {
                 DCDate issued = new DCDate(now.getYear(), now.getMonth(), now.getDay(), -1, -1, -1);
@@ -178,7 +182,8 @@ public class InstallItemServiceImpl implements InstallItemService {
         }
 
         // Add provenance description
-        itemService.addMetadata(c, item, MetadataSchema.DC_SCHEMA, "description", "provenance", "en", provDescription);
+        itemService.addMetadata(c, item, MetadataSchemaEnum.DC.getName(),
+                                "description", "provenance", "en", provDescription);
     }
 
     /**

@@ -59,7 +59,7 @@ public class MetadataSchemaTest extends AbstractUnitTest {
     public void init() {
         super.init();
         try {
-            this.ms = metadataSchemaService.find(context, MetadataSchema.DC_SCHEMA);
+            this.ms = metadataSchemaService.find(context, MetadataSchemaEnum.DC.getName());
         } catch (SQLException ex) {
             log.error("SQL Error in init", ex);
             fail("SQL Error in init: " + ex.getMessage());
@@ -122,7 +122,7 @@ public class MetadataSchemaTest extends AbstractUnitTest {
     @Test
     public void testGetSchemaID() throws SQLException {
         assertThat("testGetSchemaID 0", ms.getID(),
-                   equalTo(metadataSchemaService.find(context, MetadataSchema.DC_SCHEMA).getID()));
+                   equalTo(metadataSchemaService.find(context, MetadataSchemaEnum.DC.getName()).getID()));
     }
 
     /**

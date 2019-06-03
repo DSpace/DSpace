@@ -737,12 +737,12 @@ public class ItemTest extends AbstractDSpaceObjectTest {
     public void testGetCollections() throws Exception {
         context.turnOffAuthorisationSystem();
         Collection collection = collectionService.create(context, owningCommunity);
-        collectionService.setMetadataSingleValue(context, collection, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY,
-                                                 "collection B");
+        collectionService.setMetadataSingleValue(context, collection, MetadataSchemaEnum.DC.getName(),
+                                                 "title", null, Item.ANY, "collection B");
         it.addCollection(collection);
         collection = collectionService.create(context, owningCommunity);
-        collectionService.setMetadataSingleValue(context, collection, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY,
-                                                 "collection A");
+        collectionService.setMetadataSingleValue(context, collection, MetadataSchemaEnum.DC.getName(),
+                                                 "title", null, Item.ANY, "collection A");
         it.addCollection(collection);
         context.restoreAuthSystemState();
         assertThat("testGetCollections 0", it.getCollections(), notNullValue());

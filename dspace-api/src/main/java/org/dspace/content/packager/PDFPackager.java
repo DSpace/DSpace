@@ -33,7 +33,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.DCDate;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.content.MetadataSchema;
+import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.crosswalk.MetadataValidationException;
@@ -377,10 +377,11 @@ public class PDFPackager
             if (log.isDebugEnabled()) {
                 log.debug("PDF Info dict title=\"" + title + "\"");
             }
-            itemService.addMetadata(context, item, MetadataSchema.DC_SCHEMA, "title", null, "en", title);
+            itemService.addMetadata(context, item, MetadataSchemaEnum.DC.getName(), "title", null, "en", title);
             String value = docinfo.getAuthor();
             if (value != null) {
-                itemService.addMetadata(context, item, MetadataSchema.DC_SCHEMA, "contributor", "author", null, value);
+                itemService.addMetadata(context, item, MetadataSchemaEnum.DC.getName(),
+                                        "contributor", "author", null, value);
                 if (log.isDebugEnabled()) {
                     log.debug("PDF Info dict author=\"" + value + "\"");
                 }
@@ -388,25 +389,29 @@ public class PDFPackager
 
             value = docinfo.getCreator();
             if (value != null) {
-                itemService.addMetadata(context, item, MetadataSchema.DC_SCHEMA, "description", "provenance", "en",
+                itemService.addMetadata(context, item, MetadataSchemaEnum.DC.getName(),
+                                        "description", "provenance", "en",
                                         "Application that created the original document: " + value);
             }
 
             value = docinfo.getProducer();
             if (value != null) {
-                itemService.addMetadata(context, item, MetadataSchema.DC_SCHEMA, "description", "provenance", "en",
+                itemService.addMetadata(context, item, MetadataSchemaEnum.DC.getName(),
+                                        "description", "provenance", "en",
                                         "Original document converted to PDF by: " + value);
             }
 
             value = docinfo.getSubject();
             if (value != null) {
                 itemService
-                    .addMetadata(context, item, MetadataSchema.DC_SCHEMA, "description", "abstract", null, value);
+                    .addMetadata(context, item, MetadataSchemaEnum.DC.getName(),
+                                 "description", "abstract", null, value);
             }
 
             value = docinfo.getKeywords();
             if (value != null) {
-                itemService.addMetadata(context, item, MetadataSchema.DC_SCHEMA, "subject", "other", null, value);
+                itemService.addMetadata(context, item, MetadataSchemaEnum.DC.getName(),
+                                        "subject", "other", null, value);
             }
 
             // Take either CreationDate or ModDate as "date.created",
@@ -417,7 +422,7 @@ public class PDFPackager
             }
 
             if (calValue != null) {
-                itemService.addMetadata(context, item, MetadataSchema.DC_SCHEMA, "date", "created", null,
+                itemService.addMetadata(context, item, MetadataSchemaEnum.DC.getName(), "date", "created", null,
                                         (new DCDate(calValue.getTime())).toString());
             }
             itemService.update(context, item);

@@ -39,10 +39,6 @@ import org.hibernate.proxy.HibernateProxyHelper;
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 @Table(name = "metadataschemaregistry")
 public class MetadataSchema implements ReloadableEntity<Integer> {
-    /**
-     * Short Name of built-in Dublin Core schema.
-     */
-    public static final String DC_SCHEMA = "dc";
 
     @Id
     @Column(name = "metadata_schema_id")

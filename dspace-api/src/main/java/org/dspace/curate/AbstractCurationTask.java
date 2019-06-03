@@ -198,14 +198,17 @@ public abstract class AbstractCurationTask implements CurationTask {
     /**
      * Returns task configuration property value for passed name, else
      * <code>null</code> if no properties defined or no value for passed key.
+     * If a taskID/Name is specified, prepend it on the configuration name.
      *
      * @param name the property name
      * @return value
      * the property value, or null
      */
     protected String taskProperty(String name) {
-        // If a taskID/Name is specified, prepend it on the configuration name
-        if (StringUtils.isNotBlank(taskId)) {
+        String parameter = curator.getRunParameter(name);
+        if (null != parameter) {
+            return parameter;
+        } else if (StringUtils.isNotBlank(taskId)) {
             return configurationService.getProperty(taskId + "." + name);
         } else {
             return configurationService.getProperty(name);
@@ -215,6 +218,7 @@ public abstract class AbstractCurationTask implements CurationTask {
     /**
      * Returns task configuration integer property value for passed name, else
      * passed default value if no properties defined or no value for passed key.
+     * If a taskID/Name is specified, prepend it on the configuration name.
      *
      * @param name         the property name
      * @param defaultValue value
@@ -223,8 +227,10 @@ public abstract class AbstractCurationTask implements CurationTask {
      * the property value, or default value
      */
     protected int taskIntProperty(String name, int defaultValue) {
-        // If a taskID/Name is specified, prepend it on the configuration name
-        if (StringUtils.isNotBlank(taskId)) {
+        String parameter = curator.getRunParameter(name);
+        if (null != parameter) {
+            return Integer.valueOf(parameter);
+        } else if (StringUtils.isNotBlank(taskId)) {
             return configurationService.getIntProperty(taskId + "." + name, defaultValue);
         } else {
             return configurationService.getIntProperty(name, defaultValue);
@@ -234,6 +240,7 @@ public abstract class AbstractCurationTask implements CurationTask {
     /**
      * Returns task configuration long property value for passed name, else
      * passed default value if no properties defined or no value for passed key.
+     * If a taskID/Name is specified, prepend it on the configuration name.
      *
      * @param name         the property name
      * @param defaultValue value
@@ -242,8 +249,10 @@ public abstract class AbstractCurationTask implements CurationTask {
      * the property value, or default
      */
     protected long taskLongProperty(String name, long defaultValue) {
-        // If a taskID/Name is specified, prepend it on the configuration name
-        if (StringUtils.isNotBlank(taskId)) {
+        String parameter = curator.getRunParameter(name);
+        if (null != parameter) {
+            return Long.valueOf(parameter);
+        } else if (StringUtils.isNotBlank(taskId)) {
             return configurationService.getLongProperty(taskId + "." + name, defaultValue);
         } else {
             return configurationService.getLongProperty(name, defaultValue);
@@ -253,6 +262,7 @@ public abstract class AbstractCurationTask implements CurationTask {
     /**
      * Returns task configuration boolean property value for passed name, else
      * passed default value if no properties defined or no value for passed key.
+     * If a taskID/Name is specified, prepend it on the configuration name.
      *
      * @param name         the property name
      * @param defaultValue value
@@ -261,8 +271,10 @@ public abstract class AbstractCurationTask implements CurationTask {
      * the property value, or default
      */
     protected boolean taskBooleanProperty(String name, boolean defaultValue) {
-        // If a taskID/Name is specified, prepend it on the configuration name
-        if (StringUtils.isNotBlank(taskId)) {
+        String parameter = curator.getRunParameter(name);
+        if (null != parameter) {
+            return Boolean.valueOf(parameter);
+        } else if (StringUtils.isNotBlank(taskId)) {
             return configurationService.getBooleanProperty(taskId + "." + name, defaultValue);
         } else {
             return configurationService.getBooleanProperty(name, defaultValue);
@@ -272,14 +284,17 @@ public abstract class AbstractCurationTask implements CurationTask {
     /**
      * Returns task configuration Array property value for passed name, else
      * <code>null</code> if no properties defined or no value for passed key.
+     * If a taskID/Name is specified, prepend it on the configuration name.
      *
      * @param name the property name
      * @return value
      * the property value, or null
      */
     protected String[] taskArrayProperty(String name) {
-        // If a taskID/Name is specified, prepend it on the configuration name
-        if (StringUtils.isNotBlank(taskId)) {
+        String parameter = curator.getRunParameter(name);
+        if (null != parameter) {
+            return new String[] { parameter };
+        } else if (StringUtils.isNotBlank(taskId)) {
             return configurationService.getArrayProperty(taskId + "." + name);
         } else {
             return configurationService.getArrayProperty(name);

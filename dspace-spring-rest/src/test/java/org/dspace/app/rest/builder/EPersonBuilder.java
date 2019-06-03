@@ -24,7 +24,8 @@ public class EPersonBuilder extends AbstractDSpaceObjectBuilder<EPerson> {
         super(context);
     }
 
-    protected void cleanup() throws Exception {
+    @Override
+    public void cleanup() throws Exception {
         delete(ePerson);
     }
 
@@ -70,6 +71,24 @@ public class EPersonBuilder extends AbstractDSpaceObjectBuilder<EPerson> {
 
     public EPersonBuilder withEmail(String name) {
         ePerson.setEmail(name);
+        return this;
+    }
+
+    public EPersonBuilder withLanguage(String lang) throws SQLException {
+        ePerson.setLanguage(context, lang);
+        return this;
+    }
+
+    public EPersonBuilder withPhone(String phone) throws SQLException {
+        ePersonService.setMetadataSingleValue(
+                context,
+                ePerson,
+                "eperson",
+                "phone",
+                null,
+                null,
+                phone
+        );
         return this;
     }
 

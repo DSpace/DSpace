@@ -12,22 +12,29 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.BadRequestException;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.CommunityConverter;
+import org.dspace.app.rest.converter.MetadataConverter;
+import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.CommunityRest;
-import org.dspace.app.rest.model.MetadataEntryRest;
 import org.dspace.app.rest.model.hateoas.CommunityResource;
+import org.dspace.app.rest.model.patch.Patch;
+import org.dspace.app.rest.repository.patch.DSpaceObjectPatch;
+import org.dspace.app.rest.utils.CommunityRestEqualityUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Community;
 import org.dspace.content.service.CommunityService;
 import org.dspace.core.Context;
+import org.dspace.util.UUIDUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -43,16 +50,23 @@ import org.springframework.stereotype.Component;
  */
 
 @Component(CommunityRest.CATEGORY + "." + CommunityRest.NAME)
-public class CommunityRestRepository extends DSpaceRestRepository<CommunityRest, UUID> {
+public class CommunityRestRepository extends DSpaceObjectRestRepository<Community, CommunityRest> {
 
-    @Autowired
-    CommunityService cs;
+    private final CommunityService cs;
 
     @Autowired
     CommunityConverter converter;
 
-    public CommunityRestRepository() {
-        System.out.println("Repository initialized by Spring");
+    @Autowired
+    MetadataConverter metadataConverter;
+
+    @Autowired
+    CommunityRestEqualityUtils communityRestEqualityUtils;
+
+    public CommunityRestRepository(CommunityService dsoService,
+                                   CommunityConverter dsoConverter) {
+        super(dsoService, dsoConverter, new DSpaceObjectPatch<CommunityRest>() {});
+        this.cs = dsoService;
     }
 
     @Override
@@ -60,7 +74,7 @@ public class CommunityRestRepository extends DSpaceRestRepository<CommunityRest,
     protected CommunityRest createAndReturn(Context context) throws AuthorizeException {
         HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
         ObjectMapper mapper = new ObjectMapper();
-        CommunityRest communityRest = null;
+        CommunityRest communityRest;
         try {
             ServletInputStream input = req.getInputStream();
             communityRest = mapper.readValue(input, CommunityRest.class);
@@ -68,23 +82,34 @@ public class CommunityRestRepository extends DSpaceRestRepository<CommunityRest,
             throw new UnprocessableEntityException("Error parsing request body: " + e1.toString());
         }
 
-        Community community = null;
+        Community community;
+
 
         try {
-            community = cs.create(null, context);
-            cs.update(context, community);
-            if (communityRest.getMetadata() != null) {
-                for (MetadataEntryRest mer : communityRest.getMetadata()) {
-                    String[] metadatakey = mer.getKey().split("\\.");
-                    cs.addMetadata(context, community, metadatakey[0], metadatakey[1],
-                            metadatakey.length == 3 ? metadatakey[2] : null, mer.getLanguage(), mer.getValue());
+            Community parent = null;
+            String parentCommunityString = req.getParameter("parent");
+            if (StringUtils.isNotBlank(parentCommunityString)) {
+
+                UUID parentCommunityUuid = UUIDUtils.fromString(parentCommunityString);
+                if (parentCommunityUuid == null) {
+                    throw new BadRequestException("The given parent parameter was invalid: "
+                            + parentCommunityString);
+                }
+
+                parent = cs.find(context, parentCommunityUuid);
+                if (parent == null) {
+                    throw new UnprocessableEntityException("Parent community for id: "
+                            + parentCommunityUuid + " not found");
                 }
             }
+            community = cs.create(parent, context);
+            cs.update(context, community);
+            metadataConverter.setMetadata(context, community, communityRest.getMetadata());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
 
-        return converter.convert(community);
+        return dsoConverter.convert(community);
     }
 
     @Override
@@ -99,7 +124,7 @@ public class CommunityRestRepository extends DSpaceRestRepository<CommunityRest,
         if (community == null) {
             return null;
         }
-        return converter.fromModel(community);
+        return dsoConverter.fromModel(community);
     }
 
     @Override
@@ -116,7 +141,7 @@ public class CommunityRestRepository extends DSpaceRestRepository<CommunityRest,
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<CommunityRest> page = new PageImpl<Community>(communities, pageable, total).map(converter);
+        Page<CommunityRest> page = new PageImpl<Community>(communities, pageable, total).map(dsoConverter);
         return page;
     }
 
@@ -130,7 +155,7 @@ public class CommunityRestRepository extends DSpaceRestRepository<CommunityRest,
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<CommunityRest> page = utils.getPage(topCommunities, pageable).map(converter);
+        Page<CommunityRest> page = utils.getPage(topCommunities, pageable).map(dsoConverter);
         return page;
     }
 
@@ -151,8 +176,15 @@ public class CommunityRestRepository extends DSpaceRestRepository<CommunityRest,
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<CommunityRest> page = utils.getPage(subCommunities, pageable).map(converter);
+        Page<CommunityRest> page = utils.getPage(subCommunities, pageable).map(dsoConverter);
         return page;
+    }
+
+    @Override
+    @PreAuthorize("hasPermission(#id, 'COMMUNITY', 'WRITE')")
+    protected void patch(Context context, HttpServletRequest request, String apiCategory, String model, UUID id,
+                         Patch patch) throws AuthorizeException, SQLException {
+        patchDSpaceObject(apiCategory, model, id, patch);
     }
 
     @Override
@@ -165,4 +197,49 @@ public class CommunityRestRepository extends DSpaceRestRepository<CommunityRest,
         return new CommunityResource(community, utils, rels);
     }
 
+    @Override
+    @PreAuthorize("hasPermission(#id, 'COMMUNITY', 'WRITE')")
+    protected CommunityRest put(Context context, HttpServletRequest request, String apiCategory, String model, UUID id,
+                       JsonNode jsonNode)
+        throws RepositoryMethodNotImplementedException, SQLException, AuthorizeException {
+        CommunityRest communityRest;
+        try {
+            communityRest = new ObjectMapper().readValue(jsonNode.toString(), CommunityRest.class);
+        } catch (IOException e) {
+            throw new UnprocessableEntityException("Error parsing community json: " + e.getMessage());
+        }
+        Community community = cs.find(context, id);
+        if (community == null) {
+            throw new ResourceNotFoundException(apiCategory + "." + model + " with id: " + id + " not found");
+        }
+        CommunityRest originalCommunityRest = converter.fromModel(community);
+        if (communityRestEqualityUtils.isCommunityRestEqualWithoutMetadata(originalCommunityRest, communityRest)) {
+            metadataConverter.setMetadata(context, community, communityRest.getMetadata());
+        } else {
+            throw new UnprocessableEntityException("The given JSON and the original Community differ more " +
+                                                       "than just the metadata");
+        }
+        return converter.fromModel(community);
+    }
+    @Override
+    @PreAuthorize("hasPermission(#id, 'COMMUNITY', 'DELETE')")
+    protected void delete(Context context, UUID id) throws AuthorizeException {
+        Community community = null;
+        try {
+            community = cs.find(context, id);
+            if (community == null) {
+                throw new ResourceNotFoundException(
+                    CommunityRest.CATEGORY + "." + CommunityRest.NAME + " with id: " + id + " not found");
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Unable to find Community with id = " + id, e);
+        }
+        try {
+            cs.delete(context, community);
+        } catch (SQLException e) {
+            throw new RuntimeException("Unable to delete Community with id = " + id, e);
+        } catch (IOException e) {
+            throw new RuntimeException("Unable to delete community because the logo couldn't be deleted", e);
+        }
+    }
 }

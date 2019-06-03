@@ -69,7 +69,7 @@ public class SolrLoggerUsageEventListener extends AbstractUsageEventListener {
                 }
 
             } catch (Exception e) {
-                log.error(e.getMessage());
+                log.error("Error processing/logging UsageEvent {}", event.getName(), e);
             }
         }
 
