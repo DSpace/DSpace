@@ -61,7 +61,7 @@ public class ReportService {
                 "left join item on item.submitter_id = eperson_id and in_archive " +
                 "left join metadatavalue on metadatavalue.resource_id = item.item_id and metadata_field_id = 11 " +
                 "and text_value between '%d-%02d-%02d' and '%d-%02d-%02d' " +
-                "group by eperson.eperson_id, chair_name, faculty_name", from.getYear(), from.getMonth().getValue(), from.getDayOfMonth(), to.getYear(), from.getMonth().getValue(), to.getDayOfMonth());
+                "group by eperson.eperson_id, chair_name, faculty_name", from.getYear(), from.getMonth().getValue(), from.getDayOfMonth(), to.getYear(), to.getMonth().getValue(), to.getDayOfMonth());
         return populateDataFromQueryResult(databaseService.executeQuery(query));
     }
 
