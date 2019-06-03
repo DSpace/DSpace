@@ -333,11 +333,15 @@ public class Package {
             // --- start of related identifiers section
             // write citation for article and other related identifiers:
             jGen.writeArrayFieldStart("relatedWorks");
-            jGen.writeStartObject();
-            jGen.writeStringField("relationship", "issupplementto");
-            jGen.writeStringField("identifierType", "DOI");
-            jGen.writeStringField("identifier", restPackage.getPublicationDOI());
-            jGen.writeEndObject();
+            
+            if(restPackage.getPublicationDOI() != null &&
+               restPackage.getPublicationDOI().length() > 0) {
+                jGen.writeStartObject();
+                jGen.writeStringField("relationship", "issupplementto");
+                jGen.writeStringField("identifierType", "DOI");
+                jGen.writeStringField("identifier", restPackage.getPublicationDOI());
+                jGen.writeEndObject();
+            }
             
             // related identifiers TODO
             List<String> externals = ddp.getExternalRelations();
