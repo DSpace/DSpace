@@ -401,6 +401,35 @@ public class DryadDataPackage extends DryadObject {
         return result;
     }
 
+    /**
+     * Get the external identifiers referenced by this package.
+     * @throws SQLException
+     */
+    public List<String> getExternalRelations() {
+        log.debug("getting external relations");
+        if (getItem() != null) {
+            List<String> allRelations = new ArrayList<String>();
+            try {
+                Context c = new Context();
+                List<DryadDataFile> files = getDataFiles(c);
+                log.debug("processing from files: " + files.size());
+                for(DryadDataFile aFile : files) {
+                    List<String> extValues = aFile.getMultipleMetadataValues("dc", "relation", "external");
+                    log.debug("found in file: " + extValues);
+                    allRelations.addAll(extValues);
+                }
+            } catch(Exception e) {
+                log.error("could not retrieve external relations", e)
+            }
+            List<String> extValues = getMultipleMetadataValues("dc", "relation", "external");
+            log.debug("found in package: " + extValues);
+            allRelations.addAll(extValues);
+            return allRelations; 
+        } else {
+            return null;
+        }
+    }
+
     public String getFundingEntity() {
         String result = null;
         if (getItem() != null) {
