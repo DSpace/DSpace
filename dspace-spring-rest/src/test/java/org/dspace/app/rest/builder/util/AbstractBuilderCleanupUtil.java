@@ -27,6 +27,7 @@ import org.dspace.app.rest.builder.MetadataSchemaBuilder;
 import org.dspace.app.rest.builder.PoolTaskBuilder;
 import org.dspace.app.rest.builder.RelationshipBuilder;
 import org.dspace.app.rest.builder.RelationshipTypeBuilder;
+import org.dspace.app.rest.builder.RequestItemBuilder;
 import org.dspace.app.rest.builder.SiteBuilder;
 import org.dspace.app.rest.builder.WorkflowItemBuilder;
 import org.dspace.app.rest.builder.WorkspaceItemBuilder;
@@ -34,7 +35,7 @@ import org.dspace.app.rest.builder.WorkspaceItemBuilder;
 /**
  * This class will ensure that all the builders that are registered will be cleaned up in the order as defined
  * in the constructor. This will ensure foreign-key constraint safe deletion of the objects made with these
- * builders
+ * builders.
  */
 public class AbstractBuilderCleanupUtil {
 
@@ -57,6 +58,7 @@ public class AbstractBuilderCleanupUtil {
         map.put(CommunityBuilder.class.getName(), new LinkedList<>());
         map.put(EPersonBuilder.class.getName(), new LinkedList<>());
         map.put(GroupBuilder.class.getName(), new LinkedList<>());
+        map.put(RequestItemBuilder.class.getName(), new LinkedList<>());
         map.put(ItemBuilder.class.getName(), new LinkedList<>());
         map.put(MetadataFieldBuilder.class.getName(), new LinkedList<>());
         map.put(MetadataSchemaBuilder.class.getName(), new LinkedList<>());
