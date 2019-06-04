@@ -45,6 +45,7 @@ import org.springframework.stereotype.Component;
 public class RequestItemRepository
         extends DSpaceRestRepository<RequestItemRest, String> {
     private static final Logger LOG = LogManager.getLogger();
+
     @Autowired(required = true)
     protected RequestItemService requestItemService;
 
