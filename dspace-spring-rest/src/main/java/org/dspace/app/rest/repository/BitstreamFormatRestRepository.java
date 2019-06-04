@@ -8,7 +8,6 @@
 package org.dspace.app.rest.repository;
 
 import org.dspace.app.rest.converter.BitstreamFormatConverter;
-import org.dspace.app.rest.converter.MetadataConverter;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.BitstreamFormatRest;
@@ -51,8 +50,6 @@ public class BitstreamFormatRestRepository extends DSpaceRestRepository<Bitstrea
     @Autowired
     BitstreamFormatConverter converter;
 
-    @Autowired
-    MetadataConverter metadataConverter;
 
     public BitstreamFormatRestRepository() {
         System.out.println("Repository initialized by Spring");
@@ -131,7 +128,7 @@ public class BitstreamFormatRestRepository extends DSpaceRestRepository<Bitstrea
         } catch (SQLException e) {
             throw new ResourceNotFoundException(notFoundException);
         }
-        if (bitstreamFormatRest.getId().equals(id)) {
+        if (id.equals(bitstreamFormatRest.getId())) {
             this.setAllValuesOfRest(context, bitstreamFormat, bitstreamFormatRest);
             bitstreamFormatService.update(context, bitstreamFormat);
             return converter.fromModel(bitstreamFormat);
@@ -174,7 +171,8 @@ public class BitstreamFormatRestRepository extends DSpaceRestRepository<Bitstrea
         try {
             bitstreamFormat.setShortDescription(c, bitstreamFormatRest.getShortDescription());
         } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new RuntimeException("RuntimeException: Unable to set the short description (" +
+                    bitstreamFormatRest.getShortDescription() + ") for bitstream", e);
         }
         bitstreamFormat.setDescription(bitstreamFormatRest.getDescription());
         bitstreamFormat.setMIMEType(bitstreamFormatRest.getMimetype());
