@@ -402,12 +402,16 @@
 
         <value-pairs value-pairs-name="common_types" dc-term="type">
             <pair>
-                <displayed-value>Kunstnerisk produksjon</displayed-value>
-                <stored-value>Artistic production</stored-value>
+                <displayed-value>Arbeidsnotat</displayed-value>
+                <stored-value>Working paper</stored-value>
             </pair>
             <pair>
                 <displayed-value>Bacheloroppgave</displayed-value>
                 <stored-value>Bachelor thesis</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Bilde</displayed-value>
+                <stored-value>Image</stored-value>
             </pair>
             <pair>
                 <displayed-value>Bok</displayed-value>
@@ -418,68 +422,44 @@
                 <stored-value>Chapter</stored-value>
             </pair>
             <pair>
-                <displayed-value>Kronikk</displayed-value>
-                <stored-value>Chronicle</stored-value>
-            </pair>
-            <pair>
-                <displayed-value>Konferansebidrag</displayed-value>
-                <stored-value>Conference object</stored-value>
-            </pair>
-            <pair>
                 <displayed-value>Datasett</displayed-value>
                 <stored-value>Dataset</stored-value>
             </pair>
             <pair>
-       			<displayed-value>Designprodukt</displayed-value>
-       			<stored-value>Design product</stored-value>
-     		</pair>
+                <displayed-value>Designprodukt</displayed-value>
+                <stored-value>Design product</stored-value>
+            </pair>
             <pair>
                 <displayed-value>Doktorgradsavhandling</displayed-value>
                 <stored-value>Doctoral thesis</stored-value>
             </pair>
             <pair>
-                <displayed-value>Bilde</displayed-value>
-                <stored-value>Image</stored-value>
-            </pair>
-            <pair>
-                <displayed-value>Tidsskriftartikkel</displayed-value>
-                <stored-value>Journal article</stored-value>
-            </pair>
-            <pair>
-                <displayed-value>Læringsobjekt</displayed-value>
-                <stored-value>Learning object</stored-value>
+                <displayed-value>Fagfellevurdert</displayed-value>
+                <stored-value>Peer reviewed</stored-value>
             </pair>
             <pair>
                 <displayed-value>Forelesning</displayed-value>
                 <stored-value>Lecture</stored-value>
             </pair>
             <pair>
+                <displayed-value>Forskningsrapport</displayed-value>
+                <stored-value>Research report</stored-value>
+            </pair>
+            <pair>
                 <displayed-value>Kart</displayed-value>
                 <stored-value>Map</stored-value>
             </pair>
             <pair>
-                <displayed-value>Mastergradsoppgave</displayed-value>
-                <stored-value>Master thesis</stored-value>
+                <displayed-value>Konferansebidrag</displayed-value>
+                <stored-value>Conference object</stored-value>
             </pair>
             <pair>
-                <displayed-value>Partitur</displayed-value>
-                <stored-value>Musical score</stored-value>
+                <displayed-value>Kronikk</displayed-value>
+                <stored-value>Chronicle</stored-value>
             </pair>
             <pair>
-       			<displayed-value>Patent</displayed-value>
-       			<stored-value>Patent</stored-value>
-     		</pair>
-            <pair>
-                <displayed-value>Fagfellevurdert</displayed-value>
-                <stored-value>Peer reviewed</stored-value>
-            </pair>
-            <pair>
-                <displayed-value>Plan eller tegning</displayed-value>
-                <stored-value>Plan or blueprint</stored-value>
-            </pair>
-            <pair>
-                <displayed-value>Manuskript</displayed-value>
-                <stored-value>Preprint</stored-value>
+                <displayed-value>Kunstnerisk produksjon</displayed-value>
+                <stored-value>Artistic production</stored-value>
             </pair>
             <pair>
                 <displayed-value>Lydopptak, musikalsk</displayed-value>
@@ -490,28 +470,48 @@
                 <stored-value>Recording, oral</stored-value>
             </pair>
             <pair>
-                <displayed-value>Forskningsrapport</displayed-value>
-                <stored-value>Research report</stored-value>
+                <displayed-value>Læringsobjekt</displayed-value>
+                <stored-value>Learning object</stored-value>
             </pair>
             <pair>
-                <displayed-value>Rapport</displayed-value>
-                <stored-value>Report</stored-value>
+                <displayed-value>Manuskript</displayed-value>
+                <stored-value>Preprint</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Mastergradsoppgave</displayed-value>
+                <stored-value>Master thesis</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Partitur</displayed-value>
+                <stored-value>Musical score</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Patent</displayed-value>
+                <stored-value>Patent</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Plan eller tegning</displayed-value>
+                <stored-value>Plan or blueprint</stored-value>
             </pair>
             <pair>
                 <displayed-value>Programvare</displayed-value>
                 <stored-value>Software</stored-value>
             </pair>
             <pair>
+                <displayed-value>Rapport</displayed-value>
+                <stored-value>Report</stored-value>
+            </pair>
+            <pair>
                 <displayed-value>Studentoppgave, annet</displayed-value>
                 <stored-value>Student paper, others</stored-value>
             </pair>
             <pair>
-                <displayed-value>Video</displayed-value>
-                <stored-value>Video</stored-value>
+                <displayed-value>Tidsskriftartikkel</displayed-value>
+                <stored-value>Journal article</stored-value>
             </pair>
             <pair>
-                <displayed-value>Arbeidsnotat</displayed-value>
-                <stored-value>Working paper</stored-value>
+                <displayed-value>Video</displayed-value>
+                <stored-value>Video</stored-value>
             </pair>
             <pair>
                 <displayed-value>Andre</displayed-value>
