@@ -86,8 +86,4 @@ public class RequestItemBuilder
     protected RequestItemService getService() {
         return requestItemService;
     }
-
-    public int getPriority() {
-        return -1; // Clean up before Item
-    }
 }
