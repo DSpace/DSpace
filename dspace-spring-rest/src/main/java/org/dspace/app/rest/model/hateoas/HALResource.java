@@ -27,7 +27,8 @@ public abstract class HALResource<T> extends Resource<T> {
 
     protected final Map<String, Object> embedded = new HashMap<String, Object>();
 
-
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    @JsonUnwrapped
     private EmbeddedPageHeader pageHeader;
 
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
@@ -49,9 +50,5 @@ public abstract class HALResource<T> extends Resource<T> {
     public void setPageHeader(EmbeddedPageHeader page) {
         this.pageHeader = page;
     }
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    @JsonUnwrapped
-    public EmbeddedPageHeader getPageHeader() {
-        return pageHeader;
-    }
+
 }
