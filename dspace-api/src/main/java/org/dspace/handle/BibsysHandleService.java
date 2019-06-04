@@ -63,7 +63,7 @@ public class BibsysHandleService implements AutoCloseable {
     private String createHandleId(String instanceBaseUrl) {
         String handle = "";
         try {
-            handle = handleServiceClient.createHandleAppendToEndpont(instanceBaseUrl);
+            handle = handleServiceClient.createHandleAppendToEndpoint(instanceBaseUrl);
         } catch (IOException e) {
             log.error(e);
         }
