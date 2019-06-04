@@ -401,6 +401,40 @@ public class DryadDataPackage extends DryadObject {
         return result;
     }
 
+    /**
+     * Get the external identifiers referenced by this package.
+     * @throws SQLException
+     */
+    public List<String> getExternalRelations() {
+        log.debug("getting external relations");
+        if (getItem() != null) {
+            List<String> allRelations = new ArrayList<String>();
+            try {
+                Context c = new Context();
+                List<DryadDataFile> files = getDataFiles(c);
+                for(DryadDataFile aFile : files) {
+                    List<String> extValues = aFile.getMultipleMetadataValues("dryad", "externalIdentifier", null);
+                    allRelations.addAll(extValues);
+                }
+            } catch(Exception e) {
+                log.error("could not retrieve external relations", e);
+            }
+            List<String> extValues = getMultipleMetadataValues("dryad", "externalIdentifier", null);
+            allRelations.addAll(extValues);
+            return allRelations; 
+        } else {
+            return null;
+        }
+    }
+
+    public String getFundingEntity() {
+        String result = null;
+        if (getItem() != null) {
+            result = getSingleMetadataValue("dryad", "fundingEntity", null);
+        } 
+        return result;
+    }
+    
     public String getDashStoredDate() {
         String result = null;
         if (getItem() != null) {

@@ -1,3 +1,4 @@
+
 /*
  */
 package org.datadryad.rest.models;
@@ -191,8 +192,8 @@ public class Package {
     
     public static class SchemaDotOrgSerializer extends JsonSerializer<Package> {
         @Override
-        public void serialize(Package dataPackage, JsonGenerator jGen, SerializerProvider provider) throws IOException {
-            String packageDOI = dataPackage.getDryadDOI();
+        public void serialize(Package restPackage, JsonGenerator jGen, SerializerProvider provider) throws IOException {
+            String packageDOI = restPackage.getDryadDOI();
             
             jGen.writeStartObject();
             jGen.writeStringField("@context", "http://schema.org/");
@@ -200,22 +201,22 @@ public class Package {
             jGen.writeStringField("@id", DOIIdentifierProvider.getFullDOIURL(packageDOI));
             jGen.writeStringField("url", DOIIdentifierProvider.getFullDOIURL(packageDOI));
             jGen.writeStringField("identifier", packageDOI);
-            jGen.writeStringField("name", dataPackage.getTitle());
-            jGen.writeObjectField("author", dataPackage.getAuthorList());
-            jGen.writeStringField("datePublished", dataPackage.getPublicationDate());
-            String version = DOIIdentifierProvider.getDOIVersion(dataPackage.getDryadDOI());
+            jGen.writeStringField("name", restPackage.getTitle());
+            jGen.writeObjectField("author", restPackage.getAuthorList());
+            jGen.writeStringField("datePublished", restPackage.getPublicationDate());
+            String version = DOIIdentifierProvider.getDOIVersion(restPackage.getDryadDOI());
             if (!"".equals(version)) {
                 jGen.writeStringField("version", version);
             }
-            jGen.writeStringField("description", dataPackage.getAbstract());
-            if (dataPackage.getKeywords().size() > 0) {
-                jGen.writeObjectField("keywords", dataPackage.getKeywords());
+            jGen.writeStringField("description", restPackage.getAbstract());
+            if (restPackage.getKeywords().size() > 0) {
+                jGen.writeObjectField("keywords", restPackage.getKeywords());
             }
 
             // write citation for article:
             jGen.writeObjectFieldStart("citation");
             jGen.writeStringField("@type", "Article");
-            jGen.writeStringField("identifier", dataPackage.getPublicationDOI());
+            jGen.writeStringField("identifier", restPackage.getPublicationDOI());
             jGen.writeEndObject();
 
             // write Dryad Digital Repository Organization object:
@@ -231,15 +232,15 @@ public class Package {
 
     public static class DashSerializer extends JsonSerializer<Package> {
         @Override
-        public void serialize(Package dataPackage, JsonGenerator jGen, SerializerProvider provider) throws IOException {
-            DryadDataPackage ddp = dataPackage.getDataPackage();
+        public void serialize(Package restPackage, JsonGenerator jGen, SerializerProvider provider) throws IOException {
+            DryadDataPackage ddp = restPackage.getDataPackage();
             
             jGen.writeStartObject();
 
             jGen.writeStringField("identifier", ddp.getVersionlessIdentifier());
-            jGen.writeStringField("title", dataPackage.getTitle());
-            jGen.writeStringField("abstract", dataPackage.getAbstract());
-            jGen.writeObjectField("authors", dataPackage.getAuthorList());
+            jGen.writeStringField("title", restPackage.getTitle());
+            jGen.writeStringField("abstract", restPackage.getAbstract());
+            jGen.writeObjectField("authors", restPackage.getAuthorList());
 
             //WORKING date
             //jGen.writeStringField("date-available", dataPackage.getDateAccessioned());
@@ -328,16 +329,71 @@ public class Package {
                 }
                 jGen.writeEndArray();
             }
-            
-            // write citation for article:
-            jGen.writeArrayFieldStart("relatedWorks");
-            jGen.writeStartObject();
-            jGen.writeStringField("relationship", "iscitedby");
-            jGen.writeStringField("identifierType", "DOI");
-            jGen.writeStringField("identifier", dataPackage.getPublicationDOI());
-            jGen.writeEndObject();
-            jGen.writeEndArray();
 
+            // --- start of related identifiers section
+            // write citation for article and other related identifiers:
+            jGen.writeArrayFieldStart("relatedWorks");
+            
+            if(restPackage.getPublicationDOI() != null &&
+               restPackage.getPublicationDOI().length() > 0) {
+                jGen.writeStartObject();
+                jGen.writeStringField("relationship", "issupplementto");
+                jGen.writeStringField("identifierType", "DOI");
+                jGen.writeStringField("identifier", restPackage.getPublicationDOI());
+                jGen.writeEndObject();
+            }
+            
+            // related identifiers TODO
+            List<String> externals = ddp.getExternalRelations();
+            for(String externalRelation : externals) {
+                // parse them into URL and label
+                int colonIndex = externalRelation.indexOf(":");
+                if(colonIndex > 0 && (colonIndex + 1 < externalRelation.length())){
+                    // if good index, split
+                    String relSchema = externalRelation.substring(0, colonIndex);
+                    String relLocation = externalRelation.substring(colonIndex + 1);
+                    if(relLocation.startsWith("http")){
+                        //   if second part is URL, mark it as a URL
+                        jGen.writeStartObject();
+                        jGen.writeStringField("relationship", "issupplementedby");
+                        jGen.writeStringField("identifierType", "URL");
+                        jGen.writeStringField("identifier", relLocation);
+                        jGen.writeEndObject();
+                    } else {
+                        // else, add as a URN
+                        jGen.writeStartObject();
+                        jGen.writeStringField("relationship", "issupplementedby");
+                        jGen.writeStringField("identifierType", "URN");
+                        jGen.writeStringField("identifier", externalRelation);
+                        jGen.writeEndObject();
+                    }
+                } else {
+                    // bad index, add as a URN
+                    jGen.writeStartObject();
+                    jGen.writeStringField("relationship", "issupplementedby");
+                    jGen.writeStringField("identifierType", "URN");
+                    jGen.writeStringField("identifier", externalRelation);
+                    jGen.writeEndObject();
+                }
+            }
+            
+            jGen.writeEndArray();
+            // --- end of related identifiers section
+
+            // funder
+            String funder = ddp.getFundingEntity();
+            if(funder !=null && funder.contains("@National Sci")) {
+                int nsfIndex = funder.indexOf("@National Sci");
+                String award = funder.substring(0, nsfIndex);
+                jGen.writeArrayFieldStart("funders");
+                jGen.writeStartObject();
+                jGen.writeStringField("organization", "National Science Foundation");
+                jGen.writeStringField("awardNumber", award);
+                jGen.writeEndObject();
+                jGen.writeEndArray();
+            }
+            
+            
             // When working with Dryad Classic packages, we want to disable the
             // default DASH validation and interaction with DataCite
             jGen.writeBooleanField("skipDataciteUpdate", true);
