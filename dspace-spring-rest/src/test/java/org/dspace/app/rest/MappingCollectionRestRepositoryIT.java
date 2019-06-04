@@ -53,29 +53,14 @@ public class MappingCollectionRestRepositoryIT extends AbstractControllerIntegra
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
         Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
 
-        //2. Three public items that are readable by Anonymous with different subjects
+        //2. Public item that is readable by Anonymous with different subjects
         Item publicItem1 = ItemBuilder.createItem(context, col1)
-                                      .withTitle("Public item 1")
-                                      .withIssueDate("2017-10-17")
-                                      .withAuthor("Smith, Donald").withAuthor("Doe, John")
-                                      .withSubject("ExtraEntry")
-                                      .build();
-
-        Item publicItem2 = ItemBuilder.createItem(context, col2)
-                                      .withTitle("Public item 2")
-                                      .withIssueDate("2016-02-13")
-                                      .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
-                                      .withSubject("TestingForMore").withSubject("ExtraEntry")
-                                      .build();
-
-        Item publicItem3 = ItemBuilder.createItem(context, col2)
-                                      .withTitle("Public item 3")
-                                      .withIssueDate("2016-02-13")
-                                      .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
-                                      .withSubject("AnotherTest").withSubject("TestingForMore")
-                                      .withSubject("ExtraEntry")
-                                      .build();
-
+                .withTitle("Public item 1")
+                .withIssueDate("2017-10-17")
+                .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                .withSubject("ExtraEntry")
+                .build();
+        context.restoreAuthSystemState();
 
 //        collectionService.addItem(context, col2, publicItem1);
 //        collectionService.update(context, col2);
@@ -117,29 +102,14 @@ public class MappingCollectionRestRepositoryIT extends AbstractControllerIntegra
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
         Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
 
-        //2. Three public items that are readable by Anonymous with different subjects
+        //2. Public item that is readable by Anonymous with different subjects
         Item publicItem1 = ItemBuilder.createItem(context, col1)
                                       .withTitle("Public item 1")
                                       .withIssueDate("2017-10-17")
                                       .withAuthor("Smith, Donald").withAuthor("Doe, John")
                                       .withSubject("ExtraEntry")
                                       .build();
-
-        Item publicItem2 = ItemBuilder.createItem(context, col2)
-                                      .withTitle("Public item 2")
-                                      .withIssueDate("2016-02-13")
-                                      .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
-                                      .withSubject("TestingForMore").withSubject("ExtraEntry")
-                                      .build();
-
-        Item publicItem3 = ItemBuilder.createItem(context, col2)
-                                      .withTitle("Public item 3")
-                                      .withIssueDate("2016-02-13")
-                                      .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
-                                      .withSubject("AnotherTest").withSubject("TestingForMore")
-                                      .withSubject("ExtraEntry")
-                                      .build();
-
+        context.restoreAuthSystemState();
 
         String adminToken = getAuthToken(admin.getEmail(), password);
 
@@ -163,12 +133,14 @@ public class MappingCollectionRestRepositoryIT extends AbstractControllerIntegra
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.mappingItems", Matchers.not(Matchers.contains(
                         ItemMatcher.matchItemProperties(publicItem1))
-                )));
+                )))
+                .andExpect(jsonPath("$._embedded.mappingItems", Matchers.hasSize(0)));
         getClient().perform(get("/api/core/collections/" + col2.getID() + "/mappingItems"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.mappingItems", Matchers.contains(
                         ItemMatcher.matchItemProperties(publicItem1))
-                ));
+                ))
+                .andExpect(jsonPath("$._embedded.mappingItems", Matchers.hasSize(1)));
     }
 
     @Test
@@ -187,29 +159,14 @@ public class MappingCollectionRestRepositoryIT extends AbstractControllerIntegra
         Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
         Collection col3 = CollectionBuilder.createCollection(context, child1).withName("Collection 3").build();
 
-        //2. Three public items that are readable by Anonymous with different subjects
+        //2. Public item that is readable by Anonymous with different subjects
         Item publicItem1 = ItemBuilder.createItem(context, col1)
                                       .withTitle("Public item 1")
                                       .withIssueDate("2017-10-17")
                                       .withAuthor("Smith, Donald").withAuthor("Doe, John")
                                       .withSubject("ExtraEntry")
                                       .build();
-
-        Item publicItem2 = ItemBuilder.createItem(context, col2)
-                                      .withTitle("Public item 2")
-                                      .withIssueDate("2016-02-13")
-                                      .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
-                                      .withSubject("TestingForMore").withSubject("ExtraEntry")
-                                      .build();
-
-        Item publicItem3 = ItemBuilder.createItem(context, col2)
-                                      .withTitle("Public item 3")
-                                      .withIssueDate("2016-02-13")
-                                      .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
-                                      .withSubject("AnotherTest").withSubject("TestingForMore")
-                                      .withSubject("ExtraEntry")
-                                      .build();
-
+        context.restoreAuthSystemState();
 
         String adminToken = getAuthToken(admin.getEmail(), password);
         getClient(adminToken)
@@ -234,17 +191,20 @@ public class MappingCollectionRestRepositoryIT extends AbstractControllerIntegra
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.mappingItems", Matchers.not(Matchers.contains(
                         ItemMatcher.matchItemProperties(publicItem1))
-                )));
+                )))
+                .andExpect(jsonPath("$._embedded.mappingItems", Matchers.hasSize(0)));
         getClient().perform(get("/api/core/collections/" + col2.getID() + "/mappingItems"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.mappingItems", Matchers.contains(
                         ItemMatcher.matchItemProperties(publicItem1))
-                ));
+                ))
+                .andExpect(jsonPath("$._embedded.mappingItems", Matchers.hasSize(1)));
         getClient().perform(get("/api/core/collections/" + col3.getID() + "/mappingItems"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.mappingItems", Matchers.contains(
                         ItemMatcher.matchItemProperties(publicItem1))
-                ));
+                ))
+                .andExpect(jsonPath("$._embedded.mappingItems", Matchers.hasSize(1)));
     }
 
     @Test
@@ -264,29 +224,14 @@ public class MappingCollectionRestRepositoryIT extends AbstractControllerIntegra
         Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
         Collection col3 = CollectionBuilder.createCollection(context, child1).withName("Collection 3").build();
 
-        //2. Three public items that are readable by Anonymous with different subjects
+        //2. Public item that is readable by Anonymous with different subjects
         Item publicItem1 = ItemBuilder.createItem(context, col1)
                                       .withTitle("Public item 1")
                                       .withIssueDate("2017-10-17")
                                       .withAuthor("Smith, Donald").withAuthor("Doe, John")
                                       .withSubject("ExtraEntry")
                                       .build();
-
-        Item publicItem2 = ItemBuilder.createItem(context, col2)
-                                      .withTitle("Public item 2")
-                                      .withIssueDate("2016-02-13")
-                                      .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
-                                      .withSubject("TestingForMore").withSubject("ExtraEntry")
-                                      .build();
-
-        Item publicItem3 = ItemBuilder.createItem(context, col2)
-                                      .withTitle("Public item 3")
-                                      .withIssueDate("2016-02-13")
-                                      .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
-                                      .withSubject("AnotherTest").withSubject("TestingForMore")
-                                      .withSubject("ExtraEntry")
-                                      .build();
-
+        context.restoreAuthSystemState();
 
         String adminToken = getAuthToken(admin.getEmail(), password);
         getClient(adminToken)
@@ -333,29 +278,14 @@ public class MappingCollectionRestRepositoryIT extends AbstractControllerIntegra
         Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
         Collection col3 = CollectionBuilder.createCollection(context, child1).withName("Collection 3").build();
 
-        //2. Three public items that are readable by Anonymous with different subjects
+        //2. Public item that is readable by Anonymous with different subjects
         Item publicItem1 = ItemBuilder.createItem(context, col1)
                                       .withTitle("Public item 1")
                                       .withIssueDate("2017-10-17")
                                       .withAuthor("Smith, Donald").withAuthor("Doe, John")
                                       .withSubject("ExtraEntry")
                                       .build();
-
-        Item publicItem2 = ItemBuilder.createItem(context, col2)
-                                      .withTitle("Public item 2")
-                                      .withIssueDate("2016-02-13")
-                                      .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
-                                      .withSubject("TestingForMore").withSubject("ExtraEntry")
-                                      .build();
-
-        Item publicItem3 = ItemBuilder.createItem(context, col2)
-                                      .withTitle("Public item 3")
-                                      .withIssueDate("2016-02-13")
-                                      .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
-                                      .withSubject("AnotherTest").withSubject("TestingForMore")
-                                      .withSubject("ExtraEntry")
-                                      .build();
-
+        context.restoreAuthSystemState();
 
         String adminToken = getAuthToken(admin.getEmail(), password);
         getClient(adminToken)
@@ -380,7 +310,8 @@ public class MappingCollectionRestRepositoryIT extends AbstractControllerIntegra
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.mappingItems", Matchers.not(Matchers.contains(
                         ItemMatcher.matchItemProperties(publicItem1))
-                )));
+                )))
+                .andExpect(jsonPath("$._embedded.mappingItems", Matchers.hasSize(0)));
     }
 
     @Test
@@ -399,29 +330,14 @@ public class MappingCollectionRestRepositoryIT extends AbstractControllerIntegra
         Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
         Collection col3 = CollectionBuilder.createCollection(context, child1).withName("Collection 3").build();
 
-        //2. Three public items that are readable by Anonymous with different subjects
+        //2. Public item that is readable by Anonymous with different subjects
         Item publicItem1 = ItemBuilder.createItem(context, col1)
-                                      .withTitle("Public item 1")
-                                      .withIssueDate("2017-10-17")
-                                      .withAuthor("Smith, Donald").withAuthor("Doe, John")
-                                      .withSubject("ExtraEntry")
-                                      .build();
-
-        Item publicItem2 = ItemBuilder.createItem(context, col2)
-                                      .withTitle("Public item 2")
-                                      .withIssueDate("2016-02-13")
-                                      .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
-                                      .withSubject("TestingForMore").withSubject("ExtraEntry")
-                                      .build();
-
-        Item publicItem3 = ItemBuilder.createItem(context, col2)
-                                      .withTitle("Public item 3")
-                                      .withIssueDate("2016-02-13")
-                                      .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
-                                      .withSubject("AnotherTest").withSubject("TestingForMore")
-                                      .withSubject("ExtraEntry")
-                                      .build();
-
+                .withTitle("Public item 1")
+                .withIssueDate("2017-10-17")
+                .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                .withSubject("ExtraEntry")
+                .build();
+        context.restoreAuthSystemState();
 
         String adminToken = getAuthToken(admin.getEmail(), password);
         getClient(adminToken)
@@ -434,8 +350,6 @@ public class MappingCollectionRestRepositoryIT extends AbstractControllerIntegra
                     )
             );
 
-        itemService.update(context, publicItem1);
-
         getClient().perform(get("/api/core/items/" + publicItem1.getID() + "/mappedCollections"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$._embedded.mappedCollections", Matchers.not(Matchers.contains(
@@ -447,7 +361,8 @@ public class MappingCollectionRestRepositoryIT extends AbstractControllerIntegra
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.mappingItems", Matchers.not(Matchers.contains(
                         ItemMatcher.matchItemProperties(publicItem1))
-                )));
+                )))
+                .andExpect(jsonPath("$._embedded.mappingItems", Matchers.hasSize(0)));
 
         getClient(adminToken)
             .perform(delete("/api/core/items/" + publicItem1.getID() + "/mappedCollections/" + col2.getID()));
@@ -458,23 +373,25 @@ public class MappingCollectionRestRepositoryIT extends AbstractControllerIntegra
                        CollectionMatcher.matchCollectionEntry("Collection 2", col2.getID(), col2.getHandle()),
                        CollectionMatcher.matchCollectionEntry("Collection 1", col1.getID(), col1.getHandle())
                    ))))
-                   .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/items")))
-        ;
+                   .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/items")));
         getClient().perform(get("/api/core/collections/" + col1.getID() + "/mappingItems"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.mappingItems", Matchers.not(Matchers.contains(
                         ItemMatcher.matchItemProperties(publicItem1))
-                )));
+                )))
+                .andExpect(jsonPath("$._embedded.mappingItems", Matchers.hasSize(0)));
         getClient().perform(get("/api/core/collections/" + col2.getID() + "/mappingItems"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.mappingItems", Matchers.not(Matchers.contains(
                         ItemMatcher.matchItemProperties(publicItem1))
-                )));
+                )))
+                .andExpect(jsonPath("$._embedded.mappingItems", Matchers.hasSize(0)));
         getClient().perform(get("/api/core/collections/" + col3.getID() + "/mappingItems"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.mappingItems", Matchers.contains(
                         ItemMatcher.matchItemProperties(publicItem1))
-                ));
+                ))
+                .andExpect(jsonPath("$._embedded.mappingItems", Matchers.hasSize(1)));
 
         getClient(adminToken)
             .perform(delete("/api/core/items/" + publicItem1.getID() + "/mappedCollections/" + col1.getID()));
@@ -491,17 +408,20 @@ public class MappingCollectionRestRepositoryIT extends AbstractControllerIntegra
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.mappingItems", Matchers.not(Matchers.contains(
                         ItemMatcher.matchItemProperties(publicItem1))
-                )));
+                )))
+                .andExpect(jsonPath("$._embedded.mappingItems", Matchers.hasSize(0)));
         getClient().perform(get("/api/core/collections/" + col2.getID() + "/mappingItems"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.mappingItems", Matchers.not(Matchers.contains(
                         ItemMatcher.matchItemProperties(publicItem1))
-                )));
+                )))
+                .andExpect(jsonPath("$._embedded.mappingItems", Matchers.hasSize(0)));;
         getClient().perform(get("/api/core/collections/" + col3.getID() + "/mappingItems"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.mappingItems", Matchers.contains(
                         ItemMatcher.matchItemProperties(publicItem1))
-                ));
+                ))
+                .andExpect(jsonPath("$._embedded.mappingItems", Matchers.hasSize(1)));;
     }
 
     @Test
@@ -525,6 +445,7 @@ public class MappingCollectionRestRepositoryIT extends AbstractControllerIntegra
                 .withAuthor("Smith, Donald").withAuthor("Doe, John")
                 .withSubject("ExtraEntry")
                 .build();
+        context.restoreAuthSystemState();
 
         String adminToken = getAuthToken(admin.getEmail(), password);
         getClient(adminToken)
@@ -556,6 +477,7 @@ public class MappingCollectionRestRepositoryIT extends AbstractControllerIntegra
                 .withAuthor("Smith, Donald").withAuthor("Doe, John")
                 .withSubject("ExtraEntry")
                 .build();
+        context.restoreAuthSystemState();
 
         String adminToken = getAuthToken(admin.getEmail(), password);
         getClient(adminToken)
@@ -583,6 +505,7 @@ public class MappingCollectionRestRepositoryIT extends AbstractControllerIntegra
 
         //2. A template item for the 1st collection
         Item templateItem = col1.getTemplateItem();
+        context.restoreAuthSystemState();
 
         String adminToken = getAuthToken(admin.getEmail(), password);
         getClient(adminToken)
@@ -612,6 +535,7 @@ public class MappingCollectionRestRepositoryIT extends AbstractControllerIntegra
 
         //2. A template item for the 1st collection
         Item templateItem = col1.getTemplateItem();
+        context.restoreAuthSystemState();
 
         String adminToken = getAuthToken(admin.getEmail(), password);
         getClient(adminToken)
@@ -641,6 +565,7 @@ public class MappingCollectionRestRepositoryIT extends AbstractControllerIntegra
                 .withAuthor("Smith, Donald").withAuthor("Doe, John")
                 .withSubject("ExtraEntry")
                 .build();
+        context.restoreAuthSystemState();
 
         String adminToken = getAuthToken(admin.getEmail(), password);
         getClient(adminToken)
@@ -673,29 +598,14 @@ public class MappingCollectionRestRepositoryIT extends AbstractControllerIntegra
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
         Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
 
-        //2. Three public items that are readable by Anonymous with different subjects
+        //2. Public item that is readable by Anonymous with different subjects
         Item publicItem1 = ItemBuilder.createItem(context, col1)
-                                      .withTitle("Public item 1")
-                                      .withIssueDate("2017-10-17")
-                                      .withAuthor("Smith, Donald").withAuthor("Doe, John")
-                                      .withSubject("ExtraEntry")
-                                      .build();
-
-        Item publicItem2 = ItemBuilder.createItem(context, col2)
-                                      .withTitle("Public item 2")
-                                      .withIssueDate("2016-02-13")
-                                      .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
-                                      .withSubject("TestingForMore").withSubject("ExtraEntry")
-                                      .build();
-
-        Item publicItem3 = ItemBuilder.createItem(context, col2)
-                                      .withTitle("Public item 3")
-                                      .withIssueDate("2016-02-13")
-                                      .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
-                                      .withSubject("AnotherTest").withSubject("TestingForMore")
-                                      .withSubject("ExtraEntry")
-                                      .build();
-
+                .withTitle("Public item 1")
+                .withIssueDate("2017-10-17")
+                .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                .withSubject("ExtraEntry")
+                .build();
+        context.restoreAuthSystemState();
 
 //        collectionService.addItem(context, col2, publicItem1);
 //        collectionService.update(context, col2);
@@ -728,29 +638,14 @@ public class MappingCollectionRestRepositoryIT extends AbstractControllerIntegra
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
         Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
 
-        //2. Three public items that are readable by Anonymous with different subjects
+        //2. Public item that is readable by Anonymous with different subjects
         Item publicItem1 = ItemBuilder.createItem(context, col1)
-                                      .withTitle("Public item 1")
-                                      .withIssueDate("2017-10-17")
-                                      .withAuthor("Smith, Donald").withAuthor("Doe, John")
-                                      .withSubject("ExtraEntry")
-                                      .build();
-
-        Item publicItem2 = ItemBuilder.createItem(context, col2)
-                                      .withTitle("Public item 2")
-                                      .withIssueDate("2016-02-13")
-                                      .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
-                                      .withSubject("TestingForMore").withSubject("ExtraEntry")
-                                      .build();
-
-        Item publicItem3 = ItemBuilder.createItem(context, col2)
-                                      .withTitle("Public item 3")
-                                      .withIssueDate("2016-02-13")
-                                      .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
-                                      .withSubject("AnotherTest").withSubject("TestingForMore")
-                                      .withSubject("ExtraEntry")
-                                      .build();
-
+                .withTitle("Public item 1")
+                .withIssueDate("2017-10-17")
+                .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                .withSubject("ExtraEntry")
+                .build();
+        context.restoreAuthSystemState();
 
 //        collectionService.addItem(context, col2, publicItem1);
 //        collectionService.update(context, col2);
@@ -780,29 +675,14 @@ public class MappingCollectionRestRepositoryIT extends AbstractControllerIntegra
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
         Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
 
-        //2. Three public items that are readable by Anonymous with different subjects
+        //2. Public item that is readable by Anonymous with different subjects
         Item publicItem1 = ItemBuilder.createItem(context, col1)
-                                      .withTitle("Public item 1")
-                                      .withIssueDate("2017-10-17")
-                                      .withAuthor("Smith, Donald").withAuthor("Doe, John")
-                                      .withSubject("ExtraEntry")
-                                      .build();
-
-        Item publicItem2 = ItemBuilder.createItem(context, col2)
-                                      .withTitle("Public item 2")
-                                      .withIssueDate("2016-02-13")
-                                      .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
-                                      .withSubject("TestingForMore").withSubject("ExtraEntry")
-                                      .build();
-
-        Item publicItem3 = ItemBuilder.createItem(context, col2)
-                                      .withTitle("Public item 3")
-                                      .withIssueDate("2016-02-13")
-                                      .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
-                                      .withSubject("AnotherTest").withSubject("TestingForMore")
-                                      .withSubject("ExtraEntry")
-                                      .build();
-
+                .withTitle("Public item 1")
+                .withIssueDate("2017-10-17")
+                .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                .withSubject("ExtraEntry")
+                .build();
+        context.restoreAuthSystemState();
 
 //        collectionService.addItem(context, col2, publicItem1);
 //        collectionService.update(context, col2);
