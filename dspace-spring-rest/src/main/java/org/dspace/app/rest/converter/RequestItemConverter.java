@@ -13,6 +13,8 @@ import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.requestitem.RequestItem;
 import org.dspace.app.requestitem.service.RequestItemService;
 import org.dspace.app.rest.model.RequestItemRest;
@@ -23,8 +25,6 @@ import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.services.RequestService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -37,7 +37,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class RequestItemConverter
         implements DSpaceConverter<RequestItem, RequestItemRest> {
-    private static final Logger LOG = LoggerFactory.getLogger(RequestItemConverter.class);
+    private static final Logger LOG = LogManager.getLogger();
 
     @Autowired(required = true)
     protected BitstreamConverter bitstreamConverter;
