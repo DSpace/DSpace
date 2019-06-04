@@ -636,7 +636,6 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
             //Remove the item from the collection if we have multiple collections
             item.removeCollection(collection);
 
-
         }
 
         context.addEvent(new Event(Event.REMOVE, Constants.COLLECTION,
