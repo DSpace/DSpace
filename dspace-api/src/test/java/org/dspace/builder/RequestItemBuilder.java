@@ -10,13 +10,13 @@ package org.dspace.builder;
 
 import java.sql.SQLException;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.requestitem.RequestItem;
 import org.dspace.app.requestitem.service.RequestItemService;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Manage the creation and cleanup of {@link RequestItem}s for testing.
@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
  */
 public class RequestItemBuilder
         extends AbstractBuilder<RequestItem, RequestItemService> {
-    private static final Logger LOG = LoggerFactory.getLogger(RequestItemBuilder.class);
+    private static final Logger LOG = LogManager.getLogger();
 
     public static final String REQ_EMAIL = "jsmith@example.com";
     public static final String REQ_NAME = "John Smith";
