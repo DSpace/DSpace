@@ -345,19 +345,15 @@ public class Package {
             
             // related identifiers TODO
             List<String> externals = ddp.getExternalRelations();
-            log.debug("####################################### externals = " + externals);
             for(String externalRelation : externals) {
-                log.debug("this relation = " + externalRelation);
                 // parse them into URL and label
                 int colonIndex = externalRelation.indexOf(":");
                 if(colonIndex > 0 && (colonIndex + 1 < externalRelation.length())){
-                    log.debug("colonIndex = " + colonIndex);
                     // if good index, split
                     String relSchema = externalRelation.substring(0, colonIndex);
                     String relLocation = externalRelation.substring(colonIndex + 1);
                     if(relLocation.startsWith("http")){
                         //   if second part is URL, mark it as a URL
-                        log.debug("making http");
                         jGen.writeStartObject();
                         jGen.writeStringField("relationship", "issupplementedby");
                         jGen.writeStringField("identifierType", "URL");
@@ -365,7 +361,6 @@ public class Package {
                         jGen.writeEndObject();
                     } else {
                         // else, add as a URN
-                        log.debug("making URN 1");
                         jGen.writeStartObject();
                         jGen.writeStringField("relationship", "issupplementedby");
                         jGen.writeStringField("identifierType", "URN");
@@ -374,7 +369,6 @@ public class Package {
                     }
                 } else {
                     // bad index, add as a URN
-                    log.debug("making URN 2");
                     jGen.writeStartObject();
                     jGen.writeStringField("relationship", "issupplementedby");
                     jGen.writeStringField("identifierType", "URN");

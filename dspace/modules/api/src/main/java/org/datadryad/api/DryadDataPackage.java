@@ -412,17 +412,14 @@ public class DryadDataPackage extends DryadObject {
             try {
                 Context c = new Context();
                 List<DryadDataFile> files = getDataFiles(c);
-                log.debug("processing from files: " + files.size());
                 for(DryadDataFile aFile : files) {
                     List<String> extValues = aFile.getMultipleMetadataValues("dryad", "externalIdentifier", null);
-                    log.debug("found in file: " + extValues);
                     allRelations.addAll(extValues);
                 }
             } catch(Exception e) {
                 log.error("could not retrieve external relations", e);
             }
             List<String> extValues = getMultipleMetadataValues("dryad", "externalIdentifier", null);
-            log.debug("found in package: " + extValues);
             allRelations.addAll(extValues);
             return allRelations; 
         } else {
