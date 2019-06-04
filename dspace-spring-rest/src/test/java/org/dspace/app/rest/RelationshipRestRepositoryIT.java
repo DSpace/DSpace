@@ -71,113 +71,113 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         context.turnOffAuthorisationSystem();
 
         parentCommunity = CommunityBuilder.createCommunity(context)
-                .withName("Parent Community")
-                .build();
+                                          .withName("Parent Community")
+                                          .build();
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
-                .withName("Sub Community")
-                .build();
+                                           .withName("Sub Community")
+                                           .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
         Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
         Collection col3 = CollectionBuilder.createCollection(context, child1).withName("OrgUnits").build();
 
         Item auhor1 = ItemBuilder.createItem(context, col1)
-                .withTitle("Author1")
-                .withIssueDate("2017-10-17")
-                .withAuthor("Smith, Donald")
-                .withRelationshipType("Person")
-                .build();
+                                 .withTitle("Author1")
+                                 .withIssueDate("2017-10-17")
+                                 .withAuthor("Smith, Donald")
+                                 .withRelationshipType("Person")
+                                 .build();
 
         Item author2 = ItemBuilder.createItem(context, col2)
-                .withTitle("Author2")
-                .withIssueDate("2016-02-13")
-                .withAuthor("Smith, Maria")
-                .withRelationshipType("Person")
-                .build();
+                                  .withTitle("Author2")
+                                  .withIssueDate("2016-02-13")
+                                  .withAuthor("Smith, Maria")
+                                  .withRelationshipType("Person")
+                                  .build();
 
         Item author3 = ItemBuilder.createItem(context, col2)
-                .withTitle("Author3")
-                .withIssueDate("2016-02-13")
-                .withAuthor("Maybe, Maybe")
-                .withRelationshipType("Person")
-                .build();
+                                  .withTitle("Author3")
+                                  .withIssueDate("2016-02-13")
+                                  .withAuthor("Maybe, Maybe")
+                                  .withRelationshipType("Person")
+                                  .build();
 
         Item orgUnit1 = ItemBuilder.createItem(context, col3)
-                .withTitle("OrgUnit1")
-                .withAuthor("Testy, TEst")
-                .withIssueDate("2015-01-01")
-                .withRelationshipType("OrgUnit")
-                .build();
+                                   .withTitle("OrgUnit1")
+                                   .withAuthor("Testy, TEst")
+                                   .withIssueDate("2015-01-01")
+                                   .withRelationshipType("OrgUnit")
+                                   .build();
 
         Item project1 = ItemBuilder.createItem(context, col3)
-                .withTitle("Project1")
-                .withAuthor("Testy, TEst")
-                .withIssueDate("2015-01-01")
-                .withRelationshipType("Project")
-                .build();
+                                   .withTitle("Project1")
+                                   .withAuthor("Testy, TEst")
+                                   .withIssueDate("2015-01-01")
+                                   .withRelationshipType("Project")
+                                   .build();
 
         Item publication = ItemBuilder.createItem(context, col3)
-                .withTitle("Publication1")
-                .withAuthor("Testy, TEst")
-                .withIssueDate("2015-01-01")
-                .withRelationshipType("Publication")
-                .build();
+                                      .withTitle("Publication1")
+                                      .withAuthor("Testy, TEst")
+                                      .withIssueDate("2015-01-01")
+                                      .withRelationshipType("Publication")
+                                      .build();
 
 
         RelationshipType isOrgUnitOfPersonRelationshipType = relationshipTypeService
-                .findbyTypesAndLabels(context, entityTypeService.findByEntityType(context, "Person"),
-                        entityTypeService.findByEntityType(context, "OrgUnit"),
-                        "isOrgUnitOfPerson", "isPersonOfOrgUnit");
+            .findbyTypesAndLabels(context, entityTypeService.findByEntityType(context, "Person"),
+                                  entityTypeService.findByEntityType(context, "OrgUnit"),
+                                  "isOrgUnitOfPerson", "isPersonOfOrgUnit");
         RelationshipType isOrgUnitOfProjectRelationshipType = relationshipTypeService
-                .findbyTypesAndLabels(context, entityTypeService.findByEntityType(context, "Project"),
-                        entityTypeService.findByEntityType(context, "OrgUnit"),
-                        "isOrgUnitOfProject", "isProjectOfOrgUnit");
+            .findbyTypesAndLabels(context, entityTypeService.findByEntityType(context, "Project"),
+                                  entityTypeService.findByEntityType(context, "OrgUnit"),
+                                  "isOrgUnitOfProject", "isProjectOfOrgUnit");
         RelationshipType isAuthorOfPublicationRelationshipType = relationshipTypeService
-                .findbyTypesAndLabels(context, entityTypeService.findByEntityType(context, "Publication"),
-                        entityTypeService.findByEntityType(context, "Person"),
-                        "isAuthorOfPublication", "isPublicationOfAuthor");
+            .findbyTypesAndLabels(context, entityTypeService.findByEntityType(context, "Publication"),
+                                  entityTypeService.findByEntityType(context, "Person"),
+                                  "isAuthorOfPublication", "isPublicationOfAuthor");
 
         Relationship relationship1 = RelationshipBuilder
-                .createRelationshipBuilder(context, auhor1, orgUnit1, isOrgUnitOfPersonRelationshipType).build();
+            .createRelationshipBuilder(context, auhor1, orgUnit1, isOrgUnitOfPersonRelationshipType).build();
 
         Relationship relationship2 = RelationshipBuilder
-                .createRelationshipBuilder(context, project1, orgUnit1, isOrgUnitOfProjectRelationshipType).build();
+            .createRelationshipBuilder(context, project1, orgUnit1, isOrgUnitOfProjectRelationshipType).build();
 
         Relationship relationship3 = RelationshipBuilder
-                .createRelationshipBuilder(context, publication, auhor1, isAuthorOfPublicationRelationshipType).build();
+            .createRelationshipBuilder(context, publication, auhor1, isAuthorOfPublicationRelationshipType).build();
 
         context.restoreAuthSystemState();
 
         getClient().perform(get("/api/core/relationships"))
 
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.page",
-                        is(PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 3))))
-                .andExpect(jsonPath("$._embedded.relationships", containsInAnyOrder(
-                        RelationshipMatcher.matchRelationship(relationship1),
-                        RelationshipMatcher.matchRelationship(relationship2),
-                        RelationshipMatcher.matchRelationship(relationship3)
-                )))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.page",
+                                       is(PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 3))))
+                   .andExpect(jsonPath("$._embedded.relationships", containsInAnyOrder(
+                       RelationshipMatcher.matchRelationship(relationship1),
+                       RelationshipMatcher.matchRelationship(relationship2),
+                       RelationshipMatcher.matchRelationship(relationship3)
+                   )))
         ;
 
         getClient().perform(get("/api/core/relationships").param("size", "2"))
 
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.page",
-                        is(PageMatcher.pageEntryWithTotalPagesAndElements(0, 2, 2, 3))))
-                .andExpect(jsonPath("$._embedded.relationships", containsInAnyOrder(
-                        RelationshipMatcher.matchRelationship(relationship1),
-                        RelationshipMatcher.matchRelationship(relationship2)
-                )))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.page",
+                                       is(PageMatcher.pageEntryWithTotalPagesAndElements(0, 2, 2, 3))))
+                   .andExpect(jsonPath("$._embedded.relationships", containsInAnyOrder(
+                       RelationshipMatcher.matchRelationship(relationship1),
+                       RelationshipMatcher.matchRelationship(relationship2)
+                   )))
         ;
 
         getClient().perform(get("/api/core/relationships").param("size", "2").param("page", "1"))
 
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.page",
-                        is(PageMatcher.pageEntryWithTotalPagesAndElements(1, 2, 2, 3))))
-                .andExpect(jsonPath("$._embedded.relationships", contains(
-                        RelationshipMatcher.matchRelationship(relationship3)
-                )))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.page",
+                                       is(PageMatcher.pageEntryWithTotalPagesAndElements(1, 2, 2, 3))))
+                   .andExpect(jsonPath("$._embedded.relationships", contains(
+                       RelationshipMatcher.matchRelationship(relationship3)
+                   )))
         ;
 
     }
@@ -188,39 +188,39 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         context.turnOffAuthorisationSystem();
 
         parentCommunity = CommunityBuilder.createCommunity(context)
-                .withName("Parent Community")
-                .build();
+                                          .withName("Parent Community")
+                                          .build();
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
-                .withName("Sub Community")
-                .build();
+                                           .withName("Sub Community")
+                                           .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
         Collection col3 = CollectionBuilder.createCollection(context, child1).withName("OrgUnits").build();
 
         Item author1 = ItemBuilder.createItem(context, col1)
-                .withTitle("Author1")
-                .withIssueDate("2017-10-17")
-                .withAuthor("Smith, Donald")
-                .withRelationshipType("Person")
-                .build();
+                                  .withTitle("Author1")
+                                  .withIssueDate("2017-10-17")
+                                  .withAuthor("Smith, Donald")
+                                  .withRelationshipType("Person")
+                                  .build();
 
         Item publication = ItemBuilder.createItem(context, col3)
-                .withTitle("Publication1")
-                .withAuthor("Testy, TEst")
-                .withIssueDate("2015-01-01")
-                .withRelationshipType("Publication")
-                .build();
+                                      .withTitle("Publication1")
+                                      .withAuthor("Testy, TEst")
+                                      .withIssueDate("2015-01-01")
+                                      .withRelationshipType("Publication")
+                                      .build();
 
         RelationshipType isAuthorOfPublicationRelationshipType = relationshipTypeService
-                .findbyTypesAndLabels(context, entityTypeService.findByEntityType(context, "Publication"),
-                        entityTypeService.findByEntityType(context, "Person"),
-                        "isAuthorOfPublication", "isPublicationOfAuthor");
+            .findbyTypesAndLabels(context, entityTypeService.findByEntityType(context, "Publication"),
+                                  entityTypeService.findByEntityType(context, "Person"),
+                                  "isAuthorOfPublication", "isPublicationOfAuthor");
 
         EPerson user = EPersonBuilder.createEPerson(context)
-                .withNameInMetadata("first", "last")
-                .withEmail("testaze@gmail.com")
-                .withPassword(password)
-                .withLanguage(I18nUtil.getDefaultLocale().getLanguage())
-                .build();
+                                    .withNameInMetadata("first", "last")
+                                    .withEmail("testaze@gmail.com")
+                                    .withPassword(password)
+                                    .withLanguage(I18nUtil.getDefaultLocale().getLanguage())
+                                    .build();
         context.setCurrentUser(user);
 
         authorizeService.addPolicy(context, publication, Constants.WRITE, user);
@@ -230,17 +230,17 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         String token = getAuthToken(user.getEmail(), password);
 
         MvcResult mvcResult = getClient(token).perform(post("/api/core/relationships")
-                .param("relationshipType",
-                        isAuthorOfPublicationRelationshipType.getID()
-                                .toString())
-                .contentType(MediaType.parseMediaType
-                        (org.springframework.data.rest.webmvc.RestMediaTypes
-                                .TEXT_URI_LIST_VALUE))
-                .content(
-                        "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
-                                "https://localhost:8080/spring-rest/api/core/items/" + author1.getID()))
-                .andExpect(status().isCreated())
-                .andReturn();
+                                                           .param("relationshipType",
+                                                                  isAuthorOfPublicationRelationshipType.getID()
+                                                                                                       .toString())
+                                                           .contentType(MediaType.parseMediaType
+                                                               (org.springframework.data.rest.webmvc.RestMediaTypes
+                                                                    .TEXT_URI_LIST_VALUE))
+                                                           .content(
+                                                               "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
+                                                                   "https://localhost:8080/spring-rest/api/core/items/" + author1.getID()))
+                                              .andExpect(status().isCreated())
+                                              .andReturn();
 
         ObjectMapper mapper = new ObjectMapper();
 
@@ -249,9 +249,9 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         String firstRelationshipIdString = String.valueOf(map.get("id"));
 
         getClient().perform(get("/api/core/relationships/" + firstRelationshipIdString))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.leftId", is(publication.getID().toString())))
-                .andExpect(jsonPath("$.rightId", is(author1.getID().toString())));
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.leftId", is(publication.getID().toString())))
+                   .andExpect(jsonPath("$.rightId", is(author1.getID().toString())));
 
     }
 
@@ -261,39 +261,39 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         context.turnOffAuthorisationSystem();
 
         parentCommunity = CommunityBuilder.createCommunity(context)
-                .withName("Parent Community")
-                .build();
+                                          .withName("Parent Community")
+                                          .build();
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
-                .withName("Sub Community")
-                .build();
+                                           .withName("Sub Community")
+                                           .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
         Collection col3 = CollectionBuilder.createCollection(context, child1).withName("OrgUnits").build();
 
         Item author1 = ItemBuilder.createItem(context, col1)
-                .withTitle("Author1")
-                .withIssueDate("2017-10-17")
-                .withAuthor("Smith, Donald")
-                .withRelationshipType("Person")
-                .build();
+                                  .withTitle("Author1")
+                                  .withIssueDate("2017-10-17")
+                                  .withAuthor("Smith, Donald")
+                                  .withRelationshipType("Person")
+                                  .build();
 
         Item publication = ItemBuilder.createItem(context, col3)
-                .withTitle("Publication1")
-                .withAuthor("Testy, TEst")
-                .withIssueDate("2015-01-01")
-                .withRelationshipType("Publication")
-                .build();
+                                      .withTitle("Publication1")
+                                      .withAuthor("Testy, TEst")
+                                      .withIssueDate("2015-01-01")
+                                      .withRelationshipType("Publication")
+                                      .build();
 
         RelationshipType isAuthorOfPublicationRelationshipType = relationshipTypeService
-                .findbyTypesAndLabels(context, entityTypeService.findByEntityType(context, "Publication"),
-                        entityTypeService.findByEntityType(context, "Person"),
-                        "isAuthorOfPublication", "isPublicationOfAuthor");
+            .findbyTypesAndLabels(context, entityTypeService.findByEntityType(context, "Publication"),
+                                  entityTypeService.findByEntityType(context, "Person"),
+                                  "isAuthorOfPublication", "isPublicationOfAuthor");
 
         EPerson user = EPersonBuilder.createEPerson(context)
-                .withNameInMetadata("first", "last")
-                .withEmail("testaze@gmail.com")
-                .withPassword(password)
-                .withLanguage(I18nUtil.getDefaultLocale().getLanguage())
-                .build();
+                                     .withNameInMetadata("first", "last")
+                                     .withEmail("testaze@gmail.com")
+                                     .withPassword(password)
+                                     .withLanguage(I18nUtil.getDefaultLocale().getLanguage())
+                                     .build();
         context.setCurrentUser(user);
 
         authorizeService.addPolicy(context, author1, Constants.WRITE, user);
@@ -302,17 +302,17 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         String token = getAuthToken(user.getEmail(), password);
 
         MvcResult mvcResult = getClient(token).perform(post("/api/core/relationships")
-                .param("relationshipType",
-                        isAuthorOfPublicationRelationshipType.getID()
-                                .toString())
-                .contentType(MediaType.parseMediaType
-                        (org.springframework.data.rest.webmvc.RestMediaTypes
-                                .TEXT_URI_LIST_VALUE))
-                .content(
-                        "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
-                                "https://localhost:8080/spring-rest/api/core/items/" + author1.getID()))
-                .andExpect(status().isCreated())
-                .andReturn();
+                                                           .param("relationshipType",
+                                                                  isAuthorOfPublicationRelationshipType.getID()
+                                                                                                       .toString())
+                                                           .contentType(MediaType.parseMediaType
+                                                               (org.springframework.data.rest.webmvc.RestMediaTypes
+                                                                    .TEXT_URI_LIST_VALUE))
+                                                           .content(
+                                                               "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
+                                                                   "https://localhost:8080/spring-rest/api/core/items/" + author1.getID()))
+                                              .andExpect(status().isCreated())
+                                              .andReturn();
 
         ObjectMapper mapper = new ObjectMapper();
 
@@ -321,9 +321,9 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         String firstRelationshipIdString = String.valueOf(map.get("id"));
 
         getClient().perform(get("/api/core/relationships/" + firstRelationshipIdString))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.leftId", is(publication.getID().toString())))
-                .andExpect(jsonPath("$.rightId", is(author1.getID().toString())));
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.leftId", is(publication.getID().toString())))
+                   .andExpect(jsonPath("$.rightId", is(author1.getID().toString())));
     }
 
 
@@ -333,57 +333,57 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         context.turnOffAuthorisationSystem();
 
         parentCommunity = CommunityBuilder.createCommunity(context)
-                .withName("Parent Community")
-                .build();
+                                          .withName("Parent Community")
+                                          .build();
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
-                .withName("Sub Community")
-                .build();
+                                           .withName("Sub Community")
+                                           .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
         Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
         Collection col3 = CollectionBuilder.createCollection(context, child1).withName("OrgUnits").build();
 
         Item author1 = ItemBuilder.createItem(context, col1)
-                .withTitle("Author1")
-                .withIssueDate("2017-10-17")
-                .withAuthor("Smith, Donald")
-                .withRelationshipType("Person")
-                .build();
+                                  .withTitle("Author1")
+                                  .withIssueDate("2017-10-17")
+                                  .withAuthor("Smith, Donald")
+                                  .withRelationshipType("Person")
+                                  .build();
 
         Item publication = ItemBuilder.createItem(context, col3)
-                .withTitle("Publication1")
-                .withAuthor("Testy, TEst")
-                .withIssueDate("2015-01-01")
-                .withRelationshipType("Publication")
-                .build();
+                                      .withTitle("Publication1")
+                                      .withAuthor("Testy, TEst")
+                                      .withIssueDate("2015-01-01")
+                                      .withRelationshipType("Publication")
+                                      .build();
 
         RelationshipType isAuthorOfPublicationRelationshipType = relationshipTypeService
-                .findbyTypesAndLabels(context, entityTypeService.findByEntityType(context, "Publication"),
-                        entityTypeService.findByEntityType(context, "Person"),
-                        "isAuthorOfPublication", "isPublicationOfAuthor");
+            .findbyTypesAndLabels(context, entityTypeService.findByEntityType(context, "Publication"),
+                                  entityTypeService.findByEntityType(context, "Person"),
+                                  "isAuthorOfPublication", "isPublicationOfAuthor");
 
         EPerson user = EPersonBuilder.createEPerson(context)
-                .withNameInMetadata("first", "last")
-                .withEmail("testaze@gmail.com")
-                .withPassword(password)
-                .withLanguage(I18nUtil.getDefaultLocale().getLanguage())
-                .build();
+                                     .withNameInMetadata("first", "last")
+                                     .withEmail("testaze@gmail.com")
+                                     .withPassword(password)
+                                     .withLanguage(I18nUtil.getDefaultLocale().getLanguage())
+                                     .build();
         context.setCurrentUser(user);
         context.restoreAuthSystemState();
 
         String token = getAuthToken(user.getEmail(), password);
 
         MvcResult mvcResult = getClient(token).perform(post("/api/core/relationships")
-                .param("relationshipType",
-                        isAuthorOfPublicationRelationshipType.getID()
-                                .toString())
-                .contentType(MediaType.parseMediaType
-                        (org.springframework.data.rest.webmvc.RestMediaTypes
-                                .TEXT_URI_LIST_VALUE))
-                .content(
-                        "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
-                                "https://localhost:8080/spring-rest/api/core/items/" + author1.getID()))
-                .andExpect(status().isForbidden())
-                .andReturn();
+                                                           .param("relationshipType",
+                                                                  isAuthorOfPublicationRelationshipType.getID()
+                                                                                                       .toString())
+                                                           .contentType(MediaType.parseMediaType
+                                                               (org.springframework.data.rest.webmvc.RestMediaTypes
+                                                                    .TEXT_URI_LIST_VALUE))
+                                                           .content(
+                                                               "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
+                                                                   "https://localhost:8080/spring-rest/api/core/items/" + author1.getID()))
+                                              .andExpect(status().isForbidden())
+                                              .andReturn();
 
     }
 
@@ -398,48 +398,48 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         context.turnOffAuthorisationSystem();
 
         parentCommunity = CommunityBuilder.createCommunity(context)
-                .withName("Parent Community")
-                .build();
+                                          .withName("Parent Community")
+                                          .build();
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
-                .withName("Sub Community")
-                .build();
+                                           .withName("Sub Community")
+                                           .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
         Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
         Collection col3 = CollectionBuilder.createCollection(context, child1).withName("OrgUnits").build();
 
         Item author1 = ItemBuilder.createItem(context, col1)
-                .withTitle("Author1")
-                .withIssueDate("2017-10-17")
-                .withPersonIdentifierFirstName("Donald")
-                .withPersonIdentifierLastName("Smith")
-                .withRelationshipType("Person")
-                .build();
+                                  .withTitle("Author1")
+                                  .withIssueDate("2017-10-17")
+                                  .withPersonIdentifierFirstName("Donald")
+                                  .withPersonIdentifierLastName("Smith")
+                                  .withRelationshipType("Person")
+                                  .build();
 
         Item author2 = ItemBuilder.createItem(context, col2)
-                .withTitle("Author2")
-                .withIssueDate("2016-02-13")
-                .withPersonIdentifierFirstName("Maria")
-                .withPersonIdentifierLastName("Smith")
-                .withRelationshipType("Person")
-                .build();
+                                  .withTitle("Author2")
+                                  .withIssueDate("2016-02-13")
+                                  .withPersonIdentifierFirstName("Maria")
+                                  .withPersonIdentifierLastName("Smith")
+                                  .withRelationshipType("Person")
+                                  .build();
 
         Item author3 = ItemBuilder.createItem(context, col2)
-                .withTitle("Author3")
-                .withIssueDate("2016-02-13")
-                .withPersonIdentifierFirstName("Maybe")
-                .withPersonIdentifierLastName("Maybe")
-                .withRelationshipType("Person")
-                .build();
+                                  .withTitle("Author3")
+                                  .withIssueDate("2016-02-13")
+                                  .withPersonIdentifierFirstName("Maybe")
+                                  .withPersonIdentifierLastName("Maybe")
+                                  .withRelationshipType("Person")
+                                  .build();
 
         Item publication = ItemBuilder.createItem(context, col3)
-                .withTitle("Publication1")
-                .withIssueDate("2015-01-01")
-                .withRelationshipType("Publication")
-                .build();
+                                      .withTitle("Publication1")
+                                      .withIssueDate("2015-01-01")
+                                      .withRelationshipType("Publication")
+                                      .build();
         RelationshipType isAuthorOfPublicationRelationshipType = relationshipTypeService
-                .findbyTypesAndLabels(context, entityTypeService.findByEntityType(context, "Publication"),
-                        entityTypeService.findByEntityType(context, "Person"),
-                        "isAuthorOfPublication", "isPublicationOfAuthor");
+            .findbyTypesAndLabels(context, entityTypeService.findByEntityType(context, "Publication"),
+                                  entityTypeService.findByEntityType(context, "Person"),
+                                  "isAuthorOfPublication", "isPublicationOfAuthor");
 
         String adminToken = getAuthToken(admin.getEmail(), password);
 
@@ -447,17 +447,17 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         // Here we create our first Relationship to the Publication to give it a dc.contributor.author virtual
         // metadata field.
         MvcResult mvcResult = getClient(adminToken).perform(post("/api/core/relationships")
-                .param("relationshipType",
-                        isAuthorOfPublicationRelationshipType.getID()
-                                .toString())
-                .contentType(MediaType.parseMediaType
-                        (org.springframework.data.rest.webmvc.RestMediaTypes
-                                .TEXT_URI_LIST_VALUE))
-                .content(
-                        "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
-                                "https://localhost:8080/spring-rest/api/core/items/" + author1.getID()))
-                .andExpect(status().isCreated())
-                .andReturn();
+                                                                .param("relationshipType",
+                                                                       isAuthorOfPublicationRelationshipType.getID()
+                                                                                                            .toString())
+                                                                .contentType(MediaType.parseMediaType
+                                                                    (org.springframework.data.rest.webmvc.RestMediaTypes
+                                                                         .TEXT_URI_LIST_VALUE))
+                                                                .content(
+                                                                    "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
+                                                                        "https://localhost:8080/spring-rest/api/core/items/" + author1.getID()))
+                                                   .andExpect(status().isCreated())
+                                                   .andReturn();
         ObjectMapper mapper = new ObjectMapper();
 
         String content = mvcResult.getResponse().getContentAsString();
@@ -466,8 +466,8 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
 
         // Here we call the relationship and verify that the relationship's leftplace is 0
         getClient(adminToken).perform(get("/api/core/relationships/" + firstRelationshipIdString))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("leftPlace", is(0)));
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("leftPlace", is(0)));
 
         context.turnOffAuthorisationSystem();
 
@@ -498,22 +498,22 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         context.restoreAuthSystemState();
         // Verfiy the leftPlace of our relationship is still 0.
         getClient(adminToken).perform(get("/api/core/relationships/" + firstRelationshipIdString))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("leftPlace", is(0)));
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("leftPlace", is(0)));
 
         // Create another Relationship for the Publication, thus creating a third dc.contributor.author mdv
         mvcResult = getClient(adminToken).perform(post("/api/core/relationships")
-                .param("relationshipType",
-                        isAuthorOfPublicationRelationshipType.getID()
-                                .toString())
-                .contentType(MediaType.parseMediaType
-                        (org.springframework.data.rest.webmvc.RestMediaTypes
-                                .TEXT_URI_LIST_VALUE))
-                .content(
-                        "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
-                                "https://localhost:8080/spring-rest/api/core/items/" + author2.getID()))
-                .andExpect(status().isCreated())
-                .andReturn();
+                                                      .param("relationshipType",
+                                                             isAuthorOfPublicationRelationshipType.getID()
+                                                                                                  .toString())
+                                                      .contentType(MediaType.parseMediaType
+                                                          (org.springframework.data.rest.webmvc.RestMediaTypes
+                                                               .TEXT_URI_LIST_VALUE))
+                                                      .content(
+                                                          "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
+                                                              "https://localhost:8080/spring-rest/api/core/items/" + author2.getID()))
+                                         .andExpect(status().isCreated())
+                                         .andReturn();
 
         content = mvcResult.getResponse().getContentAsString();
         map = mapper.readValue(content, Map.class);
@@ -528,8 +528,8 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         // Relationship. Note that leftPlace 1 was skipped due to the dc.contributor.author plain text value and
         // This is expected behaviour and should be tested
         getClient(adminToken).perform(get("/api/core/relationships/" + secondRelationshipIdString))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("leftPlace", is(2)));
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("leftPlace", is(2)));
 
         author0MD = list.get(0);
         assertEquals("Smith, Donald", author0MD.getValue());
@@ -569,17 +569,17 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
 
         // Create the third Relationship thus adding a fifth dc.contributor.author mdv
         mvcResult = getClient(adminToken).perform(post("/api/core/relationships")
-                .param("relationshipType",
-                        isAuthorOfPublicationRelationshipType.getID()
-                                .toString())
-                .contentType(MediaType.parseMediaType
-                        (org.springframework.data.rest.webmvc.RestMediaTypes
-                                .TEXT_URI_LIST_VALUE))
-                .content(
-                        "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
-                                "https://localhost:8080/spring-rest/api/core/items/" + author3.getID()))
-                .andExpect(status().isCreated())
-                .andReturn();
+                                                      .param("relationshipType",
+                                                             isAuthorOfPublicationRelationshipType.getID()
+                                                                                                  .toString())
+                                                      .contentType(MediaType.parseMediaType
+                                                          (org.springframework.data.rest.webmvc.RestMediaTypes
+                                                               .TEXT_URI_LIST_VALUE))
+                                                      .content(
+                                                          "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
+                                                              "https://localhost:8080/spring-rest/api/core/items/" + author3.getID()))
+                                         .andExpect(status().isCreated())
+                                         .andReturn();
 
         content = mvcResult.getResponse().getContentAsString();
         map = mapper.readValue(content, Map.class);
@@ -592,8 +592,8 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         // Assert that the third Relationship has leftPlace 4, even though 3 relationships were created.
         // This is because the plain text values 'occupy' place 1 and 3.
         getClient(adminToken).perform(get("/api/core/relationships/" + thirdRelationshipIdString))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("leftPlace", is(4)));
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("leftPlace", is(4)));
 
         // Assert that the list is of size 5 and in the following order:
         // "Smith, Donald", "plain text", "Smith, Maria", "plain text two", "Maybe, Maybe"
@@ -708,48 +708,48 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         context.turnOffAuthorisationSystem();
 
         parentCommunity = CommunityBuilder.createCommunity(context)
-                .withName("Parent Community")
-                .build();
+                                          .withName("Parent Community")
+                                          .build();
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
-                .withName("Sub Community")
-                .build();
+                                           .withName("Sub Community")
+                                           .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
         Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
         Collection col3 = CollectionBuilder.createCollection(context, child1).withName("OrgUnits").build();
 
         Item author1 = ItemBuilder.createItem(context, col1)
-                .withTitle("Author1")
-                .withIssueDate("2017-10-17")
-                .withPersonIdentifierFirstName("Donald")
-                .withPersonIdentifierLastName("Smith")
-                .withRelationshipType("Person")
-                .build();
+                                  .withTitle("Author1")
+                                  .withIssueDate("2017-10-17")
+                                  .withPersonIdentifierFirstName("Donald")
+                                  .withPersonIdentifierLastName("Smith")
+                                  .withRelationshipType("Person")
+                                  .build();
 
         Item author2 = ItemBuilder.createItem(context, col2)
-                .withTitle("Author2")
-                .withIssueDate("2016-02-13")
-                .withPersonIdentifierFirstName("Maria")
-                .withPersonIdentifierLastName("Smith")
-                .withRelationshipType("Person")
-                .build();
+                                  .withTitle("Author2")
+                                  .withIssueDate("2016-02-13")
+                                  .withPersonIdentifierFirstName("Maria")
+                                  .withPersonIdentifierLastName("Smith")
+                                  .withRelationshipType("Person")
+                                  .build();
 
         Item author3 = ItemBuilder.createItem(context, col2)
-                .withTitle("Author3")
-                .withIssueDate("2016-02-13")
-                .withPersonIdentifierFirstName("Maybe")
-                .withPersonIdentifierLastName("Maybe")
-                .withRelationshipType("Person")
-                .build();
+                                  .withTitle("Author3")
+                                  .withIssueDate("2016-02-13")
+                                  .withPersonIdentifierFirstName("Maybe")
+                                  .withPersonIdentifierLastName("Maybe")
+                                  .withRelationshipType("Person")
+                                  .build();
 
         Item publication = ItemBuilder.createItem(context, col3)
-                .withTitle("Publication1")
-                .withIssueDate("2015-01-01")
-                .withRelationshipType("Publication")
-                .build();
+                                      .withTitle("Publication1")
+                                      .withIssueDate("2015-01-01")
+                                      .withRelationshipType("Publication")
+                                      .build();
         RelationshipType isAuthorOfPublicationRelationshipType = relationshipTypeService
-                .findbyTypesAndLabels(context, entityTypeService.findByEntityType(context, "Publication"),
-                        entityTypeService.findByEntityType(context, "Person"),
-                        "isAuthorOfPublication", "isPublicationOfAuthor");
+            .findbyTypesAndLabels(context, entityTypeService.findByEntityType(context, "Publication"),
+                                  entityTypeService.findByEntityType(context, "Person"),
+                                  "isAuthorOfPublication", "isPublicationOfAuthor");
 
         String adminToken = getAuthToken(admin.getEmail(), password);
 
@@ -758,17 +758,17 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         // This post request will add a first relationship to the publiction and thus create a first set of metadata
         // For the author values, namely "Donald Smith"
         MvcResult mvcResult = getClient(adminToken).perform(post("/api/core/relationships")
-                .param("relationshipType",
-                        isAuthorOfPublicationRelationshipType.getID()
-                                .toString())
-                .contentType(MediaType.parseMediaType
-                        (org.springframework.data.rest.webmvc.RestMediaTypes
-                                .TEXT_URI_LIST_VALUE))
-                .content(
-                        "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
-                                "https://localhost:8080/spring-rest/api/core/items/" + author1.getID()))
-                .andExpect(status().isCreated())
-                .andReturn();
+                                                                .param("relationshipType",
+                                                                       isAuthorOfPublicationRelationshipType.getID()
+                                                                                                            .toString())
+                                                                .contentType(MediaType.parseMediaType
+                                                                    (org.springframework.data.rest.webmvc.RestMediaTypes
+                                                                         .TEXT_URI_LIST_VALUE))
+                                                                .content(
+                                                                    "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
+                                                                        "https://localhost:8080/spring-rest/api/core/items/" + author1.getID()))
+                                                   .andExpect(status().isCreated())
+                                                   .andReturn();
         ObjectMapper mapper = new ObjectMapper();
 
         String content = mvcResult.getResponse().getContentAsString();
@@ -777,8 +777,8 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
 
         // This test will double check that the leftPlace for this relationship is indeed 0
         getClient(adminToken).perform(get("/api/core/relationships/" + firstRelationshipIdString))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("leftPlace", is(0)));
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("leftPlace", is(0)));
 
 
         context.turnOffAuthorisationSystem();
@@ -801,22 +801,22 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         // This test checks again that the first relationship is still on leftplace 0 and not altered
         // Because of the MetadataValue addition
         getClient(adminToken).perform(get("/api/core/relationships/" + firstRelationshipIdString))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("leftPlace", is(0)));
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("leftPlace", is(0)));
 
         // Creates another Relationship for the Publication and thus adding a third metadata value for the author
         mvcResult = getClient(adminToken).perform(post("/api/core/relationships")
-                .param("relationshipType",
-                        isAuthorOfPublicationRelationshipType.getID()
-                                .toString())
-                .contentType(MediaType.parseMediaType
-                        (org.springframework.data.rest.webmvc.RestMediaTypes
-                                .TEXT_URI_LIST_VALUE))
-                .content(
-                        "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
-                                "https://localhost:8080/spring-rest/api/core/items/" + author2.getID()))
-                .andExpect(status().isCreated())
-                .andReturn();
+                                                      .param("relationshipType",
+                                                             isAuthorOfPublicationRelationshipType.getID()
+                                                                                                  .toString())
+                                                      .contentType(MediaType.parseMediaType
+                                                          (org.springframework.data.rest.webmvc.RestMediaTypes
+                                                               .TEXT_URI_LIST_VALUE))
+                                                      .content(
+                                                          "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
+                                                              "https://localhost:8080/spring-rest/api/core/items/" + author2.getID()))
+                                         .andExpect(status().isCreated())
+                                         .andReturn();
 
         content = mvcResult.getResponse().getContentAsString();
         map = mapper.readValue(content, Map.class);
@@ -825,8 +825,8 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         // This test verifies that the newly created Relationship is on leftPlace 2, because the first relationship
         // is on leftPlace 0 and the plain text metadataValue occupies the place 1
         getClient(adminToken).perform(get("/api/core/relationships/" + secondRelationshipIdString))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("leftPlace", is(2)));
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("leftPlace", is(2)));
         context.turnOffAuthorisationSystem();
         // Get the publication from the DB again to ensure that we have the latest object
         publication = itemService.find(context, publication.getID());
@@ -847,17 +847,17 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
 
         // This creates a third relationship for the publication and thus adding a fifth value for author metadatavalues
         mvcResult = getClient(adminToken).perform(post("/api/core/relationships")
-                .param("relationshipType",
-                        isAuthorOfPublicationRelationshipType.getID()
-                                .toString())
-                .contentType(MediaType.parseMediaType
-                        (org.springframework.data.rest.webmvc.RestMediaTypes
-                                .TEXT_URI_LIST_VALUE))
-                .content(
-                        "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
-                                "https://localhost:8080/spring-rest/api/core/items/" + author3.getID()))
-                .andExpect(status().isCreated())
-                .andReturn();
+                                                      .param("relationshipType",
+                                                             isAuthorOfPublicationRelationshipType.getID()
+                                                                                                  .toString())
+                                                      .contentType(MediaType.parseMediaType
+                                                          (org.springframework.data.rest.webmvc.RestMediaTypes
+                                                               .TEXT_URI_LIST_VALUE))
+                                                      .content(
+                                                          "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
+                                                              "https://localhost:8080/spring-rest/api/core/items/" + author3.getID()))
+                                         .andExpect(status().isCreated())
+                                         .andReturn();
 
         content = mvcResult.getResponse().getContentAsString();
         map = mapper.readValue(content, Map.class);
@@ -865,8 +865,8 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
 
         // This verifies that the newly created third relationship is on leftPlace 4.
         getClient(adminToken).perform(get("/api/core/relationships/" + thirdRelationshipIdString))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("leftPlace", is(4)));
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("leftPlace", is(4)));
 
         context.turnOffAuthorisationSystem();
         publication = itemService.find(context, publication.getID());
@@ -916,14 +916,14 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         }
 
         getClient(adminToken).perform(get("/api/core/relationships/" + firstRelationshipIdString))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("leftPlace", is(0)));
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("leftPlace", is(0)));
         getClient(adminToken).perform(get("/api/core/relationships/" + secondRelationshipIdString))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("leftPlace", is(2)));
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("leftPlace", is(2)));
         getClient(adminToken).perform(get("/api/core/relationships/" + thirdRelationshipIdString))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("leftPlace", is(3)));
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("leftPlace", is(3)));
 
     }
 
@@ -939,48 +939,48 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         context.turnOffAuthorisationSystem();
 
         parentCommunity = CommunityBuilder.createCommunity(context)
-                .withName("Parent Community")
-                .build();
+                                          .withName("Parent Community")
+                                          .build();
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
-                .withName("Sub Community")
-                .build();
+                                           .withName("Sub Community")
+                                           .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
         Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
         Collection col3 = CollectionBuilder.createCollection(context, child1).withName("OrgUnits").build();
 
         Item author1 = ItemBuilder.createItem(context, col1)
-                .withTitle("Author1")
-                .withIssueDate("2017-10-17")
-                .withPersonIdentifierFirstName("Donald")
-                .withPersonIdentifierLastName("Smith")
-                .withRelationshipType("Person")
-                .build();
+                                  .withTitle("Author1")
+                                  .withIssueDate("2017-10-17")
+                                  .withPersonIdentifierFirstName("Donald")
+                                  .withPersonIdentifierLastName("Smith")
+                                  .withRelationshipType("Person")
+                                  .build();
 
         Item author2 = ItemBuilder.createItem(context, col2)
-                .withTitle("Author2")
-                .withIssueDate("2016-02-13")
-                .withPersonIdentifierFirstName("Maria")
-                .withPersonIdentifierLastName("Smith")
-                .withRelationshipType("Person")
-                .build();
+                                  .withTitle("Author2")
+                                  .withIssueDate("2016-02-13")
+                                  .withPersonIdentifierFirstName("Maria")
+                                  .withPersonIdentifierLastName("Smith")
+                                  .withRelationshipType("Person")
+                                  .build();
 
         Item author3 = ItemBuilder.createItem(context, col2)
-                .withTitle("Author3")
-                .withIssueDate("2016-02-13")
-                .withPersonIdentifierFirstName("Maybe")
-                .withPersonIdentifierLastName("Maybe")
-                .withRelationshipType("Person")
-                .build();
+                                  .withTitle("Author3")
+                                  .withIssueDate("2016-02-13")
+                                  .withPersonIdentifierFirstName("Maybe")
+                                  .withPersonIdentifierLastName("Maybe")
+                                  .withRelationshipType("Person")
+                                  .build();
 
         Item publication = ItemBuilder.createItem(context, col3)
-                .withTitle("Publication1")
-                .withIssueDate("2015-01-01")
-                .withRelationshipType("Publication")
-                .build();
+                                      .withTitle("Publication1")
+                                      .withIssueDate("2015-01-01")
+                                      .withRelationshipType("Publication")
+                                      .build();
         RelationshipType isAuthorOfPublicationRelationshipType = relationshipTypeService
-                .findbyTypesAndLabels(context, entityTypeService.findByEntityType(context, "Publication"),
-                        entityTypeService.findByEntityType(context, "Person"),
-                        "isAuthorOfPublication", "isPublicationOfAuthor");
+            .findbyTypesAndLabels(context, entityTypeService.findByEntityType(context, "Publication"),
+                                  entityTypeService.findByEntityType(context, "Person"),
+                                  "isAuthorOfPublication", "isPublicationOfAuthor");
 
         String adminToken = getAuthToken(admin.getEmail(), password);
 
@@ -989,17 +989,17 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         // This post request will add a first relationship to the publiction and thus create a first set of metadata
         // For the author values, namely "Donald Smith"
         MvcResult mvcResult = getClient(adminToken).perform(post("/api/core/relationships")
-                .param("relationshipType",
-                        isAuthorOfPublicationRelationshipType.getID()
-                                .toString())
-                .contentType(MediaType.parseMediaType
-                        (org.springframework.data.rest.webmvc.RestMediaTypes
-                                .TEXT_URI_LIST_VALUE))
-                .content(
-                        "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
-                                "https://localhost:8080/spring-rest/api/core/items/" + author1.getID()))
-                .andExpect(status().isCreated())
-                .andReturn();
+                                                                .param("relationshipType",
+                                                                       isAuthorOfPublicationRelationshipType.getID()
+                                                                                                            .toString())
+                                                                .contentType(MediaType.parseMediaType
+                                                                    (org.springframework.data.rest.webmvc.RestMediaTypes
+                                                                         .TEXT_URI_LIST_VALUE))
+                                                                .content(
+                                                                    "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
+                                                                        "https://localhost:8080/spring-rest/api/core/items/" + author1.getID()))
+                                                   .andExpect(status().isCreated())
+                                                   .andReturn();
         ObjectMapper mapper = new ObjectMapper();
 
         String content = mvcResult.getResponse().getContentAsString();
@@ -1008,8 +1008,8 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
 
         // This test will double check that the leftPlace for this relationship is indeed 0
         getClient(adminToken).perform(get("/api/core/relationships/" + firstRelationshipIdString))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("leftPlace", is(0)));
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("leftPlace", is(0)));
 
 
         context.turnOffAuthorisationSystem();
@@ -1032,22 +1032,22 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         // This test checks again that the first relationship is still on leftplace 0 and not altered
         // Because of the MetadataValue addition
         getClient(adminToken).perform(get("/api/core/relationships/" + firstRelationshipIdString))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("leftPlace", is(0)));
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("leftPlace", is(0)));
 
         // Creates another Relationship for the Publication and thus adding a third metadata value for the author
         mvcResult = getClient(adminToken).perform(post("/api/core/relationships")
-                .param("relationshipType",
-                        isAuthorOfPublicationRelationshipType.getID()
-                                .toString())
-                .contentType(MediaType.parseMediaType
-                        (org.springframework.data.rest.webmvc.RestMediaTypes
-                                .TEXT_URI_LIST_VALUE))
-                .content(
-                        "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
-                                "https://localhost:8080/spring-rest/api/core/items/" + author2.getID()))
-                .andExpect(status().isCreated())
-                .andReturn();
+                                                      .param("relationshipType",
+                                                             isAuthorOfPublicationRelationshipType.getID()
+                                                                                                  .toString())
+                                                      .contentType(MediaType.parseMediaType
+                                                          (org.springframework.data.rest.webmvc.RestMediaTypes
+                                                               .TEXT_URI_LIST_VALUE))
+                                                      .content(
+                                                          "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
+                                                              "https://localhost:8080/spring-rest/api/core/items/" + author2.getID()))
+                                         .andExpect(status().isCreated())
+                                         .andReturn();
 
         content = mvcResult.getResponse().getContentAsString();
         map = mapper.readValue(content, Map.class);
@@ -1056,8 +1056,8 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         // This test verifies that the newly created Relationship is on leftPlace 2, because the first relationship
         // is on leftPlace 0 and the plain text metadataValue occupies the place 1
         getClient(adminToken).perform(get("/api/core/relationships/" + secondRelationshipIdString))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("leftPlace", is(2)));
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("leftPlace", is(2)));
         context.turnOffAuthorisationSystem();
         // Get the publication from the DB again to ensure that we have the latest object
         publication = itemService.find(context, publication.getID());
@@ -1078,17 +1078,17 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
 
         // This creates a third relationship for the publication and thus adding a fifth value for author metadatavalues
         mvcResult = getClient(adminToken).perform(post("/api/core/relationships")
-                .param("relationshipType",
-                        isAuthorOfPublicationRelationshipType.getID()
-                                .toString())
-                .contentType(MediaType.parseMediaType
-                        (org.springframework.data.rest.webmvc.RestMediaTypes
-                                .TEXT_URI_LIST_VALUE))
-                .content(
-                        "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
-                                "https://localhost:8080/spring-rest/api/core/items/" + author3.getID()))
-                .andExpect(status().isCreated())
-                .andReturn();
+                                                      .param("relationshipType",
+                                                             isAuthorOfPublicationRelationshipType.getID()
+                                                                                                  .toString())
+                                                      .contentType(MediaType.parseMediaType
+                                                          (org.springframework.data.rest.webmvc.RestMediaTypes
+                                                               .TEXT_URI_LIST_VALUE))
+                                                      .content(
+                                                          "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
+                                                              "https://localhost:8080/spring-rest/api/core/items/" + author3.getID()))
+                                         .andExpect(status().isCreated())
+                                         .andReturn();
 
         content = mvcResult.getResponse().getContentAsString();
         map = mapper.readValue(content, Map.class);
@@ -1096,8 +1096,8 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
 
         // This verifies that the newly created third relationship is on leftPlace 4.
         getClient(adminToken).perform(get("/api/core/relationships/" + thirdRelationshipIdString))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("leftPlace", is(4)));
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("leftPlace", is(4)));
 
         context.turnOffAuthorisationSystem();
         publication = itemService.find(context, publication.getID());
@@ -1124,8 +1124,8 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         getClient(adminToken).perform(delete("/api/core/relationships/" + secondRelationshipIdString));
 
         getClient(adminToken).perform(get("/api/core/relationships/" + firstRelationshipIdString))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("leftPlace", is(0)));
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("leftPlace", is(0)));
 
         publication = itemService.find(context, publication.getID());
         list = itemService.getMetadata(publication, "dc", "contributor", "author", Item.ANY);
@@ -1154,8 +1154,8 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
 
 
         getClient(adminToken).perform(get("/api/core/relationships/" + thirdRelationshipIdString))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("leftPlace", is(3)));
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("leftPlace", is(3)));
 
     }
 
@@ -1171,63 +1171,63 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         context.turnOffAuthorisationSystem();
 
         parentCommunity = CommunityBuilder.createCommunity(context)
-                .withName("Parent Community")
-                .build();
+                                          .withName("Parent Community")
+                                          .build();
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
-                .withName("Sub Community")
-                .build();
+                                           .withName("Sub Community")
+                                           .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
         Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
         Collection col3 = CollectionBuilder.createCollection(context, child1).withName("OrgUnits").build();
 
         Item author1 = ItemBuilder.createItem(context, col1)
-                .withTitle("Author1")
-                .withIssueDate("2017-10-17")
-                .withAuthor("Smith, Donald")
-                .withRelationshipType("Person")
-                .build();
+                                  .withTitle("Author1")
+                                  .withIssueDate("2017-10-17")
+                                  .withAuthor("Smith, Donald")
+                                  .withRelationshipType("Person")
+                                  .build();
 
         Item author2 = ItemBuilder.createItem(context, col2)
-                .withTitle("Author2")
-                .withIssueDate("2016-02-13")
-                .withAuthor("Smith, Maria")
-                .withRelationshipType("Person")
-                .build();
+                                  .withTitle("Author2")
+                                  .withIssueDate("2016-02-13")
+                                  .withAuthor("Smith, Maria")
+                                  .withRelationshipType("Person")
+                                  .build();
 
         Item author3 = ItemBuilder.createItem(context, col2)
-                .withTitle("Author3")
-                .withIssueDate("2016-02-13")
-                .withAuthor("Maybe, Maybe")
-                .withRelationshipType("Person")
-                .build();
+                                  .withTitle("Author3")
+                                  .withIssueDate("2016-02-13")
+                                  .withAuthor("Maybe, Maybe")
+                                  .withRelationshipType("Person")
+                                  .build();
 
         Item orgUnit1 = ItemBuilder.createItem(context, col3)
-                .withTitle("OrgUnit1")
-                .withIssueDate("2015-01-01")
-                .withRelationshipType("OrgUnit")
-                .build();
+                                   .withTitle("OrgUnit1")
+                                   .withIssueDate("2015-01-01")
+                                   .withRelationshipType("OrgUnit")
+                                   .build();
 
         RelationshipType isOrgUnitOfPersonRelationshipType = relationshipTypeService
-                .findbyTypesAndLabels(context, entityTypeService.findByEntityType(context, "Person"),
-                        entityTypeService.findByEntityType(context, "OrgUnit"),
-                        "isOrgUnitOfPerson", "isPersonOfOrgUnit");
+            .findbyTypesAndLabels(context, entityTypeService.findByEntityType(context, "Person"),
+                                  entityTypeService.findByEntityType(context, "OrgUnit"),
+                                  "isOrgUnitOfPerson", "isPersonOfOrgUnit");
         context.restoreAuthSystemState();
         String adminToken = getAuthToken(admin.getEmail(), password);
 
         // This is essentially a sequence of adding Relationships by POST and then checking with GET to see
         // if the place is being set properly.
         MvcResult mvcResult = getClient(adminToken).perform(post("/api/core/relationships")
-                .param("relationshipType",
-                        isOrgUnitOfPersonRelationshipType.getID()
-                                .toString())
-                .contentType(MediaType.parseMediaType
-                        (org.springframework.data.rest.webmvc.RestMediaTypes
-                                .TEXT_URI_LIST_VALUE))
-                .content(
-                        "https://localhost:8080/spring-rest/api/core/items/" + author1.getID() + "\n" +
-                                "https://localhost:8080/spring-rest/api/core/items/" + orgUnit1.getID()))
-                .andExpect(status().isCreated())
-                .andReturn();
+                                                                .param("relationshipType",
+                                                                       isOrgUnitOfPersonRelationshipType.getID()
+                                                                                                        .toString())
+                                                                .contentType(MediaType.parseMediaType
+                                                                    (org.springframework.data.rest.webmvc.RestMediaTypes
+                                                                         .TEXT_URI_LIST_VALUE))
+                                                                .content(
+                                                                    "https://localhost:8080/spring-rest/api/core/items/" + author1.getID() + "\n" +
+                                                                        "https://localhost:8080/spring-rest/api/core/items/" + orgUnit1.getID()))
+                                                   .andExpect(status().isCreated())
+                                                   .andReturn();
         ObjectMapper mapper = new ObjectMapper();
 
         String content = mvcResult.getResponse().getContentAsString();
@@ -1235,20 +1235,20 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         String firstRelationshipIdString = String.valueOf(map.get("id"));
 
         getClient(adminToken).perform(get("/api/core/relationships/" + firstRelationshipIdString))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("rightPlace", is(0)));
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("rightPlace", is(0)));
 
         mvcResult = getClient(adminToken).perform(post("/api/core/relationships")
-                .param("relationshipType",
-                        isOrgUnitOfPersonRelationshipType.getID().toString())
-                .contentType(MediaType.parseMediaType
-                        (org.springframework.data.rest.webmvc.RestMediaTypes
-                                .TEXT_URI_LIST_VALUE))
-                .content(
-                        "https://localhost:8080/spring-rest/api/core/items/" + author2.getID() + "\n" +
-                                "https://localhost:8080/spring-rest/api/core/items/" + orgUnit1.getID()))
-                .andExpect(status().isCreated())
-                .andReturn();
+                                                      .param("relationshipType",
+                                                             isOrgUnitOfPersonRelationshipType.getID().toString())
+                                                      .contentType(MediaType.parseMediaType
+                                                          (org.springframework.data.rest.webmvc.RestMediaTypes
+                                                               .TEXT_URI_LIST_VALUE))
+                                                      .content(
+                                                          "https://localhost:8080/spring-rest/api/core/items/" + author2.getID() + "\n" +
+                                                              "https://localhost:8080/spring-rest/api/core/items/" + orgUnit1.getID()))
+                                         .andExpect(status().isCreated())
+                                         .andReturn();
         mapper = new ObjectMapper();
 
         content = mvcResult.getResponse().getContentAsString();
@@ -1256,20 +1256,20 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         String secondRelationshipIdString = String.valueOf(map.get("id"));
 
         getClient(adminToken).perform(get("/api/core/relationships/" + secondRelationshipIdString))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("rightPlace", is(1)));
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("rightPlace", is(1)));
 
         mvcResult = getClient(adminToken).perform(post("/api/core/relationships")
-                .param("relationshipType",
-                        isOrgUnitOfPersonRelationshipType.getID().toString())
-                .contentType(MediaType.parseMediaType
-                        (org.springframework.data.rest.webmvc.RestMediaTypes
-                                .TEXT_URI_LIST_VALUE))
-                .content(
-                        "https://localhost:8080/spring-rest/api/core/items/" + author3.getID() + "\n" +
-                                "https://localhost:8080/spring-rest/api/core/items/" + orgUnit1.getID()))
-                .andExpect(status().isCreated())
-                .andReturn();
+                                                      .param("relationshipType",
+                                                             isOrgUnitOfPersonRelationshipType.getID().toString())
+                                                      .contentType(MediaType.parseMediaType
+                                                          (org.springframework.data.rest.webmvc.RestMediaTypes
+                                                               .TEXT_URI_LIST_VALUE))
+                                                      .content(
+                                                          "https://localhost:8080/spring-rest/api/core/items/" + author3.getID() + "\n" +
+                                                              "https://localhost:8080/spring-rest/api/core/items/" + orgUnit1.getID()))
+                                         .andExpect(status().isCreated())
+                                         .andReturn();
         mapper = new ObjectMapper();
 
         content = mvcResult.getResponse().getContentAsString();
@@ -1277,8 +1277,8 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         String thirdRelationshipIdString = String.valueOf(map.get("id"));
 
         getClient(adminToken).perform(get("/api/core/relationships/" + thirdRelationshipIdString))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("rightPlace", is(2)));
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("rightPlace", is(2)));
     }
 
     /**
@@ -1294,63 +1294,63 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         context.turnOffAuthorisationSystem();
 
         parentCommunity = CommunityBuilder.createCommunity(context)
-                .withName("Parent Community")
-                .build();
+                                          .withName("Parent Community")
+                                          .build();
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
-                .withName("Sub Community")
-                .build();
+                                           .withName("Sub Community")
+                                           .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
         Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
         Collection col3 = CollectionBuilder.createCollection(context, child1).withName("OrgUnits").build();
 
         Item author1 = ItemBuilder.createItem(context, col1)
-                .withTitle("Author1")
-                .withIssueDate("2017-10-17")
-                .withAuthor("Smith, Donald")
-                .withRelationshipType("Person")
-                .build();
+                                  .withTitle("Author1")
+                                  .withIssueDate("2017-10-17")
+                                  .withAuthor("Smith, Donald")
+                                  .withRelationshipType("Person")
+                                  .build();
 
         Item author2 = ItemBuilder.createItem(context, col2)
-                .withTitle("Author2")
-                .withIssueDate("2016-02-13")
-                .withAuthor("Smith, Maria")
-                .withRelationshipType("Person")
-                .build();
+                                  .withTitle("Author2")
+                                  .withIssueDate("2016-02-13")
+                                  .withAuthor("Smith, Maria")
+                                  .withRelationshipType("Person")
+                                  .build();
 
         Item author3 = ItemBuilder.createItem(context, col2)
-                .withTitle("Author3")
-                .withIssueDate("2016-02-13")
-                .withAuthor("Maybe, Maybe")
-                .withRelationshipType("Person")
-                .build();
+                                  .withTitle("Author3")
+                                  .withIssueDate("2016-02-13")
+                                  .withAuthor("Maybe, Maybe")
+                                  .withRelationshipType("Person")
+                                  .build();
 
         Item orgUnit1 = ItemBuilder.createItem(context, col3)
-                .withTitle("OrgUnit1")
-                .withIssueDate("2015-01-01")
-                .withRelationshipType("OrgUnit")
-                .build();
+                                   .withTitle("OrgUnit1")
+                                   .withIssueDate("2015-01-01")
+                                   .withRelationshipType("OrgUnit")
+                                   .build();
 
         RelationshipType isOrgUnitOfPersonRelationshipType = relationshipTypeService
-                .findbyTypesAndLabels(context, entityTypeService.findByEntityType(context, "Person"),
-                        entityTypeService.findByEntityType(context, "OrgUnit"),
-                        "isOrgUnitOfPerson", "isPersonOfOrgUnit");
+            .findbyTypesAndLabels(context, entityTypeService.findByEntityType(context, "Person"),
+                                  entityTypeService.findByEntityType(context, "OrgUnit"),
+                                  "isOrgUnitOfPerson", "isPersonOfOrgUnit");
         context.restoreAuthSystemState();
         String adminToken = getAuthToken(admin.getEmail(), password);
 
         // This is essentially a sequence of adding Relationships by POST and then checking with GET to see
         // if the place is being set properly.
         MvcResult mvcResult = getClient(adminToken).perform(post("/api/core/relationships")
-                .param("relationshipType",
-                        isOrgUnitOfPersonRelationshipType.getID()
-                                .toString())
-                .contentType(MediaType.parseMediaType
-                        (org.springframework.data.rest.webmvc.RestMediaTypes
-                                .TEXT_URI_LIST_VALUE))
-                .content(
-                        "https://localhost:8080/spring-rest/api/core/items/" + author1.getID() + "\n" +
-                                "https://localhost:8080/spring-rest/api/core/items/" + orgUnit1.getID()))
-                .andExpect(status().isCreated())
-                .andReturn();
+                                                                .param("relationshipType",
+                                                                       isOrgUnitOfPersonRelationshipType.getID()
+                                                                                                        .toString())
+                                                                .contentType(MediaType.parseMediaType
+                                                                    (org.springframework.data.rest.webmvc.RestMediaTypes
+                                                                         .TEXT_URI_LIST_VALUE))
+                                                                .content(
+                                                                    "https://localhost:8080/spring-rest/api/core/items/" + author1.getID() + "\n" +
+                                                                        "https://localhost:8080/spring-rest/api/core/items/" + orgUnit1.getID()))
+                                                   .andExpect(status().isCreated())
+                                                   .andReturn();
         ObjectMapper mapper = new ObjectMapper();
 
         String content = mvcResult.getResponse().getContentAsString();
@@ -1358,20 +1358,20 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         String firstRelationshipIdString = String.valueOf(map.get("id"));
 
         getClient(adminToken).perform(get("/api/core/relationships/" + firstRelationshipIdString))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("rightPlace", is(0)));
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("rightPlace", is(0)));
 
         mvcResult = getClient(adminToken).perform(post("/api/core/relationships")
-                .param("relationshipType",
-                        isOrgUnitOfPersonRelationshipType.getID().toString())
-                .contentType(MediaType.parseMediaType
-                        (org.springframework.data.rest.webmvc.RestMediaTypes
-                                .TEXT_URI_LIST_VALUE))
-                .content(
-                        "https://localhost:8080/spring-rest/api/core/items/" + author2.getID() + "\n" +
-                                "https://localhost:8080/spring-rest/api/core/items/" + orgUnit1.getID()))
-                .andExpect(status().isCreated())
-                .andReturn();
+                                                      .param("relationshipType",
+                                                             isOrgUnitOfPersonRelationshipType.getID().toString())
+                                                      .contentType(MediaType.parseMediaType
+                                                          (org.springframework.data.rest.webmvc.RestMediaTypes
+                                                               .TEXT_URI_LIST_VALUE))
+                                                      .content(
+                                                          "https://localhost:8080/spring-rest/api/core/items/" + author2.getID() + "\n" +
+                                                              "https://localhost:8080/spring-rest/api/core/items/" + orgUnit1.getID()))
+                                         .andExpect(status().isCreated())
+                                         .andReturn();
         mapper = new ObjectMapper();
 
         content = mvcResult.getResponse().getContentAsString();
@@ -1379,20 +1379,20 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         String secondRelationshipIdString = String.valueOf(map.get("id"));
 
         getClient(adminToken).perform(get("/api/core/relationships/" + secondRelationshipIdString))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("rightPlace", is(1)));
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("rightPlace", is(1)));
 
         mvcResult = getClient(adminToken).perform(post("/api/core/relationships")
-                .param("relationshipType",
-                        isOrgUnitOfPersonRelationshipType.getID().toString())
-                .contentType(MediaType.parseMediaType
-                        (org.springframework.data.rest.webmvc.RestMediaTypes
-                                .TEXT_URI_LIST_VALUE))
-                .content(
-                        "https://localhost:8080/spring-rest/api/core/items/" + author3.getID() + "\n" +
-                                "https://localhost:8080/spring-rest/api/core/items/" + orgUnit1.getID()))
-                .andExpect(status().isCreated())
-                .andReturn();
+                                                      .param("relationshipType",
+                                                             isOrgUnitOfPersonRelationshipType.getID().toString())
+                                                      .contentType(MediaType.parseMediaType
+                                                          (org.springframework.data.rest.webmvc.RestMediaTypes
+                                                               .TEXT_URI_LIST_VALUE))
+                                                      .content(
+                                                          "https://localhost:8080/spring-rest/api/core/items/" + author3.getID() + "\n" +
+                                                              "https://localhost:8080/spring-rest/api/core/items/" + orgUnit1.getID()))
+                                         .andExpect(status().isCreated())
+                                         .andReturn();
         mapper = new ObjectMapper();
 
         content = mvcResult.getResponse().getContentAsString();
@@ -1400,20 +1400,20 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         String thirdRelationshipIdString = String.valueOf(map.get("id"));
 
         getClient(adminToken).perform(get("/api/core/relationships/" + thirdRelationshipIdString))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("rightPlace", is(2)));
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("rightPlace", is(2)));
 
         // Here we will delete the secondRelationship and then verify that the others have their place handled properly
         getClient(adminToken).perform(delete("/api/core/relationships/" + secondRelationshipIdString))
-                .andExpect(status().isNoContent());
+                             .andExpect(status().isNoContent());
 
         getClient(adminToken).perform(get("/api/core/relationships/" + firstRelationshipIdString))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("rightPlace", is(0)));
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("rightPlace", is(0)));
 
         getClient(adminToken).perform(get("/api/core/relationships/" + thirdRelationshipIdString))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("rightPlace", is(1)));
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("rightPlace", is(1)));
 
     }
 
@@ -1430,34 +1430,34 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         context.turnOffAuthorisationSystem();
 
         parentCommunity = CommunityBuilder.createCommunity(context)
-                .withName("Parent Community")
-                .build();
+                                          .withName("Parent Community")
+                                          .build();
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
-                .withName("Sub Community")
-                .build();
+                                           .withName("Sub Community")
+                                           .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
         Collection col3 = CollectionBuilder.createCollection(context, child1).withName("OrgUnits").build();
 
         Item author1 = ItemBuilder.createItem(context, col1)
-                .withTitle("Author1")
-                .withIssueDate("2017-10-17")
-                .withAuthor("Smith, Donald")
-                .withRelationshipType("Person")
-                .build();
+                                  .withTitle("Author1")
+                                  .withIssueDate("2017-10-17")
+                                  .withAuthor("Smith, Donald")
+                                  .withRelationshipType("Person")
+                                  .build();
 
         Item author2 = ItemBuilder.createItem(context, col1)
-                .withTitle("Author2")
-                .withIssueDate("2017-10-12")
-                .withAuthor("Smith, Donalaze")
-                .withRelationshipType("Person")
-                .build();
+                                  .withTitle("Author2")
+                                  .withIssueDate("2017-10-12")
+                                  .withAuthor("Smith, Donalaze")
+                                  .withRelationshipType("Person")
+                                  .build();
 
         Item publication = ItemBuilder.createItem(context, col3)
-                .withTitle("Publication1")
-                .withAuthor("Testy, TEst")
-                .withIssueDate("2015-01-01")
-                .withRelationshipType("Publication")
-                .build();
+                                      .withTitle("Publication1")
+                                      .withAuthor("Testy, TEst")
+                                      .withIssueDate("2015-01-01")
+                                      .withRelationshipType("Publication")
+                                      .build();
 
         Item publication2 = ItemBuilder.createItem(context, col3)
                 .withTitle("Publication2")
@@ -1467,9 +1467,9 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                 .build();
 
         RelationshipType isAuthorOfPublicationRelationshipType = relationshipTypeService
-                .findbyTypesAndLabels(context, entityTypeService.findByEntityType(context, "Publication"),
-                        entityTypeService.findByEntityType(context, "Person"),
-                        "isAuthorOfPublication", "isPublicationOfAuthor");
+            .findbyTypesAndLabels(context, entityTypeService.findByEntityType(context, "Publication"),
+                                  entityTypeService.findByEntityType(context, "Person"),
+                                  "isAuthorOfPublication", "isPublicationOfAuthor");
 
 
 
@@ -1478,17 +1478,17 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         String token = getAuthToken(admin.getEmail(), password);
 
         MvcResult mvcResult = getClient(token).perform(post("/api/core/relationships")
-                .param("relationshipType",
-                        isAuthorOfPublicationRelationshipType.getID()
-                                .toString())
-                .contentType(MediaType.parseMediaType
-                        (org.springframework.data.rest.webmvc.RestMediaTypes
-                                .TEXT_URI_LIST_VALUE))
-                .content(
-                        "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
-                                "https://localhost:8080/spring-rest/api/core/items/" + author1.getID()))
-                .andExpect(status().isCreated())
-                .andReturn();
+                                                           .param("relationshipType",
+                                                                  isAuthorOfPublicationRelationshipType.getID()
+                                                                                                       .toString())
+                                                           .contentType(MediaType.parseMediaType
+                                                               (org.springframework.data.rest.webmvc.RestMediaTypes
+                                                                    .TEXT_URI_LIST_VALUE))
+                                                           .content(
+                                                               "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
+                                                                   "https://localhost:8080/spring-rest/api/core/items/" + author1.getID()))
+                                              .andExpect(status().isCreated())
+                                              .andReturn();
 
         ObjectMapper mapper = new ObjectMapper();
         String content = mvcResult.getResponse().getContentAsString();
@@ -1540,48 +1540,48 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         context.turnOffAuthorisationSystem();
 
         parentCommunity = CommunityBuilder.createCommunity(context)
-                .withName("Parent Community")
-                .build();
+                                          .withName("Parent Community")
+                                          .build();
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
-                .withName("Sub Community")
-                .build();
+                                           .withName("Sub Community")
+                                           .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
         Collection col3 = CollectionBuilder.createCollection(context, child1).withName("OrgUnits").build();
 
         Item author1 = ItemBuilder.createItem(context, col1)
-                .withTitle("Author1")
-                .withIssueDate("2017-10-17")
-                .withAuthor("Smith, Donald")
-                .withRelationshipType("Person")
-                .build();
+                                  .withTitle("Author1")
+                                  .withIssueDate("2017-10-17")
+                                  .withAuthor("Smith, Donald")
+                                  .withRelationshipType("Person")
+                                  .build();
 
         Item author2 = ItemBuilder.createItem(context, col1)
-                .withTitle("Author2")
-                .withIssueDate("2017-10-12")
-                .withAuthor("Smith, Donalaze")
-                .withRelationshipType("Person")
-                .build();
+                                  .withTitle("Author2")
+                                  .withIssueDate("2017-10-12")
+                                  .withAuthor("Smith, Donalaze")
+                                  .withRelationshipType("Person")
+                                  .build();
 
         Item publication = ItemBuilder.createItem(context, col3)
-                .withTitle("Publication1")
-                .withAuthor("Testy, TEst")
-                .withIssueDate("2015-01-01")
-                .withRelationshipType("Publication")
-                .build();
+                                      .withTitle("Publication1")
+                                      .withAuthor("Testy, TEst")
+                                      .withIssueDate("2015-01-01")
+                                      .withRelationshipType("Publication")
+                                      .build();
 
         RelationshipType isAuthorOfPublicationRelationshipType = relationshipTypeService
-                .findbyTypesAndLabels(context, entityTypeService.findByEntityType(context, "Publication"),
-                        entityTypeService.findByEntityType(context, "Person"),
-                        "isAuthorOfPublication", "isPublicationOfAuthor");
+            .findbyTypesAndLabels(context, entityTypeService.findByEntityType(context, "Publication"),
+                                  entityTypeService.findByEntityType(context, "Person"),
+                                  "isAuthorOfPublication", "isPublicationOfAuthor");
 
 
 
         EPerson user = EPersonBuilder.createEPerson(context)
-                .withNameInMetadata("first", "last")
-                .withEmail("testaze@gmail.com")
-                .withPassword(password)
-                .withLanguage(I18nUtil.getDefaultLocale().getLanguage())
-                .build();
+                                     .withNameInMetadata("first", "last")
+                                     .withEmail("testaze@gmail.com")
+                                     .withPassword(password)
+                                     .withLanguage(I18nUtil.getDefaultLocale().getLanguage())
+                                     .build();
         context.setCurrentUser(user);
 
         authorizeService.addPolicy(context, author1, Constants.WRITE, user);
@@ -1592,15 +1592,15 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         String token = getAuthToken(user.getEmail(), password);
 
         MvcResult mvcResult = getClient(token).perform(post("/api/core/relationships")
-                .param("relationshipType",
-                        isAuthorOfPublicationRelationshipType.getID()
-                                .toString())
-                .contentType(MediaType.parseMediaType("text/uri-list"))
-                .content(
-                        "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
-                                "https://localhost:8080/spring-rest/api/core/items/" + author1.getID()))
-                .andExpect(status().isCreated())
-                .andReturn();
+                                                           .param("relationshipType",
+                                                                  isAuthorOfPublicationRelationshipType.getID()
+                                                                                                       .toString())
+                                                           .contentType(MediaType.parseMediaType("text/uri-list"))
+                                                           .content(
+                                                               "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
+                                                                   "https://localhost:8080/spring-rest/api/core/items/" + author1.getID()))
+                                              .andExpect(status().isCreated())
+                                              .andReturn();
 
         ObjectMapper mapper = new ObjectMapper();
         String content = mvcResult.getResponse().getContentAsString();
@@ -1615,9 +1615,9 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                 .andReturn();
         //verify change  and other not changed
         getClient(token).perform(get("/api/core/relationships/" + id))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.rightId", is(author2.getID().toString())))
-                .andExpect(jsonPath("$.leftId", is(publication.getID().toString())));
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.rightId", is(author2.getID().toString())))
+                        .andExpect(jsonPath("$.leftId", is(publication.getID().toString())));
 
     }
 
@@ -1632,48 +1632,48 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         context.turnOffAuthorisationSystem();
 
         parentCommunity = CommunityBuilder.createCommunity(context)
-                .withName("Parent Community")
-                .build();
+                                          .withName("Parent Community")
+                                          .build();
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
-                .withName("Sub Community")
-                .build();
+                                           .withName("Sub Community")
+                                           .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
         Collection col3 = CollectionBuilder.createCollection(context, child1).withName("OrgUnits").build();
 
         Item author1 = ItemBuilder.createItem(context, col1)
-                .withTitle("Author1")
-                .withIssueDate("2017-10-17")
-                .withAuthor("Smith, Donald")
-                .withRelationshipType("Person")
-                .build();
+                                  .withTitle("Author1")
+                                  .withIssueDate("2017-10-17")
+                                  .withAuthor("Smith, Donald")
+                                  .withRelationshipType("Person")
+                                  .build();
 
         Item author2 = ItemBuilder.createItem(context, col1)
-                .withTitle("Author2")
-                .withIssueDate("2017-10-12")
-                .withAuthor("Smith, Donalaze")
-                .withRelationshipType("Person")
-                .build();
+                                  .withTitle("Author2")
+                                  .withIssueDate("2017-10-12")
+                                  .withAuthor("Smith, Donalaze")
+                                  .withRelationshipType("Person")
+                                  .build();
 
         Item publication = ItemBuilder.createItem(context, col3)
-                .withTitle("Publication1")
-                .withAuthor("Testy, TEst")
-                .withIssueDate("2015-01-01")
-                .withRelationshipType("Publication")
-                .build();
+                                      .withTitle("Publication1")
+                                      .withAuthor("Testy, TEst")
+                                      .withIssueDate("2015-01-01")
+                                      .withRelationshipType("Publication")
+                                      .build();
 
         RelationshipType isAuthorOfPublicationRelationshipType = relationshipTypeService
-                .findbyTypesAndLabels(context, entityTypeService.findByEntityType(context, "Publication"),
-                        entityTypeService.findByEntityType(context, "Person"),
-                        "isAuthorOfPublication", "isPublicationOfAuthor");
+            .findbyTypesAndLabels(context, entityTypeService.findByEntityType(context, "Publication"),
+                                  entityTypeService.findByEntityType(context, "Person"),
+                                  "isAuthorOfPublication", "isPublicationOfAuthor");
 
 
 
         EPerson user = EPersonBuilder.createEPerson(context)
-                .withNameInMetadata("first", "last")
-                .withEmail("testaze@gmail.com")
-                .withPassword(password)
-                .withLanguage(I18nUtil.getDefaultLocale().getLanguage())
-                .build();
+                                     .withNameInMetadata("first", "last")
+                                     .withEmail("testaze@gmail.com")
+                                     .withPassword(password)
+                                     .withLanguage(I18nUtil.getDefaultLocale().getLanguage())
+                                     .build();
         context.setCurrentUser(user);
 
         authorizeService.addPolicy(context, publication, Constants.WRITE, user);
@@ -1683,15 +1683,15 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         String token = getAuthToken(user.getEmail(), password);
 
         MvcResult mvcResult = getClient(token).perform(post("/api/core/relationships")
-                .param("relationshipType",
-                        isAuthorOfPublicationRelationshipType.getID()
-                                .toString())
-                .contentType(MediaType.parseMediaType("text/uri-list"))
-                .content(
-                        "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
-                                "https://localhost:8080/spring-rest/api/core/items/" + author1.getID()))
-                .andExpect(status().isCreated())
-                .andReturn();
+                                                           .param("relationshipType",
+                                                                  isAuthorOfPublicationRelationshipType.getID()
+                                                                                                       .toString())
+                                                           .contentType(MediaType.parseMediaType("text/uri-list"))
+                                                           .content(
+                                                               "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
+                                                                   "https://localhost:8080/spring-rest/api/core/items/" + author1.getID()))
+                                              .andExpect(status().isCreated())
+                                              .andReturn();
 
         ObjectMapper mapper = new ObjectMapper();
         String content = mvcResult.getResponse().getContentAsString();
@@ -1705,9 +1705,9 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                 .andReturn();
         //verify right item change and other not changed
         getClient(token).perform(get("/api/core/relationships/" + id))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.rightId", is(author2.getID().toString())))
-                .andExpect(jsonPath("$.leftId", is(publication.getID().toString())));
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.rightId", is(author2.getID().toString())))
+                        .andExpect(jsonPath("$.leftId", is(publication.getID().toString())));
 
     }
 
@@ -1723,47 +1723,47 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         context.turnOffAuthorisationSystem();
 
         parentCommunity = CommunityBuilder.createCommunity(context)
-                .withName("Parent Community")
-                .build();
+                                          .withName("Parent Community")
+                                          .build();
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
-                .withName("Sub Community")
-                .build();
+                                           .withName("Sub Community")
+                                           .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
         Collection col3 = CollectionBuilder.createCollection(context, child1).withName("OrgUnits").build();
 
         Item author1 = ItemBuilder.createItem(context, col1)
-                .withTitle("Author1")
-                .withIssueDate("2017-10-17")
-                .withAuthor("Smith, Donald")
-                .withRelationshipType("Person")
-                .build();
+                                  .withTitle("Author1")
+                                  .withIssueDate("2017-10-17")
+                                  .withAuthor("Smith, Donald")
+                                  .withRelationshipType("Person")
+                                  .build();
 
         Item publication1 = ItemBuilder.createItem(context, col3)
-                .withTitle("Publication1")
-                .withAuthor("Testy, TEst")
-                .withIssueDate("2015-01-01")
-                .withRelationshipType("Publication")
-                .build();
+                                      .withTitle("Publication1")
+                                      .withAuthor("Testy, TEst")
+                                      .withIssueDate("2015-01-01")
+                                      .withRelationshipType("Publication")
+                                      .build();
         Item publication2 = ItemBuilder.createItem(context, col3)
-                .withTitle("Publication2")
-                .withAuthor("Testy, TEstzeaze")
-                .withIssueDate("2015-01-01")
-                .withRelationshipType("Publication")
-                .build();
+                                      .withTitle("Publication2")
+                                      .withAuthor("Testy, TEstzeaze")
+                                      .withIssueDate("2015-01-01")
+                                      .withRelationshipType("Publication")
+                                      .build();
 
         RelationshipType isAuthorOfPublicationRelationshipType = relationshipTypeService
-                .findbyTypesAndLabels(context, entityTypeService.findByEntityType(context, "Publication"),
-                        entityTypeService.findByEntityType(context, "Person"),
-                        "isAuthorOfPublication", "isPublicationOfAuthor");
+            .findbyTypesAndLabels(context, entityTypeService.findByEntityType(context, "Publication"),
+                                  entityTypeService.findByEntityType(context, "Person"),
+                                  "isAuthorOfPublication", "isPublicationOfAuthor");
 
 
 
         EPerson user = EPersonBuilder.createEPerson(context)
-                .withNameInMetadata("first", "last")
-                .withEmail("testaze@gmail.com")
-                .withPassword(password)
-                .withLanguage(I18nUtil.getDefaultLocale().getLanguage())
-                .build();
+                                     .withNameInMetadata("first", "last")
+                                     .withEmail("testaze@gmail.com")
+                                     .withPassword(password)
+                                     .withLanguage(I18nUtil.getDefaultLocale().getLanguage())
+                                     .build();
         context.setCurrentUser(user);
 
         authorizeService.addPolicy(context, publication1, Constants.WRITE, user);
@@ -1774,15 +1774,15 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         String token = getAuthToken(user.getEmail(), password);
 
         MvcResult mvcResult = getClient(token).perform(post("/api/core/relationships")
-                .param("relationshipType",
-                        isAuthorOfPublicationRelationshipType.getID()
-                                .toString())
-                .contentType(MediaType.parseMediaType("text/uri-list"))
-                .content(
-                        "https://localhost:8080/spring-rest/api/core/items/" + publication1.getID() + "\n" +
-                                "https://localhost:8080/spring-rest/api/core/items/" + author1.getID()))
-                .andExpect(status().isCreated())
-                .andReturn();
+                                                           .param("relationshipType",
+                                                                  isAuthorOfPublicationRelationshipType.getID()
+                                                                                                       .toString())
+                                                           .contentType(MediaType.parseMediaType("text/uri-list"))
+                                                           .content(
+                                                               "https://localhost:8080/spring-rest/api/core/items/" + publication1.getID() + "\n" +
+                                                                   "https://localhost:8080/spring-rest/api/core/items/" + author1.getID()))
+                                              .andExpect(status().isCreated())
+                                              .andReturn();
 
         ObjectMapper mapper = new ObjectMapper();
         String content = mvcResult.getResponse().getContentAsString();
@@ -1796,9 +1796,9 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                 .andReturn();
         //verify change  and other not changed
         getClient(token).perform(get("/api/core/relationships/" + id))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.leftId", is(publication2.getID().toString())))
-                .andExpect(jsonPath("$.rightId", is(author1.getID().toString())));
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.leftId", is(publication2.getID().toString())))
+                        .andExpect(jsonPath("$.rightId", is(author1.getID().toString())));
     }
 
 
@@ -1813,48 +1813,48 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         context.turnOffAuthorisationSystem();
 
         parentCommunity = CommunityBuilder.createCommunity(context)
-                .withName("Parent Community")
-                .build();
+                                          .withName("Parent Community")
+                                          .build();
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
-                .withName("Sub Community")
-                .build();
+                                           .withName("Sub Community")
+                                           .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
         Collection col3 = CollectionBuilder.createCollection(context, child1).withName("OrgUnits").build();
 
         Item author1 = ItemBuilder.createItem(context, col1)
-                .withTitle("Author1")
-                .withIssueDate("2017-10-17")
-                .withAuthor("Smith, Donald")
-                .withRelationshipType("Person")
-                .build();
+                                  .withTitle("Author1")
+                                  .withIssueDate("2017-10-17")
+                                  .withAuthor("Smith, Donald")
+                                  .withRelationshipType("Person")
+                                  .build();
 
         Item publication1 = ItemBuilder.createItem(context, col3)
-                .withTitle("Publication1")
-                .withAuthor("Testy, TEst")
-                .withIssueDate("2015-01-01")
-                .withRelationshipType("Publication")
-                .build();
+                                      .withTitle("Publication1")
+                                      .withAuthor("Testy, TEst")
+                                      .withIssueDate("2015-01-01")
+                                      .withRelationshipType("Publication")
+                                      .build();
 
         Item publication2 = ItemBuilder.createItem(context, col3)
-                .withTitle("Publication2")
-                .withAuthor("Testy, TEstzea")
-                .withIssueDate("2015-01-01")
-                .withRelationshipType("Publication")
-                .build();
+                                      .withTitle("Publication2")
+                                      .withAuthor("Testy, TEstzea")
+                                      .withIssueDate("2015-01-01")
+                                      .withRelationshipType("Publication")
+                                      .build();
 
         RelationshipType isAuthorOfPublicationRelationshipType = relationshipTypeService
-                .findbyTypesAndLabels(context, entityTypeService.findByEntityType(context, "Publication"),
-                        entityTypeService.findByEntityType(context, "Person"),
-                        "isAuthorOfPublication", "isPublicationOfAuthor");
+            .findbyTypesAndLabels(context, entityTypeService.findByEntityType(context, "Publication"),
+                                  entityTypeService.findByEntityType(context, "Person"),
+                                  "isAuthorOfPublication", "isPublicationOfAuthor");
 
 
 
         EPerson user = EPersonBuilder.createEPerson(context)
-                .withNameInMetadata("first", "last")
-                .withEmail("testaze@gmail.com")
-                .withPassword(password)
-                .withLanguage(I18nUtil.getDefaultLocale().getLanguage())
-                .build();
+                                     .withNameInMetadata("first", "last")
+                                     .withEmail("testaze@gmail.com")
+                                     .withPassword(password)
+                                     .withLanguage(I18nUtil.getDefaultLocale().getLanguage())
+                                     .build();
         context.setCurrentUser(user);
 
         authorizeService.addPolicy(context, author1, Constants.WRITE, user);
@@ -1864,16 +1864,16 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         String token = getAuthToken(user.getEmail(), password);
 
         MvcResult mvcResult = getClient(getAuthToken(admin.getEmail(), password))
-                .perform(post("/api/core/relationships")
-                        .param("relationshipType",
-                                isAuthorOfPublicationRelationshipType.getID()
-                                        .toString())
-                        .contentType(MediaType.parseMediaType("text/uri-list"))
-                        .content(
-                                "https://localhost:8080/spring-rest/api/core/items/" + publication1.getID() + "\n" +
-                                        "https://localhost:8080/spring-rest/api/core/items/" + author1.getID()))
-                .andExpect(status().isCreated())
-                .andReturn();
+            .perform(post("/api/core/relationships")
+                       .param("relationshipType",
+                              isAuthorOfPublicationRelationshipType.getID()
+                                                                   .toString())
+                       .contentType(MediaType.parseMediaType("text/uri-list"))
+                       .content(
+                           "https://localhost:8080/spring-rest/api/core/items/" + publication1.getID() + "\n" +
+                               "https://localhost:8080/spring-rest/api/core/items/" + author1.getID()))
+          .andExpect(status().isCreated())
+          .andReturn();
 
         ObjectMapper mapper = new ObjectMapper();
         String content = mvcResult.getResponse().getContentAsString();
@@ -1887,9 +1887,9 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                 .andReturn();
         //verify change and other not changed
         getClient(token).perform(get("/api/core/relationships/" + id))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.leftId", is(publication2.getID().toString())))
-                .andExpect(jsonPath("$.rightId", is(author1.getID().toString())));
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.leftId", is(publication2.getID().toString())))
+                        .andExpect(jsonPath("$.rightId", is(author1.getID().toString())));
     }
 
 
@@ -1904,48 +1904,48 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         context.turnOffAuthorisationSystem();
 
         parentCommunity = CommunityBuilder.createCommunity(context)
-                .withName("Parent Community")
-                .build();
+                                          .withName("Parent Community")
+                                          .build();
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
-                .withName("Sub Community")
-                .build();
+                                           .withName("Sub Community")
+                                           .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
         Collection col3 = CollectionBuilder.createCollection(context, child1).withName("OrgUnits").build();
 
         Item author1 = ItemBuilder.createItem(context, col1)
-                .withTitle("Author1")
-                .withIssueDate("2017-10-17")
-                .withAuthor("Smith, Donald")
-                .withRelationshipType("Person")
-                .build();
+                                  .withTitle("Author1")
+                                  .withIssueDate("2017-10-17")
+                                  .withAuthor("Smith, Donald")
+                                  .withRelationshipType("Person")
+                                  .build();
 
         Item author2 = ItemBuilder.createItem(context, col1)
-                .withTitle("Author2")
-                .withIssueDate("2017-10-12")
-                .withAuthor("Smith, Donalaze")
-                .withRelationshipType("Person")
-                .build();
+                                  .withTitle("Author2")
+                                  .withIssueDate("2017-10-12")
+                                  .withAuthor("Smith, Donalaze")
+                                  .withRelationshipType("Person")
+                                  .build();
 
         Item publication = ItemBuilder.createItem(context, col3)
-                .withTitle("Publication1")
-                .withAuthor("Testy, TEst")
-                .withIssueDate("2015-01-01")
-                .withRelationshipType("Publication")
-                .build();
+                                      .withTitle("Publication1")
+                                      .withAuthor("Testy, TEst")
+                                      .withIssueDate("2015-01-01")
+                                      .withRelationshipType("Publication")
+                                      .build();
 
         RelationshipType isAuthorOfPublicationRelationshipType = relationshipTypeService
-                .findbyTypesAndLabels(context, entityTypeService.findByEntityType(context, "Publication"),
-                        entityTypeService.findByEntityType(context, "Person"),
-                        "isAuthorOfPublication", "isPublicationOfAuthor");
+            .findbyTypesAndLabels(context, entityTypeService.findByEntityType(context, "Publication"),
+                                  entityTypeService.findByEntityType(context, "Person"),
+                                  "isAuthorOfPublication", "isPublicationOfAuthor");
 
 
 
         EPerson user = EPersonBuilder.createEPerson(context)
-                .withNameInMetadata("first", "last")
-                .withEmail("testaze@gmail.com")
-                .withPassword(password)
-                .withLanguage(I18nUtil.getDefaultLocale().getLanguage())
-                .build();
+                                     .withNameInMetadata("first", "last")
+                                     .withEmail("testaze@gmail.com")
+                                     .withPassword(password)
+                                     .withLanguage(I18nUtil.getDefaultLocale().getLanguage())
+                                     .build();
         context.setCurrentUser(user);
 
         context.restoreAuthSystemState();
@@ -1953,15 +1953,15 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         String token = getAuthToken(admin.getEmail(), password);
 
         MvcResult mvcResult = getClient(token).perform(post("/api/core/relationships")
-                .param("relationshipType",
-                        isAuthorOfPublicationRelationshipType.getID()
-                                .toString())
-                .contentType(MediaType.parseMediaType("text/uri-list"))
-                .content(
-                        "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
-                                "https://localhost:8080/spring-rest/api/core/items/" + author1.getID()))
-                .andExpect(status().isCreated())
-                .andReturn();
+                                                           .param("relationshipType",
+                                                                  isAuthorOfPublicationRelationshipType.getID()
+                                                                                                       .toString())
+                                                           .contentType(MediaType.parseMediaType("text/uri-list"))
+                                                           .content(
+                                                               "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
+                                                                   "https://localhost:8080/spring-rest/api/core/items/" + author1.getID()))
+                                              .andExpect(status().isCreated())
+                                              .andReturn();
 
         ObjectMapper mapper = new ObjectMapper();
         String content = mvcResult.getResponse().getContentAsString();
@@ -1992,49 +1992,49 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         context.turnOffAuthorisationSystem();
 
         parentCommunity = CommunityBuilder.createCommunity(context)
-                .withName("Parent Community")
-                .build();
+                                          .withName("Parent Community")
+                                          .build();
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
-                .withName("Sub Community")
-                .build();
+                                           .withName("Sub Community")
+                                           .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
         Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
         Collection col3 = CollectionBuilder.createCollection(context, child1).withName("OrgUnits").build();
 
         Item author1 = ItemBuilder.createItem(context, col1)
-                .withTitle("Author1")
-                .withIssueDate("2017-10-17")
-                .withAuthor("Smith, Donald")
-                .withRelationshipType("Person")
-                .build();
+                                  .withTitle("Author1")
+                                  .withIssueDate("2017-10-17")
+                                  .withAuthor("Smith, Donald")
+                                  .withRelationshipType("Person")
+                                  .build();
 
         Item author2 = ItemBuilder.createItem(context, col1)
-                .withTitle("Author2")
-                .withIssueDate("2017-10-12")
-                .withAuthor("Smith, Donalaze")
-                .withRelationshipType("Person")
-                .build();
+                                  .withTitle("Author2")
+                                  .withIssueDate("2017-10-12")
+                                  .withAuthor("Smith, Donalaze")
+                                  .withRelationshipType("Person")
+                                  .build();
 
         Item publication = ItemBuilder.createItem(context, col3)
-                .withTitle("Publication1")
-                .withAuthor("Testy, TEst")
-                .withIssueDate("2015-01-01")
-                .withRelationshipType("Publication")
-                .build();
+                                      .withTitle("Publication1")
+                                      .withAuthor("Testy, TEst")
+                                      .withIssueDate("2015-01-01")
+                                      .withRelationshipType("Publication")
+                                      .build();
 
         RelationshipType isAuthorOfPublicationRelationshipType = relationshipTypeService
-                .findbyTypesAndLabels(context, entityTypeService.findByEntityType(context, "Publication"),
-                        entityTypeService.findByEntityType(context, "Person"),
-                        "isAuthorOfPublication", "isPublicationOfAuthor");
+            .findbyTypesAndLabels(context, entityTypeService.findByEntityType(context, "Publication"),
+                                  entityTypeService.findByEntityType(context, "Person"),
+                                  "isAuthorOfPublication", "isPublicationOfAuthor");
 
 
 
         EPerson user = EPersonBuilder.createEPerson(context)
-                .withNameInMetadata("first", "last")
-                .withEmail("testaze@gmail.com")
-                .withPassword(password)
-                .withLanguage(I18nUtil.getDefaultLocale().getLanguage())
-                .build();
+                                     .withNameInMetadata("first", "last")
+                                     .withEmail("testaze@gmail.com")
+                                     .withPassword(password)
+                                     .withLanguage(I18nUtil.getDefaultLocale().getLanguage())
+                                     .build();
         context.setCurrentUser(user);
 
         authorizeService.addPolicy(context, author1, Constants.WRITE, user);
@@ -2044,15 +2044,15 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         String token = getAuthToken(admin.getEmail(), password);
 
         MvcResult mvcResult = getClient(token).perform(post("/api/core/relationships")
-                .param("relationshipType",
-                        isAuthorOfPublicationRelationshipType.getID()
-                                .toString())
-                .contentType(MediaType.parseMediaType("text/uri-list"))
-                .content(
-                        "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
-                                "https://localhost:8080/spring-rest/api/core/items/" + author1.getID()))
-                .andExpect(status().isCreated())
-                .andReturn();
+                                                           .param("relationshipType",
+                                                                  isAuthorOfPublicationRelationshipType.getID()
+                                                                                                       .toString())
+                                                           .contentType(MediaType.parseMediaType("text/uri-list"))
+                                                           .content(
+                                                               "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
+                                                                   "https://localhost:8080/spring-rest/api/core/items/" + author1.getID()))
+                                              .andExpect(status().isCreated())
+                                              .andReturn();
 
         ObjectMapper mapper = new ObjectMapper();
         String content = mvcResult.getResponse().getContentAsString();
@@ -2083,47 +2083,47 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         context.turnOffAuthorisationSystem();
 
         parentCommunity = CommunityBuilder.createCommunity(context)
-                .withName("Parent Community")
-                .build();
+                                          .withName("Parent Community")
+                                          .build();
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
-                .withName("Sub Community")
-                .build();
+                                           .withName("Sub Community")
+                                           .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
         Collection col3 = CollectionBuilder.createCollection(context, child1).withName("OrgUnits").build();
 
         Item author1 = ItemBuilder.createItem(context, col1)
-                .withTitle("Author1")
-                .withIssueDate("2017-10-17")
-                .withAuthor("Smith, Donald")
-                .withRelationshipType("Person")
-                .build();
+                                  .withTitle("Author1")
+                                  .withIssueDate("2017-10-17")
+                                  .withAuthor("Smith, Donald")
+                                  .withRelationshipType("Person")
+                                  .build();
 
         Item publication1 = ItemBuilder.createItem(context, col3)
-                .withTitle("Publication1")
-                .withAuthor("Testy, TEst")
-                .withIssueDate("2015-01-01")
-                .withRelationshipType("Publication")
-                .build();
+                                       .withTitle("Publication1")
+                                       .withAuthor("Testy, TEst")
+                                       .withIssueDate("2015-01-01")
+                                       .withRelationshipType("Publication")
+                                       .build();
         Item publication2 = ItemBuilder.createItem(context, col3)
-                .withTitle("Publication2")
-                .withAuthor("Testy, TEstzeaze")
-                .withIssueDate("2015-01-01")
-                .withRelationshipType("Publication")
-                .build();
+                                       .withTitle("Publication2")
+                                       .withAuthor("Testy, TEstzeaze")
+                                       .withIssueDate("2015-01-01")
+                                       .withRelationshipType("Publication")
+                                       .build();
 
         RelationshipType isAuthorOfPublicationRelationshipType = relationshipTypeService
-                .findbyTypesAndLabels(context, entityTypeService.findByEntityType(context, "Publication"),
-                        entityTypeService.findByEntityType(context, "Person"),
-                        "isAuthorOfPublication", "isPublicationOfAuthor");
+            .findbyTypesAndLabels(context, entityTypeService.findByEntityType(context, "Publication"),
+                                  entityTypeService.findByEntityType(context, "Person"),
+                                  "isAuthorOfPublication", "isPublicationOfAuthor");
 
 
 
         EPerson user = EPersonBuilder.createEPerson(context)
-                .withNameInMetadata("first", "last")
-                .withEmail("testaze@gmail.com")
-                .withPassword(password)
-                .withLanguage(I18nUtil.getDefaultLocale().getLanguage())
-                .build();
+                                     .withNameInMetadata("first", "last")
+                                     .withEmail("testaze@gmail.com")
+                                     .withPassword(password)
+                                     .withLanguage(I18nUtil.getDefaultLocale().getLanguage())
+                                     .build();
         context.setCurrentUser(user);
 
         authorizeService.addPolicy(context, publication1, Constants.WRITE, user);
@@ -2133,15 +2133,15 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         context.restoreAuthSystemState();
 
         MvcResult mvcResult = getClient(token).perform(post("/api/core/relationships")
-                .param("relationshipType",
-                        isAuthorOfPublicationRelationshipType.getID()
-                                .toString())
-                .contentType(MediaType.parseMediaType("text/uri-list"))
-                .content(
-                        "https://localhost:8080/spring-rest/api/core/items/" + publication1.getID() + "\n" +
-                                "https://localhost:8080/spring-rest/api/core/items/" + author1.getID()))
-                .andExpect(status().isCreated())
-                .andReturn();
+                                                           .param("relationshipType",
+                                                                  isAuthorOfPublicationRelationshipType.getID()
+                                                                                                       .toString())
+                                                           .contentType(MediaType.parseMediaType("text/uri-list"))
+                                                           .content(
+                                                               "https://localhost:8080/spring-rest/api/core/items/" + publication1.getID() + "\n" +
+                                                                   "https://localhost:8080/spring-rest/api/core/items/" + author1.getID()))
+                                              .andExpect(status().isCreated())
+                                              .andReturn();
 
         ObjectMapper mapper = new ObjectMapper();
         String content = mvcResult.getResponse().getContentAsString();
@@ -2155,9 +2155,9 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                 .andReturn();
         //verify not changed
         getClient(token).perform(get("/api/core/relationships/" + id))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.leftId", is(publication1.getID().toString())))
-                .andExpect(jsonPath("$.rightId", is(author1.getID().toString())));
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.leftId", is(publication1.getID().toString())))
+                        .andExpect(jsonPath("$.rightId", is(author1.getID().toString())));
 
     }
 

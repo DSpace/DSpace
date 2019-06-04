@@ -94,7 +94,7 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
 
     @Override
     protected RelationshipRest createAndReturn(Context context, List<String> stringList)
-            throws AuthorizeException, SQLException, RepositoryMethodNotImplementedException {
+        throws AuthorizeException, SQLException, RepositoryMethodNotImplementedException {
 
         HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
         List<DSpaceObject> list = utils.constructDSpaceObjectList(context, stringList);
@@ -102,13 +102,13 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
             Item leftItem = (Item) list.get(0);
             Item rightItem = (Item) list.get(1);
             RelationshipType relationshipType = relationshipTypeService
-                    .find(context, Integer.parseInt(req.getParameter("relationshipType")));
+                .find(context, Integer.parseInt(req.getParameter("relationshipType")));
 
             EPerson ePerson = context.getCurrentUser();
             if (authorizeService.authorizeActionBoolean(context, leftItem, Constants.WRITE) ||
-                    authorizeService.authorizeActionBoolean(context, rightItem, Constants.WRITE)) {
+                authorizeService.authorizeActionBoolean(context, rightItem, Constants.WRITE)) {
                 Relationship relationship = relationshipService.create(context, leftItem, rightItem,
-                        relationshipType, 0, 0);
+                                                                       relationshipType, 0, 0);
                 // The above if check deals with the case that a Relationship can be created if the user has write
                 // rights on one of the two items. The following updateItem calls can however call the
                 // ItemService.update() functions which would fail if the user doesn't have permission on both items.
@@ -206,10 +206,10 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
     private boolean isAllowedToModifyRelationship(Context context, Relationship relationship, Item leftItem,
                                                   Item rightItem) throws SQLException {
         return (authorizeService.authorizeActionBoolean(context, leftItem, Constants.WRITE) ||
-                authorizeService.authorizeActionBoolean(context, rightItem, Constants.WRITE)) &&
-                (authorizeService.authorizeActionBoolean(context, relationship.getLeftItem(), Constants.WRITE) ||
-                        authorizeService.authorizeActionBoolean(context, relationship.getRightItem(), Constants.WRITE)
-                );
+            authorizeService.authorizeActionBoolean(context, rightItem, Constants.WRITE)) &&
+            (authorizeService.authorizeActionBoolean(context, relationship.getLeftItem(), Constants.WRITE) ||
+            authorizeService.authorizeActionBoolean(context, relationship.getRightItem(), Constants.WRITE)
+            );
     }
 
     @Override

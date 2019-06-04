@@ -52,7 +52,7 @@ public class RelationshipRestController {
      * identifier (digits or uuid)
      */
     private static final String REGEX_REQUESTMAPPING_LABEL = "/{label:^(?!^\\d+$)" +
-            "(?!^[0-9a-fxA-FX]{8}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{12}$)[\\w+\\-]+$+}";
+        "(?!^[0-9a-fxA-FX]{8}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{12}$)[\\w+\\-]+$+}";
 
     /**
      * Regular expression in the request mapping to accept number as identifier
@@ -99,7 +99,7 @@ public class RelationshipRestController {
                                                        HttpServletRequest request, @PathVariable String label,
                                                        @RequestParam(name = "dso", required = false) String dsoId,
                                                        Pageable pageable)
-            throws Exception {
+        throws Exception {
 
         Context context = ContextUtil.obtainContext(request);
 
@@ -115,7 +115,7 @@ public class RelationshipRestController {
             }
             for (RelationshipType relationshipType : relationshipTypeList) {
                 relationships.addAll(relationshipService.findByItemAndRelationshipType(context,
-                        item, relationshipType));
+                                                                                       item, relationshipType));
             }
         } else {
             for (RelationshipType relationshipType : relationshipTypeList) {
@@ -134,7 +134,7 @@ public class RelationshipRestController {
         relationshipRestWrapper.setRelationshipRestList(relationshipRests);
 
         RelationshipResourceWrapper relationshipResourceWrapper = new RelationshipResourceWrapper(
-                relationshipRestWrapper, utils, relationshipRests.size(), pageable);
+            relationshipRestWrapper, utils, relationshipRests.size(), pageable);
 
         halLinkService.addLinks(relationshipResourceWrapper, pageable);
         return relationshipResourceWrapper;
