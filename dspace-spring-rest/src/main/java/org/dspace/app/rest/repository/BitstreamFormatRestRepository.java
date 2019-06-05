@@ -7,27 +7,23 @@
  */
 package org.dspace.app.rest.repository;
 
-import org.dspace.app.rest.converter.BitstreamFormatConverter;
-import org.dspace.app.rest.exception.DSpaceBadRequestException;
-import org.dspace.app.rest.exception.UnprocessableEntityException;
-import org.dspace.app.rest.model.BitstreamFormatRest;
-import org.dspace.app.rest.model.hateoas.BitstreamFormatResource;
-
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.BitstreamFormat;
-import org.dspace.content.service.BitstreamFormatService;
-import org.dspace.core.Context;
-
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
-
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
+import org.dspace.app.rest.converter.BitstreamFormatConverter;
+import org.dspace.app.rest.exception.DSpaceBadRequestException;
+import org.dspace.app.rest.exception.UnprocessableEntityException;
+import org.dspace.app.rest.model.BitstreamFormatRest;
+import org.dspace.app.rest.model.hateoas.BitstreamFormatResource;
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.BitstreamFormat;
+import org.dspace.content.service.BitstreamFormatService;
+import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -166,8 +162,8 @@ public class BitstreamFormatRestRepository extends DSpaceRestRepository<Bitstrea
      * @param bitstreamFormat       BitstreamFormat that will be filled with rest request values
      * @param bitstreamFormatRest   BitstreamFormatRest object created, based on values in rest request
      */
-    private void setAllValuesOfRest
-            (Context c, BitstreamFormat bitstreamFormat, BitstreamFormatRest bitstreamFormatRest) {
+    private void setAllValuesOfRest(Context c, BitstreamFormat bitstreamFormat,
+                                    BitstreamFormatRest bitstreamFormatRest) {
         try {
             bitstreamFormat.setShortDescription(c, bitstreamFormatRest.getShortDescription());
         } catch (SQLException e) {

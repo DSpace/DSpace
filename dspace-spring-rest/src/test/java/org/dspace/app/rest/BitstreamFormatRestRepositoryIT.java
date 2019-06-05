@@ -10,30 +10,28 @@ package org.dspace.app.rest;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.startsWith;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import org.dspace.app.rest.builder.BitstreamFormatBuilder;
-import org.dspace.app.rest.builder.EPersonBuilder;
-import org.dspace.app.rest.converter.BitstreamFormatConverter;
-import org.dspace.app.rest.matcher.BitstreamFormatMatcher;
-import org.dspace.app.rest.model.BitstreamFormatRest;
-import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
-
-import org.dspace.content.BitstreamFormat;
-import org.dspace.core.I18nUtil;
-import org.dspace.eperson.EPerson;
 
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Random;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.dspace.app.rest.builder.BitstreamFormatBuilder;
+import org.dspace.app.rest.builder.EPersonBuilder;
+import org.dspace.app.rest.converter.BitstreamFormatConverter;
+import org.dspace.app.rest.matcher.BitstreamFormatMatcher;
+import org.dspace.app.rest.model.BitstreamFormatRest;
+import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.content.BitstreamFormat;
+import org.dspace.core.I18nUtil;
+import org.dspace.eperson.EPerson;
 import org.hamcrest.Matchers;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -100,11 +98,13 @@ public class BitstreamFormatRestRepositoryIT extends AbstractControllerIntegrati
                 .withMimeType("application/octet-stream")
                 .withDescription("Description")
                 .build();
+        context.restoreAuthSystemState();
 
         getClient().perform(get("/api/core/bitstreamformats/" + bitstreamFormat.getID()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$.description", is(bitstreamFormat.getDescription())))
+                .andExpect(jsonPath("$.shortDescription", is(bitstreamFormat.getShortDescription())))
                 .andExpect(jsonPath("$.mimetype", is(bitstreamFormat.getMIMEType())))
                 .andExpect(jsonPath("$.type", is("bitstreamformat")))
                 .andExpect(jsonPath("$._links.self.href", startsWith(REST_SERVER_URL)))
@@ -114,9 +114,6 @@ public class BitstreamFormatRestRepositoryIT extends AbstractControllerIntegrati
 
     @Test
     public void findOneNonExistentIDInURL() throws Exception {
-        ObjectMapper mapper = new ObjectMapper();
-        BitstreamFormatRest bitstreamFormatRest = this.createRandomMockBitstreamRest(false);
-
         String nonExistentBitstreamFormatID = "404404404";
 
         getClient().perform(get("/api/core/bitstreamformats/" + nonExistentBitstreamFormatID))
@@ -142,6 +139,7 @@ public class BitstreamFormatRestRepositoryIT extends AbstractControllerIntegrati
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$.description", is(bitstreamFormatRest.getDescription())))
+                .andExpect(jsonPath("$.shortDescription", is(bitstreamFormatRest.getShortDescription())))
                 .andExpect(jsonPath("$.mimetype", is(bitstreamFormatRest.getMimetype())))
                 .andExpect(jsonPath("$.type", is("bitstreamformat")))
                 .andExpect(jsonPath("$._links.self.href", startsWith(REST_SERVER_URL)))
@@ -230,6 +228,7 @@ public class BitstreamFormatRestRepositoryIT extends AbstractControllerIntegrati
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$.description", is(bitstreamFormatRest.getDescription())))
+                .andExpect(jsonPath("$.shortDescription", is(bitstreamFormatRest.getShortDescription())))
                 .andExpect(jsonPath("$.mimetype", is(bitstreamFormatRest.getMimetype())))
                 .andExpect(jsonPath("$.type", is("bitstreamformat")))
                 .andExpect(jsonPath("$._links.self.href", startsWith(REST_SERVER_URL)))
