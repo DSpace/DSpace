@@ -7397,7 +7397,8 @@
 		
 		<property name="interceptors">  
   			<list>  
-    			<ref bean="openSessionInViewInterceptor" />  
+    			<ref bean="openSessionInViewInterceptor" />
+    			<ref bean="localeChangeInterceptor" />  
   			</list>  
 		</property>  
 	</bean>
@@ -7943,5 +7944,14 @@
     <bean id="openSessionInViewInterceptor"  
         class="org.springframework.orm.hibernate4.support.OpenSessionInViewInterceptor">  
         <property name="sessionFactory" ref="sessionFactory" />   
-    </bean>  
+    </bean>
+
+    <bean id="localeResolver" class="org.springframework.web.servlet.i18n.SessionLocaleResolver">
+        <property name="defaultLocale" value="en" />
+    </bean>
+  
+    <bean id="localeChangeInterceptor" class="org.springframework.web.servlet.i18n.LocaleChangeInterceptor">
+        <property name="paramName" value="locale" />
+    </bean>
+     
 </beans>
