@@ -12,6 +12,7 @@
 <%@ page import="java.time.format.DateTimeFormatter" %>
 <%@ page import="java.util.Map" %>
 <%@ page import="ua.edu.sumdu.essuir.entity.Speciality" %>
+<%@ page import="java.util.stream.Stream" %>
 <link rel="stylesheet" type="text/css" media="screen" href="<%= request.getContextPath() %>/static/webix/webix.css"/>
 <link rel="stylesheet" href="<%= request.getContextPath() %>/static/css/bootstrap/bootstrap.min.css"
       type="text/css"/>
@@ -45,7 +46,7 @@
 
 
 <dspace:layout locbar="nolink" title="Statistics" feedData="NONE">
-    <h2><%= request.getParameter("depositor")%></h2>
+    <h2><%=Stream.of(request.getParameter("depositor").split("//")).reduce((a, b) -> b).orElse("--")%></h2>
     <ul class="list-group">
         <c:forEach items="${data}" var="item">
             <li class="list-group-item">${item}</li>

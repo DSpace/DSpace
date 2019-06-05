@@ -1,10 +1,10 @@
 package ua.edu.sumdu.essuir.entity;
 
-import ua.edu.sumdu.essuir.cache.Author;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 public class Item {
@@ -24,6 +24,50 @@ public class Item {
     @Column(name = "withdrawn")
     private Boolean withdrawn;
 
+    @OneToMany(
+            mappedBy = "item",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.EAGER
+    )
+    @Where(clause = "metadata_field_id = 133")
+    private List<Metadatavalue> metadataFieldsForSpeciality = new ArrayList<>();
+
+    @OneToMany(
+            mappedBy = "item",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.EAGER
+    )
+    @Where(clause = "metadata_field_id = 134")
+    private List<Metadatavalue> metadataFieldsForPresentationDate = new ArrayList<>();
+
+    @OneToMany(
+            mappedBy = "item",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.EAGER
+    )
+    @Where(clause = "metadata_field_id = 25")
+    private List<Metadatavalue> metadataFieldsForLink = new ArrayList<>();
+
+    @OneToMany(
+            mappedBy = "item",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.EAGER
+    )
+    @Where(clause = "metadata_field_id = 64")
+    private List<Metadatavalue> metadataFieldsForTitle = new ArrayList<>();
+
+    @OneToMany(
+            mappedBy = "item",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.EAGER
+    )
+    @Where(clause = "metadata_field_id = 12")
+    private List<Metadatavalue> metadataFieldsForDateAvailable = new ArrayList<>();
 
     @Column(name = "last_modified")
     private LocalDateTime lastModified;
@@ -70,6 +114,34 @@ public class Item {
 
     public Boolean getDiscoverable() {
         return discoverable;
+    }
+
+    private String getMetadataFieldValue(List<Metadatavalue> values) {
+        return values.stream()
+                .filter(item -> item.getPlace() == 1 && item.getResourceTypeId() == 2)
+                .findAny()
+                .map(Metadatavalue::getTextValue)
+                .orElse("");
+    }
+
+    public String getSpecialityName() {
+        return getMetadataFieldValue(metadataFieldsForSpeciality);
+    }
+
+    public String getPresentationDate() {
+        return getMetadataFieldValue(metadataFieldsForPresentationDate);
+    }
+
+    public String getTitle() {
+        return getMetadataFieldValue(metadataFieldsForTitle);
+    }
+
+    public String getLink() {
+        return getMetadataFieldValue(metadataFieldsForLink);
+    }
+
+    public String getDateAvailable() {
+        return getMetadataFieldValue(metadataFieldsForDateAvailable);
     }
 
     public static final class Builder {

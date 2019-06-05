@@ -9,7 +9,7 @@ public class Chair {
     @JsonProperty("name")
     private String chairName;
     @JsonProperty("data")
-    private List<Person> staff;
+    private List<Depositor> staff;
 
     public Chair(String chairName) {
         this.chairName = chairName;
@@ -19,7 +19,7 @@ public class Chair {
     @JsonProperty("submission_count")
     public Integer getSubmissionCount() {
         Integer result = 0;
-        for (Person person : staff) {
+        for (Depositor person : staff) {
             result += person.getSubmissionCount();
         }
         return result;

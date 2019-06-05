@@ -189,9 +189,4 @@ public class EssuirUtils {
         AuthorCache.update();
         return findAuthor(surname, initials);
     }
-
-    public static Map<Speciality, Long> getSpecialityStatistics(LocalDate from, LocalDate to) {
-        return reportService.getSpecialityStatistics(from, to);
-    }
-
 }

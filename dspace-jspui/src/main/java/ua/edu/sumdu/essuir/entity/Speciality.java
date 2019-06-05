@@ -10,7 +10,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import javax.persistence.*;
 
 @Entity
-public class Speciality {
+public class Speciality implements Depositor {
     @Id
     @Column(name = "id")
     @JsonProperty("id")
@@ -47,6 +47,11 @@ public class Speciality {
 
     public Integer getId() {
         return id;
+    }
+
+    @Override
+    public Integer getSubmissionCount() {
+        return null;
     }
 
     public String getName() {

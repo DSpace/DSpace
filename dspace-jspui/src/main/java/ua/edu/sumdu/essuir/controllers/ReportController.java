@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 import ua.edu.sumdu.essuir.entity.Faculty;
+import ua.edu.sumdu.essuir.entity.Item;
 import ua.edu.sumdu.essuir.entity.Metadatavalue;
 import ua.edu.sumdu.essuir.repository.FacultyRepository;
 import ua.edu.sumdu.essuir.service.ReportService;
@@ -61,7 +62,7 @@ public class ReportController {
             if (AuthorizeManager.isAdmin(UIUtil.obtainContext(request))) {
                 LocalDate fromDate = LocalDate.parse(from, format);
                 LocalDate toDate = LocalDate.parse(to, format);
-                return generateResponse(reportService.getSpecialitySubmissionCountBetweenDates(fromDate, toDate));
+                return generateResponse(new ArrayList<>(reportService.getSpecialitySubmissionCountBetweenDates(fromDate, toDate)));
             }
         } catch (SQLException | JsonProcessingException e) {
             e.printStackTrace();
@@ -69,8 +70,8 @@ public class ReportController {
         return new JSONArray().toString();
     }
 
-    private String generateResponse(Map<String, Faculty>  submissions) throws JsonProcessingException {
-        ArrayList<Faculty> faculties = new ArrayList<>(submissions.values());
+    private String generateResponse(List<Faculty>  submissions) throws JsonProcessingException {
+        ArrayList<Faculty> faculties = new ArrayList<>(submissions);
         Collections.sort(faculties, new Comparator<Faculty>() {
             @Override
             public int compare(Faculty o1, Faculty o2) {
@@ -97,37 +98,25 @@ public class ReportController {
     }
 
     @RequestMapping(value = "/detailedReport", method = RequestMethod.GET)
-    public ModelAndView getDetailedReportForDepositor(@RequestParam("depositor") String depositor, ModelAndView model) {
-        Collection<Map<Integer, List<Metadatavalue>>> itemsInSpeciality;
-
+    public ModelAndView getDetailedReportForDepositor(@RequestParam(value = "from", defaultValue = "01.01.2010") String from, @RequestParam(value = "to", defaultValue = "01.01.2100") String to,@RequestParam("depositor") String depositor, ModelAndView model) {
+        List<Item> itemsInSpeciality;
+        LocalDate fromDate = LocalDate.parse(from, format);
+        LocalDate toDate = LocalDate.parse(to, format);
         if(depositor.equals("-")) {
-            itemsInSpeciality = reportService.getBacheoursWithoutSpeciality().values();
+            itemsInSpeciality = reportService.getBacheoursWithoutSpeciality();
         } else {
-            itemsInSpeciality = reportService.getItemsInSpeciality(depositor).values();
+            itemsInSpeciality = reportService.getItemsInSpeciality(depositor, fromDate, toDate);
         }
 
-
-        BiFunction<Map<Integer, List<Metadatavalue>>, Integer, String> extractItemDataByFieldId = (metadata, fieldId) -> metadata
-                .getOrDefault(fieldId, new ArrayList<>())
+        List<String> itemLinks = itemsInSpeciality
                 .stream()
-                .filter(item -> item.getPlace().equals(1))
-                .map(Metadatavalue::getTextValue)
-                .findAny()
-                .orElse("");
-
-
-        Function<Map<Integer, List<Metadatavalue>>, Pair<String, String>> extractItemNameAndLink = (metadata) ->
-                Pair.of(extractItemDataByFieldId.apply(metadata, 64), extractItemDataByFieldId.apply(metadata, 25));
-
-        List<String> collect = itemsInSpeciality
-                .stream()
-                .map(item -> extractItemNameAndLink.apply(item))
-                .map(item -> String.format("<a href = \"%s\">%s</a>", item.getRight(), item.getLeft()))
+                .sorted(Comparator.comparing(Item::getTitle))
+                .map(item -> String.format("<a href = \"%s\">%s</a>", item.getLink(), item.getTitle()))
                 .collect(Collectors.toList());
 
         model.setViewName("detailed-report");
 
-        model.addObject("data", collect);
+        model.addObject("data", itemLinks);
         return model;
     }
 }

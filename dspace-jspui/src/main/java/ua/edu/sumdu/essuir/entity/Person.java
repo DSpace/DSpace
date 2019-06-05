@@ -2,7 +2,7 @@ package ua.edu.sumdu.essuir.entity;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class Person {
+public class Person implements Depositor{
     @JsonProperty("name")
     private String name;
     @JsonProperty("submission_count")
@@ -13,10 +13,12 @@ public class Person {
         this.submissionCount = submissionCount;
     }
 
+    @Override
     public Integer getSubmissionCount() {
         return submissionCount;
     }
 
+    @Override
     public String getName() {
         return name;
     }
