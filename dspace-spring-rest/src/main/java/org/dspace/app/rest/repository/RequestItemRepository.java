@@ -8,15 +8,19 @@
 
 package org.dspace.app.rest.repository;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.UUID;
+import javax.servlet.http.HttpServletRequest;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.requestitem.RequestItem;
 import org.dspace.app.requestitem.service.RequestItemService;
 import org.dspace.app.rest.converter.RequestItemConverter;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
+import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.RequestItemRest;
 import org.dspace.app.rest.model.hateoas.RequestItemResource;
 import org.dspace.authorize.AuthorizeException;
@@ -28,7 +32,6 @@ import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.jdbc.UncategorizedSQLException;
 import org.springframework.stereotype.Component;
 
 /**
@@ -69,21 +72,59 @@ public class RequestItemRepository
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    /*
     @Override
-    public RequestItemRest save(Context context, RequestItemRest ri) {
+    public RequestItemRest save(Context context, RequestItemRest rir) {
         try {
             Bitstream bitstream = bitstreamService.find(context,
-                    UUID.fromString(ri.getBitstream().getUuid()));
+                    UUID.fromString(rir.getBitstream_id()));
             Item item = itemService.find(context,
-                    UUID.fromString(ri.getItem().getUuid()));
+                    UUID.fromString(rir.getItem_id()));
             requestItemService.createRequest(context, bitstream,
-                    item, ri.isAllfiles(), ri.getReqEmail(),
-                    ri.getReqName(), ri.getReqMessage());
+                    item, rir.isAllfiles(), rir.getRequest_email(),
+                    rir.getRequest_name(), rir.getRequest_message());
         } catch (SQLException ex) {
             LOG.error("New RequestItem not saved.", ex);
             throw new UncategorizedSQLException("New RequestItem save", null, ex);
         }
-        return ri;
+        return rir;
+    }
+    */
+
+    @Override
+    public RequestItemRest createAndReturn(Context ctx) {
+        // Fill a RequestItemRest from the client's HTTP request.
+        HttpServletRequest req = getRequestService()
+                .getCurrentRequest()
+                .getHttpServletRequest();
+        ObjectMapper mapper = new ObjectMapper();
+        RequestItemRest rir;
+        try {
+            rir = mapper.readValue(req.getInputStream(), RequestItemRest.class);
+        } catch (IOException ex) {
+            throw new UnprocessableEntityException("error parsing the body", ex);
+        }
+
+        // Create the item request model object from the REST object.
+        String token;
+        try {
+            Bitstream bitstream = bitstreamService.find(ctx,
+                    UUID.fromString(rir.getBitstream_id()));
+            Item item = itemService.find(ctx,
+                    UUID.fromString(rir.getItem_id()));
+            token = requestItemService.createRequest(ctx, bitstream, item,
+                    rir.isAllfiles(), rir.getRequest_email(), rir.getRequest_name(),
+                    rir.getRequest_message());
+        } catch (SQLException ex) {
+            throw new RuntimeException("Item request not created.", ex);
+        }
+
+
+        // Some fields are given values during creation, so return created request.
+        RequestItem ri = requestItemService.findByToken(ctx, token);
+        ri.setAccept_request(false); // Not accepted yet.  Must set:  DS-4032
+        requestItemService.update(ctx, ri);
+        return requestItemConverter.fromModel(ri);
     }
 
     // NOTICE:  there is no service method for this -- requests are never deleted?

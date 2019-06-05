@@ -60,49 +60,50 @@ public class RequestItemConverter
     @Override
     public RequestItemRest fromModel(RequestItem requestItem) {
         RequestItemRest requestItemRest = new RequestItemRest();
-        requestItemRest.setAcceptRequest(requestItem.isAccept_request());
+        requestItemRest.setAccept_request(requestItem.isAccept_request());
         requestItemRest.setAllfiles(requestItem.isAllfiles());
-        requestItemRest.setBitstream(bitstreamConverter.fromModel(requestItem.getBitstream()));
-        requestItemRest.setDecisionDate(requestItem.getDecision_date());
+        requestItemRest.setBitstream_id(requestItem.getBitstream().getID().toString());
+        requestItemRest.setDecision_date(requestItem.getDecision_date());
         requestItemRest.setExpires(requestItem.getExpires());
         requestItemRest.setId(requestItem.getID());
-        requestItemRest.setItem(itemConverter.fromModel(requestItem.getItem()));
-        requestItemRest.setReqEmail(requestItem.getReqEmail());
-        requestItemRest.setReqMessage(requestItem.getReqMessage());
-        requestItemRest.setReqName(requestItem.getReqName());
-        requestItemRest.setRequestDate(requestItem.getRequest_date());
+        requestItemRest.setItem_id(requestItem.getItem().getID().toString());
+        requestItemRest.setRequest_email(requestItem.getReqEmail());
+        requestItemRest.setRequest_message(requestItem.getReqMessage());
+        requestItemRest.setRequest_name(requestItem.getReqName());
+        requestItemRest.setRequest_date(requestItem.getRequest_date());
         requestItemRest.setToken(requestItem.getToken());
         return requestItemRest;
     }
 
     @Override
-    public RequestItem toModel(RequestItemRest obj) {
+    public RequestItem toModel(RequestItemRest rir) {
         HttpServletRequest request = requestService.getCurrentRequest().getHttpServletRequest();
         Context context = ContextUtil.obtainContext(request);
 
         // Did we receive a token?  That is:  are we updating an existing request?
-        String token = obj.getToken();
+        String token = rir.getToken();
         if (StringUtils.isBlank(token)) { // No token, so create a new request.
             try {
                 Bitstream bitstream = bitstreamService.find(context,
-                        UUID.fromString(obj.getBitstream().getUuid()));
+                        UUID.fromString(rir.getBitstream_id()));
                 Item item = itemService.find(context,
-                        UUID.fromString(obj.getItem().getUuid()));
+                        UUID.fromString(rir.getItem_id()));
                 token = requestItemService.createRequest(context,
                         bitstream,
                         item,
-                        obj.isAllfiles(),
-                        obj.getReqEmail(),
-                        obj.getReqName(),
-                        obj.getReqMessage());
+                        rir.isAllfiles(),
+                        rir.getRequest_email(),
+                        rir.getRequest_name(),
+                        rir.getRequest_message());
             } catch (SQLException ex) {
                 LOG.error(ex.getMessage(), ex);
             }
         } // Otherwise (we have a token) this is updating an existing request.
 
         RequestItem requestItem = requestItemService.findByToken(context, token);
-        requestItem.setAccept_request(obj.isAcceptRequest());
-        requestItem.setDecision_date(obj.getDecisionDate());
+        requestItem.setAccept_request(rir.isAccept_request());
+        requestItem.setDecision_date(rir.getDecision_date());
+        requestItemService.update(context, requestItem);
         return requestItem;
     }
 }

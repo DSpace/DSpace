@@ -9,7 +9,7 @@ package org.dspace.app.rest.model;
 
 import java.util.Date;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import org.dspace.app.rest.RestResourceController;
 
@@ -19,16 +19,20 @@ import org.dspace.app.rest.RestResourceController;
  *
  * @author Mark H. Wood <mwood@iupui.edu>
  */
+@LinksRest(links = {
+    @LinkRest(name = "bitstream", linkClass = BitstreamRest.class, method = "getUuid"),
+    @LinkRest(name = "item", linkClass = ItemRest.class, method = "getUuid")
+})
 public class RequestItemRest
         extends BaseObjectRest<Integer> {
     public static final String NAME = "copyrequest";
 
     public static final String CATEGORY = RestAddressableModel.TOOLS;
 
-    protected BitstreamRest bitstream;
+    protected String bitstream_id;
     protected Date decisionDate;
     protected Date expires;
-    protected ItemRest item;
+    protected String item_id;
     protected String reqEmail;
     protected String reqMessage;
     protected String reqName;
@@ -40,30 +44,28 @@ public class RequestItemRest
     /**
      * @return the bitstream requested.
      */
-    @LinkRest(linkClass = BitstreamRest.class)
-    @JsonIgnore
-    public BitstreamRest getBitstream() {
-        return bitstream;
+    public String getBitstream_id() {
+        return bitstream_id;
     }
 
     /**
-     * @param bitstream the bitstream requested.
+     * @param bitstream_id the bitstream requested.
      */
-    public void setBitstream(BitstreamRest bitstream) {
-        this.bitstream = bitstream;
+    public void setBitstream_id(String bitstream_id) {
+        this.bitstream_id = bitstream_id;
     }
 
     /**
      * @return the decisionDate
      */
-    public Date getDecisionDate() {
+    public Date getDecision_date() {
         return decisionDate;
     }
 
     /**
      * @param decided the decisionDate to set
      */
-    public void setDecisionDate(Date decided) {
+    public void setDecision_date(Date decided) {
         this.decisionDate = decided;
     }
 
@@ -84,72 +86,70 @@ public class RequestItemRest
     /**
      * @return the item requested.
      */
-    @LinkRest(linkClass = ItemRest.class)
-    @JsonIgnore
-    public ItemRest getItem() {
-        return item;
+    public String getItem_id() {
+        return item_id;
     }
 
     /**
-     * @param item the item requested.
+     * @param item_id the item requested.
      */
-    public void setItem(ItemRest item) {
-        this.item = item;
+    public void setItem_id(String item_id) {
+        this.item_id = item_id;
     }
 
     /**
      * @return the email address of the requester.
      */
-    public String getReqEmail() {
+    public String getRequest_email() {
         return reqEmail;
     }
 
     /**
      * @param email the email address of the requester.
      */
-    public void setReqEmail(String email) {
+    public void setRequest_email(String email) {
         this.reqEmail = email;
     }
 
     /**
      * @return the requester's message.
      */
-    public String getReqMessage() {
+    public String getRequest_message() {
         return reqMessage;
     }
 
     /**
      * @param message the requester's message.
      */
-    public void setReqMessage(String message) {
+    public void setRequest_message(String message) {
         this.reqMessage = message;
     }
 
     /**
      * @return the requester's name.
      */
-    public String getReqName() {
+    public String getRequest_name() {
         return reqName;
     }
 
     /**
      * @param name the requester's name.
      */
-    public void setReqName(String name) {
+    public void setRequest_name(String name) {
         this.reqName = name;
     }
 
     /**
      * @return the requestDate
      */
-    public Date getRequestDate() {
+    public Date getRequest_date() {
         return requestDate;
     }
 
     /**
      * @param requested the requestDate to set
      */
-    public void setRequestDate(Date requested) {
+    public void setRequest_date(Date requested) {
         this.requestDate = requested;
     }
 
@@ -170,14 +170,14 @@ public class RequestItemRest
     /**
      * @return true if the request has been accepted.
      */
-    public boolean isAcceptRequest() {
+    public boolean isAccept_request() {
         return acceptRequest;
     }
 
     /**
      * @param accepted true if the request has been accepted.
      */
-    public void setAcceptRequest(boolean accepted) {
+    public void setAccept_request(boolean accepted) {
         this.acceptRequest = accepted;
     }
 
@@ -210,6 +210,7 @@ public class RequestItemRest
     }
 
     @Override
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     public String getType() {
         return NAME;
     }
