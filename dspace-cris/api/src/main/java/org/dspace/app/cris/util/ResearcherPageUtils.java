@@ -397,21 +397,19 @@ return decorator.generateDisplayValue(alternativeName, rp);
 			ResearcherPage rp = (ResearcherPage) dso;
 			Map<String, String> extras = buildExtra(rp);
 
-			choiceList.add(new Choice(getPersistentIdentifier(rp), rp.getFullName(),getLabel(rp.getFullName(), rp), extras));
+			choiceList.add(new Choice(getPersistentIdentifier(rp), getLabel(rp.getFullName(), rp),rp.getFullName(), extras));
 			if (rp.getTranslatedName() != null
 					&& rp.getTranslatedName().getVisibility() == VisibilityConstants.PUBLIC
 					&& rp.getTranslatedName().getValue() != null) {
-				choiceList.add(new Choice(getPersistentIdentifier(rp), rp
-						.getTranslatedName().getValue(),
-						getLabel(rp.getTranslatedName()
-								.getValue(), rp), extras));
+				choiceList.add(new Choice(getPersistentIdentifier(rp),getLabel(rp.getTranslatedName()
+						.getValue(), rp), rp.getTranslatedName().getValue(),
+						 extras));
 			}
 			for (RestrictedField variant : rp.getVariants()) {
 				if (variant.getValue() != null
 						&& variant.getVisibility() == VisibilityConstants.PUBLIC) {
-					choiceList.add(new Choice(getPersistentIdentifier(rp), variant
-							.getValue(), getLabel(
-							variant.getValue(), rp), extras));
+					choiceList.add(new Choice(getPersistentIdentifier(rp), getLabel(
+							variant.getValue(), rp),variant.getValue(),  extras));
 				}
 			}
 	    }
