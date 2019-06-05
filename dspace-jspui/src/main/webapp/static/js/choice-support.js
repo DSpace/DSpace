@@ -341,12 +341,7 @@ function DSpaceChoicesLoad(form)
             }
             var ovalue = opt.getAttributeNode('value').value;
             var oauthority = opt.getAttributeNode('authority').value;
-            var re = /(.*)::(.*)::(.*)/; 
-            
-            var subst = '$3'; 
-             
-            var result = oauthority.replace(re, subst);
-            var option = new Option(olabel + '(' + result +')', ovalue);
+            var option = new Option(olabel, ovalue);
             option.authority = opt.getAttributeNode('authority').value;
             
             //transfer all data attributes on the option element 

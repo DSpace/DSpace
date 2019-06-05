@@ -24,11 +24,11 @@ public class BasicResearcherPageLabelDecorator implements IResearcherPageLabelDe
 	                            && !translatedName.getValue().isEmpty()
 	                            && translatedName.getVisibility() == VisibilityConstants.PUBLIC ? " "
 	                            + translatedName.getValue()
-	                            : "");
+	                            : "") + " (" + rp.getCrisID() + ")";
 	        }
 	        else
 	        {
-	            return alternativeName + " See \"" + rp.getFullName() + "\"";
+	            return alternativeName + " See \"" + rp.getFullName() + "\" (" + rp.getCrisID() + ")";
 	        }
 	}
 

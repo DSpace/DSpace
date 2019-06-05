@@ -176,7 +176,7 @@ public abstract class CRISAuthority<T extends ACrisObject> implements ChoiceAuth
     }
 
 	protected String getDisplayEntry(T cris) {
-		return cris.getName();
+		return getLabel(cris);
 	}    
     
     public abstract int getCRISTargetTypeID();
@@ -354,4 +354,10 @@ public abstract class CRISAuthority<T extends ACrisObject> implements ChoiceAuth
     }
     
     public abstract T getNewCrisObject();
+    
+    public String getLabel(T cris)
+        {
+            return cris.getName()
+                    + " (" + cris.getCrisID() + ")";
+        }
 }
