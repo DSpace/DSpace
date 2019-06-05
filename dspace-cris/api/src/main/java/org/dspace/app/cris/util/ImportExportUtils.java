@@ -183,6 +183,9 @@ public class ImportExportUtils {
 	public static final String PATH_DEFAULT_XML = ConfigurationManager.getProperty(CrisConstants.CFG_MODULE, "file.import.path")
 			+ "cris-data.csv";
 
+    public static final String PATH_EXPORT_EXCEL_DEFAULT = ConfigurationManager.getProperty(CrisConstants.CFG_MODULE, "file.export.path")
+            + "cris-data.xls";
+
 	/**
 	 * Write in the output stream the researcher pages contact data as an excel
 	 * file. The format of the exported Excel file is suitable for re-import in
