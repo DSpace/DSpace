@@ -139,32 +139,24 @@ public class ScriptCrisBulkExport {
         int entity = -1;
         ACO tmpCrisObject = null;
         
-        try
+        if (StringUtils.equalsIgnoreCase("rp", entityType))
         {
-            if (StringUtils.equalsIgnoreCase("rp", entityType))
-            {
-                tmpCrisObject = (ACO) new ResearcherPage();
-            }
-            else if (StringUtils.equalsIgnoreCase("ou", entityType))
-            {
-                tmpCrisObject = (ACO) new OrganizationUnit();
-            }
-            else if (StringUtils.equalsIgnoreCase("pj", entityType))
-            {
-                tmpCrisObject = (ACO) new Project();
-            }
-            else
-            {
-                ResearchObject tmp = ResearchObject.class.newInstance();
-                tmp.setTypo(applicationService.findTypoByShortName(
-                        DynamicObjectType.class, entityType));
-                tmpCrisObject = (ACO) new ResearchObject();
-            }
+            tmpCrisObject = (ACO) new ResearcherPage();
         }
-        catch (InstantiationException | IllegalAccessException e1)
+        else if (StringUtils.equalsIgnoreCase("ou", entityType))
         {
-            System.out.println(e1.getMessage());
-            System.exit(1);
+            tmpCrisObject = (ACO) new OrganizationUnit();
+        }
+        else if (StringUtils.equalsIgnoreCase("pj", entityType))
+        {
+            tmpCrisObject = (ACO) new Project();
+        }
+        else
+        {
+            ResearchObject tmp = new ResearchObject();
+            tmp.setTypo(applicationService
+                    .findTypoByShortName(DynamicObjectType.class, entityType));
+            tmpCrisObject = (ACO) tmp;
         }
         
         List<ACO> list = new ArrayList<ACO>();
