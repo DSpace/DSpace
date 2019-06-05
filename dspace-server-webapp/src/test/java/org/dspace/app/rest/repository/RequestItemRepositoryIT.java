@@ -7,31 +7,43 @@
  */
 package org.dspace.app.rest.repository;
 
-import static org.junit.Assert.assertEquals;
+import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.isEmptyOrNullString;
+import static org.hamcrest.Matchers.not;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.sql.SQLException;
+import java.util.Map;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.app.requestitem.RequestItem;
 import org.dspace.builder.BitstreamBuilder;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.ItemBuilder;
 import org.dspace.builder.RequestItemBuilder;
+import org.dspace.app.requestitem.service.RequestItemService;
+import org.dspace.app.rest.converter.RequestItemConverter;
 import org.dspace.app.rest.matcher.RequestCopyMatcher;
 import org.dspace.app.rest.model.RequestItemRest;
-import org.dspace.app.rest.repository.RequestItemRepository;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
-import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.hamcrest.Matchers;
+import org.junit.Before;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.web.servlet.MvcResult;
 
 /**
  *
@@ -43,6 +55,20 @@ public class RequestItemRepositoryIT
     public static final String URI_ROOT = REST_SERVER_URL
             + RequestItemRest.CATEGORY + '/'
             + RequestItemRest.NAME + 's';
+
+    @Autowired(required = true)
+    RequestItemConverter requestItemConverter;
+
+    @Autowired(required = true)
+    RequestItemService requestItemService;
+
+    @Before
+    public void init() {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context).withName(
+                "Parent Community").build();
+        context.restoreAuthSystemState();
+    }
 
     /**
      * Test of findOne method, of class RequestItemRepository.
@@ -56,9 +82,7 @@ public class RequestItemRepositoryIT
         context.turnOffAuthorisationSystem();
 
         // Create necessary supporting objects.
-        Community community = CommunityBuilder.createCommunity(context)
-                .build();
-        Collection collection = CollectionBuilder.createCollection(context, community)
+        Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
                 .build();
         Item item = ItemBuilder.createItem(context, collection)
                 .build();
@@ -71,7 +95,7 @@ public class RequestItemRepositoryIT
                 .createRequestItem(context, item, bitstream)
                 .build();
 
-        // Test:  was it created correctly?
+        // Test:  can we find it?
         final String uri = URI_ROOT + '/'
                 + request.getToken();
         getClient().perform(get(uri))
@@ -105,69 +129,85 @@ public class RequestItemRepositoryIT
 */
 
     /**
-     * Test of save method, of class RequestItemRepository.
+     * Test of createAndReturn method, of class RequestItemRepository.
+     *
+     * @throws java.sql.SQLException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
+     * @throws java.io.IOException passed through.
      */
-/*
     @Test
-    public void testSave()
-    {
-        System.out.println("save");
-        Context context = null;
-        RequestItemRest ri = null;
-        RequestItemRepository instance = new RequestItemRepository();
-        RequestItemRest expResult = null;
-        RequestItemRest result = instance.save(context, ri);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+    public void testCreateAndReturn()
+            throws SQLException, AuthorizeException, IOException, Exception {
+        System.out.println("testCreateAndReturn");
+
+        context.turnOffAuthorisationSystem();
+
+        // Create some necessary objects.
+        Collection col = CollectionBuilder.createCollection(context,
+                parentCommunity).build();
+        Item item = ItemBuilder.createItem(context, col).build();
+        InputStream is = new ByteArrayInputStream(new byte[0]);
+        Bitstream bitstream = BitstreamBuilder.createBitstream(context, item, is)
+                .withName("/dev/null")
+                .withMimeType("text/plain")
+                .build();
+
+        // Fake up a request in REST form.
+        RequestItemRest rir = new RequestItemRest();
+        rir.setBitstreamId(bitstream.getID().toString());
+        rir.setItemId(item.getID().toString());
+        rir.setRequestEmail(RequestItemBuilder.REQ_EMAIL);
+        rir.setRequestMessage(RequestItemBuilder.REQ_MESSAGE);
+        rir.setRequestName(RequestItemBuilder.REQ_NAME);
+        rir.setAllfiles(false);
+
+        // Create it and see if it was created correctly.
+        ObjectMapper mapper = new ObjectMapper();
+        String authToken = getAuthToken(admin.getEmail(), password);
+        MvcResult mvcResult = getClient(authToken)
+                .perform(post(URI_ROOT)
+                        .content(mapper.writeValueAsBytes(rir))
+                        .contentType(contentType))
+                .andExpect(status().isCreated())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$", Matchers.allOf(
+                        hasJsonPath("$.id", not(isEmptyOrNullString())),
+                        hasJsonPath("$.type", is(RequestItemRest.NAME)),
+                        hasJsonPath("$.token", not(isEmptyOrNullString())),
+                        hasJsonPath("$.request_email", is(RequestItemBuilder.REQ_EMAIL)),
+                        hasJsonPath("$.request_message", is(RequestItemBuilder.REQ_MESSAGE)),
+                        hasJsonPath("$.request_name", is(RequestItemBuilder.REQ_NAME)),
+                        hasJsonPath("$.allfiles", is(false)),
+                        hasJsonPath("$.request_date", not(isEmptyOrNullString())), // TODO should be an ISO datetime
+                        hasJsonPath("$._links.self.href", not(isEmptyOrNullString()))
+                )))
+                .andReturn();
+
+        // Clean up the created request.
+        String content = mvcResult.getResponse().getContentAsString();
+        Map<String,Object> map = mapper.readValue(content, Map.class);
+        String requestToken = String.valueOf(map.get("token"));
+        RequestItem ri = requestItemService.findByToken(context, requestToken);
+        requestItemService.delete(context, ri);
+
+        context.restoreAuthSystemState();
     }
-*/
 
     /**
      * Test of delete method, of class RequestItemRepository.
      */
-/*
+    /*
     @Test
     public void testDelete()
-            throws Exception
+    throws Exception
     {
-        System.out.println("delete");
-        Context context = null;
-        String token = "";
-        RequestItemRepository instance = new RequestItemRepository();
-        instance.delete(context, token);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+    System.out.println("delete");
+    Context context = null;
+    String token = "";
+    RequestItemRepository instance = new RequestItemRepository();
+    instance.delete(context, token);
+    // TODO review the generated test code and remove the default call to fail.
+    fail("The test case is a prototype.");
     }
-*/
-
-    /**
-     * Test of getDomainClass method, of class RequestItemRepository.
      */
-    @Test
-    public void testGetDomainClass() {
-        System.out.println("getDomainClass");
-        RequestItemRepository instance = new RequestItemRepository();
-        Class instanceClass = instance.getDomainClass();
-        assertEquals("Wrong domain class", RequestItemRest.class, instanceClass);
-    }
-
-    /**
-     * Test of wrapResource method, of class RequestItemRepository.
-     */
-/*
-    @Test
-    public void testWrapResource()
-    {
-        System.out.println("wrapResource");
-        RequestItemRest model = null;
-        String[] rels = null;
-        RequestItemRepository instance = new RequestItemRepository();
-        RequestItemResource expResult = null;
-        RequestItemResource result = instance.wrapResource(model, rels);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-*/
 }

@@ -33,7 +33,6 @@ import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.jdbc.UncategorizedSQLException;
 import org.springframework.stereotype.Component;
 
 /**
@@ -75,42 +74,39 @@ public class RequestItemRepository
     }
 
     @Override
-    protected RequestItemRest createAndReturn(Context context) {
-        // Map the user's request to a REST object.
-        HttpServletRequest httpRequest = getRequestService().getCurrentRequest()
+    public RequestItemRest createAndReturn(Context ctx) {
+        // Fill a RequestItemRest from the client's HTTP request.
+        HttpServletRequest req = getRequestService()
+                .getCurrentRequest()
                 .getHttpServletRequest();
         ObjectMapper mapper = new ObjectMapper();
-        RequestItemRest requestItemRest = null;
+        RequestItemRest rir;
         try {
-            ServletInputStream input = httpRequest.getInputStream();
-            requestItemRest = mapper.readValue(input, RequestItemRest.class);
+            rir = mapper.readValue(req.getInputStream(), RequestItemRest.class);
         } catch (IOException ex) {
-            throw new UnprocessableEntityException("Error parsing request body", ex);
+            throw new UnprocessableEntityException("error parsing the body", ex);
         }
 
-        // Create the DSpace item request object.
-        Bitstream bitstream;
-        Item item;
-        String itemRequestId;
+        // Create the item request model object from the REST object.
+        String token;
         try {
-            bitstream = bitstreamService.find(context,
-                    UUID.fromString(requestItemRest.getBitstream().getUuid()));
-            item = itemService.find(context,
-                    UUID.fromString(requestItemRest.getItem().getUuid()));
-            itemRequestId = requestItemService.createRequest(context,
-                    bitstream, item,
-                    requestItemRest.isAllfiles(),
-                    requestItemRest.getReqEmail(),
-                    requestItemRest.getReqName(),
-                    requestItemRest.getReqMessage());
+            Bitstream bitstream = bitstreamService.find(ctx,
+                    UUID.fromString(rir.getBitstreamId()));
+            Item item = itemService.find(ctx,
+                    UUID.fromString(rir.getItemId()));
+            token = requestItemService.createRequest(ctx, bitstream, item,
+                    rir.isAllfiles(), rir.getRequestEmail(), rir.getRequestName(),
+                    rir.getRequestMessage());
         } catch (SQLException ex) {
-            LOG.error("New RequestItem not saved.", ex);
-            throw new UncategorizedSQLException("New RequestItem save", null, ex);
+            throw new RuntimeException("Item request not created.", ex);
         }
 
-        // Link the REST object to the model object, and return it.
-        requestItemRest.setToken(itemRequestId);
-        return requestItemRest;
+
+        // Some fields are given values during creation, so return created request.
+        RequestItem ri = requestItemService.findByToken(ctx, token);
+        ri.setAccept_request(false); // Not accepted yet.  Must set:  DS-4032
+        requestItemService.update(ctx, ri);
+        return requestItemConverter.convert(ri, new DefaultProjection());
     }
 
     // NOTICE:  there is no service method for this -- requests are never deleted?
