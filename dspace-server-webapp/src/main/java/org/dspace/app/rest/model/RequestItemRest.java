@@ -9,7 +9,8 @@ package org.dspace.app.rest.model;
 
 import java.util.Date;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import org.dspace.app.rest.RestResourceController;
 
 /**
@@ -18,16 +19,20 @@ import org.dspace.app.rest.RestResourceController;
  *
  * @author Mark H. Wood <mwood@iupui.edu>
  */
+@LinksRest(links = {
+    @LinkRest(name = "bitstream", method = "getUuid"),
+    @LinkRest(name = "item", method = "getUuid")
+})
 public class RequestItemRest
         extends BaseObjectRest<Integer> {
     public static final String NAME = "copyrequest";
 
     public static final String CATEGORY = RestAddressableModel.TOOLS;
 
-    protected BitstreamRest bitstream;
+    protected String bitstream_id;
     protected Date decisionDate;
     protected Date expires;
-    protected ItemRest item;
+    protected String item_id;
     protected String reqEmail;
     protected String reqMessage;
     protected String reqName;
@@ -39,17 +44,15 @@ public class RequestItemRest
     /**
      * @return the bitstream requested.
      */
-    @LinkRest
-    @JsonIgnore
-    public BitstreamRest getBitstream() {
-        return bitstream;
+    public String getBitstreamId() {
+        return bitstream_id;
     }
 
     /**
-     * @param bitstream the bitstream requested.
+     * @param bitstream_id the bitstream requested.
      */
-    public void setBitstream(BitstreamRest bitstream) {
-        this.bitstream = bitstream;
+    public void setBitstreamId(String bitstream_id) {
+        this.bitstream_id = bitstream_id;
     }
 
     /**
@@ -83,58 +86,56 @@ public class RequestItemRest
     /**
      * @return the item requested.
      */
-    @LinkRest
-    @JsonIgnore
-    public ItemRest getItem() {
-        return item;
+    public String getItemId() {
+        return item_id;
     }
 
     /**
-     * @param item the item requested.
+     * @param item_id the item requested.
      */
-    public void setItem(ItemRest item) {
-        this.item = item;
+    public void setItemId(String item_id) {
+        this.item_id = item_id;
     }
 
     /**
      * @return the email address of the requester.
      */
-    public String getReqEmail() {
+    public String getRequestEmail() {
         return reqEmail;
     }
 
     /**
      * @param email the email address of the requester.
      */
-    public void setReqEmail(String email) {
+    public void setRequestEmail(String email) {
         this.reqEmail = email;
     }
 
     /**
      * @return the requester's message.
      */
-    public String getReqMessage() {
+    public String getRequestMessage() {
         return reqMessage;
     }
 
     /**
      * @param message the requester's message.
      */
-    public void setReqMessage(String message) {
+    public void setRequestMessage(String message) {
         this.reqMessage = message;
     }
 
     /**
      * @return the requester's name.
      */
-    public String getReqName() {
+    public String getRequestName() {
         return reqName;
     }
 
     /**
      * @param name the requester's name.
      */
-    public void setReqName(String name) {
+    public void setRequestName(String name) {
         this.reqName = name;
     }
 
@@ -209,6 +210,7 @@ public class RequestItemRest
     }
 
     @Override
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     public String getType() {
         return NAME;
     }
