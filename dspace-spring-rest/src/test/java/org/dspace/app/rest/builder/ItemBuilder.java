@@ -65,11 +65,11 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
     }
 
     public ItemBuilder withPersonIdentifierFirstName(final String personIdentifierFirstName) {
-        return addMetadataValue(item, "person", "identifier", "firstname", personIdentifierFirstName);
+        return addMetadataValue(item, "person", "givenName", null, personIdentifierFirstName);
     }
 
     public ItemBuilder withPersonIdentifierLastName(final String personIdentifierLastName) {
-        return addMetadataValue(item, "person", "identifier", "lastname", personIdentifierLastName);
+        return addMetadataValue(item, "person", "familyName", null, personIdentifierLastName);
     }
 
     public ItemBuilder withSubject(final String subject) {

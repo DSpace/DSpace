@@ -1,0 +1,68 @@
+<dspace-dc-types>
+
+    <dspace-header>
+        <title>Person Types</title>
+    </dspace-header>
+
+    <dc-schema>
+        <name>person</name>
+        <namespace>https://schema.org/Person</namespace>
+    </dc-schema>
+
+
+    <!--NO EQUIVALENT FOUND
+        - person.identifier.orcid > NOT FOUND
+        - person.identifier.staffid > NOT FOUND (optional but very specific id: person.isicV4, person.naics, taxID, vatID, …)
+        - person.contributor.other > NOT FOUND
+    -->
+
+    <dc-type>
+        <schema>person</schema>
+        <element>givenName</element>
+        <scope_note>Given name. In the U.S., the first name of a Person. This can be used along with familyName instead
+            of the name property.
+        </scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>person</schema>
+        <element>familyName</element>
+        <scope_note>Family name. In the U.S., the last name of an Person. This can be used along with givenName instead
+            of the name property.
+        </scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>person</schema>
+        <element>telephone</element>
+        <scope_note>The telephone number.</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>person</schema>
+        <element>knowsLanguage</element>
+        <scope_note>Of a Person, and less typically of an Organization, to indicate a known language. We do not
+            distinguish skill levels or reading/writing/speaking/signing here. Use language codes from the IETF BCP 47
+            standard.
+        </scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>person</schema>
+        <element>email</element>
+        <scope_note>Email address.</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>person</schema>
+        <element>birthDate</element>
+        <scope_note>Date of birth.</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>person</schema>
+        <element>jobTitle</element>
+        <scope_note>The job title of the person (for example, Financial Manager).</scope_note>
+    </dc-type>
+
+</dspace-dc-types>
