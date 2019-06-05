@@ -7,12 +7,11 @@
  */
 package org.dspace.app.rest.model;
 
-import org.dspace.app.rest.RestResourceController;
-
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.dspace.app.rest.RestResourceController;
 
 /**
  * The BitstreamFormat REST Resource
