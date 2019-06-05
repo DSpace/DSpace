@@ -11,6 +11,7 @@ import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.isEmptyOrNullString;
 import static org.hamcrest.Matchers.not;
+import static org.junit.Assert.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -110,25 +111,6 @@ public class RequestItemRepositoryIT
     }
 
     /**
-     * Test of findAll method, of class RequestItemRepository.
-     */
-/*
-    @Test
-    public void testFindAll()
-    {
-        System.out.println("findAll");
-        Context context = null;
-        Pageable pageable = null;
-        RequestItemRepository instance = new RequestItemRepository();
-        Page<RequestItemRest> expResult = null;
-        Page<RequestItemRest> result = instance.findAll(context, pageable);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-*/
-
-    /**
      * Test of createAndReturn method, of class RequestItemRepository.
      *
      * @throws java.sql.SQLException passed through.
@@ -138,7 +120,7 @@ public class RequestItemRepositoryIT
     @Test
     public void testCreateAndReturn()
             throws SQLException, AuthorizeException, IOException, Exception {
-        System.out.println("testCreateAndReturn");
+        System.out.println("createAndReturn");
 
         context.turnOffAuthorisationSystem();
 
@@ -194,20 +176,13 @@ public class RequestItemRepositoryIT
     }
 
     /**
-     * Test of delete method, of class RequestItemRepository.
+     * Test of getDomainClass method, of class RequestItemRepository.
      */
-    /*
     @Test
-    public void testDelete()
-    throws Exception
-    {
-    System.out.println("delete");
-    Context context = null;
-    String token = "";
-    RequestItemRepository instance = new RequestItemRepository();
-    instance.delete(context, token);
-    // TODO review the generated test code and remove the default call to fail.
-    fail("The test case is a prototype.");
+    public void testGetDomainClass() {
+        System.out.println("getDomainClass");
+        RequestItemRepository instance = new RequestItemRepository();
+        Class instanceClass = instance.getDomainClass();
+        assertEquals("Wrong domain class", RequestItemRest.class, instanceClass);
     }
-     */
 }
