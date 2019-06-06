@@ -127,7 +127,7 @@
     </bean>
 
     <util:map id="isJournalVolumeOfIssueMap">
-        <entry key="journalvolume.identifier.volume" value-ref="issueVolume_volume"/>
+        <entry key="publicationvolume.volumeNumber" value-ref="issueVolume_volume"/>
         <entry key="creativeworkseries.issn" value-ref="volumeJournal_issn_related"/>
         <entry key="journal.title" value-ref="volumeJournal_title_related"/>
     </util:map>
@@ -144,7 +144,7 @@
     <bean class="org.dspace.content.virtual.Collected" id="issueVolume_volume">
         <property name="fields">
             <util:list>
-                <value>publicationVolume.volumeNumber</value>
+                <value>publicationvolume.volumeNumber</value>
             </util:list>
         </property>
     </bean>
@@ -170,7 +170,7 @@
     </bean>
 
     <util:map id="isJournalOfVolumeMap">
-        <entry key="journal.identifier.issn" value-ref="volumeJournal_issn"/>
+        <entry key="creativeworkseries.issn" value-ref="volumeJournal_issn"/>
         <entry key="journal.title" value-ref="volumeJournal_title"/>
     </util:map>
     <bean class="org.dspace.content.virtual.Collected" id="volumeJournal_issn">
@@ -192,7 +192,7 @@
     </util:map>
 
     <util:map id="isIssueOfJournalVolumeMap">
-        <entry key="journalissue.identifier.number" value-ref="journalIssue_number"/>
+        <entry key="publicationissue.issueNumber" value-ref="journalIssue_number"/>
     </util:map>
     <bean class="org.dspace.content.virtual.Collected" id="journalIssue_number">
         <property name="fields">
@@ -203,7 +203,7 @@
     </bean>
 
     <util:map id="isJournalIssueOfPublicationMap">
-        <entry key="journal.identifier.issn"  value-ref="issueVolumeJournal_issn_related"/>
+        <entry key="creativeworkseries.issn"  value-ref="issueVolumeJournal_issn_related"/>
         <entry key="journal.title"  value-ref="issueVolumeJournal_title_related"/>
         <entry key="journalvolume.identifier.name" value-ref="issueVolume_title_related"/>
         <entry key="relation.isJournalOfPublication" value-ref="issueVolumeJournal_uuid_related"/>
