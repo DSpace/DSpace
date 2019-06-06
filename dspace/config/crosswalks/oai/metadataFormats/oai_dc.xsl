@@ -134,6 +134,7 @@
 				<dc:language><xsl:value-of select="." /></dc:language>
 			</xsl:for-each>
 			
+			<!--dc.subject = subject -->
 			<!--sedici.subject.materias = subject -->
 			<!--sedici.subject.lcsh = subject -->
 			<!--sedici.subject.decs = subject -->

@@ -119,6 +119,19 @@
 <!-- 			</xsl:if> -->
 			<xsl:value-of select="doc:element[@name='doaj']/doc:element[@name='identifier']/doc:element[@name='handle']/doc:element/doc:field[@name='value']/text()"/>
 		</fullTextUrl>
+
+		<!-- keywords :: dc.subject -->
+		<xsl:for-each select="doc:element[@name='dc']/doc:element[@name='subject']">
+			<keywords>
+				<xsl:attribute name="language">
+					<xsl:value-of select="./doc:element[@name]/@name"/>
+				</xsl:attribute>
+				<xsl:for-each select="./doc:element[@name]/doc:field[@name='value']">
+					<keyword><xsl:value-of select="./text()"/></keyword>
+				</xsl:for-each>
+			</keywords>
+		</xsl:for-each>
+
 		<!-- keywords :: sedici.subject.(materias|lcsh|decs|eurovoc|descriptores|other|keyword) -->
 		<xsl:for-each select="doc:element[@name='sedici']/doc:element[@name='subject']/
  					doc:element[@name='materias' or @name='lcsh' or @name='decs' or @name='eurovoc' or @name='descriptores' or @name='other' or @name='keyword']">

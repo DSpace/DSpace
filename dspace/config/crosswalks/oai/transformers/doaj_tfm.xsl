@@ -33,6 +33,11 @@
 		</doc:element>
 	</xsl:template>
 	
+	<!-- Keywords accord ISO 639-2B:dc.subject -->
+	<xsl:template match="doc:element[@name='dc']/doc:element[@name='subject']">
+		<xsl:apply-templates select="." mode="transformLanguageInAttribute"/>
+	</xsl:template>
+
 	<!-- Keywords accord ISO 639-2B:sedici.subject.(materias|lcsh|decs|eurovoc|descriptores|other|keyword) -->
 	<xsl:template match="doc:element[@name='sedici']/doc:element[@name='subject']/
 			doc:element[@name='materias' or @name='lcsh' or @name='decs' or @name='eurovoc' or @name='descriptores' or @name='other' or @name='keyword']//doc:element">
