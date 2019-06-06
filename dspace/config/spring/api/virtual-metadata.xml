@@ -128,7 +128,7 @@
 
     <util:map id="isJournalVolumeOfIssueMap">
         <entry key="journalvolume.identifier.volume" value-ref="issueVolume_volume"/>
-        <entry key="journal.identifier.issn" value-ref="volumeJournal_issn_related"/>
+        <entry key="creativeworkseries.issn" value-ref="volumeJournal_issn_related"/>
         <entry key="journal.title" value-ref="volumeJournal_title_related"/>
     </util:map>
     <!-- This Collected bean will create a list of publicationVolume.volumeNumber virtual metadata fields that hold
