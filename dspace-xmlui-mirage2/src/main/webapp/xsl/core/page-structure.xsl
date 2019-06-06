@@ -700,9 +700,6 @@
                 <div class="row">
                     <hr/>
                     <div class="col-xs-7 col-sm-8">
-                        <div>
-                            <a href="http://www.dspace.org/" target="_blank">DSpace software</a> copyright&#160;&#169;&#160;2002-2016&#160; <a href="http://www.duraspace.org/" target="_blank">DuraSpace</a>
-                        </div>
                         <div class="hidden-print">
                             <a>
                                 <xsl:attribute name="href">
@@ -728,15 +725,16 @@
                         </div>
                     </div>
                     <div class="col-xs-5 col-sm-4 hidden-print">
-                        <div class="pull-right">
+                        <div id="ds-footer-right">
                             <div>
-                                <i18n:text>xmlui.dri2xhtml.structural.link_dspace</i18n:text>&#160;<a href="http://www.dspace.org/" target="_blank">DSpace software</a>
+                                <a href="http://www.dspace.org/" target="_blank">DSpace software</a> copyright&#160;&#169;&#160;2002-2019&#160; <a href="http://www.duraspace.org/" target="_blank">DuraSpace</a>
                             </div>
                             <br/>
-                            <span class="theme-by"><i18n:text>xmlui.dri2xhtml.structural.link_unit</i18n:text>&#160;</span>
-                            <a title="Unit" target="_blank" href="http://www.unit.no" id="ds-footer-logo-link2">
-                                <img alt="Unit" src="{concat($theme-path, 'images/unit_product.png')}"/>
-                            </a>
+                            <span class="theme-by"><i18n:text>xmlui.dri2xhtml.structural.link_unit</i18n:text>&#160;
+                                <a title="Unit" target="_blank" href="http://www.unit.no" id="ds-footer-logo-link2">
+                                    <img alt="Unit" src="{concat($theme-path, 'images/unit_product.png')}"/>
+                                </a>
+                            </span>
                         </div>
 
                     </div>
