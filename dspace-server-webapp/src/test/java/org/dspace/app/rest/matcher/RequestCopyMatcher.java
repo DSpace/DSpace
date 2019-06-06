@@ -9,6 +9,7 @@
 package org.dspace.app.rest.matcher;
 
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
+import static org.dspace.matcher.DateMatcher.dateMatcher;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.is;
 
@@ -28,12 +29,16 @@ public class RequestCopyMatcher {
 
     public static Matcher<? super Object> matchRequestCopy(RequestItem request) {
         return allOf(
-                hasJsonPath("$._links.bitstream", Matchers.not(Matchers.empty())),
-                hasJsonPath("$._links.item", Matchers.not(Matchers.empty())),
+                //hasJsonPath("$._links.bitstream", Matchers.not(Matchers.empty())),
+                //hasJsonPath("$._links.item", Matchers.not(Matchers.empty())),
                 hasJsonPath("$.allfiles", is(request.isAllfiles())),
-                hasJsonPath("$.reqEmail", is(request.getReqEmail())),
-                hasJsonPath("$.reqName", is(request.getReqName())),
-                hasJsonPath("$.reqMessage", is(request.getReqMessage())),
+                hasJsonPath("$.request_email", is(request.getReqEmail())),
+                hasJsonPath("$.request_name", is(request.getReqName())),
+                hasJsonPath("$.request_message", is(request.getReqMessage())),
+                hasJsonPath("$.request_date", dateMatcher(request.getRequest_date())),
+                hasJsonPath("$.accept_request", is(request.isAccept_request())),
+                hasJsonPath("$.decision_date", dateMatcher(request.getDecision_date())),
+                hasJsonPath("$.expires", dateMatcher(request.getExpires())),
                 hasJsonPath("$.type", is(RequestItemRest.NAME)),
                 hasJsonPath("$._links.self.href",
                         Matchers.containsString(RequestItemRepositoryIT.URI_ROOT))
