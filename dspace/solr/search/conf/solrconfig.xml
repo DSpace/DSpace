@@ -859,6 +859,7 @@
 		  	dc.coverage.temporal^0.2 
 		  	sedici.subject.materias^0.08
 		  	sedici.subject.keywords^0.08 
+		  	dc.subject^0.08
 		  	sedici.subject.lcsh^0.05
 		  	sedici.subject.decs^0.05
 		  	sedici.subject.eurovoc^0.05
@@ -889,6 +890,7 @@
 		  	sedici.creator.person^0.5 
 		  	sedici.creator.corporate^0.5 
 		  	dc.description.abstract^0.5 
+		  	dc.subject^0.05
 		  	dc.coverage.spatial^0.2 
 		  	dc.coverage.temporal^0.2 
 		  	sedici.subject.materias^0.1

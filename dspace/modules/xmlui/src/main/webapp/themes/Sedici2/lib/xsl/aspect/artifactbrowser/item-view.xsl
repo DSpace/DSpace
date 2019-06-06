@@ -603,6 +603,14 @@
 		<!-- subjects row -->
 		<xsl:if test="dim:field[@element='subject']">
 			<div id="subjects">
+				<!--  subject nuevo -->
+				<xsl:call-template name="render-normal-field">
+					<xsl:with-param name="name" select="'dc-subject'"/>
+					<xsl:with-param name="elements" select="dim:field[@element='subject' and not(@qualifier)] "/>
+					<xsl:with-param name="filter">keywords</xsl:with-param>
+					<xsl:with-param name="operator">contains</xsl:with-param>
+				</xsl:call-template>
+
 				<!-- subject.materias row -->
 				<xsl:call-template name="render-normal-field">
 					<xsl:with-param name="name" select="'subject-materias'"/>
@@ -903,6 +911,7 @@
 		<xsl:param name="type" select="'text'"/>
 		<xsl:param name="acotar"/>
 		<xsl:param name="filter" select="''"/>
+		<xsl:param name="operator" select="'equals'"/>
 
 		<!-- Generamos salida solo si hay algun elemento para mostrar -->
 		<xsl:if test="count($elements) &gt; 0">
@@ -921,6 +930,7 @@
 					<xsl:with-param name="type" select="$type"/>
 					<xsl:with-param name="acotar" select="$acotar"/>
 					<xsl:with-param name="filter" select="$filter"/>
+					<xsl:with-param name="operator" select="$operator"/>
 				</xsl:call-template>
 
 			</div>
@@ -940,6 +950,7 @@
 		<xsl:param name="type"/>
 		<xsl:param name="acotar"/>
 		<xsl:param name="filter"/>
+		<xsl:param name="operator" select="'equals'"/>
 
 		<span class="metadata-value">
 
@@ -989,6 +1000,7 @@
 							<xsl:call-template name="filterLink">
 								<xsl:with-param name="filter" select="$filter"/>
 								<xsl:with-param name="value" select="$elements[$index]"/>
+								<xsl:with-param name="filter_relational_operator" select="$operator"/>
 							</xsl:call-template>
 						</xsl:attribute>
 						<xsl:value-of select="$elements[$index]" disable-output-escaping="yes"/>

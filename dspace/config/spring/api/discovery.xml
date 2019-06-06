@@ -521,6 +521,7 @@
         <property name="indexFieldName" value="keywords"/>
         <property name="metadataFields">
             <list>
+                <value>dc.subject</value>
                 <value>sedici.subject.decs</value>
                 <value>sedici.subject.eurovoc</value>
                 <value>sedici.subject.acmcss98</value>
