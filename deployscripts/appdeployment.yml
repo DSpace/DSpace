@@ -83,6 +83,18 @@
 - name: Undeploy SOLR
   shell: "curl -s -n 'http://localhost:9080/manager/text/undeploy?path=/{{kunde}}-solr'"
 
+- name: Look for database migrations
+  shell: "/brage/{{ kunde }}/app/bin/dspace database info"
+  register: dbinfo
+
+- name: Run database migrations
+  shell: "/brage/{{ kunde }}/app/bin/dspace {{ item }}"
+  when: dbinfo.stdout.find("pending") != -1
+  loop:
+    - "database migrate"
+    - "index-discovery -b"
+    - "oai import -c -o"
+
 - name: Deploy SOLR
   synchronize:
     delete: yes
