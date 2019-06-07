@@ -205,11 +205,25 @@ public class DashService {
     **/
     public int putDataset(Package pkg) {
         log.info("Putting dataset " + pkg.getItemID() + ", " + pkg.getDryadDOI());
-        String dashJSON = pkg.getDataPackage().getDashJSON();
-        log.debug("Got JSON object: " + dashJSON);
         int responseCode = 0;
         BufferedReader reader = null;
 
+        if (pkg.getDataPackage().getSubmitter() != null) {
+            // find the equivalent user in Dash and set the userId
+            int dashUserId = getDashUser(pkg.getDataPackage());
+            log.debug("dash user is " + dashUserId);
+            if (dashUserId != 0) {
+                ObjectNode jsonObj = (ObjectNode) mapper.readTree(dashJSON);
+                jsonObj.put("userId", dashUserId);
+                dashJSON = jsonObj.toString();
+            }
+            
+            log.debug("updated JSON object: " + dashJSON);
+        }
+
+        String dashJSON = pkg.getDataPackage().getDashJSON();
+        log.debug("Got JSON object: " + dashJSON);
+        
         try {
             String versionlessDOI = pkg.getDataPackage().getVersionlessIdentifier();
             String encodedDOI = URLEncoder.encode(versionlessDOI, "UTF-8");
@@ -220,16 +234,6 @@ public class DashService {
             connection.setRequestProperty("Authorization", "Bearer " + oauthToken);
             connection.setDoOutput(true);
             connection.setRequestMethod("PUT");
-
-            if (pkg.getDataPackage().getSubmitter() != null) {
-                // need to find the equivalent user in Dash and set the userId
-                int dashUserId = getDashUser(pkg.getDataPackage());
-                if (dashUserId != 0) {
-                    ObjectNode jsonObj = (ObjectNode) mapper.readTree(dashJSON);
-                    jsonObj.put("userId", dashUserId);
-                    dashJSON = jsonObj.toString();
-                }
-            }
 
             OutputStreamWriter wr = new OutputStreamWriter(connection.getOutputStream());
             wr.write(dashJSON);
@@ -684,6 +688,7 @@ public class DashService {
         if (dryadDataPackage.getItem() != null) {
             try {
                 URI uri = UriBuilder.fromUri(dashServer + "/api/users/").queryParam("ePersonId", Integer.toString(eperson.getID())).build();
+                log.debug("URL is " + uri.toURL());
                 HttpURLConnection connection = (HttpURLConnection) uri.toURL().openConnection();
                 connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
                 connection.setRequestProperty("Accept", "application/json");

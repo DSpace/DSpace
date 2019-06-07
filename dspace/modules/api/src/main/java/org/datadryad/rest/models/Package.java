@@ -1,6 +1,3 @@
-
-/*
- */
 package org.datadryad.rest.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -242,9 +239,6 @@ public class Package {
             jGen.writeStringField("abstract", restPackage.getAbstract());
             jGen.writeObjectField("authors", restPackage.getAuthorList());
 
-            //WORKING date
-            //jGen.writeStringField("date-available", dataPackage.getDateAccessioned());
-            
             if(ddp.getItem().isArchived()) {
                 ShoppingCart sc = ddp.getShoppingCart();
                 if(sc == null) {
@@ -257,10 +251,18 @@ public class Package {
             // keywordsToWrite and spatialToWrite will include both package- and file-level keywords
             Set<String> keywordsToWrite = new HashSet<String>();
             Set<String> spatialToWrite = new HashSet<String>();
-            
-            //TODO: replace this with a real epersonID OR DASH user ID
-            jGen.writeStringField("userId", "1");
 
+            // add the epersonID to match up with Dash
+            try {
+                if(ddp.getItem().getSubmitter() != null){
+                    jGen.writeStringField("userId", "" + ddp.getItem().getSubmitter().getID());
+                } else {
+                    jGen.writeStringField("userId", "1");
+                }
+            } catch(Exception e) {
+                log.error("unable to get submitter's ID", e);
+            }
+            
             // Data Files
             // for each file, write the
             // # <h3>File Title
