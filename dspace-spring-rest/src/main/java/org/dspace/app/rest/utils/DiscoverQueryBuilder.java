@@ -16,11 +16,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.converter.query.SearchQueryConverter;
-import org.dspace.app.rest.exception.InvalidDSpaceObjectTypeException;
-import org.dspace.app.rest.exception.InvalidRequestException;
-import org.dspace.app.rest.exception.InvalidSearchFacetException;
-import org.dspace.app.rest.exception.InvalidSearchFilterException;
-import org.dspace.app.rest.exception.InvalidSortingException;
+import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.parameter.SearchFilter;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -71,7 +67,7 @@ public class DiscoverQueryBuilder implements InitializingBean {
                                     DiscoveryConfiguration discoveryConfiguration,
                                     String query, List<SearchFilter> searchFilters,
                                     String dsoType, Pageable page)
-        throws InvalidRequestException {
+        throws DSpaceBadRequestException {
 
         DiscoverQuery queryArgs = buildCommonDiscoverQuery(context, discoveryConfiguration, query, searchFilters,
                                                            dsoType);
@@ -104,7 +100,7 @@ public class DiscoverQueryBuilder implements InitializingBean {
                                          DiscoveryConfiguration discoveryConfiguration,
                                          String prefix, String query, List<SearchFilter> searchFilters,
                                          String dsoType, Pageable page, String facetName)
-        throws InvalidRequestException {
+        throws DSpaceBadRequestException {
 
         DiscoverQuery queryArgs = buildCommonDiscoverQuery(context, discoveryConfiguration, query, searchFilters,
                                                            dsoType);
@@ -129,7 +125,7 @@ public class DiscoverQueryBuilder implements InitializingBean {
 
     private DiscoverQuery addFacetingForFacets(Context context, IndexableObject scope, String prefix,
             DiscoverQuery queryArgs, DiscoveryConfiguration discoveryConfiguration, String facetName, Pageable page)
-            throws InvalidSearchFacetException {
+            throws DSpaceBadRequestException {
 
         DiscoverySearchFilterFacet facet = discoveryConfiguration.getSidebarFacet(facetName);
         if (facet != null) {
@@ -139,7 +135,7 @@ public class DiscoverQueryBuilder implements InitializingBean {
             fillFacetIntoQueryArgs(context, scope, prefix, queryArgs, facet, pageSize);
 
         } else {
-            throw new InvalidSearchFacetException(facetName + " is not a valid search facet");
+            throw new DSpaceBadRequestException(facetName + " is not a valid search facet");
         }
 
         return queryArgs;
@@ -173,7 +169,7 @@ public class DiscoverQueryBuilder implements InitializingBean {
     private DiscoverQuery buildCommonDiscoverQuery(Context context, DiscoveryConfiguration discoveryConfiguration,
                                                    String query,
                                                    List<SearchFilter> searchFilters, String dsoType)
-        throws InvalidSearchFilterException, InvalidDSpaceObjectTypeException {
+        throws DSpaceBadRequestException {
         DiscoverQuery queryArgs = buildBaseQueryForConfiguration(discoveryConfiguration);
 
         //Add search filters
@@ -202,7 +198,7 @@ public class DiscoverQueryBuilder implements InitializingBean {
     }
 
     private void configureSorting(Pageable page, DiscoverQuery queryArgs,
-                                  DiscoverySortConfiguration searchSortConfiguration) throws InvalidSortingException {
+                                  DiscoverySortConfiguration searchSortConfiguration) throws DSpaceBadRequestException {
         String sortBy = null;
         String sortOrder = null;
 
@@ -237,11 +233,11 @@ public class DiscoverQueryBuilder implements InitializingBean {
             } else if ("desc".equalsIgnoreCase(sortOrder)) {
                 queryArgs.setSortField(sortField, DiscoverQuery.SORT_ORDER.desc);
             } else {
-                throw new InvalidSortingException(sortOrder + " is not a valid sort order");
+                throw new DSpaceBadRequestException(sortOrder + " is not a valid sort order");
             }
 
         } else {
-            throw new InvalidSortingException(sortBy + " is not a valid sort field");
+            throw new DSpaceBadRequestException(sortBy + " is not a valid sort field");
         }
     }
 
@@ -273,16 +269,16 @@ public class DiscoverQueryBuilder implements InitializingBean {
         }
     }
 
-    private int getDsoTypeId(String dsoType) throws InvalidDSpaceObjectTypeException {
+    private int getDsoTypeId(String dsoType) throws DSpaceBadRequestException {
         int index = ArrayUtils.indexOf(Constants.typeText, dsoType.toUpperCase());
         if (index < 0) {
-            throw new InvalidDSpaceObjectTypeException(dsoType + " is not a valid DSpace Object type");
+            throw new DSpaceBadRequestException(dsoType + " is not a valid DSpace Object type");
         }
         return index;
     }
 
     private String[] convertFilters(Context context, DiscoveryConfiguration discoveryConfiguration,
-                                    List<SearchFilter> searchFilters) throws InvalidSearchFilterException {
+                                    List<SearchFilter> searchFilters) throws DSpaceBadRequestException {
         ArrayList<String> filterQueries = new ArrayList<>(CollectionUtils.size(searchFilters));
 
         SearchQueryConverter searchQueryConverter = new SearchQueryConverter();
@@ -291,7 +287,7 @@ public class DiscoverQueryBuilder implements InitializingBean {
             for (SearchFilter searchFilter : CollectionUtils.emptyIfNull(transformedFilters)) {
                 DiscoverySearchFilter filter = discoveryConfiguration.getSearchFilter(searchFilter.getName());
                 if (filter == null) {
-                    throw new InvalidSearchFilterException(searchFilter.getName() + " is not a valid search filter");
+                    throw new DSpaceBadRequestException(searchFilter.getName() + " is not a valid search filter");
                 }
 
                 DiscoverFilterQuery filterQuery = searchService.toFilterQuery(context,
@@ -304,7 +300,7 @@ public class DiscoverQueryBuilder implements InitializingBean {
                 }
             }
         } catch (SQLException e) {
-            throw new InvalidSearchFilterException("There was a problem parsing the search filters.", e);
+            throw new DSpaceBadRequestException("There was a problem parsing the search filters.", e);
         }
 
         return filterQueries.toArray(new String[filterQueries.size()]);
