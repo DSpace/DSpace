@@ -208,19 +208,17 @@ public class DashService {
         int responseCode = 0;
         BufferedReader reader = null;
 
+        // find the submitter's userId in Dash and set this as the userId in the package
         if (pkg.getDataPackage().getSubmitter() != null) {
-            // find the equivalent user in Dash and set the userId
             int dashUserId = getDashUser(pkg.getDataPackage());
             log.debug("dash user is " + dashUserId);
             if (dashUserId != 0) {
-                ObjectNode jsonObj = (ObjectNode) mapper.readTree(dashJSON);
-                jsonObj.put("userId", dashUserId);
-                dashJSON = jsonObj.toString();
+                pkg.getDataPackage().setDashUserID(dashUserId);
+                log.debug("dash user set to " + pkg.getDataPackage().getDashUserID());
             }
-            
-            log.debug("updated JSON object: " + dashJSON);
         }
 
+        // generate the main package JSON
         String dashJSON = pkg.getDataPackage().getDashJSON();
         log.debug("Got JSON object: " + dashJSON);
         

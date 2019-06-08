@@ -68,16 +68,6 @@ public class Package {
         return itemID;
     }
 
-    public void setDashUserID(Integer userID) {
-        EPerson user = new EPerson();
-        user.setID(userID);
-        dataPackage.setSubmitter(user);
-    }
-
-    public Integer getDashUserID() {
-        return dataPackage.getSubmitter().getID();
-    }
-
     public String getPublicationDOI() {
         String publicationDOI = dataPackage.getPublicationDOI();
         if (publicationDOI == null) {
@@ -252,11 +242,14 @@ public class Package {
             Set<String> keywordsToWrite = new HashSet<String>();
             Set<String> spatialToWrite = new HashSet<String>();
 
-            // add the epersonID to match up with Dash
+            
             try {
-                if(ddp.getItem().getSubmitter() != null){
-                    jGen.writeStringField("userId", "" + ddp.getItem().getSubmitter().getID());
+                int userId = ddp.getDashUserID();
+                log.debug("userId = " + userId);
+                if(userId > 0) {
+                    jGen.writeStringField("userId", "" + userId);
                 } else {
+                    log.debug("setting default userId of 1");
                     jGen.writeStringField("userId", "1");
                 }
             } catch(Exception e) {
