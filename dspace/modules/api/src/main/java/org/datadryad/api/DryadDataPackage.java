@@ -114,6 +114,8 @@ public class DryadDataPackage extends DryadObject {
     private ArrayList<DryadDataPackage> duplicateItems = new ArrayList<>();
     private EPerson submitter = null;
 
+    private int dashUserID = 0;
+    
     private static Logger log = Logger.getLogger(DryadDataPackage.class);
 
     private static boolean useDryadClassic = true;
@@ -228,6 +230,14 @@ public class DryadDataPackage extends DryadObject {
         return result;
     }
 
+    public void setDashUserID(int userID) {
+        dashUserID = userID;
+    }
+
+    public int getDashUserID() {
+        return dashUserID;
+    }
+    
     public void setPublicationDate(String publicationDate) {
         if (getItem() != null) {
             addSingleMetadataValue(Boolean.TRUE, PUBLICATION_DATE_SCHEMA, PUBLICATION_DATE_ELEMENT, PUBLICATION_DATE_QUALIFIER, publicationDate);
