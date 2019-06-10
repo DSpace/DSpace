@@ -269,36 +269,44 @@ public class Package {
                 if(ddfs.size() > 0) {
                     String fileListString = "";
                     for(DryadDataFile dryadFile : ddfs) {
-                        log.debug("serializing file " + dryadFile.getIdentifier() + ", " + dryadFile.getDryadDOI()); 
-                        String fileTitle = dryadFile.getTitle();
-                        fileListString = fileListString + "<h4>" + fileTitle + "</h4>";
-                        String fileDescription = dryadFile.getDescription();
-                        if(fileDescription != null) {
-                            fileListString = fileListString + "<p>" + fileDescription + "</p>";
-                        }
+                        log.debug("serializing file " + dryadFile.getIdentifier() + ", " + dryadFile.getDryadDOI());
 
-                        // file-level keywords
+                        // file-level keywords get saved to export at the package level
                         // temporal coverage, and scientific names are lumped in with keywords for now
                         keywordsToWrite.addAll(dryadFile.getKeywords());
                         keywordsToWrite.addAll(dryadFile.getCoverageTemporal());
                         keywordsToWrite.addAll(dryadFile.getScientificNames());
-
                         spatialToWrite.addAll(dryadFile.getCoverageSpatial());
+
+                        // file titles, names, descriptions get formatted into the Usage Notes
+                        String fileTitle = dryadFile.getTitle();                        
+                        fileListString = fileListString + "<div class=\"o-metadata__file-usage-entry\"><h4 class=\"o-heading__level3-file-title\">" + fileTitle + "</h4>";
                         
+                        String fileDescription = dryadFile.getDescription();
+                        if(fileDescription != null) {
+                            fileListString = fileListString + "<div class=\"o-metadata__file-description\">" + fileDescription + "</div>";
+                        }
+                                                
                         // bitstreams
-                        fileListString = fileListString + "<p>";
                         String previousBitstreamFilename = "";
                         for(Bitstream dspaceBitstream : dryadFile.getAllBitstreams()) {
+                            fileListString = fileListString + "<div class=\"o-metadata__file-name\">";
                             DryadBitstream dryadBitstream = new DryadBitstream(dspaceBitstream);                    
                             if(dryadBitstream.isReadme()) {
                                 dryadBitstream.setReadmeFilename(previousBitstreamFilename);
                                 fileListString = fileListString + dryadBitstream.getReadmeFilename() + "</br>";
                             } else {
-                                fileListString = fileListString + dspaceBitstream.getName() + "</br>";
+                                String filename = dspaceBitstream.getName();
+                                if(filename.startsWith(fileTitle)) {
+                                    // don't record the filename if it is exactly the same as the title (with or without extension)
+                                } else {
+                                    fileListString = fileListString + filename + "</br>";
+                                }
                                 previousBitstreamFilename = dspaceBitstream.getName();
                             }
+                            fileListString = fileListString + "</div>";
                         }
-                        fileListString = fileListString + "</p>";
+                        fileListString = fileListString + "</div>";
                     }
                     jGen.writeStringField("usageNotes", fileListString);
                 }
