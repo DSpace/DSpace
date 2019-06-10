@@ -31,6 +31,9 @@ import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
  **/
 public class WorkflowItemBuilder extends AbstractBuilder<XmlWorkflowItem, XmlWorkflowItemService> {
 
+    /** Keep a reference to the underlying Item for cleanup **/
+    private Item item;
+
     private WorkspaceItem workspaceItem;
 
     private XmlWorkflowItem workflowItem;
@@ -60,6 +63,7 @@ public class WorkflowItemBuilder extends AbstractBuilder<XmlWorkflowItem, XmlWor
 
         try {
             workspaceItem = workspaceItemService.create(context, col, false);
+            item = workspaceItem.getItem();
         } catch (Exception e) {
             return handleException(e);
         }
@@ -88,6 +92,7 @@ public class WorkflowItemBuilder extends AbstractBuilder<XmlWorkflowItem, XmlWor
             XmlWorkflowItem attachedDso = c.reloadEntity(dso);
             if (attachedDso != null) {
                 getService().delete(c, attachedDso);
+                item = null;
             }
             c.complete();
         }
@@ -101,6 +106,7 @@ public class WorkflowItemBuilder extends AbstractBuilder<XmlWorkflowItem, XmlWor
             WorkspaceItem attachedDso = c.reloadEntity(dso);
             if (attachedDso != null) {
                 workspaceItemService.deleteAll(c, attachedDso);
+                item = null;
             }
             c.complete();
         }
@@ -108,14 +114,39 @@ public class WorkflowItemBuilder extends AbstractBuilder<XmlWorkflowItem, XmlWor
         indexingService.commit();
     }
 
+    private void deleteItem(Item dso) throws Exception {
+        try (Context c = new Context()) {
+            c.turnOffAuthorisationSystem();
+            Item attachedDso = c.reloadEntity(dso);
+            if (attachedDso != null) {
+                // if we still have a reference to an item it could be an approved workflow or a rejected one. In the
+                // last case we need to remove the "new" workspaceitem
+                WorkspaceItem wi = workspaceItemService.findByItem(c, item);
+                if (wi != null) {
+                    workspaceItemService.deleteAll(c, wi);
+                } else {
+                    itemService.delete(c, attachedDso);
+                }
+            }
+            c.complete();
+        }
+
+        indexingService.commit();
+    }
 
     @Override
     public void cleanup() throws Exception {
         if (workspaceItem != null) {
+            System.out.println("remove workspaceitem");
             deleteWsi(workspaceItem);
         }
         if (workflowItem != null) {
+            System.out.println("remove workflowitem");
             delete(workflowItem);
+        }
+        if (item != null) {
+            System.out.println("remove item!!!");
+            deleteItem(item);
         }
     }
 

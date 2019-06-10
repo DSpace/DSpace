@@ -26,6 +26,9 @@ import org.dspace.eperson.EPerson;
  **/
 public class WorkspaceItemBuilder extends AbstractBuilder<WorkspaceItem, WorkspaceItemService> {
 
+    /** Keep a reference to the underlying Item for cleanup **/
+    private Item item;
+
     private WorkspaceItem workspaceItem;
 
     protected WorkspaceItemBuilder(Context context) {
@@ -42,6 +45,7 @@ public class WorkspaceItemBuilder extends AbstractBuilder<WorkspaceItem, Workspa
 
         try {
             workspaceItem = workspaceItemService.create(context, col, false);
+            item = workspaceItem.getItem();
         } catch (Exception e) {
             return handleException(e);
         }
@@ -61,6 +65,19 @@ public class WorkspaceItemBuilder extends AbstractBuilder<WorkspaceItem, Workspa
 
     }
 
+    private void deleteItem(Item dso) throws Exception {
+        try (Context c = new Context()) {
+            c.turnOffAuthorisationSystem();
+            Item attachedDso = c.reloadEntity(dso);
+            if (attachedDso != null) {
+                itemService.delete(c, attachedDso);
+            }
+            c.complete();
+        }
+
+        indexingService.commit();
+    }
+
     @Override
     public void delete(WorkspaceItem dso) throws Exception {
         try (Context c = new Context()) {
@@ -68,6 +85,7 @@ public class WorkspaceItemBuilder extends AbstractBuilder<WorkspaceItem, Workspa
             WorkspaceItem attachedDso = c.reloadEntity(dso);
             if (attachedDso != null) {
                 getService().deleteAll(c, attachedDso);
+                item = null;
             }
             c.complete();
         }
@@ -78,6 +96,9 @@ public class WorkspaceItemBuilder extends AbstractBuilder<WorkspaceItem, Workspa
     @Override
     public void cleanup() throws Exception {
         delete(workspaceItem);
+        if (item != null) {
+            deleteItem(item);
+        }
     }
 
     @Override
