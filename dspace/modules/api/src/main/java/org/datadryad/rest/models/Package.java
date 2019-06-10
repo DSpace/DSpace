@@ -270,8 +270,8 @@ public class Package {
                     String fileListString = "";
                     for(DryadDataFile dryadFile : ddfs) {
                         log.debug("serializing file " + dryadFile.getIdentifier() + ", " + dryadFile.getDryadDOI()); 
-                        String fileTitle = dryadFile.getTitle();
-                        fileListString = fileListString + "<h4 class=\"o-heading__level3-file-title\">" + fileTitle + "</h4>";
+                        String fileTitle = dryadFile.getTitle();                        
+                        fileListString = fileListString + "<div class=\"file-usage-entry\"><h4 class=\"o-heading__level3-file-title\">" + fileTitle + "</h4>";
                         
                         String fileDescription = dryadFile.getDescription();
                         if(fileDescription != null) {
@@ -299,6 +299,7 @@ public class Package {
                             }
                             fileListString = fileListString + "</div>";
                         }
+                        fileListString = fileListString + "</div>";
                     }
                     jGen.writeStringField("usageNotes", fileListString);
                 }
