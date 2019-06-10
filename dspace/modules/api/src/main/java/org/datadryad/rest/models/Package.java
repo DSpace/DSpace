@@ -271,24 +271,24 @@ public class Package {
                     for(DryadDataFile dryadFile : ddfs) {
                         log.debug("serializing file " + dryadFile.getIdentifier() + ", " + dryadFile.getDryadDOI()); 
                         String fileTitle = dryadFile.getTitle();
-                        fileListString = fileListString + "<h4>" + fileTitle + "</h4>";
+                        fileListString = fileListString + "<h4 class=\"o-heading__level3-file-title\">" + fileTitle + "</h4>";
+                        
                         String fileDescription = dryadFile.getDescription();
                         if(fileDescription != null) {
-                            fileListString = fileListString + "<p>" + fileDescription + "</p>";
+                            fileListString = fileListString + "<div class=\"file-description\">" + fileDescription + "</div>";
                         }
-
+                        
                         // file-level keywords
                         // temporal coverage, and scientific names are lumped in with keywords for now
                         keywordsToWrite.addAll(dryadFile.getKeywords());
                         keywordsToWrite.addAll(dryadFile.getCoverageTemporal());
                         keywordsToWrite.addAll(dryadFile.getScientificNames());
-
                         spatialToWrite.addAll(dryadFile.getCoverageSpatial());
                         
                         // bitstreams
-                        fileListString = fileListString + "<p>";
                         String previousBitstreamFilename = "";
                         for(Bitstream dspaceBitstream : dryadFile.getAllBitstreams()) {
+                            fileListString = fileListString + "<div class=\"file-name\">";
                             DryadBitstream dryadBitstream = new DryadBitstream(dspaceBitstream);                    
                             if(dryadBitstream.isReadme()) {
                                 dryadBitstream.setReadmeFilename(previousBitstreamFilename);
@@ -297,8 +297,8 @@ public class Package {
                                 fileListString = fileListString + dspaceBitstream.getName() + "</br>";
                                 previousBitstreamFilename = dspaceBitstream.getName();
                             }
+                            fileListString = fileListString + "</div>";
                         }
-                        fileListString = fileListString + "</p>";
                     }
                     jGen.writeStringField("usageNotes", fileListString);
                 }
