@@ -298,7 +298,7 @@ public class Package {
                             } else {
                                 String filename = dspaceBitstream.getName();
                                 if(filename.startsWith(fileTitle)) {
-                                    // don't record the filename
+                                    // don't record the filename if it is exactly the same as the title (with or without extension)
                                 } else {
                                     fileListString = fileListString + filename + "</br>";
                                 }
