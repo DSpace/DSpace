@@ -430,10 +430,11 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                .andExpect(jsonPath("$.page.totalPages", is(2)))
                .andExpect(jsonPath("$.page.number", is(0)))
                // embedded items are already checked by other test, we focus on links here
-               .andExpect(jsonPath("$._links.next", Matchers.containsString("/api/discover/browses/title/items?")))
-               .andExpect(jsonPath("$._links.last", Matchers.containsString("/api/discover/browses/title/items?")))
-               .andExpect(jsonPath("$._links.first", Matchers.containsString("/api/discover/browses/title/items?")))
-               .andExpect(jsonPath("$._links.self", Matchers.endsWith("/api/discover/browses/title/items")));
+               .andExpect(jsonPath("$._links.next.href", Matchers.containsString("/api/discover/browses/title/items?")))
+               .andExpect(jsonPath("$._links.last.href", Matchers.containsString("/api/discover/browses/title/items?")))
+               .andExpect(
+                        jsonPath("$._links.first.href", Matchers.containsString("/api/discover/browses/title/items?")))
+               .andExpect(jsonPath("$._links.self.href", Matchers.endsWith("/api/discover/browses/title/items")));
 
         //** WHEN **
         //An anonymous user browses the items in the Browse by item endpoint
@@ -449,10 +450,13 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                .andExpect(jsonPath("$.page.totalPages", is(2)))
                .andExpect(jsonPath("$.page.number", is(0)))
                // embedded items are already checked by other test, we focus on links here
-               .andExpect(jsonPath("$._links.next", Matchers.containsString("/api/discover/browses/author/entries?")))
-               .andExpect(jsonPath("$._links.last", Matchers.containsString("/api/discover/browses/author/entries?")))
-               .andExpect(jsonPath("$._links.first", Matchers.containsString("/api/discover/browses/author/entries?")))
-               .andExpect(jsonPath("$._links.self", Matchers.endsWith("/api/discover/browses/author/entries")));
+                .andExpect(jsonPath("$._links.next.href",
+                        Matchers.containsString("/api/discover/browses/author/entries?")))
+                .andExpect(jsonPath("$._links.last.href",
+                        Matchers.containsString("/api/discover/browses/author/entries?")))
+                .andExpect(jsonPath("$._links.first.href",
+                        Matchers.containsString("/api/discover/browses/author/entries?")))
+                .andExpect(jsonPath("$._links.self.href", Matchers.endsWith("/api/discover/browses/author/entries")));
     }
 
     @Test
