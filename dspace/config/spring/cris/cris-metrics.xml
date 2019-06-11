@@ -20,6 +20,11 @@
 
     <bean class="org.dspace.app.cris.statistics.plugin.StatsViewIndicatorsPlugin" name="ItemStatsViewIndicatorsPlugin">
    		<property name="name" value="ItemStatsViewIndicatorsPlugin"/>
+   		<property name="resourceTypeId" value="2"/>
+   	</bean>
+
+    <bean class="org.dspace.app.cris.statistics.plugin.StatsViewIndicatorsPlugin" name="ItemStatsViewIndicatorsLitePlugin">
+   		<property name="name" value="ItemStatsViewIndicatorsLitePlugin"/>
    		<property name="queryDefault" value="{!join from=search.uniqueid  to=search.uniqueid fromIndex=statistics}time:[NOW-1DAY TO NOW] AND -isBot:true AND statistics_type:view"></property>
    		<property name="resourceTypeId" value="2"/>
    	</bean>
@@ -28,9 +33,14 @@
    		<property name="name" value="ItemStatsViewIndicatorsOptPlugin"/>
    		<property name="resourceTypeId" value="2"/>
    	</bean>
-   	   
+
    	<bean class="org.dspace.app.cris.statistics.plugin.StatsViewIndicatorsPlugin" name="RPStatsViewIndicatorsPlugin">
    		<property name="name" value="RPStatsViewIndicatorsPlugin"/>
+   		<property name="resourceTypeId" value="9"/>
+   	</bean>
+   	   
+   	<bean class="org.dspace.app.cris.statistics.plugin.StatsViewIndicatorsPlugin" name="RPStatsViewIndicatorsLitePlugin">
+   		<property name="name" value="RPStatsViewIndicatorsLitePlugin"/>
    		<property name="queryDefault" value="{!join from=search.uniqueid  to=search.uniqueid fromIndex=statistics}time:[NOW-1DAY TO NOW] AND -isBot:true AND statistics_type:view"></property>
    		<property name="resourceTypeId" value="9"/>
    	</bean>
@@ -39,27 +49,37 @@
    		<property name="name" value="RPStatsViewIndicatorsOptPlugin"/>
    		<property name="resourceTypeId" value="9"/>
    	</bean>
-   	
+
    	<bean class="org.dspace.app.cris.statistics.plugin.StatsViewIndicatorsPlugin" name="OUStatsViewIndicatorsPlugin">
    		<property name="name" value="OUStatsViewIndicatorsPlugin"/>
+   		<property name="resourceTypeId" value="11"/>
+   	</bean>
+   	
+   	<bean class="org.dspace.app.cris.statistics.plugin.StatsViewIndicatorsPlugin" name="OUStatsViewIndicatorsLitePlugin">
+   		<property name="name" value="OUStatsViewIndicatorsLitePlugin"/>
    		<property name="queryDefault" value="{!join from=search.uniqueid  to=search.uniqueid fromIndex=statistics}time:[NOW-1DAY TO NOW] AND -isBot:true AND statistics_type:view"></property>
    		<property name="resourceTypeId" value="11"/>
    	</bean>
    	
    	<bean class="org.dspace.app.cris.statistics.plugin.StatsViewIndicatorsOptimizedPlugin" name="OUStatsViewIndicatorsOptPlugin">
    		<property name="name" value="OUStatsViewIndicatorsOptPlugin"/>
-   		<property name="resourceTypeId" value="9"/>
+   		<property name="resourceTypeId" value="11"/>
    	</bean>   
-   	
+
    	<bean class="org.dspace.app.cris.statistics.plugin.StatsViewIndicatorsPlugin" name="PJStatsViewIndicatorsPlugin">
    		<property name="name" value="PJStatsViewIndicatorsPlugin"/>
+   		<property name="resourceTypeId" value="10"/>
+   	</bean>
+   	
+   	<bean class="org.dspace.app.cris.statistics.plugin.StatsViewIndicatorsPlugin" name="PJStatsViewIndicatorsLitePlugin">
+   		<property name="name" value="PJStatsViewIndicatorsLitePlugin"/>
    		<property name="queryDefault" value="{!join from=search.uniqueid  to=search.uniqueid fromIndex=statistics}time:[NOW-1DAY TO NOW] AND -isBot:true AND statistics_type:view"></property>
    		<property name="resourceTypeId" value="10"/>
    	</bean>
    	
    	<bean class="org.dspace.app.cris.statistics.plugin.StatsViewIndicatorsOptimizedPlugin" name="PJStatsViewIndicatorsOptPlugin">
    		<property name="name" value="PJStatsViewIndicatorsOptPlugin"/>
-   		<property name="resourceTypeId" value="9"/>
+   		<property name="resourceTypeId" value="10"/>
    	</bean>
 
    	

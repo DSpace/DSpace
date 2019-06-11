@@ -3,10 +3,11 @@
 # Get the DSPACE/bin directory
 BINDIR=`dirname $0`
 
-$BINDIR/dspace dsrun org.dspace.app.cris.batch.ScriptStatsMetrics -s ItemStatsViewIndicatorsOptPlugin
-$BINDIR/dspace dsrun org.dspace.app.cris.batch.ScriptStatsMetrics -s RPStatsViewIndicatorsOptPlugin
-$BINDIR/dspace dsrun org.dspace.app.cris.batch.ScriptStatsMetrics -s OUStatsViewIndicatorsOptPlugin
-$BINDIR/dspace dsrun org.dspace.app.cris.batch.ScriptStatsMetrics -s PJStatsViewIndicatorsOptPlugin
+# works on experimental Lite version of the plugin see cris-metrics.xml
+$BINDIR/dspace dsrun org.dspace.app.cris.batch.ScriptStatsMetrics -s ItemStatsViewIndicatorsLitePlugin
+$BINDIR/dspace dsrun org.dspace.app.cris.batch.ScriptStatsMetrics -s RPStatsViewIndicatorsLitePlugin
+$BINDIR/dspace dsrun org.dspace.app.cris.batch.ScriptStatsMetrics -s OUStatsViewIndicatorsLitePlugin
+$BINDIR/dspace dsrun org.dspace.app.cris.batch.ScriptStatsMetrics -s PJStatsViewIndicatorsLitePlugin
 #$BINDIR/dspace dsrun org.dspace.app.cris.batch.ScriptStatsMetrics -s PercentileViewIndicatorsPlugin
 #$BINDIR/dspace dsrun org.dspace.app.cris.batch.ScriptStatsMetrics -s PercentileViewAggregateIndicatorsPlugin
 #$BINDIR/dspace dsrun org.dspace.app.cris.batch.ScriptStatsMetrics -s PercentileDownloadIndicatorsPlugin
