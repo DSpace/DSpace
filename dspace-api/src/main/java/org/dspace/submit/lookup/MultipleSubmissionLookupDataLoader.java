@@ -46,6 +46,8 @@ public class MultipleSubmissionLookupDataLoader implements DataLoader
     private static final String NOT_FOUND_SCOPUS = "NOT-FOUND-SCOPUS";
     private static final String NOT_FOUND_ORCID = "NOT-FOUND-ORCID";
     private static final String NOT_FOUND_CINII = "NOT-FOUND-CINII";
+    
+    private static final String ORIGINAL_RECORD = "original";
 
     Map<String, DataLoader> dataloadersMap;
 
@@ -88,9 +90,11 @@ public class MultipleSubmissionLookupDataLoader implements DataLoader
                     record.makeMutable().addValue(
                             SubmissionLookupService.PROVIDER_NAME_FIELD,
                             new StringValue(providerName));
-                    record.makeMutable().addValue(
+                    if(identifiers != null) {
+                    	record.makeMutable().addValue(
                             "originalRecord",
-                            new StringValue(identifiers.keySet().iterator().next()));
+                            new StringValue(ORIGINAL_RECORD));
+                    }
                 }
             }
         }

@@ -637,7 +637,7 @@ if (dedupEnabled && admin_button) { %>
 <% } 
   if(altMetricDimensionsEnabled) { %>
 <div class="col-lg-12 col-md-4 col-sm-6">
-<div class="altmetric">
+<div class="dimensions">
 	<div class="media-left">
 	
       	<div class="__dimensions_badge_embed__" data-legend="hover-right" data-style="small_circle" <% if (doi != null) { %> data-doi="<%= doi %>"<% } else if (pmid != null) { %> data-pmid="<%= pmid %>"<% } %>" ></div>
