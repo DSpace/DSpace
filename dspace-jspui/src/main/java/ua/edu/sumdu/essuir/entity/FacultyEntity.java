@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.*;
 import java.util.List;
@@ -21,9 +23,10 @@ public class FacultyEntity {
     @JsonProperty("name")
     private String name;
 
-    @OneToMany(mappedBy = "facultyEntityName", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "facultyEntityName")
     @JsonProperty("chairs")
     @JsonManagedReference
+    @LazyCollection(LazyCollectionOption.FALSE)
     private List<ChairEntity> chairs;
 
     private FacultyEntity(Builder builder) {

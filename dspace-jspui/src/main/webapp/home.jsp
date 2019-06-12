@@ -80,7 +80,7 @@
 		<table border="0" cellpadding="2" width="100%">
 			<tr>
 				<%
-					java.util.Hashtable<String, Long> types = EssuirUtils.getTypesCount();
+					java.util.Map<String, Long> types = EssuirUtils.getTypesCount();
 					java.util.TreeMap<String, String> typesLocale = new java.util.TreeMap<String, String>();
 
 					for (String type : types.keySet()) {

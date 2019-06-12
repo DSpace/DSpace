@@ -49,11 +49,6 @@ public class Speciality implements Depositor {
         return id;
     }
 
-    @Override
-    public Integer getSubmissionCount() {
-        return null;
-    }
-
     public String getName() {
         return name;
     }

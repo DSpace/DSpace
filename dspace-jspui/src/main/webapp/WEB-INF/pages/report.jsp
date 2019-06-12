@@ -1,5 +1,7 @@
 <%@ page import="org.dspace.eperson.EPerson" %>
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
+<%@ page import="java.time.format.DateTimeFormatter" %>
+<%@ page import="java.time.LocalDate" %>
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
@@ -28,6 +30,10 @@
     boolean isAdmin = (admin == null ? false : admin.booleanValue());
 
     if (isAdmin || userEmail.equals("library_ssu@ukr.net") || userEmail.equals("libconsult@rambler.ru")) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+        LocalDate from = request.getParameter("fromDate") == null ? LocalDate.of(2010, 1, 1) : LocalDate.parse(request.getParameter("fromDate"), formatter);
+        LocalDate to = request.getParameter("endDate") == null ? LocalDate.now() : LocalDate.parse(request.getParameter("endDate"), formatter);
+
 %>
 <dspace:layout locbar="nolink" title="Statistics" feedData="NONE">
     <div class="center-block">
@@ -48,6 +54,7 @@
         </div>
     </div>
     <script>
+        var depositorType = ["faculty", "chair", "person"];
         webix.ready(function () {
             grid = webix.ui({
                 container: "reportTable",
@@ -58,7 +65,15 @@
                         header: ["<%= LocaleSupport.getLocalizedMessage(pageContext, "report.depositor") %>", {content: "textFilter"}],
                         width: 600,
                         sort: "string",
-                        template: "{common.treetable()} #name#"
+                        template: function(obj, common, value, config) {
+                            // console.log(obj.$level);
+                            // var parent = grid.getItem(obj.$parent);
+                            // var pname = "";
+                            // if(parent) {
+                            //     pname = parent.name + "//";
+                            // }
+                            return common.treetable(obj, common, value, config) + " <a href = \"/statistics/itemUploadingReport?from=" + $('#beginDate').val() + "&to=" + $('#endDate').val() + "&" +depositorType[obj.$level - 1] + "=" + obj.name + "&depositor=" + obj.name + "\">" + obj.name + "</a>";
+                        }
                     },
                     {id: "submission_count", header: "<%= LocaleSupport.getLocalizedMessage(pageContext, "report.submissions-count") %>", width: 200, sort: "int"}
                 ],
@@ -77,11 +92,10 @@
             });
         });
 
-        $(document).ready(function () {
-            var today = new Date();
-            var day = today.getDate();
-            var month = today.getMonth() + 1;
-            var year = today.getFullYear();
+        function parseDate(date) {
+            var day = date.getDate();
+            var month = date.getMonth() + 1;
+            var year = date.getFullYear();
             if (day < 10) {
                 day = '0' + day
             }
@@ -89,8 +103,14 @@
             if (month < 10) {
                 month = '0' + month
             }
+            return day + '.' + month + '.' + year;
+        }
 
-            $('#endDate').val(day + '.' + month + '.' + year);
+        $(document).ready(function () {
+            var date = '<%= from %>';
+            var endDate = '<%= to %>';
+            $('#endDate').val(parseDate(new Date(endDate)));
+            $('#beginDate').val(parseDate(new Date(date)));
         });
 
         $(function () {

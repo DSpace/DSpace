@@ -653,7 +653,7 @@ public class DatabaseManager
     {
         try
         {
-            if (c != null)
+            if (c != null && !c.isClosed())
             {
                 c.close();
             }

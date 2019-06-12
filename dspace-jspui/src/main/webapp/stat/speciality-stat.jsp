@@ -42,7 +42,7 @@
     if (isAdmin || userEmail.equals("library_ssu@ukr.net") || userEmail.equals("libconsult@rambler.ru")) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
         LocalDate from = request.getParameter("fromDate") == null ? LocalDate.of(2010, 1, 1) : LocalDate.parse(request.getParameter("fromDate"), formatter);
-        LocalDate to = request.getParameter("endDate") == null ? LocalDate.MAX : LocalDate.parse(request.getParameter("endDate"), formatter);
+        LocalDate to = request.getParameter("endDate") == null ? LocalDate.now() : LocalDate.parse(request.getParameter("endDate"), formatter);
 %>
 
 
@@ -120,7 +120,8 @@
         }
         $(document).ready(function () {
             var date = '<%= from %>';
-            $('#endDate').val(parseDate(new Date()));
+            var endDate = '<%= to %>';
+            $('#endDate').val(parseDate(new Date(endDate)));
             $('#beginDate').val(parseDate(new Date(date)));
         });
 

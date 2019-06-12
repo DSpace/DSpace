@@ -1,65 +1,78 @@
 package ua.edu.sumdu.essuir.service;
 
 
-import org.apache.log4j.Logger;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
-import ua.edu.sumdu.essuir.entity.Faculty;
-import ua.edu.sumdu.essuir.entity.Item;
+import ua.edu.sumdu.essuir.entity.*;
 
 import javax.annotation.Resource;
-import javax.sql.rowset.CachedRowSet;
-import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.function.BiPredicate;
+import java.util.stream.Collectors;
+
 
 @Service
 public class ReportService {
-    private static Logger log = Logger.getLogger(ReportService.class);
     @Resource
     private DatabaseService databaseService;
 
     @Resource
     private SpecialityReportFetcher specialityReportFetcher;
 
-    private List<Faculty> populateDataFromQueryResult(CachedRowSet queryResult) {
-        Map<String, Faculty> submissions = new HashMap<String, Faculty>();
-        try {
-            while (queryResult.next()) {
-                if (!"null".equals(queryResult.getString("email"))) {
-                    String faculty = queryResult.getString("faculty_name") == null ? " " : queryResult.getString("faculty_name");
-                    String chair = queryResult.getString("chair_name") == null ? " " : queryResult.getString("chair_name");
-                    String email = queryResult.getString("email");
-                    String lastname = Optional.ofNullable(queryResult.getString("lastname")).orElse("null");
-                    String firstname = Optional.ofNullable(queryResult.getString("firstname")).orElse("null");
-                    String person = email;
-                    if (!"null".equals(lastname) && !"null".equals(firstname)) {
-                        person = String.format("%s %s", lastname, firstname);
-                    }
-                    Integer submissionCount = Integer.parseInt(queryResult.getString("submits"));
-                    if (!submissions.containsKey(faculty)) {
-                        submissions.put(faculty, new Faculty(faculty));
-                    }
-                    submissions.get(faculty).addSubmission(chair, person, submissionCount);
-                }
-            }
-        } catch (SQLException ex) {
+    private BiPredicate<LocalDate, Pair<LocalDate, LocalDate>> isDateInRange = (date, range) -> date.isAfter(range.getLeft().minusDays(1)) && date.isBefore(range.getRight().plusDays(1));
 
+    private List<Faculty> collectStatistics(Map<Depositor, Long> data) {
+        Map<String, Faculty> result = new HashMap<>();
+        for (Map.Entry<Depositor, Long> submission : data.entrySet()) {
+            String facultyName = submission.getKey().getChairEntity().getFacultyEntityName();
+            String chairName = submission.getKey().getChairEntity().getChairName();
+            String specialityName = submission.getKey().getName();
+            result.putIfAbsent(facultyName, new Faculty(facultyName));
+            result.get(facultyName).addSubmission(chairName, specialityName, submission.getValue().intValue());
         }
-        return new ArrayList<>(submissions.values());
+
+        return new ArrayList<>(result.values());
     }
 
     public List<Faculty> getUsersSubmissionCountBetweenDates(LocalDate from, LocalDate to) {
-        String query = String.format("select eperson.eperson_id, email, lastname, firstname, chair_name, faculty_name, count(metadatavalue.resource_id) as submits " +
-                "from eperson " +
-                "left join chair on eperson.chair_id = chair.chair_id " +
-                "left join faculty on faculty.faculty_id = chair.faculty_id " +
-                "left join item on item.submitter_id = eperson_id and in_archive " +
-                "left join metadatavalue on metadatavalue.resource_id = item.item_id and metadata_field_id = 11 " +
-                "and text_value between '%d-%02d-%02d' and '%d-%02d-%02d' " +
-                "group by eperson.eperson_id, chair_name, faculty_name ", from.getYear(), from.getMonth().getValue(), from.getDayOfMonth(), to.getYear(), to.getMonth().getValue(), to.getDayOfMonth());
-        return populateDataFromQueryResult(databaseService.executeQuery(query));
+        List<Item> items = databaseService.fetchItemsInArchive();
+        Map<Depositor, Long> data = items.stream()
+                .filter(item -> isDateInRange.test(item.getDateAvailable(), Pair.of(from, to)))
+                .collect(Collectors.groupingBy(Item::getSubmitter, Collectors.counting()));
+
+        return collectStatistics(data);
     }
 
+    public List<Item> getUploadedItemsByFacultyName(String faculty, LocalDate from, LocalDate to) {
+        List<Item> items = databaseService.fetchItemsInArchive();
+
+        return items
+                .stream()
+                .filter(item -> isDateInRange.test(item.getDateAvailable(), Pair.of(from, to)))
+                .filter(item -> faculty.equals(item.getSubmitter().getChairEntity().getFacultyEntityName()))
+                .collect(Collectors.toList());
+    }
+
+    public List<Item> getUploadedItemsByChairName(String chair, LocalDate from, LocalDate to) {
+        List<Item> items = databaseService.fetchItemsInArchive();
+
+        return items
+                .stream()
+                .filter(item -> isDateInRange.test(item.getDateAvailable(), Pair.of(from, to)))
+                .filter(item -> chair.equals(item.getSubmitter().getChairEntity().getChairName()))
+                .collect(Collectors.toList());
+    }
+
+    public List<Item> getUploadedItemsByPersonEmail(String person, LocalDate from, LocalDate to) {
+        List<Item> items = databaseService.fetchItemsInArchive();
+
+        return items
+                .stream()
+                .filter(item -> isDateInRange.test(item.getDateAvailable(), Pair.of(from, to)))
+                .filter(item -> person.equals(item.getSubmitter().getEmail()))
+                .collect(Collectors.toList());
+    }
 
     public List<Item> getItemsInSpeciality(String pattern, LocalDate from, LocalDate to) {
         return specialityReportFetcher.getItemsInSpeciality(pattern, from, to);
@@ -70,6 +83,6 @@ public class ReportService {
     }
 
     public List<Faculty> getSpecialitySubmissionCountBetweenDates(LocalDate from, LocalDate to) {
-        return specialityReportFetcher.getSpecialitySubmissionCountBetweenDates(from, to);
+        return collectStatistics(specialityReportFetcher.getSpecialitySubmissionCountBetweenDates(from, to));
     }
 }

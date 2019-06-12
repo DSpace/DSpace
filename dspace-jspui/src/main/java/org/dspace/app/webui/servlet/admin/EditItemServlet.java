@@ -131,7 +131,7 @@ public class EditItemServlet extends DSpaceServlet
             // resolve handle
             DSpaceObject dso = HandleManager.resolveToObject(context, handle.trim());
 
-            // make sure it's an ITEM
+            // make sure it's an TABLE
             if ((dso != null) && (dso.getType() == Constants.ITEM))
             {
                 itemToEdit = (Item) dso;

@@ -2,6 +2,8 @@ package ua.edu.sumdu.essuir.utils;
 
 
 import org.apache.log4j.Logger;
+import org.jooq.Record;
+import org.jooq.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ua.edu.sumdu.essuir.cache.Author;
@@ -15,6 +17,7 @@ import javax.sql.rowset.CachedRowSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 public class EssuirUtils {
@@ -53,20 +56,13 @@ public class EssuirUtils {
         EssuirUtils.chairRepository = chairRepository;
     }
 
-    public static Hashtable<String, Long> getTypesCount() {
-        Hashtable<String, Long> types = new Hashtable<String, Long>();
+    public static Map<String, Long> getTypesCount() {
         String query = "SELECT text_value, COUNT(*) AS cnts FROM metadatavalue WHERE metadata_field_id = 66 AND resource_id IN (SELECT item_id FROM item WHERE in_archive) GROUP BY text_value;";
 
-        try {
-            CachedRowSet resSet = databaseService.executeQuery(query);
-            while (resSet.next()) {
-                types.put(resSet.getString("text_value"), resSet.getLong("cnts"));
-            }
-        } catch (Exception e) {
-            logger.error(e);
-        }
+        Result<Record> resSet = databaseService.executeQuery(query);
+        return resSet.stream()
+                .collect(Collectors.toMap(item -> item.get("text_value", String.class), item -> item.get("cnts", Long.class)));
 
-        return types;
     }
 
     private static String prevSessionLocale = "";
@@ -101,16 +97,11 @@ public class EssuirUtils {
 
     public static String getMinimalPaperYear() {
         String query = "SELECT MIN(text_value) AS value FROM metadatavalue LEFT JOIN item ON resource_id = item_id WHERE metadata_field_id = 15 AND in_archive";
-        CachedRowSet result = databaseService.executeQuery(query);
-        List<String> years = new LinkedList<>();
+        Result<Record> result = databaseService.executeQuery(query);
+        List<String> years = result.stream()
+                .map(item -> item.getValue("value", String.class))
+                .collect(Collectors.toList());
 
-        try {
-            while (result.next()) {
-                years.add(result.getString("value"));
-            }
-        } catch (SQLException e) {
-            logger.error(e);
-        }
         if (years.isEmpty()) {
             return MINIMAL_YEAR;
         } else {
@@ -131,21 +122,17 @@ public class EssuirUtils {
                 "ORDER BY eperson_id DESC " +
                 "LIMIT " + limit;
 
-        CachedRowSet queryResult = databaseService.executeQuery(query);
+        Result<Record> queryResult = databaseService.executeQuery(query);
         List<AuthorData> result = new LinkedList<>();
 
-        try {
-            while (queryResult.next()) {
-                result.add(new AuthorData().setLastname(queryResult.getString("lastname"))
-                        .setFirstname(queryResult.getString("firstname"))
-                        .setEmail(queryResult.getString("email"))
-                        .setFaculty(queryResult.getString("faculty_name"))
-                        .setChair(queryResult.getString("chair_name")));
-            }
-        } catch (SQLException e) {
-            logger.error(e);
-        }
-        return result;
+        return queryResult.stream()
+                .map(item -> new AuthorData().setLastname(item.get("lastname", String.class))
+                        .setFirstname(item.get("firstname", String.class))
+                        .setEmail(item.get("email", String.class))
+                        .setFaculty(item.get("faculty_name", String.class))
+                        .setChair(item.get("chair_name", String.class)))
+                .collect(Collectors.toList());
+
     }
 
     public static List<FacultyEntity> getFacultyList() {

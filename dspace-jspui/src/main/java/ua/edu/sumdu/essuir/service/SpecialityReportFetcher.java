@@ -7,13 +7,11 @@ import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import ua.edu.sumdu.essuir.entity.*;
-import ua.edu.sumdu.essuir.repository.ItemRepository;
 
 import javax.annotation.Resource;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -22,14 +20,11 @@ import java.util.stream.Stream;
 @Component
 public class SpecialityReportFetcher {
     private static Logger log = Logger.getLogger(SpecialityReportFetcher.class);
-
     @Resource
-    private ItemRepository itemRepository;
+    private DatabaseService databaseService;
 
-    private BiPredicate<String, Pair<LocalDate, LocalDate>> isDateInRange = (date, range) -> {
-        LocalDate localDate = LocalDateTime.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")).toLocalDate();
-        return localDate.isAfter(range.getLeft()) && localDate.isBefore(range.getRight());
-    };
+
+    private BiPredicate<LocalDate, Pair<LocalDate, LocalDate>> isDateInRange = (date, range) -> date.isAfter(range.getLeft().minusDays(1)) && date.isBefore(range.getRight().plusDays(1));
 
     private Speciality extractSpecialityCode(String data) {
         FacultyEntity defaultFacultyEntity = new FacultyEntity.Builder().withId(-1).withName("-").build();
@@ -71,16 +66,18 @@ public class SpecialityReportFetcher {
         return defaultSpecialityEntity;
     }
 
-    private List<Item> getBachelorsPapersMetadata() {
-        return itemRepository.selectBachelousAndMastersPapersWithMetadataFields();
+    @Transactional
+    public List<Item> getBachelorsPapersMetadata() {
+        return databaseService.fetchMastersAndBachelorsPapers();
     }
 
     private boolean isSpecialityNameAndPresentationDatePresented(Item item) {
         return !item.getSpecialityName().isEmpty() && !item.getPresentationDate().isEmpty();
     }
 
-    public List<Faculty> getSpecialitySubmissionCountBetweenDates(LocalDate from, LocalDate to) {
-        Map<Speciality, Long> specialityStatistics = getBachelorsPapersMetadata()
+    public Map<Depositor, Long> getSpecialitySubmissionCountBetweenDates(LocalDate from, LocalDate to) {
+        List<Item> bachelorsPapersMetadata = getBachelorsPapersMetadata();
+        return bachelorsPapersMetadata
                 .stream()
                 .filter(this::isSpecialityNameAndPresentationDatePresented)
                 .filter(item -> isDateInRange.test(item.getDateAvailable(), Pair.of(from, to)))
@@ -88,17 +85,6 @@ public class SpecialityReportFetcher {
                 .entrySet()
                 .stream()
                 .collect(Collectors.toMap(item -> extractSpecialityCode(item.getKey()), Map.Entry::getValue));
-
-        Map<String, Faculty> result = new HashMap<>();
-        for (Map.Entry<Speciality, Long> submission : specialityStatistics.entrySet()) {
-            String facultyName = submission.getKey().getChairEntity().getFacultyEntityName();
-            String chairName = submission.getKey().getChairEntity().getChairName();
-            String specialityName = submission.getKey().getName();
-            result.putIfAbsent(facultyName, new Faculty(facultyName));
-            result.get(facultyName).addSubmission(chairName, specialityName, submission.getValue().intValue());
-        }
-
-        return new ArrayList<>(result.values());
     }
 
     public List<Item> getBachelorsWithoutSpeciality() {

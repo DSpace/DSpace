@@ -1,19 +1,25 @@
 package ua.edu.sumdu.essuir.entity;
 
-import org.hibernate.annotations.Where;
+import org.hibernate.annotations.*;
 
 import javax.persistence.*;
+import javax.persistence.Entity;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Entity
+@Where(clause = "in_archive = true")
 public class Item {
     @Id
     @Column(name = "item_id")
     private Integer itemId;
 
-    @Column(name = "submitter_id")
-    private Integer submitterId;
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "submitter_id", referencedColumnName = "eperson_id")
+    @NotFound(action = NotFoundAction.IGNORE)
+    private EPerson submitter;
 
     @Column(name = "in_archive")
     private Boolean inArchive;
@@ -24,50 +30,7 @@ public class Item {
     @Column(name = "withdrawn")
     private Boolean withdrawn;
 
-    @OneToMany(
-            mappedBy = "item",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true,
-            fetch = FetchType.EAGER
-    )
-    @Where(clause = "metadata_field_id = 133")
-    private List<Metadatavalue> metadataFieldsForSpeciality = new ArrayList<>();
 
-    @OneToMany(
-            mappedBy = "item",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true,
-            fetch = FetchType.EAGER
-    )
-    @Where(clause = "metadata_field_id = 134")
-    private List<Metadatavalue> metadataFieldsForPresentationDate = new ArrayList<>();
-
-    @OneToMany(
-            mappedBy = "item",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true,
-            fetch = FetchType.EAGER
-    )
-    @Where(clause = "metadata_field_id = 25")
-    private List<Metadatavalue> metadataFieldsForLink = new ArrayList<>();
-
-    @OneToMany(
-            mappedBy = "item",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true,
-            fetch = FetchType.EAGER
-    )
-    @Where(clause = "metadata_field_id = 64")
-    private List<Metadatavalue> metadataFieldsForTitle = new ArrayList<>();
-
-    @OneToMany(
-            mappedBy = "item",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true,
-            fetch = FetchType.EAGER
-    )
-    @Where(clause = "metadata_field_id = 12")
-    private List<Metadatavalue> metadataFieldsForDateAvailable = new ArrayList<>();
 
     @Column(name = "last_modified")
     private LocalDateTime lastModified;
@@ -80,20 +43,25 @@ public class Item {
 
     private Item(Builder builder) {
         itemId = builder.itemId;
-        submitterId = builder.submitterId;
+        submitter = builder.submitter;
         inArchive = builder.inArchive;
         owningCollection = builder.owningCollection;
         withdrawn = builder.withdrawn;
         lastModified = builder.lastModified;
         discoverable = builder.discoverable;
+        specialityName = builder.specialityName;
+        presentationDate = builder.presentationDate;
+        title = builder.title;
+        link = builder.link;
+        dateAvailable = builder.dateAvailable;
+    }
+
+    public EPerson getSubmitter() {
+        return submitter;
     }
 
     public Integer getItemId() {
         return itemId;
-    }
-
-    public Integer getSubmitterId() {
-        return submitterId;
     }
 
     public Boolean getInArchive() {
@@ -116,54 +84,72 @@ public class Item {
         return discoverable;
     }
 
-    private String getMetadataFieldValue(List<Metadatavalue> values) {
-        return values.stream()
-                .filter(item -> item.getPlace() == 1 && item.getResourceTypeId() == 2)
-                .findAny()
-                .map(Metadatavalue::getTextValue)
-                .orElse("");
-    }
+    @Transient
+    private String specialityName;
+
+    @Transient
+    private String presentationDate;
+
+    @Transient
+    private String title;
+
+    @Transient
+    private String link;
+
+    @Transient
+    private String dateAvailable;
 
     public String getSpecialityName() {
-        return getMetadataFieldValue(metadataFieldsForSpeciality);
+        return specialityName;
     }
 
     public String getPresentationDate() {
-        return getMetadataFieldValue(metadataFieldsForPresentationDate);
+        return presentationDate;
     }
 
     public String getTitle() {
-        return getMetadataFieldValue(metadataFieldsForTitle);
+        return title;
     }
 
     public String getLink() {
-        return getMetadataFieldValue(metadataFieldsForLink);
+        return link;
     }
 
-    public String getDateAvailable() {
-        return getMetadataFieldValue(metadataFieldsForDateAvailable);
+    public LocalDate getDateAvailable() {
+        return LocalDateTime.parse(dateAvailable.isEmpty() ? "2001-01-01T01:01:01Z": dateAvailable, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")).toLocalDate();
     }
+
 
     public static final class Builder {
         private Integer itemId;
-        private Integer submitterId;
+        private EPerson submitter;
         private Boolean inArchive;
         private Integer owningCollection;
         private Boolean withdrawn;
         private LocalDateTime lastModified;
         private Boolean discoverable;
+        private String specialityName;
+        private String presentationDate;
+        private String title;
+        private String link;
+        private String dateAvailable;
 
         public Builder() {
         }
 
         public Builder(Item copy) {
             this.itemId = copy.getItemId();
-            this.submitterId = copy.getSubmitterId();
+            this.submitter = copy.getSubmitter();
             this.inArchive = copy.getInArchive();
             this.owningCollection = copy.getOwningCollection();
             this.withdrawn = copy.getWithdrawn();
             this.lastModified = copy.getLastModified();
             this.discoverable = copy.getDiscoverable();
+            this.specialityName = copy.getSpecialityName();
+            this.presentationDate = copy.getPresentationDate();
+            this.title = copy.getTitle();
+            this.link = copy.getLink();
+            this.dateAvailable = copy.getDateAvailable().toString();
         }
 
         public Builder withItemId(Integer itemId) {
@@ -171,8 +157,8 @@ public class Item {
             return this;
         }
 
-        public Builder withSubmitterId(Integer submitterId) {
-            this.submitterId = submitterId;
+        public Builder withSubmitter(EPerson submitter) {
+            this.submitter = submitter;
             return this;
         }
 
@@ -198,6 +184,31 @@ public class Item {
 
         public Builder withDiscoverable(Boolean discoverable) {
             this.discoverable = discoverable;
+            return this;
+        }
+
+        public Builder withSpecialityName(String specialityName) {
+            this.specialityName = specialityName;
+            return this;
+        }
+
+        public Builder withPresentationDate(String presentationDate) {
+            this.presentationDate = presentationDate;
+            return this;
+        }
+
+        public Builder withTitle(String title) {
+            this.title = title;
+            return this;
+        }
+
+        public Builder withLink(String link) {
+            this.link = link;
+            return this;
+        }
+
+        public Builder withDateAvailable(String dateAvailable) {
+            this.dateAvailable = dateAvailable;
             return this;
         }
 
