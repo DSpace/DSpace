@@ -101,6 +101,7 @@ public class DryadDataPackage extends DryadObject {
     // title and identifier are declared in DryadObject
     private List<DryadDataFile> cachedDataFiles;
     private String curationStatus = "";
+    private String curationStatusForDash = "";
     private String curationStatusReason = "";
     private String abstractString = "";
     private ArrayList<Author> authors = new ArrayList<>();
@@ -113,6 +114,8 @@ public class DryadDataPackage extends DryadObject {
     private ArrayList<String> mismatchedDOIs = new ArrayList<>();
     private ArrayList<DryadDataPackage> duplicateItems = new ArrayList<>();
     private EPerson submitter = null;
+    private String packageEmbargoType = null;
+    private Date packageEmbargoDate = null;
 
     private int dashUserID = 0;
     
@@ -611,6 +614,17 @@ public class DryadDataPackage extends DryadObject {
         }
     }
 
+    /**
+       DashDryad uses curation statuses slightly differently, so when a Dash-oriented process is
+       asking, we prefer to return the curationStatusForDash if it's available.
+     **/
+    public String getCurationStatusForDash() {
+        if (curationStatusForDash != null && curationStatusForDash.length() > 0){
+            return curationStatusForDash;
+        }
+        return getCurationStatus();
+    }
+
     public String getCurationStatusReason() {
         return curationStatusReason;
     }
@@ -728,7 +742,8 @@ public class DryadDataPackage extends DryadObject {
             }
             resultNode.add(node);
         }
-
+        curationStatusForDash = currentStatus;
+        
         return resultNode;
     }
 
@@ -1022,6 +1037,86 @@ public class DryadDataPackage extends DryadObject {
         return fileList;
     }
 
+    /**
+       Returns the "package-level" embargo status. That is, the most restrictive
+       embargo status associated with any of the DryadDataFiles.
+    **/
+    public String getPackageEmbargoType() {
+        log.debug("- getPackageEmbargoType, currently " + packageEmbargoType);
+        if(packageEmbargoType == null || packageEmbargoType.length() == 0) {
+            initPackageEmbargoInfo();
+        }
+        return packageEmbargoType;
+    }
+
+    /**
+       Returns the "package-level" embargo date. That is, the most restrictive
+       embargo date associated with any of the DryadDataFiles.
+    **/
+    public Date getPackageEmbargoDate() {
+        log.debug("- getPackageEmbargoDate, currently " + packageEmbargoDate);
+        if(packageEmbargoDate == null) {
+            initPackageEmbargoInfo();
+        }
+        return packageEmbargoDate;
+    }
+
+    private void initPackageEmbargoInfo() {
+        packageEmbargoType = "none";
+        Context c = null;
+        try {
+            c = new Context();            
+        } catch (Exception e) {
+            log.fatal("Can't create a context! Something is very wrong!", e);
+        }
+
+        List<DryadDataFile> files = null;
+        try {
+            files = getDataFiles(c);
+        } catch (Exception e) {
+            log.error("can't get data files!", e);
+        }
+        for(DryadDataFile file : files) {
+            log.debug("-- file embargoType: " + file.getEmbargoType());
+            log.debug("-- file embargoDate: " + file.getEmbargoDate());
+            if(file.getEmbargoType().equals("custom")) {
+                log.debug("--- set custom");
+                packageEmbargoType = "custom";
+            } else if(file.getEmbargoType().equals("oneyear") || file.getEmbargoType().equals("one year")) {
+                if(!packageEmbargoType.equals("custom")) {
+                    log.debug("--- set oneyear");
+                    packageEmbargoType = "oneyear";
+                }
+            } else if (file.getEmbargoType().equals("untilArticleAppears")) {
+                if(packageEmbargoType.equals("none")) {
+                    log.debug("--- set article");
+                    packageEmbargoType = "untilArticleAppears";
+                }
+            } 
+
+            // update the package embargo date to be the latest date present in
+            // any file, but *not* placeholder dates like 9999-12-31.
+            if(file.getEmbargoDate() != null &&
+               file.getEmbargoDate().before(new Date(7000,01,01))) {
+                log.debug("-- valid file embargoDate: " + file.getEmbargoDate()); 
+                if(packageEmbargoDate == null) {
+                    packageEmbargoDate = file.getEmbargoDate();
+                }
+            
+                if(file.getEmbargoDate().after(packageEmbargoDate)) {
+                    packageEmbargoDate = file.getEmbargoDate();
+                }
+            }
+
+            // even if an embargo status is set, if the date is in the past, we will clear it,
+            // because the embargo is no longer active
+            if(packageEmbargoDate != null && packageEmbargoDate.before(new Date())) {
+                log.debug("- clearing package embargo due to expired date");
+                packageEmbargoType = "none";
+            }
+        }
+    }
+    
     public List<DryadDataFile> getDataFiles(Context context) throws SQLException {
         log.debug("getDataFiles");
         if(cachedDataFiles == null) {
