@@ -177,7 +177,7 @@ public class PackageResource {
             try {
                 DryadDataPackage dryadDataPackage = new DryadDataPackage(manuscript);
                 dryadDataPackage.setIdentifier(pkg.getDryadDOI());
-                dryadDataPackage.setSubmitter(new EPerson(pkg.getDashUserID()));
+                dryadDataPackage.setSubmitter(new EPerson(pkg.getDataPackage().getDashUserID()));
                 packageStorage.create(journalPath, new Package(dryadDataPackage));
             } catch (Exception ex) {
                 log.error("Exception creating manuscript", ex);

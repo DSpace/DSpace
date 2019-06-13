@@ -1,6 +1,3 @@
-
-/*
- */
 package org.datadryad.rest.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -69,16 +66,6 @@ public class Package {
 
     public Integer getItemID() {
         return itemID;
-    }
-
-    public void setDashUserID(Integer userID) {
-        EPerson user = new EPerson();
-        user.setID(userID);
-        dataPackage.setSubmitter(user);
-    }
-
-    public Integer getDashUserID() {
-        return dataPackage.getSubmitter().getID();
     }
 
     public String getPublicationDOI() {
@@ -242,9 +229,6 @@ public class Package {
             jGen.writeStringField("abstract", restPackage.getAbstract());
             jGen.writeObjectField("authors", restPackage.getAuthorList());
 
-            //WORKING date
-            //jGen.writeStringField("date-available", dataPackage.getDateAccessioned());
-            
             if(ddp.getItem().isArchived()) {
                 ShoppingCart sc = ddp.getShoppingCart();
                 if(sc == null) {
@@ -257,10 +241,21 @@ public class Package {
             // keywordsToWrite and spatialToWrite will include both package- and file-level keywords
             Set<String> keywordsToWrite = new HashSet<String>();
             Set<String> spatialToWrite = new HashSet<String>();
-            
-            //TODO: replace this with a real epersonID OR DASH user ID
-            jGen.writeStringField("userId", "1");
 
+            
+            try {
+                int userId = ddp.getDashUserID();
+                log.debug("userId = " + userId);
+                if(userId > 0) {
+                    jGen.writeStringField("userId", "" + userId);
+                } else {
+                    log.debug("setting default userId of 1");
+                    jGen.writeStringField("userId", "1");
+                }
+            } catch(Exception e) {
+                log.error("unable to get submitter's ID", e);
+            }
+            
             // Data Files
             // for each file, write the
             // # <h3>File Title
@@ -274,36 +269,44 @@ public class Package {
                 if(ddfs.size() > 0) {
                     String fileListString = "";
                     for(DryadDataFile dryadFile : ddfs) {
-                        log.debug("serializing file " + dryadFile.getIdentifier() + ", " + dryadFile.getDryadDOI()); 
-                        String fileTitle = dryadFile.getTitle();
-                        fileListString = fileListString + "<h4>" + fileTitle + "</h4>";
-                        String fileDescription = dryadFile.getDescription();
-                        if(fileDescription != null) {
-                            fileListString = fileListString + "<p>" + fileDescription + "</p>";
-                        }
+                        log.debug("serializing file " + dryadFile.getIdentifier() + ", " + dryadFile.getDryadDOI());
 
-                        // file-level keywords
+                        // file-level keywords get saved to export at the package level
                         // temporal coverage, and scientific names are lumped in with keywords for now
                         keywordsToWrite.addAll(dryadFile.getKeywords());
                         keywordsToWrite.addAll(dryadFile.getCoverageTemporal());
                         keywordsToWrite.addAll(dryadFile.getScientificNames());
-
                         spatialToWrite.addAll(dryadFile.getCoverageSpatial());
+
+                        // file titles, names, descriptions get formatted into the Usage Notes
+                        String fileTitle = dryadFile.getTitle();                        
+                        fileListString = fileListString + "<div class=\"o-metadata__file-usage-entry\"><h4 class=\"o-heading__level3-file-title\">" + fileTitle + "</h4>";
                         
+                        String fileDescription = dryadFile.getDescription();
+                        if(fileDescription != null) {
+                            fileListString = fileListString + "<div class=\"o-metadata__file-description\">" + fileDescription + "</div>";
+                        }
+                                                
                         // bitstreams
-                        fileListString = fileListString + "<p>";
                         String previousBitstreamFilename = "";
                         for(Bitstream dspaceBitstream : dryadFile.getAllBitstreams()) {
+                            fileListString = fileListString + "<div class=\"o-metadata__file-name\">";
                             DryadBitstream dryadBitstream = new DryadBitstream(dspaceBitstream);                    
                             if(dryadBitstream.isReadme()) {
                                 dryadBitstream.setReadmeFilename(previousBitstreamFilename);
                                 fileListString = fileListString + dryadBitstream.getReadmeFilename() + "</br>";
                             } else {
-                                fileListString = fileListString + dspaceBitstream.getName() + "</br>";
+                                String filename = dspaceBitstream.getName();
+                                if(filename.startsWith(fileTitle)) {
+                                    // don't record the filename if it is exactly the same as the title (with or without extension)
+                                } else {
+                                    fileListString = fileListString + filename + "</br>";
+                                }
                                 previousBitstreamFilename = dspaceBitstream.getName();
                             }
+                            fileListString = fileListString + "</div>";
                         }
-                        fileListString = fileListString + "</p>";
+                        fileListString = fileListString + "</div>";
                     }
                     jGen.writeStringField("usageNotes", fileListString);
                 }
