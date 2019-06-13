@@ -53,6 +53,13 @@
                <!-- Used to show filters and results on MyDSpace -->
                    <entry key="workspace" value-ref="workspaceConfiguration" />
                 <entry key="workflow" value-ref="workflowConfiguration" />
+
+                <entry key="publicationConfiguration" value-ref="publicationConfiguration"/>
+                <entry key="personConfiguration" value-ref="personConfiguration"/>
+                <entry key="organizationConfiguration" value-ref="organizationConfiguration"/>
+                <entry key="publicationIssueConfiguration" value-ref="publicationIssueConfiguration"/>
+                <entry key="publicationVolumeConfiguration" value-ref="publicationVolumeConfiguration"/>
+                <entry key="periodicalConfiguration" value-ref="periodicalConfiguration"/>
             </map>
         </property>
         <property name="toIgnoreMetadataFields">
