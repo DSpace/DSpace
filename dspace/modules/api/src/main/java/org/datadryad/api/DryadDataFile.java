@@ -175,6 +175,14 @@ public class DryadDataFile extends DryadObject {
         return isEmbargoed;
     }
 
+    public Date getEmbargoDate() {
+        DCValue[] embargoLiftDateMetadata = getItem().getMetadata(EMBARGO_DATE_SCHEMA, EMBARGO_DATE_ELEMENT, EMBARGO_DATE_QUALIFIER, Item.ANY);
+        if(embargoLiftDateMetadata.length > 0) {
+            return getEarliestDate(embargoLiftDateMetadata);
+        }
+        return null;
+    }
+
     public void clearEmbargo() {
         addSingleMetadataValue(Boolean.TRUE, EMBARGO_TYPE_SCHEMA, EMBARGO_TYPE_ELEMENT, EMBARGO_TYPE_QUALIFIER, Item.ANY, null);
         addSingleMetadataValue(Boolean.TRUE, EMBARGO_DATE_SCHEMA, EMBARGO_DATE_ELEMENT, EMBARGO_DATE_QUALIFIER, Item.ANY, null);
@@ -317,6 +325,10 @@ public class DryadDataFile extends DryadObject {
 
     public List<String> getKeywords() {
         return getMultipleMetadataValues("dc", "subject", null);
+    }
+
+    public String getEmbargoType() {
+        return getSingleMetadataValue("dc", "type", "embargo");
     }
     
     public String getDescription() throws SQLException {

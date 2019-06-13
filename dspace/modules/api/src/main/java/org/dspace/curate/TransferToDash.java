@@ -94,6 +94,7 @@ public class TransferToDash extends AbstractCurationTask {
                 dashService.deleteDataFiles(pkg);
             }
             dashService.postDataFileReferences(context, dataPackage);
+            dashService.setEmbargoStatus(pkg);
             dashService.submitDashDataset(versionlessPackageDOI);
                         
             // provide output for the console
