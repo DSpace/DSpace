@@ -297,7 +297,7 @@ public class DashService {
             // status to embargoed
             if (embargoType.equals("custom")) {
                 addCurationActivity(ddp, "embargoed",
-                                    "Setting package-level embargo to reflect file-level embargo. Type=" + embargoType + ", PublicationDate=" +sdf.format(embargoDate), 
+                                    "Setting package-level embargo to reflect previous file-level embargo. Type=" + embargoType + ", PublicationDate=" +sdf.format(embargoDate), 
                                     getNowString(),
                                     "migration");
             } else if (embargoType.equals("oneyear") || embargoType.equals("one year")) {
@@ -306,7 +306,7 @@ public class DashService {
                     embargoDate = DateUtils.addYears(new Date(), 2);
                 }
                 addCurationActivity(ddp, "embargoed",
-                                    "Setting package-level embargo to reflect file-level embargo. Type=" + embargoType + ", PublicationDate=" +sdf.format(embargoDate), 
+                                    "Setting package-level embargo to reflect previous file-level embargo. Type=" + embargoType + ", PublicationDate=" +sdf.format(embargoDate), 
                                     getNowString(),
                                     "migration");
             } else if (embargoType.equals("untilArticleAppears")) {
@@ -315,7 +315,7 @@ public class DashService {
                     embargoDate = DateUtils.addYears(new Date(), 1);
                 }
                 addCurationActivity(ddp, "embargoed", 
-                                    "Setting package-level embargo to reflect file-level embargo. Type=" + embargoType + ", PublicationDate=" +sdf.format(embargoDate), 
+                                    "Setting package-level embargo to reflect previous file-level embargo. Type=" + embargoType + ", PublicationDate=" +sdf.format(embargoDate), 
                                     getNowString(),
                                     "migration");
             } else {
@@ -362,7 +362,15 @@ public class DashService {
         if (ddp.getPubmedID() != null && ddp.getPubmedID().length() > 0) {
             setPubmedID(pkg, ddp.getPubmedID());
         }
-        
+
+        if (ddp.getDansArchiveDate() != null && ddp.getDansArchiveDate().length() > 0) {
+            setDansArchiveDate(pkg, ddp.getDansArchiveDate());
+        }
+
+        if (ddp.getDansEditIRI() != null && ddp.getDansEditIRI().length() > 0) {
+            setDansEditIRI(pkg, ddp.getDansEditIRI());
+        }
+                
         if (ddp.getFormerManuscriptNumbers().size() > 0) {
             List<String> prevFormerMSIDs = getFormerManuscriptNumbers(pkg);
             for (String msid : ddp.getFormerManuscriptNumbers()) {
@@ -859,6 +867,14 @@ public class DashService {
 
     public int setPublicationDOI(Package pkg, String doi) {
         return postInternalDatum(pkg, "set", "publicationDOI", doi);
+    }
+
+    public int setDansArchiveDate(Package pkg, String date) {
+        return postInternalDatum(pkg, "set", "dansArchiveDate", date);
+    }
+    
+    public int setDansEditIRI(Package pkg, String iri) {
+        return postInternalDatum(pkg, "set", "dansEditIRI", iri);
     }
 
     public String getManuscriptNumber(Package pkg) {

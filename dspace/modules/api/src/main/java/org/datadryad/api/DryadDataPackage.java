@@ -333,6 +333,23 @@ public class DryadDataPackage extends DryadObject {
         return null;
     }
 
+    public String getDansArchiveDate() {
+        String archiveDate = null;
+        if (getItem() != null) {
+            archiveDate = getSingleMetadataValue("dryad", "dansArchiveDate", null);
+        }
+        return archiveDate;
+    }
+
+    public String getDansEditIRI() {
+        String editIRI = null;
+        if (getItem() != null) {
+            editIRI = getSingleMetadataValue("dryad", "dansEditIRI", null);
+        }
+        return editIRI;
+    }
+    
+
     public List<String> getMismatchedDOIs() {
         if (getItem() != null) {
             return getMultipleMetadataValues(MISMATCHED_DOI_SCHEMA, MISMATCHED_DOI_ELEMENT, MISMATCHED_DOI_QUALIFIER);
@@ -348,7 +365,6 @@ public class DryadDataPackage extends DryadObject {
         }
     }
 
-    // TODO: what is the Dash equivalent for these?
     public void setBlackoutUntilDate(Date blackoutUntilDate) {
         String dateString = null;
         if(blackoutUntilDate != null)  {
@@ -1079,20 +1095,22 @@ public class DryadDataPackage extends DryadObject {
         for(DryadDataFile file : files) {
             log.debug("-- file embargoType: " + file.getEmbargoType());
             log.debug("-- file embargoDate: " + file.getEmbargoDate());
-            if(file.getEmbargoType().equals("custom")) {
-                log.debug("--- set custom");
-                packageEmbargoType = "custom";
-            } else if(file.getEmbargoType().equals("oneyear") || file.getEmbargoType().equals("one year")) {
-                if(!packageEmbargoType.equals("custom")) {
-                    log.debug("--- set oneyear");
-                    packageEmbargoType = "oneyear";
+            if(file.getEmbargoType() != null) {
+                if(file.getEmbargoType().equals("custom")) {
+                    log.debug("--- set custom");
+                    packageEmbargoType = "custom";
+                } else if(file.getEmbargoType().equals("oneyear") || file.getEmbargoType().equals("one year")) {
+                    if(!packageEmbargoType.equals("custom")) {
+                        log.debug("--- set oneyear");
+                        packageEmbargoType = "oneyear";
+                    }
+                } else if (file.getEmbargoType().equals("untilArticleAppears")) {
+                    if(packageEmbargoType.equals("none")) {
+                        log.debug("--- set article");
+                        packageEmbargoType = "untilArticleAppears";
+                    }
                 }
-            } else if (file.getEmbargoType().equals("untilArticleAppears")) {
-                if(packageEmbargoType.equals("none")) {
-                    log.debug("--- set article");
-                    packageEmbargoType = "untilArticleAppears";
-                }
-            } 
+            }
 
             // update the package embargo date to be the latest date present in
             // any file, but *not* placeholder dates like 9999-12-31.
