@@ -1,12 +1,6 @@
 <?xml version="1.0"?>
 
 <!--
-  - dublin-core-types.xml
-  -
-  - Version:  $Revision$
-  -
-  - Date:     $Date$
-  -
   - Initial contents for Dublin Core type registry.  Once the registry has
   - been loaded, this file becomes obsolete; the current version of the
   - registry must be read from the database.
@@ -20,8 +14,6 @@
   -   <scope_note></scope_note>
   - </dc-type>
   -->
-
-<!-- start of XML -->
 
 <dspace-dc-types>
 

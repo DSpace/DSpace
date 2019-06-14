@@ -11,10 +11,16 @@ import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.workflow.factory.WorkflowServiceFactory;
 import org.dspace.xmlworkflow.service.WorkflowRequirementsService;
 import org.dspace.xmlworkflow.service.XmlWorkflowService;
-import org.dspace.xmlworkflow.storedcomponents.service.*;
+import org.dspace.xmlworkflow.storedcomponents.service.ClaimedTaskService;
+import org.dspace.xmlworkflow.storedcomponents.service.CollectionRoleService;
+import org.dspace.xmlworkflow.storedcomponents.service.InProgressUserService;
+import org.dspace.xmlworkflow.storedcomponents.service.PoolTaskService;
+import org.dspace.xmlworkflow.storedcomponents.service.WorkflowItemRoleService;
+import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
 
 /**
- * Abstract factory to get services for the xmlworkflow package, use XmlWorkflowServiceFactory.getInstance() to retrieve an implementation
+ * Abstract factory to get services for the xmlworkflow package, use XmlWorkflowServiceFactory.getInstance() to
+ * retrieve an implementation
  *
  * @author kevinvandevelde at atmire.com
  */
@@ -38,8 +44,8 @@ public abstract class XmlWorkflowServiceFactory extends WorkflowServiceFactory {
 
     public abstract XmlWorkflowItemService getXmlWorkflowItemService();
 
-    public static XmlWorkflowServiceFactory getInstance()
-    {
-        return DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName("workflowServiceFactory", XmlWorkflowServiceFactory.class);
+    public static XmlWorkflowServiceFactory getInstance() {
+        return DSpaceServicesFactory.getInstance().getServiceManager()
+                                    .getServiceByName("workflowServiceFactory", XmlWorkflowServiceFactory.class);
     }
 }

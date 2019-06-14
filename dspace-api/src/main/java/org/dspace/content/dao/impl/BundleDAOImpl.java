@@ -7,12 +7,12 @@
  */
 package org.dspace.content.dao.impl;
 
+import java.sql.SQLException;
+
 import org.dspace.content.Bundle;
 import org.dspace.content.dao.BundleDAO;
 import org.dspace.core.AbstractHibernateDSODAO;
 import org.dspace.core.Context;
-
-import java.sql.SQLException;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the Bundle object.
@@ -21,10 +21,8 @@ import java.sql.SQLException;
  *
  * @author kevinvandevelde at atmire.com
  */
-public class BundleDAOImpl extends AbstractHibernateDSODAO<Bundle> implements BundleDAO
-{
-    protected BundleDAOImpl()
-    {
+public class BundleDAOImpl extends AbstractHibernateDSODAO<Bundle> implements BundleDAO {
+    protected BundleDAOImpl() {
         super();
     }
 

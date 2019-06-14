@@ -8,14 +8,16 @@
 package org.dspace.harvest;
 
 /**
- * Exception class specifically assigned to recoverable errors that occur during harvesting. Throughout the harvest process, various exceptions
+ * Exception class specifically assigned to recoverable errors that occur during harvesting. Throughout the harvest
+ * process, various exceptions
  * are caught and turned into a HarvestingException. Uncaught exceptions are irrecoverable errors.
+ *
  * @author alexey
  */
-public class HarvestingException extends Exception{
+public class HarvestingException extends Exception {
     public HarvestingException() {
-  	        super();
-  	    }
+        super();
+    }
 
     public HarvestingException(String message, Throwable t) {
         super(message, t);

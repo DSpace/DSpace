@@ -7,19 +7,20 @@
  */
 package org.dspace.rest.common;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import java.util.Date;
-
 import javax.xml.bind.annotation.XmlRootElement;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
+
 @XmlRootElement(name = "resourcepolicy")
-public class ResourcePolicy{
-    
+public class ResourcePolicy {
+
     public enum Action {
         READ, WRITE, DELETE;
     }
-    
+
     private Integer id;
     private Action action;
     private String epersonId;   //UUID
@@ -31,12 +32,13 @@ public class ResourcePolicy{
     private String rpType;
     private Date startDate;
     private Date endDate;
-    
-    public ResourcePolicy() {}
-    
+
+    public ResourcePolicy() {
+    }
+
     public ResourcePolicy(org.dspace.authorize.ResourcePolicy dspacePolicy) {
         this.id = dspacePolicy.getID();
-        
+
         switch (dspacePolicy.getAction()) {
             case org.dspace.core.Constants.READ:
                 this.action = Action.READ;
@@ -47,18 +49,27 @@ public class ResourcePolicy{
             case org.dspace.core.Constants.DELETE:
                 this.action = Action.DELETE;
                 break;
+            default:
+                break;
         }
 
-        this.epersonId = dspacePolicy.getEPerson().getID().toString();
-        this.groupId = dspacePolicy.getGroup().getID().toString();
+        EPerson ePerson = dspacePolicy.getEPerson();
+        if (ePerson != null) {
+            this.epersonId = ePerson.getID().toString();
+        }
+
+        Group group = dspacePolicy.getGroup();
+        if (group != null) {
+            this.groupId = group.getID().toString();
+        }
+
         this.resourceId = dspacePolicy.getdSpaceObject().getID().toString();
         this.rpDescription = dspacePolicy.getRpDescription();
         this.rpName = dspacePolicy.getRpName();
         this.rpType = dspacePolicy.getRpType();
         this.startDate = dspacePolicy.getStartDate();
         this.endDate = dspacePolicy.getEndDate();
-        switch (dspacePolicy.getdSpaceObject().getType())
-        {
+        switch (dspacePolicy.getdSpaceObject().getType()) {
             case org.dspace.core.Constants.BITSTREAM:
                 this.resourceType = "bitstream";
                 break;
@@ -91,10 +102,9 @@ public class ResourcePolicy{
     public Action getAction() {
         return action;
     }
-    
+
     @JsonIgnore
-    public int getActionInt()
-    {
+    public int getActionInt() {
         switch (action) {
             case READ:
                 return org.dspace.core.Constants.READ;
@@ -102,8 +112,9 @@ public class ResourcePolicy{
                 return org.dspace.core.Constants.WRITE;
             case DELETE:
                 return org.dspace.core.Constants.DELETE;
+            default:
+                return org.dspace.core.Constants.READ;
         }
-        return org.dspace.core.Constants.READ;
     }
 
     public void setAction(Action action) {

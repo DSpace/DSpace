@@ -243,6 +243,13 @@
         </step>
     </command>
     <command>
+        <name>solr-upgrade-statistics-6x</name>
+        <description>Upgrade statistics (integer to UUID) to DSpace 6.x (or above) compatibility</description>
+        <step passuserargs="true">
+            <class>org.dspace.util.SolrUpgradePre6xStatistics</class>
+        </step>
+    </command>
+    <command>
         <name>stat-general</name>
         <description>Compile the general statistics</description>
         <step passuserargs="false">
@@ -311,13 +318,6 @@
         </step>
     </command>
     <command>
-        <name>stats-log-importer-elasticsearch</name>
-        <description>Import solr-format converted log files into Elastic Search statistics</description>
-        <step>
-            <class>org.dspace.statistics.util.StatisticsImporterElasticSearch</class>
-        </step>
-    </command>
-    <command>
         <name>stats-util</name>
         <description>Statistics Client for Maintenance of Solr Statistics Indexes</description>
         <step>
@@ -371,6 +371,13 @@
         <description>Display the version of DSpace and other troubleshooting information</description>
         <step>
             <class>org.dspace.app.util.Version</class>
+        </step>
+    </command>
+    <command>
+        <name>initialize-entities</name>
+        <description>Initialize the entities with a provided xml</description>
+        <step>
+            <class>org.dspace.app.util.InitializeEntities</class>
         </step>
     </command>
 </commands>

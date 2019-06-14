@@ -7,21 +7,22 @@
  */
 package org.dspace.xmlworkflow.state;
 
-import org.dspace.core.Context;
-import org.dspace.workflow.WorkflowException;
-import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
-import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
-import org.dspace.xmlworkflow.state.actions.UserSelectionActionConfig;
-import org.dspace.xmlworkflow.state.actions.WorkflowActionConfig;
-import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
-import org.dspace.xmlworkflow.*;
-import org.dspace.xmlworkflow.storedcomponents.service.InProgressUserService;
-
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.dspace.core.Context;
+import org.dspace.workflow.WorkflowException;
+import org.dspace.xmlworkflow.Role;
+import org.dspace.xmlworkflow.WorkflowConfigurationException;
+import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
+import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
+import org.dspace.xmlworkflow.state.actions.UserSelectionActionConfig;
+import org.dspace.xmlworkflow.state.actions.WorkflowActionConfig;
+import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
+import org.dspace.xmlworkflow.storedcomponents.service.InProgressUserService;
 
 /**
  * A class that contains all the data of an xlworkflow step
@@ -34,7 +35,8 @@ import java.util.Map;
 public class Step {
 
 
-    protected InProgressUserService inProgressUserService = XmlWorkflowServiceFactory.getInstance().getInProgressUserService();
+    protected InProgressUserService inProgressUserService = XmlWorkflowServiceFactory.getInstance()
+                                                                                     .getInProgressUserService();
     protected XmlWorkflowFactory xmlWorkflowFactory = XmlWorkflowServiceFactory.getInstance().getWorkflowFactory();
 
 
@@ -47,7 +49,8 @@ public class Step {
     private Workflow workflow;
     private int requiredUsers;
 
-    public Step(String id, Workflow workflow, Role role, UserSelectionActionConfig userSelectionMethod, List<String> actionConfigsList, Map<Integer, String> outcomes, int requiredUsers) {
+    public Step(String id, Workflow workflow, Role role, UserSelectionActionConfig userSelectionMethod,
+                List<String> actionConfigsList, Map<Integer, String> outcomes, int requiredUsers) {
         this.actionConfigsMap = new HashMap<>();
         this.outcomes = outcomes;
         this.userSelectionMethod = userSelectionMethod;
@@ -61,7 +64,7 @@ public class Step {
     }
 
     public WorkflowActionConfig getActionConfig(String actionID) {
-        if (actionConfigsMap.get(actionID)!=null) {
+        if (actionConfigsMap.get(actionID) != null) {
             return actionConfigsMap.get(actionID);
         } else {
             WorkflowActionConfig action = xmlWorkflowFactory.createWorkflowActionConfig(actionID);
@@ -73,6 +76,7 @@ public class Step {
 
     /**
      * Boolean that returns whether or not the actions in this step have a ui
+     *
      * @return a boolean
      */
     public boolean hasUI() {
@@ -85,25 +89,29 @@ public class Step {
         return false;
     }
 
-    public String getNextStepID(int outcome) throws WorkflowException, IOException, WorkflowConfigurationException, SQLException {
+    public String getNextStepID(int outcome)
+        throws WorkflowException, IOException, WorkflowConfigurationException, SQLException {
         return outcomes.get(outcome);
     }
 
 
-    public boolean isValidStep(Context context, XmlWorkflowItem wfi) throws WorkflowConfigurationException, SQLException {
+    public boolean isValidStep(Context context, XmlWorkflowItem wfi)
+        throws WorkflowConfigurationException, SQLException {
         //Check if our next step has a UI, if not then the step is valid, no need for a group
-        return !(getUserSelectionMethod() == null || getUserSelectionMethod().getProcessingAction() == null) && getUserSelectionMethod().getProcessingAction().isValidUserSelection(context, wfi, hasUI());
+        return !(getUserSelectionMethod() == null || getUserSelectionMethod()
+            .getProcessingAction() == null) && getUserSelectionMethod().getProcessingAction()
+                                                                       .isValidUserSelection(context, wfi, hasUI());
 
     }
 
     public UserSelectionActionConfig getUserSelectionMethod() {
-            return userSelectionMethod;
+        return userSelectionMethod;
     }
 
     public WorkflowActionConfig getNextAction(WorkflowActionConfig currentAction) {
         int index = actionConfigsList.indexOf(currentAction.getId());
-        if (index < actionConfigsList.size()-1) {
-            return getActionConfig(actionConfigsList.get(index+1));
+        if (index < actionConfigsList.size() - 1) {
+            return getActionConfig(actionConfigsList.get(index + 1));
         } else {
             return null;
         }
@@ -120,13 +128,11 @@ public class Step {
 
     /**
      * Check if enough users have finished this step for it to continue
-     * @param c
-     *     The relevant DSpace Context.
-     * @param wfi
-     *     the workflow item to check
+     *
+     * @param c   The relevant DSpace Context.
+     * @param wfi the workflow item to check
      * @return if enough users have finished this task
-     * @throws SQLException
-     *     An exception that provides information on a database access error or other errors.
+     * @throws SQLException An exception that provides information on a database access error or other errors.
      */
     public boolean isFinished(Context c, XmlWorkflowItem wfi) throws SQLException {
         return inProgressUserService.getNumberOfFinishedUsers(c, wfi) == requiredUsers;

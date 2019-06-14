@@ -7,16 +7,17 @@
  */
 package org.dspace.app.util.service;
 
-import org.dspace.app.util.WebApp;
-import org.dspace.core.Context;
-
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 
+import org.dspace.app.util.WebApp;
+import org.dspace.core.Context;
+
 /**
  * Service interface class for the WebApp object.
- * The implementation of this class is responsible for all business logic calls for the WebApp object and is autowired by spring
+ * The implementation of this class is responsible for all business logic calls for the WebApp object and is
+ * autowired by spring
  *
  * @author kevinvandevelde at atmire.com
  */
@@ -29,7 +30,6 @@ public interface WebAppService {
     public void delete(Context context, WebApp webApp) throws SQLException;
 
     /**
-     *
      * @return Return the list of running applications.
      */
     public List<WebApp> getApps();

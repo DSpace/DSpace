@@ -7,11 +7,20 @@
  */
 package org.dspace.workflowbasic;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+
 import org.dspace.core.Context;
 import org.dspace.core.ReloadableEntity;
 import org.dspace.eperson.EPerson;
-
-import javax.persistence.*;
 
 /**
  * Database entity representation of the TaskListItem table
@@ -24,8 +33,8 @@ public class TaskListItem implements ReloadableEntity<Integer> {
 
     @Id
     @Column(name = "tasklist_id", unique = true, nullable = false)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE ,generator="tasklistitem_seq")
-    @SequenceGenerator(name="tasklistitem_seq", sequenceName="tasklistitem_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "tasklistitem_seq")
+    @SequenceGenerator(name = "tasklistitem_seq", sequenceName = "tasklistitem_seq", allocationSize = 1)
     private int taskListItemId;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -39,10 +48,8 @@ public class TaskListItem implements ReloadableEntity<Integer> {
     /**
      * Protected constructor, create object using:
      * {@link org.dspace.workflowbasic.service.TaskListItemService#create(Context, BasicWorkflowItem, EPerson)}
-     *
      */
-    protected TaskListItem()
-    {
+    protected TaskListItem() {
 
     }
 

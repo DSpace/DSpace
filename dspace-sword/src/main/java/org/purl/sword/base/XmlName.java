@@ -9,48 +9,50 @@ package org.purl.sword.base;
 
 import nu.xom.Attribute;
 import nu.xom.Element;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 /**
- *
  * @author Neil Taylor (nst@aber.ac.uk)
  */
 public class XmlName {
 
-    /** Prefix for the name */
+    /**
+     * Prefix for the name
+     */
     private String prefix;
 
-    /** Local name */
+    /**
+     * Local name
+     */
     private String localName;
 
-    /** The namespace for the element */ 
+    /**
+     * The namespace for the element
+     */
     private String namespace;
 
-    
+
     /**
      * Create a new instance with the specified prefix and local name.
      *
-     * @param prefix     The namespace prefix.
-     * @param localName  The element's local name. 
-     * @param namespace  The element's namespace. 
+     * @param prefix    The namespace prefix.
+     * @param localName The element's local name.
+     * @param namespace The element's namespace.
      */
-    public XmlName(String prefix, String localName, String namespace)
-    {
+    public XmlName(String prefix, String localName, String namespace) {
         this.prefix = prefix;
         this.localName = localName;
         this.namespace = namespace;
     }
 
-    public XmlName(Element element)
-    {
+    public XmlName(Element element) {
         this.prefix = element.getNamespacePrefix();
         this.localName = element.getLocalName();
         this.namespace = element.getNamespaceURI();
     }
 
-    public XmlName(Attribute attribute)
-    {
+    public XmlName(Attribute attribute) {
         this.prefix = attribute.getNamespacePrefix();
         this.localName = attribute.getLocalName();
         this.namespace = attribute.getNamespaceURI();
@@ -85,7 +87,7 @@ public class XmlName {
 
     /**
      * Set the local name.
-     * 
+     *
      * @param localName the localName to set
      */
     public void setLocalName(String localName) {
@@ -94,7 +96,7 @@ public class XmlName {
 
     /**
      * Get the current namespace value.
-     * 
+     *
      * @return the namespace
      */
     public String getNamespace() {
@@ -110,34 +112,29 @@ public class XmlName {
         this.namespace = namespace;
     }
 
-    public String getQualifiedName()
-    {
+    public String getQualifiedName() {
         String qName = "";
-        if ( prefix != null && prefix.trim().length() > 0 )
-        {
-           qName = prefix + ":";
+        if (prefix != null && prefix.trim().length() > 0) {
+            qName = prefix + ":";
         }
         qName += localName;
         return qName;
     }
 
     @Override
-    public boolean equals(Object other)
-    {
+    public boolean equals(Object other) {
 
-        if ( other instanceof XmlName )
-        {
+        if (other instanceof XmlName) {
             XmlName otherName = (XmlName) other;
             return StringUtils.equals(this.namespace, otherName.namespace) &&
-                   StringUtils.equals(this.localName, otherName.localName);
+                StringUtils.equals(this.localName, otherName.localName);
         }
 
         return false;
     }
 
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         return new HashCodeBuilder().append(namespace).append(localName).hashCode();
     }
 }

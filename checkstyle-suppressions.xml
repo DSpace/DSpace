@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suppressions PUBLIC
+        "-//Puppy Crawl//DTD Suppressions 1.2//EN"
+        "http://checkstyle.sourceforge.net/dtds/suppressions_1_2.dtd">
+<suppressions>
+    <!-- Temporarily suppress indentation checks for all Tests -->
+    <!-- TODO: We should have these turned on. But, currently there's a known bug with indentation checks
+         on JMockIt Expectations blocks and similar. See https://github.com/checkstyle/checkstyle/issues/3739 -->
+    <suppress checks="Indentation" files="src[/\\]test[/\\]java"/>
+</suppressions>

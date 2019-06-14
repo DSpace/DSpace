@@ -9,11 +9,11 @@ package org.dspace.kernel.mixins;
 
 
 /**
- * Allow the service to be notified when the service manager is shutting 
+ * Allow the service to be notified when the service manager is shutting
  * it down.  This will typically be called when the kernel is stopped or
- * destroyed.  Any cleanup that a service needs to do when it is 
+ * destroyed.  Any cleanup that a service needs to do when it is
  * shut down should happen here.
- * 
+ *
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
 public interface ShutdownService {

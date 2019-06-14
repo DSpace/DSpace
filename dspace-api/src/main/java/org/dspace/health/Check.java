@@ -7,43 +7,45 @@
  */
 package org.dspace.health;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Abstract check interface.
+ *
  * @author LINDAT/CLARIN dev team
  */
 
 public abstract class Check {
 
-    protected static Logger log = Logger.getLogger(Check.class);
+    protected static Logger log = org.apache.logging.log4j.LogManager.getLogger(Check.class);
     long took_ = -1L;
     String report_ = null;
     private String errors_ = "";
 
     // this method should be overridden
-    protected abstract String run( ReportInfo ri );
+    protected abstract String run(ReportInfo ri);
 
-    public void report( ReportInfo ri ) {
+    public void report(ReportInfo ri) {
         took_ = System.currentTimeMillis();
         try {
             String run_report = run(ri);
             report_ = errors_ + run_report;
-        }finally {
+        } finally {
             took_ = System.currentTimeMillis() - took_;
         }
     }
 
-    protected void error( Throwable e ) {
+    protected void error(Throwable e) {
         error(e, null);
     }
-    protected void error( Throwable e, String msg ) {
+
+    protected void error(Throwable e, String msg) {
         errors_ += "====\nException occurred!\n";
-        if ( null != e ) {
+        if (null != e) {
             errors_ += e.toString() + "\n";
             log.error("Exception during healthcheck:", e);
         }
-        if ( null != msg ) {
+        if (null != msg) {
             errors_ += "Reason: " + msg + "\n";
         }
     }

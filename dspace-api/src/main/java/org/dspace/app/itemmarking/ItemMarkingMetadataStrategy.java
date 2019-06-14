@@ -22,46 +22,43 @@ import org.springframework.beans.factory.annotation.Autowired;
  * This is an item marking Strategy class that tries to mark an item
  * based on the existence of a specific value within the values of a specific
  * metadata field
- * 
+ *
  * @author Kostas Stamatis
- * 
  */
 public class ItemMarkingMetadataStrategy implements ItemMarkingExtractor {
 
     @Autowired(required = true)
     protected ItemService itemService;
 
-	private String metadataField;
-	Map<String, ItemMarkingInfo> mapping = new HashMap<String, ItemMarkingInfo>();
-	
-	public ItemMarkingMetadataStrategy() {
-	}
+    private String metadataField;
+    Map<String, ItemMarkingInfo> mapping = new HashMap<String, ItemMarkingInfo>();
 
-	@Override
-	public ItemMarkingInfo getItemMarkingInfo(Context context, Item item)
-			throws SQLException {
-		
-		if (metadataField != null && mapping!=null)
-		{
-			List<MetadataValue> vals = itemService.getMetadataByMetadataString(item, metadataField);
-			if (vals.size() > 0)
-			{
-				for (MetadataValue value : vals){
-					String type = value.getValue();
-					if (mapping.containsKey(type)){
-						return mapping.get(type);
-					}
-				}
-			}
-		}
-		return null;
-	}
+    public ItemMarkingMetadataStrategy() {
+    }
 
-	public void setMetadataField(String metadataField) {
-		this.metadataField = metadataField;
-	}
+    @Override
+    public ItemMarkingInfo getItemMarkingInfo(Context context, Item item)
+        throws SQLException {
 
-	public void setMapping(Map<String, ItemMarkingInfo> mapping) {
-		this.mapping = mapping;
-	}
+        if (metadataField != null && mapping != null) {
+            List<MetadataValue> vals = itemService.getMetadataByMetadataString(item, metadataField);
+            if (vals.size() > 0) {
+                for (MetadataValue value : vals) {
+                    String type = value.getValue();
+                    if (mapping.containsKey(type)) {
+                        return mapping.get(type);
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    public void setMetadataField(String metadataField) {
+        this.metadataField = metadataField;
+    }
+
+    public void setMapping(Map<String, ItemMarkingInfo> mapping) {
+        this.mapping = mapping;
+    }
 }

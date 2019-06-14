@@ -7,19 +7,19 @@
  */
 package org.dspace.ctask.general;
 
-import org.apache.log4j.Logger;
-import org.dspace.content.MetadataValue;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataValue;
 import org.dspace.curate.AbstractCurationTask;
 import org.dspace.curate.Curator;
 import org.dspace.curate.Distributive;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 
 /**
@@ -28,8 +28,7 @@ import java.util.List;
  * @author Kim Shepherd
  */
 @Distributive
-public abstract class AbstractTranslator extends AbstractCurationTask
-{
+public abstract class AbstractTranslator extends AbstractCurationTask {
 
     protected int status = Curator.CURATE_UNSET;
 
@@ -41,17 +40,16 @@ public abstract class AbstractTranslator extends AbstractCurationTask
 
     protected String apiKey = "";
 
-    private static Logger log = Logger.getLogger(AbstractTranslator.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(AbstractTranslator.class);
 
     protected List<String> results = new ArrayList<String>();
-    
+
     private final transient ConfigurationService configurationService
-             = DSpaceServicesFactory.getInstance().getConfigurationService();
+        = DSpaceServicesFactory.getInstance().getConfigurationService();
 
 
     @Override
-    public void init(Curator curator, String taskId) throws IOException
-    {
+    public void init(Curator curator, String taskId) throws IOException {
         super.init(curator, taskId);
 
         // Load configuration
@@ -60,8 +58,7 @@ public abstract class AbstractTranslator extends AbstractCurationTask
         String[] toTranslate = configurationService.getArrayProperty(PLUGIN_PREFIX + ".field.targets");
         String[] langs = configurationService.getArrayProperty(PLUGIN_PREFIX + ".language.targets");
 
-        if(!(toTranslate.length > 0 && langs.length > 0))
-        {
+        if (!(toTranslate.length > 0 && langs.length > 0)) {
             status = Curator.CURATE_ERROR;
             results.add("Configuration error");
             setResult(results.toString());
@@ -75,11 +72,9 @@ public abstract class AbstractTranslator extends AbstractCurationTask
     }
 
     @Override
-    public int perform(DSpaceObject dso) throws IOException
-    {
+    public int perform(DSpaceObject dso) throws IOException {
 
-        if(dso instanceof Item)
-        {
+        if (dso instanceof Item) {
             Item item = (Item) dso;
 
             /*
@@ -93,30 +88,27 @@ public abstract class AbstractTranslator extends AbstractCurationTask
             log.debug("Translating metadata for " + handle);
 
             List<MetadataValue> authLangs = itemService.getMetadataByMetadataString(item, authLangField);
-            if(authLangs.size() > 0)
-            {
+            if (authLangs.size() > 0) {
                 /* Assume the first... multiple
                   "authoritative" languages won't work */
                 authLang = authLangs.get(0).getValue();
                 log.debug("Authoritative language for " + handle + " is " + authLang);
             }
 
-            for(String lang : langs)
-            {
+            for (String lang : langs) {
                 lang = lang.trim();
 
-                for(String field : toTranslate)
-                {
+                for (String field : toTranslate) {
                     boolean translated = false;
                     field = field.trim();
                     String[] fieldSegments = field.split("\\.");
                     List<MetadataValue> fieldMetadata = null;
-                    
-                    if(fieldSegments.length > 2) {
+
+                    if (fieldSegments.length > 2) {
                         // First, check to see if we've already got this in the target language
-                        List<MetadataValue> checkMetadata = itemService.getMetadata(item, fieldSegments[0], fieldSegments[1], fieldSegments[2], lang);
-                        if(checkMetadata.size() > 0)
-                        {
+                        List<MetadataValue> checkMetadata = itemService
+                            .getMetadata(item, fieldSegments[0], fieldSegments[1], fieldSegments[2], lang);
+                        if (checkMetadata.size() > 0) {
                             // We've already translated this, move along
                             log.debug(handle + "already has " + field + " in " + lang + ", skipping");
                             results.add(handle + ": Skipping " + lang + " translation " + "(" + field + ")");
@@ -124,14 +116,14 @@ public abstract class AbstractTranslator extends AbstractCurationTask
                         }
 
                         // Let's carry on and get the authoritative version, then
-                        fieldMetadata = itemService.getMetadata(item, fieldSegments[0], fieldSegments[1], fieldSegments[2], authLang);
+                        fieldMetadata = itemService
+                            .getMetadata(item, fieldSegments[0], fieldSegments[1], fieldSegments[2], authLang);
 
-                    }
-                    else {
+                    } else {
                         // First, check to see if we've already got this in the target language
-                        List<MetadataValue> checkMetadata = itemService.getMetadata(item, fieldSegments[0], fieldSegments[1], null, lang);
-                        if(checkMetadata.size() > 0)
-                        {
+                        List<MetadataValue> checkMetadata = itemService
+                            .getMetadata(item, fieldSegments[0], fieldSegments[1], null, lang);
+                        if (checkMetadata.size() > 0) {
                             // We've already translated this, move along
                             log.debug(handle + "already has " + field + " in " + lang + ", skipping");
                             results.add(handle + ": Skipping " + lang + " translation " + "(" + field + ")");
@@ -139,38 +131,39 @@ public abstract class AbstractTranslator extends AbstractCurationTask
                         }
 
                         // Let's carry on and get the authoritative version, then
-                        fieldMetadata = itemService.getMetadata(item, fieldSegments[0], fieldSegments[1], null, authLang);
+                        fieldMetadata = itemService
+                            .getMetadata(item, fieldSegments[0], fieldSegments[1], null, authLang);
 
 
                     }
 
-                    if(!translated && fieldMetadata.size() > 0)
-                    {
-                        for(MetadataValue metadataValue : fieldMetadata) {
+                    if (!translated && fieldMetadata.size() > 0) {
+                        for (MetadataValue metadataValue : fieldMetadata) {
                             String value = metadataValue.getValue();
                             String translatedText = translateText(authLang, lang, value);
-                            if(translatedText != null && !"".equals(translatedText))
-                            {
+                            if (translatedText != null && !"".equals(translatedText)) {
                                 try {
                                     // Add the new metadata
-                                    if(fieldSegments.length > 2) {
-                                        itemService.addMetadata(Curator.curationContext(), item, fieldSegments[0], fieldSegments[1], fieldSegments[2], lang, translatedText);
-                                    }
-                                    else {
-                                        itemService.addMetadata(Curator.curationContext(), item, fieldSegments[0], fieldSegments[1], null, lang, translatedText);
+                                    if (fieldSegments.length > 2) {
+                                        itemService.addMetadata(Curator.curationContext(), item, fieldSegments[0],
+                                                                fieldSegments[1], fieldSegments[2], lang,
+                                                                translatedText);
+                                    } else {
+                                        itemService.addMetadata(Curator.curationContext(), item, fieldSegments[0],
+                                                                fieldSegments[1], null, lang, translatedText);
                                     }
 
                                     itemService.update(Curator.curationContext(), item);
-                                    results.add(handle + ": Translated " + authLang + " -> " + lang + " (" + field + ")");
-                                }
-                                catch(Exception e) {
+                                    results
+                                        .add(handle + ": Translated " + authLang + " -> " + lang + " (" + field + ")");
+                                } catch (Exception e) {
                                     log.info(e.getLocalizedMessage());
                                     status = Curator.CURATE_ERROR;
                                 }
 
-                            }
-                            else {
-                                results.add(handle + ": Failed translation of " + authLang + " -> " + lang + "(" + field + ")");
+                            } else {
+                                results.add(
+                                    handle + ": Failed translation of " + authLang + " -> " + lang + "(" + field + ")");
                             }
                         }
                     }
@@ -198,12 +191,10 @@ public abstract class AbstractTranslator extends AbstractCurationTask
         return null;
     }
 
-    private void processResults() throws IOException
-    {
+    private void processResults() throws IOException {
         StringBuilder sb = new StringBuilder();
         sb.append("Translation report: \n----------------\n");
-        for(String result : results)
-        {
+        for (String result : results) {
             sb.append(result).append("\n");
         }
         setResult(sb.toString());

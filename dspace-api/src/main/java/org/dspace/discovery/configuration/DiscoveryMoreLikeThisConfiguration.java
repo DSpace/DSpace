@@ -7,9 +7,9 @@
  */
 package org.dspace.discovery.configuration;
 
-import org.springframework.beans.factory.annotation.Required;
-
 import java.util.List;
+
+import org.springframework.beans.factory.annotation.Required;
 
 /**
  * Class that contains the more like this configuration on item pages
@@ -25,45 +25,37 @@ public class DiscoveryMoreLikeThisConfiguration {
     private int minWordLength;
 
     @Required
-    public void setSimilarityMetadataFields(List<String> similarityMetadataFields)
-    {
+    public void setSimilarityMetadataFields(List<String> similarityMetadataFields) {
         this.similarityMetadataFields = similarityMetadataFields;
     }
 
-    public List<String> getSimilarityMetadataFields()
-    {
+    public List<String> getSimilarityMetadataFields() {
         return similarityMetadataFields;
     }
 
     @Required
-    public void setMinTermFrequency(int minTermFrequency)
-    {
+    public void setMinTermFrequency(int minTermFrequency) {
         this.minTermFrequency = minTermFrequency;
     }
 
-    public int getMinTermFrequency()
-    {
+    public int getMinTermFrequency() {
         return minTermFrequency;
     }
 
     @Required
-    public void setMax(int max)
-    {
+    public void setMax(int max) {
         this.max = max;
     }
 
-    public int getMax()
-    {
+    public int getMax() {
         return max;
     }
 
-    public int getMinWordLength()
-    {
+    public int getMinWordLength() {
         return minWordLength;
     }
 
-    public void setMinWordLength(int minWordLength)
-    {
+    public void setMinWordLength(int minWordLength) {
         this.minWordLength = minWordLength;
     }
 }

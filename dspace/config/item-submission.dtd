@@ -18,14 +18,18 @@
  <!-- (The "select collection" step *must* be here)            -->
  <!ELEMENT step-definitions (step+) >
  
- <!ELEMENT step (heading?, processing-class, jspui-binding?, xmlui-binding?, workflow-editable?) >
- <!ATTLIST step id NMTOKEN #IMPLIED>
+ <!ELEMENT step (heading?, processing-class, type, scope?) >
+ <!ATTLIST step 
+ 		   id NMTOKEN #REQUIRED
+ 		   mandatory NMTOKEN #IMPLIED>
  
  <!ELEMENT heading (#PCDATA) >
  <!ELEMENT processing-class (#PCDATA)>
- <!ELEMENT jspui-binding (#PCDATA)>
- <!ELEMENT xmlui-binding (#PCDATA)>
- <!ELEMENT workflow-editable (#PCDATA)>
+ <!ELEMENT type (#PCDATA)>
+ <!ELEMENT scope (#PCDATA)>
+ <!ATTLIST scope 
+ 		   visibility NMTOKEN #IMPLIED 
+ 		   visibilityOutside NMTOKEN #IMPLIED>
  
  <!-- 'submission-definitions' must contain at least one       -->
  <!-- 'submission-process' node                                -->

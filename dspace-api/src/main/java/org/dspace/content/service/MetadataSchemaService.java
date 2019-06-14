@@ -7,17 +7,18 @@
  */
 package org.dspace.content.service;
 
+import java.sql.SQLException;
+import java.util.List;
+
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.MetadataSchema;
 import org.dspace.content.NonUniqueMetadataException;
 import org.dspace.core.Context;
 
-import java.sql.SQLException;
-import java.util.List;
-
 /**
  * Service interface class for the MetadataSchema object.
- * The implementation of this class is responsible for all business logic calls for the MetadataSchema object and is autowired by spring
+ * The implementation of this class is responsible for all business logic calls for the MetadataSchema object and is
+ * autowired by spring
  *
  * @author kevinvandevelde at atmire.com
  */
@@ -26,21 +27,22 @@ public interface MetadataSchemaService {
     /**
      * Creates a new metadata schema in the database, using the name and namespace.
      *
-     * @param context
-     *            DSpace context object
-     * @param name name
+     * @param context   DSpace context object
+     * @param name      name
      * @param namespace namespace
      * @return new MetadataSchema
-     * @throws SQLException if database error
-     * @throws AuthorizeException if authorization error
-     * @throws NonUniqueMetadataException if an existing field with an identical element and qualifier is already present
+     * @throws SQLException               if database error
+     * @throws AuthorizeException         if authorization error
+     * @throws NonUniqueMetadataException if an existing field with an identical element and qualifier is already
+     *                                    present
      */
-    public MetadataSchema create(Context context, String name, String namespace) throws SQLException, AuthorizeException, NonUniqueMetadataException;
+    public MetadataSchema create(Context context, String name, String namespace)
+        throws SQLException, AuthorizeException, NonUniqueMetadataException;
 
     /**
      * Get the schema object corresponding to this namespace URI.
      *
-     * @param context DSpace context
+     * @param context   DSpace context
      * @param namespace namespace URI to match
      * @return metadata schema object or null if none found.
      * @throws SQLException if database error
@@ -50,20 +52,22 @@ public interface MetadataSchemaService {
     /**
      * Update the metadata schema in the database.
      *
-     * @param context DSpace context
+     * @param context        DSpace context
      * @param metadataSchema metadata schema
-     * @throws SQLException if database error
-     * @throws AuthorizeException if authorization error
-     * @throws NonUniqueMetadataException if an existing field with an identical element and qualifier is already present
+     * @throws SQLException               if database error
+     * @throws AuthorizeException         if authorization error
+     * @throws NonUniqueMetadataException if an existing field with an identical element and qualifier is already
+     *                                    present
      */
-    public void update(Context context, MetadataSchema metadataSchema) throws SQLException, AuthorizeException, NonUniqueMetadataException;
+    public void update(Context context, MetadataSchema metadataSchema)
+        throws SQLException, AuthorizeException, NonUniqueMetadataException;
 
     /**
      * Delete the metadata schema.
      *
-     * @param context DSpace context
+     * @param context        DSpace context
      * @param metadataSchema metadata schema
-     * @throws SQLException if database error
+     * @throws SQLException       if database error
      * @throws AuthorizeException if authorization error
      */
     public void delete(Context context, MetadataSchema metadataSchema) throws SQLException, AuthorizeException;
@@ -81,10 +85,8 @@ public interface MetadataSchemaService {
      * Get the schema corresponding with this numeric ID.
      * The ID is a database key internal to DSpace.
      *
-     * @param context
-     *            context, in case we need to read it in from DB
-     * @param id
-     *            the schema ID
+     * @param context context, in case we need to read it in from DB
+     * @param id      the schema ID
      * @return the metadata schema object
      * @throws SQLException if database error
      */
@@ -93,10 +95,8 @@ public interface MetadataSchemaService {
     /**
      * Get the schema corresponding with this short name.
      *
-     * @param context
-     *            context, in case we need to read it in from DB
-     * @param shortName
-     *            the short name for the schema
+     * @param context   context, in case we need to read it in from DB
+     * @param shortName the short name for the schema
      * @return the metadata schema object
      * @throws SQLException if database error
      */

@@ -7,17 +7,15 @@
  */
 package org.dspace.submit.lookup;
 
-import gr.ekt.bte.core.Record;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import javax.xml.parsers.ParserConfigurationException;
 
+import gr.ekt.bte.core.Record;
 import org.apache.http.HttpException;
 import org.dspace.core.Context;
 import org.jdom.JDOMException;
@@ -29,63 +27,49 @@ import org.xml.sax.SAXException;
  * @author Luigi Andrea Pascarelli
  * @author Panagiotis Koutsourakis
  */
-public class CrossRefOnlineDataLoader extends NetworkSubmissionLookupDataLoader
-{
+public class CrossRefOnlineDataLoader extends NetworkSubmissionLookupDataLoader {
     protected CrossRefService crossrefService = new CrossRefService();
 
     protected boolean searchProvider = true;
 
     protected String apiKey = null;
     protected int maxResults = 10;
-    
-    public void setSearchProvider(boolean searchProvider)
-    {
+
+    public void setSearchProvider(boolean searchProvider) {
         this.searchProvider = searchProvider;
     }
 
-    public void setCrossrefService(CrossRefService crossrefService)
-    {
+    public void setCrossrefService(CrossRefService crossrefService) {
         this.crossrefService = crossrefService;
     }
 
     @Override
-    public List<String> getSupportedIdentifiers()
-    {
-        return Arrays.asList(new String[] { DOI });
+    public List<String> getSupportedIdentifiers() {
+        return Arrays.asList(new String[] {DOI});
     }
 
     @Override
     public List<Record> getByIdentifier(Context context,
-            Map<String, Set<String>> keys) throws HttpException, IOException
-    {
-        if (keys != null && keys.containsKey(DOI))
-        {
+                                        Map<String, Set<String>> keys) throws HttpException, IOException {
+        if (keys != null && keys.containsKey(DOI)) {
             Set<String> dois = keys.get(DOI);
             List<Record> items = null;
             List<Record> results = new ArrayList<Record>();
-            
-            if (getApiKey() == null){
-            	throw new RuntimeException("No CrossRef API key is specified!");
+
+            if (getApiKey() == null) {
+                throw new RuntimeException("No CrossRef API key is specified!");
             }
-            
-            try
-            {
+
+            try {
                 items = crossrefService.search(context, dois, getApiKey());
-            }
-            catch (JDOMException e)
-            {
+            } catch (JDOMException e) {
+                throw new RuntimeException(e.getMessage(), e);
+            } catch (ParserConfigurationException e) {
+                throw new RuntimeException(e.getMessage(), e);
+            } catch (SAXException e) {
                 throw new RuntimeException(e.getMessage(), e);
             }
-            catch (ParserConfigurationException e)
-            {
-                throw new RuntimeException(e.getMessage(), e);
-            }
-            catch (SAXException e)
-            {
-                throw new RuntimeException(e.getMessage(), e);
-            }
-            for (Record record : items)
-            {
+            for (Record record : items) {
                 results.add(convertFields(record));
             }
             return results;
@@ -95,36 +79,34 @@ public class CrossRefOnlineDataLoader extends NetworkSubmissionLookupDataLoader
 
     @Override
     public List<Record> search(Context context, String title, String author,
-            int year) throws HttpException, IOException
-    {
-    	if (getApiKey() == null){
-        	throw new RuntimeException("No CrossRef API key is specified!");
+                               int year) throws HttpException, IOException {
+        if (getApiKey() == null) {
+            throw new RuntimeException("No CrossRef API key is specified!");
         }
-    	
+
         List<Record> items = crossrefService.search(context, title, author,
-                year, getMaxResults(), getApiKey());
+                                                    year, getMaxResults(), getApiKey());
         return items;
     }
 
     @Override
-    public boolean isSearchProvider()
-    {
+    public boolean isSearchProvider() {
         return searchProvider;
     }
 
-	public String getApiKey() {
-		return apiKey;
-	}
+    public String getApiKey() {
+        return apiKey;
+    }
 
-	public void setApiKey(String apiKey) {
-		this.apiKey = apiKey;
-	}
+    public void setApiKey(String apiKey) {
+        this.apiKey = apiKey;
+    }
 
-	public int getMaxResults() {
-		return maxResults;
-	}
+    public int getMaxResults() {
+        return maxResults;
+    }
 
-	public void setMaxResults(int maxResults) {
-		this.maxResults = maxResults;
-	}
+    public void setMaxResults(int maxResults) {
+        this.maxResults = maxResults;
+    }
 }

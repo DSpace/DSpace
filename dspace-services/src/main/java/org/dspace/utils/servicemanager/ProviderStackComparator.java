@@ -7,21 +7,22 @@
  */
 package org.dspace.utils.servicemanager;
 
-import java.util.Comparator;
 import java.io.Serializable;
+import java.util.Comparator;
 
 
 /**
  * A Comparator for provider stacks.  This is specially designed for
- * sorting a list of ProviderHolders so it will unpack them and then do 
+ * sorting a list of ProviderHolders so it will unpack them and then do
  * the typical sorting on them while properly handling the null cases.
- * 
+ *
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
 public final class ProviderStackComparator implements Comparator<ProviderHolder<?>>, Serializable {
     public static final long serialVersionUID = 1l;
+
     public int compare(ProviderHolder<?> ph0, ProviderHolder<?> ph1) {
-        /* a negative integer, zero, or a positive integer as the first argument 
+        /* a negative integer, zero, or a positive integer as the first argument
          * is less than, equal to, or greater than the second.
          */
         int comparison = 0;

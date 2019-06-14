@@ -22,21 +22,25 @@ import org.springframework.beans.factory.annotation.Required;
 
 /**
  * This is just testing a fake service and running it through some paces to see if the lifecycles work
- * 
+ *
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
 public class FakeService1 implements ConfigChangeListener, ServiceChangeListener,
-		InitializedService, ShutdownService, Serializable {
-	private static final long serialVersionUID = 1L;
+                                     InitializedService, ShutdownService, Serializable {
+    private static final long serialVersionUID = 1L;
 
-	public int triggers = 0;
+    public int triggers = 0;
+
     public int getTriggers() {
         return triggers;
     }
+
     public String something = "aaronz";
+
     public String getSomething() {
         return something;
     }
+
     public void setSomething(String something) {
         this.something = something;
     }
@@ -51,11 +55,13 @@ public class FakeService1 implements ConfigChangeListener, ServiceChangeListener
     }
 
     private ConfigurationService configurationService;
+
     @Autowired
     @Required
     public void setConfigurationService(ConfigurationService configurationService) {
         this.configurationService = configurationService;
     }
+
     public ConfigurationService getConfigurationService() {
         return configurationService;
     }
@@ -64,17 +70,18 @@ public class FakeService1 implements ConfigChangeListener, ServiceChangeListener
      * @see org.dspace.kernel.mixins.ConfigChangeListener#configurationChanged(java.util.List, java.util.Map)
      */
     public void configurationChanged(List<String> changedSettingNames,
-            Map<String, String> changedSettings) {
+                                     Map<String, String> changedSettings) {
         something = "config:" + changedSettings.get("azeckoski.FakeService1.something");
         triggers++;
     }
 
     /* (non-Javadoc)
-     * @see org.dspace.kernel.mixins.ServiceChangeListener#serviceRegistered(java.lang.String, java.lang.Object, java.util.List)
+     * @see org.dspace.kernel.mixins.ServiceChangeListener#serviceRegistered(java.lang.String, java.lang.Object, java
+     * .util.List)
      */
     public void serviceRegistered(String serviceName, Object service,
-            List<Class<?>> implementedTypes) {
-        something = "registered:"+serviceName;
+                                  List<Class<?>> implementedTypes) {
+        something = "registered:" + serviceName;
         triggers++;
     }
 
@@ -82,7 +89,7 @@ public class FakeService1 implements ConfigChangeListener, ServiceChangeListener
      * @see org.dspace.kernel.mixins.ServiceChangeListener#serviceUnregistered(java.lang.String, java.lang.Object)
      */
     public void serviceUnregistered(String serviceName, Object service) {
-        something = "unregistered:"+serviceName;
+        something = "unregistered:" + serviceName;
         triggers++;
     }
 

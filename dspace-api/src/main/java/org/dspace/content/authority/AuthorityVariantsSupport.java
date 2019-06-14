@@ -15,7 +15,6 @@ package org.dspace.content.authority;
 import java.util.List;
 
 /**
- *
  * @author bollini
  */
 public interface AuthorityVariantsSupport {

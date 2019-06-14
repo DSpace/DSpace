@@ -9,7 +9,6 @@ package org.purl.sword.server;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -28,38 +27,26 @@ import org.purl.sword.base.SWORDException;
  */
 public class AtomDocumentServlet extends DepositServlet {
 
-    public AtomDocumentServlet()
-        throws ServletException
-    {
-        super();
-    }
-
     /**
      * Process the get request.
      */
     @Override
     protected void doGet(HttpServletRequest request,
-        HttpServletResponse response)
-        throws ServletException, IOException
-    {
-        try
-        {
+                         HttpServletResponse response)
+        throws ServletException, IOException {
+        try {
             // Create the atom document request object
             AtomDocumentRequest adr = new AtomDocumentRequest();
 
             // Are there any authentication details?
             String usernamePassword = getUsernamePassword(request);
-            if ((usernamePassword != null) && (!usernamePassword.equals("")))
-            {
+            if ((usernamePassword != null) && (!usernamePassword.equals(""))) {
                 int p = usernamePassword.indexOf(':');
-                if (p != -1)
-                {
+                if (p != -1) {
                     adr.setUsername(usernamePassword.substring(0, p));
                     adr.setPassword(usernamePassword.substring(p + 1));
                 }
-            }
-            else if (authenticateWithBasic())
-            {
+            } else if (authenticateWithBasic()) {
                 String s = "Basic realm=\"SWORD\"";
                 response.setHeader("WWW-Authenticate", s);
                 response.setStatus(401);
@@ -81,26 +68,20 @@ public class AtomDocumentServlet extends DepositServlet {
             PrintWriter out = response.getWriter();
             out.write(dr.marshall());
             out.flush();
-        }
-        catch (SWORDAuthenticationException sae)
-        {
+        } catch (SWORDAuthenticationException sae) {
             // Ask for credentials again
             String s = "Basic realm=\"SWORD\"";
             response.setHeader("WWW-Authenticate", s);
             response.setStatus(401);
-        }
-        catch (SWORDException se)
-        {
+        } catch (SWORDException se) {
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-        }
-        catch (SWORDErrorException see)
-        {
+        } catch (SWORDErrorException see) {
             // Get the details and send the right SWORD error document
             super.makeErrorDocument(see.getErrorURI(),
-                see.getStatus(),
-                see.getDescription(),
-                request,
-                response);
+                                    see.getStatus(),
+                                    see.getDescription(),
+                                    request,
+                                    response);
         }
     }
 }

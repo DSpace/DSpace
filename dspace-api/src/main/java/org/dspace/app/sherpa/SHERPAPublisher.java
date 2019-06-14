@@ -11,12 +11,10 @@ import java.util.List;
 
 /**
  * POJO representation for a SHERPA Publisher record
- * 
+ *
  * @author Andrea Bollini
- * 
  */
-public class SHERPAPublisher
-{
+public class SHERPAPublisher {
     private String name;
 
     private String alias;
@@ -34,7 +32,7 @@ public class SHERPAPublisher
     private String pubarchiving;
 
     private List<String> pubrestriction;
-    
+
     private List<String> condition;
 
     private String paidaccessurl;
@@ -52,14 +50,13 @@ public class SHERPAPublisher
     private String dateupdated;
 
     public SHERPAPublisher(String name, String alias, String homeurl,
-            String prearchiving, List<String> prerestriction,
-            String postarchiving, List<String> postrestriction,
-            String pubarchiving, List<String> pubrestriction,
-            List<String> condition, String paidaccessurl,
-            String paidaccessname, String paidaccessnotes,
-            List<String[]> copyright, String romeocolour, String datedded,
-            String dateupdated)
-    {
+                           String prearchiving, List<String> prerestriction,
+                           String postarchiving, List<String> postrestriction,
+                           String pubarchiving, List<String> pubrestriction,
+                           List<String> condition, String paidaccessurl,
+                           String paidaccessname, String paidaccessnotes,
+                           List<String[]> copyright, String romeocolour, String datedded,
+                           String dateupdated) {
         this.name = name;
 
         this.alias = alias;
@@ -95,88 +92,71 @@ public class SHERPAPublisher
         this.dateupdated = dateupdated;
     }
 
-    public String getName()
-    {
+    public String getName() {
         return name;
     }
 
-    public String getAlias()
-    {
+    public String getAlias() {
         return alias;
     }
 
-    public String getHomeurl()
-    {
+    public String getHomeurl() {
         return homeurl;
     }
 
-    public String getPrearchiving()
-    {
+    public String getPrearchiving() {
         return prearchiving;
     }
 
-    public List<String> getPrerestriction()
-    {
+    public List<String> getPrerestriction() {
         return prerestriction;
     }
 
-    public String getPostarchiving()
-    {
+    public String getPostarchiving() {
         return postarchiving;
     }
 
-    public List<String> getPostrestriction()
-    {
+    public List<String> getPostrestriction() {
         return postrestriction;
     }
 
-    public String getPubarchiving()
-    {
+    public String getPubarchiving() {
         return pubarchiving;
     }
-    
-    public List<String> getPubrestriction()
-    {
+
+    public List<String> getPubrestriction() {
         return pubrestriction;
     }
-    
-    public List<String> getCondition()
-    {
+
+    public List<String> getCondition() {
         return condition;
     }
 
-    public String getPaidaccessurl()
-    {
+    public String getPaidaccessurl() {
         return paidaccessurl;
     }
 
-    public String getPaidaccessname()
-    {
+    public String getPaidaccessname() {
         return paidaccessname;
     }
 
-    public String getPaidaccessnotes()
-    {
+    public String getPaidaccessnotes() {
         return paidaccessnotes;
     }
 
-    public List<String[]> getCopyright()
-    {
+    public List<String[]> getCopyright() {
         return copyright;
     }
 
-    public String getRomeocolour()
-    {
+    public String getRomeocolour() {
         return romeocolour;
     }
 
-    public String getDatedded()
-    {
+    public String getDatedded() {
         return dateadded;
     }
 
-    public String getDateupdated()
-    {
+    public String getDateupdated() {
         return dateupdated;
     }
 

@@ -15,11 +15,10 @@ import org.dspace.core.Context;
 /**
  * Interface to abstract the strategy for select the author to contact for
  * request copy
- * 
+ *
  * @author Andrea Bollini
- * 
  */
 public interface RequestItemAuthorExtractor {
-	public RequestItemAuthor getRequestItemAuthor(Context context, Item item)
-			throws SQLException;
+    public RequestItemAuthor getRequestItemAuthor(Context context, Item item)
+        throws SQLException;
 }

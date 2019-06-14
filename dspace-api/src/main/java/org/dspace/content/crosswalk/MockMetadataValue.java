@@ -28,8 +28,7 @@ public class MockMetadataValue {
     private String authority;
     private int confidence;
 
-    public MockMetadataValue(MetadataValue metadataValue)
-    {
+    public MockMetadataValue(MetadataValue metadataValue) {
         MetadataField metadataField = metadataValue.getMetadataField();
         MetadataSchema metadataSchema = metadataField.getMetadataSchema();
         schema = metadataSchema.getName();

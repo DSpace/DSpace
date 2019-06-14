@@ -20,12 +20,13 @@ import org.dspace.services.model.CacheConfig.CacheScope;
 /**
  * This is a simple Cache that just uses a map to store the cache values.
  * Used for the request and thread caches.
- * 
+ *
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
 public final class MapCache implements Cache {
 
     private Map<String, Object> cache;
+
     public Map<String, Object> getCache() {
         return cache;
     }
@@ -130,7 +131,7 @@ public final class MapCache implements Cache {
 
     @Override
     public String toString() {
-        return "MapCache:name="+getName()+":Scope="+cacheConfig.getCacheScope()+":size="+size();
+        return "MapCache:name=" + getName() + ":Scope=" + cacheConfig.getCacheScope() + ":size=" + size();
     }
 
 }

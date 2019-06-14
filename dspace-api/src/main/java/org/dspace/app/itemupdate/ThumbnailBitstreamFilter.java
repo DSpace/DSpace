@@ -10,15 +10,13 @@ package org.dspace.app.itemupdate;
 import java.util.Properties;
 
 /**
- *    Bitstream filter targetting the THUMBNAIL bundle
- *
+ * Bitstream filter targetting the THUMBNAIL bundle
  */
 public class ThumbnailBitstreamFilter extends BitstreamFilterByBundleName {
-	
-	public ThumbnailBitstreamFilter()
-	{
-		props = new Properties();
-		props.setProperty("bundle", "THUMBNAIL");
-	}
+
+    public ThumbnailBitstreamFilter() {
+        props = new Properties();
+        props.setProperty("bundle", "THUMBNAIL");
+    }
 
 }

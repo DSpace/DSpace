@@ -11,7 +11,8 @@ import org.dspace.authenticate.service.AuthenticationService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Factory implementation to get services for the authenticate package, use AuthenticateServiceFactory.getInstance() to retrieve an implementation
+ * Factory implementation to get services for the authenticate package, use AuthenticateServiceFactory.getInstance()
+ * to retrieve an implementation
  *
  * @author kevinvandevelde at atmire.com
  */

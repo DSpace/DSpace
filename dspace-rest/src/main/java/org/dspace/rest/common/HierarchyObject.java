@@ -10,22 +10,21 @@ package org.dspace.rest.common;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name = "object")
-public class HierarchyObject
-{
-	//id may be a numeric id or a uuid depending on the version of DSpace
+public class HierarchyObject {
+    //id may be a numeric id or a uuid depending on the version of DSpace
     private String id;
     private String name;
     private String handle;
 
-    public HierarchyObject(){
+    public HierarchyObject() {
     }
-    
-    public HierarchyObject(String id, String name, String handle){
-    	setId(id);
-    	setName(name);
-    	setHandle(handle);
+
+    public HierarchyObject(String id, String name, String handle) {
+        setId(id);
+        setName(name);
+        setHandle(handle);
     }
-        
+
     public String getId() {
         return id;
     }

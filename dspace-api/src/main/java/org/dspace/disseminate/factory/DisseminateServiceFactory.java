@@ -11,7 +11,8 @@ import org.dspace.disseminate.service.CitationDocumentService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
- * Abstract factory to get services for the disseminate package, use DisseminateServiceFactory.getInstance() to retrieve an implementation
+ * Abstract factory to get services for the disseminate package, use DisseminateServiceFactory.getInstance() to
+ * retrieve an implementation
  *
  * @author kevinvandevelde at atmire.com
  */
@@ -19,8 +20,8 @@ public abstract class DisseminateServiceFactory {
 
     public abstract CitationDocumentService getCitationDocumentService();
 
-    public static DisseminateServiceFactory getInstance()
-    {
-        return DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName("disseminateServiceFactory", DisseminateServiceFactory.class);
+    public static DisseminateServiceFactory getInstance() {
+        return DSpaceServicesFactory.getInstance().getServiceManager()
+                                    .getServiceByName("disseminateServiceFactory", DisseminateServiceFactory.class);
     }
 }

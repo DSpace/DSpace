@@ -8,29 +8,33 @@
 package org.purl.sword.client;
 
 /**
- * Hold general constants for the client. 
- * 
+ * Hold general constants for the client.
+ *
  * @author Neil Taylor
  */
-public class ClientConstants
-{
-   /** 
-    * Current software version. 
-    */
-   public static final String CLIENT_VERSION = "1.1";
+public class ClientConstants {
+    /**
+     * Current software version.
+     */
+    public static final String CLIENT_VERSION = "1.1";
 
-   /**
-    * the name of this application
-    */
-   public static final String SERVICE_NAME = "CASIS Test Client";
+    /**
+     * the name of this application
+     */
+    public static final String SERVICE_NAME = "CASIS Test Client";
 
-   /**
-    * the name of this application
-    */
-   public static final String NOT_DEFINED_TEXT = "Not defined";
+    /**
+     * the name of this application
+     */
+    public static final String NOT_DEFINED_TEXT = "Not defined";
 
-   /**
-    * The logging property file. 
-    */
-   public static final String LOGGING_PROPERTY_FILE = "log4j.properties";
+    /**
+     * The logging property file.
+     */
+    public static final String LOGGING_PROPERTY_FILE = "log4j.properties";
+
+    /**
+     * Default constructor
+     */
+    private ClientConstants() { }
 }

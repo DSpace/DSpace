@@ -22,30 +22,26 @@ package org.dspace.core;
  * @see org.dspace.core.service.PluginService
  */
 
-public class PluginInstantiationException extends RuntimeException
-{
+public class PluginInstantiationException extends RuntimeException {
     /**
      * @param msg Error message text.
      */
-    public PluginInstantiationException(String msg)
-    {
+    public PluginInstantiationException(String msg) {
         super(msg);
     }
 
     /**
-     * @param msg Error message text.
+     * @param msg   Error message text.
      * @param cause other exception that this one is wrapping.
      */
-    public PluginInstantiationException(String msg, Throwable cause)
-    {
+    public PluginInstantiationException(String msg, Throwable cause) {
         super(msg, cause);
     }
 
     /**
      * @param cause other exception that this one is wrapping.
      */
-    public PluginInstantiationException(Throwable cause)
-    {
+    public PluginInstantiationException(Throwable cause) {
         super(cause);
     }
 }

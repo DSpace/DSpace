@@ -7,26 +7,29 @@
  */
 package org.dspace.sword;
 
-import org.dspace.core.Context;
-import org.dspace.content.DSpaceObject;
 import org.dspace.content.Collection;
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.core.Context;
 import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.core.service.PluginService;
-
 import org.purl.sword.base.Deposit;
-import org.purl.sword.base.SWORDErrorException;
 import org.purl.sword.base.ErrorCodes;
+import org.purl.sword.base.SWORDErrorException;
 
 /**
  * Factory class which will mint objects conforming to the
  * SWORDIngester interface.
  *
  * @author Richard Jones
- *
  */
-public class SWORDIngesterFactory
-{
+public class SWORDIngesterFactory {
+
+    /**
+     * Default constructor
+     */
+    private SWORDIngesterFactory() { }
+
     /**
      * Generate an object which conforms to the SWORDIngester interface.
      * This Factory method may use the given DSpace context and the given
@@ -37,40 +40,30 @@ public class SWORDIngesterFactory
      * for the appropriate media types and defaults.  See the SWORD configuration
      * documentation for more details.
      *
-     * @param context
-     *     The relevant DSpace Context.
-     * @param deposit
-     *     deposit request
-     * @param dso
-     *     target DSpace object
+     * @param context The relevant DSpace Context.
+     * @param deposit deposit request
+     * @param dso     target DSpace object
      * @return SWORD ingester implementation
-     * @throws DSpaceSWORDException
-     *     can be thrown by the internals of the DSpace SWORD implementation
-     * @throws SWORDErrorException on generic SWORD exception
+     * @throws DSpaceSWORDException can be thrown by the internals of the DSpace SWORD implementation
+     * @throws SWORDErrorException  on generic SWORD exception
      */
     public static SWORDIngester getInstance(Context context, Deposit deposit,
-            DSpaceObject dso)
-            throws DSpaceSWORDException, SWORDErrorException
-    {
+                                            DSpaceObject dso)
+        throws DSpaceSWORDException, SWORDErrorException {
         PluginService pluginService = CoreServiceFactory.getInstance().getPluginService();
 
-        if (dso instanceof Collection)
-        {
+        if (dso instanceof Collection) {
             SWORDIngester ingester = (SWORDIngester) pluginService
                 .getNamedPlugin(SWORDIngester.class, deposit.getPackaging());
-            if (ingester == null)
-            {
+            if (ingester == null) {
                 throw new SWORDErrorException(ErrorCodes.ERROR_CONTENT,
-                    "No ingester configured for this package type");
+                                              "No ingester configured for this package type");
             }
             return ingester;
-        }
-        else if (dso instanceof Item)
-        {
+        } else if (dso instanceof Item) {
             SWORDIngester ingester = (SWORDIngester) pluginService
                 .getNamedPlugin(SWORDIngester.class, "SimpleFileIngester");
-            if (ingester == null)
-            {
+            if (ingester == null) {
                 throw new DSpaceSWORDException(
                     "SimpleFileIngester is not configured in plugin manager");
             }

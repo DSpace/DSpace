@@ -9,8 +9,19 @@
 [Support](https://wiki.duraspace.org/display/DSPACE/Support)
 
 DSpace open source software is a turnkey repository application used by more than 
-1000+ organizations and institutions worldwide to provide durable access to digital resources.
+2,000 organizations and institutions worldwide to provide durable access to digital resources.
 For more information, visit http://www.dspace.org/
+
+***
+:warning: **Work on DSpace 7 has begun on our `master` branch.** This means that there is temporarily NO user interface on this `master` branch. DSpace 7 will feature a new, unified [Angular](https://angular.io/) user interface, along with an enhanced, rebuilt REST API. The latest status of this work can be found on the [DSpace 7 UI Working Group](https://wiki.duraspace.org/display/DSPACE/DSpace+7+UI+Working+Group) page.  Additionally, the codebases can be found in the following places:
+  * DSpace 7 REST API work is occurring on the [`master` branch](https://github.com/DSpace/DSpace/tree/master/dspace-spring-rest) of this repository.
+     * The REST Contract is being documented at https://github.com/DSpace/Rest7Contract
+  * DSpace 7 Angular UI work is occurring at https://github.com/DSpace/dspace-angular
+  
+**If you would like to get involved in our DSpace 7 development effort, we welcome new contributors.** Just join one of our meetings or get in touch via Slack. See the [DSpace 7 UI Working Group](https://wiki.duraspace.org/display/DSPACE/DSpace+7+UI+Working+Group) wiki page for more info.
+
+**If you are looking for the ongoing maintenance work for DSpace 6 (or prior releases)**, you can find that work on the corresponding maintenance branch (e.g. [`dspace-6_x`](https://github.com/DSpace/DSpace/tree/dspace-6_x)) in this repository.
+***
 
 ## Downloads
 
@@ -28,6 +39,9 @@ https://wiki.duraspace.org/display/DSDOC6x/Installing+DSpace
 Please be aware that, as a Java web application, DSpace requires a database (PostgreSQL or Oracle) 
 and a servlet container (usually Tomcat) in order to function.
 More information about these and all other prerequisites can be found in the Installation instructions above.
+
+## Dockerfile Usage
+See the [DSpace Docker Tutorial](https://dspace-labs.github.io/DSpace-Docker-Images/).
 
 ## Contributing
 
@@ -64,6 +78,57 @@ install, upgrade, customize or host DSpace, then we recommend getting in touch w
 ## Issue Tracker
 
 The DSpace Issue Tracker can be found at: https://jira.duraspace.org/projects/DS/summary
+
+## Testing
+
+### Running Tests
+
+By default, in DSpace, Unit Tests and Integration Tests are disabled. However, they are
+run automatically by [Travis CI](https://travis-ci.org/DSpace/DSpace/) for all Pull Requests and code commits.
+
+* How to run both Unit Tests (via `maven-surefire-plugin`) and Integration Tests (via `maven-failsafe-plugin`):
+  ```
+  # NOTE: while "mvn test" runs Unit Tests,
+  # Integration Tests only run for "verify" or "install" phases
+  mvn clean install -Dmaven.test.skip=false -DskipITs=false
+  ```
+* How to run just Unit Tests:
+  ```
+  mvn clean test -Dmaven.test.skip=false
+  ```
+* How to run a *single* Unit Test
+  ```
+  # Run all tests in a specific test class
+  # NOTE: testClassName is just the class name, do not include package
+  mvn clean test -Dmaven.test.skip=false -Dtest=[testClassName]
+  
+  # Run one test method in a specific test class
+  mvn clean test -Dmaven.test.skip=false -Dtest=[testClassName]#[testMethodName]
+  ```
+* How to run Integration Tests (requires running Unit tests too)
+  ```
+  mvn clean verify -Dmaven.test.skip=false -DskipITs=false
+  ```
+* How to run a *single* Integration Test (requires running Unit tests too)
+  ```
+  # Run all integration tests in a specific test class
+  # NOTE: Integration Tests only run for "verify" or "install" phases
+  # NOTE: testClassName is just the class name, do not include package
+  mvn clean verify -Dmaven.test.skip=false -DskipITs=false -Dit.test=[testClassName]
+  
+  # Run one test method in a specific test class
+  mvn clean verify -Dmaven.test.skip=false -DskipITs=false -Dit.test=[testClassName]#[testMethodName]
+  ```
+* How to run only tests of a specific DSpace module
+  ```
+  # Before you can run only one module's tests, other modules may need installing into your ~/.m2
+  cd [dspace-src]
+  mvn clean install
+  
+  # Then, move into a module subdirectory, and run the test command
+  cd [dspace-src]/dspace-spring-rest
+  # Choose your test command from the lists above
+  ```
 
 ## License
 

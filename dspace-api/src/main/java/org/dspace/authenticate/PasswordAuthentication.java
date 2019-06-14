@@ -9,14 +9,13 @@ package org.dspace.authenticate;
 
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.collections.ListUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
@@ -47,8 +46,10 @@ import org.dspace.services.factory.DSpaceServicesFactory;
 public class PasswordAuthentication
     implements AuthenticationMethod {
 
-    /** log4j category */
-    private static Logger log = Logger.getLogger(PasswordAuthentication.class);
+    /**
+     * log4j category
+     */
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(PasswordAuthentication.class);
 
 
     /**
@@ -59,6 +60,7 @@ public class PasswordAuthentication
      * <p>
      * Example - aber.ac.uk domain : @aber.ac.uk
      * Example - MIT domain and all .ac.uk domains: @mit.edu, .ac.uk
+     *
      * @param email email
      * @throws SQLException if database error
      */
@@ -66,67 +68,62 @@ public class PasswordAuthentication
     public boolean canSelfRegister(Context context,
                                    HttpServletRequest request,
                                    String email)
-                                                 throws SQLException
-    {
+        throws SQLException {
         // Is there anything set in domain.valid?
-        String[] domains = DSpaceServicesFactory.getInstance().getConfigurationService().getArrayProperty("authentication-password.domain.valid");
-        if ((domains == null) || (domains.length==0))
-        {
+        String[] domains = DSpaceServicesFactory.getInstance().getConfigurationService()
+                                                .getArrayProperty("authentication-password.domain.valid");
+        if ((domains == null) || (domains.length == 0)) {
             // No conditions set, so must be able to self register
             return true;
-        }
-        else
-        {
+        } else {
             // Itterate through all domains
             String check;
             email = email.trim().toLowerCase();
-            for (int i = 0; i < domains.length; i++)
-            {
+            for (int i = 0; i < domains.length; i++) {
                 check = domains[i].trim().toLowerCase();
-                if (email.endsWith(check))
-                {
+                if (email.endsWith(check)) {
                     // A match, so we can register this user
                     return true;
                 }
             }
-            
+
             // No match
             return false;
-        }    
+        }
     }
 
     /**
-     *  Nothing extra to initialize.
+     * Nothing extra to initialize.
+     *
      * @throws SQLException if database error
      */
     @Override
     public void initEPerson(Context context, HttpServletRequest request,
-            EPerson eperson)
-        throws SQLException
-    {
+                            EPerson eperson)
+        throws SQLException {
     }
 
     /**
      * We always allow the user to change their password.
+     *
      * @throws SQLException if database error
      */
     @Override
     public boolean allowSetPassword(Context context,
                                     HttpServletRequest request,
                                     String username)
-        throws SQLException
-    {
+        throws SQLException {
         return true;
     }
 
     /**
      * This is an explicit method, since it needs username and password
      * from some source.
+     *
      * @return false
      */
     @Override
-    public boolean isImplicit()
-    {
+    public boolean isImplicit() {
         return false;
     }
 
@@ -135,37 +132,35 @@ public class PasswordAuthentication
      * the login.specialgroup key.
      */
     @Override
-    public List<Group> getSpecialGroups(Context context, HttpServletRequest request)
-    {
+    public List<Group> getSpecialGroups(Context context, HttpServletRequest request) {
         // Prevents anonymous users from being added to this group, and the second check
-		// ensures they are password users
-		try
-		{
+        // ensures they are password users
+        try {
             if (context.getCurrentUser() != null
-                && StringUtils.isNotBlank(EPersonServiceFactory.getInstance().getEPersonService().getPasswordHash(context.getCurrentUser()).toString()))
-			{
-				String groupName = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("authentication-password.login.specialgroup");
-				if ((groupName != null) && (!groupName.trim().equals("")))
-				{
-				    Group specialGroup = EPersonServiceFactory.getInstance().getGroupService().findByName(context, groupName);
-					if (specialGroup == null)
-					{
-						// Oops - the group isn't there.
-						log.warn(LogManager.getHeader(context,
-								"password_specialgroup",
-								"Group defined in modules/authentication-password.cfg login.specialgroup does not exist"));
-						return ListUtils.EMPTY_LIST;
-					} else
-					{
-						return Arrays.asList(specialGroup);
-					}
-				}
-			}
-		}
-		catch (Exception e) {
-            log.error(LogManager.getHeader(context,"getSpecialGroups",""),e);
-		}
-		return ListUtils.EMPTY_LIST;
+                && StringUtils.isNotBlank(
+                EPersonServiceFactory.getInstance().getEPersonService().getPasswordHash(context.getCurrentUser())
+                                     .toString())) {
+                String groupName = DSpaceServicesFactory.getInstance().getConfigurationService()
+                                                        .getProperty("authentication-password.login.specialgroup");
+                if ((groupName != null) && (!groupName.trim().equals(""))) {
+                    Group specialGroup = EPersonServiceFactory.getInstance().getGroupService()
+                                                              .findByName(context, groupName);
+                    if (specialGroup == null) {
+                        // Oops - the group isn't there.
+                        log.warn(LogManager.getHeader(context,
+                                                      "password_specialgroup",
+                                                      "Group defined in modules/authentication-password.cfg login" +
+                                                          ".specialgroup does not exist"));
+                        return Collections.EMPTY_LIST;
+                    } else {
+                        return Arrays.asList(specialGroup);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            log.error(LogManager.getHeader(context, "getSpecialGroups", ""), e);
+        }
+        return Collections.EMPTY_LIST;
     }
 
     /**
@@ -175,25 +170,15 @@ public class PasswordAuthentication
      * is only allowed to login via an implicit method
      * and returns <code>CERT_REQUIRED</code> if that is the case.
      *
-     * @param context
-     *  DSpace context, will be modified (EPerson set) upon success.
-     *
-     * @param username
-     *  Username (or email address) when method is explicit. Use null for
-     *  implicit method.
-     *
-     * @param password
-     *  Password for explicit auth, or null for implicit method.
-     *
-     * @param realm
-     *  Realm is an extra parameter used by some authentication methods, leave null if
-     *  not applicable.
-     *
-     * @param request
-     *  The HTTP request that started this operation, or null if not applicable.
-     *
+     * @param context  DSpace context, will be modified (EPerson set) upon success.
+     * @param username Username (or email address) when method is explicit. Use null for
+     *                 implicit method.
+     * @param password Password for explicit auth, or null for implicit method.
+     * @param realm    Realm is an extra parameter used by some authentication methods, leave null if
+     *                 not applicable.
+     * @param request  The HTTP request that started this operation, or null if not applicable.
      * @return One of:
-     *   SUCCESS, BAD_CREDENTIALS, CERT_REQUIRED, NO_SUCH_USER, BAD_ARGS
+     * SUCCESS, BAD_CREDENTIALS, CERT_REQUIRED, NO_SUCH_USER, BAD_ARGS
      * <p>Meaning:
      * <br>SUCCESS         - authenticated OK.
      * <br>BAD_CREDENTIALS - user exists, but assword doesn't match
@@ -208,47 +193,37 @@ public class PasswordAuthentication
                             String password,
                             String realm,
                             HttpServletRequest request)
-        throws SQLException
-    {
-        if (username != null && password != null)
-        {
+        throws SQLException {
+        if (username != null && password != null) {
             EPerson eperson = null;
-            log.info(LogManager.getHeader(context, "authenticate", "attempting password auth of user="+username));
-            eperson = EPersonServiceFactory.getInstance().getEPersonService().findByEmail(context, username.toLowerCase());
+            log.info(LogManager.getHeader(context, "authenticate", "attempting password auth of user=" + username));
+            eperson = EPersonServiceFactory.getInstance().getEPersonService()
+                                           .findByEmail(context, username.toLowerCase());
 
-            if (eperson == null)
-            {
+            if (eperson == null) {
                 // lookup failed.
                 return NO_SUCH_USER;
-            }
-            else if (!eperson.canLogIn())
-            {
+            } else if (!eperson.canLogIn()) {
                 // cannot login this way
                 return BAD_ARGS;
-            }
-            else if (eperson.getRequireCertificate())
-            {
+            } else if (eperson.getRequireCertificate()) {
                 // this user can only login with x.509 certificate
-                log.warn(LogManager.getHeader(context, "authenticate", "rejecting PasswordAuthentication because "+username+" requires certificate."));
+                log.warn(LogManager.getHeader(context, "authenticate",
+                                              "rejecting PasswordAuthentication because " + username + " requires " +
+                                                  "certificate."));
                 return CERT_REQUIRED;
-            }
-            else if (EPersonServiceFactory.getInstance().getEPersonService().checkPassword(context, eperson, password))
-            {
+            } else if (EPersonServiceFactory.getInstance().getEPersonService()
+                                            .checkPassword(context, eperson, password)) {
                 // login is ok if password matches:
                 context.setCurrentUser(eperson);
                 log.info(LogManager.getHeader(context, "authenticate", "type=PasswordAuthentication"));
                 return SUCCESS;
-            }
-            else
-            {
+            } else {
                 return BAD_CREDENTIALS;
             }
-        }
-
-        // BAD_ARGS always defers to the next authentication method.
-        // It means this method cannot use the given credentials.
-        else
-        {
+        } else {
+            // BAD_ARGS always defers to the next authentication method.
+            // It means this method cannot use the given credentials.
             return BAD_ARGS;
         }
     }
@@ -256,38 +231,20 @@ public class PasswordAuthentication
     /**
      * Returns URL of password-login servlet.
      *
-     * @param context
-     *  DSpace context, will be modified (EPerson set) upon success.
-     *
-     * @param request
-     *  The HTTP request that started this operation, or null if not applicable.
-     *
-     * @param response
-     *  The HTTP response from the servlet method.
-     *
+     * @param context  DSpace context, will be modified (EPerson set) upon success.
+     * @param request  The HTTP request that started this operation, or null if not applicable.
+     * @param response The HTTP response from the servlet method.
      * @return fully-qualified URL
      */
     @Override
     public String loginPageURL(Context context,
-                            HttpServletRequest request,
-                            HttpServletResponse response)
-    {
-        return response.encodeRedirectURL(request.getContextPath() +
-                                          "/password-login");
+                               HttpServletRequest request,
+                               HttpServletResponse response) {
+        return null;
     }
 
-    /**
-     * Returns message key for title of the "login" page, to use
-     * in a menu showing the choice of multiple login methods.
-     *
-     * @param context
-     *  DSpace context, will be modified (EPerson set) upon success.
-     *
-     * @return Message key to look up in i18n message catalog.
-     */
     @Override
-    public String loginPageTitle(Context context)
-    {
-        return "org.dspace.eperson.PasswordAuthentication.title";
+    public String getName() {
+        return "password";
     }
 }

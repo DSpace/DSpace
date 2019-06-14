@@ -45,7 +45,7 @@ import org.jdom.output.XMLOutputter;
  * <p>
  * This is just wrappers; the real work is done in RoleDisseminator and
  * RoleIngester.
- * 
+ *
  * @author mwood
  * @author Tim Donohue
  * @see org.dspace.content.packager.RoleDisseminator
@@ -55,9 +55,8 @@ import org.jdom.output.XMLOutputter;
  * @see DisseminationCrosswalk
  */
 public class RoleCrosswalk
-        extends AbstractPackagerWrappingCrosswalk
-        implements IngestionCrosswalk, DisseminationCrosswalk
-{
+    extends AbstractPackagerWrappingCrosswalk
+    implements IngestionCrosswalk, DisseminationCrosswalk {
     // Plugin Name of DSPACE-ROLES packager to use for ingest/dissemination
     // (Whatever plugin is defined with this name in 'dspace.cfg' will be used by this Crosswalk)
     private static final String ROLE_PACKAGER_PLUGIN = "DSPACE-ROLES";
@@ -71,8 +70,7 @@ public class RoleCrosswalk
      * @return array of namespaces, which may be empty.
      */
     @Override
-    public Namespace[] getNamespaces()
-    {
+    public Namespace[] getNamespaces() {
         Namespace result[] = new Namespace[1];
         result[0] = RoleDisseminator.DSROLES_NS;
         return result;
@@ -83,33 +81,32 @@ public class RoleCrosswalk
      * Get the XML Schema location(s) of the target metadata format.
      * Returns the string value of the <code>xsi:schemaLocation</code>
      * attribute that should be applied to the generated XML.
-     *  <p>
+     * <p>
      * It may return the empty string if no schema is known, but crosswalk
      * authors are strongly encouraged to implement this call so their output
      * XML can be validated correctly.
+     *
      * @return SchemaLocation string, including URI namespace, followed by
-     *  whitespace and URI of XML schema document, or empty string if unknown.
+     * whitespace and URI of XML schema document, or empty string if unknown.
      */
     @Override
-    public String getSchemaLocation()
-    {
+    public String getSchemaLocation() {
         return "";
     }
 
     /**
      * Predicate: Can this disseminator crosswalk the given object.
      *
-     * @param dso  dspace object, e.g. an <code>Item</code>.
+     * @param dso dspace object, e.g. an <code>Item</code>.
      * @return true when disseminator is capable of producing metadata.
      */
     @Override
-    public boolean canDisseminate(DSpaceObject dso)
-    {
+    public boolean canDisseminate(DSpaceObject dso) {
         //We can only disseminate SITE, COMMUNITY or COLLECTION objects,
         //as Groups are only associated with those objects.
         return (dso.getType() == Constants.SITE ||
-           dso.getType() == Constants.COMMUNITY ||
-           dso.getType() == Constants.COLLECTION);
+            dso.getType() == Constants.COMMUNITY ||
+            dso.getType() == Constants.COLLECTION);
     }
 
     /**
@@ -119,8 +116,7 @@ public class RoleCrosswalk
      * @return true when disseminator prefers you call disseminateList().
      */
     @Override
-    public boolean preferList()
-    {
+    public boolean preferList() {
         //We prefer disseminators call 'disseminateElement()' instead of 'disseminateList()'
         return false;
     }
@@ -136,20 +132,19 @@ public class RoleCrosswalk
      * empty list is returned, but never <code>null</code>.
      *
      * @param context context
-     * @param dso the  DSpace Object whose metadata to export.
+     * @param dso     the  DSpace Object whose metadata to export.
      * @return results of crosswalk as list of XML elements.
-     *
-     * @throws CrosswalkInternalException (<code>CrosswalkException</code>) failure of the crosswalk itself.
-     * @throws CrosswalkObjectNotSupported (<code>CrosswalkException</code>) Cannot crosswalk this kind of DSpace object.
-     * @throws IOException  I/O failure in services this calls
-     * @throws SQLException  Database failure in services this calls
-     * @throws AuthorizeException current user not authorized for this operation.
+     * @throws CrosswalkInternalException  (<code>CrosswalkException</code>) failure of the crosswalk itself.
+     * @throws CrosswalkObjectNotSupported (<code>CrosswalkException</code>) Cannot crosswalk this kind of DSpace
+     *                                     object.
+     * @throws IOException                 I/O failure in services this calls
+     * @throws SQLException                Database failure in services this calls
+     * @throws AuthorizeException          current user not authorized for this operation.
      */
     @Override
     public List<Element> disseminateList(Context context, DSpaceObject dso)
         throws CrosswalkException, IOException, SQLException,
-               AuthorizeException
-    {
+        AuthorizeException {
         Element dim = disseminateElement(context, dso);
         return dim.getChildren();
     }
@@ -161,43 +156,40 @@ public class RoleCrosswalk
      * <p>
      *
      * @param context context
-     * @param dso the  DSpace Object whose metadata to export.
+     * @param dso     the  DSpace Object whose metadata to export.
      * @return root Element of the target metadata, never <code>null</code>
-     *
-     * @throws CrosswalkInternalException (<code>CrosswalkException</code>) failure of the crosswalk itself.
-     * @throws CrosswalkObjectNotSupported (<code>CrosswalkException</code>) Cannot crosswalk this kind of DSpace object.
-     * @throws IOException  I/O failure in services this calls
-     * @throws SQLException  Database failure in services this calls
-     * @throws AuthorizeException current user not authorized for this operation.
+     * @throws CrosswalkInternalException  (<code>CrosswalkException</code>) failure of the crosswalk itself.
+     * @throws CrosswalkObjectNotSupported (<code>CrosswalkException</code>) Cannot crosswalk this kind of DSpace
+     *                                     object.
+     * @throws IOException                 I/O failure in services this calls
+     * @throws SQLException                Database failure in services this calls
+     * @throws AuthorizeException          current user not authorized for this operation.
      */
     @Override
     public Element disseminateElement(Context context, DSpaceObject dso)
         throws CrosswalkException, IOException, SQLException,
-               AuthorizeException
-    {
-        try
-        {
+        AuthorizeException {
+        try {
             PackageDisseminator dip = (PackageDisseminator)
-                   CoreServiceFactory.getInstance().getPluginService().getNamedPlugin(PackageDisseminator.class, ROLE_PACKAGER_PLUGIN);
-            if (dip == null)
-            {
-                throw new CrosswalkInternalException("Cannot find a PackageDisseminator plugin named " + ROLE_PACKAGER_PLUGIN);
+                CoreServiceFactory.getInstance().getPluginService()
+                                  .getNamedPlugin(PackageDisseminator.class, ROLE_PACKAGER_PLUGIN);
+            if (dip == null) {
+                throw new CrosswalkInternalException(
+                    "Cannot find a PackageDisseminator plugin named " + ROLE_PACKAGER_PLUGIN);
             }
 
             // Create a temporary file to disseminate into
             String tempDirectory = (ConfigurationManager.getProperty("upload.temp.dir") != null)
-                ? ConfigurationManager.getProperty("upload.temp.dir") : System.getProperty("java.io.tmpdir"); 
-            File tempFile = File.createTempFile("RoleCrosswalkDisseminate" + dso.hashCode(), null, new File(tempDirectory));
+                ? ConfigurationManager.getProperty("upload.temp.dir") : System.getProperty("java.io.tmpdir");
+            File tempFile = File
+                .createTempFile("RoleCrosswalkDisseminate" + dso.hashCode(), null, new File(tempDirectory));
             tempFile.deleteOnExit();
 
             // Initialize our packaging parameters
             PackageParameters pparams;
-            if(this.getPackagingParameters()!=null)
-            {
+            if (this.getPackagingParameters() != null) {
                 pparams = this.getPackagingParameters();
-            }
-            else
-            {
+            } else {
                 pparams = new PackageParameters();
             }
 
@@ -206,34 +198,27 @@ public class RoleCrosswalk
 
             // if we ended up with a Zero-length output file,
             // this means dissemination was successful but had no results
-            if(tempFile.exists() && tempFile.length()==0)
-            {
+            if (tempFile.exists() && tempFile.length() == 0) {
                 return null;
             }
-           
-            try
-            {
+
+            try {
                 //Try to parse our XML results (which were disseminated by the Packager)
                 SAXBuilder builder = new SAXBuilder();
                 Document xmlDocument = builder.build(tempFile);
                 //If XML parsed successfully, return root element of doc
-                if(xmlDocument!=null && xmlDocument.hasRootElement())
-                {
+                if (xmlDocument != null && xmlDocument.hasRootElement()) {
                     return xmlDocument.getRootElement();
-                }
-                else
-                {
+                } else {
                     return null;
                 }
+            } catch (JDOMException je) {
+                throw new MetadataValidationException(
+                    "Error parsing Roles XML (see wrapped error message for more details) ", je);
             }
-            catch (JDOMException je)
-            {
-                throw new MetadataValidationException("Error parsing Roles XML (see wrapped error message for more details) ",je);
-            }
-        }
-        catch (PackageException pe)
-        {
-            throw new CrosswalkInternalException("Failed to export Roles via packager (see wrapped error message for more details) ",pe);
+        } catch (PackageException pe) {
+            throw new CrosswalkInternalException(
+                "Failed to export Roles via packager (see wrapped error message for more details) ", pe);
         }
     }
 
@@ -243,21 +228,19 @@ public class RoleCrosswalk
     /**
      * Ingest a List of XML elements
      *
-     * @param context context
-     * @param dso DSpaceObject
-     * @param metadata list of metadata
+     * @param context                     context
+     * @param dso                         DSpaceObject
+     * @param metadata                    list of metadata
      * @param createMissingMetadataFields whether to create missing fields
      * @throws CrosswalkException if crosswalk error
-     * @throws IOException if IO error
-     * @throws SQLException if database error
+     * @throws IOException        if IO error
+     * @throws SQLException       if database error
      * @throws AuthorizeException if authorization error
      */
     @Override
     public void ingest(Context context, DSpaceObject dso, List<Element> metadata, boolean createMissingMetadataFields)
-        throws CrosswalkException, IOException, SQLException, AuthorizeException
-    {
-        if(!metadata.isEmpty())
-        {
+        throws CrosswalkException, IOException, SQLException, AuthorizeException {
+        if (!metadata.isEmpty()) {
             ingest(context, dso, ((Element) metadata.get(0)).getParentElement(), createMissingMetadataFields);
         }
     }
@@ -268,79 +251,66 @@ public class RoleCrosswalk
      * <P>
      * This essentially just wraps a call to the configured Role PackageIngester.
      *
-     * @param context context
-     * @param dso DSpaceObject
-     * @param root root element
+     * @param context                     context
+     * @param dso                         DSpaceObject
+     * @param root                        root element
      * @param createMissingMetadataFields whether to create missing fields
      * @throws CrosswalkException if crosswalk error
-     * @throws IOException if IO error
-     * @throws SQLException if database error
+     * @throws IOException        if IO error
+     * @throws SQLException       if database error
      * @throws AuthorizeException if authorization error
      */
     @Override
     public void ingest(Context context, DSpaceObject dso, Element root, boolean createMissingMetadataFields)
-        throws CrosswalkException, IOException, SQLException, AuthorizeException
-    {
+        throws CrosswalkException, IOException, SQLException, AuthorizeException {
         if (dso.getType() != Constants.SITE &&
             dso.getType() != Constants.COMMUNITY &&
-            dso.getType() != Constants.COLLECTION)
-        {
+            dso.getType() != Constants.COLLECTION) {
             throw new CrosswalkObjectNotSupported("Role crosswalk only valid for Site, Community or Collection");
         }
 
         //locate our "DSPACE-ROLES" PackageIngester plugin
         PackageIngester sip = (PackageIngester)
-                                CoreServiceFactory.getInstance().getPluginService().getNamedPlugin(PackageIngester.class, ROLE_PACKAGER_PLUGIN);
-        if (sip == null)
-        {
+            CoreServiceFactory.getInstance().getPluginService()
+                              .getNamedPlugin(PackageIngester.class, ROLE_PACKAGER_PLUGIN);
+        if (sip == null) {
             throw new CrosswalkInternalException("Cannot find a PackageIngester plugin named " + ROLE_PACKAGER_PLUGIN);
         }
 
         // Initialize our packaging parameters
         PackageParameters pparams;
-        if(this.getPackagingParameters()!=null)
-        {
+        if (this.getPackagingParameters() != null) {
             pparams = this.getPackagingParameters();
-        }
-        else
-        {
+        } else {
             pparams = new PackageParameters();
         }
-        
+
         // Initialize our license info
         String license = null;
-        if(this.getIngestionLicense()!=null)
-        {
+        if (this.getIngestionLicense() != null) {
             license = this.getIngestionLicense();
         }
-        
+
         // Create a temporary file to ingest from
         String tempDirectory = (ConfigurationManager.getProperty("upload.temp.dir") != null)
-            ? ConfigurationManager.getProperty("upload.temp.dir") : System.getProperty("java.io.tmpdir"); 
+            ? ConfigurationManager.getProperty("upload.temp.dir") : System.getProperty("java.io.tmpdir");
         File tempFile = File.createTempFile("RoleCrosswalkIngest" + dso.hashCode(), null, new File(tempDirectory));
         tempFile.deleteOnExit();
         FileOutputStream fileOutStream = null;
-        try
-        {
+        try {
             fileOutStream = new FileOutputStream(tempFile);
             XMLOutputter writer = new XMLOutputter();
             writer.output(root, fileOutStream);
-        }
-        finally
-        {
-            if (fileOutStream != null)
-            {
+        } finally {
+            if (fileOutStream != null) {
                 fileOutStream.close();
             }
         }
 
         //Actually call the ingester
-        try
-        {
+        try {
             sip.ingest(context, dso, tempFile, pparams, license);
-        }
-        catch (PackageException | WorkflowException e)
-        {
+        } catch (PackageException | WorkflowException e) {
             throw new CrosswalkInternalException(e);
         }
     }

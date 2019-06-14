@@ -7,47 +7,43 @@
  */
 package org.dspace.app.itemupdate;
 
-import java.util.regex.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.dspace.content.Bitstream;
 
 /**
  * BitstreamFilter implementation to filter by filename pattern
- *
  */
 public class BitstreamFilterByFilename extends BitstreamFilter {
-    
+
     protected Pattern pattern;
     protected String filenameRegex;
-    
-    public BitstreamFilterByFilename()
-    {
+
+    public BitstreamFilterByFilename() {
         //empty
     }
 
     /**
-     * Tests bitstream by matching the regular expression in the 
+     * Tests bitstream by matching the regular expression in the
      * properties against the bitstream name
-     * 
+     *
      * @param bitstream Bitstream
      * @return whether bitstream name matches the regular expression
      * @throws BitstreamFilterException if filter error
      */
     @Override
-    public boolean accept(Bitstream bitstream) throws BitstreamFilterException
-    {        
-        if (filenameRegex == null)
-        {
+    public boolean accept(Bitstream bitstream) throws BitstreamFilterException {
+        if (filenameRegex == null) {
             filenameRegex = props.getProperty("filename");
-            if (filenameRegex == null)
-            {
+            if (filenameRegex == null) {
                 throw new BitstreamFilterException("BitstreamFilter property 'filename' not found.");
             }
             pattern = Pattern.compile(filenameRegex);
         }
-        
+
         Matcher m = pattern.matcher(bitstream.getName());
         return m.matches();
-    }    
- 
+    }
+
 }

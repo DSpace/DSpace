@@ -7,35 +7,27 @@
  */
 package org.dspace.sword2;
 
-import org.swordapp.server.SwordServerException;
-
 /**
  * This Exception class can be thrown by the internals of the
  * DSpace SWORD implementation
  *
  * @author Richard Jones
- *
  */
-public class DSpaceSwordException extends Exception
-{
+public class DSpaceSwordException extends Exception {
 
-    public DSpaceSwordException()
-    {
+    public DSpaceSwordException() {
         super();
     }
 
-    public DSpaceSwordException(String arg0, Throwable arg1)
-    {
+    public DSpaceSwordException(String arg0, Throwable arg1) {
         super(arg0, arg1);
     }
 
-    public DSpaceSwordException(String arg0)
-    {
+    public DSpaceSwordException(String arg0) {
         super(arg0);
     }
 
-    public DSpaceSwordException(Throwable arg0)
-    {
+    public DSpaceSwordException(Throwable arg0) {
         super(arg0);
     }
 

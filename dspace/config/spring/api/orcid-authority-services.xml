@@ -1,13 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-
-    Copyright (c) 2002-2010, DuraSpace.  All rights reserved
-    Licensed under the DuraSpace License.
-
-    A copy of the DuraSpace License has been included in this
-    distribution and is available at: http://www.dspace.org/license
-
--->
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
@@ -27,7 +18,7 @@
     <bean name="AuthorityTypes" class="org.dspace.authority.AuthorityTypes">
         <property name="types">
             <list>
-                <bean class="org.dspace.authority.orcid.OrcidAuthorityValue"/>
+                <bean class="org.dspace.authority.orcid.Orcidv2AuthorityValue"/>
                 <bean class="org.dspace.authority.PersonAuthorityValue"/>
             </list>
         </property>
@@ -41,8 +32,8 @@
     </bean>
 
     <alias name="OrcidSource" alias="AuthoritySource"/>
-    <bean name="OrcidSource" class="org.dspace.authority.orcid.Orcid">
-        <constructor-arg value="http://pub.orcid.org"/>
+    <bean name="OrcidSource" class="org.dspace.authority.orcid.Orcidv2" init-method="init">
+        <constructor-arg value="${orcid.api.url}"/>
     </bean>
 
 

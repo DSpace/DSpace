@@ -7,36 +7,35 @@
  */
 package org.dspace.rest.common;
 
-import org.apache.log4j.Logger;
-
 import javax.ws.rs.WebApplicationException;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.apache.logging.log4j.Logger;
+
 /**
  * Metadata Query for DSpace Items using the REST API
+ *
  * @author Terry Brady, Georgetown University
  */
 @XmlRootElement(name = "item-filter-query")
 public class ItemFilterQuery {
-    Logger log = Logger.getLogger(ItemFilterQuery.class);
+    Logger log = org.apache.logging.log4j.LogManager.getLogger(ItemFilterQuery.class);
 
     private String field = "";
     private String operation = "";
     private String value = "";
 
-    public ItemFilterQuery(){}
+    public ItemFilterQuery() {
+    }
 
     /**
      * Construct a metadata query for DSpace items
-     * @param field
-     *     Name of the metadata field to query
-     * @param operation
-     *     Operation to perform on a metadata field
-     * @param value
-           Query value.
-     * @throws WebApplicationException
-           Runtime exception for applications.
+     *
+     * @param field     Name of the metadata field to query
+     * @param operation Operation to perform on a metadata field
+     * @param value     Query value.
+     * @throws WebApplicationException Runtime exception for applications.
      */
     public ItemFilterQuery(String field, String operation, String value) throws WebApplicationException {
         setup(field, operation, value);
@@ -48,7 +47,7 @@ public class ItemFilterQuery {
         this.setValue(value);
     }
 
-    @XmlAttribute(name="field")
+    @XmlAttribute(name = "field")
     public String getField() {
         return field;
     }
@@ -56,8 +55,8 @@ public class ItemFilterQuery {
     public void setField(String field) {
         this.field = field;
     }
-    
-    @XmlAttribute(name="operation")
+
+    @XmlAttribute(name = "operation")
     public String getOperation() {
         return operation;
     }
@@ -65,7 +64,8 @@ public class ItemFilterQuery {
     public void setOperation(String operation) {
         this.operation = operation;
     }
-    @XmlAttribute(name="value")
+
+    @XmlAttribute(name = "value")
     public String getValue() {
         return value;
     }

@@ -11,7 +11,8 @@ import org.dspace.license.service.CreativeCommonsService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Factory implementation to get services for the license package, use LicenseServiceFactory.getInstance() to retrieve an implementation
+ * Factory implementation to get services for the license package, use LicenseServiceFactory.getInstance() to
+ * retrieve an implementation
  *
  * @author kevinvandevelde at atmire.com
  */

@@ -12,28 +12,22 @@ package org.dspace.sword;
  * DSpace SWORD implementation
  *
  * @author Richard Jones
- *
  */
-public class DSpaceSWORDException extends Exception
-{
+public class DSpaceSWORDException extends Exception {
 
-    public DSpaceSWORDException()
-    {
+    public DSpaceSWORDException() {
         super();
     }
 
-    public DSpaceSWORDException(String arg0, Throwable arg1)
-    {
+    public DSpaceSWORDException(String arg0, Throwable arg1) {
         super(arg0, arg1);
     }
 
-    public DSpaceSWORDException(String arg0)
-    {
+    public DSpaceSWORDException(String arg0) {
         super(arg0);
     }
 
-    public DSpaceSWORDException(Throwable arg0)
-    {
+    public DSpaceSWORDException(Throwable arg0) {
         super(arg0);
     }
 

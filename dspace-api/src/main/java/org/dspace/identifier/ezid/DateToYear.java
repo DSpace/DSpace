@@ -20,15 +20,13 @@ import java.util.GregorianCalendar;
  * @author mwood
  */
 public class DateToYear
-        implements Transform
-{
+    implements Transform {
     private static final SimpleDateFormat parser
-            = new SimpleDateFormat("yyyy'-'MM'-'dd");
+        = new SimpleDateFormat("yyyy'-'MM'-'dd");
 
     @Override
     public synchronized String transform(String from)
-            throws ParseException
-    {
+        throws ParseException {
         Date when = parser.parse(from);
         Calendar calendar = new GregorianCalendar();
         calendar.setTime(when);

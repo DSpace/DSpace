@@ -7,7 +7,9 @@
  */
 package org.dspace.services.events;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 import org.dspace.services.RequestService;
 import org.dspace.services.model.Event;
@@ -18,7 +20,7 @@ import org.junit.Test;
 
 /**
  * Event service testing (not wrapped in requests)
- * 
+ *
  * @author Aaron Zeckoski (azeckoski@gmail.com) - azeckoski - 12:24:17 PM Nov 20, 2008
  */
 public class EventServiceTest extends DSpaceAbstractKernelTest {
@@ -66,13 +68,13 @@ public class EventServiceTest extends DSpaceAbstractKernelTest {
         Event event6 = new Event("test.event.read", "fake-resource-555", "11111", false);
         Event event7 = new Event("aaron.event.read", "az-123456", "11111", false);
 
-        eventService.fireEvent( event1 );
-        eventService.fireEvent( event2 );
-        eventService.fireEvent( event3 );
-        eventService.fireEvent( event4 );
-        eventService.fireEvent( event5 );
-        eventService.fireEvent( event6 );
-        eventService.fireEvent( event7 );
+        eventService.fireEvent(event1);
+        eventService.fireEvent(event2);
+        eventService.fireEvent(event3);
+        eventService.fireEvent(event4);
+        eventService.fireEvent(event5);
+        eventService.fireEvent(event6);
+        eventService.fireEvent(event7);
 
         // now check that the listeners were properly triggered
         assertEquals(7, listenerNoFilter.getReceivedEvents().size());
@@ -100,7 +102,8 @@ public class EventServiceTest extends DSpaceAbstractKernelTest {
     }
 
     /**
-     * Test method for {@link org.dspace.services.events.SystemEventService#queueEvent(org.dspace.services.model.Event)}.
+     * Test method for
+     * {@link org.dspace.services.events.SystemEventService#queueEvent(org.dspace.services.model.Event)}.
      */
     @Test
     public void testQueueEvent() {
@@ -137,7 +140,7 @@ public class EventServiceTest extends DSpaceAbstractKernelTest {
         eventService.queueEvent(event3);
         eventService.queueEvent(event4);
         requestService.endRequest(null);
-        
+
         assertEquals(4, listenerNoFilter.getReceivedEvents().size());
         assertEquals(event1, listenerNoFilter.getReceivedEvents().get(0));
         assertEquals(event2, listenerNoFilter.getReceivedEvents().get(1));
@@ -146,7 +149,8 @@ public class EventServiceTest extends DSpaceAbstractKernelTest {
     }
 
     /**
-     * Test method for {@link org.dspace.services.events.SystemEventService#registerEventListener(org.dspace.services.model.EventListener)}.
+     * Test method for
+     * {@link org.dspace.services.events.SystemEventService#registerEventListener(org.dspace.services.model.EventListener)}.
      */
     @Test
     public void testRegisterEventListener() {

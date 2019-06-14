@@ -7,27 +7,27 @@
  */
 package org.dspace.sword;
 
-import org.apache.commons.lang.StringUtils;
+import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
+import org.dspace.content.DSpaceObject;
+import org.dspace.content.Item;
+import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
-import org.purl.sword.base.Collection;
-import org.dspace.content.*;
 import org.dspace.core.Context;
-
-import java.util.List;
+import org.purl.sword.base.Collection;
 
 /**
  * @author Richard Jones
  *
  * Class to generate ATOM Collection elements for DSpace Items
  */
-public class ItemCollectionGenerator extends ATOMCollectionGenerator
-{
+public class ItemCollectionGenerator extends ATOMCollectionGenerator {
     protected ItemService itemService = ContentServiceFactory.getInstance()
-            .getItemService();
+                                                             .getItemService();
 
-    public ItemCollectionGenerator(SWORDService service)
-    {
+    public ItemCollectionGenerator(SWORDService service) {
         super(service);
     }
 
@@ -40,12 +40,10 @@ public class ItemCollectionGenerator extends ATOMCollectionGenerator
      * @throws DSpaceSWORDException if the dso is not an instance of Item
      */
     public Collection buildCollection(DSpaceObject dso)
-            throws DSpaceSWORDException
-    {
-        if (!(dso instanceof Item))
-        {
+        throws DSpaceSWORDException {
+        if (!(dso instanceof Item)) {
             throw new DSpaceSWORDException(
-                    "Incorrect ATOMCollectionGenerator instantiated");
+                "Incorrect ATOMCollectionGenerator instantiated");
         }
 
         // get the things we need out of the service
@@ -63,12 +61,10 @@ public class ItemCollectionGenerator extends ATOMCollectionGenerator
         // the item title is the sword collection title, or "untitled" otherwise
         String title = "Untitled";
         List<MetadataValue> dcv = itemService
-                .getMetadataByMetadataString(item, "dc.title");
-        if (!dcv.isEmpty())
-        {
+            .getMetadataByMetadataString(item, "dc.title");
+        if (!dcv.isEmpty()) {
             String firstValue = dcv.get(0).getValue();
-            if (StringUtils.isNotBlank(firstValue))
-            {
+            if (StringUtils.isNotBlank(firstValue)) {
                 title = firstValue;
             }
         }
@@ -81,17 +77,14 @@ public class ItemCollectionGenerator extends ATOMCollectionGenerator
         // abstract is the short description of the item, if it exists
         String dcAbstract = "";
         List<MetadataValue> dcva = itemService
-                .getMetadataByMetadataString(item, "dc.description.abstract");
-        if (!dcva.isEmpty())
-        {
+            .getMetadataByMetadataString(item, "dc.description.abstract");
+        if (!dcva.isEmpty()) {
             String firstValue = dcva.get(0).getValue();
-            if (StringUtils.isNotBlank(firstValue))
-            {
+            if (StringUtils.isNotBlank(firstValue)) {
                 dcAbstract = firstValue;
             }
         }
-        if (StringUtils.isNotBlank(dcAbstract))
-        {
+        if (StringUtils.isNotBlank(dcAbstract)) {
             scol.setAbstract(dcAbstract);
         }
 
@@ -101,8 +94,7 @@ public class ItemCollectionGenerator extends ATOMCollectionGenerator
         // the list of mime types that we accept, which we take from the
         // bitstream format registry
         List<String> acceptFormats = swordConfig.getAccepts(context, item);
-        for (String acceptFormat : acceptFormats)
-        {
+        for (String acceptFormat : acceptFormats) {
             scol.addAccepts(acceptFormat);
         }
 

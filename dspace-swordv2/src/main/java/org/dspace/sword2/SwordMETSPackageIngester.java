@@ -7,6 +7,9 @@
  */
 package org.dspace.sword2;
 
+import java.io.IOException;
+import java.sql.SQLException;
+
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
@@ -16,11 +19,7 @@ import org.dspace.content.packager.PackageUtils;
 import org.dspace.content.packager.PackageValidationException;
 import org.dspace.core.Context;
 
-import java.io.IOException;
-import java.sql.SQLException;
-
-public class SwordMETSPackageIngester extends DSpaceMETSIngester
-{
+public class SwordMETSPackageIngester extends DSpaceMETSIngester {
     /**
      * Policy:  For DSpace deposit license, take deposit license
      * supplied by explicit argument first, else use collection's
@@ -30,17 +29,14 @@ public class SwordMETSPackageIngester extends DSpaceMETSIngester
      * This override basically fixes a bug in the DSpaceMETSIngester which
      * allows (in fact enforces) a null licence during replace, but which
      * then requires it to be not-null here.
-     *
      */
     @Override
     public void addLicense(Context context, Item item, String license,
-            Collection collection, PackageParameters params)
-            throws PackageValidationException,
-            AuthorizeException, SQLException, IOException
-    {
+                           Collection collection, PackageParameters params)
+        throws PackageValidationException,
+        AuthorizeException, SQLException, IOException {
         if (PackageUtils.findDepositLicense(context, item) == null &&
-                license != null)
-        {
+            license != null) {
             PackageUtils.addDepositLicense(context, license, item, collection);
         }
     }

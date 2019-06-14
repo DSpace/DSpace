@@ -7,17 +7,18 @@
  */
 package org.dspace.content;
 
-import org.apache.log4j.Logger;
+import java.sql.SQLException;
+import java.util.List;
+
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.dao.MetadataSchemaDAO;
+import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.MetadataSchemaService;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.sql.SQLException;
-import java.util.List;
 
 /**
  * Service implementation for the MetadataSchema object.
@@ -28,8 +29,13 @@ import java.util.List;
  */
 public class MetadataSchemaServiceImpl implements MetadataSchemaService {
 
-    /** log4j logger */
-    private static Logger log = Logger.getLogger(MetadataSchemaServiceImpl.class);
+    /**
+     * log4j logger
+     */
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(MetadataSchemaServiceImpl.class);
+
+    @Autowired
+    protected MetadataFieldService metadataFieldService;
 
     @Autowired(required = true)
     protected AuthorizeService authorizeService;
@@ -37,32 +43,29 @@ public class MetadataSchemaServiceImpl implements MetadataSchemaService {
     @Autowired(required = true)
     protected MetadataSchemaDAO metadataSchemaDAO;
 
-    protected MetadataSchemaServiceImpl()
-    {
+    protected MetadataSchemaServiceImpl() {
 
     }
 
     @Override
-    public MetadataSchema create(Context context, String name, String namespace) throws SQLException, AuthorizeException, NonUniqueMetadataException {
-                // Check authorisation: Only admins may create metadata schemas
-        if (!authorizeService.isAdmin(context))
-        {
+    public MetadataSchema create(Context context, String name, String namespace)
+        throws SQLException, AuthorizeException, NonUniqueMetadataException {
+        // Check authorisation: Only admins may create metadata schemas
+        if (!authorizeService.isAdmin(context)) {
             throw new AuthorizeException(
-                    "Only administrators may modify the metadata registry");
+                "Only administrators may modify the metadata registry");
         }
 
         // Ensure the schema name is unique
-        if (!uniqueShortName(context,-1, name))
-        {
+        if (!uniqueShortName(context, -1, name)) {
             throw new NonUniqueMetadataException("Please make the name " + name
-                    + " unique");
+                                                     + " unique");
         }
 
         // Ensure the schema namespace is unique
-        if (!uniqueNamespace(context,-1, namespace))
-        {
+        if (!uniqueNamespace(context, -1, namespace)) {
             throw new NonUniqueMetadataException("Please make the namespace " + namespace
-                    + " unique");
+                                                     + " unique");
         }
 
 
@@ -72,8 +75,8 @@ public class MetadataSchemaServiceImpl implements MetadataSchemaService {
         metadataSchema.setName(name);
         metadataSchemaDAO.save(context, metadataSchema);
         log.info(LogManager.getHeader(context, "create_metadata_schema",
-                "metadata_schema_id="
-                        + metadataSchema.getID()));
+                                      "metadata_schema_id="
+                                          + metadataSchema.getID()));
         return metadataSchema;
     }
 
@@ -83,46 +86,47 @@ public class MetadataSchemaServiceImpl implements MetadataSchemaService {
     }
 
     @Override
-    public void update(Context context, MetadataSchema metadataSchema) throws SQLException, AuthorizeException, NonUniqueMetadataException {
+    public void update(Context context, MetadataSchema metadataSchema)
+        throws SQLException, AuthorizeException, NonUniqueMetadataException {
         // Check authorisation: Only admins may update the metadata registry
-        if (!authorizeService.isAdmin(context))
-        {
+        if (!authorizeService.isAdmin(context)) {
             throw new AuthorizeException(
-                    "Only administrators may modify the metadata registry");
+                "Only administrators may modify the metadata registry");
         }
 
         // Ensure the schema name is unique
-        if (!uniqueShortName(context, metadataSchema.getID(), metadataSchema.getName()))
-        {
+        if (!uniqueShortName(context, metadataSchema.getID(), metadataSchema.getName())) {
             throw new NonUniqueMetadataException("Please make the name " + metadataSchema.getName()
-                    + " unique");
+                                                     + " unique");
         }
 
         // Ensure the schema namespace is unique
-        if (!uniqueNamespace(context, metadataSchema.getID(), metadataSchema.getNamespace()))
-        {
+        if (!uniqueNamespace(context, metadataSchema.getID(), metadataSchema.getNamespace())) {
             throw new NonUniqueMetadataException("Please make the namespace " + metadataSchema.getNamespace()
-                    + " unique");
+                                                     + " unique");
         }
         metadataSchemaDAO.save(context, metadataSchema);
         log.info(LogManager.getHeader(context, "update_metadata_schema",
-                "metadata_schema_id=" + metadataSchema.getID() + "namespace="
-                        + metadataSchema.getNamespace() + "name=" + metadataSchema.getName()));
+                                      "metadata_schema_id=" + metadataSchema.getID() + "namespace="
+                                          + metadataSchema.getNamespace() + "name=" + metadataSchema.getName()));
     }
 
     @Override
     public void delete(Context context, MetadataSchema metadataSchema) throws SQLException, AuthorizeException {
-                // Check authorisation: Only admins may create DC types
-        if (!authorizeService.isAdmin(context))
-        {
+        // Check authorisation: Only admins may create DC types
+        if (!authorizeService.isAdmin(context)) {
             throw new AuthorizeException(
-                    "Only administrators may modify the metadata registry");
+                "Only administrators may modify the metadata registry");
         }
+
+        for (MetadataField metadataField : metadataFieldService.findAllInSchema(context, metadataSchema)) {
+            metadataFieldService.delete(context, metadataField);
+        }
+
+        metadataSchemaDAO.delete(context, metadataSchema);
 
         log.info(LogManager.getHeader(context, "delete_metadata_schema",
                 "metadata_schema_id=" + metadataSchema.getID()));
-
-        metadataSchemaDAO.delete(context, metadataSchema);
     }
 
     @Override
@@ -132,14 +136,13 @@ public class MetadataSchemaServiceImpl implements MetadataSchemaService {
 
     @Override
     public MetadataSchema find(Context context, int id) throws SQLException {
-        return metadataSchemaDAO.findByID(context,  MetadataSchema.class, id);
+        return metadataSchemaDAO.findByID(context, MetadataSchema.class, id);
     }
 
     @Override
     public MetadataSchema find(Context context, String shortName) throws SQLException {
         // If we are not passed a valid schema name then return
-        if (shortName == null)
-        {
+        if (shortName == null) {
             return null;
         }
         return metadataSchemaDAO.find(context, shortName);
@@ -150,30 +153,28 @@ public class MetadataSchemaServiceImpl implements MetadataSchemaService {
      * Return true if and only if the passed name appears within the allowed
      * number of times in the current schema.
      *
-     * @param context DSpace context
+     * @param context          DSpace context
      * @param metadataSchemaId metadata schema id
-     * @param namespace namespace URI to match
+     * @param namespace        namespace URI to match
      * @return true of false
      * @throws SQLException if database error
      */
     protected boolean uniqueNamespace(Context context, int metadataSchemaId, String namespace)
-            throws SQLException
-    {
+        throws SQLException {
         return metadataSchemaDAO.uniqueNamespace(context, metadataSchemaId, namespace);
     }
 
     /**
      * Return true if and only if the passed name is unique.
      *
-     * @param context DSpace context
+     * @param context          DSpace context
      * @param metadataSchemaId metadata schema id
-     * @param name  short name of schema
+     * @param name             short name of schema
      * @return true of false
      * @throws SQLException if database error
      */
     protected boolean uniqueShortName(Context context, int metadataSchemaId, String name)
-            throws SQLException
-    {
+        throws SQLException {
         return metadataSchemaDAO.uniqueShortName(context, metadataSchemaId, name);
     }
 }

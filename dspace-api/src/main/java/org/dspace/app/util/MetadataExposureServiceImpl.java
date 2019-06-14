@@ -7,15 +7,19 @@
  */
 package org.dspace.app.util;
 
-import org.apache.log4j.Logger;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.service.MetadataExposureService;
 import org.dspace.authorize.service.AuthorizeService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.sql.SQLException;
-import java.util.*;
 
 /**
  * Static utility class to manage configuration for exposure (hiding) of
@@ -35,71 +39,65 @@ import java.util.*;
  * scalable.
  *
  * Algorithm is as follows:
- *  1. If a Context is provided and it has a user who is Administrator,
- *     always grant access (return false).
- *  2. Return true if field is on the hidden list, false otherwise.
+ * 1. If a Context is provided and it has a user who is Administrator,
+ * always grant access (return false).
+ * 2. Return true if field is on the hidden list, false otherwise.
  *
  * The internal maps are populated from DSpace Configuration at the first
  * call, in case the properties are not available in the static context.
  *
  * Configuration Properties:
- *  ## hide a single metadata field
- *  #metadata.hide.SCHEMA.ELEMENT[.QUALIFIER] = true
- *  # example: dc.type
- *  metadata.hide.dc.type = true
- *  # example: dc.description.provenance
- *  metadata.hide.dc.description.provenance = true
+ * ## hide a single metadata field
+ * #metadata.hide.SCHEMA.ELEMENT[.QUALIFIER] = true
+ * # example: dc.type
+ * metadata.hide.dc.type = true
+ * # example: dc.description.provenance
+ * metadata.hide.dc.description.provenance = true
  *
  * @author Larry Stone
  * @version $Revision: 3734 $
  */
-public class MetadataExposureServiceImpl implements MetadataExposureService
-{
-    protected Logger log = Logger.getLogger(MetadataExposureServiceImpl.class);
+public class MetadataExposureServiceImpl implements MetadataExposureService {
+    protected Logger log = org.apache.logging.log4j.LogManager.getLogger(MetadataExposureServiceImpl.class);
 
-    protected Map<String,Set<String>> hiddenElementSets = null;
-    protected Map<String,Map<String,Set<String>>> hiddenElementMaps = null;
+    protected Map<String, Set<String>> hiddenElementSets = null;
+    protected Map<String, Map<String, Set<String>>> hiddenElementMaps = null;
 
     protected final String CONFIG_PREFIX = "metadata.hide.";
 
     @Autowired(required = true)
     protected AuthorizeService authorizeService;
 
-    protected MetadataExposureServiceImpl()
-    {
+    @Autowired(required = true)
+    protected ConfigurationService configurationService;
+
+    protected MetadataExposureServiceImpl() {
 
     }
 
     @Override
     public boolean isHidden(Context context, String schema, String element, String qualifier)
-        throws SQLException
-    {
+        throws SQLException {
         boolean hidden = false;
 
         // for schema.element, just check schema->elementSet
-        if (!isInitialized())
-        {
+        if (!isInitialized()) {
             init();
         }
 
-        if (qualifier == null)
-        {
+        if (qualifier == null) {
             Set<String> elts = hiddenElementSets.get(schema);
             hidden = elts != null && elts.contains(element);
-        }
-        // for schema.element.qualifier, just schema->eltMap->qualSet
-        else
-        {
-            Map<String,Set<String>> elts = hiddenElementMaps.get(schema);
-            if (elts == null)
-            {
+        } else { // for schema.element.qualifier, just schema->eltMap->qualSet
+            Map<String, Set<String>> elts = hiddenElementMaps.get(schema);
+            if (elts == null) {
                 return false;
             }
             Set<String> quals = elts.get(element);
             hidden = quals != null && quals.contains(qualifier);
         }
 
-        if(hidden && context != null) {
+        if (hidden && context != null) {
             // the administrator's override
             hidden = !authorizeService.isAdmin(context);
         }
@@ -113,8 +111,7 @@ public class MetadataExposureServiceImpl implements MetadataExposureService
      *
      * @return true (initialized) or false (not initialized)
      */
-    protected boolean isInitialized()
-    {
+    protected boolean isInitialized() {
         return hiddenElementSets != null;
     }
 
@@ -125,52 +122,38 @@ public class MetadataExposureServiceImpl implements MetadataExposureService
      * qualifier separated by dots and the value is true (hidden)
      * or false (exposed).
      */
-    protected synchronized void init()
-    {
-        if (!isInitialized())
-        {
+    protected synchronized void init() {
+        if (!isInitialized()) {
             hiddenElementSets = new HashMap<>();
             hiddenElementMaps = new HashMap<>();
 
-            Enumeration pne = ConfigurationManager.propertyNames();
-            while (pne.hasMoreElements())
-            {
-                String key = (String)pne.nextElement();
-                if (key.startsWith(CONFIG_PREFIX))
-                {
-                    String mdField = key.substring(CONFIG_PREFIX.length());
-                    String segment[] = mdField.split("\\.", 3);
+            List<String> propertyKeys = configurationService.getPropertyKeys();
+            for (String key : propertyKeys) {
+                if (key.startsWith(CONFIG_PREFIX)) {
+                    if (configurationService.getBooleanProperty(key, true)) {
+                        String mdField = key.substring(CONFIG_PREFIX.length());
+                        String segment[] = mdField.split("\\.", 3);
 
-                    // got schema.element.qualifier
-                    if (segment.length == 3)
-                    {
-                        Map<String,Set<String>> eltMap = hiddenElementMaps.get(segment[0]);
-                        if (eltMap == null)
-                        {
-                            eltMap = new HashMap<String,Set<String>>();
-                            hiddenElementMaps.put(segment[0], eltMap);
+                        // got schema.element.qualifier
+                        if (segment.length == 3) {
+                            Map<String, Set<String>> eltMap = hiddenElementMaps.get(segment[0]);
+                            if (eltMap == null) {
+                                eltMap = new HashMap<String, Set<String>>();
+                                hiddenElementMaps.put(segment[0], eltMap);
+                            }
+                            if (!eltMap.containsKey(segment[1])) {
+                                eltMap.put(segment[1], new HashSet<String>());
+                            }
+                            eltMap.get(segment[1]).add(segment[2]);
+                        } else if (segment.length == 2) { // got schema.element
+                            if (!hiddenElementSets.containsKey(segment[0])) {
+                                hiddenElementSets.put(segment[0], new HashSet<String>());
+                            }
+                            hiddenElementSets.get(segment[0]).add(segment[1]);
+                        } else { // oops..
+                            log.warn("Bad format in hidden metadata directive, field=\"" + mdField + "\", " +
+                                    "config property=" + key);
                         }
-                        if (!eltMap.containsKey(segment[1]))
-                        {
-                            eltMap.put(segment[1], new HashSet<String>());
-                        }
-                        eltMap.get(segment[1]).add(segment[2]);
-                    }
-
-                    // got schema.element
-                    else if (segment.length == 2)
-                    {
-                        if (!hiddenElementSets.containsKey(segment[0]))
-                        {
-                            hiddenElementSets.put(segment[0], new HashSet<String>());
-                        }
-                        hiddenElementSets.get(segment[0]).add(segment[1]);
-                    }
-
-                    // oops..
-                    else
-                    {
-                        log.warn("Bad format in hidden metadata directive, field=\""+mdField+"\", config property="+key);
                     }
                 }
             }

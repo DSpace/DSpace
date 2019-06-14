@@ -7,16 +7,17 @@
  */
 package org.dspace.harvest.service;
 
+import java.sql.SQLException;
+import java.util.List;
+
 import org.dspace.content.Collection;
 import org.dspace.core.Context;
 import org.dspace.harvest.HarvestedCollection;
 
-import java.sql.SQLException;
-import java.util.List;
-
 /**
  * Service interface class for the HarvestedCollection object.
- * The implementation of this class is responsible for all business logic calls for the HarvestedCollection object and is autowired by spring
+ * The implementation of this class is responsible for all business logic calls for the HarvestedCollection object
+ * and is autowired by spring
  *
  * @author kevinvandevelde at atmire.com
  */
@@ -25,10 +26,8 @@ public interface HarvestedCollectionService {
     /**
      * Find the harvest settings corresponding to this collection
      *
-     * @param context
-     *     The relevant DSpace Context.
-     * @param collection
-     *     target collection
+     * @param context    The relevant DSpace Context.
+     * @param collection target collection
      * @return a HarvestInstance object corresponding to this collection's settings, null if not found.
      * @throws SQLException if database error
      */
@@ -37,10 +36,8 @@ public interface HarvestedCollectionService {
     /**
      * Create a new harvest instance row for a specified collection.
      *
-     * @param context
-     *     The relevant DSpace Context.
-     * @param collection
-     *     target collection
+     * @param context    The relevant DSpace Context.
+     * @param collection target collection
      * @return a new HarvestInstance object
      * @throws SQLException if database error
      */
@@ -51,10 +48,8 @@ public interface HarvestedCollectionService {
      * options are set up correctly. This is distinct from "ready", since this collection may
      * be in process of being harvested.
      *
-     * @param context
-     *     The relevant DSpace Context.
-     * @param collection
-     *     target collection
+     * @param context    The relevant DSpace Context.
+     * @param collection target collection
      * @return is collection harvestable?
      * @throws SQLException if database error
      */
@@ -65,8 +60,7 @@ public interface HarvestedCollectionService {
      * options are set up correctly. This is distinct from "ready", since this collection may
      * be in process of being harvested.
      *
-     * @param harvestedCollection
-     *     collection to be harvested
+     * @param harvestedCollection collection to be harvested
      * @return is collection harvestable?
      * @throws SQLException if database error
      */
@@ -75,10 +69,8 @@ public interface HarvestedCollectionService {
     /**
      * Returns whether the specified collection is ready for immediate harvest.
      *
-     * @param context
-     *     The relevant DSpace Context.
-     * @param collection
-     *     collection to be harvested
+     * @param context    The relevant DSpace Context.
+     * @param collection collection to be harvested
      * @return is collection ready for immediate harvest?
      * @throws SQLException if database error
      */
@@ -87,8 +79,7 @@ public interface HarvestedCollectionService {
     /**
      * Returns whether the specified collection is ready for immediate harvest.
      *
-     * @param harvestedCollection
-     *     collection to be harvested
+     * @param harvestedCollection collection to be harvested
      * @return is collection ready for immediate harvest?
      * @throws SQLException if database error
      */
@@ -97,8 +88,7 @@ public interface HarvestedCollectionService {
     /**
      * Find all collections that are set up for harvesting
      *
-     * @param context
-     *     The relevant DSpace Context.
+     * @param context The relevant DSpace Context.
      * @return list of collection id's
      * @throws SQLException if database error
      */
@@ -107,8 +97,7 @@ public interface HarvestedCollectionService {
     /**
      * Find all collections that are ready for harvesting
      *
-     * @param context
-     *     The relevant DSpace Context.
+     * @param context The relevant DSpace Context.
      * @return list of collection id's
      * @throws SQLException if database error
      */
@@ -117,9 +106,8 @@ public interface HarvestedCollectionService {
     /**
      * Find all collections with the specified status flag.
      *
-     * @param context
-     *     The relevant DSpace Context.
-     * @param status see HarvestInstance.STATUS_...
+     * @param context The relevant DSpace Context.
+     * @param status  see HarvestInstance.STATUS_...
      * @return all collections with the specified status flag
      * @throws SQLException if database error
      */
@@ -128,8 +116,7 @@ public interface HarvestedCollectionService {
     /**
      * Find the collection that was harvested the longest time ago.
      *
-     * @param context
-     *     The relevant DSpace Context.
+     * @param context The relevant DSpace Context.
      * @return collection that was harvested the longest time ago
      * @throws SQLException if database error
      */
@@ -139,8 +126,7 @@ public interface HarvestedCollectionService {
     /**
      * Find the collection that was harvested most recently.
      *
-     * @param context
-     *     The relevant DSpace Context.
+     * @param context The relevant DSpace Context.
      * @return collection that was harvested most recently
      * @throws SQLException if database error
      */

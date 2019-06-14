@@ -22,15 +22,13 @@ public class IPTable {
 
     /* A lookup tree for IP addresses and SubnetRanges */
     private Map<String, Map<String, Map<String, Set<String>>>> map =
-            new HashMap<String, Map<String, Map<String, Set<String>>>>();
+        new HashMap<String, Map<String, Map<String, Set<String>>>>();
 
     /**
      * Can be full v4 IP, subnet or range string
      *
-     * @param ip
-     *     IP address(es)
-     * @throws IPFormatException
-     *     Exception Class to deal with IPFormat errors.
+     * @param ip IP address(es)
+     * @throws IPFormatException Exception Class to deal with IPFormat errors.
      */
     public void add(String ip) throws IPFormatException {
 
@@ -45,8 +43,7 @@ public class IPTable {
             start = range[0].trim().split("/")[0].split("\\.");
             end = range[1].trim().split("/")[0].split("\\.");
 
-            if (start.length != 4 || end.length != 4)
-            {
+            if (start.length != 4 || end.length != 4) {
                 throw new IPFormatException(ip + " - Ranges need to be full IPv4 Addresses");
             }
 
@@ -114,40 +111,36 @@ public class IPTable {
         }
     }
 
-    /** Check whether a given address is contained in this netblock.
-     * 
+    /**
+     * Check whether a given address is contained in this netblock.
+     *
      * @param ip the address to be tested
      * @return true if {@code ip} is within this table's limits
-     * @throws IPFormatException
-     *     Exception Class to deal with IPFormat errors.
+     * @throws IPFormatException Exception Class to deal with IPFormat errors.
      */
     public boolean contains(String ip) throws IPFormatException {
 
         String[] subnets = ip.split("\\.");
 
-        if (subnets.length != 4)
-        {
+        if (subnets.length != 4) {
             throw new IPFormatException("needs to be a single IP address");
         }
 
         Map<String, Map<String, Set<String>>> first = map.get(subnets[0]);
 
-        if (first == null)
-        {
+        if (first == null) {
             return false;
         }
 
         Map<String, Set<String>> second = first.get(subnets[1]);
 
-        if (second == null)
-        {
+        if (second == null) {
             return false;
         }
 
         Set<String> third = second.get(subnets[2]);
 
-        if (third == null)
-        {
+        if (third == null) {
             return false;
         }
 
@@ -155,7 +148,9 @@ public class IPTable {
 
     }
 
-    /** Convert to a Set.
+    /**
+     * Convert to a Set.
+     *
      * @return this table's content as a Set
      */
     public Set<String> toSet() {

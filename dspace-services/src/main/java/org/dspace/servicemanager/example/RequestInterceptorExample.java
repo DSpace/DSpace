@@ -9,47 +9,45 @@ package org.dspace.servicemanager.example;
 
 import org.dspace.services.RequestService;
 import org.dspace.services.model.RequestInterceptor;
-import org.dspace.services.model.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A sample RequestInterceptor which simply logs request start and end 
+ * A sample RequestInterceptor which simply logs request start and end
  * calls.
- * 
+ *
  * @author Mark Diggory (mdiggory at atmire.com)
  * @version $Revision$
  */
 public final class RequestInterceptorExample implements RequestInterceptor {
 
-	private static Logger log = LoggerFactory.getLogger(RequestInterceptorExample.class);
-	
-	/**
-	 * Constructor which will inject the instantiated 
-	 * Interceptor into a service handed to it.
-	 * 
-	 * @param service the service
-	 */
-	public RequestInterceptorExample(RequestService service)
-	{
-		service.registerRequestInterceptor(this);
-	}
-	
-        @Override
-	public void onEnd(String requestId, Session session, boolean succeeded,
-			Exception failure) {
-		log.info("Intercepting End of Request: id=" + requestId + ", session=" + session.getId() + ", succeeded=" + succeeded);
-	}
+    private static Logger log = LoggerFactory.getLogger(RequestInterceptorExample.class);
 
-        @Override
-	public void onStart(String requestId, Session session) {
-		log.info("Intercepting Start of Request: id=" + requestId + ", session=" + session.getId());
-	}
+    /**
+     * Constructor which will inject the instantiated
+     * Interceptor into a service handed to it.
+     *
+     * @param service the service
+     */
+    public RequestInterceptorExample(RequestService service) {
+        service.registerRequestInterceptor(this);
+    }
 
-        @Override
-	public int getOrder() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
+    @Override
+    public void onEnd(String requestId, boolean succeeded,
+                      Exception failure) {
+        log.info("Intercepting End of Request: id=" + requestId + ", succeeded=" + succeeded);
+    }
+
+    @Override
+    public void onStart(String requestId) {
+        log.info("Intercepting Start of Request: id=" + requestId);
+    }
+
+    @Override
+    public int getOrder() {
+        // TODO Auto-generated method stub
+        return 0;
+    }
 
 }

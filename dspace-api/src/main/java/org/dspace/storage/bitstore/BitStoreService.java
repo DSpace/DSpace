@@ -7,45 +7,40 @@
  */
 package org.dspace.storage.bitstore;
 
-import org.dspace.content.Bitstream;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 
+import org.dspace.content.Bitstream;
+
 /**
  * A low-level asset store interface
- * 
+ *
  * @author Richard Rodgers, Peter Dietz
  */
 
-public interface BitStoreService
-{
+public interface BitStoreService {
     /**
      * Initialize the asset store
      *
-     * @throws IOException
-     *     A general class of exceptions produced by failed or interrupted I/O operations.
+     * @throws IOException A general class of exceptions produced by failed or interrupted I/O operations.
      */
     public void init() throws IOException;
 
     /**
      * Return an identifier unique to this asset store instance
-     * 
+     *
      * @return a unique ID
      */
     public String generateId();
-    
+
     /**
      * Retrieve the bits for bitstream
-     * 
-     * @param bitstream
-     *     DSpace Bitstream object
-     * @throws java.io.IOException
-     *     If a problem occurs while retrieving the bits, or if no
-     *     asset with ID exists in the store
      *
+     * @param bitstream DSpace Bitstream object
      * @return The stream of bits
+     * @throws java.io.IOException If a problem occurs while retrieving the bits, or if no
+     *                             asset with ID exists in the store
      */
     public InputStream get(Bitstream bitstream) throws IOException;
 
@@ -57,38 +52,29 @@ public interface BitStoreService
      * If an exception is thrown, the bits have not been stored.
      * </p>
      *
-     * @param bitstream
-     *     The bitstream object
-     * @param inputStream
-     *     The stream of bits
-     * @throws java.io.IOException
-     *     If a problem occurs while storing the bits
+     * @param bitstream   The bitstream object
+     * @param inputStream The stream of bits
+     * @throws java.io.IOException If a problem occurs while storing the bits
      */
     public void put(Bitstream bitstream, InputStream inputStream) throws IOException;
 
     /**
      * Obtain technical metadata about an asset in the asset store.
      *
-     * @param bitstream
-     *     The bitstream to describe
-     * @param attrs
-     *     A Map whose keys consist of desired metadata fields
-     *
-     * @throws java.io.IOException
-     *     If a problem occurs while obtaining metadata
+     * @param bitstream The bitstream to describe
+     * @param attrs     A Map whose keys consist of desired metadata fields
      * @return attrs
-     *     A Map with key/value pairs of desired metadata
-     *     If file not found, then return null
+     * A Map with key/value pairs of desired metadata
+     * If file not found, then return null
+     * @throws java.io.IOException If a problem occurs while obtaining metadata
      */
     public Map about(Bitstream bitstream, Map attrs) throws IOException;
 
     /**
      * Remove an asset from the asset store.
      *
-     * @param bitstream
-     *     The bitstream of the asset to delete
-     * @throws java.io.IOException
-     *     If a problem occurs while removing the asset
+     * @param bitstream The bitstream of the asset to delete
+     * @throws java.io.IOException If a problem occurs while removing the asset
      */
     public void remove(Bitstream bitstream) throws IOException;
 }

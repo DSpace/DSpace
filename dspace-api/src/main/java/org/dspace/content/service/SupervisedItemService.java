@@ -7,26 +7,24 @@
  */
 package org.dspace.content.service;
 
+import java.sql.SQLException;
+import java.util.List;
+
 import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
-
-import java.sql.SQLException;
-import java.util.List;
 
 /**
  * Class to handle WorkspaceItems which are being supervised.
  *
  * @author Richard Jones
- * @version  $Revision$
+ * @version $Revision$
  */
-public interface SupervisedItemService
-{
+public interface SupervisedItemService {
     /**
      * Get all workspace items which are being supervised
      *
      * @param context the context this object exists in
-     *
      * @return array of SupervisedItems
      * @throws SQLException if database error
      */
@@ -36,9 +34,8 @@ public interface SupervisedItemService
     /**
      * Get items being supervised by given EPerson
      *
-     * @param   ep          the eperson who's items to supervise we want
-     * @param   context     the dspace context
-     *
+     * @param ep      the eperson who's items to supervise we want
+     * @param context the dspace context
      * @return the items eperson is supervising in an array
      * @throws SQLException if database error
      */

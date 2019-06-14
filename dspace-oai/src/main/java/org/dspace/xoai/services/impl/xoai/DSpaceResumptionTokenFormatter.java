@@ -7,19 +7,19 @@
  */
 package org.dspace.xoai.services.impl.xoai;
 
+import java.util.Date;
+
 import com.lyncode.xoai.dataprovider.core.ResumptionToken;
 import com.lyncode.xoai.dataprovider.exceptions.BadResumptionToken;
 import com.lyncode.xoai.dataprovider.services.api.ResumptionTokenFormatter;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.xoai.util.DateUtils;
-
-import java.util.Date;
 
 
 public class DSpaceResumptionTokenFormatter implements ResumptionTokenFormatter {
     private static Logger log = LogManager
-            .getLogger(DSpaceResumptionTokenFormatter.class);
+        .getLogger(DSpaceResumptionTokenFormatter.class);
 
     public DSpaceResumptionTokenFormatter() {
         // TODO Auto-generated constructor stub
@@ -27,10 +27,13 @@ public class DSpaceResumptionTokenFormatter implements ResumptionTokenFormatter 
 
     @Override
     public ResumptionToken parse(String resumptionToken) throws BadResumptionToken {
-        if (resumptionToken == null) return new ResumptionToken();
+        if (resumptionToken == null) {
+            return new ResumptionToken();
+        }
         String[] res = resumptionToken.split("/", -1);
-        if (res.length != 5) throw new BadResumptionToken();
-        else {
+        if (res.length != 5) {
+            throw new BadResumptionToken();
+        } else {
             try {
                 int offset = Integer.parseInt(res[4]);
                 String prefix = (res[0].equals("")) ? null : res[0];
@@ -49,17 +52,21 @@ public class DSpaceResumptionTokenFormatter implements ResumptionTokenFormatter 
     @Override
     public String format(ResumptionToken resumptionToken) {
         String result = "";
-        if (resumptionToken.hasMetadataPrefix())
+        if (resumptionToken.hasMetadataPrefix()) {
             result += resumptionToken.getMetadataPrefix();
+        }
         result += "/";
-        if (resumptionToken.hasFrom())
+        if (resumptionToken.hasFrom()) {
             result += DateUtils.format(resumptionToken.getFrom());
+        }
         result += "/";
-        if (resumptionToken.hasUntil())
+        if (resumptionToken.hasUntil()) {
             result += DateUtils.format(resumptionToken.getUntil());
+        }
         result += "/";
-        if (resumptionToken.hasSet())
+        if (resumptionToken.hasSet()) {
             result += resumptionToken.getSet();
+        }
         result += "/";
         result += resumptionToken.getOffset();
         return result;

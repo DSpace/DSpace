@@ -9,30 +9,25 @@ package org.dspace.browse;
 
 /**
  * Just a quick BrowseException class to give us the relevant data type
- * 
+ *
  * @author Richard Jones
  */
-public class BrowseException extends Exception
-{
+public class BrowseException extends Exception {
 
-    public BrowseException()
-    {
+    public BrowseException() {
         super();
     }
-    
-    public BrowseException(String message)
-    {
+
+    public BrowseException(String message) {
         super(message);
     }
 
-	public BrowseException(String message, Throwable cause)
-	{
-		super(message, cause);
-	}
+    public BrowseException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
-	public BrowseException(Throwable cause)
-	{
-		super(cause);
-	}
+    public BrowseException(Throwable cause) {
+        super(cause);
+    }
 
 }

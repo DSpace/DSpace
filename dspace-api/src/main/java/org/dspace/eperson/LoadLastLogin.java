@@ -18,6 +18,7 @@ import java.util.Date;
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import jdbm.RecordManager;
 import jdbm.RecordManagerFactory;
 import jdbm.RecordManagerOptions;
@@ -42,20 +43,24 @@ import org.dspace.eperson.service.EPersonService;
  *
  * @author mwood
  */
-public class LoadLastLogin
-{
+public class LoadLastLogin {
+
+    /**
+     * Default constructor
+     */
+    private LoadLastLogin() { }
+
     public static void main(String[] argv)
-            throws IOException, SQLException, AuthorizeException
-    {
+        throws IOException, SQLException, AuthorizeException {
         final String USAGE = "LoadLastLogin [options] path...path\n\n"
-                + "'path's are paths to DSpace log files";
+            + "'path's are paths to DSpace log files";
 
         final String loginRE =
             "([0-9-]+) ([0-9:]+)[^@]+@ " // Date(1), time(2), goop
-            + "([^:]+):" // user(3)
-            + "session_id=[^:]+:"
-            + "ip_addr=[0-9a-f.:]+:"
-            + "login:type=(implicit|explicit)";
+                + "([^:]+):" // user(3)
+                + "session_id=[^:]+:"
+                + "ip_addr=[0-9a-f.:]+:"
+                + "login:type=(implicit|explicit)";
 
         // Handle options, if any
         Options options = new Options();
@@ -69,13 +74,13 @@ public class LoadLastLogin
             command = parser.parse(options, argv);
         } catch (org.apache.commons.cli.ParseException ex) {
             System.err.println(ex.getMessage());
-            if (! (ex instanceof MissingOptionException))
+            if (!(ex instanceof MissingOptionException)) {
                 new HelpFormatter().printHelp(USAGE, options);
+            }
             System.exit(1);
         }
 
-        if (command.hasOption('h'))
-        {
+        if (command.hasOption('h')) {
             System.out.println("Load users' last_active dates into the database from DSpace logs.");
             System.out.println();
             new HelpFormatter().printHelp(USAGE, options);
@@ -92,8 +97,9 @@ public class LoadLastLogin
         rmProps.put(RecordManagerOptions.DISABLE_TRANSACTIONS, "true");
 
         String dbname = new File(System.getProperty("java.io.tmpdir"), "lastlogindb").getCanonicalPath();
-        if (VERBOSE)
+        if (VERBOSE) {
             System.out.println("dbname:  " + dbname);
+        }
         RecordManager stamps = RecordManagerFactory.createRecordManager(dbname, rmProps);
         BTree stampDb = BTree.createInstance(stamps, new StringComparator());
 
@@ -101,23 +107,24 @@ public class LoadLastLogin
         final Pattern loginCracker = Pattern.compile(loginRE);
         final SimpleDateFormat dateEncoder = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-        for (String logName : args)
-        {
+        for (String logName : args) {
             BufferedReader logReader = new BufferedReader(new FileReader(logName));
-            while(true)
-            {
+            while (true) {
                 String line = logReader.readLine();
                 // End of file?
-                if (null == line)
+                if (null == line) {
                     break;
+                }
                 // Skip if definitely not a login record
-                if (!line.contains(":login:"))
+                if (!line.contains(":login:")) {
                     continue;
+                }
 
                 // Try to recognize the interesting fields
                 Matcher loginMatcher = loginCracker.matcher(line);
-                if (!loginMatcher.matches())
+                if (!loginMatcher.matches()) {
                     continue;
+                }
 
                 // Pretty sure we have a login
                 String date = loginMatcher.group(1);
@@ -133,8 +140,7 @@ public class LoadLastLogin
                     continue;
                 }
                 Date previous = (Date) stampDb.find(user);
-                if (null == previous || stamp.after(previous))
-                {
+                if (null == previous || stamp.after(previous)) {
                     stampDb.insert(user, stamp, true); // Record this user's newest login so far
                 }
             }
@@ -149,34 +155,29 @@ public class LoadLastLogin
 
         EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
 
-        while(walker.getNext(stamp))
-        {
+        while (walker.getNext(stamp)) {
             // Update an EPerson's last login
             String name = (String) stamp.getKey();
             Date date = (Date) stamp.getValue();
             EPerson ePerson;
             ePerson = ePersonService.findByEmail(ctx, name);
-            if (null == ePerson)
+            if (null == ePerson) {
                 ePerson = ePersonService.findByNetid(ctx, name);
-            if (null == ePerson)
-            {
+            }
+            if (null == ePerson) {
                 System.err.println("Skipping unknown user:  " + name);
                 continue;
             }
             Date previous = ePerson.getLastActive();
-            if ((null == previous) || date.after(previous))
-            {
-                if (PRETEND)
-                {
+            if ((null == previous) || date.after(previous)) {
+                if (PRETEND) {
                     System.out.printf("%s\t%s\t%s\t%s\t%s\n",
-                            ePerson.getID().toString(),
-                            date,
-                            ePerson.getEmail(),
-                            ePerson.getNetid(),
-                            ePerson.getFullName());
-                }
-                else
-                {
+                                      ePerson.getID().toString(),
+                                      date,
+                                      ePerson.getEmail(),
+                                      ePerson.getNetid(),
+                                      ePerson.getFullName());
+                } else {
                     ePerson.setLastActive(date);
                     ePersonService.update(ctx, ePerson);
                 }
@@ -191,11 +192,13 @@ public class LoadLastLogin
         File target;
 
         target = new File(dbname + ".db");
-        if (target.exists())
+        if (target.exists()) {
             target.delete();
+        }
 
         target = new File(dbname + ".lg");
-        if (target.exists())
+        if (target.exists()) {
             target.delete();
+        }
     }
 }
