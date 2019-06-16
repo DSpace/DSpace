@@ -21,6 +21,9 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -28,6 +31,7 @@ import java.util.regex.Pattern;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.apache.commons.lang.time.DateUtils;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.log4j.Logger;
 import org.datadryad.rest.models.Package;
@@ -44,6 +48,7 @@ public class DashService {
     private String dashServer = "";
     private String oauthToken = "";
     private ObjectMapper mapper = null;
+    private String lastCurationStatus = "";
 
     public DashService() {
         // init oauth connection with DASH
@@ -270,7 +275,71 @@ public class DashService {
         return responseCode;
     }
 
+    /**
+       Set this package to have the appropriate embargo status in Dash. Assumes that the package has
+       already transferred curation statuses to Dash, so the CurationStatusForDash has a meaningful value.
+     **/
+    public void setEmbargoStatus(Package pkg) {
+        log.debug("setting embargo status for this package");
+        SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-dd'T'HH:mm:ss.SSSZ");
+        DryadDataPackage ddp = pkg.getDataPackage();
+        String curationStatus = ddp.getCurationStatusForDash();
+        log.debug("-- curationStatus " + curationStatus);
+        
+        // get target embargo settings
+        String embargoType = ddp.getPackageEmbargoType();
+        Date embargoDate = ddp.getPackageEmbargoDate();
+        log.debug("-- embargoType " + embargoType);
+        log.debug("-- embargoDate " + embargoDate);
 
+        if(curationStatus.equals("published") || curationStatus.equals("embargoed")) {
+            // if it's published or embargoed, and a file is still under embargo, set the
+            // status to embargoed
+            if (embargoType.equals("custom")) {
+                addCurationActivity(ddp, "embargoed",
+                                    "Setting package-level embargo to reflect previous file-level embargo. Type=" + embargoType + ", PublicationDate=" +sdf.format(embargoDate), 
+                                    getNowString(),
+                                    "migration");
+            } else if (embargoType.equals("oneyear") || embargoType.equals("one year")) {
+                // set to the target date, or if no date, 2 years after today
+                if(embargoDate == null) {
+                    embargoDate = DateUtils.addYears(new Date(), 2);
+                }
+                addCurationActivity(ddp, "embargoed",
+                                    "Setting package-level embargo to reflect previous file-level embargo. Type=" + embargoType + ", PublicationDate=" +sdf.format(embargoDate), 
+                                    getNowString(),
+                                    "migration");
+            } else if (embargoType.equals("untilArticleAppears")) {
+                // set to the date, or if no date, 1 year after today
+                if(embargoDate == null) {
+                    embargoDate = DateUtils.addYears(new Date(), 1);
+                }
+                addCurationActivity(ddp, "embargoed", 
+                                    "Setting package-level embargo to reflect previous file-level embargo. Type=" + embargoType + ", PublicationDate=" +sdf.format(embargoDate), 
+                                    getNowString(),
+                                    "migration");
+            } else {
+                // no embargo, do nothing
+            }                            
+        } else {
+            // it's in curation and a file has embargo, we can't set the
+            // status to embargoed yet -- how will the curators know? just
+            // make a note that curators can notice.
+            if (embargoType != null && !embargoType.equals("none")) {
+                addCurationActivity(ddp, "",
+                                    "User has requested embargo. Type=" + embargoType + ", PublicationDate=" +sdf.format(embargoDate), 
+                                    getNowString(),
+                                    "migration");
+            } 
+        }
+    }
+
+    private String getNowString() {
+        Date now = new Date();
+        SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-dd'T'HH:mm:ss.SSSZ");
+        return sdf.format(now);
+    }
+    
     /**
        Update the internal metadata in the Dash dataset for a given Package
     **/
@@ -293,7 +362,15 @@ public class DashService {
         if (ddp.getPubmedID() != null && ddp.getPubmedID().length() > 0) {
             setPubmedID(pkg, ddp.getPubmedID());
         }
-        
+
+        if (ddp.getDansArchiveDate() != null && ddp.getDansArchiveDate().length() > 0) {
+            setDansArchiveDate(pkg, ddp.getDansArchiveDate());
+        }
+
+        if (ddp.getDansEditIRI() != null && ddp.getDansEditIRI().length() > 0) {
+            setDansEditIRI(pkg, ddp.getDansEditIRI());
+        }
+                
         if (ddp.getFormerManuscriptNumbers().size() > 0) {
             List<String> prevFormerMSIDs = getFormerManuscriptNumbers(pkg);
             for (String msid : ddp.getFormerManuscriptNumbers()) {
@@ -442,7 +519,8 @@ public class DashService {
         log.debug("migrating provenances");
         // get curationActivities from Dash package
         JsonNode curationActivities = getCurationActivity(pkg);
-        // if the only curation activity is the default "in_progress," delete it
+        // if the only curation activity is the default "in_progress," delete it,
+        // but not if the package is in user workspace!
         if (curationActivities != null && curationActivities.size() == 1) {
             if (curationActivities.get(0).get("status").textValue().equals("In Progress")) {
                 int unsubmittedID = curationActivities.get(0).get("id").intValue();
@@ -530,10 +608,14 @@ public class DashService {
         return responseCode;
     }
 
-    public int addCurationActivity(DryadDataPackage dataPackage, String status, String reason, String processKeyword) {
+    public int addCurationActivity(DryadDataPackage dataPackage, String status, String reason, String createdAt, String processKeyword) {
         ObjectNode node = mapper.createObjectNode();
+        lastCurationStatus = status;
         node.put("status", status);
         node.put("note", reason);
+        if(createdAt != null) {
+            node.put("created_at", createdAt);
+        }
         if(processKeyword != null) {
             node.put("keywords", processKeyword);
         }
@@ -545,6 +627,7 @@ public class DashService {
 
         log.debug("starting addCurationActivity");
         try {
+            lastCurationStatus = node.get("status").textValue();
             String dashJSON = mapper.writeValueAsString(node);
             log.debug("curation activity json is " + dashJSON);
             String encodedDOI = URLEncoder.encode(dataPackage.getVersionlessIdentifier(), "UTF-8");
@@ -784,6 +867,14 @@ public class DashService {
 
     public int setPublicationDOI(Package pkg, String doi) {
         return postInternalDatum(pkg, "set", "publicationDOI", doi);
+    }
+
+    public int setDansArchiveDate(Package pkg, String date) {
+        return postInternalDatum(pkg, "set", "dansArchiveDate", date);
+    }
+    
+    public int setDansEditIRI(Package pkg, String iri) {
+        return postInternalDatum(pkg, "set", "dansEditIRI", iri);
     }
 
     public String getManuscriptNumber(Package pkg) {
