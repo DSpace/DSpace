@@ -294,10 +294,9 @@ public class Package {
                             DryadBitstream dryadBitstream = new DryadBitstream(dspaceBitstream);                    
                             if(dryadBitstream.isReadme()) {
                                 dryadBitstream.setReadmeFilename(previousBitstreamFilename);
-                                fileListString = fileListString + dryadBitstream.getReadmeFilename() + "</br>";
                             } else {
                                 String filename = dspaceBitstream.getName();
-                                if(filename.startsWith(fileTitle)) {
+                                if(filename.startsWith(fileTitle)){
                                     // don't record the filename if it is exactly the same as the title (with or without extension)
                                 } else {
                                     fileListString = fileListString + filename + "</br>";
