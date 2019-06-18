@@ -582,9 +582,20 @@
         <xsl:param name="size" />
         <div>
             <a>
-                <xsl:attribute name="href">
-                    <xsl:value-of select="$href"/>
-                </xsl:attribute>
+                <xsl:choose>
+                    <xsl:when test="contains(mets:FLocat[@LOCTYPE='URL']/@xlink:href,'isAllowed=y')">
+                        <!-- Enable link to fulltext since user was allowed access -->
+                        <xsl:attribute name="href">
+                            <xsl:value-of select="$href"/>
+                        </xsl:attribute>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <!-- Link to fulltext disabled - user had no access -->
+                        <xsl:attribute name="class">
+                            <xsl:text>not-active</xsl:text>
+                        </xsl:attribute>
+                    </xsl:otherwise>
+                </xsl:choose>
                 <xsl:call-template name="getFileIcon">
                     <xsl:with-param name="mimetype">
                         <xsl:value-of select="substring-before($mimetype,'/')"/>
@@ -622,26 +633,38 @@
                         </xsl:call-template>
                     </xsl:otherwise>
                 </xsl:choose>
-                <xsl:text> (</xsl:text>
+
                 <xsl:choose>
-                    <xsl:when test="$size &lt; 1024">
-                        <xsl:value-of select="$size"/>
-                        <i18n:text>xmlui.dri2xhtml.METS-1.0.size-bytes</i18n:text>
-                    </xsl:when>
-                    <xsl:when test="$size &lt; 1024 * 1024">
-                        <xsl:value-of select="substring(string($size div 1024),1,5)"/>
-                        <i18n:text>xmlui.dri2xhtml.METS-1.0.size-kilobytes</i18n:text>
-                    </xsl:when>
-                    <xsl:when test="$size &lt; 1024 * 1024 * 1024">
-                        <xsl:value-of select="substring(string($size div (1024 * 1024)),1,5)"/>
-                        <i18n:text>xmlui.dri2xhtml.METS-1.0.size-megabytes</i18n:text>
+                    <xsl:when test="contains(mets:FLocat[@LOCTYPE='URL']/@xlink:href,'isAllowed=n')">
+                        <!-- Show information in simple view that the item is restricted -->
+                        <xsl:text> (</xsl:text>
+                        <i18n:text>xmlui.BitstreamReader.auth_header</i18n:text>
+                        <xsl:text>)</xsl:text>
                     </xsl:when>
                     <xsl:otherwise>
-                        <xsl:value-of select="substring(string($size div (1024 * 1024 * 1024)),1,5)"/>
-                        <i18n:text>xmlui.dri2xhtml.METS-1.0.size-gigabytes</i18n:text>
+                        <!-- Show information about size of the bitstream -->
+                        <xsl:text> (</xsl:text>
+                        <xsl:choose>
+                            <xsl:when test="$size &lt; 1024">
+                                <xsl:value-of select="$size"/>
+                                <i18n:text>xmlui.dri2xhtml.METS-1.0.size-bytes</i18n:text>
+                            </xsl:when>
+                            <xsl:when test="$size &lt; 1024 * 1024">
+                                <xsl:value-of select="substring(string($size div 1024),1,5)"/>
+                                <i18n:text>xmlui.dri2xhtml.METS-1.0.size-kilobytes</i18n:text>
+                            </xsl:when>
+                            <xsl:when test="$size &lt; 1024 * 1024 * 1024">
+                                <xsl:value-of select="substring(string($size div (1024 * 1024)),1,5)"/>
+                                <i18n:text>xmlui.dri2xhtml.METS-1.0.size-megabytes</i18n:text>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:value-of select="substring(string($size div (1024 * 1024 * 1024)),1,5)"/>
+                                <i18n:text>xmlui.dri2xhtml.METS-1.0.size-gigabytes</i18n:text>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                        <xsl:text>)</xsl:text>
                     </xsl:otherwise>
                 </xsl:choose>
-                <xsl:text>)</xsl:text>
             </a>
         </div>
     </xsl:template>
@@ -729,9 +752,12 @@
             <div class="col-xs-6 col-sm-3">
                 <div class="thumbnail">
                     <a class="image-link">
-                        <xsl:attribute name="href">
-                            <xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:href"/>
-                        </xsl:attribute>
+                        <xsl:if test="contains(mets:FLocat[@LOCTYPE='URL']/@xlink:href,'isAllowed=y')">
+                            <!-- Enable link to fulltext since user had access -->
+                            <xsl:attribute name="href">
+                                <xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:href"/>
+                            </xsl:attribute>
+                        </xsl:if>
                         <xsl:choose>
                             <xsl:when test="$context/mets:fileSec/mets:fileGrp[@USE='THUMBNAIL']/
                         mets:file[@GROUPID=current()/@GROUPID]">
@@ -850,10 +876,22 @@
 
     <xsl:template name="view-open">
         <a>
-            <xsl:attribute name="href">
-                <xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:href"/>
-            </xsl:attribute>
-            <i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-viewOpen</i18n:text>
+            <xsl:choose>
+                <xsl:when test="contains(mets:FLocat[@LOCTYPE='URL']/@xlink:href,'isAllowed=y')">
+                    <!-- Show View/Open link since user is allowed access  -->
+                    <xsl:attribute name="href">
+                        <xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:href"/>
+                    </xsl:attribute>
+                    <i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-viewOpen</i18n:text>
+                </xsl:when>
+                <xsl:otherwise>
+                    <!-- Tell user that the bitstream is restricted -->
+                    <xsl:attribute name="class">
+                        <xsl:text>not-active</xsl:text>
+                    </xsl:attribute>
+                    <i18n:text>xmlui.BitstreamReader.auth_header</i18n:text>
+                </xsl:otherwise>
+            </xsl:choose>
         </a>
     </xsl:template>
 
