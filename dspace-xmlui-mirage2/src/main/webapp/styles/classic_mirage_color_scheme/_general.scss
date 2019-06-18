@@ -172,6 +172,10 @@ footer {
   }
 }
 
+#ds-footer-right {
+  text-align: right;
+}
+
 #ds-options {
   padding-top: $navbar-margin-bottom;
   @media(min-width: $screen-sm-min) and (max-width: $screen-sm-max) {
