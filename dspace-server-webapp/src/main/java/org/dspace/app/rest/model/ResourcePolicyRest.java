@@ -22,7 +22,7 @@ import org.dspace.app.rest.RestResourceController;
  */
 public class ResourcePolicyRest extends BaseObjectRest<Integer> {
 
-    public static final String NAME = "resourcePolicy";
+    public static final String NAME = "resourcepolicy";
     public static final String CATEGORY = RestAddressableModel.AUTHORIZATION;
 
     private String name;

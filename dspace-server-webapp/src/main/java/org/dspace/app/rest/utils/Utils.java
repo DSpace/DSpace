@@ -132,7 +132,7 @@ public class Utils {
         if (modelPlural.equals("authorities")) {
             return AuthorityRest.NAME;
         }
-        if (modelPlural.equals("resourcePolicies")) {
+        if (modelPlural.equals("resourcepolicies")) {
             return ResourcePolicyRest.NAME;
         }
         return modelPlural.replaceAll("s$", "");
