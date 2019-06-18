@@ -138,6 +138,16 @@
             <class>org.dspace.discovery.IndexClient</class>
         </step>
     </command>
+
+    <command>
+        <name>file-export</name>
+        <description>Export bitstreams to folder</description>
+        <step>
+            <class>org.dspace.storage.bitstore.FileExporter</class>
+        </step>
+    </command>
+
+
     <command>
         <name>index-lucene-init</name>
         <description>Initialise the Lucene search and browse indexes</description>
