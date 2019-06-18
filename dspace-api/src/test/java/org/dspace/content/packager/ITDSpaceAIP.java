@@ -28,7 +28,6 @@ import org.dspace.AbstractUnitTest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
-import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
@@ -95,7 +94,6 @@ public class ITDSpaceAIP extends AbstractUnitTest {
     protected ResourcePolicyService resourcePolicyService = AuthorizeServiceFactory.getInstance()
                                                                                    .getResourcePolicyService();
     protected GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
-    protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
 
     /**
      * InfoMap multiple value separator (see saveObjectInfo() and assertObject* methods)
@@ -110,7 +108,6 @@ public class ITDSpaceAIP extends AbstractUnitTest {
     private static String testItemHandle = null;
     private static String testMappedItemHandle = null;
     private static String submitterEmail = "aip-test@dspace.org";
-    private Context context;
 
     /**
      * Create a global temporary upload folder which will be cleaned up automatically by JUnit.
