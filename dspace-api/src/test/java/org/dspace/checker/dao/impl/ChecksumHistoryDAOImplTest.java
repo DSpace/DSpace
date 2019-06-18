@@ -70,7 +70,7 @@ public class ChecksumHistoryDAOImplTest
 
         // Create two older rows
         HibernateDBConnection dbc = (HibernateDBConnection) CoreHelpers.getDBConnection(context);
-        Query qry = dbc.getSession().createSQLQuery(
+        Query qry = dbc.getSession().createNativeQuery(
             "INSERT INTO checksum_history"
                 + "(check_id, process_end_date, result, bitstream_id)"
                 + " VALUES (:id, :date, :result, :bitstream)");
