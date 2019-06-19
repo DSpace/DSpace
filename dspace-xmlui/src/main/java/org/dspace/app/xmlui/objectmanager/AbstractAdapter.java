@@ -19,6 +19,9 @@ import org.dspace.app.util.Util;
 import org.dspace.app.xmlui.wing.AttributeMap;
 import org.dspace.app.xmlui.wing.Namespace;
 import org.dspace.app.xmlui.wing.WingException;
+import org.dspace.authenticate.factory.AuthenticateServiceFactory;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Item;
@@ -85,6 +88,8 @@ public abstract class AbstractAdapter
     protected ContentHandler contentHandler;
     protected LexicalHandler lexicalHandler;
     protected NamespaceSupport namespaces;
+
+    protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
     
     /**
      * Construct a new adapter, implementers must call this method so
@@ -628,6 +633,14 @@ public abstract class AbstractAdapter
        return false;
     }
     
+    /**
+     * Check if the current user is allowed to read the contents
+     * of the adapter.
+     *
+     * @return True if the user has sufficient permissions
+     * @throws SQLException passed through.
+     */
+    abstract public boolean isAuthorized() throws SQLException;
     
     
     
