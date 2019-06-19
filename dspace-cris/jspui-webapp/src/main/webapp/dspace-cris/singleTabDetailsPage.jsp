@@ -129,6 +129,9 @@
 																<span id="nested_${tipologiaDaVisualizzare.real.id}_editmode" class="spandatabind">false</span>
 																<span id="nested_${tipologiaDaVisualizzare.real.id}_externalJSP" class="spandatabind">${tipologiaDaVisualizzare.externalJSP}</span>
 																</div>
+																<c:if test="${tipologiaDaVisualizzare.real.newline}">
+																	<div class="dynaClear">&nbsp;</div>
+																</c:if>
 														</c:if>
 														<c:if
 															test="${dyna:instanceOf(tipologiaDaVisualizzare,'it.cilea.osd.jdyna.model.ADecoratorPropertiesDefinition')}">

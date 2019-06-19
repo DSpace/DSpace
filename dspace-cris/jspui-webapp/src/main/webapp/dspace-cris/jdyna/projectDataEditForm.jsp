@@ -863,6 +863,9 @@
 								<span id="nested_${tipologiaDaVisualizzare.real.id}_pageCurrent" class="spandatabind">0</span>
 								<span id="nested_${tipologiaDaVisualizzare.real.id}_editmode" class="spandatabind">false</span>
 								</div>
+								<c:if test="${tipologiaDaVisualizzare.real.newline}">
+									<div class="dynaClear">&nbsp;</div>
+								</c:if>
 							</c:if>
 
 
