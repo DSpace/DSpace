@@ -24,3 +24,8 @@
         padding-left: 0;
     }
 }
+
+.not-active {
+    pointer-events: none;
+    cursor: default;
+}
