@@ -217,7 +217,6 @@ public abstract class ASolrStatsConfigurerComponent<T extends DSpaceObject>
                         String name = (String) result.getName(i);
                         if (StringUtils.isBlank(name))
                             name = "Unknown";
-                        // if (i<limit && (Integer)result.getVal(i)>0){
                         if (i < limit && (Integer)result.getVal(i)>0)
                         {
                             limitedData.add(new StatisticDatasBeanRow(name,
