@@ -47,7 +47,8 @@ public class MultipleSubmissionLookupDataLoader implements DataLoader
     private static final String NOT_FOUND_ORCID = "NOT-FOUND-ORCID";
     private static final String NOT_FOUND_CINII = "NOT-FOUND-CINII";
     
-    private static final String ORIGINAL_RECORD = "original";
+    private static final String IDENTIFIERS_ORIGINAL_RECORD = "identifiersOriginal";
+    private static final String FILE_ORIGINAL_RECORD = "fileOriginal";
 
     Map<String, DataLoader> dataloadersMap;
 
@@ -93,7 +94,11 @@ public class MultipleSubmissionLookupDataLoader implements DataLoader
                     if(identifiers != null) {
                     	record.makeMutable().addValue(
                             "originalRecord",
-                            new StringValue(ORIGINAL_RECORD));
+                            new StringValue(IDENTIFIERS_ORIGINAL_RECORD));
+                    }else {
+                    	record.makeMutable().addValue(
+                                "originalRecord",
+                                new StringValue(FILE_ORIGINAL_RECORD));
                     }
                 }
             }
