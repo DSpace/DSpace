@@ -17,26 +17,19 @@ import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.builder.ItemBuilder;
 import org.dspace.app.rest.builder.RelationshipBuilder;
-import java.io.File;
-import java.util.Iterator;
-import java.util.List;
-
 import org.dspace.app.rest.matcher.EntityTypeMatcher;
 import org.dspace.app.rest.matcher.PageMatcher;
+import org.dspace.app.rest.matcher.RelationshipMatcher;
 import org.dspace.app.rest.matcher.RelationshipTypeMatcher;
 import org.dspace.app.rest.test.AbstractEntityIntegrationTest;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
-import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.content.EntityType;
+import org.dspace.content.Item;
 import org.dspace.content.Relationship;
 import org.dspace.content.RelationshipType;
 import org.dspace.content.service.EntityTypeService;
 import org.dspace.content.service.RelationshipTypeService;
-import org.dspace.services.ConfigurationService;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -191,7 +184,7 @@ public class RelationshipTypeRestControllerIT extends AbstractEntityIntegrationT
             .createRelationshipBuilder(context, publication2, author3, isAuthorOfPublicationRelationshipType).build();
 
         context.restoreAuthSystemState();
-        getClient().perform(get("/api/core/relationships/isAuthorOfPublication"))
+        getClient().perform(get("/api/core/relationships/search/byLabel?label=isAuthorOfPublication"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$._embedded.relationships", containsInAnyOrder(
                        RelationshipMatcher.matchRelationship(relationship1),
@@ -200,14 +193,16 @@ public class RelationshipTypeRestControllerIT extends AbstractEntityIntegrationT
                        RelationshipMatcher.matchRelationship(relationship4)
                    )));
 
-        getClient().perform(get("/api/core/relationships/isAuthorOfPublication?dso=" + publication.getID()))
+        getClient().perform(get("/api/core/relationships/search/byLabel?label=isAuthorOfPublication&dso="
+                                    + publication.getID()))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$._embedded.relationships", containsInAnyOrder(
                        RelationshipMatcher.matchRelationship(relationship1),
                        RelationshipMatcher.matchRelationship(relationship2)
                    )));
 
-        getClient().perform(get("/api/core/relationships/isAuthorOfPublication?dso=" + publication2.getID()))
+        getClient().perform(get("/api/core/relationships/search/byLabel?label=isAuthorOfPublication&dso="
+                                    + publication2.getID()))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$._embedded.relationships", containsInAnyOrder(
                        RelationshipMatcher.matchRelationship(relationship3),
