@@ -20,7 +20,7 @@ import java.util.function.BiPredicate;
 import java.util.function.Function;
 
 public class FileExporter {
-    private static Function<Item, LocalDate> extractDateAvailable = (item) -> Arrays.stream(item.getMetadata("dc", "date", "available", "ru_RU"))
+    private static Function<Item, LocalDate> extractDateAvailable = (item) -> Arrays.stream(item.getMetadata("dc", "date", "available", null))
             .findAny()
             .map(metadatum -> metadatum.value)
             .map(value -> LocalDateTime.parse(value, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")).toLocalDate())
