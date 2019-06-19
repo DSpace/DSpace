@@ -351,7 +351,7 @@
     <message key="xmlui.ArtifactBrowser.StatisticsViewer.no_report.text">There are currently no reports available for this service.  Please check back later.</message>
 
     <!-- Authentication messages used for bitstream authentication -->
-	<message key="xmlui.BitstreamReader.auth_header">locked</message>
+	<message key="xmlui.BitstreamReader.auth_header">Locked</message>
 	<message key="xmlui.BitstreamReader.auth_message">The file you are attempting to access is a restricted file and requires credentials to view. Please login below to access the file.</message>
 
 	<!-- Export Archive download messages -->
