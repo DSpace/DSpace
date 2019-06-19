@@ -18,12 +18,20 @@
 <%@ page import="org.dspace.app.webui.components.StatisticsBean"  %>
 
 <dspace:layout titlekey="jsp.loginStatistics.title" navbar="admin">
+
+<fmt:message key="jsp.statistics.range.maxresult.all" var="maxresultall"/>
+
 <h1><fmt:message key="jsp.loginStatistics.title"/></h1>
 <div>
-        <span class="label label-info">from:</span>&nbsp; ${fn:escapeXml(stats_from_date)} &nbsp;&nbsp;&nbsp; <span class="label label-info">to:</span> &nbsp; ${fn:escapeXml(stats_to_date)}
-        &nbsp;&nbsp;&nbsp;<span class="label label-info">max:</span>&nbsp;${viewFilter == '-1'? 'all' : viewFilter}
-        &nbsp;&nbsp;<a class="btn btn-default" data-toggle="modal" data-target="#stats-date-change-dialog"><fmt:message key="view.statistics.change-range" /></a>
-        </div>
+		<span class="label label-info"><fmt:message key="view.statistics.range.from" /></span> &nbsp; 
+			<c:if test="${empty stats_from_date}"><fmt:message key="view.statistics.range.no-start-date" /></c:if>
+			${fn:escapeXml(stats_from_date)} &nbsp;&nbsp;&nbsp; 
+		<span class="label label-info"><fmt:message key="view.statistics.range.to" /></span> &nbsp; 
+			<c:if test="${empty stats_to_date}"><fmt:message key="view.statistics.range.no-end-date" /></c:if>
+			${fn:escapeXml(stats_to_date)} &nbsp;&nbsp;&nbsp;
+		<span class="label label-info"><fmt:message key="jsp.statistics.range.maxresult" /></span>&nbsp;${viewFilter == '-1'? maxresultall : (empty viewFilter ? '10' : viewFilter)} &nbsp;&nbsp;&nbsp;
+		<a class="btn btn-default" data-toggle="modal" data-target="#stats-date-change-dialog"><fmt:message key="view.statistics.change-range" /></a>        
+</div>
 <table class="table table-striped">
 <tr>
 <th>&nbsp;</th>
@@ -54,54 +62,58 @@
     <form class="modal-content" id="formChangeRange" action="loginstats">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title" id="StatsDataChange">Change the range of the report</h4>
+        <h4 class="modal-title" id="StatsDataChange"><fmt:message key="view.statistics.range.change.title" /></h4>
       </div>
       <div class="modal-body">
-        From: <input class="form-control" type="text" id="stats_from_date" name="stats_from_date"/> <br/>
-        To: <input class="form-control" type="text" id="stats_to_date" name="stats_to_date"/> <br/>
+        <fmt:message key="view.statistics.range.from" /><input class="form-control" type="text" id="stats_from_date" name="stats_from_date" value="${fn:escapeXml(stats_from_date)}"/> <br/>
+        <fmt:message key="view.statistics.range.to" /><input class="form-control" type="text" id="stats_to_date" name="stats_to_date" value="${fn:escapeXml(stats_to_date)}"/> <br/>
 		<div class="form-group">
-		<fmt:message key="jsp.statistics.viewFilter" />
+		<fmt:message key="jsp.statistics.range.maxresult" />
 		<select name="viewFilter" class="form-control">
 			<option value="10" ${viewFilter == '10' ? 'selected' :''}>10</option>
 			<option value="25" ${viewFilter == '25' ? 'selected' :''}>25</option>
 			<option value="50" ${viewFilter == '50' ? 'selected' :''}>50</option>
 			<option value="100" ${viewFilter == '100' ? 'selected' :''}>100</option>
-			<option value="-1" ${viewFilter == '-1' ? 'selected' :''}><fmt:message key="jsp.statistics.viewFilter.viewAll"/></option>
+			<option value="-1" ${viewFilter == '-1' ? 'selected' :''}><fmt:message key="jsp.statistics.range.maxresult.all"/></option>
 		</select>
 		</div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        <input type="submit" class="btn btn-primary" id="changeRange"/>
+        <button type="button" class="btn btn-default" data-dismiss="modal"><fmt:message key="view.statistics.range.change.close" /></button>
+        <input type="submit" class="btn btn-primary" id="changeRange" value="<fmt:message key="view.statistics.range.change.submit" />"/>
       </div>
     </form>
   </div>
 </div>
 
 <script type="text/javascript">
-<!--
 var j = jQuery;
-j(document).ready(function() {
-        j("#stats_from_date").datepicker({
-                dateFormat: "yy-mm-dd"
+j(document).ready(function() {    
+        j('#stats_from_date').datetimepicker({
+        	format: "YYYY-MM-DD"       	
         });
-
-        j("#stats_to_date").datepicker({
-                dateFormat: "yy-mm-dd"
+        j('#stats_to_date').datetimepicker({
+        	format: "YYYY-MM-DD",
+            useCurrent: false //Important! See issue #1075
         });
-
-        j("#formChangeRange").submit(function(){
-                var sdate= j("#stats_from_date").val();
-                var edate= j("#stats_to_date").val();
-                if(sdate.length ==0){
-                        sdate.val("*");
-                }
-                if(edate.length ==0){
-                        edate.val("*");
-                }
+        j("#stats_from_date").on("dp.change", function (e) {
+            j('#stats_to_date').data("DateTimePicker").minDate(e.date);
         });
+        j("#stats_to_date").on("dp.change", function (e) {
+            j('#stats_from_date').data("DateTimePicker").maxDate(e.date);
+        });
+        
+    	j("#formChangeRange").submit(function(){
+    		var sdate= j("#stats_from_date").val();
+    		var edate= j("#stats_to_date").val();
+    		if(sdate.length ==0){
+    			sdate.val("*");
+    		}
+    		if(edate.length ==0){
+    			edate.val("*");
+    		}
+    	});
 });
--->
 </script>
 
 </dspace:layout>
