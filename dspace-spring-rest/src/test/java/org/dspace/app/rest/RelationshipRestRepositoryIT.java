@@ -45,7 +45,6 @@ import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.core.Constants;
 import org.dspace.core.I18nUtil;
 import org.dspace.eperson.EPerson;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -195,7 +194,6 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                                            .withName("Sub Community")
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
-        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
         Collection col3 = CollectionBuilder.createCollection(context, child1).withName("OrgUnits").build();
 
         Item author1 = ItemBuilder.createItem(context, col1)
@@ -269,7 +267,6 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                                            .withName("Sub Community")
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
-        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
         Collection col3 = CollectionBuilder.createCollection(context, child1).withName("OrgUnits").build();
 
         Item author1 = ItemBuilder.createItem(context, col1)
@@ -1420,7 +1417,14 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
 
     }
 
-    @Ignore
+    /**
+     * This test will create a relationship with author 1 - publication 1
+     * Then modify this relationship by changing the left item to author 2 via PUT > Verify
+     * Then modify this relationship by changing the right item to publication 2 via PUT > Verify
+     *
+     * @throws Exception
+     */
+    @Test
     public void putRelationshipAdminAccess() throws Exception {
 
         context.turnOffAuthorisationSystem();
@@ -1432,7 +1436,6 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                                            .withName("Sub Community")
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
-        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
         Collection col3 = CollectionBuilder.createCollection(context, child1).withName("OrgUnits").build();
 
         Item author1 = ItemBuilder.createItem(context, col1)
@@ -1455,6 +1458,13 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                                       .withIssueDate("2015-01-01")
                                       .withRelationshipType("Publication")
                                       .build();
+
+        Item publication2 = ItemBuilder.createItem(context, col3)
+                .withTitle("Publication2")
+                .withAuthor("Testy, TEst")
+                .withIssueDate("2015-01-01")
+                .withRelationshipType("Publication")
+                .build();
 
         RelationshipType isAuthorOfPublicationRelationshipType = relationshipTypeService
             .findbyTypesAndLabels(context, entityTypeService.findByEntityType(context, "Publication"),
@@ -1485,19 +1495,37 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         Map<String,Object> map = mapper.readValue(content, Map.class);
         String id = String.valueOf(map.get("id"));
 
-        MvcResult mvcResult2 = getClient(token).perform(put("/api/core/relationships/" + id)
-                                                            .contentType(MediaType.parseMediaType
-                                                                (org.springframework.data.rest.webmvc.RestMediaTypes
-                                                                     .TEXT_URI_LIST_VALUE))
-                                                            .content(
-                                                                "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
-                                                                    "https://localhost:8080/spring-rest/api/core/items/" + author2.getID()))
-                                               .andExpect(status().isOk())
-                                               .andReturn();
+        //Modify the left item in the relationship publication > publication 2
+        MvcResult mvcResult2 = getClient(token).perform(put("/api/core/relationships/" + id + "/leftItem")
+                .contentType(MediaType.parseMediaType
+                        (org.springframework.data.rest.webmvc.RestMediaTypes
+                                .TEXT_URI_LIST_VALUE))
+                .content(
+                        "https://localhost:8080/spring-rest/api/core/items/" + publication2.getID()))
+                .andExpect(status().isOk())
+                .andReturn();
 
+        //verify left item change and other not changed
         getClient(token).perform(get("/api/core/relationships/" + id))
-                        .andExpect(status().isOk())
-                        .andExpect(jsonPath("$.rightId", is(author2.getID().toString())));
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.leftId", is(publication2.getID().toString())))
+                .andExpect(jsonPath("$.rightId", is(author1.getID().toString())));
+
+        //Modify the right item in the relationship publication > publication 2
+        MvcResult mvcResult3 = getClient(token).perform(put("/api/core/relationships/" + id + "/rightItem")
+                .contentType(MediaType.parseMediaType
+                        (org.springframework.data.rest.webmvc.RestMediaTypes
+                                .TEXT_URI_LIST_VALUE))
+                .content(
+                                "https://localhost:8080/spring-rest/api/core/items/" + author2.getID()))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        //verify right item change and other not changed
+        getClient(token).perform(get("/api/core/relationships/" + id))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.rightId", is(author2.getID().toString())))
+                .andExpect(jsonPath("$.leftId", is(publication2.getID().toString())));
 
     }
 
@@ -1506,7 +1534,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
      * Change it to a relationship between publication 1 and author 2
      * Verify this is possible for a user with WRITE permissions on author 1 and author 2
      */
-    @Ignore
+    @Test
     public void putRelationshipWriteAccessOnAuthors() throws Exception {
 
         context.turnOffAuthorisationSystem();
@@ -1518,7 +1546,6 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                                            .withName("Sub Community")
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
-        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
         Collection col3 = CollectionBuilder.createCollection(context, child1).withName("OrgUnits").build();
 
         Item author1 = ItemBuilder.createItem(context, col1)
@@ -1580,17 +1607,17 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         Map<String,Object> map = mapper.readValue(content, Map.class);
         String id = String.valueOf(map.get("id"));
 
-        MvcResult mvcResult2 = getClient(token).perform(put("/api/core/relationships/" + id)
-                                                            .contentType(MediaType.parseMediaType("text/uri-list"))
-                                                            .content(
-                                                                "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
-                                                                    "https://localhost:8080/spring-rest/api/core/items/" + author2.getID()))
-                                               .andExpect(status().isOk())
-                                               .andReturn();
-
+        //change right item from author 1 > author 2
+        MvcResult mvcResult2 = getClient(token).perform(put("/api/core/relationships/" + id + "/rightItem")
+                .contentType(MediaType.parseMediaType("text/uri-list"))
+                .content("https://localhost:8080/spring-rest/api/core/items/" + author2.getID()))
+                .andExpect(status().isOk())
+                .andReturn();
+        //verify change  and other not changed
         getClient(token).perform(get("/api/core/relationships/" + id))
                         .andExpect(status().isOk())
-                        .andExpect(jsonPath("$.rightId", is(author2.getID().toString())));
+                        .andExpect(jsonPath("$.rightId", is(author2.getID().toString())))
+                        .andExpect(jsonPath("$.leftId", is(publication.getID().toString())));
 
     }
 
@@ -1599,7 +1626,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
      * Change it to a relationship between publication 1 and author 2
      * Verify this is possible for a user with WRITE permissions on publication 1
      */
-    @Ignore
+    @Test
     public void putRelationshipWriteAccessOnPublication() throws Exception {
 
         context.turnOffAuthorisationSystem();
@@ -1611,7 +1638,6 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                                            .withName("Sub Community")
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
-        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
         Collection col3 = CollectionBuilder.createCollection(context, child1).withName("OrgUnits").build();
 
         Item author1 = ItemBuilder.createItem(context, col1)
@@ -1671,18 +1697,17 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         String content = mvcResult.getResponse().getContentAsString();
         Map<String,Object> map = mapper.readValue(content, Map.class);
         String id = String.valueOf(map.get("id"));
-
-        MvcResult mvcResult2 = getClient(token).perform(put("/api/core/relationships/" + id)
-                                                            .contentType(MediaType.parseMediaType("text/uri-list"))
-                                                            .content(
-                                                                "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
-                                                                    "https://localhost:8080/spring-rest/api/core/items/" + author2.getID()))
-                                               .andExpect(status().isOk())
-                                               .andReturn();
-
+        //change rightItem from author1 > author2
+        MvcResult mvcResult2 = getClient(token).perform(put("/api/core/relationships/" + id + "/rightItem")
+                .contentType(MediaType.parseMediaType("text/uri-list"))
+                .content("https://localhost:8080/spring-rest/api/core/items/" + author2.getID()))
+                .andExpect(status().isOk())
+                .andReturn();
+        //verify right item change and other not changed
         getClient(token).perform(get("/api/core/relationships/" + id))
                         .andExpect(status().isOk())
-                        .andExpect(jsonPath("$.rightId", is(author2.getID().toString())));
+                        .andExpect(jsonPath("$.rightId", is(author2.getID().toString())))
+                        .andExpect(jsonPath("$.leftId", is(publication.getID().toString())));
 
     }
 
@@ -1692,7 +1717,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
      * Change it to a relationship between publication 2 and author 1
      * Verify this is possible for a user with WRITE permissions on publication 1 and publication 2
      */
-    @Ignore
+    @Test
     public void putRelationshipWriteAccessOnPublications() throws Exception {
 
         context.turnOffAuthorisationSystem();
@@ -1704,20 +1729,12 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                                            .withName("Sub Community")
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
-        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
         Collection col3 = CollectionBuilder.createCollection(context, child1).withName("OrgUnits").build();
 
         Item author1 = ItemBuilder.createItem(context, col1)
                                   .withTitle("Author1")
                                   .withIssueDate("2017-10-17")
                                   .withAuthor("Smith, Donald")
-                                  .withRelationshipType("Person")
-                                  .build();
-
-        Item author2 = ItemBuilder.createItem(context, col1)
-                                  .withTitle("Author2")
-                                  .withIssueDate("2017-10-12")
-                                  .withAuthor("Smith, Donalaze")
                                   .withRelationshipType("Person")
                                   .build();
 
@@ -1771,19 +1788,17 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         String content = mvcResult.getResponse().getContentAsString();
         Map<String,Object> map = mapper.readValue(content, Map.class);
         String id = String.valueOf(map.get("id"));
-
-        MvcResult mvcResult2 = getClient(token).perform(put("/api/core/relationships/" + id)
-                                                            .contentType(MediaType.parseMediaType("text/uri-list"))
-                                                            .content(
-                                                                "https://localhost:8080/spring-rest/api/core/items/" + publication2.getID() + "\n" +
-                                                                    "https://localhost:8080/spring-rest/api/core/items/" + author1.getID()))
-                                               .andExpect(status().isOk())
-                                               .andReturn();
-
+        //change leftItem
+        MvcResult mvcResult2 = getClient(token).perform(put("/api/core/relationships/" + id + "/leftItem")
+                .contentType(MediaType.parseMediaType("text/uri-list"))
+                .content("https://localhost:8080/spring-rest/api/core/items/" + publication2.getID()))
+                .andExpect(status().isOk())
+                .andReturn();
+        //verify change  and other not changed
         getClient(token).perform(get("/api/core/relationships/" + id))
                         .andExpect(status().isOk())
-                        .andExpect(jsonPath("$.leftId", is(publication2.getID().toString())));
-
+                        .andExpect(jsonPath("$.leftId", is(publication2.getID().toString())))
+                        .andExpect(jsonPath("$.rightId", is(author1.getID().toString())));
     }
 
 
@@ -1792,7 +1807,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
      * Change it to a relationship between publication 2 and author 1
      * Verify this is possible for a user with WRITE permissions on author 1
      */
-    @Ignore
+    @Test
     public void putRelationshipWriteAccessOnAuthor() throws Exception {
 
         context.turnOffAuthorisationSystem();
@@ -1804,20 +1819,12 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                                            .withName("Sub Community")
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
-        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
         Collection col3 = CollectionBuilder.createCollection(context, child1).withName("OrgUnits").build();
 
         Item author1 = ItemBuilder.createItem(context, col1)
                                   .withTitle("Author1")
                                   .withIssueDate("2017-10-17")
                                   .withAuthor("Smith, Donald")
-                                  .withRelationshipType("Person")
-                                  .build();
-
-        Item author2 = ItemBuilder.createItem(context, col1)
-                                  .withTitle("Author2")
-                                  .withIssueDate("2017-10-12")
-                                  .withAuthor("Smith, Donalaze")
                                   .withRelationshipType("Person")
                                   .build();
 
@@ -1872,19 +1879,17 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         String content = mvcResult.getResponse().getContentAsString();
         Map<String,Object> map = mapper.readValue(content, Map.class);
         String id = String.valueOf(map.get("id"));
-
-        MvcResult mvcResult2 = getClient(token).perform(put("/api/core/relationships/" + id)
-                                                            .contentType(MediaType.parseMediaType("text/uri-list"))
-                                                            .content(
-                                                                "https://localhost:8080/spring-rest/api/core/items/" + publication2.getID() + "\n" +
-                                                                    "https://localhost:8080/spring-rest/api/core/items/" + author1.getID()))
-                                               .andExpect(status().isOk())
-                                               .andReturn();
-
+        //change left item
+        MvcResult mvcResult2 = getClient(token).perform(put("/api/core/relationships/" + id + "/leftItem")
+                .contentType(MediaType.parseMediaType("text/uri-list"))
+                .content("https://localhost:8080/spring-rest/api/core/items/" + publication2.getID()))
+                .andExpect(status().isOk())
+                .andReturn();
+        //verify change and other not changed
         getClient(token).perform(get("/api/core/relationships/" + id))
                         .andExpect(status().isOk())
-                        .andExpect(jsonPath("$.leftId", is(publication2.getID().toString())));
-
+                        .andExpect(jsonPath("$.leftId", is(publication2.getID().toString())))
+                        .andExpect(jsonPath("$.rightId", is(author1.getID().toString())));
     }
 
 
@@ -1893,7 +1898,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
      * Change it to a relationship between publication 1 and author 2
      * Verify this is NOT possible for a user without WRITE permissions
      */
-    @Ignore
+    @Test
     public void putRelationshipNoAccess() throws Exception {
 
         context.turnOffAuthorisationSystem();
@@ -1905,7 +1910,6 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                                            .withName("Sub Community")
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
-        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
         Collection col3 = CollectionBuilder.createCollection(context, child1).withName("OrgUnits").build();
 
         Item author1 = ItemBuilder.createItem(context, col1)
@@ -1964,15 +1968,17 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         Map<String,Object> map = mapper.readValue(content, Map.class);
         String id = String.valueOf(map.get("id"));
         token = getAuthToken(user.getEmail(), password);
-
-        MvcResult mvcResult2 = getClient(token).perform(put("/api/core/relationships/" + id)
-                                                            .contentType(MediaType.parseMediaType("text/uri-list"))
-                                                            .content(
-                                                                "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
-                                                                    "https://localhost:8080/spring-rest/api/core/items/" + author2.getID()))
-                                               .andExpect(status().isForbidden())
-                                               .andReturn();
-
+        //attempt change, expect not allowed
+        MvcResult mvcResult2 = getClient(token).perform(put("/api/core/relationships/" + id + "/rightItem")
+                .contentType(MediaType.parseMediaType("text/uri-list"))
+                .content("https://localhost:8080/spring-rest/api/core/items/" + author2.getID()))
+                .andExpect(status().isForbidden())
+                .andReturn();
+        //verify nothing changed
+        getClient(token).perform(get("/api/core/relationships/" + id))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.leftId", is(publication.getID().toString())))
+                .andExpect(jsonPath("$.rightId", is(author1.getID().toString())));
     }
 
     /**
@@ -1980,7 +1986,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
      * Change it to a relationship between publication 1 and author 2
      * Verify this is NOT possible for a user with WRITE permissions on author 1
      */
-    @Ignore
+    @Test
     public void putRelationshipOnlyAccessOnOneAuthor() throws Exception {
 
         context.turnOffAuthorisationSystem();
@@ -2053,15 +2059,17 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         Map<String,Object> map = mapper.readValue(content, Map.class);
         String id = String.valueOf(map.get("id"));
         token = getAuthToken(user.getEmail(), password);
-
-        MvcResult mvcResult2 = getClient(token).perform(put("/api/core/relationships/" + id)
-                                                            .contentType(MediaType.parseMediaType("text/uri-list"))
-                                                            .content(
-                                                                "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
-                                                                    "https://localhost:8080/spring-rest/api/core/items/" + author2.getID()))
-                                               .andExpect(status().isForbidden())
-                                               .andReturn();
-
+        //attempt right item change, expect not allowed
+        MvcResult mvcResult2 = getClient(token).perform(put("/api/core/relationships/" + id + "/rightItem")
+                .contentType(MediaType.parseMediaType("text/uri-list"))
+                .content("https://localhost:8080/spring-rest/api/core/items/" + author2.getID()))
+                .andExpect(status().isForbidden())
+                .andReturn();
+        //verify not changed
+        getClient(token).perform(get("/api/core/relationships/" + id))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.leftId", is(publication.getID().toString())))
+                .andExpect(jsonPath("$.rightId", is(author1.getID().toString())));
     }
 
     /**
@@ -2069,7 +2077,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
      * Change it to a relationship between publication 2 and author 1
      * Verify this is NOT possible for a user with WRITE permissions on publication 1
      */
-    @Ignore
+    @Test
     public void putRelationshipOnlyAccessOnOnePublication() throws Exception {
 
         context.turnOffAuthorisationSystem();
@@ -2081,20 +2089,12 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                                            .withName("Sub Community")
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
-        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
         Collection col3 = CollectionBuilder.createCollection(context, child1).withName("OrgUnits").build();
 
         Item author1 = ItemBuilder.createItem(context, col1)
                                   .withTitle("Author1")
                                   .withIssueDate("2017-10-17")
                                   .withAuthor("Smith, Donald")
-                                  .withRelationshipType("Person")
-                                  .build();
-
-        Item author2 = ItemBuilder.createItem(context, col1)
-                                  .withTitle("Author2")
-                                  .withIssueDate("2017-10-12")
-                                  .withAuthor("Smith, Donalaze")
                                   .withRelationshipType("Person")
                                   .build();
 
@@ -2147,18 +2147,109 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         String content = mvcResult.getResponse().getContentAsString();
         Map<String,Object> map = mapper.readValue(content, Map.class);
         String id = String.valueOf(map.get("id"));
-
-        MvcResult mvcResult2 = getClient(token).perform(put("/api/core/relationships/" + id)
-                                                            .contentType(MediaType.parseMediaType("text/uri-list"))
-                                                            .content(
-                                                                "https://localhost:8080/spring-rest/api/core/items/" + publication2.getID() + "\n" +
-                                                                    "https://localhost:8080/spring-rest/api/core/items/" + author1.getID()))
-                                               .andExpect(status().isForbidden())
-                                               .andReturn();
-
+        //attempt left item change, expect not allowed
+        MvcResult mvcResult2 = getClient(token).perform(put("/api/core/relationships/" + id + "/leftItem")
+                .contentType(MediaType.parseMediaType("text/uri-list"))
+                .content("https://localhost:8080/spring-rest/api/core/items/" + publication2.getID()))
+                .andExpect(status().isForbidden())
+                .andReturn();
+        //verify not changed
         getClient(token).perform(get("/api/core/relationships/" + id))
                         .andExpect(status().isOk())
-                        .andExpect(jsonPath("$.leftId", is(publication1.getID().toString())));
+                        .andExpect(jsonPath("$.leftId", is(publication1.getID().toString())))
+                        .andExpect(jsonPath("$.rightId", is(author1.getID().toString())));
+
+    }
+
+    @Test
+    public void putRelationshipWithNonexistentID() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Item publication1 = ItemBuilder.createItem(context, col1)
+                .withTitle("Publication1")
+                .withAuthor("Testy, TEst")
+                .withIssueDate("2015-01-01")
+                .withRelationshipType("Publication")
+                .build();
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        context.restoreAuthSystemState();
+
+        int nonexistentRelationshipID = 404404404;
+        //attempt left item change on non-existent relationship
+        MvcResult mvcResult = getClient(token).perform(
+                put("/api/core/relationships/" + nonexistentRelationshipID + "/leftItem")
+                .contentType(MediaType.parseMediaType("text/uri-list"))
+                .content("https://localhost:8080/spring-rest/api/core/items/" + publication1.getID()))
+                .andExpect(status().isNotFound())
+                .andReturn();
+
+    }
+
+    @Test
+    public void putRelationshipWithInvalidItemIDInBody() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Item author1 = ItemBuilder.createItem(context, col1)
+                .withTitle("Author1")
+                .withIssueDate("2017-10-17")
+                .withAuthor("Smith, Donald")
+                .withRelationshipType("Person")
+                .build();
+        Item publication1 = ItemBuilder.createItem(context, col1)
+                .withTitle("Publication1")
+                .withAuthor("Testy, TEst")
+                .withIssueDate("2015-01-01")
+                .withRelationshipType("Publication")
+                .build();
+
+        RelationshipType isAuthorOfPublicationRelationshipType = relationshipTypeService
+                .findbyTypesAndLabels(context, entityTypeService.findByEntityType(context, "Publication"),
+                        entityTypeService.findByEntityType(context, "Person"),
+                        "isAuthorOfPublication", "isPublicationOfAuthor");
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        context.restoreAuthSystemState();
+
+        MvcResult mvcResult = getClient(token).perform(post("/api/core/relationships")
+                .param("relationshipType",
+                        isAuthorOfPublicationRelationshipType.getID()
+                                .toString())
+                .contentType(MediaType.parseMediaType("text/uri-list"))
+                .content(
+                        "https://localhost:8080/spring-rest/api/core/items/" + publication1.getID() + "\n" +
+                                "https://localhost:8080/spring-rest/api/core/items/" + author1.getID()))
+                .andExpect(status().isCreated())
+                .andReturn();
+
+        ObjectMapper mapper = new ObjectMapper();
+        String content = mvcResult.getResponse().getContentAsString();
+        Map<String, Object> map = mapper.readValue(content, Map.class);
+        String id = String.valueOf(map.get("id"));
+
+        int nonexistentItemID = 404404404;
+        //attempt left item change on non-existent relationship
+        MvcResult mvcResult2 = getClient(token).perform(put("/api/core/relationships/" + id + "/leftItem")
+                .contentType(MediaType.parseMediaType("text/uri-list"))
+                .content("https://localhost:8080/spring-rest/api/core/items/" + nonexistentItemID))
+                .andExpect(status().isUnprocessableEntity())
+                .andReturn();
 
     }
 }
