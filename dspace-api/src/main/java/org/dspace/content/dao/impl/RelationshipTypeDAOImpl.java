@@ -41,6 +41,14 @@ public class RelationshipTypeDAOImpl extends AbstractHibernateDAO<RelationshipTy
 
     @Override
     public List<RelationshipType> findByLeftwardOrRightwardTypeName(Context context, String type) throws SQLException {
+
+        return findByLeftwardOrRightwardTypeName(context, type, -1, -1);
+    }
+
+    @Override
+    public List<RelationshipType> findByLeftwardOrRightwardTypeName(Context context, String type, Integer limit, Integer offset)
+            throws SQLException {
+
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, RelationshipType.class);
         Root<RelationshipType> relationshipTypeRoot = criteriaQuery.from(RelationshipType.class);
@@ -51,11 +59,18 @@ public class RelationshipTypeDAOImpl extends AbstractHibernateDAO<RelationshipTy
                 criteriaBuilder.equal(relationshipTypeRoot.get(RelationshipType_.rightwardType), type)
             )
         );
-        return list(context, criteriaQuery, true, RelationshipType.class, -1, -1);
+        return list(context, criteriaQuery, true, RelationshipType.class, limit, offset);
     }
 
     @Override
     public List<RelationshipType> findByEntityType(Context context, EntityType entityType) throws SQLException {
+        return findByEntityType(context, entityType, -1, -1);
+    }
+
+    @Override
+    public List<RelationshipType> findByEntityType(Context context, EntityType entityType,
+                                                   Integer limit, Integer offset) throws SQLException {
+
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, RelationshipType.class);
         Root<RelationshipType> relationshipTypeRoot = criteriaQuery.from(RelationshipType.class);
@@ -67,7 +82,7 @@ public class RelationshipTypeDAOImpl extends AbstractHibernateDAO<RelationshipTy
                                    .equal(relationshipTypeRoot.get(RelationshipType_.rightType), entityType)
             )
         );
-        return list(context, criteriaQuery, false, RelationshipType.class, -1, -1);
+        return list(context, criteriaQuery, false, RelationshipType.class, limit, offset);
     }
 
 }

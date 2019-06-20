@@ -25,6 +25,14 @@ public class RelationshipDAOImpl extends AbstractHibernateDAO<Relationship> impl
 
     @Override
     public List<Relationship> findByItem(Context context, Item item) throws SQLException {
+
+        return findByItem(context, item, -1, -1);
+    }
+
+    @Override
+    public List<Relationship> findByItem(Context context, Item item, Integer limit, Integer offset)
+            throws SQLException {
+
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Relationship.class);
         Root<Relationship> relationshipRoot = criteriaQuery.from(Relationship.class);
@@ -32,7 +40,7 @@ public class RelationshipDAOImpl extends AbstractHibernateDAO<Relationship> impl
         criteriaQuery
             .where(criteriaBuilder.or(criteriaBuilder.equal(relationshipRoot.get(Relationship_.leftItem), item),
                                       criteriaBuilder.equal(relationshipRoot.get(Relationship_.rightItem), item)));
-        return list(context, criteriaQuery, false, Relationship.class, -1, -1);
+        return list(context, criteriaQuery, false, Relationship.class, limit, offset);
     }
 
     @Override
@@ -70,13 +78,21 @@ public class RelationshipDAOImpl extends AbstractHibernateDAO<Relationship> impl
     @Override
     public List<Relationship> findByRelationshipType(Context context, RelationshipType relationshipType)
         throws SQLException {
+
+        return findByRelationshipType(context, relationshipType, -1, -1);
+    }
+
+    @Override
+    public List<Relationship> findByRelationshipType(Context context, RelationshipType relationshipType,
+                                                     Integer limit, Integer offset) throws SQLException {
+
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Relationship.class);
         Root<Relationship> relationshipRoot = criteriaQuery.from(Relationship.class);
         criteriaQuery.select(relationshipRoot);
         criteriaQuery
             .where(criteriaBuilder.equal(relationshipRoot.get(Relationship_.relationshipType), relationshipType));
-        return list(context, criteriaQuery, true, Relationship.class, -1, -1);
+        return list(context, criteriaQuery, true, Relationship.class, limit, offset);
     }
 
 

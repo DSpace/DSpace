@@ -54,17 +54,35 @@ public class RelationshipTypeServiceImpl implements RelationshipTypeService {
 
     @Override
     public List<RelationshipType> findAll(Context context) throws SQLException {
-        return relationshipTypeDAO.findAll(context, RelationshipType.class);
+        return findAll(context, -1, -1);
+    }
+
+    @Override
+    public List<RelationshipType> findAll(Context context, Integer limit, Integer offset) throws SQLException {
+
+        return relationshipTypeDAO.findAll(context, RelationshipType.class, limit, offset);
     }
 
     @Override
     public List<RelationshipType> findByLeftwardOrRightwardTypeName(Context context, String label) throws SQLException {
-        return relationshipTypeDAO.findByLeftwardOrRightwardTypeName(context, label);
+        return findByLeftOrRightLabel(context, label, -1, -1);
+    }
+
+    @Override
+    public List<RelationshipType> findByLeftwardOrRightwardTypeName(Context context, String label, Integer limit, Integer offset)
+            throws SQLException {
+        return relationshipTypeDAO.findByLeftOrRightLabel(context, label, limit, offset);
     }
 
     @Override
     public List<RelationshipType> findByEntityType(Context context, EntityType entityType) throws SQLException {
-        return relationshipTypeDAO.findByEntityType(context, entityType);
+        return findByEntityType(context, entityType, -1, -1);
+    }
+
+    @Override
+    public List<RelationshipType> findByEntityType(Context context, EntityType entityType,
+                                                   Integer limit, Integer offset) throws SQLException {
+        return relationshipTypeDAO.findByEntityType(context, entityType, limit, offset);
     }
 
     @Override

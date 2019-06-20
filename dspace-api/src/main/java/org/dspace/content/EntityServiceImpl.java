@@ -38,8 +38,15 @@ public class EntityServiceImpl implements EntityService {
 
     @Override
     public Entity findByItemId(Context context, UUID itemId) throws SQLException {
+
+        return findByItemId(context, itemId, -1, -1);
+    }
+
+    @Override
+    public Entity findByItemId(Context context, UUID itemId, Integer limit, Integer offset) throws SQLException {
+
         Item item = itemService.find(context, itemId);
-        List<Relationship> relationshipList = relationshipService.findByItem(context, item);
+        List<Relationship> relationshipList = relationshipService.findByItem(context, item, limit, offset);
         return new Entity(item, relationshipList);
     }
 
@@ -80,8 +87,16 @@ public class EntityServiceImpl implements EntityService {
 
     @Override
     public List<Relationship> getRelationsByLabel(Context context, String label) throws SQLException {
+
+        return getRelationsByLabel(context, label, -1, -1);
+    }
+
+    @Override
+    public List<Relationship> getRelationsByLabel(Context context, String label, Integer limit, Integer offset)
+            throws SQLException {
+
         List<Relationship> listToReturn = new LinkedList<>();
-        List<Relationship> relationshipList = relationshipService.findAll(context);
+        List<Relationship> relationshipList = relationshipService.findAll(context, limit, offset);
         for (Relationship relationship : relationshipList) {
             RelationshipType relationshipType = relationship.getRelationshipType();
             if (StringUtils.equals(relationshipType.getLeftwardType(),label) ||
@@ -94,12 +109,20 @@ public class EntityServiceImpl implements EntityService {
 
     @Override
     public List<RelationshipType> getAllRelationshipTypes(Context context, Entity entity) throws SQLException {
+
+        return getAllRelationshipTypes(context, entity, -1, -1);
+    }
+
+    @Override
+    public List<RelationshipType> getAllRelationshipTypes(Context context, Entity entity, Integer limit, Integer offset)
+            throws SQLException {
+
         EntityType entityType = this.getType(context, entity);
         if (entityType == null) {
             return Collections.emptyList();
         }
         List<RelationshipType> listToReturn = new LinkedList<>();
-        for (RelationshipType relationshipType : relationshipTypeService.findAll(context)) {
+        for (RelationshipType relationshipType : relationshipTypeService.findAll(context, limit, offset)) {
             if (relationshipType.getLeftType().getID() == entityType.getID() ||
                 relationshipType.getRightType().getID() == entityType.getID()) {
                 listToReturn.add(relationshipType);
@@ -110,9 +133,17 @@ public class EntityServiceImpl implements EntityService {
 
     @Override
     public List<RelationshipType> getLeftRelationshipTypes(Context context, Entity entity) throws SQLException {
+
+        return getLeftRelationshipTypes(context, entity, -1, -1);
+    }
+
+    @Override
+    public List<RelationshipType> getLeftRelationshipTypes(Context context, Entity entity,
+                                                           Integer limit, Integer offset) throws SQLException {
+
         EntityType entityType = this.getType(context, entity);
         List<RelationshipType> listToReturn = new LinkedList<>();
-        for (RelationshipType relationshipType : relationshipTypeService.findAll(context)) {
+        for (RelationshipType relationshipType : relationshipTypeService.findAll(context, limit, offset)) {
             if (relationshipType.getLeftType().getID() == entityType.getID()) {
                 listToReturn.add(relationshipType);
             }
@@ -122,9 +153,17 @@ public class EntityServiceImpl implements EntityService {
 
     @Override
     public List<RelationshipType> getRightRelationshipTypes(Context context, Entity entity) throws SQLException {
+
+        return getRightRelationshipTypes(context, entity, -1, -1);
+    }
+
+    @Override
+    public List<RelationshipType> getRightRelationshipTypes(Context context, Entity entity,
+                                                            Integer limit, Integer offset) throws SQLException {
+
         EntityType entityType = this.getType(context, entity);
         List<RelationshipType> listToReturn = new LinkedList<>();
-        for (RelationshipType relationshipType : relationshipTypeService.findAll(context)) {
+        for (RelationshipType relationshipType : relationshipTypeService.findAll(context, limit, offset)) {
             if (relationshipType.getRightType().getID() == entityType.getID()) {
                 listToReturn.add(relationshipType);
             }
@@ -133,9 +172,16 @@ public class EntityServiceImpl implements EntityService {
     }
 
     @Override
-    public List<RelationshipType> getRelationshipTypesByTypeName(Context context, String label) throws SQLException {
+    public List<RelationshipType> getRelationshipTypesByLabel(Context context, String label) throws SQLException {
+
+        return getRelationshipTypesByLabel(context, label, -1, -1);
+    }
+
+    @Override
+    public List<RelationshipType> getRelationshipTypesByTypeName(Context context, String label,
+                                                                 Integer limit, Integer offset) throws SQLException {
         List<RelationshipType> listToReturn = new LinkedList<>();
-        for (RelationshipType relationshipType : relationshipTypeService.findAll(context)) {
+        for (RelationshipType relationshipType : relationshipTypeService.findAll(context, limit, offset)) {
             if (StringUtils.equals(relationshipType.getLeftwardType(),label) ||
                 StringUtils.equals(relationshipType.getRightwardType(),label)) {
                 listToReturn.add(relationshipType);

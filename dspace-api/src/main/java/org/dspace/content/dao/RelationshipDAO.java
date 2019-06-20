@@ -37,6 +37,20 @@ public interface RelationshipDAO extends GenericDAO<Relationship> {
     List<Relationship> findByItem(Context context,Item item) throws SQLException;
 
     /**
+     * This method returns a list of Relationship objects that have the given Item object
+     * as a leftItem or a rightItem
+     * @param context   The relevant DSpace context
+     * @param item      The item that should be either a leftItem or a rightItem of all
+     *                  the Relationship objects in the returned list
+     * @param limit     paging limit
+     * @param offset    paging offset
+     * @return          The list of Relationship objects that contain either a left or a
+     *                  right item that is equal to the given item
+     * @throws SQLException If something goes wrong
+     */
+    List<Relationship> findByItem(Context context, Item item, Integer limit, Integer offset) throws SQLException;
+
+    /**
      * This method returns the highest leftplace integer for all the relationships where this
      * item is the leftitem so that we can set a proper leftplace attribute on the next relationship
      * @param context   The relevant DSpace context
@@ -69,4 +83,19 @@ public interface RelationshipDAO extends GenericDAO<Relationship> {
      * @throws SQLException If something goes wrong
      */
     List<Relationship> findByRelationshipType(Context context, RelationshipType relationshipType) throws SQLException;
+
+    /**
+     * This method returns a list of Relationship objects for the given RelationshipType object.
+     * It will construct a list of all Relationship objects that have the given RelationshipType object
+     * as the relationshipType property
+     * @param context           The relevant DSpace context
+     * @param relationshipType  The RelationshipType object to be checked on
+     * @param limit             paging limit
+     * @param offset            paging offset
+     * @return  A list of Relationship objects that have the given RelationshipType object as the
+     *          relationshipType property
+     * @throws SQLException If something goes wrong
+     */
+    List<Relationship> findByRelationshipType(Context context, RelationshipType relationshipType,
+                                              Integer limit, Integer offset) throws SQLException;
 }
