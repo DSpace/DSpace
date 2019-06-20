@@ -1713,6 +1713,14 @@
 			<artifactId>addon-commons-api</artifactId>
 			<version>${commons.addon.modules}</version>
 		</dependency>
+
+		<dependency>
+			<groupId>com.openaire</groupId>
+			<artifactId>openaire-piwik-api</artifactId>
+			<version>${project.version}</version>
+			<type>jar</type>
+		</dependency>
+
       </dependencies>
    </dependencyManagement>
 

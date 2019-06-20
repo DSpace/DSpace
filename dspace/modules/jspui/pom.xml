@@ -317,6 +317,13 @@
 			<artifactId>additions</artifactId>
 		</dependency>
 
+		<!-- OpenAire Piwik Tracker  -->
+		<dependency>
+			<groupId>com.openaire</groupId>
+			<artifactId>openaire-piwik-api</artifactId>
+			<type>jar</type>
+		</dependency>
+
 		<dependency>
 			<groupId>org.dspace</groupId>
 			<artifactId>dspace-jspui</artifactId>
