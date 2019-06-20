@@ -295,7 +295,7 @@ public class DashService {
         if(curationStatus.equals("published") || curationStatus.equals("embargoed")) {
             // if it's published or embargoed, and a file is still under embargo, set the
             // status to embargoed
-            if (embargoType.equals("custom")) {
+            if (embargoType.equals("custom") && embargoDate != null) {
                 addCurationActivity(ddp, "embargoed",
                                     "Setting package-level embargo to reflect previous file-level embargo. Type=" + embargoType + ", PublicationDate=" +sdf.format(embargoDate), 
                                     getNowString(),
@@ -325,7 +325,7 @@ public class DashService {
             // it's in curation and a file has embargo, we can't set the
             // status to embargoed yet -- how will the curators know? just
             // make a note that curators can notice.
-            if (embargoType != null && !embargoType.equals("none")) {
+            if (embargoType != null && !embargoType.equals("none") && embargoDate != null) {
                 addCurationActivity(ddp, "",
                                     "User has requested embargo. Type=" + embargoType + ", PublicationDate=" +sdf.format(embargoDate), 
                                     getNowString(),
