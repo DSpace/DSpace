@@ -66,12 +66,6 @@ public class DSpaceOREGenerator extends AbstractGenerator
             
             Element ore = xwalk.disseminateElement(context, item);
             out.output(ore);
-            
-			/* Generate the METS document
-			contentHandler.startDocument();
-			adapter.renderMETS(contentHandler,lexicalHandler);
-			contentHandler.endDocument();*/
-			
 		} catch (JDOMException je) {
 			throw new ProcessingException(je);
 		} catch (AuthorizeException ae) {
