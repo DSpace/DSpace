@@ -237,6 +237,12 @@
          </exclusions>
       </dependency>
 
+      <dependency>
+         <groupId>com.openaire</groupId>
+         <artifactId>openaire-piwik-api</artifactId>
+         <type>jar</type>
+      </dependency>
+
    </dependencies>
 
 </project>
