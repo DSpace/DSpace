@@ -37,6 +37,19 @@ public interface EntityService {
     Entity findByItemId(Context context, UUID itemId) throws SQLException;
 
     /**
+     * This will construct an Entity object that will be returned with the Item that matches the ItemID that was
+     * passed along
+     * as well as a list of relationships for that Item.
+     * @param context   The relevant DSpace context
+     * @param itemId    The ItemID for the Item that is to be used in the Entity object
+     * @param limit     paging limit
+     * @param offset    paging offset
+     * @return The constructed Entity object with the Item and the list of relationships
+     * @throws SQLException If something goes wrong
+     */
+    Entity findByItemId(Context context, UUID itemId, Integer limit, Integer offset) throws SQLException;
+
+    /**
      * Returns the EntityType for the Item that is attached to the Entity that is passed along to this method.
      * The EntityType String logic is in the Metadata for that Item and will be searched on in the EntityTypeService
      * to retrieve the actual EntityType object
@@ -77,6 +90,20 @@ public interface EntityService {
     List<Relationship> getRelationsByLabel(Context context, String label) throws SQLException;
 
     /**
+     * Retrieves the list of relationships for which their relationshiptype has a left or right label that is
+     * equal to the passed along label String
+     * @param context   The relevant DSpace context
+     * @param label     The label that needs to be in the relationshiptype of the relationship
+     * @param limit     paging limit
+     * @param offset    paging offset
+     * @return The list of relationships that have a relationshiptype with a left or right label
+     *                  that is equal to the label param
+     * @throws SQLException If something goes wrong
+     */
+    List<Relationship> getRelationsByLabel(Context context, String label, Integer limit, Integer offset)
+            throws SQLException;
+
+    /**
      * Retrieves the list of relationships that have a relationshiptype that contains the EntityType for the given
      * Entity
      * in either the leftEntityType or the rightEntityType variables
@@ -88,6 +115,22 @@ public interface EntityService {
      * @throws SQLException If something goes wrong
      */
     List<RelationshipType> getAllRelationshipTypes(Context context, Entity entity) throws SQLException;
+
+    /**
+     * Retrieves the list of relationships that have a relationshiptype that contains the EntityType for the given
+     * Entity
+     * in either the leftEntityType or the rightEntityType variables
+     * @param context   The relevant DSpace context
+     * @param entity    The Entity for which the EntityType should be checked for relationships
+     * @param limit     paging limit
+     * @param offset    paging offset
+     * @return The list of relationships that each contain a relationshiptype in which there is a right or left
+     * entity type that
+     *                  is equal to the entity type for the given entity
+     * @throws SQLException If something goes wrong
+     */
+    List<RelationshipType> getAllRelationshipTypes(Context context, Entity entity, Integer limit, Integer offset)
+            throws SQLException;
 
     /**
      * Retrieves the list of relationships that have a relationshiptype that contains the EntityType for the given
@@ -104,6 +147,21 @@ public interface EntityService {
     /**
      * Retrieves the list of relationships that have a relationshiptype that contains the EntityType for the given
      * Entity
+     * in the leftEntityType
+     * @param context   The relevant DSpace context
+     * @param entity    The Entity for which the EntityType should be checked for relationships
+     * @param limit     paging limit
+     * @param offset    paging offset
+     * @return The list of relationships that each contain a relationshiptype in which there is a left entity type that
+     *                  is equal to the entity type for the given entity
+     * @throws SQLException If something goes wrong
+     */
+    List<RelationshipType> getLeftRelationshipTypes(Context context, Entity entity,
+                                                    Integer limit, Integer offset) throws SQLException;
+
+    /**
+     * Retrieves the list of relationships that have a relationshiptype that contains the EntityType for the given
+     * Entity
      * in the rightEntityType
      * @param context   The relevant DSpace context
      * @param entity    The Entity for which the EntityType should be checked for relationships
@@ -112,6 +170,21 @@ public interface EntityService {
      * @throws SQLException If something goes wrong
      */
     List<RelationshipType> getRightRelationshipTypes(Context context, Entity entity) throws SQLException;
+
+    /**
+     * Retrieves the list of relationships that have a relationshiptype that contains the EntityType for the given
+     * Entity
+     * in the rightEntityType
+     * @param context   The relevant DSpace context
+     * @param entity    The Entity for which the EntityType should be checked for relationships
+     * @param limit     paging limit
+     * @param offset    paging offset
+     * @return The list of relationships that each contain a relationshiptype in which there is a right entity type that
+     *                  is equal to the entity type for the given entity
+     * @throws SQLException If something goes wrong
+     */
+    List<RelationshipType> getRightRelationshipTypes(Context context, Entity entity,
+                                                     Integer limit, Integer offset) throws SQLException;
 
     /**
      * Retrieves a list of RelationshipType objects for which either their left or right label is equal to the
@@ -123,5 +196,19 @@ public interface EntityService {
      * @throws SQLException If something goes wrong
      */
     List<RelationshipType> getRelationshipTypesByTypeName(Context context, String label) throws SQLException;
+
+    /**
+     * Retrieves a list of RelationshipType objects for which either their left or right label is equal to the
+     * label parameter that's being passed along
+     * @param context   The relevant DSpace context
+     * @param label     The label for which the relationshiptype's labels must be checked
+     * @param limit     paging limit
+     * @param offset    paging offset
+     * @return The list of relationshiptypes that each contain a left or right label that is equal
+     *                  to the given label parameter
+     * @throws SQLException If something goes wrong
+     */
+    List<RelationshipType> getRelationshipTypesByLabel(Context context, String label,
+                                                       Integer limit, Integer offset) throws SQLException;
 
 }

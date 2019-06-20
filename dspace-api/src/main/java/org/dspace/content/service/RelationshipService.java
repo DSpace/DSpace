@@ -33,12 +33,34 @@ public interface RelationshipService extends DSpaceCRUDService<Relationship> {
     public List<Relationship> findByItem(Context context,Item item) throws SQLException;
 
     /**
+     * Retrieves the list of Relationships currently in the system for which the given Item is either
+     * a leftItem or a rightItem object
+     * @param context   The relevant DSpace context
+     * @param item      The Item that has to be the left or right item for the relationship to be included in the list
+     * @param limit     paging limit
+     * @param offset    paging offset
+     * @return          The list of relationships for which each relationship adheres to the above listed constraint
+     * @throws SQLException If something goes wrong
+     */
+    List<Relationship> findByItem(Context context, Item item, Integer limit, Integer offset) throws SQLException;
+
+    /**
      * Retrieves the full list of relationships currently in the system
      * @param context   The relevant DSpace context
      * @return  The list of all relationships currently in the system
      * @throws SQLException If something goes wrong
      */
     public List<Relationship> findAll(Context context) throws SQLException;
+
+    /**
+     * Retrieves the full list of relationships currently in the system
+     * @param context   The relevant DSpace context
+     * @param limit     paging limit
+     * @param offset    paging offset
+     * @return  The list of all relationships currently in the system
+     * @throws SQLException If something goes wrong
+     */
+    List<Relationship> findAll(Context context, Integer limit, Integer offset) throws SQLException;
 
     /**
      * This method creates a relationship object in the database equal to the given relationship param
@@ -125,6 +147,20 @@ public interface RelationshipService extends DSpaceCRUDService<Relationship> {
      * @throws SQLException If something goes wrong
      */
     List<Relationship> findByRelationshipType(Context context, RelationshipType relationshipType) throws SQLException;
+
+    /**
+     * This method returns a list of Relationship objets for which the relationshipType property is equal to the given
+     * RelationshipType object
+     * @param context           The relevant DSpace context
+     * @param relationshipType  The RelationshipType object that will be used to check the Relationship on
+     * @param limit             paging limit
+     * @param offset            paging offset
+     * @return  The list of Relationship objects for which the given RelationshipType object is equal
+     *          to the relationshipType property
+     * @throws SQLException If something goes wrong
+     */
+    List<Relationship> findByRelationshipType(Context context, RelationshipType relationshipType, Integer limit,
+                                              Integer offset) throws SQLException;
 
     /**
      * This method is used to construct a Relationship object with all it's variables
