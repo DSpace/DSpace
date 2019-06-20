@@ -21,16 +21,14 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.dspace.app.cris.model.CrisConstants;
 import org.dspace.app.cris.model.OrganizationUnit;
-import org.dspace.app.cris.model.Project;
+import org.dspace.app.cris.model.ResearchObject;
 import org.dspace.app.cris.model.jdyna.BoxOrganizationUnit;
 import org.dspace.app.cris.model.jdyna.EditTabOrganizationUnit;
 import org.dspace.app.cris.model.jdyna.OUPropertiesDefinition;
 import org.dspace.app.cris.model.jdyna.OUProperty;
 import org.dspace.app.cris.model.jdyna.TabOrganizationUnit;
-import org.dspace.app.cris.model.jdyna.TabProject;
-import org.dspace.app.cris.model.jdyna.VisibilityTabConstant;
-import org.dspace.app.cris.service.ApplicationService;
 import org.dspace.app.cris.service.CrisSubscribeService;
 import org.dspace.app.cris.statistics.util.StatsConfig;
 import org.dspace.app.cris.util.ICrisHomeProcessor;
@@ -41,11 +39,9 @@ import org.dspace.app.webui.util.Authenticate;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
-import org.dspace.eperson.Group;
 import org.dspace.usage.UsageEvent;
 import org.dspace.utils.DSpace;
 import org.springframework.web.servlet.ModelAndView;
@@ -62,7 +58,7 @@ import it.cilea.osd.jdyna.web.controller.SimpleDynaController;
  */
 public class OUDetailsController
         extends
-        SimpleDynaController<OUProperty, OUPropertiesDefinition, BoxOrganizationUnit, TabOrganizationUnit>
+        SimpleDynaController<OrganizationUnit, OUProperty, OUPropertiesDefinition, BoxOrganizationUnit, TabOrganizationUnit>
 {
     private CrisSubscribeService subscribeService;
     
@@ -86,15 +82,14 @@ public class OUDetailsController
     {
         Map<String, Object> model = new HashMap<String, Object>();
 
-        OrganizationUnit ou = extractOrganizationUnit(request);
-
-        if (ou == null)
-        {
-            response.sendError(HttpServletResponse.SC_NOT_FOUND,
-                    "OU page not found");
+        OrganizationUnit ou = null;
+        try {
+            ou = extractObject(request, response);
+        }
+        catch(Exception ex) {
             return null;
         }
-
+        
         Context context = UIUtil.obtainContext(request);
         
         EPerson currUser = context.getCurrentUser();
@@ -207,12 +202,27 @@ public class OUDetailsController
             HttpServletRequest request, Map<String, Object> model,
             HttpServletResponse response) throws SQLException, Exception
     {
-        
-        Integer entityId = extractEntityId(request);
-        
-        if(entityId==null) {
+
+        Integer entityId = -1;
+        //try to manage bad request, catch all generic Exception
+        try {
+            entityId = extractEntityId(request, response);
+        }
+        catch(Exception ex) {
+            log.warn(ex.getMessage() + ":"+ UIUtil.getOriginalURL(request));
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST,
+                    "Request sent by the client was syntactically incorrect");
             return null;
         }
+        
+        if (entityId == -1)
+        {
+            log.warn("Entity page not found:"+ UIUtil.getOriginalURL(request));
+            response.sendError(HttpServletResponse.SC_NOT_FOUND,
+                    "Entity page not found");
+            return null;
+        }   
+        
         Context context = UIUtil.obtainContext(request);
 
         List<TabOrganizationUnit> tabs = applicationService.getList(TabOrganizationUnit.class);
@@ -266,21 +276,21 @@ public class OUDetailsController
     }
 
     @Override
-    protected void sendRedirect(HttpServletRequest request,
+    protected void showAuthorizeError(HttpServletRequest request,
             HttpServletResponse response, Exception ex, String objectId)
             throws IOException, ServletException
     {
-        JSPManager.showAuthorizeError(request, response, new AuthorizeException(ex.getMessage()));
-        //response.sendRedirect("/cris/ou/details?id=" + objectId);
+        JSPManager.showAuthorizeError(request, response,
+                new AuthorizeException(ex.getMessage()));
     }
 
     @Override
-    protected Integer getAnagraficaId(HttpServletRequest request)
+    protected Integer getAnagraficaId(HttpServletRequest request, HttpServletResponse response) throws Exception
     {
         OrganizationUnit ou = null;
         try
         {
-            ou = extractOrganizationUnit(request);
+            ou = extractObject(request, response);
         }
         catch (NumberFormatException e)
         {
@@ -289,15 +299,6 @@ public class OUDetailsController
         return ou.getDynamicField().getId();
     }
 
-    private OrganizationUnit extractOrganizationUnit(HttpServletRequest request)
-    {
-
-        Integer id = extractEntityId(request);
-        return ((ApplicationService) applicationService).get(OrganizationUnit.class,
-                id);
-
-    }
-    
     protected Integer getRealPersistentIdentifier(String persistentIdentifier)
     {
         return ResearcherPageUtils.getRealPersistentIdentifier(persistentIdentifier, OrganizationUnit.class);
@@ -313,8 +314,8 @@ public class OUDetailsController
 	}
 	
     @Override
-    protected boolean authorize(HttpServletRequest request, BoxOrganizationUnit box) throws SQLException
+    protected boolean authorize(HttpServletRequest request, HttpServletResponse response, BoxOrganizationUnit box) throws Exception
     {
-        return CrisAuthorizeManager.authorize(UIUtil.obtainContext(request), getApplicationService(), OrganizationUnit.class, OUPropertiesDefinition.class, extractEntityId(request), box);
+        return CrisAuthorizeManager.authorize(UIUtil.obtainContext(request), getApplicationService(), OrganizationUnit.class, OUPropertiesDefinition.class, extractEntityId(request, response), box);
     }
 }

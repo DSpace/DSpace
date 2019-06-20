@@ -8,7 +8,6 @@
 package org.dspace.app.webui.cris.controller;
 
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -24,14 +23,13 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.cris.integration.RPAuthority;
+import org.dspace.app.cris.model.CrisConstants;
 import org.dspace.app.cris.model.ResearcherPage;
 import org.dspace.app.cris.model.jdyna.BoxResearcherPage;
 import org.dspace.app.cris.model.jdyna.EditTabResearcherPage;
-import org.dspace.app.cris.model.jdyna.RPAdditionalFieldStorage;
 import org.dspace.app.cris.model.jdyna.RPPropertiesDefinition;
 import org.dspace.app.cris.model.jdyna.RPProperty;
 import org.dspace.app.cris.model.jdyna.TabResearcherPage;
-import org.dspace.app.cris.model.jdyna.VisibilityTabConstant;
 import org.dspace.app.cris.service.ApplicationService;
 import org.dspace.app.cris.service.CrisSubscribeService;
 import org.dspace.app.cris.statistics.util.StatsConfig;
@@ -43,7 +41,6 @@ import org.dspace.app.webui.util.Authenticate;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.authority.AuthorityDAO;
 import org.dspace.content.authority.AuthorityDAOFactory;
 import org.dspace.core.ConfigurationManager;
@@ -70,11 +67,11 @@ import it.cilea.osd.jdyna.web.controller.SimpleDynaController;
  */
 public class ResearcherPageDetailsController
         extends
-        SimpleDynaController<RPProperty, RPPropertiesDefinition, BoxResearcherPage, TabResearcherPage>
+        SimpleDynaController<ResearcherPage, RPProperty, RPPropertiesDefinition, BoxResearcherPage, TabResearcherPage>
 {
 
     public ResearcherPageDetailsController(
-            Class<RPAdditionalFieldStorage> anagraficaObjectClass,
+            Class<ResearcherPage> anagraficaObjectClass,
             Class<RPPropertiesDefinition> classTP,
             Class<TabResearcherPage> classT, Class<BoxResearcherPage> classH)
             throws InstantiationException, IllegalAccessException
@@ -102,30 +99,11 @@ public class ResearcherPageDetailsController
         log.debug("Start handleRequest");
         Map<String, Object> model = new HashMap<String, Object>();
 
-        Integer objectId = extractEntityId(request);
-        if (objectId == -1)
-        {
-            response.sendError(HttpServletResponse.SC_NOT_FOUND,
-                    "Researcher page not found");
-            return null;
-        }
-
         ResearcherPage researcher = null;
-        try
-        {
-
-            researcher = ((ApplicationService) applicationService).get(
-                    ResearcherPage.class, objectId);
-
+        try {
+            researcher = extractObject(request, response);
         }
-        catch (NumberFormatException e)
-        {
-        }
-
-        if (researcher == null)
-        {
-            response.sendError(HttpServletResponse.SC_NOT_FOUND,
-                    "Researcher page not found");
+        catch(Exception ex) {
             return null;
         }
 
@@ -246,7 +224,6 @@ public class ResearcherPageDetailsController
         }
         catch (RuntimeException e)
         {
-            log.error(e.getMessage(), e);
             return null;
         }
 
@@ -316,11 +293,8 @@ public class ResearcherPageDetailsController
             HttpServletRequest request, Map<String, Object> model,
             HttpServletResponse response) throws Exception
     {
-        Integer researcherId = extractEntityId(request);
+        Integer researcherId = extractEntityId(request, response);
         
-        if(researcherId==null) {
-            return null;
-        }
         Context context = UIUtil.obtainContext(request);
 
         List<TabResearcherPage> tabs = applicationService.getList(TabResearcherPage.class);
@@ -335,14 +309,12 @@ public class ResearcherPageDetailsController
     }
 
     @Override
-    protected Integer getAnagraficaId(HttpServletRequest request)
+    protected Integer getAnagraficaId(HttpServletRequest request, HttpServletResponse response) throws Exception
     {
-        Integer researcherId = extractEntityId(request);
         ResearcherPage researcher = null;
         try
         {
-            researcher = ((ApplicationService) applicationService).get(
-                    ResearcherPage.class, researcherId);
+            researcher = extractObject(request, response);
         }
         catch (NumberFormatException e)
         {
@@ -363,11 +335,6 @@ public class ResearcherPageDetailsController
                 return tab.getId();
         }
         return null;
-    }
-
-    private Integer extractResearcherId(HttpServletRequest request)
-    {
-        return extractEntityId(request);
     }
 
     private String extractTabName(HttpServletRequest request)
@@ -410,15 +377,13 @@ public class ResearcherPageDetailsController
     }
 
     @Override
-    protected void sendRedirect(HttpServletRequest request,
+    protected void showAuthorizeError(HttpServletRequest request,
             HttpServletResponse response, Exception ex, String objectId)
             throws IOException, ServletException
     {
         JSPManager.showAuthorizeError(request, response,
                 new AuthorizeException(ex.getMessage()));
-        // response.sendRedirect("/cris/rp/" + objectId);
     }
-
     
     protected Integer getRealPersistentIdentifier(String persistentIdentifier)
     {
@@ -431,9 +396,9 @@ public class ResearcherPageDetailsController
     }
 
     @Override
-    protected boolean authorize(HttpServletRequest request, BoxResearcherPage box) throws SQLException
+    protected boolean authorize(HttpServletRequest request, HttpServletResponse response, BoxResearcherPage box) throws Exception
     {
-        return CrisAuthorizeManager.authorize(UIUtil.obtainContext(request), getApplicationService(), ResearcherPage.class, RPPropertiesDefinition.class, extractEntityId(request), box);        
+        return CrisAuthorizeManager.authorize(UIUtil.obtainContext(request), getApplicationService(), ResearcherPage.class, RPPropertiesDefinition.class, extractEntityId(request, response), box);        
     }
 
 }

@@ -7,9 +7,6 @@
  */
 package org.dspace.app.webui.cris.controller;
 
-import it.cilea.osd.jdyna.web.Utils;
-import it.cilea.osd.jdyna.web.controller.SimpleDynaController;
-
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -24,19 +21,14 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.dspace.app.cris.model.OrganizationUnit;
-import org.dspace.app.cris.model.Project;
+import org.dspace.app.cris.model.CrisConstants;
 import org.dspace.app.cris.model.ResearchObject;
+import org.dspace.app.cris.model.ResearcherPage;
 import org.dspace.app.cris.model.jdyna.BoxDynamicObject;
-import org.dspace.app.cris.model.jdyna.BoxOrganizationUnit;
 import org.dspace.app.cris.model.jdyna.DynamicPropertiesDefinition;
 import org.dspace.app.cris.model.jdyna.DynamicProperty;
 import org.dspace.app.cris.model.jdyna.EditTabDynamicObject;
 import org.dspace.app.cris.model.jdyna.TabDynamicObject;
-import org.dspace.app.cris.model.jdyna.TabOrganizationUnit;
-import org.dspace.app.cris.model.jdyna.TabProject;
-import org.dspace.app.cris.model.jdyna.VisibilityTabConstant;
-import org.dspace.app.cris.service.ApplicationService;
 import org.dspace.app.cris.service.CrisSubscribeService;
 import org.dspace.app.cris.statistics.util.StatsConfig;
 import org.dspace.app.cris.util.ICrisHomeProcessor;
@@ -47,14 +39,15 @@ import org.dspace.app.webui.util.Authenticate;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
-import org.dspace.eperson.Group;
 import org.dspace.usage.UsageEvent;
 import org.dspace.utils.DSpace;
 import org.springframework.web.servlet.ModelAndView;
+
+import it.cilea.osd.jdyna.web.Utils;
+import it.cilea.osd.jdyna.web.controller.SimpleDynaController;
 
 /**
  * This SpringMVC controller is used to build the ResearcherPage details page.
@@ -66,7 +59,7 @@ import org.springframework.web.servlet.ModelAndView;
  */
 public class DynamicObjectDetailsController
         extends
-        SimpleDynaController<DynamicProperty, DynamicPropertiesDefinition, BoxDynamicObject, TabDynamicObject>
+        SimpleDynaController<ResearchObject, DynamicProperty, DynamicPropertiesDefinition, BoxDynamicObject, TabDynamicObject>
 {
     private CrisSubscribeService subscribeService;
     
@@ -91,15 +84,15 @@ public class DynamicObjectDetailsController
         Map<String, Object> model = new HashMap<String, Object>();
         
         setSpecificPartPath(Utils.getSpecificPath(request, null));
-        ResearchObject dyn = extractDynamicObject(request);
 
-        if (dyn == null)
-        {
-            response.sendError(HttpServletResponse.SC_NOT_FOUND,
-                    getSpecificPartPath() + " page not found");
+        ResearchObject dyn = null;
+        try {
+            dyn = extractObject(request, response);
+        }
+        catch(Exception ex) {
             return null;
         }
-
+        
         Context context = UIUtil.obtainContext(request);
         
         EPerson currUser = context.getCurrentUser();
@@ -151,7 +144,7 @@ public class DynamicObjectDetailsController
         }
         catch (Exception e)
         {
-            throw new RuntimeException(e);
+            return null;
         }
         
         
@@ -214,14 +207,14 @@ public class DynamicObjectDetailsController
             HttpServletResponse response) throws SQLException, Exception
     {
        
-        Integer entityId = extractEntityId(request);
+        Integer entityId = extractEntityId(request, response);
         
         if(entityId==null) {
             return null;
         }
         Context context = UIUtil.obtainContext(request);
 
-        List<TabDynamicObject> tabs = applicationService.findTabByType(tabClass, extractDynamicObject(request).getTypo());
+        List<TabDynamicObject> tabs = applicationService.findTabByType(tabClass, extractObject(request, response).getTypo());
         List<TabDynamicObject> authorizedTabs = new LinkedList<TabDynamicObject>();
         
         for(TabDynamicObject tab : tabs) {
@@ -273,21 +266,22 @@ public class DynamicObjectDetailsController
     }
 
     @Override
-    protected void sendRedirect(HttpServletRequest request,
+    protected void showAuthorizeError(HttpServletRequest request,
             HttpServletResponse response, Exception ex, String objectId)
             throws IOException, ServletException
     {
-        JSPManager.showAuthorizeError(request, response, new AuthorizeException(ex.getMessage()));
-        //response.sendRedirect("/cris/dyn/details?id=" + objectId);
+        JSPManager.showAuthorizeError(request, response,
+                new AuthorizeException(ex.getMessage()));
     }
 
+
     @Override
-    protected Integer getAnagraficaId(HttpServletRequest request)
+    protected Integer getAnagraficaId(HttpServletRequest request, HttpServletResponse response) throws Exception
     {
         ResearchObject dyn = null;
         try
         {
-            dyn = extractDynamicObject(request);
+            dyn = extractObject(request, response);
         }
         catch (NumberFormatException e)
         {
@@ -296,15 +290,6 @@ public class DynamicObjectDetailsController
         return dyn.getDynamicField().getId();
     }
 
-    private ResearchObject extractDynamicObject(HttpServletRequest request)
-    {
-
-        Integer id = extractEntityId(request);
-        return ((ApplicationService) applicationService).get(ResearchObject.class,
-                id);
-
-    }
-    
     protected Integer getRealPersistentIdentifier(String persistentIdentifier)
     {
         return ResearcherPageUtils.getRealPersistentIdentifier(persistentIdentifier, ResearchObject.class);
@@ -320,8 +305,8 @@ public class DynamicObjectDetailsController
 	}
     
     @Override
-    protected boolean authorize(HttpServletRequest request, BoxDynamicObject box) throws SQLException
+    protected boolean authorize(HttpServletRequest request, HttpServletResponse response, BoxDynamicObject box) throws Exception
     {
-        return CrisAuthorizeManager.authorize(UIUtil.obtainContext(request), getApplicationService(), ResearchObject.class, DynamicPropertiesDefinition.class, extractEntityId(request), box);
+        return CrisAuthorizeManager.authorize(UIUtil.obtainContext(request), getApplicationService(), ResearchObject.class, DynamicPropertiesDefinition.class, extractEntityId(request, response), box);
     }
 }

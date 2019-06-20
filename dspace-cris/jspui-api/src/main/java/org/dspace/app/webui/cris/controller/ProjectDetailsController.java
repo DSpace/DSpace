@@ -21,13 +21,14 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.dspace.app.cris.model.CrisConstants;
 import org.dspace.app.cris.model.Project;
+import org.dspace.app.cris.model.ResearchObject;
 import org.dspace.app.cris.model.jdyna.BoxProject;
 import org.dspace.app.cris.model.jdyna.EditTabProject;
 import org.dspace.app.cris.model.jdyna.ProjectPropertiesDefinition;
 import org.dspace.app.cris.model.jdyna.ProjectProperty;
 import org.dspace.app.cris.model.jdyna.TabProject;
-import org.dspace.app.cris.service.ApplicationService;
 import org.dspace.app.cris.service.CrisSubscribeService;
 import org.dspace.app.cris.statistics.util.StatsConfig;
 import org.dspace.app.cris.util.ICrisHomeProcessor;
@@ -57,7 +58,7 @@ import it.cilea.osd.jdyna.web.controller.SimpleDynaController;
  */
 public class ProjectDetailsController
         extends
-        SimpleDynaController<ProjectProperty, ProjectPropertiesDefinition, BoxProject, TabProject>
+        SimpleDynaController<Project, ProjectProperty, ProjectPropertiesDefinition, BoxProject, TabProject>
 {
     private CrisSubscribeService subscribeService;
 
@@ -81,15 +82,14 @@ public class ProjectDetailsController
     {
         Map<String, Object> model = new HashMap<String, Object>();
 
-        Project grant = extractProject(request);
-
-        if (grant == null)
-        {
-            response.sendError(HttpServletResponse.SC_NOT_FOUND,
-                    "Grant page not found");
+        Project grant  = null;
+        try {
+            grant = extractObject(request, response);
+        }
+        catch(Exception ex) {
             return null;
         }
-
+        
         Context context = UIUtil.obtainContext(request);
 
         EPerson currUser = context.getCurrentUser();
@@ -205,11 +205,8 @@ public class ProjectDetailsController
             HttpServletResponse response) throws SQLException, Exception
     {
 
-        Integer entityId = extractEntityId(request);
-        
-        if(entityId==null) {
-            return null;
-        }
+        Integer entityId = extractEntityId(request, response);
+
         Context context = UIUtil.obtainContext(request);
 
         List<TabProject> tabs = applicationService.getList(TabProject.class);
@@ -263,22 +260,21 @@ public class ProjectDetailsController
     }
 
     @Override
-    protected void sendRedirect(HttpServletRequest request,
+    protected void showAuthorizeError(HttpServletRequest request,
             HttpServletResponse response, Exception ex, String objectId)
             throws IOException, ServletException
     {
-        // response.sendRedirect("/cris/project/details?id=" + objectId);
         JSPManager.showAuthorizeError(request, response,
                 new AuthorizeException(ex.getMessage()));
     }
 
     @Override
-    protected Integer getAnagraficaId(HttpServletRequest request)
+    protected Integer getAnagraficaId(HttpServletRequest request, HttpServletResponse response) throws Exception
     {
         Project grant = null;
         try
         {
-            grant = extractProject(request);
+            grant = extractObject(request, response);
         }
         catch (NumberFormatException e)
         {
@@ -287,14 +283,6 @@ public class ProjectDetailsController
         return grant.getDynamicField().getId();
     }
 
-    private Project extractProject(HttpServletRequest request)
-    {
-
-        Integer id = extractEntityId(request);        
-        return ((ApplicationService) applicationService).get(Project.class,id);
-
-    }
-    
     protected Integer getRealPersistentIdentifier(String persistentIdentifier)
     {
         return ResearcherPageUtils.getRealPersistentIdentifier(persistentIdentifier, Project.class);
@@ -310,8 +298,8 @@ public class ProjectDetailsController
 	}
 	
     @Override
-    protected boolean authorize(HttpServletRequest request, BoxProject box) throws SQLException
+    protected boolean authorize(HttpServletRequest request, HttpServletResponse response, BoxProject box) throws Exception
     {
-        return CrisAuthorizeManager.authorize(UIUtil.obtainContext(request), getApplicationService(), Project.class, ProjectPropertiesDefinition.class, extractEntityId(request), box);
+        return CrisAuthorizeManager.authorize(UIUtil.obtainContext(request), getApplicationService(), Project.class, ProjectPropertiesDefinition.class, extractEntityId(request, response), box);
     }
 }
