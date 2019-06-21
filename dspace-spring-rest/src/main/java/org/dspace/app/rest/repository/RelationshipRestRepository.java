@@ -34,6 +34,7 @@ import org.dspace.eperson.EPerson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
 
@@ -128,29 +129,59 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
 
     }
 
-    /*
-     * Disabled the put until https://jira.duraspace.org/browse/DS-4230 is discussed
-    @Override
-    protected RelationshipRest put(Context context, HttpServletRequest request, String apiCategory, String model,
-                                   Integer id, List<String> stringList)
-        throws RepositoryMethodNotImplementedException, SQLException, AuthorizeException {
+    /**
+     * Method to replace either the right or left item of a relationship with a given new item
+     * Called by request mappings in RelationshipRestController
+     * - For replace right item (itemToReplaceIsRight = true)
+     *      => Newly proposed changed relationship: left = old-left; right = new-item
+     * - For replace left item (itemToReplaceIsRight = false)
+     *      => Newly proposed changed relationship: left = new-item; right = old-right
+     * @param context
+     * @param contextPath           What API call was made to get here
+     * @param id                    ID of the relationship we wish to modify
+     * @param stringList            Item to replace either right or left item of relationship with
+     * @param itemToReplaceIsRight  Boolean to decide whether to replace right item (true) or left item (false)
+     * @return  The (modified) relationship
+     * @throws SQLException
+     */
+    public RelationshipRest put(Context context, String contextPath, Integer id, List<String> stringList,
+                                Boolean itemToReplaceIsRight) throws SQLException {
 
-        Relationship relationship = relationshipService.find(context, id);
+        Relationship relationship;
+        try {
+            relationship = relationshipService.find(context, id);
+        } catch (SQLException e) {
+            throw new ResourceNotFoundException(contextPath + " with id: " + id + " not found");
+        }
         if (relationship == null) {
-            throw new ResourceNotFoundException(apiCategory + "." + model + " with id: " + id + " not found");
+            throw new ResourceNotFoundException(contextPath + " with id: " + id + " not found");
         }
         List<DSpaceObject> dSpaceObjects = utils.constructDSpaceObjectList(context, stringList);
-        if (dSpaceObjects.size() == 2 && dSpaceObjects.get(0).getType() == Constants.ITEM
-            && dSpaceObjects.get(1).getType() == Constants.ITEM) {
-            Item leftItem = (Item) dSpaceObjects.get(0);
-            Item rightItem = (Item) dSpaceObjects.get(1);
+        if (dSpaceObjects.size() == 1 && dSpaceObjects.get(0).getType() == Constants.ITEM) {
+
+            Item replacementItemInRelationship = (Item) dSpaceObjects.get(0);
+            Item leftItem;
+            Item rightItem;
+            if (itemToReplaceIsRight) {
+                leftItem = relationship.getLeftItem();
+                rightItem = replacementItemInRelationship;
+            } else {
+                leftItem = replacementItemInRelationship;
+                rightItem = relationship.getRightItem();
+            }
 
             if (isAllowedToModifyRelationship(context, relationship, leftItem, rightItem)) {
                 relationship.setLeftItem(leftItem);
                 relationship.setRightItem(rightItem);
 
-                relationshipService.updatePlaceInRelationship(context, relationship, false);
-                relationshipService.update(context, relationship);
+                try {
+                    relationshipService.updatePlaceInRelationship(context, relationship, false);
+                    relationshipService.update(context, relationship);
+                    context.commit();
+                    context.reloadEntity(relationship);
+                } catch (AuthorizeException e) {
+                    throw new AccessDeniedException("You do not have write rights on this relationship's items");
+                }
 
                 return relationshipConverter.fromModel(relationship);
             } else {
@@ -161,7 +192,6 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
         }
 
     }
-    */
 
     /**
      * This method will check with the current user has write rights on both one of the original items and one of the
