@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest.csv;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
@@ -91,13 +92,13 @@ public class CsvImportIT extends AbstractEntityIntegrationTest {
         getClient().perform(get("/api/core/relationships/" + relationships.get(0).getID()))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.leftPlace", is(0)))
-                   .andExpect(jsonPath("$.rightId", is(itemC.getID().toString())))
+                   .andExpect(jsonPath("$._links.rightItem.href", containsString(itemC.getID().toString())))
                    .andExpect(jsonPath("$.rightPlace", is(1)))
                    .andExpect(jsonPath("$", Matchers.is(RelationshipMatcher.matchRelationship(relationships.get(0)))));
         getClient().perform(get("/api/core/relationships/" + relationships.get(1).getID().toString()))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.leftPlace", is(1)))
-                   .andExpect(jsonPath("$.rightId", is(itemB.getID().toString())))
+                   .andExpect(jsonPath("$._links.rightItem.href", containsString(itemB.getID().toString())))
                    .andExpect(jsonPath("$.rightPlace", is(1)))
                    .andExpect(jsonPath("$", Matchers.is(RelationshipMatcher.matchRelationship(relationships.get(1)))));
 

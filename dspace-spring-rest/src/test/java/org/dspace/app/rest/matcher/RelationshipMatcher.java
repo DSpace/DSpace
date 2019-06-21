@@ -9,6 +9,7 @@ package org.dspace.app.rest.matcher;
 
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 
 import java.util.UUID;
@@ -39,8 +40,8 @@ public class RelationshipMatcher {
                                                                                  int leftPlace, int rightPlace,
                                                                                  RelationshipType relationshipType) {
         return allOf(
-            hasJsonPath("$.leftId", is(leftId.toString())),
-            hasJsonPath("$.rightId", is(rightId.toString())),
+            hasJsonPath("$._links.leftItem.href", containsString(leftId.toString())),
+            hasJsonPath("$._links.rightItem.href", containsString(rightId.toString())),
             hasJsonPath("$.leftPlace", is(leftPlace)),
             hasJsonPath("$.rightPlace", is(rightPlace)),
             hasJsonPath("$._embedded.relationshipType",
