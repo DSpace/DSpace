@@ -9,6 +9,7 @@ package org.dspace.app.rest;
 
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -252,8 +253,10 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
 
         getClient().perform(get("/api/core/relationships/" + firstRelationshipIdString))
                    .andExpect(status().isOk())
-                   .andExpect(jsonPath("$.leftId", is(publication.getID().toString())))
-                   .andExpect(jsonPath("$.rightId", is(author1.getID().toString())));
+                   .andExpect(jsonPath("$._links.leftItem.href",
+                                       containsString(publication.getID().toString())))
+                   .andExpect(jsonPath("$._links.rightItem.href",
+                                       containsString(author1.getID().toString())));
 
     }
 
@@ -325,8 +328,8 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
 
         getClient().perform(get("/api/core/relationships/" + firstRelationshipIdString))
                    .andExpect(status().isOk())
-                   .andExpect(jsonPath("$.leftId", is(publication.getID().toString())))
-                   .andExpect(jsonPath("$.rightId", is(author1.getID().toString())));
+                   .andExpect(jsonPath("$._links.leftItem.href", containsString(publication.getID().toString())))
+                   .andExpect(jsonPath("$._links.rightItem.href", containsString(author1.getID().toString())));
     }
 
 
