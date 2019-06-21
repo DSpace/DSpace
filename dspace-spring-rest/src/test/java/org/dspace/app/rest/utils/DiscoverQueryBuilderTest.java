@@ -23,10 +23,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.dspace.app.rest.exception.InvalidDSpaceObjectTypeException;
-import org.dspace.app.rest.exception.InvalidSearchFacetException;
-import org.dspace.app.rest.exception.InvalidSearchFilterException;
-import org.dspace.app.rest.exception.InvalidSortingException;
+import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.parameter.SearchFilter;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -245,20 +242,20 @@ public class DiscoverQueryBuilderTest {
                 new ReflectionEquals(new DiscoverHitHighlightingField("fulltext", 0, 3))));
     }
 
-    @Test(expected = InvalidDSpaceObjectTypeException.class)
+    @Test(expected = DSpaceBadRequestException.class)
     public void testInvalidDSOType() throws Exception {
         queryBuilder
             .buildQuery(context, scope, discoveryConfiguration, query, Arrays.asList(searchFilter), "TEST", page);
     }
 
-    @Test(expected = InvalidSortingException.class)
+    @Test(expected = DSpaceBadRequestException.class)
     public void testInvalidSortField() throws Exception {
         page = new PageRequest(2, 10, Sort.Direction.ASC, "test");
         queryBuilder
             .buildQuery(context, scope, discoveryConfiguration, query, Arrays.asList(searchFilter), "ITEM", page);
     }
 
-    @Test(expected = InvalidSearchFilterException.class)
+    @Test(expected = DSpaceBadRequestException.class)
     public void testInvalidSearchFilter1() throws Exception {
         searchFilter = new SearchFilter("test", "equals", "Smith, Donald");
 
@@ -266,7 +263,7 @@ public class DiscoverQueryBuilderTest {
             .buildQuery(context, scope, discoveryConfiguration, query, Arrays.asList(searchFilter), "ITEM", page);
     }
 
-    @Test(expected = InvalidSearchFilterException.class)
+    @Test(expected = DSpaceBadRequestException.class)
     public void testInvalidSearchFilter2() throws Exception {
         when(searchService.toFilterQuery(any(Context.class), any(String.class), any(String.class), any(String.class)))
             .thenThrow(SQLException.class);
@@ -297,7 +294,7 @@ public class DiscoverQueryBuilderTest {
         ));
     }
 
-    @Test(expected = InvalidSearchFacetException.class)
+    @Test(expected = DSpaceBadRequestException.class)
     public void testInvalidSearchFacet() throws Exception {
         queryBuilder.buildFacetQuery(context, scope, discoveryConfiguration, null, query,
                 Arrays.asList(searchFilter), "item", page, "test");
