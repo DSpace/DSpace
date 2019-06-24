@@ -388,6 +388,78 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
     }
 
     @Test
+    /**
+     * This test was introduced to reproduce the bug DS-4269 Pagination links must be consistent also when there is not
+     * explicit pagination parameters in the request (i.e. defaults apply)
+     * 
+     * @throws Exception
+     */
+    public void browsePaginationWithoutExplicitParams() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
+
+        //2. Twenty-one public items that are readable by Anonymous
+        for (int i = 0; i <= 20; i++) {
+            ItemBuilder.createItem(context, col1)
+                  .withTitle("Public item " + String.format("%02d", i))
+                  .withIssueDate("2017-10-17")
+                  .withAuthor("Test, Author" + String.format("%02d", i))
+                  .withSubject("Java").withSubject("Unit Testing")
+                  .build();
+        }
+
+        context.restoreAuthSystemState();
+
+        //** WHEN **
+        //An anonymous user browses the items in the Browse by item endpoint
+        getClient().perform(get("/api/discover/browses/title/items"))
+               //** THEN **
+               //The status has to be 200 OK
+               .andExpect(status().isOk())
+               //We expect the content type to be "application/hal+json;charset=UTF-8"
+               .andExpect(content().contentType(contentType))
+               //We expect 21 public items
+               .andExpect(jsonPath("$.page.size", is(20)))
+               .andExpect(jsonPath("$.page.totalElements", is(21)))
+               .andExpect(jsonPath("$.page.totalPages", is(2)))
+               .andExpect(jsonPath("$.page.number", is(0)))
+               // embedded items are already checked by other test, we focus on links here
+               .andExpect(jsonPath("$._links.next.href", Matchers.containsString("/api/discover/browses/title/items?")))
+               .andExpect(jsonPath("$._links.last.href", Matchers.containsString("/api/discover/browses/title/items?")))
+               .andExpect(
+                        jsonPath("$._links.first.href", Matchers.containsString("/api/discover/browses/title/items?")))
+               .andExpect(jsonPath("$._links.self.href", Matchers.endsWith("/api/discover/browses/title/items")));
+
+        //** WHEN **
+        //An anonymous user browses the items in the Browse by item endpoint
+        getClient().perform(get("/api/discover/browses/author/entries"))
+               //** THEN **
+               //The status has to be 200 OK
+               .andExpect(status().isOk())
+               //We expect the content type to be "application/hal+json;charset=UTF-8"
+               .andExpect(content().contentType(contentType))
+               //We expect 21 public items
+               .andExpect(jsonPath("$.page.size", is(20)))
+               .andExpect(jsonPath("$.page.totalElements", is(21)))
+               .andExpect(jsonPath("$.page.totalPages", is(2)))
+               .andExpect(jsonPath("$.page.number", is(0)))
+               // embedded items are already checked by other test, we focus on links here
+                .andExpect(jsonPath("$._links.next.href",
+                        Matchers.containsString("/api/discover/browses/author/entries?")))
+                .andExpect(jsonPath("$._links.last.href",
+                        Matchers.containsString("/api/discover/browses/author/entries?")))
+                .andExpect(jsonPath("$._links.first.href",
+                        Matchers.containsString("/api/discover/browses/author/entries?")))
+                .andExpect(jsonPath("$._links.self.href", Matchers.endsWith("/api/discover/browses/author/entries")));
+    }
+
+    @Test
     public void testPaginationBrowseByDateIssuedItems() throws Exception {
         context.turnOffAuthorisationSystem();
 

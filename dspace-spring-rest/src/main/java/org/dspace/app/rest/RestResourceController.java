@@ -832,7 +832,7 @@ public class RestResourceController implements InitializingBean {
                             link = linkTo(this.getClass(), apiCategory, model).slash(uuid)
                                 .slash(subpath + '?' + querystring).withSelfRel();
                         } else {
-                            link = linkTo(this.getClass(), apiCategory, model).slash(uuid).withSelfRel();
+                            link = linkTo(this.getClass(), apiCategory, model).slash(uuid).slash(subpath).withSelfRel();
                         }
 
                         Page<HALResource> halResources = pageResult.map(linkRepository::wrapResource);

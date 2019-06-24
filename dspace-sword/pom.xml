@@ -2,10 +2,10 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.dspace</groupId>
     <artifactId>dspace-sword</artifactId>
-    <packaging>war</packaging>
+    <packaging>jar</packaging>
     <name>DSpace SWORD</name>
     <description>
-        DSpace SWORD Deposit Service Provider Web Application
+        DSpace SWORD Deposit Service Provider Extension
     </description>
 
     <!--
@@ -23,28 +23,6 @@
         <!-- This is the path to the root [dspace-src] directory. -->
         <root.basedir>${basedir}/..</root.basedir>
     </properties>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-war-plugin</artifactId>
-                <configuration>
-                    <attachClasses>true</attachClasses>
-                    <!-- In version 2.1-alpha-1, this was incorrectly named warSourceExcludes -->
-                    <packagingExcludes>WEB-INF/lib/*.jar</packagingExcludes>
-                    <warSourceExcludes>WEB-INF/lib/*.jar</warSourceExcludes>
-                    <!-- Filter the web.xml (needed for IDE compatibility/debugging) -->
-                    <filteringDeploymentDescriptors>true</filteringDeploymentDescriptors>
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>prepare-package</phase>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
 
     <profiles>
         <profile>
@@ -93,6 +71,19 @@
         <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-api-lang</artifactId>
+        </dependency>
+
+        <!-- Needed to support Spring @Configuration classes (to register servlets/beans with Spring Boot webapp) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+            <version>${spring-boot.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-logging</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
