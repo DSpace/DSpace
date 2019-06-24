@@ -190,7 +190,8 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
         }
         else
         {
-            pageMeta.addMetadata("title").addContent(name);
+            String archiveName = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.name");
+            pageMeta.addMetadata("title").addContent(archiveName + ": " + name);
         }
 
         // Add the trail back to the repository root.

@@ -184,7 +184,8 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
 
         if (title != null)
         {
-            pageMeta.addMetadata("title").addContent(title);
+            String archiveName = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.name");
+            pageMeta.addMetadata("title").addContent(archiveName + ": " + title);
         }
         else
         {

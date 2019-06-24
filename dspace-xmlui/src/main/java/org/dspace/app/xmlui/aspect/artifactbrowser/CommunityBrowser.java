@@ -217,8 +217,9 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
             WingException, UIException, SQLException, IOException,
             AuthorizeException
     {
-        // Set the page title
-        pageMeta.addMetadata("title").addContent(T_title);
+//         Set the page title
+        pageMeta.addMetadata("title").addContent( DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.name") );
+//        pageMeta.addMetadata("title").addContent(T_title);
 
         pageMeta.addTrailLink(contextPath + "/",T_dspace_home);
         pageMeta.addTrail().addContent(T_trail);
