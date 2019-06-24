@@ -48,7 +48,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  * @author Tim Donohue
  */
-@SpringBootApplication(exclude = VelocityAutoConfiguration.class)
+@SpringBootApplication
 public class Application extends SpringBootServletInitializer {
 
     private static final Logger log = LoggerFactory.getLogger(Application.class);
