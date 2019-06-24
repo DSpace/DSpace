@@ -9,6 +9,7 @@
 package org.dspace.app.oai;
 
 import static org.hamcrest.Matchers.startsWith;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
@@ -147,8 +148,8 @@ public class OAIpmhIT extends AbstractControllerIntegrationTest {
         // Get current date/time and store as "now", then round to nearest second (as OAI-PMH ignores milliseconds)
         Date now = new Date();
         Date nowToNearestSecond = DateUtils.round(now, Calendar.SECOND);
-        // Return "now" when "getEarliestDate()" is called for the currently loaded EarliestDateResolver bean
-        doReturn(now).when(earliestDateResolver).getEarliestDate(context);
+        // Return "nowToNearestSecond" when "getEarliestDate()" is called for currently loaded EarliestDateResolver bean
+        doReturn(nowToNearestSecond).when(earliestDateResolver).getEarliestDate(any());
 
         // Attempt to make an Identify request to root context
         getClient().perform(get(DEFAULT_CONTEXT).param("verb", "Identify"))
