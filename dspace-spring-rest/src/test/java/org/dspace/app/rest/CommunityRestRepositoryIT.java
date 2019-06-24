@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest;
 
+import static com.jayway.jsonpath.JsonPath.read;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
 import static org.hamcrest.Matchers.empty;
@@ -21,6 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -37,6 +39,7 @@ import org.dspace.app.rest.test.MetadataPatchSuite;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.service.CommunityService;
 import org.dspace.core.Constants;
 import org.dspace.eperson.EPerson;
 import org.hamcrest.Matchers;
@@ -44,18 +47,22 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 
+/**
+ * Integration Tests against the /api/core/communities endpoint (including any subpaths)
+ */
 public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Autowired
     CommunityConverter communityConverter;
 
     @Autowired
+    CommunityService communityService;
+
+    @Autowired
     AuthorizeService authorizeService;
 
     @Test
     public void createTest() throws Exception {
-        context.turnOffAuthorisationSystem();
-
         ObjectMapper mapper = new ObjectMapper();
         CommunityRest comm = new CommunityRest();
         // We send a name but the created community should set this to the title
@@ -86,41 +93,54 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
         comm.setMetadata(metadataRest);
 
         String authToken = getAuthToken(admin.getEmail(), password);
-        getClient(authToken).perform(post("/api/core/communities")
+
+        // Capture the UUID of the created Community (see andDo() below)
+        AtomicReference<UUID> idRef = new AtomicReference<UUID>();
+        try {
+            getClient(authToken).perform(post("/api/core/communities")
                                         .content(mapper.writeValueAsBytes(comm))
                                         .contentType(contentType))
-                   .andExpect(status().isCreated())
-                   .andExpect(content().contentType(contentType))
-                   .andExpect(jsonPath("$", Matchers.allOf(
-                               hasJsonPath("$.id", not(empty())),
-                               hasJsonPath("$.uuid", not(empty())),
-                               hasJsonPath("$.name", is("Title Text")),
-                               hasJsonPath("$.handle", not(empty())),
-                               hasJsonPath("$.type", is("community")),
-                               hasJsonPath("$._links.collections.href", not(empty())),
-                               hasJsonPath("$._links.logo.href", not(empty())),
-                               hasJsonPath("$._links.subcommunities.href", not(empty())),
-                               hasJsonPath("$._links.self.href", not(empty())),
-                               hasJsonPath("$.metadata", Matchers.allOf(
-                                       matchMetadata("dc.description", "<p>Some cool HTML code here</p>"),
-                                       matchMetadata("dc.description.abstract",
+                                .andExpect(status().isCreated())
+                                .andExpect(content().contentType(contentType))
+                                .andExpect(jsonPath("$", Matchers.allOf(
+                                    hasJsonPath("$.id", not(empty())),
+                                    hasJsonPath("$.uuid", not(empty())),
+                                    hasJsonPath("$.name", is("Title Text")),
+                                    hasJsonPath("$.handle", not(empty())),
+                                    hasJsonPath("$.type", is("community")),
+                                    hasJsonPath("$._links.collections.href", not(empty())),
+                                    hasJsonPath("$._links.logo.href", not(empty())),
+                                    hasJsonPath("$._links.subcommunities.href", not(empty())),
+                                    hasJsonPath("$._links.self.href", not(empty())),
+                                    hasJsonPath("$.metadata", Matchers.allOf(
+                                        matchMetadata("dc.description", "<p>Some cool HTML code here</p>"),
+                                        matchMetadata("dc.description.abstract",
                                                "Sample top-level community created via the REST API"),
-                                       matchMetadata("dc.description.tableofcontents", "<p>HTML News</p>"),
-                                       matchMetadata("dc.rights", "Custom Copyright Text"),
-                                       matchMetadata("dc.title", "Title Text")
-                               )))));
+                                        matchMetadata("dc.description.tableofcontents", "<p>HTML News</p>"),
+                                        matchMetadata("dc.rights", "Custom Copyright Text"),
+                                        matchMetadata("dc.title", "Title Text")
+                                        )
+                                    )
+                                )))
+                                // capture "id" returned in JSON response
+                                .andDo(result -> idRef
+                                    .set(UUID.fromString(read(result.getResponse().getContentAsString(), "$.id"))));
+        } finally {
+            // Delete the created community (cleanup after ourselves!)
+            CommunityBuilder.deleteCommunity(idRef.get());
+        }
     }
+
     @Test
     public void createWithParentTest() throws Exception {
-        context.turnOffAuthorisationSystem();
         //We turn off the authorization system in order to create the structure as defined below
         context.turnOffAuthorisationSystem();
 
-        //** GIVEN **
-        //1. A community-collection structure with one parent community with sub-community and one collection.
+        // Create a parent community to POST a new sub-community to
         parentCommunity = CommunityBuilder.createCommunity(context)
                                           .withName("Parent Community")
                                           .build();
+        context.restoreAuthSystemState();
 
         ObjectMapper mapper = new ObjectMapper();
         CommunityRest comm = new CommunityRest();
@@ -140,23 +160,26 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                         new MetadataValueRest("Title Text")));
 
         String authToken = getAuthToken(admin.getEmail(), password);
-        getClient(authToken).perform(post("/api/core/communities")
+         // Capture the UUID of the created Community (see andDo() below)
+        AtomicReference<UUID> idRef = new AtomicReference<UUID>();
+        try {
+            getClient(authToken).perform(post("/api/core/communities")
                                          .content(mapper.writeValueAsBytes(comm))
                                          .param("parent", parentCommunity.getID().toString())
                                          .contentType(contentType))
-                            .andExpect(status().isCreated())
-                            .andExpect(content().contentType(contentType))
-                            .andExpect(jsonPath("$", Matchers.allOf(
-                                hasJsonPath("$.id", not(empty())),
-                                hasJsonPath("$.uuid", not(empty())),
-                                hasJsonPath("$.name", is("Title Text")),
-                                hasJsonPath("$.handle", not(empty())),
-                                hasJsonPath("$.type", is("community")),
-                                hasJsonPath("$._links.collections.href", not(empty())),
-                                hasJsonPath("$._links.logo.href", not(empty())),
-                                hasJsonPath("$._links.subcommunities.href", not(empty())),
-                                hasJsonPath("$._links.self.href", not(empty())),
-                                hasJsonPath("$.metadata", Matchers.allOf(
+                                .andExpect(status().isCreated())
+                                .andExpect(content().contentType(contentType))
+                                .andExpect(jsonPath("$", Matchers.allOf(
+                                    hasJsonPath("$.id", not(empty())),
+                                    hasJsonPath("$.uuid", not(empty())),
+                                    hasJsonPath("$.name", is("Title Text")),
+                                    hasJsonPath("$.handle", not(empty())),
+                                    hasJsonPath("$.type", is("community")),
+                                    hasJsonPath("$._links.collections.href", not(empty())),
+                                    hasJsonPath("$._links.logo.href", not(empty())),
+                                    hasJsonPath("$._links.subcommunities.href", not(empty())),
+                                    hasJsonPath("$._links.self.href", not(empty())),
+                                    hasJsonPath("$.metadata", Matchers.allOf(
                                         MetadataMatcher.matchMetadata("dc.description",
                                                 "<p>Some cool HTML code here</p>"),
                                         MetadataMatcher.matchMetadata("dc.description.abstract",
@@ -167,12 +190,17 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                                                 "Custom Copyright Text"),
                                         MetadataMatcher.matchMetadata("dc.title",
                                                 "Title Text")
-                                )))));
-
-
-
+                                        )
+                                    )
+                                )))
+                                // capture "id" returned in JSON response
+                                .andDo(result -> idRef
+                                    .set(UUID.fromString(read(result.getResponse().getContentAsString(), "$.id"))));
+        } finally {
+            // Delete the created community (cleanup after ourselves!)
+            CommunityBuilder.deleteCommunity(idRef.get());
+        }
     }
-
 
     @Test
     public void createUnauthorizedTest() throws Exception {
@@ -854,6 +882,7 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
 
     }
 
+    @Test
     public void patchCommunityMetadataAuthorized() throws Exception {
         runPatchMetadataTests(admin, 200);
     }
