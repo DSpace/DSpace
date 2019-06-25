@@ -45,7 +45,7 @@ public class RelationshipRestController {
      * @return The modified relationship
      */
     @RequestMapping(method = RequestMethod.PUT, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_DIGIT + "/leftItem",
-        consumes = {"text/uri-list"})
+            consumes = {"text/uri-list"})
     public RelationshipRest updateRelationshipLeft(@PathVariable Integer id, HttpServletResponse response,
                                                    HttpServletRequest request) throws SQLException {
         Context context = ContextUtil.obtainContext(request);
@@ -58,7 +58,7 @@ public class RelationshipRestController {
      * @return The modified relationship
      */
     @RequestMapping(method = RequestMethod.PUT, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_DIGIT + "/rightItem",
-        consumes = {"text/uri-list"})
+            consumes = {"text/uri-list"})
     public RelationshipRest updateRelationshipRight(@PathVariable Integer id, HttpServletResponse response,
                                                     HttpServletRequest request) throws SQLException {
         Context context = ContextUtil.obtainContext(request);
