@@ -44,11 +44,11 @@ public class RelationshipTypeTest {
 
     private Context context;
 
-
     @Before
     public void init() {
+        // Default state of firstRelationshipType
         firstRelationshipType = mock(RelationshipType.class);
-        firstRelationshipType.setId(new Random().nextInt());
+        firstRelationshipType.setId(1);
         firstRelationshipType.setLeftType(mock(EntityType.class));
         firstRelationshipType.setRightType(mock(EntityType.class));
         firstRelationshipType.setLeftLabel("isAuthorOfPublication");
@@ -58,6 +58,7 @@ public class RelationshipTypeTest {
         firstRelationshipType.setRightMinCardinality(0);
         firstRelationshipType.setRightMinCardinality(null);
 
+        // Default state of secondRelationshipType
         secondRelationshipType = mock(RelationshipType.class);
         secondRelationshipType.setId(new Random().nextInt());
         secondRelationshipType.setLeftType(mock(EntityType.class));
@@ -68,44 +69,67 @@ public class RelationshipTypeTest {
         secondRelationshipType.setLeftMaxCardinality(null);
         secondRelationshipType.setRightMinCardinality(0);
         secondRelationshipType.setRightMinCardinality(null);
-
     }
 
 
     @Test
     public void testRelationshipTypeFind() throws Exception {
+        // Mock DAO to return our firstRelationshipType
         when(relationshipTypeDAO.findByID(any(), any(), any(Integer.class))).thenReturn(firstRelationshipType);
-        RelationshipType found = relationshipTypeService.find(context, new Random().nextInt());
+
+        // Declare objects utilized for this test
+        RelationshipType found = relationshipTypeService.find(context, 1);
+
+        // Pass expected and actual RelationshipTypes into comparator method
         checkRelationshipTypeValues(found, firstRelationshipType);
     }
 
     @Test
     public void testRelationshipTypeFindByTypesAndLabels() throws Exception {
+        // Mock DAO to return our firstRelationshipType
         when(relationshipTypeDAO.findByTypesAndLabels(any(), any(), any(), any(), any()))
-            .thenReturn(firstRelationshipType);
+                .thenReturn(firstRelationshipType);
+
+        // Declare objects utilized for this test
         RelationshipType found = relationshipTypeService.findbyTypesAndLabels(context, mock(EntityType.class),
-                                                                              mock(EntityType.class),
-                                                                              "mock", "mock");
+                mock(EntityType.class),
+                "mock", "mock");
+
+        // Pass expected and actual RelationshipTypes into comparator method
         checkRelationshipTypeValues(found, firstRelationshipType);
     }
 
     @Test
     public void testRelationshipTypeFindAll() throws Exception {
+        // Declare objects utilized for this test
         List<RelationshipType> mockedList = new LinkedList<>();
         mockedList.add(firstRelationshipType);
         mockedList.add(secondRelationshipType);
+
+        // Mock DAO to return our mockedList
         when(relationshipTypeDAO.findAll(context, RelationshipType.class)).thenReturn(mockedList);
+
+        // Invoke findAll()
         List<RelationshipType> foundRelationshipTypes = relationshipTypeService.findAll(context);
+
+        // Assert that our foundRelationshipTypes should not be null and contain two RelationshipTypes
         assertThat(foundRelationshipTypes, notNullValue());
         assertThat(foundRelationshipTypes.size(), equalTo(2));
     }
 
     @Test
     public void testRelationshipTypeFindByLeftOrRightLabel() throws Exception {
+        // Declare objects utilized for this test
         List<RelationshipType> mockedList = new LinkedList<>();
         mockedList.add(firstRelationshipType);
+
+        // Mock DAO to return our mockedList
         when(relationshipTypeDAO.findByLeftOrRightLabel(any(), any())).thenReturn(mockedList);
+
+        // Invoke findByLeftOrRightLabel()
         List<RelationshipType> found = relationshipTypeService.findByLeftOrRightLabel(context, "mock");
+
+        // Assert that our expected list contains our expected RelationshipType and nothing more
         assertThat(found, notNullValue());
         assertThat(found.size(), equalTo(1));
         checkRelationshipTypeValues(found.get(0), firstRelationshipType);
@@ -113,15 +137,27 @@ public class RelationshipTypeTest {
 
     @Test
     public void testRelationshipTypefindByEntityType() throws Exception {
+        // Declare objects utilized for this test
         List<RelationshipType> mockedList = new LinkedList<>();
         mockedList.add(firstRelationshipType);
+
+        // Mock DAO to return our mockedList
         when(relationshipTypeDAO.findByEntityType(any(), any())).thenReturn(mockedList);
+
+        // Invoke findByEntityType()
         List<RelationshipType> found = relationshipTypeService.findByEntityType(context, mock(EntityType.class));
+
+        // Assert that our expected list contains our expected RelationshipType and nothing more
         assertThat(found, notNullValue());
         assertThat(found.size(), equalTo(1));
         checkRelationshipTypeValues(found.get(0), firstRelationshipType);
     }
 
+    /**
+     * Helper method that compares RelationshipTypes
+     * @param found   The reported RelationshipType
+     * @param original The original RelationshipType
+     */
     private void checkRelationshipTypeValues(RelationshipType found, RelationshipType original) {
         assertThat(found, notNullValue());
         assertThat(found.getLeftLabel(), equalTo(original.getLeftLabel()));

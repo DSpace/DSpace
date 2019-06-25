@@ -28,28 +28,35 @@ public class VirtualMetadataPopulatorTest {
 
     @Test
     public void testSetMap() {
+        // Setup objects utilized in unit test
         Map<String, HashMap<String, VirtualMetadataConfiguration>> map = new HashMap<>();
         HashMap<String, VirtualMetadataConfiguration> mapExt = new HashMap<>();
         VirtualMetadataConfiguration virtualMetadataConfiguration = mock(VirtualMetadataConfiguration.class);
         mapExt.put("hashKey", virtualMetadataConfiguration);
         map.put("key", mapExt);
         virtualMetadataPopulator.setMap(map);
+
+        // The returned map should match our defined map
         assertEquals("TestSetMap 0", map, virtualMetadataPopulator.getMap());
     }
 
     @Test
     public void testGetMap() {
+        // Setup objects utilized in unit test
         Map<String, HashMap<String, VirtualMetadataConfiguration>> map = new HashMap<>();
         HashMap<String, VirtualMetadataConfiguration> mapExt = new HashMap<>();
         VirtualMetadataConfiguration virtualMetadataConfiguration = mock(VirtualMetadataConfiguration.class);
         mapExt.put("hashKey", virtualMetadataConfiguration);
         map.put("key", mapExt);
         virtualMetadataPopulator.setMap(map);
+
+        // The returned map should match our defined map
         assertEquals("TestGetMap 0", map, virtualMetadataPopulator.getMap());
     }
 
     @Test
     public void testIsUseForPlaceTrueForRelationshipType() {
+        // Setup objects utilized in unit test
         RelationshipType relationshipType = mock(RelationshipType.class);
         Map<String, HashMap<String, VirtualMetadataConfiguration>> map = new HashMap<>();
         HashMap<String, VirtualMetadataConfiguration> mapExt = new HashMap<>();
@@ -58,11 +65,17 @@ public class VirtualMetadataPopulatorTest {
         map.put("LeftLabel", mapExt);
         map.put("NotRightLabel", mapExt);
         virtualMetadataPopulator.setMap(map);
+
+        // Mock the state of objects utilized in isUseForPlaceTrueForRelationshipType()
+        // to meet the success criteria of an invocation
         when(virtualMetadataConfiguration.getUseForPlace()).thenReturn(true);
         when(relationshipType.getLeftLabel()).thenReturn("LeftLabel");
         when(relationshipType.getRightLabel()).thenReturn("RightLabel");
+
+        // Assert that the useForPlace for our mocked relationshipType is false
         assertEquals("TestGetFields 0", false,
                 virtualMetadataPopulator.isUseForPlaceTrueForRelationshipType(relationshipType, false));
+        // Assert that the useForPlace for our mocked relationshipType is true
         assertEquals("TestGetFields 1", true,
                 virtualMetadataPopulator.isUseForPlaceTrueForRelationshipType(relationshipType, true));
     }

@@ -35,24 +35,33 @@ public class UUIDValueTest {
 
     @Test
     public void testGetValues() throws Exception {
+        // Setup objects utilized in unit test
         List<String> list = new LinkedList<>();
         Item item = mock(Item.class);
         UUID uuid = UUID.randomUUID();
         when(item.getID()).thenReturn(uuid);
         list.add(String.valueOf(uuid));
+
+        // The reported value(s) should match our defined list
         assertEquals("TestGetValues 0", list, UUIDValue.getValues(context, item));
     }
 
     @Test
     public void testSetUseForPlace() {
+        // Setup objects utilized in unit test
         UUIDValue.setUseForPlace(true);
+
+        // The reported boolean should return true
         assertEquals("TestSetUseForPlace 0", true, UUIDValue.getUseForPlace());
 
     }
 
     @Test
     public void testGetUseForPlace() {
+        // Setup objects utilized in unit test
         UUIDValue.setUseForPlace(true);
+
+        // The reported boolean should return true
         assertEquals("TestGetUseForPlace 0", true, UUIDValue.getUseForPlace());
     }
 }

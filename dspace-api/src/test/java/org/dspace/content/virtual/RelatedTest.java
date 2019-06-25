@@ -52,55 +52,71 @@ public class RelatedTest {
 
     @Test
     public void testGetRelationshipTypeString() {
+        // Setup objects utilized in unit test
         related.setRelationshipTypeString("TestType");
+        // The Type String reported should match our defined Type String
         assertEquals("TestGetRelationshipTypeString 0", "TestType", related.getRelationshipTypeString());
     }
 
     @Test
     public void testSetRelationshipTypeString() {
+        // Setup objects utilized in unit test
         related.setRelationshipTypeString("TestType");
+        // The Type String reported should match our defined Type String
         assertEquals("TestSetRelationshipTypeString 0", "TestType", related.getRelationshipTypeString());
     }
 
     @Test
     public void testSetPlace() {
+        // Setup objects utilized in unit test
         related.setPlace(0);
+        // The place reported should match our defined place
         assertTrue("TestSetPlace 0", 0 == related.getPlace());
     }
 
     @Test
     public void testGetPlace() {
+        // Setup objects utilized in unit test
         related.setPlace(0);
+        // The place reported should match our defined place
         assertTrue("TestGetPlace 0", 0 == related.getPlace());
     }
 
     @Test
     public void testGetVirtualMetadataConfiguration() {
+        // The class reported should match our defined virtualMetadataConfiguration.getClass()
         assertEquals("TestGetVirtualMetadataConfiguration 0", virtualMetadataConfiguration.getClass(),
                 related.getVirtualMetadataConfiguration().getClass());
     }
 
     @Test
     public void testSetVirtualMetadataConfiguration() {
+        // Setup objects utilized in unit test
         related.setVirtualMetadataConfiguration(virtualMetadataConfiguration);
+        // The class reported should match our defined virtualMetadataConfiguration.getClass()
         assertEquals("TestGetVirtualMetadataConfiguration 0", virtualMetadataConfiguration,
                 related.getVirtualMetadataConfiguration());
     }
 
     @Test
     public void testSetUseForPlace() {
+        // Setup objects utilized in unit test
         related.setUseForPlace(true);
+        // related.getUseForPlace() should return true
         assertEquals("TestSetVirtualMetadataConfiguration 0", true, related.getUseForPlace());
     }
 
     @Test
     public void testGetUseForPlace() {
+        // Setup objects utilized in unit test
         related.setUseForPlace(true);
+        // related.getUseForPlace() should return true
         assertEquals("TestSetVirtualMetadataConfiguration 0", true, related.getUseForPlace());
     }
 
     @Test
     public void testGetValues() throws Exception {
+        // Declare objects utilized in unit test
         List<RelationshipType> relationshipTypeList = new ArrayList<>();
         List<Relationship> relationshipList = new ArrayList<>();
         Relationship relationship = mock(Relationship.class);
@@ -112,6 +128,8 @@ public class RelatedTest {
         relationshipTypeList.add(relationshipType);
         relationshipList.add(relationship);
         related.setPlace(0);
+
+        // Mock the state of objects utilized in getRelationsByLabel() to meet the success criteria of an invocation
         when(item.getID()).thenReturn(UUID.randomUUID());
         when(relationshipType.getLeftLabel()).thenReturn("LeftLabel");
         when(relationshipType.getRightLabel()).thenReturn("RightLabel");
@@ -128,12 +146,15 @@ public class RelatedTest {
         when(relationship.getRightItem()).thenReturn(item);
         when(relationship.getLeftItem()).thenReturn(item);
 
+        // The reported values should match out mocked collection of values
         assertEquals("TestGetValues 0", virtualMetadataConfiguration.getValues(context, item),
                 related.getValues(context, item));
         related.setPlace(1);
+        // Mock state to hit else if coverage
         assertEquals("TestGetValues 1", virtualMetadataConfiguration.getValues(context, item),
                 related.getValues(context, item));
         related.setPlace(2);
+        // No match should return empty LinkedList
         assertEquals("TestGetValues 2", new LinkedList<>(), related.getValues(context, item));
     }
 
