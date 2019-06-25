@@ -8,7 +8,6 @@
 package org.dspace.harvest;
 
 import java.util.Date;
-import java.util.UUID;
 
 import org.dspace.content.Item;
 import org.dspace.core.Context;
@@ -54,7 +53,7 @@ public class HarvestedItem implements ReloadableEntity<Integer>
         return id;
     }
 
-    public void setItem(Item item) {
+    void setItem(Item item) {
         this.item = item;
     }
 
