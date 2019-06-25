@@ -901,4 +901,45 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
         new MetadataPatchSuite().runWith(getClient(token), "/api/core/communities/"
                 + parentCommunity.getID(), expectedStatus);
     }
+
+    @Test
+    public void createTestInvalidParentCommunityBadRequest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        ObjectMapper mapper = new ObjectMapper();
+        CommunityRest comm = new CommunityRest();
+        // We send a name but the created community should set this to the title
+        comm.setName("Test Top-Level Community");
+
+        MetadataRest metadataRest = new MetadataRest();
+
+        MetadataValueRest description = new MetadataValueRest();
+        description.setValue("<p>Some cool HTML code here</p>");
+        metadataRest.put("dc.description", description);
+
+        MetadataValueRest abs = new MetadataValueRest();
+        abs.setValue("Sample top-level community created via the REST API");
+        metadataRest.put("dc.description.abstract", abs);
+
+        MetadataValueRest contents = new MetadataValueRest();
+        contents.setValue("<p>HTML News</p>");
+        metadataRest.put("dc.description.tableofcontents", contents);
+
+        MetadataValueRest copyright = new MetadataValueRest();
+        copyright.setValue("Custom Copyright Text");
+        metadataRest.put("dc.rights", copyright);
+
+        MetadataValueRest title = new MetadataValueRest();
+        title.setValue("Title Text");
+        metadataRest.put("dc.title", title);
+
+        comm.setMetadata(metadataRest);
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+        getClient(authToken).perform(post("/api/core/communities")
+                                         .param("parent", "123")
+                                         .content(mapper.writeValueAsBytes(comm))
+                                         .contentType(contentType))
+                            .andExpect(status().isBadRequest());
+    }
 }
