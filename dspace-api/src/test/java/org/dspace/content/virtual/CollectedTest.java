@@ -41,31 +41,42 @@ public class CollectedTest {
 
     @Test
     public void testGetFields() {
+        // The reported Class should match our mocked fields class
         assertEquals("TestGetFields 0", fields.getClass(), collected.getFields().getClass());
     }
 
     @Test
     public void testSetFields() {
+        // Setup objects utilized in unit test
         collected.setFields(fields);
+
+        // The reported fields should math our defined fields
         assertEquals("TestSetFields 0", fields, collected.getFields());
 
     }
 
     @Test
     public void testSetUseForPlace() {
+        // Setup objects utilized in unit test
         collected.setUseForPlace(true);
+
+        // collected.getUseForPlace() should return true
         assertEquals("TestSetUseForPlace 0", true, collected.getUseForPlace());
     }
 
     @Test
     public void testGetUseForPlace() {
+        // Setup objects utilized in unit test
         boolean bool = true;
         collected.setUseForPlace(true);
+
+        // The reported boolean should math our defined bool
         assertEquals("TestGetUseForPlace 0", bool, collected.getUseForPlace());
     }
 
     @Test
     public void testGetValues() {
+        // Setup objects utilized in unit test
         List<String> list = new ArrayList<>();
         List<String> valueList = new ArrayList<>();
         List<MetadataValue> metadataValueList = new ArrayList<>();
@@ -76,6 +87,9 @@ public class CollectedTest {
         list.add(s);
         String[] splittedString = s.split("\\.");
         collected.setFields(list);
+        valueList.add("TestValue");
+
+        // Mock the state of objects utilized in getValues() to meet the success criteria of an invocation
         when(itemService.getMetadata(item, splittedString.length > 0 ? splittedString[0] :
                         null,
                 splittedString.length > 1 ? splittedString[1] :
@@ -84,7 +98,8 @@ public class CollectedTest {
                         null,
                 Item.ANY, false)).thenReturn(metadataValueList);
         when(metadataValue.getValue()).thenReturn("TestValue");
-        valueList.add("TestValue");
+
+        // The reported value(s) should match our valueList
         assertEquals("TestGetValues 0", valueList, collected.getValues(context, item));
     }
 }

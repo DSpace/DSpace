@@ -65,12 +65,15 @@ public class RelationshipServiceImplTest {
 
     @Test
     public void testFindAll() throws Exception {
+        // Mock DAO to return our mocked relationshipsList
         when(relationshipDAO.findAll(context, Relationship.class)).thenReturn(relationshipsList);
+        // The reported Relationship(s) should match our relationshipsList
         assertEquals("TestFindAll 0", relationshipsList, relationshipService.findAll(context));
     }
 
     @Test
     public void testFindByItem() throws Exception {
+        // Declare objects utilized in unit test
         List<Relationship> relationshipTest = new ArrayList<>();
         Item cindy = mock(Item.class);
         Item fred = mock(Item.class);
@@ -96,63 +99,89 @@ public class RelationshipServiceImplTest {
         when(relationshipService.findByItem(context, cindy)).thenReturn(relationshipTest);
         when(relationshipDAO.findByItem(context, cindy)).thenReturn(relationshipTest);
 
+        // Mock the state of objects utilized in findByItem() to meet the success criteria of the invocation
+        when(relationshipDAO.findByItem(context, cindy)).thenReturn(relationshipTest);
 
         List<Relationship> results = relationshipService.findByItem(context, cindy);
         assertEquals("TestFindByItem 0", relationshipTest, results);
+        for (int i = 0; i < relationshipTest.size(); i++) {
+            assertEquals("TestFindByItem sort integrity", relationshipTest.get(i), results.get(i));
+        }
     }
 
     @Test
     public void testFindLeftPlaceByLeftItem() throws Exception {
+        // Declare objects utilized in unit test
         Item item = mock(Item.class);
+
+        // Mock DAO to return mocked left place as 0
         when(relationshipDAO.findLeftPlaceByLeftItem(context, item)).thenReturn(0);
+
+        // The left place reported from out mocked item should match the DAO's report of the left place
         assertEquals("TestFindLeftPlaceByLeftItem 0", relationshipDAO.findLeftPlaceByLeftItem(context, item),
                 relationshipService.findLeftPlaceByLeftItem(context, item));
     }
 
     @Test
     public void testFindRightPlaceByRightItem() throws Exception {
+        // Declare objects utilized in unit test
         Item item = mock(Item.class);
+
+        // Mock lower level DAO to return mocked right place as 0
         when(relationshipDAO.findRightPlaceByRightItem(context, item)).thenReturn(0);
+
+        // The right place reported from out mocked item should match the DAO's report of the right place
         assertEquals("TestFindRightPlaceByRightItem 0", relationshipDAO.findRightPlaceByRightItem(context, item),
                 relationshipService.findRightPlaceByRightItem(context, item));
     }
 
     @Test
     public void testFindByItemAndRelationshipType() throws Exception {
+        // Declare objects utilized in unit test
         List<Relationship> relList = new LinkedList<>();
         Item item = mock(Item.class);
         RelationshipType testRel = new RelationshipType();
 
+        // The Relationship(s) reported should match our our relList, given left place as true
         assertEquals("TestFindByItemAndRelationshipType 0", relList,
                 relationshipService.findByItemAndRelationshipType(context, item, testRel, true));
+        // The Relationship(s) reported should match our our relList
         assertEquals("TestFindByItemAndRelationshipType 1", relList,
                 relationshipService.findByItemAndRelationshipType(context, item, testRel));
     }
 
     @Test
     public void testFindByRelationshipType() throws Exception {
+        // Declare objects utilized in unit test
         List<Relationship> relList = new LinkedList<>();
         RelationshipType testRel = new RelationshipType();
 
+        // The Relationship(s) reported should match our our relList
         assertEquals("TestFindByRelationshipType 0", relList,
-                relationshipService.findByRelationshipType(context, testRel));
-        assertEquals("TestFindByRelationshipType 1", relList,
                 relationshipService.findByRelationshipType(context, testRel));
     }
 
     @Test
     public void find() throws Exception {
+        // Declare objects utilized in unit test
         Relationship relationship = new Relationship();
         relationship.setId(1337);
+
+        // Mock DAO to return our mocked relationship
         when(relationshipDAO.findByID(context, Relationship.class, relationship.getID())).thenReturn(relationship);
+
+        // The reported Relationship should match our mocked relationship
         assertEquals("TestFind 0", relationship, relationshipService.find(context, relationship.getID()));
     }
 
     @Test
     public void testCreate() throws Exception {
+        // Mock admin state
+        when(authorizeService.isAdmin(context)).thenReturn(true);
+
+        // Declare objects utilized in unit test
         Relationship relationship = relationshipDAO.create(context,new Relationship());
         context.turnOffAuthorisationSystem();
-        when(authorizeService.isAdmin(context)).thenReturn(true);
         assertEquals("TestCreate 0", relationship, relationshipService.create(context));
         MetadataValue metVal = mock(MetadataValue.class);
         List<MetadataValue> metsList = new ArrayList<>();
@@ -171,6 +200,8 @@ public class RelationshipServiceImplTest {
         relationship = getRelationship(leftItem, rightItem, testRel, 0,0);
         leftTypelist.add(relationship);
         rightTypelist.add(relationship);
+
+        // Mock the state of objects utilized in create() to meet the success criteria of the invocation
         when(virtualMetadataPopulator
                 .isUseForPlaceTrueForRelationshipType(relationship.getRelationshipType(), true)).thenReturn(true);
         when(authorizeService
@@ -189,7 +220,10 @@ public class RelationshipServiceImplTest {
         when(itemService.getMetadata(rightItem, "relationship", "type", null, Item.ANY)).thenReturn(metsList);
         when(relationshipDAO.create(any(), any())).thenReturn(relationship);
 
+        // The reported Relationship should match our defined relationship
         assertEquals("TestCreate 1", relationship, relationshipService.create(context, relationship));
+        // The reported Relationship should match our defined relationship, given left/right item
+        // and RelationshipType
         assertEquals("TestCreate 2", relationship, relationshipService.create(context, leftItem, rightItem,
                 testRel,0,0));
 
@@ -198,8 +232,10 @@ public class RelationshipServiceImplTest {
 
     @Test
     public void testDelete() throws Exception {
-        context.turnOffAuthorisationSystem();
+        // Mock admin state
         when(authorizeService.isAdmin(context)).thenReturn(true);
+
+        // Declare objects utilized in unit test
         MetadataValue metVal = mock(MetadataValue.class);
         List<MetadataValue> metsList = new ArrayList<>();
         List<Relationship> leftTypelist = new ArrayList<>();
@@ -219,6 +255,8 @@ public class RelationshipServiceImplTest {
         relationship = getRelationship(leftItem, rightItem, testRel, 0,0);
         leftTypelist.add(relationship);
         rightTypelist.add(relationship);
+
+        // Mock the state of objects utilized in delete() to meet the success criteria of the invocation
         when(virtualMetadataPopulator.isUseForPlaceTrueForRelationshipType(relationship.getRelationshipType(), true))
                 .thenReturn(true);
         when(authorizeService.authorizeActionBoolean(context, relationship.getLeftItem(), Constants.WRITE))
@@ -237,14 +275,21 @@ public class RelationshipServiceImplTest {
         when(itemService.getMetadata(rightItem, "relationship", "type", null, Item.ANY)).thenReturn(metsList);
         when(relationshipDAO.create(any(), any())).thenReturn(relationship);
         when(relationshipService.find(context,0)).thenReturn(relationship);
+
+        // Invoke delete()
         relationshipService.delete(context, relationship);
+
+        // Verify RelationshipService.delete() ran once to confirm proper invocation of delete()
         Mockito.verify(relationshipDAO).delete(context, relationship);
     }
 
     @Test
     public void testUpdate() throws Exception {
+        // Mock admin state
         context.turnOffAuthorisationSystem();
         when(authorizeService.isAdmin(context)).thenReturn(true);
+
+        // Declare objects utilized in unit test
         MetadataValue metVal = mock(MetadataValue.class);
         List<MetadataValue> metsList = new ArrayList<>();
         Item leftItem = mock(Item.class);
@@ -260,16 +305,31 @@ public class RelationshipServiceImplTest {
         testRel.setRightMinCardinality(0);
         metsList.add(metVal);
         relationship = getRelationship(leftItem, rightItem, testRel, 0,0);
+
+        // Mock the state of objects utilized in update() to meet the success criteria of the invocation
         when(itemService.getMetadata(leftItem, "relationship", "type", null, Item.ANY)).thenReturn(metsList);
         when(itemService.getMetadata(rightItem, "relationship", "type", null, Item.ANY)).thenReturn(metsList);
         when(authorizeService.authorizeActionBoolean(context, relationship.getLeftItem(),
                 Constants.WRITE)).thenReturn(true);
         when(authorizeService.authorizeActionBoolean(context, relationship.getRightItem(),
                 Constants.WRITE)).thenReturn(true);
+
+        // Invoke update()
         relationshipService.update(context, relationship);
+
+        // Verify RelationshipDAO.delete() ran once to confirm proper invocation of update()
         Mockito.verify(relationshipDAO).save(context, relationship);
     }
 
+    /**
+     * Helper method that returns a configured Relationship
+     * @param leftItem Relationship's left item
+     * @param rightItem Relationship's right item
+     * @param relationshipType Relationship's RelationshipType
+     * @param leftPlace Relationship's left place
+     * @param rightPlace Relationship's right place
+     * @return Configured Relationship
+     */
     private Relationship getRelationship(Item leftItem, Item rightItem, RelationshipType relationshipType,
                                          int leftPlace, int rightPlace) {
         Relationship relationship = new Relationship();
