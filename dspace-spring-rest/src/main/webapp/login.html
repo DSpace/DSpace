@@ -55,11 +55,11 @@
 </head>
 <body>
 <div class="container">
-    <form class="form-signin">
+    <form id="login-form" class="form-signin">
         <h2 class="form-signin-heading">HAL Browser</h2>
         <input type="text" class="input-block-level" placeholder="Username" id="username">
         <input type="password" class="input-block-level" placeholder="Password" id="password">
-        <button type="button" class="btn btn-large btn-primary" id="login">Sign in</button>
+        <button type="submit" class="btn btn-large btn-primary" id="login">Sign in</button>
         <div class="other-login-methods hidden">
             <h3>Other login methods:</h3>
 
@@ -133,13 +133,13 @@
             return string.charAt(0).toUpperCase() + string.slice(1);
         }
         
-        $("#login").click(function() {
+        $("#login-form").submit(function() {
             $.ajax({
                 //This depends on this file to be called login.html
                 url : window.location.href.replace("login.html", "") + 'api/authn/login',
                 type : 'POST',
                 async : false,
-                data : 'password='+$("#password").val()+'&user='+$("#username").val() ,
+                data : 'password='+encodeURIComponent($("#password").val())+'&user='+encodeURIComponent($("#username").val()),
                 headers : {
                     "Content-Type" : 'application/x-www-form-urlencoded',
                     "Accept:" : '*/*'
@@ -149,6 +149,8 @@
                     toastr.error('The credentials you entered are invalid. Please try again.', 'Login Failed');
                 }
             });
+
+            return false;
         });
     });
 </script>

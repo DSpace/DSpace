@@ -19,7 +19,7 @@ import org.apache.log4j.Logger;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.WorkflowItemConverter;
-import org.dspace.app.rest.exception.PatchBadRequestException;
+import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.RESTAuthorizationException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.ErrorRest;
@@ -238,7 +238,7 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
                 String section = path[1];
                 evaluatePatch(context, request, source, wsi, section, op);
             } else {
-                throw new PatchBadRequestException(
+                throw new DSpaceBadRequestException(
                     "Patch path operation need to starts with '" + OPERATION_PATH_SECTIONS + "'");
             }
         }
@@ -273,7 +273,7 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
                         stepProcessing.doPatchProcessing(context, getRequestService().getCurrentRequest(), source, op);
                         stepProcessing.doPostProcessing(context, source);
                     } else {
-                        throw new PatchBadRequestException(
+                        throw new DSpaceBadRequestException(
                             "The submission step class specified by '" + stepConfig.getProcessingClassName() +
                             "' does not extend the class org.dspace.submit.AbstractProcessingStep!" +
                             " Therefore it cannot be used by the Configurable Submission as the <processing-class>!");
