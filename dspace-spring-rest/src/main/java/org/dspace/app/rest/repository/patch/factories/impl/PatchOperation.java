@@ -8,7 +8,7 @@
 package org.dspace.app.rest.repository.patch.factories.impl;
 
 import org.apache.commons.lang3.BooleanUtils;
-import org.dspace.app.rest.exception.PatchBadRequestException;
+import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.patch.Operation;
 
@@ -26,7 +26,7 @@ public abstract class PatchOperation<R extends RestModel, T>
      * @param resource  the rest model.
      * @param operation the patch operation.
      * @return the updated rest model.
-     * @throws PatchBadRequestException
+     * @throws DSpaceBadRequestException
      */
     public abstract R perform(R resource, Operation operation);
 
@@ -37,7 +37,7 @@ public abstract class PatchOperation<R extends RestModel, T>
      */
     void checkOperationValue(Object value) {
         if (value == null) {
-            throw new PatchBadRequestException("No value provided for the operation.");
+            throw new DSpaceBadRequestException("No value provided for the operation.");
         }
     }
 
@@ -46,7 +46,7 @@ public abstract class PatchOperation<R extends RestModel, T>
      *
      * @param value the operation value
      * @return the original or derived boolean value
-     * @throws PatchBadRequestException
+     * @throws DSpaceBadRequestException
      */
     Boolean getBooleanOperationValue(Object value) {
         Boolean bool;
@@ -54,7 +54,8 @@ public abstract class PatchOperation<R extends RestModel, T>
         if (value instanceof String) {
             bool = BooleanUtils.toBooleanObject((String) value);
             if (bool == null) {
-                throw new PatchBadRequestException("Boolean value not provided.");
+                // make sure the string was converted to boolean.
+                throw new DSpaceBadRequestException("Boolean value not provided.");
             }
         } else {
             bool = (Boolean) value;

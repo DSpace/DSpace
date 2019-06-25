@@ -31,8 +31,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.atteo.evo.inflector.English;
 import org.dspace.app.rest.converter.JsonPatchConverter;
+import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.PaginationException;
-import org.dspace.app.rest.exception.PatchBadRequestException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.RepositoryNotFoundException;
 import org.dspace.app.rest.exception.RepositorySearchMethodNotFoundException;
@@ -729,7 +729,7 @@ public class RestResourceController implements InitializingBean {
             Patch patch = patchConverter.convert(jsonNode);
             modelObject = repository.patch(request, apiCategory, model, id, patch);
         } catch (RepositoryMethodNotImplementedException | UnprocessableEntityException |
-            PatchBadRequestException | ResourceNotFoundException e) {
+            DSpaceBadRequestException | ResourceNotFoundException e) {
             log.error(e.getMessage(), e);
             throw e;
         }
@@ -832,7 +832,7 @@ public class RestResourceController implements InitializingBean {
                             link = linkTo(this.getClass(), apiCategory, model).slash(uuid)
                                 .slash(subpath + '?' + querystring).withSelfRel();
                         } else {
-                            link = linkTo(this.getClass(), apiCategory, model).slash(uuid).withSelfRel();
+                            link = linkTo(this.getClass(), apiCategory, model).slash(uuid).slash(subpath).withSelfRel();
                         }
 
                         Page<HALResource> halResources = pageResult.map(linkRepository::wrapResource);
