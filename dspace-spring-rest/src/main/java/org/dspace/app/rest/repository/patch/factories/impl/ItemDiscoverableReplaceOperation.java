@@ -8,7 +8,7 @@
 package org.dspace.app.rest.repository.patch.factories.impl;
 
 import org.apache.log4j.Logger;
-import org.dspace.app.rest.exception.PatchBadRequestException;
+import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.patch.Operation;
 import org.springframework.stereotype.Component;
@@ -42,7 +42,7 @@ public class ItemDiscoverableReplaceOperation extends ReplacePatchOperation<Item
     @Override
     void checkModelForExistingValue(ItemRest resource, Operation operation) {
         if ((Object) resource.getDiscoverable() == null) {
-            throw new PatchBadRequestException("Attempting to replace a non-existent value.");
+            throw new DSpaceBadRequestException("Attempting to replace a non-existent value.");
         }
     }
 

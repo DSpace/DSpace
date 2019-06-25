@@ -22,7 +22,7 @@ import com.google.gson.Gson;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.MetadataFieldConverter;
-import org.dspace.app.rest.exception.PatchBadRequestException;
+import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.MetadataFieldRest;
 import org.dspace.app.rest.model.hateoas.MetadataFieldResource;
@@ -127,7 +127,7 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
                     MetadataFieldRest.class
             );
         } catch (IOException excIO) {
-            throw new PatchBadRequestException("error parsing request body", excIO);
+            throw new DSpaceBadRequestException("error parsing request body", excIO);
         }
 
         // validate fields

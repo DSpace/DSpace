@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.UUID;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.BadRequestException;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -23,6 +22,7 @@ import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.CommunityConverter;
 import org.dspace.app.rest.converter.MetadataConverter;
+import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.CommunityRest;
@@ -92,7 +92,7 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
 
                 UUID parentCommunityUuid = UUIDUtils.fromString(parentCommunityString);
                 if (parentCommunityUuid == null) {
-                    throw new BadRequestException("The given parent parameter was invalid: "
+                    throw new DSpaceBadRequestException("The given parent parameter was invalid: "
                             + parentCommunityString);
                 }
 

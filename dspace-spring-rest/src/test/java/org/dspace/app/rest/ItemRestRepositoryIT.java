@@ -1768,4 +1768,86 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         new MetadataPatchSuite().runWith(getClient(token), "/api/core/items/" + item.getID(), expectedStatus);
     }
 
+    /**
+     * This test will try creating an item with the InArchive property set to false. This endpoint does not allow
+     * us to create Items which aren't final (final means that they'd be in archive) and thus it'll throw a
+     * BadRequestException which is what we're testing for
+     * @throws Exception    If something goes wrong
+     */
+    @Test
+    public void testCreateItemInArchiveFalseBadRequestException() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+
+        ObjectMapper mapper = new ObjectMapper();
+        ItemRest itemRest = new ItemRest();
+        itemRest.setName("Practices of research data curation in institutional repositories:" +
+                             " A qualitative view from repository staff");
+        itemRest.setInArchive(false);
+        itemRest.setDiscoverable(true);
+        itemRest.setWithdrawn(false);
+
+        itemRest.setMetadata(new MetadataRest()
+                                 .put("dc.description", new MetadataValueRest("<p>Some cool HTML code here</p>"))
+                                 .put("dc.description.abstract",
+                                      new MetadataValueRest("Sample item created via the REST API"))
+                                 .put("dc.description.tableofcontents", new MetadataValueRest("<p>HTML News</p>"))
+                                 .put("dc.rights", new MetadataValueRest("Custom Copyright Text"))
+                                 .put("dc.title", new MetadataValueRest("Title Text")));
+
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(post("/api/core/items?owningCollection=" + col1.getID().toString())
+                                     .content(mapper.writeValueAsBytes(itemRest)).contentType(contentType))
+                        .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void testCreateItemInvalidCollectionBadRequestException() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+
+        ObjectMapper mapper = new ObjectMapper();
+        ItemRest itemRest = new ItemRest();
+        itemRest.setName("Practices of research data curation in institutional repositories:" +
+                             " A qualitative view from repository staff");
+        itemRest.setInArchive(false);
+        itemRest.setDiscoverable(true);
+        itemRest.setWithdrawn(false);
+
+        itemRest.setMetadata(new MetadataRest()
+                                 .put("dc.description", new MetadataValueRest("<p>Some cool HTML code here</p>"))
+                                 .put("dc.description.abstract",
+                                      new MetadataValueRest("Sample item created via the REST API"))
+                                 .put("dc.description.tableofcontents", new MetadataValueRest("<p>HTML News</p>"))
+                                 .put("dc.rights", new MetadataValueRest("Custom Copyright Text"))
+                                 .put("dc.title", new MetadataValueRest("Title Text")));
+
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(post("/api/core/items?owningCollection=" + parentCommunity.getID().toString())
+                                     .content(mapper.writeValueAsBytes(itemRest)).contentType(contentType))
+                        .andExpect(status().isBadRequest());
+    }
+
 }
