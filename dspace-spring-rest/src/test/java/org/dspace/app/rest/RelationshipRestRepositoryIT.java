@@ -1511,8 +1511,10 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         //verify left item change and other not changed
         getClient(token).perform(get("/api/core/relationships/" + id))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.leftId", is(publication2.getID().toString())))
-                .andExpect(jsonPath("$.rightId", is(author1.getID().toString())));
+                .andExpect(jsonPath("$._links.leftItem.href",
+                        containsString(publication2.getID().toString())))
+                .andExpect(jsonPath("$._links.rightItem.href",
+                        containsString(author1.getID().toString())));
 
         //Modify the right item in the relationship publication > publication 2
         MvcResult mvcResult3 = getClient(token).perform(put("/api/core/relationships/" + id + "/rightItem")
@@ -1527,8 +1529,10 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         //verify right item change and other not changed
         getClient(token).perform(get("/api/core/relationships/" + id))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.rightId", is(author2.getID().toString())))
-                .andExpect(jsonPath("$.leftId", is(publication2.getID().toString())));
+                .andExpect(jsonPath("$._links.rightItem.href",
+                                containsString(author2.getID().toString())))
+                .andExpect(jsonPath("$._links.leftItem.href",
+                                containsString(publication2.getID().toString())));
 
     }
 
@@ -1619,8 +1623,10 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         //verify change  and other not changed
         getClient(token).perform(get("/api/core/relationships/" + id))
                         .andExpect(status().isOk())
-                        .andExpect(jsonPath("$.rightId", is(author2.getID().toString())))
-                        .andExpect(jsonPath("$.leftId", is(publication.getID().toString())));
+                        .andExpect(jsonPath("$._links.rightItem.href",
+                                containsString(author2.getID().toString())))
+                        .andExpect(jsonPath("$._links.leftItem.href",
+                                containsString(publication.getID().toString())));
 
     }
 
@@ -1709,8 +1715,10 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         //verify right item change and other not changed
         getClient(token).perform(get("/api/core/relationships/" + id))
                         .andExpect(status().isOk())
-                        .andExpect(jsonPath("$.rightId", is(author2.getID().toString())))
-                        .andExpect(jsonPath("$.leftId", is(publication.getID().toString())));
+                        .andExpect(jsonPath("$._links.rightItem.href",
+                                containsString(author2.getID().toString())))
+                        .andExpect(jsonPath("$._links.leftItem.href",
+                                containsString(publication.getID().toString())));
 
     }
 
