@@ -169,7 +169,8 @@ public class CertificateGenerator extends AbstractReader implements Recyclable
                     }
                     limit = printMetadata(dso, content, limit, "   - Tipología:", "dc.type");
                     limit = printMetadata(dso, content, limit, "   - Grado alacanzado:", "thesis.degree.name");
-                    limit = printMetadata(dso, content, limit, "   - Unidad académica:", "thesis.degree.grantor");
+                    limit = printMetadata(dso, content, limit, "   - Unidad académica:", "mods.originInfo.place");
+                    limit = printMetadata(dso, content, limit, "   - Institución otorgante:", "thesis.degree.grantor");
                     content.setFont(PDType1Font.HELVETICA_BOLD, FONT_SIZE);
                     limit = printLine(content, "   - Fecha de carga en el repositorio: ", limit);
                     content.setFont(PDType1Font.HELVETICA, FONT_SIZE);
@@ -245,10 +246,10 @@ public class CertificateGenerator extends AbstractReader implements Recyclable
             limit = printLine(content, label, limit);
             content.setFont(font, 10);
             limit = printLine(content, metadatumToString(metadata), limit);
-            if (metadataString.equals("thesis.degree.grantor")) {
-            	// Hardcodeamos "(Universidad Nacional de La Plata)" porque nos lo pidieron. Podríamos usar autoridades pero el label (cuando se busca por id de autoridad ) no devulve la institucion padre 
-                limit = printLine(content, "(Universidad Nacional de La Plata)", limit);                
-            }
+//            if (metadataString.equals("thesis.degree.grantor")) {
+//            	// Hardcodeamos "(Universidad Nacional de La Plata)" porque nos lo pidieron. Podríamos usar autoridades pero el label (cuando se busca por id de autoridad ) no devulve la institucion padre 
+//                limit = printLine(content, "(Universidad Nacional de La Plata)", limit);                
+//            }
             limit = printNewLine(content);
         }
         return limit;
