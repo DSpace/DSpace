@@ -156,20 +156,24 @@ public class AuthorAuthority extends SPARQLAuthorityProvider {
 			if (affiliation.hasProperty(organization)){
 					
 				Resource org = affiliation.getProperty(organization).getObject().asResource();			
-				String name = org.getProperty(orgName).getString();
-				String id = org.getProperty(siocId).getString();
-				if (org.hasProperty(skosBroader)){
-					Resource orgParent = org.getProperty(skosBroader).getObject().asResource();
-					if (orgParent.hasProperty(skosBroader)){
-						string += this.getParentToString(orgParent.getProperty(skosBroader).getObject().asResource());					
+				if (org.getProperty(orgName) != null) {
+					String name = org.getProperty(orgName).getString();					
+					if (org.getProperty(orgName) != null) {
+						String id = org.getProperty(siocId).getString();
+						if (org.hasProperty(skosBroader)){
+							Resource orgParent = org.getProperty(skosBroader).getObject().asResource();
+							if (orgParent.hasProperty(skosBroader)){
+								string += this.getParentToString(orgParent.getProperty(skosBroader).getObject().asResource());					
+							}
+							string += this.getParentToString(orgParent);
+						}
+						string += (!"".equals(id)) ? id : name;
+						String start = affiliation.getProperty(startDate).getString();
+						String end = affiliation.getProperty(endDate).getString();
+						if(!"".equals(start) || !"".equals(end)){
+							string += getPeriodForFiliation(start, end);
+						}
 					}
-					string += this.getParentToString(orgParent);
-				}
-				string += (!"".equals(id)) ? id : name;
-				String start = affiliation.getProperty(startDate).getString();
-				String end = affiliation.getProperty(endDate).getString();
-				if(!"".equals(start) || !"".equals(end)){
-					string += getPeriodForFiliation(start, end);
 				}
 	
 				if (links.hasNext()) string += ", ";
