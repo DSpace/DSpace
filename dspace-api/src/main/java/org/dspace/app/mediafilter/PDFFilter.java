@@ -18,6 +18,7 @@ import java.io.Writer;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.encryption.InvalidPasswordException;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
@@ -94,11 +95,11 @@ public class PDFFilter extends MediaFilter {
 
             try {
                 pdfDoc = PDDocument.load(source);
-                if (pdfDoc.isEncrypted()) {
-                    log.error("PDF is encrypted. Cannot extract text (item: " + currentItem.getHandle() + ")");
-                    return null;
-                }
                 pts.writeText(pdfDoc, writer);
+            } catch (InvalidPasswordException ex) {
+                log.error("PDF is encrypted. Cannot extract text (item: {})",
+                    () -> currentItem.getHandle());
+                return null;
             } finally {
                 try {
                     if (pdfDoc != null) {
