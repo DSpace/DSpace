@@ -13,6 +13,7 @@ import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -259,7 +260,7 @@ public class LicenseUtilsTest extends AbstractUnitTest {
         StringWriter writer = new StringWriter();
         IOUtils.copy(
             bitstreamService.retrieve(context, itemService.getBundles(item, "LICENSE").get(0).getBitstreams().get(0)),
-            writer);
+            writer, StandardCharsets.UTF_8);
         String license = writer.toString();
 
         assertThat("testGrantLicense 0", license, equalTo(defaultLicense));
