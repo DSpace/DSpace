@@ -137,15 +137,12 @@ public class WorkflowItemBuilder extends AbstractBuilder<XmlWorkflowItem, XmlWor
     @Override
     public void cleanup() throws Exception {
         if (workspaceItem != null) {
-            System.out.println("remove workspaceitem");
             deleteWsi(workspaceItem);
         }
         if (workflowItem != null) {
-            System.out.println("remove workflowitem");
             delete(workflowItem);
         }
         if (item != null) {
-            System.out.println("remove item!!!");
             deleteItem(item);
         }
     }
