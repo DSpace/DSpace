@@ -1160,7 +1160,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
     }
 
     /**
-     * This method will test the deletion of a Relationship to then
+     * This method will test the deletion of a Relationship and will then
      * verify that the relation is removed
      * @throws Exception
      */
@@ -1206,9 +1206,9 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
 
         String adminToken = getAuthToken(admin.getEmail(), password);
 
-        // First create the structure of 5 metadatavalues just like the additions test.
+        // First create 1 relationship.
         context.restoreAuthSystemState();
-        // This post request will add a first relationship to the publiction and thus create a first set of metadata
+        // This post request will add a first relationship to the publication and thus create a first set of metadata
         // For the author values, namely "Donald Smith"
         MvcResult mvcResult = getClient(adminToken).perform(post("/api/core/relationships")
                                                                 .param("relationshipType",
@@ -1229,25 +1229,25 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         String firstRelationshipIdString = String.valueOf(map.get("id"));
 
 
-        // This test checks again that there's one relationship on the publication
+        // This test checks that there's one relationship on the publication
         getClient(adminToken).perform(get("/api/core/items/" +
                 publication.getID() + "/relationships"))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("page.totalElements", is(1)));
 
-        // This test checks again that there's one relationship on the first author
+        // This test checks that there's one relationship on the first author
         getClient(adminToken).perform(get("/api/core/items/" +
                 author1.getID() + "/relationships"))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("page.totalElements", is(1)));
 
-        // This test checks again that there's no relationship on the second author
+        // This test checks that there's no relationship on the second author
         getClient(adminToken).perform(get("/api/core/items/" +
                 author2.getID() + "/relationships"))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("page.totalElements", is(0)));
 
-        // Creates another Relationship for the Publication and thus adding a third metadata value for the author
+        // Creates another Relationship for the Publication
         mvcResult = getClient(adminToken).perform(post("/api/core/relationships")
                                                       .param("relationshipType",
                                                              isAuthorOfPublicationRelationshipType.getID()
@@ -1265,19 +1265,19 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         map = mapper.readValue(content, Map.class);
         String secondRelationshipIdString = String.valueOf(map.get("id"));
 
-        // This test checks again that there are 2 relationships on the publication
+        // This test checks that there are 2 relationships on the publication
         getClient(adminToken).perform(get("/api/core/items/" +
                 publication.getID() + "/relationships"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("page.totalElements", is(2)));
 
-        // This test checks again that there's one relationship on the first author
+        // This test checks that there's one relationship on the first author
         getClient(adminToken).perform(get("/api/core/items/" +
                 author1.getID() + "/relationships"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("page.totalElements", is(1)));
 
-        // This test checks again that there's one relationship on the second author
+        // This test checks that there's one relationship on the second author
         getClient(adminToken).perform(get("/api/core/items/" +
                 author2.getID() + "/relationships"))
                 .andExpect(status().isOk())
@@ -1288,23 +1288,46 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         getClient(adminToken).perform(delete("/api/core/relationships/" + firstRelationshipIdString));
 
 
-        // This test checks again that there's one relationship on the publication
+        // This test checks that there's one relationship on the publication
         getClient(adminToken).perform(get("/api/core/items/" +
                 publication.getID() + "/relationships"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("page.totalElements", is(1)));
 
-        // This test checks again that there's no relationship on the first author
+        // This test checks that there's no relationship on the first author
         getClient(adminToken).perform(get("/api/core/items/" +
                 author1.getID() + "/relationships"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("page.totalElements", is(0)));
 
-        // This test checks again that there are one relationship on the second author
+        // This test checks that there are one relationship on the second author
         getClient(adminToken).perform(get("/api/core/items/" +
                 author2.getID() + "/relationships"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("page.totalElements", is(1)));
+
+
+        // Now we delete the second relationship
+        getClient(adminToken).perform(delete("/api/core/relationships/" + secondRelationshipIdString));
+
+
+        // This test checks that there's no relationship on the publication
+        getClient(adminToken).perform(get("/api/core/items/" +
+                publication.getID() + "/relationships"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("page.totalElements", is(0)));
+
+        // This test checks that there's no relationship on the first author
+        getClient(adminToken).perform(get("/api/core/items/" +
+                author1.getID() + "/relationships"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("page.totalElements", is(0)));
+
+        // This test checks that there are no relationship on the second author
+        getClient(adminToken).perform(get("/api/core/items/" +
+                author2.getID() + "/relationships"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("page.totalElements", is(0)));
     }
 
     /**
