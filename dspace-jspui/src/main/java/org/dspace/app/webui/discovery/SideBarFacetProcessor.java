@@ -85,7 +85,7 @@ public class SideBarFacetProcessor implements CollectionHomeProcessor,
             if (scope !=null)
             {
                 request.setAttribute("discovery.searchScope",
-                        "/handle/" + scope.getHandle());
+                        scope.getHandle());
             }
         }
         catch (SearchServiceException e)
