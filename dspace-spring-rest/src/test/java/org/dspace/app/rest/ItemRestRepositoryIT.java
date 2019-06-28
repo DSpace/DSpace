@@ -1768,6 +1768,12 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         new MetadataPatchSuite().runWith(getClient(token), "/api/core/items/" + item.getID(), expectedStatus);
     }
 
+    /**
+     * This test will try creating an item with the InArchive property set to false. This endpoint does not allow
+     * us to create Items which aren't final (final means that they'd be in archive) and thus it'll throw a
+     * BadRequestException which is what we're testing for
+     * @throws Exception    If something goes wrong
+     */
     @Test
     public void testCreateItemInArchiveFalseBadRequestException() throws Exception {
 
