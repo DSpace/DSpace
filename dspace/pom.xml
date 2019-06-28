@@ -198,13 +198,11 @@
                 <dependency>
                     <groupId>org.dspace</groupId>
                     <artifactId>dspace-oai</artifactId>
-                    <classifier>classes</classifier>
                     <scope>compile</scope>
                 </dependency>
                 <dependency>
                     <groupId>org.dspace</groupId>
                     <artifactId>dspace-rdf</artifactId>
-                    <type>war</type>
                     <scope>compile</scope>
                 </dependency>
                 <dependency>
@@ -227,13 +225,11 @@
                 <dependency>
                     <groupId>org.dspace</groupId>
                     <artifactId>dspace-sword</artifactId>
-                    <classifier>classes</classifier>
                     <scope>compile</scope>
                 </dependency>
                 <dependency>
                     <groupId>org.dspace</groupId>
                     <artifactId>dspace-swordv2</artifactId>
-                    <classifier>classes</classifier>
                     <scope>compile</scope>
                 </dependency>
             </dependencies>
@@ -290,8 +286,6 @@
     	<dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-oai</artifactId>
-            <type>jar</type>
-            <classifier>classes</classifier>
             <exclusions>
                 <exclusion>
                     <groupId>com.lyncode</groupId>
