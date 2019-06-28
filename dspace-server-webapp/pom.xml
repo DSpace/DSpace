@@ -1,11 +1,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.dspace</groupId>
-    <artifactId>dspace-spring-rest</artifactId>
+    <artifactId>dspace-server-webapp</artifactId>
     <packaging>war</packaging>
-    <name>DSpace Spring Rest (Boot MVC + HATEOAS)</name>
+    <name>DSpace Server Webapp</name>
     <description>
-        DSpace new Rest API
+        DSpace Server Webapp (Spring Boot)
     </description>
 
     <!--

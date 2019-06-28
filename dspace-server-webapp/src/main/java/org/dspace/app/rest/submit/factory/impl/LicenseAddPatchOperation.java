@@ -23,7 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * To accept/reject the license.
  *
  * Example: <code>
- * curl -X PATCH http://${dspace.url}/dspace-spring-rest/api/submission/workspaceitems/31599 -H "Content-Type:
+ * curl -X PATCH http://${dspace.server.url}/api/submission/workspaceitems/31599 -H "Content-Type:
  * application/json" -d '[{ "op": "add", "path": "/sections/license/granted", "value":"true"}]'
  * </code>
  *

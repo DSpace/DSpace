@@ -239,8 +239,8 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                                                                (org.springframework.data.rest.webmvc.RestMediaTypes
                                                                     .TEXT_URI_LIST_VALUE))
                                                            .content(
-                                                               "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
-                                                                   "https://localhost:8080/spring-rest/api/core/items/" + author1.getID()))
+                                                               "https://localhost:8080/api/core/items/" + publication.getID() + "\n" +
+                                                                   "https://localhost:8080/api/core/items/" + author1.getID()))
                                               .andExpect(status().isCreated())
                                               .andReturn();
 
@@ -313,8 +313,8 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                                                                (org.springframework.data.rest.webmvc.RestMediaTypes
                                                                     .TEXT_URI_LIST_VALUE))
                                                            .content(
-                                                               "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
-                                                                   "https://localhost:8080/spring-rest/api/core/items/" + author1.getID()))
+                                                               "https://localhost:8080/server/api/core/items/" + publication.getID() + "\n" +
+                                                                   "https://localhost:8080/server/api/core/items/" + author1.getID()))
                                               .andExpect(status().isCreated())
                                               .andReturn();
 
@@ -384,8 +384,8 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                                                                (org.springframework.data.rest.webmvc.RestMediaTypes
                                                                     .TEXT_URI_LIST_VALUE))
                                                            .content(
-                                                               "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
-                                                                   "https://localhost:8080/spring-rest/api/core/items/" + author1.getID()))
+                                                               "https://localhost:8080/server/api/core/items/" + publication.getID() + "\n" +
+                                                                   "https://localhost:8080/server/api/core/items/" + author1.getID()))
                                               .andExpect(status().isForbidden())
                                               .andReturn();
 
@@ -458,8 +458,8 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                                                                     (org.springframework.data.rest.webmvc.RestMediaTypes
                                                                          .TEXT_URI_LIST_VALUE))
                                                                 .content(
-                                                                    "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
-                                                                        "https://localhost:8080/spring-rest/api/core/items/" + author1.getID()))
+                                                                    "https://localhost:8080/server/api/core/items/" + publication.getID() + "\n" +
+                                                                        "https://localhost:8080/server/api/core/items/" + author1.getID()))
                                                    .andExpect(status().isCreated())
                                                    .andReturn();
         ObjectMapper mapper = new ObjectMapper();
@@ -514,8 +514,8 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                                                           (org.springframework.data.rest.webmvc.RestMediaTypes
                                                                .TEXT_URI_LIST_VALUE))
                                                       .content(
-                                                          "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
-                                                              "https://localhost:8080/spring-rest/api/core/items/" + author2.getID()))
+                                                          "https://localhost:8080/server/api/core/items/" + publication.getID() + "\n" +
+                                                              "https://localhost:8080/server/api/core/items/" + author2.getID()))
                                          .andExpect(status().isCreated())
                                          .andReturn();
 
@@ -580,8 +580,8 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                                                           (org.springframework.data.rest.webmvc.RestMediaTypes
                                                                .TEXT_URI_LIST_VALUE))
                                                       .content(
-                                                          "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
-                                                              "https://localhost:8080/spring-rest/api/core/items/" + author3.getID()))
+                                                          "https://localhost:8080/server/api/core/items/" + publication.getID() + "\n" +
+                                                              "https://localhost:8080/server/api/core/items/" + author3.getID()))
                                          .andExpect(status().isCreated())
                                          .andReturn();
 
@@ -769,8 +769,8 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                                                                     (org.springframework.data.rest.webmvc.RestMediaTypes
                                                                          .TEXT_URI_LIST_VALUE))
                                                                 .content(
-                                                                    "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
-                                                                        "https://localhost:8080/spring-rest/api/core/items/" + author1.getID()))
+                                                                    "https://localhost:8080/server/api/core/items/" + publication.getID() + "\n" +
+                                                                        "https://localhost:8080/server/api/core/items/" + author1.getID()))
                                                    .andExpect(status().isCreated())
                                                    .andReturn();
         ObjectMapper mapper = new ObjectMapper();
@@ -817,8 +817,8 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                                                           (org.springframework.data.rest.webmvc.RestMediaTypes
                                                                .TEXT_URI_LIST_VALUE))
                                                       .content(
-                                                          "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
-                                                              "https://localhost:8080/spring-rest/api/core/items/" + author2.getID()))
+                                                          "https://localhost:8080/server/api/core/items/" + publication.getID() + "\n" +
+                                                              "https://localhost:8080/server/api/core/items/" + author2.getID()))
                                          .andExpect(status().isCreated())
                                          .andReturn();
 
@@ -858,8 +858,8 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                                                           (org.springframework.data.rest.webmvc.RestMediaTypes
                                                                .TEXT_URI_LIST_VALUE))
                                                       .content(
-                                                          "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
-                                                              "https://localhost:8080/spring-rest/api/core/items/" + author3.getID()))
+                                                          "https://localhost:8080/server/api/core/items/" + publication.getID() + "\n" +
+                                                              "https://localhost:8080/server/api/core/items/" + author3.getID()))
                                          .andExpect(status().isCreated())
                                          .andReturn();
 
@@ -1000,8 +1000,8 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                                                                     (org.springframework.data.rest.webmvc.RestMediaTypes
                                                                          .TEXT_URI_LIST_VALUE))
                                                                 .content(
-                                                                    "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
-                                                                        "https://localhost:8080/spring-rest/api/core/items/" + author1.getID()))
+                                                                    "https://localhost:8080/server/api/core/items/" + publication.getID() + "\n" +
+                                                                        "https://localhost:8080/server/api/core/items/" + author1.getID()))
                                                    .andExpect(status().isCreated())
                                                    .andReturn();
         ObjectMapper mapper = new ObjectMapper();
@@ -1048,8 +1048,8 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                                                           (org.springframework.data.rest.webmvc.RestMediaTypes
                                                                .TEXT_URI_LIST_VALUE))
                                                       .content(
-                                                          "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
-                                                              "https://localhost:8080/spring-rest/api/core/items/" + author2.getID()))
+                                                          "https://localhost:8080/server/api/core/items/" + publication.getID() + "\n" +
+                                                              "https://localhost:8080/server/api/core/items/" + author2.getID()))
                                          .andExpect(status().isCreated())
                                          .andReturn();
 
@@ -1089,8 +1089,8 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                                                           (org.springframework.data.rest.webmvc.RestMediaTypes
                                                                .TEXT_URI_LIST_VALUE))
                                                       .content(
-                                                          "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
-                                                              "https://localhost:8080/spring-rest/api/core/items/" + author3.getID()))
+                                                          "https://localhost:8080/server/api/core/items/" + publication.getID() + "\n" +
+                                                              "https://localhost:8080/server/api/core/items/" + author3.getID()))
                                          .andExpect(status().isCreated())
                                          .andReturn();
 
@@ -1399,8 +1399,8 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                                                                     (org.springframework.data.rest.webmvc.RestMediaTypes
                                                                          .TEXT_URI_LIST_VALUE))
                                                                 .content(
-                                                                    "https://localhost:8080/spring-rest/api/core/items/" + author1.getID() + "\n" +
-                                                                        "https://localhost:8080/spring-rest/api/core/items/" + orgUnit1.getID()))
+                                                                    "https://localhost:8080/server/api/core/items/" + author1.getID() + "\n" +
+                                                                        "https://localhost:8080/server/api/core/items/" + orgUnit1.getID()))
                                                    .andExpect(status().isCreated())
                                                    .andReturn();
         ObjectMapper mapper = new ObjectMapper();
@@ -1420,8 +1420,8 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                                                           (org.springframework.data.rest.webmvc.RestMediaTypes
                                                                .TEXT_URI_LIST_VALUE))
                                                       .content(
-                                                          "https://localhost:8080/spring-rest/api/core/items/" + author2.getID() + "\n" +
-                                                              "https://localhost:8080/spring-rest/api/core/items/" + orgUnit1.getID()))
+                                                          "https://localhost:8080/server/api/core/items/" + author2.getID() + "\n" +
+                                                              "https://localhost:8080/server/api/core/items/" + orgUnit1.getID()))
                                          .andExpect(status().isCreated())
                                          .andReturn();
         mapper = new ObjectMapper();
@@ -1441,8 +1441,8 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                                                           (org.springframework.data.rest.webmvc.RestMediaTypes
                                                                .TEXT_URI_LIST_VALUE))
                                                       .content(
-                                                          "https://localhost:8080/spring-rest/api/core/items/" + author3.getID() + "\n" +
-                                                              "https://localhost:8080/spring-rest/api/core/items/" + orgUnit1.getID()))
+                                                          "https://localhost:8080/server/api/core/items/" + author3.getID() + "\n" +
+                                                              "https://localhost:8080/server/api/core/items/" + orgUnit1.getID()))
                                          .andExpect(status().isCreated())
                                          .andReturn();
         mapper = new ObjectMapper();
@@ -1522,8 +1522,8 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                                                                     (org.springframework.data.rest.webmvc.RestMediaTypes
                                                                          .TEXT_URI_LIST_VALUE))
                                                                 .content(
-                                                                    "https://localhost:8080/spring-rest/api/core/items/" + author1.getID() + "\n" +
-                                                                        "https://localhost:8080/spring-rest/api/core/items/" + orgUnit1.getID()))
+                                                                    "https://localhost:8080/server/api/core/items/" + author1.getID() + "\n" +
+                                                                        "https://localhost:8080/server/api/core/items/" + orgUnit1.getID()))
                                                    .andExpect(status().isCreated())
                                                    .andReturn();
         ObjectMapper mapper = new ObjectMapper();
@@ -1543,8 +1543,8 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                                                           (org.springframework.data.rest.webmvc.RestMediaTypes
                                                                .TEXT_URI_LIST_VALUE))
                                                       .content(
-                                                          "https://localhost:8080/spring-rest/api/core/items/" + author2.getID() + "\n" +
-                                                              "https://localhost:8080/spring-rest/api/core/items/" + orgUnit1.getID()))
+                                                          "https://localhost:8080/server/api/core/items/" + author2.getID() + "\n" +
+                                                              "https://localhost:8080/server/api/core/items/" + orgUnit1.getID()))
                                          .andExpect(status().isCreated())
                                          .andReturn();
         mapper = new ObjectMapper();
@@ -1564,8 +1564,8 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                                                           (org.springframework.data.rest.webmvc.RestMediaTypes
                                                                .TEXT_URI_LIST_VALUE))
                                                       .content(
-                                                          "https://localhost:8080/spring-rest/api/core/items/" + author3.getID() + "\n" +
-                                                              "https://localhost:8080/spring-rest/api/core/items/" + orgUnit1.getID()))
+                                                          "https://localhost:8080/server/api/core/items/" + author3.getID() + "\n" +
+                                                              "https://localhost:8080/server/api/core/items/" + orgUnit1.getID()))
                                          .andExpect(status().isCreated())
                                          .andReturn();
         mapper = new ObjectMapper();
@@ -1660,8 +1660,8 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                                                                (org.springframework.data.rest.webmvc.RestMediaTypes
                                                                     .TEXT_URI_LIST_VALUE))
                                                            .content(
-                                                               "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
-                                                                   "https://localhost:8080/spring-rest/api/core/items/" + author1.getID()))
+                                                               "https://localhost:8080/server/api/core/items/" + publication.getID() + "\n" +
+                                                                   "https://localhost:8080/server/api/core/items/" + author1.getID()))
                                               .andExpect(status().isCreated())
                                               .andReturn();
 
@@ -1676,7 +1676,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                         (org.springframework.data.rest.webmvc.RestMediaTypes
                                 .TEXT_URI_LIST_VALUE))
                 .content(
-                        "https://localhost:8080/spring-rest/api/core/items/" + publication2.getID()))
+                        "https://localhost:8080/server/api/core/items/" + publication2.getID()))
                 .andExpect(status().isOk())
                 .andReturn();
 
@@ -1694,7 +1694,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                         (org.springframework.data.rest.webmvc.RestMediaTypes
                                 .TEXT_URI_LIST_VALUE))
                 .content(
-                                "https://localhost:8080/spring-rest/api/core/items/" + author2.getID()))
+                                "https://localhost:8080/server/api/core/items/" + author2.getID()))
                 .andExpect(status().isOk())
                 .andReturn();
 
@@ -1776,8 +1776,8 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                                                                                                        .toString())
                                                            .contentType(MediaType.parseMediaType("text/uri-list"))
                                                            .content(
-                                                               "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
-                                                                   "https://localhost:8080/spring-rest/api/core/items/" + author1.getID()))
+                                                               "https://localhost:8080/server/api/core/items/" + publication.getID() + "\n" +
+                                                                   "https://localhost:8080/server/api/core/items/" + author1.getID()))
                                               .andExpect(status().isCreated())
                                               .andReturn();
 
@@ -1789,7 +1789,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         //change right item from author 1 > author 2
         MvcResult mvcResult2 = getClient(token).perform(put("/api/core/relationships/" + id + "/rightItem")
                 .contentType(MediaType.parseMediaType("text/uri-list"))
-                .content("https://localhost:8080/spring-rest/api/core/items/" + author2.getID()))
+                .content("https://localhost:8080/server/api/core/items/" + author2.getID()))
                 .andExpect(status().isOk())
                 .andReturn();
         //verify change  and other not changed
@@ -1869,8 +1869,8 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                                                                                                        .toString())
                                                            .contentType(MediaType.parseMediaType("text/uri-list"))
                                                            .content(
-                                                               "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
-                                                                   "https://localhost:8080/spring-rest/api/core/items/" + author1.getID()))
+                                                               "https://localhost:8080/server/api/core/items/" + publication.getID() + "\n" +
+                                                                   "https://localhost:8080/server/api/core/items/" + author1.getID()))
                                               .andExpect(status().isCreated())
                                               .andReturn();
 
@@ -1881,7 +1881,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         //change rightItem from author1 > author2
         MvcResult mvcResult2 = getClient(token).perform(put("/api/core/relationships/" + id + "/rightItem")
                 .contentType(MediaType.parseMediaType("text/uri-list"))
-                .content("https://localhost:8080/spring-rest/api/core/items/" + author2.getID()))
+                .content("https://localhost:8080/server/api/core/items/" + author2.getID()))
                 .andExpect(status().isOk())
                 .andReturn();
         //verify right item change and other not changed
@@ -1962,8 +1962,8 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                                                                                                        .toString())
                                                            .contentType(MediaType.parseMediaType("text/uri-list"))
                                                            .content(
-                                                               "https://localhost:8080/spring-rest/api/core/items/" + publication1.getID() + "\n" +
-                                                                   "https://localhost:8080/spring-rest/api/core/items/" + author1.getID()))
+                                                               "https://localhost:8080/server/api/core/items/" + publication1.getID() + "\n" +
+                                                                   "https://localhost:8080/server/api/core/items/" + author1.getID()))
                                               .andExpect(status().isCreated())
                                               .andReturn();
 
@@ -1974,7 +1974,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         //change leftItem
         MvcResult mvcResult2 = getClient(token).perform(put("/api/core/relationships/" + id + "/leftItem")
                 .contentType(MediaType.parseMediaType("text/uri-list"))
-                .content("https://localhost:8080/spring-rest/api/core/items/" + publication2.getID()))
+                .content("https://localhost:8080/server/api/core/items/" + publication2.getID()))
                 .andExpect(status().isOk())
                 .andReturn();
         //verify change  and other not changed
@@ -2055,8 +2055,8 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                                                                    .toString())
                        .contentType(MediaType.parseMediaType("text/uri-list"))
                        .content(
-                           "https://localhost:8080/spring-rest/api/core/items/" + publication1.getID() + "\n" +
-                               "https://localhost:8080/spring-rest/api/core/items/" + author1.getID()))
+                           "https://localhost:8080/server/api/core/items/" + publication1.getID() + "\n" +
+                               "https://localhost:8080/server/api/core/items/" + author1.getID()))
           .andExpect(status().isCreated())
           .andReturn();
 
@@ -2067,7 +2067,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         //change left item
         MvcResult mvcResult2 = getClient(token).perform(put("/api/core/relationships/" + id + "/leftItem")
                 .contentType(MediaType.parseMediaType("text/uri-list"))
-                .content("https://localhost:8080/spring-rest/api/core/items/" + publication2.getID()))
+                .content("https://localhost:8080/server/api/core/items/" + publication2.getID()))
                 .andExpect(status().isOk())
                 .andReturn();
         //verify change and other not changed
@@ -2145,8 +2145,8 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                                                                                                        .toString())
                                                            .contentType(MediaType.parseMediaType("text/uri-list"))
                                                            .content(
-                                                               "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
-                                                                   "https://localhost:8080/spring-rest/api/core/items/" + author1.getID()))
+                                                               "https://localhost:8080/server/api/core/items/" + publication.getID() + "\n" +
+                                                                   "https://localhost:8080/server/api/core/items/" + author1.getID()))
                                               .andExpect(status().isCreated())
                                               .andReturn();
 
@@ -2158,7 +2158,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         //attempt change, expect not allowed
         MvcResult mvcResult2 = getClient(token).perform(put("/api/core/relationships/" + id + "/rightItem")
                 .contentType(MediaType.parseMediaType("text/uri-list"))
-                .content("https://localhost:8080/spring-rest/api/core/items/" + author2.getID()))
+                .content("https://localhost:8080/server/api/core/items/" + author2.getID()))
                 .andExpect(status().isForbidden())
                 .andReturn();
         //verify nothing changed
@@ -2238,8 +2238,8 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                                                                                                        .toString())
                                                            .contentType(MediaType.parseMediaType("text/uri-list"))
                                                            .content(
-                                                               "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
-                                                                   "https://localhost:8080/spring-rest/api/core/items/" + author1.getID()))
+                                                               "https://localhost:8080/server/api/core/items/" + publication.getID() + "\n" +
+                                                                   "https://localhost:8080/server/api/core/items/" + author1.getID()))
                                               .andExpect(status().isCreated())
                                               .andReturn();
 
@@ -2251,7 +2251,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         //attempt right item change, expect not allowed
         MvcResult mvcResult2 = getClient(token).perform(put("/api/core/relationships/" + id + "/rightItem")
                 .contentType(MediaType.parseMediaType("text/uri-list"))
-                .content("https://localhost:8080/spring-rest/api/core/items/" + author2.getID()))
+                .content("https://localhost:8080/server/api/core/items/" + author2.getID()))
                 .andExpect(status().isForbidden())
                 .andReturn();
         //verify not changed
@@ -2329,8 +2329,8 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                                                                                                        .toString())
                                                            .contentType(MediaType.parseMediaType("text/uri-list"))
                                                            .content(
-                                                               "https://localhost:8080/spring-rest/api/core/items/" + publication1.getID() + "\n" +
-                                                                   "https://localhost:8080/spring-rest/api/core/items/" + author1.getID()))
+                                                               "https://localhost:8080/server/api/core/items/" + publication1.getID() + "\n" +
+                                                                   "https://localhost:8080/server/api/core/items/" + author1.getID()))
                                               .andExpect(status().isCreated())
                                               .andReturn();
 
@@ -2341,7 +2341,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         //attempt left item change, expect not allowed
         MvcResult mvcResult2 = getClient(token).perform(put("/api/core/relationships/" + id + "/leftItem")
                 .contentType(MediaType.parseMediaType("text/uri-list"))
-                .content("https://localhost:8080/spring-rest/api/core/items/" + publication2.getID()))
+                .content("https://localhost:8080/server/api/core/items/" + publication2.getID()))
                 .andExpect(status().isForbidden())
                 .andReturn();
         //verify not changed
@@ -2503,7 +2503,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         MvcResult mvcResult = getClient(token).perform(
                 put("/api/core/relationships/" + nonexistentRelationshipID + "/leftItem")
                 .contentType(MediaType.parseMediaType("text/uri-list"))
-                .content("https://localhost:8080/spring-rest/api/core/items/" + publication1.getID()))
+                .content("https://localhost:8080/server/api/core/items/" + publication1.getID()))
                 .andExpect(status().isNotFound())
                 .andReturn();
 
@@ -2548,8 +2548,8 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                                 .toString())
                 .contentType(MediaType.parseMediaType("text/uri-list"))
                 .content(
-                        "https://localhost:8080/spring-rest/api/core/items/" + publication1.getID() + "\n" +
-                                "https://localhost:8080/spring-rest/api/core/items/" + author1.getID()))
+                        "https://localhost:8080/server/api/core/items/" + publication1.getID() + "\n" +
+                                "https://localhost:8080/server/api/core/items/" + author1.getID()))
                 .andExpect(status().isCreated())
                 .andReturn();
 
@@ -2562,7 +2562,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         //attempt left item change on non-existent relationship
         MvcResult mvcResult2 = getClient(token).perform(put("/api/core/relationships/" + id + "/leftItem")
                 .contentType(MediaType.parseMediaType("text/uri-list"))
-                .content("https://localhost:8080/spring-rest/api/core/items/" + nonexistentItemID))
+                .content("https://localhost:8080/server/api/core/items/" + nonexistentItemID))
                 .andExpect(status().isUnprocessableEntity())
                 .andReturn();
 

@@ -218,7 +218,7 @@
                 </dependency>
                 <dependency>
                     <groupId>org.dspace</groupId>
-                    <artifactId>dspace-spring-rest</artifactId>
+                    <artifactId>dspace-server-webapp</artifactId>
                     <type>war</type>
                     <scope>compile</scope>
                 </dependency>
@@ -267,7 +267,7 @@
                                         <sourceDirectory>${project.parent.basedir}/dspace-rdf/src/main/java</sourceDirectory>
                                         <sourceDirectory>${project.parent.basedir}/dspace-rest/src/main/java</sourceDirectory>
                                         <sourceDirectory>${project.parent.basedir}/dspace-services/src/main/java</sourceDirectory>
-                                        <sourceDirectory>${project.parent.basedir}/dspace-spring-rest/src/main/java</sourceDirectory>
+                                        <sourceDirectory>${project.parent.basedir}/dspace-server-webapp/src/main/java</sourceDirectory>
                                         <sourceDirectory>${project.parent.basedir}/dspace-sword/src/main/java</sourceDirectory>
                                         <sourceDirectory>${project.parent.basedir}/dspace-swordv2/src/main/java</sourceDirectory>
                                     </sourceDirectories>
