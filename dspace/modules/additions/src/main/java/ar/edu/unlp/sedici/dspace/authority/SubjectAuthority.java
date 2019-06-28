@@ -23,7 +23,7 @@ import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.ResIterator;
 
 //FIXME cambiar  los queries para que levanten autores
-public class VocabularyAuthority extends SPARQLAuthorityProvider {
+public class SubjectAuthority extends SPARQLAuthorityProvider {
 
 	protected static final Resource subject = ResourceFactory.createResource(NS_SEDICI+ "Subject");
 	protected static final Property prefLabel = ResourceFactory.createProperty(NS_SKOS + "prefLabel");
@@ -36,18 +36,29 @@ public class VocabularyAuthority extends SPARQLAuthorityProvider {
 	}
 
 	protected Choice extractChoice(Resource subject) {
-		
-		String key = subject.getProperty(sameAs).getString();
+		String key = this.getURIFromSubject(subject);
 		String label = subject.getProperty(prefLabel).getString();
 		String value = label;
+		String vocabulary = "[" + subject.getProperty(type).getObject().toString().replace(NS_SEDICI, "") + "]";
 		Statement broader = subject.getProperty(skosBroader);
 		if (broader != null) {
 			String fatherLabel = broader.getResource().getProperty(prefLabel).getString();
 			if (!fatherLabel.isEmpty()) {
-				label += " (" + fatherLabel + ")";
+				label += " (" + fatherLabel + ") " + vocabulary;
 			}
 		}
 		return new Choice(key, value, label);
+	}
+
+	private String getURIFromSubject(Resource resource) {
+		String uri = "";
+		if (resource.getProperty(sameAs) != null ) {
+			uri = resource.getProperty(sameAs).getString();
+		}
+		else {
+			uri = resource.getURI();
+		}
+		return uri;
 	}
 
 	protected Choice[] extractChoicesfromQuery(QueryEngineHTTP httpQuery) {
@@ -56,17 +67,25 @@ public class VocabularyAuthority extends SPARQLAuthorityProvider {
 		ResIterator RDFResources = getRDFResources(model);
 		while (RDFResources.hasNext()){
 			Resource subject = RDFResources.next();
-			String externalURI = subject.getProperty(sameAs).getString();
-			if (!choices.containsKey(externalURI)) {
-				choices.put(externalURI, this.extractChoice(subject));				
+			String uri = this.getURIFromSubject(subject);
+			if (!choices.containsKey(uri)) {
+				choices.put(uri, this.extractChoice(subject));				
 			}else {
+				// si el termino ya se encuentra en choices, y el nombre del padre no esta en el label entonces
+				// agrego el nombre del padre al label, entre parentesis.
 				Statement broader = subject.getProperty(skosBroader);
 				if (broader != null) {
 					String fatherLabel = broader.getResource().getProperty(prefLabel).getString();
-					if (!fatherLabel.isEmpty()) {
-						String label = choices.get(externalURI).label;
-						label = label.substring(0, label.length() -1) + ", " + fatherLabel + ")";
-						choices.get(externalURI).label = label;
+					String label = choices.get(uri).label;
+					if (!fatherLabel.isEmpty() && !label.contains(fatherLabel)) {
+						String vocabulary = "[" + subject.getProperty(type).getObject().toString().replace(NS_SEDICI, "") + "]";
+						label = label.replace(vocabulary, "");
+						if (label.contains("(") && label.contains(")")) {
+							label = label.substring(0, label.length() - 2) + ", " + fatherLabel + ") " + vocabulary;
+						}else {
+							label += " (" + fatherLabel + ") " + vocabulary;
+						}	
+						choices.get(uri).label = label;
 					}					
 				}
 			}
@@ -120,11 +139,13 @@ public class VocabularyAuthority extends SPARQLAuthorityProvider {
 
 		pqs.setCommandText("CONSTRUCT {"
 				+ "?concept a sedici:Subject . \n" + 
+				"  ?concept a ?type.\n" + 
 				"  ?concept skos:prefLabel ?label . \n" + 
 				"  ?concept owl:sameAs ?externalURI. \n" + 
 				"}\n");
 		pqs.append("WHERE {\n");
-		pqs.append("?concept a sedici:Subject . \n" + 
+		pqs.append(" { ?concept a sedici:Subject } UNION { ?concept a sedici:ACM }  UNION { ?concept a sedici:UNESCO }. \n" + 
+				" ?concept a ?type . \n" + 
 				" ?concept skos:prefLabel ?label . \n" + 
 				" ?concept owl:sameAs ?externalURI. \n");
 		pqs.append("FILTER(REGEX(?externalURI, ?key, \"i\")) \n");
@@ -146,6 +167,7 @@ public class VocabularyAuthority extends SPARQLAuthorityProvider {
 
 		pqs.setCommandText("CONSTRUCT { "
 				+ "?concept a sedici:Subject .\n" + 
+				"?concept a ?type.\n" + 
 				"?concept skos:prefLabel ?label .\n" + 
 				"?concept owl:sameAs ?externalURI.\n" + 
 				"?concept skos:broader ?parent .\n" + 
@@ -153,7 +175,8 @@ public class VocabularyAuthority extends SPARQLAuthorityProvider {
 				"?parent owl:sameAs ?parentURI.\n" + 
 				"\n}");
 		pqs.append("WHERE {\n");
-		pqs.append("?concept a sedici:Subject .\n" + 
+		pqs.append("{ ?concept a sedici:Subject } UNION { ?concept a sedici:ACM }  UNION { ?concept a sedici:UNESCO }.\n" + 
+				"?concept a ?type.\n" + 
 				"?concept skos:prefLabel ?label .\n" + 
 				"?concept owl:sameAs ?externalURI.\n" + 
 				"?concept skos:broader ?parent .\n" + 
