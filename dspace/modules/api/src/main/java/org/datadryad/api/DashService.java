@@ -519,28 +519,30 @@ public class DashService {
         log.debug("migrating provenances");
         // get curationActivities from Dash package
         JsonNode curationActivities = getCurationActivity(pkg);
+        JsonNode provenances = pkg.getDataPackage().getProvenancesAsCurationActivities();
         // if the only curation activity is the default "in_progress," delete it,
-        // but not if the package is in user workspace!
-        if (curationActivities != null && curationActivities.size() == 1) {
-            if (curationActivities.get(0).get("status").textValue().equals("In Progress")) {
-                int unsubmittedID = curationActivities.get(0).get("id").intValue();
-                try {
-                    URL url = new URL(dashServer + "/api/curation_activity/" + unsubmittedID);
-                    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                    connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
-                    connection.setRequestProperty("Accept", "application/json");
-                    connection.setRequestProperty("Authorization", "Bearer " + oauthToken);
-                    connection.setRequestMethod("DELETE");
-
-                    InputStream inputStream = connection.getInputStream();
-                } catch (Exception e) {
-                    throw new RuntimeException("Unable to delete curation activity from Dash", e);
-                }
+        // but not if the package has no provenances of its own!
+        if (curationActivities != null &&
+            curationActivities.size() == 1 &&
+            curationActivities.get(0).get("status").textValue().equals("In Progress") &&
+            provenances != null &&
+            provenances.size() > 0) {
+            int unsubmittedID = curationActivities.get(0).get("id").intValue();
+            try {
+                URL url = new URL(dashServer + "/api/curation_activity/" + unsubmittedID);
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+                connection.setRequestProperty("Accept", "application/json");
+                connection.setRequestProperty("Authorization", "Bearer " + oauthToken);
+                connection.setRequestMethod("DELETE");
+                
+                InputStream inputStream = connection.getInputStream();
+            } catch (Exception e) {
+                throw new RuntimeException("Unable to delete curation activity from Dash", e);
             }
         }
-
+        
         // add provenances as curation activities
-        JsonNode provenances = pkg.getDataPackage().getProvenancesAsCurationActivities();
         log.debug("migrating provenances " + provenances.toString());
         for (int i=0; i<provenances.size(); i++) {
             int responseCode = addCurationActivity(pkg.getDataPackage(), provenances.get(i));
