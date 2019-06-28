@@ -160,48 +160,6 @@
 	</dc-type>
 	<dc-type>
 		<schema>sedici</schema>
-		<element>subject</element>
-		<qualifier>lcsh</qualifier>
-		<scope_note>Materia asociada al documento, extraída del vocabulario del Library of Congress Subject Headings</scope_note>
-	</dc-type>
-	<dc-type>
-		<schema>sedici</schema>
-		<element>subject</element>
-		<qualifier>decs</qualifier>
-		<scope_note>Descriptores extraídos del tesauro DECS</scope_note>
-	</dc-type>
-	<dc-type>
-		<schema>sedici</schema>
-		<element>subject</element>
-		<qualifier>eurovoc</qualifier>
-		<scope_note>Descriptores extraídos del tesauro Eurovoc</scope_note>
-	</dc-type>
-	<dc-type>
-		<schema>sedici</schema>
-		<element>subject</element>
-		<qualifier>acmcss98</qualifier>
-		<scope_note>Descriptores extraídos del Sist de clasificacion ACM CSS 98</scope_note>
-	</dc-type>
-	<dc-type>
-		<schema>sedici</schema>
-		<element>subject</element>
-		<qualifier>descriptores</qualifier>
-		<scope_note>Descriptores extraídos de los tesauros SeDiCI y Unesco</scope_note>
-	</dc-type>
-	<dc-type>
-		<schema>sedici</schema>
-		<element>subject</element>
-		<qualifier>other</qualifier>
-		<scope_note>Descriptores libres</scope_note>
-	</dc-type>
-	<dc-type>
-		<schema>sedici</schema>
-		<element>subject</element>
-		<qualifier>keyword</qualifier>
-		<scope_note>Palabras clave extraídas del documento</scope_note>
-	</dc-type>
-	<dc-type>
-		<schema>sedici</schema>
 		<element>description</element>
 		<qualifier>fulltext</qualifier>
 		<!-- sin calificar -->

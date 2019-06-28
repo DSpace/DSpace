@@ -618,17 +618,6 @@
 					<xsl:with-param name="filter">subject</xsl:with-param>
 				</xsl:call-template>
 
-				<!-- todos los descriptores (terminos de tesuaro) -->
-				<xsl:call-template name="render-normal-field">
-					<xsl:with-param name="name" select="'subject-descriptores'"/>
-					<xsl:with-param name="elements" select="dim:field[(@element='subject' and @qualifier='descriptores') or (@element='subject' and @qualifier='decs') or (@element='subject' and @qualifier='eurovoc') or (@element='subject' and @qualifier='acmcss98') or (@element='subject' and @qualifier='other')] "/>
-				</xsl:call-template>
-
-				<!-- subject.keyword row --> 
-				<xsl:call-template name="render-normal-field">
-					<xsl:with-param name="name" select="'subject-keyword'" />
-					<xsl:with-param name="elements" select="dim:field[@element='subject' and @qualifier='keyword']" />
-				</xsl:call-template>
 			</div>
 		</xsl:if>
 

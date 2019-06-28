@@ -136,13 +136,6 @@
 			
 			<!--dc.subject = subject -->
 			<!--sedici.subject.materias = subject -->
-			<!--sedici.subject.lcsh = subject -->
-			<!--sedici.subject.decs = subject -->
-			<!--sedici.subject.eurovoc = subject -->
-			<!--sedici.subject.descriptores = subject -->
-			<!--sedici.subject.other = subject -->
-			<!--sedici.subject.keyword = subject -->
-			<!--sedici.subject.acmcss98 = subject -->
 			<!-- Imprimo primero en espanol y luego en el resto de los idiomas -->
 			<xsl:for-each select="doc:metadata/doc:element[@name='sedici']/doc:element[@name='subject']/doc:element/doc:element[not(@name) or @name='es' ]/doc:field[@name='value']">
 				<dc:subject><xsl:value-of select="." /></dc:subject>

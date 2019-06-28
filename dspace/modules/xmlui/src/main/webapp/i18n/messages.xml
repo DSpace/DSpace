@@ -2483,12 +2483,6 @@
   <message key="xmlui.ChoiceLookupTransformer.field.dc_contributor_author.nonauthority">Local value "@1@" (not in Naming Authority)</message>
 
   
-  <message key="xmlui.ChoiceLookupTransformer.field.sedici_subject_decs.help">Name of the term in DECS thesaurus</message>
-  <message key="xmlui.ChoiceLookupTransformer.field.sedici_subject_decs.title">Search a term in DECS thesaurus</message>
-  <message key="xmlui.ChoiceLookupTransformer.field.sedici_subject_decs.nonauthority">Use "@1@" (no controlled)</message>
-  <message key="xmlui.ChoiceLookupTransformer.field.sedici_subject_eurovoc.help">Name of the term in Eurovoc thesaurus</message>
-  <message key="xmlui.ChoiceLookupTransformer.field.sedici_subject_eurovoc.title">Search a term in Eurovoc thesaurus</message>
-  <message key="xmlui.ChoiceLookupTransformer.field.sedici_subject_eurovoc.nonauthority">Use @1@" (value without controlling)"</message>
   <message key="xmlui.ChoiceLookupTransformer.field.dc_coverage_spatial.help">Geographic location name</message>
   <message key="xmlui.ChoiceLookupTransformer.field.dc_coverage_spatial.title">Geographic locations</message>
   <message key="xmlui.ChoiceLookupTransformer.field.dc_coverage_spatial.nonauthority">Use "@1@" (no controlled)</message>
@@ -2679,12 +2673,7 @@
 <message key="xmlui.dri2xhtml.METS-1.0.item-format-extent">Extent</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-format-medium">Materials/Techniques</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-subject-materias">Subjects</message>
-<message key="xmlui.dri2xhtml.METS-1.0.item-subject-decs">DECS Thesaurus</message>
-<message key="xmlui.dri2xhtml.METS-1.0.item-subject-eurovoc">Eurovoc Thesaurus</message>
-<message key="xmlui.dri2xhtml.METS-1.0.item-subject-acmcss98">ACM98 Classification System</message>
-<message key="xmlui.dri2xhtml.METS-1.0.item-subject-descriptores">Descriptors</message>
-<message key="xmlui.dri2xhtml.METS-1.0.item-subject-other">Other descriptors</message>
-<message key="xmlui.dri2xhtml.METS-1.0.item-subject-keyword">Keywords</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-subject">Keywords</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-relation-journal">Journal</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-relation-event">Event</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-subtype">Document type</message>

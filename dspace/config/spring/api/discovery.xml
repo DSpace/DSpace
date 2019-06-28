@@ -477,7 +477,6 @@
         <property name="metadataFields">
             <list>
                 <value>sedici.subject.materias</value>
-                <value>sedici.subject.lcsh</value>
             </list>
         </property>
         <property name="facetLimit" value="10"/>
@@ -522,11 +521,6 @@
         <property name="metadataFields">
             <list>
                 <value>dc.subject</value>
-                <value>sedici.subject.decs</value>
-                <value>sedici.subject.eurovoc</value>
-                <value>sedici.subject.acmcss98</value>
-                <value>sedici.subject.descriptores</value>
-                <value>sedici.subject.other</value>
             </list>
         </property>
         <property name="facetLimit" value="10"/>

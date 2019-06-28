@@ -2202,11 +2202,7 @@
 	<message key="xmlui.dri2xhtml.METS-1.0.item-relation-related-with">Documentos relacionados</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-relation-review-of">E revisão de</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-relation-reviewed-by">Foi revisado por</message>
-	<message key="xmlui.dri2xhtml.METS-1.0.item-subject-acmcss98">Sistema de classificação ACM98</message>
-	<message key="xmlui.dri2xhtml.METS-1.0.item-subject-decs">Tesauro DECS</message>
-	<message key="xmlui.dri2xhtml.METS-1.0.item-subject-descriptores">Descritores</message>
-	<message key="xmlui.dri2xhtml.METS-1.0.item-subject-eurovoc">Tesauro Eurovoc</message>
-	<message key="xmlui.dri2xhtml.METS-1.0.item-subject-keyword">Palavras chave</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.item-subject">Palavras chave</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-subject-materias">Matérias</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-subject-other">Outros descritores</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-subtype">Tipo de documento</message>
@@ -2348,13 +2344,6 @@
 	<message key="xmlui.ChoiceLookupTransformer.field.dc_coverage_spatial.nonauthority">Use @1@" (não controlado)</message>
 	<message key="xmlui.ChoiceLookupTransformer.field.dc_coverage_spatial.title">Localizações geográficas</message>
 
-	<message key="xmlui.ChoiceLookupTransformer.field.sedici_subject_decs.help">Nome do item no tesauro DECS</message>
-	<message key="xmlui.ChoiceLookupTransformer.field.sedici_subject_decs.nonauthority">Use @1@" (não controlado)</message>
-	<message key="xmlui.ChoiceLookupTransformer.field.sedici_subject_decs.title">Procurar um termo no tesauro DECS</message>
-	<message key="xmlui.ChoiceLookupTransformer.field.sedici_subject_eurovoc.help">Nome do termo no tesauro Eurovoc</message>
-	<message key="xmlui.ChoiceLookupTransformer.field.sedici_subject_eurovoc.nonauthority">Uso @1@" (valor sem controle)</message>
-	<message key="xmlui.ChoiceLookupTransformer.field.sedici_subject_eurovoc.title">Procurar o termo no tesauro Eurovoc</message>
-  
 
   <!-- mobile theme -->
   <message key="xmlui.mobile.home_mobile">DSpace para dispositívos móveis</message>

@@ -132,9 +132,8 @@
 			</keywords>
 		</xsl:for-each>
 
-		<!-- keywords :: sedici.subject.(materias|lcsh|decs|eurovoc|descriptores|other|keyword) -->
-		<xsl:for-each select="doc:element[@name='sedici']/doc:element[@name='subject']/
- 					doc:element[@name='materias' or @name='lcsh' or @name='decs' or @name='eurovoc' or @name='descriptores' or @name='other' or @name='keyword']">
+		<!-- keywords :: sedici.subject.(materias) -->
+		<xsl:for-each select="doc:element[@name='sedici']/doc:element[@name='subject']/doc:element[@name='materias']">
 			<keywords>
 				<xsl:attribute name="language">
 					<xsl:value-of select="./doc:element[@name]/@name"/>
