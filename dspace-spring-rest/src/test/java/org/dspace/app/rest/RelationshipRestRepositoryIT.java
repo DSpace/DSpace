@@ -2177,7 +2177,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
         Collection col3 = CollectionBuilder.createCollection(context, child1).withName("OrgUnits").build();
 
-        Item auhor1 = ItemBuilder.createItem(context, col1)
+        Item author1 = ItemBuilder.createItem(context, col1)
                                  .withTitle("Author1")
                                  .withIssueDate("2017-10-17")
                                  .withAuthor("Smith, Donald")
@@ -2233,21 +2233,31 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                                   entityTypeService.findByEntityType(context, "Person"),
                                   "isAuthorOfPublication", "isPublicationOfAuthor");
 
+        // We're creating a Relationship of type isOrgUnitOfPerson between an author and an orgunit
         Relationship relationship1 = RelationshipBuilder
-            .createRelationshipBuilder(context, auhor1, orgUnit1, isOrgUnitOfPersonRelationshipType).build();
+            .createRelationshipBuilder(context, author1, orgUnit1, isOrgUnitOfPersonRelationshipType).build();
 
+        // We're creating a Relationship of type isOrgUnitOfPerson between a different author and the same orgunit
         Relationship relationshipAuthorExtra = RelationshipBuilder
             .createRelationshipBuilder(context, author2, orgUnit1, isOrgUnitOfPersonRelationshipType).build();
 
+        // We're creating a Relationship of type isOrgUnitOfProject between a project and an orgunit
         Relationship relationship2 = RelationshipBuilder
             .createRelationshipBuilder(context, project1, orgUnit1, isOrgUnitOfProjectRelationshipType).build();
 
+        // We're creating a Relationship of type isAuthorOfPublication between a publication and an author
         Relationship relationship3 = RelationshipBuilder
-            .createRelationshipBuilder(context, publication, auhor1, isAuthorOfPublicationRelationshipType).build();
+            .createRelationshipBuilder(context, publication, author1, isAuthorOfPublicationRelationshipType).build();
 
+        // Perform a GET request to the searchByLabel endpoint, asking for Relationships of type isOrgUnitOfPerson
+        // With an extra parameter namely DSO which resolves to the author(Smith, Donald) in the first
+        // relationship created.
+        // As that first relationship is the only one created with the given author(Smith, Donald) that holds the
+        // RelationshipType "isOrgUnitOfPerson", that Relationship should be the only one returned.
+        // This is what we're checking for
         getClient().perform(get("/api/core/relationships/search/byLabel")
                     .param("label", "isOrgUnitOfPerson")
-                    .param("dso", auhor1.getID().toString()))
+                    .param("dso", author1.getID().toString()))
 
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.page",
@@ -2257,6 +2267,10 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                    )))
         ;
 
+        // Perform a GET request to the searchByLabel endpoint, asking for Relationships of type isOrgUnitOfPerson
+        // We do not specificy a DSO param, which means ALL relationships of type isOrgUnitOfPerson should be returned
+        // Which is what we're checking for, both the first relationship and the one with a different author
+        // should be returned
         getClient().perform(get("/api/core/relationships/search/byLabel")
                                 .param("label", "isOrgUnitOfPerson"))
 
