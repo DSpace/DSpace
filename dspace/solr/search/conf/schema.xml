@@ -569,7 +569,7 @@
      <!--Dynamic field used for sidebar filters & SOLR browse by value -->
      <dynamicField name="*_filter" type="keywordFilter" indexed="true" stored="true" multiValued="true" omitNorms="true" />
      <dynamicField name="*_authority" type="keywordFilter" indexed="true" stored="true" multiValued="true" omitNorms="true" />
-     <dynamicField name="*_keyword" type="keywordFilter" indexed="true" stored="true" multiValued="true" omitNorms="true" />
+     <dynamicField name="*_keyword" type="lowerCaseSort" indexed="true" stored="true" multiValued="true" omitNorms="true" />
 
 	<!--Dynamic field used for SOLR browse by partial value -->
      <dynamicField name="*_partial" type="text" indexed="true" stored="true" multiValued="true" omitNorms="true" />
