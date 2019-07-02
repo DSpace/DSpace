@@ -126,6 +126,9 @@ public class GoogleMetadata
     private static final int MULTI = 1;
 
     private static final int ALL_FIELDS_IN_OPTION = 2;
+    
+    private static final ArrayList<String> priorityList = new ArrayList<String>(Arrays.asList(
+            "Adobe PDF", "Postscript", "Microsoft Word XML", "Microsoft Word", "RTF", "EPUB"));
 
     private Context ourContext;
     // Load configured fields from google-metadata.properties
@@ -1089,7 +1092,9 @@ public class GoogleMetadata
 		}
 		boolean result = false;
 		try {
-            result = AuthorizeManager.authorizeActionBoolean(ourContext, bitstream, Constants.READ, true);
+            result = AuthorizeManager.authorizeActionBoolean(ourContext, bitstream, Constants.READ, true)
+                    //SEDICI-Ticket#5688
+                    && priorityList.contains(bitstream.getFormat().getShortDescription());
 		} catch (SQLException e) {
 			log.error("Cannot determine whether bitstream is public, assuming it isn't. bitstream_id=" + bitstream.getID(), e);
 		}
