@@ -27,7 +27,7 @@ import org.dspace.AbstractIntegrationTest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
-import org.dspace.content.MetadataSchema;
+import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
@@ -216,11 +216,11 @@ public class StructBuilderIT
         context.turnOffAuthorisationSystem();
         Community community0 = communityService.create(null, context);
         communityService.setMetadataSingleValue(context, community0,
-                MetadataSchema.DC_SCHEMA, "title", null,
+                MetadataSchemaEnum.DC.getName(), "title", null,
                 null, "Top Community 0");
         Collection collection0_0 = collectionService.create(context, community0);
         collectionService.setMetadataSingleValue(context, collection0_0,
-                MetadataSchema.DC_SCHEMA, "title", null,
+                MetadataSchemaEnum.DC.getName(), "title", null,
                 null, "Collection 0.0");
 
         // Export the current structure.
