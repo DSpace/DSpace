@@ -1099,6 +1099,7 @@ class BrowseParams
         paramMap.put(BrowseParams.RESULTS_PER_PAGE, Integer
                 .toString(this.scope.getResultsPerPage()));
         paramMap.put(BrowseParams.ETAL, Integer.toString(this.etAl));
+        paramMap.put(BrowseParams.STARTS_WITH, this.scope.getStartsWith());
 
         return paramMap;
     }
