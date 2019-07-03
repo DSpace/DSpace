@@ -35,7 +35,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
-import org.dspace.content.MetadataSchema;
+import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
@@ -321,16 +321,16 @@ public class StructBuilder {
         element.addContent(new Element("name").setText(community.getName()));
         element.addContent(new Element("description")
                 .setText(communityService.getMetadataFirstValue(community,
-                        MetadataSchema.DC_SCHEMA, "description", "abstract", Item.ANY)));
+                        MetadataSchemaEnum.DC.getName(), "description", "abstract", Item.ANY)));
         element.addContent(new Element("intro")
                 .setText(communityService.getMetadataFirstValue(community,
-                        MetadataSchema.DC_SCHEMA, "description", null, Item.ANY)));
+                        MetadataSchemaEnum.DC.getName(), "description", null, Item.ANY)));
         element.addContent(new Element("copyright")
                 .setText(communityService.getMetadataFirstValue(community,
-                        MetadataSchema.DC_SCHEMA, "rights", null, Item.ANY)));
+                        MetadataSchemaEnum.DC.getName(), "rights", null, Item.ANY)));
         element.addContent(new Element("sidebar")
                 .setText(communityService.getMetadataFirstValue(community,
-                        MetadataSchema.DC_SCHEMA, "description", "tableofcontents", Item.ANY)));
+                        MetadataSchemaEnum.DC.getName(), "description", "tableofcontents", Item.ANY)));
 
         // Export this Community's Community children.
         for (Community subCommunity : community.getSubcommunities()) {
@@ -358,22 +358,22 @@ public class StructBuilder {
         element.addContent(new Element("name").setText(collection.getName()));
         element.addContent(new Element("description")
                 .setText(collectionService.getMetadataFirstValue(collection,
-                        MetadataSchema.DC_SCHEMA, "description", "abstract", Item.ANY)));
+                        MetadataSchemaEnum.DC.getName(), "description", "abstract", Item.ANY)));
         element.addContent(new Element("intro")
                 .setText(collectionService.getMetadataFirstValue(collection,
-                        MetadataSchema.DC_SCHEMA, "description", null, Item.ANY)));
+                        MetadataSchemaEnum.DC.getName(), "description", null, Item.ANY)));
         element.addContent(new Element("copyright")
                 .setText(collectionService.getMetadataFirstValue(collection,
-                        MetadataSchema.DC_SCHEMA, "rights", null, Item.ANY)));
+                        MetadataSchemaEnum.DC.getName(), "rights", null, Item.ANY)));
         element.addContent(new Element("sidebar")
                 .setText(collectionService.getMetadataFirstValue(collection,
-                        MetadataSchema.DC_SCHEMA, "description", "tableofcontents", Item.ANY)));
+                        MetadataSchemaEnum.DC.getName(), "description", "tableofcontents", Item.ANY)));
         element.addContent(new Element("license")
                 .setText(collectionService.getMetadataFirstValue(collection,
-                        MetadataSchema.DC_SCHEMA, "rights", "license", Item.ANY)));
+                        MetadataSchemaEnum.DC.getName(), "rights", "license", Item.ANY)));
         // Provenance is special:  multivalued
         for (MetadataValue value : collectionService.getMetadata(collection,
-                MetadataSchema.DC_SCHEMA, "provenance", null, Item.ANY)) {
+                MetadataSchemaEnum.DC.getName(), "provenance", null, Item.ANY)) {
             element.addContent(new Element("provenance")
                     .setText(value.getValue()));
         }
