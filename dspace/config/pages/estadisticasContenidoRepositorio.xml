@@ -13,7 +13,7 @@ xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
         
         <div id='pagina_estatica' class="pagina_reportesContenido">
             <div id="crecimiento_mensual_año_actual">
-                <iframe width="600" height="371" frameborder="0" scrolling="no" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRPMopBammb_n5yXOZ-c7uTlEUTQG9VNis9EzFxm4FtQWWu-1obDFqufyA7hQVSBQPpivSVsHugvmki/pubchart?oid=813404645&amp;format=interactive">Gráfico mensual</iframe>
+                <iframe width="600" height="371" frameborder="0" scrolling="no" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRPMopBammb_n5yXOZ-c7uTlEUTQG9VNis9EzFxm4FtQWWu-1obDFqufyA7hQVSBQPpivSVsHugvmki/pubchart?oid=1192274655&amp;format=interactive">Gráfico mensual</iframe>
                 <p> 
                     Gráfico interactivo donde se visualiza el crecimiento mensual en el contenido del repositorio para el año vigente.
                 </p>
