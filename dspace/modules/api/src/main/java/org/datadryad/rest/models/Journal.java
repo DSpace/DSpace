@@ -27,6 +27,7 @@ public class Journal {
     public String website = "";
     public String description = "";
     public String paymentPlanType = "";
+    public String paymentContact = "";
     
     protected DryadJournalConcept dryadJournalConcept;
 
@@ -39,6 +40,7 @@ public class Journal {
         website = dryadJournalConcept.getWebsite();
         description = dryadJournalConcept.getDescription();
         paymentPlanType = dryadJournalConcept.getPaymentPlanType();
+        paymentContact = dryadJournalConcept.getPaymentContact();
         this.dryadJournalConcept = dryadJournalConcept;
     }
 
