@@ -463,6 +463,19 @@ public class DryadJournalConcept extends DryadOrganizationConcept {
     public String getPaymentPlanType() {
         return getConceptMetadataValue(metadataProperties.getProperty(PAYMENT_PLAN));
     }
+
+    public String getPaymentContact() {
+        String allContacts = getConceptMetadataValue(metadataProperties.getProperty(NOTIFY_WEEKLY));
+        String paymentContact = null;
+        if(allContacts != null && allContacts.length() > 0) {
+            paymentContact = allContacts;
+            int firstComma = paymentContact.indexOf(",");
+            if(firstComma > 0) {
+                paymentContact = paymentContact.substring(0, firstComma);
+            }
+        }
+        return paymentContact;
+    }
     
     public void setPublicationBlackout(String value) {
         setConceptMetadataValue(metadataProperties.getProperty(PUBLICATION_BLACKOUT), value);
