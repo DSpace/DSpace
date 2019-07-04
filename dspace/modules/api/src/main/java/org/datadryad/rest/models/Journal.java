@@ -28,6 +28,7 @@ public class Journal {
     public String description = "";
     public String paymentPlanType = "";
     public String paymentContact = "";
+    public String stripeCustomerID = "";
     
     protected DryadJournalConcept dryadJournalConcept;
 
@@ -41,6 +42,7 @@ public class Journal {
         description = dryadJournalConcept.getDescription();
         paymentPlanType = dryadJournalConcept.getPaymentPlanType();
         paymentContact = dryadJournalConcept.getPaymentContact();
+        stripeCustomerID = dryadJournalConcept.getStripeCustomerID();
         this.dryadJournalConcept = dryadJournalConcept;
     }
 
