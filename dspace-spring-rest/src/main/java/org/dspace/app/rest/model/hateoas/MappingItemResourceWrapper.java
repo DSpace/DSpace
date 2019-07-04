@@ -17,6 +17,10 @@ import org.dspace.app.rest.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * This class will act as a HALResource object for the MappingItemRestWrapper data object and will transform
+ * this REST data object into a proper HAL Resource to be returned by the endpoint
+ */
 public class MappingItemResourceWrapper extends HALResource<MappingItemRestWrapper> {
     private static final Logger log = LoggerFactory.getLogger(MappingItemResourceWrapper.class);
 

@@ -16,6 +16,9 @@ import org.springframework.hateoas.Link;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
+/**
+ * This class' purpose is to add links to the MappingCollectionResourceWrapper objects
+ */
 @Component
 public class MappingCollectionResourceWrapperHalLinkFactory
     extends MappingCollectionRestHalLinkFactory<MappingCollectionResourceWrapper> {

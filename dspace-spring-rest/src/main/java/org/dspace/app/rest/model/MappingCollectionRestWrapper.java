@@ -13,6 +13,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.dspace.app.rest.MappingCollectionRestController;
 import org.dspace.content.Item;
 
+/**
+ * The REST object that will define a list of CollectionRest objects to be returned by the REST api
+ */
 public class MappingCollectionRestWrapper implements RestAddressableModel {
 
     @JsonIgnore

@@ -13,6 +13,9 @@ import java.util.UUID;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.dspace.app.rest.MappingItemRestController;
 
+/**
+ * The REST object that will define a list of ItemRest objects to be returned by the REST api
+ */
 public class MappingItemRestWrapper implements RestAddressableModel {
 
     @JsonIgnore
