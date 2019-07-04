@@ -8,4 +8,5 @@
     <include file="changelog/02-fill-speciality-table.xml" relativeToChangelogFile="true"/>
     <include file="changelog/03-metadata-field.xml" relativeToChangelogFile="true"/>
     <include file="changelog/04-add-law-speciality.xml" relativeToChangelogFile="true"/>
+    <include file="changelog/05-add-applied-math-speciality.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>
