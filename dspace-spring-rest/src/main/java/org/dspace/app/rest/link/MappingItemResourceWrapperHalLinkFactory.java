@@ -19,6 +19,9 @@ import org.springframework.hateoas.Link;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
+/**
+ * This class' purpose is to add links to the MappingItemResourceWrapper objects
+ */
 @Component
 public class MappingItemResourceWrapperHalLinkFactory
     extends MappingItemRestHalLinkFactory<MappingItemResourceWrapper> {
@@ -36,7 +39,7 @@ public class MappingItemResourceWrapperHalLinkFactory
         }
 
     }
-    public String getSelfLink(MappingItemRestWrapper mappingItemRestWrapper, Pageable pageable) throws Exception {
+    private String getSelfLink(MappingItemRestWrapper mappingItemRestWrapper, Pageable pageable) throws Exception {
         if (mappingItemRestWrapper != null) {
             UriComponentsBuilder uriBuilderSelfLink = uriBuilder(getMethodOn()
                                                                      .retrieve(

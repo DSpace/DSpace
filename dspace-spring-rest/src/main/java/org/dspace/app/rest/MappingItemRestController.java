@@ -34,6 +34,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * This Controller will deal with request about the items that are mapped to the collection given in the request url
+ * Currently this only includes a GET method for all the items that are mapped to the given collection that do not
+ * have the given collection as their owning collection
+ */
 @RestController
 @RequestMapping("/api/core/collections/" +
     "{uuid:[0-9a-fxA-FX]{8}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{12}}/mappingItems")
@@ -56,6 +61,28 @@ public class MappingItemRestController {
     @Autowired
     private HalLinkService halLinkService;
 
+    /**
+     * This method will retrieve a List of Item objects that are mapped to the Collection given in the URL.
+     * These Item objects will be filtered out of their owning collection is the given collection, resulting in
+     * returning only items that belong to a different collection but are mapped to the given one.
+     * These Items are then encapsulated in a MappingItemResourceWrapper and returned
+     *
+     * curl -X GET http://<dspace.restUrl>/api/core/collections/{uuid}/mappingItems
+     *
+     * Example:
+     * <pre>
+     * {@code
+     *      curl -X GET http://<dspace.restUrl>/api/core/collections/8b632938-77c2-487c-81f0-e804f63e68e6/mappingItems
+     * }
+     * </pre>
+     *
+     * @param uuid      The UUID of the collection
+     * @param response  The HttpServletResponse
+     * @param request   The HttpServletRequest
+     * @param pageable  The pagination object
+     * @return
+     * @throws Exception
+     */
     @RequestMapping(method = {RequestMethod.GET, RequestMethod.HEAD})
     public MappingItemResourceWrapper retrieve(@PathVariable UUID uuid, HttpServletResponse response,
                                                HttpServletRequest request, Pageable pageable) throws Exception {

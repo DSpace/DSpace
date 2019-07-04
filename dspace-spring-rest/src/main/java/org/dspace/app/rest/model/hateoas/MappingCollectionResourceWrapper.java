@@ -16,6 +16,10 @@ import org.dspace.app.rest.model.MappingCollectionRestWrapper;
 import org.dspace.app.rest.utils.Utils;
 import org.springframework.data.domain.Pageable;
 
+/**
+ * This class will act as a HALResource object for the MappingCollectionRestWrapper data object and will transform
+ * this REST data object into a proper HAL Resource to be returned by the endpoint
+ */
 public class MappingCollectionResourceWrapper extends HALResource<MappingCollectionRestWrapper> {
 
     @JsonIgnore

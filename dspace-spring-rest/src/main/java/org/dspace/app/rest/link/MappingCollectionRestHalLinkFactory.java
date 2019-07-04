@@ -9,6 +9,10 @@ package org.dspace.app.rest.link;
 
 import org.dspace.app.rest.MappingCollectionRestController;
 
+/**
+ * This class acts as an abstract class for the MappingCollectionResourceWrapperHalLinkFactory to inherit from
+ * so it already has the Controller defined
+ */
 public abstract class MappingCollectionRestHalLinkFactory<T>
     extends HalLinkFactory<T, MappingCollectionRestController> {
 
