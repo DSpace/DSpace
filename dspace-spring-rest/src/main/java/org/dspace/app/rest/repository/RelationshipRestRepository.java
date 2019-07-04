@@ -234,6 +234,18 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
         }
     }
 
+    /**
+     * This method will find all the Relationship objects that a RelationshipType that corresponds to the given Label
+     * It's also possible to pass a DSO along to this method with a parameter which will only return Relationship
+     * objects that have this DSO as leftItem or rightItem.
+     * This endpoint is paginated
+     *
+     * @param label     The label of a RelationshipType which the Relationships must have if they're to be returned
+     * @param dsoId     The dsoId of the object that has to be a leftItem or rightItem if this parameter is present
+     * @param pageable  The page object
+     * @return          A page with all the RelationshipRest objects that correspond to the constraints
+     * @throws SQLException If something goes wrong
+     */
     @SearchRestMethod(name = "byLabel")
     public Page<RelationshipRest> findByLabel(@Parameter(value = "label", required = true) String label,
                                               @Parameter(value = "dso", required = false) UUID dsoId,
