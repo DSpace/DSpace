@@ -40,6 +40,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * This controller will handle all the incoming calls on the api/code/items/{itemUuid}/owningCollection endpoint
+ * where the itemUuid corresponds to the item of which you want to edit the owning collection.
+ */
 @RestController
 @RequestMapping("/api/core/items/" +
         "{itemUuid:[0-9a-fxA-FX]{8}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{12" +
@@ -61,6 +65,18 @@ public class ItemOwningCollectionUpdateRestController {
     @Autowired
     Utils utils;
 
+    /**
+     * This method will update the owning collection of the item that correspond to the provided item uuid, effectively
+     * moving the item to the new collection.
+     *
+     * @param itemUuid The UUID of the item that will be moved
+     * @param response The response object
+     * @param request  The request object
+     * @return The wrapped resource containing the new owning collection or null when the item was not moved
+     * @throws SQLException       If something goes wrong
+     * @throws IOException        If something goes wrong
+     * @throws AuthorizeException If the user is not authorized to perform the move action
+     */
     @RequestMapping(method = RequestMethod.PUT, consumes = {"text/uri-list"})
     @PreAuthorize("hasPermission(#itemUuid, 'ITEM','WRITE')")
     @PostAuthorize("returnObject != null")
@@ -73,7 +89,7 @@ public class ItemOwningCollectionUpdateRestController {
 
         if (dsoList.size() != 1 || dsoList.get(0).getType() != COLLECTION) {
             throw new UnprocessableEntityException("The collection doesn't exist " +
-                    "or the data cannot be resolved to a collection.");
+                                                           "or the data cannot be resolved to a collection.");
         }
 
         Collection targetCollection = performItemMove(context, itemUuid, (Collection) dsoList.get(0));
@@ -85,6 +101,18 @@ public class ItemOwningCollectionUpdateRestController {
 
     }
 
+    /**
+     * This method will move the item from the current collection to the target collection
+     *
+     * @param context           The context object
+     * @param item              The item to be moved
+     * @param currentCollection The current owning collection of the item
+     * @param targetCollection  The target collection of the item
+     * @return The target collection
+     * @throws SQLException       If something goes wrong
+     * @throws IOException        If something goes wrong
+     * @throws AuthorizeException If the user is not authorized to perform the move action
+     */
     private Collection moveItem(final Context context, final Item item, final Collection currentCollection,
                                 final Collection targetCollection)
             throws SQLException, IOException, AuthorizeException {
@@ -96,6 +124,17 @@ public class ItemOwningCollectionUpdateRestController {
         return context.reloadEntity(targetCollection);
     }
 
+    /**
+     * This method will perform the item move based on the provided item uuid and the target collection
+     *
+     * @param context          The context Object
+     * @param itemUuid         The uuid of the item to be moved
+     * @param targetCollection The target collection
+     * @return The new owning collection of the item when authorized or null when not authorized
+     * @throws SQLException       If something goes wrong
+     * @throws IOException        If something goes wrong
+     * @throws AuthorizeException If the user is not authorized to perform the move action
+     */
     private Collection performItemMove(final Context context, final UUID itemUuid, final Collection targetCollection)
             throws SQLException, IOException, AuthorizeException {
 
