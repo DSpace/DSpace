@@ -134,6 +134,8 @@ public class DCInput {
      */
     private List<String> typeBind = null;
 
+    private boolean relationshipField = false;
+    private boolean metadataField = false;
     /**
      * The scope of the input sets, this restricts hidden metadata fields from
      * view during workflow processing.
@@ -206,6 +208,8 @@ public class DCInput {
             }
         }
         style = fieldMap.get("style");
+        relationshipField = fieldMap.containsKey("relation-field");
+        metadataField = fieldMap.containsKey("dc-schema") || fieldMap.containsKey("linked-metadata-field");
     }
 
     /**
