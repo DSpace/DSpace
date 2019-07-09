@@ -12,7 +12,6 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -169,7 +168,7 @@ public class BundleTest extends AbstractDSpaceObjectTest {
         assertThat("testCreate 0", created, notNullValue());
         assertTrue("testCreate 1", created.getID() != null);
         assertTrue("testCreate 2", created.getBitstreams().size() == 0);
-        assertEquals("testCreate 3", created.getName(), "testCreateBundle");
+        assertThat("testCreate 3", created.getName(), equalTo("testCreateBundle"));
     }
 
     /**
