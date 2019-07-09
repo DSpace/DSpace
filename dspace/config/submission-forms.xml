@@ -52,6 +52,7 @@
                 <relation-field>
                     <relationshiptype>isAuthorOfPublication</relationshiptype>
                     <search-configuration>personConfiguration</search-configuration>
+                    <repeatable>true</repeatable>
                     <label>Author</label>
                     <hint>Add an author</hint>
                     <linked-metadata-field>
