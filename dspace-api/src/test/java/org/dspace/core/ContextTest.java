@@ -22,8 +22,6 @@ import java.util.UUID;
 import mockit.NonStrictExpectations;
 import org.dspace.AbstractUnitTest;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.factory.AuthorizeServiceFactory;
-import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
@@ -37,7 +35,6 @@ import org.junit.Test;
  * @author tdonohue
  */
 public class ContextTest extends AbstractUnitTest {
-    protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
     protected EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
     protected GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
 
