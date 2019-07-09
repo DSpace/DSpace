@@ -24,6 +24,7 @@ import org.dspace.app.rest.repository.SubmissionFormRestRepository;
 import org.dspace.app.rest.utils.AuthorityUtils;
 import org.dspace.app.util.DCInput;
 import org.dspace.app.util.DCInputSet;
+import org.dspace.core.Utils;
 import org.dspace.submit.model.LanguageFormField;
 import org.dspace.submit.model.SelectableMetadata;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -108,17 +109,19 @@ public class SubmissionFormConverter implements DSpaceConverter<DCInputSet, Subm
         if (!StringUtils.equalsIgnoreCase(dcinput.getInputType(), "qualdrop_value")) {
             // value-pair and vocabulary are a special kind of authorities
             String inputType = dcinput.getInputType();
-
             SelectableMetadata selMd = new SelectableMetadata();
-            if (authorityUtils.isChoice(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier())) {
+
+            inputRest.setType(inputType);
+            if (StringUtils.equalsIgnoreCase(dcinput.getInputType(), "group")) {
+                inputField.setRows(submissionFormRestRepository.findOne(formName + "-" + Utils
+                    .standardize(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier(), "-")));
+            } else if (authorityUtils.isChoice(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier())) {
                 inputRest.setType(
                         getPresentation(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier(), inputType));
                 selMd.setAuthority(getAuthorityName(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier(),
                         dcinput.getPairsType(), dcinput.getVocabulary()));
                 selMd.setClosed(
                         authorityUtils.isClosed(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier()));
-            } else {
-                inputRest.setType(inputType);
             }
             selMd.setMetadata(org.dspace.core.Utils
                 .standardize(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier(), "."));

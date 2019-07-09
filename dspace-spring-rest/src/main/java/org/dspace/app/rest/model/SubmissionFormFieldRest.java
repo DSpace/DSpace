@@ -11,8 +11,11 @@ package org.dspace.app.rest.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
+
 import org.dspace.submit.model.LanguageFormField;
 import org.dspace.submit.model.SelectableMetadata;
 
@@ -38,6 +41,14 @@ public class SubmissionFormFieldRest {
      * The visibility restriction for the field
      */
     private SubmissionVisibilityRest visibility;
+
+    @JsonInclude(Include.NON_NULL)
+    @JsonIgnoreProperties( { "name", "type", "id" })
+    @JsonUnwrapped
+    /**
+     * The list of rows for "group" field
+     */
+    private SubmissionFormRest rows;
 
     /**
      * The label of the field
@@ -263,5 +274,22 @@ public class SubmissionFormFieldRest {
             this.visibility = visibility;
         }
     }
+
+    /**
+     * Getter for {@link #rows}
+     * 
+     * @return {@link #rows}
+     */
+	public SubmissionFormRest getRows() {
+		return rows;
+	}
+
+    /**
+     * Setter for {@link #rows}
+     * 
+     */
+	public void setRows(SubmissionFormRest rows) {
+		this.rows = rows;
+	}
 
 }
