@@ -136,6 +136,10 @@ public class DCInput {
 
     private boolean relationshipField = false;
     private boolean metadataField = false;
+    private String relationshipType = null;
+    private String searchConfiguration = null;
+    private String filter;
+
     /**
      * The scope of the input sets, this restricts hidden metadata fields from
      * view during workflow processing.
@@ -208,8 +212,11 @@ public class DCInput {
             }
         }
         style = fieldMap.get("style");
-        relationshipField = fieldMap.containsKey("relation-field");
-        metadataField = fieldMap.containsKey("dc-schema") || fieldMap.containsKey("linked-metadata-field");
+        relationshipField = fieldMap.containsKey("relationshiptype");
+        metadataField = fieldMap.containsKey("dc-schema");
+        relationshipType = fieldMap.get("relationshiptype");
+        searchConfiguration = fieldMap.get("search-configuration");
+        filter = fieldMap.get("filter");
     }
 
     /**
@@ -483,6 +490,18 @@ public class DCInput {
 
     public String getFieldName() {
         return Utils.standardize(this.getSchema(), this.getElement(), this.getQualifier(), ".");
+    }
+
+    public String getRelationshipType() {
+        return relationshipType;
+    }
+
+    public String getSearchConfiguration() {
+        return searchConfiguration;
+    }
+
+    public String getFilter() {
+        return filter;
     }
 
     public boolean isQualdropValue() {
