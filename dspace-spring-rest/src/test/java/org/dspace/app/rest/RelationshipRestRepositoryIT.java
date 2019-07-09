@@ -1164,6 +1164,177 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
     }
 
     /**
+     * This method will test the deletion of a Relationship and will then
+     * verify that the relation is removed
+     * @throws Exception
+     */
+    @Test
+    public void deleteRelationship() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
+        Collection col3 = CollectionBuilder.createCollection(context, child1).withName("OrgUnits").build();
+
+        Item author1 = ItemBuilder.createItem(context, col1)
+                                  .withTitle("Author1")
+                                  .withIssueDate("2017-10-17")
+                                  .withPersonIdentifierFirstName("Donald")
+                                  .withPersonIdentifierLastName("Smith")
+                                  .withRelationshipType("Person")
+                                  .build();
+
+        Item author2 = ItemBuilder.createItem(context, col2)
+                                  .withTitle("Author2")
+                                  .withIssueDate("2016-02-13")
+                                  .withPersonIdentifierFirstName("Maria")
+                                  .withPersonIdentifierLastName("Smith")
+                                  .withRelationshipType("Person")
+                                  .build();
+
+        Item publication = ItemBuilder.createItem(context, col3)
+                                      .withTitle("Publication1")
+                                      .withIssueDate("2015-01-01")
+                                      .withRelationshipType("Publication")
+                                      .build();
+        RelationshipType isAuthorOfPublicationRelationshipType = relationshipTypeService
+            .findbyTypesAndLabels(context, entityTypeService.findByEntityType(context, "Publication"),
+                                  entityTypeService.findByEntityType(context, "Person"),
+                                  "isAuthorOfPublication", "isPublicationOfAuthor");
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+
+        // First create 1 relationship.
+        context.restoreAuthSystemState();
+        // This post request will add a first relationship to the publication and thus create a first set of metadata
+        // For the author values, namely "Donald Smith"
+        MvcResult mvcResult = getClient(adminToken).perform(post("/api/core/relationships")
+                                                                .param("relationshipType",
+                                                                       isAuthorOfPublicationRelationshipType.getID()
+                                                                                                            .toString())
+                                                                .contentType(MediaType.parseMediaType
+                                                                    (org.springframework.data.rest.webmvc.RestMediaTypes
+                                                                         .TEXT_URI_LIST_VALUE))
+                                                                .content(
+                                                                    "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
+                                                                        "https://localhost:8080/spring-rest/api/core/items/" + author1.getID()))
+                                                   .andExpect(status().isCreated())
+                                                   .andReturn();
+        ObjectMapper mapper = new ObjectMapper();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        Map<String, Object> map = mapper.readValue(content, Map.class);
+        String firstRelationshipIdString = String.valueOf(map.get("id"));
+
+
+        // This test checks that there's one relationship on the publication
+        getClient(adminToken).perform(get("/api/core/items/" +
+                publication.getID() + "/relationships"))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("page.totalElements", is(1)));
+
+        // This test checks that there's one relationship on the first author
+        getClient(adminToken).perform(get("/api/core/items/" +
+                author1.getID() + "/relationships"))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("page.totalElements", is(1)));
+
+        // This test checks that there's no relationship on the second author
+        getClient(adminToken).perform(get("/api/core/items/" +
+                author2.getID() + "/relationships"))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("page.totalElements", is(0)));
+
+        // Creates another Relationship for the Publication
+        mvcResult = getClient(adminToken).perform(post("/api/core/relationships")
+                                                      .param("relationshipType",
+                                                             isAuthorOfPublicationRelationshipType.getID()
+                                                                                                  .toString())
+                                                      .contentType(MediaType.parseMediaType
+                                                          (org.springframework.data.rest.webmvc.RestMediaTypes
+                                                               .TEXT_URI_LIST_VALUE))
+                                                      .content(
+                                                          "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
+                                                              "https://localhost:8080/spring-rest/api/core/items/" + author2.getID()))
+                                         .andExpect(status().isCreated())
+                                         .andReturn();
+
+        content = mvcResult.getResponse().getContentAsString();
+        map = mapper.readValue(content, Map.class);
+        String secondRelationshipIdString = String.valueOf(map.get("id"));
+
+        // This test checks that there are 2 relationships on the publication
+        getClient(adminToken).perform(get("/api/core/items/" +
+                publication.getID() + "/relationships"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("page.totalElements", is(2)));
+
+        // This test checks that there's one relationship on the first author
+        getClient(adminToken).perform(get("/api/core/items/" +
+                author1.getID() + "/relationships"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("page.totalElements", is(1)));
+
+        // This test checks that there's one relationship on the second author
+        getClient(adminToken).perform(get("/api/core/items/" +
+                author2.getID() + "/relationships"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("page.totalElements", is(1)));
+
+
+        // Now we delete the first relationship
+        getClient(adminToken).perform(delete("/api/core/relationships/" + firstRelationshipIdString));
+
+
+        // This test checks that there's one relationship on the publication
+        getClient(adminToken).perform(get("/api/core/items/" +
+                publication.getID() + "/relationships"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("page.totalElements", is(1)));
+
+        // This test checks that there's no relationship on the first author
+        getClient(adminToken).perform(get("/api/core/items/" +
+                author1.getID() + "/relationships"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("page.totalElements", is(0)));
+
+        // This test checks that there are one relationship on the second author
+        getClient(adminToken).perform(get("/api/core/items/" +
+                author2.getID() + "/relationships"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("page.totalElements", is(1)));
+
+
+        // Now we delete the second relationship
+        getClient(adminToken).perform(delete("/api/core/relationships/" + secondRelationshipIdString));
+
+
+        // This test checks that there's no relationship on the publication
+        getClient(adminToken).perform(get("/api/core/items/" +
+                publication.getID() + "/relationships"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("page.totalElements", is(0)));
+
+        // This test checks that there's no relationship on the first author
+        getClient(adminToken).perform(get("/api/core/items/" +
+                author1.getID() + "/relationships"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("page.totalElements", is(0)));
+
+        // This test checks that there are no relationship on the second author
+        getClient(adminToken).perform(get("/api/core/items/" +
+                author2.getID() + "/relationships"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("page.totalElements", is(0)));
+    }
+
+    /**
      * This test will simply add Relationships between Items with a useForPlace attribute set to false for the
      * RelationshipType. We want to test that the Relationships that are created will still have their place
      * attributes handled in a correct way
