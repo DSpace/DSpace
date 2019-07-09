@@ -219,7 +219,7 @@ public class ScriptImportUpdateFromOrcid {
 					int success = 0;
 					int fail = 0;
 					for (SolrDocument sd : qResp.getResults()) {
-						String crisID = (String) qResp.getResults().get(0).getFirstValue("cris-id");
+						String crisID = (String) sd.getFirstValue("cris-id");
 						ResearcherPage rp = applicationService.uniqueByCrisID(crisID);
 						String token = OrcidPreferencesUtils.getTokenReleasedForSync(rp, OrcidService.SYSTEM_ORCID_TOKEN_READ_LIMITED_SCOPE);
 						String orcidRP = ResearcherPageUtils.getStringValue(rp, "orcid");
