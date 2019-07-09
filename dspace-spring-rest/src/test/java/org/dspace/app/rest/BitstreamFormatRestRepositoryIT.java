@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest;
 
+import static com.jayway.jsonpath.JsonPath.read;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.startsWith;
@@ -21,6 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicReference;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.app.rest.builder.BitstreamFormatBuilder;
@@ -48,29 +50,32 @@ public class BitstreamFormatRestRepositoryIT extends AbstractControllerIntegrati
     @Autowired
     BitstreamFormatConverter converter;
 
+    private final int DEFAULT_AMOUNT_FORMATS = 80;
+
     @Test
     public void findAllPaginationTest() throws Exception {
         getClient().perform(get("/api/core/bitstreamformats"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$.page.size", is(20)))
-                .andExpect(jsonPath("$._links.self.href", startsWith(REST_SERVER_URL)))
-                .andExpect(jsonPath("$._links.self.href", endsWith("/api/core/bitstreamformats")));
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$.page.size", is(20)))
+                   .andExpect(jsonPath("$._links.self.href", startsWith(REST_SERVER_URL)))
+                   .andExpect(jsonPath("$._links.self.href", endsWith("/api/core/bitstreamformats")))
+        ;
     }
 
     @Test
     @Ignore
     public void unknownFormatRequiredByDefault() throws Exception {
         getClient().perform(get("/api/core/bitstreamformats"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$.page.size", is(20)))
-                .andExpect(jsonPath("$.page.totalElements", is(1)))
-                .andExpect(jsonPath("$._links.self.href", startsWith(REST_SERVER_URL)))
-                .andExpect(jsonPath("$._links.self.href", endsWith("/api/core/bitstreamformats")))
-                .andExpect(jsonPath("$._embedded.bitstreamformats", Matchers.is(
-                        BitstreamFormatMatcher.matchBitstreamFormatMimeType("Unknown")
-                )));
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$.page.size", is(20)))
+                   .andExpect(jsonPath("$.page.totalElements", is(1)))
+                   .andExpect(jsonPath("$._links.self.href", startsWith(REST_SERVER_URL)))
+                   .andExpect(jsonPath("$._links.self.href", endsWith("/api/core/bitstreamformats")))
+                   .andExpect(jsonPath("$._embedded.bitstreamformats", Matchers.is(
+                       BitstreamFormatMatcher.matchBitstreamFormatMimeType("Unknown")
+                   )));
     }
 
     @Test
@@ -78,38 +83,38 @@ public class BitstreamFormatRestRepositoryIT extends AbstractControllerIntegrati
     public void findAllMimeTypeCheck() throws Exception {
         context.turnOffAuthorisationSystem();
         BitstreamFormat bitstreamFormat = BitstreamFormatBuilder.createBitstreamFormat(context)
-                .withMimeType("application/octet-stream")
-                .withDescription("Description")
-                .build();
+                                                                .withMimeType("application/octet-stream")
+                                                                .withDescription("Description")
+                                                                .build();
         getClient().perform(get("/api/core/bitstreamformats"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$.page.totalElements", is(2)))
-                .andExpect(jsonPath("$._embedded.bitstreamformats", Matchers.contains(
-                        BitstreamFormatMatcher
-                                .matchBitstreamFormat(bitstreamFormat.getMIMEType(), bitstreamFormat.getDescription())
-                )));
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$.page.totalElements", is(2)))
+                   .andExpect(jsonPath("$._embedded.bitstreamformats", Matchers.contains(
+                       BitstreamFormatMatcher
+                           .matchBitstreamFormat(bitstreamFormat.getMIMEType(), bitstreamFormat.getDescription())
+                   )))
+        ;
+
     }
 
     @Test
     public void findOne() throws Exception {
         context.turnOffAuthorisationSystem();
         BitstreamFormat bitstreamFormat = BitstreamFormatBuilder.createBitstreamFormat(context)
-                .withMimeType("application/octet-stream")
-                .withDescription("Description")
-                .build();
+                                                                .withMimeType("application/octet-stream")
+                                                                .withDescription("Description")
+                                                                .build();
         context.restoreAuthSystemState();
 
         getClient().perform(get("/api/core/bitstreamformats/" + bitstreamFormat.getID()))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$.description", is(bitstreamFormat.getDescription())))
-                .andExpect(jsonPath("$.shortDescription", is(bitstreamFormat.getShortDescription())))
-                .andExpect(jsonPath("$.mimetype", is(bitstreamFormat.getMIMEType())))
-                .andExpect(jsonPath("$.type", is("bitstreamformat")))
-                .andExpect(jsonPath("$._links.self.href", startsWith(REST_SERVER_URL)))
-                .andExpect(jsonPath("$._links.self.href",
-                        endsWith("/api/core/bitstreamformats/" + bitstreamFormat.getID())));
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$", Matchers.is(
+                           BitstreamFormatMatcher
+                                   .matchBitstreamFormat(bitstreamFormat.getID(), bitstreamFormat.getMIMEType(),
+                                                         bitstreamFormat.getDescription())
+                   )));
     }
 
     @Test
@@ -126,25 +131,44 @@ public class BitstreamFormatRestRepositoryIT extends AbstractControllerIntegrati
         BitstreamFormatRest bitstreamFormatRest = this.createRandomMockBitstreamRest(false);
         //Create bitstream format
         String token = getAuthToken(admin.getEmail(), password);
-        MvcResult mvcResult = getClient(token).perform(post("/api/core/bitstreamformats/")
-                .content(mapper.writeValueAsBytes(bitstreamFormatRest)).contentType(contentType))
-                .andExpect(status().isCreated())
-                .andReturn();
 
-        String content = mvcResult.getResponse().getContentAsString();
-        Map<String, Object> map = mapper.readValue(content, Map.class);
-        String newlyCreatedBitstreamID = String.valueOf(map.get("id"));
-        //Verify creation
-        getClient().perform(get("/api/core/bitstreamformats/" + newlyCreatedBitstreamID))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$.description", is(bitstreamFormatRest.getDescription())))
-                .andExpect(jsonPath("$.shortDescription", is(bitstreamFormatRest.getShortDescription())))
-                .andExpect(jsonPath("$.mimetype", is(bitstreamFormatRest.getMimetype())))
-                .andExpect(jsonPath("$.type", is("bitstreamformat")))
-                .andExpect(jsonPath("$._links.self.href", startsWith(REST_SERVER_URL)))
-                .andExpect(jsonPath("$._links.self.href",
-                        endsWith("/api/core/bitstreamformats/" + newlyCreatedBitstreamID)));
+        // Capture the Id of the created BitstreamFormat (see andDo() below)
+        AtomicReference<Integer> idRef = new AtomicReference<>();
+        try {
+
+            MvcResult mvcResult = getClient(token).perform(post("/api/core/bitstreamformats/")
+                                                                   .content(mapper.writeValueAsBytes(
+                                                                           bitstreamFormatRest))
+                                                                   .contentType(contentType))
+                                                  .andExpect(status().isCreated())
+                                                  .andReturn();
+
+            String content = mvcResult.getResponse().getContentAsString();
+
+
+
+            Map<String, Object> map = mapper.readValue(content, Map.class);
+            String newlyCreatedBitstreamID = String.valueOf(map.get("id"));
+            //Verify creation
+            getClient().perform(get("/api/core/bitstreamformats/" + newlyCreatedBitstreamID))
+                       .andExpect(status().isOk())
+                       .andExpect(content().contentType(contentType))
+                       .andExpect(jsonPath("$", Matchers.is(
+                               BitstreamFormatMatcher
+                                       .matchBitstreamFormat(Integer.parseInt(newlyCreatedBitstreamID),
+                                                             bitstreamFormatRest.getMimetype(),
+                                                             bitstreamFormatRest.getDescription(),
+                                                             bitstreamFormatRest.getShortDescription())
+                       )))
+                       .andDo(result -> idRef
+                               .set(read(result.getResponse().getContentAsString(), "$.id")));
+
+        } finally {
+            // Delete the created community (cleanup after ourselves!)
+            BitstreamFormatBuilder.deleteBitstreamFormat(idRef.get());
+        }
+
+
     }
 
     @Test
@@ -157,6 +181,11 @@ public class BitstreamFormatRestRepositoryIT extends AbstractControllerIntegrati
         getClient(token).perform(post("/api/core/bitstreamformats/")
                 .content(mapper.writeValueAsBytes(bitstreamFormatRest)).contentType(contentType))
                 .andExpect(status().isBadRequest());
+
+        // Check that no new bitstreamformat was created
+        getClient().perform(get("/api/core/bitstreamformats/"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.page.totalElements", is(DEFAULT_AMOUNT_FORMATS)));
     }
 
     @Test
@@ -168,6 +197,11 @@ public class BitstreamFormatRestRepositoryIT extends AbstractControllerIntegrati
         getClient(null).perform(post("/api/core/bitstreamformats/")
                 .content(mapper.writeValueAsBytes(bitstreamFormatRest)).contentType(contentType))
                 .andExpect(status().isUnauthorized());
+
+        // Check that no new bitstreamformat was created
+        getClient().perform(get("/api/core/bitstreamformats/"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.page.totalElements", is(DEFAULT_AMOUNT_FORMATS)));
     }
 
     @Test
@@ -187,21 +221,47 @@ public class BitstreamFormatRestRepositoryIT extends AbstractControllerIntegrati
         getClient(token).perform(post("/api/core/bitstreamformats/")
                 .content(mapper.writeValueAsBytes(bitstreamFormatRest)).contentType(contentType))
                 .andExpect(status().isForbidden());
+
+        // Check that no new bitstreamformat was created
+        getClient().perform(get("/api/core/bitstreamformats/"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.page.totalElements", is(DEFAULT_AMOUNT_FORMATS)));
     }
 
     @Test
     public void createAlreadyExisting() throws Exception {
         ObjectMapper mapper = new ObjectMapper();
         BitstreamFormatRest bitstreamFormatRest = this.createRandomMockBitstreamRest(true);
-        //Try to create same bitstream twice
-        String token = getAuthToken(admin.getEmail(), password);
-        getClient(token).perform(post("/api/core/bitstreamformats/")
-                .content(mapper.writeValueAsBytes(bitstreamFormatRest)).contentType(contentType))
-                .andExpect(status().isCreated());
-        //Second time it fails
-        getClient(token).perform(post("/api/core/bitstreamformats/")
-                .content(mapper.writeValueAsBytes(bitstreamFormatRest)).contentType(contentType))
-                .andExpect(status().isInternalServerError());
+
+        // Capture the Id of the created BitstreamFormat (see andDo() below)
+        AtomicReference<Integer> idRef = new AtomicReference<>();
+        try {
+
+
+            //Try to create same bitstream twice
+            String token = getAuthToken(admin.getEmail(), password);
+            getClient(token).perform(post("/api/core/bitstreamformats/")
+                                             .content(mapper.writeValueAsBytes(bitstreamFormatRest))
+                                             .contentType(contentType))
+                            .andExpect(status().isCreated())
+                            .andDo(result -> idRef
+                                    .set(read(result.getResponse().getContentAsString(), "$.id")));
+            //Second time it fails
+            getClient(token).perform(post("/api/core/bitstreamformats/")
+                                             .content(mapper.writeValueAsBytes(bitstreamFormatRest))
+                                             .contentType(contentType))
+                            .andExpect(status().isInternalServerError());
+
+            // Check that the new bitstreamformat was created only once
+            getClient().perform(get("/api/core/bitstreamformats/"))
+                       .andExpect(status().isOk())
+                       .andExpect(jsonPath("$.page.totalElements", is(DEFAULT_AMOUNT_FORMATS + 1)));
+
+
+        } finally {
+            // Delete the created community (cleanup after ourselves!)
+            BitstreamFormatBuilder.deleteBitstreamFormat(idRef.get());
+        }
     }
 
     @Test
@@ -225,15 +285,14 @@ public class BitstreamFormatRestRepositoryIT extends AbstractControllerIntegrati
 
         //Verify change
         getClient().perform(get("/api/core/bitstreamformats/" + bitstreamFormat.getID()))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$.description", is(bitstreamFormatRest.getDescription())))
-                .andExpect(jsonPath("$.shortDescription", is(bitstreamFormatRest.getShortDescription())))
-                .andExpect(jsonPath("$.mimetype", is(bitstreamFormatRest.getMimetype())))
-                .andExpect(jsonPath("$.type", is("bitstreamformat")))
-                .andExpect(jsonPath("$._links.self.href", startsWith(REST_SERVER_URL)))
-                .andExpect(jsonPath("$._links.self.href",
-                        endsWith("/api/core/bitstreamformats/" + bitstreamFormat.getID())));
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$", Matchers.is(
+                           BitstreamFormatMatcher
+                                   .matchBitstreamFormat(bitstreamFormat.getID(), bitstreamFormatRest.getMimetype(),
+                                                         bitstreamFormatRest.getDescription(),
+                                                         bitstreamFormatRest.getShortDescription())
+                   )));
     }
 
     @Test
@@ -255,6 +314,17 @@ public class BitstreamFormatRestRepositoryIT extends AbstractControllerIntegrati
         getClient(token).perform(put("/api/core/bitstreamformats/" + bitstreamFormat.getID())
                 .content(mapper.writeValueAsBytes(bitstreamFormatRest)).contentType(contentType))
                 .andExpect(status().isBadRequest());
+
+        getClient(token).perform(get("/api/core/bitstreamformats/" + bitstreamFormat.getID()))
+                        .andExpect(status().isOk())
+                        .andExpect(content().contentType(contentType))
+                        .andExpect(jsonPath("$", Matchers.is(
+                                BitstreamFormatMatcher
+                                        .matchBitstreamFormat(bitstreamFormat.getID(),
+                                                              bitstreamFormat.getMIMEType(),
+                                                              bitstreamFormat.getDescription(),
+                                                              bitstreamFormat.getShortDescription())
+                        )));
     }
 
     @Test
@@ -263,9 +333,11 @@ public class BitstreamFormatRestRepositoryIT extends AbstractControllerIntegrati
         //Create bitstream format
         context.turnOffAuthorisationSystem();
         BitstreamFormat bitstreamFormat = BitstreamFormatBuilder.createBitstreamFormat(context)
-                .withMimeType("application/octet-stream")
-                .withDescription("Description - updateNonExistingIDInURLAndJSON")
-                .build();
+                                                                .withShortDescription("Test short")
+                                                                .withMimeType("application/octet-stream")
+                                                                .withDescription(
+                                                                        "Description - updateNonExistingIDInURLAndJSON")
+                                                                .build();
         context.restoreAuthSystemState();
 
         int nonExistentBitstreamFormatID = 404404404;
@@ -276,8 +348,20 @@ public class BitstreamFormatRestRepositoryIT extends AbstractControllerIntegrati
         bitstreamFormatRest.setShortDescription("Test short UPDATED");
         bitstreamFormatRest.setId(nonExistentBitstreamFormatID);
         getClient(token).perform(put("/api/core/bitstreamformats/" + nonExistentBitstreamFormatID)
-                .content(mapper.writeValueAsBytes(bitstreamFormatRest)).contentType(contentType))
-                .andExpect(status().isNotFound());
+                                         .content(mapper.writeValueAsBytes(bitstreamFormatRest))
+                                         .contentType(contentType))
+                        .andExpect(status().isNotFound());
+
+        getClient(token).perform(get("/api/core/bitstreamformats/" + bitstreamFormat.getID()))
+                        .andExpect(status().isOk())
+                        .andExpect(content().contentType(contentType))
+                        .andExpect(jsonPath("$", Matchers.is(
+                                BitstreamFormatMatcher
+                                        .matchBitstreamFormat(bitstreamFormat.getID(),
+                                                              bitstreamFormat.getMIMEType(),
+                                                              bitstreamFormat.getDescription(),
+                                                              bitstreamFormat.getShortDescription())
+                        )));
     }
 
     @Test
@@ -286,9 +370,11 @@ public class BitstreamFormatRestRepositoryIT extends AbstractControllerIntegrati
         //Create bitstream format
         context.turnOffAuthorisationSystem();
         BitstreamFormat bitstreamFormat = BitstreamFormatBuilder.createBitstreamFormat(context)
-                .withMimeType("application/octet-stream")
-                .withDescription("Description - updateNonExistingIDInJustURL")
-                .build();
+                                                                .withShortDescription("Test short")
+                                                                .withMimeType("application/octet-stream")
+                                                                .withDescription(
+                                                                        "Description - updateNonExistingIDInJustURL")
+                                                                .build();
         context.restoreAuthSystemState();
 
         int nonExistentBitstreamFormatID = 404404404;
@@ -298,8 +384,20 @@ public class BitstreamFormatRestRepositoryIT extends AbstractControllerIntegrati
         //Update it with non existent ID in URL
         bitstreamFormatRest.setShortDescription("Test short UPDATED");
         getClient(token).perform(put("/api/core/bitstreamformats/" + nonExistentBitstreamFormatID)
-                .content(mapper.writeValueAsBytes(bitstreamFormatRest)).contentType(contentType))
-                .andExpect(status().isNotFound());
+                                         .content(mapper.writeValueAsBytes(bitstreamFormatRest))
+                                         .contentType(contentType))
+                        .andExpect(status().isNotFound());
+
+        getClient(token).perform(get("/api/core/bitstreamformats/" + bitstreamFormat.getID()))
+                        .andExpect(status().isOk())
+                        .andExpect(content().contentType(contentType))
+                        .andExpect(jsonPath("$", Matchers.is(
+                                BitstreamFormatMatcher
+                                        .matchBitstreamFormat(bitstreamFormat.getID(),
+                                                              bitstreamFormat.getMIMEType(),
+                                                              bitstreamFormat.getDescription(),
+                                                              bitstreamFormat.getShortDescription())
+                        )));
     }
 
     @Test
@@ -307,7 +405,9 @@ public class BitstreamFormatRestRepositoryIT extends AbstractControllerIntegrati
         ObjectMapper mapper = new ObjectMapper();
         //Create bitstream format
         context.turnOffAuthorisationSystem();
-        BitstreamFormat bitstreamFormat = BitstreamFormatBuilder.createBitstreamFormat(context)
+        BitstreamFormat bitstreamFormat = BitstreamFormatBuilder
+                .createBitstreamFormat(context)
+                .withShortDescription("Test short")
                 .withMimeType("application/octet-stream")
                 .withDescription("Description - updateNonExistingIDInJSONButValidInURL")
                 .build();
@@ -321,8 +421,20 @@ public class BitstreamFormatRestRepositoryIT extends AbstractControllerIntegrati
         bitstreamFormatRest.setShortDescription("Test short UPDATED");
         bitstreamFormatRest.setId(nonExistentBitstreamFormatID);
         getClient(token).perform(put("/api/core/bitstreamformats/" + bitstreamFormat.getID())
-                .content(mapper.writeValueAsBytes(bitstreamFormatRest)).contentType(contentType))
-                .andExpect(status().isBadRequest());
+                                         .content(mapper.writeValueAsBytes(bitstreamFormatRest))
+                                         .contentType(contentType))
+                        .andExpect(status().isBadRequest());
+
+        getClient(token).perform(get("/api/core/bitstreamformats/" + bitstreamFormat.getID()))
+                        .andExpect(status().isOk())
+                        .andExpect(content().contentType(contentType))
+                        .andExpect(jsonPath("$", Matchers.is(
+                                BitstreamFormatMatcher
+                                        .matchBitstreamFormat(bitstreamFormat.getID(),
+                                                              bitstreamFormat.getMIMEType(),
+                                                              bitstreamFormat.getDescription(),
+                                                              bitstreamFormat.getShortDescription())
+                        )));
     }
 
     @Test
@@ -331,6 +443,7 @@ public class BitstreamFormatRestRepositoryIT extends AbstractControllerIntegrati
         //Create bitstream format
         context.turnOffAuthorisationSystem();
         BitstreamFormat bitstreamFormat1 = BitstreamFormatBuilder.createBitstreamFormat(context)
+                .withShortDescription("Test short")
                 .withMimeType("application/octet-stream")
                 .withDescription("Description - updateNotMatchingIDsInJSONAndURL 1")
                 .build();
@@ -348,6 +461,17 @@ public class BitstreamFormatRestRepositoryIT extends AbstractControllerIntegrati
         getClient(token).perform(put("/api/core/bitstreamformats/" + bitstreamFormat1.getID())
                 .content(mapper.writeValueAsBytes(bitstreamFormatRest)).contentType(contentType))
                 .andExpect(status().isBadRequest());
+
+        getClient().perform(get("/api/core/bitstreamformats/" + bitstreamFormat1.getID()))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$", Matchers.is(
+                           BitstreamFormatMatcher
+                                   .matchBitstreamFormat(bitstreamFormat1.getID(), bitstreamFormat1.getMIMEType(),
+                                                         bitstreamFormat1.getDescription(),
+                                                         bitstreamFormat1.getShortDescription())
+                   )));
+
     }
 
     @Test
@@ -356,9 +480,10 @@ public class BitstreamFormatRestRepositoryIT extends AbstractControllerIntegrati
         //Create bitstream format
         context.turnOffAuthorisationSystem();
         BitstreamFormat bitstreamFormat = BitstreamFormatBuilder.createBitstreamFormat(context)
-                .withMimeType("application/octet-stream")
-                .withDescription("Description - updateNoAccess")
-                .build();
+                                                                .withShortDescription("Test short")
+                                                                .withMimeType("application/octet-stream")
+                                                                .withDescription("Description - updateNoAccess")
+                                                                .build();
         context.restoreAuthSystemState();
 
         BitstreamFormatRest bitstreamFormatRest = converter.fromModel(bitstreamFormat);
@@ -368,6 +493,16 @@ public class BitstreamFormatRestRepositoryIT extends AbstractControllerIntegrati
         getClient(null).perform(put("/api/core/bitstreamformats/" + bitstreamFormat.getID())
                 .content(mapper.writeValueAsBytes(bitstreamFormatRest)).contentType(contentType))
                 .andExpect(status().isUnauthorized());
+
+        getClient().perform(get("/api/core/bitstreamformats/" + bitstreamFormat.getID()))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$", Matchers.is(
+                           BitstreamFormatMatcher
+                                   .matchBitstreamFormat(bitstreamFormat.getID(), bitstreamFormat.getMIMEType(),
+                                                         bitstreamFormat.getDescription(),
+                                                         bitstreamFormat.getShortDescription())
+                   )));
     }
 
     @Test
@@ -443,14 +578,25 @@ public class BitstreamFormatRestRepositoryIT extends AbstractControllerIntegrati
         //Create bitstream format
         context.turnOffAuthorisationSystem();
         BitstreamFormat bitstreamFormat = BitstreamFormatBuilder.createBitstreamFormat(context)
-                .withMimeType("application/octet-stream")
-                .withDescription("Description - updateAdminAccess")
-                .build();
+                                                                .withMimeType("application/octet-stream")
+                                                                .withDescription("Description - updateAdminAccess")
+                                                                .build();
         context.restoreAuthSystemState();
 
         //Delete it
         getClient(null).perform(delete("/api/core/bitstreamformats/" + bitstreamFormat.getID()))
-                .andExpect(status().isUnauthorized());
+                       .andExpect(status().isUnauthorized());
+
+        getClient().perform(get("/api/core/bitstreamformats/" + bitstreamFormat.getID()))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$", Matchers.is(
+                           BitstreamFormatMatcher
+                                   .matchBitstreamFormat(bitstreamFormat.getID(), bitstreamFormat.getMIMEType(),
+                                                         bitstreamFormat.getDescription(),
+                                                         bitstreamFormat.getShortDescription())
+                   )));
+
     }
 
     @Test
@@ -474,6 +620,16 @@ public class BitstreamFormatRestRepositoryIT extends AbstractControllerIntegrati
         String token = getAuthToken(user.getEmail(), password);
         getClient(token).perform(delete("/api/core/bitstreamformats/" + bitstreamFormat.getID()))
                 .andExpect(status().isForbidden());
+
+        getClient().perform(get("/api/core/bitstreamformats/" + bitstreamFormat.getID()))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$", Matchers.is(
+                           BitstreamFormatMatcher
+                                   .matchBitstreamFormat(bitstreamFormat.getID(), bitstreamFormat.getMIMEType(),
+                                                         bitstreamFormat.getDescription(),
+                                                         bitstreamFormat.getShortDescription())
+                   )));
     }
 
     private BitstreamFormatRest createRandomMockBitstreamRest(boolean withRand) {
