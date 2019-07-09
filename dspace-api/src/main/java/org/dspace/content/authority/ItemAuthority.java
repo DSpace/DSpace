@@ -13,13 +13,14 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Category;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.util.ClientUtils;
-
 import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
-import org.dspace.content.Item;
+import org.dspace.content.authority.factory.ItemAuthorityServiceFactory;
+import org.dspace.content.authority.service.ItemAuthorityService;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.discovery.DiscoverQuery;
@@ -27,7 +28,7 @@ import org.dspace.discovery.DiscoverResult;
 import org.dspace.discovery.IndexableObject;
 import org.dspace.discovery.SearchService;
 import org.dspace.discovery.SearchServiceException;
-import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.util.UUIDUtils;
 import org.dspace.utils.DSpace;
 
 /**
@@ -42,8 +43,13 @@ public class ItemAuthority implements ChoiceAuthority {
 
     private DSpace dspace = new DSpace();
 
+    private ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+
     private SearchService searchService = dspace.getServiceManager().getServiceByName(
         "org.dspace.discovery.SearchService", SearchService.class);
+    
+    private ItemAuthorityServiceFactory itemAuthorityServiceFactory = dspace.getServiceManager().getServiceByName(
+            "itemAuthorityServiceFactory", ItemAuthorityServiceFactory.class);
 
     // punt!  this is a poor implementation..
     @Override
@@ -62,8 +68,9 @@ public class ItemAuthority implements ChoiceAuthority {
             limit = 20;
         }
 
-        String luceneQuery = ClientUtils.escapeQueryChars(text);
-        luceneQuery = luceneQuery.replaceAll("\\\\ ", " ");
+        ItemAuthorityService itemAuthorityService = itemAuthorityServiceFactory.getInstance(field);
+        String luceneQuery = itemAuthorityService.getSolrQuery(text);
+        System.out.println(luceneQuery);
         DiscoverQuery discoverQuery = new DiscoverQuery();
         discoverQuery.setDSpaceObjectFilter(org.dspace.core.Constants.ITEM);
         String filter = ConfigurationManager.getProperty("cris", "ItemAuthority."
@@ -88,7 +95,7 @@ public class ItemAuthority implements ChoiceAuthority {
             Iterator<IndexableObject> dsoIterator = resultSearch.getIndexableObjects().iterator();
             while (dsoIterator.hasNext()) {
             	DSpaceObject dso = (DSpaceObject) dsoIterator.next();
-                choiceList.add(new Choice(dso.getHandle(), dso.getName(), dso.getName()));
+                choiceList.add(new Choice(dso.getID().toString(), dso.getName(), dso.getName()));
             }
 
             Choice[] results = new Choice[choiceList.size()];
@@ -99,10 +106,6 @@ public class ItemAuthority implements ChoiceAuthority {
         } catch (SearchServiceException e) {
             log.error(e.getMessage(), e);
             return new Choices(true);
-        } finally {
-            if (context != null && context.isValid()) {
-                context.abort();
-            }
         }
     }
 
@@ -113,17 +116,13 @@ public class ItemAuthority implements ChoiceAuthority {
             Context context = null;
             try {
                 context = new Context();
-                DSpaceObject dso = HandleServiceFactory.getInstance().getHandleService().resolveToObject(context, key);
+                DSpaceObject dso = itemService.find(context, UUIDUtils.fromString(key));
                 if (dso != null) {
                     title = dso.getName();
                 }
             } catch (SQLException e) {
                 log.error(e.getMessage(), e);
                 return key;
-            } finally {
-                if (context != null && context.isValid()) {
-                    context.abort();
-                }
             }
         }
         return title;

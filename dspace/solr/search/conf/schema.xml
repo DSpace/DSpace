@@ -189,6 +189,21 @@
         </analyzer>
     </fieldType>
 
+    <!--This field is used for ItemAuthority lookup -->
+    <fieldType name="itemLookup" class="solr.TextField" sortMissingLast="true" omitNorms="true">
+        <analyzer>
+            <tokenizer class="solr.KeywordTokenizerFactory"/>
+
+	    <filter class="solr.WordDelimiterFilterFactory" generateWordParts="1" generateNumberParts="1" catenateWords="1" catenateNumbers="1" catenateAll="0" splitOnCaseChange="1"/>
+            <!--Lower cases our values-->
+            <filter class="solr.LowerCaseFilterFactory" />
+            <!--Deal with special char like ò à ù ... -->
+            <filter class="solr.ICUFoldingFilterFactory"/>
+            <!-- The TrimFilter removes any leading or trailing whitespace -->
+            <filter class="solr.TrimFilterFactory" />
+        </analyzer>
+    </fieldType>
+
     <fieldType name="keywordFilter" class="solr.TextField" sortMissingLast="true" omitNorms="true">
         <analyzer>
             <!--Treats the entire field as a single token, regardless of its content-->
@@ -329,6 +344,10 @@
     <dynamicField name="attr_*" type="textgen" indexed="true" stored="true" multiValued="true"/>
 
     <dynamicField name="random_*" type="random" />
+    
+    <!-- Item authority lookup -->
+     <field name="itemauthoritylookup" type="itemLookup" indexed="true" stored="true" multiValued="true"/>
+     <field name="itemauthoritylookupexactmatch" type="text" indexed="true" stored="true" multiValued="true"/>
  </fields>
 
  <uniqueKey>search.uniqueid</uniqueKey>
@@ -338,5 +357,7 @@
         or to add multiple fields to the same field for easier/faster searching.  -->
 
  <copyField source="*" dest="search_text"/>
+ <copyField source="title" dest="itemauthoritylookup"/>
+ <copyField source="title" dest="itemauthoritylookupexactmatch"/>
 
 </schema>
