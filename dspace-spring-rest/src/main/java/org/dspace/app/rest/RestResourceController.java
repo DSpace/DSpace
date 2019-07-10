@@ -572,8 +572,8 @@ public class RestResourceController implements InitializingBean {
      *            the api category
      * @param model
      *            the rest model that identify the REST resource collection
-     * @param id
-     *            the id of the specific rest resource
+     * @param uuid
+     *            the uuid of the specific rest resource
      * @param uploadfile
      *            the file to upload
      * @return the created resource
@@ -584,11 +584,11 @@ public class RestResourceController implements InitializingBean {
     public <ID extends Serializable> ResponseEntity<ResourceSupport> upload(HttpServletRequest request,
                                                                             @PathVariable String apiCategory,
                                                                             @PathVariable String model,
-                                                                            @PathVariable UUID id,
+                                                                            @PathVariable UUID uuid,
                                                                             @RequestParam("file") MultipartFile
                                                                                 uploadfile)
         throws HttpRequestMethodNotSupportedException {
-        return uploadInternal(request, apiCategory, model, id, uploadfile);
+        return uploadInternal(request, apiCategory, model, uuid, uploadfile);
     }
 
     /**
