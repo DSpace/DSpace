@@ -659,6 +659,55 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
 
     @Test
     /**
+     * Test the deposit of a workspaceitem POSTing to the resource workflowitems collection endpoint a workspaceitem (as
+     * uri-list) in a collection without workflow. This corresponds to the deposit action done by the submitter.
+     *
+     * @throws Exception
+     */
+    public void depositWorkspaceItemWithoutWorkflowTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. create a normal user to use as submitter
+        EPerson submitter = EPersonBuilder.createEPerson(context)
+                .withEmail("submitter@example.com")
+                .withPassword(password)
+                .build();
+
+        //2. A community with one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                .withName("Collection 1")
+                .withSubmitterGroup(submitter)
+                .build();
+
+        context.setCurrentUser(submitter);
+
+        //3. a workspace item ready to go
+        InputStream pdf = getClass().getResourceAsStream("simple-article.pdf");
+
+        WorkspaceItem wsitem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+                .withTitle("Submission Item")
+                .withIssueDate("2017-10-17")
+                .withFulltext("simple-article.pdf", "/local/path/simple-article.pdf", pdf)
+                .grantLicense()
+                .build();
+
+        context.restoreAuthSystemState();
+        String authToken = getAuthToken(submitter.getEmail(), password);
+
+        // submit the workspaceitem to complete the deposit (as there is no workflow configured)
+        getClient(authToken)
+                .perform(post(BASE_REST_SERVER_URL + "/api/workflow/workflowitems")
+                        .content("/api/submission/workspaceitems/" + wsitem.getID())
+                        .contentType(textUriContentType))
+                .andExpect(status().isCreated());
+    }
+
+    @Test
+    /**
      * Test the creation of workflowitem POSTing to the resource workflowitems collection endpoint a workspaceitem (as
      * uri-list). This corresponds to the deposit action done by the submitter.
      *
