@@ -7,13 +7,13 @@
   </submission-map>
   <step-definitions>
     <step id="collection" mandatory="true">
-      <heading>submit.progressbar.describe.collection</heading>
+      <heading>submit.progressbar.collection</heading>
       <processing-class>org.dspace.app.rest.submit.step.CollectionStep</processing-class>
       <type>collection</type>
       <scope visibility="hidden" visibilityOutside="hidden">submission</scope>
     </step>
-    <step id="patents" mandatory="true">
-      <heading>submit.progressbar.describe.patents</heading>
+    <step id="person" mandatory="true">
+      <heading>submit.progressbar.describe.person</heading>
       <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
       <type>submission-form</type>
     </step>
@@ -26,10 +26,9 @@
       <heading>submit.progressbar.license</heading>
       <processing-class>org.dspace.app.rest.submit.step.LicenseStep</processing-class>
       <type>license</type>
-      <scope visibilityOutside="read-only">submission</scope>
     </step>
-    <step id="events" mandatory="true">
-      <heading>submit.progressbar.describe.events</heading>
+    <step id="datasets" mandatory="true">
+      <heading>submit.progressbar.describe.datasets</heading>
       <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
       <type>submission-form</type>
     </step>
@@ -55,15 +54,15 @@
     </step>
   </step-definitions>
   <submission-definitions>
-    <submission-process name="patents">
+    <submission-process name="person">
       <step id="collection" />
-      <step id="patents" />
+      <step id="person" />
       <step id="upload" />
       <step id="license" />
     </submission-process>
-    <submission-process name="events">
+    <submission-process name="datasets">
       <step id="collection" />
-      <step id="events" />
+      <step id="datasets" />
       <step id="upload" />
       <step id="license" />
     </submission-process>
