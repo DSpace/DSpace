@@ -33,7 +33,8 @@ import org.dspace.authorize.AuthorizeException;
 public class DryadOrganizationConcept implements Comparable<DryadOrganizationConcept> {
     // Organization Concepts can have the following metadata properties:
     public static final String FULLNAME = "fullName";
-    public static final String CUSTOMER_ID = "customerID";
+    public static final String CUSTOMER_ID = "customerID"; // legacy ID, not used by Stripe
+    public static final String STRIPE_CUSTOMER_ID = "stripeCustomerID"; // legacy ID, not used by Stripe
     public static final String DESCRIPTION = "description";
     public static final String WEBSITE = "website";
     public static final String PAYMENT_PLAN = "paymentPlanType";
@@ -57,6 +58,7 @@ public class DryadOrganizationConcept implements Comparable<DryadOrganizationCon
         metadataProperties.setProperty(DESCRIPTION, "organization.description");
         metadataProperties.setProperty(WEBSITE, "organization.website");
         metadataProperties.setProperty(CUSTOMER_ID, "organization.customerID");
+        metadataProperties.setProperty(STRIPE_CUSTOMER_ID, "organization.stripeCustomerID");
 
         defaultMetadataValues = new Properties();
         defaultMetadataValues.setProperty(metadataProperties.getProperty(FULLNAME), "");
@@ -65,6 +67,7 @@ public class DryadOrganizationConcept implements Comparable<DryadOrganizationCon
         defaultMetadataValues.setProperty(metadataProperties.getProperty(DESCRIPTION), "");
         defaultMetadataValues.setProperty(metadataProperties.getProperty(WEBSITE), "");
         defaultMetadataValues.setProperty(metadataProperties.getProperty(CUSTOMER_ID), "");
+        defaultMetadataValues.setProperty(metadataProperties.getProperty(STRIPE_CUSTOMER_ID), "");
     }
 
     // these are mandatory elements
@@ -286,6 +289,14 @@ public class DryadOrganizationConcept implements Comparable<DryadOrganizationCon
 
     public void setCustomerID(String value) {
         setConceptMetadataValue(metadataProperties.getProperty(CUSTOMER_ID), value);
+    }
+
+    public String getStripeCustomerID() {
+        return getConceptMetadataValue(metadataProperties.getProperty(STRIPE_CUSTOMER_ID));
+    }
+
+    public void setStripeCustomerID(String value) {
+        setConceptMetadataValue(metadataProperties.getProperty(STRIPE_CUSTOMER_ID), value);
     }
 
     public String getDescription() {
