@@ -646,4 +646,80 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
 
         new MetadataPatchSuite().runWith(getClient(token), "/api/core/collections/" + col.getID(), expectedStatus);
     }
+
+    @Test
+    public void createTestInvalidParentCommunityUUIDBadRequestException() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .withLogo("ThisIsSomeDummyText")
+                                          .build();
+
+        ObjectMapper mapper = new ObjectMapper();
+        CollectionRest collectionRest = new CollectionRest();
+        // We send a name but the created collection should set this to the title
+        collectionRest.setName("Collection");
+
+        collectionRest.setMetadata(new MetadataRest()
+                                       .put("dc.description",
+                                            new MetadataValueRest("<p>Some cool HTML code here</p>"))
+                                       .put("dc.description.abstract",
+                                            new MetadataValueRest("top-level community created via the REST API"))
+                                       .put("dc.description.tableofcontents",
+                                            new MetadataValueRest("<p>HTML News</p>"))
+                                       .put("dc.rights",
+                                            new MetadataValueRest("Custom Copyright Text"))
+                                       .put("dc.title",
+                                            new MetadataValueRest("Title Text")));
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+        getClient(authToken).perform(post("/api/core/collections")
+                                         .content(mapper.writeValueAsBytes(collectionRest))
+                                         .param("parent", "123")
+                                         .contentType(contentType))
+                            .andExpect(status().isBadRequest());
+
+    }
+
+
+    @Test
+    public void createTestWithoutParentCommunityUUIDBadRequestException() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .withLogo("ThisIsSomeDummyText")
+                                          .build();
+
+        ObjectMapper mapper = new ObjectMapper();
+        CollectionRest collectionRest = new CollectionRest();
+        // We send a name but the created collection should set this to the title
+        collectionRest.setName("Collection");
+
+        collectionRest.setMetadata(new MetadataRest()
+                                       .put("dc.description",
+                                            new MetadataValueRest("<p>Some cool HTML code here</p>"))
+                                       .put("dc.description.abstract",
+                                            new MetadataValueRest("top-level community created via the REST API"))
+                                       .put("dc.description.tableofcontents",
+                                            new MetadataValueRest("<p>HTML News</p>"))
+                                       .put("dc.rights",
+                                            new MetadataValueRest("Custom Copyright Text"))
+                                       .put("dc.title",
+                                            new MetadataValueRest("Title Text")));
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+        getClient(authToken).perform(post("/api/core/collections")
+                                         .content(mapper.writeValueAsBytes(collectionRest))
+                                         .contentType(contentType))
+                            .andExpect(status().isBadRequest());
+
+    }
 }

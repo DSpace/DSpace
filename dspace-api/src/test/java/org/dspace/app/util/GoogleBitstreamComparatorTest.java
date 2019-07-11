@@ -380,6 +380,7 @@ public class GoogleBitstreamComparatorTest extends AbstractUnitTest {
     }
 
     @After
+    @Override
     public void destroy() {
         settings = null;
         super.destroy();

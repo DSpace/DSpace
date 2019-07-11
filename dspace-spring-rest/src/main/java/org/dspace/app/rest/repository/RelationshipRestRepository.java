@@ -8,10 +8,14 @@
 package org.dspace.app.rest.repository;
 
 import java.sql.SQLException;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
+import org.dspace.app.rest.Parameter;
+import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.RelationshipConverter;
 import org.dspace.app.rest.converter.RelationshipTypeConverter;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
@@ -34,6 +38,7 @@ import org.dspace.eperson.EPerson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
 
@@ -47,7 +52,13 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
 
 
     @Autowired
+    private ItemService itemService;
+
+    @Autowired
     private RelationshipService relationshipService;
+
+    @Autowired
+    private RelationshipTypeService relationshipTypeService;
 
     @Autowired
     private RelationshipConverter relationshipConverter;
@@ -56,13 +67,8 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
     private RelationshipTypeConverter relationshipTypeConverter;
 
     @Autowired
-    private RelationshipTypeService relationshipTypeService;
-
-    @Autowired
     private AuthorizeService authorizeService;
 
-    @Autowired
-    private ItemService itemService;
 
     public RelationshipRest findOne(Context context, Integer integer) {
         try {
@@ -128,29 +134,59 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
 
     }
 
-    /*
-     * Disabled the put until https://jira.duraspace.org/browse/DS-4230 is discussed
-    @Override
-    protected RelationshipRest put(Context context, HttpServletRequest request, String apiCategory, String model,
-                                   Integer id, List<String> stringList)
-        throws RepositoryMethodNotImplementedException, SQLException, AuthorizeException {
+    /**
+     * Method to replace either the right or left item of a relationship with a given new item
+     * Called by request mappings in RelationshipRestController
+     * - For replace right item (itemToReplaceIsRight = true)
+     *      => Newly proposed changed relationship: left = old-left; right = new-item
+     * - For replace left item (itemToReplaceIsRight = false)
+     *      => Newly proposed changed relationship: left = new-item; right = old-right
+     * @param context
+     * @param contextPath           What API call was made to get here
+     * @param id                    ID of the relationship we wish to modify
+     * @param stringList            Item to replace either right or left item of relationship with
+     * @param itemToReplaceIsRight  Boolean to decide whether to replace right item (true) or left item (false)
+     * @return  The (modified) relationship
+     * @throws SQLException
+     */
+    public RelationshipRest put(Context context, String contextPath, Integer id, List<String> stringList,
+                                Boolean itemToReplaceIsRight) throws SQLException {
 
-        Relationship relationship = relationshipService.find(context, id);
+        Relationship relationship;
+        try {
+            relationship = relationshipService.find(context, id);
+        } catch (SQLException e) {
+            throw new ResourceNotFoundException(contextPath + " with id: " + id + " not found");
+        }
         if (relationship == null) {
-            throw new ResourceNotFoundException(apiCategory + "." + model + " with id: " + id + " not found");
+            throw new ResourceNotFoundException(contextPath + " with id: " + id + " not found");
         }
         List<DSpaceObject> dSpaceObjects = utils.constructDSpaceObjectList(context, stringList);
-        if (dSpaceObjects.size() == 2 && dSpaceObjects.get(0).getType() == Constants.ITEM
-            && dSpaceObjects.get(1).getType() == Constants.ITEM) {
-            Item leftItem = (Item) dSpaceObjects.get(0);
-            Item rightItem = (Item) dSpaceObjects.get(1);
+        if (dSpaceObjects.size() == 1 && dSpaceObjects.get(0).getType() == Constants.ITEM) {
+
+            Item replacementItemInRelationship = (Item) dSpaceObjects.get(0);
+            Item leftItem;
+            Item rightItem;
+            if (itemToReplaceIsRight) {
+                leftItem = relationship.getLeftItem();
+                rightItem = replacementItemInRelationship;
+            } else {
+                leftItem = replacementItemInRelationship;
+                rightItem = relationship.getRightItem();
+            }
 
             if (isAllowedToModifyRelationship(context, relationship, leftItem, rightItem)) {
                 relationship.setLeftItem(leftItem);
                 relationship.setRightItem(rightItem);
 
-                relationshipService.updatePlaceInRelationship(context, relationship, false);
-                relationshipService.update(context, relationship);
+                try {
+                    relationshipService.updatePlaceInRelationship(context, relationship, false);
+                    relationshipService.update(context, relationship);
+                    context.commit();
+                    context.reloadEntity(relationship);
+                } catch (AuthorizeException e) {
+                    throw new AccessDeniedException("You do not have write rights on this relationship's items");
+                }
 
                 return relationshipConverter.fromModel(relationship);
             } else {
@@ -161,7 +197,6 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
         }
 
     }
-    */
 
     /**
      * This method will check with the current user has write rights on both one of the original items and one of the
@@ -170,7 +205,7 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
      * @param relationship  The relationship to be checked on
      * @param leftItem      The new left Item
      * @param rightItem     The new right Item
-     * @return              A boolean indicating whether the user is allowed or not
+     * @return A boolean indicating whether the user is allowed or not
      * @throws SQLException If something goes wrong
      */
     private boolean isAllowedToModifyRelationship(Context context, Relationship relationship, Item leftItem,
@@ -178,7 +213,7 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
         return (authorizeService.authorizeActionBoolean(context, leftItem, Constants.WRITE) ||
             authorizeService.authorizeActionBoolean(context, rightItem, Constants.WRITE)) &&
             (authorizeService.authorizeActionBoolean(context, relationship.getLeftItem(), Constants.WRITE) ||
-            authorizeService.authorizeActionBoolean(context, relationship.getRightItem(), Constants.WRITE)
+                authorizeService.authorizeActionBoolean(context, relationship.getRightItem(), Constants.WRITE)
             );
     }
 
@@ -197,5 +232,48 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
         } catch (SQLException e) {
             log.error("Error deleting Relationship specified by ID:" + id, e);
         }
+    }
+
+    /**
+     * This method will find all the Relationship objects that a RelationshipType that corresponds to the given Label
+     * It's also possible to pass a DSO along to this method with a parameter which will only return Relationship
+     * objects that have this DSO as leftItem or rightItem.
+     * This endpoint is paginated
+     *
+     * @param label     The label of a RelationshipType which the Relationships must have if they're to be returned
+     * @param dsoId     The dsoId of the object that has to be a leftItem or rightItem if this parameter is present
+     * @param pageable  The page object
+     * @return          A page with all the RelationshipRest objects that correspond to the constraints
+     * @throws SQLException If something goes wrong
+     */
+    @SearchRestMethod(name = "byLabel")
+    public Page<RelationshipRest> findByLabel(@Parameter(value = "label", required = true) String label,
+                                              @Parameter(value = "dso", required = false) UUID dsoId,
+                                              Pageable pageable) throws SQLException {
+
+        Context context = obtainContext();
+
+        List<RelationshipType> relationshipTypeList = relationshipTypeService.findByLeftOrRightLabel(context, label);
+        List<Relationship> relationships = new LinkedList<>();
+        if (dsoId != null) {
+
+            Item item = itemService.find(context, dsoId);
+
+            if (item == null) {
+                throw new ResourceNotFoundException("The request DSO with id: " + dsoId + " was not found");
+            }
+            for (RelationshipType relationshipType : relationshipTypeList) {
+                relationships.addAll(relationshipService.findByItemAndRelationshipType(context,
+                                                                                       item, relationshipType));
+            }
+        } else {
+            for (RelationshipType relationshipType : relationshipTypeList) {
+                relationships.addAll(relationshipService.findByRelationshipType(context, relationshipType));
+            }
+        }
+
+        Page<RelationshipRest> page = utils.getPage(relationships, pageable).map(relationshipConverter);
+        return page;
+
     }
 }

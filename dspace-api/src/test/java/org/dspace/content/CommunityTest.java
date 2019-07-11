@@ -12,7 +12,6 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -752,7 +751,7 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
         }};
 
         //null by default
-        assertEquals("testGetParentCommunity 0", c.getParentCommunities().size(), 0);
+        assertThat("testGetParentCommunity 0", c.getParentCommunities().size(), equalTo(0));
 
         //community with  parent
         Community son = communityService.create(c, context);
