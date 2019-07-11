@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.UUID;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.BadRequestException;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -23,6 +22,7 @@ import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.CollectionConverter;
 import org.dspace.app.rest.converter.MetadataConverter;
+import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.CollectionRest;
@@ -191,7 +191,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
 
                 UUID parentCommunityUuid = UUIDUtils.fromString(parentCommunityString);
                 if (parentCommunityUuid == null) {
-                    throw new BadRequestException("The given parent was invalid: "
+                    throw new DSpaceBadRequestException("The given parent was invalid: "
                             + parentCommunityString);
                 }
 
@@ -201,7 +201,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
                             + parentCommunityUuid + " not found");
                 }
             } else {
-                throw new BadRequestException("The parent parameter cannot be left empty," +
+                throw new DSpaceBadRequestException("The parent parameter cannot be left empty," +
                                                   "collections require a parent community.");
             }
             collection = cs.create(context, parent);

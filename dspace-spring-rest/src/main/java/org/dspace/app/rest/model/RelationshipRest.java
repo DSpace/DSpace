@@ -21,10 +21,13 @@ public class RelationshipRest extends BaseObjectRest<Integer> {
     public static final String NAME = "relationship";
     public static final String CATEGORY = "core";
 
+    @JsonIgnore
     private UUID leftId;
+    @JsonIgnore
+    private UUID rightId;
+
     private int relationshipTypeId;
     private RelationshipTypeRest relationshipType;
-    private UUID rightId;
     private int leftPlace;
     private int rightPlace;
 
