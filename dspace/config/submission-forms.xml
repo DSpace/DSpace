@@ -366,7 +366,7 @@ it, please enter the types and the actual numbers or codes.</hint>
           <input-type>group</input-type>
           <repeatable>true</repeatable>
           <required />
-          <hint>Enter the names of the authors of this item in the form Surname, Firstname [i.e. Smith, Josh or Smith, J].</hint>
+          <hint>Enter the names of the authors of this item.</hint>
         </field>
       </row>
       <row>
@@ -544,7 +544,7 @@ it, please enter the types and the actual numbers or codes.</hint>
           <input-type>group</input-type>
           <repeatable>true</repeatable>
           <required />
-          <hint>Enter the names of the authors of this item in the form Surname, Firstname [i.e. Smith, Josh or Smith, J].</hint>
+          <hint>Enter the names of the authors of this item.</hint>
         </field>
       </row>
       <row>
