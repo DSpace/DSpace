@@ -70,12 +70,14 @@ public class ItemAuthority implements ChoiceAuthority {
 
         ItemAuthorityService itemAuthorityService = itemAuthorityServiceFactory.getInstance(field);
         String luceneQuery = itemAuthorityService.getSolrQuery(text);
-        System.out.println(luceneQuery);
+
         DiscoverQuery discoverQuery = new DiscoverQuery();
         discoverQuery.setDSpaceObjectFilter(org.dspace.core.Constants.ITEM);
-        String filter = ConfigurationManager.getProperty("cris", "ItemAuthority."
-            + field + ".filter");
-        if (StringUtils.isNotBlank(filter)) {
+        
+    	String relationshipType = ConfigurationManager.getProperty("cris", "ItemAuthority."
+                + field + ".relationshipType");
+        if (StringUtils.isNotBlank(relationshipType)) {
+        	 String filter = "relationship.type:" + relationshipType;
             discoverQuery.addFilterQueries(filter);
         }
 
