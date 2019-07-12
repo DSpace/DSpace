@@ -1,13 +1,17 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
 package org.dspace.app.rest;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
-import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.BadRequestException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
@@ -16,18 +20,19 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.converter.BitstreamConverter;
 import org.dspace.app.rest.converter.MetadataConverter;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
-import org.dspace.app.rest.model.PropertiesRest;
+import org.dspace.app.rest.model.BitstreamPropertiesRest;
 import org.dspace.app.rest.model.hateoas.BitstreamResource;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Item;
-import org.dspace.content.MetadataValue;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -57,6 +62,7 @@ public class ItemUploadController {
     private MetadataConverter metadataConverter;
 
     @RequestMapping(method = RequestMethod.POST, value = "/bitstreams", headers = "content-type=multipart/form-data")
+    @PreAuthorize("hasPermission(#uuid, 'ITEM', 'WRITE')")
     public BitstreamResource uploadBitstream(HttpServletRequest request, @PathVariable UUID uuid,
                                              @RequestParam("file") MultipartFile uploadfile,
                                              @RequestParam(value = "properties", required = false) String properties) {
@@ -70,15 +76,14 @@ public class ItemUploadController {
             log.error("Something went wrong trying to find the Item with uuid: " + uuid, e);
         }
         if (item == null) {
-            throw new BadRequestException("The given uuid did not resolve to an Item on the server: " + uuid);
+            throw new ResourceNotFoundException("The given uuid did not resolve to an Item on the server: " + uuid);
         }
-        String fileName = uploadfile.getName();
         InputStream fileInputStream = null;
         try {
             fileInputStream = uploadfile.getInputStream();
         } catch (IOException e) {
             log.error("Something went wrong when trying to read the inputstream from the given file in the request");
-            throw new BadRequestException("The InputStream from the file couldn't be read");
+            throw new UnprocessableEntityException("The InputStream from the file couldn't be read");
         }
         try {
             bitstream = processBitstreamCreation(context, item, fileInputStream, properties);
@@ -86,7 +91,8 @@ public class ItemUploadController {
             context.commit();
         } catch (AuthorizeException | IOException | SQLException e) {
             log.error(
-                "Something went wrong with trying to create the single bitstream for file with filename: " + fileName
+                "Something went wrong with trying to create the single bitstream for file with filename: " + uploadfile
+                    .getOriginalFilename()
                     + " for item with uuid: " + uuid + " and possible properties: " + properties);
 
         }
@@ -100,26 +106,29 @@ public class ItemUploadController {
         Bitstream bitstream = null;
         if (StringUtils.isNotBlank(properties)) {
             ObjectMapper mapper = new ObjectMapper();
-            PropertiesRest propertiesRest = null;
+            BitstreamPropertiesRest bitstreamPropertiesRest = null;
             try {
-                propertiesRest = mapper.readValue(properties, PropertiesRest.class);
+                bitstreamPropertiesRest = mapper.readValue(properties, BitstreamPropertiesRest.class);
             } catch (Exception e) {
                 throw new UnprocessableEntityException("The properties parameter was incorrect: " + properties);
             }
-            String bundleName = propertiesRest.getBundleName();
+            String bundleName = bitstreamPropertiesRest.getBundleName();
             if (StringUtils.isBlank(bundleName)) {
-                throw new BadRequestException("Properties without a bundleName is not allowed");
+                throw new UnprocessableEntityException("Properties without a bundleName is not allowed");
             }
             bitstream = itemService.createSingleBitstream(context, fileInputStream, item, bundleName);
-            metadataConverter.setMetadata(context, bitstream, propertiesRest.getMetadata());
-            String name = propertiesRest.getName();
+            if (bitstreamPropertiesRest.getMetadata() != null) {
+                metadataConverter.setMetadata(context, bitstream, bitstreamPropertiesRest.getMetadata());
+            }
+            String name = bitstreamPropertiesRest.getName();
             if (StringUtils.isNotBlank(name)) {
                 bitstream.setName(context, name);
             }
-            String sequenceId = propertiesRest.getSequenceId();
-            if (StringUtils.isNotBlank(sequenceId)) {
-                bitstream.setSequenceID(Integer.parseInt(sequenceId));
+            Integer sequenceId = bitstreamPropertiesRest.getSequenceId();
+            if (sequenceId != null) {
+                bitstream.setSequenceID(sequenceId);
             }
+
         } else {
             bitstream = itemService.createSingleBitstream(context, fileInputStream, item);
 
