@@ -1,10 +1,17 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
 package org.dspace.app.rest.model;
 
-public class PropertiesRest {
+public class BitstreamPropertiesRest {
 
     private String name;
     private String bundleName;
-    private String sequenceId;
+    private Integer sequenceId;
     private MetadataRest metadata;
 
     public String getName() {
@@ -31,11 +38,11 @@ public class PropertiesRest {
         this.metadata = metadata;
     }
 
-    public String getSequenceId() {
+    public Integer getSequenceId() {
         return sequenceId;
     }
 
-    public void setSequenceId(String sequenceId) {
+    public void setSequenceId(Integer sequenceId) {
         this.sequenceId = sequenceId;
     }
 }
