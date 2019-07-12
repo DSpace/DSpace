@@ -441,15 +441,9 @@ public class RestResourceController implements InitializingBean {
         throws HttpRequestMethodNotSupportedException {
         checkModelPluralForm(apiCategory, model);
         DSpaceRestRepository<RestAddressableModel, ID> repository = utils.getResourceRepository(apiCategory, model);
-        RestAddressableModel modelObject = null;
-        try {
-            modelObject = repository.createAndReturn();
-        } catch (ClassCastException e) {
-            log.error(e.getMessage(), e);
-            return ControllerUtils.toEmptyResponse(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        RestAddressableModel modelObject = repository.createAndReturn();
         if (modelObject == null) {
-            throw new HttpRequestMethodNotSupportedException(RequestMethod.POST.toString());
+            return ControllerUtils.toEmptyResponse(HttpStatus.CREATED);
         }
         DSpaceResource result = repository.wrapResource(modelObject);
         linkService.addLinks(result);
@@ -482,7 +476,7 @@ public class RestResourceController implements InitializingBean {
             return ControllerUtils.toEmptyResponse(HttpStatus.INTERNAL_SERVER_ERROR);
         }
         if (modelObject == null) {
-            throw new HttpRequestMethodNotSupportedException(RequestMethod.POST.toString());
+            return ControllerUtils.toEmptyResponse(HttpStatus.CREATED);
         }
         DSpaceResource result = repository.wrapResource(modelObject);
         linkService.addLinks(result);
@@ -572,8 +566,8 @@ public class RestResourceController implements InitializingBean {
      *            the api category
      * @param model
      *            the rest model that identify the REST resource collection
-     * @param id
-     *            the id of the specific rest resource
+     * @param uuid
+     *            the uuid of the specific rest resource
      * @param uploadfile
      *            the file to upload
      * @return the created resource
@@ -584,11 +578,11 @@ public class RestResourceController implements InitializingBean {
     public <ID extends Serializable> ResponseEntity<ResourceSupport> upload(HttpServletRequest request,
                                                                             @PathVariable String apiCategory,
                                                                             @PathVariable String model,
-                                                                            @PathVariable UUID id,
+                                                                            @PathVariable UUID uuid,
                                                                             @RequestParam("file") MultipartFile
                                                                                 uploadfile)
         throws HttpRequestMethodNotSupportedException {
-        return uploadInternal(request, apiCategory, model, id, uploadfile);
+        return uploadInternal(request, apiCategory, model, uuid, uploadfile);
     }
 
     /**

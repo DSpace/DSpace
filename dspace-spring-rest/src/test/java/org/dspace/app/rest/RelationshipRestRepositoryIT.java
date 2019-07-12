@@ -9,6 +9,8 @@ package org.dspace.app.rest;
 
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -250,8 +252,10 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
 
         getClient().perform(get("/api/core/relationships/" + firstRelationshipIdString))
                    .andExpect(status().isOk())
-                   .andExpect(jsonPath("$.leftId", is(publication.getID().toString())))
-                   .andExpect(jsonPath("$.rightId", is(author1.getID().toString())));
+                   .andExpect(jsonPath("$._links.leftItem.href",
+                                       containsString(publication.getID().toString())))
+                   .andExpect(jsonPath("$._links.rightItem.href",
+                                       containsString(author1.getID().toString())));
 
     }
 
@@ -322,8 +326,8 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
 
         getClient().perform(get("/api/core/relationships/" + firstRelationshipIdString))
                    .andExpect(status().isOk())
-                   .andExpect(jsonPath("$.leftId", is(publication.getID().toString())))
-                   .andExpect(jsonPath("$.rightId", is(author1.getID().toString())));
+                   .andExpect(jsonPath("$._links.leftItem.href", containsString(publication.getID().toString())))
+                   .andExpect(jsonPath("$._links.rightItem.href", containsString(author1.getID().toString())));
     }
 
 
@@ -1160,6 +1164,177 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
     }
 
     /**
+     * This method will test the deletion of a Relationship and will then
+     * verify that the relation is removed
+     * @throws Exception
+     */
+    @Test
+    public void deleteRelationship() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
+        Collection col3 = CollectionBuilder.createCollection(context, child1).withName("OrgUnits").build();
+
+        Item author1 = ItemBuilder.createItem(context, col1)
+                                  .withTitle("Author1")
+                                  .withIssueDate("2017-10-17")
+                                  .withPersonIdentifierFirstName("Donald")
+                                  .withPersonIdentifierLastName("Smith")
+                                  .withRelationshipType("Person")
+                                  .build();
+
+        Item author2 = ItemBuilder.createItem(context, col2)
+                                  .withTitle("Author2")
+                                  .withIssueDate("2016-02-13")
+                                  .withPersonIdentifierFirstName("Maria")
+                                  .withPersonIdentifierLastName("Smith")
+                                  .withRelationshipType("Person")
+                                  .build();
+
+        Item publication = ItemBuilder.createItem(context, col3)
+                                      .withTitle("Publication1")
+                                      .withIssueDate("2015-01-01")
+                                      .withRelationshipType("Publication")
+                                      .build();
+        RelationshipType isAuthorOfPublicationRelationshipType = relationshipTypeService
+            .findbyTypesAndLabels(context, entityTypeService.findByEntityType(context, "Publication"),
+                                  entityTypeService.findByEntityType(context, "Person"),
+                                  "isAuthorOfPublication", "isPublicationOfAuthor");
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+
+        // First create 1 relationship.
+        context.restoreAuthSystemState();
+        // This post request will add a first relationship to the publication and thus create a first set of metadata
+        // For the author values, namely "Donald Smith"
+        MvcResult mvcResult = getClient(adminToken).perform(post("/api/core/relationships")
+                                                                .param("relationshipType",
+                                                                       isAuthorOfPublicationRelationshipType.getID()
+                                                                                                            .toString())
+                                                                .contentType(MediaType.parseMediaType
+                                                                    (org.springframework.data.rest.webmvc.RestMediaTypes
+                                                                         .TEXT_URI_LIST_VALUE))
+                                                                .content(
+                                                                    "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
+                                                                        "https://localhost:8080/spring-rest/api/core/items/" + author1.getID()))
+                                                   .andExpect(status().isCreated())
+                                                   .andReturn();
+        ObjectMapper mapper = new ObjectMapper();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        Map<String, Object> map = mapper.readValue(content, Map.class);
+        String firstRelationshipIdString = String.valueOf(map.get("id"));
+
+
+        // This test checks that there's one relationship on the publication
+        getClient(adminToken).perform(get("/api/core/items/" +
+                publication.getID() + "/relationships"))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("page.totalElements", is(1)));
+
+        // This test checks that there's one relationship on the first author
+        getClient(adminToken).perform(get("/api/core/items/" +
+                author1.getID() + "/relationships"))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("page.totalElements", is(1)));
+
+        // This test checks that there's no relationship on the second author
+        getClient(adminToken).perform(get("/api/core/items/" +
+                author2.getID() + "/relationships"))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("page.totalElements", is(0)));
+
+        // Creates another Relationship for the Publication
+        mvcResult = getClient(adminToken).perform(post("/api/core/relationships")
+                                                      .param("relationshipType",
+                                                             isAuthorOfPublicationRelationshipType.getID()
+                                                                                                  .toString())
+                                                      .contentType(MediaType.parseMediaType
+                                                          (org.springframework.data.rest.webmvc.RestMediaTypes
+                                                               .TEXT_URI_LIST_VALUE))
+                                                      .content(
+                                                          "https://localhost:8080/spring-rest/api/core/items/" + publication.getID() + "\n" +
+                                                              "https://localhost:8080/spring-rest/api/core/items/" + author2.getID()))
+                                         .andExpect(status().isCreated())
+                                         .andReturn();
+
+        content = mvcResult.getResponse().getContentAsString();
+        map = mapper.readValue(content, Map.class);
+        String secondRelationshipIdString = String.valueOf(map.get("id"));
+
+        // This test checks that there are 2 relationships on the publication
+        getClient(adminToken).perform(get("/api/core/items/" +
+                publication.getID() + "/relationships"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("page.totalElements", is(2)));
+
+        // This test checks that there's one relationship on the first author
+        getClient(adminToken).perform(get("/api/core/items/" +
+                author1.getID() + "/relationships"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("page.totalElements", is(1)));
+
+        // This test checks that there's one relationship on the second author
+        getClient(adminToken).perform(get("/api/core/items/" +
+                author2.getID() + "/relationships"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("page.totalElements", is(1)));
+
+
+        // Now we delete the first relationship
+        getClient(adminToken).perform(delete("/api/core/relationships/" + firstRelationshipIdString));
+
+
+        // This test checks that there's one relationship on the publication
+        getClient(adminToken).perform(get("/api/core/items/" +
+                publication.getID() + "/relationships"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("page.totalElements", is(1)));
+
+        // This test checks that there's no relationship on the first author
+        getClient(adminToken).perform(get("/api/core/items/" +
+                author1.getID() + "/relationships"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("page.totalElements", is(0)));
+
+        // This test checks that there are one relationship on the second author
+        getClient(adminToken).perform(get("/api/core/items/" +
+                author2.getID() + "/relationships"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("page.totalElements", is(1)));
+
+
+        // Now we delete the second relationship
+        getClient(adminToken).perform(delete("/api/core/relationships/" + secondRelationshipIdString));
+
+
+        // This test checks that there's no relationship on the publication
+        getClient(adminToken).perform(get("/api/core/items/" +
+                publication.getID() + "/relationships"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("page.totalElements", is(0)));
+
+        // This test checks that there's no relationship on the first author
+        getClient(adminToken).perform(get("/api/core/items/" +
+                author1.getID() + "/relationships"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("page.totalElements", is(0)));
+
+        // This test checks that there are no relationship on the second author
+        getClient(adminToken).perform(get("/api/core/items/" +
+                author2.getID() + "/relationships"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("page.totalElements", is(0)));
+    }
+
+    /**
      * This test will simply add Relationships between Items with a useForPlace attribute set to false for the
      * RelationshipType. We want to test that the Relationships that are created will still have their place
      * attributes handled in a correct way
@@ -1508,8 +1683,10 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         //verify left item change and other not changed
         getClient(token).perform(get("/api/core/relationships/" + id))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.leftId", is(publication2.getID().toString())))
-                .andExpect(jsonPath("$.rightId", is(author1.getID().toString())));
+                .andExpect(jsonPath("$._links.leftItem.href",
+                        containsString(publication2.getID().toString())))
+                .andExpect(jsonPath("$._links.rightItem.href",
+                        containsString(author1.getID().toString())));
 
         //Modify the right item in the relationship publication > publication 2
         MvcResult mvcResult3 = getClient(token).perform(put("/api/core/relationships/" + id + "/rightItem")
@@ -1524,8 +1701,10 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         //verify right item change and other not changed
         getClient(token).perform(get("/api/core/relationships/" + id))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.rightId", is(author2.getID().toString())))
-                .andExpect(jsonPath("$.leftId", is(publication2.getID().toString())));
+                .andExpect(jsonPath("$._links.rightItem.href",
+                                containsString(author2.getID().toString())))
+                .andExpect(jsonPath("$._links.leftItem.href",
+                                containsString(publication2.getID().toString())));
 
     }
 
@@ -1616,8 +1795,10 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         //verify change  and other not changed
         getClient(token).perform(get("/api/core/relationships/" + id))
                         .andExpect(status().isOk())
-                        .andExpect(jsonPath("$.rightId", is(author2.getID().toString())))
-                        .andExpect(jsonPath("$.leftId", is(publication.getID().toString())));
+                        .andExpect(jsonPath("$._links.rightItem.href",
+                                containsString(author2.getID().toString())))
+                        .andExpect(jsonPath("$._links.leftItem.href",
+                                containsString(publication.getID().toString())));
 
     }
 
@@ -1706,8 +1887,10 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         //verify right item change and other not changed
         getClient(token).perform(get("/api/core/relationships/" + id))
                         .andExpect(status().isOk())
-                        .andExpect(jsonPath("$.rightId", is(author2.getID().toString())))
-                        .andExpect(jsonPath("$.leftId", is(publication.getID().toString())));
+                        .andExpect(jsonPath("$._links.rightItem.href",
+                                containsString(author2.getID().toString())))
+                        .andExpect(jsonPath("$._links.leftItem.href",
+                                containsString(publication.getID().toString())));
 
     }
 
@@ -1797,8 +1980,10 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         //verify change  and other not changed
         getClient(token).perform(get("/api/core/relationships/" + id))
                         .andExpect(status().isOk())
-                        .andExpect(jsonPath("$.leftId", is(publication2.getID().toString())))
-                        .andExpect(jsonPath("$.rightId", is(author1.getID().toString())));
+                        .andExpect(jsonPath("$._links.leftItem.href",
+                                containsString(publication2.getID().toString())))
+                        .andExpect(jsonPath("$._links.rightItem.href",
+                                containsString(author1.getID().toString())));
     }
 
 
@@ -1888,8 +2073,10 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         //verify change and other not changed
         getClient(token).perform(get("/api/core/relationships/" + id))
                         .andExpect(status().isOk())
-                        .andExpect(jsonPath("$.leftId", is(publication2.getID().toString())))
-                        .andExpect(jsonPath("$.rightId", is(author1.getID().toString())));
+                        .andExpect(jsonPath("$._links.leftItem.href",
+                                containsString(publication2.getID().toString())))
+                        .andExpect(jsonPath("$._links.rightItem.href",
+                                containsString(author1.getID().toString())));
     }
 
 
@@ -1977,8 +2164,10 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         //verify nothing changed
         getClient(token).perform(get("/api/core/relationships/" + id))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.leftId", is(publication.getID().toString())))
-                .andExpect(jsonPath("$.rightId", is(author1.getID().toString())));
+                .andExpect(jsonPath("$._links.leftItem.href",
+                        containsString(publication.getID().toString())))
+                .andExpect(jsonPath("$._links.rightItem.href",
+                        containsString(author1.getID().toString())));
     }
 
     /**
@@ -2068,8 +2257,10 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         //verify not changed
         getClient(token).perform(get("/api/core/relationships/" + id))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.leftId", is(publication.getID().toString())))
-                .andExpect(jsonPath("$.rightId", is(author1.getID().toString())));
+                .andExpect(jsonPath("$._links.leftItem.href",
+                        containsString(publication.getID().toString())))
+                .andExpect(jsonPath("$._links.rightItem.href",
+                        containsString(author1.getID().toString())));
     }
 
     /**
@@ -2156,9 +2347,133 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         //verify not changed
         getClient(token).perform(get("/api/core/relationships/" + id))
                         .andExpect(status().isOk())
-                        .andExpect(jsonPath("$.leftId", is(publication1.getID().toString())))
-                        .andExpect(jsonPath("$.rightId", is(author1.getID().toString())));
+                .andExpect(jsonPath("$._links.leftItem.href",
+                        containsString(publication1.getID().toString())))
+                .andExpect(jsonPath("$._links.rightItem.href",
+                        containsString(author1.getID().toString())));
 
+    }
+
+    @Test
+    public void findRelationshipByLabelTest() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
+        Collection col3 = CollectionBuilder.createCollection(context, child1).withName("OrgUnits").build();
+
+        Item author1 = ItemBuilder.createItem(context, col1)
+                                 .withTitle("Author1")
+                                 .withIssueDate("2017-10-17")
+                                 .withAuthor("Smith, Donald")
+                                 .withRelationshipType("Person")
+                                 .build();
+
+        Item author2 = ItemBuilder.createItem(context, col2)
+                                  .withTitle("Author2")
+                                  .withIssueDate("2016-02-13")
+                                  .withAuthor("Smith, Maria")
+                                  .withRelationshipType("Person")
+                                  .build();
+
+        Item author3 = ItemBuilder.createItem(context, col2)
+                                  .withTitle("Author3")
+                                  .withIssueDate("2016-02-13")
+                                  .withAuthor("Maybe, Maybe")
+                                  .withRelationshipType("Person")
+                                  .build();
+
+        Item orgUnit1 = ItemBuilder.createItem(context, col3)
+                                   .withTitle("OrgUnit1")
+                                   .withAuthor("Testy, TEst")
+                                   .withIssueDate("2015-01-01")
+                                   .withRelationshipType("OrgUnit")
+                                   .build();
+
+        Item project1 = ItemBuilder.createItem(context, col3)
+                                   .withTitle("Project1")
+                                   .withAuthor("Testy, TEst")
+                                   .withIssueDate("2015-01-01")
+                                   .withRelationshipType("Project")
+                                   .build();
+
+        Item publication = ItemBuilder.createItem(context, col3)
+                                      .withTitle("Publication1")
+                                      .withAuthor("Testy, TEst")
+                                      .withIssueDate("2015-01-01")
+                                      .withRelationshipType("Publication")
+                                      .build();
+
+
+        RelationshipType isOrgUnitOfPersonRelationshipType = relationshipTypeService
+            .findbyTypesAndLabels(context, entityTypeService.findByEntityType(context, "Person"),
+                                  entityTypeService.findByEntityType(context, "OrgUnit"),
+                                  "isOrgUnitOfPerson", "isPersonOfOrgUnit");
+        RelationshipType isOrgUnitOfProjectRelationshipType = relationshipTypeService
+            .findbyTypesAndLabels(context, entityTypeService.findByEntityType(context, "Project"),
+                                  entityTypeService.findByEntityType(context, "OrgUnit"),
+                                  "isOrgUnitOfProject", "isProjectOfOrgUnit");
+        RelationshipType isAuthorOfPublicationRelationshipType = relationshipTypeService
+            .findbyTypesAndLabels(context, entityTypeService.findByEntityType(context, "Publication"),
+                                  entityTypeService.findByEntityType(context, "Person"),
+                                  "isAuthorOfPublication", "isPublicationOfAuthor");
+
+        // We're creating a Relationship of type isOrgUnitOfPerson between an author and an orgunit
+        Relationship relationship1 = RelationshipBuilder
+            .createRelationshipBuilder(context, author1, orgUnit1, isOrgUnitOfPersonRelationshipType).build();
+
+        // We're creating a Relationship of type isOrgUnitOfPerson between a different author and the same orgunit
+        Relationship relationshipAuthorExtra = RelationshipBuilder
+            .createRelationshipBuilder(context, author2, orgUnit1, isOrgUnitOfPersonRelationshipType).build();
+
+        // We're creating a Relationship of type isOrgUnitOfProject between a project and an orgunit
+        Relationship relationship2 = RelationshipBuilder
+            .createRelationshipBuilder(context, project1, orgUnit1, isOrgUnitOfProjectRelationshipType).build();
+
+        // We're creating a Relationship of type isAuthorOfPublication between a publication and an author
+        Relationship relationship3 = RelationshipBuilder
+            .createRelationshipBuilder(context, publication, author1, isAuthorOfPublicationRelationshipType).build();
+
+        // Perform a GET request to the searchByLabel endpoint, asking for Relationships of type isOrgUnitOfPerson
+        // With an extra parameter namely DSO which resolves to the author(Smith, Donald) in the first
+        // relationship created.
+        // As that first relationship is the only one created with the given author(Smith, Donald) that holds the
+        // RelationshipType "isOrgUnitOfPerson", that Relationship should be the only one returned.
+        // This is what we're checking for
+        getClient().perform(get("/api/core/relationships/search/byLabel")
+                    .param("label", "isOrgUnitOfPerson")
+                    .param("dso", author1.getID().toString()))
+
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.page",
+                                       is(PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 1))))
+                   .andExpect(jsonPath("$._embedded.relationships", hasItem(
+                       RelationshipMatcher.matchRelationship(relationship1)
+                   )))
+        ;
+
+        // Perform a GET request to the searchByLabel endpoint, asking for Relationships of type isOrgUnitOfPerson
+        // We do not specificy a DSO param, which means ALL relationships of type isOrgUnitOfPerson should be returned
+        // Which is what we're checking for, both the first relationship and the one with a different author
+        // should be returned
+        getClient().perform(get("/api/core/relationships/search/byLabel")
+                                .param("label", "isOrgUnitOfPerson"))
+
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.page",
+                                       is(PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 2))))
+                   .andExpect(jsonPath("$._embedded.relationships", containsInAnyOrder(
+                       RelationshipMatcher.matchRelationship(relationship1),
+                       RelationshipMatcher.matchRelationship(relationshipAuthorExtra)
+                   )))
+        ;
     }
 
     @Test
