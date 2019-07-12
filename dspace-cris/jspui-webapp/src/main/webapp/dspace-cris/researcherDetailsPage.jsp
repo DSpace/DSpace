@@ -59,7 +59,7 @@
     // Can the logged in user edit
     Boolean bEdit = (Boolean)request.getAttribute("canEdit");
     boolean canEdit = (bEdit == null ? false : bEdit.booleanValue());
-    
+    boolean canDisconnectOrcid = ConfigurationManager.getBooleanProperty("cris","rp.orcid.candisconnect");
     // Get the current page, minus query string
     String currentPage = UIUtil.getOriginalURL(request);
     int c = currentPage.indexOf( '?' );
@@ -80,6 +80,7 @@
 <c:set var="baseURL" value="${fn:replace(req.requestURL, fn:substring(req.requestURI, 0, fn:length(req.requestURI)), req.contextPath)}" />
 <c:set var="metaprofilename"><c:choose><c:when test="${!empty entity.preferredName.value}">${entity.preferredName.value}</c:when><c:otherwise>${entity.fullName}</c:otherwise></c:choose></c:set>
 <c:set var="fieldRSS" scope="request"><%= fieldFeed %></c:set>
+<c:set var="canDisconnectOrcid" scope="page"><%= canDisconnectOrcid %></c:set>
 
 <c:set var="dspace.cris.navbar" scope="request">
 
@@ -240,6 +241,31 @@
 				
 			});
 			
+			j('#disconnect-orcid-rp').on('click', function(){
+				j('#label-success').remove();
+				j('#label-error').remove();				
+				j.ajax({
+					url: "<%= request.getContextPath() %>/json/orcid/disconnect",
+					data: {
+						"crisid": '${entity.crisID}'
+					},
+					success : function(data) {
+						send = data.result;
+						if(send==-1){
+							j('#selfclaimrp-result').append('<span id="label-error" class="label label-warning"><fmt:message key="jsp.cris.detail.disconnectorcidrp.error-1"><fmt:param value="${baseURL}/cris/rp/${entity.crisID}"/></fmt:message></span>');	
+						}
+						else{
+							j('#selfclaimrp-result').append('<span id="label-success" class="label label-warning"><fmt:message key="jsp.cris.detail.disconnectorcidrp.success"><fmt:param value="${baseURL}/cris/rp/${entity.crisID}"/></fmt:message></span>');
+							j('#orciddisconnect-modal').modal('show');
+							setTimeout(function () { // wait 3 seconds and reload
+								    window.location.reload(true);
+								  }, 3000);
+						}
+					}
+				});
+				
+			});
+			
 			j("#tabs").tabs({
 				cache: true,
 				active: ${currTabIdx-1},
@@ -353,7 +379,12 @@
 							</c:if>
 							<li>
 								<a href="${root}/cris/tools/rp/rebindItemsToRP.htm?id=${researcher.id}&operation=list"><i class="fa fa-search"></i> <fmt:message key="jsp.authority-claim.choice.list.items"/></a>
-							</li>							
+							</li>
+							<c:if test="${!empty anagraficaObject.anagrafica4view['orcid'] && canDisconnectOrcid}">
+							<li>
+								<a href="#" id="disconnect-orcid-rp"><i class="fa fa-search"></i> <fmt:message key="jsp.authority-orcid.disconnect"/></a>
+							</li>
+							</c:if>							
 						</ul>
 					</div> 
 					
@@ -509,6 +540,9 @@
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 
+<div id="orciddisconnect-modal" style="display:none">
+	<!-- empty -->
+</div>
 </dspace:layout>
 </c:otherwise>
 </c:choose>

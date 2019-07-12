@@ -7,6 +7,7 @@
  */
 package org.dspace.app.cris.model.orcid;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -42,11 +43,14 @@ import org.dspace.app.cris.service.RelationPreferenceService;
 import org.dspace.app.cris.util.Researcher;
 import org.dspace.app.cris.util.ResearcherPageUtils;
 import org.dspace.authority.orcid.OrcidService;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
+import org.dspace.core.Context;
 import org.dspace.discovery.SearchServiceException;
+import org.dspace.eperson.EPerson;
 import org.dspace.utils.DSpace;
 import org.orcid.jaxb.model.common_v2.CreditName;
 import org.orcid.jaxb.model.common_v2.ExternalId;
@@ -1238,4 +1242,50 @@ public class OrcidPreferencesUtils
 	{
 	    return ResearcherPageUtils.getStringValue(researcher, tokenName);
 	}
+	
+    public static boolean disconnectOrcidbyResearcherPage(Context context, ResearcherPage rp)
+    {
+        String orcid = ResearcherPageUtils.getStringValue(rp, "orcid");
+        
+        if(StringUtils.isNotBlank(rp.getSourceRef())) {
+            if("orcid".equals(rp.getSourceRef())) {
+                rp.setSourceID(null);
+                rp.setSourceRef(null);
+            }
+        }
+        
+        if (StringUtils.isNotBlank(orcid))
+        {
+            // clear orcid
+            List<RPProperty> rppp = rp.getAnagrafica4view()
+                    .get("orcid");
+            if (rppp != null && !rppp.isEmpty())
+            {
+                for (RPProperty rpppp : rppp)
+                {
+                    rp.removeProprieta(rpppp);
+                }
+            }
+            
+            // clear tokens
+            setTokens(rp, null);
+            
+            // clear orcid info on eperson
+            try
+            {
+                EPerson eperson = EPerson.find(context, rp.getEpersonID());
+                eperson.clearMetadata("eperson", "orcid", null, null);
+                eperson.clearMetadata("eperson", "orcid", "accesstoken", null);
+                eperson.update();
+                context.commit();
+            }
+            catch (SQLException | AuthorizeException e)
+            {
+                log.error(e.getMessage());
+            }
+            return true;
+        }
+        return false;
+    }
+
 }

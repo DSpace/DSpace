@@ -25,5 +25,10 @@
 	<bean class="org.dspace.app.cris.integration.CrisService" id="org.dspace.core.ExternalService">
 		<property name="applicationService" ref="applicationService" />
 	</bean>
-	
+
+	<bean id="standaloneMethod" class="org.dspace.app.webui.cris.orcid.OrcidStandaloneAuthenticationMethod">
+		<property name="applicationService" ref="applicationService" />
+		<property name="searchService" ref="org.dspace.discovery.SearchService" />
+	</bean>
+		
 </beans>
