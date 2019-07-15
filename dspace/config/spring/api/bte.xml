@@ -24,6 +24,7 @@
 				<entry key="csv" value-ref="csvDataLoader" />
 				<entry key="tsv" value-ref="tsvDataLoader" />
 				<entry key="oai" value-ref="oaipmhDataLoader" />
+				<entry key="grobid" value-ref="grobidDataLoader" />
 			</map>
 		</property>
 		
@@ -119,6 +120,7 @@
 	            <entry key="endnote" value-ref="endnoteDataLoader"/>
 	            <entry key="csv" value-ref="csvDataLoader"/>
 	            <entry key="tsv" value-ref="tsvDataLoader"/>
+	            <entry key="grobid" value-ref="grobidDataLoader" />
 			</map>
 	    </property>
 	</bean>
@@ -517,6 +519,25 @@
                 </map>
             </constructor-arg>
 	</bean>
+
+	<!-- Grobid -->
+	
+	<bean id="grobidDataLoader" class="org.dspace.submit.extraction.GrobidFileDataLoader">
+		<property name="url" value="${metadata.extraction.grobid.url}"/>
+		<property name="fieldMap">
+			<map>
+				<entry key="analytictitle" value="title" />
+				<entry key="analyticname" value="authors" />
+				<entry key="monogrtitle" value="journal" />
+				<entry key="publicationstmtdatepublished" value="issued" />
+				<entry key="ISSN" value="jissn" />
+				<entry key="ISBN" value="pisbn" />
+				<entry key="DOI" value="doi" />
+				<entry key="profiledescabstractparagraph" value="abstract" />
+				<entry key="profiledesckeywordsterm" value="allkeywords" />
+			</map>
+		</property>
+	</bean>	
 
 	<!-- **************************************************************************************************** -->
 	<!-- Output Mapping 																					  -->

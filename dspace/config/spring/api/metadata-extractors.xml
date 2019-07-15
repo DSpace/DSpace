@@ -14,8 +14,8 @@
             </list>
         </property>
     </bean>
-	
-<!-- 	<bean id="grobid" class="org.dspace.submit.extraction.MetadataExtractor">
+
+ 	<bean id="grobid" class="org.dspace.submit.extraction.MetadataExtractor">
 		<property name="dataLoader" ref="grobidDataLoader"/>
 		<property name="configurationService" ref="org.dspace.services.ConfigurationService"/>
         <property name="extensions">
@@ -24,7 +24,5 @@
             </list>
         </property>
     </bean>
-
- -->
  
  </beans>

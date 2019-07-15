@@ -115,35 +115,37 @@ public class MetadataStep extends AbstractProcessingStep {
     protected void enrichItem(Context context, List<Record> rset, Item item) throws SQLException, AuthorizeException {
         for (Record record : rset) {
             for (String field : record.getFields()) {
-                try {
-                    String[] tfield = Utils.tokenize(field);
-                    List<MetadataValue> mdvs = itemService
-                        .getMetadata(item, tfield[0], tfield[1], tfield[2], Item.ANY);
-                    if (mdvs == null || mdvs.isEmpty()) {
-                        for (Value value : record.getValues(field)) {
-
-                            itemService.addMetadata(context, item, tfield[0], tfield[1], tfield[2], null,
-                                                    value.getAsString());
-                        }
-                    } else {
-                        external:
-                        for (Value value : record.getValues(field)) {
-                            boolean found = false;
-                            for (MetadataValue mdv : mdvs) {
-                                if (mdv.getValue().equals(value.getAsString())) {
-                                    found = true;
-                                    continue external;
-                                }
-                            }
-                            if (!found) {
-                                itemService.addMetadata(context, item, tfield[0], tfield[1], tfield[2], null,
-                                                        value.getAsString());
-                            }
-                        }
-                    }
-                } catch (SQLException e) {
-                    log.error(e.getMessage(), e);
-                }
+            	if (record.getValues(field) != null) {
+	                try {
+	                    String[] tfield = Utils.tokenize(field);
+	                    List<MetadataValue> mdvs = itemService
+	                        .getMetadata(item, tfield[0], tfield[1], tfield[2], Item.ANY);
+	                    if (mdvs == null || mdvs.isEmpty()) {
+	                        for (Value value : record.getValues(field)) {
+	
+	                            itemService.addMetadata(context, item, tfield[0], tfield[1], tfield[2], null,
+	                                                    value.getAsString());
+	                        }
+	                    } else {
+	                        external:
+	                        for (Value value : record.getValues(field)) {
+	                            boolean found = false;
+	                            for (MetadataValue mdv : mdvs) {
+	                                if (mdv.getValue().equals(value.getAsString())) {
+	                                    found = true;
+	                                    continue external;
+	                                }
+	                            }
+	                            if (!found) {
+	                                itemService.addMetadata(context, item, tfield[0], tfield[1], tfield[2], null,
+	                                                        value.getAsString());
+	                            }
+	                        }
+	                    }
+	                } catch (SQLException e) {
+	                    log.error(e.getMessage(), e);
+	                }
+            	}
             }
         }
         itemService.update(context, item);
