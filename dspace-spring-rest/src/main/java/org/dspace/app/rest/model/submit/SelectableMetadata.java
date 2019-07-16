@@ -25,7 +25,7 @@ public class SelectableMetadata {
     private String metadata;
     private String label;
     private String authority;
-    private Boolean closed;
+    private Boolean closed = false;
 
     public String getMetadata() {
         return metadata;
