@@ -1,5 +1,8 @@
 package ar.edu.unlp.sedici.dspace.authority;
 
+import java.util.Comparator;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.dspace.content.authority.Choice;
 import org.dspace.content.authority.ChoiceAuthority;
@@ -143,6 +146,20 @@ public abstract class SPARQLAuthorityProvider implements ChoiceAuthority {
 		// FIXME: la sintaxis debería ser protected
 		return Syntax.syntaxSPARQL_10;
 	}
+	
+	protected Choice[] choicesListToArraySorted(List<Choice> choices) {
+		choices.sort(new Comparator<Choice>() {
+		    @Override
+		    public int compare(Choice m1, Choice m2) {
+		        if(m1.label == m2.label){
+		            return 0;
+		        }
+		        return m1.label.compareTo(m2.label) < 0 ? -1 : 1;
+		     }
+		});
+		return choices.toArray(new Choice[0]);
+	}
+
 
 
 

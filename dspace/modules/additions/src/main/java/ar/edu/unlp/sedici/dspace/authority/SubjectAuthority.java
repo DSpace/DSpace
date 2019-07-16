@@ -13,14 +13,14 @@ public class SubjectAuthority extends GeneralSEDICIAuthorityProvider {
 
 	@Override
 	protected String getSelectQueryFields(boolean idSearch) {
-		return " DISTINCT ?label ?uri";
+		return " DISTINCT ?label ?key";
 	}
 
 	@Override
 	protected Choice extractChoice(QuerySolution solution) {
 		String key = "";
-		if (solution.contains("uri")){
-			key = solution.getLiteral("uri").getString();			
+		if (solution.contains("key")){
+			key = solution.getLiteral("key").getString();			
 		} else {
 			key = solution.getResource("concept").getURI();			
 		}
@@ -41,7 +41,7 @@ public class SubjectAuthority extends GeneralSEDICIAuthorityProvider {
 			}
 		}
 		ArrayList<Choice> list = new ArrayList<Choice>(choices.values());
-		return list.toArray(new Choice[0]);
+		return choicesListToArraySorted(list);
 	}
 	
 }
