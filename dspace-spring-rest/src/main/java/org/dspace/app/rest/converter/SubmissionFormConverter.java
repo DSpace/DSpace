@@ -20,12 +20,13 @@ import org.dspace.app.rest.model.SubmissionFormRest;
 import org.dspace.app.rest.model.SubmissionFormRowRest;
 import org.dspace.app.rest.model.SubmissionVisibilityRest;
 import org.dspace.app.rest.model.VisibilityEnum;
+import org.dspace.app.rest.model.submit.SelectableMetadata;
+import org.dspace.app.rest.model.submit.SelectableRelationship;
 import org.dspace.app.rest.repository.SubmissionFormRestRepository;
 import org.dspace.app.rest.utils.AuthorityUtils;
 import org.dspace.app.util.DCInput;
 import org.dspace.app.util.DCInputSet;
 import org.dspace.submit.model.LanguageFormField;
-import org.dspace.submit.model.SelectableMetadata;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -77,7 +78,7 @@ public class SubmissionFormConverter implements DSpaceConverter<DCInputSet, Subm
     private SubmissionFormFieldRest getField(DCInput dcinput, String formName) {
         SubmissionFormFieldRest inputField = new SubmissionFormFieldRest();
         List<SelectableMetadata> selectableMetadata = new ArrayList<SelectableMetadata>();
-
+        List<SelectableRelationship> selectableRelationships = new ArrayList<SelectableRelationship>();
         inputField.setLabel(dcinput.getLabel());
         inputField.setHints(dcinput.getHints());
         inputField.setStyle(dcinput.getStyle());
@@ -143,7 +144,17 @@ public class SubmissionFormConverter implements DSpaceConverter<DCInputSet, Subm
         }
         inputField.setInput(inputRest);
         inputField.setSelectableMetadata(selectableMetadata);
+        handleSelectableRelationships(dcinput, selectableRelationships);
+        inputField.setSelectableRelationships(selectableRelationships);
         return inputField;
+    }
+
+    private void handleSelectableRelationships(DCInput dcinput, List<SelectableRelationship> selectableRelationships) {
+        SelectableRelationship selectableRelationship = new SelectableRelationship();
+        selectableRelationship.setRelationshipType(dcinput.getRelationshipType());
+        selectableRelationship.setFilter(dcinput.getFilter());
+        selectableRelationship.setSearchConfiguration(dcinput.getSearchConfiguration());
+        selectableRelationships.add(selectableRelationship);
     }
 
     private String getPresentation(String schema, String element, String qualifier, String inputType) {
