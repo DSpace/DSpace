@@ -107,23 +107,26 @@ public class SubmissionFormConverter implements DSpaceConverter<DCInputSet, Subm
         inputRest.setRegex(dcinput.getRegex());
 
         if (!StringUtils.equalsIgnoreCase(dcinput.getInputType(), "qualdrop_value")) {
-            // value-pair and vocabulary are a special kind of authorities
-            String inputType = dcinput.getInputType();
+            if (dcinput.isMetadataField()) {
+                // value-pair and vocabulary are a special kind of authorities
+                String inputType = dcinput.getInputType();
 
-            SelectableMetadata selMd = new SelectableMetadata();
-            if (authorityUtils.isChoice(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier())) {
-                inputRest.setType(
-                        getPresentation(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier(), inputType));
-                selMd.setAuthority(getAuthorityName(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier(),
-                        dcinput.getPairsType(), dcinput.getVocabulary()));
-                selMd.setClosed(
-                        authorityUtils.isClosed(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier()));
-            } else {
-                inputRest.setType(inputType);
+                SelectableMetadata selMd = new SelectableMetadata();
+                if (authorityUtils.isChoice(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier())) {
+                    inputRest.setType(getPresentation(dcinput.getSchema(), dcinput.getElement(),
+                                                      dcinput.getQualifier(), inputType));
+                    selMd.setAuthority(getAuthorityName(dcinput.getSchema(), dcinput.getElement(),
+                                                        dcinput.getQualifier(), dcinput.getPairsType(),
+                                                        dcinput.getVocabulary()));
+                    selMd.setClosed(
+                            authorityUtils.isClosed(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier()));
+                } else {
+                    inputRest.setType(inputType);
+                }
+                selMd.setMetadata(org.dspace.core.Utils
+                    .standardize(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier(), "."));
+                selectableMetadata.add(selMd);
             }
-            selMd.setMetadata(org.dspace.core.Utils
-                .standardize(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier(), "."));
-            selectableMetadata.add(selMd);
 
         } else {
             inputRest.setType(INPUT_TYPE_ONEBOX);

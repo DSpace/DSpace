@@ -528,4 +528,12 @@ public class DCInput {
 
         return true;
     }
+
+    public boolean isRelationshipField() {
+        return relationshipField;
+    }
+
+    public boolean isMetadataField() {
+        return metadataField;
+    }
 }
