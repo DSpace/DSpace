@@ -15,11 +15,12 @@ import ar.edu.unlp.sedici.dspace.authority.SPARQLAuthorityProvider;
 
 public abstract class GeneralSEDICIAuthorityProvider extends SPARQLAuthorityProvider {
 
-    protected final String CHOICES_ONLYLEAFS_PREFIX = "choices.onlyLeafs.";
-    protected final String CHOICES_PARENT_PREFIX = "choices.parent.";
-    protected final String CHOICES_PARENTPROPERTY_PREFIX = "choices.parentProperty.";
-    protected final String CHOICES_TYPEPROPERTY_PREFIX = "choices.typeProperty.";
-    protected final String CHOICES_LABELPROPERTY_PREFIX = "choices.labelProperty.";
+    protected final String CHOICES_ONLYLEAFS_PREFIX = "sedici.choices.onlyLeafs.";
+    protected final String CHOICES_PARENT_PREFIX = "sedici.choices.parent.";
+    protected final String CHOICES_PARENTPROPERTY_PREFIX = "sedici.choices.parentProperty.";
+    protected final String CHOICES_TYPEPROPERTY_PREFIX = "sedici.choices.typeProperty.";
+    protected final String CHOICES_LABELPROPERTY_PREFIX = "sedici.choices.labelProperty.";
+    protected final String CHOICES_EXTERNALURI_PREFIX = "sedici.choices.externalUriProperty.";
 
 	protected ParameterizedSparqlString getSparqlSearch(
 			String field, String filter, String locale,boolean idSearch) {
@@ -31,6 +32,8 @@ public abstract class GeneralSEDICIAuthorityProvider extends SPARQLAuthorityProv
 				ConfigurationManager.getProperty(CHOICES_LABELPROPERTY_PREFIX+metadataField):"skos:prefLabel";
 		String parent= ConfigurationManager.getProperty(CHOICES_PARENT_PREFIX+metadataField) != null ?
 				ConfigurationManager.getProperty(CHOICES_PARENT_PREFIX+metadataField):null;
+		String externalUri= ConfigurationManager.getProperty(CHOICES_EXTERNALURI_PREFIX + metadataField) != null ?
+				ConfigurationManager.getProperty(CHOICES_EXTERNALURI_PREFIX + metadataField):null;
 		String parentProperty= ConfigurationManager.getProperty(CHOICES_PARENTPROPERTY_PREFIX+metadataField) != null ?
 				ConfigurationManager.getProperty(CHOICES_PARENTPROPERTY_PREFIX+metadataField):"skos:broader";
 		boolean onlyLeafs= ConfigurationManager.getBooleanProperty(CHOICES_ONLYLEAFS_PREFIX+metadataField,false);
@@ -42,12 +45,15 @@ public abstract class GeneralSEDICIAuthorityProvider extends SPARQLAuthorityProv
 		pqs.setNsPrefix("sedici", NS_SEDICI);
 		pqs.setNsPrefix("skos", NS_SKOS);
 		pqs.setNsPrefix("sioc", NS_SIOC);
+		pqs.setNsPrefix("owl", NS_OWL);
 
 		pqs.setCommandText("SELECT "+ this.getSelectQueryFields(idSearch) + "\n");
 		pqs.append("WHERE {\n");
 		pqs.append("?concept a "+ typeProperty + " .\n");
 		pqs.append("?concept "+ labelProperty +" ?label .\n");
-
+		if (externalUri != null) {
+			pqs.append("?concept "+ externalUri +" ?uri .\n");			
+		}
 		if (parent != null) {
 		   //Si el parent es vacio se buscan nodos raiz, es decir, sin padre
 		   if ("".equals(parent)){
@@ -67,7 +73,6 @@ public abstract class GeneralSEDICIAuthorityProvider extends SPARQLAuthorityProv
 		if (idSearch) {
 			pqs.append("FILTER(REGEX(?concept, ?key, \"i\")) \n");
 			pqs.append("}\n");
-
 			pqs.setLiteral("key", filter);
 		}
 		else {
@@ -83,11 +88,12 @@ public abstract class GeneralSEDICIAuthorityProvider extends SPARQLAuthorityProv
 	protected String getSelectQueryFields(boolean idSearch){
 		return "?concept ?label";
 	}
-
+	
 	protected void getTextFilterQuery(ParameterizedSparqlString pqs, String filter) {
 		if (!"".equals(filter)) {
-			pqs.append("FILTER(REGEX(?label, ?text, \"i\")) \n");
-			pqs.setLiteral("text", filter.trim());
+			pqs.append("FILTER(REGEX(?label, ?text, \"i\") || REGEX(?label, ?text, \"i\")) \n");
+			pqs.setLiteral("text", " " + filter.trim());
+			pqs.setLiteral("textWithCaret", "^" + filter.trim());
 		}
 	}
 	
