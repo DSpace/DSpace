@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -75,7 +76,10 @@ public class CommunityDAOImpl extends AbstractHibernateDSODAO<Community> impleme
             query.setMaxResults(limit);
         }
         query.setParameter(sortField.toString(), sortField.getID());
-        return list(query);
+        return list(query)
+                .stream()
+                .distinct()
+                .collect(Collectors.toList());
     }
 
     @Override

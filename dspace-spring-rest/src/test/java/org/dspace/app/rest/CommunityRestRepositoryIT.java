@@ -21,6 +21,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -267,6 +269,44 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                    .andExpect(jsonPath("$.page.size", is(20)))
                    .andExpect(jsonPath("$.page.totalElements", is(2)))
         ;
+    }
+
+    @Test
+    public void findAllNoDuplicatesOnMultipleCommunityTitlesTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        List<String> titles = Arrays.asList("First title", "Second title", "Third title", "Fourth title");
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName(titles.get(0))
+                .withTitle(titles.get(1))
+                .withTitle(titles.get(2))
+                .withTitle(titles.get(3))
+                .build();
+
+        getClient().perform(get("/api/core/communities"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._embedded.communities", Matchers.contains(
+                        CommunityMatcher.matchCommunityEntryMultipleTitles(titles, parentCommunity.getID(),
+                                parentCommunity.getHandle())
+                )))
+                .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/communities")))
+                .andExpect(jsonPath("$.page.totalElements", is(1)));
+    }
+
+    @Test
+    public void findAllNoNameCommunityIsReturned() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context).build();
+
+        getClient().perform(get("/api/core/communities"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._embedded.communities", Matchers.contains(
+                        CommunityMatcher.matchCommunityEntry(parentCommunity.getID(),
+                                parentCommunity.getHandle())
+                )))
+                .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/communities")))
+                .andExpect(jsonPath("$.page.totalElements", is(1)));
     }
 
     @Test
