@@ -90,6 +90,11 @@ public class BitstreamFormatBuilder extends AbstractCRUDBuilder<BitstreamFormat>
         return this;
     }
 
+    public BitstreamFormatBuilder withSupportLevel(int supportLevel) throws SQLException {
+        bitstreamFormat.setSupportLevel(supportLevel);
+        return this;
+    }
+
     /**
      * Delete the Test BitstreamFormat referred to by the given UUID
      * @param id Id of Test BitstreamFormat to delete

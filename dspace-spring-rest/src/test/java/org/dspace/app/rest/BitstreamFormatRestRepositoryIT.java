@@ -32,6 +32,7 @@ import org.dspace.app.rest.matcher.BitstreamFormatMatcher;
 import org.dspace.app.rest.model.BitstreamFormatRest;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.content.BitstreamFormat;
+import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.core.I18nUtil;
 import org.dspace.eperson.EPerson;
 import org.hamcrest.Matchers;
@@ -49,6 +50,9 @@ public class BitstreamFormatRestRepositoryIT extends AbstractControllerIntegrati
 
     @Autowired
     BitstreamFormatConverter converter;
+
+    @Autowired
+    BitstreamFormatService bitstreamFormatService;
 
     private final int DEFAULT_AMOUNT_FORMATS = 80;
 
@@ -303,6 +307,7 @@ public class BitstreamFormatRestRepositoryIT extends AbstractControllerIntegrati
         BitstreamFormat bitstreamFormat = BitstreamFormatBuilder.createBitstreamFormat(context)
                 .withMimeType("application/octet-stream")
                 .withDescription("Description - updateAdminAccess")
+                .withSupportLevel(BitstreamFormat.SUPPORTED)
                 .build();
         context.restoreAuthSystemState();
 
@@ -323,7 +328,9 @@ public class BitstreamFormatRestRepositoryIT extends AbstractControllerIntegrati
                                         .matchBitstreamFormat(bitstreamFormat.getID(),
                                                               bitstreamFormat.getMIMEType(),
                                                               bitstreamFormat.getDescription(),
-                                                              bitstreamFormat.getShortDescription())
+                                                              bitstreamFormat.getShortDescription(),
+                                                              bitstreamFormatService
+                                                                      .getSupportLevelText(bitstreamFormat))
                         )));
     }
 

@@ -47,6 +47,19 @@ public class BitstreamFormatMatcher {
                 hasJsonPath("$._links.self.href", endsWith("/api/core/bitstreamformats/" + id))
         );
     }
+    public static Matcher<? super Object> matchBitstreamFormat(int id, String mimetype, String description,
+                                                               String shortDescription, String supportLevel) {
+        return allOf(
+                hasJsonPath("$.id", is(id)),
+                hasJsonPath("$.description", is(description)),
+                hasJsonPath("$.shortDescription", is(shortDescription)),
+                hasJsonPath("$.mimetype", is(mimetype)),
+                hasJsonPath("$.supportLevel", is(supportLevel)),
+                hasJsonPath("$.type", is("bitstreamformat")),
+                hasJsonPath("$._links.self.href", startsWith(REST_SERVER_URL)),
+                hasJsonPath("$._links.self.href", endsWith("/api/core/bitstreamformats/" + id))
+        );
+    }
 
     public static Matcher<? super Object> matchBitstreamFormat(String mimetype, String description) {
         return allOf(
