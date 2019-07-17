@@ -66,7 +66,7 @@ public class ExtractMetadataStep extends ExtractionStep implements UploadableSte
                     }
 
                     FileDataLoader fdl = (FileDataLoader) dataLoader;
-                    fdl.setFilename(file.getAbsolutePath() + "/" + Utils.getFileName(multipartFile));
+                    fdl.setFilename(file.getAbsolutePath());
 
                     recordSet = convertFields(dataLoader.getRecords(), bteBatchImportService.getOutputMap());
 
