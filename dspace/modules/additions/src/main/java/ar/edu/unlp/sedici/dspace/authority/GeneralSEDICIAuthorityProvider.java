@@ -52,7 +52,7 @@ public abstract class GeneralSEDICIAuthorityProvider extends SPARQLAuthorityProv
 		pqs.append("?concept a "+ typeProperty + " .\n");
 		pqs.append("?concept "+ labelProperty +" ?label .\n");
 		if (externalKey != null) {
-			pqs.append("?concept "+ externalKey +" ?key .\n");			
+			pqs.append("?concept "+ externalKey +" ?externalKey .\n");			
 		}
 		if (parent != null) {
 		   //Si el parent es vacio se buscan nodos raiz, es decir, sin padre
@@ -71,9 +71,8 @@ public abstract class GeneralSEDICIAuthorityProvider extends SPARQLAuthorityProv
 		}
 		//Dependiendo del paramtro idSearch la busqueda se hace por id o por text
 		if (idSearch) {
-			pqs.append("FILTER(REGEX(?concept, ?key, \"i\")) \n");
+			getIdSearchFilterQuery(pqs,filter);
 			pqs.append("}\n");
-			pqs.setLiteral("key", filter);
 		}
 		else {
 			filter = normalizeTextForParserSPARQL10(filter);
@@ -83,6 +82,11 @@ public abstract class GeneralSEDICIAuthorityProvider extends SPARQLAuthorityProv
 		}
 
 		return pqs;
+	}
+
+	protected void getIdSearchFilterQuery(ParameterizedSparqlString pqs, String filter) {
+		pqs.append("FILTER(?concept = ?key) \n");
+		pqs.setLiteral("key", filter);
 	}
 
 	protected String getSelectQueryFields(boolean idSearch){

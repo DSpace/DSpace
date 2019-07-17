@@ -5,6 +5,7 @@ import java.util.HashMap;
 
 import org.dspace.content.authority.Choice;
 
+import com.hp.hpl.jena.query.ParameterizedSparqlString;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.sparql.engine.http.QueryEngineHTTP;
@@ -13,14 +14,14 @@ public class SubjectAuthority extends GeneralSEDICIAuthorityProvider {
 
 	@Override
 	protected String getSelectQueryFields(boolean idSearch) {
-		return " DISTINCT ?label ?key";
+		return " DISTINCT ?label ?externalKey";
 	}
 
 	@Override
 	protected Choice extractChoice(QuerySolution solution) {
 		String key = "";
-		if (solution.contains("key")){
-			key = solution.getLiteral("key").getString();			
+		if (solution.contains("externalKey")){
+			key = solution.getLiteral("externalKey").getString();			
 		} else {
 			key = solution.getResource("concept").getURI();			
 		}
@@ -44,4 +45,9 @@ public class SubjectAuthority extends GeneralSEDICIAuthorityProvider {
 		return choicesListToArraySorted(list);
 	}
 	
+	protected void getIdSearchFilterQuery(ParameterizedSparqlString pqs, String filter) {
+		pqs.append("FILTER(?externalKey = ?key) \n");
+		pqs.setLiteral("key", filter);
+	}
+
 }
