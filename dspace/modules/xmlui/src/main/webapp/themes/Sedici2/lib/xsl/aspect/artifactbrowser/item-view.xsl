@@ -46,8 +46,6 @@
     	<xsl:param name="value"/>
     	<xsl:param name="filter_relational_operator" select="'equals'"/>
     	
-		<xsl:variable name="normalizedValue" select="translate(string($value),'áéíóú','aeiou')"/>
-
     	<xsl:value-of select="$linkFilter"/>
     	<xsl:text>?filtertype=</xsl:text>
     	<xsl:value-of select="$filter"/>
@@ -56,7 +54,7 @@
     	<xsl:value-of select="$filter_relational_operator"/>    	
     	<xsl:text disable-output-escaping="yes"><![CDATA[&]]></xsl:text>
     	<xsl:text>filter=</xsl:text>
-		<xsl:value-of select="$normalizedValue"/>
+		<xsl:value-of select="$value"/>
     </xsl:template>
     
     <xsl:template name="showExternalServices">
@@ -608,7 +606,7 @@
 					<xsl:with-param name="name" select="'dc-subject'"/>
 					<xsl:with-param name="elements" select="dim:field[@element='subject' and not(@qualifier)] "/>
 					<xsl:with-param name="filter">keywords</xsl:with-param>
-					<xsl:with-param name="operator">contains</xsl:with-param>
+					<xsl:with-param name="operator">equals</xsl:with-param>
 				</xsl:call-template>
 
 				<!-- subject.materias row -->
