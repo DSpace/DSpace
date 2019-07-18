@@ -41,6 +41,7 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import javax.mail.internet.ParseException;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.velocity.Template;
@@ -320,16 +321,16 @@ public class Email {
         vctx.put("params", Collections.unmodifiableList(arguments));
 
         if (null == template) {
-            // No template, so look for a String of content.
+            if (StringUtils.isBlank(content)) {
+                // No template and no content -- PANIC!!!
+                throw new MessagingException("Email has no body");
+            }
+            // No template, so use a String of content.
             StringResourceRepository repo = (StringResourceRepository)
                     templateEngine.getApplicationAttribute(RESOURCE_REPOSITORY_NAME);
             repo.putStringResource(contentName, content);
-            if (null == content) { // SNH -- see constructor
-                // No template and no content -- PANIC!!!
-                throw new MessagingException("Email has no body");
-            } else {   // Turn content into a template.
-                template = templateEngine.getTemplate(contentName);
-            }
+            // Turn content into a template.
+            template = templateEngine.getTemplate(contentName);
         }
 
         StringWriter writer = new StringWriter();
@@ -433,7 +434,7 @@ public class Email {
     }
 
     /**
-     * Get the plain-text template for an email message. The message is suitable
+     * Get the VTL template for an email message. The message is suitable
      * for inserting values using Apache Velocity.
      *
      * @param emailFile
@@ -485,7 +486,10 @@ public class Email {
     /**
      * Test method to send an email to check email server settings
      *
-     * @param args the command line arguments given
+     * @param args command line arguments.  The first is the path to an email
+     *              template file; the rest are the positional arguments for the
+     *              template.  If there are no arguments, a short, plain test
+     *              message is sent.
      */
     public static void main(String[] args) {
         ConfigurationService config
@@ -498,7 +502,7 @@ public class Email {
         try {
             if (args.length <= 0) {
                 message = new Email();
-                message.content = "This is a test email sent from DSpace: " + url;
+                message.setContent("testing", "This is a test email sent from DSpace: " + url);
             } else {
                 message = Email.getEmail(args[0]);
                 for (int i = 1; i < args.length; i++) {
