@@ -14,49 +14,57 @@ xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 
 <div id="pagina_estatica" class="pagina_staff">
 
-	<h1>Directora PrEBi-SEDICI, Directora Iniciativa LibLink (ISTEC)</h1>
+	<h1>Dirección PREBI-SEDICI</h1>
 	<ul>
 		<li>
-			<a href="http://prebi.unlp.edu.ar/wp-content/uploads/2007/12/Marisa-De-Giusti-CV-270611.pdf" title="Marisa R. De Giusti">Marisa R. De Giusti</a>
+			<a href="http://prebi.unlp.edu.ar/wp-content/uploads/2007/12/Marisa-De-Giusti-CV-270611.pdf" title="Marisa R. De Giusti">Marisa R. De Giusti</a> &lt;marisa.degiusti @ sedici.unlp.edu.ar&gt;
 		</li>
 	</ul>
-	<h1>Catalogación, digitalización, edición</h1>
+	<h1>Equipo de Catalogación</h1>
 	<ul>
-		<li>Analía Pinto</li>
-		<li>Silvia Peloche</li>
-		<li>Ariel Matías Cánepa</li>
-		<li>Paula Salamone Lacunza</li>
+		<li>Analía Pinto &lt;analia @ sedici.unlp.edu.ar&gt;</li>
+		<li>Bernarda Malpere &lt;bernarda @ sedici.unlp.edu.ar&gt;</li>
+		<li>Carlos Nusch &lt;carlosnusch @ prebi.unlp.edu.ar&gt;</li>
+		<li>Silvia Peloche &lt;silvia @ sedici.unlp.edu.ar&gt;</li>
 	</ul>
 
+	<h1>Equipo de Digitalización</h1>
+	<ul>
+		<li>Esteban Fernández &lt;estebancfernandez @ prebi.unlp.edu.ar&gt;</li>
+		<li>Lorenzo Calamante &lt;lorenzo.calamante @ sedici.unlp.edu.ar&gt;</li>
+		<li>Pablo Mendez Moura &lt;estebancfernandez @ prebi.unlp.edu.ar&gt;</li>
+	</ul>
+		
 	<h1>Diseño gráfico</h1>
 	<ul>
-		<li>Lucas Folegotto</li>
-		
+		<li>Lucas Folegotto &lt;lucas @ sedici.unlp.edu.ar&gt;</li> 
 	</ul>
 
-	<h1>Referencia</h1>
+	<h1>Equipo de Referencia</h1>
 	<ul>
-		<li>Carlos Nusch</li>
-		<li>Esteban Fernandez</li>
-		<li>Bruno Percivale</li>
+		<li>Carlos Nusch &lt;carlosnusch @ prebi.unlp.edu.ar&gt;</li>
+		<li>Enzo Golfetto &lt;enzogolfetto @ prebi.unlp.edu.ar&gt;</li>
+		<li>Esteban Fernández &lt;estebancfernandez @ prebi.unlp.edu.ar&gt;</li>
+		<li>Rafael Carlon &lt;rafaelcarlon @ prebi.unlp.edu.ar&gt;</li>
 	</ul>
 	
-	<h1>Administración</h1>
+	<h1>Portal de Revistas UNLP <a href="http://revistas.unlp.edu.ar">http://revistas.unlp.edu.ar</a></h1>
 	<ul>
-		<li>Gustavo Jaquenod</li>
+		<li>Dolores garcía &lt;dolores.garcia @ sedici.unlp.edu.ar&gt;</li>
+		<li>Gonzalo Villarreal &lt;gonzalo @ prebi.unlp.edu.ar&gt;</li>
 	</ul>
 
-	<h1>Desarrollo, investigación y mantenimiento de software</h1>
+	<h1>Equipo informático</h1>
 	<ul>
-		<li>Agustín Marisi</li>
-		<li>Agustín Terruzzi</li>
-		<li>Ariel Lira</li>
-		<li>Ariel Sobrado</li>
-		<li>Gonzalo Villarreal</li>
-		<li>José Daniel Texier</li>
-		<li>María Marta Vila</li>
-		<li>Esteban Zozaya</li>
-		<li>Facundo Gabriel Adorno</li>
+		<li>Ariel Lira &lt;alira @ sedici.unlp.edu.ar&gt;</li>
+		<li>Ariel Sobrado &lt;asobrado @ sedici.unlp.edu.ar&gt;</li>
+		<li>Ezequiel Manzur &lt;ezemanzur @ sedici.unlp.edu.ar&gt;</li>
+		<li>Facundo Gabriel Adorno &lt;facundo @ sedici.unlp.edu.ar&gt;</li>
+		<li>Gonzalo Villarreal &lt;gonzalo @ prebi.unlp.edu.ar&gt;</li>
+		<li>Ignacio Soloaga &lt;ignaciosoloaga @ sedici.unlp.edu.ar&gt;</li>
+		<li>María Marta Vila &lt;vilamm @ sedici.unlp.edu.ar&gt;</li>
+		<li>Pablo de Albuquerque &lt;pablo @ sedici.unlp.edu.ar&gt;</li>
+		<li>Santiago Tettamanti &lt;santit @ sedici.unlp.edu.ar&gt;</li>
 	</ul>
 
 
