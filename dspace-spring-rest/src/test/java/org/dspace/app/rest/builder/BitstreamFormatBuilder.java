@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest.builder;
 
+import java.io.IOException;
 import java.sql.SQLException;
 
 import org.apache.logging.log4j.Logger;
@@ -82,6 +83,38 @@ public class BitstreamFormatBuilder extends AbstractCRUDBuilder<BitstreamFormat>
     public BitstreamFormatBuilder withDescription(String description) {
         bitstreamFormat.setDescription(description);
         return this;
+    }
+
+    public BitstreamFormatBuilder withShortDescription(String description) throws SQLException {
+        bitstreamFormat.setShortDescription(context, description);
+        return this;
+    }
+
+    public BitstreamFormatBuilder withSupportLevel(int supportLevel) throws SQLException {
+        bitstreamFormat.setSupportLevel(supportLevel);
+        return this;
+    }
+
+    /**
+     * Delete the Test BitstreamFormat referred to by the given UUID
+     * @param id Id of Test BitstreamFormat to delete
+     * @throws SQLException
+     * @throws IOException
+     */
+    public static void deleteBitstreamFormat(int id) throws SQLException, IOException {
+        try (Context c = new Context()) {
+            c.turnOffAuthorisationSystem();
+            BitstreamFormat bitstreamFormat = bitstreamFormatService.find(c, id);
+            if (bitstreamFormat != null) {
+                try {
+                    bitstreamFormatService.delete(c, bitstreamFormat);
+                } catch (AuthorizeException e) {
+                    // cannot occur, just wrap it to make the compiler happy
+                    throw new RuntimeException(e.getMessage(), e);
+                }
+            }
+            c.complete();
+        }
     }
 
 }
