@@ -10,6 +10,7 @@ package org.dspace.app.rest.model;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.dspace.app.rest.RestResourceController;
 
 /**
@@ -28,7 +29,7 @@ public class BitstreamFormatRest extends BaseObjectRest<Integer> {
 
     private String mimetype;
 
-    private int supportLevel;
+    private String supportLevel;
 
     private boolean internal;
 
@@ -58,11 +59,11 @@ public class BitstreamFormatRest extends BaseObjectRest<Integer> {
         this.mimetype = mimetype;
     }
 
-    public int getSupportLevel() {
+    public String getSupportLevel() {
         return supportLevel;
     }
 
-    public void setSupportLevel(int supportLevel) {
+    public void setSupportLevel(String supportLevel) {
         this.supportLevel = supportLevel;
     }
 
@@ -82,6 +83,7 @@ public class BitstreamFormatRest extends BaseObjectRest<Integer> {
         this.extensions = extensions;
     }
 
+
     @JsonIgnore
     @Override
     public String getCategory() {
@@ -89,6 +91,7 @@ public class BitstreamFormatRest extends BaseObjectRest<Integer> {
     }
 
     @Override
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     public String getType() {
         return NAME;
     }
