@@ -249,13 +249,24 @@ public class Resource
      */
     protected static EPerson getUser(HttpHeaders headers)
     {
-        List<String> list = headers.getRequestHeader(TokenHolder.TOKEN_HEADER);
-        String token = null;
-        if ((list != null) && (list.size() > 0))
-        {
-            token = list.get(0);
-            return TokenHolder.getEPerson(token);
+        Context context = null;
+        try {
+            context = new Context();
+
+            List<String> list = headers.getRequestHeader(TokenHolder.TOKEN_HEADER);
+            String token = null;
+            if ((list != null) && (list.size() > 0))
+            {
+                token = list.get(0);
+                int ePersonId = TokenHolder.getEPersonId(token);
+                EPerson ePerson = EPerson.find(context, ePersonId);
+                return ePerson;
+            }
+        } catch (SQLException e) {
+            Resource.processException("Status eperson db lookup error: " + e.getMessage(), context);
         }
+
+
         return null;
     }
 

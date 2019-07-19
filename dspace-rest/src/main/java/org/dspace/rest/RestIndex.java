@@ -169,16 +169,26 @@ public class RestIndex {
     @Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
     public Response logout(@Context HttpHeaders headers)
     {
+        org.dspace.core.Context context = null;
         List<String> list = headers.getRequestHeader(TokenHolder.TOKEN_HEADER);
         String token = null;
         boolean logout = false;
         EPerson ePerson = null;
-        if (list != null)
-        {
-            token = list.get(0);
-            ePerson = TokenHolder.getEPerson(token);
-            logout = TokenHolder.logout(token);
+
+        try {
+            if (list != null)
+            {
+                context = new org.dspace.core.Context();
+                token = list.get(0);
+                int ePersonId = TokenHolder.getEPersonId(token);
+                ePerson = EPerson.find(context, ePersonId);
+                logout = TokenHolder.logout(context, token);
+            }
+        } catch (SQLException e) {
+            Resource.processException("Status eperson db lookup error: " + e.getMessage(), context);
         }
+
+
         if ((token == null) || (!logout))
         {
             return Response.status(Response.Status.BAD_REQUEST).build();
