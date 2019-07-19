@@ -93,6 +93,8 @@ import org.dspace.storage.rdbms.DatabaseUtils;
 import org.dspace.utils.DSpace;
 import org.springframework.stereotype.Service;
 
+import com.ibm.icu.text.Normalizer;
+
 /**
  * SolrIndexer contains the methods that index Items and their metadata,
  * collections, communities, etc. It is meant to either be invoked from the
@@ -1189,11 +1191,13 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                             	if (authority != null)
                             	{
                                 	String facetValue = preferedLabel != null?preferedLabel:value;
-                                	doc.addField(searchFilter.getIndexFieldName() + "_filter", facetValue.toLowerCase() + separator + facetValue + AUTHORITY_SEPARATOR + authority);
+                                	String normalizedValue = Normalizer.normalize(facetValue.toLowerCase(), Normalizer.NFD).replaceAll("[\\p{InCombiningDiacriticalMarks}]", "");
+                                	doc.addField(searchFilter.getIndexFieldName() + "_filter", normalizedValue + separator + facetValue + AUTHORITY_SEPARATOR + authority);
                             	}
                             	else
                             	{
-                                	doc.addField(searchFilter.getIndexFieldName() + "_filter", value.toLowerCase() + separator + value);
+                            		String normalizedValue = Normalizer.normalize(value.toLowerCase(), Normalizer.NFD).replaceAll("[\\p{InCombiningDiacriticalMarks}]", "");
+                                	doc.addField(searchFilter.getIndexFieldName() + "_filter", normalizedValue + separator + value);
                             	}
                             }else
                                 if(searchFilter.getType().equals(DiscoveryConfigurationParameters.TYPE_DATE))

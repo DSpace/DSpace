@@ -35,6 +35,8 @@ import org.dspace.handle.HandleManager;
 import org.dspace.utils.DSpace;
 import org.xml.sax.SAXException;
 
+import com.ibm.icu.text.Normalizer;
+
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
@@ -223,7 +225,8 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
         DiscoverFacetField discoverFacetField;
         if(request.getParameter(SearchFilterParam.STARTS_WITH) != null)
         {
-            discoverFacetField = new DiscoverFacetField(facetField, DiscoveryConfigurationParameters.TYPE_TEXT, getPageSize() + 1, DiscoveryConfigurationParameters.SORT.VALUE, request.getParameter(SearchFilterParam.STARTS_WITH).toLowerCase());
+            String normalizedValue = Normalizer.normalize(request.getParameter(SearchFilterParam.STARTS_WITH).toLowerCase(), Normalizer.NFD).replaceAll("[\\p{InCombiningDiacriticalMarks}]", "").trim();
+        	discoverFacetField = new DiscoverFacetField(facetField, DiscoveryConfigurationParameters.TYPE_TEXT, getPageSize() + 1, DiscoveryConfigurationParameters.SORT.VALUE, normalizedValue);
         }else{
             discoverFacetField = new DiscoverFacetField(facetField, DiscoveryConfigurationParameters.TYPE_TEXT, getPageSize() + 1, DiscoveryConfigurationParameters.SORT.VALUE);
         }
@@ -404,7 +407,8 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
 //            jumpList.addItemXref(generateURL("browse", letterQuery), "0-9");
             for (char c = 'A'; c <= 'Z'; c++)
             {
-                String linkUrl = basicUrl + "&" +  SearchFilterParam.STARTS_WITH +  "=" + Character.toString(c).toLowerCase();
+                String normalizedValue = Normalizer.normalize(Character.toString(c).toLowerCase(), Normalizer.NFD).replaceAll("[\\p{InCombiningDiacriticalMarks}]", "").trim();
+            	String linkUrl = basicUrl + "&" +  SearchFilterParam.STARTS_WITH +  "=" + normalizedValue;
                 jumpList.addItemXref(linkUrl, Character
                         .toString(c));
             }
