@@ -71,8 +71,8 @@ public class UriListParsingIT extends AbstractControllerIntegrationTest {
 
 
         MockHttpServletRequest mockRequest = new MockHttpServletRequest();
-        String uriListString =  "https://localhost:8080/api/core/items/" + publicItem1.getID() + "\n" +
-            "https://localhost:8080/api/core/items/" + publicItem2.getID();
+        String uriListString =  "https://localhost:8080/server/api/core/items/" + publicItem1.getID() + "\n" +
+            "https://localhost:8080/server/api/core/items/" + publicItem2.getID();
         mockRequest.setContentType("text/uri-list");
         mockRequest.setContent(uriListString.getBytes());
         List<DSpaceObject> dSpaceObjectList = utils.constructDSpaceObjectList(
