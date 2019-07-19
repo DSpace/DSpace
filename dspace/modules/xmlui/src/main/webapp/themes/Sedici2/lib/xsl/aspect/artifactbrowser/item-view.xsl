@@ -716,13 +716,12 @@
 		<!-- Info about how to cite this document -->
 		<xsl:if test="./dim:field[@element='identifier'][@qualifier='uri']">
 			<div id="item-URI-suggestion">
-				<i18n:text>sedici.items.handle.utilizacion_URI</i18n:text>
-				<a>
-					<xsl:attribute name="href">
-						<xsl:value-of select="./dim:field[@element='identifier'][@qualifier='uri']"/>
-					</xsl:attribute>
-					<xsl:value-of select="./dim:field[@element='identifier'][@qualifier='uri']"/>
-				</a>
+				<b><i18n:text>sedici.items.handle.utilizacion_URI</i18n:text></b>
+				<xsl:for-each select="dim:field[@element='identifier' and @qualifier='uri']">
+					<li>
+						<a target="_blank"><xsl:attribute name="href"><xsl:value-of select="." /></xsl:attribute><xsl:value-of select="." /></a>
+					</li>
+				</xsl:for-each>
 			</div>
 		</xsl:if>
 		
