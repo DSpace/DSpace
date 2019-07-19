@@ -239,8 +239,8 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                                                                (org.springframework.data.rest.webmvc.RestMediaTypes
                                                                     .TEXT_URI_LIST_VALUE))
                                                            .content(
-                                                               "https://localhost:8080/api/core/items/" + publication.getID() + "\n" +
-                                                                   "https://localhost:8080/api/core/items/" + author1.getID()))
+                                                               "https://localhost:8080/server/api/core/items/" + publication.getID() + "\n" +
+                                                                   "https://localhost:8080/server/api/core/items/" + author1.getID()))
                                               .andExpect(status().isCreated())
                                               .andReturn();
 
