@@ -34,7 +34,7 @@
          agency. Please configure a DOIConnector as well! -->
 
     <!-- In order to mint DOIs with DSpace, get an agreement with a DOI registration
-         agency,  take a look into dspace.cfg, and uncomment this.
+         agency,  take a look into dspace.cfg, and uncomment this. -->
     <bean id="org.dspace.identifier.DOIIdentifierProvider"
         class="org.dspace.identifier.DOIIdentifierProvider"
         scope="singleton">
@@ -43,7 +43,6 @@
         <property name="DOIConnector"
             ref="org.dspace.identifier.doi.DOIConnector" />
     </bean>
-    -->
     
     <!-- The DOIConnector will handle the API calls to your DOI registration
          agency for the DOIIdentifierProvider. If your registration agency
@@ -53,8 +52,8 @@
          e.g. EZID is part of DataCite but provides their own APIs. The following
          DataCiteConnector won't work if EZID is your registration agency.
     -->
-    <!-- Uncomment this to use the DataCite API directly as DOIConnector.
-    <bean id="org.dspace.identifier.doi.DOIConnector"
+    <!-- Uncomment this to use the DataCite API directly as DOIConnector. -->
+    <!-- <bean id="org.dspace.identifier.doi.DOIConnector"
         class="org.dspace.identifier.doi.DataCiteConnector"
         scope="singleton">
         <property name='DATACITE_SCHEME' value='https'/>
@@ -107,5 +106,17 @@
 
     </bean>
     -->
+    
+    <bean id="org.dspace.identifier.doi.DOIConnector"
+        class="ar.edu.unlp.sedici.dspace.identifier.doi.CrossrefConnector"
+        scope="singleton">
+        <property name='DATACITE_SCHEME' value='https'/>
+        <property name='DATACITE_HOST' value='test.crossref.org'/>
+        <property name='CROSSREF_DEPOSIT_PATH' value='/servlet/deposit' />
+        <property name='CROSSREF_SUBMISSION_PATH' value='/servlet/submissionDownload' />
+        <property name='CROSSREF_QUERY_PATH' value='/servlet/query' />
+        <property name="DEPOSIT_PREFIX_FILENAME" value="sedici" />
+        <property name='disseminationCrosswalkName' value="Crossref" />
+    </bean>
 
 </beans>

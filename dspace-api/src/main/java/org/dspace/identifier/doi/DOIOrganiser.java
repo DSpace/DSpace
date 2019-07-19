@@ -117,7 +117,8 @@ public class DOIOrganiser {
                 .withLongOpt("register-doi")
                 .hasArgs(1)
                 .withDescription("Register a specified identifier. "
-                + "You can specify the identifier by ItemID, Handle or DOI.")
+                + "You can specify the identifier by ItemID, Handle or DOI,"
+                + " or a list of identifiers separated with coma.")
                 .create();
         
         options.addOption(registerDoi);
@@ -331,29 +332,30 @@ public class DOIOrganiser {
         
         if(line.hasOption("register-doi"))
         {
-            String identifier = line.getOptionValue("register-doi");
+            String identifiers = line.getOptionValue("register-doi");
             
-            if(null == identifier)
+            if(null == identifiers)
             {
                 helpformater.printHelp("\nDOI organiser\n", options);
             }
             else
             {
-                try {
-                    TableRow doiRow = organiser.findTableRow(identifier);
-                    DSpaceObject dso = DSpaceObject.find(
-                            context, 
-                            doiRow.getIntColumn("resource_type_id"),
-                            doiRow.getIntColumn("resource_id"));
-                    organiser.register(doiRow, dso);
-                } catch (SQLException ex) {
-                    LOG.error(ex);
-                } catch (IllegalArgumentException ex) {
-                    LOG.error(ex);
-                } catch (IllegalStateException ex) {
-                    LOG.error(ex);
-                } catch (IdentifierException ex) {
-                    LOG.error(ex);
+                String[] identifiersList = identifiers.split(",");
+                for (String identifier: identifiersList) {
+                    try {
+                        if (!line.hasOption('q')) {
+                            System.out.println("Registering identifier " + identifier);
+                        }
+                        TableRow doiRow = organiser.findTableRow(identifier.trim());
+                        DSpaceObject dso = DSpaceObject.find(
+                                context,
+                                doiRow.getIntColumn("resource_type_id"),
+                                doiRow.getIntColumn("resource_id"));
+                        organiser.register(doiRow, dso);
+                    } catch (Exception ex) {
+                        LOG.error(ex);
+                        ex.printStackTrace(System.err);
+                    }
                 }
             }
         }
@@ -544,6 +546,7 @@ public class DOIOrganiser {
             {
                 System.err.println("It wasn't possible to register this identifier: " 
                                  + DOI.SCHEME + doiRow.getStringColumn("doi"));
+                ex.printStackTrace(System.err);
             }
              
         }
@@ -556,6 +559,7 @@ public class DOIOrganiser {
             {
                 System.err.println("It wasn't possible to register this identifier: " 
                                  + DOI.SCHEME + doiRow.getStringColumn("doi"));
+                ex.printStackTrace(System.err);
             }
             
             throw new IllegalStateException("Database table DOI contains a DOI "
@@ -570,6 +574,7 @@ public class DOIOrganiser {
             {
                 System.err.println("It wasn't possible to register this identifier: " 
                                  + DOI.SCHEME + doiRow.getStringColumn("doi"));
+                ex.printStackTrace(System.err);
             }
             throw new RuntimeException("Error while trying to get data from database", ex);
         }

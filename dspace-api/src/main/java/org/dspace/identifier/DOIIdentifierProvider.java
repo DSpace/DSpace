@@ -165,11 +165,28 @@ public class DOIIdentifierProvider
     public String register(Context context, DSpaceObject dso)
             throws IdentifierException
     {
-        String doi = mint(context, dso);
-        // register tries to reserve doi if it's not already.
-        // So we don't have to reserve it here.
-        this.register(context, dso, doi);
-        return doi;
+        // Solo registrar el item si cumple ciertas condiciones
+        if (isRegistrableDSO(dso)) {
+            String doi = mint(context, dso);
+            // register tries to reserve doi if it's not already.
+            // So we don't have to reserve it here.
+            this.register(context, dso, doi);
+            return doi;
+        }
+        else{
+            log.info("Couldn't register doi for DSO with handle "
+                    + dso.getHandle()
+                    + ", the DSO does not meet the conditions"
+                    + " that the repository imposes to have doi");
+            return null;
+        }
+    }
+
+    private boolean isRegistrableDSO(DSpaceObject dso) {
+	    // TO DO
+	    // Implementar filtro en el que solo se registren dois para los items que
+	    // nosotros querramos, que cumplan ciertas condiciones
+	    return false;
     }
 
     @Override
@@ -813,11 +830,15 @@ public class DOIIdentifierProvider
         }
         else
         {
+            // Agregado por sedici
+            if (dso.getHandle() == null) {
+                throw new IllegalStateException("Trying to assign a DOI "
+                        + "to an item without a handle!");
+            }
             // We need to generate a new DOI.
             doiRow = DatabaseManager.create(context, "Doi");
 
-            doi = this.getPrefix() + "/" + this.getNamespaceSeparator() + 
-                    doiRow.getIntColumn("doi_id");
+            doi = this.getPrefix() + "/" + dso.getHandle();
         }
                     
         doiRow.setColumn("doi", doi);
