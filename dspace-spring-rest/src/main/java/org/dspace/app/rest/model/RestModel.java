@@ -14,7 +14,7 @@ import org.atteo.evo.inflector.English;
 
 /**
  * A REST resource directly or indirectly (in a collection) exposed must have at
- * least a type attribute to facilitate deserialization
+ * least a type attribute to facilitate deserialization.
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
@@ -29,6 +29,7 @@ public interface RestModel extends Serializable {
     public static final String SUBMISSION = "submission";
     public static final String WORKFLOW = "workflow";
     public static final String AUTHORIZATION = "authz";
+    public static final String TOOLS = "tools";
 
     public String getType();
 

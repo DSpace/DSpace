@@ -16,6 +16,8 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
 
 /**
+ * Manage queries of the Solr authority core.
+ *
  * @author Antoine Snyers (antoine at atmire.com)
  * @author Kevin Van de Velde (kevin at atmire dot com)
  * @author Ben Bosman (ben at atmire dot com)
@@ -26,6 +28,13 @@ public interface AuthoritySearchService {
     public QueryResponse search(SolrQuery query)
             throws SolrServerException, MalformedURLException, IOException;
 
+    /**
+     * Retrieves all the metadata fields which are indexed in the authority control.
+     *
+     * @return names of indexed fields.
+     * @throws SolrServerException passed through.
+     * @throws MalformedURLException passed through.
+     */
     public List<String> getAllIndexedMetadataFields() throws Exception;
 
 }

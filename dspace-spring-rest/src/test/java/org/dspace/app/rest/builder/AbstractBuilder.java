@@ -11,6 +11,8 @@ import java.util.List;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.requestitem.factory.RequestItemServiceFactory;
+import org.dspace.app.requestitem.service.RequestItemService;
 import org.dspace.app.rest.builder.util.AbstractBuilderCleanupUtil;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
@@ -52,6 +54,8 @@ import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
  * Abstract builder class that holds references to all available services
  *
  * @author Jonas Van Goolen - (jonas@atmire.com)
+ * @param <T> Model object type.
+ * @param <S> Service for that type.
  */
 public abstract class AbstractBuilder<T, S> {
 
@@ -79,6 +83,7 @@ public abstract class AbstractBuilder<T, S> {
     static MetadataFieldService metadataFieldService;
     static MetadataSchemaService metadataSchemaService;
     static SiteService siteService;
+    static RequestItemService requestItemService;
     static RelationshipService relationshipService;
     static RelationshipTypeService relationshipTypeService;
     static EntityTypeService entityTypeService;
@@ -124,6 +129,7 @@ public abstract class AbstractBuilder<T, S> {
         metadataFieldService = ContentServiceFactory.getInstance().getMetadataFieldService();
         metadataSchemaService = ContentServiceFactory.getInstance().getMetadataSchemaService();
         siteService = ContentServiceFactory.getInstance().getSiteService();
+        requestItemService = RequestItemServiceFactory.getInstance().getRequestItemService();
         relationshipService = ContentServiceFactory.getInstance().getRelationshipService();
         relationshipTypeService = ContentServiceFactory.getInstance().getRelationshipTypeService();
         entityTypeService = ContentServiceFactory.getInstance().getEntityTypeService();
@@ -159,6 +165,7 @@ public abstract class AbstractBuilder<T, S> {
         metadataFieldService = null;
         metadataSchemaService = null;
         siteService = null;
+        requestItemService = null;
         relationshipService = null;
         relationshipTypeService = null;
         entityTypeService = null;

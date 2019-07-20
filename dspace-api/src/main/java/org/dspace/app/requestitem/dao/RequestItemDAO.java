@@ -15,13 +15,21 @@ import org.dspace.core.GenericDAO;
 
 /**
  * Database Access Object interface class for the RequestItem object.
- * The implementation of this class is responsible for all database calls for the RequestItem object and is autowired
- * by spring
- * This class should only be accessed from a single service and should never be exposed outside of the API
+ * The implementation of this class is responsible for all database calls for
+ * the RequestItem object and is autowired by Spring.
+ * This class should only be accessed from a single service and should never be
+ * exposed outside of the API.
  *
  * @author kevinvandevelde at atmire.com
  */
 public interface RequestItemDAO extends GenericDAO<RequestItem> {
-
+    /**
+     * Fetch a request named by its unique token (passed in emails).
+     *
+     * @param context the current DSpace context.
+     * @param token uniquely identifies the request.
+     * @return the found request (or {@code null}?)
+     * @throws SQLException passed through.
+     */
     public RequestItem findByToken(Context context, String token) throws SQLException;
 }

@@ -21,7 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Service implementation for the RequestItem object.
- * This class is responsible for all business logic calls for the RequestItem object and is autowired by spring.
+ * This class is responsible for all business logic calls for the RequestItem object and is autowired by Spring.
  * This class should never be accessed directly.
  *
  * @author kevinvandevelde at atmire.com
@@ -74,6 +74,15 @@ public class RequestItemServiceImpl implements RequestItemService {
     public void update(Context context, RequestItem requestItem) {
         try {
             requestItemDAO.save(context, requestItem);
+        } catch (SQLException e) {
+            log.error(e.getMessage());
+        }
+    }
+
+    @Override
+    public void delete(Context context, RequestItem requestItem) {
+        try {
+            requestItemDAO.delete(context, requestItem);
         } catch (SQLException e) {
             log.error(e.getMessage());
         }
