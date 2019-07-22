@@ -173,27 +173,29 @@ public class MetadataStep extends AbstractProcessingStep {
 
     public List<Record> convertFields(List<Record> recordSet, Map<String, String> fieldMap) {
         List<Record> result = new ArrayList<Record>();
-        for (Record publication : recordSet) {
-            for (String fieldName : fieldMap.keySet()) {
-                String md = null;
-                if (fieldMap != null) {
-                    md = fieldMap.get(fieldName);
+        if (recordSet != null) {
+            for (Record publication : recordSet) {
+                for (String fieldName : fieldMap.keySet()) {
+                    String md = null;
+                    if (fieldMap != null) {
+                        md = fieldMap.get(fieldName);
+                    }
+
+                    if (StringUtils.isBlank(md)) {
+                        continue;
+                    } else {
+                        md = md.trim();
+                    }
+
+                    if (publication.isMutable()) {
+                        List<Value> values = publication.getValues(md);
+                        publication.makeMutable().removeField(md);
+                        publication.makeMutable().addField(fieldName, values);
+                    }
                 }
 
-                if (StringUtils.isBlank(md)) {
-                    continue;
-                } else {
-                    md = md.trim();
-                }
-
-                if (publication.isMutable()) {
-                    List<Value> values = publication.getValues(md);
-                    publication.makeMutable().removeField(md);
-                    publication.makeMutable().addField(fieldName, values);
-                }
+                result.add(publication);
             }
-
-            result.add(publication);
         }
         return result;
     }

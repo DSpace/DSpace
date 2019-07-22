@@ -39,6 +39,10 @@ public interface SubmissionLookupDataLoader extends DataLoader {
 
     public final static String TYPE = "type";
 
+    public final static String WOSID = "isiid";
+
+    public final static String ORCID = "orciid";
+
     List<String> getSupportedIdentifiers();
 
     boolean isSearchProvider();

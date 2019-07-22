@@ -79,6 +79,7 @@ public class GrobidFileDataLoader extends FileDataLoader {
             try {
                 CloseableHttpClient client = HttpClients.createDefault();
                 method = new HttpPost(url + "/api/processHeaderDocument");
+                System.out.println(filename);
                 InputStream inputStream = new FileInputStream(new File(filename));
                 MultipartEntityBuilder builder = MultipartEntityBuilder.create();
                 builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
