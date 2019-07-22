@@ -30,9 +30,42 @@ import org.dspace.eperson.EPerson;
 public interface ItemDAO extends DSpaceObjectLegacySupportDAO<Item> {
     public Iterator<Item> findAll(Context context, boolean archived) throws SQLException;
 
+    /**
+     * Find all Items according to the flags and pagination parameters
+     * 
+     * @param context
+     *            DSpace Context
+     * @param archived
+     *            flag to include archived items
+     * @param limit
+     *            max number of items to return
+     * @param offset
+     *            pagination offset
+     * @return an Iterator over the selected items
+     * @throws SQLException
+     */
     public Iterator<Item> findAll(Context context, boolean archived, int limit, int offset) throws SQLException;
 
     public Iterator<Item> findAll(Context context, boolean archived, boolean withdrawn) throws SQLException;
+
+    /**
+     * Find all Items according to the flags and pagination parameters
+     * 
+     * @param context
+     *            DSpace Context
+     * @param archived
+     *            flag to include archived items
+     * @param withdrawn
+     *            flag to include withdrawn items
+     * @param limit
+     *            max number of items to return
+     * @param offset
+     *            pagination offset
+     * @return an Iterator over the selected items
+     * @throws SQLException
+     */
+    public Iterator<Item> findAll(Context context, boolean archived, boolean withdrawn, int limit, int offset)
+            throws SQLException;
 
     /**
      * Find all Items modified since a Date.

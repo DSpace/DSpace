@@ -152,6 +152,23 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                       .withSubject("ExtraEntry")
                                       .build();
 
+        //3. Two withdrawn items
+        Item withdrawnItem1 = ItemBuilder.createItem(context, col1)
+                                      .withTitle("Withdrawn item 1")
+                                      .withIssueDate("2019-10-17")
+                                      .withAuthor("Smith, Mario").withAuthor("Doe, Paolo")
+                                      .withSubject("ExtraWith")
+                                      .withdrawn()
+                                      .build();
+
+        Item withdrawnItem2 = ItemBuilder.createItem(context, col2)
+                                      .withTitle("Withdrawn item 2")
+                                      .withIssueDate("2019-02-13")
+                                      .withAuthor("Smith, Carla").withAuthor("Doe, Claudio")
+                                      .withSubject("TestingForWithdrawn").withSubject("ExtraEntry")
+                                      .withdrawn()
+                                      .build();
+
         String token = getAuthToken(admin.getEmail(), password);
 
         getClient(token).perform(get("/api/core/items")
@@ -166,33 +183,69 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                    .andExpect(jsonPath("$._embedded.items", Matchers.not(
                            Matchers.contains(
                                ItemMatcher.matchItemWithTitleAndDateIssued(publicItem3,
-                                       "Public item 3", "2016-02-13")
+                                       "Public item 3", "2016-02-13"),
+                               ItemMatcher.matchItemWithTitleAndDateIssued(withdrawnItem1,
+                                       "Withdrawn item 1", "2019-10-17"),
+                               ItemMatcher.matchItemWithTitleAndDateIssued(withdrawnItem2,
+                                       "Withdrawn item 2", "2019-02-13")
                            )
                    )))
                    .andExpect(jsonPath("$._links.self.href",
                            Matchers.containsString("/api/core/items")))
+                   .andExpect(jsonPath("$.page.size", is(2)))
+                   .andExpect(jsonPath("$.page.totalElements", is(5)))
         ;
 
         getClient(token).perform(get("/api/core/items")
                    .param("size", "2")
                    .param("page", "1"))
                    .andExpect(status().isOk())
-                   .andExpect(jsonPath("$._embedded.items", Matchers.contains(
+                   .andExpect(jsonPath("$._embedded.items", Matchers.containsInAnyOrder(
                        ItemMatcher.matchItemWithTitleAndDateIssued(publicItem3,
-                               "Public item 3", "2016-02-13")
+                               "Public item 3", "2016-02-13"),
+                       ItemMatcher.matchItemWithTitleAndDateIssued(withdrawnItem1,
+                               "Withdrawn item 1", "2019-10-17")
                    )))
                    .andExpect(jsonPath("$._embedded.items", Matchers.not(
                        Matchers.contains(
                            ItemMatcher.matchItemWithTitleAndDateIssued(publicItem1,
                                    "Public item 1", "2017-10-17"),
                            ItemMatcher.matchItemWithTitleAndDateIssued(publicItem2,
-                                   "Public item 2", "2016-02-13")
+                                   "Public item 2", "2016-02-13"),
+                           ItemMatcher.matchItemWithTitleAndDateIssued(withdrawnItem2,
+                                   "Withdrawn item 2", "2019-02-13")
                        )
                    )))
                    .andExpect(jsonPath("$._links.self.href",
                            Matchers.containsString("/api/core/items")))
                    .andExpect(jsonPath("$.page.size", is(2)))
-                   .andExpect(jsonPath("$.page.totalElements", is(3)))
+                   .andExpect(jsonPath("$.page.totalElements", is(5)))
+        ;
+
+        getClient(token).perform(get("/api/core/items")
+                .param("size", "2")
+                .param("page", "2"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded.items", Matchers.contains(
+                    ItemMatcher.matchItemWithTitleAndDateIssued(withdrawnItem2,
+                            "Withdrawn item 2", "2019-02-13")
+                )))
+                .andExpect(jsonPath("$._embedded.items", Matchers.not(
+                    Matchers.contains(
+                        ItemMatcher.matchItemWithTitleAndDateIssued(publicItem1,
+                                "Public item 1", "2017-10-17"),
+                        ItemMatcher.matchItemWithTitleAndDateIssued(publicItem2,
+                                "Public item 2", "2016-02-13"),
+                        ItemMatcher.matchItemWithTitleAndDateIssued(publicItem3,
+                                "Public item 3", "2016-02-13"),
+                        ItemMatcher.matchItemWithTitleAndDateIssued(withdrawnItem1,
+                                "Withdrawn item 1", "2019-10-17")
+                    )
+                )))
+                .andExpect(jsonPath("$._links.self.href",
+                        Matchers.containsString("/api/core/items")))
+                .andExpect(jsonPath("$.page.size", is(2)))
+                .andExpect(jsonPath("$.page.totalElements", is(5)))
         ;
     }
 
