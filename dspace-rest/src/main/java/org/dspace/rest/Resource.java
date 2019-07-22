@@ -258,9 +258,10 @@ public class Resource
             if ((list != null) && (list.size() > 0))
             {
                 token = list.get(0);
-                int ePersonId = TokenHolder.getEPersonId(token);
-                EPerson ePerson = EPerson.find(context, ePersonId);
-                return ePerson;
+                Integer ePersonId = TokenHolder.getEPersonId(token);
+                if (ePersonId != null) {
+                    return EPerson.find(context, ePersonId);
+                }
             }
         } catch (SQLException e) {
             Resource.processException("Status eperson db lookup error: " + e.getMessage(), context);

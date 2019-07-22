@@ -115,7 +115,7 @@ public class TokenHolder
      * 
      * @param token
      *            Token under which is stored eperson.
-     * @return Return instance of EPerson if is token right, otherwise it
+     * @return Return EPerson id if token is right, otherwise it
      *         returns NULL.
      */
     public static synchronized Integer getEPersonId(String token)
