@@ -569,10 +569,19 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                     .file(pdfFile))
                 // bulk create should return 200, 201 (created) is better for single resource
                 .andExpect(status().isOk())
-                //FIXME it will be nice to setup a mock grobid server for end to end testing
-                // no metadata for now
-//              .andExpect(jsonPath("$._embedded.workspaceitems[0]._embedded.traditionalpageone['dc.title'][0].value",
-//              is("This is a simple test file")))
+                // testing grobid extraction
+                .andExpect(jsonPath(
+                      "$._embedded.workspaceitems[0].sections.traditionalpageone['dc.title'][0].value",
+                is("This is a simple test file")))
+                .andExpect(jsonPath(
+                      "$._embedded.workspaceitems[0].sections.traditionalpageone['dc.contributor.author'][0].value",
+                is("Bollini, Andrea")))
+                .andExpect(jsonPath(
+                      "$._embedded.workspaceitems[0].sections.traditionalpageone['dc.date.issued'][0].value",
+                is("2018")))
+                .andExpect(jsonPath(
+                      "$._embedded.workspaceitems[0].sections.traditionalpagetwo['dc.description.abstract'][0].value",
+                is("This is the abstract of our PDF file")))
                 // we can just check that the pdf is stored in the item
                 .andExpect(
                         jsonPath("$._embedded.workspaceitems[0].sections.upload.files[0].metadata['dc.title'][0].value",

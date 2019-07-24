@@ -72,7 +72,12 @@
             <type>license</type>
             <scope visibilityOutside="read-only">submission</scope>
         </step>
-
+		<step id="extraction">
+			<heading></heading>
+			<processing-class>org.dspace.app.rest.submit.step.ExtractMetadataStep</processing-class>
+			<type>utils</type>
+			<scope visibility="hidden" visibilityOutside="hidden">submission</scope>
+		</step>
         <!-- Step Upload Item with Embargo Features to enable this step, please
             make sure to comment-out the previous step "UploadStep" <step id="upload-with-embargo">
             <heading>submit.progressbar.upload</heading> <processing-class>org.dspace.submit.step.UploadWithEmbargoStep</processing-class>
@@ -133,6 +138,7 @@
             <!--<step id="sample"/> -->
 
             <step id="collection"/>
+            <step id="extraction" />
 
             <!--Step will be to Describe the item. -->
             <step id="traditionalpageone"/>
