@@ -17,7 +17,7 @@ import org.hamcrest.Matcher;
 
 /**
  * Helper class to simplify testing of the submission form configuration
- * 
+ *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
  */
@@ -29,7 +29,7 @@ public class SubmissionFormFieldMatcher {
      * Shortcut for the
      * {@link SubmissionFormFieldMatcher#matchFormFieldDefinition(String, String, String, boolean, String, String, String)}
      * with a null style
-     * 
+     *
      * @param type
      *            the expected input type
      * @param label
@@ -52,7 +52,7 @@ public class SubmissionFormFieldMatcher {
 
     /**
      * Check the json representation of a submission form
-     * 
+     *
      * @param type
      *            the expected input type
      * @param label
@@ -86,5 +86,37 @@ public class SubmissionFormFieldMatcher {
                 hasNoJsonPath("$.style"),
             hasJsonPath("$.hints", containsString(hints))
         );
+    }
+
+    public static Matcher<? super Object> matchFormOpenRelationshipFieldDefinition(String type, String label,
+                                                                                   String mandatoryMessage,
+                                                                                   boolean repeatable, String hints,
+                                                                                   String metadata,
+                                                                                   String relationshipType,
+                                                                                   String filter,
+                                                                                   String searchConfiguration) {
+        return allOf(
+            hasJsonPath("$.selectableRelationships[0].relationshipType", is(relationshipType)),
+            hasJsonPath("$.selectableRelationships[0].filter", is(filter)),
+            hasJsonPath("$.selectableRelationships[0].searchConfiguration", is(searchConfiguration)),
+            matchFormFieldDefinition(type, label, mandatoryMessage, repeatable, hints, metadata));
+    }
+
+    public static Matcher<? super Object> matchFormClosedRelationshipFieldDefinition(String label,
+                                                                                   String mandatoryMessage,
+                                                                                   boolean repeatable, String hints,
+                                                                                   String relationshipType,
+                                                                                   String filter,
+                                                                                   String searchConfiguration) {
+        return allOf(
+            hasJsonPath("$.selectableRelationships[0].relationshipType", is(relationshipType)),
+            hasJsonPath("$.selectableRelationships[0].filter", is(filter)),
+            hasJsonPath("$.selectableRelationships[0].searchConfiguration", is(searchConfiguration)),
+            hasJsonPath("$.label", is(label)),
+            mandatoryMessage != null ? hasJsonPath("$.mandatoryMessage", containsString(mandatoryMessage)) :
+                hasNoJsonPath("$.mandatoryMessage"),
+            hasJsonPath("$.mandatory", is(mandatoryMessage != null)),
+            hasJsonPath("$.repeatable", is(repeatable)),
+            hasJsonPath("$.hints", containsString(hints)));
     }
 }
