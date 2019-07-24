@@ -62,7 +62,7 @@ public class ItemUploadController {
     private MetadataConverter metadataConverter;
 
     @RequestMapping(method = RequestMethod.POST, value = "/bitstreams", headers = "content-type=multipart/form-data")
-    @PreAuthorize("hasPermission(#uuid, 'ITEM', 'WRITE')")
+    @PreAuthorize("hasPermission(#uuid, 'ITEM', 'WRITE') && hasPermission(#uuid, 'ITEM', 'ADD')")
     public BitstreamResource uploadBitstream(HttpServletRequest request, @PathVariable UUID uuid,
                                              @RequestParam("file") MultipartFile uploadfile,
                                              @RequestParam(value = "properties", required = false) String properties) {
@@ -86,7 +86,7 @@ public class ItemUploadController {
             throw new UnprocessableEntityException("The InputStream from the file couldn't be read");
         }
         try {
-            bitstream = processBitstreamCreation(context, item, fileInputStream, properties);
+            bitstream = processBitstreamCreation(context, item, fileInputStream, properties, uploadfile.getOriginalFilename());
             itemService.update(context, item);
             context.commit();
         } catch (AuthorizeException | IOException | SQLException e) {
@@ -100,7 +100,7 @@ public class ItemUploadController {
     }
 
     private Bitstream processBitstreamCreation(Context context, Item item, InputStream fileInputStream,
-                                               String properties)
+                                               String properties, String originalFilename)
         throws AuthorizeException, IOException, SQLException {
 
         Bitstream bitstream = null;
@@ -123,10 +123,16 @@ public class ItemUploadController {
             String name = bitstreamPropertiesRest.getName();
             if (StringUtils.isNotBlank(name)) {
                 bitstream.setName(context, name);
+            } else {
+                bitstream.setName(context, originalFilename);
             }
             Integer sequenceId = bitstreamPropertiesRest.getSequenceId();
             if (sequenceId != null) {
-                bitstream.setSequenceID(sequenceId);
+                try {
+                    bitstreamService.setSequenceId(context, bitstream, item, sequenceId);
+                } catch (IllegalArgumentException e) {
+                    throw new UnprocessableEntityException(e.getMessage(), e);
+                }
             }
 
         } else {

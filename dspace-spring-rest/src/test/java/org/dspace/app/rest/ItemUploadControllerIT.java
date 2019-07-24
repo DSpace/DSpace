@@ -325,8 +325,7 @@ public class ItemUploadControllerIT extends AbstractEntityIntegrationTest {
         String token = getAuthToken(admin.getEmail(), password);
 
         context.restoreAuthSystemState();
-        getClient(token).perform(MockMvcRequestBuilders.fileUpload("/api/core/items/" + item.getID() + "/bitstreams")
-                                                       .file(null))
+        getClient(token).perform(MockMvcRequestBuilders.fileUpload("/api/core/items/" + item.getID() + "/bitstreams"))
                         .andExpect(status().isUnprocessableEntity());
     }
 
@@ -413,7 +412,6 @@ public class ItemUploadControllerIT extends AbstractEntityIntegrationTest {
 
     //TODO This check on sequence ID doesn't happen
     @Test
-    @Ignore
     public void uploadBitstreamSameSequenceIdTwiceUnprocessableEntityException() throws Exception {
         context.turnOffAuthorisationSystem();
 

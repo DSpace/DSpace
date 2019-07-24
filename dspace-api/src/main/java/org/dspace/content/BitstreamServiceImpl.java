@@ -465,4 +465,16 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
     public Long getLastModified(Bitstream bitstream) {
         return bitstreamStorageService.getLastModified(bitstream);
     }
+
+    public void setSequenceId(Context context, Bitstream bitstream, Item item, Integer sequenceId) {
+        for (Bundle bundle : item.getBundles()) {
+            for (Bitstream bitstreamInBundle : bundle.getBitstreams()) {
+                if (bitstreamInBundle.getSequenceID() == sequenceId) {
+                    throw new IllegalArgumentException("The given sequenceId already exists within the item");
+                }
+            }
+        }
+
+        bitstream.setSequenceID(sequenceId);
+    }
 }
