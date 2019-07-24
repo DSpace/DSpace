@@ -137,6 +137,7 @@ public class ItemUploadController {
 
         } else {
             bitstream = itemService.createSingleBitstream(context, fileInputStream, item);
+            bitstream.setName(context, originalFilename);
 
         }
         bitstreamService.update(context, bitstream);
