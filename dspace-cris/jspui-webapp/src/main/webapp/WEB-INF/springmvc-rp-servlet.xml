@@ -7946,7 +7946,7 @@
         <property name="sessionFactory" ref="sessionFactory" />   
     </bean>
 
-    <bean id="localeResolver" class="org.springframework.web.servlet.i18n.SessionLocaleResolver">
+    <bean id="localeResolver" class="org.dspace.app.webui.cris.servlet.CustomSessionLocaleResolver">
         <property name="defaultLocale" value="en" />
     </bean>
   
