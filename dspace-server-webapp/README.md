@@ -1,5 +1,5 @@
-# DSpace7 REST Webapp
-> This is the new REST webapp for DSpace 7 build with Spring MVC + HATEOAS with a focus on the [JSON HAL format](http://stateless.co/hal_specification.html) ([formal specification](https://tools.ietf.org/html/draft-kelly-json-hal-08))
+# DSpace Server Webapp
+> This is the new server webapp for DSpace 7 built with Spring Boot, MVC + HATEOAS with a focus on the [JSON HAL format](http://stateless.co/hal_specification.html) ([formal specification](https://tools.ietf.org/html/draft-kelly-json-hal-08))
 
 This webapp uses the following technologies:
 - [Spring Boot](https://projects.spring.io/spring-boot/) 
@@ -15,8 +15,8 @@ Check the infomation available on the DSpace Official Wiki page for the [DSpace 
 [DSpace 7 REST: Coding DSpace Objects](https://wiki.duraspace.org/display/DSPACE/DSpace+7+REST%3A+Coding+DSpace+Objects)
 
 ## How to run
-The only tested way right now is to run this webapp inside your IDE (Eclipse). Just create a new Tomcat 8 server and deploy the dspace-spring-rest maven module to it.
-> The *dspace.dir* is configured in the *dspace-spring-rest/src/main/resources/application.properties* file
+The only tested way right now is to run this webapp inside your IDE (Eclipse). Just create a new Tomcat 8 server and deploy the dspace-server-webapp maven module to it.
+> The *dspace.dir* is configured in the *dspace-server-webapp/src/main/resources/application.properties* file
 [currently](src/main/resources/application.properties#L25)
 
 > dspace.dir = d:/install/dspace7
