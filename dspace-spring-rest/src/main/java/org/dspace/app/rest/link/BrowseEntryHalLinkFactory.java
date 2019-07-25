@@ -54,13 +54,13 @@ public class BrowseEntryHalLinkFactory extends HalLinkFactory<BrowseEntryResourc
         return BrowseEntryResource.class;
     }
 
-    // TODO use the reflaction to discover the link repository and additional information on the link annotation to
+    // TODO use the reflection to discover the link repository and additional information on the link annotation to
     // build the parameters?
     private UriComponentsBuilder addFilterParams(UriComponentsBuilder uriComponentsBuilder,
                                                  final BrowseEntryRest data) {
         UriComponentsBuilder result;
         if (data.getAuthority() != null) {
-            result = uriComponentsBuilder.queryParam("filterValue", data.getAuthority());
+            result = uriComponentsBuilder.queryParam("filterAuthority", data.getAuthority());
         } else {
             result = uriComponentsBuilder.queryParam("filterValue", data.getValue());
         }

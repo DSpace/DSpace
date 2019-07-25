@@ -11,21 +11,18 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 /**
- * Malformed patch document (taken from rfc5789#section-2.2) - When the server
- * determines that the patch document provided by the client is not properly
- * formatted, it SHOULD return a 400 (Bad Request) response. The definition of
- * badly formatted depends on the patch document chosen.
+ * When a request is malformed, we use this exception to indicate this to the client
  *
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
 @ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "Bad Request")
-public class PatchBadRequestException extends RuntimeException {
+public class DSpaceBadRequestException extends RuntimeException {
 
-    public PatchBadRequestException(String message) {
+    public DSpaceBadRequestException(String message) {
         this(message, null);
     }
 
-    public PatchBadRequestException(String message, Exception e) {
+    public DSpaceBadRequestException(String message, Exception e) {
         super(message, e);
     }
 }
