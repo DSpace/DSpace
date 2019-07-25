@@ -11,6 +11,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
+import org.dspace.discovery.IndexableObject;
 import org.dspace.sort.SortException;
 import org.dspace.sort.SortOption;
 
@@ -114,6 +115,8 @@ public class BrowserScope {
 
     private String authority = null;
 
+    private String userLocale = null;
+
     /**
      * Construct a new BrowserScope using the given Context
      *
@@ -131,7 +134,7 @@ public class BrowserScope {
      * @param dso the container object; a Community or Collection
      * @throws BrowseException if browse error
      */
-    public void setBrowseContainer(DSpaceObject dso)
+    public void setBrowseContainer(IndexableObject dso)
         throws BrowseException {
         if (dso instanceof Collection) {
             this.collection = (Collection) dso;
@@ -581,5 +584,13 @@ public class BrowserScope {
 
     public void setAuthorityValue(String value) {
         authority = value;
+    }
+
+    public void setUserLocale(String userLocale) {
+        this.userLocale = userLocale;
+    }
+
+    public String getUserLocale() {
+        return userLocale;
     }
 }

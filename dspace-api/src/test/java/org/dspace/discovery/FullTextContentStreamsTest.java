@@ -16,9 +16,9 @@ import static org.mockito.Mockito.when;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
-import org.apache.commons.io.Charsets;
 import org.apache.commons.io.IOUtils;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
@@ -77,11 +77,11 @@ public class FullTextContentStreamsTest {
         when(textBitstream3.getSizeBytes()).thenReturn(3L);
 
         when(bitstreamService.retrieve(null, textBitstream1))
-            .thenReturn(new ByteArrayInputStream("This is text 1".getBytes(Charsets.UTF_8)));
+            .thenReturn(new ByteArrayInputStream("This is text 1".getBytes(StandardCharsets.UTF_8)));
         when(bitstreamService.retrieve(null, textBitstream2))
-            .thenReturn(new ByteArrayInputStream("This is text 2".getBytes(Charsets.UTF_8)));
+            .thenReturn(new ByteArrayInputStream("This is text 2".getBytes(StandardCharsets.UTF_8)));
         when(bitstreamService.retrieve(null, textBitstream3))
-            .thenReturn(new ByteArrayInputStream("This is text 3".getBytes(Charsets.UTF_8)));
+            .thenReturn(new ByteArrayInputStream("This is text 3".getBytes(StandardCharsets.UTF_8)));
 
         streams.bitstreamService = bitstreamService;
     }
@@ -150,7 +150,7 @@ public class FullTextContentStreamsTest {
         InputStream inputStream = streams.getStream();
         assertNotNull(inputStream);
         assertEquals("The data in the input stream should match the text of the bitstream", "\nThis is text 1",
-                     IOUtils.toString(inputStream, Charsets.UTF_8));
+                     IOUtils.toString(inputStream, StandardCharsets.UTF_8));
     }
 
     @Test
@@ -169,7 +169,7 @@ public class FullTextContentStreamsTest {
         InputStream inputStream = streams.getStream();
         assertNotNull(inputStream);
         assertEquals("The data in the input stream should match 'This is text 1'", "\nThis is text 1" +
-            "\nThis is text 2\nThis is text 3", IOUtils.toString(inputStream, Charsets.UTF_8));
+            "\nThis is text 2\nThis is text 3", IOUtils.toString(inputStream, StandardCharsets.UTF_8));
     }
 
     @Test
@@ -188,7 +188,7 @@ public class FullTextContentStreamsTest {
         assertFalse("Content stream should not be empty", streams.isEmpty());
         InputStream inputStream = streams.getStream();
         assertNotNull(inputStream);
-        String content = IOUtils.toString(inputStream, Charsets.UTF_8);
+        String content = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
         assertTrue("The data should contain data of the first bitstream that is not corrupt",
                    content.contains("This is text 1"));
         assertFalse("The data should NOT contain data of the second bitstream that is corrupt",
