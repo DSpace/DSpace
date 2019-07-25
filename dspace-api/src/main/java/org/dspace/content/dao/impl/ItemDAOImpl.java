@@ -57,7 +57,7 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
 
     @Override
     public Iterator<Item> findAll(Context context, boolean archived, boolean withdrawn) throws SQLException {
-        Query query = createQuery(context, "FROM Item WHERE inArchive= :in_archive or withdrawn = :withdrawn");
+        Query query = createQuery(context, "FROM Item WHERE inArchive= :in_archive or withdrawn = :withdrawn order by id");
         query.setParameter("in_archive", archived);
         query.setParameter("withdrawn", withdrawn);
         return iterate(query);
@@ -122,7 +122,7 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
         {
             hqlQueryString += " AND STR(metadatavalue.value) = :text_value";
         }
-        Query query = createQuery(context, hqlQueryString);
+        Query query = createQuery(context, hqlQueryString + " order by item.id");
 
         query.setParameter("in_archive", inArchive);
         query.setParameter("metadata_field", metadataField);
@@ -211,7 +211,7 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
 
     @Override
     public Iterator<Item> findArchivedByCollection(Context context, Collection collection, Integer limit, Integer offset) throws SQLException {
-        Query query = createQuery(context, "select i from Item i join i.collections c WHERE :collection IN c AND i.inArchive=:in_archive");
+        Query query = createQuery(context, "select i from Item i join i.collections c WHERE :collection IN c AND i.inArchive=:in_archive order by i.id");
         query.setParameter("collection", collection);
         query.setParameter("in_archive", true);
         if(offset != null)
