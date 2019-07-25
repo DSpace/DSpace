@@ -23,7 +23,8 @@ import org.hamcrest.Matcher;
  */
 public class SubmissionFormFieldMatcher {
 
-    private SubmissionFormFieldMatcher() { }
+    private SubmissionFormFieldMatcher() {
+    }
 
     /**
      * Shortcut for the
@@ -46,7 +47,7 @@ public class SubmissionFormFieldMatcher {
      * @return a Matcher for all the condition above
      */
     public static Matcher<? super Object> matchFormFieldDefinition(String type, String label, String mandatoryMessage,
-            boolean repeatable, String hints, String metadata) {
+                                                                   boolean repeatable, String hints, String metadata) {
         return matchFormFieldDefinition(type, label, mandatoryMessage, repeatable, hints, null, metadata);
     }
 
@@ -72,9 +73,10 @@ public class SubmissionFormFieldMatcher {
      * @return a Matcher for all the condition above
      */
     public static Matcher<? super Object> matchFormFieldDefinition(String type, String label, String mandatoryMessage,
-            boolean repeatable, String hints, String style, String metadata) {
+                                                                   boolean repeatable, String hints, String style,
+                                                                   String metadata) {
         return allOf(
-                // check each field definition
+            // check each field definition
             hasJsonPath("$.input.type", is(type)),
             hasJsonPath("$.label", containsString(label)),
             hasJsonPath("$.selectableMetadata[0].metadata", is(metadata)),
@@ -103,11 +105,11 @@ public class SubmissionFormFieldMatcher {
     }
 
     public static Matcher<? super Object> matchFormClosedRelationshipFieldDefinition(String label,
-                                                                                   String mandatoryMessage,
-                                                                                   boolean repeatable, String hints,
-                                                                                   String relationshipType,
-                                                                                   String filter,
-                                                                                   String searchConfiguration) {
+                                                                                     String mandatoryMessage,
+                                                                                     boolean repeatable, String hints,
+                                                                                     String relationshipType,
+                                                                                     String filter,
+                                                                                     String searchConfiguration) {
         return allOf(
             hasJsonPath("$.selectableRelationships[0].relationshipType", is(relationshipType)),
             hasJsonPath("$.selectableRelationships[0].filter", is(filter)),
@@ -117,6 +119,8 @@ public class SubmissionFormFieldMatcher {
                 hasNoJsonPath("$.mandatoryMessage"),
             hasJsonPath("$.mandatory", is(mandatoryMessage != null)),
             hasJsonPath("$.repeatable", is(repeatable)),
-            hasJsonPath("$.hints", containsString(hints)));
+            hasJsonPath("$.hints", containsString(hints)),
+            hasNoJsonPath("$.input.type"),
+            hasNoJsonPath("$.selectableMetadata"));
     }
 }
