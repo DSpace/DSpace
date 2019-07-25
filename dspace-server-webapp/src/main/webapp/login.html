@@ -1,0 +1,158 @@
+<!--
+
+    The contents of this file are subject to the license and copyright
+    detailed in the LICENSE and NOTICE files at the root of the source
+    tree and available online at
+
+    http://www.dspace.org/license/
+
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Sign in - HAL Browser</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet"/>
+    <link href="browser/vendor/css/bootstrap.css" rel="stylesheet">
+    <link href="browser/vendor/css/bootstrap-responsive.css" rel="stylesheet">
+    <style type="text/css">
+        body {
+            padding-top: 40px;
+            padding-bottom: 40px;
+            background-color: #f5f5f5;
+        }
+        .form-signin {
+            max-width: 300px;
+            padding: 19px 29px 29px;
+            margin: 0 auto 20px;
+            background-color: #fff;
+            border: 1px solid #e5e5e5;
+            -webkit-border-radius: 5px;
+            -moz-border-radius: 5px;
+            border-radius: 5px;
+            -webkit-box-shadow: 0 1px 2px rgba(0, 0, 0, .05);
+            -moz-box-shadow: 0 1px 2px rgba(0, 0, 0, .05);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, .05);
+        }
+        .form-signin .form-signin-heading, .form-signin .checkbox {
+            margin-bottom: 10px;
+        }
+        .form-signin input[type="text"], .form-signin input[type="password"] {
+            font-size: 16px;
+            height: auto;
+            margin-bottom: 15px;
+            padding: 7px 9px;
+        }
+
+        .alternative-login {
+            margin-bottom: 10px;
+        }
+    </style>
+    <script src="browser/vendor/js/jquery-1.10.2.min.js"></script>
+    <script src="browser/vendor/js/bootstrap.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+</head>
+<body>
+<div class="container">
+    <form id="login-form" class="form-signin">
+        <h2 class="form-signin-heading">HAL Browser</h2>
+        <input type="text" class="input-block-level" placeholder="Username" id="username">
+        <input type="password" class="input-block-level" placeholder="Password" id="password">
+        <button type="submit" class="btn btn-large btn-primary" id="login">Sign in</button>
+        <div class="other-login-methods hidden">
+            <h3>Other login methods:</h3>
+
+        </div>
+    </form>
+</div>
+
+<script>
+    $(document).ready(function() {
+        var successHandler = function(result, status, xhr) {
+            document.cookie = "MyHalBrowserToken=" + xhr.getResponseHeader('Authorization').split(" ")[1];
+            toastr.success('You are now logged in. Please wait while we redirect you...', 'Login Successful');
+            setTimeout(function() {
+                window.location.href = window.location.pathname.replace("login.html", "");
+            }, 2000);
+        };  
+        toastr.options = {
+            "closeButton": false,
+            "debug": false,
+            "newestOnTop": false,
+            "progressBar": false,
+            "positionClass": "toast-top-center",
+            "preventDuplicates": false,
+            "showDuration": "300",
+            "hideDuration": "1000",
+            "timeOut": "3000",
+            "extendedTimeOut": "1000",
+            "showEasing": "swing",
+            "hideEasing": "linear",
+            "showMethod": "fadeIn",
+            "hideMethod": "fadeOut",
+            "onclick" : function() { toastr.remove(); }
+        }
+
+        $.ajax({
+          url : window.location.href.replace("login.html", "") + 'api/authn/login',
+          type : 'POST',
+          success : successHandler,
+          error : function(result, status, xhr) {
+              if (result.status === 401) {
+                  var authenticate = result.getResponseHeader("WWW-Authenticate");
+                  var element = $('div.other-login-methods');
+                  if(authenticate !== null) {
+                      var realms = authenticate.match(/(\w+ (\w+=((".*?")|[^,]*)(, )?)*)/g);
+                      if (realms.length == 1){
+                          var loc = /location="([^,]*)"/.exec(authenticate);
+                          if (loc !== null && loc.length === 2) {
+                          document.location = loc[1];
+                          }
+                      } else if (realms.length > 1){
+                          for (var i = 0; i < realms.length; i++){
+                              addLocationButton(realms[i], element);
+
+                          }
+                      }
+                  }
+              }
+          }
+        });
+
+        function addLocationButton(realm, element){
+            element.removeClass("hidden");
+            var loc = /location="([^,]*)"/.exec(realm);
+            var name = /(\w+) (\w+=((".*?")|[^,]*)(, )?)*/.exec(realm);
+            if (loc !== null && loc.length === 2) {
+                element.append('<a href="' + loc[1] + '" class="btn btn-large btn-primary alternative-login">' + capitalizeFirstLetter(name[1]) + '</a>');
+            }
+        }
+
+        function capitalizeFirstLetter(string) {
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        }
+        
+        $("#login-form").submit(function() {
+            $.ajax({
+                //This depends on this file to be called login.html
+                url : window.location.href.replace("login.html", "") + 'api/authn/login',
+                type : 'POST',
+                async : false,
+                data : 'password='+encodeURIComponent($("#password").val())+'&user='+encodeURIComponent($("#username").val()),
+                headers : {
+                    "Content-Type" : 'application/x-www-form-urlencoded',
+                    "Accept:" : '*/*'
+                },
+                success : successHandler,
+                error : function() {
+                    toastr.error('The credentials you entered are invalid. Please try again.', 'Login Failed');
+                }
+            });
+
+            return false;
+        });
+    });
+</script>
+</body>
+</html>

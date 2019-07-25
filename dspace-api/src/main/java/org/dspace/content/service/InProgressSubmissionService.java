@@ -26,7 +26,7 @@ import org.dspace.core.Context;
  * @author kevinvandevelde at atmire.com
  */
 public interface InProgressSubmissionService<T extends InProgressSubmission<ID>, ID extends Serializable>
-    extends BrowsableObjectService<T, ID> {
+    extends IndexableObjectService<T, ID> {
 
     /**
      * Deletes submission wrapper, doesn't delete item contents

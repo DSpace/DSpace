@@ -18,10 +18,10 @@ import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
-import org.dspace.browse.BrowsableObject;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.ReloadableEntity;
+import org.dspace.discovery.IndexableObject;
 import org.dspace.eperson.EPerson;
 
 /**
@@ -34,7 +34,7 @@ import org.dspace.eperson.EPerson;
  */
 @Entity
 @Table(name = "cwf_claimtask")
-public class ClaimedTask implements ReloadableEntity<Integer>, BrowsableObject<Integer> {
+public class ClaimedTask implements ReloadableEntity<Integer>, IndexableObject<Integer> {
 
     @Id
     @Column(name = "claimtask_id")
