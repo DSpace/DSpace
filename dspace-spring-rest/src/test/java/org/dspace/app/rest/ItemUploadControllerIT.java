@@ -8,14 +8,20 @@
 package org.dspace.app.rest;
 
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.IsNull.notNullValue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.util.Map;
+import java.util.UUID;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.builder.ItemBuilder;
+import org.dspace.app.rest.matcher.BitstreamMatcher;
 import org.dspace.app.rest.matcher.MetadataMatcher;
 import org.dspace.app.rest.model.BitstreamPropertiesRest;
 import org.dspace.app.rest.model.MetadataRest;
@@ -32,6 +38,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 public class ItemUploadControllerIT extends AbstractEntityIntegrationTest {
@@ -67,7 +74,7 @@ public class ItemUploadControllerIT extends AbstractEntityIntegrationTest {
                                                        input.getBytes());
 
         BitstreamPropertiesRest bitstreamPropertiesRest = new BitstreamPropertiesRest();
-        bitstreamPropertiesRest.setBundleName("ORIGINAL");
+        bitstreamPropertiesRest.setBundleName("TESTINGBUNDLE");
         bitstreamPropertiesRest.setName("testing");
         bitstreamPropertiesRest.setSequenceId(123456);
 
@@ -93,25 +100,36 @@ public class ItemUploadControllerIT extends AbstractEntityIntegrationTest {
         ObjectMapper mapper = new ObjectMapper();
 
         context.restoreAuthSystemState();
-        getClient(token).perform(MockMvcRequestBuilders.fileUpload("/api/core/items/" + item.getID() + "/bitstreams")
-                                                       .file(file)
-                                                       .param("properties", mapper
-                                                           .writeValueAsString(bitstreamPropertiesRest)))
+        MvcResult mvcResult = getClient(token).perform(
+            MockMvcRequestBuilders.fileUpload("/api/core/items/" + item.getID() + "/bitstreams")
+                                  .file(file)
+                                  .param("properties", mapper
+                                      .writeValueAsString(bitstreamPropertiesRest)))
+                                              .andExpect(status().isOk())
+                                              .andExpect(jsonPath("$.name", is("testing")))
+                                              .andExpect(jsonPath("$.bundleName", is("TESTINGBUNDLE")))
+                                              .andExpect(jsonPath("$.sequenceId", is(Integer.parseInt("123456"))))
+                                              .andExpect(jsonPath("$", Matchers.allOf(
+                                                  hasJsonPath("$.metadata", Matchers.allOf(
+                                                      MetadataMatcher.matchMetadata("dc.description",
+                                                                                    "description"),
+                                                      MetadataMatcher.matchMetadata("dc.description.tableofcontents",
+                                                                                    "News"),
+                                                      MetadataMatcher.matchMetadata("dc.rights",
+                                                                                    "Custom Copyright Text"),
+                                                      MetadataMatcher.matchMetadata("dc.title",
+                                                                                    "testing")
+                                                  ))))).andReturn();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        Map<String, Object> map = mapper.readValue(content, Map.class);
+        String bitstreamId = String.valueOf(map.get("id"));
+
+        getClient(token).perform(get("/api/core/items/" + item.getID() + "/bitstreams"))
                         .andExpect(status().isOk())
-                        .andExpect(jsonPath("$.name", Matchers.is("testing")))
-                        .andExpect(jsonPath("$.bundleName", Matchers.is("ORIGINAL")))
-                        .andExpect(jsonPath("$.sequenceId", Matchers.is(Integer.parseInt("123456"))))
-                        .andExpect(jsonPath("$", Matchers.allOf(
-                            hasJsonPath("$.metadata", Matchers.allOf(
-                                MetadataMatcher.matchMetadata("dc.description",
-                                                              "description"),
-                                MetadataMatcher.matchMetadata("dc.description.tableofcontents",
-                                                              "News"),
-                                MetadataMatcher.matchMetadata("dc.rights",
-                                                              "Custom Copyright Text"),
-                                MetadataMatcher.matchMetadata("dc.title",
-                                                              "testing")
-                            )))));
+                        .andExpect(jsonPath("_embedded.bitstreams", Matchers.hasItem(
+                            BitstreamMatcher.matchBitstreamEntry(UUID.fromString(bitstreamId), file.getSize()))));
+
     }
 
     @Test
@@ -141,9 +159,25 @@ public class ItemUploadControllerIT extends AbstractEntityIntegrationTest {
         MockMultipartFile file = new MockMultipartFile("file", "hello.txt", MediaType.TEXT_PLAIN_VALUE,
                                                        input.getBytes());
         context.restoreAuthSystemState();
-        getClient(token).perform(MockMvcRequestBuilders.fileUpload("/api/core/items/" + item.getID() + "/bitstreams")
-                                                       .file(file))
-                        .andExpect(status().isOk());
+        MvcResult mvcResult = getClient(token)
+            .perform(MockMvcRequestBuilders.fileUpload("/api/core/items/" + item.getID() + "/bitstreams")
+                                           .file(file))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.bundleName", is("ORIGINAL")))
+            .andExpect(jsonPath("$.name", is("hello.txt")))
+            .andExpect(jsonPath("$.sequenceId", is(1)))
+            .andReturn();
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        Map<String, Object> map = mapper.readValue(content, Map.class);
+        String bitstreamId = String.valueOf(map.get("id"));
+
+        getClient(token).perform(get("/api/core/items/" + item.getID() + "/bitstreams"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("_embedded.bitstreams", Matchers.hasItem(
+                            BitstreamMatcher.matchBitstreamEntry(UUID.fromString(bitstreamId), file.getSize()))));
     }
 
     @Test
@@ -177,10 +211,22 @@ public class ItemUploadControllerIT extends AbstractEntityIntegrationTest {
                                                        input.getBytes());
 
         context.restoreAuthSystemState();
-        getClient(token).perform(MockMvcRequestBuilders.fileUpload("/api/core/items/" + item.getID() + "/bitstreams")
-                                                       .file(file))
+        MvcResult mvcResult = getClient(token)
+            .perform(MockMvcRequestBuilders.fileUpload("/api/core/items/" + item.getID() + "/bitstreams")
+                                           .file(file))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.uuid", notNullValue())).andReturn();
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        Map<String, Object> map = mapper.readValue(content, Map.class);
+        String bitstreamId = String.valueOf(map.get("id"));
+
+        getClient(token).perform(get("/api/core/items/" + item.getID() + "/bitstreams"))
                         .andExpect(status().isOk())
-                        .andExpect(jsonPath("$.uuid", notNullValue()));
+                        .andExpect(jsonPath("_embedded.bitstreams", Matchers.hasItem(
+                            BitstreamMatcher.matchBitstreamEntry(UUID.fromString(bitstreamId), file.getSize()))));
     }
 
     @Test
@@ -215,6 +261,10 @@ public class ItemUploadControllerIT extends AbstractEntityIntegrationTest {
         getClient(token).perform(MockMvcRequestBuilders.fileUpload("/api/core/items/" + item.getID() + "/bitstreams")
                                                        .file(file))
                         .andExpect(status().isForbidden());
+
+        getClient(token).perform(get("/api/core/items/" + item.getID() + "/bitstreams"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("_embedded.bitstreams").doesNotExist());
     }
 
     @Test
@@ -249,6 +299,10 @@ public class ItemUploadControllerIT extends AbstractEntityIntegrationTest {
         getClient().perform(MockMvcRequestBuilders.fileUpload("/api/core/items/" + item.getID() + "/bitstreams")
                                                   .file(file))
                    .andExpect(status().isUnauthorized());
+
+        getClient(token).perform(get("/api/core/items/" + item.getID() + "/bitstreams"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("_embedded.bitstreams").doesNotExist());
     }
 
     @Test
@@ -282,51 +336,31 @@ public class ItemUploadControllerIT extends AbstractEntityIntegrationTest {
                                                        input.getBytes());
 
         BitstreamPropertiesRest bitstreamPropertiesRest = new BitstreamPropertiesRest();
-        String originalBundle = "ORIGINAL";
-        bitstreamPropertiesRest.setBundleName(originalBundle);
+        String testbundle = "TESTBUNDLE";
+        bitstreamPropertiesRest.setBundleName(testbundle);
 
         ObjectMapper mapper = new ObjectMapper();
 
 
         context.restoreAuthSystemState();
-        getClient(token).perform(MockMvcRequestBuilders.fileUpload("/api/core/items/" + item.getID() + "/bitstreams")
-                                                       .file(file)
-                                                       .param("properties", mapper
-                                                           .writeValueAsString(bitstreamPropertiesRest)))
+        MvcResult mvcResult = getClient(token)
+            .perform(MockMvcRequestBuilders.fileUpload("/api/core/items/" + item.getID() + "/bitstreams")
+                                           .file(file)
+                                           .param("properties", mapper
+                                               .writeValueAsString(bitstreamPropertiesRest)))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.bundleName", is(testbundle)))
+            .andExpect(jsonPath("$.uuid", notNullValue())).andReturn();
+
+
+        String content = mvcResult.getResponse().getContentAsString();
+        Map<String, Object> map = mapper.readValue(content, Map.class);
+        String bitstreamId = String.valueOf(map.get("id"));
+
+        getClient(token).perform(get("/api/core/items/" + item.getID() + "/bitstreams"))
                         .andExpect(status().isOk())
-                        .andExpect(jsonPath("$.bundleName", Matchers.is(originalBundle)))
-                        .andExpect(jsonPath("$.uuid", notNullValue()));
-    }
-
-    //TODO This test just fails to run entirely because we cannot pass 'null' to a file upload
-    // Should we support this test case differently and if so, how?
-    @Test
-    @Ignore
-    public void uploadBitstreamNoFileUnprocessableEntityException() throws Exception {
-        context.turnOffAuthorisationSystem();
-
-
-        parentCommunity = CommunityBuilder.createCommunity(context)
-                                          .withName("Parent Community")
-                                          .build();
-        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
-                                           .withName("Sub Community")
-                                           .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
-        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
-        Collection col3 = CollectionBuilder.createCollection(context, child1).withName("OrgUnits").build();
-
-        Item item = ItemBuilder.createItem(context, col1)
-                               .withTitle("Author1")
-                               .withIssueDate("2017-10-17")
-                               .withAuthor("Smith, Donald")
-                               .build();
-
-        String token = getAuthToken(admin.getEmail(), password);
-
-        context.restoreAuthSystemState();
-        getClient(token).perform(MockMvcRequestBuilders.fileUpload("/api/core/items/" + item.getID() + "/bitstreams"))
-                        .andExpect(status().isUnprocessableEntity());
+                        .andExpect(jsonPath("_embedded.bitstreams", Matchers.hasItem(
+                            BitstreamMatcher.matchBitstreamEntry(UUID.fromString(bitstreamId), file.getSize()))));
     }
 
     // TODO This test doesn't work either as it seems that only the first file is ever transfered into the request
@@ -407,6 +441,10 @@ public class ItemUploadControllerIT extends AbstractEntityIntegrationTest {
                                                        .param("properties", mapper
                                                            .writeValueAsString(bitstreamPropertiesRest)))
                         .andExpect(status().isUnprocessableEntity());
+
+        getClient(token).perform(get("/api/core/items/" + item.getID() + "/bitstreams"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("_embedded.bitstreams").doesNotExist());
     }
 
 
@@ -470,9 +508,9 @@ public class ItemUploadControllerIT extends AbstractEntityIntegrationTest {
                                                        .param("properties", mapper
                                                            .writeValueAsString(bitstreamPropertiesRest)))
                         .andExpect(status().isOk())
-                        .andExpect(jsonPath("$.name", Matchers.is("testing")))
-                        .andExpect(jsonPath("$.bundleName", Matchers.is("ORIGINAL")))
-                        .andExpect(jsonPath("$.sequenceId", Matchers.is(Integer.parseInt("123456"))))
+                        .andExpect(jsonPath("$.name", is("testing")))
+                        .andExpect(jsonPath("$.bundleName", is("ORIGINAL")))
+                        .andExpect(jsonPath("$.sequenceId", is(Integer.parseInt("123456"))))
                         .andExpect(jsonPath("$", Matchers.allOf(
                             hasJsonPath("$.metadata", Matchers.allOf(
                                 MetadataMatcher.matchMetadata("dc.description",
@@ -490,6 +528,10 @@ public class ItemUploadControllerIT extends AbstractEntityIntegrationTest {
                                                        .param("properties", mapper
                                                            .writeValueAsString(bitstreamPropertiesRest)))
                         .andExpect(status().isUnprocessableEntity());
+
+        getClient(token).perform(get("/api/core/items/" + item.getID() + "/bitstreams"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.page.totalElements", is(1)));
 
     }
 

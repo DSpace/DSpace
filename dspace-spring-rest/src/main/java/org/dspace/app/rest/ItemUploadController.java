@@ -26,7 +26,9 @@ import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
+import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Item;
+import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
@@ -61,6 +63,9 @@ public class ItemUploadController {
     @Autowired
     private MetadataConverter metadataConverter;
 
+    @Autowired
+    private BitstreamFormatService bitstreamFormatService;
+
     @RequestMapping(method = RequestMethod.POST, value = "/bitstreams", headers = "content-type=multipart/form-data")
     @PreAuthorize("hasPermission(#uuid, 'ITEM', 'WRITE') && hasPermission(#uuid, 'ITEM', 'ADD')")
     public BitstreamResource uploadBitstream(HttpServletRequest request, @PathVariable UUID uuid,
@@ -86,7 +91,8 @@ public class ItemUploadController {
             throw new UnprocessableEntityException("The InputStream from the file couldn't be read");
         }
         try {
-            bitstream = processBitstreamCreation(context, item, fileInputStream, properties, uploadfile.getOriginalFilename());
+            bitstream = processBitstreamCreation(context, item, fileInputStream, properties,
+                                                 uploadfile.getOriginalFilename());
             itemService.update(context, item);
             context.commit();
         } catch (AuthorizeException | IOException | SQLException e) {
@@ -140,6 +146,8 @@ public class ItemUploadController {
             bitstream.setName(context, originalFilename);
 
         }
+        BitstreamFormat bitstreamFormat = bitstreamFormatService.guessFormat(context, bitstream);
+        bitstreamService.setFormat(context, bitstream, bitstreamFormat);
         bitstreamService.update(context, bitstream);
 
         return bitstream;

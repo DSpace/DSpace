@@ -8,6 +8,7 @@
 package org.dspace.content;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -504,6 +505,54 @@ public class BitstreamTest extends AbstractDSpaceObjectTest {
         //by default this bitstream is not linked to any object
         assertThat("testGetParentObject 0", bitstreamService.getParentObject(context, bs),
                    nullValue());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testSetSequenceIdToAlreadyExistingIllegalArgumentException()
+        throws SQLException, IOException, AuthorizeException {
+
+        context.turnOffAuthorisationSystem();
+        Community owningCommunity = communityService.create(null, context);
+        Collection collection = collectionService.create(context, owningCommunity);
+        WorkspaceItem workspaceItem = workspaceItemService.create(context, collection, false);
+        Item item = installItemService.installItem(context, workspaceItem);
+
+        item.setSubmitter(context.getCurrentUser());
+        itemService.update(context, item);
+        //we need to commit the changes so we don't block the table for testing
+
+
+
+        File f = new File(testProps.get("test.bitstream").toString());
+        Bitstream firstBitstream = itemService.createSingleBitstream(context, new FileInputStream(f), item);
+        Bitstream secondBitstream = itemService.createSingleBitstream(context, new FileInputStream(f), item);
+
+        bitstreamService.setSequenceId(context, secondBitstream, item, firstBitstream.getSequenceID());
+        context.restoreAuthSystemState();
+    }
+
+    @Test
+    public void testSetSequenceId() throws SQLException, IOException, AuthorizeException {
+
+        context.turnOffAuthorisationSystem();
+        Community owningCommunity = communityService.create(null, context);
+        Collection collection = collectionService.create(context, owningCommunity);
+        WorkspaceItem workspaceItem = workspaceItemService.create(context, collection, false);
+        Item item = installItemService.installItem(context, workspaceItem);
+
+        item.setSubmitter(context.getCurrentUser());
+        itemService.update(context, item);
+        //we need to commit the changes so we don't block the table for testing
+
+
+
+        File f = new File(testProps.get("test.bitstream").toString());
+        Bitstream firstBitstream = itemService.createSingleBitstream(context, new FileInputStream(f), item);
+        Bitstream secondBitstream = itemService.createSingleBitstream(context, new FileInputStream(f), item);
+
+        bitstreamService.setSequenceId(context, secondBitstream, item, firstBitstream.getSequenceID() + 1);
+        assertThat(secondBitstream.getSequenceID(), is(firstBitstream.getSequenceID() + 1));
+        context.restoreAuthSystemState();
     }
 
 }
