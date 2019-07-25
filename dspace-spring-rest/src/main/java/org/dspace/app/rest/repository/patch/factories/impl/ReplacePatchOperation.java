@@ -7,7 +7,7 @@
  */
 package org.dspace.app.rest.repository.patch.factories.impl;
 
-import org.dspace.app.rest.exception.PatchBadRequestException;
+import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.patch.Operation;
@@ -29,7 +29,7 @@ public abstract class ReplacePatchOperation<R extends RestModel, T>
      * @param resource  the rest model.
      * @param operation the replace patch operation.
      * @return the updated rest model.
-     * @throws PatchBadRequestException
+     * @throws DSpaceBadRequestException
      * @throws UnprocessableEntityException
      */
     @Override
@@ -47,7 +47,7 @@ public abstract class ReplacePatchOperation<R extends RestModel, T>
      * @param resource  the rest model.
      * @param operation the replace patch operation.
      * @return the updated rest model.
-     * @throws PatchBadRequestException
+     * @throws DSpaceBadRequestException
      * @throws UnprocessableEntityException
      */
     abstract R replace(R resource, Operation operation);
@@ -59,7 +59,7 @@ public abstract class ReplacePatchOperation<R extends RestModel, T>
      * to assure that the replace operation acts only on an existing value.
      *
      * @param resource the rest model.
-     * @throws PatchBadRequestException
+     * @throws DSpaceBadRequestException
      */
     abstract void checkModelForExistingValue(R resource, Operation operation);
 

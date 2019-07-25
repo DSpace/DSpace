@@ -9,6 +9,8 @@ package org.dspace.app.rest.converter;
 
 import org.dspace.app.rest.model.BitstreamFormatRest;
 import org.dspace.content.BitstreamFormat;
+import org.dspace.content.service.BitstreamFormatService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -19,15 +21,24 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class BitstreamFormatConverter implements DSpaceConverter<BitstreamFormat, BitstreamFormatRest> {
+
+    @Autowired
+    BitstreamFormatService bitstreamFormatService;
+
     @Override
     public BitstreamFormatRest fromModel(BitstreamFormat obj) {
         BitstreamFormatRest bf = new BitstreamFormatRest();
-        bf.setDescription(obj.getDescription());
-        bf.setExtensions(bf.getExtensions());
         bf.setId(obj.getID());
-        bf.setMimetype(obj.getMIMEType());
         bf.setShortDescription(obj.getShortDescription());
+        bf.setDescription(obj.getDescription());
+        bf.setMimetype(obj.getMIMEType());
         bf.setInternal(obj.isInternal());
+        if (obj.getSupportLevel() > 0) {
+            bf.setSupportLevel(bitstreamFormatService.getSupportLevelText(obj));
+        } else {
+            bf.setSupportLevel("UNKNOWN");
+        }
+        bf.setExtensions(obj.getExtensions());
         return bf;
     }
 

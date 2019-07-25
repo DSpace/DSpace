@@ -17,7 +17,6 @@ import org.dspace.app.rest.converter.DiscoverFacetResultsConverter;
 import org.dspace.app.rest.converter.DiscoverFacetsConverter;
 import org.dspace.app.rest.converter.DiscoverResultConverter;
 import org.dspace.app.rest.converter.DiscoverSearchSupportConverter;
-import org.dspace.app.rest.exception.InvalidRequestException;
 import org.dspace.app.rest.model.FacetConfigurationRest;
 import org.dspace.app.rest.model.FacetResultsRest;
 import org.dspace.app.rest.model.SearchConfigurationRest;
@@ -91,8 +90,7 @@ public class DiscoveryRestRepository extends AbstractDSpaceRestRepository {
 
     public SearchResultsRest getSearchObjects(final String query, final String dsoType, final String dsoScope,
                                               final String configuration,
-                                              final List<SearchFilter> searchFilters, final Pageable page)
-        throws InvalidRequestException {
+                                              final List<SearchFilter> searchFilters, final Pageable page) {
         Context context = obtainContext();
         IndexableObject scopeObject = scopeResolver.resolveScope(context, dsoScope);
         DiscoveryConfiguration discoveryConfiguration = searchConfigurationService
@@ -131,8 +129,7 @@ public class DiscoveryRestRepository extends AbstractDSpaceRestRepository {
     }
 
     public FacetResultsRest getFacetObjects(String facetName, String prefix, String query, String dsoType,
-            String dsoScope, final String configuration, List<SearchFilter> searchFilters, Pageable page)
-            throws InvalidRequestException {
+            String dsoScope, final String configuration, List<SearchFilter> searchFilters, Pageable page) {
 
         Context context = obtainContext();
 
@@ -158,7 +155,7 @@ public class DiscoveryRestRepository extends AbstractDSpaceRestRepository {
     }
 
     public SearchResultsRest getAllFacets(String query, String dsoType, String dsoScope, String configuration,
-                                          List<SearchFilter> searchFilters) throws InvalidRequestException {
+                                          List<SearchFilter> searchFilters) {
 
         Context context = obtainContext();
         Pageable page = new PageRequest(1, 1);

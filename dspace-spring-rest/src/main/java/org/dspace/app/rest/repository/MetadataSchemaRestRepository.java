@@ -19,7 +19,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import org.dspace.app.rest.converter.MetadataSchemaConverter;
-import org.dspace.app.rest.exception.PatchBadRequestException;
+import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.MetadataSchemaRest;
 import org.dspace.app.rest.model.hateoas.MetadataSchemaResource;
@@ -101,7 +101,7 @@ public class MetadataSchemaRestRepository extends DSpaceRestRepository<MetadataS
                     MetadataSchemaRest.class
             );
         } catch (IOException excIO) {
-            throw new PatchBadRequestException("error parsing request body", excIO);
+            throw new DSpaceBadRequestException("error parsing request body", excIO);
         }
 
         // validate fields

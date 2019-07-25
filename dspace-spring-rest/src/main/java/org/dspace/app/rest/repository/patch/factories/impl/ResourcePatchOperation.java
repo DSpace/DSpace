@@ -7,7 +7,7 @@
  */
 package org.dspace.app.rest.repository.patch.factories.impl;
 
-import org.dspace.app.rest.exception.PatchBadRequestException;
+import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.patch.Operation;
 
@@ -18,6 +18,6 @@ import org.dspace.app.rest.model.patch.Operation;
 public interface ResourcePatchOperation<R extends RestModel> {
 
     R perform(R resource, Operation operation)
-            throws PatchBadRequestException;
+            throws DSpaceBadRequestException;
 
 }
