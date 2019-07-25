@@ -335,23 +335,12 @@ public class DOIIdentifierProvider
                     + "is marked as DELETED.", DOIIdentifierException.DOI_IS_DELETED);
         }
 
+        // We have to reserve DOI before we can register it
+        if (!connector.isDOIReserved(context, doi)) {
+            this.reserveOnline(context, dso, identifier);
+        }
         // register DOI Online
-        try {
-            connector.registerDOI(context, dso, doi);
-        }
-        catch (DOIIdentifierException die)
-        {
-            // do we have to reserve DOI before we can register it?
-            if (die.getCode() == DOIIdentifierException.RESERVE_FIRST)
-            {
-                this.reserveOnline(context, dso, identifier);
-                connector.registerDOI(context, dso, doi);
-            }
-            else
-            {
-                throw die;
-            }
-        }
+        connector.registerDOI(context, dso, doi);
 
         // safe DOI as metadata of the item
         try {
