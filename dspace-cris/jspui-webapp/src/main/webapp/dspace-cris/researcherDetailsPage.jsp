@@ -139,6 +139,14 @@
 									postfunction();
 								},
 								error : function(data) {
+								},
+								complete: function(data) {
+									j('#' + id).dataTable({
+												searching: false, 
+												info: false, 
+												paging: false,
+												ordering : true
+									});
 								}
 							});		
 						};
@@ -146,7 +154,6 @@
 							j('#nested_'+id+'_next').click(
 									function() {
 								    	ajaxFunction(parseInt(j('#nested_'+id+"_pageCurrent").html())+1);
-										
 							});
 							j('#nested_'+id+'_prev').click(
 									function() {
@@ -162,7 +169,6 @@
 					error : function(data) {
 					},
 					complete: function(data) {
-						
 						j('#' + id).dataTable({
 									searching: false, 
 									info: false, 
