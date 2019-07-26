@@ -1,11 +1,11 @@
 # This image will be published as dspace/dspace
 # See https://dspace-labs.github.io/DSpace-Docker-Images/ for usage details
-# 
+#
 # This version is JDK8 compatible
 # - tomcat:8-jre8
 # - ANT 1.10.5
 # - maven:3-jdk-8
-# - note: 
+# - note:
 # - default tag for branch: dspace/dspace: dspace/dspace:dspace-7_x-jdk8
 
 # Step 1 - Run Maven Build
@@ -55,6 +55,6 @@ EXPOSE 8080 8009
 ENV JAVA_OPTS=-Xmx2000m
 
 RUN mv /usr/local/tomcat/webapps/ROOT /usr/local/tomcat/webapps/ROOT.bk && \
-    ln -s $DSPACE_INSTALL/webapps/spring-rest   /usr/local/tomcat/webapps/ROOT && \
-    ln -s $DSPACE_INSTALL/webapps/spring-rest   /usr/local/tomcat/webapps/spring-rest   && \
+    ln -s $DSPACE_INSTALL/webapps/server   /usr/local/tomcat/webapps/ROOT && \
+    ln -s $DSPACE_INSTALL/webapps/server   /usr/local/tomcat/webapps/server   && \
     ln -s $DSPACE_INSTALL/webapps/rest          /usr/local/tomcat/webapps/rest
