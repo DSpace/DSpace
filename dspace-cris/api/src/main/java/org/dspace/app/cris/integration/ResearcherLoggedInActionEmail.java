@@ -70,7 +70,7 @@ public class ResearcherLoggedInActionEmail implements PostLoggedInAction
                     String orcid = (String) request.getAttribute("orcid");
                     String filterQuery = "";
                     if(StringUtils.isNotBlank(eperson.getEmail())){
-                    	filterQuery= "crisrp.email:\""+eperson.getEmail()+"\"" + " OR crisrp.email_private:\""+eperson.getEmail()+"\"";
+                        filterQuery = "cris-email:\""+eperson.getEmail()+"\"" + " OR cris-email_private:\""+eperson.getEmail()+"\"";
                     }
                     
                     if(StringUtils.isNotBlank(orcid)){
