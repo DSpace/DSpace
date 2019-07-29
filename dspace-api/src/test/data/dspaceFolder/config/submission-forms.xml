@@ -248,6 +248,18 @@ it, please enter the types and the actual numbers or codes.</hint>
  <form-value-pairs>
    <value-pairs value-pairs-name="common_identifiers" dc-term="identifier">
      <pair>
+       <displayed-value>DOI</displayed-value>
+       <stored-value>doi</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>Scopus ID</displayed-value>
+       <stored-value>scopus</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>WOS ID</displayed-value>
+       <stored-value>isi</stored-value>
+     </pair>
+     <pair>
        <displayed-value>ISSN</displayed-value>
        <stored-value>issn</stored-value>
      </pair>

@@ -656,6 +656,181 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
     @Test
     /**
+     * Test the metadata lookup
+     *
+     * @throws Exception
+     */
+    public void lookupDOIMetadataTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        String authToken = getAuthToken(admin.getEmail(), password);
+
+        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+                .build();
+
+        // try to add the web of science identifier
+        List<Operation> addId = new ArrayList<Operation>();
+        // create a list of values to use in add operation
+        List<Map<String, String>> values = new ArrayList<Map<String, String>>();
+        Map<String, String> value = new HashMap<String, String>();
+        value.put("value", "10.1021/ac0354342");
+        values.add(value);
+        addId.add(new AddOperation("/sections/traditionalpageone/dc.identifier.doi", values));
+
+        String patchBody = getPatchContent(addId);
+
+        getClient(authToken).perform(patch("/api/submission/workspaceitems/" + witem.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                    .andExpect(status().isOk())
+                    // testing lookup
+                    .andExpect(jsonPath("$.sections.traditionalpageone['dc.identifier.doi'][0].value",
+                        is("10.1021/ac0354342")))
+                    .andExpect(jsonPath("$.sections.traditionalpageone['dc.title'][0].value",
+                        is("Multistep microreactions with proteins using electrocapture technology.")))
+                    .andExpect(jsonPath("$.sections.traditionalpageone['dc.type'][0].value",
+                        is("Journal Article")))
+                    .andExpect(jsonPath("$.sections.traditionalpageone['dc.date.issued'][0].value",
+                        is("2004-05-01")))
+                    .andExpect(jsonPath("$.sections.traditionalpageone['dc.contributor.author'][0].value",
+                        is("Astorga-Wells, Juan")))
+                    .andExpect(jsonPath("$.sections.traditionalpageone['dc.contributor.author'][1].value",
+                        is("Bergman, Tomas")))
+                    .andExpect(jsonPath("$.sections.traditionalpageone['dc.contributor.author'][2].value",
+                        is("Jörnvall, Hans")))
+                    .andExpect(jsonPath("$.sections.traditionalpageone['dc.identifier.issn'][0].value",
+                        is("0003-2700")))
+                    .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.description.abstract'][0].value",
+                        is("A method to perform multistep reactions by means of electroimmobilization of a " +
+                           "target molecule in a microflow stream is presented. A target protein is captured " +
+                           "by the opposing effects between the hydrodynamic and electric forces, after which " +
+                           "another medium is injected into the system. The second medium carries enzymes or " +
+                           "other reagents, which are brought into contact with the target protein and react." +
+                           " The immobilization is reversed by disconnecting the electric field, " +
+                           "upon which products are collected at the outlet of the device for analysis. On-line " +
+                           "reduction, alkylation, and trypsin digestion of proteins is demonstrated and was" +
+                           " monitored by MALDI mass spectrometry.")))
+            ;
+
+            // verify that the patch changes have been persisted
+            getClient().perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                .andExpect(status().isOk())
+                // testing lookup
+                .andExpect(jsonPath("$.sections.traditionalpageone['dc.identifier.doi'][0].value",
+                    is("10.1021/ac0354342")))
+                .andExpect(jsonPath("$.sections.traditionalpageone['dc.title'][0].value",
+                    is("Multistep microreactions with proteins using electrocapture technology.")))
+                .andExpect(jsonPath("$.sections.traditionalpageone['dc.type'][0].value",
+                    is("Journal Article")))
+                .andExpect(jsonPath("$.sections.traditionalpageone['dc.date.issued'][0].value",
+                    is("2004-05-01")))
+                .andExpect(jsonPath("$.sections.traditionalpageone['dc.contributor.author'][0].value",
+                    is("Astorga-Wells, Juan")))
+                .andExpect(jsonPath("$.sections.traditionalpageone['dc.contributor.author'][1].value",
+                    is("Bergman, Tomas")))
+                .andExpect(jsonPath("$.sections.traditionalpageone['dc.contributor.author'][2].value",
+                    is("Jörnvall, Hans")))
+                .andExpect(jsonPath("$.sections.traditionalpageone['dc.identifier.issn'][0].value",
+                    is("0003-2700")))
+                .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.description.abstract'][0].value",
+                    is("A method to perform multistep reactions by means of electroimmobilization of a " +
+                       "target molecule in a microflow stream is presented. A target protein is captured " +
+                       "by the opposing effects between the hydrodynamic and electric forces, after which " +
+                       "another medium is injected into the system. The second medium carries enzymes or " +
+                       "other reagents, which are brought into contact with the target protein and react." +
+                       " The immobilization is reversed by disconnecting the electric field, " +
+                       "upon which products are collected at the outlet of the device for analysis. On-line " +
+                       "reduction, alkylation, and trypsin digestion of proteins is demonstrated and was" +
+                       " monitored by MALDI mass spectrometry.")))
+            ;
+
+    }
+
+    @Test
+    /**
+     * Test the metadata lookup
+     *
+     * @throws Exception
+     */
+    public void lookupWOSMetadataTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        String authToken = getAuthToken(admin.getEmail(), password);
+
+        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+                .build();
+
+        // try to add the web of science identifier
+        List<Operation> addId = new ArrayList<Operation>();
+        // create a list of values to use in add operation
+        List<Map<String, String>> values = new ArrayList<Map<String, String>>();
+        Map<String, String> value = new HashMap<String, String>();
+        value.put("value", "10.1021/ac0354342");
+        values.add(value);
+        addId.add(new AddOperation("/sections/traditionalpageone/dc.identifier.doi", values));
+
+        String patchBody = getPatchContent(addId);
+
+        getClient(authToken).perform(patch("/api/submission/workspaceitems/" + witem.getID())
+            .content(patchBody)
+            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isOk())
+                // testing lookup
+                .andExpect(jsonPath("$.sections.traditionalpageone['dc.identifier.isi'][0].value",
+                    is("WOS:000270372400005")))
+                .andExpect(jsonPath("$.sections.traditionalpageone['dc.title'][0].value",
+                    is("Individual Susceptibility to Cadmium Toxicity and Metallothionein Gene Polymorphisms:" +
+                       " with References to Current Status of Occupational Cadmium Exposure")))
+                .andExpect(jsonPath("$.sections.traditionalpageone['dc.type'][0].value",
+                    is("Article")))
+                .andExpect(jsonPath("$.sections.traditionalpageone['dc.date.issued'][0].value",
+                    is("2009")))
+                .andExpect(jsonPath("$.sections.traditionalpageone['dc.contributor.author'][0].value",
+                    is("Miura, N")))
+                .andExpect(jsonPath("$.sections.traditionalpageone['dc.identifier.issn'][0].value",
+                    is("0019-8366")))
+        ;
+
+        // verify that the patch changes have been persisted
+        getClient().perform(get("/api/submission/workspaceitems/" + witem.getID()))
+            .andExpect(status().isOk())
+            // testing lookup
+            .andExpect(jsonPath("$.sections.traditionalpageone['dc.identifier.isi'][0].value",
+                    is("WOS:000270372400005")))
+            .andExpect(jsonPath("$.sections.traditionalpageone['dc.title'][0].value",
+                    is("Individual Susceptibility to Cadmium Toxicity and Metallothionein Gene Polymorphisms:" +
+                       " with References to Current Status of Occupational Cadmium Exposure")))
+            .andExpect(jsonPath("$.sections.traditionalpageone['dc.type'][0].value",
+                    is("Article")))
+            .andExpect(jsonPath("$.sections.traditionalpageone['dc.date.issued'][0].value",
+                    is("2009")))
+            .andExpect(jsonPath("$.sections.traditionalpageone['dc.contributor.author'][0].value",
+                    is("Miura, N")))
+            .andExpect(jsonPath("$.sections.traditionalpageone['dc.identifier.issn'][0].value",
+                    is("0019-8366")))
+        ;
+    }
+
+    @Test
+    /**
      * Test the update of metadata
      *
      * @throws Exception
