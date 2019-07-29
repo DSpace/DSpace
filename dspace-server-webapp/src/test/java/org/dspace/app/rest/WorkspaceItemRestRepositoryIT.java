@@ -47,6 +47,8 @@ import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.eperson.EPerson;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.springframework.mock.web.MockMultipartFile;
@@ -762,6 +764,9 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
      * @throws Exception
      */
     public void lookupWOSMetadataTest() throws Exception {
+        ConfigurationService configService = DSpaceServicesFactory.getInstance().getConfigurationService();
+        String wosUser = configService.getProperty("submission.lookup.webofknowledge.user");
+        String wosPassword = configService.getProperty("submission.lookup.webofknowledge.password");
         context.turnOffAuthorisationSystem();
 
         //** GIVEN **
@@ -783,15 +788,49 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         // create a list of values to use in add operation
         List<Map<String, String>> values = new ArrayList<Map<String, String>>();
         Map<String, String> value = new HashMap<String, String>();
-        value.put("value", "10.1021/ac0354342");
+        value.put("value", "WOS:000270372400005");
         values.add(value);
-        addId.add(new AddOperation("/sections/traditionalpageone/dc.identifier.doi", values));
+        addId.add(new AddOperation("/sections/traditionalpageone/dc.identifier.isi", values));
 
         String patchBody = getPatchContent(addId);
 
-        getClient(authToken).perform(patch("/api/submission/workspaceitems/" + witem.getID())
-            .content(patchBody)
-            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+        if (wosUser == null || wosUser.equals("") || wosPassword == null ||  wosPassword.equals("")) {
+            getClient(authToken).perform(patch("/api/submission/workspaceitems/" + witem.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                    .andExpect(status().isOk())
+                    // testing lookup
+                    .andExpect(jsonPath("$.sections.traditionalpageone['dc.identifier.isi'][0].value",
+                        is("WOS:000270372400005")));
+
+                // verify that the patch changes have been persisted
+                getClient().perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                    .andExpect(status().isOk())
+                    // testing lookup
+                    .andExpect(jsonPath("$.sections.traditionalpageone['dc.identifier.isi'][0].value",
+                        is("WOS:000270372400005")));
+        } else {
+            getClient(authToken).perform(patch("/api/submission/workspaceitems/" + witem.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                    .andExpect(status().isOk())
+                    // testing lookup
+                    .andExpect(jsonPath("$.sections.traditionalpageone['dc.identifier.isi'][0].value",
+                        is("WOS:000270372400005")))
+                    .andExpect(jsonPath("$.sections.traditionalpageone['dc.title'][0].value",
+                        is("Individual Susceptibility to Cadmium Toxicity and Metallothionein Gene Polymorphisms:" +
+                           " with References to Current Status of Occupational Cadmium Exposure")))
+                    .andExpect(jsonPath("$.sections.traditionalpageone['dc.type'][0].value",
+                        is("Article")))
+                    .andExpect(jsonPath("$.sections.traditionalpageone['dc.date.issued'][0].value",
+                        is("2009")))
+                    .andExpect(jsonPath("$.sections.traditionalpageone['dc.contributor.author'][0].value",
+                        is("Miura, N")))
+                    .andExpect(jsonPath("$.sections.traditionalpageone['dc.identifier.issn'][0].value",
+                        is("0019-8366")));
+
+            // verify that the patch changes have been persisted
+            getClient().perform(get("/api/submission/workspaceitems/" + witem.getID()))
                 .andExpect(status().isOk())
                 // testing lookup
                 .andExpect(jsonPath("$.sections.traditionalpageone['dc.identifier.isi'][0].value",
@@ -806,27 +845,8 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .andExpect(jsonPath("$.sections.traditionalpageone['dc.contributor.author'][0].value",
                     is("Miura, N")))
                 .andExpect(jsonPath("$.sections.traditionalpageone['dc.identifier.issn'][0].value",
-                    is("0019-8366")))
-        ;
-
-        // verify that the patch changes have been persisted
-        getClient().perform(get("/api/submission/workspaceitems/" + witem.getID()))
-            .andExpect(status().isOk())
-            // testing lookup
-            .andExpect(jsonPath("$.sections.traditionalpageone['dc.identifier.isi'][0].value",
-                    is("WOS:000270372400005")))
-            .andExpect(jsonPath("$.sections.traditionalpageone['dc.title'][0].value",
-                    is("Individual Susceptibility to Cadmium Toxicity and Metallothionein Gene Polymorphisms:" +
-                       " with References to Current Status of Occupational Cadmium Exposure")))
-            .andExpect(jsonPath("$.sections.traditionalpageone['dc.type'][0].value",
-                    is("Article")))
-            .andExpect(jsonPath("$.sections.traditionalpageone['dc.date.issued'][0].value",
-                    is("2009")))
-            .andExpect(jsonPath("$.sections.traditionalpageone['dc.contributor.author'][0].value",
-                    is("Miura, N")))
-            .andExpect(jsonPath("$.sections.traditionalpageone['dc.identifier.issn'][0].value",
-                    is("0019-8366")))
-        ;
+                    is("0019-8366")));
+        }
     }
 
     @Test
