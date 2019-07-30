@@ -117,17 +117,20 @@ public class EditCommunityMetadataForm extends AbstractDSpaceTransformer
 	    metadataList.addLabel(T_label_name);
 	    Text name = metadataList.addItem().addText("name");
 	    name.setSize(40);
-      name.setValue(communityService.getMetadata(thisCommunity, "name"));
-      
-      // Begin UMD Customization
-      // Add a select (dropdown) to choose communitygroup
-      java.util.List<CommunityGroup> groups = communityGroupService.findAll();
-      metadataList.addLabel(T_label_group);
-      Select group = metadataList.addItem().addSelect("community_group");
-      for (CommunityGroup cGroup : groups) {
-        group.addOption(cGroup.getID(), cGroup.getShortName());
-      }
-      // End UMD Customization
+        name.setValue(communityService.getMetadata(thisCommunity, "name"));
+        
+        // Begin UMD Customization
+        // Add a select (dropdown) to choose communitygroup
+        java.util.List<CommunityGroup> groups = communityGroupService.findAll();
+        metadataList.addLabel(T_label_group);
+        Select group = metadataList.addItem().addSelect("community_group");
+        int currentCommunityId = thisCommunity.getGroupID();
+        boolean selected;
+        for (CommunityGroup cGroup : groups) {
+            selected = cGroup.getID() == currentCommunityId ? true : false;
+            group.addOption(selected, cGroup.getID(), cGroup.getShortName());
+        }
+        // End UMD Customization
 	    
 	    // short description
 	    metadataList.addLabel(T_label_short_description);

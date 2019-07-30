@@ -895,10 +895,10 @@ public class FlowContainerUtils
 		communityService.setMetadata(context, newCommunity, "copyright_text", copyrightText);
 		communityService.setMetadata(context, newCommunity, "side_bar_text", sideBarText);
         
-    // Begin UMD Customizaiton
-    String communityGroup = request.getParameter("community_group");
-    newCommunity.setGroupID(Integer.parseInt(communityGroup));
-    // End UMD Customizaiton
+		// Begin UMD Customizaiton
+		String communityGroup = request.getParameter("community_group");
+		newCommunity.setGroupID(Integer.parseInt(communityGroup));
+		// End UMD Customizaiton
 
     	// Upload the logo
 		Object object = request.get("logo");
@@ -983,10 +983,10 @@ public class FlowContainerUtils
         communityService.setMetadata(context, community, "copyright_text", copyrightText);
         communityService.setMetadata(context, community, "side_bar_text", sideBarText);
 
-    // Begin UMD Customizaiton
-    String communityGroup = request.getParameter("community_group");
-    community.setGroupID(Integer.parseInt(communityGroup));
-    // End UMD Customizaiton
+		// Begin UMD Customizaiton
+		String communityGroup = request.getParameter("community_group");
+		community.setGroupID(Integer.parseInt(communityGroup));
+		// End UMD Customizaiton
         
         if (deleteLogo)
         {
