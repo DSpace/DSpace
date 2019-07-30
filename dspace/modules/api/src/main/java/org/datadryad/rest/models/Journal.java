@@ -29,6 +29,9 @@ public class Journal {
     public String paymentPlanType = "";
     public String paymentContact = "";
     public String stripeCustomerID = "";
+    public Boolean allowReviewWorkflow;
+    public Boolean allowEmbargo;
+    public Boolean allowBlackout;
     
     protected DryadJournalConcept dryadJournalConcept;
 
@@ -43,6 +46,9 @@ public class Journal {
         paymentPlanType = dryadJournalConcept.getPaymentPlanType();
         paymentContact = dryadJournalConcept.getPaymentContact();
         stripeCustomerID = dryadJournalConcept.getStripeCustomerID();
+        allowReviewWorkflow = dryadJournalConcept.getAllowReviewWorkflow();
+        allowEmbargo = dryadJournalConcept.getAllowEmbargo();
+        allowBlackout = dryadJournalConcept.getPublicationBlackout();
         this.dryadJournalConcept = dryadJournalConcept;
     }
 
