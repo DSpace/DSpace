@@ -24,6 +24,7 @@
 				<entry key="csv" value-ref="csvDataLoader" />
 				<entry key="tsv" value-ref="tsvDataLoader" />
 				<entry key="oai" value-ref="oaipmhDataLoader" />
+				<entry key="grobid" value-ref="grobidDataLoader" />
 			</map>
 		</property>
 		
@@ -119,6 +120,8 @@
 	            <entry key="endnote" value-ref="endnoteDataLoader"/>
 	            <entry key="csv" value-ref="csvDataLoader"/>
 	            <entry key="tsv" value-ref="tsvDataLoader"/>
+	            <entry key="grobid" value-ref="grobidDataLoader" />
+	            <entry key="wos" value-ref="wosOnlineDataLoader"/>
 			</map>
 	    </property>
 	</bean>
@@ -517,6 +520,184 @@
                 </map>
             </constructor-arg>
 	</bean>
+
+	<!-- Scopus -->
+	<bean id="scopusOnlineDataLoader" class="org.dspace.submit.lookup.ScopusOnlineDataLoader" scope="prototype">
+		<property name="searchProvider" value="false" />
+		<property name="fieldMap" ref="scopusInputMap" />
+	</bean>	
+	
+	<alias name="scopusOnlineDataLoader"
+		alias="org.dspace.submit.lookup.ScopusOnlineDataLoader" />
+
+	<bean name="scopusInputMap" class="java.util.HashMap" scope="prototype">
+            <constructor-arg>
+                <map key-type="java.lang.String" value-type="java.lang.String">
+                    <entry key="url" value="url" />
+                    <entry key="eid" value="eid" />
+                    <entry key="doi" value="doi" />
+                    <entry key="pmid" value="pubmedID" />
+                    <entry key="title" value="title" />
+                    <entry key="itemType" value="subtype" />
+                    <entry key="scopusType" value="providerType" />
+                    <entry key="sourceTitle" value="journal" />
+                    <entry key="isbn" value="pisbn" />
+                    <entry key="issn" value="jissn" />
+                    <entry key="eissn" value="eissn" />
+                    <entry key="issued" value="issued" />
+                    <entry key="volume" value="volume" />
+                    <entry key="issue" value="issue" />
+                    <entry key="spage" value="firstpage" />
+                    <entry key="epage" value="lastpage" />
+                    <entry key="description" value="abstract" />
+                    <entry key="scopusKeywords" value="keywords" />
+                    <entry key="articlenumber" value="articlenumber" />                    
+                    <entry key="authors" value="authors" />
+					<entry key="authorUrl" value="authorUrl" />
+					<entry key="authorScopusid" value="authorScopusID" />
+					<entry key="orcid" value="orcid" />
+                </map>
+            </constructor-arg>
+	</bean>
+
+	<!-- SCOPUS scival Data Loaders -->
+	<bean id="scivalOnlineDataLoader" class="org.dspace.submit.lookup.SciValOnlineDataLoader" scope="prototype">
+		<property name="searchProvider" value="false" />
+		<!-- Uncomment the following line if you want to define the max results 
+			returned by the Scopus free text (by author, title) search. Default value 
+			is 10 -->
+		<!-- <property name="maxResults" value="10" /> -->
+		<property name="fieldMap" ref="scivalInputMap" />
+		<property name="configurationService" ref="org.dspace.services.ConfigurationService"/>
+	</bean>
+
+	<alias name="scivalOnlineDataLoader"
+		alias="org.dspace.submit.lookup.SciValOnlineDataLoader" />
+
+	<bean name="scivalInputMap" class="java.util.HashMap" scope="prototype">
+		<constructor-arg>
+			<map key-type="java.lang.String" value-type="java.lang.String">
+				<entry key="eid" value="eid" />
+				<entry key="doi" value="doi" />
+				<entry key="issn" value="jissn" />
+				<entry key="eissn" value="jeissn" />
+				<entry key="isbn" value="pisbn" />
+				<entry key="journalTitle" value="journal" />
+				<entry key="title" value="title" />
+				<entry key="year" value="issued" />
+				<entry key="volume" value="volume" />
+				<entry key="issue" value="issue" />
+				<entry key="edition" value="edition" />
+				<entry key="startPage" value="firstpage" />
+				<entry key="endPage" value="lastpage" />
+				<entry key="authors" value="authors" />
+				<entry key="chairs" value="chairs" />
+				<entry key="affiliations" value="affiliations" />
+				<entry key="articleNumber" value="articleNumber" />
+				<entry key="authorsWithAffiliations" value="authorsWithAffiliations" />
+				<entry key="displayUrl" value="scopusUrl" />
+				<entry key="citationCount" value="scopusCitation" />
+				<entry key="citationUrl" value="scopusCitationUrl" />
+				<entry key="url" value="url" />
+				<entry key="classificationASJC" value="classificationASJC" />
+				<entry key="keywords" value="keywords" />
+				<entry key="language" value="language" />
+				<entry key="abstracts" value="abstract" />
+				<entry key="abstractita" value="abstractita" />
+				<entry key="abstracteng" value="abstracteng" />
+				<entry key="abstractfre" value="abstractfre" />
+				<entry key="abstractger" value="abstractger" />
+				<entry key="abstractesp" value="abstractesp" />
+				<!-- <entry key="issueDate" value="issued" /> -->
+				<entry key="medium" value="medium" />
+				<entry key="titleAlternative" value="titlealternative" />
+				<entry key="issueTitle" value="issuetitle" />
+				<entry key="conferenceName" value="conferenceName" />
+				<entry key="conferenceNumber" value="conferenceNumber" />
+				<entry key="conferencePlace" value="conferencePlace" />
+				<entry key="conferenceYear" value="conferenceYear" />
+				<entry key="conferenceSponsor" value="sponsor" />
+				<entry key="conferenceTarget" value="conferencetarget" />
+				<entry key="supplement" value="supplement" />
+				<entry key="scpId" value="scopusid" />
+				<entry key="medlineId" value="medlineid" />
+				<entry key="bookTitle" value="booktitle" />
+				<!-- <entry key="#sourceAuthor" value="" /> -->
+				<!-- <entry key="#sourceTranslator" value="" /> -->
+				<entry key="publisherName" value="publisher" />
+				<entry key="publisherPlace" value="publisherPlace" />
+				<entry key="publisherCountry" value="publisherCountry" />
+				<entry key="internationalAuthor" value="internationalauthor" />
+				<entry key="itemType" value="subtype" />
+			</map>
+		</constructor-arg>
+	</bean>
+
+	<!-- WOS Data Loaders -->
+	<bean id="wosOnlineDataLoader" class="org.dspace.submit.lookup.WOSOnlineDataLoader"
+		scope="prototype">
+		<property name="searchProvider" value="false" />
+		<!-- Uncomment the following line if you want to define the max results 
+			returned by the WOS free text (by author, title) search. Default value 
+			is 10 -->
+		<!-- <property name="maxResults" value="10" /> -->
+		<property name="fieldMap" ref="wosInputMap" />
+		<property name="configurationService" ref="org.dspace.services.ConfigurationService"/>
+	</bean>
+
+	<alias name="wosOnlineDataLoader"
+		alias="org.dspace.submit.lookup.WOSOnlineDataLoader" />
+
+	<bean name="wosInputMap" class="java.util.HashMap" scope="prototype">
+		<constructor-arg>
+			<map key-type="java.lang.String" value-type="java.lang.String">
+				<entry key="isiId" value="isiId" />
+				<entry key="doi" value="doi" />
+				<entry key="issn" value="jissn" />
+				<entry key="journalTitle" value="journal" />
+				<entry key="title" value="title" />
+				<entry key="year" value="issued" />
+				<entry key="volume" value="volume" />
+				<entry key="issue" value="issue" />
+				<entry key="startPage" value="firstpage" />
+				<entry key="endPage" value="lastpage" />
+				<entry key="authors" value="authors" />
+				<entry key="citationCount" value="wosCitation" />
+				<entry key="keywords" value="keywords" />
+				<entry key="language" value="language" />
+				<entry key="abstracts" value="abstract" />
+				<entry key="abstractita" value="abstractita" />
+				<entry key="abstracteng" value="abstracteng" />
+				<entry key="abstractfre" value="abstractfre" />
+				<entry key="abstractger" value="abstractger" />
+				<entry key="abstractesp" value="abstractesp" />
+				<entry key="publisherName" value="publisher" />
+				<entry key="publisherPlace" value="publisherPlace" />
+				<entry key="publisherCountry" value="publisherCountry" />
+				<entry key="itemType" value="subtype" />
+				<entry key="wosType" value="providerType" />
+			</map>
+		</constructor-arg>
+	</bean>
+
+	<!-- Grobid -->
+	
+	<bean id="grobidDataLoader" class="org.dspace.submit.extraction.GrobidFileDataLoader">
+		<property name="url" value="${metadata.extraction.grobid.url}"/>
+		<property name="fieldMap">
+			<map>
+				<entry key="analytictitle" value="title" />
+				<entry key="analyticname" value="authors" />
+				<entry key="monogrtitle" value="journal" />
+				<entry key="publicationstmtdatepublished" value="issued" />
+				<entry key="ISSN" value="jissn" />
+				<entry key="ISBN" value="pisbn" />
+				<entry key="DOI" value="doi" />
+				<entry key="profiledescabstractparagraph" value="abstract" />
+				<entry key="profiledesckeywordsterm" value="allkeywords" />
+			</map>
+		</property>
+	</bean>	
 
 	<!-- **************************************************************************************************** -->
 	<!-- Output Mapping 																					  -->

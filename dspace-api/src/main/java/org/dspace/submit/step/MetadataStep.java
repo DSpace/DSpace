@@ -5,6 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
+
 package org.dspace.submit.step;
 
 import java.io.IOException;
@@ -115,34 +116,36 @@ public class MetadataStep extends AbstractProcessingStep {
     protected void enrichItem(Context context, List<Record> rset, Item item) throws SQLException, AuthorizeException {
         for (Record record : rset) {
             for (String field : record.getFields()) {
-                try {
-                    String[] tfield = Utils.tokenize(field);
-                    List<MetadataValue> mdvs = itemService
-                        .getMetadata(item, tfield[0], tfield[1], tfield[2], Item.ANY);
-                    if (mdvs == null || mdvs.isEmpty()) {
-                        for (Value value : record.getValues(field)) {
+                if (record.getValues(field) != null) {
+                    try {
+                        String[] tfield = Utils.tokenize(field);
+                        List<MetadataValue> mdvs = itemService
+                            .getMetadata(item, tfield[0], tfield[1], tfield[2], Item.ANY);
+                        if (mdvs == null || mdvs.isEmpty()) {
+                            for (Value value : record.getValues(field)) {
 
-                            itemService.addMetadata(context, item, tfield[0], tfield[1], tfield[2], null,
-                                                    value.getAsString());
-                        }
-                    } else {
-                        external:
-                        for (Value value : record.getValues(field)) {
-                            boolean found = false;
-                            for (MetadataValue mdv : mdvs) {
-                                if (mdv.getValue().equals(value.getAsString())) {
-                                    found = true;
-                                    continue external;
-                                }
-                            }
-                            if (!found) {
                                 itemService.addMetadata(context, item, tfield[0], tfield[1], tfield[2], null,
                                                         value.getAsString());
                             }
+                        } else {
+                            external:
+                            for (Value value : record.getValues(field)) {
+                                boolean found = false;
+                                for (MetadataValue mdv : mdvs) {
+                                    if (mdv.getValue().equals(value.getAsString())) {
+                                        found = true;
+                                        continue external;
+                                    }
+                                }
+                                if (!found) {
+                                    itemService.addMetadata(context, item, tfield[0], tfield[1], tfield[2], null,
+                                                            value.getAsString());
+                                }
+                            }
                         }
+                    } catch (SQLException e) {
+                        log.error(e.getMessage(), e);
                     }
-                } catch (SQLException e) {
-                    log.error(e.getMessage(), e);
                 }
             }
         }
@@ -170,27 +173,29 @@ public class MetadataStep extends AbstractProcessingStep {
 
     public List<Record> convertFields(List<Record> recordSet, Map<String, String> fieldMap) {
         List<Record> result = new ArrayList<Record>();
-        for (Record publication : recordSet) {
-            for (String fieldName : fieldMap.keySet()) {
-                String md = null;
-                if (fieldMap != null) {
-                    md = fieldMap.get(fieldName);
+        if (recordSet != null) {
+            for (Record publication : recordSet) {
+                for (String fieldName : fieldMap.keySet()) {
+                    String md = null;
+                    if (fieldMap != null) {
+                        md = fieldMap.get(fieldName);
+                    }
+
+                    if (StringUtils.isBlank(md)) {
+                        continue;
+                    } else {
+                        md = md.trim();
+                    }
+
+                    if (publication.isMutable()) {
+                        List<Value> values = publication.getValues(md);
+                        publication.makeMutable().removeField(md);
+                        publication.makeMutable().addField(fieldName, values);
+                    }
                 }
 
-                if (StringUtils.isBlank(md)) {
-                    continue;
-                } else {
-                    md = md.trim();
-                }
-
-                if (publication.isMutable()) {
-                    List<Value> values = publication.getValues(md);
-                    publication.makeMutable().removeField(md);
-                    publication.makeMutable().addField(fieldName, values);
-                }
+                result.add(publication);
             }
-
-            result.add(publication);
         }
         return result;
     }

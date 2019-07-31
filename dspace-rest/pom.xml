@@ -4,8 +4,9 @@
     <artifactId>dspace-rest</artifactId>
     <packaging>war</packaging>
     <version>7.0-SNAPSHOT</version>
-    <name>DSpace REST :: API and Implementation</name>
-    <description>DSpace RESTful Web Services API</description>
+    <name>DSpace (Deprecated) REST Webapp</name>
+    <description>DSpace RESTful Web Services API. NOTE: this REST API is DEPRECATED.
+        Please consider using the REST API in the dspace-server-webapp instead!</description>
     <url>http://demo.dspace.org</url>
 
     <parent>

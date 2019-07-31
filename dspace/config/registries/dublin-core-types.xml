@@ -269,6 +269,27 @@
     <scope_note>Uniform Resource Identifier</scope_note>
   </dc-type>
 
+  <dc-type>
+	<schema>dc</schema>
+    <element>identifier</element>
+    <qualifier>doi</qualifier>
+    <scope_note>Digital object identifier</scope_note>
+  </dc-type>
+
+  <dc-type>
+	<schema>dc</schema>
+    <element>identifier</element>
+    <qualifier>scopus</qualifier>
+    <scope_note>Scopus Identifier</scope_note>
+  </dc-type>
+
+  <dc-type>
+	<schema>dc</schema>
+    <element>identifier</element>
+    <qualifier>isi</qualifier>
+    <scope_note>Web of Knowledge Identifier</scope_note>
+  </dc-type>
+
   <!-- Used by system: do not remove -->
   <dc-type>
 	<schema>dc</schema>
@@ -472,6 +493,34 @@
     <scope_note>References Uniform Resource Identifier for related item.</scope_note>
   </dc-type>
 
+  <dc-type>
+	<schema>dc</schema>
+    <element>relation</element>
+    <qualifier>dataset</qualifier>
+    <scope_note>References dataset for related item.</scope_note>
+  </dc-type>
+
+  <dc-type>
+	<schema>dc</schema>
+    <element>relation</element>
+    <qualifier>journal</qualifier>
+    <scope_note>References journal for related item.</scope_note>
+  </dc-type>
+
+  <dc-type>
+	<schema>dc</schema>
+    <element>relation</element>
+    <qualifier>orgunit</qualifier>
+    <scope_note>References orgunit for related item.</scope_note>
+  </dc-type>
+
+  <dc-type>
+	<schema>dc</schema>
+    <element>relation</element>
+    <qualifier>project</qualifier>
+    <scope_note>References project for related item.</scope_note>
+  </dc-type>
+  
   <dc-type>
 	<schema>dc</schema>
     <element>rights</element>

@@ -42,6 +42,10 @@ dspace.baseUrl = http://localhost:8080
 # Alternatively, you can use a url redirect or deploy the web application under the servlet container root.
 #dspace.url = ${dspace.baseUrl}
 
+# This is the URL that will be used for the REST endpoints to be served on.
+# This will typically be followed by /api to determine the root endpoints.
+dspace.restUrl = ${dspace.baseUrl}/spring-rest
+
 # Name of the site
 dspace.name = DSpace at My University
 
@@ -199,3 +203,23 @@ db.schema = public
 # Authentication by Password (encrypted in DSpace's database). See authentication-password.cfg for default configuration.
 # Enabled by default in authentication.cfg
 #plugin.sequence.org.dspace.authenticate.AuthenticationMethod = org.dspace.authenticate.PasswordAuthentication
+
+##########################
+# METADATA EXTRACTION #
+##########################
+# Grobid url.
+metadata.extraction.grobid.url =
+
+############################################
+# LOOKUP SUBMISSION PROVIDER CONFIGURATION #
+############################################
+#For Scopus service (note that by default the service is disabled see bte.xml) you need to obtain an API Key from Scopus. Once you get it, add it to the following configuration value
+submission.lookup.scopus.apikey =
+#use SciVal or Scopus service
+submission.lookup.scivalcontent.apikey =
+#For WOS (note that by default the service is disabled see bte.xml) require access to http://search.webofknowledge.com/esti/wokmws/ws/WokSearch
+submission.lookup.webofknowledge.ip.authentication = false
+# or
+submission.lookup.webofknowledge.user =
+submission.lookup.webofknowledge.password =
+

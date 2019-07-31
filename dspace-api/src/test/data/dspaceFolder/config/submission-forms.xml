@@ -185,7 +185,7 @@ it, please enter the types and the actual numbers or codes.</hint>
          <!-- An input-type of twobox MUST be marked as repeatable -->
          <repeatable>true</repeatable>
          <label>Subject Keywords</label>
-         <input-type>twobox</input-type>
+         <input-type>tag</input-type>
          <hint>Enter appropriate subject keywords or phrases. </hint>
          <required></required>
          <vocabulary>srsc</vocabulary>
@@ -247,6 +247,18 @@ it, please enter the types and the actual numbers or codes.</hint>
 
  <form-value-pairs>
    <value-pairs value-pairs-name="common_identifiers" dc-term="identifier">
+     <pair>
+       <displayed-value>DOI</displayed-value>
+       <stored-value>doi</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>Scopus ID</displayed-value>
+       <stored-value>scopus</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>WOS ID</displayed-value>
+       <stored-value>isi</stored-value>
+     </pair>
      <pair>
        <displayed-value>ISSN</displayed-value>
        <stored-value>issn</stored-value>

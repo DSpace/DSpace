@@ -5,6 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
+
 package org.dspace.content.authority;
 
 import java.sql.SQLException;
@@ -14,7 +15,6 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.solr.client.solrj.util.ClientUtils;
 import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.authority.factory.ItemAuthorityServiceFactory;
@@ -36,6 +36,7 @@ import org.dspace.utils.DSpace;
  * the corresponding dataset or viceversa)
  *
  * @author Andrea Bollini
+ * @author Giusdeppe Digilio
  * @version $Revision $
  */
 public class ItemAuthority implements ChoiceAuthority {
@@ -47,7 +48,7 @@ public class ItemAuthority implements ChoiceAuthority {
 
     private SearchService searchService = dspace.getServiceManager().getServiceByName(
         "org.dspace.discovery.SearchService", SearchService.class);
-    
+
     private ItemAuthorityServiceFactory itemAuthorityServiceFactory = dspace.getServiceManager().getServiceByName(
             "itemAuthorityServiceFactory", ItemAuthorityServiceFactory.class);
 
@@ -73,11 +74,11 @@ public class ItemAuthority implements ChoiceAuthority {
 
         DiscoverQuery discoverQuery = new DiscoverQuery();
         discoverQuery.setDSpaceObjectFilter(org.dspace.core.Constants.ITEM);
-        
-    	String relationshipType = ConfigurationManager.getProperty("cris", "ItemAuthority."
+
+        String relationshipType = ConfigurationManager.getProperty("cris", "ItemAuthority."
                 + field + ".relationshipType");
         if (StringUtils.isNotBlank(relationshipType)) {
-        	 String filter = "relationship.type:" + relationshipType;
+            String filter = "relationship.type:" + relationshipType;
             discoverQuery.addFilterQueries(filter);
         }
 
@@ -96,7 +97,7 @@ public class ItemAuthority implements ChoiceAuthority {
             // Process results of query
             Iterator<IndexableObject> dsoIterator = resultSearch.getIndexableObjects().iterator();
             while (dsoIterator.hasNext()) {
-            	DSpaceObject dso = (DSpaceObject) dsoIterator.next();
+                DSpaceObject dso = (DSpaceObject) dsoIterator.next();
                 choiceList.add(new Choice(dso.getID().toString(), dso.getName(), dso.getName()));
             }
 
@@ -107,7 +108,7 @@ public class ItemAuthority implements ChoiceAuthority {
 
         } catch (SearchServiceException e) {
             log.error(e.getMessage(), e);
-            return new Choices(true);
+            return new Choices(Choices.CF_UNSET);
         }
     }
 
