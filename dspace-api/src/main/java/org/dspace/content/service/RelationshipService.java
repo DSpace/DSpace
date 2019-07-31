@@ -134,11 +134,31 @@ public interface RelationshipService extends DSpaceCRUDService<Relationship> {
      * @param relationshipType  The RelationshipType object for the relationship
      * @param leftPlace         The leftPlace integer for the relationship
      * @param rightPlace        The rightPlace integer for the relationship
+     * @param leftWardLabel     The leftWardLabel integer for the relationship
+     * @param rightWardLabel    The rightWardLabel integer for the relationship
+     * @return                  The created Relationship object with the given properties
+     * @throws AuthorizeException   If something goes wrong
+     * @throws SQLException         If something goes wrong
+     */
+    Relationship create(Context c, Item leftItem, Item rightItem, RelationshipType relationshipType,
+                        int leftPlace, int rightPlace, String leftWardLabel, String rightWardLabel)
+        throws AuthorizeException, SQLException;
+
+
+    /**
+     * This method is used to construct a Relationship object with all it's variables,
+     * except the leftward and rightward labels
+     * @param c                 The relevant DSpace context
+     * @param leftItem          The leftItem Item object for the relationship
+     * @param rightItem         The rightItem Item object for the relationship
+     * @param relationshipType  The RelationshipType object for the relationship
+     * @param leftPlace         The leftPlace integer for the relationship
+     * @param rightPlace        The rightPlace integer for the relationship
      * @return                  The created Relationship object with the given properties
      * @throws AuthorizeException   If something goes wrong
      * @throws SQLException         If something goes wrong
      */
     Relationship create(Context c, Item leftItem, Item rightItem, RelationshipType relationshipType,
                         int leftPlace, int rightPlace)
-        throws AuthorizeException, SQLException;
+            throws AuthorizeException, SQLException;
 }
