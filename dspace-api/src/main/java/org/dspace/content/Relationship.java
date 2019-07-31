@@ -78,6 +78,18 @@ public class Relationship implements ReloadableEntity<Integer> {
     private int rightPlace;
 
     /**
+     * A String containing an alternative label (name variant) for the left side
+     */
+    @Column(name = "left_ward_label")
+    private String leftWardLabel;
+
+    /**
+     * A String containing an alternative label (name variant) for the right side
+     */
+    @Column(name = "right_ward_label")
+    private String rightWardLabel;
+
+    /**
      * Protected constructor, create object using:
      * {@link org.dspace.content.service.RelationshipService#create(Context)} }
      */
@@ -168,6 +180,38 @@ public class Relationship implements ReloadableEntity<Integer> {
      */
     public void setRightPlace(int rightPlace) {
         this.rightPlace = rightPlace;
+    }
+
+    /**
+     * Standard getter for the leftWardLabel String in this Relationship
+     * @return  the leftWardlabel String for this relationship
+     */
+    public String getLeftWardLabel() {
+        return leftWardLabel;
+    }
+
+    /**
+     * Standard setter for the leftWardlabel String in this Relationship
+     * @param leftWardLabel    the leftWardLabel String that will be used in this relationship
+     */
+    public void setLeftWardLabel(String leftWardLabel) {
+        this.leftWardLabel = leftWardLabel;
+    }
+
+    /**
+     * Standard getter for the rightWardlabel Integer in this Relationship
+     * @return  the rightWardLabel string for this relationship
+     */
+    public String getRightWardLabel() {
+        return rightWardLabel;
+    }
+
+    /**
+     * Standard setter for the rightWardLabel String in this Relationship
+     * @param rightWardLabel    the rightWardLabel String that will be used in this relationship
+     */
+    public void setRightWardLabel(String rightWardLabel) {
+        this.rightWardLabel = rightWardLabel;
     }
 
     /**

@@ -30,6 +30,8 @@ public class RelationshipRest extends BaseObjectRest<Integer> {
     private RelationshipTypeRest relationshipType;
     private int leftPlace;
     private int rightPlace;
+    private String leftWardLabel;
+    private String rightWardLabel;
 
     public String getType() {
         return NAME;
@@ -91,5 +93,21 @@ public class RelationshipRest extends BaseObjectRest<Integer> {
 
     public void setRelationshipTypeId(int relationshipTypeId) {
         this.relationshipTypeId = relationshipTypeId;
+    }
+
+    public String getRightWardLabel() {
+        return rightWardLabel;
+    }
+
+    public void setRightWardLabel(String rightWardLabel) {
+        this.rightWardLabel = rightWardLabel;
+    }
+
+    public String getLeftWardLabel() {
+        return leftWardLabel;
+    }
+
+    public void setLeftWardLabel(String leftWardLabel) {
+        this.leftWardLabel = leftWardLabel;
     }
 }
