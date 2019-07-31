@@ -57,6 +57,11 @@
 			<processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
 			<type>submission-form</type>
 		</step>
+		<step id="traditionalpagetwo" mandatory="true">
+			<heading>submit.progressbar.describe.steptwo</heading>
+			<processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+			<type>submission-form</type>
+		</step>
 
 		<step id="peopleStep" mandatory="true">
 			<heading>submit.progressbar.describe.stepone</heading>
@@ -78,21 +83,17 @@
 			<processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
 			<type>submission-form</type>
 		</step>
-		<step id="journalVolumesStep" mandatory="true">
+		<step id="journalVolumeStep" mandatory="true">
 			<heading>submit.progressbar.describe.stepone</heading>
 			<processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
 			<type>submission-form</type>
 		</step>
-		<step id="journalIssuesStep" mandatory="true">
+		<step id="journalIssueStep" mandatory="true">
 			<heading>submit.progressbar.describe.stepone</heading>
 			<processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
 			<type>submission-form</type>
 		</step>
-		<step id="traditionalpagetwo" mandatory="true">
-			<heading>submit.progressbar.describe.steptwo</heading>
-			<processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
-			<type>submission-form</type>
-		</step>
+
 		<step id="upload">
 			<heading>submit.progressbar.upload</heading>
 			<processing-class>org.dspace.app.rest.submit.step.UploadStep</processing-class>
@@ -182,24 +183,42 @@
 		</submission-process>
 
 		<submission-process name="People">
+			<step id="collection" />
 			<step id="peopleStep"/>
+			<step id="upload" />
+			<step id="license" />
 		</submission-process>
 
 		<submission-process name="Project">
+			<step id="collection" />
 			<step id="projectStep"/>
+			<step id="upload" />
+			<step id="license" />
 		</submission-process>
 
 		<submission-process name="OrgUnit">
+			<step id="collection" />
 			<step id="orgUnitStep"/>
+			<step id="upload" />
+			<step id="license" />
 		</submission-process>
 		<submission-process name="Journals">
+			<step id="collection" />
 			<step id="journalStep"/>
+			<step id="upload" />
+			<step id="license" />
 		</submission-process>
 		<submission-process name="JournalVolumes">
-			<step id="journalVolumesStep"/>
+			<step id="collection" />
+			<step id="journalVolumeStep"/>
+			<step id="upload" />
+			<step id="license" />
 		</submission-process>
 		<submission-process name="JournalIssues">
-			<step id="journalIssuesStep"/>
+			<step id="collection" />
+			<step id="journalIssueStep"/>
+			<step id="upload" />
+			<step id="license" />
 		</submission-process>
 	</submission-definitions>
 
