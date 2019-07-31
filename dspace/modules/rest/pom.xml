@@ -3,10 +3,11 @@
     <groupId>org.dspace.modules</groupId>
     <artifactId>rest</artifactId>
     <packaging>war</packaging>
-    <name>DSpace REST :: Local Customizations</name>
+    <name>DSpace (Deprecated) REST Webapp :: Local Customizations</name>
     <description>
         This project allows you to overlay your own local REST customizations
-        on top of the default REST API provided with DSpace.
+        on top of the deprecated REST API provided with DSpace. NOTE: This REST API is DEPRECATED. Please consider
+        using the REST API in dspace-server-webapp instead.
     </description>
 
     <parent>

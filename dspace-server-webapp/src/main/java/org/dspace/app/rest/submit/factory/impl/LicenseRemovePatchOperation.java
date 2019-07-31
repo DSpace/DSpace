@@ -20,7 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * To remove a previous granted license:
  *
  * Example: <code>
- * curl -X PATCH http://${dspace.url}/dspace-spring-rest/api/submission/workspaceitems/31599 -H "Content-Type:
+ * curl -X PATCH http://${dspace.server.url}/api/submission/workspaceitems/31599 -H "Content-Type:
  * application/json" -d '[{ "op": "remove", "path": "/sections/license/granted"}]'
  * </code>
  *

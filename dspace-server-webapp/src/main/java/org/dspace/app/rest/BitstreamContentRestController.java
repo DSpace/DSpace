@@ -44,7 +44,7 @@ import org.springframework.web.bind.annotation.RestController;
  * The mapping for requested endpoint try to resolve a valid UUID, for example
  * <pre>
  * {@code
- * https://<dspace.url>/dspace-spring-rest/api/core/bitstreams/26453b4d-e513-44e8-8d5b-395f62972eff/content
+ * https://<dspace.server.url>/api/core/bitstreams/26453b4d-e513-44e8-8d5b-395f62972eff/content
  * }
  * </pre>
  *
