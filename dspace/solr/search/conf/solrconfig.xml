@@ -1793,6 +1793,7 @@
          <str name="fieldRegex">.*</str>
          <lst name="exclude">
            <str name="fieldRegex">.*_private</str>
+           <str name="fieldRegex">cris-.*</str>
          </lst>
        </lst>
        <str name="dest">search_text</str>
