@@ -7,7 +7,9 @@
  */
 package org.dspace.app.rest;
 
+import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.List;
@@ -96,10 +98,13 @@ public class AuthorityEntryLinkRepositoryIT extends AbstractControllerIntegratio
         String grobid = configService.getProperty("metadata.extraction.grobid.url");
 
         getClient(token).perform(get("/api/integration/authorities/AuthorAuthority/entries")
+                .param("query", "Author1")
                 .param("metadata", "dc.contributor.author")
                 .param("uuid", col1.getID().toString())
                 .param("size", "10"))
             //We expect a 200 OK status
-            .andExpect(status().isOk());
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.page.size", is(10)))
+            .andExpect(jsonPath("$.page.totalElements", is(1)));
     }
 }
