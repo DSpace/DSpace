@@ -233,7 +233,7 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
     }
 
     /**
-     * Method to implement to support scroll of entity instances from the collection resource endpoin
+     * Method to implement to support scroll of entity instances from the collection resource endpoint
      *
      * @param context
      *            the dspace context
