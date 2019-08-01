@@ -191,7 +191,7 @@ public class Relationship implements ReloadableEntity<Integer> {
     }
 
     /**
-     * Standard setter for the leftWardlabel String in this Relationship
+     * Standard setter for the leftwardlabel String in this Relationship
      * @param leftwardLabel    the leftwardLabel String that will be used in this relationship
      */
     public void setLeftwardLabel(String leftwardLabel) {
@@ -199,7 +199,7 @@ public class Relationship implements ReloadableEntity<Integer> {
     }
 
     /**
-     * Standard getter for the rightWardlabel Integer in this Relationship
+     * Standard getter for the rightwardlabel String in this Relationship
      * @return  the rightwardLabel string for this relationship
      */
     public String getRightwardLabel() {

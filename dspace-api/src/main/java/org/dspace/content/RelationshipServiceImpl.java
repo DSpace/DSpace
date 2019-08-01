@@ -56,6 +56,7 @@ public class RelationshipServiceImpl implements RelationshipService {
         return relationshipDAO.create(context, new Relationship());
     }
 
+    @Override
     public Relationship create(Context c, Item leftItem, Item rightItem, RelationshipType relationshipType,
                                int leftPlace, int rightPlace) throws AuthorizeException, SQLException {
         return create(c, leftItem, rightItem, relationshipType, leftPlace, rightPlace, null, null);
