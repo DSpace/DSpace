@@ -24,7 +24,7 @@ public class PersonItemAuthorityService implements ItemAuthorityService {
         String firstName = ClientUtils.escapeQueryChars(tmpPersonName.getFirstNames().trim());
 
         if (StringUtils.isBlank(firstName)) {
-            String luceneQuery = lastName;
+            String luceneQuery = lastName + "*";
             luceneQuery = luceneQuery.replaceAll("\\\\ ", " ");
 
             solrQuery = "{!lucene q.op=AND df=itemauthoritylookup}(" + luceneQuery + ") OR (\""
