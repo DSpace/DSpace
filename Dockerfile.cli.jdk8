@@ -51,5 +51,3 @@ ENV DSPACE_INSTALL=/dspace
 COPY --from=ant_build /dspace $DSPACE_INSTALL
 
 ENV JAVA_OPTS=-Xmx1000m
-
-CMD tail -f /dev/null
