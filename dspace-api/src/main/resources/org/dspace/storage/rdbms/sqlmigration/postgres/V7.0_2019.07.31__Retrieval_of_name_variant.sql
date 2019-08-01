@@ -7,7 +7,7 @@
 --
 
 -------------------------------------------------------------------------
--- Create columns leftWardLabel and RightWardLabel in table relationship
+-- Create columns leftwardLabel and rightwardLabel in table relationship
 -------------------------------------------------------------------------
 
 ALTER TABLE relationship ADD left_ward_label VARCHAR;

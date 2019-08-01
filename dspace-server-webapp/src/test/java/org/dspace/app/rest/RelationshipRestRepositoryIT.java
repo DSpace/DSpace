@@ -12,6 +12,7 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -25,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.JsonObject;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
@@ -389,6 +391,430 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                                               .andExpect(status().isForbidden())
                                               .andReturn();
 
+    }
+
+    @Test
+    public void createRelationShipWithLeftwardLabel() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+            .withName("Parent Community")
+            .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+            .withName("Sub Community")
+            .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
+        Collection col3 = CollectionBuilder.createCollection(context, child1).withName("OrgUnits").build();
+
+        Item author1 = ItemBuilder.createItem(context, col1)
+            .withTitle("Author1")
+            .withIssueDate("2017-10-17")
+            .withAuthor("Smith, Donald")
+            .withRelationshipType("Person")
+            .build();
+
+        Item publication = ItemBuilder.createItem(context, col3)
+            .withTitle("Publication1")
+            .withAuthor("Testy, TEst")
+            .withIssueDate("2015-01-01")
+            .withRelationshipType("Publication")
+            .build();
+
+        RelationshipType isAuthorOfPublicationRelationshipType = relationshipTypeService
+            .findbyTypesAndLabels(context, entityTypeService.findByEntityType(context, "Publication"),
+                entityTypeService.findByEntityType(context, "Person"),
+                "isAuthorOfPublication", "isPublicationOfAuthor");
+
+        EPerson user = EPersonBuilder.createEPerson(context)
+            .withNameInMetadata("first", "last")
+            .withEmail("testaze@gmail.com")
+            .withPassword(password)
+            .withLanguage(I18nUtil.getDefaultLocale().getLanguage())
+            .build();
+
+        authorizeService.addPolicy(context, publication, Constants.WRITE, user);
+        authorizeService.addPolicy(context, author1, Constants.WRITE, user);
+
+        context.setCurrentUser(user);
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(user.getEmail(), password);
+        String leftwardLabel = "Name variant test left";
+
+        MvcResult mvcResult = getClient(token).perform(post("/api/core/relationships")
+            .param("relationshipType",
+                isAuthorOfPublicationRelationshipType.getID().toString())
+            .param("leftwardLabel", leftwardLabel)
+            .contentType(MediaType.parseMediaType
+                (org.springframework.data.rest.webmvc.RestMediaTypes
+                    .TEXT_URI_LIST_VALUE))
+            .content(
+                "https://localhost:8080/server/api/core/items/" + publication.getID() + "\n" +
+                    "https://localhost:8080/server/api/core/items/" + author1.getID()))
+            .andExpect(status().isCreated())
+            .andReturn();
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        Map<String, Object> map = mapper.readValue(content, Map.class);
+        Integer relationshipId = (Integer) map.get("id");
+
+        getClient().perform(get("/api/core/relationships/" + relationshipId))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.id", is(relationshipId)))
+            .andExpect(jsonPath("$.leftwardLabel", containsString(leftwardLabel)))
+            .andExpect(jsonPath("$.rightwardLabel", is(nullValue())));
+    }
+
+    @Test
+    public void createRelationShipWithRightWardLabel() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+            .withName("Parent Community")
+            .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+            .withName("Sub Community")
+            .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
+        Collection col3 = CollectionBuilder.createCollection(context, child1).withName("OrgUnits").build();
+
+        Item author1 = ItemBuilder.createItem(context, col1)
+            .withTitle("Author1")
+            .withIssueDate("2017-10-17")
+            .withAuthor("Smith, Donald")
+            .withRelationshipType("Person")
+            .build();
+
+        Item publication = ItemBuilder.createItem(context, col3)
+            .withTitle("Publication1")
+            .withAuthor("Testy, TEst")
+            .withIssueDate("2015-01-01")
+            .withRelationshipType("Publication")
+            .build();
+
+        RelationshipType isAuthorOfPublicationRelationshipType = relationshipTypeService
+            .findbyTypesAndLabels(context, entityTypeService.findByEntityType(context, "Publication"),
+                entityTypeService.findByEntityType(context, "Person"),
+                "isAuthorOfPublication", "isPublicationOfAuthor");
+
+        EPerson user = EPersonBuilder.createEPerson(context)
+            .withNameInMetadata("first", "last")
+            .withEmail("testaze@gmail.com")
+            .withPassword(password)
+            .withLanguage(I18nUtil.getDefaultLocale().getLanguage())
+            .build();
+
+        authorizeService.addPolicy(context, publication, Constants.WRITE, user);
+        authorizeService.addPolicy(context, author1, Constants.WRITE, user);
+
+        context.setCurrentUser(user);
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(user.getEmail(), password);
+        String rightwardLabel = "Name variant test right";
+
+        MvcResult mvcResult = getClient(token).perform(post("/api/core/relationships")
+            .param("relationshipType",
+                isAuthorOfPublicationRelationshipType.getID().toString())
+            .param("rightwardLabel", rightwardLabel)
+            .contentType(MediaType.parseMediaType
+                (org.springframework.data.rest.webmvc.RestMediaTypes
+                    .TEXT_URI_LIST_VALUE))
+            .content(
+                "https://localhost:8080/server/api/core/items/" + publication.getID() + "\n" +
+                    "https://localhost:8080/server/api/core/items/" + author1.getID()))
+            .andExpect(status().isCreated())
+            .andReturn();
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        Map<String, Object> map = mapper.readValue(content, Map.class);
+        Integer relationshipId = (Integer) map.get("id");
+
+        getClient().perform(get("/api/core/relationships/" + relationshipId))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.id", is(relationshipId)))
+            .andExpect(jsonPath("$.leftwardLabel", is(nullValue())))
+            .andExpect(jsonPath("$.rightwardLabel", containsString(rightwardLabel)));
+    }
+
+    @Test
+    public void createRelationShipWithRightWardlabelAndLeftWardLabel() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+            .withName("Parent Community")
+            .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+            .withName("Sub Community")
+            .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
+        Collection col3 = CollectionBuilder.createCollection(context, child1).withName("OrgUnits").build();
+
+        Item author1 = ItemBuilder.createItem(context, col1)
+            .withTitle("Author1")
+            .withIssueDate("2017-10-17")
+            .withAuthor("Smith, Donald")
+            .withRelationshipType("Person")
+            .build();
+
+        Item publication = ItemBuilder.createItem(context, col3)
+            .withTitle("Publication1")
+            .withAuthor("Testy, TEst")
+            .withIssueDate("2015-01-01")
+            .withRelationshipType("Publication")
+            .build();
+
+        RelationshipType isAuthorOfPublicationRelationshipType = relationshipTypeService
+            .findbyTypesAndLabels(context, entityTypeService.findByEntityType(context, "Publication"),
+                entityTypeService.findByEntityType(context, "Person"),
+                "isAuthorOfPublication", "isPublicationOfAuthor");
+
+        EPerson user = EPersonBuilder.createEPerson(context)
+            .withNameInMetadata("first", "last")
+            .withEmail("testaze@gmail.com")
+            .withPassword(password)
+            .withLanguage(I18nUtil.getDefaultLocale().getLanguage())
+            .build();
+
+        authorizeService.addPolicy(context, publication, Constants.WRITE, user);
+        authorizeService.addPolicy(context, author1, Constants.WRITE, user);
+
+        context.setCurrentUser(user);
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(user.getEmail(), password);
+        String leftwardLabel = "Name variant test left";
+        String rightwardLabel = "Name variant test right";
+
+        MvcResult mvcResult = getClient(token).perform(post("/api/core/relationships")
+            .param("relationshipType",
+                isAuthorOfPublicationRelationshipType.getID().toString())
+            .param("leftwardLabel", leftwardLabel)
+            .param("rightwardLabel", rightwardLabel)
+            .contentType(MediaType.parseMediaType
+                (org.springframework.data.rest.webmvc.RestMediaTypes
+                    .TEXT_URI_LIST_VALUE))
+            .content(
+                "https://localhost:8080/server/api/core/items/" + publication.getID() + "\n" +
+                    "https://localhost:8080/server/api/core/items/" + author1.getID()))
+            .andExpect(status().isCreated())
+            .andReturn();
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        Map<String, Object> map = mapper.readValue(content, Map.class);
+        Integer relationshipId = (Integer) map.get("id");
+
+        getClient().perform(get("/api/core/relationships/" + relationshipId))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.id", is(relationshipId)))
+            .andExpect(jsonPath("$.leftwardLabel", containsString(leftwardLabel)))
+            .andExpect(jsonPath("$.rightwardLabel", containsString(rightwardLabel)));
+    }
+
+    @Test
+    public void createRelationShipAndAddLeftWardLabelAfterwards() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+            .withName("Parent Community")
+            .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+            .withName("Sub Community")
+            .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
+        Collection col3 = CollectionBuilder.createCollection(context, child1).withName("OrgUnits").build();
+
+        Item author1 = ItemBuilder.createItem(context, col1)
+            .withTitle("Author1")
+            .withIssueDate("2017-10-17")
+            .withAuthor("Smith, Donald")
+            .withRelationshipType("Person")
+            .build();
+
+        Item publication = ItemBuilder.createItem(context, col3)
+            .withTitle("Publication1")
+            .withAuthor("Testy, TEst")
+            .withIssueDate("2015-01-01")
+            .withRelationshipType("Publication")
+            .build();
+
+        RelationshipType isAuthorOfPublicationRelationshipType = relationshipTypeService
+            .findbyTypesAndLabels(context, entityTypeService.findByEntityType(context, "Publication"),
+                entityTypeService.findByEntityType(context, "Person"),
+                "isAuthorOfPublication", "isPublicationOfAuthor");
+
+        EPerson user = EPersonBuilder.createEPerson(context)
+            .withNameInMetadata("first", "last")
+            .withEmail("testaze@gmail.com")
+            .withPassword(password)
+            .withLanguage(I18nUtil.getDefaultLocale().getLanguage())
+            .build();
+
+        authorizeService.addPolicy(context, publication, Constants.WRITE, user);
+        authorizeService.addPolicy(context, author1, Constants.WRITE, user);
+
+        context.setCurrentUser(user);
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(user.getEmail(), password);
+        String leftwardLabel = "Name variant test label";
+
+        MvcResult mvcResult = getClient(token).perform(post("/api/core/relationships")
+            .param("relationshipType",
+                isAuthorOfPublicationRelationshipType.getID().toString())
+            .contentType(MediaType.parseMediaType
+                (org.springframework.data.rest.webmvc.RestMediaTypes
+                    .TEXT_URI_LIST_VALUE))
+            .content(
+                "https://localhost:8080/server/api/core/items/" + publication.getID() + "\n" +
+                    "https://localhost:8080/server/api/core/items/" + author1.getID()))
+            .andExpect(status().isCreated())
+            .andReturn();
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        Map<String, Object> map = mapper.readValue(content, Map.class);
+        Integer relationshipId = (Integer) map.get("id");
+
+        // Verify labels are not present
+        getClient().perform(get("/api/core/relationships/" + relationshipId))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.id", is(relationshipId)))
+            .andExpect(jsonPath("$.leftwardLabel", is(nullValue())))
+            .andExpect(jsonPath("$.rightwardLabel", is(nullValue())));
+
+        JsonObject contentObj = new JsonObject();
+        contentObj.addProperty("leftwardLabel", leftwardLabel);
+
+        // Add leftwardlabel
+        getClient(token).perform(put("/api/core/relationships/" + relationshipId)
+                                .contentType("application/json")
+                                .content(contentObj.toString()))
+            .andExpect(status().isOk());
+
+        // Verify leftwardlabel is present and rightwardlabel not
+        getClient().perform(get("/api/core/relationships/" + relationshipId))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.id", is(relationshipId)))
+            .andExpect(jsonPath("$.leftwardLabel", containsString(leftwardLabel)))
+            .andExpect(jsonPath("$.rightwardLabel", is(nullValue())));
+    }
+
+    @Test
+    public void createRelationShipThenAddLabelsAndRemoveThem() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+            .withName("Parent Community")
+            .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+            .withName("Sub Community")
+            .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
+        Collection col3 = CollectionBuilder.createCollection(context, child1).withName("OrgUnits").build();
+
+        Item author1 = ItemBuilder.createItem(context, col1)
+            .withTitle("Author1")
+            .withIssueDate("2017-10-17")
+            .withAuthor("Smith, Donald")
+            .withRelationshipType("Person")
+            .build();
+
+        Item publication = ItemBuilder.createItem(context, col3)
+            .withTitle("Publication1")
+            .withAuthor("Testy, TEst")
+            .withIssueDate("2015-01-01")
+            .withRelationshipType("Publication")
+            .build();
+
+        RelationshipType isAuthorOfPublicationRelationshipType = relationshipTypeService
+            .findbyTypesAndLabels(context, entityTypeService.findByEntityType(context, "Publication"),
+                entityTypeService.findByEntityType(context, "Person"),
+                "isAuthorOfPublication", "isPublicationOfAuthor");
+
+        EPerson user = EPersonBuilder.createEPerson(context)
+            .withNameInMetadata("first", "last")
+            .withEmail("testaze@gmail.com")
+            .withPassword(password)
+            .withLanguage(I18nUtil.getDefaultLocale().getLanguage())
+            .build();
+
+        authorizeService.addPolicy(context, publication, Constants.WRITE, user);
+        authorizeService.addPolicy(context, author1, Constants.WRITE, user);
+
+        context.setCurrentUser(user);
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(user.getEmail(), password);
+        String leftwardLabel = "Name variant test left";
+        String rightwardLabel = "Name variant test right";
+
+        MvcResult mvcResult = getClient(token).perform(post("/api/core/relationships")
+            .param("relationshipType",
+                isAuthorOfPublicationRelationshipType.getID().toString())
+            .contentType(MediaType.parseMediaType
+                (org.springframework.data.rest.webmvc.RestMediaTypes
+                    .TEXT_URI_LIST_VALUE))
+            .content(
+                "https://localhost:8080/server/api/core/items/" + publication.getID() + "\n" +
+                    "https://localhost:8080/server/api/core/items/" + author1.getID()))
+            .andExpect(status().isCreated())
+            .andReturn();
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        Map<String, Object> map = mapper.readValue(content, Map.class);
+        Integer relationshipId = (Integer) map.get("id");
+
+        // Verify labels are not present
+        getClient().perform(get("/api/core/relationships/" + relationshipId))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.id", is(relationshipId)))
+            .andExpect(jsonPath("$.leftwardLabel", is(nullValue())))
+            .andExpect(jsonPath("$.rightwardLabel", is(nullValue())));
+
+        JsonObject contentObj = new JsonObject();
+        contentObj.addProperty("leftwardLabel", leftwardLabel);
+        contentObj.addProperty("rightwardLabel", rightwardLabel);
+
+        // Add leftwardlabel and rightwardlabel
+        getClient(token).perform(put("/api/core/relationships/" + relationshipId)
+            .contentType("application/json")
+            .content(contentObj.toString()))
+            .andExpect(status().isOk());
+
+        // Verify leftwardlabel and rightwardlabel are present
+        getClient().perform(get("/api/core/relationships/" + relationshipId))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.id", is(relationshipId)))
+            .andExpect(jsonPath("$.leftwardLabel", containsString(leftwardLabel)))
+            .andExpect(jsonPath("$.rightwardLabel", containsString(rightwardLabel)));
+
+        // Remove leftwardlabel and rightwardlabel
+        getClient(token).perform(put("/api/core/relationships/" + relationshipId)
+            .contentType("application/json")
+            .content("{}"))
+            .andExpect(status().isOk());
+
+        // Verify leftwardlabel and rightwardlabel are both gone
+        getClient().perform(get("/api/core/relationships/" + relationshipId))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.id", is(relationshipId)))
+            .andExpect(jsonPath("$.leftwardLabel", is(nullValue())))
+            .andExpect(jsonPath("$.rightwardLabel", is(nullValue())));
     }
 
     /**

@@ -71,8 +71,8 @@ public class RelationshipServiceImpl implements RelationshipService {
         relationship.setRelationshipType(relationshipType);
         relationship.setLeftPlace(leftPlace);
         relationship.setRightPlace(rightPlace);
-        relationship.setLeftWardLabel(leftWardLabel);
-        relationship.setRightWardLabel(rightWardLabel);
+        relationship.setLeftwardLabel(leftWardLabel);
+        relationship.setRightwardLabel(rightWardLabel);
         return create(c, relationship);
     }
 
