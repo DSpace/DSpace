@@ -184,7 +184,7 @@ public class Relationship implements ReloadableEntity<Integer> {
 
     /**
      * Standard getter for the leftwardLabel String in this Relationship
-     * @return  the leftWardlabel String for this relationship
+     * @return  the leftwardlabel String for this relationship
      */
     public String getLeftwardLabel() {
         return leftwardLabel;

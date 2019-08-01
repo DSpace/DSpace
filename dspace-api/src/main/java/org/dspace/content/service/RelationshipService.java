@@ -134,14 +134,14 @@ public interface RelationshipService extends DSpaceCRUDService<Relationship> {
      * @param relationshipType  The RelationshipType object for the relationship
      * @param leftPlace         The leftPlace integer for the relationship
      * @param rightPlace        The rightPlace integer for the relationship
-     * @param leftWardLabel     The leftWardLabel integer for the relationship
-     * @param rightWardLabel    The rightWardLabel integer for the relationship
+     * @param leftwardLabel     The leftwardLabel integer for the relationship
+     * @param rightwardLabel    The rightwardLabel integer for the relationship
      * @return                  The created Relationship object with the given properties
      * @throws AuthorizeException   If something goes wrong
      * @throws SQLException         If something goes wrong
      */
     Relationship create(Context c, Item leftItem, Item rightItem, RelationshipType relationshipType,
-                        int leftPlace, int rightPlace, String leftWardLabel, String rightWardLabel)
+                        int leftPlace, int rightPlace, String leftwardLabel, String rightwardLabel)
         throws AuthorizeException, SQLException;
 
 

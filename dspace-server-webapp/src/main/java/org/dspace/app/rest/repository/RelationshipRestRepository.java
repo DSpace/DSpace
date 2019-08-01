@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest.repository;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
@@ -14,6 +15,7 @@ import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.log4j.Logger;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
@@ -110,14 +112,14 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
             RelationshipType relationshipType = relationshipTypeService
                 .find(context, Integer.parseInt(req.getParameter("relationshipType")));
 
-            String leftWardLabel = req.getParameter("leftwardLabel");
-            String rightWardLabel = req.getParameter("rightwardLabel");
+            String leftwardLabel = req.getParameter("leftwardLabel");
+            String rightwardLabel = req.getParameter("rightwardLabel");
 
             EPerson ePerson = context.getCurrentUser();
             if (authorizeService.authorizeActionBoolean(context, leftItem, Constants.WRITE) ||
                 authorizeService.authorizeActionBoolean(context, rightItem, Constants.WRITE)) {
                 Relationship relationship = relationshipService.create(context, leftItem, rightItem,
-                    relationshipType, 0, 0, leftWardLabel, rightWardLabel);
+                    relationshipType, 0, 0, leftwardLabel, rightwardLabel);
                 // The above if check deals with the case that a Relationship can be created if the user has write
                 // rights on one of the two items. The following updateItem calls can however call the
                 // ItemService.update() functions which would fail if the user doesn't have permission on both items.
@@ -231,39 +233,26 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
             throw new ResourceNotFoundException("Relationship" + " with id: " + id + " not found");
         }
 
-        Integer leftPlace = null;
-        Integer rightPlace = null;
-        String leftwardLabel = null;
-        String rightwardLabel = null;
-
-        if (jsonNode.hasNonNull("leftwardLabel")) {
-            leftwardLabel = jsonNode.get("leftwardLabel").asText();
-        }
-
-        if (jsonNode.hasNonNull("rightwardLabel")) {
-            rightwardLabel = jsonNode.get("rightwardLabel").asText();
-        }
-
-        if (jsonNode.hasNonNull("leftPlace")) {
-            leftPlace = jsonNode.get("leftPlace").asInt();
-        }
-
-        if (jsonNode.hasNonNull("rightPlace")) {
-            rightPlace = jsonNode.get("rightPlace").asInt();
-        }
-
         try {
 
-            if (leftPlace != null) {
-                relationship.setLeftPlace(leftPlace);
+            RelationshipRest relationshipRest;
+
+            try {
+                relationshipRest = new ObjectMapper().readValue(jsonNode.toString(), RelationshipRest.class);
+            } catch (IOException e) {
+                throw new UnprocessableEntityException("Error parsing request body: " + e.toString());
             }
 
-            if (rightPlace != null) {
-                relationship.setRightPlace(rightPlace);
+            relationship.setLeftwardLabel(relationshipRest.getLeftwardLabel());
+            relationship.setRightwardLabel(relationshipRest.getRightwardLabel());
+
+            if (jsonNode.hasNonNull("rightPlace")) {
+                relationship.setRightPlace(relationshipRest.getRightPlace());
             }
 
-            relationship.setLeftwardLabel(leftwardLabel);
-            relationship.setRightwardLabel(rightwardLabel);
+            if (jsonNode.hasNonNull("leftPlace")) {
+                relationship.setRightPlace(relationshipRest.getLeftPlace());
+            }
 
             relationshipService.update(context, relationship);
             context.commit();

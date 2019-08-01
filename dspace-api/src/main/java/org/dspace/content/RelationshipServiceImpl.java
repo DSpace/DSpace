@@ -64,7 +64,7 @@ public class RelationshipServiceImpl implements RelationshipService {
 
     @Override
     public Relationship create(Context c, Item leftItem, Item rightItem, RelationshipType relationshipType,
-                               int leftPlace, int rightPlace, String leftWardLabel, String rightWardLabel)
+                               int leftPlace, int rightPlace, String leftwardLabel, String rightwardLabel)
             throws AuthorizeException, SQLException {
         Relationship relationship = new Relationship();
         relationship.setLeftItem(leftItem);
@@ -72,8 +72,8 @@ public class RelationshipServiceImpl implements RelationshipService {
         relationship.setRelationshipType(relationshipType);
         relationship.setLeftPlace(leftPlace);
         relationship.setRightPlace(rightPlace);
-        relationship.setLeftwardLabel(leftWardLabel);
-        relationship.setRightwardLabel(rightWardLabel);
+        relationship.setLeftwardLabel(leftwardLabel);
+        relationship.setRightwardLabel(rightwardLabel);
         return create(c, relationship);
     }
 
