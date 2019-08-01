@@ -24,6 +24,7 @@ import org.bouncycastle.crypto.CryptoException;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
 import org.dspace.core.PluginManager;
@@ -161,6 +162,8 @@ public class CitationDocument {
     
     public File makeCitedDocument(Context context,Bitstream bitstream,String configuration)
             throws IOException, SQLException, AuthorizeException, COSVisitorException {
+        // check authorization
+        AuthorizeManager.authorizeAction(context, bitstream, Constants.READ);
         PDDocument document = new PDDocument();
         PDDocument sourceDocument = new PDDocument();
         String filePath =tempDir.getAbsolutePath() + "/bitstream.cover.pdf";
