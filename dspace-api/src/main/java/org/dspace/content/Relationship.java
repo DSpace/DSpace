@@ -81,13 +81,13 @@ public class Relationship implements ReloadableEntity<Integer> {
      * A String containing an alternative label (name variant) for the left side
      */
     @Column(name = "left_ward_label")
-    private String leftWardLabel;
+    private String leftwardLabel;
 
     /**
      * A String containing an alternative label (name variant) for the right side
      */
     @Column(name = "right_ward_label")
-    private String rightWardLabel;
+    private String rightwardLabel;
 
     /**
      * Protected constructor, create object using:
@@ -183,35 +183,35 @@ public class Relationship implements ReloadableEntity<Integer> {
     }
 
     /**
-     * Standard getter for the leftWardLabel String in this Relationship
+     * Standard getter for the leftwardLabel String in this Relationship
      * @return  the leftWardlabel String for this relationship
      */
-    public String getLeftWardLabel() {
-        return leftWardLabel;
+    public String getLeftwardLabel() {
+        return leftwardLabel;
     }
 
     /**
      * Standard setter for the leftWardlabel String in this Relationship
-     * @param leftWardLabel    the leftWardLabel String that will be used in this relationship
+     * @param leftwardLabel    the leftwardLabel String that will be used in this relationship
      */
-    public void setLeftWardLabel(String leftWardLabel) {
-        this.leftWardLabel = leftWardLabel;
+    public void setLeftwardLabel(String leftwardLabel) {
+        this.leftwardLabel = leftwardLabel;
     }
 
     /**
      * Standard getter for the rightWardlabel Integer in this Relationship
-     * @return  the rightWardLabel string for this relationship
+     * @return  the rightwardLabel string for this relationship
      */
-    public String getRightWardLabel() {
-        return rightWardLabel;
+    public String getRightwardLabel() {
+        return rightwardLabel;
     }
 
     /**
-     * Standard setter for the rightWardLabel String in this Relationship
-     * @param rightWardLabel    the rightWardLabel String that will be used in this relationship
+     * Standard setter for the rightwardLabel String in this Relationship
+     * @param rightwardLabel    the rightwardLabel String that will be used in this relationship
      */
-    public void setRightWardLabel(String rightWardLabel) {
-        this.rightWardLabel = rightWardLabel;
+    public void setRightwardLabel(String rightwardLabel) {
+        this.rightwardLabel = rightwardLabel;
     }
 
     /**

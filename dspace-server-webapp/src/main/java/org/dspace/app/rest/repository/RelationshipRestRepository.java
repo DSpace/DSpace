@@ -262,8 +262,8 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
                 relationship.setRightPlace(rightPlace);
             }
 
-            relationship.setLeftWardLabel(leftwardLabel);
-            relationship.setRightWardLabel(rightwardLabel);
+            relationship.setLeftwardLabel(leftwardLabel);
+            relationship.setRightwardLabel(rightwardLabel);
 
             relationshipService.update(context, relationship);
             context.commit();
