@@ -23,8 +23,8 @@ import org.dspace.app.rest.exception.MethodNotAllowedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.link.HalLinkService;
 import org.dspace.app.rest.model.CollectionRest;
-import org.dspace.app.rest.model.MappingCollectionRestWrapper;
-import org.dspace.app.rest.model.hateoas.MappingCollectionResourceWrapper;
+import org.dspace.app.rest.model.MappedCollectionRestWrapper;
+import org.dspace.app.rest.model.hateoas.MappedCollectionResourceWrapper;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.authorize.AuthorizeException;
@@ -42,16 +42,16 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * This RestController takes care of the retrieval, creation and deletion of MappingCollections
+ * This RestController takes care of the retrieval, creation and deletion of MappedCollections
  * This class will typically receive a UUID that resolves to an Item and it'll perform logic on its collections
  */
 @RestController
 @RequestMapping("/api/core/items/" +
         "{uuid:[0-9a-fxA-FX]{8}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{12}}" +
         "/mappedCollections")
-public class MappingCollectionRestController {
+public class MappedCollectionRestController {
 
-    private static final Logger log = Logger.getLogger(MappingCollectionRestController.class);
+    private static final Logger log = Logger.getLogger(MappedCollectionRestController.class);
 
     @Autowired
     private ItemService itemService;
@@ -71,7 +71,7 @@ public class MappingCollectionRestController {
     /**
      * This method will retrieve a List of Collections in which the item, that corresponds to the given UUID, resides
      * The owning collection is not included in this list. It will transform the list of Collections to a list of
-     * CollectionRest objects and it'll then encapsulate these into a MappingCollectionResourceWrapper object
+     * CollectionRest objects and it'll then encapsulate these into a MappedCollectionResourceWrapper object
      *
      * curl -X GET http://<dspace.restUrl>/api/core/item/{uuid}/mappedCollections
      *
@@ -90,7 +90,7 @@ public class MappingCollectionRestController {
      * @throws SQLException If something goes wrong
      */
     @RequestMapping(method = {RequestMethod.GET, RequestMethod.HEAD})
-    public MappingCollectionResourceWrapper retrieve(@PathVariable UUID uuid, HttpServletResponse response,
+    public MappedCollectionResourceWrapper retrieve(@PathVariable UUID uuid, HttpServletResponse response,
                                                      HttpServletRequest request, Pageable pageable)
             throws SQLException {
         Context context = ContextUtil.obtainContext(request);
@@ -104,10 +104,10 @@ public class MappingCollectionRestController {
             }
         }
 
-        MappingCollectionRestWrapper mappingCollectionRestWrapper = new MappingCollectionRestWrapper();
-        mappingCollectionRestWrapper.setMappingCollectionRestList(mappingCollectionRest);
+        MappedCollectionRestWrapper mappingCollectionRestWrapper = new MappedCollectionRestWrapper();
+        mappingCollectionRestWrapper.setMappedCollectionRestList(mappingCollectionRest);
         mappingCollectionRestWrapper.setItem(item);
-        MappingCollectionResourceWrapper mappingCollectionResourceWrapper = new MappingCollectionResourceWrapper(
+        MappedCollectionResourceWrapper mappingCollectionResourceWrapper = new MappedCollectionResourceWrapper(
                 mappingCollectionRestWrapper, utils, pageable);
 
 

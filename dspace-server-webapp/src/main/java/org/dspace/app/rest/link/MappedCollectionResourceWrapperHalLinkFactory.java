@@ -9,24 +9,24 @@ package org.dspace.app.rest.link;
 
 import java.util.LinkedList;
 
-import org.dspace.app.rest.model.MappingCollectionRestWrapper;
-import org.dspace.app.rest.model.hateoas.MappingCollectionResourceWrapper;
+import org.dspace.app.rest.model.MappedCollectionRestWrapper;
+import org.dspace.app.rest.model.hateoas.MappedCollectionResourceWrapper;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.Link;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
 /**
- * This class' purpose is to add links to the MappingCollectionResourceWrapper objects
+ * This class' purpose is to add links to the MappedCollectionResourceWrapper objects
  */
 @Component
-public class MappingCollectionResourceWrapperHalLinkFactory
-    extends MappingCollectionRestHalLinkFactory<MappingCollectionResourceWrapper> {
+public class MappedCollectionResourceWrapperHalLinkFactory
+    extends MappedCollectionRestHalLinkFactory<MappedCollectionResourceWrapper> {
 
-    protected void addLinks(MappingCollectionResourceWrapper halResource, Pageable pageable, LinkedList<Link> list)
+    protected void addLinks(MappedCollectionResourceWrapper halResource, Pageable pageable, LinkedList<Link> list)
         throws Exception {
 
-        MappingCollectionRestWrapper mappingCollectionRestWrapper = halResource.getContent();
+        MappedCollectionRestWrapper mappingCollectionRestWrapper = halResource.getContent();
         if (mappingCollectionRestWrapper != null) {
 
             UriComponentsBuilder uriBuilderSelfLink = uriBuilder(getMethodOn()
@@ -38,7 +38,7 @@ public class MappingCollectionResourceWrapperHalLinkFactory
     }
 
 
-    protected Class<MappingCollectionResourceWrapper> getResourceClass() {
-        return MappingCollectionResourceWrapper.class;
+    protected Class<MappedCollectionResourceWrapper> getResourceClass() {
+        return MappedCollectionResourceWrapper.class;
     }
 }

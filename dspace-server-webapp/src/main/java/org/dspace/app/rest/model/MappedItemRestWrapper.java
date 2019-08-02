@@ -11,15 +11,15 @@ import java.util.List;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.dspace.app.rest.MappingItemRestController;
+import org.dspace.app.rest.MappedItemRestController;
 
 /**
  * The REST object that will define a list of ItemRest objects to be returned by the REST api
  */
-public class MappingItemRestWrapper implements RestAddressableModel {
+public class MappedItemRestWrapper implements RestAddressableModel {
 
     @JsonIgnore
-    private List<ItemRest> mappingItemRestList;
+    private List<ItemRest> mappedItemRestList;
 
     private UUID collectionUuid;
 
@@ -31,12 +31,12 @@ public class MappingItemRestWrapper implements RestAddressableModel {
         this.collectionUuid = collectionUuid;
     }
 
-    public List<ItemRest> getMappingItemRestList() {
-        return mappingItemRestList;
+    public List<ItemRest> getMappedItemRestList() {
+        return mappedItemRestList;
     }
 
-    public void setMappingItemRestList(List<ItemRest> mappingItemRestList) {
-        this.mappingItemRestList = mappingItemRestList;
+    public void setMappedItemRestList(List<ItemRest> mappedItemRestList) {
+        this.mappedItemRestList = mappedItemRestList;
     }
 
     public String getCategory() {
@@ -44,7 +44,7 @@ public class MappingItemRestWrapper implements RestAddressableModel {
     }
 
     public Class getController() {
-        return MappingItemRestController.class;
+        return MappedItemRestController.class;
     }
 
     public String getType() {

@@ -12,24 +12,24 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.dspace.app.rest.model.ItemRest;
-import org.dspace.app.rest.model.MappingItemRestWrapper;
+import org.dspace.app.rest.model.MappedItemRestWrapper;
 import org.dspace.app.rest.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class will act as a HALResource object for the MappingItemRestWrapper data object and will transform
+ * This class will act as a HALResource object for the MappedItemRestWrapper data object and will transform
  * this REST data object into a proper HAL Resource to be returned by the endpoint
  */
-public class MappingItemResourceWrapper extends HALResource<MappingItemRestWrapper> {
-    private static final Logger log = LoggerFactory.getLogger(MappingItemResourceWrapper.class);
+public class MappedItemResourceWrapper extends HALResource<MappedItemRestWrapper> {
+    private static final Logger log = LoggerFactory.getLogger(MappedItemResourceWrapper.class);
 
     @JsonIgnore
     private List<ItemResource> itemResources;
     @JsonIgnore
     private Integer totalElements;
 
-    public MappingItemResourceWrapper(MappingItemRestWrapper content, Utils utils,
+    public MappedItemResourceWrapper(MappedItemRestWrapper content, Utils utils,
                                       Integer totalElements, String... rels) {
         super(content);
         embed(utils);
@@ -38,11 +38,11 @@ public class MappingItemResourceWrapper extends HALResource<MappingItemRestWrapp
 
     private void embed(Utils utils) {
         List<ItemResource> itemResources = new LinkedList<>();
-        for (ItemRest itemRest : getContent().getMappingItemRestList()) {
+        for (ItemRest itemRest : getContent().getMappedItemRestList()) {
             itemResources.add(new ItemResource(itemRest, utils));
         }
         this.itemResources = itemResources;
-        embedResource("mappingItems", itemResources);
+        embedResource("mappedItems", itemResources);
     }
 
     public List<ItemResource> getItemResources() {

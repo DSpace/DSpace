@@ -10,25 +10,25 @@ package org.dspace.app.rest.model;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.dspace.app.rest.MappingCollectionRestController;
+import org.dspace.app.rest.MappedCollectionRestController;
 import org.dspace.content.Item;
 
 /**
  * The REST object that will define a list of CollectionRest objects to be returned by the REST api
  */
-public class MappingCollectionRestWrapper implements RestAddressableModel {
+public class MappedCollectionRestWrapper implements RestAddressableModel {
 
     @JsonIgnore
-    private List<CollectionRest> mappingCollectionRestList;
+    private List<CollectionRest> mappedCollectionRestList;
 
     @JsonIgnore
     private Item item;
-    public List<CollectionRest> getMappingCollectionRestList() {
-        return mappingCollectionRestList;
+    public List<CollectionRest> getMappedCollectionRestList() {
+        return mappedCollectionRestList;
     }
 
-    public void setMappingCollectionRestList(List<CollectionRest> mappingCollectionRestList) {
-        this.mappingCollectionRestList = mappingCollectionRestList;
+    public void setMappedCollectionRestList(List<CollectionRest> mappedCollectionRestList) {
+        this.mappedCollectionRestList = mappedCollectionRestList;
     }
 
     public String getCategory() {
@@ -36,7 +36,7 @@ public class MappingCollectionRestWrapper implements RestAddressableModel {
     }
 
     public Class getController() {
-        return MappingCollectionRestController.class;
+        return MappedCollectionRestController.class;
     }
 
     public String getType() {
