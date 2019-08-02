@@ -822,14 +822,14 @@
         </profile>
 
 		<profile>
-            <id>dspace-spring-rest</id>
+            <id>dspace-server-webapp</id>
             <activation>
                 <file>
-                    <exists>dspace-spring-rest/pom.xml</exists>
+                    <exists>dspace-server-webapp/pom.xml</exists>
                 </file>
             </activation>
             <modules>
-                <module>dspace-spring-rest</module>
+                <module>dspace-server-webapp</module>
             </modules>
         </profile>
 
@@ -854,7 +854,7 @@
                 <module>dspace-services</module>
                 <module>dspace-sword</module>
                 <module>dspace-swordv2</module>
-                <module>dspace-spring-rest</module>
+                <module>dspace-server-webapp</module>
             </modules>
             <build>
                 <plugins>
@@ -980,7 +980,7 @@
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
-                <artifactId>dspace-spring-rest</artifactId>
+                <artifactId>dspace-server-webapp</artifactId>
                 <version>7.0-SNAPSHOT</version>
                 <type>war</type>
             </dependency>
@@ -1104,7 +1104,18 @@
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>handle</artifactId>
-                <version>6.2</version>
+                <version>9.1.0.v20190416</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty.aggregate</groupId>
+                <artifactId>jetty-all</artifactId>
+                <version>8.1.22.v20160922</version>
+                <exclusions>
+                    <exclusion>
+                        <artifactId>javax.servlet</artifactId>
+                        <groupId>org.eclipse.jetty.orbit</groupId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
