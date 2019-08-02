@@ -50,7 +50,7 @@
         <form name="traditionalpageone">
             <row>
                 <relation-field>
-                    <relationshiptype>isAuthorOfPublication</relationshiptype>
+                    <relationship-type>isAuthorOfPublication</relationship-type>
                     <search-configuration>personConfiguration</search-configuration>
                     <repeatable>true</repeatable>
                     <label>Author</label>
@@ -490,7 +490,7 @@
         <form name="journalVolumeStep">
             <row>
                 <relation-field>
-                    <relationshiptype>isVolumeOfJournal</relationshiptype>
+                    <relationship-type>isVolumeOfJournal</relationship-type>
                     <search-configuration>periodicalConfiguration</search-configuration>
                     <filter>creativework.publisher:somepublishername</filter>
                     <label>Journal</label>

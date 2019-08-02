@@ -134,8 +134,8 @@ public class DCInput {
      */
     private List<String> typeBind = null;
 
-    private boolean relationshipField = false;
-    private boolean metadataField = false;
+    private boolean isRelationshipField = false;
+    private boolean isMetadataField = false;
     private String relationshipType = null;
     private String searchConfiguration = null;
     private String filter;
@@ -212,9 +212,9 @@ public class DCInput {
             }
         }
         style = fieldMap.get("style");
-        relationshipField = fieldMap.containsKey("relationshiptype");
-        metadataField = fieldMap.containsKey("dc-schema");
-        relationshipType = fieldMap.get("relationshiptype");
+        isRelationshipField = fieldMap.containsKey("relationship-type");
+        isMetadataField = fieldMap.containsKey("dc-schema");
+        relationshipType = fieldMap.get("relationship-type");
         searchConfiguration = fieldMap.get("search-configuration");
         filter = fieldMap.get("filter");
     }
@@ -530,10 +530,10 @@ public class DCInput {
     }
 
     public boolean isRelationshipField() {
-        return relationshipField;
+        return isRelationshipField;
     }
 
     public boolean isMetadataField() {
-        return metadataField;
+        return isMetadataField;
     }
 }
