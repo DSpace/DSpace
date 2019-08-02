@@ -56,8 +56,8 @@
 
  <!ELEMENT readonly (#PCDATA) >
 
-<!ELEMENT relationshiptype (#PCDATA) >
+<!ELEMENT relationship-type (#PCDATA) >
 <!ELEMENT search-configuration (#PCDATA) >
 <!ELEMENT filter (#PCDATA) >
-<!ELEMENT relation-field (relationshiptype, search-configuration, filter?, repeatable?, label, hint, linked-metadata-field?, required?)>
+<!ELEMENT relation-field (relationship-type, search-configuration, filter?, repeatable?, label, hint, linked-metadata-field?, required?)>
 <!ELEMENT linked-metadata-field (dc-schema, dc-element, dc-qualifier?, input-type)>

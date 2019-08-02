@@ -156,6 +156,13 @@ public class SubmissionFormConverter implements DSpaceConverter<DCInputSet, Subm
         return inputField;
     }
 
+    /**
+     * This method fills in the List of SelectableRelationship objects with a single SelectableRelationship object
+     * which will be fetched from the DCInput which contains a parsed version of the config in the submission-forms.xml
+     * config file
+     * @param dcinput                   The parsed input from submission-forms.xml
+     * @param selectableRelationships   The list to which the SelectableRelationship object will be added
+     */
     private void handleSelectableRelationships(DCInput dcinput, List<SelectableRelationship> selectableRelationships) {
         SelectableRelationship selectableRelationship = new SelectableRelationship();
         selectableRelationship.setRelationshipType(dcinput.getRelationshipType());
