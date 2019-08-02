@@ -18,8 +18,8 @@ import org.apache.log4j.Logger;
 import org.dspace.app.rest.converter.ItemConverter;
 import org.dspace.app.rest.link.HalLinkService;
 import org.dspace.app.rest.model.ItemRest;
-import org.dspace.app.rest.model.MappingItemRestWrapper;
-import org.dspace.app.rest.model.hateoas.MappingItemResourceWrapper;
+import org.dspace.app.rest.model.MappedItemRestWrapper;
+import org.dspace.app.rest.model.hateoas.MappedItemResourceWrapper;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.content.Collection;
@@ -42,9 +42,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/core/collections/" +
     "{uuid:[0-9a-fxA-FX]{8}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{12}}/mappedItems")
-public class MappingItemRestController {
+public class MappedItemRestController {
 
-    private static final Logger log = Logger.getLogger(MappingItemRestController.class);
+    private static final Logger log = Logger.getLogger(MappedItemRestController.class);
 
     @Autowired
     private CollectionService collectionService;
@@ -65,14 +65,14 @@ public class MappingItemRestController {
      * This method will retrieve a List of Item objects that are mapped to the Collection given in the URL.
      * These Item objects will be filtered out of their owning collection is the given collection, resulting in
      * returning only items that belong to a different collection but are mapped to the given one.
-     * These Items are then encapsulated in a MappingItemResourceWrapper and returned
+     * These Items are then encapsulated in a MappedItemResourceWrapper and returned
      *
-     * curl -X GET http://<dspace.restUrl>/api/core/collections/{uuid}/mappingItems
+     * curl -X GET http://<dspace.restUrl>/api/core/collections/{uuid}/mappedItems
      *
      * Example:
      * <pre>
      * {@code
-     *      curl -X GET http://<dspace.restUrl>/api/core/collections/8b632938-77c2-487c-81f0-e804f63e68e6/mappingItems
+     *      curl -X GET http://<dspace.restUrl>/api/core/collections/8b632938-77c2-487c-81f0-e804f63e68e6/mappedItems
      * }
      * </pre>
      *
@@ -84,7 +84,7 @@ public class MappingItemRestController {
      * @throws Exception
      */
     @RequestMapping(method = {RequestMethod.GET, RequestMethod.HEAD})
-    public MappingItemResourceWrapper retrieve(@PathVariable UUID uuid, HttpServletResponse response,
+    public MappedItemResourceWrapper retrieve(@PathVariable UUID uuid, HttpServletResponse response,
                                                HttpServletRequest request, Pageable pageable) throws Exception {
         Context context = ContextUtil.obtainContext(request);
         Collection collection = collectionService.find(context, uuid);
@@ -99,13 +99,13 @@ public class MappingItemRestController {
             }
         }
 
-        MappingItemRestWrapper mappingItemRestWrapper = new MappingItemRestWrapper();
-        mappingItemRestWrapper.setMappingItemRestList(mappedItemRestList);
-        mappingItemRestWrapper.setCollectionUuid(uuid);
-        MappingItemResourceWrapper mappingItemResourceWrapper =
-            new MappingItemResourceWrapper(mappingItemRestWrapper, utils, totalElements);
+        MappedItemRestWrapper mappedItemRestWrapper = new MappedItemRestWrapper();
+        mappedItemRestWrapper.setMappedItemRestList(mappedItemRestList);
+        mappedItemRestWrapper.setCollectionUuid(uuid);
+        MappedItemResourceWrapper mappedItemResourceWrapper =
+            new MappedItemResourceWrapper(mappedItemRestWrapper, utils, totalElements);
 
-        halLinkService.addLinks(mappingItemResourceWrapper, pageable);
-        return mappingItemResourceWrapper;
+        halLinkService.addLinks(mappedItemResourceWrapper, pageable);
+        return mappedItemResourceWrapper;
     }
 }

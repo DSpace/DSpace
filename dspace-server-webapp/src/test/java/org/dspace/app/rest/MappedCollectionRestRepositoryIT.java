@@ -30,7 +30,7 @@ import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class MappingCollectionRestRepositoryIT extends AbstractControllerIntegrationTest {
+public class MappedCollectionRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Autowired
     private CollectionService collectionService;
@@ -77,12 +77,12 @@ public class MappingCollectionRestRepositoryIT extends AbstractControllerIntegra
 
         getClient().perform(get("/api/core/collections/" + col1.getID() + "/mappedItems"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$._embedded.mappingItems", Matchers.not(Matchers.contains(
+                .andExpect(jsonPath("$._embedded.mappedItems", Matchers.not(Matchers.contains(
                         ItemMatcher.matchItemProperties(publicItem1))
                 )));
         getClient().perform(get("/api/core/collections/" + col2.getID() + "/mappedItems"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$._embedded.mappingItems", Matchers.not(Matchers.contains(
+                .andExpect(jsonPath("$._embedded.mappedItems", Matchers.not(Matchers.contains(
                         ItemMatcher.matchItemProperties(publicItem1))
                 )));
     }
@@ -131,16 +131,16 @@ public class MappingCollectionRestRepositoryIT extends AbstractControllerIntegra
 
         getClient().perform(get("/api/core/collections/" + col1.getID() + "/mappedItems"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$._embedded.mappingItems", Matchers.not(Matchers.contains(
+                .andExpect(jsonPath("$._embedded.mappedItems", Matchers.not(Matchers.contains(
                         ItemMatcher.matchItemProperties(publicItem1))
                 )))
-                .andExpect(jsonPath("$._embedded.mappingItems", Matchers.hasSize(0)));
+                .andExpect(jsonPath("$._embedded.mappedItems", Matchers.hasSize(0)));
         getClient().perform(get("/api/core/collections/" + col2.getID() + "/mappedItems"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$._embedded.mappingItems", Matchers.contains(
+                .andExpect(jsonPath("$._embedded.mappedItems", Matchers.contains(
                         ItemMatcher.matchItemProperties(publicItem1))
                 ))
-                .andExpect(jsonPath("$._embedded.mappingItems", Matchers.hasSize(1)));
+                .andExpect(jsonPath("$._embedded.mappedItems", Matchers.hasSize(1)));
     }
 
     @Test
@@ -189,26 +189,26 @@ public class MappingCollectionRestRepositoryIT extends AbstractControllerIntegra
 
         getClient().perform(get("/api/core/collections/" + col1.getID() + "/mappedItems"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$._embedded.mappingItems", Matchers.not(Matchers.contains(
+                .andExpect(jsonPath("$._embedded.mappedItems", Matchers.not(Matchers.contains(
                         ItemMatcher.matchItemProperties(publicItem1))
                 )))
-                .andExpect(jsonPath("$._embedded.mappingItems", Matchers.hasSize(0)));
+                .andExpect(jsonPath("$._embedded.mappedItems", Matchers.hasSize(0)));
         getClient().perform(get("/api/core/collections/" + col2.getID() + "/mappedItems"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$._embedded.mappingItems", Matchers.contains(
+                .andExpect(jsonPath("$._embedded.mappedItems", Matchers.contains(
                         ItemMatcher.matchItemProperties(publicItem1))
                 ))
-                .andExpect(jsonPath("$._embedded.mappingItems", Matchers.hasSize(1)));
+                .andExpect(jsonPath("$._embedded.mappedItems", Matchers.hasSize(1)));
         getClient().perform(get("/api/core/collections/" + col3.getID() + "/mappedItems"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$._embedded.mappingItems", Matchers.contains(
+                .andExpect(jsonPath("$._embedded.mappedItems", Matchers.contains(
                         ItemMatcher.matchItemProperties(publicItem1))
                 ))
-                .andExpect(jsonPath("$._embedded.mappingItems", Matchers.hasSize(1)));
+                .andExpect(jsonPath("$._embedded.mappedItems", Matchers.hasSize(1)));
     }
 
     @Test
-    public void itemHasNoDuplicatesInMappingCollectionAndCollectionHasNoDuplicatesInMappingItemsTest()
+    public void itemHasNoDuplicatesInMappedCollectionAndCollectionHasNoDuplicatesInMappedItemsTest()
         throws Exception {
         context.turnOffAuthorisationSystem();
 
@@ -255,14 +255,14 @@ public class MappingCollectionRestRepositoryIT extends AbstractControllerIntegra
 
         getClient().perform(get("/api/core/collections/" + col2.getID() + "/mappedItems"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$._embedded.mappingItems", Matchers.not(Matchers.containsInAnyOrder(
+                .andExpect(jsonPath("$._embedded.mappedItems", Matchers.not(Matchers.containsInAnyOrder(
                         ItemMatcher.matchItemProperties(publicItem1),
                         ItemMatcher.matchItemProperties(publicItem1)))
                 ));
     }
 
     @Test
-    public void itemHasNoOriginalCollectionInMappingCollectionAndCollectionHasNoOriginalItemInMappingItemsTest()
+    public void itemHasNoOriginalCollectionInMappedCollectionAndCollectionHasNoOriginalItemInMappedItemsTest()
         throws Exception {
         context.turnOffAuthorisationSystem();
 
@@ -308,14 +308,14 @@ public class MappingCollectionRestRepositoryIT extends AbstractControllerIntegra
         ;
         getClient().perform(get("/api/core/collections/" + col1.getID() + "/mappedItems"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$._embedded.mappingItems", Matchers.not(Matchers.contains(
+                .andExpect(jsonPath("$._embedded.mappedItems", Matchers.not(Matchers.contains(
                         ItemMatcher.matchItemProperties(publicItem1))
                 )))
-                .andExpect(jsonPath("$._embedded.mappingItems", Matchers.hasSize(0)));
+                .andExpect(jsonPath("$._embedded.mappedItems", Matchers.hasSize(0)));
     }
 
     @Test
-    public void removeMappingCollectionTest() throws Exception {
+    public void removeMappedCollectionTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
         //** GIVEN **
@@ -359,10 +359,10 @@ public class MappingCollectionRestRepositoryIT extends AbstractControllerIntegra
         ;
         getClient().perform(get("/api/core/collections/" + col1.getID() + "/mappedItems"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$._embedded.mappingItems", Matchers.not(Matchers.contains(
+                .andExpect(jsonPath("$._embedded.mappedItems", Matchers.not(Matchers.contains(
                         ItemMatcher.matchItemProperties(publicItem1))
                 )))
-                .andExpect(jsonPath("$._embedded.mappingItems", Matchers.hasSize(0)));
+                .andExpect(jsonPath("$._embedded.mappedItems", Matchers.hasSize(0)));
 
         getClient(adminToken)
             .perform(delete("/api/core/items/" + publicItem1.getID() + "/mappedCollections/" + col2.getID()));
@@ -376,22 +376,22 @@ public class MappingCollectionRestRepositoryIT extends AbstractControllerIntegra
                    .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/items")));
         getClient().perform(get("/api/core/collections/" + col1.getID() + "/mappedItems"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$._embedded.mappingItems", Matchers.not(Matchers.contains(
+                .andExpect(jsonPath("$._embedded.mappedItems", Matchers.not(Matchers.contains(
                         ItemMatcher.matchItemProperties(publicItem1))
                 )))
-                .andExpect(jsonPath("$._embedded.mappingItems", Matchers.hasSize(0)));
+                .andExpect(jsonPath("$._embedded.mappedItems", Matchers.hasSize(0)));
         getClient().perform(get("/api/core/collections/" + col2.getID() + "/mappedItems"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$._embedded.mappingItems", Matchers.not(Matchers.contains(
+                .andExpect(jsonPath("$._embedded.mappedItems", Matchers.not(Matchers.contains(
                         ItemMatcher.matchItemProperties(publicItem1))
                 )))
-                .andExpect(jsonPath("$._embedded.mappingItems", Matchers.hasSize(0)));
+                .andExpect(jsonPath("$._embedded.mappedItems", Matchers.hasSize(0)));
         getClient().perform(get("/api/core/collections/" + col3.getID() + "/mappedItems"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$._embedded.mappingItems", Matchers.contains(
+                .andExpect(jsonPath("$._embedded.mappedItems", Matchers.contains(
                         ItemMatcher.matchItemProperties(publicItem1))
                 ))
-                .andExpect(jsonPath("$._embedded.mappingItems", Matchers.hasSize(1)));
+                .andExpect(jsonPath("$._embedded.mappedItems", Matchers.hasSize(1)));
 
         getClient(adminToken)
             .perform(delete("/api/core/items/" + publicItem1.getID() + "/mappedCollections/" + col1.getID()));
@@ -406,26 +406,26 @@ public class MappingCollectionRestRepositoryIT extends AbstractControllerIntegra
         ;
         getClient().perform(get("/api/core/collections/" + col1.getID() + "/mappedItems"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$._embedded.mappingItems", Matchers.not(Matchers.contains(
+                .andExpect(jsonPath("$._embedded.mappedItems", Matchers.not(Matchers.contains(
                         ItemMatcher.matchItemProperties(publicItem1))
                 )))
-                .andExpect(jsonPath("$._embedded.mappingItems", Matchers.hasSize(0)));
+                .andExpect(jsonPath("$._embedded.mappedItems", Matchers.hasSize(0)));
         getClient().perform(get("/api/core/collections/" + col2.getID() + "/mappedItems"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$._embedded.mappingItems", Matchers.not(Matchers.contains(
+                .andExpect(jsonPath("$._embedded.mappedItems", Matchers.not(Matchers.contains(
                         ItemMatcher.matchItemProperties(publicItem1))
                 )))
-                .andExpect(jsonPath("$._embedded.mappingItems", Matchers.hasSize(0)));;
+                .andExpect(jsonPath("$._embedded.mappedItems", Matchers.hasSize(0)));;
         getClient().perform(get("/api/core/collections/" + col3.getID() + "/mappedItems"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$._embedded.mappingItems", Matchers.contains(
+                .andExpect(jsonPath("$._embedded.mappedItems", Matchers.contains(
                         ItemMatcher.matchItemProperties(publicItem1))
                 ))
-                .andExpect(jsonPath("$._embedded.mappingItems", Matchers.hasSize(1)));;
+                .andExpect(jsonPath("$._embedded.mappedItems", Matchers.hasSize(1)));;
     }
 
     @Test
-    public void doNotAllowMappingCollectionIfGivenCollectionIsOwningCollectionOfGivenItemTest() throws Exception {
+    public void doNotAllowMappedCollectionIfGivenCollectionIsOwningCollectionOfGivenItemTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
         //** GIVEN **
@@ -457,7 +457,7 @@ public class MappingCollectionRestRepositoryIT extends AbstractControllerIntegra
     }
 
     @Test
-    public void doNotAllowDeleteMappingCollectionIfGivenCollectionIsOwningCollectionOfGivenItemTest() throws Exception {
+    public void doNotAllowDeleteMappedCollectionIfGivenCollectionIsOwningCollectionOfGivenItemTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
         //** GIVEN **
@@ -487,7 +487,7 @@ public class MappingCollectionRestRepositoryIT extends AbstractControllerIntegra
     }
 
     @Test
-    public void doNotAllowMappingCollectionWithATemplateItem() throws Exception {
+    public void doNotAllowMappedCollectionWithATemplateItem() throws Exception {
         context.turnOffAuthorisationSystem();
         //** GIVEN **
         //1. A community-collection structure with one parent community with sub-community and two collections.
@@ -517,7 +517,7 @@ public class MappingCollectionRestRepositoryIT extends AbstractControllerIntegra
     }
 
     @Test
-    public void doNotAllowDeleteMappingCollectionWithATemplateItem() throws Exception {
+    public void doNotAllowDeleteMappedCollectionWithATemplateItem() throws Exception {
         context.turnOffAuthorisationSystem();
         //** GIVEN **
         //1. A community-collection structure with one parent community with sub-community and two collections.
@@ -545,7 +545,7 @@ public class MappingCollectionRestRepositoryIT extends AbstractControllerIntegra
     }
 
     @Test
-    public void mappingCollectionNeedsValidIDs() throws Exception {
+    public void mappedCollectionNeedsValidIDs() throws Exception {
         context.turnOffAuthorisationSystem();
         //** GIVEN **
         //1. A community-collection structure with one parent community with sub-community and two collections.
@@ -661,7 +661,7 @@ public class MappingCollectionRestRepositoryIT extends AbstractControllerIntegra
     }
 
     @Test
-    public void removingMappingCollectionCannotBeDoneAnonymouslyTest() throws Exception {
+    public void removingMappedCollectionCannotBeDoneAnonymouslyTest() throws Exception {
 
         context.turnOffAuthorisationSystem();
         //** GIVEN **

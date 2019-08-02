@@ -12,28 +12,28 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.dspace.app.rest.model.CollectionRest;
-import org.dspace.app.rest.model.MappingCollectionRestWrapper;
+import org.dspace.app.rest.model.MappedCollectionRestWrapper;
 import org.dspace.app.rest.utils.Utils;
 import org.springframework.data.domain.Pageable;
 
 /**
- * This class will act as a HALResource object for the MappingCollectionRestWrapper data object and will transform
+ * This class will act as a HALResource object for the MappedCollectionRestWrapper data object and will transform
  * this REST data object into a proper HAL Resource to be returned by the endpoint
  */
-public class MappingCollectionResourceWrapper extends HALResource<MappingCollectionRestWrapper> {
+public class MappedCollectionResourceWrapper extends HALResource<MappedCollectionRestWrapper> {
 
     @JsonIgnore
     private List<CollectionResource> collectionResources = new LinkedList<>();
 
-    public MappingCollectionResourceWrapper(MappingCollectionRestWrapper content, Utils utils, Pageable pageable,
+    public MappedCollectionResourceWrapper(MappedCollectionRestWrapper content, Utils utils, Pageable pageable,
                                             String... rels) {
         super(content);
         addEmbeds(content, utils, pageable);
     }
 
-    private void addEmbeds(final MappingCollectionRestWrapper data, final Utils utils, Pageable pageable) {
+    private void addEmbeds(final MappedCollectionRestWrapper data, final Utils utils, Pageable pageable) {
 
-        for (CollectionRest collectionRest : data.getMappingCollectionRestList()) {
+        for (CollectionRest collectionRest : data.getMappedCollectionRestList()) {
 
             collectionResources.add(new CollectionResource(collectionRest, utils));
         }
