@@ -21,7 +21,7 @@ public class HarvestedCollectionRest extends BaseObjectRest<Integer> {
     public static final String CATEGORY = "core";
 
     @JsonProperty("harvest_type")
-    private HarvestedTypeEnum harvestType;
+    private HarvestTypeEnum harvestType;
 
     @JsonProperty("oai_source")
     private String oaiSource;
@@ -48,7 +48,7 @@ public class HarvestedCollectionRest extends BaseObjectRest<Integer> {
         return harvestType.ordinal();
     }
 
-    public void setHarvestType(HarvestedTypeEnum harvestType) {
+    public void setHarvestType(HarvestTypeEnum harvestType) {
         this.harvestType = harvestType;
     }
 

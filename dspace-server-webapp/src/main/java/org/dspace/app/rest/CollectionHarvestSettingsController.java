@@ -11,7 +11,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.HarvestedCollectionRest;
-import org.dspace.app.rest.model.HarvestedTypeEnum;
+import org.dspace.app.rest.model.HarvestTypeEnum;
 import org.dspace.content.Collection;
 import org.dspace.content.service.CollectionService;
 import org.dspace.core.Context;
@@ -74,7 +74,7 @@ public class CollectionHarvestSettingsController {
         }
 
         // Delete harvestedCollection object if harvest type is not set
-        if (harvestedCollectionRest.getHarvestType() == HarvestedTypeEnum.NONE.getValue()) {
+        if (harvestedCollectionRest.getHarvestType() == HarvestTypeEnum.NONE.getValue()) {
             harvestedCollectionService.delete(context, harvestedCollection);
         } else {
             updateCollectionHarvestSettings(harvestedCollection, harvestedCollectionRest);
