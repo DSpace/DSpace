@@ -1,0 +1,19 @@
+package org.dspace.content;
+
+import java.util.List;
+
+import org.dspace.content.virtual.VirtualMetadataPopulator;
+
+public interface RelationshipMetadataService {
+
+    /**
+     * This method retrieves a list of MetadataValue objects that get constructed from processing
+     * the given Item's Relationships through the config given to the {@link VirtualMetadataPopulator}
+     * @param item  The Item that will be processed through it's Relationships
+     * @param enableVirtualMetadata This parameter will determine whether the list of Relationship metadata
+     *                              should be populated with metadata that is being generated through the
+     *                              VirtualMetadataPopulator functionality or not
+     * @return      The list of MetadataValue objects constructed through the Relationships
+     */
+    public List<RelationshipMetadataValue> getRelationshipMetadata(Item item, boolean enableVirtualMetadata);
+}
