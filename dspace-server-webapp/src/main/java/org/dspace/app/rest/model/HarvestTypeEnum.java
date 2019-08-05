@@ -1,6 +1,6 @@
 package org.dspace.app.rest.model;
 
-public enum HarvestedTypeEnum {
+public enum HarvestTypeEnum {
     NONE(0),
     METADATA_ONLY(1),
     METADATA_AND_REF(2),
@@ -8,7 +8,7 @@ public enum HarvestedTypeEnum {
 
     private int harvestType;
 
-    HarvestedTypeEnum(int harvestType) {
+    HarvestTypeEnum(int harvestType) {
         this.harvestType = harvestType;
     }
 
