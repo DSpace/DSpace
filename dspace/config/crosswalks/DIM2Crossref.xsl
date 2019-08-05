@@ -50,27 +50,26 @@
 					<xsl:when test="$type='Artículo'">
 						<xsl:call-template name="setJournal" />
 					</xsl:when>
-
-					<!-- <xsl:when test="$type='Libro'">
+					<xsl:when test="$type='Libro'">
 						<xsl:call-template name="setBook" />
-					</xsl:when> -->
+					</xsl:when>
 
-					<!-- <xsl:when test="string(text())='Objeto de conferencia'">
+					<xsl:when test="$type='Conjunto de datos'">
+						<xsl:call-template name="setDataset" />
+					</xsl:when>
+
+					<!-- <xsl:when test="$type='Objeto de conferencia'">
 						<xsl:call-template name="setObjetoDeConferencia" />
 					</xsl:when> -->
 
-					<!-- <xsl:when test="string(text())='Conjunto de datos'">
-						<xsl:call-template name="setConjuntoDeDatos" />
-					</xsl:when> -->
-
 					<!-- No se mapean
-					<xsl:when test="$subtype='Objeto Fisico'"></xsl:when>
-					<xsl:when test="$subtype='Objeto de aprendizaje'"></xsl:when>
-					<xsl:when test="$subtype='Imagen fija'"></xsl:when>
-					<xsl:when test="$subtype='Documento institucional'"></xsl:when>
-					<xsl:when test="$subtype='Audio'"></xsl:when>
-					<xsl:when test="$subtype='Publicacion seriada'"></xsl:when>
-					<xsl:when test="$subtype='Imagen en movimiento'"></xsl:when> -->
+					<xsl:when test="$type='Objeto Fisico'"></xsl:when>
+					<xsl:when test="$type='Objeto de aprendizaje'"></xsl:when>
+					<xsl:when test="$type='Imagen fija'"></xsl:when>
+					<xsl:when test="$type='Documento institucional'"></xsl:when>
+					<xsl:when test="$type='Audio'"></xsl:when>
+					<xsl:when test="$type='Publicacion seriada'"></xsl:when>
+					<xsl:when test="$type='Imagen en movimiento'"></xsl:when> -->
 				</xsl:choose>
 			</body>
 		</doi_batch>
@@ -221,26 +220,219 @@
 	</xsl:template>
 
 	<xsl:template name="setBook">
-		<!-- TO DO -->
-		<book book_type="other" xmlns="http://www.crossref.org/schema/4.4.2">
+		<book book_type="other"
+			xmlns="http://www.crossref.org/schema/4.4.2">
 
 			<book_metadata reference_distribution_opts="none">
+				<xsl:call-template name="setDocLanguageAttr" />
+
+				<xsl:choose>
+					<xsl:when
+						test="//dspace:field[@mdschema='sedici' and @element='subtype']/text() = 'Libro'">
+						<!-- Solo mapear estos metadatos si el item es subtype 'Libro' -->
+
+						<!-- contributors -->
+						<xsl:call-template name="setContributors" />
+
+						<!-- titles -->
+						<xsl:call-template name="setTitles" />
+
+						<!-- jats:abstract -->
+						<xsl:call-template name="setAbstract" />
+
+						<!-- No se mapea, no tenemos esa información
+						<edition_number></edition_number> -->
+
+					</xsl:when>
+					<xsl:otherwise>
+						<!-- El item es subtype 'Capitulo de libro' o es parte de un libro -->
+						<!-- book title -->
+						<titles xmlns="http://www.crossref.org/schema/4.4.2">
+							<title>
+								<xsl:value-of
+									select="//dspace:field[@mdschema='sedici' and @element='relation' and @qualifier='bookTitle']" />
+							</title>
+						</titles>
+					</xsl:otherwise>
+				</xsl:choose>
+
+				<!-- publication_date -->
+				<xsl:call-template name="setPublicationDate" />
+
+				<!-- No se mapea, no tenemos esa información
+				<acceptance_date></acceptance_date> -->
+
+				<xsl:call-template name="setISBN" />
+
+				<xsl:call-template name="setPublisher" />
+
+				<xsl:if
+					test="//dspace:field[@mdschema='sedici' and @element='subtype']/text() = 'Libro'">
+					<!-- Solo mapear estos metadatos si el item es subtype 'Libro' -->
+
+					<!-- No se mapea, el indentifier ya lo mapeamos en doi_data
+					<publisher_item></publisher_item> -->
+
+					<!-- <crossmark></crossmark> -->
+
+					<!-- No se mapea, no tenemos información de fundRef
+					<fr:program name="fundref" xmlns:fr="http://www.crossref.org/fundref.xsd">
+					</fr:program> -->
+
+					<!-- ai:program -->
+					<xsl:call-template name="setAIProgram" />
+
+					<!-- rel:program -->
+					<xsl:call-template name="setRelationsProgram" />
+
+					<!-- No se mapea porque no usamos ninguna red de preservación
+					<archive_locations></archive_locations> -->
+
+					<!-- doi_data -->
+					<xsl:call-template name="setDOIData" />
+
+					<!-- No se mapea, no tenemos esa información
+					<citation_list></citation_list> -->
+				</xsl:if>
+
 			</book_metadata>
 
+			<!--
 			<book_series_metadata reference_distribution_opts="none">
 			</book_series_metadata>
 
 			<book_set_metadata reference_distribution_opts="none">
 			</book_set_metadata>
+			 -->
 
 			<xsl:if
-					test="//dspace:field[@mdschema='dc' and @element='type']/text() = 'Capitulo de libro'">
+				test="//dspace:field[@mdschema='sedici' and @element='subtype']/text() = 'Capitulo de libro'">
 				<content_item component_type="chapter"
 					level_sequence_number="1" publication_type="full_text"
 					reference_distribution_opts="none">
+					<xsl:call-template name="setDocLanguageAttr" />
+					<xsl:call-template name="setPublicationTypeAttr" />
+
+					<!-- contributors -->
+					<xsl:call-template name="setContributors" />
+
+					<!-- titles -->
+					<xsl:call-template name="setTitles" />
+
+					<!-- jats:abstract -->
+					<xsl:call-template name="setAbstract" />
+
+					<!-- No se mapea, no tenemos esa información
+					<component_number></component_number> -->
+
+					<!-- publication_date -->
+					<xsl:call-template name="setPublicationDate" />
+
+					<!-- No se mapea, no tenemos esa información
+					<acceptance_date></acceptance_date> -->
+
+					<!-- pages -->
+					<xsl:call-template name="setPages" />
+
+					<!-- No se mapea, el indentifier ya lo mapeamos en doi_data
+					<publisher_item></publisher_item> -->
+
+					<!-- <crossmark></crossmark> -->
+
+					<!-- No se mapea, no tenemos información de fundRef
+					<fr:program name="fundref" xmlns:fr="http://www.crossref.org/fundref.xsd">
+					</fr:program> -->
+
+					<!-- ai:program -->
+					<xsl:call-template name="setAIProgram" />
+
+					<!-- No se mapea, no tenemos esa información
+					<ct:program></ct:program> -->
+
+					<!-- rel:program -->
+					<xsl:call-template name="setRelationsProgram" />
+
+					<!-- No se mapea porque no usamos ninguna red de preservación
+					<archive_locations></archive_locations> -->
+
+					<!-- No se mapea porque no utilizamos Scholarly Sharing Network (SCN) policies
+					<scn_policies></scn_policies> -->
+
+					<!-- doi_data -->
+					<xsl:call-template name="setDOIData" />
+
+					<!-- No se mapea, no tenemos esa información
+					<citation_list></citation_list> -->
+
+					<!-- No se mapea, no aplica a ningún metadato que tengamos
+					<component_list></component_list> -->
 				</content_item>
 			</xsl:if>
 		</book>
+	</xsl:template>
+
+	<xsl:template name="setDataset">
+		<database xmlns="http://www.crossref.org/schema/4.4.2">
+			<database_metadata reference_distribution_opts="none">
+				<xsl:call-template name="setDocLanguageAttr" />
+				<!-- titles -->
+				<xsl:call-template name="setTitles" />
+			</database_metadata>
+
+			<dataset dataset_type="record">
+
+				<!-- contributors -->
+				<xsl:call-template name="setContributors" />
+
+				<!-- titles -->
+				<xsl:call-template name="setTitles" />
+
+				<database_date>
+					<xsl:call-template name="setPublicationDate" />
+				</database_date>
+
+				<!-- No se mapea, el identifier ya lo mapeamos en doi_data
+				<publisher_item></publisher_item>  -->
+
+				<!-- description -->
+				<xsl:if
+					test="//dspace:field[@mdschema='dc' and @element='description' and @qualifier='abstract']">
+					<description>
+						<xsl:attribute name="language">
+							<xsl:value-of select="//dspace:field[@mdschema='dc' and @element='description' and @qualifier='abstract']/@lang" />
+						</xsl:attribute>
+						<xsl:value-of select="//dspace:field[@mdschema='dc' and @element='description' and @qualifier='abstract']" />
+					</description>
+				</xsl:if>
+
+				<!-- No se mapea, no tenemos esa información
+				<format></format> -->
+
+				<!-- <crossmark></crossmark> -->
+
+				<!-- No se mapea, no tenemos información de fundRef
+				<fr:program name="fundref" xmlns:fr="http://www.crossref.org/fundref.xsd">
+				</fr:program> -->
+
+				<!-- ai:program -->
+				<xsl:call-template name="setAIProgram" />
+
+				<!-- rel:program -->
+				<xsl:call-template name="setRelationsProgram" />
+
+				<!-- No se mapea porque no usamos ninguna red de preservación
+				<archive_locations></archive_locations> -->
+
+				<!-- doi_data -->
+				<xsl:call-template name="setDOIData" />
+
+				<!-- No se mapea, no tenemos esa información
+				<citation_list></citation_list> -->
+
+				<!-- No se mapea, no aplica a ningún metadato que tengamos
+				<component_list></component_list> -->
+			</dataset>
+		</database>
 	</xsl:template>
 
 	<xsl:template name="setFullTitle">
@@ -270,16 +462,18 @@
 		<contributors xmlns="http://www.crossref.org/schema/4.4.2">
 
 			<!-- <person_name role=author> -->
-			<xsl:call-template name="setPersonName">
-				<xsl:with-param name="person"
-					select="//dspace:field[@mdschema='sedici' and @element='creator' and @qualifier='person']" />
-				<xsl:with-param name="role">
-					<xsl:text>author</xsl:text>
-				</xsl:with-param>
-				<xsl:with-param name="sequence">
-					<xsl:text>first</xsl:text>
-				</xsl:with-param>
-			</xsl:call-template>
+			<xsl:for-each
+				select="//dspace:field[@mdschema='sedici' and @element='creator' and @qualifier='person']" >
+				<xsl:call-template name="setPersonName">
+					<xsl:with-param name="person" select="." />
+					<xsl:with-param name="role">
+						<xsl:text>author</xsl:text>
+					</xsl:with-param>
+					<xsl:with-param name="sequence">
+						<xsl:text>first</xsl:text>
+					</xsl:with-param>
+				</xsl:call-template>
+			</xsl:for-each>
 
 			<!-- <organization> -->
 			<xsl:for-each
@@ -290,7 +484,7 @@
 				</organization>
 			</xsl:for-each>
 
-			<!-- <person_name role=editor> -->
+			<!-- contributor.editor <person_name role=editor> -->
 			<xsl:for-each
 				select="//dspace:field[@mdschema='sedici' and @element='contributor' and @qualifier='editor']" >
 				<xsl:call-template name="setPersonName">
@@ -300,6 +494,20 @@
 					</xsl:with-param>
 					<xsl:with-param name="sequence">
 						<xsl:text>first</xsl:text>
+					</xsl:with-param>
+				</xsl:call-template>
+			</xsl:for-each>
+
+			<!-- contributor.compiler <person_name role=editor> -->
+			<xsl:for-each
+				select="//dspace:field[@mdschema='sedici' and @element='contributor' and @qualifier='compiler']" >
+				<xsl:call-template name="setPersonName">
+					<xsl:with-param name="person" select="." />
+					<xsl:with-param name="role">
+						<xsl:text>editor</xsl:text>
+					</xsl:with-param>
+					<xsl:with-param name="sequence">
+						<xsl:text>additional</xsl:text>
 					</xsl:with-param>
 				</xsl:call-template>
 			</xsl:for-each>
@@ -410,7 +618,8 @@
 	<xsl:template name="setISBN">
 		<xsl:for-each
 			select="//dspace:field[@mdschema='sedici' and @element='identifier' and @qualifier='isbn']">
-			<xsl:if test="string-length(.) &gt; 9">
+			<xsl:if
+				test="(translate(substring(.,1,1),'123456789','') != substring(.,1,1)) and (string-length(.) &gt; 9)">
 				<isbn xmlns="http://www.crossref.org/schema/4.4.2">
 					<xsl:value-of select="substring(.,1,17)" />
 				</isbn>
@@ -500,19 +709,6 @@
 				</rel:related_item>
 			</xsl:if>
 
-			<!-- sedici.relation.bookTitle -->
-			<xsl:if
-				test="//dspace:field[@mdschema='sedici' and @element='relation' and @qualifier='bookTitle']">
-				<rel:related_item>
-					<rel:description>Book title which the item is part of</rel:description>
-					<rel:inter_work_relation
-						identifier-type="other" relationship-type="isPartOf">
-						<xsl:value-of
-							select="//dspace:field[@mdschema='sedici' and @element='relation' and @qualifier='bookTitle']" />
-					</rel:inter_work_relation>
-				</rel:related_item>
-			</xsl:if>
-
 			<!-- sedici.relation.isReviewOf -->
 			<xsl:if
 				test="//dspace:field[@mdschema='sedici' and @element='relation' and @qualifier='isReviewOf']">
@@ -589,6 +785,15 @@
 				</xsl:choose>
 			</xsl:if>
 		</xsl:for-each>
+	</xsl:template>
+
+	<xsl:template name="setPublisher">
+		<publisher xmlns="http://www.crossref.org/schema/4.4.2">
+			<publisher_name>
+				<xsl:value-of
+					select="//dspace:field[@mdschema='dc' and @element='publisher']" />
+			</publisher_name>
+		</publisher>
 	</xsl:template>
 
 	<xsl:template name="setDOIData">
