@@ -151,6 +151,29 @@ public interface ItemService
         throws SQLException;
 
     /**
+     * Get all the archived items mapped to this collection (excludes owning collection). The order is indeterminate.
+     *
+     * @param context    DSpace context object
+     * @param collection Collection (parent)
+     * @param limit      limited number of items
+     * @param offset     offset value
+     * @return an iterator over the items in the collection.
+     * @throws SQLException if database error
+     */
+    public Iterator<Item> findByCollectionMapping(Context context, Collection collection, Integer limit, Integer offset)
+            throws SQLException;
+
+    /**
+     * Count all the archived items mapped to this collection (excludes owning collection). The order is indeterminate.
+     *
+     * @param context    DSpace context object
+     * @param collection Collection (parent)
+     * @return an iterator over the items in the collection.
+     * @throws SQLException if database error
+     */
+    public int countByCollectionMapping(Context context, Collection collection) throws SQLException;
+
+    /**
      * Get all the items (including private and withdrawn) in this collection. The order is indeterminate.
      *
      * @param context DSpace context object
