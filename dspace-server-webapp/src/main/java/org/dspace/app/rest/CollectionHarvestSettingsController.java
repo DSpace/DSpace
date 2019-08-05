@@ -1,9 +1,15 @@
 package org.dspace.app.rest;
 
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.UUID;
+import javax.servlet.ServletInputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
-import org.dspace.app.rest.model.CollectionRest;
 import org.dspace.app.rest.model.HarvestedCollectionRest;
 import org.dspace.app.rest.model.HarvestedTypeEnum;
 import org.dspace.content.Collection;
@@ -19,15 +25,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.ServletInputStream;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.List;
-import java.util.UUID;
 
-import static org.dspace.core.Constants.COLLECTION;
 
 @RestController
 @RequestMapping("/api/core/collections/" +
@@ -35,7 +33,8 @@ import static org.dspace.core.Constants.COLLECTION;
     "}}/harvester")
 public class CollectionHarvestSettingsController {
 
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(CollectionHarvestSettingsController.class);
+    private static final Logger log
+        = org.apache.logging.log4j.LogManager.getLogger(CollectionHarvestSettingsController.class);
 
     @Autowired
     CollectionService collectionService;
@@ -45,7 +44,9 @@ public class CollectionHarvestSettingsController {
 
     @RequestMapping(method = RequestMethod.PUT, consumes = {"application/json"})
     @PreAuthorize("hasAuthority('ADMIN')")
-    public void updateHarvestSettingsEndpoint(@PathVariable UUID itemUuid, HttpServletResponse response, HttpServletRequest request) throws SQLException {
+    public void updateHarvestSettingsEndpoint(@PathVariable UUID itemUuid,
+                                              HttpServletResponse response,
+                                              HttpServletRequest request) throws SQLException {
 
         Context context = new Context();
         Collection collection = collectionService.find(context, itemUuid);
@@ -73,11 +74,12 @@ public class CollectionHarvestSettingsController {
         }
 
         // Delete harvestedCollection object if harvest type is not set
-        if (harvestedCollectionRest.getHarvestType() == HarvestedTypeEnum.TYPE_NONE.getValue()) {
+        if (harvestedCollectionRest.getHarvestType() == HarvestedTypeEnum.NONE.getValue()) {
             harvestedCollectionService.delete(context, harvestedCollection);
+        } else {
+            updateCollectionHarvestSettings(harvestedCollection, harvestedCollectionRest);
         }
 
-        updateCollectionHarvestSettings(harvestedCollection, harvestedCollectionRest);
         context.complete();
     }
 
