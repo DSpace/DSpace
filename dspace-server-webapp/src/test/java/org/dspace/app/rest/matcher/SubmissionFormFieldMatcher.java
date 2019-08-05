@@ -90,6 +90,31 @@ public class SubmissionFormFieldMatcher {
         );
     }
 
+    /**
+     * Check the json representation of an open relationship field.
+     * This is a combination of an entity relationship lookup and a plain text metadata entry field
+     *
+     * @param type
+     *            the expected input type
+     * @param label
+     *            the expected label
+     * @param mandatoryMessage
+     *            the expected mandatoryMessage, can be null. If not empty the field is expected to be flagged as
+     *            mandatory
+     * @param repeatable
+     *            the expected repeatable flag
+     * @param hints
+     *            the expected hints message
+     * @param metadata
+     *            the expected metadata
+     * @param relationshipType
+     *            the type of relationship
+     * @param filter
+     *            the optional filter to be used for the lookup
+     * @param searchConfiguration
+     *            the searchConfiguration to be used for the lookup
+     * @return a Matcher for all the condition above
+     */
     public static Matcher<? super Object> matchFormOpenRelationshipFieldDefinition(String type, String label,
                                                                                    String mandatoryMessage,
                                                                                    boolean repeatable, String hints,
@@ -98,12 +123,33 @@ public class SubmissionFormFieldMatcher {
                                                                                    String filter,
                                                                                    String searchConfiguration) {
         return allOf(
-            hasJsonPath("$.selectableRelationships[0].relationshipType", is(relationshipType)),
-            hasJsonPath("$.selectableRelationships[0].filter", is(filter)),
-            hasJsonPath("$.selectableRelationships[0].searchConfiguration", is(searchConfiguration)),
+            hasJsonPath("$.selectableRelationship.relationshipType", is(relationshipType)),
+            hasJsonPath("$.selectableRelationship.filter", is(filter)),
+            hasJsonPath("$.selectableRelationship.searchConfiguration", is(searchConfiguration)),
             matchFormFieldDefinition(type, label, mandatoryMessage, repeatable, hints, metadata));
     }
 
+    /**
+     * Check the json representation of a closed relationship field.
+     * This is an entity relationship lookup without a plain text metadata entry field
+     *
+     * @param label
+     *            the expected label
+     * @param mandatoryMessage
+     *            the expected mandatoryMessage, can be null. If not empty the field is expected to be flagged as
+     *            mandatory
+     * @param repeatable
+     *            the expected repeatable flag
+     * @param hints
+     *            the expected hints message
+     * @param relationshipType
+     *            the type of relationship
+     * @param filter
+     *            the optional filter to be used for the lookup
+     * @param searchConfiguration
+     *            the searchConfiguration to be used for the lookup
+     * @return a Matcher for all the condition above
+     */
     public static Matcher<? super Object> matchFormClosedRelationshipFieldDefinition(String label,
                                                                                      String mandatoryMessage,
                                                                                      boolean repeatable, String hints,
@@ -111,9 +157,9 @@ public class SubmissionFormFieldMatcher {
                                                                                      String filter,
                                                                                      String searchConfiguration) {
         return allOf(
-            hasJsonPath("$.selectableRelationships[0].relationshipType", is(relationshipType)),
-            hasJsonPath("$.selectableRelationships[0].filter", is(filter)),
-            hasJsonPath("$.selectableRelationships[0].searchConfiguration", is(searchConfiguration)),
+            hasJsonPath("$.selectableRelationship.relationshipType", is(relationshipType)),
+            hasJsonPath("$.selectableRelationship.filter", is(filter)),
+            hasJsonPath("$.selectableRelationship.searchConfiguration", is(searchConfiguration)),
             hasJsonPath("$.label", is(label)),
             mandatoryMessage != null ? hasJsonPath("$.mandatoryMessage", containsString(mandatoryMessage)) :
                 hasNoJsonPath("$.mandatoryMessage"),
