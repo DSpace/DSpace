@@ -7,15 +7,8 @@
  */
 package org.dspace.app.rest.model;
 
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.dspace.app.rest.CollectionHarvestSettingsController;
-import org.dspace.content.Collection;
-import org.dspace.harvest.HarvestedCollection;
-
-import javax.persistence.Column;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import java.util.Date;
 
 /**
  * The HarvestCollection REST Resource
@@ -50,9 +43,6 @@ public class HarvestedCollectionRest extends BaseObjectRest<Integer> {
     public String getType() {
         return NAME;
     }
-
-    private Integer id;
-    private Collection collection;
 
     public int getHarvestType() {
         return harvestType.ordinal();
