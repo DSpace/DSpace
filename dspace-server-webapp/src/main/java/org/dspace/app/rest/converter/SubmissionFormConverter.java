@@ -78,7 +78,7 @@ public class SubmissionFormConverter implements DSpaceConverter<DCInputSet, Subm
     private SubmissionFormFieldRest getField(DCInput dcinput, String formName) {
         SubmissionFormFieldRest inputField = new SubmissionFormFieldRest();
         List<SelectableMetadata> selectableMetadata = new ArrayList<SelectableMetadata>();
-        List<SelectableRelationship> selectableRelationships = new ArrayList<SelectableRelationship>();
+        SelectableRelationship selectableRelationship;
         inputField.setLabel(dcinput.getLabel());
         inputField.setHints(dcinput.getHints());
         inputField.setStyle(dcinput.getStyle());
@@ -108,6 +108,8 @@ public class SubmissionFormConverter implements DSpaceConverter<DCInputSet, Subm
 
         if (!StringUtils.equalsIgnoreCase(dcinput.getInputType(), "qualdrop_value")) {
             if (dcinput.isMetadataField()) {
+                // only try to process the metadata input type if there's a metadata field
+
                 // value-pair and vocabulary are a special kind of authorities
                 String inputType = dcinput.getInputType();
 
@@ -129,6 +131,7 @@ public class SubmissionFormConverter implements DSpaceConverter<DCInputSet, Subm
             }
 
         } else {
+            // if the field is a qualdrop_value
             inputRest.setType(INPUT_TYPE_ONEBOX);
             List<String> pairs = dcinput.getPairs();
             for (int idx = 0; idx < pairs.size(); idx += 2) {
@@ -150,25 +153,24 @@ public class SubmissionFormConverter implements DSpaceConverter<DCInputSet, Subm
             inputField.setSelectableMetadata(selectableMetadata);
         }
         if (dcinput.isRelationshipField()) {
-            handleSelectableRelationships(dcinput, selectableRelationships);
-            inputField.setSelectableRelationships(selectableRelationships);
+            selectableRelationship = getSelectableRelationships(dcinput);
+            inputField.setSelectableRelationship(selectableRelationship);
         }
         return inputField;
     }
 
     /**
-     * This method fills in the List of SelectableRelationship objects with a single SelectableRelationship object
-     * which will be fetched from the DCInput which contains a parsed version of the config in the submission-forms.xml
-     * config file
+     * This method will create a SelectableRelationship object
+     * The DCInput will be used to define all the properties of the SelectableRelationship object
      * @param dcinput                   The parsed input from submission-forms.xml
-     * @param selectableRelationships   The list to which the SelectableRelationship object will be added
+     * @return                          The SelectableRelationship object based on the dcinput
      */
-    private void handleSelectableRelationships(DCInput dcinput, List<SelectableRelationship> selectableRelationships) {
+    private SelectableRelationship getSelectableRelationships(DCInput dcinput) {
         SelectableRelationship selectableRelationship = new SelectableRelationship();
         selectableRelationship.setRelationshipType(dcinput.getRelationshipType());
         selectableRelationship.setFilter(dcinput.getFilter());
         selectableRelationship.setSearchConfiguration(dcinput.getSearchConfiguration());
-        selectableRelationships.add(selectableRelationship);
+        return selectableRelationship;
     }
 
     private String getPresentation(String schema, String element, String qualifier, String inputType) {

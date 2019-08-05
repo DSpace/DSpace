@@ -7,6 +7,18 @@
  */
 package org.dspace.app.rest.model.submit;
 
+/**
+ * The SelectableRelationship REST Resource. It is not addressable directly, only
+ * used as inline object in the InputForm resource.
+ *
+ * SelectableRelationship encapsulates the configuration specific to the
+ * submission of an entity relationship.
+ * It contains a mandatory relationshipType, an optional filter for the lookup,
+ * and a mandatory searchConfiguration for the lookup
+ *
+ * @author Raf Ponsaerts (raf.ponsaerts at atmire.com)
+ * @author Ben Bosman (ben.bosman at atmire.com)
+ */
 public class SelectableRelationship {
     private String relationshipType;
     private String filter;

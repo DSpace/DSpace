@@ -529,10 +529,20 @@ public class DCInput {
         return true;
     }
 
+    /**
+     * Verify whether the current field contains an entity relationship
+     * This also implies a relationship type is defined for this field
+     * The field can contain both an entity relationship and a metadata field simultaneously
+     */
     public boolean isRelationshipField() {
         return isRelationshipField;
     }
 
+    /**
+     * Verify whether the current field contains a metadata field
+     * This also implies a field type is defined for this field
+     * The field can contain both an entity relationship and a metadata field simultaneously
+     */
     public boolean isMetadataField() {
         return isMetadataField;
     }

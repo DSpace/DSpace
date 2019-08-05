@@ -71,7 +71,7 @@ public class SubmissionFormFieldRest {
      */
     private String style;
 
-    private List<SelectableRelationship> selectableRelationships;
+    private SelectableRelationship selectableRelationship;
     /**
      * The list of metadata, often a single element, to offer for the storage of the information. This map the DSpace <
      * 7 concepts of qualdrop
@@ -266,12 +266,11 @@ public class SubmissionFormFieldRest {
         }
     }
 
-
-    public List<SelectableRelationship> getSelectableRelationships() {
-        return selectableRelationships;
+    public SelectableRelationship getSelectableRelationship() {
+        return selectableRelationship;
     }
 
-    public void setSelectableRelationships(List<SelectableRelationship> selectableRelationships) {
-        this.selectableRelationships = selectableRelationships;
+    public void setSelectableRelationship(SelectableRelationship selectableRelationship) {
+        this.selectableRelationship = selectableRelationship;
     }
 }
