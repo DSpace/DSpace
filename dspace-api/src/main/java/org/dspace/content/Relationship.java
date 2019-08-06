@@ -80,13 +80,13 @@ public class Relationship implements ReloadableEntity<Integer> {
     /**
      * A String containing an alternative label (name variant) for the left side
      */
-    @Column(name = "left_ward_label")
+    @Column(name = "leftward_label")
     private String leftwardLabel;
 
     /**
      * A String containing an alternative label (name variant) for the right side
      */
-    @Column(name = "right_ward_label")
+    @Column(name = "rightward_label")
     private String rightwardLabel;
 
     /**
