@@ -431,13 +431,15 @@ public class DCInputsReader {
         }
         String missing = null;
         String nodeName = n.getNodeName();
-        if (field.get("dc-element") == null && (nodeName.equals("field") || field.containsKey("linked-metadata-field"))) {
+        if (field.get("dc-element") == null &&
+                (nodeName.equals("field") || field.containsKey("linked-metadata-field"))) {
             missing = "dc-element";
         }
         if (field.get("label") == null) {
             missing = "label";
         }
-        if (field.get("input-type") == null && (nodeName.equals("field") || field.containsKey("linked-metadata-field"))) {
+        if (field.get("input-type") == null &&
+                (nodeName.equals("field") || field.containsKey("linked-metadata-field"))) {
             missing = "input-type";
         }
         if (missing != null) {
