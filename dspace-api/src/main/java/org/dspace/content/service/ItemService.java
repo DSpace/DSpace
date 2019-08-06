@@ -24,10 +24,8 @@ import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataValue;
-import org.dspace.content.RelationshipMetadataValue;
 import org.dspace.content.Thumbnail;
 import org.dspace.content.WorkspaceItem;
-import org.dspace.content.virtual.VirtualMetadataPopulator;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
@@ -40,7 +38,7 @@ import org.dspace.eperson.Group;
  * @author kevinvandevelde at atmire.com
  */
 public interface ItemService
-        extends DSpaceObjectService<Item>, DSpaceObjectLegacySupportService<Item>, IndexableObjectService<Item, UUID> {
+    extends DSpaceObjectService<Item>, DSpaceObjectLegacySupportService<Item>, IndexableObjectService<Item, UUID> {
 
     public Thumbnail getThumbnail(Context context, Item item, boolean requireOriginal) throws SQLException;
 
@@ -182,7 +180,7 @@ public interface ItemService
      * @throws SQLException if database error
      */
     public Iterator<Item> findInArchiveOrWithdrawnNonDiscoverableModifiedSince(Context context, Date since)
-            throws SQLException;
+        throws SQLException;
 
     /**
      * Get all the items (including private and withdrawn) in this collection. The order is indeterminate.

@@ -120,10 +120,8 @@ public class RelationshipMetadataServiceImpl implements RelationshipMetadataServ
     //hashmaps parameter. The beans will be used to retrieve the values for the RelationshipMetadataValue objects
     //and the keys of the hashmap will be used to construct the RelationshipMetadataValue object.
     private List<RelationshipMetadataValue> handleRelationshipTypeMetadataMapping(Context context, Item item,
-                                                                                  HashMap<String, VirtualMetadataConfiguration> hashMaps,
-                                                                                  Item otherItem, String relationName,
-                                                                                  Relationship relationship, int place,
-                                                                                  boolean isLeft) throws SQLException {
+        HashMap<String, VirtualMetadataConfiguration> hashMaps, Item otherItem, String relationName,
+        Relationship relationship, int place, boolean isLeft) throws SQLException {
 
         List<RelationshipMetadataValue> resultingMetadataValueList = new LinkedList<>();
         for (Map.Entry<String, VirtualMetadataConfiguration> entry : hashMaps.entrySet()) {
@@ -133,12 +131,16 @@ public class RelationshipMetadataServiceImpl implements RelationshipMetadataServ
             if (virtualBean.getPopulateWithNameVariant()) {
                 String wardLabel = isLeft ? relationship.getLeftwardLabel() : relationship.getRightwardLabel();
                 if (wardLabel != null) {
-                    resultingMetadataValueList.add(constructRelationshipMetadataValue(context, item, relationship.getID(), place, key, virtualBean, wardLabel));
+                    resultingMetadataValueList.add(
+                        constructRelationshipMetadataValue(context, item, relationship.getID(), place, key, virtualBean,
+                                                           wardLabel));
                 } else {
-                    handleVirtualBeanValues(context, item, otherItem, relationship, place, resultingMetadataValueList, key, virtualBean);
+                    handleVirtualBeanValues(context, item, otherItem, relationship, place, resultingMetadataValueList,
+                                            key, virtualBean);
                 }
             } else {
-                handleVirtualBeanValues(context, item, otherItem, relationship, place, resultingMetadataValueList, key, virtualBean);
+                handleVirtualBeanValues(context, item, otherItem, relationship, place, resultingMetadataValueList, key,
+                                        virtualBean);
             }
         }
         return resultingMetadataValueList;
@@ -148,13 +150,23 @@ public class RelationshipMetadataServiceImpl implements RelationshipMetadataServ
                                          int place, List<RelationshipMetadataValue> resultingMetadataValueList,
                                          String key, VirtualMetadataConfiguration virtualBean) throws SQLException {
         for (String value : virtualBean.getValues(context, otherItem)) {
-            resultingMetadataValueList.add(constructRelationshipMetadataValue(context, item, relationship.getID(), place, key, virtualBean, value));
+            RelationshipMetadataValue relationshipMetadataValue = constructRelationshipMetadataValue(context, item,
+                                                                                                     relationship
+                                                                                                         .getID(),
+                                                                                                     place,
+                                                                                                     key, virtualBean,
+                                                                                                     value);
+            if (relationshipMetadataValue != null) {
+                resultingMetadataValueList.add(relationshipMetadataValue);
+            }
         }
     }
 
-    private RelationshipMetadataValue constructRelationshipMetadataValue(Context context, Item item, Integer relationshipId, int place,
-                                                    String key, VirtualMetadataConfiguration virtualBean,
-                                                    String value) {
+    private RelationshipMetadataValue constructRelationshipMetadataValue(Context context, Item item,
+                                                                         Integer relationshipId, int place,
+                                                                         String key,
+                                                                         VirtualMetadataConfiguration virtualBean,
+                                                                         String value) {
         RelationshipMetadataValue metadataValue = constructMetadataValue(context, key);
         if (metadataValue != null) {
             metadataValue = constructResultingMetadataValue(item, value, metadataValue, relationshipId);
