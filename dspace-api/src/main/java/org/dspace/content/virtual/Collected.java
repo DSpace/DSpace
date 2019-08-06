@@ -77,6 +77,12 @@ public class Collected implements VirtualMetadataConfiguration {
         return useForPlace;
     }
 
+    public void setPopulateWithNameVariant(boolean populateWithNameVariant) { }
+
+    public boolean getPopulateWithNameVariant() {
+        return false;
+    }
+
     /**
      * this method will retrieve the metadata values from the given item for all the metadata fields listed
      * in the fields property and it'll return all those values as a list
