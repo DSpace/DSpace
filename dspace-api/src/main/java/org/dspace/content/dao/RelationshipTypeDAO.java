@@ -25,28 +25,30 @@ public interface RelationshipTypeDAO extends GenericDAO<RelationshipType> {
 
     /**
      * This method is used to retrieve the RelationshipType object that has the same
-     * leftType, rightType, leftLabel and rightLabel as given in the parameters
-     * @param context       The relevant DSpace context
-     * @param leftType      The leftType EntityType object to be matched in the query
-     * @param rightType     The rightType EntityType object to be matched in the query
-     * @param leftLabel     The leftLabel String to be matched in the query
-     * @param rightLabel    The rightLabel String to be matched in the query
-     * @return              The RelationshipType object that matches all the given parameters
+     * leftType, rightType, leftwardLabel and rightwardLabel as given in the parameters
+     * @param context           The relevant DSpace context
+     * @param leftType          The leftType EntityType object to be matched in the query
+     * @param rightType         The rightType EntityType object to be matched in the query
+     * @param leftwardLabel     The leftwardLabel String to be matched in the query
+     * @param rightwardLabel    The rightwardLabel String to be matched in the query
+     * @return                  The RelationshipType object that matches all the given parameters
      * @throws SQLException If something goes wrong
      */
-    RelationshipType findByTypesAndLabels(Context context,
-                                          EntityType leftType,EntityType rightType,String leftLabel,String rightLabel)
-                                                throws SQLException;
+    RelationshipType findByTypesAndLabels(Context context, EntityType leftType,EntityType rightType,
+                                                                              String leftwardLabel,
+                                                                              String rightwardLabel)
+                                                                                    throws SQLException;
 
     /**
      * This method will return a list of RelationshipType objects for which the given label is equal to
-     * either the leftLabel or rightLabel.
+     * either the leftwardLabel or rightwardLabel.
      * @param context   The relevant DSpace context
      * @param label     The label that will be used to check on
-     * @return A list of RelationshipType objects that have the given label as either the leftLabel or rightLabel
+     * @return A list of RelationshipType objects that have the given label as either the leftwardLabel
+     *         or rightwardLabel
      * @throws SQLException If something goes wrong
      */
-    List<RelationshipType> findByLeftOrRightLabel(Context context, String label) throws SQLException;
+    List<RelationshipType> findByLeftwardOrRightwardLabel(Context context, String label) throws SQLException;
 
     /**
      * This method will return a list of RelationshipType objects for which the given EntityType object is equal

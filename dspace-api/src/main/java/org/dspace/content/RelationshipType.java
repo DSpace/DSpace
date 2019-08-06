@@ -26,8 +26,8 @@ import org.dspace.core.ReloadableEntity;
  * Class representing a RelationshipType
  * This class contains an Integer ID that will be the unique value and primary key in the database.
  * This key is automatically generated
- * It also has a leftType and rightType EntityType that describes the relationshipType together with a leftLabel and
- * rightLabel.
+ * It also has a leftType and rightType EntityType that describes the relationshipType together with a leftwardLabel and
+ * rightwardLabel.
  * The cardinality properties describe how many of each relations this relationshipType can support
  */
 @Entity
@@ -61,20 +61,20 @@ public class RelationshipType implements ReloadableEntity<Integer> {
     private EntityType rightType;
 
     /**
-     * The leftLabel String field for the relationshipType
+     * The leftwardLabel String field for the relationshipType
      * This is stored as a String and cannot be null
      * This is a textual representation of the name of the relationship that this RelationshipType is connected to
      */
-    @Column(name = "left_label", nullable = false)
-    private String leftLabel;
+    @Column(name = "leftward_label", nullable = false)
+    private String leftwardLabel;
 
     /**
-     * The rightLabel String field for the relationshipType
+     * The rightwardLabel String field for the relationshipType
      * This is stored as a String and cannot be null
      * This is a textual representation of the name of the relationship that this RelationshipType is connected to
      */
-    @Column(name = "right_label", nullable = false)
-    private String rightLabel;
+    @Column(name = "rightward_label", nullable = false)
+    private String rightwardLabel;
 
     /**
      * The minimum amount of relations for the leftItem that need to be present at all times
@@ -149,35 +149,35 @@ public class RelationshipType implements ReloadableEntity<Integer> {
     }
 
     /**
-     * Standard getter for the leftLabel String for this RelationshipType
-     * @return  The leftLabel String of this RelationshipType
+     * Standard getter for the leftwardLabel String for this RelationshipType
+     * @return  The leftwardLabel String of this RelationshipType
      */
-    public String getLeftLabel() {
-        return leftLabel;
+    public String getLeftwardLabel() {
+        return leftwardLabel;
     }
 
     /**
-     * Standard setter for the leftLabel String for this RelationshipType
-     * @param leftLabel The leftLabel String that this RelationshipType should receive
+     * Standard setter for the leftwardLabel String for this RelationshipType
+     * @param leftwardLabel The leftwardLabel String that this RelationshipType should receive
      */
-    public void setLeftLabel(String leftLabel) {
-        this.leftLabel = leftLabel;
+    public void setLeftwardLabel(String leftwardLabel) {
+        this.leftwardLabel = leftwardLabel;
     }
 
     /**
-     * Standard getter for the rightLabel String for this RelationshipType
-     * @return  The rightLabel String of this RelationshipType
+     * Standard getter for the rightwardLabel String for this RelationshipType
+     * @return  The rightwardLabel String of this RelationshipType
      */
-    public String getRightLabel() {
-        return rightLabel;
+    public String getRightwardLabel() {
+        return rightwardLabel;
     }
 
     /**
-     * Standard setter for the rightLabel String for this RelationshipType
-     * @param rightLabel The rightLabel String that this RelationshipType should receive
+     * Standard setter for the rightwardLabel String for this RelationshipType
+     * @param rightwardLabel The rightwardLabel String that this RelationshipType should receive
      */
-    public void setRightLabel(String rightLabel) {
-        this.rightLabel = rightLabel;
+    public void setRightwardLabel(String rightwardLabel) {
+        this.rightwardLabel = rightwardLabel;
     }
 
     /**

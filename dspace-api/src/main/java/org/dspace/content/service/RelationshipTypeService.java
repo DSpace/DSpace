@@ -23,9 +23,9 @@ public interface RelationshipTypeService extends DSpaceCRUDService<RelationshipT
 
     /**
      * This method creates the given RelationshipType object in the database and returns it
-     * @param context           The relevant DSpace context
-     * @param relationshipType  The RelationshipType to be created in the database
-     * @return                  The newly created RelationshipType
+     * @param context               The relevant DSpace context
+     * @param relationshipType      The RelationshipType to be created in the database
+     * @return                      The newly created RelationshipType
      * @throws SQLException         If something goes wrong
      * @throws AuthorizeException   If something goes wrong with authorizations
      */
@@ -33,16 +33,16 @@ public interface RelationshipTypeService extends DSpaceCRUDService<RelationshipT
 
     /**
      * Retrieves a RelationshipType for which the given parameters all match the one in the returned RelationshipType
-     * @param context       The relevant DSpace context
-     * @param leftType      The rightType EntityType that needs to match for the returned RelationshipType
-     * @param rightType     The rightType EntityType that needs to match for the returned RelationshipType
-     * @param leftLabel     The leftLabel String that needs to match for the returned RelationshipType
-     * @param rightLabel    The rightLabel String that needs to match for the returned RelationshipType
+     * @param context           The relevant DSpace context
+     * @param leftType          The rightType EntityType that needs to match for the returned RelationshipType
+     * @param rightType         The rightType EntityType that needs to match for the returned RelationshipType
+     * @param leftwardLabel     The leftwardLabel String that needs to match for the returned RelationshipType
+     * @param rightwardLabel    The rightwardLabel String that needs to match for the returned RelationshipType
      * @return
      * @throws SQLException If something goes wrong
      */
     RelationshipType findbyTypesAndLabels(Context context,EntityType leftType,EntityType rightType,
-                                          String leftLabel,String rightLabel)
+                                          String leftwardLabel,String rightwardLabel)
                                             throws SQLException;
 
     /**
@@ -62,7 +62,7 @@ public interface RelationshipTypeService extends DSpaceCRUDService<RelationshipT
      *                  that is equal to the given label param
      * @throws SQLException If something goes wrong
      */
-    List<RelationshipType> findByLeftOrRightLabel(Context context, String label) throws SQLException;
+    List<RelationshipType> findByLeftwardOrRightwardLabel(Context context, String label) throws SQLException;
 
     /**
      * Returns a list of RelationshipType objects for which the given EntityType is equal to either the leftType
@@ -80,8 +80,8 @@ public interface RelationshipTypeService extends DSpaceCRUDService<RelationshipT
      * @param context                       The relevant DSpace context
      * @param leftEntityType                The leftEntityType EntityType object for this relationshipType
      * @param rightEntityType               The rightEntityType EntityType object for this relationshipType
-     * @param leftLabel                     The leftLabel String object for this relationshipType
-     * @param rightLabel                    The rightLabel String object for this relationshipType
+     * @param leftwardLabel                 The leftwardLabel String object for this relationshipType
+     * @param rightwardLabel                The rightwardLabel String object for this relationshipType
      * @param leftCardinalityMinInteger     The leftCardinalityMinInteger Integer object for this relationshipType
      * @param leftCardinalityMaxInteger     The leftCardinalityMaxInteger Integer object for this relationshipType
      * @param rightCardinalityMinInteger    The rightCardinalityMinInteger Integer object for this relationshipType
@@ -90,8 +90,9 @@ public interface RelationshipTypeService extends DSpaceCRUDService<RelationshipT
      * @throws SQLException                 If something goes wrong
      * @throws AuthorizeException           If something goes wrong
      */
-    RelationshipType create(Context context, EntityType leftEntityType, EntityType rightEntityType, String leftLabel,
-                            String rightLabel, Integer leftCardinalityMinInteger, Integer leftCardinalityMaxInteger,
-                            Integer rightCardinalityMinInteger, Integer rightCardinalityMaxInteger)
+    RelationshipType create(Context context, EntityType leftEntityType, EntityType rightEntityType,
+                            String leftwardLabel, String rightwardLabel, Integer leftCardinalityMinInteger,
+                            Integer leftCardinalityMaxInteger, Integer rightCardinalityMinInteger,
+                            Integer rightCardinalityMaxInteger)
         throws SQLException, AuthorizeException;
 }

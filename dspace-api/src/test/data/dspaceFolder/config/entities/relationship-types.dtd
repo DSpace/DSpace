@@ -2,11 +2,11 @@
 
 
 <!ELEMENT relationships (type)*>
-<!ELEMENT type (leftType|rightType|leftLabel|rightLabel|leftCardinality|rightCardinality)*>
+<!ELEMENT type (leftType|rightType|leftwardLabel|rightwardLabel|leftCardinality|rightCardinality)*>
 <!ELEMENT leftType (#PCDATA)>
 <!ELEMENT rightType (#PCDATA)>
-<!ELEMENT leftLabel (#PCDATA)>
-<!ELEMENT rightLabel (#PCDATA)>
+<!ELEMENT leftwardLabel (#PCDATA)>
+<!ELEMENT rightwardLabel (#PCDATA)>
 <!ELEMENT leftCardinality (min|max)*>
 <!ELEMENT min (#PCDATA)>
 <!ELEMENT rightCardinality (min|max)*>

@@ -50,9 +50,9 @@ public class VirtualMetadataPopulator {
     public boolean isUseForPlaceTrueForRelationshipType(RelationshipType relationshipType, boolean isLeft) {
         HashMap<String, VirtualMetadataConfiguration> hashMaps;
         if (isLeft) {
-            hashMaps = this.getMap().get(relationshipType.getLeftLabel());
+            hashMaps = this.getMap().get(relationshipType.getLeftwardLabel());
         } else {
-            hashMaps = this.getMap().get(relationshipType.getRightLabel());
+            hashMaps = this.getMap().get(relationshipType.getRightwardLabel());
         }
         if (hashMaps != null) {
             for (Map.Entry<String, VirtualMetadataConfiguration> entry : hashMaps.entrySet()) {

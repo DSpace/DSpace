@@ -6,9 +6,13 @@
 -- http://www.dspace.org/license/
 --
 
--------------------------------------------------------------------------
+-----------------------------------------------------------------------------------
 -- Create columns leftwardLabel and rightwardLabel in table relationship
--------------------------------------------------------------------------
+-- Rename columns left_label and right_label to leftward_label and rightward_label
+-----------------------------------------------------------------------------------
 
 ALTER TABLE relationship ADD leftward_label VARCHAR;
 ALTER TABLE relationship ADD rightward_label VARCHAR;
+
+ALTER TABLE relationship_type RENAME left_label TO leftward_label;
+ALTER TABLE relationship_type RENAME right_label TO rightward_label;

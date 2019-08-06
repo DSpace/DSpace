@@ -319,7 +319,8 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
 
         Context context = obtainContext();
 
-        List<RelationshipType> relationshipTypeList = relationshipTypeService.findByLeftOrRightLabel(context, label);
+        List<RelationshipType> relationshipTypeList =
+            relationshipTypeService.findByLeftwardOrRightwardLabel(context, label);
         List<Relationship> relationships = new LinkedList<>();
         if (dsoId != null) {
 

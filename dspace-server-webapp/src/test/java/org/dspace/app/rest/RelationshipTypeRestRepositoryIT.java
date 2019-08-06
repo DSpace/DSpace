@@ -49,87 +49,87 @@ public class RelationshipTypeRestRepositoryIT extends AbstractEntityIntegrationT
     public void findPublicationPersonRelationshipType() throws SQLException {
         String leftTypeString = "Publication";
         String rightTypeString = "Person";
-        String leftLabel = "isAuthorOfPublication";
-        String rightLabel = "isPublicationOfAuthor";
-        checkRelationshipType(leftTypeString, rightTypeString, leftLabel, rightLabel);
+        String leftwardLabel = "isAuthorOfPublication";
+        String rightwardLabel = "isPublicationOfAuthor";
+        checkRelationshipType(leftTypeString, rightTypeString, leftwardLabel, rightwardLabel);
     }
 
     @Test
     public void findPublicationProjectRelationshipType() throws SQLException {
         String leftTypeString = "Publication";
         String rightTypeString = "Project";
-        String leftLabel = "isProjectOfPublication";
-        String rightLabel = "isPublicationOfProject";
-        checkRelationshipType(leftTypeString, rightTypeString, leftLabel, rightLabel);
+        String leftwardLabel = "isProjectOfPublication";
+        String rightwardLabel = "isPublicationOfProject";
+        checkRelationshipType(leftTypeString, rightTypeString, leftwardLabel, rightwardLabel);
     }
 
     @Test
     public void findPublicationOrgUnitRelationshipType() throws SQLException {
         String leftTypeString = "Publication";
         String rightTypeString = "OrgUnit";
-        String leftLabel = "isOrgUnitOfPublication";
-        String rightLabel = "isPublicationOfOrgUnit";
-        checkRelationshipType(leftTypeString, rightTypeString, leftLabel, rightLabel);
+        String leftwardLabel = "isOrgUnitOfPublication";
+        String rightwardLabel = "isPublicationOfOrgUnit";
+        checkRelationshipType(leftTypeString, rightTypeString, leftwardLabel, rightwardLabel);
     }
 
     @Test
     public void findPersonProjectRelationshipType() throws SQLException {
         String leftTypeString = "Person";
         String rightTypeString = "Project";
-        String leftLabel = "isProjectOfPerson";
-        String rightLabel = "isPersonOfProject";
-        checkRelationshipType(leftTypeString, rightTypeString, leftLabel, rightLabel);
+        String leftwardLabel = "isProjectOfPerson";
+        String rightwardLabel = "isPersonOfProject";
+        checkRelationshipType(leftTypeString, rightTypeString, leftwardLabel, rightwardLabel);
     }
 
     @Test
     public void findPersonOrgUnitRelationshipType() throws SQLException {
         String leftTypeString = "Person";
         String rightTypeString = "OrgUnit";
-        String leftLabel = "isOrgUnitOfPerson";
-        String rightLabel = "isPersonOfOrgUnit";
-        checkRelationshipType(leftTypeString, rightTypeString, leftLabel, rightLabel);
+        String leftwardLabel = "isOrgUnitOfPerson";
+        String rightwardLabel = "isPersonOfOrgUnit";
+        checkRelationshipType(leftTypeString, rightTypeString, leftwardLabel, rightwardLabel);
     }
 
     @Test
     public void findProjectOrgUnitRelationshipType() throws SQLException {
         String leftTypeString = "Project";
         String rightTypeString = "OrgUnit";
-        String leftLabel = "isOrgUnitOfProject";
-        String rightLabel = "isProjectOfOrgUnit";
-        checkRelationshipType(leftTypeString, rightTypeString, leftLabel, rightLabel);
+        String leftwardLabel = "isOrgUnitOfProject";
+        String rightwardLabel = "isProjectOfOrgUnit";
+        checkRelationshipType(leftTypeString, rightTypeString, leftwardLabel, rightwardLabel);
     }
 
     @Test
     public void findJournalJournalVolumeRelationshipType() throws SQLException {
         String leftTypeString = "Journal";
         String rightTypeString = "JournalVolume";
-        String leftLabel = "isVolumeOfJournal";
-        String rightLabel = "isJournalOfVolume";
-        checkRelationshipType(leftTypeString, rightTypeString, leftLabel, rightLabel);
+        String leftwardLabel = "isVolumeOfJournal";
+        String rightwardLabel = "isJournalOfVolume";
+        checkRelationshipType(leftTypeString, rightTypeString, leftwardLabel, rightwardLabel);
     }
 
     @Test
     public void findJournalVolumeJournalIssueRelationshipType() throws SQLException {
         String leftTypeString = "JournalVolume";
         String rightTypeString = "JournalIssue";
-        String leftLabel = "isIssueOfJournalVolume";
-        String rightLabel = "isJournalVolumeOfIssue";
-        checkRelationshipType(leftTypeString, rightTypeString, leftLabel, rightLabel);
+        String leftwardLabel = "isIssueOfJournalVolume";
+        String rightwardLabel = "isJournalVolumeOfIssue";
+        checkRelationshipType(leftTypeString, rightTypeString, leftwardLabel, rightwardLabel);
     }
 
-    private void checkRelationshipType(String leftType, String rightType, String leftLabel, String rightLabel)
+    private void checkRelationshipType(String leftType, String rightType, String leftwardLabel, String rightwardLabel)
         throws SQLException {
         RelationshipType relationshipType = relationshipTypeService
             .findbyTypesAndLabels(context, entityTypeService.findByEntityType(context, leftType),
                                   entityTypeService.findByEntityType(context, rightType),
-                                  leftLabel, rightLabel);
+                                  leftwardLabel, rightwardLabel);
         assertNotNull(relationshipType);
         assertEquals(entityTypeService.findByEntityType(context, leftType),
                      relationshipType.getLeftType());
         assertEquals(entityTypeService.findByEntityType(context, rightType),
                      relationshipType.getRightType());
-        assertEquals(leftLabel, relationshipType.getLeftLabel());
-        assertEquals(rightLabel, relationshipType.getRightLabel());
+        assertEquals(leftwardLabel, relationshipType.getLeftwardLabel());
+        assertEquals(rightwardLabel, relationshipType.getRightwardLabel());
     }
 
     @Test
@@ -167,8 +167,8 @@ public class RelationshipTypeRestRepositoryIT extends AbstractEntityIntegrationT
 
         RelationshipType foundRelationshipType = null;
         for (RelationshipType relationshipType : relationshipTypes) {
-            if (StringUtils.equals(relationshipType.getLeftLabel(), "isAuthorOfPublication") && StringUtils
-                .equals(relationshipType.getRightLabel(), "isPublicationOfAuthor")) {
+            if (StringUtils.equals(relationshipType.getLeftwardLabel(), "isAuthorOfPublication") && StringUtils
+                .equals(relationshipType.getRightwardLabel(), "isPublicationOfAuthor")) {
                 foundRelationshipType = relationshipType;
                 break;
             }
@@ -212,8 +212,8 @@ public class RelationshipTypeRestRepositoryIT extends AbstractEntityIntegrationT
 
         RelationshipType foundRelationshipType = null;
         for (RelationshipType relationshipType : relationshipTypes) {
-            if (StringUtils.equals(relationshipType.getLeftLabel(), "isIssueOfJournalVolume") && StringUtils
-                .equals(relationshipType.getRightLabel(), "isJournalVolumeOfIssue")) {
+            if (StringUtils.equals(relationshipType.getLeftwardLabel(), "isIssueOfJournalVolume") && StringUtils
+                .equals(relationshipType.getRightwardLabel(), "isJournalVolumeOfIssue")) {
                 foundRelationshipType = relationshipType;
                 break;
             }

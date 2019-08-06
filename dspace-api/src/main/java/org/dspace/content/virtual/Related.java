@@ -155,8 +155,8 @@ public class Related implements VirtualMetadataConfiguration {
         List<RelationshipType> relationshipTypes = entityService.getAllRelationshipTypes(context, entity);
         List<RelationshipType> possibleRelationshipTypes = new LinkedList<>();
         for (RelationshipType relationshipType : relationshipTypes) {
-            if (StringUtils.equals(relationshipType.getLeftLabel(), relationshipTypeString) || StringUtils
-                .equals(relationshipType.getRightLabel(), relationshipTypeString)) {
+            if (StringUtils.equals(relationshipType.getLeftwardLabel(), relationshipTypeString) || StringUtils
+                .equals(relationshipType.getRightwardLabel(), relationshipTypeString)) {
                 possibleRelationshipTypes.add(relationshipType);
             }
         }

@@ -128,8 +128,8 @@ public class InitializeEntities {
 
                     String leftType =  eElement.getElementsByTagName("leftType").item(0).getTextContent();
                     String rightType = eElement.getElementsByTagName("rightType").item(0).getTextContent();
-                    String leftLabel = eElement.getElementsByTagName("leftLabel").item(0).getTextContent();
-                    String rightLabel = eElement.getElementsByTagName("rightLabel").item(0).getTextContent();
+                    String leftwardLabel = eElement.getElementsByTagName("leftwardLabel").item(0).getTextContent();
+                    String rightwardLabel = eElement.getElementsByTagName("rightwardLabel").item(0).getTextContent();
 
 
                     NodeList leftCardinalityList = eElement.getElementsByTagName("leftCardinality");
@@ -154,7 +154,7 @@ public class InitializeEntities {
                         rightCardinalityMax = getString(rightCardinalityMax,(Element) node, "max");
 
                     }
-                    populateRelationshipType(context, leftType, rightType, leftLabel, rightLabel,
+                    populateRelationshipType(context, leftType, rightType, leftwardLabel, rightwardLabel,
                                              leftCardinalityMin, leftCardinalityMax,
                                              rightCardinalityMin, rightCardinalityMax);
 
@@ -173,8 +173,8 @@ public class InitializeEntities {
         return leftCardinalityMin;
     }
 
-    private void populateRelationshipType(Context context, String leftType, String rightType, String leftLabel,
-                                          String rightLabel, String leftCardinalityMin, String leftCardinalityMax,
+    private void populateRelationshipType(Context context, String leftType, String rightType, String leftwardLabel,
+                                          String rightwardLabel, String leftCardinalityMin, String leftCardinalityMax,
                                           String rightCardinalityMin, String rightCardinalityMax)
         throws SQLException, AuthorizeException {
 
@@ -211,9 +211,9 @@ public class InitializeEntities {
             rightCardinalityMaxInteger = null;
         }
         RelationshipType relationshipType = relationshipTypeService
-            .findbyTypesAndLabels(context, leftEntityType, rightEntityType, leftLabel, rightLabel);
+            .findbyTypesAndLabels(context, leftEntityType, rightEntityType, leftwardLabel, rightwardLabel);
         if (relationshipType == null) {
-            relationshipTypeService.create(context, leftEntityType, rightEntityType, leftLabel, rightLabel,
+            relationshipTypeService.create(context, leftEntityType, rightEntityType, leftwardLabel, rightwardLabel,
                                            leftCardinalityMinInteger, leftCardinalityMaxInteger,
                                            rightCardinalityMinInteger, rightCardinalityMaxInteger);
         } else {
