@@ -6,13 +6,14 @@
  * http://www.dspace.org/license/
  */
 package org.dspace.app.webui.servlet;
-
 import org.apache.commons.validator.EmailValidator;
 import org.apache.log4j.Logger;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.*;
 import org.dspace.eperson.EPerson;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestTemplate;
 
 import javax.mail.MessagingException;
 import javax.servlet.ServletException;
@@ -22,6 +23,8 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.sql.SQLException;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Servlet for handling user feedback
@@ -65,6 +68,18 @@ public class FeedbackServlet extends DSpaceServlet
             throw new AuthorizeException();
         }
 
+        Map<String, String> googleRequestParameters = new HashMap<>();
+        googleRequestParameters.put("secret", ConfigurationManager.getProperty("recaptcha.private"));
+        googleRequestParameters.put("response", request.getParameter("g-recaptcha-response"));
+        googleRequestParameters.put("remoteip", host);
+
+        ResponseEntity<Map> recaptchaResponseEntity = new RestTemplate()
+                .postForEntity("https://www.google.com/recaptcha/api/siteverify?secret={secret}&response={response}&remoteip={remoteip}", googleRequestParameters, Map.class, googleRequestParameters);
+
+
+        Map<String, Object> googleCaptchaVerifyRepsonse = recaptchaResponseEntity.getBody();
+        Boolean verifyStatus = (Boolean)googleCaptchaVerifyRepsonse.get("success");
+
         // The email address they provided
         String formEmail = request.getParameter("email");
 
@@ -84,7 +99,7 @@ public class FeedbackServlet extends DSpaceServlet
         }
 
         // Has the user just posted their feedback?
-        if (request.getParameter("submit") != null)
+        if (request.getParameter("submit") != null && verifyStatus)
         {
             EmailValidator ev = EmailValidator.getInstance();
             String feedback = request.getParameter("feedback");

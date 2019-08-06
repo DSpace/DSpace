@@ -17,6 +17,7 @@
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
+<%@ page import="org.dspace.core.ConfigurationManager" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
@@ -65,6 +66,7 @@
     }
 %>
     <form action="<%= request.getContextPath() %>/feedback" method="post" class="form-horizontal">
+
         <div class="form-group">
             <label for="temail" class="col-sm-4 control-label"><fmt:message key="jsp.feedback.form.email"/></label>
             <div class="col-sm-6">
@@ -79,10 +81,15 @@
         </div>
 
         <div class="form-group">
+            <div class="col-sm-offset-4 col-sm-6 g-recaptcha" data-sitekey="<%= ConfigurationManager.getProperty("recaptcha.public") %>"></div>
+        </div>
+
+        <div class="form-group">
             <div class="col-sm-offset-4 col-sm-6">
                 <input type="submit" name="submit" value="<fmt:message key="jsp.feedback.form.send"/>"  class="btn btn-default"/>
             </div>
         </div>
     </form>
 
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 </dspace:layout>
