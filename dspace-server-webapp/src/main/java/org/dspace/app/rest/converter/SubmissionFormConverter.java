@@ -138,10 +138,10 @@ public class SubmissionFormConverter implements DSpaceConverter<DCInputSet, Subm
                     selMd.setMetadata(org.dspace.core.Utils
                             .standardize(dcinput.getSchema(), dcinput.getElement(), pairs.get(idx + 1), "."));
                     if (authorityUtils.isChoice(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier())) {
-                        selMd.setAuthority(getAuthorityName(dcinput.getSchema(), dcinput.getElement(), pairs.get(idx + 1),
-                                dcinput.getPairsType(), dcinput.getVocabulary()));
-                        selMd.setClosed(
-                                authorityUtils.isClosed(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier()));
+                        selMd.setAuthority(getAuthorityName(dcinput.getSchema(), dcinput.getElement(),
+                                pairs.get(idx + 1), dcinput.getPairsType(), dcinput.getVocabulary()));
+                        selMd.setClosed(authorityUtils.isClosed(dcinput.getSchema(), dcinput.getElement(),
+                                dcinput.getQualifier()));
                     }
                     selectableMetadata.add(selMd);
                 }
