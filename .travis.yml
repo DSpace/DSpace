@@ -1,5 +1,6 @@
 language: java
 sudo: false
+dist: trusty
 
 env: 
   # Give Maven 1GB of memory to work with
