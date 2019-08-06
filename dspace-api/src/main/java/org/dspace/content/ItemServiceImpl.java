@@ -13,11 +13,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -44,7 +42,6 @@ import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataSchemaService;
 import org.dspace.content.service.RelationshipService;
 import org.dspace.content.service.WorkspaceItemService;
-import org.dspace.content.virtual.VirtualMetadataConfiguration;
 import org.dspace.content.virtual.VirtualMetadataPopulator;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -1344,7 +1341,8 @@ prevent the generation of resource policy entry values with null dspace_object a
         //except for relation.type which is the type of item in the model
         if (StringUtils.equals(schema, MetadataSchemaEnum.RELATION.getName()) && !StringUtils.equals(element, "type")) {
 
-            List<RelationshipMetadataValue> relationMetadata = relationshipMetadataService.getRelationshipMetadata(item, false);
+            List<RelationshipMetadataValue> relationMetadata = relationshipMetadataService
+                .getRelationshipMetadata(item, false);
             List<MetadataValue> listToReturn = new LinkedList<>();
             for (MetadataValue metadataValue : relationMetadata) {
                 if (StringUtils.equals(metadataValue.getMetadataField().getElement(), element)) {
@@ -1381,7 +1379,7 @@ prevent the generation of resource policy entry values with null dspace_object a
      * This method will sort the List of MetadataValue objects based on the MetadataSchema, MetadataField Element,
      * MetadataField Qualifier and MetadataField Place in that order.
      * @param listToReturn  The list to be sorted
-     * @return              The list sorted on those criteria
+     * @return The list sorted on those criteria
      */
     private List<MetadataValue> sortMetadataValueList(List<MetadataValue> listToReturn) {
         Comparator<MetadataValue> comparator = Comparator.comparing(
@@ -1398,8 +1396,6 @@ prevent the generation of resource policy entry values with null dspace_object a
         listToReturn = metadataValueStream.collect(Collectors.toList());
         return listToReturn;
     }
-
-
 
 
 }
