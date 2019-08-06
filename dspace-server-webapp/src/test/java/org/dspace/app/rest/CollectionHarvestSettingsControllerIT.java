@@ -73,7 +73,8 @@ public class CollectionHarvestSettingsControllerIT extends AbstractControllerInt
 
         HarvestedCollection harvestedCollection = harvestedCollectionService.find(context, collection);
 
-        assertTrue(harvestedCollection.getHarvestType() == HarvestTypeEnum.valueOf(json.getString("harvest_type")).getValue());
+        assertTrue(harvestedCollection.getHarvestType()
+            == HarvestTypeEnum.valueOf(json.getString("harvest_type")).getValue());
         assertTrue(harvestedCollection.getOaiSource().equals(json.getString("oai_source")));
         assertTrue(harvestedCollection.getOaiSetId().equals(json.getString("oai_set_id")));
         assertTrue(harvestedCollection.getHarvestMetadataConfig().equals(json.getString("metadata_config_id")));
