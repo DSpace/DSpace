@@ -8,10 +8,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.HarvestTypeEnum;
 import org.dspace.app.rest.model.HarvestedCollectionRest;
+import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.content.Collection;
 import org.dspace.content.service.CollectionService;
 import org.dspace.core.Context;
@@ -29,12 +29,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/core/collections/" +
-    "{itemUuid:[0-9a-fxA-FX]{8}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{12" +
+    "{collectionUuid:[0-9a-fxA-FX]{8}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{12" +
     "}}/harvester")
 public class CollectionHarvestSettingsController {
-
-    private static final Logger log
-        = org.apache.logging.log4j.LogManager.getLogger(CollectionHarvestSettingsController.class);
 
     @Autowired
     CollectionService collectionService;
@@ -44,15 +41,15 @@ public class CollectionHarvestSettingsController {
 
     @RequestMapping(method = RequestMethod.PUT, consumes = {"application/json"})
     @PreAuthorize("hasAuthority('ADMIN')")
-    public void updateHarvestSettingsEndpoint(@PathVariable UUID itemUuid,
+    public void updateHarvestSettingsEndpoint(@PathVariable UUID collectionUuid,
                                               HttpServletResponse response,
                                               HttpServletRequest request) throws SQLException {
 
-        Context context = new Context();
-        Collection collection = collectionService.find(context, itemUuid);
+        Context context = ContextUtil.obtainContext(request);
+        Collection collection = collectionService.find(context, collectionUuid);
 
         if (collection == null) {
-            throw new ResourceNotFoundException("Collection with uuid: " + itemUuid + " not found");
+            throw new ResourceNotFoundException("Collection with uuid: " + collectionUuid + " not found");
         }
 
         // Parse json into HarvestCollectionRest
@@ -63,7 +60,7 @@ public class CollectionHarvestSettingsController {
             ServletInputStream input = request.getInputStream();
             harvestedCollectionRest = mapper.readValue(input, HarvestedCollectionRest.class);
         } catch (IOException e) {
-            throw new UnprocessableEntityException("Error parsing request body: " + e.toString());
+            throw new UnprocessableEntityException("Error parsing request body: " + e.toString(), e);
         }
 
         // Create a new harvestedCollection object if there isn't one yet
@@ -77,14 +74,14 @@ public class CollectionHarvestSettingsController {
         if (harvestedCollectionRest.getHarvestType() == HarvestTypeEnum.NONE.getValue()) {
             harvestedCollectionService.delete(context, harvestedCollection);
         } else {
-            updateCollectionHarvestSettings(harvestedCollection, harvestedCollectionRest);
+            updateCollectionHarvestSettings(context, harvestedCollection, harvestedCollectionRest);
         }
 
         context.complete();
     }
 
-    public void updateCollectionHarvestSettings(HarvestedCollection harvestedCollection,
-                                                HarvestedCollectionRest harvestedCollectionRest) {
+    private void updateCollectionHarvestSettings(Context context, HarvestedCollection harvestedCollection,
+                                                HarvestedCollectionRest harvestedCollectionRest) throws SQLException {
         int harvestType = harvestedCollectionRest.getHarvestType();
         String oaiSource = harvestedCollectionRest.getOaiSource();
         String oaiSetId = harvestedCollectionRest.getOaiSetId();
@@ -94,5 +91,7 @@ public class CollectionHarvestSettingsController {
         harvestedCollection.setOaiSource(oaiSource);
         harvestedCollection.setOaiSetId(oaiSetId);
         harvestedCollection.setHarvestMetadataConfig(metadataConfigId);
+
+        harvestedCollectionService.update(context, harvestedCollection);
     }
 }
