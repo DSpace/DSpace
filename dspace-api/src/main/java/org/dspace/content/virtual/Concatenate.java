@@ -44,6 +44,7 @@ public class Concatenate implements VirtualMetadataConfiguration {
      */
     private boolean useForPlace = false;
 
+    private boolean populateWithNameVariant = false;
     /**
      * Generic getter for the fields property
      * @return The list of fields to be used in this bean
@@ -90,6 +91,14 @@ public class Concatenate implements VirtualMetadataConfiguration {
      */
     public boolean getUseForPlace() {
         return useForPlace;
+    }
+
+    public void setPopulateWithNameVariant(boolean populateWithNameVariant) {
+        this.populateWithNameVariant = populateWithNameVariant;
+    }
+
+    public boolean getPopulateWithNameVariant() {
+        return populateWithNameVariant;
     }
 
     /**
