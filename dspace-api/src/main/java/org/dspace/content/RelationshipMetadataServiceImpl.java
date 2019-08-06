@@ -91,13 +91,15 @@ public class RelationshipMetadataServiceImpl implements RelationshipMetadataServ
             otherItem = relationship.getRightItem();
             relationName = relationship.getRelationshipType().getLeftLabel();
             place = relationship.getLeftPlace();
-            isLeftwards = false; //if the current item is stored on the left, the name variant is retrieved from the rightwards label
+            isLeftwards = false; //if the current item is stored on the left,
+            // the name variant is retrieved from the rightwards label
         } else if (StringUtils.equals(relationshipType.getRightType().getLabel(), entityType)) {
             hashMaps = virtualMetadataPopulator.getMap().get(relationshipType.getRightLabel());
             otherItem = relationship.getLeftItem();
             relationName = relationship.getRelationshipType().getRightLabel();
             place = relationship.getRightPlace();
-            isLeftwards = true; //if the current item is stored on the right, the name variant is retrieved from the leftwards label
+            isLeftwards = true; //if the current item is stored on the right,
+            // the name variant is retrieved from the leftwards label
         } else {
             //No virtual metadata can be created
             return resultingMetadataValueList;
