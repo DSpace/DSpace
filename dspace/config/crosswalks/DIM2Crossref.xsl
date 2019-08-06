@@ -5,7 +5,8 @@
 <xsl:stylesheet  version="1.0"
 	xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
 	xmlns:dspace="http://www.dspace.org/xmlns/dspace/dim"
-	xmlns:java="http://xml.apache.org/xalan/java" >
+	xmlns:java="http://xml.apache.org/xalan/java"
+	xmlns:func="http://exslt.org/functions" >
 
 	<xsl:output method="xml" indent="yes" encoding="utf-8" />
 
@@ -613,8 +614,14 @@
 
 			<!-- dc.identifier.uri -->
 			<resource>
-				<xsl:value-of
-					select="//dspace:field[@mdschema='dc' and @element='identifier' and @qualifier='uri']" />
+			    <!-- When UPDATE content at Crossref, we must use this same crosswalk, so we must avoid to print the "dx.doi..." value in this field, 
+			     only the handle value, as originally was pushed to Crossref. -->
+				<xsl:for-each select="//dspace:field[@mdschema='dc' and @element='identifier' and @qualifier='uri']">
+				    <xsl:variable name="dc-identifier" select="."/>
+				    <xsl:if test="dspace:is-handle-url($dc-identifier)">
+						<xsl:value-of select="$dc-identifier" />
+				    </xsl:if>
+				</xsl:for-each>
 			</resource>
 
 			<!-- No mapeamos un doi a varios recursos
@@ -648,5 +655,20 @@
 				</xsl:attribute>
 		</xsl:if>
 	</xsl:template>
+	
 
+<!-- AUXILIARY FUNCTIONS/TEMPLATES -->
+    <!-- custom xsl functions -->
+    <func:function name="dspace:is-handle-url">
+        <xsl:param name="urlValue"/>
+          <xsl:choose>
+              <xsl:when test="$urlValue!='' and (starts-with(urlValue, java:org.dspace.core.ConfigurationManager.getProperty('handle.canonical.prefix')) 
+                                   or starts-with($urlValue,'http://hdl.handle.net/') or contains($urlValue, 'handle'))">
+                 <func:result select="true()"/>
+             </xsl:when>
+             <xsl:otherwise>
+                 <func:result select="false()"/>
+             </xsl:otherwise>
+         </xsl:choose>
+    </func:function>
 </xsl:stylesheet>
