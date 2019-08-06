@@ -10,5 +10,5 @@
 -- Create columns leftwardLabel and rightwardLabel in table relationship
 -------------------------------------------------------------------------
 
-ALTER TABLE relationship ADD left_ward_label VARCHAR;
-ALTER TABLE relationship ADD right_ward_label VARCHAR;
+ALTER TABLE relationship ADD leftward_label VARCHAR;
+ALTER TABLE relationship ADD rightward_label VARCHAR;
