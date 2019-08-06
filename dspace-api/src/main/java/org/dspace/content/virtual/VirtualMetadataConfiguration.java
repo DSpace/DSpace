@@ -42,4 +42,8 @@ public interface VirtualMetadataConfiguration {
      * @return  The useForPlace to be used by this bean
      */
     boolean getUseForPlace();
+
+    void setPopulateWithNameVariant(boolean populateWithNameVariant);
+
+    boolean getPopulateWithNameVariant();
 }

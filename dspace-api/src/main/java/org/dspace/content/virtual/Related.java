@@ -132,6 +132,12 @@ public class Related implements VirtualMetadataConfiguration {
         return useForPlace;
     }
 
+    public void setPopulateWithNameVariant(boolean populateWithNameVariant) { }
+
+    public boolean getPopulateWithNameVariant() {
+        return false;
+    }
+
     /**
      * This method will find the correct Relationship from the given item to retrieve the other item from it
      * and pass this along to the next VirtualBean that's stored in this class.
