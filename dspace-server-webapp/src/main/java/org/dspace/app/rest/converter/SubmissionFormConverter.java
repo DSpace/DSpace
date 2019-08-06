@@ -106,9 +106,9 @@ public class SubmissionFormConverter implements DSpaceConverter<DCInputSet, Subm
 
         inputRest.setRegex(dcinput.getRegex());
 
-        if (!StringUtils.equalsIgnoreCase(dcinput.getInputType(), "qualdrop_value")) {
-            if (dcinput.isMetadataField()) {
-                // only try to process the metadata input type if there's a metadata field
+        if (dcinput.isMetadataField()) {
+            // only try to process the metadata input type if there's a metadata field
+            if (!StringUtils.equalsIgnoreCase(dcinput.getInputType(), "qualdrop_value")) {
 
                 // value-pair and vocabulary are a special kind of authorities
                 String inputType = dcinput.getInputType();
@@ -128,26 +128,26 @@ public class SubmissionFormConverter implements DSpaceConverter<DCInputSet, Subm
                 selMd.setMetadata(org.dspace.core.Utils
                     .standardize(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier(), "."));
                 selectableMetadata.add(selMd);
-            }
-
-        } else {
-            // if the field is a qualdrop_value
-            inputRest.setType(INPUT_TYPE_ONEBOX);
-            List<String> pairs = dcinput.getPairs();
-            for (int idx = 0; idx < pairs.size(); idx += 2) {
-                SelectableMetadata selMd = new SelectableMetadata();
-                selMd.setLabel((String) pairs.get(idx));
-                selMd.setMetadata(org.dspace.core.Utils
-                    .standardize(dcinput.getSchema(), dcinput.getElement(), pairs.get(idx + 1), "."));
-                if (authorityUtils.isChoice(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier())) {
-                    selMd.setAuthority(getAuthorityName(dcinput.getSchema(), dcinput.getElement(), pairs.get(idx + 1),
-                        dcinput.getPairsType(), dcinput.getVocabulary()));
-                    selMd.setClosed(
-                        authorityUtils.isClosed(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier()));
+            } else {
+                // if the field is a qualdrop_value
+                inputRest.setType(INPUT_TYPE_ONEBOX);
+                List<String> pairs = dcinput.getPairs();
+                for (int idx = 0; idx < pairs.size(); idx += 2) {
+                    SelectableMetadata selMd = new SelectableMetadata();
+                    selMd.setLabel((String) pairs.get(idx));
+                    selMd.setMetadata(org.dspace.core.Utils
+                            .standardize(dcinput.getSchema(), dcinput.getElement(), pairs.get(idx + 1), "."));
+                    if (authorityUtils.isChoice(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier())) {
+                        selMd.setAuthority(getAuthorityName(dcinput.getSchema(), dcinput.getElement(), pairs.get(idx + 1),
+                                dcinput.getPairsType(), dcinput.getVocabulary()));
+                        selMd.setClosed(
+                                authorityUtils.isClosed(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier()));
+                    }
+                    selectableMetadata.add(selMd);
                 }
-                selectableMetadata.add(selMd);
             }
         }
+
         inputField.setInput(inputRest);
         if (dcinput.isMetadataField()) {
             inputField.setSelectableMetadata(selectableMetadata);
