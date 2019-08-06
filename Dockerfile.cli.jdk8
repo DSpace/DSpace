@@ -2,11 +2,11 @@
 # See https://dspace-labs.github.io/DSpace-Docker-Images/ for usage details
 #
 # This version is JDK8 compatible
-# - tomcat:8-jre8
+# - openjdk:8-jre8
 # - ANT 1.10.5
 # - maven:3-jdk-8
 # - note:
-# - default tag for branch: dspace/dspace: dspace/dspace:dspace-6_x-jdk8
+# - default tag for branch: dspace/dspace-cli: dspace/dspace-cli:dspace-6_x
 
 # Step 1 - Run Maven Build
 FROM dspace/dspace-dependencies:dspace-6_x as build
@@ -45,7 +45,7 @@ RUN mkdir $ANT_HOME && \
 RUN ant init_installation update_configs update_code
 
 # Step 3 - Run tomcat
-# Create a new tomcat image that does not retain the the build directory contents
+# Create a new jdk image that does not retain the the build directory contents
 FROM openjdk:8-jdk
 ENV DSPACE_INSTALL=/dspace
 COPY --from=ant_build /dspace $DSPACE_INSTALL
