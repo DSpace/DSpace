@@ -357,7 +357,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
     }
 
     @Test
-    public void createRelationShipWithLeftwardLabel() throws Exception {
+    public void createRelationshipWithLeftwardLabel() throws Exception {
         context.turnOffAuthorisationSystem();
 
         authorizeService.addPolicy(context, publication1, Constants.WRITE, user1);
@@ -399,7 +399,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
     }
 
     @Test
-    public void createRelationShipWithRightWardLabel() throws Exception {
+    public void createRelationshipWithRightwardLabel() throws Exception {
         context.turnOffAuthorisationSystem();
 
         authorizeService.addPolicy(context, publication1, Constants.WRITE, user1);
@@ -441,7 +441,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
     }
 
     @Test
-    public void createRelationShipWithRightWardlabelAndLeftWardLabel() throws Exception {
+    public void createRelationshipWithRightwardLabelAndLeftwardLabel() throws Exception {
         context.turnOffAuthorisationSystem();
 
         authorizeService.addPolicy(context, publication1, Constants.WRITE, user1);
@@ -485,7 +485,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
     }
 
     @Test
-    public void createRelationShipAndAddLeftWardLabelAfterwards() throws Exception {
+    public void createRelationshipAndAddLeftwardLabelAfterwards() throws Exception {
         context.turnOffAuthorisationSystem();
 
         authorizeService.addPolicy(context, publication1, Constants.WRITE, user1);
@@ -543,7 +543,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
     }
 
     @Test
-    public void createRelationShipThenAddLabelsAndRemoveThem() throws Exception {
+    public void createRelationshipThenAddLabelsAndRemoveThem() throws Exception {
         context.turnOffAuthorisationSystem();
 
         authorizeService.addPolicy(context, publication1, Constants.WRITE, user1);
