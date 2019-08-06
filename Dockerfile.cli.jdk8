@@ -2,7 +2,7 @@
 # See https://dspace-labs.github.io/DSpace-Docker-Images/ for usage details
 #
 # This version is JDK8 compatible
-# - openjdk:8-jre8
+# - openjdk:8-jdk
 # - ANT 1.10.5
 # - maven:3-jdk-8
 # - note:
@@ -30,7 +30,7 @@ RUN mvn package && \
   mvn clean
 
 # Step 2 - Run Ant Deploy
-FROM openjdk:8-jre8 as ant_build
+FROM openjdk:8-jdk as ant_build
 ARG TARGET_DIR=dspace-installer
 COPY --from=build /install /dspace-src
 WORKDIR /dspace-src
