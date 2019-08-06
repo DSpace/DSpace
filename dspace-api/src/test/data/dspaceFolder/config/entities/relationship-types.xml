@@ -5,8 +5,8 @@
     <type>
         <leftType>Publication</leftType>
         <rightType>Person</rightType>
-        <leftLabel>isAuthorOfPublication</leftLabel>
-        <rightLabel>isPublicationOfAuthor</rightLabel>
+        <leftwardLabel>isAuthorOfPublication</leftwardLabel>
+        <rightwardLabel>isPublicationOfAuthor</rightwardLabel>
         <leftCardinality>
             <min>0</min>
         </leftCardinality>
@@ -17,8 +17,8 @@
     <type>
         <leftType>Publication</leftType>
         <rightType>Project</rightType>
-        <leftLabel>isProjectOfPublication</leftLabel>
-        <rightLabel>isPublicationOfProject</rightLabel>
+        <leftwardLabel>isProjectOfPublication</leftwardLabel>
+        <rightwardLabel>isPublicationOfProject</rightwardLabel>
         <leftCardinality>
             <min>0</min>
         </leftCardinality>
@@ -29,8 +29,8 @@
     <type>
         <leftType>Publication</leftType>
         <rightType>OrgUnit</rightType>
-        <leftLabel>isOrgUnitOfPublication</leftLabel>
-        <rightLabel>isPublicationOfOrgUnit</rightLabel>
+        <leftwardLabel>isOrgUnitOfPublication</leftwardLabel>
+        <rightwardLabel>isPublicationOfOrgUnit</rightwardLabel>
         <leftCardinality>
             <min>0</min>
         </leftCardinality>
@@ -41,8 +41,8 @@
     <type>
         <leftType>Person</leftType>
         <rightType>Project</rightType>
-        <leftLabel>isProjectOfPerson</leftLabel>
-        <rightLabel>isPersonOfProject</rightLabel>
+        <leftwardLabel>isProjectOfPerson</leftwardLabel>
+        <rightwardLabel>isPersonOfProject</rightwardLabel>
         <leftCardinality>
             <min>0</min>
         </leftCardinality>
@@ -53,8 +53,8 @@
     <type>
         <leftType>Person</leftType>
         <rightType>OrgUnit</rightType>
-        <leftLabel>isOrgUnitOfPerson</leftLabel>
-        <rightLabel>isPersonOfOrgUnit</rightLabel>
+        <leftwardLabel>isOrgUnitOfPerson</leftwardLabel>
+        <rightwardLabel>isPersonOfOrgUnit</rightwardLabel>
         <leftCardinality>
             <min>0</min>
         </leftCardinality>
@@ -65,8 +65,8 @@
     <type>
         <leftType>Project</leftType>
         <rightType>OrgUnit</rightType>
-        <leftLabel>isOrgUnitOfProject</leftLabel>
-        <rightLabel>isProjectOfOrgUnit</rightLabel>
+        <leftwardLabel>isOrgUnitOfProject</leftwardLabel>
+        <rightwardLabel>isProjectOfOrgUnit</rightwardLabel>
         <leftCardinality>
             <min>0</min>
         </leftCardinality>
@@ -77,8 +77,8 @@
     <type>
         <leftType>Journal</leftType>
         <rightType>JournalVolume</rightType>
-        <leftLabel>isVolumeOfJournal</leftLabel>
-        <rightLabel>isJournalOfVolume</rightLabel>
+        <leftwardLabel>isVolumeOfJournal</leftwardLabel>
+        <rightwardLabel>isJournalOfVolume</rightwardLabel>
         <leftCardinality>
             <min>0</min>
         </leftCardinality>
@@ -89,8 +89,8 @@
     <type>
         <leftType>JournalVolume</leftType>
         <rightType>JournalIssue</rightType>
-        <leftLabel>isIssueOfJournalVolume</leftLabel>
-        <rightLabel>isJournalVolumeOfIssue</rightLabel>
+        <leftwardLabel>isIssueOfJournalVolume</leftwardLabel>
+        <rightwardLabel>isJournalVolumeOfIssue</rightwardLabel>
         <leftCardinality>
             <min>0</min>
         </leftCardinality>
@@ -102,8 +102,8 @@
     <type>
         <leftType>Publication</leftType>
         <rightType>OrgUnit</rightType>
-        <leftLabel>isAuthorOfPublication</leftLabel>
-        <rightLabel>isPublicationOfAuthor</rightLabel>
+        <leftwardLabel>isAuthorOfPublication</leftwardLabel>
+        <rightwardLabel>isPublicationOfAuthor</rightwardLabel>
         <leftCardinality>
             <min>0</min>
         </leftCardinality>
@@ -114,8 +114,8 @@
     <type>
         <leftType>JournalIssue</leftType>
         <rightType>Publication</rightType>
-        <leftLabel>isPublicationOfJournalIssue</leftLabel>
-        <rightLabel>isJournalIssueOfPublication</rightLabel>
+        <leftwardLabel>isPublicationOfJournalIssue</leftwardLabel>
+        <rightwardLabel>isJournalIssueOfPublication</rightwardLabel>
         <leftCardinality>
             <min>0</min>
         </leftCardinality>

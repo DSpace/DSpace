@@ -51,8 +51,8 @@ public class RelationshipTypeTest {
         firstRelationshipType.setId(1);
         firstRelationshipType.setLeftType(mock(EntityType.class));
         firstRelationshipType.setRightType(mock(EntityType.class));
-        firstRelationshipType.setLeftLabel("isAuthorOfPublication");
-        firstRelationshipType.setRightLabel("isPublicationOfAuthor");
+        firstRelationshipType.setLeftwardLabel("isAuthorOfPublication");
+        firstRelationshipType.setRightwardLabel("isPublicationOfAuthor");
         firstRelationshipType.setLeftMinCardinality(0);
         firstRelationshipType.setLeftMaxCardinality(null);
         firstRelationshipType.setRightMinCardinality(0);
@@ -63,8 +63,8 @@ public class RelationshipTypeTest {
         secondRelationshipType.setId(new Random().nextInt());
         secondRelationshipType.setLeftType(mock(EntityType.class));
         secondRelationshipType.setRightType(mock(EntityType.class));
-        secondRelationshipType.setLeftLabel("isProjectOfPerson");
-        secondRelationshipType.setRightLabel("isPersonOfProject");
+        secondRelationshipType.setLeftwardLabel("isProjectOfPerson");
+        secondRelationshipType.setRightwardLabel("isPersonOfProject");
         secondRelationshipType.setLeftMinCardinality(0);
         secondRelationshipType.setLeftMaxCardinality(null);
         secondRelationshipType.setRightMinCardinality(0);
@@ -118,16 +118,16 @@ public class RelationshipTypeTest {
     }
 
     @Test
-    public void testRelationshipTypeFindByLeftOrRightLabel() throws Exception {
+    public void testRelationshipTypeFindByLeftOrRightwardLabel() throws Exception {
         // Declare objects utilized for this test
         List<RelationshipType> mockedList = new LinkedList<>();
         mockedList.add(firstRelationshipType);
 
         // Mock DAO to return our mockedList
-        when(relationshipTypeDAO.findByLeftOrRightLabel(any(), any())).thenReturn(mockedList);
+        when(relationshipTypeDAO.findByLeftwardOrRightwardLabel(any(), any())).thenReturn(mockedList);
 
-        // Invoke findByLeftOrRightLabel()
-        List<RelationshipType> found = relationshipTypeService.findByLeftOrRightLabel(context, "mock");
+        // Invoke findByLeftwardOrRightwardLabel()
+        List<RelationshipType> found = relationshipTypeService.findByLeftwardOrRightwardLabel(context, "mock");
 
         // Assert that our expected list contains our expected RelationshipType and nothing more
         assertThat(found, notNullValue());
@@ -160,8 +160,8 @@ public class RelationshipTypeTest {
      */
     private void checkRelationshipTypeValues(RelationshipType found, RelationshipType original) {
         assertThat(found, notNullValue());
-        assertThat(found.getLeftLabel(), equalTo(original.getLeftLabel()));
-        assertThat(found.getRightLabel(), equalTo(original.getRightLabel()));
+        assertThat(found.getLeftwardLabel(), equalTo(original.getLeftwardLabel()));
+        assertThat(found.getRightwardLabel(), equalTo(original.getRightwardLabel()));
         assertThat(found.getLeftType(), equalTo(original.getLeftType()));
         assertThat(found.getRightType(), equalTo(original.getRightType()));
         assertThat(found.getLeftMinCardinality(), equalTo(original.getLeftMinCardinality()));

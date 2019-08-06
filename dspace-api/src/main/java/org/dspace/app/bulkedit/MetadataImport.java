@@ -640,7 +640,7 @@ public class MetadataImport {
 
             if (StringUtils.equals(schema, MetadataSchemaEnum.RELATION.getName())) {
                 List<RelationshipType> relationshipTypeList = relationshipTypeService
-                    .findByLeftOrRightLabel(c, element);
+                    .findByLeftwardOrRightwardLabel(c, element);
                 for (RelationshipType relationshipType : relationshipTypeList) {
                     for (Relationship relationship : relationshipService
                         .findByItemAndRelationshipType(c, item, relationshipType)) {
@@ -716,13 +716,13 @@ public class MetadataImport {
         List<RelationshipType> rightRelationshipTypesForEntity = entityService.getRightRelationshipTypes(c, entity);
 
         for (RelationshipType relationshipType : entityService.getAllRelationshipTypes(c, entity)) {
-            if (StringUtils.equalsIgnoreCase(relationshipType.getLeftLabel(), element)) {
-                left = handleLeftLabelEqualityRelationshipTypeElement(c, entity, relationEntity, left,
+            if (StringUtils.equalsIgnoreCase(relationshipType.getLeftwardLabel(), element)) {
+                left = handleLeftwardLabelEqualityRelationshipTypeElement(c, entity, relationEntity, left,
                                                                       acceptableRelationshipTypes,
                                                                       leftRelationshipTypesForEntity,
                                                                       relationshipType);
-            } else if (StringUtils.equalsIgnoreCase(relationshipType.getRightLabel(), element)) {
-                left = handleRightLabelEqualityRelationshipTypeElement(c, entity, relationEntity, left,
+            } else if (StringUtils.equalsIgnoreCase(relationshipType.getRightwardLabel(), element)) {
+                left = handleRightwardLabelEqualityRelationshipTypeElement(c, entity, relationEntity, left,
                                                                        acceptableRelationshipTypes,
                                                                        rightRelationshipTypesForEntity,
                                                                        relationshipType);
@@ -789,7 +789,7 @@ public class MetadataImport {
      *                                          be false in this case
      * @throws SQLException                     If something goes wrong
      */
-    private boolean handleRightLabelEqualityRelationshipTypeElement(Context c, Entity entity, Entity relationEntity,
+    private boolean handleRightwardLabelEqualityRelationshipTypeElement(Context c, Entity entity, Entity relationEntity,
                                                                     boolean left,
                                                                     List<RelationshipType> acceptableRelationshipTypes,
                                                                     List<RelationshipType>
@@ -831,7 +831,7 @@ public class MetadataImport {
      *                                          be true in this case
      * @throws SQLException                     If something goes wrong
      */
-    private boolean handleLeftLabelEqualityRelationshipTypeElement(Context c, Entity entity, Entity relationEntity,
+    private boolean handleLeftwardLabelEqualityRelationshipTypeElement(Context c, Entity entity, Entity relationEntity,
                                                                    boolean left,
                                                                    List<RelationshipType> acceptableRelationshipTypes,
                                                                    List<RelationshipType>

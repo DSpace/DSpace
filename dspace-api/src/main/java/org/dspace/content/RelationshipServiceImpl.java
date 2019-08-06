@@ -108,7 +108,7 @@ public class RelationshipServiceImpl implements RelationshipService {
                                                                               false);
 
         context.turnOffAuthorisationSystem();
-        //If useForPlace for the leftlabel is false for the relationshipType,
+        //If useForPlace for the leftwardlabel is false for the relationshipType,
         // we need to sort the relationships here based on leftplace.
         if (!virtualMetadataPopulator.isUseForPlaceTrueForRelationshipType(relationship.getRelationshipType(), true)) {
             if (!leftRelationships.isEmpty()) {
@@ -125,7 +125,7 @@ public class RelationshipServiceImpl implements RelationshipService {
 
         }
 
-        //If useForPlace for the rightLabel is false for the relationshipType,
+        //If useForPlace for the rightwardLabel is false for the relationshipType,
         // we need to sort the relationships here based on the rightplace.
         if (!virtualMetadataPopulator.isUseForPlaceTrueForRelationshipType(relationship.getRelationshipType(), false)) {
             if (!rightRelationships.isEmpty()) {
@@ -230,8 +230,8 @@ public class RelationshipServiceImpl implements RelationshipService {
 
     private void logRelationshipTypeDetailsForError(RelationshipType relationshipType) {
         log.warn("The relationshipType's ID is: " + relationshipType.getID());
-        log.warn("The relationshipType's left label is: " + relationshipType.getLeftLabel());
-        log.warn("The relationshipType's right label is: " + relationshipType.getRightLabel());
+        log.warn("The relationshipType's leftward label is: " + relationshipType.getLeftwardLabel());
+        log.warn("The relationshipType's rightward label is: " + relationshipType.getRightwardLabel());
         log.warn("The relationshipType's left entityType label is: " + relationshipType.getLeftType().getLabel());
         log.warn("The relationshipType's right entityType label is: " + relationshipType.getRightType().getLabel());
         log.warn("The relationshipType's left min cardinality is: " + relationshipType.getLeftMinCardinality());
@@ -271,8 +271,8 @@ public class RelationshipServiceImpl implements RelationshipService {
         List<Relationship> list = relationshipDAO.findByItem(context, item);
 
         list.sort((o1, o2) -> {
-            int relationshipType = o1.getRelationshipType().getLeftLabel()
-                                     .compareTo(o2.getRelationshipType().getLeftLabel());
+            int relationshipType = o1.getRelationshipType().getLeftwardLabel()
+                                     .compareTo(o2.getRelationshipType().getLeftwardLabel());
             if (relationshipType != 0) {
                 return relationshipType;
             } else {
@@ -385,12 +385,16 @@ public class RelationshipServiceImpl implements RelationshipService {
         for (Relationship relationship : list) {
             if (isLeft) {
                 if (StringUtils
-                    .equals(relationship.getRelationshipType().getLeftLabel(), relationshipType.getLeftLabel())) {
+                    .equals(
+                        relationship.getRelationshipType().getLeftwardLabel(), relationshipType.getLeftwardLabel())
+                ) {
                     listToReturn.add(relationship);
                 }
             } else {
                 if (StringUtils
-                    .equals(relationship.getRelationshipType().getRightLabel(), relationshipType.getRightLabel())) {
+                    .equals(
+                        relationship.getRelationshipType().getRightwardLabel(), relationshipType.getRightwardLabel())
+                ) {
                     listToReturn.add(relationship);
                 }
             }

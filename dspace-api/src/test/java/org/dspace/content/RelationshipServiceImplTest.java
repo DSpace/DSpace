@@ -84,12 +84,12 @@ public class RelationshipServiceImplTest {
         RelationshipType hasDog = new RelationshipType();
         RelationshipType hasFather = new RelationshipType();
         RelationshipType hasMother = new RelationshipType();
-        hasDog.setLeftLabel("hasDog");
-        hasDog.setRightLabel("isDogOf");
-        hasFather.setLeftLabel("hasFather");
-        hasFather.setRightLabel("isFatherOf");
-        hasMother.setLeftLabel("hasMother");
-        hasMother.setRightLabel("isMotherOf");
+        hasDog.setLeftwardLabel("hasDog");
+        hasDog.setRightwardLabel("isDogOf");
+        hasFather.setLeftwardLabel("hasFather");
+        hasFather.setRightwardLabel("isFatherOf");
+        hasMother.setLeftwardLabel("hasMother");
+        hasMother.setRightwardLabel("isMotherOf");
 
         relationshipTest.add(getRelationship(cindy, spot, hasDog,0,0));
         relationshipTest.add(getRelationship(cindy, jasper, hasDog,0,1));
@@ -194,8 +194,8 @@ public class RelationshipServiceImplTest {
         EntityType rightEntityType = mock(EntityType.class);
         testRel.setLeftType(leftEntityType);
         testRel.setRightType(rightEntityType);
-        testRel.setLeftLabel("Entitylabel");
-        testRel.setRightLabel("Entitylabel");
+        testRel.setLeftwardLabel("Entitylabel");
+        testRel.setRightwardLabel("Entitylabel");
         metsList.add(metVal);
         relationship = getRelationship(leftItem, rightItem, testRel, 0,0);
         leftTypelist.add(relationship);
@@ -247,8 +247,8 @@ public class RelationshipServiceImplTest {
         EntityType rightEntityType = mock(EntityType.class);
         testRel.setLeftType(leftEntityType);
         testRel.setRightType(rightEntityType);
-        testRel.setLeftLabel("Entitylabel");
-        testRel.setRightLabel("Entitylabel");
+        testRel.setLeftwardLabel("Entitylabel");
+        testRel.setRightwardLabel("Entitylabel");
         testRel.setLeftMinCardinality(0);
         testRel.setRightMinCardinality(0);
         metsList.add(metVal);
@@ -299,8 +299,8 @@ public class RelationshipServiceImplTest {
         EntityType rightEntityType = mock(EntityType.class);
         testRel.setLeftType(leftEntityType);
         testRel.setRightType(rightEntityType);
-        testRel.setLeftLabel("Entitylabel");
-        testRel.setRightLabel("Entitylabel");
+        testRel.setLeftwardLabel("Entitylabel");
+        testRel.setRightwardLabel("Entitylabel");
         testRel.setLeftMinCardinality(0);
         testRel.setRightMinCardinality(0);
         metsList.add(metVal);
