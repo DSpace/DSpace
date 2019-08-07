@@ -59,6 +59,8 @@ public class CollectionHarvestSettingsControllerIT extends AbstractControllerInt
         return json;
     }
 
+
+    // This test might fail if the oai_source ("https://dspace.mit.edu/oai/request") is down
     @Test
     public void EndpointWorksWithStandardSettings() throws Exception {
         String token = getAuthToken(admin.getEmail(), password);
@@ -78,6 +80,19 @@ public class CollectionHarvestSettingsControllerIT extends AbstractControllerInt
         assertTrue(harvestedCollection.getOaiSource().equals(json.getString("oai_source")));
         assertTrue(harvestedCollection.getOaiSetId().equals(json.getString("oai_set_id")));
         assertTrue(harvestedCollection.getHarvestMetadataConfig().equals(json.getString("metadata_config_id")));
+    }
+
+    @Test
+    public void UnProcessableEntityIfIncorrectSettings() throws Exception {
+        String token = getAuthToken(admin.getEmail(), password);
+
+        JSONObject json = createHarvestSettingsJson("METADATA_ONLY", "https://dspace.mit.edu/iao/request", "col_1721.1_114174", "bc");
+
+        getClient(token).perform(
+            put("/api/core/collections/" + collection.getID() + "/harvester")
+                .contentType("application/json")
+                .content(json.toString()))
+            .andExpect(status().isUnprocessableEntity());
     }
 
     @Test
