@@ -7,6 +7,16 @@
  */
 package org.dspace.disseminate;
 
+import java.awt.Color;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.pdfbox.exceptions.COSVisitorException;
@@ -22,19 +32,18 @@ import org.apache.pdfbox.pdmodel.graphics.xobject.PDJpeg;
 import org.apache.pdfbox.pdmodel.graphics.xobject.PDXObjectImage;
 import org.bouncycastle.crypto.CryptoException;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.*;
+import org.dspace.authorize.AuthorizeManager;
+import org.dspace.content.Bitstream;
+import org.dspace.content.Community;
+import org.dspace.content.DCDate;
+import org.dspace.content.Item;
+import org.dspace.content.Metadatum;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
 import org.dspace.core.PluginManager;
 import org.dspace.storage.bitstore.BitstreamStorageManager;
-
-import java.awt.*;
-import java.io.*;
-import java.sql.SQLException;
-import java.util.*;
-import java.util.List;
 
 
 /**
