@@ -2250,7 +2250,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
     }
 
     @Test
-    public void leftWardLabelRelationshipTest() throws Exception {
+    public void rightWardLabelRelationshipTest() throws Exception {
 
         context.turnOffAuthorisationSystem();
 
@@ -2261,7 +2261,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
 
         Relationship relationship3 = RelationshipBuilder
             .createRelationshipBuilder(context, publication1, author1, isAuthorOfPublicationRelationshipType)
-            .withLeftWardLabel("LeftWardLabelTest").build();
+            .withRightWardLabel("RightWardLabelTest").build();
 
         context.restoreAuthSystemState();
 
@@ -2278,12 +2278,12 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         getClient().perform(get("/api/core/items/" + publication1.getID()))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.metadata", allOf(
-                       matchMetadata("dc.contributor.author", "LeftWardLabelTest"),
+                       matchMetadata("dc.contributor.author", "RightWardLabelTest"),
                        matchMetadata("dc.title", "Publication1"))));
     }
 
     @Test
-    public void nonLeftWardLabelRelationshipTest() throws Exception {
+    public void nonRightWardLabelRelationshipTest() throws Exception {
 
         context.turnOffAuthorisationSystem();
 
@@ -2317,7 +2317,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
     }
 
     @Test
-    public void mixedLeftWardLabelAndRegularRelationshipTest() throws Exception {
+    public void mixedRightWardLabelAndRegularRelationshipTest() throws Exception {
 
         context.turnOffAuthorisationSystem();
 
@@ -2341,7 +2341,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
 
         Relationship relationship2 = RelationshipBuilder
             .createRelationshipBuilder(context, publication1, author1, isAuthorOfPublicationRelationshipType)
-            .withLeftWardLabel("TestingLeftWardLabel").build();
+            .withRightWardLabel("TestingRightWardLabel").build();
 
         context.restoreAuthSystemState();
 
@@ -2361,13 +2361,13 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                    .andExpect(jsonPath("$.metadata", allOf(
                        matchMetadata("dc.contributor.author", "Maybe, Maybe"),
                        matchMetadata("dc.contributor.author", "Testy, TEst"),
-                       matchMetadata("dc.contributor.author", "TestingLeftWardLabel"),
+                       matchMetadata("dc.contributor.author", "TestingRightWardLabel"),
                        not(matchMetadata("dc.contributor.author", "testingLastName, testingFirstName")),
                        matchMetadata("dc.title", "Publication1"))));
     }
 
     @Test
-    public void rightWardLabelRelationshipTest() throws Exception {
+    public void leftWardLabelRelationshipTest() throws Exception {
 
         context.turnOffAuthorisationSystem();
 
@@ -2378,7 +2378,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
 
         Relationship relationship3 = RelationshipBuilder
             .createRelationshipBuilder(context, publication1, author3, isAuthorOfPublicationRelationshipType)
-            .withRightWardLabel("rightWardLabelTest").withLeftPlace(1).build();
+            .withLeftWardLabel("leftWardLabel").withLeftPlace(1).build();
 
         context.restoreAuthSystemState();
 
