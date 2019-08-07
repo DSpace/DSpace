@@ -17,8 +17,12 @@ import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.HashSet;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -989,5 +993,40 @@ public class OAIHarvester {
         }
 
         return errorSet;
+    }
+
+    public static List<Map<String,String>> getAvailableMetadataFormats() {
+        List<Map<String,String>> configs = new ArrayList<>();
+        String metaString = "oai.harvester.metadataformats.";
+        Enumeration pe = Collections.enumeration(
+            DSpaceServicesFactory.getInstance().getConfigurationService().getPropertyKeys("oai")
+        );
+        while (pe.hasMoreElements()) {
+            String key = (String) pe.nextElement();
+            if (key.startsWith(metaString)) {
+
+                String metadataString = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty(key);
+
+                String id = key.substring(metaString.length());
+                String label;
+                String namespace = "";
+
+                if (metadataString.indexOf(',') != -1) {
+                    label = metadataString.substring(metadataString.indexOf(',') + 1);
+                    namespace = metadataString.substring(0, metadataString.indexOf(','));
+                } else {
+                    label = id + "(" + metadataString + ")";
+                }
+
+                Map<String,String> config = new HashMap<>();
+                config.put("id", id);
+                config.put("label", label);
+                config.put("namespace", namespace);
+
+                configs.add(config);
+            }
+        }
+
+        return configs;
     }
 }
