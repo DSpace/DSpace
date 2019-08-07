@@ -16,6 +16,8 @@ import org.dspace.content.Collection;
 import org.dspace.content.service.CollectionService;
 import org.dspace.core.Context;
 import org.dspace.harvest.HarvestedCollection;
+import org.dspace.harvest.HarvestingException;
+import org.dspace.harvest.OAIHarvester;
 import org.dspace.harvest.service.HarvestedCollectionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
@@ -73,11 +75,23 @@ public class CollectionHarvestSettingsController {
         // Delete harvestedCollection object if harvest type is not set
         if (harvestedCollectionRest.getHarvestType() == HarvestTypeEnum.NONE.getValue()) {
             harvestedCollectionService.delete(context, harvestedCollection);
-        } else {
+        } else if (testHarvestSettings(context, collection, harvestedCollection)) {
             updateCollectionHarvestSettings(context, harvestedCollection, harvestedCollectionRest);
+        } else {
+            throw new UnprocessableEntityException("Incorrect harvest settings in request");
         }
 
         context.complete();
+    }
+
+    private boolean testHarvestSettings(Context context, Collection collection, HarvestedCollection harvestedCollection)
+        throws SQLException {
+        try {
+            OAIHarvester harvester = new OAIHarvester(context, collection, harvestedCollection);
+            return harvester.verifyOAIharvester().size() == 0;
+        } catch (HarvestingException e) {
+            return false;
+        }
     }
 
     private void updateCollectionHarvestSettings(Context context, HarvestedCollection harvestedCollection,
