@@ -66,7 +66,7 @@ public class RelationshipServiceImplTest {
     @Test
     public void testFindAll() throws Exception {
         // Mock DAO to return our mocked relationshipsList
-        when(relationshipDAO.findAll(context, Relationship.class)).thenReturn(relationshipsList);
+        when(relationshipDAO.findAll(context, Relationship.class, -1, -1)).thenReturn(relationshipsList);
         // The reported Relationship(s) should match our relationshipsList
         assertEquals("TestFindAll 0", relationshipsList, relationshipService.findAll(context));
     }
@@ -96,11 +96,10 @@ public class RelationshipServiceImplTest {
         relationshipTest.add(getRelationship(cindy, hank, hasFather,0,0));
         relationshipTest.add(getRelationship(fred, cindy, hasMother,0,0));
         relationshipTest.add(getRelationship(bob, cindy, hasMother,1,0));
-        when(relationshipService.findByItem(context, cindy)).thenReturn(relationshipTest);
-        when(relationshipDAO.findByItem(context, cindy)).thenReturn(relationshipTest);
+        when(relationshipService.findByItem(context, cindy, -1, -1)).thenReturn(relationshipTest);
 
         // Mock the state of objects utilized in findByItem() to meet the success criteria of the invocation
-        when(relationshipDAO.findByItem(context, cindy)).thenReturn(relationshipTest);
+        when(relationshipDAO.findByItem(context, cindy, -1, -1)).thenReturn(relationshipTest);
 
         List<Relationship> results = relationshipService.findByItem(context, cindy);
         assertEquals("TestFindByItem 0", relationshipTest, results);

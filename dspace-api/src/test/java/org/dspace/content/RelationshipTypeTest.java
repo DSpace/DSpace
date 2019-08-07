@@ -107,7 +107,7 @@ public class RelationshipTypeTest {
         mockedList.add(secondRelationshipType);
 
         // Mock DAO to return our mockedList
-        when(relationshipTypeDAO.findAll(context, RelationshipType.class)).thenReturn(mockedList);
+        when(relationshipTypeDAO.findAll(context, RelationshipType.class, -1, -1)).thenReturn(mockedList);
 
         // Invoke findAll()
         List<RelationshipType> foundRelationshipTypes = relationshipTypeService.findAll(context);
@@ -124,7 +124,7 @@ public class RelationshipTypeTest {
         mockedList.add(firstRelationshipType);
 
         // Mock DAO to return our mockedList
-        when(relationshipTypeDAO.findByLeftwardOrRightwardTypeName(any(), any())).thenReturn(mockedList);
+        when(relationshipTypeDAO.findByLeftwardOrRightwardTypeName(context, "mock", -1, -1)).thenReturn(mockedList);
 
         // Invoke findByLeftwardOrRightwardTypeName()
         List<RelationshipType> found = relationshipTypeService.findByLeftwardOrRightwardTypeName(context, "mock");
@@ -142,10 +142,11 @@ public class RelationshipTypeTest {
         mockedList.add(firstRelationshipType);
 
         // Mock DAO to return our mockedList
-        when(relationshipTypeDAO.findByEntityType(any(), any())).thenReturn(mockedList);
+        when(relationshipTypeDAO.findByEntityType(any(), any(), any(), any())).thenReturn(mockedList);
 
         // Invoke findByEntityType()
-        List<RelationshipType> found = relationshipTypeService.findByEntityType(context, mock(EntityType.class));
+        List<RelationshipType> found = relationshipTypeService
+                .findByEntityType(context, mock(EntityType.class), -1, -1);
 
         // Assert that our expected list contains our expected RelationshipType and nothing more
         assertThat(found, notNullValue());
