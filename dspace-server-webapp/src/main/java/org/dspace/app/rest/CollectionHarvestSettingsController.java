@@ -1,3 +1,10 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
 package org.dspace.app.rest;
 
 import java.io.IOException;
@@ -17,7 +24,6 @@ import org.dspace.content.Collection;
 import org.dspace.content.service.CollectionService;
 import org.dspace.core.Context;
 import org.dspace.harvest.HarvestedCollection;
-import org.dspace.harvest.HarvestingException;
 import org.dspace.harvest.OAIHarvester;
 import org.dspace.harvest.service.HarvestedCollectionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -85,8 +91,9 @@ public class CollectionHarvestSettingsController {
         context.complete();
     }
 
-    private boolean testHarvestSettings(Context context, Collection collection, HarvestedCollectionRest harvestedCollectionRest)
-        throws SQLException {
+    private boolean testHarvestSettings(Context context,
+                                        Collection collection,
+                                        HarvestedCollectionRest harvestedCollectionRest) throws SQLException {
         List<String> errors = OAIHarvester.verifyOAIharvester(
             harvestedCollectionRest.getOaiSource(),
             harvestedCollectionRest.getOaiSetId(),
