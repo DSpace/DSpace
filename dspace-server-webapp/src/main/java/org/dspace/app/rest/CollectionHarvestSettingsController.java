@@ -2,6 +2,7 @@ package org.dspace.app.rest;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.UUID;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -75,7 +76,7 @@ public class CollectionHarvestSettingsController {
         // Delete harvestedCollection object if harvest type is not set
         if (harvestedCollectionRest.getHarvestType() == HarvestTypeEnum.NONE.getValue()) {
             harvestedCollectionService.delete(context, harvestedCollection);
-        } else if (testHarvestSettings(context, collection, harvestedCollection)) {
+        } else if (testHarvestSettings(context, collection, harvestedCollectionRest)) {
             updateCollectionHarvestSettings(context, harvestedCollection, harvestedCollectionRest);
         } else {
             throw new UnprocessableEntityException("Incorrect harvest settings in request");
@@ -84,14 +85,15 @@ public class CollectionHarvestSettingsController {
         context.complete();
     }
 
-    private boolean testHarvestSettings(Context context, Collection collection, HarvestedCollection harvestedCollection)
+    private boolean testHarvestSettings(Context context, Collection collection, HarvestedCollectionRest harvestedCollectionRest)
         throws SQLException {
-        try {
-            OAIHarvester harvester = new OAIHarvester(context, collection, harvestedCollection);
-            return harvester.verifyOAIharvester().size() == 0;
-        } catch (HarvestingException e) {
-            return false;
-        }
+        List<String> errors = OAIHarvester.verifyOAIharvester(
+            harvestedCollectionRest.getOaiSource(),
+            harvestedCollectionRest.getOaiSetId(),
+            harvestedCollectionRest.getMetadataConfigId(),
+            true
+        );
+        return errors.size() == 0;
     }
 
     private void updateCollectionHarvestSettings(Context context, HarvestedCollection harvestedCollection,
