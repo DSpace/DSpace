@@ -528,7 +528,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             try {
                 getSolr().deleteByQuery(
                     "search.resourcetype:[" + Constants.ITEM + " TO " + Constants.COMMUNITY + "]" +
-                    " AND " +
+                    " OR " +
                     "search.resourcetype:[" + Constants.WORKSPACEITEM + " TO " + Constants.CLAIMEDTASK + "]");
             } catch (Exception e) {
                 throw new SearchServiceException(e.getMessage(), e);
@@ -559,7 +559,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 SolrQuery query = new SolrQuery();
                 // Query for all indexed Items, Collections and Communities,
                 // returning just their handle
-                query.setFields(HANDLE_FIELD);
+                query.setFields(HANDLE_FIELD, RESOURCE_UNIQUE_ID, RESOURCE_ID_FIELD, RESOURCE_TYPE_FIELD);
                 query.setQuery(RESOURCE_TYPE_FIELD + ":" + type);
                 QueryResponse rsp = getSolr().query(query, SolrRequest.METHOD.POST);
                 SolrDocumentList docs = rsp.getResults();
@@ -2207,10 +2207,14 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     /**
      * Find the indexable object by type and UUID
      *
-     * @param context The relevant DSpace Context.
-     * @param doc     the solr document
+     * @param context
+     *            The relevant DSpace Context.
+     * @param doc
+     *            the solr document, the following fields MUST be present RESOURCE_TYPE_FIELD, RESOURCE_ID_FIELD and
+     *            HANDLE_FIELD
      * @return an IndexableObject
-     * @throws SQLException An exception that provides information on a database access error or other errors.
+     * @throws SQLException
+     *             An exception that provides information on a database access error or other errors.
      */
     protected IndexableObject findIndexableObject(Context context, SolrDocument doc) throws SQLException {
         Integer type = (Integer) doc.getFirstValue(RESOURCE_TYPE_FIELD);

@@ -70,7 +70,7 @@ public class ChecksumHistoryDAOImplTest
 
         // Create two older rows
         HibernateDBConnection dbc = (HibernateDBConnection) CoreHelpers.getDBConnection(context);
-        Query qry = dbc.getSession().createSQLQuery(
+        Query qry = dbc.getSession().createNativeQuery(
             "INSERT INTO checksum_history"
                 + "(check_id, process_end_date, result, bitstream_id)"
                 + " VALUES (:id, :date, :result, :bitstream)");
@@ -127,17 +127,17 @@ public class ChecksumHistoryDAOImplTest
 
         qry.setParameter("date", matchDate);
         count = (Long) qry.getSingleResult();
-        assertEquals("Should find no row at matchDate", count, 0);
+        assertEquals("Should find no row at matchDate", 0, count);
 
         // See if nonmatching old row is still present.
         qry.setParameter("date", noMatchDate);
         count = (Long) qry.getSingleResult();
-        assertEquals("Should find one row at noMatchDate", count, 1);
+        assertEquals("Should find one row at noMatchDate", 1, count);
 
         // See if new row is still present.
         qry.setParameter("date", futureDate);
         count = (Long) qry.getSingleResult();
-        assertEquals("Should find one row at futureDate", count, 1);
+        assertEquals("Should find one row at futureDate", 1, count);
     }
 
     /**

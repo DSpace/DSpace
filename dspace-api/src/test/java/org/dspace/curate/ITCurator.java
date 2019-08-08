@@ -168,7 +168,7 @@ public class ITCurator
     /**
      * Absorb report strings into a sequential collection.
      */
-    class ListReporter
+    static class ListReporter
             implements Appendable {
         private final List<String> report = new ArrayList<>();
 
