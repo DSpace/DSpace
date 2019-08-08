@@ -9,6 +9,7 @@ package org.dspace.app.rest;
 
 import static com.jayway.jsonpath.JsonPath.read;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
+import static junit.framework.TestCase.assertEquals;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
@@ -25,6 +26,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -45,9 +48,12 @@ import org.dspace.content.service.CommunityService;
 import org.dspace.core.Constants;
 import org.dspace.eperson.EPerson;
 import org.hamcrest.Matchers;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MvcResult;
 
 /**
  * Integration Tests against the /api/core/communities endpoint (including any subpaths)
@@ -307,6 +313,39 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                 )))
                 .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/communities")))
                 .andExpect(jsonPath("$.page.totalElements", is(1)));
+    }
+
+    @Test
+    public void findAllCommunitiesAreReturnedInCorrectOrder() throws Exception {
+        // The hibernate query for finding all communities is "SELECT ... ORDER BY STR(dc_title.value)"
+        // So the communities should be returned in alphabetical order
+
+        context.turnOffAuthorisationSystem();
+
+        List<String> orderedTitles = Arrays.asList("Abc", "Bcd", "Cde");
+
+        Community community1 = CommunityBuilder.createCommunity(context)
+            .withName(orderedTitles.get(0))
+            .build();
+
+        Community community2 = CommunityBuilder.createCommunity(context)
+            .withName(orderedTitles.get(1))
+            .build();
+
+        Community community3 = CommunityBuilder.createCommunity(context)
+            .withName(orderedTitles.get(2))
+            .build();
+
+        ObjectMapper mapper = new ObjectMapper();
+        MvcResult result = getClient().perform(get("/api/core/communities")).andReturn();
+        String response = result.getResponse().getContentAsString();
+        JSONArray communities = new JSONObject(response).getJSONObject("_embedded").getJSONArray("communities");
+        List<String> responseTitles = StreamSupport.stream(communities.spliterator(), false)
+                                        .map(JSONObject.class::cast)
+                                        .map(x -> x.getString("name"))
+                                        .collect(Collectors.toList());
+
+        assertEquals(orderedTitles, responseTitles);
     }
 
     @Test
