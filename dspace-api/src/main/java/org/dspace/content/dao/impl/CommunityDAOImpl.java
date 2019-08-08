@@ -10,9 +10,9 @@ package org.dspace.content.dao.impl;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
 import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -76,10 +76,7 @@ public class CommunityDAOImpl extends AbstractHibernateDSODAO<Community> impleme
             query.setMaxResults(limit);
         }
         query.setParameter(sortField.toString(), sortField.getID());
-        return list(query)
-                .stream()
-                .distinct()
-                .collect(Collectors.toList());
+        return new LinkedList<Community>(new LinkedHashSet<>(list(query)));
     }
 
     @Override
@@ -103,7 +100,6 @@ public class CommunityDAOImpl extends AbstractHibernateDSODAO<Community> impleme
         Query query = createQuery(context, queryBuilder.toString());
         query.setParameter(sortField.toString(), sortField.getID());
         query.setHint("org.hibernate.cacheable", Boolean.TRUE);
-
 
         return findMany(context, query);
     }
