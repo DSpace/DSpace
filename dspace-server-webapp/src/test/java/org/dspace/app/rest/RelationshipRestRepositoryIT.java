@@ -2249,8 +2249,13 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
 
     }
 
+    /**
+     * Verify when a rightward label is present which has been configured to
+     * be used for virtual metadata, that the virtual metadata is populated
+     * with the custom label
+     */
     @Test
-    public void rightWardLabelRelationshipTest() throws Exception {
+    public void rightwardLabelRelationshipTest() throws Exception {
 
         context.turnOffAuthorisationSystem();
 
@@ -2261,7 +2266,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
 
         Relationship relationship3 = RelationshipBuilder
             .createRelationshipBuilder(context, publication1, author1, isAuthorOfPublicationRelationshipType)
-            .withRightWardLabel("RightWardLabelTest").build();
+            .withRightwardLabel("RightwardLabelTest").build();
 
         context.restoreAuthSystemState();
 
@@ -2278,12 +2283,16 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         getClient().perform(get("/api/core/items/" + publication1.getID()))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.metadata", allOf(
-                       matchMetadata("dc.contributor.author", "RightWardLabelTest"),
+                       matchMetadata("dc.contributor.author", "RightwardLabelTest"),
                        matchMetadata("dc.title", "Publication1"))));
     }
 
+    /**
+     * Verify when no rightward label is present, that the virtual metadata is populated
+     * with the metadata from the related item
+     */
     @Test
-    public void nonRightWardLabelRelationshipTest() throws Exception {
+    public void nonRightwardLabelRelationshipTest() throws Exception {
 
         context.turnOffAuthorisationSystem();
 
@@ -2316,8 +2325,14 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                        matchMetadata("dc.title", "Publication1"))));
     }
 
+    /**
+     * Verify when a rightward label is present which has been configured to
+     * be used for virtual metadata, that the virtual metadata is populated
+     * with the custom label
+     * Verify that only the relationship containing the rightward label will be updated
+     */
     @Test
-    public void mixedRightWardLabelAndRegularRelationshipTest() throws Exception {
+    public void mixedRightwardLabelAndRegularRelationshipTest() throws Exception {
 
         context.turnOffAuthorisationSystem();
 
@@ -2341,7 +2356,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
 
         Relationship relationship2 = RelationshipBuilder
             .createRelationshipBuilder(context, publication1, author1, isAuthorOfPublicationRelationshipType)
-            .withRightWardLabel("TestingRightWardLabel").build();
+            .withRightwardLabel("TestingRightwardLabel").build();
 
         context.restoreAuthSystemState();
 
@@ -2361,13 +2376,18 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                    .andExpect(jsonPath("$.metadata", allOf(
                        matchMetadata("dc.contributor.author", "Maybe, Maybe"),
                        matchMetadata("dc.contributor.author", "Testy, TEst"),
-                       matchMetadata("dc.contributor.author", "TestingRightWardLabel"),
+                       matchMetadata("dc.contributor.author", "TestingRightwardLabel"),
                        not(matchMetadata("dc.contributor.author", "testingLastName, testingFirstName")),
                        matchMetadata("dc.title", "Publication1"))));
     }
 
+    /**
+     * Verify when a leftward label is present which has NOT been configured to
+     * be used for virtual metadata, that the virtual metadata is NOT populated
+     * with the custom label
+     */
     @Test
-    public void leftWardLabelRelationshipTest() throws Exception {
+    public void leftwardLabelRelationshipTest() throws Exception {
 
         context.turnOffAuthorisationSystem();
 
@@ -2378,7 +2398,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
 
         Relationship relationship3 = RelationshipBuilder
             .createRelationshipBuilder(context, publication1, author3, isAuthorOfPublicationRelationshipType)
-            .withLeftWardLabel("leftWardLabel").withLeftPlace(1).build();
+            .withLeftwardLabel("leftwardLabel").withLeftPlace(1).build();
 
         context.restoreAuthSystemState();
 
