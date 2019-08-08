@@ -43,16 +43,16 @@
     </util:map>
     <!--
          If the related item has:
-            person.identifier.lastname = Smith
-            person.identifier.firstname = John
+            person.familyName = Smith
+            person.givenName = John
          Then the original item will have, in this case:
             dc.contributor.author = Smith, John -->
     <bean class="org.dspace.content.virtual.Concatenate" id="publicationAuthor_author">
         <property name="fields">
             <util:list>
-                <value>person.identifier.lastname</value>
-                <value>person.identifier.firstname</value>
-                <value>orgunit.identifier.name</value>
+                <value>person.familyName</value>
+                <value>person.givenName</value>
+                <value>organization.legalName</value>
             </util:list>
         </property>
         <property name="separator">
@@ -70,7 +70,7 @@
     <bean class="org.dspace.content.virtual.Collected" id="publicationOrgUnit_name">
         <property name="fields">
             <util:list>
-                <value>orgunit.identifier.name</value>
+                <value>organization.legalName</value>
             </util:list>
         </property>
     </bean>
@@ -80,15 +80,15 @@
     </util:map>
     <!--
      If the related item has:
-        person.identifier.lastname = Smith
-        person.identifier.firstname = John
+        person.familyName = Smith
+        person.givenName = John
      Then the original item will have, in this case:
         dc.contributor.author = Smith, John -->
     <bean class="org.dspace.content.virtual.Concatenate" id="projectPerson_author">
         <property name="fields">
             <util:list>
-                <value>person.identifier.lastname</value>
-                <value>person.identifier.firstname</value>
+                <value>person.familyName</value>
+                <value>person.givenName</value>
             </util:list>
         </property>
         <property name="separator">
@@ -100,17 +100,17 @@
         <entry key="project.contributor.other" value-ref="projectOrgUnit_other"/>
     </util:map>
     <!-- This Collected bean wil create a list of project.contributor.other virtual metadata fields that hold
-         the value of orgunit.identifier.name, each of them in a separate metadatavalue
+         the value of organization.legalName, each of them in a separate metadatavalue
          If the related item has:
-            orgunit.identifier.name = Generic name
-            orgunit.identifier.name = Even more generic name
+            organization.legalName = Generic name
+            organization.legalName = Even more generic name
          Then the original item will have, in this case:
             project.contributor.other = Generic name
             project.contributor.other = Even more generic name -->
     <bean class="org.dspace.content.virtual.Collected" id="projectOrgUnit_other">
         <property name="fields">
             <util:list>
-                <value>orgunit.identifier.name</value>
+                <value>organization.legalName</value>
             </util:list>
         </property>
     </bean>
@@ -121,37 +121,37 @@
     <bean class="org.dspace.content.virtual.Collected" id="personProject_other">
         <property name="fields">
             <util:list>
-                <value>orgunit.identifier.name</value>
+                <value>organization.legalName</value>
             </util:list>
         </property>
     </bean>
 
     <util:map id="isJournalVolumeOfIssueMap">
-        <entry key="journalvolume.identifier.volume" value-ref="issueVolume_volume"/>
-        <entry key="journal.identifier.issn" value-ref="volumeJournal_issn_related"/>
+        <entry key="publicationvolume.volumeNumber" value-ref="issueVolume_volume"/>
+        <entry key="creativeworkseries.issn" value-ref="volumeJournal_issn_related"/>
         <entry key="journal.title" value-ref="volumeJournal_title_related"/>
     </util:map>
-    <!-- This Collected bean will create a list of journalvolume.identifier.volume virtual metadata fields that hold
-     the value of journalvolume.identifier.volume, each of them in a separate metadatavalue
+    <!-- This Collected bean will create a list of publicationVolume.volumeNumber virtual metadata fields that hold
+     the value of publicationVolume.volumeNumber, each of them in a separate metadatavalue
      If the related item has:
-        journalvolume.identifier.volume = Generic volume
-        journalvolume.identifier.volume = Even more generic volume
+        publicationVolume.volumeNumber = Generic volume
+        publicationVolume.volumeNumber = Even more generic volume
      Then the original item will have, in this case:
-        journalvolume.identifier.volume = Generic volume
-        journalvolume.identifier.volume = Even more generic volume
+        publicationVolume.volumeNumber = Generic volume
+        publicationVolume.volumeNumber = Even more generic volume
      Note that these metadata fields have the same signature of schema, element and qualifier, but that poses no problem
      -->
     <bean class="org.dspace.content.virtual.Collected" id="issueVolume_volume">
         <property name="fields">
             <util:list>
-                <value>journalvolume.identifier.volume</value>
+                <value>publicationvolume.volumeNumber</value>
             </util:list>
         </property>
     </bean>
     <!--    This Related bean defines a relationship type that will be used on a journal issue.
             The journal issue will receive 2 metadata fields if we look at the map 'isJournalVolumeOfIssueMap' it'll
-            receive the journalvolume.identifier.volume metadata field and the journal.identifier.issn metadata field.
-         Since the journal.identifier.issn metadata field can't be filled in through the metadata of the journalvolume
+            receive the publicationVolume.volumeNumber metadata field and the creativeworkseries.issn metadata field.
+         Since the creativeworkseries.issn metadata field can't be filled in through the metadata of the journalvolume
          alone, we need to pass this call higher up the chain to the journalvolume's relationships to find the journal.
          Therefore we've created this Related bean which will look at the journalvolume's relationships with type
          'isJournalOfVolume' to find the journal that this journalvolume is related to and it'll then call the next
@@ -170,20 +170,20 @@
     </bean>
 
     <util:map id="isJournalOfVolumeMap">
-        <entry key="journal.identifier.issn" value-ref="volumeJournal_issn"/>
+        <entry key="creativeworkseries.issn" value-ref="volumeJournal_issn"/>
         <entry key="journal.title" value-ref="volumeJournal_title"/>
     </util:map>
     <bean class="org.dspace.content.virtual.Collected" id="volumeJournal_issn">
         <property name="fields">
             <util:list>
-                <value>journal.identifier.issn</value>
+                <value>creativeworkseries.issn</value>
             </util:list>
         </property>
     </bean>
     <bean class="org.dspace.content.virtual.Collected" id="volumeJournal_title">
         <property name="fields">
             <util:list>
-                <value>journal.identifier.name</value>
+                <value>dc.title</value>
             </util:list>
         </property>
     </bean>
@@ -192,18 +192,18 @@
     </util:map>
 
     <util:map id="isIssueOfJournalVolumeMap">
-        <entry key="journalissue.identifier.number" value-ref="journalIssue_number"/>
+        <entry key="publicationissue.issueNumber" value-ref="journalIssue_number"/>
     </util:map>
     <bean class="org.dspace.content.virtual.Collected" id="journalIssue_number">
         <property name="fields">
             <util:list>
-                <value>journalissue.identifier.number</value>
+                <value>publicationissue.issueNumber</value>
             </util:list>
         </property>
     </bean>
 
     <util:map id="isJournalIssueOfPublicationMap">
-        <entry key="journal.identifier.issn"  value-ref="issueVolumeJournal_issn_related"/>
+        <entry key="creativeworkseries.issn"  value-ref="issueVolumeJournal_issn_related"/>
         <entry key="journal.title"  value-ref="issueVolumeJournal_title_related"/>
         <entry key="journalvolume.identifier.name" value-ref="issueVolume_title_related"/>
         <entry key="relation.isJournalOfPublication" value-ref="issueVolumeJournal_uuid_related"/>
@@ -211,7 +211,7 @@
     <bean class="org.dspace.content.virtual.Concatenate" id="issueVolume_title">
         <property name="fields">
             <util:list>
-                <value>journalvolume.identifier.name</value>
+                <value>dc.title</value>
             </util:list>
         </property>
         <property name="separator">
@@ -220,8 +220,8 @@
     </bean>
 
     <!-- This Related bean defines a relationship type that will be used on a publication.
-        The publication will receive 1 virtual metadata value namely the journal.identifier.issn to which it belongs
-     Since the journal.identifier.issn metadata field can't be filled in through the metadata of the journalIssue
+        The publication will receive 1 virtual metadata value namely the creativeworkseries.issn to which it belongs
+     Since the creativeworkseries.issn metadata field can't be filled in through the metadata of the journalIssue
      alone, we need to pass this call higher up the chain to the journalissue's relationships to find the journal.
      Therefore we've created this Related bean which will look at the journalissue's relationships with type
      'isJournalVolumeOfIssue' to find the journalvolume that this journalissue is related to and it'll then call the next
