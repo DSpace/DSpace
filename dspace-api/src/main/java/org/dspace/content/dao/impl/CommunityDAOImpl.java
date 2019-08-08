@@ -101,7 +101,7 @@ public class CommunityDAOImpl extends AbstractHibernateDSODAO<Community> impleme
         query.setParameter(sortField.toString(), sortField.getID());
         query.setHint("org.hibernate.cacheable", Boolean.TRUE);
 
-        return findMany(context, query);
+        return new LinkedList<Community>(new LinkedHashSet<>(findMany(context, query)));
     }
 
     @Override
