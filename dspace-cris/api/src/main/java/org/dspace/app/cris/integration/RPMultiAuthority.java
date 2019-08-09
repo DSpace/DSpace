@@ -303,7 +303,7 @@ public class RPMultiAuthority extends CRISAuthority
                 for (DSpaceObject dso : result.getDspaceObjects())
                 {
                     ResearcherPage rp = (ResearcherPage) dso;
-                    buildAggregateByExtra(rp);
+                    choiceList.addAll(buildAggregateByExtra(rp));
                 }
             }
 
