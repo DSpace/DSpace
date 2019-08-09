@@ -262,7 +262,16 @@
 				<!-- No se mapea, no tenemos esa información
 				<acceptance_date></acceptance_date> -->
 
-				<xsl:call-template name="setISBN" />
+				<!-- isbn -->
+				<xsl:choose>
+					<xsl:when
+						test="(translate(substring(//dspace:field[@mdschema='sedici' and @element='identifier' and @qualifier='isbn'],1,1),'123456789','') != substring(//dspace:field[@mdschema='sedici' and @element='identifier' and @qualifier='isbn'],1,1)) and (string-length(//dspace:field[@mdschema='sedici' and @element='identifier' and @qualifier='isbn']) &gt; 9)">
+						<xsl:call-template name="setISBN" />
+					</xsl:when>
+					<xsl:otherwise>
+						<error>Error: sedici.identifier.isbn not valid</error>
+					</xsl:otherwise>
+				</xsl:choose>
 
 				<xsl:call-template name="setPublisher" />
 
@@ -436,10 +445,18 @@
 	</xsl:template>
 
 	<xsl:template name="setFullTitle">
-		<full_title xmlns="http://www.crossref.org/schema/4.4.2">
-			<xsl:value-of
-			select="//dspace:field[@mdschema='sedici' and @element='relation' and @qualifier='journalTitle']" />
-		</full_title>
+		<xsl:choose>
+			<xsl:when
+				test="//dspace:field[@mdschema='sedici' and @element='relation' and @qualifier='journalTitle']" >
+				<full_title xmlns="http://www.crossref.org/schema/4.4.2">
+					<xsl:value-of
+						select="//dspace:field[@mdschema='sedici' and @element='relation' and @qualifier='journalTitle']" />
+				</full_title>
+			</xsl:when>
+			<xsl:otherwise>
+				<error xmlns="http://www.crossref.org/schema/4.4.2">Error: sedici.relation.journalTitle not found</error>
+			</xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
 
 	<xsl:template name="setTitles">
@@ -583,24 +600,33 @@
 	</xsl:template>
 
 	<xsl:template name="setApprovalDate">
-		<xsl:for-each
-			select="//dspace:field[@mdschema='sedici' and @element='date' and @qualifier='exposure']">
-			<approval_date xmlns="http://www.crossref.org/schema/4.4.2">
-				<xsl:if test="string-length(./text()) &gt; 5">
-					<month>
-						<xsl:value-of select="substring(./text(),6,2)" />
-					</month>
-				</xsl:if>
-				<xsl:if test="string-length(./text()) &gt; 8">
-					<day>
-						<xsl:value-of select="substring(./text(),9)" />
-					</day>
-				</xsl:if>
-				<year>
-					<xsl:value-of select="substring(./text(),1,4)" />
-				</year>
-			</approval_date>
-		</xsl:for-each>
+		<xsl:choose>
+			<xsl:when
+				test="//dspace:field[@mdschema='sedici' and @element='date' and @qualifier='exposure']">
+				<xsl:for-each
+					select="//dspace:field[@mdschema='sedici' and @element='date' and @qualifier='exposure']">
+					<approval_date
+						xmlns="http://www.crossref.org/schema/4.4.2">
+						<xsl:if test="string-length(./text()) &gt; 5">
+							<month>
+								<xsl:value-of select="substring(./text(),6,2)" />
+							</month>
+						</xsl:if>
+						<xsl:if test="string-length(./text()) &gt; 8">
+							<day>
+								<xsl:value-of select="substring(./text(),9)" />
+							</day>
+						</xsl:if>
+						<year>
+							<xsl:value-of select="substring(./text(),1,4)" />
+						</year>
+					</approval_date>
+				</xsl:for-each>
+			</xsl:when>
+			<xsl:otherwise>
+				<error xmlns="http://www.crossref.org/schema/4.4.2">Error: sedici.date.exposure not found</error>
+			</xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
 
 	<xsl:template name="setInstitution">
@@ -736,13 +762,18 @@
 	</xsl:template>
 
 	<xsl:template name="setISSN">
-		<xsl:if
-			test="string-length(//dspace:field[@mdschema='sedici' and @element='identifier' and @qualifier='issn']) &gt; 7">
-			<issn xmlns="http://www.crossref.org/schema/4.4.2">
-				<xsl:value-of
-					select="substring(//dspace:field[@mdschema='sedici' and @element='identifier' and @qualifier='issn'],1,9)" />
-			</issn>
-		</xsl:if>
+		<xsl:choose>
+			<xsl:when
+				test="string-length(//dspace:field[@mdschema='sedici' and @element='identifier' and @qualifier='issn']) &gt; 7">
+				<issn xmlns="http://www.crossref.org/schema/4.4.2">
+					<xsl:value-of
+						select="substring(//dspace:field[@mdschema='sedici' and @element='identifier' and @qualifier='issn'],1,9)" />
+				</issn>
+			</xsl:when>
+			<xsl:otherwise>
+				<error xmlns="http://www.crossref.org/schema/4.4.2">Error: sedici.identifier.issn not found</error>
+			</xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
 
 	<xsl:template name="setPages">
@@ -788,12 +819,20 @@
 	</xsl:template>
 
 	<xsl:template name="setPublisher">
-		<publisher xmlns="http://www.crossref.org/schema/4.4.2">
-			<publisher_name>
-				<xsl:value-of
-					select="//dspace:field[@mdschema='dc' and @element='publisher']" />
-			</publisher_name>
-		</publisher>
+		<xsl:choose>
+			<xsl:when
+				test="//dspace:field[@mdschema='dc' and @element='publisher']">
+				<publisher xmlns="http://www.crossref.org/schema/4.4.2">
+					<publisher_name>
+						<xsl:value-of
+							select="//dspace:field[@mdschema='dc' and @element='publisher']" />
+					</publisher_name>
+				</publisher>
+			</xsl:when>
+			<xsl:otherwise>
+				<error xmlns="http://www.crossref.org/schema/4.4.2">Error: dc.publisher not found</error>
+			</xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
 
 	<xsl:template name="setDOIData">

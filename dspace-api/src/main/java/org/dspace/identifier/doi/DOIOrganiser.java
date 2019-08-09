@@ -542,12 +542,9 @@ public class DOIOrganiser {
                     + doiIdentifierException
                         .codeToString(doiIdentifierException.getCode()), ex);
             
-            if(!quiet)
-            {
-                System.err.println("It wasn't possible to register this identifier: " 
-                                 + DOI.SCHEME + doiRow.getStringColumn("doi"));
-                ex.printStackTrace(System.err);
-            }
+            System.err.println("It wasn't possible to register this identifier: "
+                             + DOI.SCHEME + doiRow.getStringColumn("doi"));
+            ex.printStackTrace(System.err);
              
         }
         catch (IllegalArgumentException ex) 
