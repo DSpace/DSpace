@@ -13,7 +13,7 @@ import java.util.List;
 
 /**
  * A mock for the HarvestedCollectionService
- * @author Jelle Pelgrims (jelle.atmire at gmail.com)
+ * @author Jelle Pelgrims (jelle.pelgrims at atmire.com)
  */
 public class MockHarvestedCollectionServiceImpl extends HarvestedCollectionServiceImpl {
 

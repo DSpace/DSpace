@@ -28,7 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 /**
  * Integration test for collection harvest settings controller
  *
- * @author Jelle Pelgrims (jelle.atmire at gmail.com)
+ * @author Jelle Pelgrims (jelle.pelgrims at atmire.com)
  */
 public class CollectionHarvestSettingsControllerIT extends AbstractControllerIntegrationTest {
 

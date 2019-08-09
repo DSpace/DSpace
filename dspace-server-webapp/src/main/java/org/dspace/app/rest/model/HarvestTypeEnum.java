@@ -11,7 +11,7 @@ package org.dspace.app.rest.model;
 /**
  * An enum containing all the possible harvest types
  *
- * @author Jelle Pelgrims (jelle.atmire @ gmail.com)
+ * @author Jelle Pelgrims (jelle.pelgrims at atmire.com)
  */
 public enum HarvestTypeEnum {
     NONE(0),

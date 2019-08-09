@@ -13,7 +13,7 @@ import org.dspace.app.rest.CollectionHarvestSettingsController;
 /**
  * The HarvestCollection REST Resource
  *
- * @author Jelle Pelgrims (jelle.atmire at gmail.com)
+ * @author Jelle Pelgrims (jelle.pelgrims at atmire.com)
  */
 public class HarvestedCollectionRest extends BaseObjectRest<Integer> {
 

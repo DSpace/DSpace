@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * Rest controller that handles the harvesting metadata formats
  *
- * @author Jelle Pelgrims
+ * @author Jelle Pelgrims (jelle.pelgrims at atmire.com)
  */
 @RestController
 @RequestMapping("/api/config/harvestermetadata")

@@ -14,7 +14,7 @@ import org.dspace.app.rest.utils.Utils;
  * Harvester metadata rest HAL Resource. The HAL Resource wraps the REST Resource
  * adding support for the links.
  *
- * @author Jelle Pelgrims (jelle.pelgrims at gmail.com)
+ * @author Jelle Pelgrims (jelle.pelgrims at atmire.com)
  */
 public class HarvesterMetadataResource extends DSpaceResource<HarvesterMetadataRest> {
 

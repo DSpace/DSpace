@@ -16,7 +16,7 @@ import org.dspace.app.rest.HarvesterMetadataController;
 /**
  * The rest resource used for harvester metadata
  *
- * @author Jelle Pelgrims
+ * @author Jelle Pelgrims (jelle.pelgrims at atmire.com)
  */
 public class HarvesterMetadataRest extends BaseObjectRest<String> {
 
