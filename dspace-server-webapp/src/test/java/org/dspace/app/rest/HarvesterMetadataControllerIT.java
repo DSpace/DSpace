@@ -18,7 +18,7 @@ import org.junit.Test;
 /**
  * Integration test for harvester metadata controller
  *
- * @author Jelle Pelgrims (jelle.atmire at gmail.com)
+ * @author Jelle Pelgrims (jelle.pelgrims at atmire.com)
  */
 public class HarvesterMetadataControllerIT extends AbstractControllerIntegrationTest {
 

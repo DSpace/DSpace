@@ -40,7 +40,7 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * Rest controller that handles the changing of harvest settings for collections
  *
- * @author Jelle Pelgrims
+ * @author Jelle Pelgrims (jelle.pelgrims at atmire.com)
  */
 @RestController
 @RequestMapping("/api/core/collections/" +
