@@ -23,8 +23,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-
-
+/**
+ * Rest controller that handles the harvesting metadata formats
+ *
+ * @author Jelle Pelgrims
+ */
 @RestController
 @RequestMapping("/api/config/harvestermetadata")
 public class HarvesterMetadataController {
@@ -35,6 +38,12 @@ public class HarvesterMetadataController {
     @Autowired
     private HalLinkService halLinkService;
 
+    /**
+     * GET endpoint that returns all available metadata formats
+     * @param request   The request object
+     * @param response  The response object
+     * @return a HarvesterMetadataResource containing all available metadata formats
+     */
     @RequestMapping(method = RequestMethod.GET)
     public HarvesterMetadataResource get(HttpServletRequest request,
                                      HttpServletResponse response) {

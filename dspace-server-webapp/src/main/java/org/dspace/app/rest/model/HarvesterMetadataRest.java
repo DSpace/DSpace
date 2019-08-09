@@ -13,6 +13,11 @@ import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.dspace.app.rest.HarvesterMetadataController;
 
+/**
+ * The rest resource used for harvester metadata
+ *
+ * @author Jelle Pelgrims
+ */
 public class HarvesterMetadataRest extends BaseObjectRest<String> {
 
     public static final String NAME = "harvestermetadata";

@@ -10,6 +10,12 @@ package org.dspace.app.rest.model.hateoas;
 import org.dspace.app.rest.model.HarvesterMetadataRest;
 import org.dspace.app.rest.utils.Utils;
 
+/**
+ * Harvester metadata rest HAL Resource. The HAL Resource wraps the REST Resource
+ * adding support for the links.
+ *
+ * @author Jelle Pelgrims (jelle.pelgrims at gmail.com)
+ */
 public class HarvesterMetadataResource extends DSpaceResource<HarvesterMetadataRest> {
 
     public HarvesterMetadataResource(HarvesterMetadataRest data, Utils utils, String... rels) {
