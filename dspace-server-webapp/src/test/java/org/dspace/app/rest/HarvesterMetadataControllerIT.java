@@ -15,7 +15,11 @@ import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.harvest.OAIHarvester;
 import org.junit.Test;
 
-
+/**
+ * Integration test for harvester metadata controller
+ *
+ * @author Jelle Pelgrims (jelle.atmire at gmail.com)
+ */
 public class HarvesterMetadataControllerIT extends AbstractControllerIntegrationTest {
 
     @Test

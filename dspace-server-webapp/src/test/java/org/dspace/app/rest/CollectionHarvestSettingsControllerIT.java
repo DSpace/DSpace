@@ -25,6 +25,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+/**
+ * Integration test for collection harvest settings controller
+ *
+ * @author Jelle Pelgrims (jelle.atmire at gmail.com)
+ */
 public class CollectionHarvestSettingsControllerIT extends AbstractControllerIntegrationTest {
 
     Collection collection;
@@ -44,11 +49,17 @@ public class CollectionHarvestSettingsControllerIT extends AbstractControllerInt
             .build();
         collection = CollectionBuilder.createCollection(context, community).withName("Collection 1").build();
 
-
-
         context.restoreAuthSystemState();
     }
 
+    /**
+     * Function to create a JSONObject containing the harvest settings
+     * @param harvestType           The harvest type
+     * @param oaiSource             The OAI source
+     * @param oaiSetId              The OAI set id
+     * @param metadataConfigId      The metadata config id
+     * @return A JSONObject containing the given harvest settings
+     */
     public JSONObject createHarvestSettingsJson(String harvestType,
                                                 String oaiSource, String oaiSetId, String metadataConfigId) {
         JSONObject json = new JSONObject();
@@ -59,13 +70,11 @@ public class CollectionHarvestSettingsControllerIT extends AbstractControllerInt
         return json;
     }
 
-
-    // This test might fail if the oai_source ("https://dspace.mit.edu/oai/request") is down
     @Test
     public void EndpointWorksWithStandardSettings() throws Exception {
         String token = getAuthToken(admin.getEmail(), password);
 
-        JSONObject json = createHarvestSettingsJson("METADATA_ONLY", "https://dspace.mit.edu/oai/request", "col_1721.1_114174", "dc");
+        JSONObject json = createHarvestSettingsJson("METADATA_ONLY", "https://dspace.org/oai/request", "col_1721.1_114174", "dc");
 
         getClient(token).perform(
             put("/api/core/collections/" + collection.getID() + "/harvester")
@@ -99,7 +108,7 @@ public class CollectionHarvestSettingsControllerIT extends AbstractControllerInt
     public void HarvestSettingsDeletedIfHarvestTypeIsNone() throws Exception {
         String token = getAuthToken(admin.getEmail(), password);
 
-        JSONObject json = createHarvestSettingsJson("NONE", "", "", "");
+        JSONObject json = createHarvestSettingsJson("NONE", "", "", "dc");
 
         getClient(token).perform(
             put("/api/core/collections/" + collection.getID() + "/harvester")
