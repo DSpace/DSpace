@@ -1399,8 +1399,11 @@ public class PushToORCID
         if (StringUtils.isNotBlank(itemMetadata.getAmount()))
         {
             Amount amount = new Amount();
-            CurrencyCode currencyCode = CurrencyCode
-                    .fromValue(itemMetadata.getCurrencyCode());
+            CurrencyCode currencyCode = CurrencyCode.EUR;
+            String amountCurrencyCode = itemMetadata.getAmountCurrencyCode();
+            if(StringUtils.isNotBlank(amountCurrencyCode)) {
+                currencyCode = CurrencyCode.fromValue(amountCurrencyCode);
+            }
             amount.setValue(itemMetadata.getAmount());
             amount.setCurrencyCode(currencyCode);
             funding.setAmount(amount);
