@@ -104,14 +104,22 @@ public class ApproveRejectReviewItem {
 
     public static void processReviewPackagesUsingManuscript(Manuscript manuscript) throws ApproveRejectReviewItemException {
         try {
+            String dashStatus = null;
+            if(manuscript.isAccepted()) {
+                dashStatus = "submitted";
+            } else if (manuscript.isRejected()) {
+                dashStatus = "withdrawn";
+            }
+
             log.info("sending manuscript status to dash -- msid=" + manuscript.getManuscriptId() +
-                     ", status=" + manuscript.getStatus() +
+                     ", status=" + dashStatus +
                      ", issn=" + manuscript.getJournalISSN());
+            
             DashService dashService = new DashService();
             String dashDatasetDOI = dashService.getDatasetID(manuscript.getManuscriptId());
             log.info(" - dashDatasetDOI=" + dashDatasetDOI);
             int resultCode = dashService.addCurationActivity(dashDatasetDOI,
-                                                             manuscript.getStatus(),
+                                                             dashStatus,
                                                              "setting manuscript status based on notification from journal",
                                                              null, null);
             log.info(" - resultCode=" + resultCode);
