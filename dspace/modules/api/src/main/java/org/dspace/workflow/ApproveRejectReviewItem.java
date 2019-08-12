@@ -2,6 +2,7 @@ package org.dspace.workflow;
 
 import org.apache.commons.cli.*;
 import org.apache.log4j.Logger;
+import org.datadryad.api.DashService;
 import org.datadryad.api.DryadDataPackage;
 import org.datadryad.api.DryadJournalConcept;
 import org.datadryad.rest.models.Manuscript;
@@ -103,6 +104,19 @@ public class ApproveRejectReviewItem {
 
     public static void processReviewPackagesUsingManuscript(Manuscript manuscript) throws ApproveRejectReviewItemException {
         try {
+            log.info("sending manuscript status to dash -- msid=" + manuscript.getManuscriptId() +
+                     ", status=" + manuscript.getStatus() +
+                     ", issn=" + manuscript.getJournalISSN());
+            DashService dashService = new DashService();
+            String dashDatasetDOI = dashService.getDatasetID(manuscript.getManuscriptId());
+            log.info(" - dashDatasetDOI=" + dashDatasetDOI);
+            int resultCode = dashService.addCurationActivity(dashDatasetDOI,
+                                                             manuscript.getStatus(),
+                                                             "setting manuscript status based on notification from journal",
+                                                             null, null);
+            log.info(" - resultCode=" + resultCode);
+                
+            
             Context c = new Context();
             List<DryadDataPackage> matchingPackages = DryadDataPackage.findAllByManuscript(c, manuscript);
             for (DryadDataPackage dataPackage : matchingPackages) {
