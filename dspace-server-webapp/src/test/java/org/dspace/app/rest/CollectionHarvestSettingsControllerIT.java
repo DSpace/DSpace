@@ -7,19 +7,30 @@
  */
 package org.dspace.app.rest;
 
+import static org.hamcrest.Matchers.endsWith;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.util.List;
+import java.util.Map;
 
 import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
+import org.dspace.app.rest.matcher.MetadataConfigsMatcher;
 import org.dspace.app.rest.model.HarvestTypeEnum;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.harvest.HarvestedCollection;
+import org.dspace.harvest.OAIHarvester;
 import org.dspace.harvest.service.HarvestedCollectionService;
+import org.hamcrest.Matchers;
 import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
@@ -33,6 +44,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class CollectionHarvestSettingsControllerIT extends AbstractControllerIntegrationTest {
 
     Collection collection;
+    Collection collectionNoHarvestSettings;
 
     @Autowired
     HarvestedCollectionService harvestedCollectionService;
@@ -48,6 +60,9 @@ public class CollectionHarvestSettingsControllerIT extends AbstractControllerInt
             .withName("Sub Community")
             .build();
         collection = CollectionBuilder.createCollection(context, community).withName("Collection 1").build();
+        collectionNoHarvestSettings = CollectionBuilder.createCollection(context, community)
+                                                        .withName("Collection 2")
+                                                        .build();
 
         context.restoreAuthSystemState();
     }
@@ -71,7 +86,79 @@ public class CollectionHarvestSettingsControllerIT extends AbstractControllerInt
     }
 
     @Test
-    public void EndpointWorksWithStandardSettings() throws Exception {
+    public void GetCollectionHarvestSettings() throws Exception {
+        String token = getAuthToken(admin.getEmail(), password);
+
+        List<Map<String,String>> configs = OAIHarvester.getAvailableMetadataFormats();
+
+        // Add harvest settings to collection
+        JSONObject json = createHarvestSettingsJson("METADATA_ONLY", "https://dspace.org/oai/request", "col_1721.1_114174", "dc");
+
+        getClient(token).perform(
+            put("/api/core/collections/" + collection.getID() + "/harvester")
+                .contentType("application/json")
+                .content(json.toString()))
+            .andExpect(status().isOk());
+
+        //Retrieve harvest settings
+        getClient(token).perform(
+            get("/api/core/collections/" + collection.getID() + "/harvester"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.harvest_type", is("METADATA_ONLY")))
+                .andExpect(jsonPath("$.oai_source", is("https://dspace.org/oai/request")))
+                .andExpect(jsonPath("$.oai_set_id", is("col_1721.1_114174")))
+                .andExpect(jsonPath("$.harvest_message", is(nullValue())))
+                .andExpect(jsonPath("$.metadata_config_id", is("dc")))
+                .andExpect(jsonPath("$.harvest_status", is("READY")))
+                .andExpect(jsonPath("$.harvest_start_time", is(nullValue())))
+                .andExpect(jsonPath("$.last_harvested", is(nullValue())))
+                .andExpect(jsonPath("$._links.self.href",
+                    endsWith("api/core/collections/" + collection.getID() + "/harvester")))
+                .andExpect(jsonPath("$._embedded.metadata_configs",  Matchers.allOf(
+                    MetadataConfigsMatcher.matchMetadataConfigs(configs)
+                )))
+                .andExpect(jsonPath("$._embedded.metadata_configs._links.self.href",
+                    endsWith("/api/config/harvestermetadata")));
+    }
+
+    @Test
+    public void GetCollectionHarvestSettingsIfNotAdmin() throws Exception {
+        String token = getAuthToken(eperson.getEmail(), password);
+
+        getClient(token).perform(
+            put("/api/core/collections/" + collection.getID() + "/harvester")
+                .contentType("application/json"))
+            .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void getCollectionHarvestSettingsIfNotSet() throws Exception {
+        String token = getAuthToken(admin.getEmail(), password);
+
+        List<Map<String,String>> configs = OAIHarvester.getAvailableMetadataFormats();
+
+        getClient(token).perform(
+            get("/api/core/collections/" + collectionNoHarvestSettings.getID() + "/harvester"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.harvest_type", is("NONE")))
+            .andExpect(jsonPath("$.oai_source", is(nullValue())))
+            .andExpect(jsonPath("$.oai_set_id", is(nullValue())))
+            .andExpect(jsonPath("$.harvest_message", is(nullValue())))
+            .andExpect(jsonPath("$.metadata_config_id", is(nullValue())))
+            .andExpect(jsonPath("$.harvest_status", is(nullValue())))
+            .andExpect(jsonPath("$.harvest_start_time", is(nullValue())))
+            .andExpect(jsonPath("$.last_harvested", is(nullValue())))
+            .andExpect(jsonPath("$._links.self.href",
+                endsWith("api/core/collections/" + collectionNoHarvestSettings.getID() + "/harvester")))
+            .andExpect(jsonPath("$._embedded.metadata_configs",  Matchers.allOf(
+                MetadataConfigsMatcher.matchMetadataConfigs(configs)
+            )))
+            .andExpect(jsonPath("$._embedded.metadata_configs._links.self.href",
+                endsWith("/api/config/harvestermetadata")));
+    }
+
+    @Test
+    public void PutWorksWithStandardSettings() throws Exception {
         String token = getAuthToken(admin.getEmail(), password);
 
         JSONObject json = createHarvestSettingsJson("METADATA_ONLY", "https://dspace.org/oai/request", "col_1721.1_114174", "dc");
@@ -92,7 +179,7 @@ public class CollectionHarvestSettingsControllerIT extends AbstractControllerInt
     }
 
     @Test
-    public void UnProcessableEntityIfIncorrectSettings() throws Exception {
+    public void PutUnProcessableEntityIfIncorrectSettings() throws Exception {
         String token = getAuthToken(admin.getEmail(), password);
 
         JSONObject json = createHarvestSettingsJson("METADATA_ONLY", "https://dspace.mit.edu/iao/request", "col_1721.1_114174", "bc");
@@ -105,7 +192,7 @@ public class CollectionHarvestSettingsControllerIT extends AbstractControllerInt
     }
 
     @Test
-    public void HarvestSettingsDeletedIfHarvestTypeIsNone() throws Exception {
+    public void PutHarvestSettingsDeletedIfHarvestTypeIsNone() throws Exception {
         String token = getAuthToken(admin.getEmail(), password);
 
         JSONObject json = createHarvestSettingsJson("NONE", "", "", "dc");
@@ -122,14 +209,14 @@ public class CollectionHarvestSettingsControllerIT extends AbstractControllerInt
     }
 
     @Test
-    public void UnauthorizedIfNotAuthenticated() throws Exception {
+    public void PutUnauthorizedIfNotAuthenticated() throws Exception {
         getClient().perform(put("/api/core/collections/" + collection.getID() + "/harvester")
             .contentType("application/json"))
             .andExpect(status().isUnauthorized());
     }
 
     @Test
-    public void ForbiddenIfNotEnoughpermissions() throws Exception {
+    public void PutForbiddenIfNotEnoughpermissions() throws Exception {
         String token = getAuthToken(eperson.getEmail(), password);
 
         getClient(token).perform(put("/api/core/collections/" + collection.getID() + "/harvester")
@@ -138,7 +225,7 @@ public class CollectionHarvestSettingsControllerIT extends AbstractControllerInt
     }
 
     @Test
-    public void NotFoundIfNoSuchCollection() throws Exception {
+    public void PutNotFoundIfNoSuchCollection() throws Exception {
         String token = getAuthToken(admin.getEmail(), password);
 
         String fakeUuid = "6c9a081e-f2e5-42cd-8cf8-338f64b0841b";
@@ -148,7 +235,7 @@ public class CollectionHarvestSettingsControllerIT extends AbstractControllerInt
     }
 
     @Test
-    public void UnprocessableEntityIfHarvestTypeIncorrect() throws Exception {
+    public void PutUnprocessableEntityIfHarvestTypeIncorrect() throws Exception {
         String token = getAuthToken(admin.getEmail(), password);
 
         JSONObject json = createHarvestSettingsJson("INCORRECT_HARVEST_TYPE", "https://dspace.mit.edu/oai/request", "col_1721.1_114174", "dc");
