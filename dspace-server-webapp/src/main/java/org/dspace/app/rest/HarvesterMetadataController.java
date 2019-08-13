@@ -33,7 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class HarvesterMetadataController {
 
     @Autowired
-    private Utils utils;
+    Utils utils;
 
     @Autowired
     private HalLinkService halLinkService;

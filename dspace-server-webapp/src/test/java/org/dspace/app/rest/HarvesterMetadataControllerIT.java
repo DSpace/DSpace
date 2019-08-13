@@ -1,18 +1,24 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
 package org.dspace.app.rest;
 
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.endsWith;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
+import org.dspace.app.rest.matcher.MetadataConfigsMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.harvest.OAIHarvester;
+import org.hamcrest.Matchers;
 import org.junit.Test;
 
 /**
@@ -28,15 +34,12 @@ public class HarvesterMetadataControllerIT extends AbstractControllerIntegration
 
         List<Map<String,String>> configs = OAIHarvester.getAvailableMetadataFormats();
 
-        Function<String,List<String>> getAllValues =
-            key -> configs.stream().map(x -> x.get(key)).collect(Collectors.toList());
-
         getClient(token).perform(
             get("/api/config/harvestermetadata"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.configs[*].id", is(getAllValues.apply("id"))))
-                .andExpect(jsonPath("$.configs[*].label", is(getAllValues.apply("label"))))
-                .andExpect(jsonPath("$.configs[*].namespace", is(getAllValues.apply("namespace"))))
-                .andExpect(jsonPath("$._links.self.href", notNullValue()));
+                .andExpect(jsonPath("$", Matchers.allOf(
+                    MetadataConfigsMatcher.matchMetadataConfigs(configs)
+                )))
+                .andExpect(jsonPath("$._links.self.href", endsWith("/api/config/harvestermetadata")));
     }
 }

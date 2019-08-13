@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest.model;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
@@ -18,16 +19,16 @@ import org.dspace.app.rest.HarvesterMetadataController;
  *
  * @author Jelle Pelgrims (jelle.pelgrims at atmire.com)
  */
-public class HarvesterMetadataRest extends BaseObjectRest<String> {
+public class HarvesterMetadataRest extends BaseObjectRest {
 
-    public static final String NAME = "harvestermetadata";
-    public static final String CATEGORY = RestAddressableModel.CONFIGURATION;
+    public static final String CATEGORY = "config";
+    public static final String NAME = "harvesterMetadata";
 
     private List<Map<String,String>> configs;
 
     @Override
     @JsonIgnore
-    public String getId() {
+    public Serializable getId() {
         return id;
     }
 
@@ -36,13 +37,14 @@ public class HarvesterMetadataRest extends BaseObjectRest<String> {
         return CATEGORY;
     }
 
-    public Class getController() {
-        return HarvesterMetadataController.class;
-    }
-
     @JsonIgnore
     public String getType() {
         return NAME;
+    }
+
+
+    public Class getController() {
+        return HarvesterMetadataController.class;
     }
 
     public List<Map<String,String>> getConfigs() {
@@ -52,7 +54,5 @@ public class HarvesterMetadataRest extends BaseObjectRest<String> {
     public void setConfigs(List<Map<String,String>> configs) {
         this.configs = configs;
     }
-
-
 
 }

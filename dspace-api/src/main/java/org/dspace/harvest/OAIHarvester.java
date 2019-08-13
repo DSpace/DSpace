@@ -927,7 +927,7 @@ public class OAIHarvester {
                 String namespace = "";
 
                 if (metadataString.indexOf(',') != -1) {
-                    label = metadataString.substring(metadataString.indexOf(',') + 1);
+                    label = metadataString.substring(metadataString.indexOf(',') + 2);
                     namespace = metadataString.substring(0, metadataString.indexOf(','));
                 } else {
                     label = id + "(" + metadataString + ")";

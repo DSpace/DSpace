@@ -5,7 +5,6 @@
  *
  * http://www.dspace.org/license/
  */
-
 package org.dspace.app.rest.model;
 
 /**
@@ -27,5 +26,24 @@ public enum HarvestTypeEnum {
 
     public int getValue() {
         return harvestType;
+    }
+
+    /**
+     * Creates an enum from the given integer
+     * @param harvestType The harvest type
+     * @return a harvestTypeEnum
+     */
+    public static HarvestTypeEnum fromInt(Integer harvestType) {
+        if (harvestType == null) {
+            return HarvestTypeEnum.NONE;
+        }
+
+        switch (harvestType) {
+            case 0: return HarvestTypeEnum.NONE;
+            case 1: return HarvestTypeEnum.METADATA_ONLY;
+            case 2: return HarvestTypeEnum.METADATA_AND_REF;
+            case 3: return HarvestTypeEnum.METADATA_AND_BITSTREAMS;
+            default: throw new IllegalArgumentException("No corresponding enum value for integer");
+        }
     }
 }
