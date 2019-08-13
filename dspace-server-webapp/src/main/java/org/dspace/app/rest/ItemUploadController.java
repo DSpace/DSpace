@@ -87,8 +87,9 @@ public class ItemUploadController {
         try {
             fileInputStream = uploadfile.getInputStream();
         } catch (IOException e) {
-            log.error("Something went wrong when trying to read the inputstream from the given file in the request");
-            throw new UnprocessableEntityException("The InputStream from the file couldn't be read");
+            log.error("Something went wrong when trying to read the inputstream from the given file in the request",
+                    e);
+            throw new UnprocessableEntityException("The InputStream from the file couldn't be read", e);
         }
         try {
             bitstream = processBitstreamCreation(context, item, fileInputStream, properties,
@@ -96,11 +97,11 @@ public class ItemUploadController {
             itemService.update(context, item);
             context.commit();
         } catch (AuthorizeException | IOException | SQLException e) {
-            log.error(
-                "Something went wrong with trying to create the single bitstream for file with filename: " + uploadfile
-                    .getOriginalFilename()
-                    + " for item with uuid: " + uuid + " and possible properties: " + properties);
-
+            String message = "Something went wrong with trying to create the single bitstream for file with filename: "
+                    + uploadfile.getOriginalFilename()
+                    + " for item with uuid: " + uuid + " and possible properties: " + properties;
+            log.error(message, e);
+            throw new RuntimeException(message, e);
         }
         return new BitstreamResource(bitstreamConverter.fromModel(bitstream), utils);
     }
