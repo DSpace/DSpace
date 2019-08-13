@@ -112,14 +112,14 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
             RelationshipType relationshipType = relationshipTypeService
                 .find(context, Integer.parseInt(req.getParameter("relationshipType")));
 
-            String leftwardLabel = req.getParameter("leftwardLabel");
-            String rightwardLabel = req.getParameter("rightwardLabel");
+            String leftwardValue = req.getParameter("leftwardValue");
+            String rightwardValue = req.getParameter("rightwardValue");
 
             EPerson ePerson = context.getCurrentUser();
             if (authorizeService.authorizeActionBoolean(context, leftItem, Constants.WRITE) ||
                 authorizeService.authorizeActionBoolean(context, rightItem, Constants.WRITE)) {
                 Relationship relationship = relationshipService.create(context, leftItem, rightItem,
-                    relationshipType, 0, 0, leftwardLabel, rightwardLabel);
+                    relationshipType, 0, 0, leftwardValue, rightwardValue);
                 // The above if check deals with the case that a Relationship can be created if the user has write
                 // rights on one of the two items. The following updateItem calls can however call the
                 // ItemService.update() functions which would fail if the user doesn't have permission on both items.
@@ -243,8 +243,8 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
                 throw new UnprocessableEntityException("Error parsing request body: " + e.toString());
             }
 
-            relationship.setLeftwardLabel(relationshipRest.getLeftwardLabel());
-            relationship.setRightwardLabel(relationshipRest.getRightwardLabel());
+            relationship.setLeftwardValue(relationshipRest.getLeftwardValue());
+            relationship.setRightwardValue(relationshipRest.getRightwardValue());
 
             if (jsonNode.hasNonNull("rightPlace")) {
                 relationship.setRightPlace(relationshipRest.getRightPlace());
@@ -320,7 +320,7 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
         Context context = obtainContext();
 
         List<RelationshipType> relationshipTypeList =
-            relationshipTypeService.findByLeftwardOrRightwardLabel(context, label);
+            relationshipTypeService.findByLeftwardOrRightwardType(context, label);
         List<Relationship> relationships = new LinkedList<>();
         if (dsoId != null) {
 

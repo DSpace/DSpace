@@ -38,8 +38,8 @@ public class RelationshipTypeMatcher {
         String rightEntityTypeLabel) {
 
         return matchExplicitRelationshipTypeValuesAndExplicitEntityTypeValues(relationshipType.getID(),
-                                                                              relationshipType.getLeftwardLabel(),
-                                                                              relationshipType.getRightwardLabel(),
+                                                                              relationshipType.getLeftwardType(),
+                                                                              relationshipType.getRightwardType(),
                                                                               relationshipType.getLeftMinCardinality(),
                                                                               relationshipType.getLeftMaxCardinality(),
                                                                               relationshipType.getRightMinCardinality(),
@@ -49,10 +49,10 @@ public class RelationshipTypeMatcher {
     }
 
     private static Matcher<? super Object> matchExplicitRelationshipTypeValuesAndExplicitEntityType(int id,
-        String leftwardLabel, String rightwardLabel, Integer leftMinCardinality, Integer leftMaxCardinality,
+        String leftwardType, String rightwardType, Integer leftMinCardinality, Integer leftMaxCardinality,
         Integer rightMinCardinality, Integer rightMaxCardinality,
         EntityType leftEntityType, EntityType rightEntityType) {
-        return matchExplicitRelationshipTypeValuesAndExplicitEntityTypeValues(id, leftwardLabel, rightwardLabel,
+        return matchExplicitRelationshipTypeValuesAndExplicitEntityTypeValues(id, leftwardType, rightwardType,
                                                                               leftMinCardinality, leftMaxCardinality,
                                                                               rightMinCardinality,
                                                                               rightMaxCardinality,
@@ -63,13 +63,13 @@ public class RelationshipTypeMatcher {
     }
 
     private static Matcher<? super Object> matchExplicitRelationshipTypeValuesAndExplicitEntityTypeValues(int id,
-        String leftwardLabel, String rightwardLabel, Integer leftMinCardinality, Integer leftMaxCardinality,
+        String leftwardType, String rightwardType, Integer leftMinCardinality, Integer leftMaxCardinality,
         Integer rightMinCardinality, Integer rightMaxCardinality, int leftEntityTypeId, String leftEntityTypeLabel,
         int rightEntityTypeId, String rightEntityTypeLabel) {
         return allOf(
             hasJsonPath("$.id", is(id)),
-            hasJsonPath("$.leftwardLabel", is(leftwardLabel)),
-            hasJsonPath("$.rightwardLabel", is(rightwardLabel)),
+            hasJsonPath("$.leftwardType", is(leftwardType)),
+            hasJsonPath("$.rightwardType", is(rightwardType)),
             hasJsonPath("$.leftMinCardinality", is(leftMinCardinality)),
             hasJsonPath("$.leftMaxCardinality", is(leftMaxCardinality)),
             hasJsonPath("$.rightMinCardinality", is(rightMinCardinality)),

@@ -36,13 +36,13 @@ public interface RelationshipTypeService extends DSpaceCRUDService<RelationshipT
      * @param context           The relevant DSpace context
      * @param leftType          The rightType EntityType that needs to match for the returned RelationshipType
      * @param rightType         The rightType EntityType that needs to match for the returned RelationshipType
-     * @param leftwardLabel     The leftwardLabel String that needs to match for the returned RelationshipType
-     * @param rightwardLabel    The rightwardLabel String that needs to match for the returned RelationshipType
+     * @param leftwardType      The leftwardType String that needs to match for the returned RelationshipType
+     * @param rightwardType     The rightwardType String that needs to match for the returned RelationshipType
      * @return
      * @throws SQLException If something goes wrong
      */
     RelationshipType findbyTypesAndLabels(Context context,EntityType leftType,EntityType rightType,
-                                          String leftwardLabel,String rightwardLabel)
+                                          String leftwardType,String rightwardType)
                                             throws SQLException;
 
     /**
@@ -54,7 +54,7 @@ public interface RelationshipTypeService extends DSpaceCRUDService<RelationshipT
     List<RelationshipType> findAll(Context context) throws SQLException;
 
     /**
-     * Retrieves all RelationshipType objects that have a left or right label that is
+     * Retrieves all RelationshipType objects that have a left or right type that is
      * equal to the given String
      * @param context   The relevant DSpace context
      * @param label     The label that has to match
@@ -62,7 +62,7 @@ public interface RelationshipTypeService extends DSpaceCRUDService<RelationshipT
      *                  that is equal to the given label param
      * @throws SQLException If something goes wrong
      */
-    List<RelationshipType> findByLeftwardOrRightwardLabel(Context context, String label) throws SQLException;
+    List<RelationshipType> findByLeftwardOrRightwardType(Context context, String label) throws SQLException;
 
     /**
      * Returns a list of RelationshipType objects for which the given EntityType is equal to either the leftType
@@ -80,8 +80,8 @@ public interface RelationshipTypeService extends DSpaceCRUDService<RelationshipT
      * @param context                       The relevant DSpace context
      * @param leftEntityType                The leftEntityType EntityType object for this relationshipType
      * @param rightEntityType               The rightEntityType EntityType object for this relationshipType
-     * @param leftwardLabel                 The leftwardLabel String object for this relationshipType
-     * @param rightwardLabel                The rightwardLabel String object for this relationshipType
+     * @param leftwardType                  The leftwardType String object for this relationshipType
+     * @param rightwardType                 The rightwardType String object for this relationshipType
      * @param leftCardinalityMinInteger     The leftCardinalityMinInteger Integer object for this relationshipType
      * @param leftCardinalityMaxInteger     The leftCardinalityMaxInteger Integer object for this relationshipType
      * @param rightCardinalityMinInteger    The rightCardinalityMinInteger Integer object for this relationshipType
@@ -91,7 +91,7 @@ public interface RelationshipTypeService extends DSpaceCRUDService<RelationshipT
      * @throws AuthorizeException           If something goes wrong
      */
     RelationshipType create(Context context, EntityType leftEntityType, EntityType rightEntityType,
-                            String leftwardLabel, String rightwardLabel, Integer leftCardinalityMinInteger,
+                            String leftwardType, String rightwardType, Integer leftCardinalityMinInteger,
                             Integer leftCardinalityMaxInteger, Integer rightCardinalityMinInteger,
                             Integer rightCardinalityMaxInteger)
         throws SQLException, AuthorizeException;

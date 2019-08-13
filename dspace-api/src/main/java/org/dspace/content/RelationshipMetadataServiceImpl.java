@@ -87,16 +87,16 @@ public class RelationshipMetadataServiceImpl implements RelationshipMetadataServ
         int place = 0;
         boolean isLeftwards;
         if (StringUtils.equals(relationshipType.getLeftType().getLabel(), entityType)) {
-            hashMaps = virtualMetadataPopulator.getMap().get(relationshipType.getLeftwardLabel());
+            hashMaps = virtualMetadataPopulator.getMap().get(relationshipType.getLeftwardType());
             otherItem = relationship.getRightItem();
-            relationName = relationship.getRelationshipType().getLeftwardLabel();
+            relationName = relationship.getRelationshipType().getLeftwardType();
             place = relationship.getLeftPlace();
             isLeftwards = false; //if the current item is stored on the left,
             // the name variant is retrieved from the rightwards label
         } else if (StringUtils.equals(relationshipType.getRightType().getLabel(), entityType)) {
-            hashMaps = virtualMetadataPopulator.getMap().get(relationshipType.getRightwardLabel());
+            hashMaps = virtualMetadataPopulator.getMap().get(relationshipType.getRightwardType());
             otherItem = relationship.getLeftItem();
-            relationName = relationship.getRelationshipType().getRightwardLabel();
+            relationName = relationship.getRelationshipType().getRightwardType();
             place = relationship.getRightPlace();
             isLeftwards = true; //if the current item is stored on the right,
             // the name variant is retrieved from the leftwards label
@@ -131,7 +131,7 @@ public class RelationshipMetadataServiceImpl implements RelationshipMetadataServ
             VirtualMetadataConfiguration virtualBean = entry.getValue();
 
             if (virtualBean.getPopulateWithNameVariant()) {
-                String wardLabel = isLeftwards ? relationship.getLeftwardLabel() : relationship.getRightwardLabel();
+                String wardLabel = isLeftwards ? relationship.getLeftwardValue() : relationship.getRightwardValue();
                 if (wardLabel != null) {
                     resultingMetadataValueList.add(
                         constructRelationshipMetadataValue(context, item, relationship.getID(), place, key, virtualBean,
