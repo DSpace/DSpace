@@ -16,6 +16,7 @@ import org.dspace.content.Metadatum;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.FormatIdentifier;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataSchema;
 import org.dspace.core.Context;
 import org.dspace.identifier.doi.DOIConnector;
 import org.dspace.identifier.doi.DOIIdentifierException;
@@ -56,6 +57,11 @@ public class DOIIdentifierProvider
      * DSpace items.
      */
     private DOIConnector connector;
+    /**
+     * List containing values of sub-tipologies (sedici.subtype) used to determine for what items 
+     * the DOI provider must generate doi's. Configure this at "identifier-service" configuration file.
+     */
+    protected List<String> tipologyFilter;
     
     static final String CFG_PREFIX = "identifier.doi.prefix";
     static final String CFG_NAMESPACE_SEPARATOR = "identifier.doi.namespaceseparator";
@@ -124,6 +130,11 @@ public class DOIIdentifierProvider
         this.connector = connector;
     }
     
+    @Required
+    public void setTipologyFilter(List<String> tipologyFilter) {
+        this.tipologyFilter = tipologyFilter;
+    }
+
     /**
      * This identifier provider supports identifiers of type
      * {@link org.dspace.identifier.DOI}.
@@ -166,33 +177,50 @@ public class DOIIdentifierProvider
             throws IdentifierException
     {
         // Solo registrar el item si cumple ciertas condiciones
-        if (isRegistrableDSO(dso)) {
-            String doi = mint(context, dso);
-            // register tries to reserve doi if it's not already.
-            // So we don't have to reserve it here.
-            this.register(context, dso, doi);
-            return doi;
-        }
-        else{
-            log.info("Couldn't register doi for DSO with handle "
-                    + dso.getHandle()
-                    + ", the DSO does not meet the conditions"
-                    + " that the repository imposes to have doi");
+        if (!isRegistrableDSO(dso)) {
+            log.info("Couldn't register doi for DSO with handle " + dso.getHandle()
+                    + ", the DSO does not meet the conditions that the repository imposes to have doi");
             return null;
         }
+        String doi = mint(context, dso);
+        // register tries to reserve doi if it's not already.
+        // So we don't have to reserve it here.
+        this.register(context, dso, doi);
+        return doi;
     }
 
+    /**
+     * Determine if DSO is registrable at DOI connector registration agency. It is determined 
+     * based on the check of different filters conditions.
+     * @param dso
+     * @return false if the item does not apply any filters conditions. Else, return true.
+     */
     private boolean isRegistrableDSO(DSpaceObject dso) {
-	    // TO DO
-	    // Implementar filtro en el que solo se registren dois para los items que
-	    // nosotros querramos, que cumplan ciertas condiciones
-	    return false;
+        if(this.tipologyFilter != null && this.tipologyFilter.size() > 0) {
+            Metadatum[] metadataList = dso.getMetadata("sedici", "subtype", null, Item.ANY);
+	        for (String subtipology : tipologyFilter) {
+                for (Metadatum mdt : metadataList) {
+                    if (mdt.value.equalsIgnoreCase(subtipology)) {
+                        return true;
+                    }
+                }
+            }
+	        //If no filter is triggered, then this item must not be approved for DOI generation.
+	        return false;
+	    }
+	    return true;
     }
 
     @Override
     public void register(Context context, DSpaceObject dso, String identifier)
             throws IdentifierException
     {
+        // Solo registrar el item si cumple ciertas condiciones
+        if (!isRegistrableDSO(dso)) {
+            log.info("Couldn't register doi for DSO with handle " + dso.getHandle()
+                    + ", the DSO does not meet the conditions that the repository imposes to have doi");
+            return;
+        }
         String doi = DOI.formatIdentifier(identifier);
         TableRow doiRow = null;
 
