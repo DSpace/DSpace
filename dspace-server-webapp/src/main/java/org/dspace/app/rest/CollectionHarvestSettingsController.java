@@ -135,7 +135,7 @@ public class CollectionHarvestSettingsController {
             harvestedCollectionService.delete(context, harvestedCollection);
 
         } else if (harvestedCollectionRest.getHarvestType() != HarvestTypeEnum.NONE.getValue()) {
-            List<String> errors = testHarvestSettings(collection, harvestedCollectionRest);
+            List<String> errors = testHarvestSettings(harvestedCollectionRest);
 
             if (errors.size() == 0) {
                 if (harvestedCollection == null) {
@@ -159,8 +159,7 @@ public class CollectionHarvestSettingsController {
      * @param harvestedCollectionRest    A object containg the harvest settings to be tested
      * @return
      */
-    private List<String> testHarvestSettings(Collection collection,
-                                        HarvestedCollectionRest harvestedCollectionRest) {
+    private List<String> testHarvestSettings(HarvestedCollectionRest harvestedCollectionRest) {
 
         int harvestType = harvestedCollectionRest.getHarvestType();
         String metadataConfigId = harvestedCollectionRest.getMetadataConfigId();
