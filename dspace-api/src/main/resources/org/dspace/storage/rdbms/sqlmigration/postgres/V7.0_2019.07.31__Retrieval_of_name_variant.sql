@@ -7,12 +7,12 @@
 --
 
 -----------------------------------------------------------------------------------
--- Create columns leftwardLabel and rightwardLabel in table relationship
--- Rename columns left_label and right_label to leftward_label and rightward_label
+-- Create columns leftwardValue and rightwardValue in table relationship
+-- Rename columns left_label and right_label to leftward_type and rightward_type
 -----------------------------------------------------------------------------------
 
-ALTER TABLE relationship ADD leftward_label VARCHAR;
-ALTER TABLE relationship ADD rightward_label VARCHAR;
+ALTER TABLE relationship ADD leftward_value VARCHAR;
+ALTER TABLE relationship ADD rightward_value VARCHAR;
 
-ALTER TABLE relationship_type RENAME COLUMN left_label TO leftward_label;
-ALTER TABLE relationship_type RENAME COLUMN right_label TO rightward_label;
+ALTER TABLE relationship_type RENAME COLUMN left_label TO leftward_type;
+ALTER TABLE relationship_type RENAME COLUMN right_label TO rightward_type;

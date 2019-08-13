@@ -85,13 +85,13 @@ public class RelationshipBuilder extends AbstractBuilder<Relationship, Relations
         return this;
     }
 
-    public RelationshipBuilder withLeftwardLabel(String leftWardLabel) throws SQLException {
-        relationship.setLeftwardLabel(leftWardLabel);
+    public RelationshipBuilder withLeftwardValue(String leftwardValue) throws SQLException {
+        relationship.setLeftwardValue(leftwardValue);
         return this;
     }
 
-    public RelationshipBuilder withRightwardLabel(String rightWardLabel) throws SQLException {
-        relationship.setRightwardLabel(rightWardLabel);
+    public RelationshipBuilder withRightwardValue(String rightwardValue) throws SQLException {
+        relationship.setRightwardValue(rightwardValue);
         return this;
     }
 

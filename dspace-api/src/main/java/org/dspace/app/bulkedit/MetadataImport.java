@@ -640,7 +640,7 @@ public class MetadataImport {
 
             if (StringUtils.equals(schema, MetadataSchemaEnum.RELATION.getName())) {
                 List<RelationshipType> relationshipTypeList = relationshipTypeService
-                    .findByLeftwardOrRightwardLabel(c, element);
+                    .findByLeftwardOrRightwardType(c, element);
                 for (RelationshipType relationshipType : relationshipTypeList) {
                     for (Relationship relationship : relationshipService
                         .findByItemAndRelationshipType(c, item, relationshipType)) {
@@ -716,13 +716,13 @@ public class MetadataImport {
         List<RelationshipType> rightRelationshipTypesForEntity = entityService.getRightRelationshipTypes(c, entity);
 
         for (RelationshipType relationshipType : entityService.getAllRelationshipTypes(c, entity)) {
-            if (StringUtils.equalsIgnoreCase(relationshipType.getLeftwardLabel(), element)) {
-                left = handleLeftwardLabelEqualityRelationshipTypeElement(c, entity, relationEntity, left,
+            if (StringUtils.equalsIgnoreCase(relationshipType.getLeftwardType(), element)) {
+                left = handleLeftwardTypeEqualityRelationshipTypeElement(c, entity, relationEntity, left,
                                                                       acceptableRelationshipTypes,
                                                                       leftRelationshipTypesForEntity,
                                                                       relationshipType);
-            } else if (StringUtils.equalsIgnoreCase(relationshipType.getRightwardLabel(), element)) {
-                left = handleRightwardLabelEqualityRelationshipTypeElement(c, entity, relationEntity, left,
+            } else if (StringUtils.equalsIgnoreCase(relationshipType.getRightwardType(), element)) {
+                left = handleRightwardTypeEqualityRelationshipTypeElement(c, entity, relationEntity, left,
                                                                        acceptableRelationshipTypes,
                                                                        rightRelationshipTypesForEntity,
                                                                        relationshipType);
@@ -789,12 +789,13 @@ public class MetadataImport {
      *                                          be false in this case
      * @throws SQLException                     If something goes wrong
      */
-    private boolean handleRightwardLabelEqualityRelationshipTypeElement(Context c, Entity entity, Entity relationEntity,
-                                                                    boolean left,
-                                                                    List<RelationshipType> acceptableRelationshipTypes,
-                                                                    List<RelationshipType>
-                                                                        rightRelationshipTypesForEntity,
-                                                                    RelationshipType relationshipType)
+    private boolean handleRightwardTypeEqualityRelationshipTypeElement(Context c, Entity entity,
+                                                                   Entity relationEntity,
+                                                                   boolean left,
+                                                                   List<RelationshipType> acceptableRelationshipTypes,
+                                                                   List<RelationshipType>
+                                                                    rightRelationshipTypesForEntity,
+                                                                   RelationshipType relationshipType)
         throws SQLException {
         if (StringUtils.equalsIgnoreCase(entityService.getType(c, entity).getLabel(),
                                          relationshipType.getRightType().getLabel()) &&
@@ -831,12 +832,12 @@ public class MetadataImport {
      *                                          be true in this case
      * @throws SQLException                     If something goes wrong
      */
-    private boolean handleLeftwardLabelEqualityRelationshipTypeElement(Context c, Entity entity, Entity relationEntity,
-                                                                   boolean left,
-                                                                   List<RelationshipType> acceptableRelationshipTypes,
-                                                                   List<RelationshipType>
-                                                                       leftRelationshipTypesForEntity,
-                                                                   RelationshipType relationshipType)
+    private boolean handleLeftwardTypeEqualityRelationshipTypeElement(Context c, Entity entity, Entity relationEntity,
+                                                                  boolean left,
+                                                                  List<RelationshipType> acceptableRelationshipTypes,
+                                                                  List<RelationshipType>
+                                                                   leftRelationshipTypesForEntity,
+                                                                  RelationshipType relationshipType)
         throws SQLException {
         if (StringUtils.equalsIgnoreCase(entityService.getType(c, entity).getLabel(),
                                          relationshipType.getLeftType().getLabel()) &&

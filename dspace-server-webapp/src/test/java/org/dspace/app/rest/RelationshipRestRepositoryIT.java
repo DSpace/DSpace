@@ -357,7 +357,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
     }
 
     @Test
-    public void createRelationshipWithLeftwardLabel() throws Exception {
+    public void createRelationshipWithLeftWardValue() throws Exception {
         context.turnOffAuthorisationSystem();
 
         authorizeService.addPolicy(context, publication1, Constants.WRITE, user1);
@@ -367,13 +367,13 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         context.restoreAuthSystemState();
 
         String token = getAuthToken(user1.getEmail(), password);
-        String leftwardLabel = "Name variant test left";
+        String leftwardValue = "Name variant test left";
 
         MvcResult mvcResult = getClient(token).perform(post("/api/core/relationships")
                                                            .param("relationshipType",
                                                                   isAuthorOfPublicationRelationshipType.getID()
                                                                                                        .toString())
-                                                           .param("leftwardLabel", leftwardLabel)
+                                                           .param("leftwardValue", leftwardValue)
                                                            .contentType(MediaType.parseMediaType
                                                                (org.springframework.data.rest.webmvc.RestMediaTypes
                                                                     .TEXT_URI_LIST_VALUE))
@@ -394,12 +394,12 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         getClient().perform(get("/api/core/relationships/" + relationshipId))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.id", is(relationshipId)))
-                   .andExpect(jsonPath("$.leftwardLabel", containsString(leftwardLabel)))
-                   .andExpect(jsonPath("$.rightwardLabel", is(nullValue())));
+                   .andExpect(jsonPath("$.leftwardValue", containsString(leftwardValue)))
+                   .andExpect(jsonPath("$.rightwardValue", is(nullValue())));
     }
 
     @Test
-    public void createRelationshipWithRightwardLabel() throws Exception {
+    public void createRelationshipWithRightwardValue() throws Exception {
         context.turnOffAuthorisationSystem();
 
         authorizeService.addPolicy(context, publication1, Constants.WRITE, user1);
@@ -409,13 +409,13 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         context.restoreAuthSystemState();
 
         String token = getAuthToken(user1.getEmail(), password);
-        String rightwardLabel = "Name variant test right";
+        String rightwardValue = "Name variant test right";
 
         MvcResult mvcResult = getClient(token).perform(post("/api/core/relationships")
                                                            .param("relationshipType",
                                                                   isAuthorOfPublicationRelationshipType.getID()
                                                                                                        .toString())
-                                                           .param("rightwardLabel", rightwardLabel)
+                                                           .param("rightwardValue", rightwardValue)
                                                            .contentType(MediaType.parseMediaType
                                                                (org.springframework.data.rest.webmvc.RestMediaTypes
                                                                     .TEXT_URI_LIST_VALUE))
@@ -436,12 +436,12 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         getClient().perform(get("/api/core/relationships/" + relationshipId))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.id", is(relationshipId)))
-                   .andExpect(jsonPath("$.leftwardLabel", is(nullValue())))
-                   .andExpect(jsonPath("$.rightwardLabel", containsString(rightwardLabel)));
+                   .andExpect(jsonPath("$.leftwardValue", is(nullValue())))
+                   .andExpect(jsonPath("$.rightwardValue", containsString(rightwardValue)));
     }
 
     @Test
-    public void createRelationshipWithRightwardLabelAndLeftwardLabel() throws Exception {
+    public void createRelationshipWithRightwardValueAndLeftWardValue() throws Exception {
         context.turnOffAuthorisationSystem();
 
         authorizeService.addPolicy(context, publication1, Constants.WRITE, user1);
@@ -451,15 +451,15 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         context.restoreAuthSystemState();
 
         String token = getAuthToken(user1.getEmail(), password);
-        String leftwardLabel = "Name variant test left";
-        String rightwardLabel = "Name variant test right";
+        String leftwardValue = "Name variant test left";
+        String rightwardValue = "Name variant test right";
 
         MvcResult mvcResult = getClient(token).perform(post("/api/core/relationships")
                                                            .param("relationshipType",
                                                                   isAuthorOfPublicationRelationshipType.getID()
                                                                                                        .toString())
-                                                           .param("leftwardLabel", leftwardLabel)
-                                                           .param("rightwardLabel", rightwardLabel)
+                                                           .param("leftwardValue", leftwardValue)
+                                                           .param("rightwardValue", rightwardValue)
                                                            .contentType(MediaType.parseMediaType
                                                                (org.springframework.data.rest.webmvc.RestMediaTypes
                                                                     .TEXT_URI_LIST_VALUE))
@@ -480,12 +480,12 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         getClient().perform(get("/api/core/relationships/" + relationshipId))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.id", is(relationshipId)))
-                   .andExpect(jsonPath("$.leftwardLabel", containsString(leftwardLabel)))
-                   .andExpect(jsonPath("$.rightwardLabel", containsString(rightwardLabel)));
+                   .andExpect(jsonPath("$.leftwardValue", containsString(leftwardValue)))
+                   .andExpect(jsonPath("$.rightwardValue", containsString(rightwardValue)));
     }
 
     @Test
-    public void createRelationshipAndAddLeftwardLabelAfterwards() throws Exception {
+    public void createRelationshipAndAddLeftWardValueAfterwards() throws Exception {
         context.turnOffAuthorisationSystem();
 
         authorizeService.addPolicy(context, publication1, Constants.WRITE, user1);
@@ -495,7 +495,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         context.restoreAuthSystemState();
 
         String token = getAuthToken(user1.getEmail(), password);
-        String leftwardLabel = "Name variant test label";
+        String leftwardValue = "Name variant test label";
 
         MvcResult mvcResult = getClient(token).perform(post("/api/core/relationships")
                                                            .param("relationshipType",
@@ -522,24 +522,24 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         getClient().perform(get("/api/core/relationships/" + relationshipId))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.id", is(relationshipId)))
-                   .andExpect(jsonPath("$.leftwardLabel", is(nullValue())))
-                   .andExpect(jsonPath("$.rightwardLabel", is(nullValue())));
+                   .andExpect(jsonPath("$.leftwardValue", is(nullValue())))
+                   .andExpect(jsonPath("$.rightwardValue", is(nullValue())));
 
         JsonObject contentObj = new JsonObject();
-        contentObj.addProperty("leftwardLabel", leftwardLabel);
+        contentObj.addProperty("leftwardValue", leftwardValue);
 
-        // Add leftwardlabel
+        // Add leftwardValue
         getClient(token).perform(put("/api/core/relationships/" + relationshipId)
                                      .contentType("application/json")
                                      .content(contentObj.toString()))
                         .andExpect(status().isOk());
 
-        // Verify leftwardlabel is present and rightwardlabel not
+        // Verify leftwardValue is present and rightwardValue not
         getClient().perform(get("/api/core/relationships/" + relationshipId))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.id", is(relationshipId)))
-                   .andExpect(jsonPath("$.leftwardLabel", containsString(leftwardLabel)))
-                   .andExpect(jsonPath("$.rightwardLabel", is(nullValue())));
+                   .andExpect(jsonPath("$.leftwardValue", containsString(leftwardValue)))
+                   .andExpect(jsonPath("$.rightwardValue", is(nullValue())));
     }
 
     @Test
@@ -553,8 +553,8 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         context.restoreAuthSystemState();
 
         String token = getAuthToken(user1.getEmail(), password);
-        String leftwardLabel = "Name variant test left";
-        String rightwardLabel = "Name variant test right";
+        String leftwardValue = "Name variant test left";
+        String rightwardValue = "Name variant test right";
 
         MvcResult mvcResult = getClient(token).perform(post("/api/core/relationships")
                                                            .param("relationshipType",
@@ -581,38 +581,38 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         getClient().perform(get("/api/core/relationships/" + relationshipId))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.id", is(relationshipId)))
-                   .andExpect(jsonPath("$.leftwardLabel", is(nullValue())))
-                   .andExpect(jsonPath("$.rightwardLabel", is(nullValue())));
+                   .andExpect(jsonPath("$.leftwardValue", is(nullValue())))
+                   .andExpect(jsonPath("$.rightwardValue", is(nullValue())));
 
         JsonObject contentObj = new JsonObject();
-        contentObj.addProperty("leftwardLabel", leftwardLabel);
-        contentObj.addProperty("rightwardLabel", rightwardLabel);
+        contentObj.addProperty("leftwardValue", leftwardValue);
+        contentObj.addProperty("rightwardValue", rightwardValue);
 
-        // Add leftwardlabel and rightwardlabel
+        // Add leftwardValue and rightwardValue
         getClient(token).perform(put("/api/core/relationships/" + relationshipId)
                                      .contentType("application/json")
                                      .content(contentObj.toString()))
                         .andExpect(status().isOk());
 
-        // Verify leftwardlabel and rightwardlabel are present
+        // Verify leftwardValue and rightwardValue are present
         getClient().perform(get("/api/core/relationships/" + relationshipId))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.id", is(relationshipId)))
-                   .andExpect(jsonPath("$.leftwardLabel", containsString(leftwardLabel)))
-                   .andExpect(jsonPath("$.rightwardLabel", containsString(rightwardLabel)));
+                   .andExpect(jsonPath("$.leftwardValue", containsString(leftwardValue)))
+                   .andExpect(jsonPath("$.rightwardValue", containsString(rightwardValue)));
 
-        // Remove leftwardlabel and rightwardlabel
+        // Remove leftwardValue and rightwardValue
         getClient(token).perform(put("/api/core/relationships/" + relationshipId)
                                      .contentType("application/json")
                                      .content("{}"))
                         .andExpect(status().isOk());
 
-        // Verify leftwardlabel and rightwardlabel are both gone
+        // Verify leftwardValue and rightwardValue are both gone
         getClient().perform(get("/api/core/relationships/" + relationshipId))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.id", is(relationshipId)))
-                   .andExpect(jsonPath("$.leftwardLabel", is(nullValue())))
-                   .andExpect(jsonPath("$.rightwardLabel", is(nullValue())));
+                   .andExpect(jsonPath("$.leftwardValue", is(nullValue())))
+                   .andExpect(jsonPath("$.rightwardValue", is(nullValue())));
     }
 
     /**
@@ -2250,12 +2250,12 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
     }
 
     /**
-     * Verify when a rightward label is present which has been configured to
+     * Verify when a rightward value is present which has been configured to
      * be used for virtual metadata, that the virtual metadata is populated
-     * with the custom label
+     * with the custom value
      */
     @Test
-    public void rightwardLabelRelationshipTest() throws Exception {
+    public void rightwardValueRelationshipTest() throws Exception {
 
         context.turnOffAuthorisationSystem();
 
@@ -2266,7 +2266,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
 
         Relationship relationship3 = RelationshipBuilder
             .createRelationshipBuilder(context, publication1, author1, isAuthorOfPublicationRelationshipType)
-            .withRightwardLabel("RightwardLabelTest").build();
+            .withRightwardValue("RightwardValueTest").build();
 
         context.restoreAuthSystemState();
 
@@ -2283,16 +2283,16 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         getClient().perform(get("/api/core/items/" + publication1.getID()))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.metadata", allOf(
-                       matchMetadata("dc.contributor.author", "RightwardLabelTest"),
+                       matchMetadata("dc.contributor.author", "RightwardValueTest"),
                        matchMetadata("dc.title", "Publication1"))));
     }
 
     /**
-     * Verify when no rightward label is present, that the virtual metadata is populated
+     * Verify when no rightward value is present, that the virtual metadata is populated
      * with the metadata from the related item
      */
     @Test
-    public void nonRightwardLabelRelationshipTest() throws Exception {
+    public void nonRightwardValueRelationshipTest() throws Exception {
 
         context.turnOffAuthorisationSystem();
 
@@ -2326,13 +2326,13 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
     }
 
     /**
-     * Verify when a rightward label is present which has been configured to
+     * Verify when a rightward value is present which has been configured to
      * be used for virtual metadata, that the virtual metadata is populated
-     * with the custom label
-     * Verify that only the relationship containing the rightward label will be updated
+     * with the custom value
+     * Verify that only the relationship containing the rightward value will be updated
      */
     @Test
-    public void mixedRightwardLabelAndRegularRelationshipTest() throws Exception {
+    public void mixedRightwardValueAndRegularRelationshipTest() throws Exception {
 
         context.turnOffAuthorisationSystem();
 
@@ -2356,7 +2356,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
 
         Relationship relationship2 = RelationshipBuilder
             .createRelationshipBuilder(context, publication1, author1, isAuthorOfPublicationRelationshipType)
-            .withRightwardLabel("TestingRightwardLabel").build();
+            .withRightwardValue("TestingRightwardValue").build();
 
         context.restoreAuthSystemState();
 
@@ -2376,18 +2376,18 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                    .andExpect(jsonPath("$.metadata", allOf(
                        matchMetadata("dc.contributor.author", "Maybe, Maybe"),
                        matchMetadata("dc.contributor.author", "Testy, TEst"),
-                       matchMetadata("dc.contributor.author", "TestingRightwardLabel"),
+                       matchMetadata("dc.contributor.author", "TestingRightwardValue"),
                        not(matchMetadata("dc.contributor.author", "testingLastName, testingFirstName")),
                        matchMetadata("dc.title", "Publication1"))));
     }
 
     /**
-     * Verify when a leftward label is present which has NOT been configured to
+     * Verify when a leftward value is present which has NOT been configured to
      * be used for virtual metadata, that the virtual metadata is NOT populated
-     * with the custom label
+     * with the custom value
      */
     @Test
-    public void leftwardLabelRelationshipTest() throws Exception {
+    public void leftwardValueRelationshipTest() throws Exception {
 
         context.turnOffAuthorisationSystem();
 
@@ -2398,7 +2398,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
 
         Relationship relationship3 = RelationshipBuilder
             .createRelationshipBuilder(context, publication1, author3, isAuthorOfPublicationRelationshipType)
-            .withLeftwardLabel("leftwardLabel").withLeftPlace(1).build();
+            .withLeftwardValue("leftwardValue").withLeftPlace(1).build();
 
         context.restoreAuthSystemState();
 
