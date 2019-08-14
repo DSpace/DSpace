@@ -651,8 +651,9 @@ implements DOIConnector
      * @throws DOIIdentifierException if XML contains any error.
      */
     private void checkCrossrefErrors(Element root, DSpaceObject dso) throws DOIIdentifierException {
-        String xpath_expression = "//crossref:error";
-        List<Element> errorElements = getElementsFromPath(root, xpath_expression, "crossref", root.getNamespaceURI());
+        String xpath_expression = "//dspaceCrswalk:error";
+        List<Element> errorElements = getElementsFromPath(root, xpath_expression, "dspaceCrswalk",
+                "http://www.dspace.org/xmlns/dspace/crosswalk");
         if (errorElements != null) {
             StringBuffer errors = new StringBuffer();
             for (Element errorElement : errorElements) {
@@ -784,6 +785,8 @@ implements DOIConnector
 
         Element root = prepareDSOForDisseminate(dso, doi);
         
+        checkCrossrefErrors(root, dso);
+
         String metadataDOI = extractDOI(root);
         if (null == metadataDOI)
         {
@@ -1183,7 +1186,7 @@ implements DOIConnector
      * @return a list of all nodes objects tied to XPATH or @null if the XPATH does not match.
      */
     private List<?> getNodesFromPath(Element root, String xpath_expression, String ns_prefix, String ns_uri) {
-        List<?> doiData = null;
+        List<?> targetNodes = null;
         XPath xpathDOI;
         Document doc;
         try {
@@ -1194,14 +1197,12 @@ implements DOIConnector
             } else {
                 doc = new Document(root);
             }
-            if(xpathDOI.selectNodes(doc) != null && !xpathDOI.selectNodes(doc).isEmpty()) {
-                doiData = xpathDOI.selectNodes(doc);
-            }
+            targetNodes = xpathDOI.selectNodes(doc);
         } catch (JDOMException e) {
             log.error("Incorrect XPATH expression!! Please check it. (XPATH =" + xpath_expression  + ")",  e.getMessage());
             //continue the normal code and return @null if this excepcion is raised...
         }
-        return doiData;
+        return targetNodes;
     }
 
     /**
@@ -1209,7 +1210,7 @@ implements DOIConnector
      */
     private List<Element> getElementsFromPath(Element root, String xpath_expression, String ns_prefix, String ns_uri) {
         List<?> nodes = getNodesFromPath(root, xpath_expression, ns_prefix, ns_uri);
-        if (nodes == null) {
+        if (nodes == null || nodes.isEmpty()) {
             return null;
         }
         List<Element> elements = new ArrayList<Element>();
@@ -1223,14 +1224,24 @@ implements DOIConnector
      * Get an Element node object within XML data tied to the specified XPATH expression.
      */
     private Element getElementFromPath(Element root, String xpath_expression, String ns_prefix, String ns_uri) {
-        return (Element)(getNodesFromPath(root, xpath_expression, ns_prefix, ns_uri).get(0));
+        Element element = null;
+        List<?> nodes = getNodesFromPath(root, xpath_expression, ns_prefix, ns_uri);
+        if(nodes != null && !nodes.isEmpty()) {
+            element = (Element)(nodes.get(0));
+        }
+        return element;
     }
 
     /**
      * Get an Attribute node object within XML data tied to the specified XPATH expression.
      */
     private Attribute getAttributeFromPath(Element root, String xpath_expression, String ns_prefix, String ns_uri) {
-        return (Attribute)(getNodesFromPath(root, xpath_expression, ns_prefix, ns_uri).get(0));
+        Attribute attribute = null;
+        List<?> nodes = getNodesFromPath(root, xpath_expression, ns_prefix, ns_uri);
+        if(nodes != null && !nodes.isEmpty()) {
+            attribute = (Attribute)(nodes.get(0));
+        }
+        return attribute;
     }
     
     /**

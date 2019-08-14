@@ -5,6 +5,7 @@
 <xsl:stylesheet  version="1.0"
 	xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
 	xmlns:dspace="http://www.dspace.org/xmlns/dspace/dim"
+	xmlns:dspaceCrswalk="http://www.dspace.org/xmlns/dspace/crosswalk"
 	xmlns:java="http://xml.apache.org/xalan/java"
 	xmlns:func="http://exslt.org/functions" >
 
@@ -39,7 +40,7 @@
 			</head>
 
 			<body>
-				<xsl:variable name="type" select="//dspace:field[@mdschema='dc' and @element='type']/text()"/>
+				<xsl:variable name="type" select="dspace:field[@mdschema='dc' and @element='type']/text()"/>
 				<xsl:choose>
 					<xsl:when test="$type='Tesis'">
 						<xsl:call-template name="setDissertation" />
@@ -101,7 +102,7 @@
 			<!-- degree -->
 			<degree>
 				<xsl:value-of
-					select="//dspace:field[@mdschema='thesis' and @element='degree' and @qualifier='name']" />
+					select="dspace:field[@mdschema='thesis' and @element='degree' and @qualifier='name']" />
 			</degree>
 
 			<!-- isbn -->
@@ -228,7 +229,7 @@
 
 				<xsl:choose>
 					<xsl:when
-						test="//dspace:field[@mdschema='sedici' and @element='subtype']/text() = 'Libro'">
+						test="dspace:field[@mdschema='sedici' and @element='subtype']/text() = 'Libro'">
 						<!-- Solo mapear estos metadatos si el item es subtype 'Libro' -->
 
 						<!-- contributors -->
@@ -244,15 +245,18 @@
 						<edition_number></edition_number> -->
 
 					</xsl:when>
-					<xsl:otherwise>
+					<xsl:when test="dspace:field[@mdschema='sedici' and @element='relation' and @qualifier='bookTitle']">
 						<!-- El item es subtype 'Capitulo de libro' o es parte de un libro -->
 						<!-- book title -->
 						<titles xmlns="http://www.crossref.org/schema/4.4.2">
 							<title>
 								<xsl:value-of
-									select="//dspace:field[@mdschema='sedici' and @element='relation' and @qualifier='bookTitle']" />
+									select="dspace:field[@mdschema='sedici' and @element='relation' and @qualifier='bookTitle']" />
 							</title>
 						</titles>
+					</xsl:when>
+					<xsl:otherwise>
+						<dspaceCrswalk:error>Error: sedici.relation.bookTitle not found</dspaceCrswalk:error>
 					</xsl:otherwise>
 				</xsl:choose>
 
@@ -263,20 +267,21 @@
 				<acceptance_date></acceptance_date> -->
 
 				<!-- isbn -->
+				<xsl:variable name="isbn" select="dspace:field[@mdschema='sedici' and @element='identifier' and @qualifier='isbn']" />
 				<xsl:choose>
 					<xsl:when
-						test="(translate(substring(//dspace:field[@mdschema='sedici' and @element='identifier' and @qualifier='isbn'],1,1),'123456789','') != substring(//dspace:field[@mdschema='sedici' and @element='identifier' and @qualifier='isbn'],1,1)) and (string-length(//dspace:field[@mdschema='sedici' and @element='identifier' and @qualifier='isbn']) &gt; 9)">
+						test="java:ar.edu.unlp.sedici.dspace.utils.Utils.matchRegex($isbn, '(978-)?\d[\d \-]+[\dX]')">
 						<xsl:call-template name="setISBN" />
 					</xsl:when>
 					<xsl:otherwise>
-						<error>Error: sedici.identifier.isbn not valid</error>
+						<dspaceCrswalk:error>Error: sedici.identifier.isbn not valid</dspaceCrswalk:error>
 					</xsl:otherwise>
 				</xsl:choose>
 
 				<xsl:call-template name="setPublisher" />
 
 				<xsl:if
-					test="//dspace:field[@mdschema='sedici' and @element='subtype']/text() = 'Libro'">
+					test="dspace:field[@mdschema='sedici' and @element='subtype']/text() = 'Libro'">
 					<!-- Solo mapear estos metadatos si el item es subtype 'Libro' -->
 
 					<!-- No se mapea, el indentifier ya lo mapeamos en doi_data
@@ -315,7 +320,7 @@
 			 -->
 
 			<xsl:if
-				test="//dspace:field[@mdschema='sedici' and @element='subtype']/text() = 'Capitulo de libro'">
+				test="dspace:field[@mdschema='sedici' and @element='subtype']/text() = 'Capitulo de libro'">
 				<content_item component_type="chapter"
 					level_sequence_number="1" publication_type="full_text"
 					reference_distribution_opts="none">
@@ -405,12 +410,12 @@
 
 				<!-- description -->
 				<xsl:if
-					test="//dspace:field[@mdschema='dc' and @element='description' and @qualifier='abstract']">
+					test="dspace:field[@mdschema='dc' and @element='description' and @qualifier='abstract']">
 					<description>
 						<xsl:attribute name="language">
-							<xsl:value-of select="//dspace:field[@mdschema='dc' and @element='description' and @qualifier='abstract']/@lang" />
+							<xsl:value-of select="dspace:field[@mdschema='dc' and @element='description' and @qualifier='abstract']/@lang" />
 						</xsl:attribute>
-						<xsl:value-of select="//dspace:field[@mdschema='dc' and @element='description' and @qualifier='abstract']" />
+						<xsl:value-of select="dspace:field[@mdschema='dc' and @element='description' and @qualifier='abstract']" />
 					</description>
 				</xsl:if>
 
@@ -447,14 +452,14 @@
 	<xsl:template name="setFullTitle">
 		<xsl:choose>
 			<xsl:when
-				test="//dspace:field[@mdschema='sedici' and @element='relation' and @qualifier='journalTitle']" >
+				test="dspace:field[@mdschema='sedici' and @element='relation' and @qualifier='journalTitle']" >
 				<full_title xmlns="http://www.crossref.org/schema/4.4.2">
 					<xsl:value-of
-						select="//dspace:field[@mdschema='sedici' and @element='relation' and @qualifier='journalTitle']" />
+						select="dspace:field[@mdschema='sedici' and @element='relation' and @qualifier='journalTitle']" />
 				</full_title>
 			</xsl:when>
 			<xsl:otherwise>
-				<error xmlns="http://www.crossref.org/schema/4.4.2">Error: sedici.relation.journalTitle not found</error>
+				<dspaceCrswalk:error>Error: sedici.relation.journalTitle not found</dspaceCrswalk:error>
 			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>
@@ -463,13 +468,13 @@
 		<titles xmlns="http://www.crossref.org/schema/4.4.2">
 			<title>
 				<xsl:value-of
-					select="//dspace:field[@mdschema='dc' and @element='title' and not(@qualifier='alternative')]" />
+					select="dspace:field[@mdschema='dc' and @element='title' and not(@qualifier='alternative')]" />
 			</title>
 			<xsl:if
-				test="//dspace:field[@mdschema='sedici' and @element='title' and not(@qualifier='subtitlo')]">
+				test="dspace:field[@mdschema='sedici' and @element='title' and not(@qualifier='subtitlo')]">
 				<subtitle>
 					<xsl:value-of
-						select="//dspace:field[@mdschema='sedici' and @element='title' and not(@qualifier='subtitlo')]" />
+						select="dspace:field[@mdschema='sedici' and @element='title' and not(@qualifier='subtitlo')]" />
 				</subtitle>
 			</xsl:if>
 		</titles>
@@ -480,7 +485,7 @@
 
 			<!-- <person_name role=author> -->
 			<xsl:for-each
-				select="//dspace:field[@mdschema='sedici' and @element='creator' and @qualifier='person']" >
+				select="dspace:field[@mdschema='sedici' and @element='creator' and @qualifier='person']" >
 				<xsl:call-template name="setPersonName">
 					<xsl:with-param name="person" select="." />
 					<xsl:with-param name="role">
@@ -494,7 +499,7 @@
 
 			<!-- <organization> -->
 			<xsl:for-each
-				select="//dspace:field[@mdschema='sedici' and @element='contributor' and @qualifier='corporate]']">
+				select="dspace:field[@mdschema='sedici' and @element='contributor' and @qualifier='corporate]']">
 				<organization contributor_role="author"
 					sequence="first">
 					<xsl:value-of select="." />
@@ -503,7 +508,7 @@
 
 			<!-- contributor.editor <person_name role=editor> -->
 			<xsl:for-each
-				select="//dspace:field[@mdschema='sedici' and @element='contributor' and @qualifier='editor']" >
+				select="dspace:field[@mdschema='sedici' and @element='contributor' and @qualifier='editor']" >
 				<xsl:call-template name="setPersonName">
 					<xsl:with-param name="person" select="." />
 					<xsl:with-param name="role">
@@ -517,7 +522,7 @@
 
 			<!-- contributor.compiler <person_name role=editor> -->
 			<xsl:for-each
-				select="//dspace:field[@mdschema='sedici' and @element='contributor' and @qualifier='compiler']" >
+				select="dspace:field[@mdschema='sedici' and @element='contributor' and @qualifier='compiler']" >
 				<xsl:call-template name="setPersonName">
 					<xsl:with-param name="person" select="." />
 					<xsl:with-param name="role">
@@ -565,7 +570,7 @@
 
 	<xsl:template name="setAbstract">
 		<xsl:for-each
-			select="//dspace:field[@mdschema='dc' and @element='description' and @qualifier='abstract']">
+			select="dspace:field[@mdschema='dc' and @element='description' and @qualifier='abstract']">
 			<jats:abstract
 				xmlns:jats="http://www.ncbi.nlm.nih.gov/JATS1">
 				<xsl:attribute name="xml:lang">
@@ -580,7 +585,7 @@
 
 	<xsl:template name="setPublicationDate">
 		<xsl:for-each
-			select="//dspace:field[@mdschema='dc' and @element='date' and @qualifier='issued']">
+			select="dspace:field[@mdschema='dc' and @element='date' and @qualifier='issued']">
 			<publication_date xmlns="http://www.crossref.org/schema/4.4.2">
 				<xsl:if test="string-length(./text()) &gt; 5">
 					<month>
@@ -602,9 +607,9 @@
 	<xsl:template name="setApprovalDate">
 		<xsl:choose>
 			<xsl:when
-				test="//dspace:field[@mdschema='sedici' and @element='date' and @qualifier='exposure']">
+				test="dspace:field[@mdschema='sedici' and @element='date' and @qualifier='exposure']">
 				<xsl:for-each
-					select="//dspace:field[@mdschema='sedici' and @element='date' and @qualifier='exposure']">
+					select="dspace:field[@mdschema='sedici' and @element='date' and @qualifier='exposure']">
 					<approval_date
 						xmlns="http://www.crossref.org/schema/4.4.2">
 						<xsl:if test="string-length(./text()) &gt; 5">
@@ -624,18 +629,18 @@
 				</xsl:for-each>
 			</xsl:when>
 			<xsl:otherwise>
-				<error xmlns="http://www.crossref.org/schema/4.4.2">Error: sedici.date.exposure not found</error>
+				<dspaceCrswalk:error>Error: sedici.date.exposure not found</dspaceCrswalk:error>
 			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>
 
 	<xsl:template name="setInstitution">
 		<xsl:if
-			test="//dspace:field[@mdschema='thesis' and @element='degree' and @qualifier='grantor']">
+			test="dspace:field[@mdschema='thesis' and @element='degree' and @qualifier='grantor']">
 			<institution xmlns="http://www.crossref.org/schema/4.4.2">
 				<institution_name>
 					<xsl:value-of
-						select="//dspace:field[@mdschema='thesis' and @element='degree' and @qualifier='grantor']" />
+						select="dspace:field[@mdschema='thesis' and @element='degree' and @qualifier='grantor']" />
 				</institution_name>
 			</institution>
 		</xsl:if>
@@ -643,9 +648,9 @@
 
 	<xsl:template name="setISBN">
 		<xsl:for-each
-			select="//dspace:field[@mdschema='sedici' and @element='identifier' and @qualifier='isbn']">
+			select="dspace:field[@mdschema='sedici' and @element='identifier' and @qualifier='isbn']">
 			<xsl:if
-				test="(translate(substring(.,1,1),'123456789','') != substring(.,1,1)) and (string-length(.) &gt; 9)">
+				test="java:ar.edu.unlp.sedici.dspace.utils.Utils.matchRegex(., '(978-)?\d[\d \-]+[\dX]')">
 				<isbn xmlns="http://www.crossref.org/schema/4.4.2">
 					<xsl:value-of select="substring(.,1,17)" />
 				</isbn>
@@ -655,13 +660,13 @@
 
 	<xsl:template name="setAIProgram">
 		<xsl:if
-			test="//dspace:field[@mdschema='sedici' and @element='rights' and @qualifier='uri']">
+			test="dspace:field[@mdschema='sedici' and @element='rights' and @qualifier='uri']">
 			<ai:program
 				xmlns:ai="http://www.crossref.org/AccessIndicators.xsd"
 				name="AccessIndicators">
 				<ai:license_ref>
 					<xsl:value-of
-						select="//dspace:field[@mdschema='sedici' and @element='rights' and @qualifier='uri']" />
+						select="dspace:field[@mdschema='sedici' and @element='rights' and @qualifier='uri']" />
 				</ai:license_ref>
 			</ai:program>
 		</xsl:if>
@@ -673,88 +678,88 @@
 
 			<!-- sedici.relation.journalVolumeAndIssue -->
 			<xsl:if
-				test="//dspace:field[@mdschema='sedici' and @element='relation' and @qualifier='journalVolumeAndIssue']">
+				test="dspace:field[@mdschema='sedici' and @element='relation' and @qualifier='journalVolumeAndIssue']">
 				<rel:related_item>
 					<rel:description>Journal issue or volume which the item is part of</rel:description>
 					<rel:inter_work_relation
 						identifier-type="other" relationship-type="isPartOf">
 						<xsl:value-of
-							select="//dspace:field[@mdschema='sedici' and @element='relation' and @qualifier='journalVolumeAndIssue']" />
+							select="dspace:field[@mdschema='sedici' and @element='relation' and @qualifier='journalVolumeAndIssue']" />
 					</rel:inter_work_relation>
 				</rel:related_item>
 			</xsl:if>
 
 			<!-- sedici.relation.event -->
 			<xsl:if
-				test="//dspace:field[@mdschema='sedici' and @element='relation' and @qualifier='event']">
+				test="dspace:field[@mdschema='sedici' and @element='relation' and @qualifier='event']">
 				<rel:related_item>
 					<rel:description>Event name the item is part of</rel:description>
 					<rel:inter_work_relation
 						identifier-type="other" relationship-type="isPartOf">
 						<xsl:value-of
-							select="//dspace:field[@mdschema='sedici' and @element='relation' and @qualifier='event']" />
+							select="dspace:field[@mdschema='sedici' and @element='relation' and @qualifier='event']" />
 					</rel:inter_work_relation>
 				</rel:related_item>
 			</xsl:if>
 
 			<!-- sedici.relation.isRelatedWith -->
 			<xsl:if
-				test="//dspace:field[@mdschema='sedici' and @element='relation' and @qualifier='isRelatedWith']">
+				test="dspace:field[@mdschema='sedici' and @element='relation' and @qualifier='isRelatedWith']">
 				<rel:related_item>
 					<rel:inter_work_relation
 						identifier-type="uri" relationship-type="isRelatedMaterial">
 						<xsl:value-of
-							select="//dspace:field[@mdschema='sedici' and @element='relation' and @qualifier='isRelatedWith']" />
+							select="dspace:field[@mdschema='sedici' and @element='relation' and @qualifier='isRelatedWith']" />
 					</rel:inter_work_relation>
 				</rel:related_item>
 			</xsl:if>
 
 			<!-- sedici.relation.ciclo -->
 			<xsl:if
-				test="//dspace:field[@mdschema='sedici' and @element='relation' and @qualifier='ciclo']">
+				test="dspace:field[@mdschema='sedici' and @element='relation' and @qualifier='ciclo']">
 				<rel:related_item>
 					<rel:description>Program name which the item is part of</rel:description>
 					<rel:inter_work_relation
 						identifier-type="other" relationship-type="isPartOf">
 						<xsl:value-of
-							select="//dspace:field[@mdschema='sedici' and @element='relation' and @qualifier='ciclo']" />
+							select="dspace:field[@mdschema='sedici' and @element='relation' and @qualifier='ciclo']" />
 					</rel:inter_work_relation>
 				</rel:related_item>
 			</xsl:if>
 
 			<!-- sedici.relation.isPartOfSeries -->
 			<xsl:if
-				test="//dspace:field[@mdschema='sedici' and @element='relation' and @qualifier='isPartOfSeries']">
+				test="dspace:field[@mdschema='sedici' and @element='relation' and @qualifier='isPartOfSeries']">
 				<rel:related_item>
 					<rel:description>Series which the item is part of</rel:description>
 					<rel:inter_work_relation
 						identifier-type="other" relationship-type="isPartOf">
 						<xsl:value-of
-							select="//dspace:field[@mdschema='sedici' and @element='relation' and @qualifier='isPartOfSeries']" />
+							select="dspace:field[@mdschema='sedici' and @element='relation' and @qualifier='isPartOfSeries']" />
 					</rel:inter_work_relation>
 				</rel:related_item>
 			</xsl:if>
 
 			<!-- sedici.relation.isReviewOf -->
 			<xsl:if
-				test="//dspace:field[@mdschema='sedici' and @element='relation' and @qualifier='isReviewOf']">
+				test="dspace:field[@mdschema='sedici' and @element='relation' and @qualifier='isReviewOf']">
 				<rel:related_item>
 					<rel:inter_work_relation
 						identifier-type="uri" relationship-type="isReviewOf">
 						<xsl:value-of
-							select="//dspace:field[@mdschema='sedici' and @element='relation' and @qualifier='isReviewOf']" />
+							select="dspace:field[@mdschema='sedici' and @element='relation' and @qualifier='isReviewOf']" />
 					</rel:inter_work_relation>
 				</rel:related_item>
 			</xsl:if>
 
 			<!-- sedici.relation.isReviewedBy -->
 			<xsl:if
-				test="//dspace:field[@mdschema='sedici' and @element='relation' and @qualifier='isReviewedBy']">
+				test="dspace:field[@mdschema='sedici' and @element='relation' and @qualifier='isReviewedBy']">
 				<rel:related_item>
 					<rel:inter_work_relation
 						identifier-type="uri" relationship-type="hasReview">
 						<xsl:value-of
-							select="//dspace:field[@mdschema='sedici' and @element='relation' and @qualifier='isReviewedBy']" />
+							select="dspace:field[@mdschema='sedici' and @element='relation' and @qualifier='isReviewedBy']" />
 					</rel:inter_work_relation>
 				</rel:related_item>
 			</xsl:if>
@@ -764,56 +769,35 @@
 	<xsl:template name="setISSN">
 		<xsl:choose>
 			<xsl:when
-				test="string-length(//dspace:field[@mdschema='sedici' and @element='identifier' and @qualifier='issn']) &gt; 7">
+				test="java:ar.edu.unlp.sedici.dspace.utils.Utils.matchRegex(dspace:field[@mdschema='sedici' and @element='identifier' and @qualifier='issn'], '\d{4}-?\d{3}[\dX]')">
 				<issn xmlns="http://www.crossref.org/schema/4.4.2">
 					<xsl:value-of
-						select="substring(//dspace:field[@mdschema='sedici' and @element='identifier' and @qualifier='issn'],1,9)" />
+						select="dspace:field[@mdschema='sedici' and @element='identifier' and @qualifier='issn']" />
 				</issn>
 			</xsl:when>
 			<xsl:otherwise>
-				<error xmlns="http://www.crossref.org/schema/4.4.2">Error: sedici.identifier.issn not found</error>
+				<dspaceCrswalk:error>Error: sedici.identifier.issn not found</dspaceCrswalk:error>
 			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>
 
 	<xsl:template name="setPages">
 		<xsl:for-each
-			select="//dspace:field[@mdschema='dc' and @element='format' and @qualifier='extent']">
+			select="dspace:field[@mdschema='dc' and @element='format' and @qualifier='extent']">
 			<xsl:if
-				test="contains(./text(),'p.') or contains(./text(),'P.')">
+				test="java:ar.edu.unlp.sedici.dspace.utils.Utils.matchRegex(., '^([pP]\.?)? ?\d+-\d+?$')">
 				<xsl:variable name="pages"
-					select="translate(./text(),'Pp. ','')" />
-				<xsl:choose>
-					<xsl:when test="contains($pages,'+')">
-						<xsl:variable name="parsedPages"
-							select="substring-before($pages,'+')" />
-						<xsl:if test="contains($parsedPages,'-')">
-							<pages xmlns="http://www.crossref.org/schema/4.4.2">
-								<first_page>
-									<xsl:value-of
-										select="substring-before($parsedPages,'-')" />
-								</first_page>
-								<last_page>
-									<xsl:value-of
-										select="substring-after($parsedPages,'-')" />
-								</last_page>
-							</pages>
-						</xsl:if>
-					</xsl:when>
-					<xsl:otherwise>
-						<xsl:if test="contains($pages,'-')">
-							<pages xmlns="http://www.crossref.org/schema/4.4.2">
-								<first_page>
-									<xsl:value-of
-										select="substring-before($pages,'-')" />
-								</first_page>
-								<last_page>
-									<xsl:value-of select="substring-after($pages,'-')" />
-								</last_page>
-							</pages>
-						</xsl:if>
-					</xsl:otherwise>
-				</xsl:choose>
+					select="translate(.,'Pp. ','')" />
+				<pages xmlns="http://www.crossref.org/schema/4.4.2">
+					<first_page>
+						<xsl:value-of
+							select="substring-before($pages,'-')" />
+					</first_page>
+					<last_page>
+						<xsl:value-of
+							select="substring-after($pages,'-')" />
+					</last_page>
+				</pages>
 			</xsl:if>
 		</xsl:for-each>
 	</xsl:template>
@@ -821,16 +805,16 @@
 	<xsl:template name="setPublisher">
 		<xsl:choose>
 			<xsl:when
-				test="//dspace:field[@mdschema='dc' and @element='publisher']">
+				test="dspace:field[@mdschema='dc' and @element='publisher']">
 				<publisher xmlns="http://www.crossref.org/schema/4.4.2">
 					<publisher_name>
 						<xsl:value-of
-							select="//dspace:field[@mdschema='dc' and @element='publisher']" />
+							select="dspace:field[@mdschema='dc' and @element='publisher']" />
 					</publisher_name>
 				</publisher>
 			</xsl:when>
 			<xsl:otherwise>
-				<error xmlns="http://www.crossref.org/schema/4.4.2">Error: dc.publisher not found</error>
+				<dspaceCrswalk:error>Error: dc.publisher not found</dspaceCrswalk:error>
 			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>
@@ -842,9 +826,9 @@
 			<doi>
 				<!-- Solo seteo el doi si ya existe alguno en sedici.identifier.doi, sino se setea uno nuevo despúes, por afuera del xsl -->
 				<xsl:if
-				test="//dspace:field[@mdschema='sedici' and @element='identifier' and @qualifier='doi' and contains(., '10.')]">
+				test="dspace:field[@mdschema='sedici' and @element='identifier' and @qualifier='doi' and contains(., '10.')]">
 					<xsl:variable name="doi"
-					select="//dspace:field[@mdschema='sedici' and @element='identifier' and @qualifier='doi']" />
+					select="dspace:field[@mdschema='sedici' and @element='identifier' and @qualifier='doi']" />
 					<xsl:variable name="doiStartIndex"
 					select="string-length(substring-before($doi,'10.'))+1" />
 					<xsl:value-of select="substring($doi,$doiStartIndex)" />
@@ -860,7 +844,7 @@
 			<resource>
 			    <!-- When UPDATE content at Crossref, we must use this same crosswalk, so we must avoid to print the "dx.doi..." value in this field, 
 			     only the handle value, as originally was pushed to Crossref. -->
-				<xsl:for-each select="//dspace:field[@mdschema='dc' and @element='identifier' and @qualifier='uri']">
+				<xsl:for-each select="dspace:field[@mdschema='dc' and @element='identifier' and @qualifier='uri']">
 				    <xsl:variable name="dc-identifier" select="."/>
 				    <xsl:if test="dspace:is-handle-url($dc-identifier)">
 						<xsl:value-of select="$dc-identifier" />
@@ -876,20 +860,20 @@
 
 	<xsl:template name="setDocLanguageAttr">
 		<xsl:if
-			test="//dspace:field[@mdschema='dc' and @element='language']">
+			test="dspace:field[@mdschema='dc' and @element='language']">
 			<xsl:attribute name="language">
 				<xsl:value-of
-					select="//dspace:field[@mdschema='dc' and @element='language']" />
+					select="dspace:field[@mdschema='dc' and @element='language']" />
 			</xsl:attribute>
 		</xsl:if>
 	</xsl:template>
 
 	<xsl:template name="setPublicationTypeAttr">
 		<xsl:if
-			test="//dspace:field[@mdschema='sedici' and @element='description' and @qualifier='fulltext']">
+			test="dspace:field[@mdschema='sedici' and @element='description' and @qualifier='fulltext']">
 				<xsl:attribute name="publication_type">
 					<xsl:choose>
-						<xsl:when test="//dspace:field[@mdschema='sedici' and @element='description' and @qualifier='fulltext'] = 'true'">
+						<xsl:when test="dspace:field[@mdschema='sedici' and @element='description' and @qualifier='fulltext'] = 'true'">
 							<xsl:text>full_text</xsl:text>
 						</xsl:when>
 						<xsl:otherwise>

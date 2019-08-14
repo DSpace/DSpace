@@ -57,4 +57,8 @@ public class Utils {
 		return count;
 	}
 
+	public static boolean matchRegex(String text, String regex) {
+		return java.util.regex.Pattern.matches(regex, text);
+	}
+
 }

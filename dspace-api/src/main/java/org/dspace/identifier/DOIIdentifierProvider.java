@@ -61,7 +61,7 @@ public class DOIIdentifierProvider
      * List containing values of sub-tipologies (sedici.subtype) used to determine for what items 
      * the DOI provider must generate doi's. Configure this at "identifier-service" configuration file.
      */
-    protected List<String> tipologyFilter;
+    protected List<String> typeFilter;
     
     static final String CFG_PREFIX = "identifier.doi.prefix";
     static final String CFG_NAMESPACE_SEPARATOR = "identifier.doi.namespaceseparator";
@@ -131,8 +131,8 @@ public class DOIIdentifierProvider
     }
     
     @Required
-    public void setTipologyFilter(List<String> tipologyFilter) {
-        this.tipologyFilter = tipologyFilter;
+    public void setTypeFilter(List<String> typeFilterList) {
+        this.typeFilter = typeFilterList;
     }
 
     /**
@@ -177,7 +177,7 @@ public class DOIIdentifierProvider
             throws IdentifierException
     {
         // Solo registrar el item si cumple ciertas condiciones
-        if (!isRegistrableDSO(dso)) {
+        if (!isEligibleDSO(dso)) {
             log.info("Couldn't register doi for DSO with handle " + dso.getHandle()
                     + ", the DSO does not meet the conditions that the repository imposes to have doi");
             return null;
@@ -190,15 +190,15 @@ public class DOIIdentifierProvider
     }
 
     /**
-     * Determine if DSO is registrable at DOI connector registration agency. It is determined 
+     * Determine if DSO is eligible for register at DOI connector registration agency. It is determined 
      * based on the check of different filters conditions.
      * @param dso
      * @return false if the item does not apply any filters conditions. Else, return true.
      */
-    private boolean isRegistrableDSO(DSpaceObject dso) {
-        if(this.tipologyFilter != null && this.tipologyFilter.size() > 0) {
+    private boolean isEligibleDSO(DSpaceObject dso) {
+        if(this.typeFilter != null && this.typeFilter.size() > 0) {
             Metadatum[] metadataList = dso.getMetadata("sedici", "subtype", null, Item.ANY);
-	        for (String subtipology : tipologyFilter) {
+	        for (String subtipology : typeFilter) {
                 for (Metadatum mdt : metadataList) {
                     if (mdt.value.equalsIgnoreCase(subtipology)) {
                         return true;
@@ -216,7 +216,7 @@ public class DOIIdentifierProvider
             throws IdentifierException
     {
         // Solo registrar el item si cumple ciertas condiciones
-        if (!isRegistrableDSO(dso)) {
+        if (!isEligibleDSO(dso)) {
             log.info("Couldn't register doi for DSO with handle " + dso.getHandle()
                     + ", the DSO does not meet the conditions that the repository imposes to have doi");
             return;

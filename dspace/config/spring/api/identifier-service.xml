@@ -42,12 +42,12 @@
             ref="org.dspace.services.ConfigurationService" />
         <property name="DOIConnector"
             ref="org.dspace.identifier.doi.DOIConnector" />
-        <property name="tipologyFilter">
+        <property name="typeFilter">
             <!-- Define a list of sub-tipologies values (sedici.subtype) used as a filter
             for determine if the current item must be generated a DOI. 
             Set this list EMPTY if you dont want to specify any filter...-->
             <list>
-                <value>Tesis de grado</value>
+                <value>Tesis de doctorado</value>
                 <value>Tesis de maestria</value>
                 <value>Libro</value>
             </list>
