@@ -13,12 +13,17 @@ import org.dspace.scripts.DSpaceRunnable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+/**
+ * This converter will convert an object of {@Link DSpaceRunnable} to an object
+ * of {@link ScriptRest}
+ */
 @Component
 public class ScriptConverter implements DSpaceConverter<DSpaceRunnable, ScriptRest> {
 
     @Autowired
     private ParameterConverter parameterConverter;
 
+    @Override
     public ScriptRest fromModel(DSpaceRunnable script) {
         ScriptRest scriptRest = new ScriptRest();
         scriptRest.setDescription(script.getDescription());
@@ -28,6 +33,7 @@ public class ScriptConverter implements DSpaceConverter<DSpaceRunnable, ScriptRe
         return scriptRest;
     }
 
+    @Override
     public DSpaceRunnable toModel(ScriptRest obj) {
         return null;
     }

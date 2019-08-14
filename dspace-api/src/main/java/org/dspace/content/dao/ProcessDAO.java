@@ -16,6 +16,19 @@ import org.dspace.core.GenericDAO;
 
 public interface ProcessDAO extends GenericDAO<Process> {
 
+    /**
+     * This method will return all the Process objects in the database in a list and it'll be sorted by script name
+     * @param context   The relevant DSpace context
+     * @return          The list of all Process objects in the database sorted on scriptname
+     * @throws SQLException If something goes wrong
+     */
     public List<Process> findAllSortByScript(Context context) throws SQLException;
+
+    /**
+     * This method will return all the Process objects in the database in a list and it'll be sorted by start time
+     * @param context   The relevant DSpace context
+     * @return          The list of all Process objects in the database sorted by starttime
+     * @throws SQLException If something goes wrong
+     */
     public List<Process> findAllSortByStartTime(Context context) throws SQLException;
 }

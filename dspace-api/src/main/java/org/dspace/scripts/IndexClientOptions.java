@@ -10,6 +10,9 @@ package org.dspace.scripts;
 
 import org.apache.commons.cli.CommandLine;
 
+/**
+ * This Enum holds all the possible options and combinations for the Index discovery script
+ */
 public enum IndexClientOptions {
     REMOVE,
     CLEAN,
@@ -25,6 +28,12 @@ public enum IndexClientOptions {
     FORCEUPDATEANDSPELLCHECK,
     HELP;
 
+    /**
+     * This method resolves the CommandLine parameters to figure out which action the index-discovery script should
+     * perform
+     * @param commandLine   The relevant CommandLine for the index-discovery script
+     * @return              The index-discovery option to be ran, parsed from the CommandLine
+     */
     public static IndexClientOptions getIndexClientOption(CommandLine commandLine) {
         if (commandLine.hasOption("h")) {
             return IndexClientOptions.HELP;

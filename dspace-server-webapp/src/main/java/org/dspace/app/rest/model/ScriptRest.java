@@ -14,6 +14,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.dspace.app.rest.RestResourceController;
 
+/**
+ * This class serves as a REST representation of a Script
+ */
 public class ScriptRest extends BaseObjectRest<String> {
 
     public static final String NAME = "script";

@@ -7,10 +7,22 @@
  */
 package org.dspace.app.rest.model;
 
+/**
+ * This class serves as a REST representation for a script parameter
+ */
 public class ParameterRest {
 
+    /**
+     * The name of the parameter
+     */
     private String name;
+    /**
+     * The description of the parameter
+     */
     private String description;
+    /**
+     * The type of the parameter
+     */
     private String type;
 
     public String getName() {

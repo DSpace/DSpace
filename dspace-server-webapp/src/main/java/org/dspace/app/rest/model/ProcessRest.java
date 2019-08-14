@@ -15,6 +15,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.dspace.app.rest.ProcessRestController;
 import org.dspace.content.ProcessStatus;
 
+/**
+ * This class serves as a REST representation for the {@link org.dspace.content.Process} class
+ */
 public class ProcessRest extends BaseObjectRest<UUID> {
     public static final String NAME = "process";
     public static final String PLURAL_NAME = "processes";

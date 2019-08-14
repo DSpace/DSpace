@@ -17,6 +17,9 @@ import org.dspace.content.service.ProcessService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+/**
+ * This converter will convert an object of {@Link Process} to an object of {@link ProcessRest}
+ */
 @Component
 public class ProcessConverter implements DSpaceConverter<Process, ProcessRest> {
 
@@ -26,6 +29,7 @@ public class ProcessConverter implements DSpaceConverter<Process, ProcessRest> {
     @Autowired
     private DSpaceRunnableParameterConverter dSpaceRunnableParameterConverter;
 
+    @Override
     public ProcessRest fromModel(Process process) {
         ProcessRest processRest = new ProcessRest();
         processRest.setScriptName(process.getName());
@@ -39,6 +43,7 @@ public class ProcessConverter implements DSpaceConverter<Process, ProcessRest> {
         return processRest;
     }
 
+    @Override
     public Process toModel(ProcessRest obj) {
         return null;
     }

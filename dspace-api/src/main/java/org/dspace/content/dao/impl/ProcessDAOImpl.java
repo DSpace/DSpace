@@ -46,3 +46,5 @@ public class ProcessDAOImpl extends AbstractHibernateDAO<Process> implements Pro
         return list(context, criteriaQuery, false, Process.class, -1, -1);
     }
 }
+
+

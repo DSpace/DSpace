@@ -18,12 +18,16 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.Link;
 import org.springframework.stereotype.Component;
 
+/**
+ * This HalLinkFactory class will provide a means to add Links to the ProcessResource
+ */
 @Component
 public class ProcessHalLinkFactory extends HalLinkFactory<ProcessResource, ProcessRestController> {
 
     @Autowired
     private ConfigurationService configurationService;
 
+    @Override
     protected void addLinks(ProcessResource halResource, Pageable pageable, LinkedList<Link> list) throws Exception {
         String dspaceRestUrl = configurationService.getProperty("dspace.restUrl");
         list.add(buildLink(Link.REL_SELF, getMethodOn().getProcessById(halResource.getContent().getProcessId())));
@@ -37,10 +41,12 @@ public class ProcessHalLinkFactory extends HalLinkFactory<ProcessResource, Proce
                                                                                           .getProcessId() + "/files"));
     }
 
+    @Override
     protected Class<ProcessRestController> getControllerClass() {
         return ProcessRestController.class;
     }
 
+    @Override
     protected Class<ProcessResource> getResourceClass() {
         return ProcessResource.class;
     }

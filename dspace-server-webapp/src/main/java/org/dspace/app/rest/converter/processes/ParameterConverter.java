@@ -16,9 +16,17 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.dspace.app.rest.model.ParameterRest;
 import org.springframework.stereotype.Component;
 
+/**
+ * This converter will convert the Options of a script to a list of ParameterRest objects
+ */
 @Component
 public class ParameterConverter {
 
+    /**
+     * This method will convert the Options of a script to a list of ParameterRest objects
+     * @param options   The options of a script
+     * @return          The resulting list of ParameterRest objects
+     */
     public List<ParameterRest> convertOptionsToParameterRestList(Options options) {
         List<ParameterRest> listToReturn = new LinkedList<>();
 

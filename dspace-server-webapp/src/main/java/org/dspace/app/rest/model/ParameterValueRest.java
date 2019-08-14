@@ -9,9 +9,18 @@ package org.dspace.app.rest.model;
 
 import org.apache.commons.lang3.StringUtils;
 
+/**
+ * This class serves as a REST representation for a paramater with a value given to the script
+ */
 public class ParameterValueRest {
 
+    /**
+     * The name of the parameter
+     */
     private String name;
+    /**
+     * The value of the parameter
+     */
     private String value;
 
     public String getName() {

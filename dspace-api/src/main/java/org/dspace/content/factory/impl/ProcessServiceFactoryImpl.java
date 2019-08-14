@@ -11,11 +11,15 @@ import org.dspace.content.factory.ProcessServiceFactory;
 import org.dspace.content.service.ProcessService;
 import org.springframework.beans.factory.annotation.Autowired;
 
+/**
+ * The implementation for the {@link ProcessServiceFactory}
+ */
 public class ProcessServiceFactoryImpl extends ProcessServiceFactory {
 
     @Autowired(required = true)
     private ProcessService processService;
 
+    @Override
     public ProcessService getProcessService() {
         return processService;
     }
