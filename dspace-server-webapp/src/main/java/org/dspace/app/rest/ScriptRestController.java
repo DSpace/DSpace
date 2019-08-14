@@ -20,7 +20,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-
+/**
+ * This controller takes care of all the requests to the system/scripts endpoint
+ */
 @RestController
 @RequestMapping("/api/" + ScriptRest.CATEGORY + "/" + ScriptRest.PLURAL_NAME)
 public class ScriptRestController {
@@ -33,6 +35,13 @@ public class ScriptRestController {
     @Autowired
     private ScriptRestRepository scriptRestRepository;
 
+    /**
+     * This method can be called by sending a POST request to the system/scripts/{name}/processes endpoint
+     * This will start a process for the script that matches the given name
+     * @param scriptName    The name of the script that we want to start a process for
+     * @return              The ProcessResource object for the created process
+     * @throws Exception    If something goes wrong
+     */
     @RequestMapping(method = RequestMethod.POST, value = "/{name}/processes")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ProcessResource startProcess(@PathVariable(name = "name") String scriptName) throws Exception {

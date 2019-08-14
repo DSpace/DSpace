@@ -12,12 +12,20 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
+/**
+ * This class serves as a representation of a command line parameter by holding a String name and a String value
+ */
 public class DSpaceCommandLineParameter {
     private String name;
     private String value;
 
     public static String SEPARATOR = "|||";
 
+    /**
+     * This constructor will take a String key and String value and store them in their appriopriate fields
+     * @param key   The String value to be stored as the name of the parameter
+     * @param value The String value to be stored as the value of the parameter
+     */
     public DSpaceCommandLineParameter(String key, String value) {
         this.name = key;
 
@@ -28,6 +36,11 @@ public class DSpaceCommandLineParameter {
         }
     }
 
+    /**
+     * This constructors accepts a single parameter String that is defined as e.g. "-c test" and it'll parse this
+     * String into the key "-c" and value "test" to then call the other constructor with those parameters
+     * @param parameter The String parameter
+     */
     public DSpaceCommandLineParameter(String parameter) {
         this(StringUtils.substringBefore(parameter, " "), StringUtils.substringAfter(parameter, " "));
     }
@@ -48,6 +61,11 @@ public class DSpaceCommandLineParameter {
         this.value = value;
     }
 
+    /**
+     * Converts the DSpaceCommandLineParameter into a String format by concatenating the value and the name String
+     * values by separating them with a space
+     * @return The String representation of a DSpaceCommandlineParameter object
+     */
     public String toString() {
         String stringToReturn = "";
         stringToReturn += getName();
@@ -58,6 +76,13 @@ public class DSpaceCommandLineParameter {
         return stringToReturn;
     }
 
+    /**
+     * This method will convert a list of DSpaceCommandLineParameter objects into a single String. This is done by
+     * calling the toString() method on each of the DSpaceCommandLineParameter objects in the list and concatenating
+     * them with the Separator defined in this class
+     * @param parameterList The list of DSpaceCommandLineParameter objects to be converted into a String
+     * @return              The resulting String
+     */
     public static String concatenate(List<DSpaceCommandLineParameter> parameterList) {
         if (parameterList.isEmpty()) {
             return null;
@@ -65,6 +90,11 @@ public class DSpaceCommandLineParameter {
         return parameterList.stream().map(parameter -> parameter.toString()).collect(Collectors.joining(SEPARATOR));
     }
 
+    /**
+     * Will return a boolean indicating whether the given param is equal to this object
+     * @param other The other object
+     * @return      A boolean indicating equality
+     */
     public boolean equals(Object other) {
         if (other == null) {
             return false;

@@ -7,8 +7,6 @@
  */
 package org.dspace.content;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -19,7 +17,6 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
-import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.dao.ProcessDAO;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.ProcessService;
@@ -106,17 +103,6 @@ public class ProcessServiceImpl implements ProcessService {
     }
 
     @Override
-    public void appendFile(Context context, Process process, InputStream is, String type)
-        throws IOException, SQLException, AuthorizeException {
-        Bitstream bitstream = bitstreamService.create(context, is);
-        bitstream.setName(context, "process-" + process.getID() + ".log");
-        bitstreamService.addMetadata(context, bitstream, "process", "type", null, null, type);
-        bitstreamService.update(context, bitstream);
-        process.addBitstream(bitstream);
-        update(context, process);
-    }
-
-    @Override
     public void delete(Context context, Process process) throws SQLException {
         processDAO.delete(context, process);
         log.info("Process with ID: " + process.getID() + " and name: " + process.getName() + " has been deleted");
@@ -128,6 +114,7 @@ public class ProcessServiceImpl implements ProcessService {
         processDAO.save(context, process);
     }
 
+    @Override
     public List<DSpaceCommandLineParameter> getParameters(Process process) {
         if (StringUtils.isBlank(process.getParameters())) {
             return Collections.emptyList();

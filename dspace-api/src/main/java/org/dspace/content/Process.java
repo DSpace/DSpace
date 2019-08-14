@@ -31,6 +31,9 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.dspace.core.ReloadableEntity;
 import org.dspace.eperson.EPerson;
 
+/**
+ * This class is the DB Entity representation of the Process object to be stored in the Database
+ */
 @Entity
 @Table(name = "process")
 public class Process implements ReloadableEntity<Integer> {
@@ -162,7 +165,7 @@ public class Process implements ReloadableEntity<Integer> {
     }
 
     /**
-     * Return <code>true</code> if <code>other</code> is the same Bitstream
+     * Return <code>true</code> if <code>other</code> is the same Process
      * as this object, <code>false</code> otherwise
      *
      * @param other object to compare to

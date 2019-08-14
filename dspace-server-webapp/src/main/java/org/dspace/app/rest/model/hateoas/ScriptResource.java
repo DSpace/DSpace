@@ -11,6 +11,9 @@ import org.dspace.app.rest.model.ScriptRest;
 import org.dspace.app.rest.model.hateoas.annotations.RelNameDSpaceResource;
 import org.dspace.app.rest.utils.Utils;
 
+/**
+ * The Resource representation of a Script object
+ */
 @RelNameDSpaceResource(ScriptRest.NAME)
 public class ScriptResource extends DSpaceResource<ScriptRest> {
     public ScriptResource(ScriptRest data, Utils utils, String... rels) {

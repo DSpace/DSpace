@@ -30,6 +30,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * This controller takes cares of all the request going to the Processes endpoint
+ */
 @RestController
 @RequestMapping("/api/" + ProcessRest.CATEGORY + "/" + ProcessRest.PLURAL_NAME)
 public class ProcessRestController implements InitializingBean {
@@ -52,6 +55,14 @@ public class ProcessRestController implements InitializingBean {
                 new Link("/api/" + ProcessRest.CATEGORY + "/" + ProcessRest.PLURAL_NAME, ProcessRest.PLURAL_NAME)));
     }
 
+    /**
+     * This method is called by a GET request to the system/processes endpoint. This will return an embeddedPage object
+     * containing all the Process objects in the database represented as a ProcessResource object
+     * @param pageable  The pageable for the request
+     * @return          The embeddedPage containing all the Process objects from the database represented as
+     *                  ProcessResource objects
+     * @throws Exception    If something goes wrong
+     */
     @RequestMapping(method = RequestMethod.GET)
     public EmbeddedPage getProcesses(Pageable pageable) throws Exception {
         if (log.isTraceEnabled()) {
@@ -76,6 +87,13 @@ public class ProcessRestController implements InitializingBean {
         return embeddedPage;
     }
 
+    /**
+     * This method will retrieve the Process object from the database that matches the given processId and it'll
+     * send this back as a ProcessResource
+     * @param processId     The process Id to be searched on
+     * @return              The ProcessResource object constructed from the Process retrieved by the id
+     * @throws SQLException If something goes wrong
+     */
     @RequestMapping(method = RequestMethod.GET, value = "/{processId}")
     public ProcessResource getProcessById(@PathVariable(name = "processId") Integer processId) throws SQLException {
         if (log.isTraceEnabled()) {

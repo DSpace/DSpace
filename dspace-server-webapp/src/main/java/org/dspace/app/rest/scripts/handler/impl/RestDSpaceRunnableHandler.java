@@ -25,9 +25,10 @@ import org.dspace.eperson.EPerson;
 import org.dspace.scripts.DSpaceCommandLineParameter;
 import org.dspace.scripts.DSpaceRunnable;
 import org.dspace.scripts.handler.DSpaceRunnableHandler;
-import org.dspace.utils.DSpace;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
+/**
+ * The {@link DSpaceRunnableHandler} dealing with Scripts started from the REST api
+ */
 public class RestDSpaceRunnableHandler implements DSpaceRunnableHandler {
     private static final Logger log = org.apache.logging.log4j.LogManager
         .getLogger(RestDSpaceRunnableHandler.class);
@@ -37,6 +38,12 @@ public class RestDSpaceRunnableHandler implements DSpaceRunnableHandler {
     private Integer processId;
     private String scriptName;
 
+    /**
+     * This constructor will initialise the handler with the process created from the parameters
+     * @param ePerson       The eperson that creates the process
+     * @param scriptName    The name of the script for which is a process will be created
+     * @param parameters    The parameters for this process
+     */
     public RestDSpaceRunnableHandler(EPerson ePerson, String scriptName, List<DSpaceCommandLineParameter> parameters) {
         Context context = new Context();
         try {
@@ -169,6 +176,10 @@ public class RestDSpaceRunnableHandler implements DSpaceRunnableHandler {
         }
     }
 
+    /**
+     * This method will return the process created by this handler
+     * @return  The Process database object created by this handler
+     */
     public Process getProcess() {
         Context context = new Context();
         try {
@@ -183,6 +194,11 @@ public class RestDSpaceRunnableHandler implements DSpaceRunnableHandler {
         return null;
     }
 
+    /**
+     * This method will schedule a process to be run, it will trigger the run method for the Script passed along
+     * to this method as well as updating the database logic for the Process representing the execution of this script
+     * @param script    The script to be ran
+     */
     public void schedule(DSpaceRunnable script) {
         Context context = new Context();
         try {

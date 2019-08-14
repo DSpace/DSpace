@@ -40,6 +40,9 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
+/**
+ * This is the REST repository dealing with the Script logic
+ */
 @Component(ScriptRest.CATEGORY + "." + ScriptRest.NAME)
 public class ScriptRestRepository extends DSpaceRestRepository<ScriptRest, String> {
 
@@ -78,14 +81,24 @@ public class ScriptRestRepository extends DSpaceRestRepository<ScriptRest, Strin
         return scriptRestPage;
     }
 
+    @Override
     public Class<ScriptRest> getDomainClass() {
         return ScriptRest.class;
     }
 
+    @Override
     public DSpaceResource<ScriptRest> wrapResource(ScriptRest model, String... rels) {
         return new ScriptResource(model, utils, rels);
     }
 
+    /**
+     * This method will take a String scriptname parameter and it'll try to resolve this to a script known by DSpace.
+     * If a script is found, it'll start a process for this script with the given properties to this request
+     * @param scriptName    The name of the script that will try to be resolved and started
+     * @return A ProcessRest object representing the started process for this script
+     * @throws SQLException If something goes wrong
+     * @throws IOException  If something goes wrong
+     */
     public ProcessRest startProcess(String scriptName) throws SQLException, IOException {
         Context context = obtainContext();
         List<ParameterValueRest> parameterValueRestList = new LinkedList<>();
@@ -121,6 +134,13 @@ public class ScriptRestRepository extends DSpaceRestRepository<ScriptRest, Strin
         return null;
     }
 
+    /**
+     * This method will try to find the script to run and run if possible
+     * @param args                  The arguments to be passed along to the script
+     * @param dSpaceRunnableHandler The handler for the script, this will be a RestDSpaceRunnableHandler in this
+     *                              instance
+     * @param scriptName            The name of the script for which a process wants to be started
+     */
     private void runDSpaceScriptWithArgs(String[] args, RestDSpaceRunnableHandler dSpaceRunnableHandler,
                                          String scriptName) {
         List<DSpaceRunnable> scripts = new DSpace().getServiceManager().getServicesByType(DSpaceRunnable.class);
@@ -131,8 +151,9 @@ public class ScriptRestRepository extends DSpaceRestRepository<ScriptRest, Strin
                     dSpaceRunnableHandler.schedule(script);
                 } catch (ParseException e) {
                     script.printHelp();
-                    dSpaceRunnableHandler.handleException("Failed to parse the arguments given to the script with name: " + scriptName
-                                                              + " and args: " + Arrays.toString(args), e);
+                    dSpaceRunnableHandler
+                        .handleException("Failed to parse the arguments given to the script with name: " + scriptName
+                                             + " and args: " + Arrays.toString(args), e);
                 }
             }
         }

@@ -7,6 +7,9 @@
  */
 package org.dspace.content;
 
+/**
+ * This Enum holds a representation of all the possible states that a Process can be in
+ */
 public enum ProcessStatus {
     SCHEDULED,
     RUNNING,
