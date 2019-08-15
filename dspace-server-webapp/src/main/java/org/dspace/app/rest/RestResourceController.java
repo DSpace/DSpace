@@ -51,6 +51,7 @@ import org.dspace.app.rest.repository.LinkRestRepository;
 import org.dspace.app.rest.utils.RestRepositoryUtils;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.util.UUIDUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -441,7 +442,15 @@ public class RestResourceController implements InitializingBean {
         throws HttpRequestMethodNotSupportedException {
         checkModelPluralForm(apiCategory, model);
         DSpaceRestRepository<RestAddressableModel, ID> repository = utils.getResourceRepository(apiCategory, model);
-        RestAddressableModel modelObject = repository.createAndReturn();
+
+        String parentCommunityString = request.getParameter("parent");
+        RestAddressableModel modelObject;
+        if (parentCommunityString != null) {
+            UUID parentCommunityUuid = UUIDUtils.fromString(parentCommunityString);
+            modelObject = repository.createAndReturn(parentCommunityUuid);
+        } else {
+            modelObject = repository.createAndReturn();
+        }
         if (modelObject == null) {
             return ControllerUtils.toEmptyResponse(HttpStatus.CREATED);
         }
