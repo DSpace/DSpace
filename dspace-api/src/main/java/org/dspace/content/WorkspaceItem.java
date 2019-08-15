@@ -27,10 +27,10 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.dspace.browse.BrowsableObject;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.ReloadableEntity;
+import org.dspace.discovery.IndexableObject;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.workflow.WorkflowItem;
@@ -45,7 +45,7 @@ import org.hibernate.proxy.HibernateProxyHelper;
 @Entity
 @Table(name = "workspaceitem")
 public class WorkspaceItem
-    implements InProgressSubmission<Integer>, Serializable, ReloadableEntity<Integer>, BrowsableObject<Integer> {
+    implements InProgressSubmission<Integer>, Serializable, ReloadableEntity<Integer>, IndexableObject<Integer> {
 
     @Id
     @Column(name = "workspace_item_id", unique = true, nullable = false)

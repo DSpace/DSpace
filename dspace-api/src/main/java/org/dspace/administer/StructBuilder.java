@@ -7,12 +7,16 @@
  */
 package org.dspace.administer;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -23,12 +27,16 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.xpath.XPathAPI;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.Item;
+import org.dspace.content.MetadataSchemaEnum;
+import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
@@ -36,6 +44,7 @@ import org.dspace.core.Context;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.jdom.Element;
+import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -47,18 +56,17 @@ import org.xml.sax.SAXException;
  * an XML file.
  *
  * The XML file structure needs to be:
- * <p>
- * {@code
+ * <pre>{@code
  * <import_structure>
- * <community>
- * <name>....</name>
- * <community>...</community>
- * <collection>
- * <name>....</name>
- * </collection>
- * </community>
+ *   <community>
+ *     <name>....</name>
+ *     <community>...</community>
+ *     <collection>
+ *       <name>....</name>
+ *     </collection>
+ *   </community>
  * </import_structure>
- * }
+ * }</pre>
  * <p>
  * It can be arbitrarily deep, and supports all the metadata elements
  * that make up the community and collection metadata.  See the system
@@ -68,26 +76,31 @@ import org.xml.sax.SAXException;
  */
 
 public class StructBuilder {
-    /**
-     * The output XML document which will contain updated information about the
-     * imported structure.
+    /** Name of the root element for the document to be imported. */
+    static final String INPUT_ROOT = "import_structure";
+
+    /*
+     * Name of the root element for the document produced by importing.
+     * Community and collection elements are annotated with their identifiers.
      */
-    private static final org.jdom.Document xmlOutput
-            = new org.jdom.Document(new Element("imported_structure"));
+    static final String RESULT_ROOT = "imported_structure";
 
     /**
-     * A hash table to hold metadata for the collection being worked on.
+     * A table to hold metadata for the collection being worked on.
      */
     private static final Map<String, String> collectionMap = new HashMap<>();
 
     /**
-     * A hash table to hold metadata for the community being worked on.
+     * A table to hold metadata for the community being worked on.
      */
     private static final Map<String, String> communityMap = new HashMap<>();
 
-    protected static CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
-    protected static CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
-    protected static EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
+    protected static CommunityService communityService
+            = ContentServiceFactory.getInstance().getCommunityService();
+    protected static CollectionService collectionService
+            = ContentServiceFactory.getInstance().getCollectionService();
+    protected static EPersonService ePersonService
+            = EPersonServiceFactory.getInstance().getEPersonService();
 
     /**
      * Default constructor
@@ -96,31 +109,48 @@ public class StructBuilder {
 
     /**
      * Main method to be run from the command line to import a structure into
-     * DSpace
+     * DSpacee or export existing structure to a file.The command is of the form:
      *
-     * This is of the form:
+     * <p>{@code StructBuilder -f [XML source] -e [administrator email] -o [output file]}
      *
-     * {@code StructBuilder -f [xml source] -e [administrator email] -o [output file]}
+     * <p>to import, or
      *
-     * The output file will contain exactly the same as the source xml document, but
-     * with the handle for each imported item added as an attribute.
+     * <p>{@code StructBuilder -x -e [administrator email] -o [output file]}</p>
      *
-     * @param argv the command line arguments given
+     * <p>to export.  The output will contain exactly the same as the source XML
+     * document, but with the Handle for each imported item added as an attribute.
+     *
+     *
+     * @param argv command line arguments.
      * @throws ParserConfigurationException passed through.
      * @throws SQLException passed through.
+     * @throws FileNotFoundException if input or output could not be opened.
+     * @throws TransformerException if the input document is invalid.
      */
     public static void main(String[] argv)
-            throws ParserConfigurationException, SQLException {
-        CommandLineParser parser = new DefaultParser();
-
+            throws ParserConfigurationException, SQLException,
+            FileNotFoundException, IOException, TransformerException {
+        // Define command line options.
         Options options = new Options();
 
-        options.addOption("h", "help", false, "help");
+        options.addOption("h", "help", false, "Print this help message.");
         options.addOption("?", "help");
-        options.addOption("f", "file", true, "input structure document");
-        options.addOption("e", "eperson", true, "eperson");
-        options.addOption("o", "output", true, "output structure document");
+        options.addOption("x", "export", false, "Export the current structure as XML.");
 
+        options.addOption(Option.builder("e").longOpt("eperson")
+                .desc("User who is manipulating the repository's structure.")
+                .hasArg().argName("eperson").required().build());
+
+        options.addOption(Option.builder("f").longOpt("file")
+                .desc("File of new structure information.")
+                .hasArg().argName("input").build());
+
+        options.addOption(Option.builder("o").longOpt("output")
+                .desc("File to receive the structure map ('-' for standard out).")
+                .hasArg().argName("output").required().build());
+
+        // Parse the command line.
+        CommandLineParser parser = new DefaultParser();
         CommandLine line = null;
         try {
             line = parser.parse(options, argv);
@@ -130,36 +160,33 @@ public class StructBuilder {
             System.exit(1);
         }
 
+        // If the user asked for help, give it and exit.
         if (line.hasOption('h') || line.hasOption('?')) {
-            usage(options);
+            giveHelp(options);
             System.exit(0);
         }
 
-        String file = null;
-        String eperson = null;
-        String output = null;
-
-        if (line.hasOption('f')) {
-            file = line.getOptionValue('f');
-        }
-
-        if (line.hasOption('e')) {
-            eperson = line.getOptionValue('e');
-        }
-
-        if (line.hasOption('o')) {
-            output = line.getOptionValue('o');
-        }
-
-        if (output == null || eperson == null || file == null) {
-            usage(options);
+        // Otherwise, analyze the command.
+        // Must be import or export.
+        if (!(line.hasOption('f') || line.hasOption('x'))) {
+            giveHelp(options);
             System.exit(1);
+        }
+
+        // Open the output stream.
+        String output = line.getOptionValue('o');
+        OutputStream outputStream;
+        if ("-".equals(output)) {
+            outputStream = System.out;
+        } else {
+            outputStream = new FileOutputStream(output);
         }
 
         // create a context
         Context context = new Context();
 
-        // set the context
+        // set the context.
+        String eperson = line.getOptionValue('e');
         try {
             context.setCurrentUser(ePersonService.findByEmail(context, eperson));
         } catch (SQLException ex) {
@@ -167,10 +194,47 @@ public class StructBuilder {
             System.exit(1);
         }
 
+        // Export? Import?
+        if (line.hasOption('x')) { // export
+            exportStructure(context, outputStream);
+        } else { // Must be import
+            String input = line.getOptionValue('f');
+            if (null == input) {
+                usage(options);
+                System.exit(1);
+            }
+
+            InputStream inputStream;
+            if ("-".equals(input)) {
+                inputStream = System.in;
+            } else {
+                inputStream = new FileInputStream(input);
+            }
+
+            importStructure(context, inputStream, outputStream);
+        }
+        System.exit(0);
+    }
+
+    /**
+     * Import new Community/Collection structure.
+     *
+     * @param context
+     * @param input XML which describes the new communities and collections.
+     * @param output input, annotated with the new objects' identifiers.
+     * @throws IOException
+     * @throws ParserConfigurationException
+     * @throws SAXException
+     * @throws TransformerException
+     * @throws SQLException
+     */
+    static void importStructure(Context context, InputStream input, OutputStream output)
+            throws IOException, ParserConfigurationException, SQLException, TransformerException {
+
         // load the XML
         Document document = null;
         try {
-            document = loadXML(file);
+            document = loadXML(input);
         } catch (IOException ex) {
             System.err.format("The input document could not be read:  %s%n", ex.getMessage());
             System.exit(1);
@@ -180,12 +244,18 @@ public class StructBuilder {
         }
 
         // run the preliminary validation, to be sure that the the XML document
-        // is properly structured
+        // is properly structured.
         try {
             validate(document);
         } catch (TransformerException ex) {
             System.err.format("The input document is invalid:  %s%n", ex.getMessage());
             System.exit(1);
+        }
+
+        // Check for 'identifier' attributes -- possibly output by this class.
+        NodeList identifierNodes = XPathAPI.selectNodeList(document, "//*[@identifier]");
+        if (identifierNodes.getLength() > 0) {
+            System.err.println("The input document has 'identifier' attributes, which will be ignored.");
         }
 
         // load the mappings into the member variable hashmaps
@@ -219,16 +289,19 @@ public class StructBuilder {
         }
 
         // generate the output
-        Element root = xmlOutput.getRootElement();
+        final Element root = new Element(RESULT_ROOT);
+
         for (Element element : elements) {
             root.addContent(element);
         }
 
-        // finally write the string into the output file
-        try (BufferedWriter out = new BufferedWriter(new FileWriter(output));) {
-            out.write(new XMLOutputter().outputString(xmlOutput));
+        // finally write the string into the output file.
+        final org.jdom.Document xmlOutput = new org.jdom.Document(root);
+        try {
+            new XMLOutputter().output(xmlOutput, output);
         } catch (IOException e) {
-            System.out.println("Unable to write to output file " + output);
+            System.out.printf("Unable to write to output file %s:  %s%n",
+                    output, e.getMessage());
             System.exit(1);
         }
 
@@ -236,16 +309,134 @@ public class StructBuilder {
     }
 
     /**
+     * Add a single community, and its children, to the Document.
+     *
+     * @param community
+     * @return a fragment representing this Community.
+     */
+    private static Element exportACommunity(Community community) {
+        // Export this Community.
+        Element element = new Element("community");
+        element.setAttribute("identifier", community.getHandle());
+        element.addContent(new Element("name").setText(community.getName()));
+        element.addContent(new Element("description")
+                .setText(communityService.getMetadataFirstValue(community,
+                        MetadataSchemaEnum.DC.getName(), "description", "abstract", Item.ANY)));
+        element.addContent(new Element("intro")
+                .setText(communityService.getMetadataFirstValue(community,
+                        MetadataSchemaEnum.DC.getName(), "description", null, Item.ANY)));
+        element.addContent(new Element("copyright")
+                .setText(communityService.getMetadataFirstValue(community,
+                        MetadataSchemaEnum.DC.getName(), "rights", null, Item.ANY)));
+        element.addContent(new Element("sidebar")
+                .setText(communityService.getMetadataFirstValue(community,
+                        MetadataSchemaEnum.DC.getName(), "description", "tableofcontents", Item.ANY)));
+
+        // Export this Community's Community children.
+        for (Community subCommunity : community.getSubcommunities()) {
+            element.addContent(exportACommunity(subCommunity));
+        }
+
+        // Export this Community's Collection children.
+        for (Collection collection : community.getCollections()) {
+            element.addContent(exportACollection(collection));
+        }
+
+        return element;
+    }
+
+    /**
+     * Add a single Collection to the Document.
+     *
+     * @param collection
+     * @return a fragment representing this Collection.
+     */
+    private static Element exportACollection(Collection collection) {
+        // Export this Collection.
+        Element element = new Element("collection");
+        element.setAttribute("identifier", collection.getHandle());
+        element.addContent(new Element("name").setText(collection.getName()));
+        element.addContent(new Element("description")
+                .setText(collectionService.getMetadataFirstValue(collection,
+                        MetadataSchemaEnum.DC.getName(), "description", "abstract", Item.ANY)));
+        element.addContent(new Element("intro")
+                .setText(collectionService.getMetadataFirstValue(collection,
+                        MetadataSchemaEnum.DC.getName(), "description", null, Item.ANY)));
+        element.addContent(new Element("copyright")
+                .setText(collectionService.getMetadataFirstValue(collection,
+                        MetadataSchemaEnum.DC.getName(), "rights", null, Item.ANY)));
+        element.addContent(new Element("sidebar")
+                .setText(collectionService.getMetadataFirstValue(collection,
+                        MetadataSchemaEnum.DC.getName(), "description", "tableofcontents", Item.ANY)));
+        element.addContent(new Element("license")
+                .setText(collectionService.getMetadataFirstValue(collection,
+                        MetadataSchemaEnum.DC.getName(), "rights", "license", Item.ANY)));
+        // Provenance is special:  multivalued
+        for (MetadataValue value : collectionService.getMetadata(collection,
+                MetadataSchemaEnum.DC.getName(), "provenance", null, Item.ANY)) {
+            element.addContent(new Element("provenance")
+                    .setText(value.getValue()));
+        }
+
+        return element;
+    }
+
+    /**
+     * Write out the existing Community/Collection structure.
+     */
+    static void exportStructure(Context context, OutputStream output) {
+        // Build a document from the Community/Collection hierarchy.
+        Element rootElement = new Element(INPUT_ROOT);  // To be read by importStructure, perhaps
+
+        List<Community> communities = null;
+        try {
+            communities = communityService.findAllTop(context);
+        } catch (SQLException ex) {
+            System.out.printf("Unable to get the list of top-level communities:  %s%n",
+                    ex.getMessage());
+            System.exit(1);
+        }
+
+        for (Community community : communities) {
+            rootElement.addContent(exportACommunity(community));
+        }
+
+        // Now write the structure out.
+        org.jdom.Document xmlOutput = new org.jdom.Document(rootElement);
+        try {
+            XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
+            outputter.output(xmlOutput, output);
+        } catch (IOException e) {
+            System.out.printf("Unable to write to output file %s:  %s%n",
+                    output, e.getMessage());
+            System.exit(1);
+        }
+    }
+
+    /**
      * Output the usage information.
      */
     private static void usage(Options options) {
         HelpFormatter helper = new HelpFormatter();
-        helper.printHelp("java StructBuilder -f <source XML file> -o <output file> -e <eperson email>",
-                "Load community/collection structure from a file.",
+        try (PrintWriter writer = new PrintWriter(System.out);) {
+            helper.printUsage(writer, 80/* FIXME Magic */,
+                    "structure-builder", options);
+        }
+    }
+
+    /**
+     * Help the user more.
+     */
+    private static void giveHelp(Options options) {
+        HelpFormatter formatter = new HelpFormatter();
+        formatter.printHelp("struct-builder",
+                "Import or export Community/Collection structure.",
                 options,
-                "Communities will be created from the top level,"
-                        + " and a map of communities to handles will be returned"
-                        + " in the output file.");
+                "When importing (-f), communities will be created from the "
+                    + "top level, and a map of communities to handles will "
+                    + "be returned in the output file.  When exporting (-x),"
+                    + "the current structure will be written to the map file.",
+                true);
     }
 
     /**
@@ -267,7 +458,7 @@ public class StructBuilder {
         if (first.getLength() == 0) {
             err.append("-There are no top level communities in the source document.");
             System.out.println(err.toString());
-            System.exit(0);
+            System.exit(1);
         }
 
         String errs = validateCommunities(first, 1);
@@ -278,7 +469,7 @@ public class StructBuilder {
 
         if (trip) {
             System.out.println(err.toString());
-            System.exit(0);
+            System.exit(1);
         }
     }
 
@@ -367,17 +558,17 @@ public class StructBuilder {
     }
 
     /**
-     * Load in the XML from file.
+     * Load the XML document from input.
      *
-     * @param filename the filename to load from
-     * @return the DOM representation of the XML file
+     * @param input the filename to load from.
+     * @return the DOM representation of the XML input.
      */
-    private static org.w3c.dom.Document loadXML(String filename)
+    private static org.w3c.dom.Document loadXML(InputStream input)
         throws IOException, ParserConfigurationException, SAXException {
         DocumentBuilder builder = DocumentBuilderFactory.newInstance()
                                                         .newDocumentBuilder();
 
-        org.w3c.dom.Document document = builder.parse(new File(filename));
+        org.w3c.dom.Document document = builder.parse(input);
 
         return document;
     }
@@ -388,7 +579,7 @@ public class StructBuilder {
      * @param node the node from which we want to extract the string value
      * @return the string value of the node
      */
-    public static String getStringValue(Node node) {
+    private static String getStringValue(Node node) {
         String value = node.getNodeValue();
 
         if (node.hasChildNodes()) {

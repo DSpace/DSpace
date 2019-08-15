@@ -14,13 +14,14 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import net.cnri.util.StreamTable;
 import net.handle.hdllib.Encoder;
 import net.handle.hdllib.HandleException;
 import net.handle.hdllib.HandleStorage;
 import net.handle.hdllib.HandleValue;
 import net.handle.hdllib.ScanCallback;
 import net.handle.hdllib.Util;
-import net.handle.util.StreamTable;
+
 import org.apache.logging.log4j.Logger;
 import org.dspace.core.Context;
 import org.dspace.handle.factory.HandleServiceFactory;

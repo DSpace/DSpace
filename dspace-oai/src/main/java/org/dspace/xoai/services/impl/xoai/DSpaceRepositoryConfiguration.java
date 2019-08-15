@@ -27,6 +27,8 @@ import org.dspace.xoai.services.api.EarliestDateResolver;
 import org.dspace.xoai.services.api.config.ConfigurationService;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.web.util.UriComponentsBuilder;
 
 /**
  * @author Lyncode Development Team (dspace at lyncode dot com)
@@ -68,17 +70,27 @@ public class DSpaceRepositoryConfiguration implements RepositoryConfiguration {
     public String getBaseUrl() {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
             .getRequest();
+
+        // Parse the current OAI "context" path out of the last HTTP request.
+        // (e.g. for "http://mydspace.edu/oai/request", the oaiContextPath is "request")
+        UriComponentsBuilder builder = ServletUriComponentsBuilder.fromRequest(request);
+        List<String> pathSegments = builder.buildAndExpand().getPathSegments();
+        String oaiContextPath = pathSegments.get(pathSegments.size() - 1);
+
         if (baseUrl == null) {
             baseUrl = configurationService.getProperty("oai.url");
             if (baseUrl == null) {
                 log.warn(
                     "{ OAI 2.0 :: DSpace } Not able to retrieve the oai.url property from oai.cfg. Falling back to " +
                         "request address");
+                // initialize baseUrl to a fallback "oai.url" which is the current request with OAI context removed.
                 baseUrl = request.getRequestURL().toString()
-                                 .replace(request.getPathInfo(), "");
+                                 .replace(oaiContextPath, "");
             }
         }
-        return baseUrl + request.getPathInfo();
+
+        // BaseURL is the path of OAI with the current OAI context appended
+        return baseUrl + "/" + oaiContextPath;
     }
 
     @Override

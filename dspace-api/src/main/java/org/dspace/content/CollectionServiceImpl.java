@@ -153,10 +153,11 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
 
     @Override
     public List<Collection> findAll(Context context) throws SQLException {
-        MetadataField nameField = metadataFieldService.findByElement(context, MetadataSchema.DC_SCHEMA, "title", null);
+        MetadataField nameField = metadataFieldService.findByElement(context, MetadataSchemaEnum.DC.getName(),
+                                                                     "title", null);
         if (nameField == null) {
             throw new IllegalArgumentException(
-                "Required metadata field '" + MetadataSchema.DC_SCHEMA + ".title' doesn't exist!");
+                "Required metadata field '" + MetadataSchemaEnum.DC.getName() + ".title' doesn't exist!");
         }
 
         return collectionDAO.findAll(context, nameField);
@@ -164,10 +165,11 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
 
     @Override
     public List<Collection> findAll(Context context, Integer limit, Integer offset) throws SQLException {
-        MetadataField nameField = metadataFieldService.findByElement(context, MetadataSchema.DC_SCHEMA, "title", null);
+        MetadataField nameField = metadataFieldService.findByElement(context, MetadataSchemaEnum.DC.getName(),
+                                                                     "title", null);
         if (nameField == null) {
             throw new IllegalArgumentException(
-                "Required metadata field '" + MetadataSchema.DC_SCHEMA + ".title' doesn't exist!");
+                "Required metadata field '" + MetadataSchemaEnum.DC.getName() + ".title' doesn't exist!");
         }
 
         return collectionDAO.findAll(context, nameField, limit, offset);
@@ -272,6 +274,15 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
 
     @Override
     public Collection find(Context context, UUID id) throws SQLException {
+        return collectionDAO.findByID(context, Collection.class, id);
+    }
+
+    @Override
+    /**
+     * This method is an alias of the find method needed to avoid ambiguity between the IndexableObjectService interface
+     * and the DSpaceObjectService interface
+     */
+    public Collection findIndexableObject(Context context, UUID id) throws SQLException {
         return collectionDAO.findByID(context, Collection.class, id);
     }
 
@@ -779,6 +790,15 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
     @Override
     public int getSupportsTypeConstant() {
         return Constants.COLLECTION;
+    }
+
+    @Override
+    /**
+     * This method is an alias of the getSupportsTypeConstant method needed to avoid ambiguity between the
+     * IndexableObjectService interface and the DSpaceObjectService interface
+     */
+    public int getSupportsIndexableObjectTypeConstant() {
+        return getSupportsTypeConstant();
     }
 
     @Override
