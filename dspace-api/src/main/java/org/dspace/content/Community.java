@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.persistence.Cacheable;
 import javax.persistence.CascadeType;
@@ -31,6 +32,7 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CommunityService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.discovery.IndexableObject;
 import org.dspace.eperson.Group;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.proxy.HibernateProxyHelper;
@@ -49,7 +51,7 @@ import org.hibernate.proxy.HibernateProxyHelper;
 @Table(name = "community")
 @Cacheable
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE, include = "non-lazy")
-public class Community extends DSpaceObject implements DSpaceObjectLegacySupport {
+public class Community extends DSpaceObject implements DSpaceObjectLegacySupport, IndexableObject<UUID> {
     /**
      * log4j category
      */
@@ -260,7 +262,7 @@ public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
     @Override
     public String getName() {
         String value = getCommunityService()
-            .getMetadataFirstValue(this, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY);
+            .getMetadataFirstValue(this, MetadataSchemaEnum.DC.getName(), "title", null, Item.ANY);
         return value == null ? "" : value;
     }
 

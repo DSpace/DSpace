@@ -20,11 +20,13 @@ import com.sun.syndication.feed.module.opensearch.OpenSearchModule;
 import com.sun.syndication.feed.module.opensearch.entity.OSQuery;
 import com.sun.syndication.feed.module.opensearch.impl.OpenSearchModuleImpl;
 import com.sun.syndication.io.FeedException;
+
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.service.OpenSearchService;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.discovery.IndexableObject;
 import org.dspace.handle.service.HandleService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
@@ -118,7 +120,7 @@ public class OpenSearchServiceImpl implements OpenSearchService {
     @Override
     public String getResultsString(Context context, String format, String query, int totalResults, int start,
                                    int pageSize,
-                                   DSpaceObject scope, List<DSpaceObject> results,
+                                   IndexableObject scope, List<IndexableObject> results,
                                    Map<String, String> labels) throws IOException {
         try {
             return getResults(context, format, query, totalResults, start, pageSize, scope, results, labels)
@@ -132,7 +134,7 @@ public class OpenSearchServiceImpl implements OpenSearchService {
     @Override
     public Document getResultsDoc(Context context, String format, String query, int totalResults, int start,
                                   int pageSize,
-                                  DSpaceObject scope, List<DSpaceObject> results, Map<String, String> labels)
+                                  IndexableObject scope, List<IndexableObject> results, Map<String, String> labels)
         throws IOException {
         try {
             return getResults(context, format, query, totalResults, start, pageSize, scope, results, labels)
@@ -144,8 +146,8 @@ public class OpenSearchServiceImpl implements OpenSearchService {
     }
 
     protected SyndicationFeed getResults(Context context, String format, String query, int totalResults, int start,
-                                         int pageSize,
-                                         DSpaceObject scope, List<DSpaceObject> results, Map<String, String> labels) {
+                                         int pageSize, IndexableObject scope,
+                                         List<IndexableObject> results, Map<String, String> labels) {
         // Encode results in requested format
         if ("rss".equals(format)) {
             format = "rss_2.0";

@@ -1190,14 +1190,15 @@ public class DatabaseUtils {
      * <P>
      * Because the DB migration may be initialized by commandline or any one of
      * the many DSpace webapps, this checks for the existence of a temporary
-     * file to know when Discovery/Solr needs reindexing.
-     *
-     * @return whether reindex flag is true/false
+     * file, and the discovery.autoReindex setting to know when
+     * Discovery/Solr needs reindexing.
+     * @return whether reindexing should happen.
      */
     public static boolean getReindexDiscovery() {
-        // Simply check if the flag file exists
-        File reindexFlag = new File(reindexDiscoveryFilePath);
-        return reindexFlag.exists();
+        boolean autoReindex = DSpaceServicesFactory.getInstance()
+            .getConfigurationService()
+            .getBooleanProperty("discovery.autoReindex", true);
+        return (autoReindex && new File(reindexDiscoveryFilePath).exists());
     }
 
     /**
@@ -1222,7 +1223,7 @@ public class DatabaseUtils {
 
     /**
      * Internal class to actually perform re-indexing in a separate thread.
-     * (See checkReindexDiscovery() method)>
+     * (See checkReindexDiscovery() method).
      */
     private static class ReindexerThread extends Thread {
         private final IndexingService indexer;

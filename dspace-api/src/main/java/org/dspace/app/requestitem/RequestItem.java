@@ -78,7 +78,7 @@ public class RequestItem implements ReloadableEntity<Integer> {
     private Date request_date = null;
 
     @Column(name = "accept_request")
-    private Boolean accept_request = null;
+    private boolean accept_request;
 
     /**
      * Protected constructor, create object using:
@@ -88,6 +88,7 @@ public class RequestItem implements ReloadableEntity<Integer> {
     protected RequestItem() {
     }
 
+    @Override
     public Integer getID() {
         return requestitem_id;
     }
