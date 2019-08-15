@@ -14,7 +14,6 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 import java.io.StringWriter;
 import java.sql.SQLException;
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -1040,8 +1039,6 @@ public class SolrServiceImpl implements SearchService, IndexingService {
      */
     protected void buildDocument(Context context, Item item)
         throws SQLException, IOException {
-        final DateFormat solrDateFormatter = SolrUtils.getDateFormatter();
-
         String handle = item.getHandle();
 
         if (handle == null) {
@@ -1059,7 +1056,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         doc.addField("archived", item.isArchived());
         doc.addField("withdrawn", item.isWithdrawn());
         doc.addField("discoverable", item.isDiscoverable());
-        doc.addField("lastModified", solrDateFormatter.format(item.getLastModified()));
+        doc.addField("lastModified", SolrUtils.getDateFormatter().format(item.getLastModified()));
 
         EPerson submitter = item.getSubmitter();
         if (submitter != null) {
@@ -1480,7 +1477,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                     if (type.equals(DiscoveryConfigurationParameters.TYPE_DATE)) {
                         Date date = MultiFormatDateParser.parse(value);
                         if (date != null) {
-                            String stringDate = solrDateFormatter.format(date);
+                            String stringDate = SolrUtils.getDateFormatter().format(date);
                             doc.addField(field + "_dt", stringDate);
                         } else {
                             log.warn("Error while indexing sort date field, item: " + item
