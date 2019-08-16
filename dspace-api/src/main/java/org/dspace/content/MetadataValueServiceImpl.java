@@ -74,7 +74,7 @@ public class MetadataValueServiceImpl implements MetadataValueService {
     @Override
     public Iterator<MetadataValue> findByFieldAndValue(Context context, MetadataField metadataField, String value)
             throws SQLException {
-        return metadataValueDAO.findByFieldAndValue(context, metadataField, value);
+        return metadataValueDAO.findItemValuesByFieldAndValue(context, metadataField, value);
     }
 
     @Override

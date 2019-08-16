@@ -1610,7 +1610,9 @@ public class MetadataImport {
                         newLine.add(key, value);
                     }
                 } else {
-                    newLine.add(key, line.get(key).get(0));
+                    if (!line.get(key).get(0).isEmpty()) {
+                        newLine.add(key, line.get(key).get(0));
+                    }
                 }
             }
         }
