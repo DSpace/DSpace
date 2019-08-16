@@ -499,7 +499,7 @@ public class MetadataImport {
         log.debug(LogManager.getHeader(c, "metadata_import",
                                        "item_id=" + item.getID() + ",fromCSV=" + all));
 
-        // Don't compare collections  or actions
+        // Don't compare collections or actions or rowNames
         if (("collection".equals(md)) || ("action".equals(md)) || ("rowName".equals(md))) {
             return;
         }
@@ -718,6 +718,7 @@ public class MetadataImport {
      * Gets an existing entity from a reference.
      *
      * @param context the context to use.
+     * @param reference the reference which may be a UUID, metadata reference, or rowName reference.
      * @return the entity, which is guaranteed to exist.
      * @throws MetadataImportException if the reference is badly formed or refers to a non-existing item.
      */
@@ -1661,7 +1662,7 @@ public class MetadataImport {
      * The reference may refer to a previously-processed item in the CSV or an item in the database.
      *
      * @param context the context to use.
-     * @param reference the reference.
+     * @param reference the reference which may be a UUID, metadata reference, or rowName reference.
      * @return the uuid.
      * @throws MetadataImportException if the reference is malformed or ambiguous (refers to multiple items).
      */
@@ -1675,7 +1676,7 @@ public class MetadataImport {
             } catch (IllegalArgumentException e) {
                 throw new MetadataImportException("Not a UUID or indirect entity reference: '" + reference + "'");
             }
-        } else if (!reference.startsWith("rowName:") ) {
+        } else if (!reference.startsWith("rowName:") ) { //Assume it's a metadata value reference
             MetadataValueService metadataValueService = ContentServiceFactory.getInstance().getMetadataValueService();
             MetadataFieldService metadataFieldService =
                     ContentServiceFactory.getInstance().getMetadataFieldService();
@@ -1703,6 +1704,7 @@ public class MetadataImport {
                 throw new MetadataImportException("Error looking up item by metadata reference: " + reference, e);
             }
         }
+        // Lookup UUIDs that may have already been processed
         Set<UUID> csvUUIDs = getMatchingCSVUUIDs(reference);
         if (csvUUIDs.size() > 1) {
             throw new MetadataImportException("Ambiguous reference; multiple matches in csv: " + reference);
