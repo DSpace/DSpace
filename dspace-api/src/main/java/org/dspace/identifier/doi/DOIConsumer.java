@@ -66,6 +66,14 @@ public class DOIConsumer implements Consumer
         }
         Item item = (Item) dso;
         
+        //When an item comes from workflow/submission process (IS NOT ARCHIVED), then no doi exists in DOI table. This is
+        //because a DOI is assigned once an item is archived. A verification is added to avoid the generation
+        //of unnecessary logs after ARCHIVE process, caused by the absence of DOI before this process.
+        if(!item.isArchived()) {
+            //Item is not in archive (i.e. comes from submission/workflow), it is so expected. Hence stop consumer execution...
+            return;
+        }
+        
         DOIIdentifierProvider provider = new DSpace().getSingletonService(
                 DOIIdentifierProvider.class);
         
@@ -77,6 +85,8 @@ public class DOIConsumer implements Consumer
         {
             log.warn("DOIConsumer cannot handles items without DOIs, skipping: "
                     + event.toString());
+            //When items is IN ARCHIVED and does not have DOI assigned by the DOI Provider, then finalize consumer at this point...
+            return;
         }
         try
         {
