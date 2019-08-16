@@ -20,7 +20,7 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.converter.BitstreamConverter;
 import org.dspace.app.rest.converter.MetadataConverter;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
-import org.dspace.app.rest.model.BitstreamPropertiesRest;
+import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.hateoas.BitstreamResource;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.rest.utils.Utils;
@@ -66,6 +66,12 @@ public class ItemUploadController {
     @Autowired
     private BitstreamFormatService bitstreamFormatService;
 
+    /**
+     * Method to upload a Bitstream to an Item with the given UUID in the URL. This will create a Bitstream with the
+     * file provided in the request and attach this to the Item that matches the UUID in the URL.
+     * This will only work for uploading one file, any extra files will silently be ignored
+     * @return The created BitstreamResource
+     */
     @RequestMapping(method = RequestMethod.POST, value = "/bitstreams", headers = "content-type=multipart/form-data")
     @PreAuthorize("hasPermission(#uuid, 'ITEM', 'WRITE') && hasPermission(#uuid, 'ITEM', 'ADD')")
     public BitstreamResource uploadBitstream(HttpServletRequest request, @PathVariable UUID uuid,
@@ -113,27 +119,27 @@ public class ItemUploadController {
         Bitstream bitstream = null;
         if (StringUtils.isNotBlank(properties)) {
             ObjectMapper mapper = new ObjectMapper();
-            BitstreamPropertiesRest bitstreamPropertiesRest = null;
+            BitstreamRest bitstreamRest = null;
             try {
-                bitstreamPropertiesRest = mapper.readValue(properties, BitstreamPropertiesRest.class);
+                bitstreamRest = mapper.readValue(properties, BitstreamRest.class);
             } catch (Exception e) {
                 throw new UnprocessableEntityException("The properties parameter was incorrect: " + properties);
             }
-            String bundleName = bitstreamPropertiesRest.getBundleName();
+            String bundleName = bitstreamRest.getBundleName();
             if (StringUtils.isBlank(bundleName)) {
                 throw new UnprocessableEntityException("Properties without a bundleName is not allowed");
             }
             bitstream = itemService.createSingleBitstream(context, fileInputStream, item, bundleName);
-            if (bitstreamPropertiesRest.getMetadata() != null) {
-                metadataConverter.setMetadata(context, bitstream, bitstreamPropertiesRest.getMetadata());
+            if (bitstreamRest.getMetadata() != null) {
+                metadataConverter.setMetadata(context, bitstream, bitstreamRest.getMetadata());
             }
-            String name = bitstreamPropertiesRest.getName();
+            String name = bitstreamRest.getName();
             if (StringUtils.isNotBlank(name)) {
                 bitstream.setName(context, name);
             } else {
                 bitstream.setName(context, originalFilename);
             }
-            Integer sequenceId = bitstreamPropertiesRest.getSequenceId();
+            Integer sequenceId = bitstreamRest.getSequenceId();
             if (sequenceId != null) {
                 try {
                     bitstreamService.setSequenceId(context, bitstream, item, sequenceId);
