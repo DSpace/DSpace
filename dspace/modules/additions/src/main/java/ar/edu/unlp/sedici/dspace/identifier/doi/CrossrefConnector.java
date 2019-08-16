@@ -356,8 +356,15 @@ implements DOIConnector
         return isDOIRegistered(context, null, doi);
     }
     
+    
+    /**
+     * Check if an specific doi is registered at registration agency.
+     * 
+     * @param doi   The doi for check at registration agency.
+     * @param dso   (!)This parameter is no longer used, for now...
+     * @return true     if DOI is registered at registration agency.
+     */
     @Override
-    //TODO adaptar a Crossref (Falta completar una parte del código para que funcione cuando parámetro dso!=null)
     public boolean isDOIRegistered(Context context, DSpaceObject dso, String doi)
             throws DOIIdentifierException
     {
@@ -367,39 +374,39 @@ implements DOIConnector
             // status code 200 means the doi is reserved and registered
             case (200) :
             {
+                Document queryResult = null;
+                try {
+                    queryResult = parseXMLContent(response.getContent());
+                    if(queryResult == null) {
+                        throw new DOIIdentifierException("Unable to obtain Crossref DOI-To-Query results ('/query') "
+                                + "for DOI=" + doi + ". The response is empty...", DOIIdentifierException.INTERNAL_ERROR);
+                    }
+                } catch (JDOMException e) {
+                    throw new DOIIdentifierException("Got a JDOMException while parsing "
+                            + "a response from the Crossref DOI-To-Query results ('/query') endpoint,"
+                            + "DOI=" + doi, e,
+                            DOIIdentifierException.BAD_ANSWER);
+                }
                 // Do we check if doi is reserved generally or for a specified dso?
                 if (null == dso)
                 {
-                    try {
-                        Document queryResult = parseXMLContent(response.getContent());
-                        if(queryResult == null) {
-                            throw new DOIIdentifierException("Unable to obtain Crossref DOI-To-Query results ('/query') "
-                                    + "for DOI=" + doi + ". The response is empty...", DOIIdentifierException.INTERNAL_ERROR);
-                        } else {
                             Element queryRoot = queryResult.getRootElement();
                             Element errorTagLookup = getElementFromPath(queryRoot, "/doi_records/doi_record/crossref/error", "", queryRoot.getNamespaceURI());
                             //If there is no <error> tag in the XML response, then there exists a records in Crossref for specified DOI...
                             return (errorTagLookup == null)? true : false;
-                        }
-                    } catch (JDOMException e) {
-                        throw new DOIIdentifierException("Got a JDOMException while parsing "
-                                + "a response from the Crossref DOI-To-Query results ('/query') endpoint,"
-                                + "DOI=" + doi, e,
-                                DOIIdentifierException.BAD_ANSWER);
-                    }
                 }
                 
-                // DataCite returns the URL the DOI currently points to.
-                // To ensure that the DOI is registered for a specified dso it
-                // should be sufficient to compare the URL DataCite returns with
-                // the URL of the dso.
+                // In our case of use, it is strange that an specific DOI change the URL to the object
+                // where is pointing. Therefore, the verification for DSO URL is disabled.
+                // In case check for DSO Url must be enabled in the future, this code remains here as help...
                 
-                //TODO adaptar esta parte del código para Crossref
-//                String doiUrl = response.getContent();
+//                Element queryRoot = queryResult.getRootElement();
+//                Element resourceURL = getElementFromPath(queryRoot, "/doi_records/doi_record/crossref//doi_data/resource", "", queryRoot.getNamespaceURI());
+//                String doiUrl = (null == resourceURL || resourceURL.getTextTrim().isEmpty())? null : resourceURL.getTextTrim();
 //                if (null == doiUrl)
 //                {
-//                    log.error("Received a status code 200 without a response content. DOI: {}.", doi);
-//                    throw new DOIIdentifierException("Received a http status code 200 without a response content.",
+//                    log.error("A DOI is registered at Crossref, but no resource URL was saved. DOI: {}.", doi);
+//                    throw new DOIIdentifierException("A DOI is registered at Crossref, but no resource URL was saved.",
 //                            DOIIdentifierException.BAD_ANSWER);
 //                }
 //                
@@ -522,6 +529,71 @@ implements DOIConnector
 
         initProcessingDate();
 
+        Element root = prepareDSOForDisseminate(dso, doi);
+        
+        checkCrossrefErrors(root, dso);
+
+        String metadataDOI = extractDOI(root);
+        if (null == metadataDOI)
+        {
+            // The DOI will be saved as metadata of dso after successful
+            // registration. To register a doi it has to be part of the metadata
+            // sent to DataCite. So we add it to the XML we'll send to DataCite
+            // and we'll add it to the DSO after successful registration.
+            root = addDOI(doi, root);
+        }
+        else if (!metadataDOI.equals(doi.substring(DOI.SCHEME.length())))
+        {
+            // FIXME: that's not an error. If at all, it is worth logging it.
+            throw new DOIIdentifierException("DSO with type " + dso.getTypeText()
+                    + " and id " + dso.getID() + " already has DOI "
+                    + metadataDOI + ". Won't register DOI " + doi + " for it.");
+        }
+        
+        // send metadata FILE as a POST to "/deposit"
+        DataCiteResponse resp = this.sendMetadataPostRequest(doi, root);
+        
+        switch(resp.statusCode)
+        {
+            // 200 -> Submission of Crossref file was successful.
+            case (200) :
+            {
+                log.info("The submission file for DOI={} to Crossref was succesfully send! Proceeding to inspect result...", doi);
+                break;
+            }
+            case (503) :
+            {
+                //Further info: https://support.crossref.org/hc/en-us/articles/214960123
+                log.info("The submission file for DOI={} cannot be processed because the "
+                        + "submission queue at Crossref is full. Retry deposit sending later...", doi);
+                throw new DOIIdentifierException("Unable to submit file at Crossref for DOI= " + doi 
+                        + ". The submission queue is full. Please retry later.",
+                        DOIIdentifierException.INTERNAL_ERROR);
+            }
+            default :
+            {
+                log.warn("While registration of DOI {}, we got a http status code "
+                        + "{} and the message \"{}\".", new String[]
+                        {doi, Integer.toString(resp.statusCode), resp.getContent()});
+                throw new DOIIdentifierException("Unable to parse an answer from "
+                        + "Crossref API. Please have a look into DSpace logs.",
+                        DOIIdentifierException.BAD_ANSWER);
+            }
+        }
+        // Check at "submissionDownload" the result of metadata send to "/deposit" in the previous step
+        //FIXME (Ver ticket#5914) Por ahora, se elimina la etapa de revisión del envío, hasta encontrar una solución factible...
+        //checkSubmissionProcess(doi);
+        
+    }
+
+    /**
+     * Return DOM model for the XML file for submission at Crossref API.
+     * @param dso   the DSpace object to disseminate.
+     * @param doi   the DOI currently being processed.
+     * @return  the DOM model result of the dissemination process.
+     * @throws DOIIdentifierException   if an error occurs when disseminate.
+     */
+    private Element prepareDSOForDisseminate(DSpaceObject dso, String doi) throws DOIIdentifierException {
         this.prepareXwalk();
         
         if (!this.xwalk.canDisseminate(dso))
@@ -569,58 +641,35 @@ implements DOIConnector
         {
             throw new RuntimeException(se);
         }
-        
-        String metadataDOI = extractDOI(root);
-        if (null == metadataDOI)
-        {
-            // The DOI will be saved as metadata of dso after successful
-            // registration. To register a doi it has to be part of the metadata
-            // sent to DataCite. So we add it to the XML we'll send to DataCite
-            // and we'll add it to the DSO after successful registration.
-            root = addDOI(doi, root);
-        }
-        else if (!metadataDOI.equals(doi.substring(DOI.SCHEME.length())))
-        {
-            // FIXME: that's not an error. If at all, it is worth logging it.
-            throw new DOIIdentifierException("DSO with type " + dso.getTypeText()
-                    + " and id " + dso.getID() + " already has DOI "
-                    + metadataDOI + ". Won't reserve DOI " + doi + " for it.");
-        }
-        
-        // send metadata FILE as a POST to "/deposit"
-        DataCiteResponse resp = this.sendMetadataPostRequest(doi, root);
-        
-        switch(resp.statusCode)
-        {
-            // 200 -> Submission of Crossref file was succesful.
-            case (200) :
-            {
-                log.info("The submission file for DOI={} to Crossref was succesfully send! Proceeding to inspect result...", doi);
-                break;
+        return root;
+    }
+
+    /**
+     * Searches for any error in the XML generated by the crosswalk.
+     * An error is represented by an <error> element inside the XML.
+     * @param dso the DSpaceObject being processed.
+     * @throws DOIIdentifierException if XML contains any error.
+     */
+    private void checkCrossrefErrors(Element root, DSpaceObject dso) throws DOIIdentifierException {
+        String xpath_expression = "//dspaceCrswalk:error";
+        List<Element> errorElements = getElementsFromPath(root, xpath_expression, "dspaceCrswalk",
+                "http://www.dspace.org/xmlns/dspace/crosswalk");
+        if (errorElements != null) {
+            StringBuffer errors = new StringBuffer();
+            for (Element errorElement : errorElements) {
+                errors.append(errorElement.getValue());
+                errors.append(". ");
+                log.error("Crossref crosswalk error: "
+                        + errorElement.getValue()
+                        + ". For item "
+                        + dso.getID());
             }
-            case (503) :
-            {
-                //Further info: https://support.crossref.org/hc/en-us/articles/214960123
-                log.info("The submission file for DOI={} cannot be processed because the "
-                        + "submission queue at Crossref is full. Retry deposit sending later...", doi);
-                throw new DOIIdentifierException("Unable to submit file at Crossref for DOI= " + doi 
-                        + ". The submission queue is full. Please retry later.",
-                        DOIIdentifierException.INTERNAL_ERROR);
-            }
-            default :
-            {
-                log.warn("While registration of DOI {}, we got a http status code "
-                        + "{} and the message \"{}\".", new String[]
-                        {doi, Integer.toString(resp.statusCode), resp.getContent()});
-                throw new DOIIdentifierException("Unable to parse an answer from "
-                        + "Crossref API. Please have a look into DSpace logs.",
-                        DOIIdentifierException.BAD_ANSWER);
-            }
+            throw new DOIIdentifierException("CrosswalkException occurred while "
+                    + "converting " + dso.getTypeText() + "/" + dso.getID()
+                    + " using crosswalk " + this.CROSSWALK_NAME + ". "
+                    + errors,
+                    DOIIdentifierException.CONVERSION_ERROR);
         }
-        // Check at "submissionDownload" the result of metadata send to "/deposit" in the previous step
-        //FIXME (Ver ticket#5914) Por ahora, se elimina la etapa de revisión del envío, hasta encontrar una solución factible...
-        //checkSubmissionProcess(doi);
-        
     }
 
     /**
@@ -722,22 +771,66 @@ implements DOIConnector
     }
 
     @Override
-    //TODO adaptar a Crossref
     public void updateMetadata(Context context, DSpaceObject dso, String doi) 
             throws DOIIdentifierException
     { 
-        // check if doi is reserved for another object
-        if (!this.isDOIReserved(context, dso, doi) && this.isDOIReserved(context, doi))
+        // check if doi is registered
+        if (!this.isDOIRegistered(context, doi))
         {
-            log.warn("Trying to update metadata for DOI {}, that is reserved"
-                    + " for another dso.", doi);
-            throw new DOIIdentifierException("Trying to update metadta for "
-                    + "a DOI that is reserved for another object.",
-                    DOIIdentifierException.DOI_ALREADY_EXISTS);
+            log.warn("Trying to update metadata for DOI {}, that is not registered!", doi);
+            throw new DOIIdentifierException("Trying to update metadata for DOI=" + doi + 
+                    ", that is not registered at Crossref!", DOIIdentifierException.DOI_DOES_NOT_EXIST);
         }
-        // We can use reserveDOI to update metadata. Datacite API uses the same
-        // request for reservartion as for updating metadata.
-        this.reserveDOI(context, dso, doi);
+        initProcessingDate();
+
+        Element root = prepareDSOForDisseminate(dso, doi);
+        
+        checkCrossrefErrors(root, dso);
+
+        String metadataDOI = extractDOI(root);
+        if (null == metadataDOI)
+        {
+            //Add DOI for update, only if no other DOI exists. It the last happens, there must be some errors at item metadata.
+            root = addDOI(doi, root);
+        }
+        else if (!metadataDOI.equals(doi.substring(DOI.SCHEME.length())))
+        {
+            log.warn("Crossref UPDATE cancelled for DSO with handle="+ dso.getHandle() +". Cannot update a record with 2 DOIs! Please check your metadata. "
+                    + "(Crossref_DOI="+ doi.substring(DOI.SCHEME.length()) +", other_DOI="+ metadataDOI +").");
+            throw new DOIIdentifierException("Cancelling UPDATE process for Crossref record. There exists another DOI for this object! "
+                    + "(DOI_at_Crossref=" + doi.substring(DOI.SCHEME.length()) +", another_DOI=" +metadataDOI + ")");
+        }
+        
+        // send metadata FILE as a POST to "/deposit"
+        DataCiteResponse resp = this.sendMetadataPostRequest(doi, root);
+        
+        switch(resp.statusCode)
+        {
+            // 200 -> Submission UPDATE file at Crossref API was successful.
+            case (200) :
+            {
+                log.info("The submission UPDATE file for record with DOI={} at Crossref was succesfully send!", doi);
+                break;
+            }
+            case (503) :
+            {
+                //Further info: https://support.crossref.org/hc/en-us/articles/214960123
+                log.info("The submission UPDATE file for DOI={} cannot be processed because the "
+                        + "submission queue at Crossref is full. Retry deposit sending later...", doi);
+                throw new DOIIdentifierException("Unable to submit UPDATE file at Crossref for DOI= " + doi 
+                        + ". The submission queue is full. Please retry later.",
+                        DOIIdentifierException.INTERNAL_ERROR);
+            }
+            default :
+            {
+                log.warn("While UPDATE process of DOI {}, we got a http status code "
+                        + "{} and the message \"{}\".", new String[]
+                        {doi, Integer.toString(resp.statusCode), resp.getContent()});
+                throw new DOIIdentifierException("Unable to parse an answer from "
+                        + "Crossref API. Please have a look into DSpace logs.",
+                        DOIIdentifierException.BAD_ANSWER);
+            }
+        }
     }
     
     //TODO adaptar a Crossref/fijarse si se sigue usando....
@@ -1088,12 +1181,12 @@ implements DOIConnector
     }
 
     /**
-     * Please use the {@code getElementFromPath} or {@code getAttributeFromPath} instead this, unless necessary.
-     * Get an node object within XML data tied to the specified XPATH expression.
-     * @return the node object tied to XPATH or @null if the XPATH does not match.
+     * Please use the {@code getElementsFromPath} instead this, unless necessary.
+     * Get all nodes objects within XML data tied to the specified XPATH expression.
+     * @return a list of all nodes objects tied to XPATH or @null if the XPATH does not match.
      */
-    private Object getNodeFromPath(Element root, String xpath_expression, String ns_prefix, String ns_uri) {
-        Object doiData = null;
+    private List<?> getNodesFromPath(Element root, String xpath_expression, String ns_prefix, String ns_uri) {
+        List<?> targetNodes = null;
         XPath xpathDOI;
         Document doc;
         try {
@@ -1104,27 +1197,51 @@ implements DOIConnector
             } else {
                 doc = new Document(root);
             }
-            if(xpathDOI.selectNodes(doc) != null && !xpathDOI.selectNodes(doc).isEmpty()) {
-                doiData = xpathDOI.selectNodes(doc).get(0);
-            }
+            targetNodes = xpathDOI.selectNodes(doc);
         } catch (JDOMException e) {
             log.error("Incorrect XPATH expression!! Please check it. (XPATH =" + xpath_expression  + ")",  e.getMessage());
             //continue the normal code and return @null if this excepcion is raised...
         }
-        return doiData;
+        return targetNodes;
     }
+
+    /**
+     * Get an Element node object within XML data tied to the specified XPATH expression.
+     */
+    private List<Element> getElementsFromPath(Element root, String xpath_expression, String ns_prefix, String ns_uri) {
+        List<?> nodes = getNodesFromPath(root, xpath_expression, ns_prefix, ns_uri);
+        if (nodes == null || nodes.isEmpty()) {
+            return null;
+        }
+        List<Element> elements = new ArrayList<Element>();
+        for (Object node : nodes) {
+            elements.add((Element) node);
+        }
+        return elements;
+    }
+
     /**
      * Get an Element node object within XML data tied to the specified XPATH expression.
      */
     private Element getElementFromPath(Element root, String xpath_expression, String ns_prefix, String ns_uri) {
-        return (Element)getNodeFromPath(root, xpath_expression, ns_prefix, ns_uri);
+        Element element = null;
+        List<?> nodes = getNodesFromPath(root, xpath_expression, ns_prefix, ns_uri);
+        if(nodes != null && !nodes.isEmpty()) {
+            element = (Element)(nodes.get(0));
+        }
+        return element;
     }
 
     /**
      * Get an Attribute node object within XML data tied to the specified XPATH expression.
      */
     private Attribute getAttributeFromPath(Element root, String xpath_expression, String ns_prefix, String ns_uri) {
-        return (Attribute)getNodeFromPath(root, xpath_expression, ns_prefix, ns_uri);
+        Attribute attribute = null;
+        List<?> nodes = getNodesFromPath(root, xpath_expression, ns_prefix, ns_uri);
+        if(nodes != null && !nodes.isEmpty()) {
+            attribute = (Attribute)(nodes.get(0));
+        }
+        return attribute;
     }
     
     /**

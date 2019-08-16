@@ -362,7 +362,7 @@ public class DOIOrganiser {
         
         if(line.hasOption("update-doi"))
         {
-            String identifier = line.getOptionValue('u');
+            String identifier = line.getOptionValue("update-doi");
             
             if(null == identifier)
             {
@@ -391,7 +391,7 @@ public class DOIOrganiser {
         
         if(line.hasOption("delete-doi"))
         {
-            String identifier = line.getOptionValue('d');
+            String identifier = line.getOptionValue("delete-doi");
 
             if (null == identifier) 
             {
@@ -542,12 +542,9 @@ public class DOIOrganiser {
                     + doiIdentifierException
                         .codeToString(doiIdentifierException.getCode()), ex);
             
-            if(!quiet)
-            {
-                System.err.println("It wasn't possible to register this identifier: " 
-                                 + DOI.SCHEME + doiRow.getStringColumn("doi"));
-                ex.printStackTrace(System.err);
-            }
+            System.err.println("It wasn't possible to register this identifier: "
+                             + DOI.SCHEME + doiRow.getStringColumn("doi"));
+            ex.printStackTrace(System.err);
              
         }
         catch (IllegalArgumentException ex) 
