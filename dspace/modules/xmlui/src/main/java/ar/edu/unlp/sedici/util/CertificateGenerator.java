@@ -160,6 +160,9 @@ public class CertificateGenerator extends AbstractReader implements Recyclable
 
                     limit = printNewLine(content);
                     limit = printMetadata(dso, content, limit, "   - Título:", "dc.title");
+                    if ((dso.getMetadata("sedici", "title", "subtitle", Item.ANY)).length > 0) {
+                        limit = printMetadata(dso, content, limit, "   - Subtítulo:", "sedici.title.subtitle");            
+                    }
                     limit = printMetadata(dso, content, limit, "   - Autor(es):", "sedici.creator.person");
                     if ((dso.getMetadata("sedici", "date", "exposure", Item.ANY)).length > 0) {
                         limit = printMetadata(dso, content, limit, "   - Fecha de exposición:", "sedici.date.exposure");            
