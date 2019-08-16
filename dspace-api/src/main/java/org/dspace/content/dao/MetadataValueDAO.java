@@ -28,7 +28,8 @@ public interface MetadataValueDAO extends GenericDAO<MetadataValue> {
 
     public List<MetadataValue> findByField(Context context, MetadataField fieldId) throws SQLException;
 
-    public Iterator<MetadataValue> findByFieldAndValue(Context context, MetadataField metadataField, String value)
+    public Iterator<MetadataValue> findItemValuesByFieldAndValue(Context context,
+                                                                 MetadataField metadataField, String value)
             throws SQLException;
 
     public Iterator<MetadataValue> findByValueLike(Context context, String value) throws SQLException;

@@ -69,15 +69,25 @@ public class CSVMetadataImportReferenceTest extends AbstractEntityIntegrationTes
      * @param leftItem the left item in a known relationship
      * @param rightItem the right item in a known relationship
      * @param expectedCount expected relationship count for a known relationship
+     * @param placeDirection direction of subjects relationship(s)
+     * @param placeCount Expected place of subject's relationship
      */
-    private void assertRelationship(Item leftItem, Item rightItem, int expectedCount) throws SQLException {
-        List<Relationship> rels = relationshipService.findByItem(context, leftItem);
+    private void assertRelationship(Item leftItem, Item rightItem, int expectedCount,
+                                    String placeDirection, int placeCount) throws SQLException {
+        List<Relationship> rels = relationshipService.findByItem(context, rightItem);
+        Relationship relationship = null;
         int foundCount = 0;
         for (Relationship rel : rels) {
-            if (rel.getLeftItem().getID().equals(leftItem.getID())
-                    && rel.getRightItem().getID().equals(rightItem.getID())) {
+            if (rel.getRightItem().getID().equals(rightItem.getID())
+                    && rel.getLeftItem().getID().equals(leftItem.getID())) {
                 foundCount++;
+                relationship = rel;
             }
+        }
+        if (placeDirection.equalsIgnoreCase("left")) {
+            assertEquals(relationship.getLeftPlace(), placeCount);
+        } else {
+            assertEquals(relationship.getRightPlace(), placeCount);
         }
         assertEquals(expectedCount, foundCount);
     }
@@ -92,7 +102,7 @@ public class CSVMetadataImportReferenceTest extends AbstractEntityIntegrationTes
                 "+,Person,," +  col1.getHandle() + ",0",
                 "+,Publication,dc.identifier.other:0," +  col1.getHandle() + ",1"};
         Item[] items = runImport(csv);
-        assertRelationship(items[1], items[0], 1);
+        assertRelationship(items[1], items[0], 1, "left", 0);
     }
 
     /**
@@ -122,7 +132,7 @@ public class CSVMetadataImportReferenceTest extends AbstractEntityIntegrationTes
                 "+,Test Item 1,Person,," +  col1.getHandle() + ",idVal,0",
                 "+,Test Item 2,Publication,rowName:idVal," +  col1.getHandle() + ",anything,1"};
         Item[] items = runImport(csv);
-        assertRelationship(items[1], items[0], 1);
+        assertRelationship(items[1], items[0], 1, "left", 0);
     }
 
     /**
@@ -136,8 +146,8 @@ public class CSVMetadataImportReferenceTest extends AbstractEntityIntegrationTes
         "+,Person,," +  col1.getHandle() + ",1",
         "+,Publication,dc.identifier.other:0||dc.identifier.other:1," +  col1.getHandle() + ",2"};
         Item[] items = runImport(csv);
-        assertRelationship(items[2], items[0], 1);
-        assertRelationship(items[2], items[1], 1);
+        assertRelationship(items[2], items[0], 1, "left", 0);
+        assertRelationship(items[2], items[1], 1, "left", 1);
     }
 
     /**
@@ -151,8 +161,8 @@ public class CSVMetadataImportReferenceTest extends AbstractEntityIntegrationTes
                 "+,Person,," +  col1.getHandle() + ",1,val2",
                 "+,Publication,rowName:val1||rowName:val2," +  col1.getHandle() + ",2,val3"};
         Item[] items = runImport(csv);
-        assertRelationship(items[2], items[0], 1);
-        assertRelationship(items[2], items[1], 1);
+        assertRelationship(items[2], items[0], 1, "left", 0);
+        assertRelationship(items[2], items[1], 1, "left", 1);
     }
 
     /**
@@ -167,7 +177,7 @@ public class CSVMetadataImportReferenceTest extends AbstractEntityIntegrationTes
         String[] csv = {"id,relationship.type,relation.isAuthorOfPublication,collection,rowName,dc.identifier.other",
                 "+,Publication," + person.getID().toString() + "," +  col1.getHandle() + ",anything,0"};
         Item[] items = runImport(csv);
-        assertRelationship(items[0], person, 1);
+        assertRelationship(items[0], person, 1, "left", 0);
     }
 
     /**
@@ -186,8 +196,8 @@ public class CSVMetadataImportReferenceTest extends AbstractEntityIntegrationTes
                 "+,Publication," + person.getID().toString() + "||" + person2.getID().toString() + "," +
                         col1.getHandle() + ",anything,0"};
         Item[] items = runImport(csv);
-        assertRelationship(items[0], person, 1);
-        assertRelationship(items[0], person2, 1);
+        assertRelationship(items[0], person, 1, "left", 0);
+        assertRelationship(items[0], person2, 1, "left", 1);
     }
 
     /**
@@ -205,8 +215,34 @@ public class CSVMetadataImportReferenceTest extends AbstractEntityIntegrationTes
                 "+,Person2,Person,," +  col1.getHandle() + ",idVal,0",
                 "+,Pub1,Publication,dc.title:Person||dc.title:Person2," +  col1.getHandle() + ",anything,1"};
         Item[] items = runImport(csv);
-        assertRelationship(items[1], person, 1);
-        assertRelationship(items[1], items[0], 1);
+        assertRelationship(items[1], person, 1, "left", 0);
+        assertRelationship(items[1], items[0], 1, "left", 1);
+    }
+
+    /**
+     * Test existence of newly created items with proper relationships defined in the item's metadata via
+     * multi mixed references. One archived item, one by metadata reference in the CSV, and one by a rowName reference
+     * in the CSV
+     */
+    @Test
+    public void testMultiMixedRefArchivedCsv() throws Exception {
+        Item person = ItemBuilder.createItem(context, col1)
+                .withTitle("Person")
+                .withRelationshipType("Person")
+                .build();
+        Item person2 = ItemBuilder.createItem(context, col1)
+                .withTitle("Person2")
+                .withRelationshipType("Person")
+                .build();
+        String[] csv = {"id,dc.title,relationship.type,relation.isAuthorOfPublication,collection,rowName," +
+                "dc.identifier.other",
+                "+,Person3,Person,," +  col1.getHandle() + ",idVal,0",
+                "+,Pub1,Publication," + person.getID() + "||dc.title:Person2||rowName:idVal," +
+                 col1.getHandle() + ",anything,1"};
+        Item[] items = runImport(csv);
+        assertRelationship(items[1], person, 1, "left", 0);
+        assertRelationship(items[1], person2, 1, "left", 1);
+        assertRelationship(items[1], items[0], 1, "left", 2);
     }
 
     /**
@@ -220,7 +256,7 @@ public class CSVMetadataImportReferenceTest extends AbstractEntityIntegrationTes
                 "+,Person:,Person,," +  col1.getHandle() + ",idVal,0",
                 "+,Pub1,Publication,dc.title:Person:," +  col1.getHandle() + ",anything,1"};
         Item[] items = runImport(csv);
-        assertRelationship(items[1], items[0], 1);
+        assertRelationship(items[1], items[0], 1, "left", 0);
     }
 
     /**
@@ -232,6 +268,18 @@ public class CSVMetadataImportReferenceTest extends AbstractEntityIntegrationTes
                 "+,Person,," + col1.getHandle() + ",1",
                 "+,Person,," + col1.getHandle() + ",1",
                 "+,Publication,dc.identifier.other:1," + col1.getHandle() + ",2"};
+        assertEquals(1, performImportScript(csv, true));
+    }
+
+    /**
+     * Test failure when referring to item by non unique metadata in the csv file.
+     */
+    @Test
+    public void testNonUniqueRowName() throws Exception {
+        String[] csv = {"id,relationship.type,relation.isAuthorOfPublication,collection,dc.identifier.other,rowName",
+                "+,Person,," + col1.getHandle() + ",1,value",
+                "+,Person,," + col1.getHandle() + ",1,value",
+                "+,Publication,rowName:value," + col1.getHandle() + ",2"};
         assertEquals(1, performImportScript(csv, true));
     }
 
@@ -276,6 +324,17 @@ public class CSVMetadataImportReferenceTest extends AbstractEntityIntegrationTes
         String[] csv = {"id,relationship.type,relation.isAuthorOfPublication,collection,dc.identifier.other",
                 "+,Person,," + col1.getHandle() + ",1",
                 "+,Publication,dc.identifier.other:8675309," + col1.getHandle() + ",2"};
+        assertEquals(1, performImportScript(csv, false));
+    }
+
+    /**
+     * Test failure when refering to an item in the CSV that hasn't been created yet due to it's order in the CSV
+     */
+    @Test
+    public void testCSVImportWrongOrder() throws Exception {
+        String[] csv = {"id,relationship.type,relation.isAuthorOfPublication,collection,dc.identifier.other",
+                "+,Publication,dc.identifier.other:8675309," + col1.getHandle() + ",2",
+                "+,Person,," + col1.getHandle() + ",1",};
         assertEquals(1, performImportScript(csv, false));
     }
 
