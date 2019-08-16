@@ -112,6 +112,15 @@ public class ItemUploadController {
         return new BitstreamResource(bitstreamConverter.fromModel(bitstream), utils);
     }
 
+    /**
+     * Creates the bitstream based on the given parameters
+     * @param context           The context
+     * @param item              The item where the bitstream should be store
+     * @param fileInputStream   The input stream used to create the bitstream
+     * @param properties        The properties to be assigned to the bitstream
+     * @param originalFilename  The filename as it was uploaded
+     * @return                  The bitstream which has been created
+     */
     private Bitstream processBitstreamCreation(Context context, Item item, InputStream fileInputStream,
                                                String properties, String originalFilename)
         throws AuthorizeException, IOException, SQLException {
