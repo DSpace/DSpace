@@ -4077,3 +4077,9 @@ table.dropdown-table.ui-accordion tr:hover td{
 	width: 97%;
 }
  
+/* jQuery UI autocomplete max-height */
+.ui-autocomplete {
+	max-height: 300px;
+	overflow-y: auto;
+	overflow-x: hidden;
+}

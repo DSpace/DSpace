@@ -14,7 +14,7 @@ var errorConfianzaPlural='Hay errores en el formulario';
 //-------------------Variable para el limite en el lookup
 var limit_lookup=150;
 //-------------------Variable para el limite en el suggest
-var limit_suggest=50;
+var limit_suggest=0;
 //-------------------Variable para el paginado del lookup
 var previous_start=0;
 
