@@ -9,6 +9,7 @@ package org.dspace.app.rest.repository;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -122,8 +123,14 @@ public class ScriptRestRepository extends DSpaceRestRepository<ScriptRest, Strin
         try {
             RestDSpaceRunnableHandler restDSpaceRunnableHandler = new RestDSpaceRunnableHandler(
                 context.getCurrentUser(), scriptName, dSpaceCommandLineParameters);
-            runDSpaceScriptWithArgs(dSpaceCommandLineParameters.stream().map(x -> x.toString()).toArray(String[]::new),
-                                    restDSpaceRunnableHandler, scriptName);
+
+            List<String> args = new ArrayList<>();
+            args.add(scriptName);
+            for (DSpaceCommandLineParameter parameter : dSpaceCommandLineParameters) {
+                args.add(parameter.getName());
+                args.add(parameter.getValue());
+            }
+            runDSpaceScriptWithArgs(args.toArray(new String[0]), restDSpaceRunnableHandler, scriptName);
             context.complete();
             return processConverter.fromModel(restDSpaceRunnableHandler.getProcess());
         } catch (SQLException e) {
