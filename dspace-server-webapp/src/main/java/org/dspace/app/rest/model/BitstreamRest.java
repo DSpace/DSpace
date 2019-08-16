@@ -76,6 +76,7 @@ public class BitstreamRest extends DSpaceObjectRest {
     }
 
     @Override
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     public String getType() {
         return NAME;
     }

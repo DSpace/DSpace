@@ -23,7 +23,7 @@ import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.builder.ItemBuilder;
 import org.dspace.app.rest.matcher.BitstreamMatcher;
 import org.dspace.app.rest.matcher.MetadataMatcher;
-import org.dspace.app.rest.model.BitstreamPropertiesRest;
+import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.MetadataRest;
 import org.dspace.app.rest.model.MetadataValueRest;
 import org.dspace.app.rest.test.AbstractEntityIntegrationTest;
@@ -73,10 +73,10 @@ public class ItemUploadControllerIT extends AbstractEntityIntegrationTest {
         MockMultipartFile file = new MockMultipartFile("file", "hello.txt", MediaType.TEXT_PLAIN_VALUE,
                                                        input.getBytes());
 
-        BitstreamPropertiesRest bitstreamPropertiesRest = new BitstreamPropertiesRest();
-        bitstreamPropertiesRest.setBundleName("TESTINGBUNDLE");
-        bitstreamPropertiesRest.setName("testing");
-        bitstreamPropertiesRest.setSequenceId(123456);
+        BitstreamRest bitstreamRest = new BitstreamRest();
+        bitstreamRest.setBundleName("TESTINGBUNDLE");
+        bitstreamRest.setName("testing");
+        bitstreamRest.setSequenceId(123456);
 
         MetadataRest metadataRest = new MetadataRest();
 
@@ -96,7 +96,7 @@ public class ItemUploadControllerIT extends AbstractEntityIntegrationTest {
         title.setValue("Title Text");
         metadataRest.put("dc.title", title);
 
-        bitstreamPropertiesRest.setMetadata(metadataRest);
+        bitstreamRest.setMetadata(metadataRest);
         ObjectMapper mapper = new ObjectMapper();
 
         context.restoreAuthSystemState();
@@ -104,7 +104,7 @@ public class ItemUploadControllerIT extends AbstractEntityIntegrationTest {
             MockMvcRequestBuilders.fileUpload("/api/core/items/" + item.getID() + "/bitstreams")
                                   .file(file)
                                   .param("properties", mapper
-                                      .writeValueAsString(bitstreamPropertiesRest)))
+                                      .writeValueAsString(bitstreamRest)))
                                               .andExpect(status().isOk())
                                               .andExpect(jsonPath("$.name", is("testing")))
                                               .andExpect(jsonPath("$.bundleName", is("TESTINGBUNDLE")))
@@ -335,9 +335,9 @@ public class ItemUploadControllerIT extends AbstractEntityIntegrationTest {
         MockMultipartFile file = new MockMultipartFile("file", "hello.txt", MediaType.TEXT_PLAIN_VALUE,
                                                        input.getBytes());
 
-        BitstreamPropertiesRest bitstreamPropertiesRest = new BitstreamPropertiesRest();
+        BitstreamRest bitstreamRest = new BitstreamRest();
         String testbundle = "TESTBUNDLE";
-        bitstreamPropertiesRest.setBundleName(testbundle);
+        bitstreamRest.setBundleName(testbundle);
 
         ObjectMapper mapper = new ObjectMapper();
 
@@ -347,7 +347,7 @@ public class ItemUploadControllerIT extends AbstractEntityIntegrationTest {
             .perform(MockMvcRequestBuilders.fileUpload("/api/core/items/" + item.getID() + "/bitstreams")
                                            .file(file)
                                            .param("properties", mapper
-                                               .writeValueAsString(bitstreamPropertiesRest)))
+                                               .writeValueAsString(bitstreamRest)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.bundleName", is(testbundle)))
             .andExpect(jsonPath("$.uuid", notNullValue())).andReturn();
@@ -430,7 +430,7 @@ public class ItemUploadControllerIT extends AbstractEntityIntegrationTest {
         MockMultipartFile file = new MockMultipartFile("file", "hello.txt", MediaType.TEXT_PLAIN_VALUE,
                                                        input.getBytes());
 
-        BitstreamPropertiesRest bitstreamPropertiesRest = new BitstreamPropertiesRest();
+        BitstreamRest bitstreamRest = new BitstreamRest();
 
         ObjectMapper mapper = new ObjectMapper();
 
@@ -439,7 +439,7 @@ public class ItemUploadControllerIT extends AbstractEntityIntegrationTest {
         getClient(token).perform(MockMvcRequestBuilders.fileUpload("/api/core/items/" + item.getID() + "/bitstreams")
                                                        .file(file)
                                                        .param("properties", mapper
-                                                           .writeValueAsString(bitstreamPropertiesRest)))
+                                                           .writeValueAsString(bitstreamRest)))
                         .andExpect(status().isUnprocessableEntity());
 
         getClient(token).perform(get("/api/core/items/" + item.getID() + "/bitstreams"))
@@ -448,7 +448,6 @@ public class ItemUploadControllerIT extends AbstractEntityIntegrationTest {
     }
 
 
-    //TODO This check on sequence ID doesn't happen
     @Test
     public void uploadBitstreamSameSequenceIdTwiceUnprocessableEntityException() throws Exception {
         context.turnOffAuthorisationSystem();
@@ -476,10 +475,10 @@ public class ItemUploadControllerIT extends AbstractEntityIntegrationTest {
         MockMultipartFile file = new MockMultipartFile("file", "hello.txt", MediaType.TEXT_PLAIN_VALUE,
                                                        input.getBytes());
 
-        BitstreamPropertiesRest bitstreamPropertiesRest = new BitstreamPropertiesRest();
-        bitstreamPropertiesRest.setBundleName("ORIGINAL");
-        bitstreamPropertiesRest.setName("testing");
-        bitstreamPropertiesRest.setSequenceId(123456);
+        BitstreamRest bitstreamRest = new BitstreamRest();
+        bitstreamRest.setBundleName("ORIGINAL");
+        bitstreamRest.setName("testing");
+        bitstreamRest.setSequenceId(123456);
 
         MetadataRest metadataRest = new MetadataRest();
 
@@ -499,14 +498,14 @@ public class ItemUploadControllerIT extends AbstractEntityIntegrationTest {
         title.setValue("Title Text");
         metadataRest.put("dc.title", title);
 
-        bitstreamPropertiesRest.setMetadata(metadataRest);
+        bitstreamRest.setMetadata(metadataRest);
         ObjectMapper mapper = new ObjectMapper();
 
         context.restoreAuthSystemState();
         getClient(token).perform(MockMvcRequestBuilders.fileUpload("/api/core/items/" + item.getID() + "/bitstreams")
                                                        .file(file)
                                                        .param("properties", mapper
-                                                           .writeValueAsString(bitstreamPropertiesRest)))
+                                                           .writeValueAsString(bitstreamRest)))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$.name", is("testing")))
                         .andExpect(jsonPath("$.bundleName", is("ORIGINAL")))
@@ -526,7 +525,7 @@ public class ItemUploadControllerIT extends AbstractEntityIntegrationTest {
         getClient(token).perform(MockMvcRequestBuilders.fileUpload("/api/core/items/" + item.getID() + "/bitstreams")
                                                        .file(file)
                                                        .param("properties", mapper
-                                                           .writeValueAsString(bitstreamPropertiesRest)))
+                                                           .writeValueAsString(bitstreamRest)))
                         .andExpect(status().isUnprocessableEntity());
 
         getClient(token).perform(get("/api/core/items/" + item.getID() + "/bitstreams"))
