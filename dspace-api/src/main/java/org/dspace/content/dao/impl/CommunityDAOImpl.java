@@ -76,6 +76,9 @@ public class CommunityDAOImpl extends AbstractHibernateDSODAO<Community> impleme
             query.setMaxResults(limit);
         }
         query.setParameter(sortField.toString(), sortField.getID());
+
+        // Convert List to HashSet and back again to filter out duplicates (e.g. a community
+        // having multiple titles/translations), without changing the order of elements
         return new LinkedList<Community>(new LinkedHashSet<>(list(query)));
     }
 
@@ -101,6 +104,8 @@ public class CommunityDAOImpl extends AbstractHibernateDSODAO<Community> impleme
         query.setParameter(sortField.toString(), sortField.getID());
         query.setHint("org.hibernate.cacheable", Boolean.TRUE);
 
+        // Convert List to HashSet and back again to filter out duplicates (e.g. a community
+        // having multiple titles/translations), without changing the order of elements
         return new LinkedList<Community>(new LinkedHashSet<>(findMany(context, query)));
     }
 
