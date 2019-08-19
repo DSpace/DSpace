@@ -201,6 +201,7 @@ public class ScriptRetrieveCitation {
 				}
 
 				context.commit();
+				context.clearCache();
 			}
 			Date endDate = new Date();
 			long processTime = (endDate.getTime() - startDate.getTime()) / 1000;
