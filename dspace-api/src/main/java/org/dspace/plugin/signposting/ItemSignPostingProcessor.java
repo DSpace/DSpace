@@ -7,6 +7,8 @@
  */
 package org.dspace.plugin.signposting;
 
+import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -20,7 +22,15 @@ import org.dspace.plugin.PluginException;
  */
 public interface ItemSignPostingProcessor
 {
+    public static int SIGNPOSTING_MAX_LINKS = 10;
+    
     void process(Context context, HttpServletRequest request,
             HttpServletResponse response, Item item)
         throws PluginException, AuthorizeException;
+    
+    boolean showAsLinkset(Context context, HttpServletRequest request,
+            HttpServletResponse response, Item item);
+    
+    Map<String, Object> buildLinkset(Context context, HttpServletRequest request,
+            HttpServletResponse response, Item item);
 }

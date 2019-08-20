@@ -545,6 +545,8 @@
    <field name="cris-sourceid" type="string" indexed="true" stored="true" omitNorms="true" />
    <field name="cris-sourceref" type="string" indexed="true" stored="true" omitNorms="true" />
    <field name="crisdo.type" type="string" indexed="true" stored="true" omitNorms="true" />
+   <field name="cris-email" type="string" indexed="true" stored="true" omitNorms="true" />
+   <field name="cris-email_private" type="string" indexed="true" stored="true" omitNorms="true" />
    <dynamicField name="relationpreference.*" type="string" indexed="true" stored="true" omitNorms="true" multiValued="true"/>
    <field name="crisauthoritylookup" type="text" indexed="true" stored="true" multiValued="true"/>
    <copyField source="crisrp.fullName" dest="crisauthoritylookup"/>
@@ -554,6 +556,8 @@
    <copyField source="crisproject.title" dest="crisauthoritylookup"/>
    <copyField source="crisou.name" dest="crisauthoritylookup"/>
    <copyField source="crisdo.name" dest="crisauthoritylookup"/>
+   <copyField source="crisrp.email" dest="cris-email"/>
+   <copyField source="crisrp.email_private" dest="cris-email_private"/>
 
     <!-- index for build a facet on the resource type -->
    <field name="resourcetype_filter" type="keywordFilter" indexed="true" stored="true" required="true" omitNorms="true" />

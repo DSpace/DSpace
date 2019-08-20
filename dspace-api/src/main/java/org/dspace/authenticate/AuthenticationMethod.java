@@ -57,6 +57,16 @@ public interface AuthenticationMethod {
     /** User or password is not appropriate for this method. */
     public static final int BAD_ARGS = 5;
 
+    /** Multiple Users found using this method. */
+    public static final int MULTIPLE_USERS = 6;
+    
+    /** Multiple found using this method. */
+    public static final int MULTIPLE_PROFILE = 7;
+
+    /** Another Researcher Page found using this method. */
+    public static final int NO_SUCH_PROFILE = 8;
+    
+    public static final int GENERIC_ERROR = 9;
 
     /**
      * Predicate, whether to allow new EPerson to be created.

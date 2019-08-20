@@ -229,7 +229,7 @@ public class BitstreamServlet extends DSpaceServlet
         
         preProcessBitstreamHome(context, request, response, bitstream);
         
-    	InputStream is =null;
+    	InputStream is = null;
     	
     	CoverPageService coverService = new DSpace().getSingletonService(CoverPageService.class);
     	Collection owningColl = item.getOwningCollection();
@@ -238,29 +238,39 @@ public class BitstreamServlet extends DSpaceServlet
     		collHandle= owningColl.getHandle();
     	}
     	String configFile =coverService.getConfigFile(collHandle);
-        if(StringUtils.isNotBlank(configFile) && coverService.isValidType(bitstream)){
-        	// Pipe the bits
-        	
-        	try {
-        		CitationDocument citationDocument = new CitationDocument(configFile);
-				File citedDoc = citationDocument.makeCitedDocument(context,bitstream,configFile);
-				is = new FileInputStream(citedDoc);
-		        response.setHeader("Content-Length", String
-		                .valueOf(citedDoc.length()));
+        if (StringUtils.isNotBlank(configFile)
+                && coverService.isValidType(bitstream))
+        {
+            // Pipe the bits
 
-			} catch (COSVisitorException e) {
-				is =  bitstream.retrieve();
-		        response.setHeader("Content-Length", String
-		                .valueOf(bitstream.getSize()));
+            try
+            {
+                CitationDocument citationDocument = new CitationDocument(
+                        configFile);
+                File citedDoc = citationDocument.makeCitedDocument(context,
+                        bitstream, configFile);
+                is = new FileInputStream(citedDoc);
+                response.setHeader("Content-Length",
+                        String.valueOf(citedDoc.length()));
+            }
+            catch (AuthorizeException e)
+            {
+                log.error(e.getMessage(), e);
+                throw e;
+            }
+            catch (Exception e)
+            {
+                log.error(e.getMessage(), e);
+            }
 
-				log.error(e.getMessage(), e);
-			}
-        }else{
+        }
+        
+        if(is == null) {
         	 is = bitstream.retrieve();
              response.setHeader("Content-Length", String
                      .valueOf(bitstream.getSize()));
-
         }
+        
 		// Set the response MIME type
         response.setContentType(bitstream.getFormat().getMIMEType());
 

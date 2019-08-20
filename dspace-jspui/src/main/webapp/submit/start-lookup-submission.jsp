@@ -374,7 +374,7 @@ void generateCollectionTree(javax.servlet.jsp.JspWriter out, CollectionsTree tre
 		<div id="result-form">
 			<form class="form-horizontal" id="form-submission-identifiers" action="" method="post">
 				<div class="form-group">
-					<label for="select-collection-manual" class="col-sm-2 control-label"><fmt:message key="jsp.submit.start-lookup-submission.select.collection.label"/></label>
+					<label for="select-collection-identifier" class="col-sm-2 control-label"><fmt:message key="jsp.submit.start-lookup-submission.select.collection.label"/></label>
 					<div class="col-sm-7">
 							<dspace:selectcollection klass="form-control" id="select-collection-identifier" collection="<%= collection_id %>"/>
 					</div>
@@ -521,16 +521,13 @@ void generateCollectionTree(javax.servlet.jsp.JspWriter out, CollectionsTree tre
             j("li.ui-state-default").toggleClass("ui-state-default ui-corner-top");
             j("div.ui-tabs-panel").toggleClass("ui-tabs-panel ui-widget-content ui-corner-bottom tab-content with-padding");
             },
-        activate: function( event, ui ) {
+	        activate: function( event, ui ) {
             j("li.ui-tabs-active").toggleClass("ui-tabs-active ui-state-active active");
-            if ('tabs-result' == ui.newPanel.attr('id'))
-   				{
-				j('#manual-submission>form').appendTo("#no_result_manual_submission");	
-    		}
-            else{
-            	j('#no_result_manual_submission>form').appendTo("#manual-submission");	
-   					}
-    			}
+	            if ('tabs-result' != ui.newPanel.attr('id'))
+	            {
+	            	j('#no_result_manual_submission>form').appendTo("#manual-submission");	
+	   			}
+        	}
     	});
    	
     	j('#link-ricerca-identificatore').click(function(){

@@ -168,7 +168,7 @@ public class RetrieveCitationInPMC
 				log.info(LogManager.getHeader(null, "retrieve_citation_pubmed",
                         "Processing informations itemWorked:\""+itemWorked+"\" maxItemToWork: \"" + maxItemToWork + "\" - start:\"" + start + "\" - page:\"" + page + "\""));
 				int docWorked = 0;
-				internal: for (DSpaceObject dso : qresp.getDspaceObjects()) {					
+				internal: for (DSpaceObject dso : qresp.getDspaceObjects()) {				
 					List<SearchDocument> list = qresp.getSearchDocument(dso);
 					for (SearchDocument doc : list) {
 						if (maxItemToWork != 0 && itemWorked == maxItemToWork) {
@@ -210,6 +210,7 @@ public class RetrieveCitationInPMC
 						docWorked++;
 					}
 				}
+				context.clearCache();
 			}
 			Date endDate = new Date();
 			long processTime = (endDate.getTime() - startDate.getTime()) / 1000;
@@ -233,11 +234,8 @@ public class RetrieveCitationInPMC
         Integer[] arrPMCIDs = new Integer[pmcIDs.size()];
         arrPMCIDs = pmcIDs.toArray(arrPMCIDs);
         List<PMCRecord> pmcRecords = null;
-        Context context = null;
         try
         {
-            context = new Context();
-
             try
             {
                 pmcRecords = entrez.getMultiPMCRecord(arrPMCIDs);
@@ -319,13 +317,6 @@ public class RetrieveCitationInPMC
         catch (Exception ex)
         {
             log.error(ex.getMessage(), ex);
-        }
-        finally
-        {
-            if (context != null && context.isValid())
-            {
-                context.abort();
-            }
         }
     }
 

@@ -7,8 +7,11 @@
  */
 package org.dspace.app.webui.components.signposting;
 
-import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -22,7 +25,6 @@ import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.plugin.ItemHomeProcessor;
 import org.dspace.plugin.PluginException;
 import org.dspace.plugin.signposting.ItemSignPostingProcessor;
 
@@ -76,6 +78,68 @@ public class PublicationBundaryItemHome implements ItemSignPostingProcessor
     public void setRelation(String relation)
     {
         this.relation = relation;
+    }
+
+    @Override
+    public boolean showAsLinkset(Context context, HttpServletRequest request,
+            HttpServletResponse response, Item item)
+    {
+        try
+        {
+            int size = 0;
+            for(Bundle bundle : item.getBundles(Constants.CONTENT_BUNDLE_NAME)) {
+                size += bundle.getBitstreams().length; 
+            }
+            if(size > SIGNPOSTING_MAX_LINKS) {
+                return true;                    
+            }
+        }
+        catch (SQLException ex)
+        {
+            log.error("Problem to add signposting pattern", ex);
+        }
+        return false;
+    }
+
+    @Override
+    public Map<String, Object> buildLinkset(Context context,
+            HttpServletRequest request, HttpServletResponse response, Item item)
+    {
+        
+        Map<String, Object> result = new HashMap<>();
+        List<Map<String, String>> resultList = new ArrayList<>();
+        
+        String handle = item.getHandle();
+        try
+        {            
+            for(Bundle bundle : item.getBundles(Constants.CONTENT_BUNDLE_NAME)) {
+                for(Bitstream bit : bundle.getBitstreams()) {
+                    Map<String, String> bitstreams = new HashMap<>();
+                    String value = ConfigurationManager.getProperty("dspace.url");
+                    String mime = bit.getFormat().getMIMEType();
+                    
+                    if ((handle != null) && (bit.getSequenceID() > 0)) {
+                        value = value + "/bitstream/" + handle + "/" + bit.getSequenceID() + "/";
+                    } else {
+                        value = value + "/retrieve/" + bit.getID() + "/";
+                    }
+            
+                    value = value + UIUtil.encodeBitstreamName(bit.getName(), Constants.DEFAULT_ENCODING);
+                    bitstreams.put("href", value);
+                    bitstreams.put("type", mime);
+                    resultList.add(bitstreams);
+                }                
+            }
+        }
+        catch (Exception ex)
+        {
+            log.error("Problem to add signposting pattern", ex);
+        }
+        
+        if(!resultList.isEmpty()) {
+            result.put(getRelation(), resultList);
+        }
+        return result;
     }
 
 }

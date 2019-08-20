@@ -40,7 +40,9 @@ public class OrcidFundingMetadata extends MappingMetadata {
 	public static final String TYPE = "type";
 
 	public static final String AMOUNT = "amount";
-	public static final String CURRENCY_CODE = "currency_code";
+	public static final String AMOUNT_CURRENCY_CODE = "amount.currencycode";
+	
+	public static final String GENERIC_CURRENCY_CODE = "currency_code";	
 	
 	public static final String STARTDATE = "start-date";
 	
@@ -149,11 +151,18 @@ public class OrcidFundingMetadata extends MappingMetadata {
 	}
 
 	public String getCurrencyCode() {
-		if (!metadataMappings.get(CURRENCY_CODE).isEmpty()) {
-			return metadataMappings.get(CURRENCY_CODE).get(0);
+		if (!metadataMappings.get(GENERIC_CURRENCY_CODE).isEmpty()) {
+			return metadataMappings.get(GENERIC_CURRENCY_CODE).get(0);
 		}
 		return null;
 	}
+
+    public String getAmountCurrencyCode() {
+        if (!metadataMappings.get(AMOUNT_CURRENCY_CODE).isEmpty()) {
+            return metadataMappings.get(AMOUNT_CURRENCY_CODE).get(0);
+        }
+        return null;
+    }
 	
 	public String getAmount() {
 		if (!metadataMappings.get(AMOUNT).isEmpty()) {

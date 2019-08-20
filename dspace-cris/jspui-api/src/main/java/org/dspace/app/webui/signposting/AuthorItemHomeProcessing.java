@@ -9,7 +9,10 @@ package org.dspace.app.webui.signposting;
 
 import java.beans.PropertyEditor;
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -179,6 +182,136 @@ public class AuthorItemHomeProcessing implements ItemSignPostingProcessor
     public void setRetrievedExternally(String retrievedExternally)
     {
         this.retrievedExternally = retrievedExternally;
+    }
+
+    @Override
+    public boolean showAsLinkset(Context context, HttpServletRequest request,
+            HttpServletResponse response, Item item)
+    {
+        try
+        {
+            MetadataAuthorityManager mam = MetadataAuthorityManager
+                    .getManager();
+            if (mam.isAuthorityControlled(
+                    getMetadataField().replaceAll("\\.", "_")))
+            {
+                if (StringUtils.isNotBlank(getRetrievedExternally()))
+                {
+                    Metadatum[] metadatums = item
+                            .getMetadataByMetadataString(getMetadataField());
+                    if (metadatums.length > SIGNPOSTING_MAX_LINKS)
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            log.error("Problem to add signposting pattern", ex);
+        }
+
+        return false;
+    }
+
+    @Override
+    public Map<String, Object> buildLinkset(Context context,
+            HttpServletRequest request, HttpServletResponse response, Item item)
+    {
+
+        Map<String, Object> result = new HashMap<>();
+        List<Map<String, String>> resultList = new ArrayList<>();
+
+        try
+        {
+            MetadataAuthorityManager mam = MetadataAuthorityManager
+                    .getManager();
+            if (mam.isAuthorityControlled(
+                    getMetadataField().replaceAll("\\.", "_")))
+            {
+                if (StringUtils.isNotBlank(getRetrievedExternally()))
+                {
+                    Map<String, String> authors = new HashMap<>();
+
+                    Metadatum[] metadatums = item
+                            .getMetadataByMetadataString(getMetadataField());
+                    for (Metadatum metadatum : metadatums)
+                    {
+                        String authority = metadatum.authority;
+                        if (StringUtils.isNotBlank(authority))
+                        {
+                            ResearcherPage entity = applicationService
+                                    .getEntityByCrisId(authority,
+                                            ResearcherPage.class);
+                            if (entity != null)
+                            {
+                                List<RPProperty> values = entity
+                                        .getAnagrafica4view()
+                                        .get(getRetrievedExternally());
+                                for (RPProperty val : values)
+                                {
+                                    PropertyEditor pe = val.getTypo()
+                                            .getRendering().getPropertyEditor(
+                                                    applicationService);
+                                    pe.setValue(val.getObject());
+
+                                    authors.put("href", MessageFormat.format(
+                                            getPattern(), pe.getAsText()));
+                                    resultList.add(authors);
+                                }
+                            }
+                            
+                        }
+                    }
+                }
+                else
+                {
+                    Metadatum[] metadatums = item
+                            .getMetadataByMetadataString(getMetadataField());
+                    Map<String, String> authors = new HashMap<>();
+                    for (Metadatum metadatum : metadatums)
+                    {
+                        if (StringUtils.isNotBlank(metadatum.value))
+                        {
+                            response.addHeader("Link",
+                                    MessageFormat.format(getPattern(),
+                                            metadatum.authority) + "; rel=\""
+                                            + getRelationHeader() + "\"");
+                            authors.put("href", MessageFormat
+                                    .format(getPattern(), metadatum.authority));
+                            resultList.add(authors);
+                        }
+                    }
+                }
+            }
+            else
+            {
+
+                Map<String, String> authors = new HashMap<>();
+                Metadatum[] metadatums = item
+                        .getMetadataByMetadataString(getMetadataField());
+                for (Metadatum metadatum : metadatums)
+                {
+                    if (StringUtils.isNotBlank(metadatum.value))
+                    {
+                        response.addHeader("Link", metadatum.value + "; rel=\""
+                                + getRelationHeader() + "\"");
+                        authors.put("href", metadatum.value);
+                        resultList.add(authors);
+                    }
+                }
+
+            }
+        }
+        catch (Exception ex)
+        {
+            log.error("Problem to add signposting pattern", ex);
+        }
+
+        if(!resultList.isEmpty()) {
+            result.put(getRelationHeader(), resultList);
+        }
+        return result;
     }
 
 }

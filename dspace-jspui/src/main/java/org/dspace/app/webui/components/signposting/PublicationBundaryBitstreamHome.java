@@ -7,9 +7,6 @@
  */
 package org.dspace.app.webui.components.signposting;
 
-import java.io.UnsupportedEncodingException;
-import java.sql.SQLException;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 

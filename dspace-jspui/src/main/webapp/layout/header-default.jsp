@@ -53,8 +53,24 @@
     Locale sessionLocale = UIUtil.getSessionLocale(request);
     boolean isRtl = StringUtils.isNotBlank(LocaleUIHelper.ifLtr(request, "","rtl"));    
     String resourceSyncBaseURL = ConfigurationManager.getProperty("resourcesync", "base-url");
+    
+    //TODO manage better the change locale maybe with javascript function
+    String queryString = "?";
+    if (StringUtils.isNotBlank(request.getQueryString()))
+    {
+        queryString += request.getQueryString();
+        if (supportedLocales != null && supportedLocales.length > 1)
+        {
+            for (int i = supportedLocales.length - 1; i >= 0; i--)
+            {
+                queryString = StringUtils.replace(queryString, "&locale="+supportedLocales[i], "");
+                queryString = StringUtils.replace(queryString, "locale="+supportedLocales[i]+"&", "");
+                //WARNING the follow line is mandatory the last
+                queryString = StringUtils.replace(queryString, "locale="+supportedLocales[i], "");
+            }
+        }
+    }
 %>
-
 <!DOCTYPE html>
 <html>
     <head>
@@ -261,7 +277,7 @@ window.cookieconsent.initialise({
      {
  %>
         <li><a onclick="javascript:document.repost.locale.value='<%=supportedLocales[i].toString()%>';
-                  document.repost.submit();" href="?locale=<%=supportedLocales[i].toString()%>">
+                  document.repost.submit();" href="<%=queryString%>&locale=<%=supportedLocales[i].toString()%>">
           <%= LocaleSupport.getLocalizedMessage(pageContext, "jsp.layout.navbar-default.language."+supportedLocales[i].toString()) %>                  
        </a></li>
  <%

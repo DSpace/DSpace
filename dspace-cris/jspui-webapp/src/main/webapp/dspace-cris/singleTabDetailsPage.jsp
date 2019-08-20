@@ -124,7 +124,7 @@
 																			<fmt:message key="jsp.jdyna.nestedloading" />
 																<span class="spandatabind nestedinfo">${tipologiaDaVisualizzare.real.id}</span>
 																<span id="nested_${tipologiaDaVisualizzare.real.id}_totalHit" class="spandatabind">0</span>
-																<span id="nested_${tipologiaDaVisualizzare.real.id}_limit" class="spandatabind">5</span>
+																<span id="nested_${tipologiaDaVisualizzare.real.id}_limit" class="spandatabind">20</span>
 																<span id="nested_${tipologiaDaVisualizzare.real.id}_pageCurrent" class="spandatabind">0</span>
 																<span id="nested_${tipologiaDaVisualizzare.real.id}_editmode" class="spandatabind">false</span>
 																<span id="nested_${tipologiaDaVisualizzare.real.id}_externalJSP" class="spandatabind">${tipologiaDaVisualizzare.externalJSP}</span>

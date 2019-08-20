@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.jsp.jstl.core.Config;
 
+import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.oltu.oauth2.client.OAuthClient;
@@ -30,6 +31,7 @@ import org.dspace.app.webui.util.Authenticate;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.authenticate.AuthenticationManager;
 import org.dspace.authenticate.AuthenticationMethod;
+import org.dspace.authenticate.StandaloneMethod;
 import org.dspace.authority.orcid.OrcidAccessToken;
 import org.dspace.authority.orcid.OrcidService;
 import org.dspace.authorize.AuthorizeException;
@@ -37,6 +39,8 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
 import org.dspace.core.LogManager;
+import org.dspace.discovery.SearchServiceException;
+import org.dspace.utils.DSpace;
 
 /**
  * Attempt to authenticate the user based upon their ORCID OAuth Permissions.
@@ -76,7 +80,13 @@ public class OAuthAuthenticationServlet extends DSpaceServlet {
 	@Override
 	protected void doDSPost(Context context, HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException, SQLException, AuthorizeException {
-		// TODO Auto-generated method stub
+
+	    String requestStandAlone = request.getParameter("standalone");
+	    boolean standalone = false;
+	    if(StringUtils.isNotBlank(requestStandAlone)) {
+	        standalone = Boolean.parseBoolean(requestStandAlone);
+	    }
+	    
 		try {
 			/*
 			 * Implementing and OAUth Flow Goals: 1. Redirect User to specific
@@ -103,7 +113,7 @@ public class OAuthAuthenticationServlet extends DSpaceServlet {
 								ConfigurationManager.getProperty("authentication-oauth", "application-authorize-url"))
 						.setClientId(ConfigurationManager.getProperty("authentication-oauth", "application-client-id"))
 						.setRedirectURI(
-								ConfigurationManager.getProperty("authentication-oauth", "application-redirect-uri"))
+								ConfigurationManager.getProperty("authentication-oauth", "application-redirect-uri")+"?standalone="+standalone)
 						.setResponseType("code")
 						.setScope(ConfigurationManager.getProperty("authentication-oauth", "application-client-scope"));
 
@@ -176,33 +186,79 @@ public class OAuthAuthenticationServlet extends DSpaceServlet {
 		}
 
 		// Locate the eperson
-		int status = AuthenticationManager.authenticate(context, null, null, null, request);
+        int status = AuthenticationMethod.BAD_ARGS;
+        if(standalone) {
+            StandaloneMethod standaloneMethod = new DSpace()
+                    .getServiceManager()
+                    .getServiceByName("standaloneMethod", StandaloneMethod.class);
+            if (standaloneMethod != null)
+            {
+                try
+                {
+                    status = standaloneMethod.connect(context, null, null, null,
+                            request);
+                }
+                catch (SearchServiceException e)
+                {
+                    throw new ServletException(
+                            "Unable to preform connection to orcid: "
+                                    + e.getMessage(),
+                            e);
+                }
+            }            
+            String jsp = null;
+            String assistanceTicket = RandomStringUtils.randomNumeric(10);
+            request.setAttribute("orcid.standalone.ticket", assistanceTicket);
+            if (status == AuthenticationMethod.SUCCESS) {
+                response.sendRedirect(ConfigurationManager.getProperty("dspace.url") + "/cris/rp/" + context.getCrisID());
+                return;
+            } else if (status == AuthenticationMethod.MULTIPLE_USERS) {
+                log.info(LogManager.getHeader(context, "failed_connect", "type=orcid, multple_users, ticket "+ assistanceTicket));
+                jsp = "/login/orcid-multiple-found.jsp";
+            } else if (status == AuthenticationMethod.NO_SUCH_USER) {
+                log.info(LogManager.getHeader(context, "failed_connect", "type=orcid, no_such_user, ticket "+ assistanceTicket));
+                jsp = "/login/orcid-different-found.jsp";
+            } else if (status == AuthenticationMethod.MULTIPLE_PROFILE) {
+                log.info(LogManager.getHeader(context, "failed_connect", "type=orcid, multiple_profile, ticket "+ assistanceTicket));
+                jsp = "/login/orcid-multiple-profile-found.jsp";
+            } else if (status == AuthenticationMethod.NO_SUCH_PROFILE) {
+                log.info(LogManager.getHeader(context, "failed_connect", "type=orcid, no_such_profile, ticket " + assistanceTicket));
+                jsp = "/login/orcid-different-profile-found.jsp";                
+            } else {            
+                log.info(LogManager.getHeader(context, "failed__connect", "type=orcid, oauth authentication error , ticket " + assistanceTicket));
+                jsp = "/login/orcid-generic-error.jsp";
+            }
+            JSPManager.showJSP(request, response, jsp);
+        }
+        else {
+            status = AuthenticationManager.authenticate(context, null, null, null, request);
+            
+            String jsp = null;
+            if (status == AuthenticationMethod.SUCCESS) {
+                // Logged in OK.
+                Authenticate.loggedIn(context, request, context.getCurrentUser());
 
-		String jsp = null;
-		if (status == AuthenticationMethod.SUCCESS) {
-			// Logged in OK.
-			Authenticate.loggedIn(context, request, context.getCurrentUser());
+                // Set the Locale according to user preferences
+                Locale epersonLocale = I18nUtil.getEPersonLocale(context.getCurrentUser());
+                context.setCurrentLocale(epersonLocale);
+                Config.set(request.getSession(), Config.FMT_LOCALE, epersonLocale);
 
-			// Set the Locale according to user preferences
-			Locale epersonLocale = I18nUtil.getEPersonLocale(context.getCurrentUser());
-			context.setCurrentLocale(epersonLocale);
-			Config.set(request.getSession(), Config.FMT_LOCALE, epersonLocale);
+                log.info(LogManager.getHeader(context, "login", "type=orcid"));
 
-			log.info(LogManager.getHeader(context, "login", "type=orcid"));
+                // resume previous request
+                Authenticate.resumeInterruptedRequest(request, response);
 
-			// resume previous request
-			Authenticate.resumeInterruptedRequest(request, response);
-
-			return;
-		} else if (status == AuthenticationMethod.CERT_REQUIRED) {
-			jsp = "/error/require-certificate.jsp";
-		} else if (status == AuthenticationMethod.NO_SUCH_USER) {
-			log.info(LogManager.getHeader(context, "failed_login", "type=orcid, no_such_user"));
-			jsp = "/login/orcid-not-in-records.jsp";
-		} else {
-			log.info(LogManager.getHeader(context, "failed_login", "type=orcid, oauth authentication error"));
-			jsp = "/login/orcid-incorrect.jsp";
-		}
-		JSPManager.showJSP(request, response, jsp);
+                return;
+            } else if (status == AuthenticationMethod.CERT_REQUIRED) {
+                jsp = "/error/require-certificate.jsp";
+            } else if (status == AuthenticationMethod.NO_SUCH_USER) {
+                log.info(LogManager.getHeader(context, "failed_login", "type=orcid, no_such_user"));
+                jsp = "/login/orcid-not-in-records.jsp";
+            } else {
+                log.info(LogManager.getHeader(context, "failed_login", "type=orcid, oauth authentication error"));
+                jsp = "/login/orcid-incorrect.jsp";
+            }
+            JSPManager.showJSP(request, response, jsp);
+        }
 	}
 }
