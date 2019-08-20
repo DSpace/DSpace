@@ -2,8 +2,8 @@ package org.dspace.app.rest.model;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.dspace.content.Bitstream;
-import org.dspace.content.Item;
 
 /**
  * The Bundle REST Resource
@@ -15,9 +15,14 @@ public class BundleRest extends DSpaceObjectRest {
     public static final String NAME = "bundle";
     public static final String CATEGORY = RestAddressableModel.CORE;
 
-    private Bitstream primaryBitstream;
-    private List<Bitstream> bitstreams;
-    private List<Item> items;
+    private BitstreamRest primaryBitstream;
+    private List<BitstreamRest> bitstreams;
+
+    @Override
+    @JsonIgnore
+    public String getId() {
+        return super.getId();
+    }
 
     public String getCategory() {
         return CATEGORY;
@@ -27,28 +32,25 @@ public class BundleRest extends DSpaceObjectRest {
         return NAME;
     }
 
-    public Bitstream getPrimaryBitstream() {
+
+    @JsonIgnore
+    @LinkRest(linkClass = Bitstream.class)
+    public BitstreamRest getPrimaryBitstream() {
         return primaryBitstream;
     }
 
-    public void setPrimaryBitstream(Bitstream primaryBitstream) {
+    public void setPrimaryBitstream(BitstreamRest primaryBitstream) {
         this.primaryBitstream = primaryBitstream;
     }
 
-    public List<Bitstream> getBitstreams() {
+    @LinkRest(linkClass = Bitstream.class)
+    @JsonIgnore
+    public List<BitstreamRest> getBitstreams() {
         return bitstreams;
     }
 
-    public void setBitstreams(List<Bitstream> bitstreams) {
+    public void setBitstreams(List<BitstreamRest> bitstreams) {
         this.bitstreams = bitstreams;
-    }
-
-    public List<Item> getItems() {
-        return items;
-    }
-
-    public void setItems(List<Item> items) {
-        this.items = items;
     }
 
 }
