@@ -8,18 +8,15 @@
 package org.dspace.app.rest.converter;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.logging.log4j.Logger;
-import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.RelationshipRest;
 import org.dspace.app.rest.utils.ContextUtil;
-import org.dspace.content.Bitstream;
-import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
@@ -47,7 +44,7 @@ public class ItemConverter
     @Autowired(required = true)
     private CollectionConverter collectionConverter;
     @Autowired(required = true)
-    private BitstreamConverter bitstreamConverter;
+    private BundleConverter bundleConverter;
     @Autowired
     private RequestService requestService;
     @Autowired
@@ -84,14 +81,12 @@ public class ItemConverter
         } catch (Exception e) {
             log.error("Error setting template item of for item " + item.getHandle(), e);
         }
-        List<BitstreamRest> bitstreams = new ArrayList<BitstreamRest>();
-        for (Bundle bun : obj.getBundles()) {
-            for (Bitstream bit : bun.getBitstreams()) {
-                BitstreamRest bitrest = bitstreamConverter.fromModel(bit);
-                bitstreams.add(bitrest);
-            }
-        }
-        item.setBitstreams(bitstreams);
+
+        item.setBundles(obj.getBundles()
+                            .stream()
+                            .map(x -> bundleConverter.fromModel(x))
+                            .collect(Collectors.toList()));
+
         List<Relationship> relationships = new LinkedList<>();
         try {
             Context context;
