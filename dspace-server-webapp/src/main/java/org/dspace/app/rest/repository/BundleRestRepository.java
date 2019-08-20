@@ -52,7 +52,7 @@ public class BundleRestRepository extends DSpaceObjectRestRepository<Bundle, Bun
     }
 
     public Class<BundleRest> getDomainClass() {
-        return null;
+        return BundleRest.class;
     }
 
     public DSpaceResource<BundleRest> wrapResource(BundleRest model, String... rels) {
