@@ -44,7 +44,7 @@ dspace.baseUrl = http://localhost:8080
 
 # This is the URL that will be used for the REST endpoints to be served on.
 # This will typically be followed by /api to determine the root endpoints.
-dspace.restUrl = ${dspace.baseUrl}/spring-rest
+dspace.restUrl = ${dspace.baseUrl}/server
 
 # Name of the site
 dspace.name = DSpace at My University
@@ -61,7 +61,10 @@ dspace.name = DSpace at My University
 # The included 'solr' webapp MUST be deployed to Tomcat for DSpace to function.
 # Usually it will be available via port 8080 and the 'solr' context path. But,
 # But, you may need to modify this if you are running DSpace on a custom port, etc.
-solr.server = http://localhost:8080/solr
+solr.server = http://localhost:8983/solr
+
+# Multicore SOLR prefix (keep empty if you run SOLR for just one DSpace-CRIS installation)
+solr.multicorePrefix =
 
 ##########################
 # DATABASE CONFIGURATION #
