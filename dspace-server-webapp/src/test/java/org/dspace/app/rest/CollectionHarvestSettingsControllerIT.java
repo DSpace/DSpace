@@ -17,16 +17,22 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
 import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
+import org.dspace.app.rest.builder.EPersonBuilder;
 import org.dspace.app.rest.matcher.MetadataConfigsMatcher;
 import org.dspace.app.rest.model.HarvestTypeEnum;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.core.Constants;
+import org.dspace.eperson.EPerson;
 import org.dspace.harvest.HarvestedCollection;
 import org.dspace.harvest.OAIHarvester;
 import org.dspace.harvest.service.HarvestedCollectionService;
@@ -43,14 +49,18 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class CollectionHarvestSettingsControllerIT extends AbstractControllerIntegrationTest {
 
-    Collection collection;
-    Collection collectionNoHarvestSettings;
+    @Autowired
+    AuthorizeService authorizeService;
 
     @Autowired
     HarvestedCollectionService harvestedCollectionService;
 
+    Collection collection;
+    Collection collectionNoHarvestSettings;
+    EPerson ePersonWithWriteRights;
+
     @Before
-    public void SetUp() {
+    public void SetUp() throws SQLException, AuthorizeException {
         context.turnOffAuthorisationSystem();
 
         parentCommunity = CommunityBuilder.createCommunity(context)
@@ -59,10 +69,21 @@ public class CollectionHarvestSettingsControllerIT extends AbstractControllerInt
         Community community = CommunityBuilder.createSubCommunity(context, parentCommunity)
             .withName("Sub Community")
             .build();
-        collection = CollectionBuilder.createCollection(context, community).withName("Collection 1").build();
+
+        collection = CollectionBuilder.createCollection(context, community)
+                                        .withName("Collection 1")
+                                        .build();
+
         collectionNoHarvestSettings = CollectionBuilder.createCollection(context, community)
                                                         .withName("Collection 2")
                                                         .build();
+
+        ePersonWithWriteRights = EPersonBuilder.createEPerson(context)
+            .withEmail("email@email.com")
+            .withPassword(password)
+            .build();
+
+        authorizeService.addPolicy(context, collection, Constants.WRITE, ePersonWithWriteRights);
 
         context.restoreAuthSystemState();
     }
@@ -129,6 +150,19 @@ public class CollectionHarvestSettingsControllerIT extends AbstractControllerInt
             put("/api/core/collections/" + collection.getID() + "/harvester")
                 .contentType("application/json"))
             .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void GetCollectionHarvestSettingsIfUserHasWriteRights() throws Exception {
+        context.setCurrentUser(ePersonWithWriteRights);
+        String token = getAuthToken(ePersonWithWriteRights.getEmail(), password);
+        JSONObject json = createHarvestSettingsJson("METADATA_ONLY", "https://dspace.org/oai/request", "col_1721.1_114174", "dc");
+
+        getClient(token).perform(
+            put("/api/core/collections/" + collection.getID() + "/harvester")
+                .contentType("application/json")
+                .content(json.toString()))
+            .andExpect(status().isOk());
     }
 
     @Test
