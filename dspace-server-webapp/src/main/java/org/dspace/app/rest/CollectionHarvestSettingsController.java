@@ -7,21 +7,15 @@
  */
 package org.dspace.app.rest;
 
-import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.dspace.app.rest.exception.UnprocessableEntityException;
+import org.dspace.app.rest.converter.HarvestedCollectionConverter;
 import org.dspace.app.rest.link.HalLinkService;
-import org.dspace.app.rest.model.HarvestTypeEnum;
 import org.dspace.app.rest.model.HarvestedCollectionRest;
 import org.dspace.app.rest.model.hateoas.HarvestedCollectionResource;
 import org.dspace.app.rest.repository.HarvestedCollectionRestRepository;
@@ -51,6 +45,9 @@ import org.springframework.web.bind.annotation.RestController;
     "{collectionUuid:[0-9a-fxA-FX]{8}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{12" +
     "}}/harvester")
 public class CollectionHarvestSettingsController {
+
+    @Autowired
+    HarvestedCollectionConverter harvestedCollectionConverter;
 
     @Autowired
     CollectionService collectionService;
@@ -94,7 +91,6 @@ public class CollectionHarvestSettingsController {
         return resource;
     }
 
-
     /**
      * PUT Endpoint for updating the settings of a collection.
      *
@@ -103,117 +99,33 @@ public class CollectionHarvestSettingsController {
      * @param request           The request object
      * @throws SQLException
      */
+    @PreAuthorize("hasPermission(#collectionUuid, 'COLLECTION', 'WRITE')")
     @RequestMapping(method = RequestMethod.PUT, consumes = {"application/json"})
-    @PreAuthorize("hasAuthority('ADMIN')")
-    public void updateHarvestSettingsEndpoint(@PathVariable UUID collectionUuid,
+    public HarvestedCollectionResource updateHarvestSettingsEndpoint(@PathVariable UUID collectionUuid,
                                               HttpServletResponse response,
                                               HttpServletRequest request) throws SQLException {
 
         Context context = ContextUtil.obtainContext(request);
         Collection collection = collectionService.find(context, collectionUuid);
+        HarvestedCollectionResource harvestedCollectionResource = null;
 
         if (collection == null) {
             throw new ResourceNotFoundException("Collection with uuid: " + collectionUuid + " not found");
         }
 
-        // Parse json into HarvestCollectionRest
-        ObjectMapper mapper = new ObjectMapper();
-        HarvestedCollectionRest harvestedCollectionRest;
+        HarvestedCollection harvestedCollection =
+            harvestedCollectionRestRepository.update(context, request, collection);
 
-        try {
-            ServletInputStream input = request.getInputStream();
-            harvestedCollectionRest = mapper.readValue(input, HarvestedCollectionRest.class);
-        } catch (IOException e) {
-            throw new UnprocessableEntityException("Error parsing request body: " + e.toString(), e);
+        // Return a harvestedCollectionResource only if a new harvestedCollection was created
+        if (harvestedCollection != null) {
+            List<Map<String,String>> configs = OAIHarvester.getAvailableMetadataFormats();
+            HarvestedCollectionRest harvestedCollectionRest =
+                harvestedCollectionConverter.fromModel(harvestedCollection, collection, configs);
+            harvestedCollectionResource = new HarvestedCollectionResource(harvestedCollectionRest);
         }
 
-        HarvestedCollection harvestedCollection = harvestedCollectionService.find(context, collection);
+        context.commit();
 
-        // Delete harvestedCollectionService object if harvest type is not set
-        if (harvestedCollectionRest.getHarvestType() == HarvestTypeEnum.NONE.getValue()
-            && harvestedCollection != null) {
-            harvestedCollectionService.delete(context, harvestedCollection);
-
-        } else if (harvestedCollectionRest.getHarvestType() != HarvestTypeEnum.NONE.getValue()) {
-            List<String> errors = testHarvestSettings(harvestedCollectionRest);
-
-            if (errors.size() == 0) {
-                if (harvestedCollection == null) {
-                    harvestedCollection = harvestedCollectionService.create(context, collection);
-                }
-
-                updateCollectionHarvestSettings(context, harvestedCollection, harvestedCollectionRest);
-            } else {
-                throw new UnprocessableEntityException(
-                    "Incorrect harvest settings in request. The following errors were found: " + errors.toString()
-                );
-            }
-        }
-
-        context.complete();
-    }
-
-    /**
-     * Function used to verify that the harvest settings work
-     * @param collection                 The collection to which the harvest settings should be aplied
-     * @param harvestedCollectionRest    A object containg the harvest settings to be tested
-     * @return
-     */
-    private List<String> testHarvestSettings(HarvestedCollectionRest harvestedCollectionRest) {
-
-        int harvestType = harvestedCollectionRest.getHarvestType();
-        String metadataConfigId = harvestedCollectionRest.getMetadataConfigId();
-
-        List<String> errors = new ArrayList<>();
-
-        // See if metadata config identifier appears in available metadata formats
-        List<Map<String,String>> metadataFormats = OAIHarvester.getAvailableMetadataFormats();
-        boolean inAvailableMetadataFormats = metadataFormats.stream()
-                                                            .filter(x -> x.get("id").equals(metadataConfigId))
-                                                            .count() >= 1;
-
-        if (inAvailableMetadataFormats) {
-            boolean testORE = Arrays.asList(
-                HarvestTypeEnum.METADATA_AND_REF.getValue(),
-                HarvestTypeEnum.METADATA_AND_BITSTREAMS.getValue()
-            ).contains(harvestType);
-
-            // Actually verify the harvest settings
-            List<String> verificationErrors = harvestedCollectionService.verifyOAIharvester(
-                harvestedCollectionRest.getOaiSource(),
-                harvestedCollectionRest.getOaiSetId(),
-                metadataConfigId,
-                testORE
-            );
-            errors = verificationErrors;
-        } else {
-            errors.add(
-                "The metadata format with identifier '" + metadataConfigId + "' is not an available metadata format."
-            );
-        }
-
-        return errors;
-    }
-
-    /**
-     * Function to update the harvest settings of a collection
-     * @param context                    The context object
-     * @param harvestedCollection        The harvestedCollection whose settings should be updated
-     * @param harvestedCollectionRest    An object containing the new harvest settings
-     * @throws SQLException
-     */
-    private void updateCollectionHarvestSettings(Context context, HarvestedCollection harvestedCollection,
-                                                HarvestedCollectionRest harvestedCollectionRest) throws SQLException {
-        int harvestType = harvestedCollectionRest.getHarvestType();
-        String oaiSource = harvestedCollectionRest.getOaiSource();
-        String oaiSetId = harvestedCollectionRest.getOaiSetId();
-        String metadataConfigId = harvestedCollectionRest.getMetadataConfigId();
-
-        harvestedCollection.setHarvestType(harvestType);
-        harvestedCollection.setOaiSource(oaiSource);
-        harvestedCollection.setOaiSetId(oaiSetId);
-        harvestedCollection.setHarvestMetadataConfig(metadataConfigId);
-
-        harvestedCollectionService.update(context, harvestedCollection);
+        return harvestedCollectionResource;
     }
 }
