@@ -27,7 +27,6 @@ import org.dspace.content.service.CollectionService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
@@ -80,7 +79,8 @@ public class AuthorityEntryLinkRepository extends AbstractDSpaceRestRepository
                 results.add(authorityUtils.convertEntry(value, name));
             }
         }
-        return new PageImpl<AuthorityEntryRest>(results, pageable, results.size());
+
+        return utils.getPage(results, pageable);
     }
 
 }
