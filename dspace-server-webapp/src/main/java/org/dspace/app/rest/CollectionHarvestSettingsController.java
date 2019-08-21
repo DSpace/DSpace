@@ -70,7 +70,7 @@ public class CollectionHarvestSettingsController {
      * @param response  The response object
      * @return a HarvesterMetadataResource containing all available metadata formats
      */
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasPermission(#collectionUuid, 'COLLECTION', 'READ')")
     @RequestMapping(method = RequestMethod.GET)
     public HarvestedCollectionResource get(@PathVariable UUID collectionUuid,
                                            HttpServletRequest request,
@@ -122,6 +122,7 @@ public class CollectionHarvestSettingsController {
             HarvestedCollectionRest harvestedCollectionRest =
                 harvestedCollectionConverter.fromModel(harvestedCollection, collection, configs);
             harvestedCollectionResource = new HarvestedCollectionResource(harvestedCollectionRest);
+            halLinkService.addLinks(harvestedCollectionResource);
         }
 
         context.commit();
