@@ -153,7 +153,7 @@ public class CollectionHarvestSettingsControllerIT extends AbstractControllerInt
     }
 
     @Test
-    public void GetCollectionHarvestSettingsIfUserHasWriteRights() throws Exception {
+    public void GetAndPutCollectionHarvestSettingsIfUserHasWriteRights() throws Exception {
         context.setCurrentUser(ePersonWithWriteRights);
         String token = getAuthToken(ePersonWithWriteRights.getEmail(), password);
         JSONObject json = createHarvestSettingsJson("METADATA_ONLY", "https://dspace.org/oai/request", "col_1721.1_114174", "dc");
@@ -162,6 +162,11 @@ public class CollectionHarvestSettingsControllerIT extends AbstractControllerInt
             put("/api/core/collections/" + collection.getID() + "/harvester")
                 .contentType("application/json")
                 .content(json.toString()))
+            .andExpect(status().isOk());
+
+        getClient(token).perform(
+            get("/api/core/collections/" + collection.getID() + "/harvester")
+                .contentType("application/json"))
             .andExpect(status().isOk());
     }
 
