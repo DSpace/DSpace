@@ -36,6 +36,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamFormatService;
+import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.MetadataSchemaService;
 import org.dspace.core.Constants;
@@ -68,6 +69,8 @@ public class ItemTest extends AbstractDSpaceObjectTest {
     private BitstreamFormatService bitstreamFormatService = ContentServiceFactory.getInstance()
                                                                                  .getBitstreamFormatService();
     private MetadataFieldService metadataFieldService = ContentServiceFactory.getInstance().getMetadataFieldService();
+
+    private CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
 
     private Collection collection;
     private Community owningCommunity;
@@ -1961,6 +1964,82 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         assertThat("testFindByAuthorityValue 3", result, notNullValue());
         assertTrue("testFindByAuthorityValue 4", result.hasNext());
         assertThat("testFindByAuthorityValue 5", result.next(), equalTo(it));
+    }
+
+    /**
+     * Test of countByCollectionMapping method, of ItemService
+     */
+    @Test
+    public void testFindByCollectionMapping() throws Exception {
+        int limit = 5;
+        int offset = 0;
+        context.turnOffAuthorisationSystem();
+        Collection colToMapTo = this.createCollection();
+        Item item1 = this.createItem();
+
+        Iterator<Item> result = itemService.findByCollectionMapping(context, colToMapTo, limit, offset);
+        assertThat("testFindByCollectionMapping 0", result, notNullValue());
+        assertFalse("testFindByCollectionMapping 1", result.hasNext());
+
+        //map item1 to colToMapTO
+        collectionService.addItem(context, colToMapTo, item1);
+        collectionService.update(context, colToMapTo);
+        context.restoreAuthSystemState();
+
+        result = itemService.findByCollectionMapping(context, colToMapTo, limit, offset);
+        assertThat("testFindByCollectionMapping 3", result, notNullValue());
+        assertTrue("testFindByCollectionMapping 4", result.hasNext());
+        assertThat("testFindByCollectionMapping 5", result.next(), equalTo(item1));
+
+        //Pagination tests
+        //map item2 to colToMapTO
+        context.turnOffAuthorisationSystem();
+        Item item2 = this.createItem();
+        collectionService.addItem(context, colToMapTo, item2);
+        context.restoreAuthSystemState();
+
+        limit = 5;
+        offset = 1;
+        result = itemService.findByCollectionMapping(context, colToMapTo, limit, offset);
+        Item secondItemMapped = result.next();
+        assertTrue("testFindByCollectionMapping 7", secondItemMapped.equals(item1) || secondItemMapped.equals(item2));
+        assertFalse("testFindByCollectionMapping 8", result.hasNext());
+        limit = 1;
+        offset = 0;
+        result = itemService.findByCollectionMapping(context, colToMapTo, limit, offset);
+        Item onlyItemFound = result.next();
+        assertTrue("testFindByCollectionMapping 9", onlyItemFound .equals(item1) || onlyItemFound .equals(item2));
+        assertFalse("testFindByCollectionMapping 10", result.hasNext());
+        limit = 5;
+        offset = 3;
+        result = itemService.findByCollectionMapping(context, colToMapTo, limit, offset);
+        assertFalse("testFindByCollectionMapping 11", result.hasNext());
+
+    }
+
+    /**
+     * Test of countByCollectionMapping method, of ItemService
+     */
+    @Test
+    public void testCountByCollectionMapping() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Collection colToMapTo = this.createCollection();
+        Item item1 = this.createItem();
+        Item item2 = this.createItem();
+
+        int result = itemService.countByCollectionMapping(context, colToMapTo);
+        assertThat("testFindByCollectionMapping 0", result, notNullValue());
+        assertTrue("testFindByCollectionMapping 1", result == 0);
+
+        //map items to colToMapTO
+        collectionService.addItem(context, colToMapTo, item1);
+        collectionService.addItem(context, colToMapTo, item2);
+        collectionService.update(context, colToMapTo);
+        context.restoreAuthSystemState();
+
+        result = itemService.countByCollectionMapping(context, colToMapTo);
+        assertThat("testFindByCollectionMapping 3", result, notNullValue());
+        assertTrue("testFindByCollectionMapping 1", result == 2);
     }
 
     protected Collection createCollection() throws SQLException, AuthorizeException {
