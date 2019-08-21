@@ -70,7 +70,7 @@ public class CollectionHarvestSettingsController {
      * @param response  The response object
      * @return a HarvesterMetadataResource containing all available metadata formats
      */
-    @PreAuthorize("hasPermission(#collectionUuid, 'COLLECTION', 'READ')")
+    @PreAuthorize("hasPermission(#collectionUuid, 'COLLECTION', 'WRITE')")
     @RequestMapping(method = RequestMethod.GET)
     public HarvestedCollectionResource get(@PathVariable UUID collectionUuid,
                                            HttpServletRequest request,
