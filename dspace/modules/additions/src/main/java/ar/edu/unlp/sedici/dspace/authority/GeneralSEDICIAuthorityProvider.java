@@ -51,6 +51,7 @@ public abstract class GeneralSEDICIAuthorityProvider extends SPARQLAuthorityProv
 		pqs.append("WHERE {\n");
 		pqs.append("?concept a "+ typeProperty + " .\n");
 		pqs.append("?concept "+ labelProperty +" ?label .\n");
+		this.getWhereQueryFields(pqs);
 		if (externalKey != null) {
 			pqs.append("?concept "+ externalKey +" ?externalKey .\n");			
 		}
@@ -82,6 +83,10 @@ public abstract class GeneralSEDICIAuthorityProvider extends SPARQLAuthorityProv
 		}
 
 		return pqs;
+	}
+
+	protected void getWhereQueryFields(ParameterizedSparqlString pqs) {
+		
 	}
 
 	protected void getIdSearchFilterQuery(ParameterizedSparqlString pqs, String filter) {
