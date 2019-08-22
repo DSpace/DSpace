@@ -28,6 +28,7 @@ public class BitstreamRest extends DSpaceObjectRest {
     private BitstreamFormatRest format;
     private Long sizeBytes;
     private CheckSumRest checkSum;
+    @JsonProperty(access = Access.READ_ONLY)
     private Integer sequenceId;
 
     public String getBundleName() {
@@ -76,6 +77,7 @@ public class BitstreamRest extends DSpaceObjectRest {
     }
 
     @Override
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     public String getType() {
         return NAME;
     }
