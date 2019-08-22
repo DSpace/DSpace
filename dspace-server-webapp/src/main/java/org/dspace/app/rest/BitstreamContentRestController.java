@@ -7,6 +7,8 @@
  */
 package org.dspace.app.rest;
 
+import static org.dspace.app.rest.utils.RegexUtils.REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
@@ -54,7 +56,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/api/" + BitstreamRest.CATEGORY + "/" + BitstreamRest.PLURAL_NAME
-    + "/{uuid:[0-9a-fxA-FX]{8}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{12}}/content")
+    + REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID + "/content")
 public class BitstreamContentRestController {
 
     private static final Logger log = org.apache.logging.log4j.LogManager
