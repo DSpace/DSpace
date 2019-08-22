@@ -87,6 +87,10 @@
         </dependency>
         <dependency>
             <groupId>org.dspace</groupId>
+            <artifactId>essuir</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.dspace</groupId>
             <artifactId>dspace-api-lang</artifactId>
         </dependency>
         <dependency>
