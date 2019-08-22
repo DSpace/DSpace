@@ -41,7 +41,7 @@
 
     Boolean communityAdmin = (Boolean)request.getAttribute("is.communityAdmin");
     boolean isCommunityAdmin = (communityAdmin == null ? false : communityAdmin.booleanValue());
-    
+
     Boolean collectionAdmin = (Boolean)request.getAttribute("is.collectionAdmin");
     boolean isCollectionAdmin = (collectionAdmin == null ? false : collectionAdmin.booleanValue());
 
@@ -175,10 +175,10 @@
                 %>
 			   <li class="divider"></li>
                            <% if (isAdmin) {%>
-                    
+
                                 <li><a href="<%= request.getContextPath()%>/dspace-admin">
                            <% } else if (isCommunityAdmin || isCollectionAdmin) {%>
-                        
+
                                 <li><a href="<%= request.getContextPath()%>/tools">
                 <% } %>
                 <fmt:message key="jsp.administer"/></a></li>

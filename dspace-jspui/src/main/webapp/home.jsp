@@ -73,9 +73,17 @@
 
 <dspace:layout locbar="nolink" titlekey="jsp.home.title" feedData="<%= feedData %>">
 
-	<div class="jumbotron">
-        <%= topNews %>
-	</div>
+	<table width="100%" style="margin-bottom:20px">
+		<tr>
+			<td class="jumbotron" width="75%">
+			<%= topNews %>
+		</td>
+		<td width="20px"/><td valign="top" class="jumbotron">
+			<p align="center" style="margin-bottom:22px"><a href="http://sumdu.edu.ua"><img src="/image/sumdu-logo-tr.gif" style="margin-top: 38px;"></a></p>
+			<%= sideNews %>
+		</td></tr>
+	</table>
+
 
 <div class="row">
 <%
@@ -164,9 +172,6 @@ if (submissions != null && submissions.count() > 0)
 <%
 }
 %>
-<div class="col-md-4">
-    <%= sideNews %>
-</div>
 </div>
 <div class="container row">
 <%

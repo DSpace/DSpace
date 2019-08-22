@@ -23,9 +23,39 @@
   --%>
 
 <%@ page contentType="text/html;charset=UTF-8" %>
-  
+
+<%@ page import="org.dspace.core.I18nUtil" %>
 <%@ page import="java.util.List" %>
+<%@ page import="java.util.Locale" %>
+
+
+<%
+    Locale[] supportedLocales = I18nUtil.getSupportedLocales();
+    if (supportedLocales != null && supportedLocales.length > 1)
+    {
+%>
 <ol class="breadcrumb btn-success">
+    <div style="position:absolute;right:30px;">
+        <form method="get" name="repost" action="">
+            <input type ="hidden" name ="locale"/>
+        </form>
+        <%
+            for (int i = supportedLocales.length-1; i >= 0; i--)
+            {
+        %>
+        <a href="#" class ="langChangeOn"
+           onclick="javascript:document.repost.locale.value='<%=supportedLocales[i].toString()%>';
+                   document.repost.submit();">
+            <img width="20px" height="14px" src="/flags/<%=supportedLocales[i].toString()%>.gif" alt="<%= supportedLocales[i].getDisplayLanguage(supportedLocales[i])%>"/>
+        </a>
+        <%
+            }
+        %>
+    </div>
+        <%
+    }
+%>
+
 <%
     List parentTitles = (List) request.getAttribute("dspace.layout.parenttitles");
     List parentLinks = (List) request.getAttribute("dspace.layout.parentlinks");
@@ -41,7 +71,7 @@
             {
 %>
 <li class="active"><%= s %></li>
-<%           
+<%
             }
             else
             {

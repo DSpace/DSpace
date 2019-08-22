@@ -134,7 +134,7 @@
     if (locbar)
     {
 %>
-<div class="container">
+<div class="container" style = "position:relative;">
                 <dspace:include page="/layout/location-bar.jsp" />
 </div>                
 <%

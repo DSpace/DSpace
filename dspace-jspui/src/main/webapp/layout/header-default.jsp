@@ -86,8 +86,8 @@
         <script type="text/javascript" src="<%= request.getContextPath() %>/utils.js"></script>
         <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/choice-support.js"> </script>
         <dspace:include page="/layout/google-analytics-snippet.jsp" />
-
     <%
+
     if (extraHeadDataLast != null)
     { %>
         <%= extraHeadDataLast %>
@@ -129,23 +129,23 @@
 </header>
 
 <main id="content" role="main">
-<div class="container banner">
-    <div class="row">
-        <div class="col-md-9 brand">
-            <h1><fmt:message key="jsp.layout.header-default.brand.heading" /></h1>
-            <fmt:message key="jsp.layout.header-default.brand.description" /> 
-        </div>
-        <div class="col-md-3"><img class="pull-right" src="<%= request.getContextPath() %>/image/logo.gif" alt="DSpace logo" />
-        </div>
-    </div>
-</div>
+<%--<div class="container banner">--%>
+	<%--<div class="row">--%>
+		<%--<div class="col-md-9 brand">--%>
+		<%--<h1><fmt:message key="jsp.layout.header-default.brand.heading" /></h1>--%>
+        <%--<fmt:message key="jsp.layout.header-default.brand.description" /> --%>
+        <%--</div>--%>
+        <%--<div class="col-md-3"><img class="pull-right" src="<%= request.getContextPath() %>/image/logo.gif" alt="DSpace logo" />--%>
+        <%--</div>--%>
+	<%--</div>--%>
+<%--</div>	--%>
 <br/>
                 <%-- Location bar --%>
 <%
     if (locbar)
     {
 %>
-<div class="container">
+<div class="container" style = "position:relative;">
     <dspace:include page="/layout/location-bar.jsp" />
 </div>                
 <%
@@ -158,4 +158,4 @@
 <% if (request.getAttribute("dspace.layout.sidebar") != null) { %>
     <div class="row">
     <div class="col-md-9">
-<% } %>	
+<% } %>
