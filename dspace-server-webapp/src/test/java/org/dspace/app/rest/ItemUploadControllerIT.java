@@ -76,7 +76,6 @@ public class ItemUploadControllerIT extends AbstractEntityIntegrationTest {
         BitstreamRest bitstreamRest = new BitstreamRest();
         bitstreamRest.setBundleName("TESTINGBUNDLE");
         bitstreamRest.setName("testing");
-        bitstreamRest.setSequenceId(123456);
 
         MetadataRest metadataRest = new MetadataRest();
 
@@ -108,7 +107,6 @@ public class ItemUploadControllerIT extends AbstractEntityIntegrationTest {
                                               .andExpect(status().isOk())
                                               .andExpect(jsonPath("$.name", is("testing")))
                                               .andExpect(jsonPath("$.bundleName", is("TESTINGBUNDLE")))
-                                              .andExpect(jsonPath("$.sequenceId", is(Integer.parseInt("123456"))))
                                               .andExpect(jsonPath("$", Matchers.allOf(
                                                   hasJsonPath("$.metadata", Matchers.allOf(
                                                       MetadataMatcher.matchMetadata("dc.description",
@@ -445,93 +443,6 @@ public class ItemUploadControllerIT extends AbstractEntityIntegrationTest {
         getClient(token).perform(get("/api/core/items/" + item.getID() + "/bitstreams"))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("_embedded.bitstreams").doesNotExist());
-    }
-
-
-    @Test
-    public void uploadBitstreamSameSequenceIdTwiceUnprocessableEntityException() throws Exception {
-        context.turnOffAuthorisationSystem();
-
-
-        parentCommunity = CommunityBuilder.createCommunity(context)
-                                          .withName("Parent Community")
-                                          .build();
-        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
-                                           .withName("Sub Community")
-                                           .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
-        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
-        Collection col3 = CollectionBuilder.createCollection(context, child1).withName("OrgUnits").build();
-
-        Item item = ItemBuilder.createItem(context, col1)
-                               .withTitle("Author1")
-                               .withIssueDate("2017-10-17")
-                               .withAuthor("Smith, Donald")
-                               .build();
-
-        String token = getAuthToken(admin.getEmail(), password);
-        String input = "Hello, World!";
-
-        MockMultipartFile file = new MockMultipartFile("file", "hello.txt", MediaType.TEXT_PLAIN_VALUE,
-                                                       input.getBytes());
-
-        BitstreamRest bitstreamRest = new BitstreamRest();
-        bitstreamRest.setBundleName("ORIGINAL");
-        bitstreamRest.setName("testing");
-        bitstreamRest.setSequenceId(123456);
-
-        MetadataRest metadataRest = new MetadataRest();
-
-        MetadataValueRest description = new MetadataValueRest();
-        description.setValue("description");
-        metadataRest.put("dc.description", description);
-
-        MetadataValueRest contents = new MetadataValueRest();
-        contents.setValue("News");
-        metadataRest.put("dc.description.tableofcontents", contents);
-
-        MetadataValueRest copyright = new MetadataValueRest();
-        copyright.setValue("Custom Copyright Text");
-        metadataRest.put("dc.rights", copyright);
-
-        MetadataValueRest title = new MetadataValueRest();
-        title.setValue("Title Text");
-        metadataRest.put("dc.title", title);
-
-        bitstreamRest.setMetadata(metadataRest);
-        ObjectMapper mapper = new ObjectMapper();
-
-        context.restoreAuthSystemState();
-        getClient(token).perform(MockMvcRequestBuilders.fileUpload("/api/core/items/" + item.getID() + "/bitstreams")
-                                                       .file(file)
-                                                       .param("properties", mapper
-                                                           .writeValueAsString(bitstreamRest)))
-                        .andExpect(status().isOk())
-                        .andExpect(jsonPath("$.name", is("testing")))
-                        .andExpect(jsonPath("$.bundleName", is("ORIGINAL")))
-                        .andExpect(jsonPath("$.sequenceId", is(Integer.parseInt("123456"))))
-                        .andExpect(jsonPath("$", Matchers.allOf(
-                            hasJsonPath("$.metadata", Matchers.allOf(
-                                MetadataMatcher.matchMetadata("dc.description",
-                                                              "description"),
-                                MetadataMatcher.matchMetadata("dc.description.tableofcontents",
-                                                              "News"),
-                                MetadataMatcher.matchMetadata("dc.rights",
-                                                              "Custom Copyright Text"),
-                                MetadataMatcher.matchMetadata("dc.title",
-                                                              "testing")
-                            )))));
-
-        getClient(token).perform(MockMvcRequestBuilders.fileUpload("/api/core/items/" + item.getID() + "/bitstreams")
-                                                       .file(file)
-                                                       .param("properties", mapper
-                                                           .writeValueAsString(bitstreamRest)))
-                        .andExpect(status().isUnprocessableEntity());
-
-        getClient(token).perform(get("/api/core/items/" + item.getID() + "/bitstreams"))
-                        .andExpect(status().isOk())
-                        .andExpect(jsonPath("$.page.totalElements", is(1)));
-
     }
 
 }

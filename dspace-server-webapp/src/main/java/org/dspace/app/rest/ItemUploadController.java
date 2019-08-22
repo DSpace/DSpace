@@ -148,14 +148,6 @@ public class ItemUploadController {
             } else {
                 bitstream.setName(context, originalFilename);
             }
-            Integer sequenceId = bitstreamRest.getSequenceId();
-            if (sequenceId != null) {
-                try {
-                    bitstreamService.setSequenceId(context, bitstream, item, sequenceId);
-                } catch (IllegalArgumentException e) {
-                    throw new UnprocessableEntityException(e.getMessage(), e);
-                }
-            }
 
         } else {
             bitstream = itemService.createSingleBitstream(context, fileInputStream, item);

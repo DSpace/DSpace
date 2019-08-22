@@ -223,6 +223,4 @@ public interface BitstreamService extends DSpaceObjectService<Bitstream>, DSpace
     List<Bitstream> getNotReferencedBitstreams(Context context) throws SQLException;
 
     public Long getLastModified(Bitstream bitstream);
-
-    public void setSequenceId(Context context, Bitstream bitstream, Item item, Integer sequenceId);
 }
