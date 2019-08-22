@@ -7,6 +7,9 @@
  */
 package org.dspace.app.rest;
 
+import static org.dspace.app.rest.utils.RegexUtils.REGEX_REQUESTMAPPING_IDENTIFIER_AS_DIGIT;
+import static org.dspace.app.rest.utils.RegexUtils.REGEX_REQUESTMAPPING_IDENTIFIER_AS_STRING_VERSION_STRONG;
+import static org.dspace.app.rest.utils.RegexUtils.REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
@@ -92,24 +95,6 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/api/{apiCategory}/{model}")
 @SuppressWarnings("rawtypes")
 public class RestResourceController implements InitializingBean {
-
-    /**
-     * Regular expression in the request mapping to accept UUID as identifier
-     */
-    private static final String REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID =
-        "/{uuid:[0-9a-fxA-FX]{8}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{12}}";
-
-    /**
-     * Regular expression in the request mapping to accept a string as identifier but not the other kind of
-     * identifier (digits or uuid)
-     */
-    private static final String REGEX_REQUESTMAPPING_IDENTIFIER_AS_STRING_VERSION_STRONG = "/{id:^(?!^\\d+$)" +
-        "(?!^[0-9a-fxA-FX]{8}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{12}$)[\\w+\\-]+$+}";
-
-    /**
-     * Regular expression in the request mapping to accept number as identifier
-     */
-    private static final String REGEX_REQUESTMAPPING_IDENTIFIER_AS_DIGIT = "/{id:\\d+}";
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(RestResourceController.class);
 

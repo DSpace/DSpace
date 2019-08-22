@@ -7,6 +7,8 @@
  */
 package org.dspace.app.rest;
 
+import static org.dspace.app.rest.utils.RegexUtils.REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID;
+
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -40,8 +42,7 @@ import org.springframework.web.bind.annotation.RestController;
  * have the given collection as their owning collection
  */
 @RestController
-@RequestMapping("/api/core/collections/" +
-    "{uuid:[0-9a-fxA-FX]{8}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{12}}/mappedItems")
+@RequestMapping("/api/core/collections" + REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID + "/mappedItems")
 public class MappedItemRestController {
 
     private static final Logger log = Logger.getLogger(MappedItemRestController.class);
