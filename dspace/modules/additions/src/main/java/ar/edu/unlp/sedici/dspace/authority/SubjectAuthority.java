@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.dspace.content.authority.Choice;
+import org.dspace.core.ConfigurationManager;
 
 import com.hp.hpl.jena.query.ParameterizedSparqlString;
 import com.hp.hpl.jena.query.QuerySolution;
@@ -11,6 +12,15 @@ import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.sparql.engine.http.QueryEngineHTTP;
 
 public class SubjectAuthority extends GeneralSEDICIAuthorityProvider {
+
+	protected String getSparqlEndpoint() {
+		String endpoint = ConfigurationManager.getProperty("sparql-authorities", "vocabularios-authorities.endpoint.url");
+		if (endpoint != null) {
+			return endpoint;
+		} else {
+			throw new NullPointerException("Missing endpoint configuration.");
+		}
+	}
 
 	@Override
 	protected String getSelectQueryFields(boolean idSearch) {
