@@ -229,6 +229,9 @@ public class InitialQuestionsStep extends AbstractProcessingStep
                 itemService.addMetadata(context, item, MetadataSchema.DC_SCHEMA, "date", "issued", null, "today");
             }
         }
+        else {
+            itemService.clearMetadata(context, item, MetadataSchema.DC_SCHEMA, "date", "issued", Item.ANY);
+        }
 
         // commit all changes to DB
         ContentServiceFactory.getInstance().getInProgressSubmissionService(subInfo.getSubmissionItem()).update(context, subInfo.getSubmissionItem());
