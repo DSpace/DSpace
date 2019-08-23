@@ -40,11 +40,13 @@
       <h3 class="text-success"><fmt:message key="jsp.components.login-form.orcid-heading" /></h3>
       <p><fmt:message key="jsp.components.login-form.orcid-description"/></p>
       <p class="text-center">
-      <a href="<%= request.getContextPath() %>/oauth-login">
-      <button class="btn btn-default">
-      	<fmt:message key="jsp.components.login-form.orcid-login"/>
-      	<img src="<%= request.getContextPath() %>/image/orcid_64x64.png" title="ORCID Authentication" />
-      </button></a></p>
+      	<a href="<%= request.getContextPath() %>/oauth-login">
+	      	<button id="connect-orcid-button" <%-- onclick="openORCID()"--%> >
+      			<img id="orcid-id-icon" src="https://orcid.org/sites/default/files/images/orcid_24x24.png" width="24" height="24" alt="ORCID iD icon"/>
+      			<fmt:message key="jsp.components.login-form.orcid-login"/>
+      		</button>
+	   	</a>
+	  </p>
       </div>
       </div>
       <script type="text/javascript">
