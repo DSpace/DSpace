@@ -7,6 +7,7 @@
  */
 package org.dspace.servicemanager.spring;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -36,7 +37,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  */
 public final class SpringServiceManager implements ServiceManagerSystem {
 
-    private static Logger log = LoggerFactory.getLogger(SpringServiceManager.class);
+    private static final Logger log = LoggerFactory.getLogger(SpringServiceManager.class);
 
     private ClassPathXmlApplicationContext applicationContext;
 
@@ -149,7 +150,7 @@ public final class SpringServiceManager implements ServiceManagerSystem {
     @SuppressWarnings("unchecked")
     @Override
     public <T> List<T> getServicesByType(Class<T> type) {
-        ArrayList<T> l = new ArrayList<T>();
+        ArrayList<T> l = new ArrayList<>();
         Map<String, T> beans;
         try {
             beans = applicationContext.getBeansOfType(type, true, true);
@@ -237,9 +238,11 @@ public final class SpringServiceManager implements ServiceManagerSystem {
                         }
                     } catch (ClassNotFoundException e) {
                         //Ignore this exception, if we get one this just means that this module isn't loaded
-                    } catch (Exception e) {
-                        log.error("Error while retrieving spring resource paths for module: " + springLoaderClassName,
-                                  e);
+                    } catch (IllegalAccessException | IllegalArgumentException
+                            | InstantiationException | NoSuchMethodException
+                            | SecurityException | InvocationTargetException e) {
+                        log.error("Error while retrieving spring resource paths for module: {}",
+                                springLoaderClassName, e);
                     }
                 }
             }
@@ -323,7 +326,7 @@ public final class SpringServiceManager implements ServiceManagerSystem {
 
     @Override
     public List<String> getServicesNames() {
-        ArrayList<String> beanNames = new ArrayList<String>();
+        ArrayList<String> beanNames = new ArrayList<>();
         String[] singletons = applicationContext.getBeanFactory().getSingletonNames();
         for (String singleton : singletons) {
             if (singleton.startsWith("org.springframework.context")) {
@@ -342,7 +345,7 @@ public final class SpringServiceManager implements ServiceManagerSystem {
 
     @Override
     public Map<String, Object> getServices() {
-        Map<String, Object> services = new HashMap<String, Object>();
+        Map<String, Object> services = new HashMap<>();
         String[] singletons = applicationContext.getBeanFactory().getSingletonNames();
         for (String singleton : singletons) {
             if (singleton.startsWith("org.springframework.context")) {

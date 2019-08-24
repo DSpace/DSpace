@@ -47,6 +47,8 @@ public final class DSpaceServiceManager implements ServiceManagerSystem {
 
     protected boolean running = false;
 
+    private ServiceManagerSystem serviceManagerSystem;
+
     /**
      * @return true if the service manager is running
      */
@@ -65,13 +67,10 @@ public final class DSpaceServiceManager implements ServiceManagerSystem {
         }
     }
 
-    private List<ServiceManagerSystem> serviceManagers = Collections
-        .synchronizedList(new ArrayList<ServiceManagerSystem>());
-    private SpringServiceManager primaryServiceManager = null;
     /**
      * This holds the stack of activators.  It is randomly ordered.
      */
-    private List<Activator> activators = Collections.synchronizedList(new ArrayList<Activator>());
+    private final List<Activator> activators = Collections.synchronizedList(new ArrayList<>());
 
     protected boolean developing = false;
 
@@ -114,11 +113,11 @@ public final class DSpaceServiceManager implements ServiceManagerSystem {
             try {
                 activator.start(this);
                 activators.add(activator);
-                log.info("Started and registered activator: " + activator.getClass().getName());
+                log.info("Started and registered activator: {}", activator.getClass().getName());
             } catch (Exception e1) {
                 log.error(
-                    "ERROR: Failed to start activator (" + activator.getClass().getName() + "): " + e1.getMessage(),
-                    e1);
+                    "ERROR: Failed to start activator ({}): {}",
+                        activator.getClass().getName(), e1.getMessage(), e1);
             }
         }
     }
@@ -133,9 +132,10 @@ public final class DSpaceServiceManager implements ServiceManagerSystem {
                 // succeeded creating the activator
                 try {
                     activator.stop(this);
-                    log.info("Stopped and unregistered activator: " + activatorClassName);
+                    log.info("Stopped and unregistered activator: {}", activatorClassName);
                 } catch (Exception e1) {
-                    log.error("ERROR: Failed to stop activator (" + activatorClassName + "): " + e1.getMessage(), e1);
+                    log.error("ERROR: Failed to stop activator ({}): {}",
+                            activatorClassName, e1.getMessage(), e1);
                 }
             }
         }
@@ -146,14 +146,14 @@ public final class DSpaceServiceManager implements ServiceManagerSystem {
      * This will call all the services which want to be notified when the service manager is ready
      */
     public void notifyServiceManagerReady() {
-        for (ServiceManagerSystem sms : serviceManagers) {
-            List<ServiceManagerReadyAware> services = sms.getServicesByType(ServiceManagerReadyAware.class);
-            for (ServiceManagerReadyAware serviceManagerReadyAware : services) {
-                try {
-                    serviceManagerReadyAware.serviceManagerReady(this);
-                } catch (Exception e) {
-                    log.error("ERROR: Failure in service when calling serviceManagerReady: " + e.getMessage(), e);
-                }
+        List<ServiceManagerReadyAware> services
+                = serviceManagerSystem.getServicesByType(ServiceManagerReadyAware.class);
+        for (ServiceManagerReadyAware serviceManagerReadyAware : services) {
+            try {
+                serviceManagerReadyAware.serviceManagerReady(this);
+            } catch (Exception e) {
+                log.error("ERROR: Failure in service when calling serviceManagerReady: {}",
+                        e.getMessage(), e);
             }
         }
     }
@@ -190,17 +190,15 @@ public final class DSpaceServiceManager implements ServiceManagerSystem {
     @Override
     public void shutdown() {
         unregisterActivators();
-        for (ServiceManagerSystem sms : serviceManagers) {
-            try {
-                sms.shutdown();
-            } catch (Exception e) {
-                // shutdown failures are not great but should NOT cause an interruption of processing
-                log.error("Failure shutting down service manager (" + sms + "): " + e.getMessage(), e);
-            }
+        try {
+            serviceManagerSystem.shutdown();
+        } catch (Exception e) {
+            // shutdown failures are not great but should NOT cause an interruption of processing
+            log.error("Failure shutting down service manager ({}): {}",
+                    serviceManagerSystem, e.getMessage(), e);
         }
         this.running = false; // wait til the end
-        this.serviceManagers.clear();
-        this.primaryServiceManager = null;
+        this.serviceManagerSystem = null;
         log.info("Shutdown DSpace core service manager");
     }
 
@@ -224,7 +222,7 @@ public final class DSpaceServiceManager implements ServiceManagerSystem {
         try {
             // have to put this at the top because otherwise initializing beans will die when they try to use the SMS
             this.running = true;
-            // create the primary SMS and start it
+            // create the SMS and start it
             SpringServiceManager springSMS = new SpringServiceManager(this, configurationService, testing, developing,
                                                                       springXmlConfigFiles);
             try {
@@ -234,8 +232,7 @@ public final class DSpaceServiceManager implements ServiceManagerSystem {
                 throw new IllegalStateException("failure starting up spring service manager: " + e.getMessage(), e);
             }
             // add it to the list of service managers
-            this.serviceManagers.add(springSMS);
-            this.primaryServiceManager = springSMS;
+            this.serviceManagerSystem = springSMS;
 
             // now startup the activators
             registerActivators();
@@ -243,7 +240,7 @@ public final class DSpaceServiceManager implements ServiceManagerSystem {
             // now we call the ready mixins
             notifyServiceManagerReady();
 
-        } catch (Exception e) {
+        } catch (IllegalStateException e) {
             shutdown(); // execute the shutdown
             String message = "Failed to startup the DSpace Service Manager: " + e.getMessage();
             log.error(message, e);
@@ -251,15 +248,14 @@ public final class DSpaceServiceManager implements ServiceManagerSystem {
         }
     }
 
+    @Override
     public void registerService(String name, Object service) {
         checkRunning();
         if (name == null || service == null) {
             throw new IllegalArgumentException("name and service cannot be null");
         }
-        // register service/provider with all
-        for (ServiceManagerSystem sms : serviceManagers) {
-            sms.registerService(name, service);
-        }
+        // register service/provider
+        serviceManagerSystem.registerService(name, service);
     }
 
     @Override
@@ -268,131 +264,110 @@ public final class DSpaceServiceManager implements ServiceManagerSystem {
         if (name == null || service == null) {
             throw new IllegalArgumentException("name and service cannot be null");
         }
-        // register service/provider with all
-        for (ServiceManagerSystem sms : serviceManagers) {
-            sms.registerServiceNoAutowire(name, service);
-        }
+        // register service/provider
+        serviceManagerSystem.registerServiceNoAutowire(name, service);
     }
 
+    @Override
     public <T> T registerServiceClass(String name, Class<T> type) {
         checkRunning();
         if (name == null || type == null) {
             throw new IllegalArgumentException("name and type cannot be null");
         }
-        // we only register with the primary
-        return primaryServiceManager.registerServiceClass(name, type);
+
+        return serviceManagerSystem.registerServiceClass(name, type);
     }
 
+    @Override
     public void unregisterService(String name) {
         checkRunning();
         if (name == null) {
             throw new IllegalArgumentException("name cannot be null");
         }
-        // only unregister with the primary
-        primaryServiceManager.unregisterService(name);
+
+        serviceManagerSystem.unregisterService(name);
     }
 
+    @Override
     public <T> T getServiceByName(String name, Class<T> type) {
         checkRunning();
         if (type == null) {
             throw new IllegalArgumentException("type cannot be null");
         }
         T service = null;
-        for (ServiceManagerSystem sms : serviceManagers) {
-            try {
-                service = sms.getServiceByName(name, type);
-                if (service != null) {
-                    break;
-                }
-            } catch (Exception e) {
-                // keep going
-            }
-        }
-        // need to check the service mixin manager if not found
-        if (service == null
-            && name != null) {
-            for (ServiceManagerSystem sms : serviceManagers) {
-                if (service == null) {
-                    service = sms.getServiceByName(name, type);
-                }
-            }
+        try {
+            service = serviceManagerSystem.getServiceByName(name, type);
+        } catch (Exception e) {
+            // keep going
         }
         return service;
     }
 
     @Override
     public ConfigurableApplicationContext getApplicationContext() {
-        return primaryServiceManager.getApplicationContext();
+        return serviceManagerSystem.getApplicationContext();
     }
 
+    @Override
     public <T> List<T> getServicesByType(Class<T> type) {
         checkRunning();
         if (type == null) {
             throw new IllegalArgumentException("type cannot be null");
         }
-        HashSet<T> set = new HashSet<T>();
-        for (ServiceManagerSystem sms : serviceManagers) {
-            try {
-                set.addAll(sms.getServicesByType(type));
-            } catch (Exception e) {
-                // keep going
-            }
+        HashSet<T> set = new HashSet<>();
+        try {
+            set.addAll(serviceManagerSystem.getServicesByType(type));
+        } catch (Exception e) {
+            // keep going
         }
         // put the set into a list for easier access and sort it
-        List<T> services = new ArrayList<T>(set);
+        List<T> services = new ArrayList<>(set);
         Collections.sort(services, new ServiceManagerUtils.ServiceComparator());
         return services;
     }
 
+    @Override
     public List<String> getServicesNames() {
         checkRunning();
-        List<String> names = new ArrayList<String>();
-        for (ServiceManagerSystem sms : serviceManagers) {
-            try {
-                names.addAll(sms.getServicesNames());
-            } catch (Exception e) {
-                // keep going
-            }
+        List<String> names = new ArrayList<>();
+        try {
+            names.addAll(serviceManagerSystem.getServicesNames());
+        } catch (Exception e) {
+            // keep going
         }
         Collections.sort(names);
         return names;
     }
 
+    @Override
     public boolean isServiceExists(String name) {
         checkRunning();
         if (name == null) {
             throw new IllegalArgumentException("name cannot be null");
         }
         boolean exists = false;
-        for (ServiceManagerSystem sms : serviceManagers) {
-            try {
-                exists = sms.isServiceExists(name);
-                if (exists) {
-                    break;
-                }
-            } catch (Exception e) {
-                // keep going
-            }
+        try {
+            exists = serviceManagerSystem.isServiceExists(name);
+        } catch (Exception e) {
+            // keep going
         }
         return exists;
     }
 
+    @Override
     public Map<String, Object> getServices() {
         checkRunning();
-        Map<String, Object> services = new HashMap<String, Object>();
-        for (ServiceManagerSystem sms : serviceManagers) {
-            try {
-                for (Entry<String, Object> entry : sms.getServices().entrySet()) {
-                    if (!services.containsKey(entry.getKey())) {
-                        services.put(entry.getKey(), entry.getValue());
-                    }
+        Map<String, Object> services = new HashMap<>();
+        try {
+            for (Entry<String, Object> entry : serviceManagerSystem.getServices().entrySet()) {
+                if (!services.containsKey(entry.getKey())) {
+                    services.put(entry.getKey(), entry.getValue());
                 }
-            } catch (Exception e) {
-                // keep going if it fails for one
-                log.error(
-                    "Failed to get list of services from service manager (" + sms.getClass() + "): " + e.getMessage(),
-                    e);
             }
+        } catch (Exception e) {
+            log.error(
+                "Failed to get list of services from service manager ({}): {}",
+                    serviceManagerSystem.getClass(), e.getMessage(), e);
         }
         return services;
     }
@@ -402,6 +377,7 @@ public final class DSpaceServiceManager implements ServiceManagerSystem {
      * Every service gets called to notify them of the config change
      * depending on the the listener they are using.
      */
+    @Override
     public void pushConfig(Map<String, Object> properties) {
         checkRunning();
         if (properties != null && !properties.isEmpty()) {
@@ -410,43 +386,41 @@ public final class DSpaceServiceManager implements ServiceManagerSystem {
             if (changedNames.length > 0) {
                 // some configs changed so push the changes to the listeners in all known services and providers
                 // make the list of changed setting names and map of changed settings
-                ArrayList<String> changedSettingNames = new ArrayList<String>();
-                Map<String, String> changedSettings = new LinkedHashMap<String, String>();
+                ArrayList<String> changedSettingNames = new ArrayList<>();
+                Map<String, String> changedSettings = new LinkedHashMap<>();
                 for (String configName : changedNames) {
                     changedSettingNames.add(configName);
                     changedSettings.put(configName, configurationService.getProperty(configName));
                 }
                 // notify the services that implement the mixin
-                for (ServiceManagerSystem sms : serviceManagers) {
-                    List<ConfigChangeListener> configChangeListeners = sms
-                        .getServicesByType(ConfigChangeListener.class);
-                    for (ConfigChangeListener configChangeListener : configChangeListeners) {
-                        // notify this service
-                        try {
-                            boolean notify = false;
-                            String[] notifyNames = configChangeListener.notifyForConfigNames();
-                            if (notifyNames == null || notifyNames.length == 0) {
-                                notify = true;
-                            } else {
-                                for (String notifyName : notifyNames) {
-                                    // check to see if the name matches one of those the listener cares about
-                                    for (String changedName : changedNames) {
-                                        if (notifyName != null && notifyName.equals(changedName)) {
-                                            notify = true;
-                                            break;
-                                        }
+                List<ConfigChangeListener> configChangeListeners = serviceManagerSystem
+                    .getServicesByType(ConfigChangeListener.class);
+                for (ConfigChangeListener configChangeListener : configChangeListeners) {
+                    // notify this service
+                    try {
+                        boolean notify = false;
+                        String[] notifyNames = configChangeListener.notifyForConfigNames();
+                        if (notifyNames == null || notifyNames.length == 0) {
+                            notify = true;
+                        } else {
+                            for (String notifyName : notifyNames) {
+                                // check to see if the name matches one of those the listener cares about
+                                for (String changedName : changedNames) {
+                                    if (notifyName != null && notifyName.equals(changedName)) {
+                                        notify = true;
+                                        break;
                                     }
                                 }
                             }
-                            // do the notify if we should at this point
-                            if (notify) {
-                                configChangeListener.configurationChanged(changedSettingNames, changedSettings);
-                            }
-                        } catch (Exception e) {
-                            log.error(
-                                "Failure occurred while trying to notify service of config change: " + e.getMessage(),
-                                e);
                         }
+                        // do the notify if we should at this point
+                        if (notify) {
+                            configChangeListener.configurationChanged(changedSettingNames, changedSettings);
+                        }
+                    } catch (Exception e) {
+                        log.error(
+                            "Failure occurred while trying to notify service of config change: " + e.getMessage(),
+                            e);
                     }
                 }
             }
