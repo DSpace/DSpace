@@ -7,35 +7,41 @@
  */
 package org.dspace.servicemanager;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.dspace.kernel.Activator;
+import org.dspace.kernel.config.SpringLoader;
 import org.dspace.kernel.mixins.ConfigChangeListener;
 import org.dspace.kernel.mixins.InitializedService;
 import org.dspace.kernel.mixins.ServiceChangeListener;
 import org.dspace.kernel.mixins.ServiceManagerReadyAware;
 import org.dspace.kernel.mixins.ShutdownService;
 import org.dspace.servicemanager.config.DSpaceConfigurationService;
-import org.dspace.servicemanager.spring.SpringServiceManager;
+import org.dspace.servicemanager.spring.DSpaceBeanFactoryPostProcessor;
 import org.dspace.services.ConfigurationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanWrapper;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.PropertyAccessorFactory;
-import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.beans.factory.ListableBeanFactory;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
- * This is the core service manager which ties together the other
- * service managers and generally handles any edge cases in the various
- * systems.
+ * A service locator based on Spring.
  *
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
@@ -43,11 +49,56 @@ public final class DSpaceServiceManager implements ServiceManagerSystem {
 
     private static Logger log = LoggerFactory.getLogger(DSpaceServiceManager.class);
 
+    public static final String CONFIG_PATH = "spring/spring-dspace-applicationContext.xml";
+    public static final String CORE_RESOURCE_PATH = "classpath*:spring/spring-dspace-core-services.xml";
+    public static final String ADDON_RESOURCE_PATH = "classpath*:spring/spring-dspace-addon-*-services.xml";
+
     private final DSpaceConfigurationService configurationService;
+
+    private ClassPathXmlApplicationContext applicationContext;
 
     protected boolean running = false;
 
-    private ServiceManagerSystem serviceManagerSystem;
+    protected boolean developing = false;
+
+    protected boolean testing = false;
+
+    protected String[] springXmlConfigFiles = null;
+
+    /**
+     * This holds the stack of activators.  It is randomly ordered.
+     */
+    private final List<Activator> activators = Collections.synchronizedList(new ArrayList<>());
+
+    /**
+     * Standard constructor.
+     *
+     * @param configurationService current DSpace configuration service
+     */
+    public DSpaceServiceManager(DSpaceConfigurationService configurationService) {
+        if (configurationService == null) {
+            throw new IllegalArgumentException("Failure creating service manager:  configuration service is null");
+        }
+        this.configurationService = configurationService;
+        this.developing = configurationService.getPropertyAsType("service.manager.developing", boolean.class);
+    }
+
+    /**
+     * TESTING - This is for testing only.
+     *
+     * @param configurationService current DSpace configuration service.
+     * @param springXmlConfigFiles one or more Spring XML configuration files.
+     */
+    protected DSpaceServiceManager(DSpaceConfigurationService configurationService,
+            String... springXmlConfigFiles) {
+        if (configurationService == null) {
+            throw new IllegalArgumentException("Configuration service cannot be null");
+        }
+        this.configurationService = configurationService;
+        this.springXmlConfigFiles = springXmlConfigFiles;
+        this.testing = true;
+        this.developing = true;
+    }
 
     /**
      * @return true if the service manager is running
@@ -57,7 +108,7 @@ public final class DSpaceServiceManager implements ServiceManagerSystem {
     }
 
     /**
-     * Checks to see if the service manager is running, if not throws an exception
+     * Checks to see if the service manager is running.
      *
      * @throws IllegalStateException if not running
      */
@@ -68,39 +119,21 @@ public final class DSpaceServiceManager implements ServiceManagerSystem {
     }
 
     /**
-     * This holds the stack of activators.  It is randomly ordered.
+     * @return the current spring bean factory OR null if there is not one.
      */
-    private final List<Activator> activators = Collections.synchronizedList(new ArrayList<>());
-
-    protected boolean developing = false;
-
-    /**
-     * Standard constructor.
-     *
-     * @param configurationService current DSpace configuration service
-     */
-    public DSpaceServiceManager(DSpaceConfigurationService configurationService) {
-        if (configurationService == null) {
-            throw new IllegalArgumentException("Failure creating service manager, configuration service is null");
+    public ListableBeanFactory getBeanFactory() {
+        if (applicationContext != null) {
+            return applicationContext.getBeanFactory();
         }
-        this.configurationService = configurationService;
-        this.developing = configurationService.getPropertyAsType("service.manager.developing", boolean.class);
+        return null;
     }
 
-    protected boolean testing = false;
-    protected String[] springXmlConfigFiles = null;
-
     /**
-     * TESTING - This is for testing only.
-     *
-     * @param configurationService current DSpace configuration service
-     * @param springXmlConfigFiles one or more Spring XML configs
+     * @return the parent core Spring {@link ApplicationContext}
      */
-    protected DSpaceServiceManager(DSpaceConfigurationService configurationService, String... springXmlConfigFiles) {
-        this.configurationService = configurationService;
-        this.springXmlConfigFiles = springXmlConfigFiles;
-        this.testing = true;
-        this.developing = true;
+    @Override
+    public ClassPathXmlApplicationContext getApplicationContext() {
+        return applicationContext;
     }
 
     /**
@@ -123,7 +156,7 @@ public final class DSpaceServiceManager implements ServiceManagerSystem {
     }
 
     /**
-     * Unregisters all registered activators using this service manager.
+     * De-registers all registered activators using this service manager.
      */
     private void unregisterActivators() {
         for (Activator activator : activators) {
@@ -143,11 +176,11 @@ public final class DSpaceServiceManager implements ServiceManagerSystem {
     }
 
     /**
-     * This will call all the services which want to be notified when the service manager is ready
+     * This will call all the services which want to be notified when the service manager is ready.
      */
     public void notifyServiceManagerReady() {
         List<ServiceManagerReadyAware> services
-                = serviceManagerSystem.getServicesByType(ServiceManagerReadyAware.class);
+                = getServicesByType(ServiceManagerReadyAware.class);
         for (ServiceManagerReadyAware serviceManagerReadyAware : services) {
             try {
                 serviceManagerReadyAware.serviceManagerReady(this);
@@ -159,7 +192,7 @@ public final class DSpaceServiceManager implements ServiceManagerSystem {
     }
 
     /**
-     * Checks to see if a listener should be notified
+     * Checks to see if a listener should be notified.
      *
      * @param implementedTypes      the types implemented by the service changing
      * @param serviceChangeListener the listener
@@ -185,21 +218,30 @@ public final class DSpaceServiceManager implements ServiceManagerSystem {
     }
 
     /**
-     * Shut down all service managers, including this one.
+     * Shut down the Spring context and leave the "running" state.
      */
     @Override
     public void shutdown() {
         unregisterActivators();
-        try {
-            serviceManagerSystem.shutdown();
-        } catch (Exception e) {
-            // shutdown failures are not great but should NOT cause an interruption of processing
-            log.error("Failure shutting down service manager ({}): {}",
-                    serviceManagerSystem, e.getMessage(), e);
+
+        if (applicationContext != null) {
+            try {
+                applicationContext.close();
+            } catch (Exception e) {
+                // keep going anyway
+                log.warn("Exception closing ApplicationContext:  {}", e.getMessage(), e);
+            }
+            try {
+                applicationContext.destroy();
+            } catch (Exception e) {
+                // keep going anyway
+                log.warn("Exception destroying ApplicationContext:  {}", e.getMessage(), e);
+            }
+            applicationContext = null;
         }
+
         this.running = false; // wait til the end
-        this.serviceManagerSystem = null;
-        log.info("Shutdown DSpace core service manager");
+        log.info("DSpace service manager is shut down.");
     }
 
     /* (non-Javadoc)
@@ -219,20 +261,30 @@ public final class DSpaceServiceManager implements ServiceManagerSystem {
                 }
             }
         }
+
+        long startTime = System.currentTimeMillis();
         try {
             // have to put this at the top because otherwise initializing beans will die when they try to use the SMS
             this.running = true;
-            // create the SMS and start it
-            SpringServiceManager springSMS = new SpringServiceManager(this, configurationService, testing, developing,
-                                                                      springXmlConfigFiles);
-            try {
-                springSMS.startup();
-            } catch (Exception e) {
-                // startup failures are deadly
-                throw new IllegalStateException("failure starting up spring service manager: " + e.getMessage(), e);
+
+            // get all Spring config paths
+            String[] allPaths = getSpringPaths(testing, springXmlConfigFiles, configurationService);
+            applicationContext = new ClassPathXmlApplicationContext(allPaths, false);
+            // Make sure that the Spring files from the config directory can override the Spring files from our jars
+            applicationContext.setAllowBeanDefinitionOverriding(true);
+            applicationContext.setAllowCircularReferences(true);
+            //applicationContext.registerShutdownHook(); // this interferes with the kernel shutdown hook
+            // add the config interceptors (partially done in the xml)
+            applicationContext.addBeanFactoryPostProcessor(
+                    new DSpaceBeanFactoryPostProcessor(this, configurationService, testing));
+            applicationContext.refresh();
+            if (developing) {
+                log.warn("Service Manager is running in developmentMode.  Services will be loaded on demand only");
+                // TODO find a way to set this sucker to super duper lazy mode? it is currently not actually doing it
+            } else {
+                applicationContext.getBeanFactory().preInstantiateSingletons();
+                applicationContext.getBeanFactory().freezeConfiguration();
             }
-            // add it to the list of service managers
-            this.serviceManagerSystem = springSMS;
 
             // now startup the activators
             registerActivators();
@@ -246,36 +298,66 @@ public final class DSpaceServiceManager implements ServiceManagerSystem {
             log.error(message, e);
             throw new RuntimeException(message, e);
         }
+
+        long totalTime = System.currentTimeMillis() - startTime;
+        log.info("Service Manager started up in {} ms with {} services...",
+                totalTime, applicationContext.getBeanDefinitionCount());
     }
 
     @Override
     public void registerService(String name, Object service) {
         checkRunning();
-        if (name == null || service == null) {
-            throw new IllegalArgumentException("name and service cannot be null");
+        if (name == null) {
+            throw new IllegalArgumentException("name cannot be null");
+        }
+        if (service == null) {
+            throw new IllegalArgumentException("service cannot be null");
         }
         // register service/provider
-        serviceManagerSystem.registerService(name, service);
+        try {
+            applicationContext.getBeanFactory().autowireBean(service);
+        } catch (BeansException e) {
+            throw new IllegalArgumentException(
+                "Invalid service (" + service + ") with name (" + name + ") registration: " + e.getMessage(), e);
+        }
+        registerBean(name, service);
     }
 
     @Override
     public void registerServiceNoAutowire(String name, Object service) {
         checkRunning();
-        if (name == null || service == null) {
-            throw new IllegalArgumentException("name and service cannot be null");
+        if (name == null) {
+            throw new IllegalArgumentException("name cannot be null");
+        }
+        if (service == null) {
+            throw new IllegalArgumentException("service cannot be null");
         }
         // register service/provider
-        serviceManagerSystem.registerServiceNoAutowire(name, service);
+        registerBean(name, service);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T> T registerServiceClass(String name, Class<T> type) {
         checkRunning();
-        if (name == null || type == null) {
-            throw new IllegalArgumentException("name and type cannot be null");
+        if (name == null) {
+            throw new IllegalArgumentException("name cannot be null");
+        }
+        if (type == null) {
+            throw new IllegalArgumentException("type cannot be null");
         }
 
-        return serviceManagerSystem.registerServiceClass(name, type);
+        T service;
+        try {
+            service = (T) applicationContext.getBeanFactory()
+                    .autowire(type, AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, true);
+            registerBean(name, service);
+        } catch (BeansException e) {
+            throw new IllegalArgumentException("Invalid service class (" + type
+                        + ") with name (" + name
+                        + ") registration: " + e.getMessage(), e);
+        }
+        return service;
     }
 
     @Override
@@ -285,43 +367,113 @@ public final class DSpaceServiceManager implements ServiceManagerSystem {
             throw new IllegalArgumentException("name cannot be null");
         }
 
-        serviceManagerSystem.unregisterService(name);
+        if (applicationContext.containsBean(name)) {
+            try {
+                Object beanInstance = applicationContext.getBean(name);
+                try {
+                    applicationContext.getBeanFactory().destroyBean(name, beanInstance);
+                } catch (NoSuchBeanDefinitionException e) {
+                    // this happens if the bean was registered manually (annoyingly)
+                    DSpaceServiceManager.shutdownService(beanInstance);
+                }
+            } catch (BeansException e) {
+                // nothing to do here, could not find the bean
+            }
+        }
     }
 
+    /**
+     * This handles the common part of various types of service registrations.
+     *
+     * @param name    name of bean
+     * @param service service object
+     */
+    private void registerBean(String name, Object service) {
+        try {
+            applicationContext.getBeanFactory().initializeBean(service, name);
+            applicationContext.getBeanFactory().registerSingleton(name, service);
+        } catch (BeansException e) {
+            throw new IllegalArgumentException(
+                "Invalid service (" + service + ") with name (" + name + ") registration: " + e.getMessage(), e);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
     @Override
     public <T> T getServiceByName(String name, Class<T> type) {
         checkRunning();
         if (type == null) {
-            throw new IllegalArgumentException("type cannot be null");
+            throw new IllegalArgumentException("Type cannot be null");
         }
+
         T service = null;
-        try {
-            service = serviceManagerSystem.getServiceByName(name, type);
-        } catch (Exception e) {
-            // keep going
+        // handle special case to return the core AC
+        if (ApplicationContext.class.getName().equals(name)
+            && ApplicationContext.class.isAssignableFrom(type)) {
+            service = (T) getApplicationContext();
+        } else {
+            if (name != null) {
+                // get by name and type
+                try {
+                    service = (T) applicationContext.getBean(name, type);
+                } catch (BeansException e) {
+                    // no luck, try the fall back option
+                    log.info(
+                        "Unable to locate bean by name or id={}."
+                                + " Will try to look up bean by type next."
+                                + " BeansException: {}", name, e.getMessage());
+                    service = null;
+                }
+            } else {
+                // try making up the name based on the type
+                try {
+                    service = (T) applicationContext.getBean(type.getName(), type);
+                } catch (BeansException e) {
+                    // no luck, try the fall back option
+                    log.info("Unable to locate bean by name or id={}."
+                            + " Will try to look up bean by type next."
+                            + " BeansException: {}", type.getName(), e.getMessage());
+                    service = null;
+                }
+            }
+            // if still no luck then try by type only
+            if (name == null
+                && service == null) {
+                try {
+                    Map<String, T> map = applicationContext.getBeansOfType(type);
+                    if (map.size() == 1) {
+                        // only return the bean if there is exactly one
+                        service = (T) map.values().iterator().next();
+                    } else {
+                        log.error("Multiple beans of type {} found. Only one was expected!", type.getName());
+                    }
+                } catch (BeansException e) {
+                    // I guess there are no beans of this type
+                    log.error(e.getMessage(), e);
+                    service = null;
+                }
+            }
         }
         return service;
     }
 
-    @Override
-    public ConfigurableApplicationContext getApplicationContext() {
-        return serviceManagerSystem.getApplicationContext();
-    }
-
+    @SuppressWarnings("unchecked")
     @Override
     public <T> List<T> getServicesByType(Class<T> type) {
         checkRunning();
         if (type == null) {
             throw new IllegalArgumentException("type cannot be null");
         }
-        HashSet<T> set = new HashSet<>();
+
+        List<T> services = new ArrayList<>();
+        Map<String, T> beans;
         try {
-            set.addAll(serviceManagerSystem.getServicesByType(type));
-        } catch (Exception e) {
-            // keep going
+            beans = applicationContext.getBeansOfType(type, true, true);
+            services.addAll((Collection<? extends T>) beans.values());
+        } catch (BeansException e) {
+            throw new RuntimeException("Failed to get beans of type (" + type + "): " + e.getMessage(), e);
         }
-        // put the set into a list for easier access and sort it
-        List<T> services = new ArrayList<>(set);
+
         Collections.sort(services, new ServiceManagerUtils.ServiceComparator());
         return services;
     }
@@ -329,14 +481,16 @@ public final class DSpaceServiceManager implements ServiceManagerSystem {
     @Override
     public List<String> getServicesNames() {
         checkRunning();
-        List<String> names = new ArrayList<>();
-        try {
-            names.addAll(serviceManagerSystem.getServicesNames());
-        } catch (Exception e) {
-            // keep going
+        ArrayList<String> beanNames = new ArrayList<>();
+        String[] singletons = applicationContext.getBeanFactory().getSingletonNames();
+        for (String singleton : singletons) {
+            if (singleton.startsWith("org.springframework.context")) {
+                continue; // skip the Spring standard ones
+            }
+            beanNames.add(singleton);
         }
-        Collections.sort(names);
-        return names;
+        Collections.sort(beanNames);
+        return beanNames;
     }
 
     @Override
@@ -345,29 +499,24 @@ public final class DSpaceServiceManager implements ServiceManagerSystem {
         if (name == null) {
             throw new IllegalArgumentException("name cannot be null");
         }
-        boolean exists = false;
-        try {
-            exists = serviceManagerSystem.isServiceExists(name);
-        } catch (Exception e) {
-            // keep going
-        }
-        return exists;
+        return applicationContext.containsBean(name);
     }
 
     @Override
     public Map<String, Object> getServices() {
         checkRunning();
         Map<String, Object> services = new HashMap<>();
-        try {
-            for (Entry<String, Object> entry : serviceManagerSystem.getServices().entrySet()) {
-                if (!services.containsKey(entry.getKey())) {
-                    services.put(entry.getKey(), entry.getValue());
-                }
+        String[] singletons = applicationContext.getBeanFactory().getSingletonNames();
+        for (String singleton : singletons) {
+            if (singleton.startsWith("org.springframework.context")) {
+                continue; // skip the spring standard ones
             }
-        } catch (Exception e) {
-            log.error(
-                "Failed to get list of services from service manager ({}): {}",
-                    serviceManagerSystem.getClass(), e.getMessage(), e);
+            String beanName = singleton;
+            Object service = applicationContext.getBeanFactory().getSingleton(beanName);
+            if (service == null) {
+                continue;
+            }
+            services.put(beanName, service);
         }
         return services;
     }
@@ -393,8 +542,8 @@ public final class DSpaceServiceManager implements ServiceManagerSystem {
                     changedSettings.put(configName, configurationService.getProperty(configName));
                 }
                 // notify the services that implement the mixin
-                List<ConfigChangeListener> configChangeListeners = serviceManagerSystem
-                    .getServicesByType(ConfigChangeListener.class);
+                List<ConfigChangeListener> configChangeListeners
+                    = getServicesByType(ConfigChangeListener.class);
                 for (ConfigChangeListener configChangeListener : configChangeListeners) {
                     // notify this service
                     try {
@@ -497,9 +646,61 @@ public final class DSpaceServiceManager implements ServiceManagerSystem {
             try {
                 ((ShutdownService) service).shutdown();
             } catch (Exception e) {
-                log.error("Failure shutting down service: " + service, e);
+                log.error("Failure shutting down service: {}", service, e);
             }
         }
+    }
+
+    /**
+     * Build the complete list of Spring configuration paths, including
+     * hard-wired paths.
+     *
+     * @param testMode are we testing the service manager?
+     * @param configPaths paths supplied at startup.
+     * @param configurationService DSpace configuration source.
+     * @return
+     */
+    public static String[] getSpringPaths(boolean testMode, String[] configPaths,
+                                          DSpaceConfigurationService configurationService) {
+        List<String> pathList = new LinkedList<>();
+        pathList.add(CONFIG_PATH);
+        pathList.add(ADDON_RESOURCE_PATH);
+        if (testMode) {
+            log.warn("TEST Service Manager running in test mode:  no core beans will be started");
+        } else {
+            // only load the core beans when not testing the service manager
+            pathList.add(CORE_RESOURCE_PATH);
+        }
+        if (configPaths != null) {
+            pathList.addAll(Arrays.asList(configPaths));
+        }
+        if (testMode) {
+            log.warn("TEST Spring Service Manager running in test mode, no DSpace home Spring files will be loaded");
+        } else {
+            //Retrieve all our spring file locations depending on the deployed module
+            String[] springLoaderClassNames = configurationService.getArrayProperty("spring.springloader.modules");
+            if (springLoaderClassNames != null) {
+                for (String springLoaderClassName : springLoaderClassNames) {
+                    try {
+                        Class<SpringLoader> springLoaderClass = (Class<SpringLoader>) Class
+                            .forName(springLoaderClassName.trim());
+                        String[] resourcePaths = springLoaderClass.getConstructor().newInstance()
+                                                                  .getResourcePaths(configurationService);
+                        if (resourcePaths != null) {
+                            pathList.addAll(Arrays.asList(resourcePaths));
+                        }
+                    } catch (ClassNotFoundException e) {
+                        //Ignore this exception, if we get one this just means that this module isn't loaded
+                    } catch (IllegalAccessException | IllegalArgumentException
+                            | InstantiationException | NoSuchMethodException
+                            | SecurityException | InvocationTargetException e) {
+                        log.error("Error while retrieving Spring resource paths for module: {}",
+                                springLoaderClassName, e);
+                    }
+                }
+            }
+        }
+        return pathList.toArray(new String[pathList.size()]);
     }
 
 }

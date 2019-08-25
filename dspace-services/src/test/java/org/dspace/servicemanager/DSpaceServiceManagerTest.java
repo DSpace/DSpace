@@ -23,7 +23,6 @@ import org.dspace.servicemanager.config.DSpaceConfigurationService;
 import org.dspace.servicemanager.example.ConcreteExample;
 import org.dspace.servicemanager.fakeservices.FakeService1;
 import org.dspace.servicemanager.spring.SpringAnnotationBean;
-import org.dspace.servicemanager.spring.TestSpringServiceManager;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -34,6 +33,7 @@ import org.junit.Test;
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
 public class DSpaceServiceManagerTest {
+    public static String SPRING_TEST_CONFIG_FILE = "spring/spring-test-services.xml";
 
     DSpaceServiceManager dsm;
     DSpaceConfigurationService configurationService;
@@ -46,7 +46,7 @@ public class DSpaceServiceManagerTest {
         configurationService.loadConfig(SampleAnnotationBean.class.getName() + ".sampleValue", "beckyz");
         configurationService.loadConfig("fakeBean.fakeParam", "beckyz");
 
-        dsm = new DSpaceServiceManager(configurationService, TestSpringServiceManager.SPRING_TEST_CONFIG_FILE);
+        dsm = new DSpaceServiceManager(configurationService, SPRING_TEST_CONFIG_FILE);
     }
 
     @After
@@ -256,7 +256,7 @@ public class DSpaceServiceManagerTest {
     public void testPushConfig() {
         dsm.startup();
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put("some.test.thing", "A value");
         dsm.pushConfig(properties);
 
@@ -298,7 +298,7 @@ public class DSpaceServiceManagerTest {
         assertEquals(1, service.getTriggers());
 
         // now we do a config change
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put("azeckoski.FakeService1.something", "THING");
         dsm.pushConfig(properties);
         assertEquals("config:THING", service.getSomething());
@@ -317,10 +317,12 @@ public class DSpaceServiceManagerTest {
 
         public int value = 0;
 
+        @Override
         public void init() {
             value++;
         }
 
+        @Override
         public void shutdown() {
             value++;
         }
