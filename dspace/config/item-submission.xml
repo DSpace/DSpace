@@ -12,6 +12,12 @@
       <type>collection</type>
       <scope visibility="hidden" visibilityOutside="hidden">submission</scope>
     </step>
+    <step id="extraction">
+      <heading></heading>
+      <processing-class>org.dspace.app.rest.submit.step.ExtractMetadataStep</processing-class>
+      <type>utils</type>
+	  <scope visibility="hidden" visibilityOutside="hidden">submission</scope>
+    </step>
     <step id="person" mandatory="true">
       <heading>submit.progressbar.describe.person</heading>
       <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
@@ -86,6 +92,7 @@
     </submission-process>
     <submission-process name="publications">
       <step id="collection" />
+      <step id="extraction" />
       <step id="publications" />
       <step id="upload" />
       <step id="license" />
