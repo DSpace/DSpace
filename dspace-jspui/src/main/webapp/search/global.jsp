@@ -150,7 +150,7 @@
 							auto_query: request.term,
 							auto_sort: 'count',
 							auto_type: jQ("#filtertype").val(),
-							location: '<%= searchScope%>'	
+							location: '<%= Utils.addEntities(searchScope)%>'	
 						},
 						success: function( data ) {
 							response( jQ.map( data.autocomplete, function( item ) {
@@ -450,7 +450,7 @@ for (DiscoverySearchFilterFacet facetConf : facetsConf)
 	        %><li class="list-group-item"><span class="badge"><%= fvalue.getCount() %></span> <a href="<%= request.getContextPath()
                 + "/global-search?query="
                 + URLEncoder.encode(query,"UTF-8")
-				+ "&amp;location="+searchScope
+				+ "&amp;location="+Utils.addEntities(searchScope)
                 + httpFilters
                 + "&amp;filtername="+URLEncoder.encode(f,"UTF-8")
                 + "&amp;filterquery="+URLEncoder.encode(fvalue.getAsFilterQuery(),"UTF-8")
@@ -471,7 +471,7 @@ for (DiscoverySearchFilterFacet facetConf : facetsConf)
 	        <a class="pull-left" href="<%= request.getContextPath()
                 + "/global-search?query="
                 + URLEncoder.encode(query,"UTF-8")
-				+ "&amp;location="+searchScope
+				+ "&amp;location="+Utils.addEntities(searchScope)
                 + httpFilters
                 + "&amp;"+f+"_page="+(currFp-1) %>"><fmt:message key="jsp.search.facet.refine.previous" /></a>
             <% } %>
@@ -479,7 +479,7 @@ for (DiscoverySearchFilterFacet facetConf : facetsConf)
             <a href="<%= request.getContextPath()
                 + "/global-search?query="
                 + URLEncoder.encode(query,"UTF-8")
-				+ "&amp;location="+searchScope
+				+ "&amp;location="+Utils.addEntities(searchScope)
                 + httpFilters
                 + "&amp;"+f+"_page="+(currFp+1) %>"><span class="pull-right"><fmt:message key="jsp.search.facet.refine.next" /></span></a>
             <%

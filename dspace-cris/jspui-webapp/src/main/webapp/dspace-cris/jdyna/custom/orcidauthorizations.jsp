@@ -268,7 +268,10 @@ j(document).ready(function() {
 					
 				</c:otherwise>
 			</c:choose>
-
+			<div class="clearfix">&nbsp;</div>
+			<div class="col-md-12 alert alert-info text-center">
+				<fmt:message key="jsp.orcid.custom.box.label.removeorcid" />
+			</div>
 			</div>
 		</div>
 	</div>

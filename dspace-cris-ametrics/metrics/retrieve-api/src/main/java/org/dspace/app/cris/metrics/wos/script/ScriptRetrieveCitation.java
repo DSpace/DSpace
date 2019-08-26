@@ -87,10 +87,10 @@ public class ScriptRetrieveCitation
         options.addOption("h", "help", false, "help");
 
         options.addOption("e", "enrich", false,
-                "Enrich item with the response from scopus");
+                "Enrich item with the response from wos");
 
         options.addOption("s", "disable-sleep", false,
-                "disable sleep timeout for each call to scopus");
+                "disable sleep timeout for each call to wos");
 
         options.addOption("t", "time", true,
                 "Limit to update only citation more old than <t> seconds. Use 0 to force update of all record");
@@ -230,8 +230,8 @@ public class ScriptRetrieveCitation
                         itemForceWorked++;
                     }
                     context.commit();
-                    context.clearCache();
                 }
+                context.clearCache();
             }
             Date endDate = new Date();
             long processTime = (endDate.getTime() - startDate.getTime()) / 1000;

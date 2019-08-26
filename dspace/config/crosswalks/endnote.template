@@ -8,7 +8,7 @@
 %V @dc.relation.volume@
 %N @dc.relation.issue@
 %7 @dc.relation.edition@
-%B @dc.relation.booktitle@
+%B @dc.relation.ispartofbook@
 %X @dc.description.abstract@
 %K @virtual.keywords.single@
 %U @dc.identifier.url@
