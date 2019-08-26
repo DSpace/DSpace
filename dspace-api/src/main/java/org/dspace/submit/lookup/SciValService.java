@@ -123,40 +123,40 @@ public class SciValService {
                     method = new HttpPost(
                         endPoint);
                     method.addHeader("SOAPAction", endPoint + "?method=match");
-    
+
                     String requestHead = count > 1 ? REQUEST_HEAD_MULTI
                         .replace("PLACE-HOLDER-MULTI", String.valueOf(count)) : REQUEST_HEAD_SINGLE;
                     String raw_body = requestHead + query + REQUEST_END.replace("PLACE-HOLDER_CLIENT_KEY", clientKey);
-    
+
                     StringEntity re = new StringEntity(raw_body, "text/xml", "UTF-8");
                     method.setEntity(re);
                     // Execute the method.
                     HttpResponse httpResponse = client.execute(method);
                     int statusCode = httpResponse.getStatusLine().getStatusCode();
-    
+
                     if (statusCode != HttpStatus.SC_OK) {
                         throw new RuntimeException(
                             "Chiamata al webservice fallita: "
                                 + httpResponse.getStatusLine());
                     }
-    
+
                     DocumentBuilderFactory factory = DocumentBuilderFactory
                         .newInstance();
                     factory.setValidating(false);
                     factory.setIgnoringComments(true);
                     factory.setIgnoringElementContentWhitespace(true);
-    
+
                     DocumentBuilder builder;
                     try {
                         builder = factory.newDocumentBuilder();
-    
+
                         InputStream responseBodyAsStream = httpResponse.getEntity().getContent();
                         Document inDoc = builder.parse(responseBodyAsStream);
-    
+
                         Element xmlRoot = inDoc.getDocumentElement();
                         Element soapBody = XMLUtils
                             .getSingleElement(xmlRoot, "SOAP-ENV:Body");
-    
+
                         Element matchResponse = XMLUtils.getSingleElement(soapBody, "SOAP-ENV:matchResponse");
                         Element matchReturn = XMLUtils.getSingleElement(matchResponse, "matchReturn");
                         List<Element> matchItems = XMLUtils.getElementList(matchReturn, "item");
@@ -194,17 +194,17 @@ public class SciValService {
                     factory.setValidating(false);
                     factory.setIgnoringComments(true);
                     factory.setIgnoringElementContentWhitespace(true);
-    
+
                     DocumentBuilder builder;
                     builder = factory.newDocumentBuilder();
-    
+
                     Document inDoc = builder.parse(stream);
-    
+
                     Element xmlRoot = inDoc.getDocumentElement();
                     Element soapBody = XMLUtils
                         .getSingleElement(xmlRoot,
                                           "SOAP-ENV:Body");
-    
+
                     Element matchResponse = XMLUtils.getSingleElement(soapBody,
                                                                       "SOAP-ENV:matchResponse");
                     Element matchReturn = XMLUtils.getSingleElement(matchResponse, "matchReturn");

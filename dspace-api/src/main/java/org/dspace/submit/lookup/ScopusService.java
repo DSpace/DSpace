@@ -92,14 +92,14 @@ public class ScopusService {
                     HttpClientBuilder hcBuilder = HttpClients.custom();
                     Builder requestConfigBuilder = RequestConfig.custom();
                     requestConfigBuilder.setConnectionRequestTimeout(timeout);
-    
+
                     if (StringUtils.isNotBlank(proxyHost)
                         && StringUtils.isNotBlank(proxyPort)) {
                         HttpHost proxy = new HttpHost(proxyHost, Integer.parseInt(proxyPort), "http");
                         DefaultProxyRoutePlanner routePlanner = new DefaultProxyRoutePlanner(proxy);
                         hcBuilder.setRoutePlanner(routePlanner);
                     }
-    
+
                     HttpClient client = hcBuilder.build();
                     int start = 0;
                     boolean lastPageReached = false;
@@ -110,31 +110,31 @@ public class ScopusService {
                                 "&view=COMPLETE&start=" + start + "&query=" + URLEncoder
                                 .encode(query));
                         method.setConfig(requestConfigBuilder.build());
-    
+
                         // Execute the method.
                         HttpResponse httpResponse = client.execute(method);
                         int statusCode = httpResponse.getStatusLine().getStatusCode();
-    
+
                         if (statusCode != HttpStatus.SC_OK) {
                             throw new RuntimeException("WS call failed: "
                                                            + statusCode);
                         }
-    
+
                         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
                         factory.setValidating(false);
                         factory.setIgnoringComments(true);
                         factory.setIgnoringElementContentWhitespace(true);
-    
+
                         DocumentBuilder builder;
                         try {
                             builder = factory.newDocumentBuilder();
-    
+
                             InputStream responseBodyAsStream = httpResponse.getEntity().getContent();
-    
+
                             Document inDoc = builder.parse(responseBodyAsStream);
-    
+
                             Element xmlRoot = inDoc.getDocumentElement();
-    
+
                             List<Element> pages = XMLUtils.getElementList(xmlRoot,
                                                                           "link");
                             lastPageReached = true;
@@ -147,7 +147,7 @@ public class ScopusService {
                             }
                             List<Element> pubArticles = XMLUtils.getElementList(xmlRoot,
                                                                                 "entry");
-    
+
                             for (Element xmlArticle : pubArticles) {
                                 Record scopusItem = null;
                                 try {
@@ -160,13 +160,13 @@ public class ScopusService {
                                             + e.getMessage(), e);
                                 }
                             }
-    
+
                         } catch (ParserConfigurationException e1) {
                             log.error(e1.getMessage(), e1);
                         } catch (SAXException e1) {
                             log.error(e1.getMessage(), e1);
                         }
-    
+
                         start += itemPerPage;
                     }
                 } catch (Exception e1) {
@@ -188,10 +188,10 @@ public class ScopusService {
                     factory.setValidating(false);
                     factory.setIgnoringComments(true);
                     factory.setIgnoringElementContentWhitespace(true);
-    
+
                     DocumentBuilder builder = factory.newDocumentBuilder();
                     Document inDoc = builder.parse(stream);
-    
+
                     Element xmlRoot = inDoc.getDocumentElement();
                 } catch (Exception e) {
                     throw new RuntimeException(e.getMessage(), e);
