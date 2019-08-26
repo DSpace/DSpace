@@ -30,7 +30,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.content.MetadataSchema;
+import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.factory.ContentServiceFactory;
@@ -158,7 +158,7 @@ public class PackageUtils {
      */
     public static void checkItemMetadata(Item item)
         throws PackageValidationException {
-        List<MetadataValue> t = itemService.getMetadata(item, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY);
+        List<MetadataValue> t = itemService.getMetadata(item, MetadataSchemaEnum.DC.getName(), "title", null, Item.ANY);
         if (t == null || t.size() == 0) {
             throw new PackageValidationException("Item cannot be created without the required \"title\" DC metadata.");
         }

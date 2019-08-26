@@ -32,7 +32,7 @@ import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.DCDate;
 import org.dspace.content.Item;
-import org.dspace.content.MetadataSchema;
+import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.BitstreamFormatService;
@@ -593,7 +593,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
 
             // Get title
             List<MetadataValue> titles = itemService
-                .getMetadata(item, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY);
+                .getMetadata(item, MetadataSchemaEnum.DC.getName(), "title", null, Item.ANY);
             String title = "";
             try {
                 title = I18nUtil.getMessage("org.dspace.workflow.WorkflowManager.untitled");
@@ -891,7 +891,8 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
 
         // Add to item as a DC field
         itemService
-            .addMetadata(context, myitem, MetadataSchema.DC_SCHEMA, "description", "provenance", "en", provDescription);
+            .addMetadata(context, myitem, MetadataSchemaEnum.DC.getName(),
+                         "description", "provenance", "en", provDescription);
 
         //Clear any workflow schema related metadata
         itemService
@@ -1024,7 +1025,8 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
 
         // Add message to the DC
         itemService
-            .addMetadata(context, myitem, MetadataSchema.DC_SCHEMA, "description", "provenance", "en", provmessage);
+            .addMetadata(context, myitem, MetadataSchemaEnum.DC.getName(),
+                         "description", "provenance", "en", provmessage);
         itemService.update(context, myitem);
     }
 
