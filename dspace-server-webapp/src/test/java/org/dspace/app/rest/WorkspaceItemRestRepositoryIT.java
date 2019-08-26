@@ -28,6 +28,7 @@ import javax.ws.rs.core.MediaType;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.CharEncoding;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.dspace.app.rest.builder.BitstreamBuilder;
 import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
@@ -708,7 +709,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                     .andExpect(jsonPath("$.sections.traditionalpageone['dc.contributor.author'][1].value",
                         is("Bergman, Tomas")))
                     .andExpect(jsonPath("$.sections.traditionalpageone['dc.contributor.author'][2].value",
-                        is("Jörnvall, Hans")))
+                        is(StringEscapeUtils.unescapeJava("J\\u00F6rnvall, Hans"))))
                     .andExpect(jsonPath("$.sections.traditionalpageone['dc.identifier.issn'][0].value",
                         is("0003-2700")))
                     .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.description.abstract'][0].value",
@@ -740,7 +741,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .andExpect(jsonPath("$.sections.traditionalpageone['dc.contributor.author'][1].value",
                     is("Bergman, Tomas")))
                 .andExpect(jsonPath("$.sections.traditionalpageone['dc.contributor.author'][2].value",
-                    is("Jörnvall, Hans")))
+                    is(StringEscapeUtils.unescapeJava("J\\u00F6rnvall, Hans"))))
                 .andExpect(jsonPath("$.sections.traditionalpageone['dc.identifier.issn'][0].value",
                     is("0003-2700")))
                 .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.description.abstract'][0].value",
