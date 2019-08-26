@@ -47,10 +47,13 @@ import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.apache.solr.client.solrj.impl.HttpSolrClient.RemoteSolrException;
 import org.apache.solr.client.solrj.request.AbstractUpdateRequest;
 import org.apache.solr.client.solrj.request.ContentStreamUpdateRequest;
 import org.apache.solr.client.solrj.request.CoreAdminRequest;
@@ -108,8 +111,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBean {
 
-    private static final org.apache.logging.log4j.Logger log =
-            org.apache.logging.log4j.LogManager.getLogger(SolrLoggerServiceImpl.class);
+    private static final Logger log = LogManager.getLogger();
 
     private static final String MULTIPLE_VALUES_SPLITTER = "|";
     protected SolrClient solr;
@@ -167,7 +169,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
         statisticsCoreURL = configurationService.getProperty("solr-statistics.server");
 
         if (null != statisticsCoreURL) {
-            Path statisticsPath = Paths.get(new URI(statisticsCoreURL));
+            Path statisticsPath = Paths.get(new URI(statisticsCoreURL).getPath());
             statisticsCoreBase = statisticsPath
                     .getName(statisticsPath.getNameCount() - 1)
                     .toString();
@@ -1221,12 +1223,12 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
 
             for (File tempCsv : filesToUpload) {
                 //Upload the data in the csv files to our new solr core
-                ContentStreamUpdateRequest contentStreamUpdateRequest = new ContentStreamUpdateRequest("/update/csv");
-                contentStreamUpdateRequest.setParam("stream.contentType", "text/plain;charset=utf-8");
+                ContentStreamUpdateRequest contentStreamUpdateRequest = new ContentStreamUpdateRequest("/update");
+                contentStreamUpdateRequest.setParam("stream.contentType", "text/csv;charset=utf-8");
                 contentStreamUpdateRequest.setParam("escape", "\\");
                 contentStreamUpdateRequest.setParam("skip", "_version_");
                 contentStreamUpdateRequest.setAction(AbstractUpdateRequest.ACTION.COMMIT, true, true);
-                contentStreamUpdateRequest.addFile(tempCsv, "text/plain;charset=utf-8");
+                contentStreamUpdateRequest.addFile(tempCsv, "text/csv;charset=utf-8");
 
                 //Add parsing directives for the multivalued fields so that they are stored as separate values
                 // instead of one value
@@ -1246,7 +1248,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
             solr.deleteByQuery(filterQuery.toString());
             solr.commit(true, true);
 
-            log.info("Moved " + totalRecords + " records into core: " + coreName);
+            log.info("Moved {} records into core: {}", totalRecords, coreName);
         }
 
         FileUtils.deleteDirectory(tempDirectory);
@@ -1254,18 +1256,18 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
 
     protected HttpSolrClient createCore(HttpSolrClient solr, String coreName)
             throws IOException, SolrServerException {
-        String baseSolrUrl = solr.getBaseURL().replace(statisticsCoreBase, "");
+        String baseSolrUrl = solr.getBaseURL().replace(statisticsCoreBase, ""); // Has trailing slash
 
         //DS-3458: Test to see if a solr core already exists.  If it exists,
         // return a connection to that core.  Otherwise create a new core and
         // return a connection to it.
-        HttpSolrClient returnServer = new HttpSolrClient.Builder(baseSolrUrl + "/" + coreName).build();
+        HttpSolrClient returnServer = new HttpSolrClient.Builder(baseSolrUrl + coreName).build();
         try {
             SolrPingResponse ping = returnServer.ping();
             log.debug("Ping of Solr Core {} returned with Status {}",
                     coreName, ping.getStatus());
             return returnServer;
-        } catch (IOException | SolrServerException e) {
+        } catch (IOException | RemoteSolrException | SolrServerException e) {
             log.debug("Ping of Solr Core {} failed with {}.  New Core Will be Created",
                     coreName, e.getClass().getName());
         }
@@ -1274,10 +1276,14 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
         //http://lucene.apache.org/solr/4_4_0/solr-solrj/org/apache/solr/client/solrj/request/CoreAdminRequest.html
         CoreAdminRequest.Create create = new CoreAdminRequest.Create();
         create.setCoreName(coreName);
+        String configSetName = configurationService
+                .getProperty("solr-statistics.configset", "statistics");
+        create.setConfigSet(configSetName);
+        create.setInstanceDir(coreName);
 
         HttpSolrClient solrServer = new HttpSolrClient.Builder(baseSolrUrl).build();
         create.process(solrServer);
-        log.info("Created core with name: " + coreName);
+        log.info("Created core with name: {} from configset {}", coreName, configSetName);
         return returnServer;
     }
 
@@ -1412,10 +1418,10 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
 
             //Add all the separate csv files
             for (File tempCsv : tempCsvFiles) {
-                ContentStreamUpdateRequest contentStreamUpdateRequest = new ContentStreamUpdateRequest("/update/csv");
-                contentStreamUpdateRequest.setParam("stream.contentType", "text/plain;charset=utf-8");
+                ContentStreamUpdateRequest contentStreamUpdateRequest = new ContentStreamUpdateRequest("/update");
+                contentStreamUpdateRequest.setParam("stream.contentType", "text/csv;charset=utf-8");
                 contentStreamUpdateRequest.setAction(AbstractUpdateRequest.ACTION.COMMIT, true, true);
-                contentStreamUpdateRequest.addFile(tempCsv, "text/plain;charset=utf-8");
+                contentStreamUpdateRequest.addFile(tempCsv, "text/csv;charset=utf-8");
 
                 solr.request(contentStreamUpdateRequest);
             }
