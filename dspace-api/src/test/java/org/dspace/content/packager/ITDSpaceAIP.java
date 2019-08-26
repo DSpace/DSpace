@@ -28,7 +28,6 @@ import org.dspace.AbstractUnitTest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
-import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
@@ -36,7 +35,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.content.MetadataSchema;
+import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.factory.ContentServiceFactory;
@@ -95,7 +94,6 @@ public class ITDSpaceAIP extends AbstractUnitTest {
     protected ResourcePolicyService resourcePolicyService = AuthorizeServiceFactory.getInstance()
                                                                                    .getResourcePolicyService();
     protected GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
-    protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
 
     /**
      * InfoMap multiple value separator (see saveObjectInfo() and assertObject* methods)
@@ -110,7 +108,6 @@ public class ITDSpaceAIP extends AbstractUnitTest {
     private static String testItemHandle = null;
     private static String testMappedItemHandle = null;
     private static String submitterEmail = "aip-test@dspace.org";
-    private Context context;
 
     /**
      * Create a global temporary upload folder which will be cleaned up automatically by JUnit.
@@ -164,17 +161,18 @@ public class ITDSpaceAIP extends AbstractUnitTest {
             //
             Community topCommunity = communityService.create(null, context);
             communityService
-                .addMetadata(context, topCommunity, MetadataSchema.DC_SCHEMA, "title", null, null, "Top Community");
+                .addMetadata(context, topCommunity, MetadataSchemaEnum.DC.getName(),
+                             "title", null, null, "Top Community");
             communityService.update(context, topCommunity);
             topCommunityHandle = topCommunity.getHandle();
 
             Community child = communityService.createSubcommunity(context, topCommunity);
             communityService
-                .addMetadata(context, child, MetadataSchema.DC_SCHEMA, "title", null, null, "Child Community");
+                .addMetadata(context, child, MetadataSchemaEnum.DC.getName(), "title", null, null, "Child Community");
             communityService.update(context, child);
 
             Community grandchild = communityService.createSubcommunity(context, child);
-            communityService.addMetadata(context, grandchild, MetadataSchema.DC_SCHEMA, "title", null, null,
+            communityService.addMetadata(context, grandchild, MetadataSchemaEnum.DC.getName(), "title", null, null,
                                          "Grandchild Community");
             communityService.update(context, grandchild);
 
@@ -558,8 +556,9 @@ public class ITDSpaceAIP extends AbstractUnitTest {
 
         // Change the Community name
         String newName = "This is NOT my Community name!";
-        communityService.clearMetadata(context, topCommunity, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY);
-        communityService.addMetadata(context, topCommunity, MetadataSchema.DC_SCHEMA, "title", null, null, newName);
+        communityService.clearMetadata(context, topCommunity, MetadataSchemaEnum.DC.getName(), "title", null, Item.ANY);
+        communityService.addMetadata(context, topCommunity, MetadataSchemaEnum.DC.getName(),
+                                     "title", null, null, newName);
 
         // Ensure name is changed
         assertEquals("testReplaceCommunityOnly() new name", topCommunity.getName(), newName);
@@ -781,8 +780,10 @@ public class ITDSpaceAIP extends AbstractUnitTest {
 
         // Change the Collection name
         String newName = "This is NOT my Collection name!";
-        collectionService.clearMetadata(context, testCollection, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY);
-        collectionService.addMetadata(context, testCollection, MetadataSchema.DC_SCHEMA, "title", null, null, newName);
+        collectionService.clearMetadata(context, testCollection, MetadataSchemaEnum.DC.getName(),
+                                        "title", null, Item.ANY);
+        collectionService.addMetadata(context, testCollection, MetadataSchemaEnum.DC.getName(),
+                                      "title", null, null, newName);
 
         // Ensure name is changed
         assertEquals("testReplaceCollectionOnly() new name", testCollection.getName(), newName);
@@ -1029,8 +1030,8 @@ public class ITDSpaceAIP extends AbstractUnitTest {
 
         // Change the Item name
         String newName = "This is NOT my Item name!";
-        itemService.clearMetadata(context, testItem, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY);
-        itemService.addMetadata(context, testItem, MetadataSchema.DC_SCHEMA, "title", null, null, newName);
+        itemService.clearMetadata(context, testItem, MetadataSchemaEnum.DC.getName(), "title", null, Item.ANY);
+        itemService.addMetadata(context, testItem, MetadataSchemaEnum.DC.getName(), "title", null, null, newName);
 
         // Ensure name is changed
         assertEquals("testReplaceItem() new name", testItem.getName(), newName);

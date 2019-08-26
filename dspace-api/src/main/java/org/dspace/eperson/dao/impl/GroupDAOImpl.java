@@ -167,7 +167,7 @@ public class GroupDAOImpl extends AbstractHibernateDSODAO<Group> implements Grou
     @Override
     public void delete(Context context, Group group) throws SQLException {
         Query query = getHibernateSession(context)
-            .createSQLQuery("DELETE FROM group2group WHERE parent_id=:groupId or child_id=:groupId");
+            .createNativeQuery("DELETE FROM group2group WHERE parent_id=:groupId or child_id=:groupId");
         query.setParameter("groupId", group.getID());
         query.executeUpdate();
         super.delete(context, group);

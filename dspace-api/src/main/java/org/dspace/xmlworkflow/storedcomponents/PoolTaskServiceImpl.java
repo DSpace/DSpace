@@ -49,7 +49,7 @@ public class PoolTaskServiceImpl implements PoolTaskService {
     }
 
     @Override
-    public int getSupportsTypeConstant() {
+    public int getSupportsIndexableObjectTypeConstant() {
         return Constants.POOLTASK;
     }
 
@@ -142,7 +142,7 @@ public class PoolTaskServiceImpl implements PoolTaskService {
     }
 
     @Override
-    public PoolTask find(Context context, Integer id) throws SQLException {
+    public PoolTask findIndexableObject(Context context, Integer id) throws SQLException {
         if (id == null) {
             return null;
         }

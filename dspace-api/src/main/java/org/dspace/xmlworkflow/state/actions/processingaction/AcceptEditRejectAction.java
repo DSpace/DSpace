@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DCDate;
-import org.dspace.content.MetadataSchema;
+import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.core.Context;
 import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
 import org.dspace.xmlworkflow.state.Step;
@@ -91,7 +91,7 @@ public class AcceptEditRejectAction extends ProcessingAction {
             + usersName + " on " + now + " (GMT) ";
 
         // Add to item as a DC field
-        itemService.addMetadata(c, wfi.getItem(), MetadataSchema.DC_SCHEMA, "description", "provenance", "en",
+        itemService.addMetadata(c, wfi.getItem(), MetadataSchemaEnum.DC.getName(), "description", "provenance", "en",
                                 provDescription);
         itemService.update(c, wfi.getItem());
     }
