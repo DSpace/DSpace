@@ -7,32 +7,49 @@
  */
 package org.dspace.app.rest;
 
+import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.endsWith;
+import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.UUID;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.codec.CharEncoding;
 import org.apache.commons.io.IOUtils;
 import org.dspace.app.rest.builder.BitstreamBuilder;
 import org.dspace.app.rest.builder.BundleBuilder;
 import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
+import org.dspace.app.rest.builder.EPersonBuilder;
 import org.dspace.app.rest.builder.ItemBuilder;
+import org.dspace.app.rest.builder.ResourcePolicyBuilder;
 import org.dspace.app.rest.matcher.BitstreamMatcher;
 import org.dspace.app.rest.matcher.BundleMatcher;
+import org.dspace.app.rest.matcher.MetadataMatcher;
+import org.dspace.app.rest.model.BundleRest;
+import org.dspace.app.rest.model.MetadataRest;
+import org.dspace.app.rest.model.MetadataValueRest;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.authorize.ResourcePolicy;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.core.Constants;
+import org.dspace.eperson.EPerson;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.test.web.servlet.MvcResult;
 
 public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
 
@@ -46,66 +63,252 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
     public void setUp() throws Exception {
         super.setUp();
 
-        System.out.println("test");
         context.turnOffAuthorisationSystem();
 
         parentCommunity = CommunityBuilder.createCommunity(context)
-            .withName("Parent Community")
-            .build();
+                                          .withName("Parent Community")
+                                          .build();
 
         collection = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
 
         item = ItemBuilder.createItem(context, collection)
-            .withTitle("Public item 1")
-            .withIssueDate("2017-10-17")
-            .withAuthor("Smith, Donald").withAuthor("Doe, John")
-            .withSubject("ExtraEntry")
-            .build();
+                          .withTitle("Public item 1")
+                          .withIssueDate("2017-10-17")
+                          .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                          .withSubject("ExtraEntry")
+                          .build();
 
-        String bitstreamContent = "Dummy content";
-        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
-            bitstream1 = BitstreamBuilder.createBitstream(context, item, is)
-                .withName("Bitstream")
-                .withMimeType("text/plain")
-                .build();
-        }
-
-        bundle1 = BundleBuilder.createBundle(context, item)
-            .withName("testname")
-            .withBitstream(bitstream1)
-            .build();
-        bundle2 = BundleBuilder.createBundle(context, item).withName("test2").build();
 
         context.restoreAuthSystemState();
+
     }
 
     @Test
     public void GetSingleBundle() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        String bitstreamContent = "Dummy content";
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream1 = BitstreamBuilder.createBitstream(context, item, is)
+                                         .withName("Bitstream")
+                                         .withMimeType("text/plain")
+                                         .build();
+        }
+
+        bundle1 = BundleBuilder.createBundle(context, item)
+                               .withName("testname")
+                               .withBitstream(bitstream1)
+                               .build();
+
+        context.restoreAuthSystemState();
+
         getClient().perform(get("/api/core/bundles/" + bundle1.getID()))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(contentType))
-            .andExpect(jsonPath("$", BundleMatcher.matchBundle(bundle1)))
-            .andExpect(jsonPath("$._embedded.bitstreams._embedded.bitstreams", containsInAnyOrder(
-                BitstreamMatcher.matchBitstreamEntry(bitstream1.getID(), bitstream1.getSizeBytes())))
-            )
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$", BundleMatcher.matchBundle(bundle1)))
+                   .andExpect(jsonPath("$._embedded.bitstreams._embedded.bitstreams", containsInAnyOrder(
+                           BitstreamMatcher.matchBitstreamEntry(bitstream1.getID(), bitstream1.getSizeBytes())))
+                   )
         ;
     }
 
 
     @Test
     public void getItemBundles() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        String bitstreamContent = "Dummy content";
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream1 = BitstreamBuilder.createBitstream(context, item, is)
+                                         .withName("Bitstream")
+                                         .withMimeType("text/plain")
+                                         .build();
+        }
+
+        bundle1 = BundleBuilder.createBundle(context, item)
+                               .withName("testname")
+                               .withBitstream(bitstream1)
+                               .build();
+        bundle2 = BundleBuilder.createBundle(context, item).withName("test2").build();
+
+        context.restoreAuthSystemState();
+
         getClient().perform(get("/api/core/items/" + item.getID() + "/bundles"))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(contentType))
-            .andExpect(jsonPath("$._embedded.bundles", Matchers.hasItems(
-                    BundleMatcher.matchBundle(bundle1),
-                    BundleMatcher.matchBundle(bundle2)
-                )))
-            .andExpect(jsonPath("$._links.self.href", endsWith("/api/core/items/" + item.getID() + "/bundles")))
-            ;
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$._embedded.bundles", Matchers.hasItems(
+                           BundleMatcher.matchBundle(bundle1),
+                           BundleMatcher.matchBundle(bundle2)
+                   )))
+                   .andExpect(jsonPath("$._links.self.href", endsWith("/api/core/items/" + item.getID() + "/bundles")))
+        ;
     }
 
+    @Test
+    public void createBundleWithoutMetadata() throws Exception {
+        ObjectMapper mapper = new ObjectMapper();
+        BundleRest bundleRest = new BundleRest();
+        bundleRest.setName("Create Bundle Without Metadata");
 
+        String token = getAuthToken(admin.getEmail(), password);
+
+        MvcResult mvcResult = getClient(token).perform(post("/api/core/items/" + item.getID() + "/bundles")
+                                                               .content(mapper.writeValueAsBytes(bundleRest))
+                                                               .contentType(contentType))
+                                              .andExpect(status().isCreated())
+                                              .andReturn();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        Map<String, Object> map = mapper.readValue(content, Map.class);
+        UUID bundleUuid = UUID.fromString(String.valueOf(map.get("uuid")));
+
+
+        getClient().perform(get("/api/core/bundles/" + bundleUuid))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$", BundleMatcher.matchBundle(
+                           "Create Bundle Without Metadata",
+                           bundleUuid, null, Constants.BUNDLE, new ArrayList<>())));
+    }
+
+    @Test
+    public void createBundleWithMetadata() throws Exception {
+        ObjectMapper mapper = new ObjectMapper();
+
+        BundleRest bundleRest = new BundleRest();
+        bundleRest.setName("Create Bundle Without Metadata");
+        bundleRest.setMetadata(new MetadataRest()
+                                       .put("dc.description",
+                                            new MetadataValueRest("A description"))
+                                       .put("dc.relation",
+                                            new MetadataValueRest("A relation")));
+
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        MvcResult mvcResult = getClient(token).perform(post("/api/core/items/" + item.getID() + "/bundles")
+                                                               .content(mapper.writeValueAsBytes(bundleRest))
+                                                               .contentType(contentType))
+                                              .andExpect(status().isCreated())
+                                              .andReturn();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        Map<String, Object> map = mapper.readValue(content, Map.class);
+        UUID bundleUuid = UUID.fromString(String.valueOf(map.get("uuid")));
+
+
+        getClient().perform(get("/api/core/bundles/" + bundleUuid))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$", BundleMatcher.matchBundle(
+                           "Create Bundle Without Metadata",
+                           bundleUuid, null, Constants.BUNDLE, new ArrayList<>())))
+                   .andExpect(jsonPath("$", Matchers.allOf(
+                           hasJsonPath("$.metadata", Matchers.allOf(
+                                   MetadataMatcher.matchMetadata("dc.description",
+                                                                 "A description"),
+                                   MetadataMatcher.matchMetadata("dc.relation",
+                                                                 "A relation"))))));
+    }
+
+    @Test
+    public void createBundleAsAnonymous() throws Exception {
+        ObjectMapper mapper = new ObjectMapper();
+
+        BundleRest bundleRest = new BundleRest();
+        bundleRest.setName("Create Bundle Without Metadata");
+
+        getClient().perform(post("/api/core/items/" + item.getID() + "/bundles")
+                                    .content(mapper.writeValueAsBytes(bundleRest)).contentType(contentType))
+                   .andExpect(status().isUnauthorized());
+
+        getClient().perform(get("/api/core/items/" + item.getID() + "/bundles"))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$.page.totalElements", is(0)));
+
+    }
+
+    @Test
+    public void createBundleWithInsufficientPermissions() throws Exception {
+        ObjectMapper mapper = new ObjectMapper();
+
+        BundleRest bundleRest = new BundleRest();
+        bundleRest.setName("Create Bundle Without Metadata");
+
+        String token = getAuthToken(eperson.getEmail(), password);
+
+
+        getClient(token).perform(post("/api/core/items/" + item.getID() + "/bundles")
+                                         .content(mapper.writeValueAsBytes(bundleRest)).contentType(contentType))
+                        .andExpect(status().isForbidden());
+
+        getClient().perform(get("/api/core/items/" + item.getID() + "/bundles"))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$.page.totalElements", is(0)));
+
+    }
+
+    @Test
+    public void createBundleWithSufficientPermissions() throws Exception {
+        ObjectMapper mapper = new ObjectMapper();
+
+        context.turnOffAuthorisationSystem();
+
+        EPerson createBundleEperson = EPersonBuilder.createEPerson(context).withEmail("createm@bundle.org")
+                                                    .withPassword("test")
+                                                    .withNameInMetadata("Create", "Bundle").build();
+
+        ResourcePolicy rp1 = ResourcePolicyBuilder.createResourcePolicy(context).withUser(createBundleEperson)
+                                                  .withAction(Constants.ADD)
+                                                  .withDspaceObject(item).build();
+        context.restoreAuthSystemState();
+
+
+        BundleRest bundleRest = new BundleRest();
+        bundleRest.setName("Create Bundle Without Metadata");
+
+
+        String token = getAuthToken(createBundleEperson.getEmail(), "test");
+
+
+        MvcResult mvcResult = getClient(token).perform(post("/api/core/items/" + item.getID() + "/bundles")
+                                                               .content(mapper.writeValueAsBytes(bundleRest))
+                                                               .contentType(contentType))
+                                              .andExpect(status().isCreated())
+                                              .andReturn();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        Map<String, Object> map = mapper.readValue(content, Map.class);
+        UUID bundleUuid = UUID.fromString(String.valueOf(map.get("uuid")));
+
+
+        getClient().perform(get("/api/core/bundles/" + bundleUuid))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$", BundleMatcher.matchBundle(
+                           "Create Bundle Without Metadata",
+                           bundleUuid, null, Constants.BUNDLE, new ArrayList<>())));
+
+    }
+
+    @Test
+    public void createBundleOnNonExistingItem() throws Exception {
+        ObjectMapper mapper = new ObjectMapper();
+
+        BundleRest bundleRest = new BundleRest();
+        bundleRest.setName("Create Bundle Without Metadata");
+
+        String token = getAuthToken(eperson.getEmail(), password);
+
+
+        getClient(token).perform(post("/api/core/items/" + UUID.randomUUID() + "/bundles")
+                                         .content(mapper.writeValueAsBytes(bundleRest)).contentType(contentType))
+                        .andExpect(status().isNotFound());
+
+    }
 
 
 }
