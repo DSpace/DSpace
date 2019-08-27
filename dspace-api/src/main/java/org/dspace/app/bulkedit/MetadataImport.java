@@ -1611,7 +1611,7 @@ public class MetadataImport {
                         newLine.add(key, value);
                     }
                 } else {
-                    if (!line.get(key).get(0).isEmpty()) {
+                    if (line.get(key).size() > 0) {
                         newLine.add(key, line.get(key).get(0));
                     }
                 }
