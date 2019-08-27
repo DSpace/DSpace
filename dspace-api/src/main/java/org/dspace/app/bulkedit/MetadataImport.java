@@ -1590,6 +1590,7 @@ public class MetadataImport {
 
     /**
      * Gets a copy of the given csv line with all entity references resolved to UUID strings.
+     * Keys being iterated over represent metadatafields or special columns to be processed.
      *
      * @param line the csv line to process.
      * @return a copy, with all references resolved.
@@ -1598,9 +1599,12 @@ public class MetadataImport {
     public DSpaceCSVLine resolveEntityRefs(DSpaceCSVLine line) throws MetadataImportException {
         DSpaceCSVLine newLine = new DSpaceCSVLine(line.getID());
         for (String key : line.keys()) {
+            // If a key represents a relation field attempt to resolve the reference from the csvRefMap
             if (key.split("\\.")[0].equalsIgnoreCase("relation")) {
                 if (line.get(key).size() > 0) {
                     for (String val : line.get(key)) {
+                        // Attempt to resolve the relation reference
+                        // These can be a UUID, metadata reference or rowName reference
                         String uuid = resolveEntityRef(c, val).toString();
                         newLine.add(key, uuid);
                     }
@@ -1676,7 +1680,7 @@ public class MetadataImport {
             } catch (IllegalArgumentException e) {
                 throw new MetadataImportException("Not a UUID or indirect entity reference: '" + reference + "'");
             }
-        } else if (!reference.startsWith("rowName:") ) { //Assume it's a metadata value reference
+        } else if (!reference.startsWith("rowName:") ) { // Not a rowName ref; so it's a metadata value reference
             MetadataValueService metadataValueService = ContentServiceFactory.getInstance().getMetadataValueService();
             MetadataFieldService metadataFieldService =
                     ContentServiceFactory.getInstance().getMetadataFieldService();
@@ -1704,7 +1708,9 @@ public class MetadataImport {
                 throw new MetadataImportException("Error looking up item by metadata reference: " + reference, e);
             }
         }
-        // Lookup UUIDs that may have already been processed
+        // Lookup UUIDs that may have already been processed into the csvRefMap
+        // See populateRefAndRowMap() for how the csvRefMap is populated
+        // See getMatchingCSVUUIDs() for how the reference param is sourced from the csvRefMap
         Set<UUID> csvUUIDs = getMatchingCSVUUIDs(reference);
         if (csvUUIDs.size() > 1) {
             throw new MetadataImportException("Ambiguous reference; multiple matches in csv: " + reference);
@@ -1717,7 +1723,7 @@ public class MetadataImport {
             } else {
                 return csvUUID; // one match from csv
             }
-        } else { // size == 0
+        } else { // size == 0; the reference does not exist throw an error
             if (uuid == null) {
                 throw new MetadataImportException("No matches found for reference: " + reference);
             } else {
