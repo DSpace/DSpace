@@ -58,6 +58,7 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
     private Bundle bundle1;
     private Bundle bundle2;
     private Bitstream bitstream1;
+    private Bitstream bitstream2;
 
     @Before
     public void setUp() throws Exception {
@@ -308,6 +309,41 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
                                          .content(mapper.writeValueAsBytes(bundleRest)).contentType(contentType))
                         .andExpect(status().isNotFound());
 
+    }
+
+    @Test
+    public void getBitstreamsForBundle() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        String bitstreamContent = "Dummy content";
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream1 = BitstreamBuilder.createBitstream(context, item, is)
+                                         .withName("Bitstream")
+                                         .withDescription("Description")
+                                         .withMimeType("text/plain")
+                                         .build();
+            bitstream2 = BitstreamBuilder.createBitstream(context, item, is)
+                                         .withName("Bitstream2")
+                                         .withDescription("Description2")
+                                         .withMimeType("text/plain")
+                                         .build();
+        }
+
+        bundle1 = BundleBuilder.createBundle(context, item)
+                               .withName("testname")
+                               .withBitstream(bitstream1)
+                               .withBitstream(bitstream2)
+                               .build();
+
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/api/core/bundles/" + bundle1.getID() + "/bitstreams"))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$._embedded.bitstreams", Matchers.hasItems(
+                           BitstreamMatcher.matchBitstreamEntry(bitstream1),
+                           BitstreamMatcher.matchBitstreamEntry(bitstream2)
+                   )));
     }
 
 
