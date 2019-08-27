@@ -47,7 +47,7 @@ import org.xml.sax.SAXException;
 public class ScopusService {
 
     private static final String ENDPOINT_SEARCH_SCOPUS = "http://api.elsevier.com/content/search/scopus";
-    //private static final String ENDPOINT_SEARCH_SCOPUS = "http://localhost:9999/content/search/scopus";
+    //private static final String ENDPOINT_SEARCH_SCOPUS = "http://localhost:10622/content/search/scopus";
 
     private static final Logger log = Logger.getLogger(ScopusService.class);
 
@@ -85,121 +85,123 @@ public class ScopusService {
         String apiKey = ConfigurationManager.getProperty("submission.lookup.scopus.apikey");
 
         List<Record> results = new ArrayList<>();
-        if (!ConfigurationManager.getBooleanProperty(SubmissionLookupService.CFG_MODULE, "remoteservice.demo")) {
-            HttpGet method = null;
-            try {
-                HttpClientBuilder hcBuilder = HttpClients.custom();
-                Builder requestConfigBuilder = RequestConfig.custom();
-                requestConfigBuilder.setConnectionRequestTimeout(timeout);
+        if (!apiKey.equals("") && apiKey != null) {
+            if (!ConfigurationManager.getBooleanProperty(SubmissionLookupService.CFG_MODULE, "remoteservice.demo")) {
+                HttpGet method = null;
+                try {
+                    HttpClientBuilder hcBuilder = HttpClients.custom();
+                    Builder requestConfigBuilder = RequestConfig.custom();
+                    requestConfigBuilder.setConnectionRequestTimeout(timeout);
 
-                if (StringUtils.isNotBlank(proxyHost)
-                    && StringUtils.isNotBlank(proxyPort)) {
-                    HttpHost proxy = new HttpHost(proxyHost, Integer.parseInt(proxyPort), "http");
-                    DefaultProxyRoutePlanner routePlanner = new DefaultProxyRoutePlanner(proxy);
-                    hcBuilder.setRoutePlanner(routePlanner);
-                }
-
-                HttpClient client = hcBuilder.build();
-                int start = 0;
-                boolean lastPageReached = false;
-                while (!lastPageReached) {
-                    // open session
-                    method = new HttpGet(
-                        ENDPOINT_SEARCH_SCOPUS + "?httpAccept=application/xml&apiKey=" + apiKey +
-                            "&view=COMPLETE&start=" + start + "&query=" + URLEncoder
-                            .encode(query));
-                    method.setConfig(requestConfigBuilder.build());
-
-                    // Execute the method.
-                    HttpResponse httpResponse = client.execute(method);
-                    int statusCode = httpResponse.getStatusLine().getStatusCode();
-
-                    if (statusCode != HttpStatus.SC_OK) {
-                        throw new RuntimeException("WS call failed: "
-                                                       + statusCode);
+                    if (StringUtils.isNotBlank(proxyHost)
+                        && StringUtils.isNotBlank(proxyPort)) {
+                        HttpHost proxy = new HttpHost(proxyHost, Integer.parseInt(proxyPort), "http");
+                        DefaultProxyRoutePlanner routePlanner = new DefaultProxyRoutePlanner(proxy);
+                        hcBuilder.setRoutePlanner(routePlanner);
                     }
 
-                    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+                    HttpClient client = hcBuilder.build();
+                    int start = 0;
+                    boolean lastPageReached = false;
+                    while (!lastPageReached) {
+                        // open session
+                        method = new HttpGet(
+                            ENDPOINT_SEARCH_SCOPUS + "?httpAccept=application/xml&apiKey=" + apiKey +
+                                "&view=COMPLETE&start=" + start + "&query=" + URLEncoder
+                                .encode(query));
+                        method.setConfig(requestConfigBuilder.build());
+
+                        // Execute the method.
+                        HttpResponse httpResponse = client.execute(method);
+                        int statusCode = httpResponse.getStatusLine().getStatusCode();
+
+                        if (statusCode != HttpStatus.SC_OK) {
+                            throw new RuntimeException("WS call failed: "
+                                                           + statusCode);
+                        }
+
+                        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+                        factory.setValidating(false);
+                        factory.setIgnoringComments(true);
+                        factory.setIgnoringElementContentWhitespace(true);
+
+                        DocumentBuilder builder;
+                        try {
+                            builder = factory.newDocumentBuilder();
+
+                            InputStream responseBodyAsStream = httpResponse.getEntity().getContent();
+
+                            Document inDoc = builder.parse(responseBodyAsStream);
+
+                            Element xmlRoot = inDoc.getDocumentElement();
+
+                            List<Element> pages = XMLUtils.getElementList(xmlRoot,
+                                                                          "link");
+                            lastPageReached = true;
+                            for (Element page : pages) {
+                                String refPage = page.getAttribute("ref");
+                                if (StringUtils.equalsIgnoreCase(refPage, "next")) {
+                                    lastPageReached = false;
+                                    break;
+                                }
+                            }
+                            List<Element> pubArticles = XMLUtils.getElementList(xmlRoot,
+                                                                                "entry");
+
+                            for (Element xmlArticle : pubArticles) {
+                                Record scopusItem = null;
+                                try {
+                                    scopusItem = ScopusUtils
+                                        .convertScopusDomToRecord(xmlArticle);
+                                    results.add(scopusItem);
+                                } catch (Exception e) {
+                                    throw new RuntimeException(
+                                        "EID is not valid or not exist: "
+                                            + e.getMessage(), e);
+                                }
+                            }
+
+                        } catch (ParserConfigurationException e1) {
+                            log.error(e1.getMessage(), e1);
+                        } catch (SAXException e1) {
+                            log.error(e1.getMessage(), e1);
+                        }
+
+                        start += itemPerPage;
+                    }
+                } catch (Exception e1) {
+                    log.error(e1.getMessage(), e1);
+                } finally {
+                    if (method != null) {
+                        method.releaseConnection();
+                    }
+                }
+            } else {
+                InputStream stream = null;
+                try {
+                    File file = new File(
+                        ConfigurationManager.getProperty("dspace.dir")
+                            + "/config/crosswalks/demo/scopus-search.xml");
+                    stream = new FileInputStream(file);
+                    DocumentBuilderFactory factory = DocumentBuilderFactory
+                        .newInstance();
                     factory.setValidating(false);
                     factory.setIgnoringComments(true);
                     factory.setIgnoringElementContentWhitespace(true);
 
-                    DocumentBuilder builder;
-                    try {
-                        builder = factory.newDocumentBuilder();
+                    DocumentBuilder builder = factory.newDocumentBuilder();
+                    Document inDoc = builder.parse(stream);
 
-                        InputStream responseBodyAsStream = httpResponse.getEntity().getContent();
-
-                        Document inDoc = builder.parse(responseBodyAsStream);
-
-                        Element xmlRoot = inDoc.getDocumentElement();
-
-                        List<Element> pages = XMLUtils.getElementList(xmlRoot,
-                                                                      "link");
-                        lastPageReached = true;
-                        for (Element page : pages) {
-                            String refPage = page.getAttribute("ref");
-                            if (StringUtils.equalsIgnoreCase(refPage, "next")) {
-                                lastPageReached = false;
-                                break;
-                            }
+                    Element xmlRoot = inDoc.getDocumentElement();
+                } catch (Exception e) {
+                    throw new RuntimeException(e.getMessage(), e);
+                } finally {
+                    if (stream != null) {
+                        try {
+                            stream.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
                         }
-                        List<Element> pubArticles = XMLUtils.getElementList(xmlRoot,
-                                                                            "entry");
-
-                        for (Element xmlArticle : pubArticles) {
-                            Record scopusItem = null;
-                            try {
-                                scopusItem = ScopusUtils
-                                    .convertScopusDomToRecord(xmlArticle);
-                                results.add(scopusItem);
-                            } catch (Exception e) {
-                                throw new RuntimeException(
-                                    "EID is not valid or not exist: "
-                                        + e.getMessage(), e);
-                            }
-                        }
-
-                    } catch (ParserConfigurationException e1) {
-                        log.error(e1.getMessage(), e1);
-                    } catch (SAXException e1) {
-                        log.error(e1.getMessage(), e1);
-                    }
-
-                    start += itemPerPage;
-                }
-            } catch (Exception e1) {
-                log.error(e1.getMessage(), e1);
-            } finally {
-                if (method != null) {
-                    method.releaseConnection();
-                }
-            }
-        } else {
-            InputStream stream = null;
-            try {
-                File file = new File(
-                    ConfigurationManager.getProperty("dspace.dir")
-                        + "/config/crosswalks/demo/scopus-search.xml");
-                stream = new FileInputStream(file);
-                DocumentBuilderFactory factory = DocumentBuilderFactory
-                    .newInstance();
-                factory.setValidating(false);
-                factory.setIgnoringComments(true);
-                factory.setIgnoringElementContentWhitespace(true);
-
-                DocumentBuilder builder = factory.newDocumentBuilder();
-                Document inDoc = builder.parse(stream);
-
-                Element xmlRoot = inDoc.getDocumentElement();
-            } catch (Exception e) {
-                throw new RuntimeException(e.getMessage(), e);
-            } finally {
-                if (stream != null) {
-                    try {
-                        stream.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
                     }
                 }
             }

@@ -121,6 +121,8 @@
 	            <entry key="csv" value-ref="csvDataLoader"/>
 	            <entry key="tsv" value-ref="tsvDataLoader"/>
 	            <entry key="grobid" value-ref="grobidDataLoader" />
+	            <entry key="scopus" value-ref="scopusOnlineDataLoader"/>
+	            <entry key="scival" value-ref="scivalOnlineDataLoader"/>
 	            <entry key="wos" value-ref="wosOnlineDataLoader"/>
 			</map>
 	    </property>

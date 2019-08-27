@@ -216,11 +216,14 @@ metadata.extraction.grobid.url =
 ############################################
 # LOOKUP SUBMISSION PROVIDER CONFIGURATION #
 ############################################
-#For Scopus service (note that by default the service is disabled see bte.xml) you need to obtain an API Key from Scopus. Once you get it, add it to the following configuration value
+# In order to use the Scopus services you need to obtain an API Key from Scopus. Once you get it, add it to the following configuration value.
+# Note that when apikey is configured by default the service is enabled, see bte.xml for further configuration
 submission.lookup.scopus.apikey =
-#use SciVal or Scopus service
+# use SciVal or Scopus service
 submission.lookup.scivalcontent.apikey =
-#For WOS (note that by default the service is disabled see bte.xml) require access to http://search.webofknowledge.com/esti/wokmws/ws/WokSearch
+# In order to use the WOS services you need to require access to http://search.webofknowledge.com/esti/wokmws/ws/WokSearch
+# Note that when credentials are configured, or ip authentication is enabled, by default the service is enabled,
+# see bte.xml for further configuration
 submission.lookup.webofknowledge.ip.authentication = false
 # or
 submission.lookup.webofknowledge.user =

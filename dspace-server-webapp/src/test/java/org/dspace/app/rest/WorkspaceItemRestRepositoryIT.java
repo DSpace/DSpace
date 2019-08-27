@@ -28,6 +28,7 @@ import javax.ws.rs.core.MediaType;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.CharEncoding;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.dspace.app.rest.builder.BitstreamBuilder;
 import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
@@ -708,7 +709,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                     .andExpect(jsonPath("$.sections.traditionalpageone['dc.contributor.author'][1].value",
                         is("Bergman, Tomas")))
                     .andExpect(jsonPath("$.sections.traditionalpageone['dc.contributor.author'][2].value",
-                        is("Jörnvall, Hans")))
+                        is(StringEscapeUtils.unescapeJava("J\\u00F6rnvall, Hans"))))
                     .andExpect(jsonPath("$.sections.traditionalpageone['dc.identifier.issn'][0].value",
                         is("0003-2700")))
                     .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.description.abstract'][0].value",
@@ -740,7 +741,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .andExpect(jsonPath("$.sections.traditionalpageone['dc.contributor.author'][1].value",
                     is("Bergman, Tomas")))
                 .andExpect(jsonPath("$.sections.traditionalpageone['dc.contributor.author'][2].value",
-                    is("Jörnvall, Hans")))
+                    is(StringEscapeUtils.unescapeJava("J\\u00F6rnvall, Hans"))))
                 .andExpect(jsonPath("$.sections.traditionalpageone['dc.identifier.issn'][0].value",
                     is("0003-2700")))
                 .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.description.abstract'][0].value",
@@ -755,6 +756,129 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                        " monitored by MALDI mass spectrometry.")))
             ;
 
+    }
+
+    @Test
+    /**
+     * Test the metadata lookup
+     *
+     * @throws Exception
+     */
+    public void lookupScopusMetadataTest() throws Exception {
+        ConfigurationService configService = DSpaceServicesFactory.getInstance().getConfigurationService();
+        String apikey = configService.getProperty("submission.lookup.scopus.apikey");
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        String authToken = getAuthToken(admin.getEmail(), password);
+
+        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+                .build();
+
+        // try to add the web of science identifier
+        List<Operation> addId = new ArrayList<Operation>();
+        // create a list of values to use in add operation
+        List<Map<String, String>> values = new ArrayList<Map<String, String>>();
+        Map<String, String> value = new HashMap<String, String>();
+        value.put("value", "10.1016/j.joi.2016.11.006");
+        values.add(value);
+        addId.add(new AddOperation("/sections/traditionalpageone/dc.identifier.doi", values));
+
+        String patchBody = getPatchContent(addId);
+
+        if (apikey == null || apikey.equals("")) {
+            getClient(authToken).perform(patch("/api/submission/workspaceitems/" + witem.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                    .andExpect(status().isOk())
+                    // testing lookup
+                    .andExpect(jsonPath("$.sections.traditionalpageone['dc.identifier.doi'][0].value",
+                        is("10.1016/j.joi.2016.11.006")));
+
+                // verify that the patch changes have been persisted
+                getClient().perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                    .andExpect(status().isOk())
+                    // testing lookup
+                    .andExpect(jsonPath("$.sections.traditionalpageone['dc.identifier.doi'][0].value",
+                        is("10.1016/j.joi.2016.11.006")));
+        } else {
+            getClient(authToken).perform(patch("/api/submission/workspaceitems/" + witem.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                    .andExpect(status().isOk())
+                    // testing lookup
+                    .andExpect(jsonPath("$.sections.traditionalpageone['dc.identifier.doi'][0].value",
+                        is("10.1016/j.joi.2016.11.006")))
+                    .andExpect(jsonPath("$.sections.traditionalpageone['dc.title'][0].value",
+                        is("Partial orders for zero-sum arrays with applications to network theory")))
+                    .andExpect(jsonPath("$.sections.traditionalpageone['dc.date.issued'][0].value",
+                        is("2017-02-01")))
+                    .andExpect(jsonPath("$.sections.traditionalpageone['dc.contributor.author'][0].value",
+                        is("Liu Y.")))
+                    .andExpect(jsonPath("$.sections.traditionalpageone['dc.contributor.author'][1].value",
+                        is("Rousseau R")))
+                    .andExpect(jsonPath("$.sections.traditionalpageone['dc.contributor.author'][2].value",
+                        is("Egghe L.")))
+                    .andExpect(jsonPath("$.sections.traditionalpageone['dc.identifier.issn'][0].value",
+                        is("17511577")))
+                    .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.description.abstract'][0].value",
+                        is(StringEscapeUtils.unescapeJava("\\u00A9 2016 Elsevier Ltd In this contribution" +
+                           " we study partial orders in the set" +
+                           " of zero-sum arrays. Concretely, these partial orders relate to local and" +
+                           " global hierarchy and dominance theories. The exact relation between hierarchy" +
+                           " and dominance curves is explained. Based on this investigation we design a" +
+                           " new approach for measuring dominance or stated otherwise, power structures," +
+                           " in networks. A new type of Lorenz curve to measure dominance or power is proposed," +
+                           " and used to illustrate intrinsic characteristics of networks. The new curves," +
+                           " referred to as D-curves are partly concave and partly convex. As such they do" +
+                           " not satisfy Dalton's transfer principle. Most importantly, this article" +
+                           " introduces a framework to compare different power structures as a whole." +
+                           " It is shown that D-curves have several properties making them suitable to" +
+                           " measure dominance. If dominance and being a subordinate are reversed, the" +
+                           " dominance structure in a network is also reversed."))));
+
+            // verify that the patch changes have been persisted
+            getClient().perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                .andExpect(status().isOk())
+                // testing lookup
+                .andExpect(jsonPath("$.sections.traditionalpageone['dc.identifier.doi'][0].value",
+                        is("10.1016/j.joi.2016.11.006")))
+                    .andExpect(jsonPath("$.sections.traditionalpageone['dc.title'][0].value",
+                        is("Partial orders for zero-sum arrays with applications to network theory")))
+                    .andExpect(jsonPath("$.sections.traditionalpageone['dc.date.issued'][0].value",
+                        is("2017-02-01")))
+                    .andExpect(jsonPath("$.sections.traditionalpageone['dc.contributor.author'][0].value",
+                        is("Liu Y.")))
+                    .andExpect(jsonPath("$.sections.traditionalpageone['dc.contributor.author'][1].value",
+                        is("Rousseau R")))
+                    .andExpect(jsonPath("$.sections.traditionalpageone['dc.contributor.author'][2].value",
+                        is("Egghe L.")))
+                    .andExpect(jsonPath("$.sections.traditionalpageone['dc.identifier.issn'][0].value",
+                        is("17511577")))
+                    .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.description.abstract'][0].value",
+                        is(StringEscapeUtils.unescapeJava("\\u00A9 2016 Elsevier Ltd In this contribution" +
+                           " we study partial orders in the set" +
+                           " of zero-sum arrays. Concretely, these partial orders relate to local and" +
+                           " global hierarchy and dominance theories. The exact relation between hierarchy" +
+                           " and dominance curves is explained. Based on this investigation we design a" +
+                           " new approach for measuring dominance or stated otherwise, power structures," +
+                           " in networks. A new type of Lorenz curve to measure dominance or power is proposed," +
+                           " and used to illustrate intrinsic characteristics of networks. The new curves," +
+                           " referred to as D-curves are partly concave and partly convex. As such they do" +
+                           " not satisfy Dalton's transfer principle. Most importantly, this article" +
+                           " introduces a framework to compare different power structures as a whole." +
+                           " It is shown that D-curves have several properties making them suitable to" +
+                           " measure dominance. If dominance and being a subordinate are reversed, the" +
+                           " dominance structure in a network is also reversed."))));
+        }
     }
 
     @Test
