@@ -334,9 +334,21 @@ public class CSVMetadataImportReferenceTest extends AbstractEntityIntegrationTes
     public void testCSVImportWrongOrder() throws Exception {
         String[] csv = {"id,relationship.type,relation.isAuthorOfPublication,collection,dc.identifier.other",
                 "+,Publication,dc.identifier.other:8675309," + col1.getHandle() + ",2",
-                "+,Person,," + col1.getHandle() + ",1",};
+                "+,Person,," + col1.getHandle() + ",8675309",};
         assertEquals(1, performImportScript(csv, false));
     }
+
+    /**
+     * Test failure when refering to an item in the CSV that hasn't been created yet due to it's order in the CSV
+     */
+    @Test
+    public void testCSVImportWrongOrderRowName() throws Exception {
+        String[] csv = {"id,relationship.type,relation.isAuthorOfPublication,collection,dc.identifier.other,rowName",
+                "+,Publication,rowName:row2," + col1.getHandle() + ",2,row1",
+                "+,Person,," + col1.getHandle() + ",8675309,row2",};
+        assertEquals(1, performImportScript(csv, false));
+    }
+
 
     /**
      * Import mocked CSVs to test item creation behavior, deleting temporary file afterward.
