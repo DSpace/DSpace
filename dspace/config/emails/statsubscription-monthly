@@ -1,0 +1,16 @@
+# E-mail sent with the monthly statistics update subscribed
+#
+# See org.dspace.core.Email for information on the format of this file.
+#
+Subject: Monthly statistics update
+Please find in the attached file the monthly update about the 
+statistics of the resources that you have subscribed.
+
+--
+The DSpace Team
+
+To unsubscribe use this link
+{0}
+
+or manage your subscriptions at
+{1} 
