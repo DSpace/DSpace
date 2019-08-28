@@ -233,7 +233,7 @@ public class CsvImportIT extends AbstractEntityIntegrationTest {
         out.close();
         out = null;
 
-        runDSpaceScript("metadata-import", "-f", "test.csv", "-e", "admin@email.com", "-s");
+        runDSpaceScript("metadata-import", "-f", filename, "-e", "admin@email.com", "-s");
 
         File file = new File(filename);
         if (file.exists()) {
