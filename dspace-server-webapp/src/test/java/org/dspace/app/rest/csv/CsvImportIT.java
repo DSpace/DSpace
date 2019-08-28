@@ -16,6 +16,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.sql.SQLException;
@@ -233,5 +234,10 @@ public class CsvImportIT extends AbstractEntityIntegrationTest {
         out = null;
 
         runDSpaceScript("metadata-import", "-f", "test.csv", "-e", "admin@email.com", "-s");
+
+        File file = new File(filename);
+        if (file.exists()) {
+            file.delete();
+        }
     }
 }
