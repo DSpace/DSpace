@@ -562,18 +562,6 @@
 			<xsl:with-param name="acotar" select="'true'"/>
 		</xsl:call-template>
 
-		<!-- coverage.spatial row -->
-		<xsl:call-template name="render-normal-field">
-			<xsl:with-param name="name" select="'coverage-spatial'"/>
-			<xsl:with-param name="elements" select="dim:field[@element='coverage' and @qualifier='spatial'] "/>
-		</xsl:call-template>
-
-		<!-- coverage.temporal row -->
-		<xsl:call-template name="render-normal-field">
-			<xsl:with-param name="name" select="'coverage-temporal'"/>
-			<xsl:with-param name="elements" select="dim:field[@element='coverage' and @qualifier='temporal'] "/>
-		</xsl:call-template>
-		
 		<!-- dc.audience -->
 		<xsl:call-template name="render-normal-field">
 			<xsl:with-param name="name" select="'audience'"/>

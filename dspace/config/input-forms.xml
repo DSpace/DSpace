@@ -363,33 +363,6 @@
 					<visibility-on-group>Bibliotecarios</visibility-on-group>
 				</field>
 
-				<!-- Alcance Geográfico -->
-				<!-- TODO Hay que hacerlo controlado -->
-				<field>
-					<dc-schema>dc</dc-schema>
-					<dc-element>coverage</dc-element>
-					<dc-qualifier>spatial</dc-qualifier>
-					<repeatable>true</repeatable>
-					<label>Alcance Geográfico</label>
-					<input-type>onebox</input-type>
-					<hint>Zona geográfica a la que se hace referencia en la obra</hint>
-					<visibility-on-group>Bibliotecarios</visibility-on-group>
-					<type-bind>!Objeto Fisico</type-bind>
-				</field>
-
-				<!-- Alcance Temporal -->
-				<field>
-					<dc-schema>dc</dc-schema>
-					<dc-element>coverage</dc-element>
-					<dc-qualifier>temporal</dc-qualifier>
-					<repeatable>true</repeatable>
-					<label>Alcance Temporal</label>
-					<input-type>onebox</input-type>
-					<hint>Período temporal al que se hace referencia en el texto</hint>
-					<visibility-on-group>Bibliotecarios</visibility-on-group>
-					<type-bind>!Objeto Fisico</type-bind>
-				</field>
-
 				<!-- Descripción Física / Inscipcion y Enumeración de partes-->
 
 				<field>

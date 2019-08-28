@@ -123,14 +123,6 @@
 			<xsl:for-each select="doc:metadata/doc:element[@name='bitstreams']/doc:element[@name='bitstream']/doc:field[@name='format']">
 				<dc:format><xsl:value-of select="." /></dc:format>
 			</xsl:for-each>
-			<!-- dc.coverage -->
-			<xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='coverage']/doc:element/doc:field[@name='value']">
-				<dc:coverage><xsl:value-of select="." /></dc:coverage>
-			</xsl:for-each>
-			<!-- dc.coverage.* -->
-			<xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='coverage']/doc:element/doc:element/doc:field[@name='value']">
-				<dc:coverage><xsl:value-of select="." /></dc:coverage>
-			</xsl:for-each>
 			<!-- dc.publisher -->
 			<xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='publisher']/doc:element/doc:field[@name='value']">
 				<dc:publisher><xsl:value-of select="." /></dc:publisher>
