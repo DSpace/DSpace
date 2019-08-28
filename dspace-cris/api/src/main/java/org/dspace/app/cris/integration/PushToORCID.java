@@ -1523,7 +1523,7 @@ public class PushToORCID
             for (String valContributor : itemMetadata.getContributorsCoLead())
             {
                 addFundingContributor(fundingContributors, valContributor,
-                        "colead");
+                        "co-lead");
                 buildFundingContributors = true;
             }
         }
@@ -2611,7 +2611,7 @@ public class PushToORCID
                 ResearcherUrl researcherUrl = new ResearcherUrl();
                 researcherUrl.setUrlName(l.split("###")[0]);
                 Url url = new Url();
-                url.setValue(l.split("###")[1]);
+                url.setValue(l.split("###").length > 1 ? l.split("###")[1] : l);
                 researcherUrl.setUrl(url);
                 researcherUrls.add(researcherUrl);
             }
