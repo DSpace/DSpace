@@ -8,7 +8,9 @@
 package org.dspace.app.cris.batch;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,6 +25,12 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.poifs.filesystem.POIFSFileSystem;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
 import org.dspace.app.cris.model.CrisConstants;
 import org.dspace.app.cris.model.ResearchObject;
 import org.dspace.app.cris.model.jdyna.BoxDynamicObject;
@@ -74,6 +82,7 @@ import org.dspace.app.cris.model.jdyna.widget.WidgetPointerOU;
 import org.dspace.app.cris.model.jdyna.widget.WidgetPointerPJ;
 import org.dspace.app.cris.model.jdyna.widget.WidgetPointerRP;
 import org.dspace.app.cris.service.ApplicationService;
+import org.dspace.app.cris.util.UtilsXLS;
 import org.dspace.core.Context;
 import org.dspace.utils.DSpace;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -100,11 +109,6 @@ import it.cilea.osd.jdyna.widget.WidgetCheckRadio;
 import it.cilea.osd.jdyna.widget.WidgetDate;
 import it.cilea.osd.jdyna.widget.WidgetLink;
 import it.cilea.osd.jdyna.widget.WidgetTesto;
-import jxl.Cell;
-import jxl.Sheet;
-import jxl.Workbook;
-import jxl.WorkbookSettings;
-import jxl.read.biff.BiffException;
 
 public class ImportCRISDataModelConfiguration
 {
@@ -114,7 +118,7 @@ public class ImportCRISDataModelConfiguration
     private static boolean append = false;
 
     public static void main(String[] args)
-            throws ParseException, SQLException, BiffException, IOException,
+            throws ParseException, SQLException, IOException,
             InstantiationException, IllegalAccessException
     {
 		String fileExcel = null;
@@ -155,10 +159,8 @@ public class ImportCRISDataModelConfiguration
 		// leggo tutte le righe e mi creo una struttura dati ad hoc per
 		// accogliere definizioni dei metadati di primo livello e inizializzo la
 		// struttura per i nested
-		WorkbookSettings ws = new WorkbookSettings();
-		ws.setEncoding("Cp1252");
-
-		Workbook workbook = Workbook.getWorkbook(new File(fileExcel), ws);
+		InputStream inp = new FileInputStream(new File(fileExcel));
+        HSSFWorkbook workbook = new HSSFWorkbook(new POIFSFileSystem(inp));
 
 		// target , lista altri metadati
 		Map<String, List<List<String>>> widgetMap = new HashMap<String, List<List<String>>>();
@@ -718,19 +720,19 @@ public class ImportCRISDataModelConfiguration
         applicationService.saveOrUpdate(clazzBox, box);
     }
 
-	private static void buildResearchObject(Workbook workbook, String sheetName,
+	private static void buildResearchObject(HSSFWorkbook workbook, String sheetName,
             ApplicationService applicationService, PlatformTransactionManager transactionManager, TransactionStatus status)
     {
-		Cell[] riga;
-		Sheet sheet = workbook.getSheet(sheetName);
+		/*Cell[]*/Row riga;
+		HSSFSheet sheet = workbook.getSheet(sheetName);
 		int indexRiga = 1;
-		int rows = sheet.getColumn(2).length;
+		int rows = sheet./*getColumn(2).length*/getLastRowNum() + 1;
 		
 		boolean commitTransaction = false;
         while (indexRiga < rows)
         {
 			riga = sheet.getRow(indexRiga);
-			String key = riga[2].getContents().trim();
+			String key = UtilsXLS.stringCellValue(/*riga[2]*/riga.getCell(2)).trim();
             if (key.equals("rp") || key.equals("pj") || key.equals("ou")
                     || key.equals("###"))
             {
@@ -1321,20 +1323,20 @@ public class ImportCRISDataModelConfiguration
 		return dtp;
 	}
 
-    private static void buildMap(Workbook workbook, String sheetName,
+    private static void buildMap(HSSFWorkbook workbook, String sheetName,
             Map<String, List<List<String>>> widgetMap, int indexKey)
     {
-		Cell[] riga;
-		Sheet sheet = workbook.getSheet(sheetName);
+		/*Cell[]*/Row riga;
+		HSSFSheet sheet = workbook.getSheet(sheetName);
 		int indexRiga = 1;
-		int rows = sheet.getColumn(0).length;
+		int rows = sheet./*getColumn(0).length*/getLastRowNum() + 1;
 
         while (indexRiga < rows)
         {
 			riga = sheet.getRow(indexRiga);
-			String key = riga[indexKey].getContents().trim();
+			String key = UtilsXLS.stringCellValue(riga/*[indexKey]*/.getCell(indexKey)).trim();
 			if("nesteddefinition".equals(sheetName)) {
-				String prefix = riga[0].getContents().trim();
+				String prefix = UtilsXLS.stringCellValue(riga/*[0]*/.getCell(0)).trim();
 				if(!"rp".equals(prefix) && !"ou".equals(prefix) && !"pj".equals(prefix)) {
 					if(!key.startsWith(prefix)) {
 						key = prefix + key;
@@ -1343,8 +1345,11 @@ public class ImportCRISDataModelConfiguration
 			}
 			List<String> metadata = new ArrayList<String>();
 			
-			for(int i = 0; i<sheet.getColumns(); i++) {
-                metadata.add(riga[i].getContents().trim());
+			for(int i = 0; i</*sheet.getColumns()*/riga.getLastCellNum() + 1; i++) {
+				if (riga.getCell(i) == null)
+					continue;
+				
+                metadata.add(UtilsXLS.stringCellValue(riga/*[i]*/.getCell(i)).trim());
 			}
 			insertInMap(widgetMap, key, metadata);
 
@@ -1353,26 +1358,29 @@ public class ImportCRISDataModelConfiguration
 		}
 	}
 
-	private static void buildControlledList(Workbook workbook, String sheetName,
+	private static void buildControlledList(HSSFWorkbook workbook, String sheetName,
             Map<String, List<String>> controlledListMap)
     {
 		Cell row;
-		Sheet sheet = workbook.getSheet(sheetName);		
-		int indexColumn = 0;		
-		int columns = sheet.getRow(0).length;
-        while (indexColumn < columns)
+		Sheet sheet = workbook.getSheet(sheetName);
+//		int indexColumn = 0;
+		int columns = sheet.getRow(0)./*length*/getLastCellNum() + 1;
+        for (int indexColumn = 0; indexColumn < columns; indexColumn++)
         {
-			int rows = sheet.getColumn(indexColumn).length;
+        	if (sheet.getRow(0).getCell(indexColumn) == null)
+        		continue;
+        	
+			int rows = sheet./*getColumn(indexColumn).length*/getLastRowNum() + 1;
 			int indexRiga = 1;
-			String header = sheet.getRow(0)[indexColumn].getContents().trim();
+			String header = UtilsXLS.stringCellValue(sheet.getRow(0)/*[indexColumn].getContents()*/.getCell(indexColumn)).trim();
             while (indexRiga < rows)
             {
-				row = sheet.getRow(indexRiga)[indexColumn];				
+				row = sheet.getRow(indexRiga)/*[indexColumn]*/.getCell(indexColumn);				
                 insertInList(controlledListMap, header,
-                        row.getContents().trim());
+                		UtilsXLS.stringCellValue(row/*getContents()*/).trim());
 				indexRiga++;
 			}
-			indexColumn++;
+//			indexColumn++;
 		}
 	}
 

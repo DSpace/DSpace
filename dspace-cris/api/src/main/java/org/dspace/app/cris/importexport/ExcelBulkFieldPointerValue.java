@@ -10,8 +10,7 @@ package org.dspace.app.cris.importexport;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import jxl.Cell;
-
+import org.apache.poi.ss.usermodel.Cell;
 import org.dspace.app.cris.util.UtilsXML;
 import org.w3c.dom.Element;
 
@@ -50,7 +49,7 @@ public class ExcelBulkFieldPointerValue extends ExcelBulkFieldValue
     public ExcelBulkFieldPointerValue(Cell element, int position)
     {
         super(element, position);
-        String val = element.getContents()
+        String val = element.getStringCellValue()
                 .split(ExcelBulkField.REGEX_REPEATABLE_SPLIT)[position];
         Matcher tagCrisMatch = patternCrisId.matcher(val);
         if (tagCrisMatch.find())

@@ -7,7 +7,7 @@
  */
 package org.dspace.app.cris.importexport;
 
-import jxl.Cell;
+import org.apache.poi.ss.usermodel.Cell;
 
 public class ExcelBulkFieldPointer extends ExcelBulkField implements IBulkChangeFieldPointer {
 	

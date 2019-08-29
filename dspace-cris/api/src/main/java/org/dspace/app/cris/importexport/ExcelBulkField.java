@@ -10,7 +10,7 @@ package org.dspace.app.cris.importexport;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import jxl.Cell;
+import org.apache.poi.ss.usermodel.Cell;
 
 public class ExcelBulkField implements IBulkChangeField {
 
@@ -24,7 +24,7 @@ public class ExcelBulkField implements IBulkChangeField {
 
 	@Override
 	public int size() {
-		return element.getContents().split(REGEX_REPEATABLE_SPLIT).length;
+		return element.getStringCellValue().split(REGEX_REPEATABLE_SPLIT).length;
 	}
 
 	@Override

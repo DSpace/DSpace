@@ -16,10 +16,12 @@ import it.cilea.osd.jdyna.model.PropertiesDefinition;
 import it.cilea.osd.jdyna.model.Property;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.Writer;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -28,16 +30,13 @@ import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import jxl.Workbook;
-import jxl.WorkbookSettings;
-import jxl.read.biff.BiffException;
-import jxl.write.Label;
-import jxl.write.WritableSheet;
-import jxl.write.WritableWorkbook;
-import jxl.write.WriteException;
-
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.poifs.filesystem.POIFSFileSystem;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.dspace.app.cris.model.ACrisObject;
 import org.dspace.app.cris.model.jdyna.ACrisNestedObject;
+import org.dspace.app.cris.util.UtilsXLS;
 import org.xml.sax.SAXException;
 
 public class ExcelBulkChangesService implements IBulkChangesService
@@ -82,14 +81,16 @@ public class ExcelBulkChangesService implements IBulkChangesService
         Utils.bufferedCopy(input, out);
         out.close();
         
-        WorkbookSettings ws = new WorkbookSettings();
-        ws.setEncoding(encoding);
-        Workbook workbook = null;
+//        WorkbookSettings ws = new WorkbookSettings();
+//        ws.setEncoding(encoding);
+        HSSFWorkbook workbook = null;
         try
         {
-			workbook = Workbook.getWorkbook(fileXls, ws);
+        	InputStream ios = new FileInputStream(fileXls);
+        	//POIFSFileSystem pfs = new POIFSFileSystem(ios);
+			workbook = /*Workbook.getWorkbook(fileXls, ws);*/(HSSFWorkbook)WorkbookFactory.create(ios);
         }
-        catch (BiffException e)
+        catch (Exception e)
         {
             throw new IOException("Invalid excel file: " + e.getMessage());
         }
@@ -103,70 +104,80 @@ public class ExcelBulkChangesService implements IBulkChangesService
             throws IOException, NoSuchFieldException, SecurityException,
             InstantiationException, IllegalAccessException
     {
-        WritableWorkbook workbook = Workbook.createWorkbook(filexsd);
+        /*WritableWorkbook workbook = Workbook.createWorkbook(filexsd);*/
+        HSSFWorkbook workbook = new HSSFWorkbook();
 
-    	WritableSheet sheetEntities = workbook.createSheet("main_entities", 0);
-        WritableSheet sheetNested = workbook.createSheet("main_nested", 1);
+        HSSFSheet sheetEntities = workbook.createSheet("main_entities"/*, 0*/);
+        HSSFSheet sheetNested = workbook.createSheet("main_nested"/*, 1*/);
     	int xEntities = 0;
     	int xNested = 0;
         for (String headerColumn : ExcelBulkChanges.HEADER_COLUMNS)
         {
-            try
-            {
-				sheetEntities.addCell(new Label(xEntities++, 0, headerColumn));
-            }
-            catch (WriteException e)
-            {
-                throw new IOException(
-                        "Error to create template from fixed header columns: "
-                                + e.getMessage());
-            }
+//            try
+//            {
+            	UtilsXLS.addCell(sheetEntities, xEntities++, 0, headerColumn);
+//            }
+//            catch (WriteException e)
+//            {
+//                throw new IOException(
+//                        "Error to create template from fixed header columns: "
+//                                + e.getMessage());
+//            }
 
         }
         for (String headerColumn : ExcelBulkChanges.HEADER_NESTED_COLUMNS)
         {
-            try
-            {
-				sheetNested.addCell(new Label(xNested++, 0, headerColumn));
-            }
-            catch (WriteException e)
-            {
-                throw new IOException(
-                        "Error to create template from fixed nested header columns: "
-                                + e.getMessage());
-			}
+//            try
+//            {
+            	UtilsXLS.addCell(sheetNested, xNested++, 0, headerColumn);
+//            }
+//            catch (WriteException e)
+//            {
+//                throw new IOException(
+//                        "Error to create template from fixed nested header columns: "
+//                                + e.getMessage());
+//			}
 	    	
 	    }
         
         for (IContainable cont : metadata)
         {
-            try
-            {
-                sheetEntities.addCell(
-                        new Label(xEntities++, 0, cont.getShortName()));
-            }
-            catch (WriteException e)
-            {
-                throw new IOException(
-                        "Error to create template from dynamic metadata: "
-                                + e.getMessage());
-            }
+//            try
+//            {
+            	UtilsXLS.addCell(sheetEntities,
+                        xEntities++, 0, cont.getShortName());
+//            }
+//            catch (WriteException e)
+//            {
+//                throw new IOException(
+//                        "Error to create template from dynamic metadata: "
+//                                + e.getMessage());
+//            }
         }
         for (IContainable cont : metadataNested)
         {
-            try
-            {
-                sheetNested
-                        .addCell(new Label(xNested++, 0, cont.getShortName()));
-            }
-            catch (WriteException e)
-            {
-                throw new IOException(
-                        "Error to create template from dynamic nested metadata: "
-                                + e.getMessage());
-			}
+//            try
+//            {
+            	UtilsXLS.addCell(sheetNested,
+                        xNested++, 0, cont.getShortName());
+//            }
+//            catch (WriteException e)
+//            {
+//                throw new IOException(
+//                        "Error to create template from dynamic nested metadata: "
+//                                + e.getMessage());
+//			}
 	    }
-
+        try {
+        	OutputStream os = new FileOutputStream(filexsd);
+        	workbook.write(os);
+        }
+        catch (IOException e) {
+        	throw new IOException(
+        			"Error to create xls file " + filexsd + ": "
+        					+ e.getMessage());
+        }
+        
     	return filexsd;
     }
 

@@ -53,7 +53,6 @@ import org.dspace.storage.rdbms.DatabaseUtils;
 import org.hibernate.Session;
 
 import it.cilea.osd.common.model.Identifiable;
-import jxl.read.biff.BiffException;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
@@ -1090,7 +1089,7 @@ public class ApplicationService extends ExtendedTabService
 					String[] args = new String[] { "-f", file };
 					ImportCRISDataModelConfiguration.main(args);
 					log.info("Rebuild CRIS Configuration is complete");
-				} catch (SQLException | IOException | BiffException | InstantiationException | IllegalAccessException
+				} catch (SQLException | IOException | InstantiationException | IllegalAccessException
 						| ParseException e) {
 					log.error("Error attempting to Rebuild CRIS Configuration", e);
 				} finally {

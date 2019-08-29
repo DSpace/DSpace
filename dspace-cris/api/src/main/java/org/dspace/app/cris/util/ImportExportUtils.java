@@ -30,6 +30,8 @@ import javax.xml.transform.TransformerException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.dspace.app.cris.importexport.ExcelBulkChanges;
 import org.dspace.app.cris.importexport.IBulkChange;
 import org.dspace.app.cris.importexport.IBulkChangeField;
@@ -125,11 +127,6 @@ import it.cilea.osd.jdyna.widget.WidgetFile;
 import it.cilea.osd.jdyna.widget.WidgetLink;
 import it.cilea.osd.jdyna.widget.WidgetPointer;
 import it.cilea.osd.jdyna.widget.WidgetTesto;
-import jxl.Workbook;
-import jxl.write.Label;
-import jxl.write.WritableSheet;
-import jxl.write.WritableWorkbook;
-import jxl.write.WriteException;
 
 /**
  * Static class that provides export functionalities from the RPs database to
@@ -185,7 +182,7 @@ public class ImportExportUtils {
 
     public static final String PATH_EXPORT_EXCEL_DEFAULT = ConfigurationManager.getProperty(CrisConstants.CFG_MODULE, "file.export.path")
             + "cris-data.xls";
-
+    
 	/**
 	 * Write in the output stream the researcher pages contact data as an excel
 	 * file. The format of the exported Excel file is suitable for re-import in
@@ -204,45 +201,48 @@ public class ImportExportUtils {
 	 * @throws IllegalArgumentException
 	 */
 	public static <ACO extends ACrisObject<P, TP, NP, NTP, ACNO, ATNO>, P extends Property<TP>, TP extends PropertiesDefinition, NP extends ANestedProperty<NTP>, NTP extends ANestedPropertiesDefinition, ACNO extends ACrisNestedObject<NP, NTP, P, TP>, ATNO extends ATypeNestedObject<NTP>> void exportExcel(List<ACO> rps, ApplicationService applicationService, OutputStream os,
-			List<IContainable> metadata, List<IContainable> metadataNestedLevel) throws IOException, WriteException, IllegalArgumentException,
+			List<IContainable> metadata, List<IContainable> metadataNestedLevel) throws IOException, IllegalArgumentException,
 			IllegalAccessException, InvocationTargetException {
 
-		WritableWorkbook workbook = Workbook.createWorkbook(os);
+		/*WritableWorkbook workbook = Workbook.createWorkbook(os);*/
+		HSSFWorkbook workbook = new HSSFWorkbook();
 
-		WritableSheet sheetEntities = workbook.createSheet("main_entities", 0);
-        WritableSheet sheetNested = workbook.createSheet("nested_entities", 1);
+		HSSFSheet sheetEntities = workbook.createSheet("main_entities"/*, 0*/);
+		HSSFSheet sheetNested = workbook.createSheet("nested_entities"/*, 1*/);
         int xEntities = 0;
         int xNested = 0;
         // create initial caption (other caption could be write field together)
         for(String headerColumn : ExcelBulkChanges.HEADER_COLUMNS) {
             if (xEntities != 0)
             {
-                try
-                {
-                    sheetEntities
-                            .addCell(new Label(xEntities-1, 0, headerColumn));
-                }
-                catch (WriteException e)
-                {
-                    throw new IOException(
-                            "Error to create template from fixed header columns: "
-                                    + e.getMessage());
-                }
+//                try
+//                {
+                    /*sheetEntities
+                            .addCell(new Label(xEntities-1, 0, headerColumn));*/
+            		UtilsXLS.addCell(sheetEntities, xEntities-1, 0, headerColumn);
+//                }
+//                catch (WriteException e)
+//                {
+//                    throw new IOException(
+//                            "Error to create template from fixed header columns: "
+//                                    + e.getMessage());
+//                }
             }
             xEntities++;
         }
 		
         for(String headerColumn : ExcelBulkChanges.HEADER_NESTED_COLUMNS) {
-                try
-                {
-                    sheetNested.addCell(new Label(xNested, 0, headerColumn));
-                }
-                catch (WriteException e)
-                {
-                    throw new IOException(
-                            "Error to create template from fixed nested header columns: "
-                                    + e.getMessage());
-                }
+//                try
+//                {
+//                    sheetNested.addCell(new Label(xNested, 0, headerColumn));
+                    UtilsXLS.addCell(sheetNested, xNested, 0, headerColumn);
+//                }
+//                catch (WriteException e)
+//                {
+//                    throw new IOException(
+//                            "Error to create template from fixed nested header columns: "
+//                                    + e.getMessage());
+//                }
             xNested++;
         }
         
@@ -253,21 +253,25 @@ public class ImportExportUtils {
 		    if(rp!=null) {	
     	        //HEADER_CRISID,HEADER_UUID,HEADER_SOURCEREF,HEADER_SOURCEID
     		    int y = 0;
-    		    sheetEntities.addCell(new Label(0, i, ""));
-    	        Label label = (Label) sheetEntities.getCell(0, i);
-    	        label.setString(rp.getCrisID());
+//    		    sheetEntities.addCell(new Label(0, i, ""));
+//    	        Cell label = sheetEntities.getCell(0, i);
+//    	        label.setCellValue(rp.getCrisID());
+    	        UtilsXLS.addCell(sheetEntities, 0, i, rp.getCrisID());
     	        y++;
-    	        sheetEntities.addCell(new Label(1, i, ""));
-                label = (Label) sheetEntities.getCell(1, i);
-                label.setString(rp.getUuid());
+//    	        sheetEntities.addCell(new Label(1, i, ""));
+//              label = sheetEntities.getCell(1, i);
+//              label.setCellValue(rp.getUuid());
+                UtilsXLS.addCell(sheetEntities, 1, i, rp.getUuid());
                 y++;
-                sheetEntities.addCell(new Label(2, i, ""));
-                label = (Label) sheetEntities.getCell(2, i);
-                label.setString(rp.getSourceRef());
+//              sheetEntities.addCell(new Label(2, i, ""));
+//              label = sheetEntities.getCell(2, i);
+//              label.setCellValue(rp.getSourceRef());
+                UtilsXLS.addCell(sheetEntities, 2, i, rp.getSourceRef());
                 y++;
-                sheetEntities.addCell(new Label(3, i, ""));
-    			label = (Label) sheetEntities.getCell(3, i);
-    			label.setString(rp.getSourceID());
+//              sheetEntities.addCell(new Label(3, i, ""));
+//    			label = sheetEntities.getCell(3, i);
+//    			label.setCellValue(rp.getSourceID());
+    			UtilsXLS.addCell(sheetEntities, 3, i, rp.getSourceID());
     			
     			for (IContainable containable : metadata) {
     				if (containable instanceof ADecoratorPropertiesDefinition) {
@@ -292,29 +296,35 @@ public class ImportExportUtils {
     
                       // HEADER_CRISID(parent object), HEADER_SOURCEREF(parent object), HEADER_SOURCEID(parent object), HEADER_UUID,HEADER_SOURCEREF,HEADER_SOURCEID
                         int yy = 0;
-                        sheetNested.addCell(new Label(0, ii, ""));
-                        label = (Label) sheetNested.getCell(0, ii);
-                        label.setString(rp.getCrisID());
+//                      sheetNested.addCell(new Label(0, ii, ""));
+//                      label = (Label) sheetNested.getCell(0, ii);
+//                      label.setString(rp.getCrisID());
+                        UtilsXLS.addCell(sheetNested, 0, ii, rp.getSourceID());
                         yy++;
-                        sheetNested.addCell(new Label(1, ii, ""));
-                        label = (Label) sheetNested.getCell(1, ii);
-                        label.setString(rp.getSourceRef());
+//                      sheetNested.addCell(new Label(1, ii, ""));
+//                      label = (Label) sheetNested.getCell(1, ii);
+//                      label.setString(rp.getSourceRef());
+                        UtilsXLS.addCell(sheetNested, 1, ii, rp.getSourceRef());
                         yy++;
-                        sheetNested.addCell(new Label(2, ii, ""));
-                        label = (Label) sheetNested.getCell(2, ii);
-                        label.setString(rp.getSourceID());
+//                      sheetNested.addCell(new Label(2, ii, ""));
+//                      label = (Label) sheetNested.getCell(2, ii);
+//                      label.setString(rp.getSourceID());
+                        UtilsXLS.addCell(sheetNested, 2, ii, rp.getSourceID());
                         yy++;
-                        sheetNested.addCell(new Label(3, ii, ""));
-                        label = (Label) sheetNested.getCell(3, ii);
-                        label.setString(rpn.getUuid());
+//                      sheetNested.addCell(new Label(3, ii, ""));
+//                      label = (Label) sheetNested.getCell(3, ii);
+//                      label.setString(rpn.getUuid());
+                        UtilsXLS.addCell(sheetNested, 3, ii, rp.getUuid());
                         yy++;
-                        sheetNested.addCell(new Label(4, ii, ""));
-                        label = (Label) sheetNested.getCell(4, ii);
-                        label.setString(rpn.getSourceReference().getSourceRef());
+//                      sheetNested.addCell(new Label(4, ii, ""));
+//                      label = (Label) sheetNested.getCell(4, ii);
+//                      label.setString(rpn.getSourceReference().getSourceRef());
+                        UtilsXLS.addCell(sheetNested, 4, ii, rp.getSourceRef());
                         yy++;
-                        sheetNested.addCell(new Label(5, ii, ""));
-                        label = (Label) sheetNested.getCell(5, ii);
-                        label.setString(rpn.getSourceReference().getSourceID());
+//                      sheetNested.addCell(new Label(5, ii, ""));
+//                      label = (Label) sheetNested.getCell(5, ii);
+//                      label.setString(rpn.getSourceReference().getSourceID());
+                        UtilsXLS.addCell(sheetNested, 5, ii, rp.getSourceID());
     
                         try
                         {
@@ -339,8 +349,7 @@ public class ImportExportUtils {
 		    }
 		}
 		// All sheets and cells added. Now write out the workbook
-		workbook.write();
-		workbook.close();
+		workbook.write(os);
 	}
 
 	private static <P extends Property<TP>, TP extends PropertiesDefinition, NP extends ANestedProperty<NTP>, NTP extends ANestedPropertiesDefinition, ACNO extends ACrisNestedObject<NP, NTP, P, TP>, ATNO extends ATypeNestedObject<NTP>, ACO extends ACrisObject<P, TP, NP, NTP, ACNO, ATNO>> ACO getCrisObject(
@@ -1962,23 +1971,24 @@ public class ImportExportUtils {
 	}
 
 	public static void exportConfiguration(ApplicationService applicationService, OutputStream os) throws IOException,
-			WriteException, IllegalArgumentException, IllegalAccessException, InvocationTargetException {
+			IllegalArgumentException, IllegalAccessException, InvocationTargetException {
 
-		WritableWorkbook workbook = Workbook.createWorkbook(os);
+		/*WritableWorkbook workbook = Workbook.createWorkbook(os);*/
+		HSSFWorkbook workbook = new HSSFWorkbook();
 
-		WritableSheet propertiesdefinitionSheet = workbook.createSheet("propertiesdefinition", 0);
-        WritableSheet nesteddefinitionSheet = workbook.createSheet("nesteddefinition", 1);
-        WritableSheet tabSheet = workbook.createSheet("tab", 2);
-        WritableSheet etabSheet = workbook.createSheet("etab", 3);
-        WritableSheet boxSheet = workbook.createSheet("box", 4);
-        WritableSheet tab2boxSheet = workbook.createSheet("tab2box", 5);
-        WritableSheet etab2boxSheet = workbook.createSheet("etab2box", 6);
-        WritableSheet box2metadataSheet = workbook.createSheet("box2metadata", 7);
-        WritableSheet utilsdataSheet = workbook.createSheet("utilsdata", 8);
-        WritableSheet controlledlistSheet = workbook.createSheet("controlledlist", 9);
-        WritableSheet tabpolicySheet = workbook.createSheet("tabpolicy", 10);
-        WritableSheet etabpolicySheet = workbook.createSheet("etabpolicy", 11);
-        WritableSheet boxpolicySheet = workbook.createSheet("boxpolicy", 12);
+		HSSFSheet propertiesdefinitionSheet = workbook.createSheet("propertiesdefinition"/*, 0*/);
+		HSSFSheet nesteddefinitionSheet = workbook.createSheet("nesteddefinition"/*, 1*/);
+		HSSFSheet tabSheet = workbook.createSheet("tab"/*, 2*/);
+		HSSFSheet etabSheet = workbook.createSheet("etab"/*, 3*/);
+        HSSFSheet boxSheet = workbook.createSheet("box"/*, 4*/);
+        HSSFSheet tab2boxSheet = workbook.createSheet("tab2box"/*, 5*/);
+        HSSFSheet etab2boxSheet = workbook.createSheet("etab2box"/*, 6*/);
+        HSSFSheet box2metadataSheet = workbook.createSheet("box2metadata"/*, 7*/);
+        HSSFSheet utilsdataSheet = workbook.createSheet("utilsdata"/*, 8*/);
+        HSSFSheet controlledlistSheet = workbook.createSheet("controlledlist"/*, 9*/);
+        HSSFSheet tabpolicySheet = workbook.createSheet("tabpolicy"/*, 10*/);
+        HSSFSheet etabpolicySheet = workbook.createSheet("etabpolicy"/*, 11*/);
+        HSSFSheet boxpolicySheet = workbook.createSheet("boxpolicy"/*, 12*/);
         
         Map<String, Class<? extends PropertiesDefinition>> propDefTypes = new HashMap<String, Class<? extends PropertiesDefinition>>();
         propDefTypes.put("rp", RPPropertiesDefinition.class);
@@ -2022,7 +2032,7 @@ public class ImportExportUtils {
         		"TARGET", "SHORTNAME", "LABEL", "REPEATABLE", "PRIORITY", "HELP",
 				"ACCESS LEVEL", "MANDATORY", "WIDGET", "POINTER CLASS", "RENDERING", "LABEL-SIZE", "FIELD-WIDTH",   
 				"FIELD-HEIGHT", "NEW-LINE","TEXTROWS","TEXTCOLS", "NONE" }) {
-        	propertiesdefinitionSheet.addCell(new Label(colIdx, 0, pDefHeader));
+        	UtilsXLS.addCell(propertiesdefinitionSheet, colIdx, 0, pDefHeader);
         	colIdx++;
         }
         
@@ -2030,15 +2040,15 @@ public class ImportExportUtils {
 		for (String pDefHeader : new String[] { "TARGET", "SHORTNAME", "LABEL", "REPEATABLE", "PRIORITY", "HELP",
 				"ACCESS LEVEL", "MANDATORY", "WIDGET", "POINTER CLASS", "ANCESTOR", "RENDERING", "LABEL-SIZE",
 				"FIELD-WIDTH", "FIELD-HEIGHT", "NEW-LINE","TEXTROWS","TEXTCOLS", "NONE" }) {
-			nesteddefinitionSheet.addCell(new Label(colIdx, 0, pDefHeader));
+			UtilsXLS.addCell(nesteddefinitionSheet, colIdx, 0, pDefHeader);
         	colIdx++;
         }
 		
 		colIdx = 0;
 		for (String pDefHeader : new String[] { "TARGET", "SHORTNAME", "LABEL", "MANDATORY", "PRIORITY", "VISIBILITY",
 				"EXT", "MIME", "NONE" }) {
-			tabSheet.addCell(new Label(colIdx, 0, pDefHeader));
-			etabSheet.addCell(new Label(colIdx, 0, pDefHeader));
+			UtilsXLS.addCell(tabSheet, colIdx, 0, pDefHeader);
+			UtilsXLS.addCell(etabSheet, colIdx, 0, pDefHeader);
         	colIdx++;
         }
 		
@@ -2046,56 +2056,56 @@ public class ImportExportUtils {
 		for (String pDefHeader : new String[] { "TARGET", "COLLAPSED", "EXTERNALJSP", "PRIORITY", "SHORTNAME", "LABEL",
 				"UNRELEVANT", "VISIBILITY", "NONE"
 		}) {
-			boxSheet.addCell(new Label(colIdx, 0, pDefHeader));
+			UtilsXLS.addCell(boxSheet, colIdx, 0, pDefHeader);
         	colIdx++;
         }
 		
 		colIdx = 0;
 		for (String pDefHeader : new String[] { "TARGET", "TAB", "BOX"}) {
-			tab2boxSheet.addCell(new Label(colIdx, 0, pDefHeader));
-			etab2boxSheet.addCell(new Label(colIdx, 0, pDefHeader));
+			UtilsXLS.addCell(tab2boxSheet, colIdx, 0, pDefHeader);
+			UtilsXLS.addCell(etab2boxSheet, colIdx, 0, pDefHeader);
 			colIdx++;
 		}
 
 		colIdx = 0;
 		for (String pDefHeader : new String[] { "TARGET", "BOX", "METADATA"}) {
-			box2metadataSheet.addCell(new Label(colIdx, 0, pDefHeader));
+			UtilsXLS.addCell(box2metadataSheet, colIdx, 0, pDefHeader);
 			colIdx++;
 		}
 
         colIdx = 0;
         for (String pDefHeader : new String[] { "TARGET", "SHORTNAME", "METADATA", "TYPE" })
         {
-            tabpolicySheet.addCell(new Label(colIdx, 0, pDefHeader));
-            etabpolicySheet.addCell(new Label(colIdx, 0, pDefHeader));
-            boxpolicySheet.addCell(new Label(colIdx, 0, pDefHeader)); 
+        	UtilsXLS.addCell(tabpolicySheet, colIdx, 0, pDefHeader);
+            UtilsXLS.addCell(etabpolicySheet, colIdx, 0, pDefHeader);
+            UtilsXLS.addCell(boxpolicySheet, colIdx, 0, pDefHeader); 
             colIdx++;
         }
 	        
-		utilsdataSheet.addCell(new Label(0, 0, "nested"));
-		utilsdataSheet.addCell(new Label(0, 1, "text"));
-		utilsdataSheet.addCell(new Label(0, 2, "date"));
-		utilsdataSheet.addCell(new Label(0, 3, "link"));
-		utilsdataSheet.addCell(new Label(0, 4, "file"));
-		utilsdataSheet.addCell(new Label(0, 5, "pointer"));
-		utilsdataSheet.addCell(new Label(0, 6, "image"));
-		utilsdataSheet.addCell(new Label(0, 7, "boolean"));
-		utilsdataSheet.addCell(new Label(0, 8, "radio"));
-		utilsdataSheet.addCell(new Label(0, 9, "checkbox"));
+        UtilsXLS.addCell(utilsdataSheet, 0, 0, "nested");
+        UtilsXLS.addCell(utilsdataSheet, 0, 1, "text");
+        UtilsXLS.addCell(utilsdataSheet, 0, 2, "date");
+        UtilsXLS.addCell(utilsdataSheet, 0, 3, "link");
+        UtilsXLS.addCell(utilsdataSheet, 0, 4, "file");
+        UtilsXLS.addCell(utilsdataSheet, 0, 5, "pointer");
+        UtilsXLS.addCell(utilsdataSheet, 0, 6, "image");
+        UtilsXLS.addCell(utilsdataSheet, 0, 7, "boolean");
+        UtilsXLS.addCell(utilsdataSheet, 0, 8, "radio");
+        UtilsXLS.addCell(utilsdataSheet, 0, 9, "checkbox");
 		
-		utilsdataSheet.addCell(new Label(1, 0, "y"));
-		utilsdataSheet.addCell(new Label(1, 1, "n"));
+        UtilsXLS.addCell(utilsdataSheet, 1, 0, "y");
+        UtilsXLS.addCell(utilsdataSheet, 1, 1, "n");
 		
-		utilsdataSheet.addCell(new Label(2, 0, "###"));
-		utilsdataSheet.addCell(new Label(2, 1, "rp"));
-		utilsdataSheet.addCell(new Label(2, 2, "pj"));
-		utilsdataSheet.addCell(new Label(2, 3, "ou"));
+        UtilsXLS.addCell(utilsdataSheet, 2, 0, "###");
+        UtilsXLS.addCell(utilsdataSheet, 2, 1, "rp");
+        UtilsXLS.addCell(utilsdataSheet, 2, 2, "pj");
+        UtilsXLS.addCell(utilsdataSheet, 2, 3, "ou");
 		
-		utilsdataSheet.addCell(new Label(3, 0, "HIGH_ACCESS"));
-		utilsdataSheet.addCell(new Label(3, 1, "STANDARD_ACCESS"));
-		utilsdataSheet.addCell(new Label(3, 2, "ADMIN_ACCESS"));
-		utilsdataSheet.addCell(new Label(3, 3, "LOW_ACCESS"));
-		utilsdataSheet.addCell(new Label(3, 4, "POLICY_ACCESS"));
+        UtilsXLS.addCell(utilsdataSheet, 3, 0, "HIGH_ACCESS");
+        UtilsXLS.addCell(utilsdataSheet, 3, 1, "STANDARD_ACCESS");
+        UtilsXLS.addCell(utilsdataSheet, 3, 2, "ADMIN_ACCESS");
+        UtilsXLS.addCell(utilsdataSheet, 3, 3, "LOW_ACCESS");
+        UtilsXLS.addCell(utilsdataSheet, 3, 4, "POLICY_ACCESS");
 		
         int rowIdx = 1;
         int rowNestedIdx = 1;
@@ -2111,35 +2121,35 @@ public class ImportExportUtils {
         for (String oType : propDefTypes.keySet()) {
         	List<? extends PropertiesDefinition> propDefs = applicationService.getList(propDefTypes.get(oType));
             for (PropertiesDefinition propDef : propDefs) {
-	        	try
-	            {
-	            	propertiesdefinitionSheet.addCell(new Label(0, rowIdx, oType));
-	            	propertiesdefinitionSheet.addCell(new Label(1, rowIdx, propDef.getShortName()));
-	            	propertiesdefinitionSheet.addCell(new Label(2, rowIdx, propDef.getLabel()));
-	            	propertiesdefinitionSheet.addCell(new Label(3, rowIdx, propDef.isRepeatable()?"y":"n"));
-	            	propertiesdefinitionSheet.addCell(new Label(4, rowIdx, propDef.getPriority()+""));
-	            	propertiesdefinitionSheet.addCell(new Label(5, rowIdx, propDef.getHelp()));
-	            	propertiesdefinitionSheet.addCell(new Label(6, rowIdx, accessLevels.get(propDef.getAccessLevel())));
-	            	propertiesdefinitionSheet.addCell(new Label(7, rowIdx, propDef.isMandatory()?"y":"n"));
-	            	propertiesdefinitionSheet.addCell(new Label(8, rowIdx, getWidgetDescription(propDef.getRendering(), propDef.isRepeatable())));
-	            	propertiesdefinitionSheet.addCell(new Label(9, rowIdx, getPointerClassDescription(applicationService, propDef.getRendering())));
-	            	propertiesdefinitionSheet.addCell(new Label(10, rowIdx, getWidgetTextRenderingDescription(propDef.getRendering())));
+//	        	try
+//	            {
+	        		UtilsXLS.addCell(propertiesdefinitionSheet, 0, rowIdx, oType);
+	        		UtilsXLS.addCell(propertiesdefinitionSheet, 1, rowIdx, propDef.getShortName());
+	        		UtilsXLS.addCell(propertiesdefinitionSheet, 2, rowIdx, propDef.getLabel());
+	        		UtilsXLS.addCell(propertiesdefinitionSheet, 3, rowIdx, propDef.isRepeatable()?"y":"n");
+	        		UtilsXLS.addCell(propertiesdefinitionSheet, 4, rowIdx, propDef.getPriority()+"");
+	        		UtilsXLS.addCell(propertiesdefinitionSheet, 5, rowIdx, propDef.getHelp());
+	        		UtilsXLS.addCell(propertiesdefinitionSheet, 6, rowIdx, accessLevels.get(propDef.getAccessLevel()));
+	        		UtilsXLS.addCell(propertiesdefinitionSheet, 7, rowIdx, propDef.isMandatory()?"y":"n");
+	        		UtilsXLS.addCell(propertiesdefinitionSheet, 8, rowIdx, getWidgetDescription(propDef.getRendering(), propDef.isRepeatable()));
+	        		UtilsXLS.addCell(propertiesdefinitionSheet, 9, rowIdx, getPointerClassDescription(applicationService, propDef.getRendering()));
+	        		UtilsXLS.addCell(propertiesdefinitionSheet, 10, rowIdx, getWidgetTextRenderingDescription(propDef.getRendering()));
 	            	if (propDef.getLabelMinSize() != null && propDef.getLabelMinSize() > 0) {
-	            		propertiesdefinitionSheet.addCell(new Label(11, rowIdx, propDef.getLabelMinSize()+""));
+	            		UtilsXLS.addCell(propertiesdefinitionSheet, 11, rowIdx, propDef.getLabelMinSize()+"");
 	            	}
 	            	if (propDef.getFieldMinSize() != null && propDef.getFieldMinSize().getCol() > 0) {
-	            		propertiesdefinitionSheet.addCell(new Label(12, rowIdx, propDef.getFieldMinSize().getCol()+""));
+	            		UtilsXLS.addCell(propertiesdefinitionSheet, 12, rowIdx, propDef.getFieldMinSize().getCol()+"");
 	            	}
 	            	if (propDef.getFieldMinSize() != null && propDef.getFieldMinSize().getRow() > 0) {
-	            		propertiesdefinitionSheet.addCell(new Label(13, rowIdx, propDef.getFieldMinSize().getRow()+""));
+	            		UtilsXLS.addCell(propertiesdefinitionSheet, 13, rowIdx, propDef.getFieldMinSize().getRow()+"");
 	            	}
-	            	propertiesdefinitionSheet.addCell(new Label(14, rowIdx, propDef.isNewline()?"y":"n"));
+	            	UtilsXLS.addCell(propertiesdefinitionSheet, 14, rowIdx, propDef.isNewline()?"y":"n");
 	            	
-	            	propertiesdefinitionSheet.addCell(new Label(15,rowIdx,getWidgetTextSizeRow(propDef.getRendering())));
+	            	UtilsXLS.addCell(propertiesdefinitionSheet, 15,rowIdx,getWidgetTextSizeRow(propDef.getRendering()));
 	            	
-	            	propertiesdefinitionSheet.addCell(new Label(16,rowIdx,getWidgetTextSizeCol(propDef.getRendering())));
+	            	UtilsXLS.addCell(propertiesdefinitionSheet, 16,rowIdx,getWidgetTextSizeCol(propDef.getRendering()));
 	            	
-	            	propertiesdefinitionSheet.addCell(new Label(17, rowIdx, "#"));
+	            	UtilsXLS.addCell(propertiesdefinitionSheet, 17, rowIdx, "#");
 	            	
 	            	if (propDef.getRendering() instanceof WidgetCheckRadio) {
 	            		WidgetCheckRadio widget = (WidgetCheckRadio) propDef.getRendering();
@@ -2147,39 +2157,39 @@ public class ImportExportUtils {
 						// FIXME this make impossible to have the same property
 						// name in different objects associated with a
 						// controlled list
-	            		controlledlistSheet.addCell(new Label(colControlledList, 0, propDef.getShortName()));
+	            		UtilsXLS.addCell(controlledlistSheet, colControlledList, 0, propDef.getShortName());
 	            		int tmpIdx = 1;
 	            		for (String c : cLists) {
-	            			controlledlistSheet.addCell(new Label(colControlledList, tmpIdx, c));
+	            			UtilsXLS.addCell(controlledlistSheet, colControlledList, tmpIdx, c);
 	            			tmpIdx++;
 	            		}
 	            		colControlledList++;
 	            	}
-	            }
-	            catch (WriteException e)
-	            {
-	                throw new IOException(
-	                        "Error to create template from fixed header columns: "
-	                                + e.getMessage());
-	            }
+//	            }
+//	            catch (IOException e)
+//	            {
+//	                throw new IOException(
+//	                        "Error to create template from fixed header columns: "
+//	                                + e.getMessage());
+//	            }
 	        	rowIdx++;
             }
             
             List<? extends ATypeNestedObject> nestedDefs = applicationService.getList(nestedDefTypes.get(oType));
             for (ATypeNestedObject propDef : nestedDefs) {
-	        	try
-	            {
-	        		propertiesdefinitionSheet.addCell(new Label(0, rowIdx, oType));
-	            	propertiesdefinitionSheet.addCell(new Label(1, rowIdx, propDef.getShortName()));
-	            	propertiesdefinitionSheet.addCell(new Label(2, rowIdx, propDef.getLabel()));
-	            	propertiesdefinitionSheet.addCell(new Label(3, rowIdx, propDef.isRepeatable()?"y":"n"));
-	            	propertiesdefinitionSheet.addCell(new Label(4, rowIdx, propDef.getPriority()+""));
-	            	propertiesdefinitionSheet.addCell(new Label(5, rowIdx, propDef.getHelp()));
-	            	propertiesdefinitionSheet.addCell(new Label(6, rowIdx, accessLevels.get(propDef.getAccessLevel())));
-	            	propertiesdefinitionSheet.addCell(new Label(7, rowIdx, propDef.isMandatory()?"y":"n"));
-	            	propertiesdefinitionSheet.addCell(new Label(8, rowIdx, "nested"));
-	            	propertiesdefinitionSheet.addCell(new Label(9, rowIdx, "n"));
-	            	propertiesdefinitionSheet.addCell(new Label(10, rowIdx, ""));
+//	        	try
+//	            {
+	        		UtilsXLS.addCell(propertiesdefinitionSheet, 0, rowIdx, oType);
+	        		UtilsXLS.addCell(propertiesdefinitionSheet, 1, rowIdx, propDef.getShortName());
+	        		UtilsXLS.addCell(propertiesdefinitionSheet, 2, rowIdx, propDef.getLabel());
+	        		UtilsXLS.addCell(propertiesdefinitionSheet, 3, rowIdx, propDef.isRepeatable()?"y":"n");
+	        		UtilsXLS.addCell(propertiesdefinitionSheet, 4, rowIdx, propDef.getPriority()+"");
+	        		UtilsXLS.addCell(propertiesdefinitionSheet, 5, rowIdx, propDef.getHelp());
+	        		UtilsXLS.addCell(propertiesdefinitionSheet, 6, rowIdx, accessLevels.get(propDef.getAccessLevel()));
+	        		UtilsXLS.addCell(propertiesdefinitionSheet, 7, rowIdx, propDef.isMandatory()?"y":"n");
+	        		UtilsXLS.addCell(propertiesdefinitionSheet, 8, rowIdx, "nested");
+	            	UtilsXLS.addCell(propertiesdefinitionSheet, 9, rowIdx, "n");
+	            	UtilsXLS.addCell(propertiesdefinitionSheet, 10, rowIdx, "");
 //	            	not defined for nested
 //	            	if (propDef.getLabelMinSize() != null && propDef.getLabelMinSize() > 0) {
 //	            		propertiesdefinitionSheet.addCell(new Label(11, rowIdx, propDef.getLabelMinSize()+""));
@@ -2190,47 +2200,47 @@ public class ImportExportUtils {
 //	            	if (propDef.getFieldMinSize() != null && propDef.getFieldMinSize().getRow() > 0) {
 //	            		propertiesdefinitionSheet.addCell(new Label(13, rowIdx, propDef.getFieldMinSize().getRow()+""));
 //	            	}
-	            	propertiesdefinitionSheet.addCell(new Label(14, rowIdx, propDef.isNewline()?"y":"n"));
-	            	propertiesdefinitionSheet.addCell(new Label(15,rowIdx,getWidgetTextSizeRow(propDef.getRendering())));
-	            	propertiesdefinitionSheet.addCell(new Label(16,rowIdx,getWidgetTextSizeCol(propDef.getRendering())));	            	
-	            	propertiesdefinitionSheet.addCell(new Label(17, rowIdx, "#"));
+	            	UtilsXLS.addCell(propertiesdefinitionSheet, 14, rowIdx, propDef.isNewline()?"y":"n");
+	            	UtilsXLS.addCell(propertiesdefinitionSheet, 15,rowIdx,getWidgetTextSizeRow(propDef.getRendering()));
+	            	UtilsXLS.addCell(propertiesdefinitionSheet, 16,rowIdx,getWidgetTextSizeCol(propDef.getRendering()));	            	
+	            	UtilsXLS.addCell(propertiesdefinitionSheet, 17, rowIdx, "#");
 	            	rowIdx++;
 	            	
 					List<? extends PropertiesDefinition> nestedpropDefs = applicationService
 							.findMaskByShortName(nestedDefTypes.get(oType),
 									propDef.getShortName());
 	                for (PropertiesDefinition npropDef : nestedpropDefs) {
-	    	        	try
-	    	            {
+//	    	        	try
+//	    	            {
 	    	        		// shortname of the nested group "the propdef" of the parent
-	    	        		nesteddefinitionSheet.addCell(new Label(0, rowNestedIdx, oType));
-							nesteddefinitionSheet.addCell(new Label(1, rowNestedIdx, npropDef.getShortName()));
-	    	            	nesteddefinitionSheet.addCell(new Label(2, rowNestedIdx, npropDef.getLabel()));
-	    	            	nesteddefinitionSheet.addCell(new Label(3, rowNestedIdx, npropDef.isRepeatable()?"y":"n"));
-	    	            	nesteddefinitionSheet.addCell(new Label(4, rowNestedIdx, npropDef.getPriority()+""));
-	    	            	nesteddefinitionSheet.addCell(new Label(5, rowNestedIdx, npropDef.getHelp()));
-	    	            	nesteddefinitionSheet.addCell(new Label(6, rowNestedIdx, accessLevels.get(npropDef.getAccessLevel())));
-	    	            	nesteddefinitionSheet.addCell(new Label(7, rowNestedIdx, npropDef.isMandatory()?"y":"n"));
-	    	            	nesteddefinitionSheet.addCell(new Label(8, rowNestedIdx, getWidgetDescription(npropDef.getRendering(), npropDef.isRepeatable())));
-							nesteddefinitionSheet.addCell(new Label(9, rowNestedIdx, getPointerClassDescription(applicationService, npropDef.getRendering())));
-	    	            	nesteddefinitionSheet.addCell(new Label(10, rowNestedIdx, propDef.getShortName()));
-	    	            	nesteddefinitionSheet.addCell(new Label(11, rowNestedIdx, getWidgetTextRenderingDescription(npropDef.getRendering())));
+	    	        		UtilsXLS.addCell(nesteddefinitionSheet, 0, rowNestedIdx, oType);
+	    	        		UtilsXLS.addCell(nesteddefinitionSheet, 1, rowNestedIdx, npropDef.getShortName());
+	    	        		UtilsXLS.addCell(nesteddefinitionSheet, 2, rowNestedIdx, npropDef.getLabel());
+	    	        		UtilsXLS.addCell(nesteddefinitionSheet, 3, rowNestedIdx, npropDef.isRepeatable()?"y":"n");
+	    	        		UtilsXLS.addCell(nesteddefinitionSheet, 4, rowNestedIdx, npropDef.getPriority()+"");
+	    	            	UtilsXLS.addCell(nesteddefinitionSheet, 5, rowNestedIdx, npropDef.getHelp());
+	    	            	UtilsXLS.addCell(nesteddefinitionSheet, 6, rowNestedIdx, accessLevels.get(npropDef.getAccessLevel()));
+	    	            	UtilsXLS.addCell(nesteddefinitionSheet, 7, rowNestedIdx, npropDef.isMandatory()?"y":"n");
+	    	            	UtilsXLS.addCell(nesteddefinitionSheet, 8, rowNestedIdx, getWidgetDescription(npropDef.getRendering(), npropDef.isRepeatable()));
+	    	            	UtilsXLS.addCell(nesteddefinitionSheet, 9, rowNestedIdx, getPointerClassDescription(applicationService, npropDef.getRendering()));
+	    	            	UtilsXLS.addCell(nesteddefinitionSheet, 10, rowNestedIdx, propDef.getShortName());
+	    	            	UtilsXLS.addCell(nesteddefinitionSheet, 11, rowNestedIdx, getWidgetTextRenderingDescription(npropDef.getRendering()));
 	    	            	if (npropDef.getLabelMinSize() != null && npropDef.getLabelMinSize() > 0) {
-	    	            		nesteddefinitionSheet.addCell(new Label(12, rowNestedIdx, npropDef.getLabelMinSize()+""));
+	    	            		UtilsXLS.addCell(nesteddefinitionSheet, 12, rowNestedIdx, npropDef.getLabelMinSize()+"");
 	    	            	}
 	    	            	if (npropDef.getFieldMinSize() != null && npropDef.getFieldMinSize().getCol() > 0) {
-	    	            		nesteddefinitionSheet.addCell(new Label(13, rowNestedIdx, npropDef.getFieldMinSize().getCol()+""));
+	    	            		UtilsXLS.addCell(nesteddefinitionSheet, 13, rowNestedIdx, npropDef.getFieldMinSize().getCol()+"");
 	    	            	}
 	    	            	if (npropDef.getFieldMinSize() != null && npropDef.getFieldMinSize().getRow() > 0) {
-	    	            		nesteddefinitionSheet.addCell(new Label(14, rowNestedIdx, npropDef.getFieldMinSize().getRow()+""));
+	    	            		UtilsXLS.addCell(nesteddefinitionSheet, 14, rowNestedIdx, npropDef.getFieldMinSize().getRow()+"");
 	    	            	}
-	    	            	nesteddefinitionSheet.addCell(new Label(15, rowNestedIdx, npropDef.isNewline()?"y":"n"));
+	    	            	UtilsXLS.addCell(nesteddefinitionSheet, 15, rowNestedIdx, npropDef.isNewline()?"y":"n");
 	    	            	
-	    	            	nesteddefinitionSheet.addCell(new Label(16,rowNestedIdx,getWidgetTextSizeRow(npropDef.getRendering())));
+	    	            	UtilsXLS.addCell(nesteddefinitionSheet, 16,rowNestedIdx,getWidgetTextSizeRow(npropDef.getRendering()));
 	    	            	
-	    	            	nesteddefinitionSheet.addCell(new Label(17,rowNestedIdx,getWidgetTextSizeCol(npropDef.getRendering())));
+	    	            	UtilsXLS.addCell(nesteddefinitionSheet, 17,rowNestedIdx,getWidgetTextSizeCol(npropDef.getRendering()));
 	    	            	
-	    	            	nesteddefinitionSheet.addCell(new Label(18, rowNestedIdx, "#"));
+	    	            	UtilsXLS.addCell(nesteddefinitionSheet, 18, rowNestedIdx, "#");
 	    	            	
 	    	            	if (npropDef.getRendering() instanceof WidgetCheckRadio) {
 	    	            		WidgetCheckRadio widget = (WidgetCheckRadio) npropDef.getRendering();
@@ -2238,73 +2248,73 @@ public class ImportExportUtils {
 	    						// FIXME this make impossible to have the same property
 	    						// name in different objects associated with a
 	    						// controlled list
-	    	            		controlledlistSheet.addCell(new Label(colControlledList, 0, npropDef.getShortName()));
+	    	            		UtilsXLS.addCell(controlledlistSheet, colControlledList, 0, npropDef.getShortName());
 	    	            		int tmpIdx = 1;
 	    	            		for (String c : cLists) {
-	    	            			controlledlistSheet.addCell(new Label(colControlledList, tmpIdx, c));
+	    	            			UtilsXLS.addCell(controlledlistSheet, colControlledList, tmpIdx, c);
 	    	            			tmpIdx++;
 	    	            		}
 	    	            		colControlledList++;
 	    	            	}
-	    	            }
-	    	            catch (WriteException e)
-	    	            {
-	    	                throw new IOException(
-	    	                        "Error to create template from fixed header columns: "
-	    	                                + e.getMessage());
-	    	            }
+//	    	            }
+//	    	            catch (IOException e)
+//	    	            {
+//	    	                throw new IOException(
+//	    	                        "Error to create template from fixed header columns: "
+//	    	                                + e.getMessage());
+//	    	            }
 	    	        	rowNestedIdx++;
 	                }
-	            }
-	            catch (WriteException e)
-	            {
-	                throw new IOException(
-	                        "Error to create template from fixed header columns: "
-	                                + e.getMessage());
-	            }
+//	            }
+//	            catch (IOException e)
+//	            {
+//	                throw new IOException(
+//	                        "Error to create template from fixed header columns: "
+//	                                + e.getMessage());
+//	            }
             }
             
             List<? extends Tab> tabs = applicationService
 					.getList(tabTypes.get(oType));
             for (Tab tab : tabs) {
-            	tabSheet.addCell(new Label(0, rowTabIdx, oType));
-            	tabSheet.addCell(new Label(1, rowTabIdx, tab.getShortName()));
-            	tabSheet.addCell(new Label(2, rowTabIdx, tab.getTitle()));
-            	tabSheet.addCell(new Label(3, rowTabIdx, tab.isMandatory()?"y":"n"));
-            	tabSheet.addCell(new Label(4, rowTabIdx, tab.getPriority()+""));
-				tabSheet.addCell(new Label(5, rowTabIdx, accessLevels.get(tab.getVisibility())));
+            	UtilsXLS.addCell(tabSheet, 0, rowTabIdx, oType);
+            	UtilsXLS.addCell(tabSheet, 1, rowTabIdx, tab.getShortName());
+            	UtilsXLS.addCell(tabSheet, 2, rowTabIdx, tab.getTitle());
+            	UtilsXLS.addCell(tabSheet, 3, rowTabIdx, tab.isMandatory()?"y":"n");
+            	UtilsXLS.addCell(tabSheet, 4, rowTabIdx, tab.getPriority()+"");
+            	UtilsXLS.addCell(tabSheet, 5, rowTabIdx, accessLevels.get(tab.getVisibility()));
 				if (tab.getExt() != null) {
-					tabSheet.addCell(new Label(6, rowTabIdx, tab.getExt()));
+					UtilsXLS.addCell(tabSheet, 6, rowTabIdx, tab.getExt());
 				}
 				if (tab.getMime() != null) {
-					tabSheet.addCell(new Label(7, rowTabIdx, tab.getMime()));
+					UtilsXLS.addCell(tabSheet, 7, rowTabIdx, tab.getMime());
 				}
-				tabSheet.addCell(new Label(8, rowTabIdx, "#"));				
+				UtilsXLS.addCell(tabSheet, 8, rowTabIdx, "#");				
 				rowTabIdx++;
 				
 				for (Object boxObj : applicationService.findPropertyHolderInTab(tabTypes.get(oType), tab.getId())) {
 					Box box = (Box) boxObj;
-					tab2boxSheet.addCell(new Label(0, rowTab2boxIdx, oType));
-					tab2boxSheet.addCell(new Label(1, rowTab2boxIdx, tab.getShortName()));
-					tab2boxSheet.addCell(new Label(2, rowTab2boxIdx, box.getShortName()));
+					UtilsXLS.addCell(tab2boxSheet, 0, rowTab2boxIdx, oType);
+					UtilsXLS.addCell(tab2boxSheet, 1, rowTab2boxIdx, tab.getShortName());
+					UtilsXLS.addCell(tab2boxSheet, 2, rowTab2boxIdx, box.getShortName());
 					rowTab2boxIdx++;
 				}
 				
 				int idxPolicy = 1;
 				List<PropertiesDefinition> policies = applicationService.findPDAuthorizationGroupInTab(tabTypes.get(oType), tab.getId());
 				for(PropertiesDefinition policy : policies) {
-				    tabpolicySheet.addCell(new Label(0, idxPolicy, oType));
-				    tabpolicySheet.addCell(new Label(1, idxPolicy, tab.getShortName()));
-				    tabpolicySheet.addCell(new Label(2, idxPolicy, policy.getShortName()));
-				    tabpolicySheet.addCell(new Label(3, idxPolicy, "group"));
+					UtilsXLS.addCell(tabpolicySheet, 0, idxPolicy, oType);
+					UtilsXLS.addCell(tabpolicySheet, 1, idxPolicy, tab.getShortName());
+					UtilsXLS.addCell(tabpolicySheet, 2, idxPolicy, policy.getShortName());
+					UtilsXLS.addCell(tabpolicySheet, 3, idxPolicy, "group");
 				    idxPolicy++;
 				}
 				policies = applicationService.findPDAuthorizationSingleInTab(tabTypes.get(oType), tab.getId());
                 for(PropertiesDefinition policy : policies) {
-                    tabpolicySheet.addCell(new Label(0, idxPolicy, oType));
-                    tabpolicySheet.addCell(new Label(1, idxPolicy, tab.getShortName()));
-                    tabpolicySheet.addCell(new Label(2, idxPolicy, policy.getShortName()));
-                    tabpolicySheet.addCell(new Label(3, idxPolicy, "eperson"));
+                	UtilsXLS.addCell(tabpolicySheet, 0, idxPolicy, oType);
+                	UtilsXLS.addCell(tabpolicySheet, 1, idxPolicy, tab.getShortName());
+                	UtilsXLS.addCell(tabpolicySheet, 2, idxPolicy, policy.getShortName());
+                	UtilsXLS.addCell(tabpolicySheet, 3, idxPolicy, "eperson");
                     idxPolicy++;
                 }
             }
@@ -2312,26 +2322,26 @@ public class ImportExportUtils {
             List<? extends Tab> etabs = applicationService
 					.getList(etabTypes.get(oType));
             for (Tab tab : etabs) {
-            	etabSheet.addCell(new Label(0, rowETabIdx, oType));
-            	etabSheet.addCell(new Label(1, rowETabIdx, tab.getShortName()));
-            	etabSheet.addCell(new Label(2, rowETabIdx, tab.getTitle()));
-            	etabSheet.addCell(new Label(3, rowETabIdx, tab.isMandatory()?"y":"n"));
-            	etabSheet.addCell(new Label(4, rowETabIdx, tab.getPriority()+""));
-            	etabSheet.addCell(new Label(5, rowETabIdx, accessLevels.get(tab.getVisibility())));
+            	UtilsXLS.addCell(etabSheet, 0, rowETabIdx, oType);
+            	UtilsXLS.addCell(etabSheet, 1, rowETabIdx, tab.getShortName());
+            	UtilsXLS.addCell(etabSheet, 2, rowETabIdx, tab.getTitle());
+            	UtilsXLS.addCell(etabSheet, 3, rowETabIdx, tab.isMandatory()?"y":"n");
+            	UtilsXLS.addCell(etabSheet, 4, rowETabIdx, tab.getPriority()+"");
+            	UtilsXLS.addCell(etabSheet, 5, rowETabIdx, accessLevels.get(tab.getVisibility()));
 				if (tab.getExt() != null) {
-					etabSheet.addCell(new Label(6, rowETabIdx, tab.getExt()));
+					UtilsXLS.addCell(etabSheet, 6, rowETabIdx, tab.getExt());
 				}
 				if (tab.getMime() != null) {
-					etabSheet.addCell(new Label(7, rowETabIdx, tab.getMime()));
+					UtilsXLS.addCell(etabSheet, 7, rowETabIdx, tab.getMime());
 				}
-				etabSheet.addCell(new Label(8, rowETabIdx, "#"));				
+				UtilsXLS.addCell(etabSheet, 8, rowETabIdx, "#");				
 				rowETabIdx++;
 				
 				for (Object boxObj : applicationService.findPropertyHolderInTab(etabTypes.get(oType), tab.getId())) {
 					Box box = (Box) boxObj;
-					etab2boxSheet.addCell(new Label(0, rowETab2boxIdx, oType));
-					etab2boxSheet.addCell(new Label(1, rowETab2boxIdx, tab.getShortName()));
-					etab2boxSheet.addCell(new Label(2, rowETab2boxIdx, box.getShortName()));
+					UtilsXLS.addCell(etab2boxSheet, 0, rowETab2boxIdx, oType);
+					UtilsXLS.addCell(etab2boxSheet, 1, rowETab2boxIdx, tab.getShortName());
+					UtilsXLS.addCell(etab2boxSheet, 2, rowETab2boxIdx, box.getShortName());
 					rowETab2boxIdx++;
 				}
 				
@@ -2339,19 +2349,19 @@ public class ImportExportUtils {
                 
                 List<PropertiesDefinition> policies = applicationService.findPDAuthorizationGroupInTab(tabTypes.get(oType), tab.getId());
                 for(PropertiesDefinition policy : policies) {
-                    etabpolicySheet.addCell(new Label(0, idxPolicy, oType));
-                    etabpolicySheet.addCell(new Label(1, idxPolicy, tab.getShortName()));
-                    etabpolicySheet.addCell(new Label(2, idxPolicy, policy.getShortName()));
-                    etabpolicySheet.addCell(new Label(3, idxPolicy, "group"));
+                	UtilsXLS.addCell(etabpolicySheet, 0, idxPolicy, oType);
+                	UtilsXLS.addCell(etabpolicySheet, 1, idxPolicy, tab.getShortName());
+                	UtilsXLS.addCell(etabpolicySheet, 2, idxPolicy, policy.getShortName());
+                	UtilsXLS.addCell(etabpolicySheet, 3, idxPolicy, "group");
                     idxPolicy++;
                 }
                 
                 policies = applicationService.findPDAuthorizationSingleInTab(tabTypes.get(oType), tab.getId());
                 for(PropertiesDefinition policy : policies) {
-                    etabpolicySheet.addCell(new Label(0, idxPolicy, oType));
-                    etabpolicySheet.addCell(new Label(1, idxPolicy, tab.getShortName()));
-                    etabpolicySheet.addCell(new Label(2, idxPolicy, policy.getShortName()));
-                    etabpolicySheet.addCell(new Label(3, idxPolicy, "eperson"));
+                	UtilsXLS.addCell(etabpolicySheet, 0, idxPolicy, oType);
+                	UtilsXLS.addCell(etabpolicySheet, 1, idxPolicy, tab.getShortName());
+                	UtilsXLS.addCell(etabpolicySheet, 2, idxPolicy, policy.getShortName());
+                	UtilsXLS.addCell(etabpolicySheet, 3, idxPolicy, "eperson");
                     idxPolicy++;
                 }
             }
@@ -2359,23 +2369,23 @@ public class ImportExportUtils {
             List<? extends Box> boxes = applicationService
 					.getList(boxTypes.get(oType));
             for (Box box : boxes) {
-            	boxSheet.addCell(new Label(0, rowBoxIdx, oType));
-            	boxSheet.addCell(new Label(1, rowBoxIdx, box.isCollapsed()?"y":"n"));
-            	boxSheet.addCell(new Label(2, rowBoxIdx, box.getExternalJSP()));
-            	boxSheet.addCell(new Label(3, rowBoxIdx, box.getPriority()+""));
-            	boxSheet.addCell(new Label(4, rowBoxIdx, box.getShortName()));
-            	boxSheet.addCell(new Label(5, rowBoxIdx, box.getTitle()));
-            	boxSheet.addCell(new Label(6, rowBoxIdx, box.isUnrelevant()?"y":"n"));
-            	boxSheet.addCell(new Label(7, rowBoxIdx, accessLevels.get(box.getVisibility())));
-            	boxSheet.addCell(new Label(8, rowBoxIdx, "#"));            	
+            	UtilsXLS.addCell(boxSheet, 0, rowBoxIdx, oType);
+            	UtilsXLS.addCell(boxSheet, 1, rowBoxIdx, box.isCollapsed()?"y":"n");
+            	UtilsXLS.addCell(boxSheet, 2, rowBoxIdx, box.getExternalJSP());
+            	UtilsXLS.addCell(boxSheet, 3, rowBoxIdx, box.getPriority()+"");
+            	UtilsXLS.addCell(boxSheet, 4, rowBoxIdx, box.getShortName());
+            	UtilsXLS.addCell(boxSheet, 5, rowBoxIdx, box.getTitle());
+            	UtilsXLS.addCell(boxSheet, 6, rowBoxIdx, box.isUnrelevant()?"y":"n");
+            	UtilsXLS.addCell(boxSheet, 7, rowBoxIdx, accessLevels.get(box.getVisibility()));
+            	UtilsXLS.addCell(boxSheet, 8, rowBoxIdx, "#");            	
 				rowBoxIdx++;
 				
 				for (Object pdefObj : applicationService.findContainableInPropertyHolder(boxTypes.get(oType),
 						box.getId())) {
 					Containable pdef = (Containable) pdefObj;
-					box2metadataSheet.addCell(new Label(0, rowBox2metadataIdx, oType));
-					box2metadataSheet.addCell(new Label(1, rowBox2metadataIdx, box.getShortName()));
-					box2metadataSheet.addCell(new Label(2, rowBox2metadataIdx, pdef.getShortName()));
+					UtilsXLS.addCell(box2metadataSheet, 0, rowBox2metadataIdx, oType);
+					UtilsXLS.addCell(box2metadataSheet, 1, rowBox2metadataIdx, box.getShortName());
+					UtilsXLS.addCell(box2metadataSheet, 2, rowBox2metadataIdx, pdef.getShortName());
 					rowBox2metadataIdx++;
 				}
 				
@@ -2383,19 +2393,19 @@ public class ImportExportUtils {
                 List<PropertiesDefinition> policies = applicationService.findPDAuthorizationGroupInBox(boxTypes.get(oType),
                         box.getId());
                 for(PropertiesDefinition policy : policies) {
-                    boxpolicySheet.addCell(new Label(0, idxPolicy, oType));
-                    boxpolicySheet.addCell(new Label(1, idxPolicy, box.getShortName()));
-                    boxpolicySheet.addCell(new Label(2, idxPolicy, policy.getShortName()));
-                    boxpolicySheet.addCell(new Label(3, idxPolicy, "group"));
+                	UtilsXLS.addCell(boxpolicySheet, 0, idxPolicy, oType);
+                	UtilsXLS.addCell(boxpolicySheet, 1, idxPolicy, box.getShortName());
+                	UtilsXLS.addCell(boxpolicySheet, 2, idxPolicy, policy.getShortName());
+                	UtilsXLS.addCell(boxpolicySheet, 3, idxPolicy, "group");
                     idxPolicy++;
                 }
                 policies = applicationService.findPDAuthorizationSingleInBox(boxTypes.get(oType),
                         box.getId());
                 for(PropertiesDefinition policy : policies) {
-                    boxpolicySheet.addCell(new Label(0, idxPolicy, oType));
-                    boxpolicySheet.addCell(new Label(1, idxPolicy, box.getShortName()));
-                    boxpolicySheet.addCell(new Label(2, idxPolicy, policy.getShortName()));
-                    boxpolicySheet.addCell(new Label(3, idxPolicy, "eperson"));
+                	UtilsXLS.addCell(boxpolicySheet, 0, idxPolicy, oType);
+                	UtilsXLS.addCell(boxpolicySheet, 1, idxPolicy, box.getShortName());
+                	UtilsXLS.addCell(boxpolicySheet, 2, idxPolicy, policy.getShortName());
+                	UtilsXLS.addCell(boxpolicySheet, 3, idxPolicy, "eperson");
                     idxPolicy++;
                 }
             }
@@ -2408,38 +2418,38 @@ public class ImportExportUtils {
         for (DynamicObjectType dyn : dynTypes) {
         	String oType = dyn.getShortName();
 
-        	utilsdataSheet.addCell(new Label(2, rowUtilsDataDynObjectsIdx, oType));
+        	UtilsXLS.addCell(utilsdataSheet, 2, rowUtilsDataDynObjectsIdx, oType);
         	rowUtilsDataDynObjectsIdx++;
         	
 			List<? extends PropertiesDefinition> propDefs = applicationService.findMaskByShortName(DynamicTypeNestedObject.class,
                     oType);
             for (PropertiesDefinition propDef : propDefs) {
-	        	try
-	            {
-	            	propertiesdefinitionSheet.addCell(new Label(0, rowIdx, oType));
-	            	propertiesdefinitionSheet.addCell(new Label(1, rowIdx, propDef.getShortName().substring(oType.length())));
-	            	propertiesdefinitionSheet.addCell(new Label(2, rowIdx, propDef.getLabel()));
-	            	propertiesdefinitionSheet.addCell(new Label(3, rowIdx, propDef.isRepeatable()?"y":"n"));
-	            	propertiesdefinitionSheet.addCell(new Label(4, rowIdx, propDef.getPriority()+""));
-	            	propertiesdefinitionSheet.addCell(new Label(5, rowIdx, propDef.getHelp()));
-	            	propertiesdefinitionSheet.addCell(new Label(6, rowIdx, accessLevels.get(propDef.getAccessLevel())));
-	            	propertiesdefinitionSheet.addCell(new Label(7, rowIdx, propDef.isMandatory()?"y":"n"));
-	            	propertiesdefinitionSheet.addCell(new Label(8, rowIdx, getWidgetDescription(propDef.getRendering(), propDef.isRepeatable())));
-	            	propertiesdefinitionSheet.addCell(new Label(9, rowIdx, getPointerClassDescription(applicationService, propDef.getRendering())));
-	            	propertiesdefinitionSheet.addCell(new Label(10, rowIdx, getWidgetTextRenderingDescription(propDef.getRendering())));
+//	        	try
+//	            {
+	        		UtilsXLS.addCell(propertiesdefinitionSheet, 0, rowIdx, oType);
+	        		UtilsXLS.addCell(propertiesdefinitionSheet, 1, rowIdx, propDef.getShortName().substring(oType.length()));
+	        		UtilsXLS.addCell(propertiesdefinitionSheet, 2, rowIdx, propDef.getLabel());
+	        		UtilsXLS.addCell(propertiesdefinitionSheet, 3, rowIdx, propDef.isRepeatable()?"y":"n");
+	        		UtilsXLS.addCell(propertiesdefinitionSheet, 4, rowIdx, propDef.getPriority()+"");
+	        		UtilsXLS.addCell(propertiesdefinitionSheet, 5, rowIdx, propDef.getHelp());
+	        		UtilsXLS.addCell(propertiesdefinitionSheet, 6, rowIdx, accessLevels.get(propDef.getAccessLevel()));
+	        		UtilsXLS.addCell(propertiesdefinitionSheet, 7, rowIdx, propDef.isMandatory()?"y":"n");
+	            	UtilsXLS.addCell(propertiesdefinitionSheet, 8, rowIdx, getWidgetDescription(propDef.getRendering(), propDef.isRepeatable()));
+	            	UtilsXLS.addCell(propertiesdefinitionSheet, 9, rowIdx, getPointerClassDescription(applicationService, propDef.getRendering()));
+	            	UtilsXLS.addCell(propertiesdefinitionSheet, 10, rowIdx, getWidgetTextRenderingDescription(propDef.getRendering()));
 	            	if (propDef.getLabelMinSize() != null && propDef.getLabelMinSize() > 0) {
-	            		propertiesdefinitionSheet.addCell(new Label(11, rowIdx, propDef.getLabelMinSize()+""));
+	            		UtilsXLS.addCell(propertiesdefinitionSheet, 11, rowIdx, propDef.getLabelMinSize()+"");
 	            	}
 	            	if (propDef.getFieldMinSize() != null && propDef.getFieldMinSize().getCol() > 0) {
-	            		propertiesdefinitionSheet.addCell(new Label(12, rowIdx, propDef.getFieldMinSize().getCol()+""));
+	            		UtilsXLS.addCell(propertiesdefinitionSheet, 12, rowIdx, propDef.getFieldMinSize().getCol()+"");
 	            	}
 	            	if (propDef.getFieldMinSize() != null && propDef.getFieldMinSize().getRow() > 0) {
-	            		propertiesdefinitionSheet.addCell(new Label(13, rowIdx, propDef.getFieldMinSize().getRow()+""));
+	            		UtilsXLS.addCell(propertiesdefinitionSheet, 13, rowIdx, propDef.getFieldMinSize().getRow()+"");
 	            	}
-	            	propertiesdefinitionSheet.addCell(new Label(14, rowIdx, propDef.isNewline()?"y":"n"));
-	            	propertiesdefinitionSheet.addCell(new Label(15,rowIdx,getWidgetTextSizeRow(propDef.getRendering())));
-	            	propertiesdefinitionSheet.addCell(new Label(16,rowIdx,getWidgetTextSizeCol(propDef.getRendering())));
-	            	propertiesdefinitionSheet.addCell(new Label(17, rowIdx, "#"));
+	            	UtilsXLS.addCell(propertiesdefinitionSheet, 14, rowIdx, propDef.isNewline()?"y":"n");
+	            	UtilsXLS.addCell(propertiesdefinitionSheet, 15,rowIdx,getWidgetTextSizeRow(propDef.getRendering()));
+	            	UtilsXLS.addCell(propertiesdefinitionSheet, 16,rowIdx,getWidgetTextSizeCol(propDef.getRendering()));
+	            	UtilsXLS.addCell(propertiesdefinitionSheet, 17, rowIdx, "#");
 	            	
 	            	if (propDef.getRendering() instanceof WidgetCheckRadio) {
 	            		WidgetCheckRadio widget = (WidgetCheckRadio) propDef.getRendering();
@@ -2447,40 +2457,40 @@ public class ImportExportUtils {
 						// FIXME this make impossible to have the same property
 						// name in different objects associated with a
 						// controlled list
-	            		controlledlistSheet.addCell(new Label(colControlledList, 0, propDef.getShortName()));
+	            		UtilsXLS.addCell(controlledlistSheet, colControlledList, 0, propDef.getShortName());
 	            		int tmpIdx = 1;
 	            		for (String c : cLists) {
-	            			controlledlistSheet.addCell(new Label(colControlledList, tmpIdx, c));
+	            			UtilsXLS.addCell(controlledlistSheet, colControlledList, tmpIdx, c);
 	            			tmpIdx++;
 	            		}
 	            		colControlledList++;
 	            	}
-	            }
-	            catch (WriteException e)
-	            {
-	                throw new IOException(
-	                        "Error to create template from fixed header columns: "
-	                                + e.getMessage());
-	            }
+//	            }
+//	            catch (IOException e)
+//	            {
+//	                throw new IOException(
+//	                        "Error to create template from fixed header columns: "
+//	                                + e.getMessage());
+//	            }
 	        	rowIdx++;
             }
             
             List<? extends ATypeNestedObject> nestedDefs = applicationService.getList(DynamicTypeNestedObject.class);
             for (ATypeNestedObject propDef : nestedDefs) {
-	        	try
-	            {
+//	        	try
+//	            {
 	        		if (!StringUtils.startsWith(propDef.getShortName(), oType)) continue;
-	        		propertiesdefinitionSheet.addCell(new Label(0, rowIdx, oType));
-	            	propertiesdefinitionSheet.addCell(new Label(1, rowIdx, propDef.getShortName().substring(oType.length())));
-	            	propertiesdefinitionSheet.addCell(new Label(2, rowIdx, propDef.getLabel()));
-	            	propertiesdefinitionSheet.addCell(new Label(3, rowIdx, propDef.isRepeatable()?"y":"n"));
-	            	propertiesdefinitionSheet.addCell(new Label(4, rowIdx, propDef.getPriority()+""));
-	            	propertiesdefinitionSheet.addCell(new Label(5, rowIdx, propDef.getHelp()));
-	            	propertiesdefinitionSheet.addCell(new Label(6, rowIdx, accessLevels.get(propDef.getAccessLevel())));
-	            	propertiesdefinitionSheet.addCell(new Label(7, rowIdx, propDef.isMandatory()?"y":"n"));
-	            	propertiesdefinitionSheet.addCell(new Label(8, rowIdx, "nested"));
-	            	propertiesdefinitionSheet.addCell(new Label(9, rowIdx, "n"));
-	            	propertiesdefinitionSheet.addCell(new Label(10, rowIdx, ""));
+	        		UtilsXLS.addCell(propertiesdefinitionSheet, 0, rowIdx, oType);
+	        		UtilsXLS.addCell(propertiesdefinitionSheet, 1, rowIdx, propDef.getShortName().substring(oType.length()));
+	        		UtilsXLS.addCell(propertiesdefinitionSheet, 2, rowIdx, propDef.getLabel());
+	        		UtilsXLS.addCell(propertiesdefinitionSheet, 3, rowIdx, propDef.isRepeatable()?"y":"n");
+	        		UtilsXLS.addCell(propertiesdefinitionSheet, 4, rowIdx, propDef.getPriority()+"");
+	        		UtilsXLS.addCell(propertiesdefinitionSheet, 5, rowIdx, propDef.getHelp());
+	        		UtilsXLS.addCell(propertiesdefinitionSheet, 6, rowIdx, accessLevels.get(propDef.getAccessLevel()));
+	        		UtilsXLS.addCell(propertiesdefinitionSheet, 7, rowIdx, propDef.isMandatory()?"y":"n");
+	        		UtilsXLS.addCell(propertiesdefinitionSheet, 8, rowIdx, "nested");
+	        		UtilsXLS.addCell(propertiesdefinitionSheet, 9, rowIdx, "n");
+	        		UtilsXLS.addCell(propertiesdefinitionSheet, 10, rowIdx, "");
 //	            	not defined for nested
 //	            	if (propDef.getLabelMinSize() != null && propDef.getLabelMinSize() > 0) {
 //	            		propertiesdefinitionSheet.addCell(new Label(11, rowIdx, propDef.getLabelMinSize()+""));
@@ -2491,44 +2501,44 @@ public class ImportExportUtils {
 //	            	if (propDef.getFieldMinSize() != null && propDef.getFieldMinSize().getRow() > 0) {
 //	            		propertiesdefinitionSheet.addCell(new Label(13, rowIdx, propDef.getFieldMinSize().getRow()+""));
 //	            	}
-	            	propertiesdefinitionSheet.addCell(new Label(14, rowIdx, propDef.isNewline()?"y":"n"));
-	            	propertiesdefinitionSheet.addCell(new Label(15,rowIdx,getWidgetTextSizeRow(propDef.getRendering())));
-	            	propertiesdefinitionSheet.addCell(new Label(16,rowIdx,getWidgetTextSizeCol(propDef.getRendering())));
-	            	propertiesdefinitionSheet.addCell(new Label(17, rowIdx, "#"));
+	        		UtilsXLS.addCell(propertiesdefinitionSheet, 14, rowIdx, propDef.isNewline()?"y":"n");
+	        		UtilsXLS.addCell(propertiesdefinitionSheet, 15,rowIdx,getWidgetTextSizeRow(propDef.getRendering()));
+	        		UtilsXLS.addCell(propertiesdefinitionSheet, 16,rowIdx,getWidgetTextSizeCol(propDef.getRendering()));
+	        		UtilsXLS.addCell(propertiesdefinitionSheet, 17, rowIdx, "#");
 	            	rowIdx++;
 	            	
 					List<? extends PropertiesDefinition> nestedpropDefs = applicationService
 							.likePropertiesDefinitionsByShortName(DynamicNestedPropertiesDefinition.class,
 									propDef.getShortName());
 	                for (PropertiesDefinition npropDef : nestedpropDefs) {
-	    	        	try
-	    	            {
+//	    	        	try
+//	    	            {
 	    	        		// shortname of the nested group "the propdef" of the parent
-	    	        		nesteddefinitionSheet.addCell(new Label(0, rowNestedIdx, oType));
-							nesteddefinitionSheet.addCell(new Label(1, rowNestedIdx, npropDef.getShortName()));
-	    	            	nesteddefinitionSheet.addCell(new Label(2, rowNestedIdx, npropDef.getLabel()));
-	    	            	nesteddefinitionSheet.addCell(new Label(3, rowNestedIdx, npropDef.isRepeatable()?"y":"n"));
-	    	            	nesteddefinitionSheet.addCell(new Label(4, rowNestedIdx, npropDef.getPriority()+""));
-	    	            	nesteddefinitionSheet.addCell(new Label(5, rowNestedIdx, npropDef.getHelp()));
-	    	            	nesteddefinitionSheet.addCell(new Label(6, rowNestedIdx, accessLevels.get(npropDef.getAccessLevel())));
-	    	            	nesteddefinitionSheet.addCell(new Label(7, rowNestedIdx, npropDef.isMandatory()?"y":"n"));
-	    	            	nesteddefinitionSheet.addCell(new Label(8, rowNestedIdx, getWidgetDescription(npropDef.getRendering(), npropDef.isRepeatable())));
-							nesteddefinitionSheet.addCell(new Label(9, rowNestedIdx, getPointerClassDescription(applicationService, npropDef.getRendering())));
-	    	            	nesteddefinitionSheet.addCell(new Label(10, rowNestedIdx, propDef.getShortName()));
-	    	            	nesteddefinitionSheet.addCell(new Label(11, rowNestedIdx, getWidgetTextRenderingDescription(npropDef.getRendering())));
+	    	        		UtilsXLS.addCell(nesteddefinitionSheet, 0, rowNestedIdx, oType);
+	    	        		UtilsXLS.addCell(nesteddefinitionSheet, 1, rowNestedIdx, npropDef.getShortName());
+	    	        		UtilsXLS.addCell(nesteddefinitionSheet, 2, rowNestedIdx, npropDef.getLabel());
+	    	        		UtilsXLS.addCell(nesteddefinitionSheet, 3, rowNestedIdx, npropDef.isRepeatable()?"y":"n");
+	    	        		UtilsXLS.addCell(nesteddefinitionSheet, 4, rowNestedIdx, npropDef.getPriority()+"");
+	    	        		UtilsXLS.addCell(nesteddefinitionSheet, 5, rowNestedIdx, npropDef.getHelp());
+	    	        		UtilsXLS.addCell(nesteddefinitionSheet, 6, rowNestedIdx, accessLevels.get(npropDef.getAccessLevel()));
+	    	        		UtilsXLS.addCell(nesteddefinitionSheet, 7, rowNestedIdx, npropDef.isMandatory()?"y":"n");
+	    	        		UtilsXLS.addCell(nesteddefinitionSheet, 8, rowNestedIdx, getWidgetDescription(npropDef.getRendering(), npropDef.isRepeatable()));
+	    	        		UtilsXLS.addCell(nesteddefinitionSheet, 9, rowNestedIdx, getPointerClassDescription(applicationService, npropDef.getRendering()));
+							UtilsXLS.addCell(nesteddefinitionSheet, 10, rowNestedIdx, propDef.getShortName());
+							UtilsXLS.addCell(nesteddefinitionSheet, 11, rowNestedIdx, getWidgetTextRenderingDescription(npropDef.getRendering()));
 	    	            	if (npropDef.getLabelMinSize() != null && npropDef.getLabelMinSize() > 0) {
-	    	            		nesteddefinitionSheet.addCell(new Label(12, rowNestedIdx, npropDef.getLabelMinSize()+""));
+	    	            		UtilsXLS.addCell(nesteddefinitionSheet, 12, rowNestedIdx, npropDef.getLabelMinSize()+"");
 	    	            	}
 	    	            	if (npropDef.getFieldMinSize() != null && npropDef.getFieldMinSize().getCol() > 0) {
-	    	            		nesteddefinitionSheet.addCell(new Label(13, rowNestedIdx, npropDef.getFieldMinSize().getCol()+""));
+	    	            		UtilsXLS.addCell(nesteddefinitionSheet, 13, rowNestedIdx, npropDef.getFieldMinSize().getCol()+"");
 	    	            	}
 	    	            	if (npropDef.getFieldMinSize() != null && npropDef.getFieldMinSize().getRow() > 0) {
-	    	            		nesteddefinitionSheet.addCell(new Label(14, rowNestedIdx, npropDef.getFieldMinSize().getRow()+""));
+	    	            		UtilsXLS.addCell(nesteddefinitionSheet, 14, rowNestedIdx, npropDef.getFieldMinSize().getRow()+"");
 	    	            	}
-	    	            	nesteddefinitionSheet.addCell(new Label(15, rowNestedIdx, npropDef.isNewline()?"y":"n"));
-	    	            	nesteddefinitionSheet.addCell(new Label(16,rowNestedIdx,getWidgetTextSizeRow(npropDef.getRendering())));
-	    	            	nesteddefinitionSheet.addCell(new Label(17,rowNestedIdx,getWidgetTextSizeCol(npropDef.getRendering())));
-	    	            	nesteddefinitionSheet.addCell(new Label(18, rowNestedIdx, "#"));
+	    	            	UtilsXLS.addCell(nesteddefinitionSheet, 15, rowNestedIdx, npropDef.isNewline()?"y":"n");
+	    	            	UtilsXLS.addCell(nesteddefinitionSheet, 16,rowNestedIdx,getWidgetTextSizeRow(npropDef.getRendering()));
+	    	            	UtilsXLS.addCell(nesteddefinitionSheet, 17,rowNestedIdx,getWidgetTextSizeCol(npropDef.getRendering()));
+	    	            	UtilsXLS.addCell(nesteddefinitionSheet, 18, rowNestedIdx, "#");
 
 	    	            	if (npropDef.getRendering() instanceof WidgetCheckRadio) {
 	    	            		WidgetCheckRadio widget = (WidgetCheckRadio) npropDef.getRendering();
@@ -2536,55 +2546,55 @@ public class ImportExportUtils {
 	    						// FIXME this make impossible to have the same property
 	    						// name in different objects associated with a
 	    						// controlled list
-	    	            		controlledlistSheet.addCell(new Label(colControlledList, 0, npropDef.getShortName()));
+	    	            		UtilsXLS.addCell(controlledlistSheet, colControlledList, 0, npropDef.getShortName());
 	    	            		int tmpIdx = 1;
 	    	            		for (String c : cLists) {
-	    	            			controlledlistSheet.addCell(new Label(colControlledList, tmpIdx, c));
+	    	            			UtilsXLS.addCell(controlledlistSheet, colControlledList, tmpIdx, c);
 	    	            			tmpIdx++;
 	    	            		}
 	    	            		colControlledList++;
 	    	            	}
-	    	            }
-	    	            catch (WriteException e)
-	    	            {
-	    	                throw new IOException(
-	    	                        "Error to create template from fixed header columns: "
-	    	                                + e.getMessage());
-	    	            }
+//	    	            }
+//	    	            catch (IOException e)
+//	    	            {
+//	    	                throw new IOException(
+//	    	                        "Error to create template from fixed header columns: "
+//	    	                                + e.getMessage());
+//	    	            }
 	    	        	rowNestedIdx++;
 	                }
-	            }
-	            catch (WriteException e)
-	            {
-	                throw new IOException(
-	                        "Error to create template from fixed header columns: "
-	                                + e.getMessage());
-	            }
+//	            }
+//	            catch (IOException e)
+//	            {
+//	                throw new IOException(
+//	                        "Error to create template from fixed header columns: "
+//	                                + e.getMessage());
+//	            }
             }
             
             List<? extends Tab> tabs = applicationService
 					.findTabByType(TabDynamicObject.class, dyn);
             for (Tab tab : tabs) {
-            	tabSheet.addCell(new Label(0, rowTabIdx, oType));
-            	tabSheet.addCell(new Label(1, rowTabIdx, tab.getShortName()));
-            	tabSheet.addCell(new Label(2, rowTabIdx, tab.getTitle()));
-            	tabSheet.addCell(new Label(3, rowTabIdx, tab.isMandatory()?"y":"n"));
-            	tabSheet.addCell(new Label(4, rowTabIdx, tab.getPriority()+""));
-				tabSheet.addCell(new Label(5, rowTabIdx, accessLevels.get(tab.getVisibility())));
+            	UtilsXLS.addCell(tabSheet, 0, rowTabIdx, oType);
+            	UtilsXLS.addCell(tabSheet, 1, rowTabIdx, tab.getShortName());
+            	UtilsXLS.addCell(tabSheet, 2, rowTabIdx, tab.getTitle());
+            	UtilsXLS.addCell(tabSheet, 3, rowTabIdx, tab.isMandatory()?"y":"n");
+            	UtilsXLS.addCell(tabSheet, 4, rowTabIdx, tab.getPriority()+"");
+            	UtilsXLS.addCell(tabSheet, 5, rowTabIdx, accessLevels.get(tab.getVisibility()));
 				if (tab.getExt() != null) {
-					tabSheet.addCell(new Label(6, rowTabIdx, tab.getExt()));
+					UtilsXLS.addCell(tabSheet, 6, rowTabIdx, tab.getExt());
 				}
 				if (tab.getMime() != null) {
-					tabSheet.addCell(new Label(7, rowTabIdx, tab.getMime()));
+					UtilsXLS.addCell(tabSheet, 7, rowTabIdx, tab.getMime());
 				}
-				tabSheet.addCell(new Label(8, rowTabIdx, "#"));				
+				UtilsXLS.addCell(tabSheet, 8, rowTabIdx, "#");				
 				rowTabIdx++;
 				
 				for (Object boxObj : applicationService.findPropertyHolderInTab(TabDynamicObject.class, tab.getId())) {
 					Box box = (Box) boxObj;
-					tab2boxSheet.addCell(new Label(0, rowTab2boxIdx, oType));
-					tab2boxSheet.addCell(new Label(1, rowTab2boxIdx, tab.getShortName()));
-					tab2boxSheet.addCell(new Label(2, rowTab2boxIdx, box.getShortName()));
+					UtilsXLS.addCell(tab2boxSheet, 0, rowTab2boxIdx, oType);
+					UtilsXLS.addCell(tab2boxSheet, 1, rowTab2boxIdx, tab.getShortName());
+					UtilsXLS.addCell(tab2boxSheet, 2, rowTab2boxIdx, box.getShortName());
 					rowTab2boxIdx++;
 				}
             }
@@ -2592,26 +2602,26 @@ public class ImportExportUtils {
             List<? extends Tab> etabs = applicationService
             		.findEditTabByType(EditTabDynamicObject.class, dyn);
             for (Tab tab : etabs) {
-            	etabSheet.addCell(new Label(0, rowETabIdx, oType));
-            	etabSheet.addCell(new Label(1, rowETabIdx, tab.getShortName()));
-            	etabSheet.addCell(new Label(2, rowETabIdx, tab.getTitle()));
-            	etabSheet.addCell(new Label(3, rowETabIdx, tab.isMandatory()?"y":"n"));
-            	etabSheet.addCell(new Label(4, rowETabIdx, tab.getPriority()+""));
-            	etabSheet.addCell(new Label(5, rowETabIdx, accessLevels.get(tab.getVisibility())));
+            	UtilsXLS.addCell(etabSheet, 0, rowETabIdx, oType);
+            	UtilsXLS.addCell(etabSheet, 1, rowETabIdx, tab.getShortName());
+            	UtilsXLS.addCell(etabSheet, 2, rowETabIdx, tab.getTitle());
+            	UtilsXLS.addCell(etabSheet, 3, rowETabIdx, tab.isMandatory()?"y":"n");
+            	UtilsXLS.addCell(etabSheet, 4, rowETabIdx, tab.getPriority()+"");
+            	UtilsXLS.addCell(etabSheet, 5, rowETabIdx, accessLevels.get(tab.getVisibility()));
 				if (tab.getExt() != null) {
-					etabSheet.addCell(new Label(6, rowETabIdx, tab.getExt()));
+					UtilsXLS.addCell(etabSheet, 6, rowETabIdx, tab.getExt());
 				}
 				if (tab.getMime() != null) {
-					etabSheet.addCell(new Label(7, rowETabIdx, tab.getMime()));
+					UtilsXLS.addCell(etabSheet, 7, rowETabIdx, tab.getMime());
 				}
-				etabSheet.addCell(new Label(8, rowETabIdx, "#"));				
+				UtilsXLS.addCell(etabSheet, 8, rowETabIdx, "#");				
 				rowETabIdx++;
 				
 				for (Object boxObj : applicationService.findPropertyHolderInTab(EditTabDynamicObject.class, tab.getId())) {
 					Box box = (Box) boxObj;
-					etab2boxSheet.addCell(new Label(0, rowETab2boxIdx, oType));
-					etab2boxSheet.addCell(new Label(1, rowETab2boxIdx, tab.getShortName()));
-					etab2boxSheet.addCell(new Label(2, rowETab2boxIdx, box.getShortName()));
+					UtilsXLS.addCell(etab2boxSheet, 0, rowETab2boxIdx, oType);
+					UtilsXLS.addCell(etab2boxSheet, 1, rowETab2boxIdx, tab.getShortName());
+					UtilsXLS.addCell(etab2boxSheet, 2, rowETab2boxIdx, box.getShortName());
 					rowETab2boxIdx++;
 				}
             }
@@ -2619,31 +2629,30 @@ public class ImportExportUtils {
             List<? extends Box> boxes = applicationService
 					.findBoxByType(BoxDynamicObject.class, dyn);
             for (Box box : boxes) {
-            	boxSheet.addCell(new Label(0, rowBoxIdx, oType));
-            	boxSheet.addCell(new Label(1, rowBoxIdx, box.isCollapsed()?"y":"n"));
-            	boxSheet.addCell(new Label(2, rowBoxIdx, box.getExternalJSP()));
-            	boxSheet.addCell(new Label(3, rowBoxIdx, box.getPriority()+""));
-            	boxSheet.addCell(new Label(4, rowBoxIdx, box.getShortName()));
-            	boxSheet.addCell(new Label(5, rowBoxIdx, box.getTitle()));
-            	boxSheet.addCell(new Label(6, rowBoxIdx, box.isUnrelevant()?"y":"n"));
-            	boxSheet.addCell(new Label(7, rowBoxIdx, accessLevels.get(box.getVisibility())));
-            	boxSheet.addCell(new Label(8, rowBoxIdx, "#"));            	
+            	UtilsXLS.addCell(boxSheet, 0, rowBoxIdx, oType);
+            	UtilsXLS.addCell(boxSheet, 1, rowBoxIdx, box.isCollapsed()?"y":"n");
+            	UtilsXLS.addCell(boxSheet, 2, rowBoxIdx, box.getExternalJSP());
+            	UtilsXLS.addCell(boxSheet, 3, rowBoxIdx, box.getPriority()+"");
+            	UtilsXLS.addCell(boxSheet, 4, rowBoxIdx, box.getShortName());
+            	UtilsXLS.addCell(boxSheet, 5, rowBoxIdx, box.getTitle());
+            	UtilsXLS.addCell(boxSheet, 6, rowBoxIdx, box.isUnrelevant()?"y":"n");
+            	UtilsXLS.addCell(boxSheet, 7, rowBoxIdx, accessLevels.get(box.getVisibility()));
+            	UtilsXLS.addCell(boxSheet, 8, rowBoxIdx, "#");            	
 				rowBoxIdx++;
 				
 				for (Object pdefObj : applicationService.findContainableInPropertyHolder(BoxDynamicObject.class,
 						box.getId())) {
 					Containable pdef = (Containable) pdefObj;
-					box2metadataSheet.addCell(new Label(0, rowBox2metadataIdx, oType));
-					box2metadataSheet.addCell(new Label(1, rowBox2metadataIdx, box.getShortName()));
-					box2metadataSheet.addCell(new Label(2, rowBox2metadataIdx, pdef.getShortName()));
+					UtilsXLS.addCell(box2metadataSheet, 0, rowBox2metadataIdx, oType);
+					UtilsXLS.addCell(box2metadataSheet, 1, rowBox2metadataIdx, box.getShortName());
+					UtilsXLS.addCell(box2metadataSheet, 2, rowBox2metadataIdx, pdef.getShortName());
 					rowBox2metadataIdx++;
 				}
             }
         }
 
         // All sheets and cells added. Now write out the workbook
-		workbook.write();
-		workbook.close();
+        workbook.write(os);
 	}
 
 	private static String getWidgetTextRenderingDescription(AWidget widget) {
