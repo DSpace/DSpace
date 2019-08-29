@@ -32,7 +32,6 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.dspace.app.cris.model.ACrisObject;
 import org.dspace.app.cris.model.jdyna.ACrisNestedObject;
@@ -81,14 +80,11 @@ public class ExcelBulkChangesService implements IBulkChangesService
         Utils.bufferedCopy(input, out);
         out.close();
         
-//        WorkbookSettings ws = new WorkbookSettings();
-//        ws.setEncoding(encoding);
         HSSFWorkbook workbook = null;
         try
         {
         	InputStream ios = new FileInputStream(fileXls);
-        	//POIFSFileSystem pfs = new POIFSFileSystem(ios);
-			workbook = /*Workbook.getWorkbook(fileXls, ws);*/(HSSFWorkbook)WorkbookFactory.create(ios);
+        				workbook = (HSSFWorkbook)WorkbookFactory.create(ios);
         }
         catch (Exception e)
         {
@@ -104,7 +100,6 @@ public class ExcelBulkChangesService implements IBulkChangesService
             throws IOException, NoSuchFieldException, SecurityException,
             InstantiationException, IllegalAccessException
     {
-        /*WritableWorkbook workbook = Workbook.createWorkbook(filexsd);*/
         HSSFWorkbook workbook = new HSSFWorkbook();
 
         HSSFSheet sheetEntities = workbook.createSheet("main_entities"/*, 0*/);
@@ -113,60 +108,23 @@ public class ExcelBulkChangesService implements IBulkChangesService
     	int xNested = 0;
         for (String headerColumn : ExcelBulkChanges.HEADER_COLUMNS)
         {
-//            try
-//            {
-            	UtilsXLS.addCell(sheetEntities, xEntities++, 0, headerColumn);
-//            }
-//            catch (WriteException e)
-//            {
-//                throw new IOException(
-//                        "Error to create template from fixed header columns: "
-//                                + e.getMessage());
-//            }
+            UtilsXLS.addCell(sheetEntities, xEntities++, 0, headerColumn);
 
         }
         for (String headerColumn : ExcelBulkChanges.HEADER_NESTED_COLUMNS)
         {
-//            try
-//            {
-            	UtilsXLS.addCell(sheetNested, xNested++, 0, headerColumn);
-//            }
-//            catch (WriteException e)
-//            {
-//                throw new IOException(
-//                        "Error to create template from fixed nested header columns: "
-//                                + e.getMessage());
-//			}
-	    	
+            UtilsXLS.addCell(sheetNested, xNested++, 0, headerColumn);
 	    }
         
         for (IContainable cont : metadata)
         {
-//            try
-//            {
-            	UtilsXLS.addCell(sheetEntities,
-                        xEntities++, 0, cont.getShortName());
-//            }
-//            catch (WriteException e)
-//            {
-//                throw new IOException(
-//                        "Error to create template from dynamic metadata: "
-//                                + e.getMessage());
-//            }
+            UtilsXLS.addCell(sheetEntities,
+            		xEntities++, 0, cont.getShortName());
         }
         for (IContainable cont : metadataNested)
         {
-//            try
-//            {
-            	UtilsXLS.addCell(sheetNested,
-                        xNested++, 0, cont.getShortName());
-//            }
-//            catch (WriteException e)
-//            {
-//                throw new IOException(
-//                        "Error to create template from dynamic nested metadata: "
-//                                + e.getMessage());
-//			}
+        	UtilsXLS.addCell(sheetNested,
+                    xNested++, 0, cont.getShortName());
 	    }
         try {
         	OutputStream os = new FileOutputStream(filexsd);

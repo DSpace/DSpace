@@ -11,7 +11,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.poi.ss.usermodel.Cell;
-import org.dspace.app.cris.util.UtilsXML;
 import org.w3c.dom.Element;
 
 public class ExcelBulkFieldLinkValue extends ExcelBulkFieldValue implements IBulkChangeFieldLinkValue {

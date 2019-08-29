@@ -25,10 +25,10 @@ import org.apache.poi.xssf.usermodel.XSSFRichTextString;
 import org.dspace.app.cris.util.UtilsXLS;
 
 public class ExcelBulkChange implements IBulkChange {
-	protected /*Cell[]*/Row row;
+	protected Row row;
 	protected List<String> header;
 	
-	public ExcelBulkChange(/*Cell[]*/Row row, List<String> mainHeaders) {
+	public ExcelBulkChange(Row row, List<String> mainHeaders) {
 		this.row = row;
 		this.header = mainHeaders;
 	}
@@ -37,7 +37,7 @@ public class ExcelBulkChange implements IBulkChange {
 	public String getSourceID() {
 		int pos = ArrayUtils.indexOf(ExcelBulkChanges.HEADER_COLUMNS,ExcelBulkChanges.HEADER_SOURCEID);
 		if (row.getCell(pos) != null)
-			return UtilsXLS.stringCellValue(row/*[pos]*/.getCell(pos));
+			return UtilsXLS.stringCellValue(row.getCell(pos));
 		else
 			return "";
 	}
@@ -46,7 +46,7 @@ public class ExcelBulkChange implements IBulkChange {
 	public String getSourceRef() {
 		int pos = ArrayUtils.indexOf(ExcelBulkChanges.HEADER_COLUMNS,ExcelBulkChanges.HEADER_SOURCEREF);
 		if (row.getCell(pos) != null)
-			return UtilsXLS.stringCellValue(row/*[pos]*/.getCell(pos));
+			return UtilsXLS.stringCellValue(row.getCell(pos));
 		else
 			return "";
 	}
@@ -55,7 +55,7 @@ public class ExcelBulkChange implements IBulkChange {
 	public String getCrisID() {
 		int pos = ArrayUtils.indexOf(ExcelBulkChanges.HEADER_COLUMNS,ExcelBulkChanges.HEADER_CRISID);
 		if (row.getCell(pos) != null)
-			return UtilsXLS.stringCellValue(row/*[pos]*/.getCell(pos));
+			return UtilsXLS.stringCellValue(row.getCell(pos));
 		else
 			return "";
 	}
@@ -64,7 +64,7 @@ public class ExcelBulkChange implements IBulkChange {
 	public String getUUID() {
 		int pos = ArrayUtils.indexOf(ExcelBulkChanges.HEADER_COLUMNS,ExcelBulkChanges.HEADER_UUID);
 		if (row.getCell(pos) != null)
-			return UtilsXLS.stringCellValue(row/*[pos]*/.getCell(pos));
+			return UtilsXLS.stringCellValue(row.getCell(pos));
 		else
 			return "";
 	}
@@ -73,7 +73,7 @@ public class ExcelBulkChange implements IBulkChange {
 	public String getAction() {
 		int pos = ArrayUtils.indexOf(ExcelBulkChanges.HEADER_COLUMNS,ExcelBulkChanges.HEADER_ACTION);
 		if (row.getCell(pos) != null)
-			return UtilsXLS.stringCellValue(row/*[pos]*/.getCell(pos));
+			return UtilsXLS.stringCellValue(row.getCell(pos));
 		else
 			return "";
 	}
@@ -83,8 +83,8 @@ public class ExcelBulkChange implements IBulkChange {
 		int index = -1;
 		if(this.header.contains(field)) {
 			index = this.header.indexOf(field);
-			if (index < row./*length*/getLastCellNum() + 1 && row.getCell(index) != null)
-				return new ExcelBulkField(row/*[index]*/.getCell(index));
+			if (index < row.getLastCellNum() + 1 && row.getCell(index) != null)
+				return new ExcelBulkField(row.getCell(index));
 			else
 				return new ExcelBulkField(new EmptyCell());
 		}
@@ -96,8 +96,8 @@ public class ExcelBulkChange implements IBulkChange {
 		int index = -1;
 		if(this.header.contains(field)) {
 			index = this.header.indexOf(field);
-			if (index < row./*length*/getLastCellNum() + 1 && row.getCell(index) != null)
-			 	return new ExcelBulkFieldLink(row/*[index]*/.getCell(index));
+			if (index < row.getLastCellNum() + 1 && row.getCell(index) != null)
+			 	return new ExcelBulkFieldLink(row.getCell(index));
 			else
 				return new ExcelBulkFieldLink(new EmptyCell());
 		}		
@@ -111,8 +111,8 @@ public class ExcelBulkChange implements IBulkChange {
         if (this.header.contains(field))
         {
             index = this.header.indexOf(field);
-            if (index < row./*length*/getLastCellNum() + 1 && row.getCell(index) != null)
-            	return new ExcelBulkFieldPointer(row/*[index]*/.getCell(index));
+            if (index < row.getLastCellNum() + 1 && row.getCell(index) != null)
+            	return new ExcelBulkFieldPointer(row.getCell(index));
             else
 				return new ExcelBulkFieldPointer(new EmptyCell());
         }        
@@ -132,8 +132,8 @@ public class ExcelBulkChange implements IBulkChange {
         if (this.header.contains(field))
         {
             index = this.header.indexOf(field);
-            if (row/*[index]*/.getCell(index) != null)
-            	return new ExcelBulkFieldFile(row/*[index]*/.getCell(index));
+            if (row.getCell(index) != null)
+            	return new ExcelBulkFieldFile(row.getCell(index));
             else
             	return new ExcelBulkFieldFile(new EmptyCell());
         }
@@ -279,47 +279,5 @@ public class ExcelBulkChange implements IBulkChange {
 		@Override
 		public void setHyperlink(Hyperlink link) {			
 		}
-
-		// TODO: remove it
-//		@Override
-//		public int getRow() {
-//			return -1;
-//		}
-//
-//		@Override
-//		public int getColumn() {
-//			return -1;
-//		}
-//
-//		@Override
-//		public CellType getType() {
-//			return CellType.EMPTY;
-//		}
-//
-//		@Override
-//		public boolean isHidden() {
-//			return true;
-//		}
-//
-//		@Override
-//		public String getContents() {
-//			return "";
-//		}
-//
-//		@Override
-//		public CellFormat getCellFormat() {
-//			return null;
-//		}
-//
-//		@Override
-//		public CellFeatures getCellFeatures() {
-//			return null;
-//		}
-//
-//		@Override
-//		public String getString() {
-//			return "";
-//		}
-    	
     }
 }

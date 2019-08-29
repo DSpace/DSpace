@@ -723,16 +723,16 @@ public class ImportCRISDataModelConfiguration
 	private static void buildResearchObject(HSSFWorkbook workbook, String sheetName,
             ApplicationService applicationService, PlatformTransactionManager transactionManager, TransactionStatus status)
     {
-		/*Cell[]*/Row riga;
+		Row riga;
 		HSSFSheet sheet = workbook.getSheet(sheetName);
 		int indexRiga = 1;
-		int rows = sheet./*getColumn(2).length*/getLastRowNum() + 1;
+		int rows = sheet.getLastRowNum() + 1;
 		
 		boolean commitTransaction = false;
         while (indexRiga < rows)
         {
 			riga = sheet.getRow(indexRiga);
-			String key = UtilsXLS.stringCellValue(/*riga[2]*/riga.getCell(2)).trim();
+			String key = UtilsXLS.stringCellValue(riga.getCell(2)).trim();
             if (key.equals("rp") || key.equals("pj") || key.equals("ou")
                     || key.equals("###"))
             {
@@ -1326,17 +1326,17 @@ public class ImportCRISDataModelConfiguration
     private static void buildMap(HSSFWorkbook workbook, String sheetName,
             Map<String, List<List<String>>> widgetMap, int indexKey)
     {
-		/*Cell[]*/Row riga;
+		Row riga;
 		HSSFSheet sheet = workbook.getSheet(sheetName);
 		int indexRiga = 1;
-		int rows = sheet./*getColumn(0).length*/getLastRowNum() + 1;
+		int rows = sheet.getLastRowNum() + 1;
 
         while (indexRiga < rows)
         {
 			riga = sheet.getRow(indexRiga);
-			String key = UtilsXLS.stringCellValue(riga/*[indexKey]*/.getCell(indexKey)).trim();
+			String key = UtilsXLS.stringCellValue(riga.getCell(indexKey)).trim();
 			if("nesteddefinition".equals(sheetName)) {
-				String prefix = UtilsXLS.stringCellValue(riga/*[0]*/.getCell(0)).trim();
+				String prefix = UtilsXLS.stringCellValue(riga.getCell(0)).trim();
 				if(!"rp".equals(prefix) && !"ou".equals(prefix) && !"pj".equals(prefix)) {
 					if(!key.startsWith(prefix)) {
 						key = prefix + key;
@@ -1345,11 +1345,11 @@ public class ImportCRISDataModelConfiguration
 			}
 			List<String> metadata = new ArrayList<String>();
 			
-			for(int i = 0; i</*sheet.getColumns()*/riga.getLastCellNum() + 1; i++) {
+			for(int i = 0; i<riga.getLastCellNum() + 1; i++) {
 				if (riga.getCell(i) == null)
 					continue;
 				
-                metadata.add(UtilsXLS.stringCellValue(riga/*[i]*/.getCell(i)).trim());
+                metadata.add(UtilsXLS.stringCellValue(riga.getCell(i)).trim());
 			}
 			insertInMap(widgetMap, key, metadata);
 
@@ -1363,24 +1363,22 @@ public class ImportCRISDataModelConfiguration
     {
 		Cell row;
 		Sheet sheet = workbook.getSheet(sheetName);
-//		int indexColumn = 0;
-		int columns = sheet.getRow(0)./*length*/getLastCellNum() + 1;
+		int columns = sheet.getRow(0).getLastCellNum() + 1;
         for (int indexColumn = 0; indexColumn < columns; indexColumn++)
         {
         	if (sheet.getRow(0).getCell(indexColumn) == null)
         		continue;
         	
-			int rows = sheet./*getColumn(indexColumn).length*/getLastRowNum() + 1;
+			int rows = sheet.getLastRowNum() + 1;
 			int indexRiga = 1;
-			String header = UtilsXLS.stringCellValue(sheet.getRow(0)/*[indexColumn].getContents()*/.getCell(indexColumn)).trim();
+			String header = UtilsXLS.stringCellValue(sheet.getRow(0).getCell(indexColumn)).trim();
             while (indexRiga < rows)
             {
-				row = sheet.getRow(indexRiga)/*[indexColumn]*/.getCell(indexColumn);				
+				row = sheet.getRow(indexRiga).getCell(indexColumn);				
                 insertInList(controlledListMap, header,
-                		UtilsXLS.stringCellValue(row/*getContents()*/).trim());
+                		UtilsXLS.stringCellValue(row).trim());
 				indexRiga++;
 			}
-//			indexColumn++;
 		}
 	}
 

@@ -16,7 +16,7 @@ import org.dspace.app.cris.util.UtilsXLS;
 
 public class ExcelBulkChangeNested extends ExcelBulkChange implements IBulkChangeNested {
 
-	public ExcelBulkChangeNested(/*Cell[]*/Row row, List<String> nestedHeaders)
+	public ExcelBulkChangeNested(Row row, List<String> nestedHeaders)
     {
         super(row, nestedHeaders);
     }
@@ -25,7 +25,7 @@ public class ExcelBulkChangeNested extends ExcelBulkChange implements IBulkChang
 	public String getSourceID() {
 		int pos = ArrayUtils.indexOf(ExcelBulkChanges.HEADER_NESTED_COLUMNS,ExcelBulkChanges.HEADER_SOURCEID);
 		if (row.getCell(pos) != null)
-			return UtilsXLS.stringCellValue(row/*[pos]*/.getCell(pos));
+			return UtilsXLS.stringCellValue(row.getCell(pos));
 		else
 			return "";
 	}
@@ -34,7 +34,7 @@ public class ExcelBulkChangeNested extends ExcelBulkChange implements IBulkChang
 	public String getSourceRef() {
 		int pos = ArrayUtils.indexOf(ExcelBulkChanges.HEADER_NESTED_COLUMNS,ExcelBulkChanges.HEADER_SOURCEREF);
 		if (row.getCell(pos) != null)
-			return UtilsXLS.stringCellValue(row/*[pos]*/.getCell(pos));
+			return UtilsXLS.stringCellValue(row.getCell(pos));
 		else
 			return "";
 	}
@@ -48,7 +48,7 @@ public class ExcelBulkChangeNested extends ExcelBulkChange implements IBulkChang
 	public String getUUID() {
 		int pos = ArrayUtils.indexOf(ExcelBulkChanges.HEADER_NESTED_COLUMNS,ExcelBulkChanges.HEADER_UUID);
 		if (row.getCell(pos) != null)
-			return UtilsXLS.stringCellValue(row/*[pos]*/.getCell(pos));
+			return UtilsXLS.stringCellValue(row.getCell(pos));
 		else
 			return "";
 	}
@@ -63,7 +63,7 @@ public class ExcelBulkChangeNested extends ExcelBulkChange implements IBulkChang
     {
         int pos = ArrayUtils.indexOf(ExcelBulkChanges.HEADER_NESTED_COLUMNS,ExcelBulkChanges.HEADER_SOURCEID_PARENT);
         if (row.getCell(pos) != null)
-        	return UtilsXLS.stringCellValue(row/*[pos]*/.getCell(pos));
+        	return UtilsXLS.stringCellValue(row.getCell(pos));
         else
         	return "";
     }
@@ -73,7 +73,7 @@ public class ExcelBulkChangeNested extends ExcelBulkChange implements IBulkChang
     {
         int pos = ArrayUtils.indexOf(ExcelBulkChanges.HEADER_NESTED_COLUMNS,ExcelBulkChanges.HEADER_SOURCEREF_PARENT);
         if (row.getCell(pos) != null)
-        	return UtilsXLS.stringCellValue(row/*[pos]*/.getCell(pos));
+        	return UtilsXLS.stringCellValue(row.getCell(pos));
         else
         	return "";
     }
@@ -83,7 +83,7 @@ public class ExcelBulkChangeNested extends ExcelBulkChange implements IBulkChang
     {
         int pos = ArrayUtils.indexOf(ExcelBulkChanges.HEADER_NESTED_COLUMNS,ExcelBulkChanges.HEADER_CRISID_PARENT);
         if (row.getCell(pos) != null)
-        	return UtilsXLS.stringCellValue(row/*[pos]*/.getCell(pos));
+        	return UtilsXLS.stringCellValue(row.getCell(pos));
         else
         	return "";
     }

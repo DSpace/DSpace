@@ -102,11 +102,7 @@ public class UtilsXLS {
 
 		}
 		y = y + 1;
-//		Label label_v = new Label(y, i, field_value);
-//		sheet.addCell(label_v);
 		addCell(sheet, y, i, field_value);
-//		Label labelCaption = new Label(y, 0, shortName);
-//		sheet.addCell(labelCaption);
 		addCell(sheet, y, 0, shortName);
 		
 		return y;
@@ -149,30 +145,18 @@ public class UtilsXLS {
 
 			}
 			y = y + 1;
-//			Label label_v = new Label(y, i, field_value);
-//			Label labelCaption = new Label(y, 0, decorator.getShortName());
-//			sheet.addCell(labelCaption);
 			addCell(sheet, y, 0, decorator.getShortName());
 			
 			y = y + 1;
-//			Label label_vv = new Label(y, i, field_visibility);
-//			labelCaption = new Label(y, 0, decorator.getShortName()
-//					+ ImportExportUtils.LABELCAPTION_VISIBILITY_SUFFIX);
-//			sheet.addCell(labelCaption);
 			addCell(sheet, y, 0, decorator.getShortName()
 					+ ImportExportUtils.LABELCAPTION_VISIBILITY_SUFFIX);
 
-//			sheet.addCell(label_v);
 			addCell(sheet, y, i, field_value);
-//			sheet.addCell(label_vv);
 			addCell(sheet, y, i, field_visibility);
 
 		} else if (method.getReturnType().isAssignableFrom(String.class)) {
 			y = y + 1;
-//			sheet.addCell(new Label(y, i, (String) field));
 			addCell(sheet, y, i, (String) field);
-//			Label labelCaption = new Label(y, 0, decorator.getShortName());
-//			sheet.addCell(labelCaption);
 			addCell(sheet, y, 0, decorator.getShortName());
 		} else {
 			if (RestrictedFieldLocalOrRemoteFile.class.isAssignableFrom(method
@@ -180,68 +164,41 @@ public class UtilsXLS {
 				RestrictedFieldLocalOrRemoteFile rflor = (RestrictedFieldLocalOrRemoteFile) field;
 				y = y + 1;
 				if (StringUtils.isNotEmpty(rflor.getRemoteUrl())) {
-//					sheet.addCell(new Label(y, i, rflor.getRemoteUrl()));
 					addCell(sheet, y, i, rflor.getRemoteUrl());
 				} else {
-//					sheet.addCell(new Label(y, i, rflor.getMimeType()
-//							+ STOPFIELDS_EXCEL + rflor.getValue()));
 					addCell(sheet, y, i, rflor.getMimeType()
 							+ STOPFIELDS_EXCEL + rflor.getValue());
 				}
-//				Label labelCaption = new Label(y, 0, decorator.getShortName());
-//				sheet.addCell(labelCaption);
 				addCell(sheet, y, 0, decorator.getShortName());
 				y = y + 1;
-//				sheet.addCell(new Label(y, i, VisibilityConstants
-//						.getDescription(rflor.getVisibility())));
 				addCell(sheet, y, i, VisibilityConstants
 						.getDescription(rflor.getVisibility()));
-//				labelCaption = new Label(y, 0, decorator.getShortName()
-//						+ ImportExportUtils.LABELCAPTION_VISIBILITY_SUFFIX);
-//				sheet.addCell(labelCaption);
 				addCell(sheet, y, 0, decorator.getShortName()
 						+ ImportExportUtils.LABELCAPTION_VISIBILITY_SUFFIX);
 			} else if (RestrictedFieldFile.class.isAssignableFrom(method
 					.getReturnType())) {
 				RestrictedFieldFile rflor = (RestrictedFieldFile) field;
 				y = y + 1;
-//				Label labelCaption = new Label(y, 0, decorator.getShortName());
-//				sheet.addCell(labelCaption);
 				addCell(sheet, y, 0, decorator.getShortName());
 				if (StringUtils.isNotEmpty(rflor.getValue())) {
-//					sheet.addCell(new Label(y, i, rflor.getMimeType()
-//							+ STOPFIELDS_EXCEL + rflor.getValue()));
 					addCell(sheet, y, i, rflor.getMimeType()
 							+ STOPFIELDS_EXCEL + rflor.getValue());
 				}
 				y = y + 1;
-//				labelCaption = new Label(y, 0, decorator.getShortName()
-//						+ ImportExportUtils.LABELCAPTION_VISIBILITY_SUFFIX);
-//				sheet.addCell(labelCaption);
 				addCell(sheet, y, 0, decorator.getShortName()
 						+ ImportExportUtils.LABELCAPTION_VISIBILITY_SUFFIX);
 				if (StringUtils.isNotEmpty(rflor.getValue())) {
-//					sheet.addCell(new Label(y, i, VisibilityConstants
-//							.getDescription(rflor.getVisibility())));
 					addCell(sheet, y, i, VisibilityConstants
 							.getDescription(rflor.getVisibility()));
 				}
 			} else {
 				RestrictedField rr = (RestrictedField) field;
 				y = y + 1;
-//				sheet.addCell(new Label(y, i, rr.getValue()));
 				addCell(sheet, y, i, rr.getValue());
-//				Label labelCaption = new Label(y, 0, decorator.getShortName());
-//				sheet.addCell(labelCaption);
 				addCell(sheet, y, 0, decorator.getShortName());
 				y = y + 1;
-//				sheet.addCell(new Label(y, i, VisibilityConstants
-//						.getDescription(rr.getVisibility())));
 				addCell(sheet, y, i, VisibilityConstants
 						.getDescription(rr.getVisibility()));
-//				labelCaption = new Label(y, 0, decorator.getShortName()
-//						+ ImportExportUtils.LABELCAPTION_VISIBILITY_SUFFIX);
-//				sheet.addCell(labelCaption);
 				addCell(sheet, y, 0, decorator.getShortName()
 						+ ImportExportUtils.LABELCAPTION_VISIBILITY_SUFFIX);
 			}
@@ -278,11 +235,7 @@ public class UtilsXLS {
 
         }
         yy = yy + 1;
-//      Label label_v = new Label(yy, ii, field_value);
-//      sheetNested.addCell(label_v);
         addCell(sheetNested, yy, ii, field_value);
-//     	Label labelCaption = new Label(yy, 0, containable.getShortName());
-//      sheetNested.addCell(labelCaption);
         addCell(sheetNested, yy, 0, containable.getShortName());
         
         return yy;
@@ -340,21 +293,4 @@ public class UtilsXLS {
     	
     	return f.formatCellValue(cell);
     }
-    
-//    /***
-//     * Get a cell from the worksheet.
-//     * 
-//     * @param sheet The worksheet
-//     * @param colIndex The column of the new cell
-//     * @param rowIndex The row of the new cell
-//     * @return The cell. Returns null if the cell does not exist.
-//     */
-//    public static Cell getCell(HSSFSheet sheet, int colIndex, int rowIndex) {
-//    	Row row = sheet.getRow(rowIndex);
-//    	if (row == null)
-//    		return null;
-//    	
-//    	Cell cell = row.getCell(colIndex);
-//        return cell;
-//    }
 }

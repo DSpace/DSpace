@@ -182,7 +182,7 @@ public class ImportExportUtils {
 
     public static final String PATH_EXPORT_EXCEL_DEFAULT = ConfigurationManager.getProperty(CrisConstants.CFG_MODULE, "file.export.path")
             + "cris-data.xls";
-    
+
 	/**
 	 * Write in the output stream the researcher pages contact data as an excel
 	 * file. The format of the exported Excel file is suitable for re-import in
@@ -204,45 +204,23 @@ public class ImportExportUtils {
 			List<IContainable> metadata, List<IContainable> metadataNestedLevel) throws IOException, IllegalArgumentException,
 			IllegalAccessException, InvocationTargetException {
 
-		/*WritableWorkbook workbook = Workbook.createWorkbook(os);*/
 		HSSFWorkbook workbook = new HSSFWorkbook();
 
-		HSSFSheet sheetEntities = workbook.createSheet("main_entities"/*, 0*/);
-		HSSFSheet sheetNested = workbook.createSheet("nested_entities"/*, 1*/);
+		HSSFSheet sheetEntities = workbook.createSheet("main_entities");
+		HSSFSheet sheetNested = workbook.createSheet("nested_entities");
         int xEntities = 0;
         int xNested = 0;
         // create initial caption (other caption could be write field together)
         for(String headerColumn : ExcelBulkChanges.HEADER_COLUMNS) {
             if (xEntities != 0)
             {
-//                try
-//                {
-                    /*sheetEntities
-                            .addCell(new Label(xEntities-1, 0, headerColumn));*/
-            		UtilsXLS.addCell(sheetEntities, xEntities-1, 0, headerColumn);
-//                }
-//                catch (WriteException e)
-//                {
-//                    throw new IOException(
-//                            "Error to create template from fixed header columns: "
-//                                    + e.getMessage());
-//                }
+            	UtilsXLS.addCell(sheetEntities, xEntities-1, 0, headerColumn);
             }
             xEntities++;
         }
 		
         for(String headerColumn : ExcelBulkChanges.HEADER_NESTED_COLUMNS) {
-//                try
-//                {
-//                    sheetNested.addCell(new Label(xNested, 0, headerColumn));
-                    UtilsXLS.addCell(sheetNested, xNested, 0, headerColumn);
-//                }
-//                catch (WriteException e)
-//                {
-//                    throw new IOException(
-//                            "Error to create template from fixed nested header columns: "
-//                                    + e.getMessage());
-//                }
+        	UtilsXLS.addCell(sheetNested, xNested, 0, headerColumn);
             xNested++;
         }
         
@@ -253,24 +231,12 @@ public class ImportExportUtils {
 		    if(rp!=null) {	
     	        //HEADER_CRISID,HEADER_UUID,HEADER_SOURCEREF,HEADER_SOURCEID
     		    int y = 0;
-//    		    sheetEntities.addCell(new Label(0, i, ""));
-//    	        Cell label = sheetEntities.getCell(0, i);
-//    	        label.setCellValue(rp.getCrisID());
     	        UtilsXLS.addCell(sheetEntities, 0, i, rp.getCrisID());
     	        y++;
-//    	        sheetEntities.addCell(new Label(1, i, ""));
-//              label = sheetEntities.getCell(1, i);
-//              label.setCellValue(rp.getUuid());
                 UtilsXLS.addCell(sheetEntities, 1, i, rp.getUuid());
                 y++;
-//              sheetEntities.addCell(new Label(2, i, ""));
-//              label = sheetEntities.getCell(2, i);
-//              label.setCellValue(rp.getSourceRef());
                 UtilsXLS.addCell(sheetEntities, 2, i, rp.getSourceRef());
                 y++;
-//              sheetEntities.addCell(new Label(3, i, ""));
-//    			label = sheetEntities.getCell(3, i);
-//    			label.setCellValue(rp.getSourceID());
     			UtilsXLS.addCell(sheetEntities, 3, i, rp.getSourceID());
     			
     			for (IContainable containable : metadata) {
@@ -296,34 +262,16 @@ public class ImportExportUtils {
     
                       // HEADER_CRISID(parent object), HEADER_SOURCEREF(parent object), HEADER_SOURCEID(parent object), HEADER_UUID,HEADER_SOURCEREF,HEADER_SOURCEID
                         int yy = 0;
-//                      sheetNested.addCell(new Label(0, ii, ""));
-//                      label = (Label) sheetNested.getCell(0, ii);
-//                      label.setString(rp.getCrisID());
                         UtilsXLS.addCell(sheetNested, 0, ii, rp.getSourceID());
                         yy++;
-//                      sheetNested.addCell(new Label(1, ii, ""));
-//                      label = (Label) sheetNested.getCell(1, ii);
-//                      label.setString(rp.getSourceRef());
                         UtilsXLS.addCell(sheetNested, 1, ii, rp.getSourceRef());
                         yy++;
-//                      sheetNested.addCell(new Label(2, ii, ""));
-//                      label = (Label) sheetNested.getCell(2, ii);
-//                      label.setString(rp.getSourceID());
                         UtilsXLS.addCell(sheetNested, 2, ii, rp.getSourceID());
                         yy++;
-//                      sheetNested.addCell(new Label(3, ii, ""));
-//                      label = (Label) sheetNested.getCell(3, ii);
-//                      label.setString(rpn.getUuid());
                         UtilsXLS.addCell(sheetNested, 3, ii, rp.getUuid());
                         yy++;
-//                      sheetNested.addCell(new Label(4, ii, ""));
-//                      label = (Label) sheetNested.getCell(4, ii);
-//                      label.setString(rpn.getSourceReference().getSourceRef());
                         UtilsXLS.addCell(sheetNested, 4, ii, rp.getSourceRef());
                         yy++;
-//                      sheetNested.addCell(new Label(5, ii, ""));
-//                      label = (Label) sheetNested.getCell(5, ii);
-//                      label.setString(rpn.getSourceReference().getSourceID());
                         UtilsXLS.addCell(sheetNested, 5, ii, rp.getSourceID());
     
                         try
@@ -1973,22 +1921,21 @@ public class ImportExportUtils {
 	public static void exportConfiguration(ApplicationService applicationService, OutputStream os) throws IOException,
 			IllegalArgumentException, IllegalAccessException, InvocationTargetException {
 
-		/*WritableWorkbook workbook = Workbook.createWorkbook(os);*/
 		HSSFWorkbook workbook = new HSSFWorkbook();
 
-		HSSFSheet propertiesdefinitionSheet = workbook.createSheet("propertiesdefinition"/*, 0*/);
-		HSSFSheet nesteddefinitionSheet = workbook.createSheet("nesteddefinition"/*, 1*/);
-		HSSFSheet tabSheet = workbook.createSheet("tab"/*, 2*/);
-		HSSFSheet etabSheet = workbook.createSheet("etab"/*, 3*/);
-        HSSFSheet boxSheet = workbook.createSheet("box"/*, 4*/);
-        HSSFSheet tab2boxSheet = workbook.createSheet("tab2box"/*, 5*/);
-        HSSFSheet etab2boxSheet = workbook.createSheet("etab2box"/*, 6*/);
-        HSSFSheet box2metadataSheet = workbook.createSheet("box2metadata"/*, 7*/);
-        HSSFSheet utilsdataSheet = workbook.createSheet("utilsdata"/*, 8*/);
-        HSSFSheet controlledlistSheet = workbook.createSheet("controlledlist"/*, 9*/);
-        HSSFSheet tabpolicySheet = workbook.createSheet("tabpolicy"/*, 10*/);
-        HSSFSheet etabpolicySheet = workbook.createSheet("etabpolicy"/*, 11*/);
-        HSSFSheet boxpolicySheet = workbook.createSheet("boxpolicy"/*, 12*/);
+		HSSFSheet propertiesdefinitionSheet = workbook.createSheet("propertiesdefinition");
+		HSSFSheet nesteddefinitionSheet = workbook.createSheet("nesteddefinition");
+		HSSFSheet tabSheet = workbook.createSheet("tab");
+		HSSFSheet etabSheet = workbook.createSheet("etab");
+        HSSFSheet boxSheet = workbook.createSheet("box");
+        HSSFSheet tab2boxSheet = workbook.createSheet("tab2box");
+        HSSFSheet etab2boxSheet = workbook.createSheet("etab2box");
+        HSSFSheet box2metadataSheet = workbook.createSheet("box2metadata");
+        HSSFSheet utilsdataSheet = workbook.createSheet("utilsdata");
+        HSSFSheet controlledlistSheet = workbook.createSheet("controlledlist");
+        HSSFSheet tabpolicySheet = workbook.createSheet("tabpolicy");
+        HSSFSheet etabpolicySheet = workbook.createSheet("etabpolicy");
+        HSSFSheet boxpolicySheet = workbook.createSheet("boxpolicy");
         
         Map<String, Class<? extends PropertiesDefinition>> propDefTypes = new HashMap<String, Class<? extends PropertiesDefinition>>();
         propDefTypes.put("rp", RPPropertiesDefinition.class);
@@ -2165,20 +2112,11 @@ public class ImportExportUtils {
 	            		}
 	            		colControlledList++;
 	            	}
-//	            }
-//	            catch (IOException e)
-//	            {
-//	                throw new IOException(
-//	                        "Error to create template from fixed header columns: "
-//	                                + e.getMessage());
-//	            }
 	        	rowIdx++;
             }
             
             List<? extends ATypeNestedObject> nestedDefs = applicationService.getList(nestedDefTypes.get(oType));
             for (ATypeNestedObject propDef : nestedDefs) {
-//	        	try
-//	            {
 	        		UtilsXLS.addCell(propertiesdefinitionSheet, 0, rowIdx, oType);
 	        		UtilsXLS.addCell(propertiesdefinitionSheet, 1, rowIdx, propDef.getShortName());
 	        		UtilsXLS.addCell(propertiesdefinitionSheet, 2, rowIdx, propDef.getLabel());
@@ -2210,8 +2148,6 @@ public class ImportExportUtils {
 							.findMaskByShortName(nestedDefTypes.get(oType),
 									propDef.getShortName());
 	                for (PropertiesDefinition npropDef : nestedpropDefs) {
-//	    	        	try
-//	    	            {
 	    	        		// shortname of the nested group "the propdef" of the parent
 	    	        		UtilsXLS.addCell(nesteddefinitionSheet, 0, rowNestedIdx, oType);
 	    	        		UtilsXLS.addCell(nesteddefinitionSheet, 1, rowNestedIdx, npropDef.getShortName());
@@ -2256,22 +2192,8 @@ public class ImportExportUtils {
 	    	            		}
 	    	            		colControlledList++;
 	    	            	}
-//	    	            }
-//	    	            catch (IOException e)
-//	    	            {
-//	    	                throw new IOException(
-//	    	                        "Error to create template from fixed header columns: "
-//	    	                                + e.getMessage());
-//	    	            }
 	    	        	rowNestedIdx++;
 	                }
-//	            }
-//	            catch (IOException e)
-//	            {
-//	                throw new IOException(
-//	                        "Error to create template from fixed header columns: "
-//	                                + e.getMessage());
-//	            }
             }
             
             List<? extends Tab> tabs = applicationService
@@ -2465,13 +2387,6 @@ public class ImportExportUtils {
 	            		}
 	            		colControlledList++;
 	            	}
-//	            }
-//	            catch (IOException e)
-//	            {
-//	                throw new IOException(
-//	                        "Error to create template from fixed header columns: "
-//	                                + e.getMessage());
-//	            }
 	        	rowIdx++;
             }
             
@@ -2511,8 +2426,6 @@ public class ImportExportUtils {
 							.likePropertiesDefinitionsByShortName(DynamicNestedPropertiesDefinition.class,
 									propDef.getShortName());
 	                for (PropertiesDefinition npropDef : nestedpropDefs) {
-//	    	        	try
-//	    	            {
 	    	        		// shortname of the nested group "the propdef" of the parent
 	    	        		UtilsXLS.addCell(nesteddefinitionSheet, 0, rowNestedIdx, oType);
 	    	        		UtilsXLS.addCell(nesteddefinitionSheet, 1, rowNestedIdx, npropDef.getShortName());
@@ -2554,22 +2467,8 @@ public class ImportExportUtils {
 	    	            		}
 	    	            		colControlledList++;
 	    	            	}
-//	    	            }
-//	    	            catch (IOException e)
-//	    	            {
-//	    	                throw new IOException(
-//	    	                        "Error to create template from fixed header columns: "
-//	    	                                + e.getMessage());
-//	    	            }
 	    	        	rowNestedIdx++;
 	                }
-//	            }
-//	            catch (IOException e)
-//	            {
-//	                throw new IOException(
-//	                        "Error to create template from fixed header columns: "
-//	                                + e.getMessage());
-//	            }
             }
             
             List<? extends Tab> tabs = applicationService
