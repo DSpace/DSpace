@@ -2068,8 +2068,6 @@ public class ImportExportUtils {
         for (String oType : propDefTypes.keySet()) {
         	List<? extends PropertiesDefinition> propDefs = applicationService.getList(propDefTypes.get(oType));
             for (PropertiesDefinition propDef : propDefs) {
-//	        	try
-//	            {
 	        		UtilsXLS.addCell(propertiesdefinitionSheet, 0, rowIdx, oType);
 	        		UtilsXLS.addCell(propertiesdefinitionSheet, 1, rowIdx, propDef.getShortName());
 	        		UtilsXLS.addCell(propertiesdefinitionSheet, 2, rowIdx, propDef.getLabel());
@@ -2346,8 +2344,6 @@ public class ImportExportUtils {
 			List<? extends PropertiesDefinition> propDefs = applicationService.findMaskByShortName(DynamicTypeNestedObject.class,
                     oType);
             for (PropertiesDefinition propDef : propDefs) {
-//	        	try
-//	            {
 	        		UtilsXLS.addCell(propertiesdefinitionSheet, 0, rowIdx, oType);
 	        		UtilsXLS.addCell(propertiesdefinitionSheet, 1, rowIdx, propDef.getShortName().substring(oType.length()));
 	        		UtilsXLS.addCell(propertiesdefinitionSheet, 2, rowIdx, propDef.getLabel());
@@ -2392,8 +2388,6 @@ public class ImportExportUtils {
             
             List<? extends ATypeNestedObject> nestedDefs = applicationService.getList(DynamicTypeNestedObject.class);
             for (ATypeNestedObject propDef : nestedDefs) {
-//	        	try
-//	            {
 	        		if (!StringUtils.startsWith(propDef.getShortName(), oType)) continue;
 	        		UtilsXLS.addCell(propertiesdefinitionSheet, 0, rowIdx, oType);
 	        		UtilsXLS.addCell(propertiesdefinitionSheet, 1, rowIdx, propDef.getShortName().substring(oType.length()));

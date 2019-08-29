@@ -173,7 +173,6 @@ public class ScriptStatSubscribe
         {
             os = new FileOutputStream(tmpfile);
 
-            /*WritableWorkbook workbook = Workbook.createWorkbook(os);*/
             HSSFWorkbook workbook = new HSSFWorkbook();
 
             int r = 0;
@@ -204,14 +203,11 @@ public class ScriptStatSubscribe
                 {
                     sheet = workbook.createSheet(I18nUtil.getMessage("org.dspace.app.cris.batch.ScriptStatSubscribe.sheet." + statdetails.getType())/*,
                             sheetNumber*/);
-//                  WritableFont labelFont = new WritableFont(
-//                          WritableFont.ARIAL, 10, WritableFont.BOLD);
                     Font labelFont = workbook.createFont();
                     labelFont.setFontName("Arial");
                     labelFont.setFontHeight((short)10);
                     labelFont.setBoldweight((short)10);
                     // TODO: labelFont.setCharset(CP_WINDOWS_1252);
-//                  WritableCellFormat cfobj = new WritableCellFormat(labelFont);
                     CellStyle cfobj = workbook.createCellStyle();
                     cfobj.setFont(labelFont);
                     UtilsXLS.addCell(sheet,
@@ -288,9 +284,6 @@ public class ScriptStatSubscribe
                     }
                     for (int i = 0; i < headerCell; i++)
                     {
-//                        final CellView view = sheet.getColumnView(i);
-//                        view.setAutosize(true);
-//                        sheet.setColumnView(i, view);
                     	sheet.autoSizeColumn(i);
                     }
                     sheetNumber++;

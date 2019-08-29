@@ -160,7 +160,7 @@ public class ImportCRISDataModelConfiguration
 		// accogliere definizioni dei metadati di primo livello e inizializzo la
 		// struttura per i nested
 		InputStream inp = new FileInputStream(new File(fileExcel));
-        HSSFWorkbook workbook = new HSSFWorkbook(new POIFSFileSystem(inp));
+		HSSFWorkbook workbook = new HSSFWorkbook(new POIFSFileSystem(inp));
 
 		// target , lista altri metadati
 		Map<String, List<List<String>>> widgetMap = new HashMap<String, List<List<String>>>();
