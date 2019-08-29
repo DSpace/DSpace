@@ -62,7 +62,10 @@ public class ExcelBulkChange implements IBulkChange {
 		int index = -1;
 		if(this.header.contains(field)) {
 			index = this.header.indexOf(field);
-			return new ExcelBulkField(row[index]);
+			if (index < row.length)
+				return new ExcelBulkField(row[index]);
+			else
+				return new ExcelBulkField(new EmptyCell());
 		}
 		return new ExcelBulkField(new EmptyCell());
 	}
@@ -72,7 +75,10 @@ public class ExcelBulkChange implements IBulkChange {
 		int index = -1;
 		if(this.header.contains(field)) {
 			index = this.header.indexOf(field);
-			return new ExcelBulkFieldLink(row[index]);
+			if (index < row.length)
+			 	return new ExcelBulkFieldLink(row[index]);
+			else
+				return new ExcelBulkFieldLink(new EmptyCell());
 		}		
 		return new ExcelBulkFieldLink(new EmptyCell());
 	}
@@ -84,7 +90,10 @@ public class ExcelBulkChange implements IBulkChange {
         if (this.header.contains(field))
         {
             index = this.header.indexOf(field);
-            return new ExcelBulkFieldPointer(row[index]);
+            if (index < row.length)
+            	return new ExcelBulkFieldPointer(row[index]);
+            else
+				return new ExcelBulkFieldPointer(new EmptyCell());
         }        
         return new ExcelBulkFieldPointer(new EmptyCell());
     }
