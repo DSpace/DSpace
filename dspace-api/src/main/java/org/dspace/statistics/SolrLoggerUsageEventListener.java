@@ -7,11 +7,15 @@
  */
 package org.dspace.statistics;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.apache.logging.log4j.Logger;
 import org.dspace.eperson.EPerson;
 import org.dspace.services.model.Event;
 import org.dspace.statistics.service.SolrLoggerService;
 import org.dspace.usage.AbstractUsageEventListener;
+import org.dspace.usage.RestUsageSearchEvent;
 import org.dspace.usage.UsageEvent;
 import org.dspace.usage.UsageSearchEvent;
 import org.dspace.usage.UsageWorkflowEvent;
@@ -53,14 +57,27 @@ public class SolrLoggerUsageEventListener extends AbstractUsageEventListener {
                                                    currentUser);
                     }
                 } else if (UsageEvent.Action.SEARCH == ue.getAction()) {
-                    UsageSearchEvent usageSearchEvent = (UsageSearchEvent) ue;
-                    //Only log if the user has already filled in a query !
-                    if (!CollectionUtils.isEmpty(((UsageSearchEvent) ue).getQueries())) {
-                        solrLoggerService.postSearch(ue.getObject(), ue.getRequest(), currentUser,
-                                                     usageSearchEvent.getQueries(), usageSearchEvent.getRpp(),
-                                                     usageSearchEvent.getSortBy(),
-                                                     usageSearchEvent.getSortOrder(), usageSearchEvent.getPage(),
-                                                     usageSearchEvent.getScope());
+                    if (ue instanceof UsageSearchEvent) {
+                        UsageSearchEvent usageSearchEvent = (UsageSearchEvent) ue;
+                        //Only log if the user has already filled in a query !
+                        if (!CollectionUtils.isEmpty(((UsageSearchEvent) ue).getQueries())) {
+                            solrLoggerService.postSearch(ue.getObject(), ue.getRequest(), currentUser,
+                                                         usageSearchEvent.getQueries(), usageSearchEvent.getRpp(),
+                                                         usageSearchEvent.getSortBy(),
+                                                         usageSearchEvent.getSortOrder(), usageSearchEvent.getPage(),
+                                                         usageSearchEvent.getScope());
+                        }
+                    } else {
+                        RestUsageSearchEvent restUsageSearchEvent = (RestUsageSearchEvent) ue;
+
+                        List<String> queries = new LinkedList<>();
+                        queries.add(restUsageSearchEvent.getQuery());
+                        solrLoggerService
+                            .postSearch(restUsageSearchEvent.getObject(), restUsageSearchEvent.getRequest(),
+                                        currentUser, queries, restUsageSearchEvent.getPage().getSize(),
+                                        restUsageSearchEvent.getSort().getBy(),
+                                        restUsageSearchEvent.getSort().getOrder(),
+                                        restUsageSearchEvent.getPage().getNumber(), restUsageSearchEvent.getScope());
                     }
                 } else if (UsageEvent.Action.WORKFLOW == ue.getAction()) {
                     UsageWorkflowEvent usageWorkflowEvent = (UsageWorkflowEvent) ue;

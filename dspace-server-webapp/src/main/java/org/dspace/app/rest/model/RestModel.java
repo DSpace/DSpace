@@ -26,6 +26,7 @@ public interface RestModel extends Serializable {
     public static final String DISCOVER = "discover";
     public static final String CONFIGURATION = "config";
     public static final String INTEGRATION = "integration";
+    public static final String STATISTICS = "statistics";
     public static final String SUBMISSION = "submission";
     public static final String WORKFLOW = "workflow";
     public static final String AUTHORIZATION = "authz";

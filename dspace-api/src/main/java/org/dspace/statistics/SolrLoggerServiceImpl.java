@@ -88,6 +88,7 @@ import org.dspace.statistics.service.SolrLoggerService;
 import org.dspace.statistics.util.DnsLookup;
 import org.dspace.statistics.util.LocationUtils;
 import org.dspace.statistics.util.SpiderDetector;
+import org.dspace.usage.RestUsageSearchEvent;
 import org.dspace.usage.UsageWorkflowEvent;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
