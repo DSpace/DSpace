@@ -393,8 +393,9 @@
 					<repeatable>true</repeatable>
 					<label>Extensión</label>
 					<input-type>onebox</input-type>
-					<hint>Cantidad de páginas, duración, tamaño, peso, etc. Utilizar sistema métrico decimal cuando sea posible. Ej: 123pp. Las medidas deben ir en el siguiente orden: Alto, Ancho, Largo, Diámetro. </hint>
+					<hint>Cantidad de páginas en forma de rango. Siempre indicar página inicial y página final separadas por un guión. Por ejemplo: 123-280 </hint>
 					<visibility-on-group>Bibliotecarios</visibility-on-group>
+					<type-bind>Articulo,Objeto de conferencia,Libro</type-bind>
 				</field>
 				
 				<!-- Medio Fisico / Materiales-->
