@@ -103,6 +103,10 @@ public class DCInputsReader
     }
 
 
+    public static String getFormDefFile() {
+        return FORM_DEF_FILE;
+    }
+
     private void buildInputs(String fileName)
          throws DCInputsReaderException
     {

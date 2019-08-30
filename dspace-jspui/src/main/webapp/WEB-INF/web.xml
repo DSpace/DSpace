@@ -37,7 +37,7 @@
   
   <context-param>
     <param-name>contextConfigLocation</param-name>
-    <param-value>/WEB-INF/spring/*.xml</param-value>
+    <param-value>/WEB-INF/spring/applicationContext.xml</param-value>
   </context-param>
   
 
@@ -144,6 +144,20 @@
   <listener>
       <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
   </listener>
+
+    <servlet>
+        <servlet-name>Spring MVC Servlet</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+        <init-param>
+            <param-name>contextConfigLocation</param-name>
+            <param-value>/WEB-INF/spring/applicationContext.xml</param-value>
+        </init-param>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>Spring MVC Servlet</servlet-name>
+        <url-pattern></url-pattern>
+    </servlet-mapping>
 
   <!-- Servlets -->
 
@@ -815,7 +829,12 @@
     <servlet-name>request-item</servlet-name>
     <url-pattern>/request-item</url-pattern>
   </servlet-mapping>
-  
+
+    <!--<servlet-mapping>-->
+        <!--<servlet-name>home-page</servlet-name>-->
+        <!--<url-pattern></url-pattern>-->
+    <!--</servlet-mapping>-->
+
   <!-- Icon MIME type -->
   <mime-mapping>
     <extension>ico</extension>

@@ -1,0 +1,512 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE input-forms SYSTEM "input-forms.dtd">
+
+
+<input-forms>
+
+    <!-- The form-map maps collection handles to forms. DSpace does not       -->
+    <!-- require that a collection's name be unique, even within a community .-->
+    <!-- DSpace does however insure that each collection's handle is unique.  -->
+    <!-- Form-map provides the means to associate a unique collection name    -->
+    <!-- with a form. The form-map also provides the special handle "default" -->
+    <!-- (which is never a collection), here mapped to "traditional". Any     -->
+    <!-- collection which does not appear in this map will be associated with -->
+    <!-- the mapping for handle "default".                                    -->
+
+    <form-map>
+        <name-map collection-handle="default" form-name="traditional" />
+    </form-map>
+
+
+    <!-- The form-definitions map lays out the detailed definition of all the -->
+    <!-- submission forms.Each separate form set has a unique name as an      -->
+    <!-- attribute. This name matches one of the names in the form-map. One   -->
+    <!-- named form set has the name "traditional"; as this name suggests,    -->
+    <!-- it is the old style and is also the default, which gets used when    -->
+    <!-- the specified collection has no correspondingly named form set.      -->
+    <!--                                                                      -->
+    <!-- Each form set contains an ordered set of pages; each page defines    -->
+    <!-- one submission metadata entry screen. Each page has an ordered list  -->
+    <!-- of field definitions, Each field definition corresponds to one       -->
+    <!-- metatdata entry (a so-called row), which has a DC element name, a    -->
+    <!-- displayed label, a text string prompt which is called a hint , and   -->
+    <!-- an input-type. Each field also may hold optional elements: DC        -->
+    <!-- qualifier name, a repeatable flag, and a text string whose presence  -->
+    <!-- serves as a 'this field is required' flag.                           -->
+
+    <form-definitions>
+
+        <form name="traditional">
+            <page number="1">
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>contributor</dc-element>
+                    <dc-qualifier>author</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Автори</label>
+                    <input-type>name</input-type>
+                    <hint>Введіть авторів цього матеріалу.</hint>
+                    <required></required>
+                </field>
+
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>title</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Назва</label>
+                    <input-type>onebox</input-type>
+                    <hint>Введіть основну назву.</hint>
+                    <required>Ви повинні ввести основну назву для цього матеріалу.</required>
+                </field>
+
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>title</dc-element>
+                    <dc-qualifier>alternative</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Інші назви</label>
+                    <input-type>onebox</input-type>
+                    <hint>Введіть іншу назву (якщо є).</hint>
+                    <required></required>
+                </field>
+
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>date</dc-element>
+                    <dc-qualifier>issued</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Дата публікації</label>
+                    <input-type>date</input-type>
+                    <hint>Введіть дату публікації.</hint>
+                    <required>Вам необхідно ввести хоча б рік.</required>
+                </field>
+
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>publisher</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Видавець</label>
+                    <input-type>onebox</input-type>
+                    <hint>Вкажіть, де раніше видавався документ</hint>
+                    <required></required>
+                </field>
+
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>identifier</dc-element>
+                    <dc-qualifier>citation</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Бібліографічний опис</label>
+                    <input-type>onebox</input-type>
+                    <hint>Введіть стандартний бібліографічний опис для попередьо випущеного примірника цього матеріалу.</hint>
+                    <required></required>
+                </field>
+
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>speciality</dc-element>
+                    <dc-qualifier>id</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Спеціальність</label>
+                    <input-type>onebox</input-type>
+                    <hint></hint>
+                    <required></required>
+                </field>
+
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>type</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Вид документа</label>
+                    <input-type value-pairs-name="common_types">dropdown</input-type>
+                    <hint>Виберіть тип(и) змісту матеріалу. Щоб вибрати більш ніж одне значення у списку, Вам необхідно тримати натиснутою клавішу [CTRL] або ж [Shift].</hint>
+                    <required></required>
+                </field>
+
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>date</dc-element>
+                    <dc-qualifier>presentation</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Дата захисту</label>
+                    <input-type>onebox</input-type>
+                    <hint></hint>
+                    <required></required>
+                </field>
+
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>language</dc-element>
+                    <dc-qualifier>iso</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Мова</label>
+                    <input-type value-pairs-name="common_iso_languages">dropdown</input-type>
+                    <hint>Виберіть мову основного змісту матеріалу. Якщо у списку нижче немає відповідної мови, будь ласка, вибирайте 'Інша мова'.
+                        Якщо зміст матеріалу насправді не містить мову (наприклад, якщо це набір даних чи зображення), будь ласка, вибирайте 'Невизначено'.</hint>
+                    <required></required>
+                </field>
+            </page>
+
+            <page number="2">
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>subject</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <!-- An input-type of twobox MUST be marked as repeatable -->
+                    <repeatable>true</repeatable>
+                    <label>Ключові слова</label>
+                    <input-type>threelocbox</input-type>
+                    <hint>Введіть нижче відповідні матеріалу ключові слова. Кожне ключове слово або фраза заносяться в окремий рядок з маленької літери. </hint>
+                    <required></required>
+                    <vocabulary>srsc</vocabulary>
+                </field>
+
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>description</dc-element>
+                    <dc-qualifier>abstract</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Анотація</label>
+                    <input-type>textarea</input-type>
+                    <hint>Введіть нижче короткий зміст (резюме) для матеріалу. </hint>
+                    <required></required>
+                </field>
+
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>description</dc-element>
+                    <dc-qualifier>sponsorship</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Спонсорська підтримка</label>
+                    <input-type>textarea</input-type>
+                    <hint>Введіть нижче у текстове поле імена/найменування будь-яких спосорів та/чи коди фондів. </hint>
+                    <required></required>
+                </field>
+
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>description</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Опис</label>
+                    <input-type>textarea</input-type>
+                    <hint>Введіть нижче будь-який інший опис чи зміст, посилання, коментарі тощо. </hint>
+                    <required></required>
+                </field>
+            </page>
+        </form>
+
+        <form name="one">
+            <page number="1">
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>contributor</dc-element>
+                    <dc-qualifier>author</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Одне: автори</label>
+                    <input-type>name</input-type>
+                    <hint>Введіть нижче авторів цього матеріалу.</hint>
+                    <required></required>
+                </field>
+            </page>
+        </form>
+    </form-definitions>
+
+
+    <!-- form-value-pairs populate dropdown and qualdrop-value lists.          -->
+    <!-- The form-value-pairs element holds child elements named 'value-pairs' -->
+    <!-- A 'value-pairs' element has a value-pairs-name and a dc-term          -->
+    <!-- attribute. The dc-term attribute specifies which to which Dublin Core -->
+    <!-- Term this set of value-pairs applies.                                 -->
+    <!--     Current dc-terms are: identifier-pairs, type-pairs, and           -->
+    <!--     language_iso-pairs. The name attribute matches a name             -->
+    <!--     in the form-map, above.                                           -->
+    <!-- A value-pair contains one 'pair' for each value displayed in the list -->
+    <!-- Each pair contains a 'displayed-value' element and a 'stored-value'   -->
+    <!-- element. A UI list displays the displayed-values, but the program     -->
+    <!-- stores the associated stored-values in the database.                  -->
+
+    <form-value-pairs>
+        <value-pairs value-pairs-name="common_identifiers" dc-term="identifier">
+            <pair>
+                <displayed-value>ISSN</displayed-value>
+                <stored-value>issn</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Other</displayed-value>
+                <stored-value>other</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>ISMN</displayed-value>
+                <stored-value>ismn</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Gov't Doc #</displayed-value>
+                <stored-value>govdoc</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>URI</displayed-value>
+                <stored-value>uri</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>ISBN</displayed-value>
+                <stored-value>isbn</stored-value>
+            </pair>
+        </value-pairs>
+
+        <value-pairs value-pairs-name="common_types" dc-term="type">
+            <pair>
+                <displayed-value>Автореферат</displayed-value>
+                <stored-value>Synopsis</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Авторське свідоцтво</displayed-value>
+                <stored-value>authors certificate</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Аудіоматеріали</displayed-value>
+                <stored-value>Recording, acoustical</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Брошура</displayed-value>
+                <stored-value>Brochure</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Буклет</displayed-value>
+                <stored-value>Booklet</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Відеоматеріали</displayed-value>
+                <stored-value>Video</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Газета</displayed-value>
+                <stored-value>Newspaper</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Дисертація</displayed-value>
+                <stored-value>Thesis</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Журнал</displayed-value>
+                <stored-value>Magazine</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Збірник завдань</displayed-value>
+                <stored-value>Collection of assignments</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Звіт</displayed-value>
+                <stored-value>Technical Report</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Книга</displayed-value>
+                <stored-value>Book</stored-value>
+            </pair>
+
+            <pair>
+                <displayed-value>Конкурсна наукова робота</displayed-value>
+                <stored-value>Competitive_scientific_work</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Розділ книги</displayed-value>
+                <stored-value>Book chapter</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Конспект лекцій</displayed-value>
+                <stored-value>Learning Object</stored-value>
+            </pair>
+
+            <pair>
+                <displayed-value>Навчальний посібник</displayed-value>
+                <stored-value>Schoolbook</stored-value>
+            </pair>
+
+            <pair>
+                <displayed-value>Магістерська робота</displayed-value>
+                <stored-value>Masters thesis</stored-value>
+            </pair>
+
+            <pair>
+                <displayed-value>Монографія</displayed-value>
+                <stored-value>Monograph</stored-value>
+            </pair>
+
+            <pair>
+                <displayed-value>Методичні вказівки</displayed-value>
+                <stored-value>Working Paper</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Мультимедійні матеріали</displayed-value>
+                <stored-value>Multimedia</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Патент</displayed-value>
+                <stored-value>Patent</stored-value>
+            </pair>
+
+            <pair>
+                <displayed-value>Підручник</displayed-value>
+                <stored-value>Textbook</stored-value>
+            </pair>
+
+            <pair>
+                <displayed-value>Презентація</displayed-value>
+                <stored-value>Presentation</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Препринт</displayed-value>
+                <stored-value>Preprint</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Програма</displayed-value>
+                <stored-value>Software</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Рецензія</displayed-value>
+                <stored-value>Review</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Стаття</displayed-value>
+                <stored-value>Article</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Тези доповідей</displayed-value>
+                <stored-value>Theses</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Бакалаврська робота</displayed-value>
+                <stored-value>Bachelous paper</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Інше</displayed-value>
+                <stored-value>Other</stored-value>
+            </pair>
+
+            <!--  <pair>
+                <displayed-value>Анімація</displayed-value>
+                <stored-value>Animation</stored-value>
+              </pair>
+
+              <pair>
+                <displayed-value>Глава з книги</displayed-value>
+                <stored-value>Book chapter</stored-value>
+              </pair>
+              <pair>
+                <displayed-value>Набір даних</displayed-value>
+                <stored-value>Dataset</stored-value>
+              </pair>
+              <pair>
+                <displayed-value>Навчальний об'єкт</displayed-value>
+                <stored-value>Learning Object</stored-value>
+              </pair>
+              <pair>
+                <displayed-value>Зображення</displayed-value>
+                <stored-value>Image</stored-value>
+              </pair>
+              <pair>
+                <displayed-value>Зображення, тривимірне</displayed-value>
+                <stored-value>Image, 3-D</stored-value>
+              </pair>
+              <pair>
+                <displayed-value>Мапа</displayed-value>
+                <stored-value>Map</stored-value>
+              </pair>
+              <pair>
+                <displayed-value>Нотний запис</displayed-value>
+                <stored-value>Musical Score</stored-value>
+              </pair>
+              <pair>
+                <displayed-value>План чи креслення</displayed-value>
+                <stored-value>Plan or blueprint</stored-value>
+              </pair>
+              <pair>
+                <displayed-value>Звукозапис, акустичний</displayed-value>
+                <stored-value>Recording, acoustical</stored-value>
+              </pair>
+              <pair>
+                <displayed-value>Звукозапис, музичний</displayed-value>
+                <stored-value>Recording, musical</stored-value>
+              </pair>
+              <pair>
+                <displayed-value>Звукозапис, усний</displayed-value>
+                <stored-value>Recording, oral</stored-value>
+              </pair>
+              <pair>
+                <displayed-value>Програмне забезпечення</displayed-value>
+                <stored-value>Software</stored-value>
+              </pair> -->
+            <pair>
+                <displayed-value>Списки</displayed-value>
+                <stored-value>Lists</stored-value>
+            </pair>
+        </value-pairs>
+
+        <!-- default language order: (from dspace 1.2.1)
+             "en_US", "en", "es", "de", "fr", "it", "ja", "zh", "other", ""
+          -->
+        <value-pairs value-pairs-name="common_iso_languages" dc-term="language_iso">
+            <pair>
+                <displayed-value>Невизначено</displayed-value>
+                <stored-value></stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Українська</displayed-value>
+                <stored-value>uk</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Російська</displayed-value>
+                <stored-value>ru</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Польська</displayed-value>
+                <stored-value>pl</stored-value>
+            </pair>
+            <!-- <pair>
+               <displayed-value>Білоруська</displayed-value>
+               <stored-value>be</stored-value>
+             </pair>
+             <pair>
+               <displayed-value>Молдавська</displayed-value>
+               <stored-value>mo</stored-value>
+             </pair> -->
+            <pair>
+                <displayed-value>Англійська</displayed-value>
+                <stored-value>en</stored-value>
+            </pair>
+            <!--  <pair>
+                <displayed-value>Іспанська</displayed-value>
+                <stored-value>es</stored-value>
+              </pair> -->
+            <pair>
+                <displayed-value>Німецька</displayed-value>
+                <stored-value>de</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Французька</displayed-value>
+                <stored-value>fr</stored-value>
+            </pair>
+            <!--  <pair>
+                <displayed-value>Італійська</displayed-value>
+                <stored-value>it</stored-value>
+              </pair>
+              <pair>
+                <displayed-value>Японська</displayed-value>
+                <stored-value>ja</stored-value>
+              </pair>
+              <pair>
+                <displayed-value>Китайська</displayed-value>
+                <stored-value>zh</stored-value>
+              </pair> -->
+            <pair>
+                <displayed-value>Інші мови</displayed-value>
+                <stored-value>other</stored-value>
+            </pair>
+        </value-pairs>
+
+    </form-value-pairs>
+
+</input-forms>

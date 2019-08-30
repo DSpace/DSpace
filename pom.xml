@@ -5,9 +5,6 @@
     <artifactId>dspace-parent</artifactId>
     <packaging>pom</packaging>
     <version>6.4-SNAPSHOT</version>
-    <modules>
-        <module>essuir</module>
-    </modules>
     <name>DSpace Parent Project</name>
     <description>
    	DSpace open source software is a turnkey institutional repository application.
@@ -39,7 +36,7 @@
             Hibernate version pinned to 4.2, 4.3 does not work with the spring version we are currently using
             Upgrading the spring version will make the XMLUI crash
         -->
-        <hibernate.version>4.2.21.Final</hibernate.version>
+        <hibernate.version>4.2.2.Final</hibernate.version>
         <spring.version>3.2.16.RELEASE</spring.version>
         <!-- 'root.basedir' is the path to the root [dspace-src] dir. It must be redefined by each child POM,
              as it is used to reference the LICENSE_HEADER and *.properties file(s) in that directory. -->
@@ -743,18 +740,6 @@
             </modules>
         </profile>
 
-        <profile>
-            <id>essuir</id>
-            <activation>
-                <file>
-                    <exists>essuir/pom.xml</exists>
-                </file>
-            </activation>
-            <modules>
-                <module>essuir</module>
-            </modules>
-        </profile>
-
         <!--
          The 'release' profile is used by the 'maven-release-plugin' (see above)
          to actually perform a DSpace software release to Maven central.
@@ -780,7 +765,6 @@
                 <module>dspace-swordv2</module>
                 <module>dspace-xmlui-mirage2</module>
                 <module>dspace-xmlui</module>
-                <module>essuir</module>
             </modules>
             <build>
                 <plugins>
@@ -985,13 +969,6 @@
                 <version>[6.0.0,7.0.0)</version>
                 <type>war</type>
             </dependency>
-
-            <dependency>
-                <groupId>org.dspace</groupId>
-                <artifactId>essuir</artifactId>
-                <version>6.4-SNAPSHOT</version>
-            </dependency>
-
             <!-- DSpace third Party Dependencies -->
             <dependency>
                 <groupId>org.hibernate</groupId>
@@ -1004,6 +981,12 @@
                 <artifactId>hibernate-ehcache</artifactId>
                 <version>${hibernate.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-entitymanager</artifactId>
+                <version>${hibernate.version}</version>
+            </dependency>
+
 
             <dependency>
                 <groupId>org.springframework</groupId>
@@ -1063,6 +1046,13 @@
                 <groupId>org.springframework</groupId>
                 <version>${spring.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>org.springframework.data</groupId>
+                <artifactId>spring-data-jpa</artifactId>
+                <version>1.6.4.RELEASE</version>
+            </dependency>
+
 
             <dependency>
                 <groupId>org.apache.ant</groupId>
@@ -1456,6 +1446,42 @@
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-annotations</artifactId>
                 <version>${jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.liquibase</groupId>
+                <artifactId>liquibase-core</artifactId>
+                <version>3.6.2</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.logging</groupId>
+                <artifactId>jboss-logging</artifactId>
+                <version>3.3.1.Final</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jooq</groupId>
+                <artifactId>jooq</artifactId>
+                <version>3.11.11</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jooq</groupId>
+                <artifactId>jooq-meta</artifactId>
+                <version>3.11.11</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jooq</groupId>
+                <artifactId>jooq-codegen</artifactId>
+                <version>3.11.11</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.javassist</groupId>
+                <artifactId>javassist</artifactId>
+                <version>3.18.1-GA</version>
+            </dependency>
+            <dependency>
+                <groupId>org.codehaus.janino</groupId>
+                <artifactId>janino</artifactId>
+                <version>3.0.12</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
