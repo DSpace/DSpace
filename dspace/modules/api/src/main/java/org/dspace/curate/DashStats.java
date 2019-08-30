@@ -165,7 +165,7 @@ public class DashStats extends AbstractCurationTask {
 		if (vals.length == 0) {
 		    log.debug("Object has no dc.title" + handle);
 		} else {
-		    packageTitle = vals[0].value;
+		    packageTitle = cleanValue(vals[0].value);
 		}
 		log.debug("packageTitle = " + packageTitle);
 
@@ -178,24 +178,24 @@ public class DashStats extends AbstractCurationTask {
 		} else {
                     for(int i = 0; i < vals.length; i++) {
                         log.debug(" -- adding " + vals[i].value);
-                        packageAuthors = packageAuthors + vals[i].value;
+                        packageAuthors = packageAuthors + cleanValue(vals[i].value);
                         if(vals.length > i + 1) {
                             packageAuthors = packageAuthors + "|";
                         }
                     } 
                     log.debug("authors are " + packageAuthors);
 		}
-		log.debug("packageTitle = " + packageTitle);
+
                 
 		// article DOI
 		vals = item.getMetadata("dc.relation.isreferencedby");
 		if (vals.length == 0) {
 		    log.debug("Object has no articleDOI (dc.relation.isreferencedby) " + handle);
 		} else {
-		    articleDOI = vals[0].value;
+		    articleDOI = cleanValue(vals[0].value);
 		}
 		log.debug("articleDOI = " + articleDOI);
-
+                
 		
 		// journal
 	 	vals = item.getMetadata("prism.publicationName");
@@ -205,7 +205,7 @@ public class DashStats extends AbstractCurationTask {
 		    context.abort();
 		    return Curator.CURATE_SKIP;
 		} else {
-		    journal = vals[0].value;
+		    journal = cleanValue(vals[0].value);
 		}
 		log.debug("journal = " + journal);
                 
@@ -217,7 +217,7 @@ public class DashStats extends AbstractCurationTask {
 		    context.abort();
 		    return Curator.CURATE_SKIP;
 		} else {
-		    dateAccessioned = vals[0].value;
+		    dateAccessioned = cleanValue(vals[0].value);
 		}
 		log.debug("dateAccessioned = " + dateAccessioned);
 
@@ -228,7 +228,7 @@ public class DashStats extends AbstractCurationTask {
 		DCValue[] manuvals = item.getMetadata("dc.identifier.manuscriptNumber");
 		manuscriptNum = null;
 		if(manuvals.length > 0) {
-		    manuscriptNum = manuvals[0].value;
+		    manuscriptNum = cleanValue(manuvals[0].value);
 		}
 		if(manuscriptNum != null && manuscriptNum.trim().length() > 0) {
 		    log.debug("has a real manuscriptNum = " + manuscriptNum);
@@ -322,7 +322,7 @@ public class DashStats extends AbstractCurationTask {
 		    
 		    // for each data file in the package
 		    for(int i = 0; i < dataFiles.length; i++) {
-			String fileID = dataFiles[i].value;
+			String fileID = cleanValue(dataFiles[i].value);
 			log.debug(" ======= processing fileID = " + fileID);
 
 			// get the DSpace Item for this fileID
@@ -427,6 +427,16 @@ public class DashStats extends AbstractCurationTask {
 	return Curator.CURATE_SUCCESS;
     }
 
+    /**
+       Removes offensive characters from a string value.
+    **/
+    private String cleanValue(String value) {
+        String result = value.replaceAll("\\r?\\n", " ");
+        result = result.replace('\t', ' ');
+        result = result.replace('|', ' ');
+        return result;
+    }
+    
     /**
        An XML utility method that returns the text content of a node.
     **/
