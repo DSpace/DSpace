@@ -169,6 +169,40 @@ public class DashService {
         return response;
     }
 
+    public String getDatasetID(String manuscriptNumber) {
+        String response = "";
+        log.debug("getting Dash datasetID for " + manuscriptNumber);
+
+        try {
+            String manu = URLEncoder.encode(manuscriptNumber, "UTF-8");
+            URL url = new URL(dashServer + "/api/datasets?manuscriptNumber=" + manu);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+            connection.setRequestProperty("Accept", "application/json");
+            connection.setRequestProperty("Authorization", "Bearer " + oauthToken);
+
+            InputStream stream = connection.getErrorStream();
+            if (stream == null) {
+                stream = connection.getInputStream();
+            }
+            BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+            String line = null;
+            StringWriter responseContent = new StringWriter(connection.getContentLength() > 0 ? connection.getContentLength() : 2048);
+            while ((line = reader.readLine()) != null) {
+                responseContent.append(line);
+            }
+            String json = responseContent.toString();
+            log.debug("got response content: " + responseContent);
+            ObjectNode jsonObj = (ObjectNode) mapper.readTree(json);
+            response = jsonObj.findValue("identifier").asText();
+        } catch (Exception e) {
+            log.error("Unable to get Dash JSON", e);
+        }
+        
+        return response;
+    }
+    
     /**
        Checks whether a dataset has been stored in DASH. First, checks whether the dryad.dashStoredDate is set.
        If not, calls the DASH API to determine whether the dataset has been fully stored (Merritt status is 'submitted')
@@ -610,21 +644,31 @@ public class DashService {
         return responseCode;
     }
 
-    public int addCurationActivity(DryadDataPackage dataPackage, String status, String reason, String createdAt, String processKeyword) {
+    public int addCurationActivity(DryadDataPackage dataPackage, String status, String note,
+                                   String createdAt, String processKeyword) {
+        return addCurationActivity(dataPackage, status, note, createdAt, processKeyword);
+    }
+
+    public int addCurationActivity(String dashDatasetDOI, String status, String note,
+                                   String createdAt, String processKeyword) {
         ObjectNode node = mapper.createObjectNode();
         lastCurationStatus = status;
         node.put("status", status);
-        node.put("note", reason);
+        node.put("note", note);
         if(createdAt != null) {
             node.put("created_at", createdAt);
         }
         if(processKeyword != null) {
             node.put("keywords", processKeyword);
         }
-        return addCurationActivity(dataPackage, node);
+        return addCurationActivity(dashDatasetDOI, node);
     }
-
+        
     private int addCurationActivity(DryadDataPackage dataPackage, JsonNode node) {
+        return addCurationActivity(dataPackage.getVersionlessIdentifier(), node);
+    }
+    
+    private int addCurationActivity(String dashDatasetDOI, JsonNode node) {
         int responseCode = 0;
 
         log.debug("starting addCurationActivity");
@@ -632,7 +676,7 @@ public class DashService {
             lastCurationStatus = node.get("status").textValue();
             String dashJSON = mapper.writeValueAsString(node);
             log.debug("curation activity json is " + dashJSON);
-            String encodedDOI = URLEncoder.encode(dataPackage.getVersionlessIdentifier(), "UTF-8");
+            String encodedDOI = URLEncoder.encode(dashDatasetDOI, "UTF-8");
             URL url = new URL(dashServer + "/api/datasets/" + encodedDOI + "/curation_activity");
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
