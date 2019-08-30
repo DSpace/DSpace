@@ -575,19 +575,7 @@
 					<type-bind>Libro</type-bind>
 				</field>
 
-				<!-- Otros identificadores -->
-				<field>
-					<dc-schema>sedici</dc-schema>
-					<dc-element>identifier</dc-element>
-					<repeatable>true</repeatable>
-					<label>Otros identificadores</label>
-					<input-type value-pairs-name="common_identifiers">qualdrop_value</input-type>
-					<hint>Otros códigos de identificación de la obra</hint>
-					<visibility-on-group>Bibliotecarios</visibility-on-group>
-					<type-bind>!Objeto Fisico</type-bind>
-				</field>
-				
-				<!-- Otros identificadores - Solo Objeto Físico y Publicacion seriada - Es para acotar las opciones brindadas por el value-pairs 'common_identifiers' -->
+				<!-- Otros identificadores  -->
 				<field>
 					<dc-schema>sedici</dc-schema>
 					<dc-element>identifier</dc-element>
@@ -595,8 +583,7 @@
 					<repeatable>true</repeatable>
 					<label>Otros identificadores</label>
 					<input-type>onebox</input-type>
-					<hint>Identificadores del objeto, como ser museo y número u otros identificadores internos. Indicar código con letras, números, dos puntos y guiones sin espacios. Ejemplos: MF:1234, F:14, MK:123</hint>
-					<type-bind>Objeto Fisico</type-bind>
+					<hint>Identificadores del recurso, como ser DOI (https://doi.org/12.3456/nnnnn), handle (http://hdl.handle.net/12345/6789) u otros identificadores internos como ser números de expediente, etc. Indicar códigos con letras, números, dos puntos y guiones SIN espacios.</hint>
 				</field>
 
 				<!-- Nombre del Ciclo para los audios -->
@@ -1008,21 +995,6 @@
 			</pair>
 		</value-pairs>
 		
-		<value-pairs value-pairs-name="common_identifiers" dc-term="identifier">
-			<pair>
-				<displayed-value>Otro</displayed-value>
-				<stored-value>other</stored-value>
-			</pair>
-			<pair>
-				<displayed-value>DOI</displayed-value>
-				<stored-value>doi</stored-value>
-			</pair>
-			<pair>
-				<displayed-value>Handle</displayed-value>
-				<stored-value>handle</stored-value>
-			</pair>
-		</value-pairs>
-
 		<value-pairs value-pairs-name="common_libro_oa_contributors" dc-term="identifier">
 			<pair>
 				<displayed-value>Editor</displayed-value>
