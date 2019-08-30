@@ -2609,10 +2609,19 @@ public class PushToORCID
             for (String l : links)
             {
                 ResearcherUrl researcherUrl = new ResearcherUrl();
-                researcherUrl.setUrlName(l.split("###")[0]);
+                String[] splittedLink = l.split("###");
                 Url url = new Url();
-                url.setValue(l.split("###").length > 1 ? l.split("###")[1] : l);
-                researcherUrl.setUrl(url);
+				if (splittedLink.length == 2) {
+					researcherUrl
+							.setUrlName(StringUtils.isNotBlank(splittedLink[0]) ? splittedLink[0] : splittedLink[1]);
+	                url.setValue(splittedLink[1]);
+	                researcherUrl.setUrl(url);
+				}
+				else {
+					researcherUrl.setUrlName(l);
+	                url.setValue(l);
+	                researcherUrl.setUrl(url);
+				}
                 researcherUrls.add(researcherUrl);
             }
         }
