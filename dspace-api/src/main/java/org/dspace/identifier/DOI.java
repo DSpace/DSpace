@@ -23,17 +23,17 @@ public class DOI
 {
     public static final String SCHEME = "doi:";
 
-    public static final String RESOLVER = "http://dx.doi.org";
+    public static final String RESOLVER = "https://doi.org";
     
     
     /**
      * This method helps to convert a DOI into a URL. It takes DOIs in one of
      * the following formats  and returns it as URL (f.e. 
-     * http://dx.doi.org/10.123/456). Allowed formats are:
+     * https://doi.org/10.123/456). Allowed formats are:
      * <ul>
      *   <li>doi:10.123/456</li>
      *   <li>10.123/456</li>
-     *   <li>http://dx.doi.org/10.123/456</li>
+     *   <li>https://doi.org/10.123/456</li>
      * </ul>
      * 
      * @param identifier  A DOI that should be returned in external form.
@@ -75,7 +75,7 @@ public class DOI
     /**
      * Recognize format of DOI and return it with leading doi-Scheme.
      * @param identifier Identifier to format, following format are accepted:
-     *                   f.e. 10.123/456, doi:10.123/456, http://dx.doi.org/10.123/456.
+     *                   f.e. 10.123/456, doi:10.123/456, https://doi.org/10.123/456.
      * @return Given Identifier with DOI-Scheme, f.e. doi:10.123/456.
      * @throws IllegalArgumentException If identifier is empty or null.
      * @throws DOIIdentifierException If DOI could not be recognized.
