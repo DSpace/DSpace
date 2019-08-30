@@ -105,11 +105,11 @@
 			<xsl:with-param name="elements" select="dim:field[@element='relation' and @qualifier='bookTitle'] "/>
 		</xsl:call-template>
 
-		<!-- relation.isPartOfSeries row -->
+		<!-- relation.ispartof row -->
 		
         <xsl:call-template name="render-normal-field">
-    		<xsl:with-param name="name" select="'relation-isPartOfSeries'"/>
-    		<xsl:with-param name="elements"    select="dim:field[@element='relation' and @qualifier='isPartOfSeries'] "/>
+    		<xsl:with-param name="name" select="'relation-ispartof'"/>
+    		<xsl:with-param name="elements"    select="dim:field[@element='relation' and @qualifier='ispartof'] "/>
 		</xsl:call-template>
 		<!-- Author(s) row -->
 		<div class="simple-item-view-authors">

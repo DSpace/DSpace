@@ -621,11 +621,11 @@
 			<xsl:with-param name="type">url</xsl:with-param>
 		</xsl:call-template>
 		
-		<!-- relation.isPartOfSeries row -->
+		<!-- relation.ispartof row -->
 		
         <xsl:call-template name="render-normal-field">
-    		<xsl:with-param name="name" select="'relation-isPartOfSeries'"/>
-    		<xsl:with-param name="elements"    select="dim:field[@element='relation' and @qualifier='isPartOfSeries'] "/>
+    		<xsl:with-param name="name" select="'relation-ispartof'"/>
+    		<xsl:with-param name="elements"    select="dim:field[@element='relation' and @qualifier='ispartof'] "/>
 		</xsl:call-template>
 
 		<!-- Mostramos los documentos relacionados (es probable que sean muchos) -->

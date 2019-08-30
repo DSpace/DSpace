@@ -727,15 +727,15 @@
 				</rel:related_item>
 			</xsl:if>
 
-			<!-- sedici.relation.isPartOfSeries -->
+			<!-- dc.relation.ispartof -->
 			<xsl:if
-				test="dspace:field[@mdschema='sedici' and @element='relation' and @qualifier='isPartOfSeries']">
+				test="dspace:field[@mdschema='dc' and @element='relation' and @qualifier='ispartof'and contains(., 'Serie: ') ]">
 				<rel:related_item>
 					<rel:description>Series which the item is part of</rel:description>
 					<rel:inter_work_relation
 						identifier-type="other" relationship-type="isPartOf">
 						<xsl:value-of
-							select="dspace:field[@mdschema='sedici' and @element='relation' and @qualifier='isPartOfSeries']" />
+							select="dspace:field[@mdschema='dc' and @element='relation' and @qualifier='ispartof' and contains(., 'Serie: ')]" />
 					</rel:inter_work_relation>
 				</rel:related_item>
 			</xsl:if>

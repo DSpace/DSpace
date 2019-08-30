@@ -632,14 +632,13 @@
 					<type-bind>Articulo,Publicacion seriada</type-bind>
 				</field>
 
-				<!-- Serie de Libro -->
 				<field>
-					<dc-schema>sedici</dc-schema>
+					<dc-schema>dc</dc-schema>
 					<dc-element>relation</dc-element>
-					<dc-qualifier>isPartOfSeries</dc-qualifier>
-					<label>Titulo y número de la serie</label>
+					<dc-qualifier>ispartof</dc-qualifier>
+					<label>Titulo de la serie o colección</label>
 					<input-type>onebox</input-type>
-					<hint>Titulo y número de la serie en la que el libro fué publicado</hint>
+					<hint>Titulo y número de la serie o colección en la que el libro fué publicado. Agregar prefijo "Serie: " o "Colección: " según corresponda</hint>
 					<type-bind>Libro</type-bind>
 				</field>
 
