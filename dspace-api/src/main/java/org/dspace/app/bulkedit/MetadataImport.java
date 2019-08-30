@@ -1725,7 +1725,9 @@ public class MetadataImport {
             }
         } else { // size == 0; the reference does not exist throw an error
             if (uuid == null) {
-                throw new MetadataImportException("No matches found for reference: " + reference);
+                throw new MetadataImportException("No matches found for reference: " + reference
+                        + ",  Keep in mind you can only reference entries that are listed before " +
+                        "this one within the CSV.");
             } else {
                 return uuid; // one match from db
             }
