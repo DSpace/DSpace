@@ -1,5 +1,6 @@
 package org.ssu.entity;
 
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.io.Serializable;
@@ -29,7 +30,6 @@ public class ItemTypeResponse implements Serializable {
     public String getSearchQuery() {
         return searchQuery;
     }
-
 
     public static final class Builder {
         private Integer count;
