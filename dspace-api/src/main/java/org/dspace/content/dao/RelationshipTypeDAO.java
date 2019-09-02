@@ -48,7 +48,7 @@ public interface RelationshipTypeDAO extends GenericDAO<RelationshipType> {
      *         or rightwardType
      * @throws SQLException If something goes wrong
      */
-    List<RelationshipType> findByLeftwardOrRightwardType(Context context, String type) throws SQLException;
+    List<RelationshipType> findByLeftwardOrRightwardTypeName(Context context, String type) throws SQLException;
 
     /**
      * This method will return a list of RelationshipType objects for which the given EntityType object is equal

@@ -129,7 +129,7 @@ public class EntityServiceImpl implements EntityService {
     }
 
     @Override
-    public List<RelationshipType> getRelationshipTypesByType(Context context, String label) throws SQLException {
+    public List<RelationshipType> getRelationshipTypesByTypeName(Context context, String label) throws SQLException {
         List<RelationshipType> listToReturn = new LinkedList<>();
         for (RelationshipType relationshipType : relationshipTypeService.findAll(context)) {
             if (StringUtils.equals(relationshipType.getLeftwardType(),label) ||

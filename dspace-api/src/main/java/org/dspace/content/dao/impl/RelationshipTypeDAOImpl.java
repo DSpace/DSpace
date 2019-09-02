@@ -40,7 +40,7 @@ public class RelationshipTypeDAOImpl extends AbstractHibernateDAO<RelationshipTy
     }
 
     @Override
-    public List<RelationshipType> findByLeftwardOrRightwardType(Context context, String type) throws SQLException {
+    public List<RelationshipType> findByLeftwardOrRightwardTypeName(Context context, String type) throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, RelationshipType.class);
         Root<RelationshipType> relationshipTypeRoot = criteriaQuery.from(RelationshipType.class);
