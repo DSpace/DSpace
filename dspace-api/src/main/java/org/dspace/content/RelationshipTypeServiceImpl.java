@@ -58,8 +58,8 @@ public class RelationshipTypeServiceImpl implements RelationshipTypeService {
     }
 
     @Override
-    public List<RelationshipType> findByLeftwardOrRightwardType(Context context, String label) throws SQLException {
-        return relationshipTypeDAO.findByLeftwardOrRightwardType(context, label);
+    public List<RelationshipType> findByLeftwardOrRightwardTypeName(Context context, String label) throws SQLException {
+        return relationshipTypeDAO.findByLeftwardOrRightwardTypeName(context, label);
     }
 
     @Override

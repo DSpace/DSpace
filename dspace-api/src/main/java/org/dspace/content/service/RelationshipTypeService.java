@@ -62,7 +62,7 @@ public interface RelationshipTypeService extends DSpaceCRUDService<RelationshipT
      *                  that is equal to the given label param
      * @throws SQLException If something goes wrong
      */
-    List<RelationshipType> findByLeftwardOrRightwardType(Context context, String label) throws SQLException;
+    List<RelationshipType> findByLeftwardOrRightwardTypeName(Context context, String label) throws SQLException;
 
     /**
      * Returns a list of RelationshipType objects for which the given EntityType is equal to either the leftType

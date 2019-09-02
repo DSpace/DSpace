@@ -260,7 +260,7 @@ public class EntityServiceImplTest  {
         RelationshipType relationshipType = mock(RelationshipType.class);
         list.add(relationshipType);
 
-        // Mock the state of objects utilized in getRelationshipTypesByType()
+        // Mock the state of objects utilized in getRelationshipTypesByTypeName()
         // to meet the success criteria of the invocation
         when(relationshipTypeService.findAll(context)).thenReturn(list);
         when(relationshipType.getLeftwardType()).thenReturn("leftwardType");
@@ -268,7 +268,7 @@ public class EntityServiceImplTest  {
 
         // The RelationshipType(s) reported from our mocked Entity should match our list
         assertEquals("TestGetRelationshipTypesByLabel 0", list,
-                entityService.getRelationshipTypesByType(context, "leftwardType"));
+                entityService.getRelationshipTypesByTypeName(context, "leftwardType"));
     }
 
 
