@@ -70,4 +70,39 @@ public class EssuirSiteController {
         model.setViewName("home");
         return model;
     }
+
+    @RequestMapping("/provision")
+    public String provisionPage() {
+        return "position";
+    }
+
+    @RequestMapping("/about")
+    public String aboutPage() {
+        return "about";
+    }
+
+    @RequestMapping("/instruction")
+    public String instructionPage() {
+        return "instruction";
+    }
+
+    @RequestMapping("/contacts")
+    public String contactsPage() {
+        return "contacts";
+    }
+
+    @RequestMapping("/application1")
+    public String application1Page() {
+        return "application1";
+    }
+
+    @RequestMapping("/application2")
+    public String application2Page() {
+        return "application2";
+    }
+
+    @RequestMapping("/structure")
+    public String structurePage() {
+        return "structure";
+    }
 }

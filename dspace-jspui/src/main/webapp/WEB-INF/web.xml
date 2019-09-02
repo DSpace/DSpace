@@ -154,11 +154,6 @@
         </init-param>
     </servlet>
 
-    <servlet-mapping>
-        <servlet-name>Spring MVC Servlet</servlet-name>
-        <url-pattern></url-pattern>
-    </servlet-mapping>
-
   <!-- Servlets -->
 
   <servlet>
@@ -830,10 +825,45 @@
     <url-pattern>/request-item</url-pattern>
   </servlet-mapping>
 
-    <!--<servlet-mapping>-->
-        <!--<servlet-name>home-page</servlet-name>-->
-        <!--<url-pattern></url-pattern>-->
-    <!--</servlet-mapping>-->
+    <servlet-mapping>
+        <servlet-name>Spring MVC Servlet</servlet-name>
+        <url-pattern></url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>Spring MVC Servlet</servlet-name>
+        <url-pattern>/about</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>Spring MVC Servlet</servlet-name>
+        <url-pattern>/contacts</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>Spring MVC Servlet</servlet-name>
+        <url-pattern>/instruction</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>Spring MVC Servlet</servlet-name>
+        <url-pattern>/provision</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>Spring MVC Servlet</servlet-name>
+        <url-pattern>/application1</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>Spring MVC Servlet</servlet-name>
+        <url-pattern>/application2</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>Spring MVC Servlet</servlet-name>
+        <url-pattern>/structure</url-pattern>
+    </servlet-mapping>
 
   <!-- Icon MIME type -->
   <mime-mapping>
