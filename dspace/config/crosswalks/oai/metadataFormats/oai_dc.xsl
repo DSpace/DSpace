@@ -72,11 +72,7 @@
 				<dc:date><xsl:value-of select="." /></dc:date>
 			</xsl:for-each>
 			<!-- dc.type -->
-			<xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='type']/doc:element/doc:field[@name='value']">
-				<dc:type><xsl:value-of select="." /></dc:type>
-			</xsl:for-each>
-			<!-- dc.type.* -->
-			<xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='type']/doc:element/doc:element/doc:field[@name='value']">
+			<xsl:for-each select="doc:metadata/doc:element[@name='item']/doc:element[@name='openairetype']/doc:element/doc:field[@name='value']">
 				<dc:type><xsl:value-of select="." /></dc:type>
 			</xsl:for-each>
 			<!-- dc.identifier -->
@@ -88,14 +84,14 @@
 				<dc:identifier><xsl:value-of select="." /></dc:identifier>
 			</xsl:for-each>
 			<!-- dc.language -->
-			<xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='language']/doc:element/doc:field[@name='value']">
+			<xsl:for-each select="doc:metadata/doc:element[@name='item']/doc:element[@name='languageiso639-1']/doc:element/doc:field[@name='value']">
 				<dc:language><xsl:value-of select="." /></dc:language>
 			</xsl:for-each>
-			<!-- dc.language.* -->
-			<xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='language']/doc:element/doc:element/doc:field[@name='value']">
-				<dc:language><xsl:value-of select="." /></dc:language>
+			<!-- dc.relation (from the CRIS Project) -->
+			<xsl:for-each select="doc:metadata/doc:element[@name='crisitem']/doc:element[@name='project']/doc:element[@name='openAire']/doc:element/doc:field[@name='value']">
+				<dc:relation><xsl:value-of select="." /></dc:relation>
 			</xsl:for-each>
-			<!-- dc.relation -->
+			<!-- dc.relation (flat metadata) -->
 			<xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='relation']/doc:element/doc:field[@name='value']">
 				<dc:relation><xsl:value-of select="." /></dc:relation>
 			</xsl:for-each>
@@ -103,13 +99,17 @@
 			<xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='relation']/doc:element/doc:element/doc:field[@name='value']">
 				<dc:relation><xsl:value-of select="." /></dc:relation>
 			</xsl:for-each>
-			<!-- dc.rights -->
-			<xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='rights']/doc:element/doc:field[@name='value']">
-				<dc:rights><xsl:value-of select="." /></dc:rights>
-			</xsl:for-each>
-			<!-- dc.rights.* -->
-			<xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='rights']/doc:element/doc:element/doc:field[@name='value']">
-				<dc:rights><xsl:value-of select="." /></dc:rights>
+			<!-- dc.rights OpenAire-->
+			<xsl:for-each select="doc:metadata/doc:element[@name='item']/doc:element[@name='grantfulltext']/doc:element/doc:field[@name='value']">
+				<xsl:choose>
+					<xsl:when test="contains(., 'embargoEnd')">
+						<dc:rights>info:eu-repo/semantics/embargoedAccess</dc:rights>
+						<dc:date><xsl:value-of select="." /></dc:date>
+					</xsl:when>
+					<xsl:otherwise>
+						<dc:rights><xsl:value-of select="." /></dc:rights>
+					</xsl:otherwise>
+				</xsl:choose>
 			</xsl:for-each>
 			<!-- dc.format -->
 			<xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='format']/doc:element/doc:field[@name='value']">
@@ -147,11 +147,6 @@
 			<xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='source']/doc:element/doc:element/doc:field[@name='value']">
 				<dc:source><xsl:value-of select="." /></dc:source>
 			</xsl:for-each>
-			<!-- dc.relation Project OpenAire -->
-			<xsl:for-each select="doc:metadata/doc:element[@name='crisitem']/doc:element[@name='project']/doc:element[@name='openAire']/doc:field[@name='value']">
-				<dc:relation><xsl:value-of select="." /></dc:relation>
-			</xsl:for-each>
-			
 		</oai_dc:dc>
 	</xsl:template>
 </xsl:stylesheet>

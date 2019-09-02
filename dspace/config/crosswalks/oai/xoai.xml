@@ -20,7 +20,7 @@
 
             <Format ref="oaidc"/>
             <Format ref="mets"/>
-            <Format ref="xoai"/>
+            <!--  <Format ref="xoai"/>-->
             <Format ref="didl"/>
             <Format ref="dim"/>
             <Format ref="ore"/>
@@ -430,7 +430,7 @@
         <CustomCondition id="driverDocumentTypeCondition">
             <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
             <Configuration>
-                <string name="field">dc.type</string>
+                <string name="field">item.openairetype</string>
                 <string name="operator">ends_with</string>
                 <list name="values">
                     <string>article</string>
@@ -486,11 +486,22 @@
         <CustomCondition id="openaireRelationCondition">
             <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
             <Configuration>
-                <string name="field">item.project.openaire</string>
+                <string name="field">crisitem.project.openAire </string>
                 <string name="operator">starts_with</string>
                 <string name="value">info:eu-repo/grantAgreement/</string>
             </Configuration>
         </CustomCondition>
+        
+        <!-- NOTE to use the flat metadata comment in the previous and use the follow  configuration -->
+        <!--        
+        <CustomCondition id="openaireRelationCondition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.relation</string>
+                <string name="operator">starts_with</string>
+                <string name="value">info:eu-repo/grantAgreement/</string>
+            </Configuration>
+        </CustomCondition> -->        
     </Filters>
 
     <Sets>
