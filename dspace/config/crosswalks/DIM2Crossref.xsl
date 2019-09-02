@@ -734,8 +734,7 @@
 					<rel:description>Series which the item is part of</rel:description>
 					<rel:inter_work_relation
 						identifier-type="other" relationship-type="isPartOf">
-						<xsl:value-of
-							select="dspace:field[@mdschema='dc' and @element='relation' and @qualifier='ispartof' and contains(., 'Serie: ')]" />
+						<xsl:value-of select="substring-after(dspace:field[@mdschema='dc' and @element='relation' and @qualifier='ispartof' and contains(., 'Serie: ')]/text(),'Serie: ')" />
 					</rel:inter_work_relation>
 				</rel:related_item>
 			</xsl:if>
