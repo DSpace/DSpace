@@ -68,6 +68,7 @@ public class ComponentInfoDTO<T extends DSpaceObject>
 	    	}
     	}
     	pairs.put("start"+type, page);
+    	pairs.remove("onlytab");
     	for(String key: pairs.keySet()){
     		sb.append(key+"="+pairs.get(key)+"&");
     	}
