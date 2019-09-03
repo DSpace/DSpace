@@ -105,4 +105,16 @@ public class EssuirSiteController {
     public String structurePage() {
         return "structure";
     }
+
+
+    @RequestMapping("/faq")
+    public ModelAndView faqPage(ModelAndView model, HttpServletRequest request) throws SQLException {
+        Context dspaceContext = UIUtil.obtainContext(request);
+        Locale locale = dspaceContext.getCurrentLocale();
+        NewsService newsService = CoreServiceFactory.getInstance().getNewsService();
+        String faqFilePath = String.format("faq%s.html", locale.getLanguage().equals("en") ? "" : "_" + locale.getLanguage());
+        model.addObject("faq", newsService.readNewsFile(faqFilePath));
+        model.setViewName("faq");
+        return model;
+    }
 }
