@@ -44,11 +44,11 @@
     <div id="designedby" class="container text-muted">
 
         <!--PR -->
-        <a href="http://www.prchecker.info/" title="PRchecker.info" target="_blank" rel="nofollow">
-            <img src="http://pr-v2.prchecker.info/getpr.v2.php?codex=aHR0cDovL2Vzc3Vpci5zdW1kdS5lZHUudWEv&amp;tag=2" alt="PRchecker.info" style="border:0;"></a>
+        <a href="https://www.prchecker.info/" title="PRchecker.info" target="_blank" rel="nofollow">
+            <img src="https://pr-v2.prchecker.info/getpr.v2.php?codex=aHR0cDovL2Vzc3Vpci5zdW1kdS5lZHUudWEv&amp;tag=2" alt="PRchecker.info" style="border:0;"></a>
         <!--/PR -->
         <!--LiveInternet counter--><script type="text/javascript"><!--
-    document.write("<a href='http://www.liveinternet.ru/click' "+
+    document.write("<a href='https://www.liveinternet.ru/click' "+
             "target=_blank><img src='//counter.yadro.ru/hit?t14.6;r"+
             escape(document.referrer)+((typeof(screen)=="undefined")?"":
             ";s"+screen.width+"*"+screen.height+"*"+(screen.colorDepth?
@@ -81,14 +81,14 @@
                     width = 36;
                 }
         %>
-        <!--Openstat--><span id="openstat2145233"></span><script type="text/javascript">
-        var openstat = { counter: 2145233, image: 5065, next: openstat }; (function(d, t, p) {
-            var j = d.createElement(t); j.async = true; j.type = "text/javascript";
-            j.src = ("https:" == p ? "https:" : "http:") + "//openstat.net/cnt.js";
-            var s = d.getElementsByTagName(t)[0]; s.parentNode.insertBefore(j, s);
-        })(document, "script", document.location.protocol);
-    </script><!--/Openstat-->
-        <%
+        <%--<!--Openstat--><span id="openstat2145233"></span><script type="text/javascript">--%>
+        <%--var openstat = { counter: 2145233, image: 5065, next: openstat }; (function(d, t, p) {--%>
+            <%--var j = d.createElement(t); j.async = true; j.type = "text/javascript";--%>
+            <%--j.src = ("https:" == p ? "https:" : "http:") + "//openstat.net/cnt.js";--%>
+            <%--var s = d.getElementsByTagName(t)[0]; s.parentNode.insertBefore(j, s);--%>
+        <%--})(document, "script", document.location.protocol);--%>
+    <%--</script><!--/Openstat-->--%>
+        <%--<%--%>
             }
         %>
         <div id="footer_feedback" class="pull-right" style="font-size:10pt">
