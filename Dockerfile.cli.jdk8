@@ -45,7 +45,7 @@ RUN mkdir $ANT_HOME && \
 
 RUN ant init_installation update_configs update_code
 
-# Step 3 - Run tomcat
+# Step 3 - Run jdk
 # Create a new tomcat image that does not retain the the build directory contents
 FROM openjdk:8-jdk
 ENV DSPACE_INSTALL=/dspace
