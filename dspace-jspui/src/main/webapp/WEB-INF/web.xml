@@ -827,6 +827,11 @@
 
     <servlet-mapping>
         <servlet-name>Spring MVC Servlet</servlet-name>
+        <url-pattern>/recent-items</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>Spring MVC Servlet</servlet-name>
         <url-pattern></url-pattern>
     </servlet-mapping>
 

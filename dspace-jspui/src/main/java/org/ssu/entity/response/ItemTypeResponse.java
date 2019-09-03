@@ -1,4 +1,4 @@
-package org.ssu.entity;
+package org.ssu.entity.response;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;

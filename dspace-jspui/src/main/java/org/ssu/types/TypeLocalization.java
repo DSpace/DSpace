@@ -6,11 +6,12 @@ import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
 import org.springframework.stereotype.Service;
 import org.ssu.LocalizedInputsReader;
-import org.ssu.entity.ItemTypeResponse;
+import org.ssu.entity.response.ItemTypeResponse;
 
 import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -37,11 +38,11 @@ public class TypeLocalization {
                 .collect(Collectors.toMap(item -> item.get(METADATAVALUE.value), item -> item.get(DSL.count())));
     }
 
-    private void updateTypeLocalizationTable(String locale) {
+    private void updateTypeLocalizationTable(Locale locale) {
         typesTable.clear();
         List<String> typesList = null;
         try {
-            typesList = new LocalizedInputsReader().getInputsReader(locale).getPairs("common_types");
+            typesList = new LocalizedInputsReader().getInputsReader(locale.getLanguage()).getPairs("common_types");
         } catch (DCInputsReaderException e) {
             e.printStackTrace();
         }
@@ -49,12 +50,12 @@ public class TypeLocalization {
             typesTable.put(typesList.get(i + 1), typesList.get(i));
     }
 
-    public String getTypeLocalized(String type, String locale) {
+    public String getTypeLocalized(String type, Locale locale) {
         updateTypeLocalizationTable(locale);
         return typesTable.getOrDefault(type, type);
     }
 
-    public List<ItemTypeResponse> getSubmissionStatisticsByType(String locale) {
+    public List<ItemTypeResponse> getSubmissionStatisticsByType(Locale locale) {
 
         return getTypesCount().entrySet()
                 .stream()

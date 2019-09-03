@@ -1,11 +1,14 @@
 package org.ssu;
 
+import org.dspace.app.webui.components.RecentSubmissionsException;
+import org.dspace.app.webui.components.RecentSubmissionsManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.browse.ItemCountException;
 import org.dspace.browse.ItemCounter;
 import org.dspace.content.Community;
+import org.dspace.content.Item;
+import org.dspace.content.MetadataSchema;
 import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.service.CommunityService;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
 import org.dspace.core.factory.CoreServiceFactory;
@@ -13,7 +16,8 @@ import org.dspace.core.service.NewsService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
-import org.ssu.entity.ItemTypeResponse;
+import org.ssu.entity.response.ItemTypeResponse;
+import org.ssu.entity.response.RecentItem;
 import org.ssu.statistics.EssuirStatistics;
 import org.ssu.statistics.StatisticsData;
 import org.ssu.types.TypeLocalization;
@@ -24,7 +28,6 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RequestMapping("/")
@@ -61,7 +64,7 @@ public class EssuirSiteController {
                 }));
 
         StatisticsData totalStatistic = essuirStatistics.getTotalStatistic();
-        List<ItemTypeResponse> submissionStatisticsByType = typeLocalization.getSubmissionStatisticsByType(locale.getLanguage());
+        List<ItemTypeResponse> submissionStatisticsByType = typeLocalization.getSubmissionStatisticsByType(locale);
         model.addObject("topNews", String.format(topNews, totalStatistic.getTotalCount(), totalStatistic.getLastUpdate()));
         model.addObject("sideNews", sideNews);
         model.addObject("submissions", submissionStatisticsByType);
@@ -107,6 +110,24 @@ public class EssuirSiteController {
     }
 
 
+    @RequestMapping("/recent-items")
+    public ModelAndView recentItemsPage(ModelAndView model, HttpServletRequest request) throws SQLException, RecentSubmissionsException {
+        Context context = UIUtil.obtainContext(request);
+        Locale locale = context.getCurrentLocale();
+        List<Item> items = new RecentSubmissionsManager(context).getRecentSubmissions(null).getRecentSubmissions();
+
+        List<RecentItem> recentItems = items.stream()
+                .map(item -> new RecentItem.Builder()
+                        .withTitle(item.getName())
+                        .withType(typeLocalization.getTypeLocalized(item.getItemService().getMetadataFirstValue(item, MetadataSchema.DC_SCHEMA, "type", null, Item.ANY), locale))
+                        .withHandle(item.getHandle())
+                        .build())
+                .collect(Collectors.toList());
+        model.addObject("recentItems", recentItems);
+        model.setViewName("recent-items");
+        return model;
+    }
+
     @RequestMapping("/faq")
     public ModelAndView faqPage(ModelAndView model, HttpServletRequest request) throws SQLException {
         Context dspaceContext = UIUtil.obtainContext(request);
@@ -115,6 +136,7 @@ public class EssuirSiteController {
         String faqFilePath = String.format("faq%s.html", locale.getLanguage().equals("en") ? "" : "_" + locale.getLanguage());
         model.addObject("faq", newsService.readNewsFile(faqFilePath));
         model.setViewName("faq");
+
         return model;
     }
 }

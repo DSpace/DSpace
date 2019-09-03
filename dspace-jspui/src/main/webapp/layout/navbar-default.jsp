@@ -115,7 +115,8 @@
 				%>
 				    
 				<%-- End of dynamic browse indices --%>
-
+                <li class="divider"></li>
+                <li><a href="<%= request.getContextPath() %>/recent-items"><fmt:message key="jsp.collection-home.recentsub"/></a></li>
                 <li><a href="<%= request.getContextPath() %>/faq"><fmt:message key="jsp.layout.navbar-default.faq"/></a></li>
 
     </ul>
