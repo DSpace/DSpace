@@ -107,7 +107,7 @@
              uncomment the below aspect and comment out the "Original Workflow" aspect above.
              PLEASE NOTE: in order to use the configurable workflow you must also run the
              database migration scripts as detailed in the DSpace Documentation -->
-        <aspect name="XMLWorkflow" path="resource://aspects/XMLWorkflow/" />
+         <aspect name="XMLWorkflow" path="resource://aspects/XMLWorkflow/" />
 
         <!-- ==============
              SWORDv1 Client

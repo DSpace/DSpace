@@ -58,6 +58,18 @@ public class HarvestedCollection implements ReloadableEntity<Integer>
     @Temporal(TemporalType.TIMESTAMP)
     private Date lastHarvested;
 
+    @Column(name = "metadata_authority_type")
+    private String metadataAuthorityType;
+
+    @Column(name = "workflow_process")
+    private String workflowProcess;
+
+    @Column(name = "bundle_versioning_strategy")
+    private String bundleVersioningStrategy;
+
+    @Column(name = "ingest_filter")
+    private String ingestFilter;
+
     @Transient
 	public static final int TYPE_NONE = 0;
     @Transient
@@ -138,7 +150,22 @@ public class HarvestedCollection implements ReloadableEntity<Integer>
     public void setHarvestStartTime(Date date) {
         this.harvestStartTime = date;
     }
-    
+
+    public void setMetadataAuthorityType(String metadataAuthorityType) {
+        this.metadataAuthorityType = metadataAuthorityType;
+    }
+
+    public void setWorkflowProcess(String workflowProcess) {
+        this.workflowProcess = workflowProcess;
+    }
+
+    public void setBundleVersioningStrategy(String bundleVersioningStrategy) {
+        this.bundleVersioningStrategy = bundleVersioningStrategy;
+    }
+
+    public void setIngestFilter(String ingestFilter) {
+        this.ingestFilter = ingestFilter;
+    }
 
     /* Getting for the appropriate harvesting-related columns */
     public Collection getCollection() {
@@ -180,4 +207,23 @@ public class HarvestedCollection implements ReloadableEntity<Integer>
     public Date getHarvestStartTime() {
     	return harvestStartTime;
     }
+
+    public String getMetadataAuthorityType()
+    {
+        return metadataAuthorityType;
+    }
+
+    public String getWorkflowProcess()
+    {
+        return workflowProcess;
+    }
+
+    public String getBundleVersioningStrategy() {
+        return bundleVersioningStrategy;
+    }
+
+    public String getIngestFilter() {
+        return ingestFilter;
+    }
+
 }

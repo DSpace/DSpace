@@ -481,8 +481,9 @@ public class QDCCrosswalk extends SelfNamedPlugin
                 {
                     lang = me.getAttributeValue("lang");
                 }
-
-                itemService.addMetadata(context, item, metadataField, lang, me.getText());
+                if (!(me.getText().contains("http://hdl.handle.net") && metadataField.toString().equals("dc_identifier_uri"))) {
+                    itemService.addMetadata(context, item, metadataField, lang, me.getText());
+                }
             }
             else
             {

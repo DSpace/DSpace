@@ -5,6 +5,9 @@ dspace.ui = {{ kunde }}-xmlui
 dspace.url = ${dspace.baseUrl}/${dspace.ui}
 dspace.name = {{ kundedata[kunde]["arkivnavn"] | default('Brage') }}
 dspace.orgnr = {{ kundedata[kunde]["orgnr"] }}
+dspace.cristinId = {{ kundedata[kunde]["CristinInstitusjonsnummer"] | default('123') }}
+dspace.epost = {{ kundedata[kunde]["epost"] }}
+dspace.fullname = {{ kundedata[kunde]["navn"] }}
 
 assetstore.dir = /brage/{{ kunde }}/data
 

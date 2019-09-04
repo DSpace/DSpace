@@ -69,7 +69,7 @@
         <mapping class="org.dspace.app.requestitem.RequestItem"/>
 
         <!--Basic workflow services, comment or remove when switching to the configurable workflow -->
-<!--        <mapping class="org.dspace.workflowbasic.BasicWorkflowItem"/>-->
+<!-- <mapping class="org.dspace.workflowbasic.BasicWorkflowItem"/>-->
 <!--        <mapping class="org.dspace.workflowbasic.TaskListItem"/>-->
 
         <!--Configurable workflow services, uncomment the xml workflow classes below to enable the configurable workflow-->

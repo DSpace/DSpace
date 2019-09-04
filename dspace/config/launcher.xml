@@ -160,6 +160,13 @@
         </step>
     </command>
     <command>
+        <name>map-workflows</name>
+        <description>Map CRIStin/Inspera collections to xmlworkflow in config/workflow.xml (restart tomcat!).</description>
+        <step>
+            <class>org.dspace.xmlworkflow.cristin.LinkCollectionToWorkflow</class>
+        </step>
+    </command>
+    <command>
         <name>metadata-export</name>
         <description>Export metadata for batch editing</description>
         <step>

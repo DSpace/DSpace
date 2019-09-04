@@ -315,6 +315,16 @@
             <artifactId>spring-orm</artifactId>
         </dependency>
         <dependency>
+            <groupId>commons-httpclient</groupId>
+            <artifactId>commons-httpclient</artifactId>
+            <version>3.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>okhttp</artifactId>
+            <version>3.14.2</version>
+        </dependency>
+        <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>handle</artifactId>
         </dependency>
@@ -739,6 +749,12 @@
             <groupId>no.bibsys</groupId>
             <artifactId>feidelib-jar</artifactId>
             <version>1.0.29</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-httpclient</groupId>
+            <artifactId>commons-httpclient</artifactId>
+            <version>3.1</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
