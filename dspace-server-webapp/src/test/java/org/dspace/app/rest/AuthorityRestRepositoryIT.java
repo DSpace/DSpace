@@ -26,7 +26,7 @@ public class AuthorityRestRepositoryIT extends AbstractControllerIntegrationTest
                 .param("query", "Research")
                 .param("size", "1000"))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.page.totalElements", Matchers.greaterThan(1)));
+                    .andExpect(jsonPath("$.page.totalElements", Matchers.is(26)));
     }
 
     @Test
@@ -50,6 +50,6 @@ public class AuthorityRestRepositoryIT extends AbstractControllerIntegrationTest
                 .param("query", "Book")
                 .param("size", "1000"))
                         .andExpect(status().isOk())
-                        .andExpect(jsonPath("$.page.totalElements", Matchers.greaterThan(0)));
+                        .andExpect(jsonPath("$.page.totalElements", Matchers.is(2)));
     }
 }
