@@ -113,14 +113,11 @@ public class CollectionHarvestSettingsController {
             throw new ResourceNotFoundException("Collection with uuid: " + collectionUuid + " not found");
         }
 
-        HarvestedCollection harvestedCollection =
+        HarvestedCollectionRest harvestedCollectionRest =
             harvestedCollectionRestRepository.update(context, request, collection);
 
         // Return a harvestedCollectionResource only if a new harvestedCollection was created
-        if (harvestedCollection != null) {
-            List<Map<String,String>> configs = OAIHarvester.getAvailableMetadataFormats();
-            HarvestedCollectionRest harvestedCollectionRest =
-                harvestedCollectionConverter.fromModel(harvestedCollection, collection, configs);
+        if (harvestedCollectionRest != null) {
             harvestedCollectionResource = new HarvestedCollectionResource(harvestedCollectionRest);
             halLinkService.addLinks(harvestedCollectionResource);
         }

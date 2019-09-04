@@ -65,7 +65,7 @@ public class HarvestedCollectionRestRepository extends AbstractDSpaceRestReposit
      * @return              a harvestedCollection if a new harvestedCollection is created, otherwise null
      * @throws SQLException
      */
-    public HarvestedCollection update(Context context,
+    public HarvestedCollectionRest update(Context context,
                                       HttpServletRequest request,
                                       Collection collection) throws SQLException {
         HarvestedCollectionRest harvestedCollectionRest = parseHarvestedCollectionRest(context, request, collection);
@@ -75,6 +75,7 @@ public class HarvestedCollectionRestRepository extends AbstractDSpaceRestReposit
         if (harvestedCollectionRest.getHarvestType() == HarvestTypeEnum.NONE.getValue()
             && harvestedCollection != null) {
             harvestedCollectionService.delete(context, harvestedCollection);
+            return harvestedCollectionConverter.fromModel(null);
 
         } else if (harvestedCollectionRest.getHarvestType() != HarvestTypeEnum.NONE.getValue()) {
             List<String> errors = testHarvestSettings(harvestedCollectionRest);
@@ -86,7 +87,9 @@ public class HarvestedCollectionRestRepository extends AbstractDSpaceRestReposit
 
                 updateCollectionHarvestSettings(context, harvestedCollection, harvestedCollectionRest);
                 harvestedCollection = harvestedCollectionService.find(context, collection);
-                return harvestedCollection;
+                List<Map<String,String>> configs = OAIHarvester.getAvailableMetadataFormats();
+
+                return harvestedCollectionConverter.fromModel(harvestedCollection, collection, configs);
             } else {
                 throw new UnprocessableEntityException(
                     "Incorrect harvest settings in request. The following errors were found: " + errors.toString()
