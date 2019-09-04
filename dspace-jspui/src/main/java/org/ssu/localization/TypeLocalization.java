@@ -1,12 +1,9 @@
-package org.ssu.types;
+package org.ssu.localization;
 
-import org.apache.log4j.Logger;
 import org.dspace.app.util.DCInputsReaderException;
-import org.jooq.DSLContext;
-import org.jooq.impl.DSL;
 import org.springframework.stereotype.Service;
-import org.ssu.LocalizedInputsReader;
 import org.ssu.entity.response.ItemTypeResponse;
+import org.ssu.statistics.EssuirStatistics;
 
 import javax.annotation.Resource;
 import java.util.HashMap;
@@ -17,26 +14,9 @@ import java.util.stream.Collectors;
 
 @Service
 public class TypeLocalization {
-    private static final org.ssu.entity.jooq.Metadatavalue METADATAVALUE = org.ssu.entity.jooq.Metadatavalue.TABLE;
-    private static final org.ssu.entity.jooq.Item ITEM = org.ssu.entity.jooq.Item.TABLE;
-    private static final org.ssu.entity.jooq.Handle HANDLE = org.ssu.entity.jooq.Handle.TABLE;
-    private static Logger logger = Logger.getLogger(TypeLocalization.class);
     @Resource
-    private DSLContext dsl;
+    private EssuirStatistics essuirStatistics;
     private Map<String, String> typesTable = new HashMap<>();
-
-    public Map<String, Integer> getTypesCount() {
-
-        return dsl.select(METADATAVALUE.value, DSL.count())
-                .from(ITEM)
-                .join(HANDLE).on(HANDLE.resourceLegacyId.eq(ITEM.itemId))
-                .join(METADATAVALUE).on(METADATAVALUE.dspaceObjectId.eq(HANDLE.resourceId))
-                .where(ITEM.inArchive.isTrue().and(METADATAVALUE.metadataFieldId.eq(66)))
-                .groupBy(METADATAVALUE.value)
-                .fetch()
-                .stream()
-                .collect(Collectors.toMap(item -> item.get(METADATAVALUE.value), item -> item.get(DSL.count())));
-    }
 
     private void updateTypeLocalizationTable(Locale locale) {
         typesTable.clear();
@@ -57,7 +37,7 @@ public class TypeLocalization {
 
     public List<ItemTypeResponse> getSubmissionStatisticsByType(Locale locale) {
 
-        return getTypesCount().entrySet()
+        return essuirStatistics.getStatisticsByType().entrySet()
                 .stream()
                 .map(item -> new ItemTypeResponse.Builder().withTitle(getTypeLocalized(item.getKey(), locale)).withCount(item.getValue()).withSearchQuery(item.getKey()).build())
                 .collect(Collectors.toList());

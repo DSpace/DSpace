@@ -18,9 +18,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import org.ssu.entity.response.ItemTypeResponse;
 import org.ssu.entity.response.RecentItem;
+import org.ssu.localization.TypeLocalization;
 import org.ssu.statistics.EssuirStatistics;
 import org.ssu.statistics.StatisticsData;
-import org.ssu.types.TypeLocalization;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -137,6 +137,14 @@ public class EssuirSiteController {
         model.addObject("faq", newsService.readNewsFile(faqFilePath));
         model.setViewName("faq");
 
+        return model;
+    }
+
+    @RequestMapping("/top-publications")
+    public ModelAndView top10authorsPage(ModelAndView model, HttpServletRequest request) throws SQLException {
+        List<org.ssu.entity.Item> collect = essuirStatistics.topPublications(10);
+        model.addObject("publicationList", collect);
+        model.setViewName("top-publications");
         return model;
     }
 }

@@ -1,4 +1,4 @@
-package org.ssu;
+package org.ssu.localization;
 
 import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.util.DCInputsReaderException;

@@ -876,6 +876,11 @@
         <url-pattern>/faq</url-pattern>
     </servlet-mapping>
 
+    <servlet-mapping>
+        <servlet-name>Spring MVC Servlet</servlet-name>
+        <url-pattern>/top-publications</url-pattern>
+    </servlet-mapping>
+
   <!-- Icon MIME type -->
   <mime-mapping>
     <extension>ico</extension>
