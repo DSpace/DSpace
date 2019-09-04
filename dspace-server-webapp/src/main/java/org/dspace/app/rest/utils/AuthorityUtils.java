@@ -82,4 +82,14 @@ public class AuthorityUtils {
         result.setName(authorityName);
         return result;
     }
+    
+    /**
+     * Get the configured "isHierarchical" value for this authority.
+     *
+     * @param authorityName single string identifying authority name
+     * @return true if authority is Hierarchical.
+     */
+    public boolean isHierarchical(String authorityName) {
+        return cas.getChoiceAuthorityByAuthorityName(authorityName).isHierarchical();
+    }
 }

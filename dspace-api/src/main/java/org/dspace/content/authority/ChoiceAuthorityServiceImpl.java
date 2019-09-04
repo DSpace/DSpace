@@ -396,4 +396,17 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
         }
         return ma;
     }
+
+    @Override
+    public Choices getChoicesByParent(String authorityName, String parentId, int start, int limit, String locale) {
+        HierarchicalAuthority ma = (HierarchicalAuthority) getChoiceAuthorityByAuthorityName(authorityName);
+        return ma.getChoicesByParent(authorityName, parentId, start, limit, locale);
+    }
+    
+    @Override
+    public Choices getTopChoices(String authorityName, int start, int limit, String locale) {
+        HierarchicalAuthority ma = (HierarchicalAuthority) getChoiceAuthorityByAuthorityName(authorityName);
+        return ma.getTopChoices(authorityName, start, limit, locale);
+    }
+
 }

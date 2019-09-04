@@ -8,6 +8,7 @@
 package org.dspace.content.authority;
 
 import java.io.File;
+import java.sql.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -54,13 +55,14 @@ import org.xml.sax.InputSource;
  * @author Michael B. Klein
  */
 
-public class DSpaceControlledVocabulary extends SelfNamedPlugin implements ChoiceAuthority {
+public class DSpaceControlledVocabulary extends SelfNamedPlugin implements HierarchicalAuthority {
 
     private static Logger log = org.apache.logging.log4j.LogManager.getLogger(DSpaceControlledVocabulary.class);
     protected static String xpathTemplate = "//node[contains(translate(@label,'ABCDEFGHIJKLMNOPQRSTUVWXYZ'," +
         "'abcdefghijklmnopqrstuvwxyz'),'%s')]";
     protected static String idTemplate = "//node[@id = '%s']";
     protected static String idParentTemplate = "//node[@id = '%s']/parent::isComposedBy";
+    protected static String rootTemplate = "/node";
     protected static String pluginNames[] = null;
 
     protected String vocabularyName = null;
@@ -151,39 +153,45 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Choic
             xpathExpression += String.format(xpathTemplate, textHierarchy[i].replaceAll("'", "&apos;").toLowerCase());
         }
         XPath xpath = XPathFactory.newInstance().newXPath();
-        Choice[] choices;
+        List<Choice> choices = new ArrayList<Choice>();
         try {
             NodeList results = (NodeList) xpath.evaluate(xpathExpression, vocabulary, XPathConstants.NODESET);
             String[] authorities = new String[results.getLength()];
             String[] values = new String[results.getLength()];
             String[] labels = new String[results.getLength()];
             String[] parent = new String[results.getLength()];
+            ArrayList<String>[] children = new ArrayList[results.getLength()];
             String[] notes = new String[results.getLength()];
             for (int i = 0; i < results.getLength(); i++) {
                 Node node = results.item(i);
-                readNode(authorities, values, labels, parent, notes, i, node);
+                children[i] = new ArrayList<String>();
+                readNode(authorities, values, labels, parent, children[i], notes, i, node);
             }
             int resultCount = labels.length - start;
             // limit = 0 means no limit
-            if ((limit > 0) && (resultCount > limit)) {
+            if ((collection == null) && (limit > 0) && (resultCount > limit)) {
                 resultCount = limit;
             }
-            choices = new Choice[resultCount];
+            
             if (resultCount > 0) {
                 for (int i = 0; i < resultCount; i++) {
-                    choices[i] = new Choice(authorities[start + i], values[start + i], labels[start + i]);
+                    Choice choice = new Choice(authorities[start + i], values[start + i], labels[start + i]);
                     if (StringUtils.isNotBlank(parent[i])) {
-                        choices[i].extras.put("parent", parent[i]);
+                        choice.extras.put("parent", parent[i]);
                     }
                     if (StringUtils.isNotBlank(notes[i])) {
-                        choices[i].extras.put("note", notes[i]);
+                        choice.extras.put("note", notes[i]);
                     }
+                    if (children[i].size() > 0) {
+                        choice.extras.put("children", String.join("::", children[i]));
+                    }
+                    choices.add(choice);
                 }
             }
         } catch (XPathExpressionException e) {
-            choices = new Choice[0];
+            log.warn(e.getMessage(), e);
         }
-        return new Choices(choices, 0, choices.length, Choices.CF_AMBIGUOUS, false);
+        return new Choices(choices.toArray(new Choice[choices.size()]), 0, choices.size(), Choices.CF_AMBIGUOUS, false);
     }
 
     @Override
@@ -207,11 +215,6 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Choic
     }
 
     @Override
-    public boolean isHierarchical() {
-        return true;
-    }
-
-    @Override
     public Choice getChoice(String fieldKey, String authKey, String locale) {
         init();
         log.debug("Getting matches for '" + authKey + "'");
@@ -220,23 +223,7 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Choic
         try {
             Node node = (Node) xpath.evaluate(xpathExpression, vocabulary, XPathConstants.NODE);
             if (node != null) {
-                String[] authorities = new String[1];
-                String[] values = new String[1];
-                String[] labels = new String[1];
-                String[] parent = new String[1];
-                String[] note = new String[1];
-                readNode(authorities, values, labels, parent, note, 0, node);
-
-                if (values.length > 0) {
-                    Choice choice = new Choice(authorities[0], values[0], labels[0]);
-                    if (StringUtils.isNotBlank(parent[0])) {
-                        choice.extras.put("parent", parent[0]);
-                    }
-                    if (StringUtils.isNotBlank(note[0])) {
-                        choice.extras.put("note", note[0]);
-                    }
-                    return choice;
-                }
+                return createChoiceFromNode(node);
             }
         } catch (XPathExpressionException e) {
             log.warn(e.getMessage(), e);
@@ -244,8 +231,8 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Choic
         return new Choice("", "", "");
     }
 
-    private void readNode(String[] authorities, String[] values, String[] labels, String[] parent, String[] notes,
-                          int i, Node node) {
+    private void readNode(String[] authorities, String[] values, String[] labels, String[] parent, List<String> children,
+            String[] notes, int i, Node node) {
         String hierarchy = this.buildString(node);
         if (this.suggestHierarchy) {
             labels[i] = hierarchy;
@@ -268,6 +255,7 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Choic
                 }
             }
         }
+
         Node idAttr = node.getAttributes().getNamedItem("id");
         if (null != idAttr) { // 'id' is optional
             authorities[i] = idAttr.getNodeValue();
@@ -282,6 +270,22 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Choic
                         }
                     }
                 }
+                
+                for (int ci = 0; ci < childNodes.getLength(); ci++) {
+                    Node firstChild = childNodes.item(ci);
+                    if (firstChild != null && "isComposedBy".equals(firstChild.getNodeName())) {
+                        for (int cii = 0; cii < firstChild.getChildNodes().getLength(); cii++) {
+                            Node childN = firstChild.getChildNodes().item(cii);
+                            if (childN != null && "node".equals(childN.getNodeName())) {
+                                Node childIdAttr = childN.getAttributes().getNamedItem("id");
+                                if (null != childIdAttr) {
+                                  children.add(childIdAttr.getNodeValue());
+                                }
+                            }
+                        }
+                        break;
+                    }
+                }
             }
         } else {
             authorities[i] = null;
@@ -289,4 +293,70 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Choic
         }
     }
 
+    private Choice createChoiceFromNode(Node node) {
+        if (node != null) {
+            String[] authorities = new String[1];
+            String[] values = new String[1];
+            String[] labels = new String[1];
+            String[] parent = new String[1];
+            List<String> children = new ArrayList<String>();
+            String[] note = new String[1];
+            readNode(authorities, values, labels, parent, children, note, 0, node);
+
+            if (values.length > 0) {
+                Choice choice = new Choice(authorities[0], values[0], labels[0]);
+                if (StringUtils.isNotBlank(parent[0])) {
+                    choice.extras.put("parent", parent[0]);
+                }
+                if (StringUtils.isNotBlank(note[0])) {
+                    choice.extras.put("note", note[0]);
+                }
+                if (children.size() > 0) {
+                    choice.extras.put("children", String.join("::", children));
+                }
+                return choice;
+            }
+        }
+        return new Choice("", "", "");
+    }
+
+    @Override
+    public Choices getTopChoices(String authorityName, int start, int limit, String locale) {
+        init();
+        String xpathExpression = rootTemplate;
+        List<Choice> choices = getChoicesByXpath(xpathExpression);
+
+        return new Choices(choices.toArray(new Choice[choices.size()]), 0, choices.size(), Choices.CF_AMBIGUOUS, false);
+    }
+
+    @Override
+    public Choices getChoicesByParent(String authorityName, String parentId, int start, int limit, String locale) {
+        init();
+        String xpathExpression = String.format(idTemplate, parentId);
+        List<Choice> choices = getChoicesByXpath(xpathExpression);
+
+        return new Choices(choices.toArray(new Choice[choices.size()]), 0, choices.size(), Choices.CF_AMBIGUOUS, false);
+    }
+
+    private List<Choice> getChoicesByXpath(String xpathExpression) {
+        List<Choice> choices = new ArrayList<Choice>();
+        XPath xpath = XPathFactory.newInstance().newXPath();
+        try {
+            Node parentNode = (Node) xpath.evaluate(xpathExpression, vocabulary, XPathConstants.NODE);
+            if (parentNode != null) {
+                NodeList childNodes = (NodeList) xpath.evaluate(".//isComposedBy", parentNode, XPathConstants.NODE);
+                if (null != childNodes) {
+                    for (int i = 0; i < childNodes.getLength(); i++) {
+                        Node childNode = childNodes.item(i);
+                        if (childNode != null && "node".equals(childNode.getNodeName())) {
+                            choices.add(createChoiceFromNode(childNode));
+                        }
+                    }
+                }
+            }
+        } catch (XPathExpressionException e) {
+            log.warn(e.getMessage(), e);
+        }
+        return choices;
+    }
 }

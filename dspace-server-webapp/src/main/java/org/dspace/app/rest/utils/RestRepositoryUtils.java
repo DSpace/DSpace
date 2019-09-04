@@ -103,6 +103,26 @@ public class RestRepositoryUtils {
      * null if it is not found
      */
     public Method getSearchMethod(String searchMethodName, DSpaceRestRepository repository) {
+        return _getSearchMethod(searchMethodName, repository);
+    }
+    
+    /**
+     * @param searchMethodName
+     * @param repository
+     * @return the search method in the repository with the specified name or
+     * null if it is not found
+     */
+    public Method getSearchMethod(String searchMethodName, LinkRestRepository repository) {
+        return _getSearchMethod(searchMethodName, repository);
+    }
+
+    /**
+     * @param searchMethodName
+     * @param repository
+     * @return the search method in the repository with the specified name or
+     * null if it is not found
+     */
+    private Method _getSearchMethod(String searchMethodName, Object repository) {
         Method searchMethod = null;
         // DSpaceRestRepository is possibly enhanced with a Spring AOP proxy. Therefor use ClassUtils to determine
         // the underlying implementation class.
