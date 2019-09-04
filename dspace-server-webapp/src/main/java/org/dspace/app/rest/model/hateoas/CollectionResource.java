@@ -23,5 +23,6 @@ public class CollectionResource extends DSpaceResource<CollectionRest> {
         super(collection, utils, rels);
         add(utils.linkToSubResource(collection, CollectionRest.LICENSE));
         add(utils.linkToSubResource(collection, CollectionRest.HARVEST));
+        add(utils.linkToSubResource(collection, "mappedItems"));
     }
 }
