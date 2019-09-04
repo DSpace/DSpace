@@ -11,6 +11,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.response.QueryResponse;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.authority.PersonAuthorityValue;
 import org.dspace.authority.factory.AuthorityServiceFactory;
@@ -50,6 +52,13 @@ public class AuthorityRestRepositoryIT extends AbstractControllerIntegrationTest
         person1.setValue("Shirasaka, Seiko");
         person1.setField("dc_contributor_author");
         AuthorityServiceFactory.getInstance().getAuthorityIndexingService().indexContent(person1);
+
+        PersonAuthorityValue person2 = new PersonAuthorityValue();
+        person2.setLastName("Miller");
+        person2.setFirstName("Tyler E");
+        person2.setValue("Miller, Tyler E");
+        person2.setField("dc_contributor_author");
+        AuthorityServiceFactory.getInstance().getAuthorityIndexingService().indexContent(person2);
     }
 
     @Test
@@ -105,12 +114,37 @@ public class AuthorityRestRepositoryIT extends AbstractControllerIntegrationTest
     }
 
     @Test
+    public void noResultsSolrQueryTest() throws Exception {
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(
+                get("/api/integration/authorities/SolrAuthorAuthority/entries")
+                        .param("metadata", "dc.contributor.author")
+                        .param("query", "Smith")
+                        .param("size", "1000"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.page.totalElements", Matchers.is(0)));
+    }
+
+    @Test
     public void retrieveSrscValueTest() throws Exception {
         String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(
                 get("/api/integration/authorities/srsc/entryValues/SCB1922"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.page.totalElements", Matchers.is(1)));
+    }
+
+    @Test
+    @Ignore
+    /**
+     * This functionality is currently broken, it an empty value
+     */
+    public void noResultsSrscValueTest() throws Exception {
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(
+                get("/api/integration/authorities/srsc/entryValues/DOESNTEXIST"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.page.totalElements", Matchers.is(0)));
     }
 
     @Test
@@ -131,6 +165,21 @@ public class AuthorityRestRepositoryIT extends AbstractControllerIntegrationTest
         String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(
                 get("/api/integration/authorities/common_types/entryValues/Learning%20Object"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.page.totalElements", Matchers.is(1)));
+    }
+
+    @Test
+    public void retrieveSolrValueTest() throws Exception {
+        String token = getAuthToken(admin.getEmail(), password);
+
+        SolrQuery query = new SolrQuery();
+        query.setQuery("*:*");
+        QueryResponse queryResponse = AuthorityServiceFactory.getInstance().getAuthoritySearchService().search(query);
+        String id = String.valueOf(queryResponse.getResults().get(0).getFieldValue("id"));
+
+        getClient(token).perform(
+                get("/api/integration/authorities/SolrAuthorAuthority/entryValues/" + id))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.page.totalElements", Matchers.is(1)));
     }
