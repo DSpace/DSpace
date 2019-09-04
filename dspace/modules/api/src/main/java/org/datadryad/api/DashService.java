@@ -235,6 +235,24 @@ public class DashService {
         return isStored;
     }
 
+    /*
+      For items in review status, get the DASH sharingLink.
+     */
+    public String getSharingLink(String doi) {
+        String sharingLink = null;
+        // call dash API and get the link
+        String json = getDashJSON(doi);
+        try {
+            ObjectNode jsonObj = (ObjectNode) mapper.readTree(json);
+            sharingLink = jsonObj.findValue("sharingLink").asText();
+            log.debug("sharingLink = " + sharingLink);
+        } catch (Exception e) {
+            log.error("can't parse DASH JSON", e);
+        }
+        
+        return sharingLink;
+    }
+
     /**
        PUTs a DryadDataPackage to Dash, creating a new submission or updating an
        existing submission (using the DOI contained in the Data Package).
