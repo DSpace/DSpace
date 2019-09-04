@@ -1,0 +1,27 @@
+# Submission email message
+#
+# {0}  Title of submission
+# {1}  Name of collection
+# {2}  Name of the submitter
+# {3}  Status of the submission
+#
+Subject: Kvittering - Registreringen er fullført / Receipt - Submission Complete
+
+Tittel / Title:               {0}
+Samling / Collection:         {1}
+Registrert av / Submitted by: {2}
+
+Den innførselen du har registrert kan bli sendt til godkjenning. 
+Du vil få beskjed via e-post når den er publisert, eller hvis det skulle oppstå problemer. 
+Du kan sjekke status for dine registreringer på Min side: / 
+
+Your submission will now go through the workflow process designated for the collection to which you are submitting. 
+You will receive an e-mail notification as soon as your submission has become a part of the collection, 
+or if for some reason there is a problem with your submission. 
+You can also check on the status of your submission by going to My page:
+
+{3}
+
+Med vennlig hilsen / Sincerely,
+
+Administrator

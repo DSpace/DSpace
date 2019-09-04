@@ -6,19 +6,18 @@
 # {3}  Description of task
 # {4}  link to 'my DSpace' page 
 #
-Subject: DSpace: You have a new task
+Subject: Ny arbeidsoppgave / New task
 
-A new item has been submitted:
+En ny innførsel har blitt registrert for publiseringsarkivet / A new item has been submitted to the archive:
 
-Title:        {0}
-Collection:   {1}
-Submitted by: {2}
+Tittel / Title:               {0}
+Samling / Collection:         {1}
+Registrert av / Submitted by: {2}
 
-{3}
+En ny oppgave er tilgjengelig / {3}
 
-To claim this task, please visit your "My DSpace"
-page:  {4}
+Gå til Min side for å ta denne arbeidsoppgaven / To claim this task, visit My page:  {4}
 
-Many thanks!
+Med vennlig hilsen / Sincerely,
 
-DSpace
+Administrator

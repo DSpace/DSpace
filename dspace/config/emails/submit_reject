@@ -6,18 +6,20 @@
 # {3}  Reason for the rejection
 # {4}  Link to 'My DSpace' page
 #
-Subject: DSpace: Submission Rejected
+Subject: Registrering avvist / Submission Rejected
 
-You submitted: {0}
+Du registrerte / You submitted: {0}
 
-To collection: {1}
+I samlingen / To collection: {1}
 
-Your submission has been rejected by {2}
-with the following explanation:
+Registreringen din har blitt avvist av / Your submission has been rejected by {2}
+med følgende begrunnelse / with the following explanation:
 
 {3}
 
-Your submission has not been deleted.  You can access it from your
-"My DSpace" page: {4}
+Registreringen din har ikke blitt slettet og du har tilgang til den fra Min side
+/ Your submission has not been deleted and you can access it from My page: {4}
 
-DSpace
+Med vennlig hilsen / Sincerely,
+
+Administrator
