@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.logging.log4j.Logger;
+import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
@@ -39,9 +40,9 @@ public class AuthoritySolrServiceImpl implements AuthorityIndexingService, Autho
     /**
      * Non-Static CommonsHttpSolrServer for processing indexing events.
      */
-    protected HttpSolrClient solr = null;
+    protected SolrClient solr = null;
 
-    protected HttpSolrClient getSolr()
+    protected SolrClient getSolr()
             throws MalformedURLException, SolrServerException, IOException {
         if (solr == null) {
 
@@ -49,12 +50,14 @@ public class AuthoritySolrServiceImpl implements AuthorityIndexingService, Autho
 
             log.debug("Solr authority URL: " + solrService);
 
-            solr = new HttpSolrClient.Builder(solrService).build();
-            solr.setBaseURL(solrService);
+            HttpSolrClient solrServer = new HttpSolrClient.Builder(solrService).build();
+            solrServer.setBaseURL(solrService);
 
             SolrQuery solrQuery = new SolrQuery().setQuery("*:*");
 
-            solr.query(solrQuery);
+            solrServer.query(solrQuery);
+
+            solr = solrServer;
         }
 
         return solr;
