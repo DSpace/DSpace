@@ -3,7 +3,7 @@
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
  *
- * https://github.com/CILEA/dspace-cris/wiki/License
+ * http://www.dspace.org/license/
  */
 package org.dspace.app.cris.batch;
 
@@ -32,18 +32,21 @@ public class ScriptCrisUnsubscribeEPerson {
 			String[] args) throws ParseException, SQLException {
 		log.info("#### START UNSUBSCRIBE EPERSON: -----" + new Date() + " ----- ####");
 		Context dspaceContext = new Context();
-		dspaceContext.setIgnoreAuthorization(true);
+		dspaceContext.turnOffAuthorisationSystem();
+		dspaceContext.turnOffItemWrapper();
 		CommandLineParser parser = new PosixParser();
 
 		Options options = new Options();
 		options.addOption("h", "help", false, "help");
 		options.addOption("e", "email", true, "Email of ePerson *");
+		options.addOption("q", "quiet", false, "Skip sending the summary email");
 		
 		CommandLine line = parser.parse(options, args);
 		String eperson = "";
 		if (line.hasOption("e")) {
 			eperson = line.getOptionValue("e");
 		}
+		boolean skipEmail = line.hasOption('q');
 
 		if (line.hasOption('h') || StringUtils.isEmpty(eperson)) {
 			HelpFormatter myhelp = new HelpFormatter();
@@ -57,12 +60,15 @@ public class ScriptCrisUnsubscribeEPerson {
 		}
 
 		try {
-			UnsubscribeEPersionUtils.process(dspaceContext, eperson);
+			UnsubscribeEPersionUtils.process(dspaceContext, eperson, skipEmail);
 		} catch (Exception e) {
 			log.error(e.getMessage());
 		}
 		
 		log.info("#### END UNSUBSCRIBE EPERSON: -----" + new Date() + " ----- ####");
+		// Finish off and tidy up
+		dspaceContext.restoreAuthSystemState();
+        dspaceContext.restoreItemWrapperState();
 		dspaceContext.complete();
 	}
 }

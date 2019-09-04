@@ -1,3 +1,10 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
 package org.dspace.app.cris.util;
 
 import java.util.List;
@@ -30,10 +37,11 @@ public class UnsubscribeEPersionUtils {
 	 * 
 	 * @param context The context
 	 * @param email The mail related to an ePerson
+	 * @param skipEmail if true skip sending the summary email.
 	 * @throws Exception
 	 */
 	public static void process(
-			Context context, String email) throws Exception {
+			Context context, String email, boolean skipEmail) throws Exception {
 				
 		EPerson eperson = EPerson.findByEmail(context, email);
 		if (eperson == null) {
@@ -44,17 +52,20 @@ public class UnsubscribeEPersionUtils {
 		Email recoverEmail = Email.getEmail(I18nUtil.getEmailFilename(Locale.getDefault(), "unsubscriptions"));
 		String recipient = ConfigurationManager.getProperty("alert.recipient");
 		String notify = ConfigurationManager.getProperty("registration.notify");
+		String mailTo = "";
 		if (StringUtils.isNotBlank(recipient)) {
 			log.debug("Using alert.recipient: " + recipient);
 
 			recoverEmail.addRecipient(recipient);
+			mailTo = recipient;
 		}
 		else if (StringUtils.isNotBlank(notify)) {
 			log.debug("Using registration.notify: " + recipient);
 			
 			recoverEmail.addRecipient(notify);
+			mailTo = notify;
 		}
-		else {
+		else if (!skipEmail) {
 			throw new Exception("No administration email configurated. Fix configuration value alert.recipient or registration.notify.");
 		}
 		log.debug("{0}: " + email);
@@ -67,7 +78,7 @@ public class UnsubscribeEPersionUtils {
 			for (Community c : communities) {
 				list.append("\t" + c.getName() + ", with handle " + c.getHandle() + "\n");
 				
-				Subscribe.unsubscribe(context, eperson, Community.find(context, c.getID()));
+				Subscribe.unsubscribe(context, eperson, c);
 			}
 		}
 		log.debug("unsubscribe communities: {1}: " + list.toString());
@@ -80,7 +91,7 @@ public class UnsubscribeEPersionUtils {
 			for (Collection c : collections) {
 				list.append("\t" + c.getName() + ", handle " + c.getHandle() + "\n");
 				
-				Subscribe.unsubscribe(context, eperson, Collection.find(context, c.getID()));
+				Subscribe.unsubscribe(context, eperson, c);
 			}
 		}
 		log.debug("unsubscribe collections: {2}: " + list.toString());
@@ -157,6 +168,13 @@ public class UnsubscribeEPersionUtils {
 		log.debug("unsubscribe statistics: {4}: " + list.toString());
 		recoverEmail.addArgument(list.toString());	// {4}
 		
-		recoverEmail.send();
+		if (!skipEmail) {
+			recoverEmail.send();
+			
+			log.info("summary email sent to " + mailTo);
+		}
+		else {
+			log.info("skip sending the summary email");
+		}
 	}
 }
