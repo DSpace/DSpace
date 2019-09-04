@@ -265,6 +265,17 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     }
 
     @Override
+    public Iterator<Item> findByCollectionMapping(Context context, Collection collection, Integer limit, Integer offset)
+        throws SQLException {
+        return itemDAO.findArchivedByCollectionExcludingOwning(context, collection, limit, offset);
+    }
+
+    @Override
+    public int countByCollectionMapping(Context context, Collection collection) throws SQLException {
+        return itemDAO.countArchivedByCollectionExcludingOwning(context, collection);
+    }
+
+    @Override
     public Iterator<Item> findAllByCollection(Context context, Collection collection) throws SQLException {
         return itemDAO.findAllByCollection(context, collection);
     }
@@ -485,7 +496,8 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
         super.update(context, item);
 
-        // Set sequence IDs for bitstreams in item
+        // Set sequence IDs for bitstreams in Item. To guarantee uniqueness,
+        // sequence IDs are assigned in sequential order (starting with 1)
         int sequence = 0;
         List<Bundle> bunds = item.getBundles();
 
@@ -502,8 +514,6 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
         // start sequencing bitstreams without sequence IDs
         sequence++;
-
-
         for (Bundle bund : bunds) {
             List<Bitstream> streams = bund.getBitstreams();
 
