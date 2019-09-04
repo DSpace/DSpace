@@ -29,9 +29,11 @@ public class HarvestedCollectionResource extends HALResource<HarvestedCollection
     }
 
     private void embedResource(String relationship, HarvesterMetadataRest harvesterMetadataRest) {
-        HarvesterMetadataResource harvesterMetadataResource =
-            new HarvesterMetadataResource(harvesterMetadataRest, utils);
-        embedResource(relationship, harvesterMetadataResource);
+        if (harvesterMetadataRest != null) {
+            HarvesterMetadataResource harvesterMetadataResource =
+                new HarvesterMetadataResource(harvesterMetadataRest, utils);
+            embedResource(relationship, harvesterMetadataResource);
+        }
     }
 
 }
