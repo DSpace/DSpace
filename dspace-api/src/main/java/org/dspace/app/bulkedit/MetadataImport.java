@@ -715,14 +715,19 @@ public class MetadataImport {
         List<RelationshipType> leftRelationshipTypesForEntity = entityService.getLeftRelationshipTypes(c, entity);
         List<RelationshipType> rightRelationshipTypesForEntity = entityService.getRightRelationshipTypes(c, entity);
 
+        //Identify which RelationshipType objects match the combination of:
+        // * the left entity type
+        // * the right entity type
+        // * the name of the relationship type (based on the expected direction of the relationship)
+        //The matches are included in the acceptableRelationshipTypes
         for (RelationshipType relationshipType : entityService.getAllRelationshipTypes(c, entity)) {
             if (StringUtils.equalsIgnoreCase(relationshipType.getLeftwardType(), element)) {
-                left = handleLeftwardTypeNameEqualityRelationshipTypeElement(c, entity, relationEntity, left,
+                left = verifyValidLeftwardRelationshipType(c, entity, relationEntity, left,
                                                                              acceptableRelationshipTypes,
                                                                              leftRelationshipTypesForEntity,
                                                                              relationshipType);
             } else if (StringUtils.equalsIgnoreCase(relationshipType.getRightwardType(), element)) {
-                left = handleRightwardTypeEqualityRelationshipTypeElement(c, entity, relationEntity, left,
+                left = verifyValidRightwardRelationshipType(c, entity, relationEntity, left,
                                                                           acceptableRelationshipTypes,
                                                                           rightRelationshipTypesForEntity,
                                                                           relationshipType);
@@ -789,14 +794,14 @@ public class MetadataImport {
      *                                          be false in this case
      * @throws SQLException                     If something goes wrong
      */
-    private boolean handleRightwardTypeEqualityRelationshipTypeElement(Context c, Entity entity,
-                                                                       Entity relationEntity,
-                                                                       boolean left,
-                                                                       List<RelationshipType>
+    private boolean verifyValidRightwardRelationshipType(Context c, Entity entity,
+                                                         Entity relationEntity,
+                                                         boolean left,
+                                                         List<RelationshipType>
                                                                            acceptableRelationshipTypes,
-                                                                       List<RelationshipType>
+                                                         List<RelationshipType>
                                                                            rightRelationshipTypesForEntity,
-                                                                       RelationshipType relationshipType)
+                                                         RelationshipType relationshipType)
         throws SQLException {
         if (StringUtils.equalsIgnoreCase(entityService.getType(c, entity).getLabel(),
                                          relationshipType.getRightType().getLabel()) &&
@@ -833,14 +838,14 @@ public class MetadataImport {
      *                                          be true in this case
      * @throws SQLException                     If something goes wrong
      */
-    private boolean handleLeftwardTypeNameEqualityRelationshipTypeElement(Context c, Entity entity,
-                                                                          Entity relationEntity,
-                                                                          boolean left,
-                                                                          List<RelationshipType>
+    private boolean verifyValidLeftwardRelationshipType(Context c, Entity entity,
+                                                        Entity relationEntity,
+                                                        boolean left,
+                                                        List<RelationshipType>
                                                                               acceptableRelationshipTypes,
-                                                                          List<RelationshipType>
+                                                        List<RelationshipType>
                                                                               leftRelationshipTypesForEntity,
-                                                                          RelationshipType relationshipType)
+                                                        RelationshipType relationshipType)
         throws SQLException {
         if (StringUtils.equalsIgnoreCase(entityService.getType(c, entity).getLabel(),
                                          relationshipType.getLeftType().getLabel()) &&
