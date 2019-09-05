@@ -62,9 +62,6 @@ public class SearchEventRestRepository extends AbstractDSpaceRestRepository {
 
     private void checkSearchEventRestValidity(SearchEventRest searchEventRest) {
 
-        if (StringUtils.isBlank(searchEventRest.getQuery())) {
-            throw new DSpaceBadRequestException("The query was empty");
-        }
         if (!isPageValid(searchEventRest.getPage())) {
             throw new DSpaceBadRequestException("The given page was invalid");
         }
@@ -77,7 +74,8 @@ public class SearchEventRestRepository extends AbstractDSpaceRestRepository {
         if (sort == null) {
             return false;
         }
-        if (!(StringUtils.equals(sort.getOrder(), "asc") || StringUtils.equals(sort.getOrder(), "desc"))) {
+        if (!(StringUtils.equalsIgnoreCase(sort.getOrder(), "asc") ||
+            StringUtils.equalsIgnoreCase(sort.getOrder(), "desc"))) {
             return false;
         }
         return true;

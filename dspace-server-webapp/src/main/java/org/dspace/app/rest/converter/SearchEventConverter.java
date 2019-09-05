@@ -39,7 +39,9 @@ public class SearchEventConverter {
             restUsageSearchEvent.setScope((DSpaceObject) scopeObject);
         }
         restUsageSearchEvent.setConfiguration(searchEventRest.getConfiguration());
-        restUsageSearchEvent.setAppliedFilters(convertAppliedFilters(searchEventRest.getAppliedFilters()));
+        if (searchEventRest.getAppliedFilters() != null) {
+            restUsageSearchEvent.setAppliedFilters(convertAppliedFilters(searchEventRest.getAppliedFilters()));
+        }
         restUsageSearchEvent.setSort(convertSort(searchEventRest.getSort()));
         restUsageSearchEvent.setPage(convertPage(searchEventRest.getPage()));
 
