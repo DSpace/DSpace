@@ -33,6 +33,7 @@ import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.MetadataValueService;
 import org.dspace.content.service.RelationshipService;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,6 +63,14 @@ public class CSVMetadataImportReferenceTest extends AbstractEntityIntegrationTes
                 .withName("Parent Community")
                 .build();
         col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
+    }
+
+    /**
+     * Close testing enviorment and restore auth system
+     */
+    @After
+    public void close() {
+        context.restoreAuthSystemState();
     }
 
     /**
