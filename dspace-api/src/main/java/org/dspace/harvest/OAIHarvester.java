@@ -676,15 +676,7 @@ public class OAIHarvester {
                     throw new HarvestingException("Handle collision: attempted to re-assign handle '" + hdl + "' to an incoming harvested item '" + hi.getOaiID() + "'.");
                 }
     		}
-
-    		try {
-    			item = installItemService.installItem(ourContext, wi, null);
-    		}
-    		// clean up the workspace item if something goes wrong before
-    		catch(SQLException | IOException | AuthorizeException se) {
-				workspaceItemService.deleteWrapper(ourContext, wi);
-    			throw se;
-    		}
+			item = ingestionWorkflow.postCreate(ourContext, wi, hdl);
 		}
 
     	// Now create the special ORE bundle and drop the ORE document in it

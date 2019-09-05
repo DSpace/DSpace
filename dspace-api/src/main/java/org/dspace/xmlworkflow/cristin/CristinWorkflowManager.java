@@ -83,12 +83,7 @@ public class CristinWorkflowManager {
      */
     public static void startWithoutNotify(Context context, WorkspaceItem wsItem)
             throws SQLException, AuthorizeException, IOException, WorkflowException {
-        ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
-        if ("xmlworkflow".equals(configurationService.getProperty("workflow", "workflow.framework"))) {
             XmlWorkflowServiceFactory.getInstance().getWorkflowService().start(context, wsItem);
-        } else {
-            WorkflowServiceFactory.getInstance().getWorkflowService().start(context, wsItem);
-        }
     }
 
     /**
