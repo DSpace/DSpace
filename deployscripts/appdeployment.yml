@@ -84,6 +84,9 @@
   shell: "curl -s -n 'http://localhost:9080/manager/text/undeploy?path=/{{kunde}}-solr'"
 
 - name: Look for database migrations
+  shell: "/brage/{{ kunde }}/app/bin/dspace map-workflows"
+
+- name: Look for database migrations
   shell: "/brage/{{ kunde }}/app/bin/dspace database info"
   register: dbinfo
 
