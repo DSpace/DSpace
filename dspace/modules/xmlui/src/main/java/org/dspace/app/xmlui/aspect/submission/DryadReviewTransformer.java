@@ -5,7 +5,10 @@ import org.apache.cocoon.ProcessingException;
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.environment.SourceResolver;
+import org.apache.cocoon.environment.http.HttpEnvironment;
+import org.apache.cocoon.environment.http.HttpResponse;
 import org.apache.log4j.Logger;
+import org.datadryad.api.DashService;
 import org.datadryad.api.DryadJournalConcept;
 import org.dspace.JournalUtils;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
@@ -19,10 +22,12 @@ import org.dspace.content.Collection;
 import org.dspace.content.DCValue;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.identifier.DOIIdentifierProvider;
 import org.dspace.identifier.IdentifierNotFoundException;
 import org.dspace.identifier.IdentifierNotResolvableException;
 import org.dspace.utils.DSpace;
+import org.dspace.workflow.ClaimedTask;
 import org.dspace.workflow.DryadWorkflowUtils;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowRequirementsManager;
@@ -35,7 +40,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.dspace.workflow.ClaimedTask;
+import javax.servlet.http.HttpServletResponse;
+
 
 /**
  * User: kevin (kevin at atmire.com)
@@ -63,7 +69,7 @@ public class DryadReviewTransformer extends AbstractDSpaceTransformer {
     private boolean authorized;
     private boolean currentlyInReview;
     private String requestDoi;
-
+    
     @Override
     public void setup(SourceResolver resolver, Map objectModel, String src, Parameters parameters) throws ProcessingException, SAXException, IOException {
         super.setup(resolver, objectModel, src, parameters);
@@ -78,15 +84,34 @@ public class DryadReviewTransformer extends AbstractDSpaceTransformer {
 
         requestDoi = request.getParameter("doi");
         if(requestDoi != null) {
-            authorized = true;
-            loadWFItemByDOI(requestDoi);
-            if(wfItem == null) {
-                // Not found
+            String dryadSystem = ConfigurationManager.getProperty("dryad.system");
+            if (dryadSystem != null && dryadSystem.toLowerCase().equals("dash")) {   
+
+                // get redirectURL from DASH
+                DashService dashService = new DashService();
+                String redirectURL = dashService.getSharingLink(requestDoi);
+                log.debug("redirectURL from Dash is " + redirectURL);
+                if(redirectURL == null || redirectURL.length() == 0) {
+                    // assume the item is published
+                    redirectURL = ConfigurationManager.getProperty("dash.server") + "/stash/dataset/" + requestDoi;
+                }
+
+                HttpServletResponse httpResponse = (HttpServletResponse)
+                    objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
+                httpResponse.sendRedirect(redirectURL);
                 return;
+            } else {
+                // continue to classic Dryad page
+                authorized = true;
+                loadWFItemByDOI(requestDoi);
+                if(wfItem == null) {
+                    // Not found
+                    return;
+                }
+                // DOI was found. Set authorized true and the reviewerToken for downloads
+                String reviewerKey = getItemToken();
+                request.getSession().setAttribute("reviewerToken", reviewerKey);
             }
-            // DOI was found. Set authorized true and the reviewerToken for downloads
-            String reviewerKey = getItemToken();
-            request.getSession().setAttribute("reviewerToken", reviewerKey);
         } else {
             requestDoi = "";
             // DOI not present, require token
