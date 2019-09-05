@@ -31,7 +31,8 @@
 <%@ page import="org.dspace.browse.BrowseIndex" %>
 <%@ page import="org.dspace.browse.BrowseInfo" %>
 <%@ page import="java.util.Map" %>
-<%
+    <%@ page import="org.dspace.services.factory.DSpaceServicesFactory" %>
+        <%
     // Is anyone logged in?
     EPerson user = (EPerson) request.getAttribute("dspace.current.user");
 
@@ -104,6 +105,12 @@
 				<%-- Insert the dynamic browse indices here --%>
 				
 				<%
+				    int topPublicationsCount = DSpaceServicesFactory.getInstance().getConfigurationService().getIntProperty("jsp.view.top_publications_count");
+				    int topAuthorsCount = DSpaceServicesFactory.getInstance().getConfigurationService().getIntProperty("jsp.view.top_authors_count");
+
+				    request.setAttribute("topPublicationsCount", topPublicationsCount);
+				    request.setAttribute("topAuthorsCount", topAuthorsCount);
+
 					for (int i = 0; i < bis.length; i++)
 					{
 						BrowseIndex bix = bis[i];
@@ -118,8 +125,17 @@
                 <li class="divider"></li>
                 <li><a href="<%= request.getContextPath() %>/recent-items"><fmt:message key="jsp.collection-home.recentsub"/></a></li>
                 <li><a href="<%= request.getContextPath() %>/faq"><fmt:message key="jsp.layout.navbar-default.faq"/></a></li>
-                <li><a href="<%= request.getContextPath() %>/top-publications"><fmt:message key="jsp.top50items"/></a></li>
+                <li><a href="<%= request.getContextPath() %>/top-publications">
+                    <fmt:message key="jsp.top50items">
+                        <fmt:param value="${topPublicationsCount}"/>
+                    </fmt:message>
+                </a></li>
 
+                <li><a href="<%= request.getContextPath() %>/top-authors">
+                <fmt:message key="jsp.top10authors">
+                    <fmt:param value="${topAuthorsCount}"/>
+                </fmt:message>
+                </a></li>
     </ul>
           </li>
           <li class="<%= ( currentPage.endsWith( "/help" ) ? "active" : "" ) %>"><dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") %>"><fmt:message key="jsp.layout.navbar-default.help"/></dspace:popup></li>

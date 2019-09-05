@@ -878,6 +878,11 @@
 
     <servlet-mapping>
         <servlet-name>Spring MVC Servlet</servlet-name>
+        <url-pattern>/top-authors</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>Spring MVC Servlet</servlet-name>
         <url-pattern>/top-publications</url-pattern>
     </servlet-mapping>
 

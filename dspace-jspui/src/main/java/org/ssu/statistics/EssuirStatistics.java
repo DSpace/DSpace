@@ -4,15 +4,18 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
+import org.jooq.lambda.Seq;
 import org.springframework.stereotype.Service;
+
+import org.ssu.entity.AuthorLocalization;
 import org.ssu.localization.AuthorsCache;
 import org.ssu.repository.MetadatavalueRepository;
 
 import javax.annotation.Resource;
-import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -25,6 +28,9 @@ public class EssuirStatistics {
 
     @Resource
     private MetadatavalueRepository metadatavalueRepository;
+
+    @Resource
+    private AuthorsCache authorsCache;
 
     @Resource
     private DSLContext dsl;
@@ -100,7 +106,7 @@ public class EssuirStatistics {
                 .collect(Collectors.toMap(item -> item.get(STATISTICS.itemId), item -> item.get(DSL.sum(STATISTICS.viewCount)).longValue()));
     }
 
-    public List<org.ssu.entity.Item> topPublications(int limit) throws SQLException {
+    public List<org.ssu.entity.Item> topPublications(int limit) {
         List<Pair<Integer, Long>> downloads = getDownloadsStatistics().entrySet()
                 .stream()
                 .sorted((a, b) -> b.getValue().compareTo(a.getValue()))
@@ -115,6 +121,24 @@ public class EssuirStatistics {
                         .withName(metadatavalueRepository.getItemTitleByItemId(item.getKey()))
                         .withLink(metadatavalueRepository.getItemLinkByItemId(item.getKey()))
                         .build())
+                .collect(Collectors.toList());
+    }
+
+    public List<Pair<AuthorLocalization, Long>> topAuthors(int limit) {
+        Map<Integer, Long> downloads = getDownloadsStatistics();
+        List<Pair<String, Integer>> authors = metadatavalueRepository.getItemAuthorAndItemIdMapping();
+        Map<String, Long> collect = authors.stream()
+                .collect(Collectors.toMap(Pair::getKey,
+                        author -> downloads.getOrDefault(author.getValue(), 0L),
+                        (a, b) -> a + b));
+
+        return Seq.seq(collect.entrySet())
+                .sorted((a, b) -> b.getValue().compareTo(a.getValue()))
+                .limit(5 * limit)
+                .map(item -> Pair.of(authorsCache.getAuthorLocalization(item.getKey()), item.getValue()))
+                .filter(item -> !item.getKey().getSurname(Locale.ENGLISH).toLowerCase().contains("litnarovych"))
+                .distinct(Pair::getKey)
+                .limit(limit)
                 .collect(Collectors.toList());
     }
 
