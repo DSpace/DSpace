@@ -198,4 +198,44 @@ public class ViewEventRestRepositoryIT extends AbstractControllerIntegrationTest
                    .andExpect(status().isBadRequest());
 
     }
+
+    @Test
+    public void postTestWrongTargetTypeBadRequestException() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
+
+        //2. Three public items that are readable by Anonymous with different subjects
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                                      .withTitle("Public item 1")
+                                      .withIssueDate("2017-10-17")
+                                      .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                                      .withSubject("ExtraEntry")
+                                      .build();
+
+        context.restoreAuthSystemState();
+
+        ViewEventRest viewEventRest = new ViewEventRest();
+        viewEventRest.setTargetType("aezazeaezea");
+        viewEventRest.setTargetId(publicItem1.getID());
+
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        getClient().perform(post("/api/statistics/viewevents")
+                                .content(mapper.writeValueAsBytes(viewEventRest))
+                                .contentType(contentType))
+                   .andExpect(status().isBadRequest());
+
+    }
 }

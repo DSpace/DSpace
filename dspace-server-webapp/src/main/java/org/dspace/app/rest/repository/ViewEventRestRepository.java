@@ -9,6 +9,7 @@ package org.dspace.app.rest.repository;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Locale;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -47,7 +48,8 @@ public class ViewEventRestRepository extends AbstractDSpaceRestRepository {
         } catch (IOException e1) {
             throw new UnprocessableEntityException("Error parsing request body", e1);
         }
-        if (viewEventRest.getTargetId() == null || StringUtils.isBlank(viewEventRest.getTargetType())) {
+        if (viewEventRest.getTargetId() == null || StringUtils.isBlank(viewEventRest.getTargetType()) ||
+            !Arrays.asList(Constants.typeText).contains(viewEventRest.getTargetType().toUpperCase())) {
             throw new DSpaceBadRequestException("The given ViewEvent was invalid, one or more properties are either" +
                                                     "wrong or missing");
         }
