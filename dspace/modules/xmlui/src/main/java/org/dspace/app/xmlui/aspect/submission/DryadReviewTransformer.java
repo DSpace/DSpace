@@ -69,7 +69,6 @@ public class DryadReviewTransformer extends AbstractDSpaceTransformer {
     private boolean authorized;
     private boolean currentlyInReview;
     private String requestDoi;
-    private ObjectMapper mapper = null;
     
     @Override
     public void setup(SourceResolver resolver, Map objectModel, String src, Parameters parameters) throws ProcessingException, SAXException, IOException {
@@ -94,7 +93,7 @@ public class DryadReviewTransformer extends AbstractDSpaceTransformer {
                 log.debug("redirectURL from Dash is " + redirectURL);
                 if(redirectURL == null || redirectURL.length() == 0) {
                     // assume the item is published
-                    redirectURL = "https://datadryad.org/stash/dataset/" + requestDoi;
+                    redirectURL = ConfigurationManager.getProperty("dash.server") + "/stash/dataset/" + requestDoi;
                 }
 
                 HttpServletResponse httpResponse = (HttpServletResponse)

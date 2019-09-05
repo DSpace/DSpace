@@ -143,7 +143,7 @@ public class DashService {
 
         try {
             doi = URLEncoder.encode(doi, "UTF-8");
-            URL url = new URL(dashServer + "/api/datasets/" + doi);
+            URL url = new URL(dashServer + "/api/v2/datasets/" + doi);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
             connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
@@ -175,7 +175,7 @@ public class DashService {
 
         try {
             String manu = URLEncoder.encode(manuscriptNumber, "UTF-8");
-            URL url = new URL(dashServer + "/api/datasets?manuscriptNumber=" + manu);
+            URL url = new URL(dashServer + "/api/v2/datasets?manuscriptNumber=" + manu);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
             connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
@@ -239,6 +239,7 @@ public class DashService {
       For items in review status, get the DASH sharingLink.
      */
     public String getSharingLink(String doi) {
+        log.debug("getting sharingLink for " + doi);
         String sharingLink = null;
         // call dash API and get the link
         String json = getDashJSON(doi);
@@ -283,7 +284,7 @@ public class DashService {
         try {
             String versionlessDOI = pkg.getDataPackage().getVersionlessIdentifier();
             String encodedDOI = URLEncoder.encode(versionlessDOI, "UTF-8");
-            URL url = new URL(dashServer + "/api/datasets/" + encodedDOI);
+            URL url = new URL(dashServer + "/api/v2/datasets/" + encodedDOI);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
             connection.setRequestProperty("Accept", "application/json");
@@ -483,7 +484,7 @@ public class DashService {
                     String dashJSON = dryadBitstream.getDashReferenceJSON();
                     log.debug("Got JSON object: " + dashJSON);
                     String encodedPackageDOI = URLEncoder.encode(dataPackage.getVersionlessIdentifier(), "UTF-8");
-                    URL url = new URL(dashServer + "/api/datasets/" + encodedPackageDOI + "/urls");
+                    URL url = new URL(dashServer + "/api/v2/datasets/" + encodedPackageDOI + "/urls");
                     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                     connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
                     connection.setRequestProperty("Accept", "application/json");
@@ -581,7 +582,7 @@ public class DashService {
             provenances.size() > 0) {
             int unsubmittedID = curationActivities.get(0).get("id").intValue();
             try {
-                URL url = new URL(dashServer + "/api/curation_activity/" + unsubmittedID);
+                URL url = new URL(dashServer + "/api/v2/curation_activity/" + unsubmittedID);
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                 connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
                 connection.setRequestProperty("Accept", "application/json");
@@ -621,7 +622,7 @@ public class DashService {
 
         try {
             String encodedDOI = URLEncoder.encode(doi, "UTF-8");
-            URL url = new URL(dashServer + "/api/datasets/" + encodedDOI);
+            URL url = new URL(dashServer + "/api/v2/datasets/" + encodedDOI);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestProperty("Content-Type", "application/json-patch+json; charset=UTF-8");
             connection.setRequestProperty("Authorization", "Bearer " + oauthToken);
@@ -695,7 +696,7 @@ public class DashService {
             String dashJSON = mapper.writeValueAsString(node);
             log.debug("curation activity json is " + dashJSON);
             String encodedDOI = URLEncoder.encode(dashDatasetDOI, "UTF-8");
-            URL url = new URL(dashServer + "/api/datasets/" + encodedDOI + "/curation_activity");
+            URL url = new URL(dashServer + "/api/v2/datasets/" + encodedDOI + "/curation_activity");
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
             connection.setRequestProperty("Accept", "application/json");
@@ -741,7 +742,7 @@ public class DashService {
         
         try {
             String encodedDOI = URLEncoder.encode(pkg.getDataPackage().getVersionlessIdentifier(), "UTF-8");
-            URL url = new URL(dashServer + "/api/datasets/" + encodedDOI + "/versions");
+            URL url = new URL(dashServer + "/api/v2/datasets/" + encodedDOI + "/versions");
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
             connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
@@ -802,7 +803,7 @@ public class DashService {
     public JsonNode getCurationActivity(Package pkg) {
         try {
             String encodedDOI = URLEncoder.encode(pkg.getDataPackage().getVersionlessIdentifier(), "UTF-8");
-            URL url = new URL(dashServer + "/api/datasets/" + encodedDOI + "/curation_activity");
+            URL url = new URL(dashServer + "/api/v2/datasets/" + encodedDOI + "/curation_activity");
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
             connection.setRequestProperty("Accept", "application/json");
@@ -833,7 +834,7 @@ public class DashService {
         EPerson eperson = dryadDataPackage.getSubmitter();
         if (dryadDataPackage.getItem() != null) {
             try {
-                URI uri = UriBuilder.fromUri(dashServer + "/api/users/").queryParam("ePersonId", Integer.toString(eperson.getID())).build();
+                URI uri = UriBuilder.fromUri(dashServer + "/api/v2/users/").queryParam("ePersonId", Integer.toString(eperson.getID())).build();
                 log.debug("URL is " + uri.toURL());
                 HttpURLConnection connection = (HttpURLConnection) uri.toURL().openConnection();
                 connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
@@ -872,7 +873,7 @@ public class DashService {
 
         try {
             String encodedDOI = URLEncoder.encode(pkg.getDataPackage().getVersionlessIdentifier(), "UTF-8");
-            URL url = new URL(dashServer + "/api/datasets/" + encodedDOI + "/internal_data");
+            URL url = new URL(dashServer + "/api/v2/datasets/" + encodedDOI + "/internal_data");
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
             connection.setRequestProperty("Accept", "application/json");
@@ -1013,7 +1014,7 @@ public class DashService {
 
         try {
             String encodedDOI = URLEncoder.encode(pkg.getDataPackage().getVersionlessIdentifier(), "UTF-8");
-            URL url = new URL(dashServer + "/api/datasets/" + encodedDOI + "/" + requestType + "_internal_datum");
+            URL url = new URL(dashServer + "/api/v2/datasets/" + encodedDOI + "/" + requestType + "_internal_datum");
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
             connection.setRequestProperty("Accept", "application/json");
@@ -1080,7 +1081,7 @@ public class DashService {
         ArrayList<DryadDataPackage> dryadDataPackages = new ArrayList<>();
 
         try {
-            URIBuilder ub = new URIBuilder(dashServer + "/api/datasets/");
+            URIBuilder ub = new URIBuilder(dashServer + "/api/v2/datasets/");
             for (String param : queryPairs.keySet()) {
                 ub.addParameter(param, queryPairs.get(param));
             }
