@@ -50,7 +50,8 @@ public class RelationshipMetadataServiceImpl implements RelationshipMetadataServ
                 List<Relationship> relationships = relationshipService.findByItem(context, item);
                 for (Relationship relationship : relationships) {
                     fullMetadataValueList
-                        .addAll(handleItemRelationship(context, item, entityType, relationship, enableVirtualMetadata));
+                        .addAll(findRelationshipMetadataValueForItemRelationship(context, item, entityType,
+                                relationship, enableVirtualMetadata));
                 }
 
             }
@@ -73,11 +74,23 @@ public class RelationshipMetadataServiceImpl implements RelationshipMetadataServ
         return null;
     }
 
-    //This method processes the Relationship of an Item and will return a list of RelationshipMetadataValue objects
-    //that are generated for this specfic relationship for the item through the config in VirtualMetadataPopulator
-    private List<RelationshipMetadataValue> handleItemRelationship(Context context, Item item, String entityType,
-                                                                   Relationship relationship,
-                                                                   boolean enableVirtualMetadata)
+    /**
+     * This method processes one Relationship of an Item and will return a list of RelationshipMetadataValue objects
+     * that are generated for this specific relationship for the item through the config in VirtualMetadataPopulator
+     *
+     * It returns a combination of the output of the findVirtualMetadataFromConfiguration method and
+     *
+     * @param context               The context
+     * @param item                  The item whose virtual metadata is requested
+     * @param entityType            The entity type of the given item
+     * @param relationship          The relationship whose virtual metadata is requested
+     * @param enableVirtualMetadata Determines whether the VirtualMetadataPopulator should be used.
+     *                              If false, only the relation."relationname" metadata is populated
+     *                              If true, fields from the spring config virtual metadata is included as well
+     * @return                      The list of virtual metadata values
+     */
+    private List<RelationshipMetadataValue> findRelationshipMetadataValueForItemRelationship(
+            Context context, Item item, String entityType, Relationship relationship, boolean enableVirtualMetadata)
         throws SQLException {
         List<RelationshipMetadataValue> resultingMetadataValueList = new LinkedList<>();
         RelationshipType relationshipType = relationship.getRelationshipType();
@@ -106,7 +119,7 @@ public class RelationshipMetadataServiceImpl implements RelationshipMetadataServ
         }
 
         if (hashMaps != null && enableVirtualMetadata) {
-            resultingMetadataValueList.addAll(handleRelationshipTypeMetadataMapping(context, item, hashMaps,
+            resultingMetadataValueList.addAll(findVirtualMetadataFromConfiguration(context, item, hashMaps,
                                                                                     otherItem, relationName,
                                                                                     relationship, place, isLeftwards));
         }
@@ -118,10 +131,24 @@ public class RelationshipMetadataServiceImpl implements RelationshipMetadataServ
         return resultingMetadataValueList;
     }
 
-    //This method will retrieve a list of RelationshipMetadataValue objects based on the config passed along in the
-    //hashmaps parameter. The beans will be used to retrieve the values for the RelationshipMetadataValue objects
-    //and the keys of the hashmap will be used to construct the RelationshipMetadataValue object.
-    private List<RelationshipMetadataValue> handleRelationshipTypeMetadataMapping(Context context, Item item,
+    /**
+     * This method will retrieve a list of RelationshipMetadataValue objects based on the config passed along in the
+     * hashmaps parameter. The beans will be used to retrieve the values for the RelationshipMetadataValue objects
+     * and the keys of the hashmap will be used to construct the RelationshipMetadataValue object.
+     *
+     * @param context               The context
+     * @param item                  The item whose virtual metadata is requested
+     * @param hashMaps              The list of VirtualMetadataConfiguration objects which will generate the
+     *                              virtual metadata. These configurations are applicable for a relationship
+     *                              between both items
+     * @param otherItem             The related item whose actual metadata is requested
+     * @param relationName          The name of the relationship
+     * @param relationship          The relationship whose virtual metadata is requested
+     * @param place                 The place to use in the virtual metadata
+     * @param isLeftwards           Determines the direction of the virtual metadata
+     * @return                      The list of virtual metadata values
+     */
+    private List<RelationshipMetadataValue> findVirtualMetadataFromConfiguration(Context context, Item item,
         HashMap<String, VirtualMetadataConfiguration> hashMaps, Item otherItem, String relationName,
         Relationship relationship, int place, boolean isLeftwards) throws SQLException {
 
@@ -137,20 +164,37 @@ public class RelationshipMetadataServiceImpl implements RelationshipMetadataServ
                         constructRelationshipMetadataValue(context, item, relationship.getID(), place, key, virtualBean,
                                                            wardLabel));
                 } else {
-                    handleVirtualBeanValues(context, item, otherItem, relationship, place, resultingMetadataValueList,
-                                            key, virtualBean);
+                    resultingMetadataValueList.addAll(
+                            handleVirtualBeanValues(context, item, otherItem, relationship, place, key, virtualBean));
                 }
             } else {
-                handleVirtualBeanValues(context, item, otherItem, relationship, place, resultingMetadataValueList, key,
-                                        virtualBean);
+                resultingMetadataValueList.addAll(
+                        handleVirtualBeanValues(context, item, otherItem, relationship, place, key, virtualBean));
             }
         }
         return resultingMetadataValueList;
     }
 
-    private void handleVirtualBeanValues(Context context, Item item, Item otherItem, Relationship relationship,
-                                         int place, List<RelationshipMetadataValue> resultingMetadataValueList,
-                                         String key, VirtualMetadataConfiguration virtualBean) throws SQLException {
+    /**
+     * This method will retrieve a list of RelationshipMetadataValue objects based on the config passed along in the
+     * hashmaps parameter. The beans will be used to retrieve the values for the RelationshipMetadataValue objects
+     * and the keys of the hashmap will be used to construct the RelationshipMetadataValue object.
+     *
+     * @param context               The context
+     * @param item                  The item whose virtual metadata is requested
+     * @param otherItem             The related item whose actual metadata is requested
+     * @param relationship          The relationship whose virtual metadata is requested
+     * @param place                 The place to use in the virtual metadata
+     * @param key                   The key corresponding to the VirtualMetadataConfiguration
+     * @param virtualBean           The VirtualMetadataConfiguration object which will generate the
+     *                              virtual metadata. This configuration is applicable for a relationship
+     *                              between both items
+     * @return                      The list of virtual metadata values
+     */
+    private List<RelationshipMetadataValue> handleVirtualBeanValues(
+            Context context, Item item, Item otherItem, Relationship relationship, int place,
+            String key, VirtualMetadataConfiguration virtualBean) throws SQLException {
+        List<RelationshipMetadataValue> resultingMetadataValueList = new LinkedList<>();
         for (String value : virtualBean.getValues(context, otherItem)) {
             RelationshipMetadataValue relationshipMetadataValue = constructRelationshipMetadataValue(context, item,
                                                                                                      relationship
@@ -162,6 +206,7 @@ public class RelationshipMetadataServiceImpl implements RelationshipMetadataServ
                 resultingMetadataValueList.add(relationshipMetadataValue);
             }
         }
+        return resultingMetadataValueList;
     }
 
     private RelationshipMetadataValue constructRelationshipMetadataValue(Context context, Item item,
