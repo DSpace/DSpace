@@ -187,6 +187,7 @@ public class MetadataImport {
             int rowCount = 1;
             for (DSpaceCSVLine line : toImport) {
                 //Resolve references to other items
+                populateRefAndRowMap(line, rowCount, null);
                 line = resolveEntityRefs(line);
                 // Get the DSpace item to compare with
                 UUID id = line.getID();
