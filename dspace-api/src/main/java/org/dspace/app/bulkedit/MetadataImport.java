@@ -790,8 +790,10 @@ public class MetadataImport {
      *                                          for the right entity
      * @param relationshipType                  The RelationshipType object that we want to check whether it's
      *                                          valid to be added or not
-     * @return A boolean indicating whether the relationship is left or right, will
-     *                                          be false in this case
+     * @return                                  A boolean indicating whether the relationship is left or right.
+     *                                          Will be set to false if the relationship is valid.
+     *                                          Will remain unmodified from the left parameter if the
+     *                                          relationship is not valid.
      * @throws SQLException                     If something goes wrong
      */
     private boolean verifyValidRightwardRelationshipType(Context c, Entity entity,
@@ -834,8 +836,10 @@ public class MetadataImport {
      *                                          for the left entity
      * @param relationshipType                  The RelationshipType object that we want to check whether it's
      *                                          valid to be added or not
-     * @return A boolean indicating whether the relationship is left or right, will
-     *                                          be true in this case
+     * @return                                  A boolean indicating whether the relationship is left or right.
+     *                                          Will be set to true if the relationship is valid.
+     *                                          Will remain unmodified from the left parameter if the
+     *                                          relationship is not valid.
      * @throws SQLException                     If something goes wrong
      */
     private boolean verifyValidLeftwardRelationshipType(Context c, Entity entity,
