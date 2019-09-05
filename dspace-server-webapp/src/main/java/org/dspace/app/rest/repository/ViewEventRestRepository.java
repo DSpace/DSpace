@@ -10,18 +10,14 @@ package org.dspace.app.rest.repository;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Locale;
-import java.util.UUID;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
-import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.ViewEventRest;
-import org.dspace.app.rest.model.hateoas.DSpaceResource;
-import org.dspace.app.rest.model.hateoas.ViewEventResource;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.factory.ContentServiceFactory;
@@ -31,29 +27,17 @@ import org.dspace.core.Context;
 import org.dspace.services.EventService;
 import org.dspace.usage.UsageEvent;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 @Component(ViewEventRest.CATEGORY + "." + ViewEventRest.NAME)
-public class ViewEventRestRepository extends DSpaceRestRepository<ViewEventRest, UUID> {
+public class ViewEventRestRepository extends AbstractDSpaceRestRepository {
 
     @Autowired
     private EventService eventService;
 
-    public ViewEventRest findOne(Context context, UUID uuid) {
-        throw new RepositoryMethodNotImplementedException("No implementation found; Method not allowed!", "");
-    }
+    public ViewEventRest createViewEvent() throws AuthorizeException, SQLException {
 
-    public Page<ViewEventRest> findAll(Context context, Pageable pageable) {
-        throw new RepositoryMethodNotImplementedException("No implementation found; Method not allowed!", "");
-    }
-
-
-    @Override
-    protected ViewEventRest createAndReturn(Context context)
-        throws AuthorizeException, SQLException {
-
+        Context context = obtainContext();
         HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
         ObjectMapper mapper = new ObjectMapper();
         ViewEventRest viewEventRest = null;
@@ -78,13 +62,5 @@ public class ViewEventRestRepository extends DSpaceRestRepository<ViewEventRest,
         UsageEvent usageEvent = new UsageEvent(UsageEvent.Action.VIEW, req, context, dSpaceObject);
         eventService.fireEvent(usageEvent);
         return viewEventRest;
-    }
-
-    public Class<ViewEventRest> getDomainClass() {
-        return ViewEventRest.class;
-    }
-
-    public DSpaceResource<ViewEventRest> wrapResource(ViewEventRest model, String... rels) {
-        return new ViewEventResource(model, utils, rels);
     }
 }
