@@ -20,7 +20,6 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.statistics.ObjectCount;
-import org.dspace.usage.RestUsageSearchEvent;
 import org.dspace.usage.UsageWorkflowEvent;
 
 /**
