@@ -279,8 +279,7 @@ jsp.search.results.searchin<%= StringUtils.isNotBlank(searchScope) && !StringUti
 <%
 String dsoName = "";
 if(StringUtils.contains(searchScope, hdlPrefix) ){
-	String hdl = StringUtils.substring(searchScope, 8);
-	DSpaceObject dso = HandleManager.resolveToObject(UIUtil.obtainContext(request),hdl );
+	DSpaceObject dso = HandleManager.resolveToObject(UIUtil.obtainContext(request),searchScope);
 	dsoName = (dso != null) ? dso.getName() :"";
 }
 %>
