@@ -347,9 +347,10 @@ public class DashService {
         log.debug("-- embargoType " + embargoType);
         log.debug("-- embargoDate " + embargoDate);
 
-        // exit early if the there is no date, the item was published before the cutoff date and the embargo isn't "custom"
+        // exit early if the there is no embargo date, the item was published before the cutoff date and the embargo isn't "custom"
+        String pubDate = ddp.getPublicationDate();
         if(!embargoType.equals("custom") &&
-           (embargoDate == null || embargoDate.length() == 0) &&
+           embargoDate == null &&
            ddp.getPublicationDate().compareTo("2018-09") < 0) {
             return;
         }
