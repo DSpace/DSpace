@@ -21,6 +21,7 @@ import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.log4j.Logger;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
@@ -529,8 +530,7 @@ public class DOIOrganiser {
             {
                 sendAlertMail("Register", dso,
                               DOI.SCHEME + doiRow.getStringColumn("doi"),
-                              doiIdentifierException.codeToString(doiIdentifierException
-                                                                    .getCode())); 
+                              ExceptionUtils.getStackTrace(doiIdentifierException));
             }
             catch (IOException ioe) 
             {
@@ -612,8 +612,7 @@ public class DOIOrganiser {
             {
                 sendAlertMail("Reserve", dso,
                               DOI.SCHEME + doiRow.getStringColumn("doi"),
-                              DOIIdentifierException.codeToString(
-                                    doiIdentifierException.getCode()));
+                              ExceptionUtils.getStackTrace(doiIdentifierException));
             } 
             catch (IOException ioe) 
             {
@@ -691,8 +690,7 @@ public class DOIOrganiser {
             {
                 sendAlertMail("Update", dso,
                               DOI.SCHEME + doiRow.getStringColumn("doi"),
-                              doiIdentifierException.codeToString(doiIdentifierException
-                                                                    .getCode()));
+                              ExceptionUtils.getStackTrace(doiIdentifierException));
             } 
             catch (IOException ioe) 
             {
