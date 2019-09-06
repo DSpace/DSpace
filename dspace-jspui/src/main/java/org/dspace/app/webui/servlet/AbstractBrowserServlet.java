@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
@@ -84,6 +85,10 @@ public abstract class AbstractBrowserServlet extends DSpaceServlet
         {
             // first, lift all the stuff out of the request that we might need
             String type = request.getParameter("type");
+            // mandatory request parameters
+            if(StringUtils.isBlank(type)) {
+            	return null;
+            }
             String order = request.getParameter("order");
             String value = request.getParameter("value");
             String valueLang = request.getParameter("value_lang");

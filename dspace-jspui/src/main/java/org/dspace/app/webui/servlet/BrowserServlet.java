@@ -82,7 +82,7 @@ public class BrowserServlet extends AbstractBrowserServlet
                 requestURL += "?" + request.getQueryString();
             }
             log.warn("We were unable to parse the browse request (e.g. an unconfigured index or sort option was used). Will send a 400 Bad Request. Requested URL was: " + requestURL);
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+            JSPManager.showIntegrityError(request, response);
             return;
         }
 

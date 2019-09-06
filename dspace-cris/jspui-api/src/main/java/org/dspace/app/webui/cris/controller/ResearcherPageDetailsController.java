@@ -46,6 +46,8 @@ import org.dspace.content.authority.AuthorityDAOFactory;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
+import org.dspace.discovery.BadRequestSearchServiceException;
+import org.dspace.discovery.SearchServiceException;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.statistics.SolrLogger;
@@ -381,8 +383,16 @@ public class ResearcherPageDetailsController
             HttpServletResponse response, Exception ex, String objectId)
             throws IOException, ServletException
     {
-        JSPManager.showAuthorizeError(request, response,
-                new AuthorizeException(ex.getMessage()));
+    	if(ex instanceof BadRequestSearchServiceException) {
+            JSPManager.showIntegrityError(request, response);
+    	}
+    	else if(ex instanceof SearchServiceException) {
+            JSPManager.showInternalError(request, response);
+    	}
+    	else {
+            JSPManager.showAuthorizeError(request, response,
+                    new AuthorizeException(ex.getMessage()));    		
+    	}
     }
     
     protected Integer getRealPersistentIdentifier(String persistentIdentifier)
