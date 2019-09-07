@@ -335,6 +335,8 @@ public class DashService {
     public void setEmbargoStatus(Package pkg) {
         log.debug("setting embargo status for this package");
         SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-dd'T'HH:mm:ss.SSSZ");
+        SimpleDateFormat verysdf = new SimpleDateFormat("yyyy-MM-dd");
+        
         DryadDataPackage ddp = pkg.getDataPackage();
         String curationStatus = ddp.getCurationStatusForDash();
         log.debug("-- curationStatus " + curationStatus);
@@ -344,6 +346,14 @@ public class DashService {
         Date embargoDate = ddp.getPackageEmbargoDate();
         log.debug("-- embargoType " + embargoType);
         log.debug("-- embargoDate " + embargoDate);
+
+        // exit early if the there is no embargo date, the item was published before the cutoff date and the embargo isn't "custom"
+        String pubDate = ddp.getPublicationDate();
+        if(!embargoType.equals("custom") &&
+           embargoDate == null &&
+           ddp.getPublicationDate().compareTo("2018-09") < 0) {
+            return;
+        }
 
         if(curationStatus.equals("published") || curationStatus.equals("embargoed")) {
             // if it's published or embargoed, and a file is still under embargo, set the
