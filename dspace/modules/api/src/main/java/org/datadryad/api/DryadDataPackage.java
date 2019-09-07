@@ -125,11 +125,16 @@ public class DryadDataPackage extends DryadObject {
     private static DashService dashService = null;
 
     static {
+        /*
+          Since we rearranged the interaction between Dryad Classic and Dash, this class should
+          always assume Dryad Classic.
+          
         String dryadSystem = ConfigurationManager.getProperty("dryad.system");
         if (dryadSystem != null && dryadSystem.toLowerCase().equals("dash")) {
             useDryadClassic = false;
             dashService = new DashService();
         }
+        */
     }
 
     public DryadDataPackage() {}

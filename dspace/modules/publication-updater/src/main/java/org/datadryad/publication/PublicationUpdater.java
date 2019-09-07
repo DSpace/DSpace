@@ -480,11 +480,17 @@ public class PublicationUpdater extends HttpServlet {
     }
 
     private boolean useDryadClassic() {
-        String dryadSystem = ConfigurationManager.getProperty("dryad.system");
+
         boolean useDryadClassic = true;
-        if (dryadSystem != null && dryadSystem.toLowerCase().equals("dash")) {
-            useDryadClassic = false;
-        }
+
+        // Since we moved active APU development directly into the Dash system,
+        // anyone calling this method definitely wants to use Dryad classic,
+        // regardless of the config.
+        // String dryadSystem = ConfigurationManager.getProperty("dryad.system");
+        //if (dryadSystem != null && dryadSystem.toLowerCase().equals("dash")) {
+        //            useDryadClassic = false;
+        //}
+        
         return useDryadClassic;
     }
 }
