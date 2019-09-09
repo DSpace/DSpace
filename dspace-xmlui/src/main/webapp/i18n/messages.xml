@@ -178,6 +178,7 @@
     <message key="xmlui.ArtifactBrowser.ConfigurableBrowse.etal.all">All</message>
 
     <message key="xmlui.ArtifactBrowser.ConfigurableBrowse.sort_by.title">title</message>
+    <message key="xmlui.ArtifactBrowser.ConfigurableBrowse.sort_by.author">author</message>
     <message key="xmlui.ArtifactBrowser.ConfigurableBrowse.sort_by.dateissued">issue date</message>
     <message key="xmlui.ArtifactBrowser.ConfigurableBrowse.sort_by.dateaccessioned">submit date</message>
 
