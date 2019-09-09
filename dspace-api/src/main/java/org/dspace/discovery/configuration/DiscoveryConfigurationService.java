@@ -78,9 +78,9 @@ public class DiscoveryConfigurationService {
 
     public List<DiscoveryConfiguration> getIndexAlwaysConfigurations() {
         List<DiscoveryConfiguration> configs = new ArrayList<>();
-        for(String key : map.keySet()) {
+        for (String key : map.keySet()) {
             DiscoveryConfiguration config = map.get(key);
-            if(config.isIndexAlways()) {
+            if (config.isIndexAlways()) {
                 configs.add(config);
             }
         }
