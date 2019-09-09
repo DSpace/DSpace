@@ -170,6 +170,9 @@ public class DSpaceCSV implements Serializable {
                 if ("collection".equals(element)) {
                     // Store the heading
                     headings.add(element);
+                }   else if ("rowName".equals(element)) {
+                    // Store the heading
+                    headings.add(element);
                 } else if ("action".equals(element)) { // Store the action
                     // Store the heading
                     headings.add(element);

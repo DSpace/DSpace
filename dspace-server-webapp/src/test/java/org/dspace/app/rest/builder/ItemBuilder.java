@@ -60,6 +60,10 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
                                 "date", "issued", new DCDate(issueDate).toString());
     }
 
+    public ItemBuilder withIdentifierOther(final String identifierOther) {
+        return addMetadataValue(item, MetadataSchemaEnum.DC.getName(), "identifier", "other", identifierOther);
+    }
+
     public ItemBuilder withAuthor(final String authorName) {
         return addMetadataValue(item, MetadataSchemaEnum.DC.getName(), "contributor", "author", authorName);
     }
