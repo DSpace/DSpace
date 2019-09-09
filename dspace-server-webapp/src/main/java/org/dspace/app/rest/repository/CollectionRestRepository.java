@@ -168,7 +168,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
 
     @Override
     protected CollectionRest createAndReturn(Context context) throws AuthorizeException {
-        throw new DSpaceBadRequestException("Missing parent parameter.");
+        throw new DSpaceBadRequestException("Cannot create a Collection without providing a parent Community.");
     }
 
     @Override
@@ -176,8 +176,8 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
     protected CollectionRest createAndReturn(Context context, UUID id) throws AuthorizeException {
 
         if (id == null) {
-            throw new DSpaceBadRequestException("The given parent parameter was invalid: "
-                + id);
+            throw new DSpaceBadRequestException("Parent Community UUID is null. " +
+                "Cannot create a Collection without providing a parent Community");
         }
 
         HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
@@ -187,8 +187,9 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
             ServletInputStream input = req.getInputStream();
             collectionRest = mapper.readValue(input, CollectionRest.class);
         } catch (IOException e1) {
-            throw new UnprocessableEntityException("Error parsing request body: " + e1.toString());
+            throw new UnprocessableEntityException("Error parsing request body.", e1);
         }
+
         Collection collection;
         try {
             Community parent = communityService.find(context, id);
@@ -200,8 +201,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
             cs.update(context, collection);
             metadataConverter.setMetadata(context, collection, collectionRest.getMetadata());
         } catch (SQLException e) {
-            throw new RuntimeException("Unable to create new Collection under parent Community " +
-                                           id, e);
+            throw new RuntimeException("Unable to create new Collection under parent Community " + id, e);
         }
         return converter.convert(collection);
     }

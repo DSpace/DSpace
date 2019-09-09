@@ -98,8 +98,8 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
     protected CommunityRest createAndReturn(Context context, UUID id) throws AuthorizeException {
 
         if (id == null) {
-            throw new DSpaceBadRequestException("The given parent parameter was invalid: "
-                + id);
+            throw new DSpaceBadRequestException("Parent Community UUID is null. " +
+                "Cannot create a SubCommunity without providing a parent Community.");
         }
 
         HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
@@ -109,7 +109,7 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
             ServletInputStream input = req.getInputStream();
             communityRest = mapper.readValue(input, CommunityRest.class);
         } catch (IOException e1) {
-            throw new UnprocessableEntityException("Error parsing request body: " + e1.toString());
+            throw new UnprocessableEntityException("Error parsing request body.", e1);
         }
 
         Community community;
