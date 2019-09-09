@@ -51,6 +51,15 @@ public class DiscoveryConfiguration implements InitializingBean {
     private DiscoveryHitHighlightingConfiguration hitHighlightingConfiguration;
     private DiscoveryMoreLikeThisConfiguration moreLikeThisConfiguration;
     private boolean spellCheckEnabled;
+    private boolean indexAlways = false;
+
+    public boolean isIndexAlways() {
+        return indexAlways;
+    }
+
+    public void setIndexAlways(boolean indexAlways) {
+        this.indexAlways = indexAlways;
+    }
 
     public String getId() {
         return id;
