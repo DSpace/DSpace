@@ -165,11 +165,13 @@ public class RelationshipMetadataServiceImpl implements RelationshipMetadataServ
                                                            wardLabel));
                 } else {
                     resultingMetadataValueList.addAll(
-                            handleVirtualBeanValues(context, item, otherItem, relationship, place, key, virtualBean));
+                            findRelationshipMetadataValueFromBean(context, item, otherItem, relationship, place, key,
+                                    virtualBean));
                 }
             } else {
                 resultingMetadataValueList.addAll(
-                        handleVirtualBeanValues(context, item, otherItem, relationship, place, key, virtualBean));
+                        findRelationshipMetadataValueFromBean(context, item, otherItem, relationship, place, key,
+                                virtualBean));
             }
         }
         return resultingMetadataValueList;
@@ -191,7 +193,7 @@ public class RelationshipMetadataServiceImpl implements RelationshipMetadataServ
      *                              between both items
      * @return                      The list of virtual metadata values
      */
-    private List<RelationshipMetadataValue> handleVirtualBeanValues(
+    private List<RelationshipMetadataValue> findRelationshipMetadataValueFromBean(
             Context context, Item item, Item otherItem, Relationship relationship, int place,
             String key, VirtualMetadataConfiguration virtualBean) throws SQLException {
         List<RelationshipMetadataValue> resultingMetadataValueList = new LinkedList<>();
