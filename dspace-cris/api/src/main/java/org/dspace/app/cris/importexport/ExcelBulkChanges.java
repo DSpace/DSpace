@@ -10,12 +10,13 @@ package org.dspace.app.cris.importexport;
 import java.util.ArrayList;
 import java.util.List;
 
-import jxl.Cell;
-import jxl.Sheet;
-import jxl.Workbook;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Row;
+import org.dspace.app.cris.util.UtilsXLS;
+
 
 public class ExcelBulkChanges implements IBulkChanges
 {
@@ -45,22 +46,24 @@ public class ExcelBulkChanges implements IBulkChanges
             HEADER_CRISID_PARENT, HEADER_SOURCEREF_PARENT, HEADER_SOURCEID_PARENT, HEADER_UUID, HEADER_SOURCEREF,
             HEADER_SOURCEID };
 	
-	private Sheet mainObjects;
-	private Sheet nestedObjects;
+	private HSSFSheet mainObjects;
+	private HSSFSheet nestedObjects;
 	
 	private List<String> mainHeaders = new ArrayList<String>();
 	private List<String> nestedHeaders = new ArrayList<String>();
 
-    public ExcelBulkChanges(Workbook workbook)
+    public ExcelBulkChanges(HSSFWorkbook workbook)
     {
-        Cell[] row;
+        Row row;
         this.mainObjects = workbook.getSheet("main_entities");
         this.nestedObjects = workbook.getSheet("nested_entities");
-        int column = 0;
         row = mainObjects.getRow(0);
-        while (column<row.length)
+        for (int column = 0; column<row.getLastCellNum() + 1; column++)
         {
-        	String cellContent = StringUtils.trim(row[column].getContents());
+        	if (row.getCell(column) == null)
+        		continue;
+        	
+        	String cellContent = UtilsXLS.stringCellValue(row.getCell(column)).trim();
             if (StringUtils.isNotBlank(cellContent))
             {
 				mainHeaders.add(cellContent);
@@ -73,7 +76,6 @@ public class ExcelBulkChanges implements IBulkChanges
                                     + " expected " + HEADER_COLUMNS[column]);
         		}        		
         	}    
-            column++;
         }
         
         if (mainHeaders.size() < HEADER_COLUMNS.length)
@@ -84,12 +86,14 @@ public class ExcelBulkChanges implements IBulkChanges
         
         if (nestedObjects != null)
         {
-	        column = 0;
 	        row = nestedObjects.getRow(0);
-	        while (column<row.length)
+	        for (int column = 0; column<row.getLastCellNum() + 1; column++)
 	        {
-                String cellContent = StringUtils
-                        .trim(row[column].getContents());
+	        	if (row.getCell(column) == null)
+	        		continue;
+	        	
+                String cellContent = UtilsXLS.
+                        stringCellValue(row.getCell(column)).trim();
                 if (StringUtils.isNotBlank(cellContent))
                 {
 	        		nestedHeaders.add(cellContent);
@@ -104,7 +108,6 @@ public class ExcelBulkChanges implements IBulkChanges
                                         + HEADER_NESTED_COLUMNS[column]);
 	        		}	        		
 	        	}
-                column++;
 	        }
 	        
             if (nestedHeaders.size() < HEADER_NESTED_COLUMNS.length)
@@ -125,22 +128,21 @@ public class ExcelBulkChanges implements IBulkChanges
 	@Override
     public int size()
     {
-        return mainObjects.getRows() - 1
-                + (nestedObjects != null ? nestedObjects.getRows() - 1 : 0);
+		return mainObjects.getLastRowNum() + (nestedObjects != null ? nestedObjects.getLastRowNum() : 0);
 	}
 
 	@Override
     public IBulkChange getChanges(int i)
     {
-        if (i < mainObjects.getRows())
+        if (i < mainObjects.getLastRowNum() + 1)
         {
             log.debug("Retrieve in entity sheet row #" + i);
             return new ExcelBulkChange(mainObjects.getRow(i), mainHeaders);
         }
         else
         {
-            log.debug("Retrieve in nested sheet row #" + (i - (mainObjects.getRows() - 1)));
-            return getNestedChanges((i - (mainObjects.getRows() - 1)));
+            log.debug("Retrieve in nested sheet row #" + (i - (mainObjects.getLastRowNum())));
+            return getNestedChanges((i - (mainObjects.getLastRowNum())));
         }
 		}
 
@@ -149,5 +151,4 @@ public class ExcelBulkChanges implements IBulkChanges
         log.debug("Retrieve in nested sheet row #" + (i));
         return new ExcelBulkChangeNested(nestedObjects.getRow(i), nestedHeaders);
 	}
-
 }

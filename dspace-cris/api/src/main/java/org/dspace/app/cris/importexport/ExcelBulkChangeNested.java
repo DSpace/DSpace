@@ -9,14 +9,14 @@ package org.dspace.app.cris.importexport;
 
 import java.util.List;
 
-import jxl.Cell;
-
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.ss.usermodel.Row;
+import org.dspace.app.cris.util.UtilsXLS;
 
 public class ExcelBulkChangeNested extends ExcelBulkChange implements IBulkChangeNested {
 
-	public ExcelBulkChangeNested(Cell[] row, List<String> nestedHeaders)
+	public ExcelBulkChangeNested(Row row, List<String> nestedHeaders)
     {
         super(row, nestedHeaders);
     }
@@ -24,13 +24,19 @@ public class ExcelBulkChangeNested extends ExcelBulkChange implements IBulkChang
     @Override
 	public String getSourceID() {
 		int pos = ArrayUtils.indexOf(ExcelBulkChanges.HEADER_NESTED_COLUMNS,ExcelBulkChanges.HEADER_SOURCEID);
-		return row[pos].getContents();
+		if (row.getCell(pos) != null)
+			return UtilsXLS.stringCellValue(row.getCell(pos));
+		else
+			return "";
 	}
 
 	@Override
 	public String getSourceRef() {
 		int pos = ArrayUtils.indexOf(ExcelBulkChanges.HEADER_NESTED_COLUMNS,ExcelBulkChanges.HEADER_SOURCEREF);
-		return row[pos].getContents();
+		if (row.getCell(pos) != null)
+			return UtilsXLS.stringCellValue(row.getCell(pos));
+		else
+			return "";
 	}
 
 	@Override
@@ -41,7 +47,10 @@ public class ExcelBulkChangeNested extends ExcelBulkChange implements IBulkChang
 	@Override
 	public String getUUID() {
 		int pos = ArrayUtils.indexOf(ExcelBulkChanges.HEADER_NESTED_COLUMNS,ExcelBulkChanges.HEADER_UUID);
-		return row[pos].getContents();
+		if (row.getCell(pos) != null)
+			return UtilsXLS.stringCellValue(row.getCell(pos));
+		else
+			return "";
 	}
 
 	@Override
@@ -53,21 +62,30 @@ public class ExcelBulkChangeNested extends ExcelBulkChange implements IBulkChang
     public String getParentSourceID()
     {
         int pos = ArrayUtils.indexOf(ExcelBulkChanges.HEADER_NESTED_COLUMNS,ExcelBulkChanges.HEADER_SOURCEID_PARENT);
-        return row[pos].getContents();
+        if (row.getCell(pos) != null)
+        	return UtilsXLS.stringCellValue(row.getCell(pos));
+        else
+        	return "";
     }
 
     @Override
     public String getParentSourceRef()
     {
         int pos = ArrayUtils.indexOf(ExcelBulkChanges.HEADER_NESTED_COLUMNS,ExcelBulkChanges.HEADER_SOURCEREF_PARENT);
-        return row[pos].getContents();
+        if (row.getCell(pos) != null)
+        	return UtilsXLS.stringCellValue(row.getCell(pos));
+        else
+        	return "";
     }
 
     @Override
     public String getParentCrisID()
     {
         int pos = ArrayUtils.indexOf(ExcelBulkChanges.HEADER_NESTED_COLUMNS,ExcelBulkChanges.HEADER_CRISID_PARENT);
-        return row[pos].getContents();
+        if (row.getCell(pos) != null)
+        	return UtilsXLS.stringCellValue(row.getCell(pos));
+        else
+        	return "";
     }
     
     @Override

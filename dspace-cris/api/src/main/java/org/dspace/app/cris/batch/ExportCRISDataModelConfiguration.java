@@ -30,9 +30,6 @@ import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
 
-import jxl.read.biff.BiffException;
-import jxl.write.WriteException;
-
 public class ExportCRISDataModelConfiguration
 {
     private static Logger log = Logger
@@ -41,8 +38,8 @@ public class ExportCRISDataModelConfiguration
     private static boolean append = false;
 
     public static void main(String[] args)
-            throws ParseException, SQLException, BiffException, IOException,
-            InstantiationException, IllegalAccessException, WriteException, IllegalArgumentException, InvocationTargetException
+            throws ParseException, SQLException, IOException,
+            InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException
     {
 		String fileExcel = null;
 		CommandLineParser parser = new PosixParser();
