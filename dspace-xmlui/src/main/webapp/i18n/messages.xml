@@ -703,6 +703,8 @@
     <message key="xmlui.Submission.Submissions.workflow_column3">Item</message>
     <message key="xmlui.Submission.Submissions.workflow_column4">Collection</message>
     <message key="xmlui.Submission.Submissions.workflow_column5">Submitter</message>
+    <message key="xmlui.Submission.Submissions.workflow_columnAuthor">Authors</message>
+    <message key="xmlui.Submission.Submissions.workflow_columnIssued">Date Issued</message>
     <message key="xmlui.Submission.Submissions.workflow_submit_return">Return selected tasks to the pool</message>
     <message key="xmlui.Submission.Submissions.workflow_info2">No tasks are assigned to you</message>
     <message key="xmlui.Submission.Submissions.workflow_head3">Tasks in the pool</message>
