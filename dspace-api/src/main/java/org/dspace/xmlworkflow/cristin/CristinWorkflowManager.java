@@ -56,12 +56,7 @@ public class CristinWorkflowManager {
      */
     public static void start(Context context, WorkspaceItem wsItem)
             throws SQLException, AuthorizeException, IOException, WorkflowException {
-        ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
-        if ("xmlworkflow".equals(configurationService.getProperty("workflow", "workflow.framework"))) {
             XmlWorkflowServiceFactory.getInstance().getWorkflowService().start(context, wsItem);
-        } else {
-            WorkflowServiceFactory.getInstance().getWorkflowService().start(context, wsItem);
-        }
     }
 
     /**
@@ -121,11 +116,7 @@ public class CristinWorkflowManager {
             throw new WorkflowException("No admin eperson defined, and passed eperson is null - probably need to fix your config");
         }
 
-        if ("xmlworkflow".equals(configurationService.getProperty("workflow", "workflow.framework"))) {
             XmlWorkflowServiceFactory.getInstance().getWorkflowService().sendWorkflowItemBackSubmission(context, (XmlWorkflowItem) wfItem, ePerson, "", "");
-        } else {
-            WorkflowServiceFactory.getInstance().getWorkflowService().abort(context, (WorkflowItem) wfItem, ePerson);
-        }
     }
 
     // our own workflow control
@@ -220,12 +211,7 @@ public class CristinWorkflowManager {
      * @throws SQLException
      */
     public static boolean isItemInWorkflow(Context context, Item item) throws SQLException {
-        ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
-        if (configurationService.getProperty("workflow", "workflow.framework").equals("xmlworkflow")) {
             return CristinWorkflowManager.isItemInXmlWorkflow(context, item);
-        } else {
-            return CristinWorkflowManager.isItemInOriginalWorkflow(context, item);
-        }
     }
 
     /**
@@ -283,12 +269,7 @@ public class CristinWorkflowManager {
      */
     public static InProgressSubmission getWorkflowItem(Context context, Item item)
             throws SQLException {
-        ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
-        if (configurationService.getProperty("workflow", "workflow.framework").equals("xmlworkflow")) {
             return CristinWorkflowManager.getXmlWorkflowItem(context, item);
-        } else {
-            return CristinWorkflowManager.getOriginalWorkflowItem(context, item);
-        }
     }
 
     /**

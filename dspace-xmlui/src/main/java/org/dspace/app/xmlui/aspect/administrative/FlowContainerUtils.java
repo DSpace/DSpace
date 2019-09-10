@@ -274,7 +274,7 @@ public class FlowContainerUtils
 			harvestedCollectionService.update(context, hc);
 		}
 		String message = "Harvesting options successfully modified.";
-		if (hc != null && DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("workflow", "workflow.framework").equals("xmlworkflow")) {
+		if (hc != null) {
 			String workflowProcess = hc.getWorkflowProcess();
 			collection = collectionService.find(context, collectionID);
 			String handle = collection.getHandle();
@@ -519,12 +519,7 @@ public class FlowContainerUtils
 			if (roleGroup == null)
 				roleGroup = collectionService.createSubmitters(context, collection);
 		}else{
-			roleGroup = workflowService.getWorkflowRoleGroup(context, collection, roleName, roleGroup);
-			if(DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("workflow","workflow.framework").equals("xmlworkflow")){//Resolve our id to a role
-				roleGroup = getXMLWorkflowRole(context, roleName, collection, roleGroup);
-			}else{
-				roleGroup = getOriginalWorkflowRole(context, roleName, collection, roleGroup);
-			}
+			roleGroup = getXMLWorkflowRole(context, roleName, collection, roleGroup);
 		}
 
 		// In case we needed to create a group, save our changes

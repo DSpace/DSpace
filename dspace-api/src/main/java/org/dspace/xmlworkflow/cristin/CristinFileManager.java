@@ -581,7 +581,7 @@ public class CristinFileManager {
     }
 
     /**
-     * Helper method to escape all chaacters that are not part of the canon set
+     * Helper method to escape all characters that are not part of the canon set
      *
      * @param sourceString source unescaped string
      */
