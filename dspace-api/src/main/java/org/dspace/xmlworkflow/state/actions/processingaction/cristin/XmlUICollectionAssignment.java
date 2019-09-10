@@ -97,7 +97,7 @@ public class XmlUICollectionAssignment extends ProcessingAction {
                 continue;
             }
             Collection col = collectionService.find(context, UUID.fromString(colID));
-            collectionService.removeItem(context, col, item);
+            collectionService.addItem(context, col, item);
             collectionService.update(context, col);
         }
     }
