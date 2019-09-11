@@ -22,7 +22,7 @@ import org.springframework.stereotype.Service;
  * magic makes this work.
  */
 @Service
-public class MockSolrServiceImpl extends AuthoritySolrServiceImpl implements InitializingBean, DisposableBean {
+public class MockAuthoritySolrServiceImpl extends AuthoritySolrServiceImpl implements InitializingBean, DisposableBean {
 
     private MockSolrServer mockSolrServer;
 
