@@ -86,7 +86,6 @@ public class AuthorityRestRepositoryIT extends AbstractControllerIntegrationTest
     }
 
     @Test
-    @Ignore
     /**
      * This functionality is currently broken, it returns all 22 values
      */
@@ -135,7 +134,6 @@ public class AuthorityRestRepositoryIT extends AbstractControllerIntegrationTest
     }
 
     @Test
-    @Ignore
     /**
      * This functionality is currently broken, it an empty value
      */
@@ -157,7 +155,6 @@ public class AuthorityRestRepositoryIT extends AbstractControllerIntegrationTest
     }
 
     @Test
-    @Ignore
     /**
      * This functionality is currently broken
      */
