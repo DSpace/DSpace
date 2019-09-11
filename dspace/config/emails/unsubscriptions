@@ -1,0 +1,24 @@
+# E-mail sent to designated address when unsubscribe eperson command was requested
+#
+# Parameters: {0} EPerson email
+#             {1} list of communities
+#             {2} list of collections
+#             {3} list of CRIS items
+#             {4} list of statistics
+#
+# See org.dspace.core.Email for information on the format of this file.
+#
+Subject: Unsubscribed eperson {0} from the following communities, collections, Cris items, statistics
+The following email was sent since an unsubscribe eperson command, related to {0}, was requested.
+
+The ePerson was unsubscribed from the following communities:
+{1}
+
+The ePerson was unsubscribed from the following collections:
+{2}
+
+The ePerson was unsubscribed from the following CRIS items:
+{3}
+
+The ePerson was unsubscribed from the following statistics:
+{4}
