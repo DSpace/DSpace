@@ -151,12 +151,12 @@ public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
         return Arrays.asList(output);
     }
 
-    void addCollection(Collection collection)
+    public void addCollection(Collection collection)
     {
         collections.add(collection);
     }
 
-    void removeCollection(Collection collection)
+    public void removeCollection(Collection collection)
     {
         collections.remove(collection);
     }

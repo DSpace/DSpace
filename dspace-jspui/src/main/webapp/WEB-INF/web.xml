@@ -531,7 +531,7 @@
   </servlet-mapping>
 
   <servlet-mapping>
-    <servlet-name>community-list</servlet-name>
+    <servlet-name>Spring MVC Servlet</servlet-name>
     <url-pattern>/community-list</url-pattern>
   </servlet-mapping>
 
