@@ -364,7 +364,7 @@ public class RestResourceController implements InitializingBean {
      * @return
      */
     @RequestMapping(method = RequestMethod.GET, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_STRING_VERSION_STRONG +
-        "/{rel}/{relid:[\\w+\\-]+}")
+        "/{rel}/{relid}")
     public ResourceSupport findRel(HttpServletRequest request, HttpServletResponse response,
                                    @PathVariable String apiCategory,
                                    @PathVariable String model, @PathVariable String id, @PathVariable String rel,
