@@ -321,7 +321,6 @@
     <dynamicField name="*_tl"  type="long"    indexed="true" stored="true" docValues="true"/>
     <dynamicField name="*_tf"  type="float"   indexed="true" stored="true" docValues="true"/>
     <dynamicField name="*_td"  type="double"  indexed="true" stored="true" docValues="true"/>
-    <dynamicField name="*_tdt" type="date"    indexed="true" stored="true" docValues="true"/>
 
     <dynamicField name="*_pi"  type="pint"    indexed="true" stored="true"/>
 
