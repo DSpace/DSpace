@@ -13,6 +13,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.response.QueryResponse;
+import org.dspace.app.rest.matcher.AuthorityEntryMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.authority.PersonAuthorityValue;
 import org.dspace.authority.factory.AuthorityServiceFactory;
@@ -135,7 +136,6 @@ public class AuthorityRestRepositoryIT extends AbstractControllerIntegrationTest
     }
 
     @Test
-    @Ignore
     /**
      * This functionality is currently broken, it an empty value
      */
@@ -144,7 +144,10 @@ public class AuthorityRestRepositoryIT extends AbstractControllerIntegrationTest
         getClient(token).perform(
                 get("/api/integration/authorities/srsc/entryValues/DOESNTEXIST"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.page.totalElements", Matchers.is(0)));
+                .andExpect(jsonPath("$._embedded.authorityEntries", Matchers.contains(
+                    AuthorityEntryMatcher.matchAuthorityEntry("", "", "")
+                )))
+                .andExpect(jsonPath("$.page.totalElements", Matchers.is(1)));
     }
 
     @Test
@@ -157,7 +160,6 @@ public class AuthorityRestRepositoryIT extends AbstractControllerIntegrationTest
     }
 
     @Test
-    @Ignore
     /**
      * This functionality is currently broken
      */
