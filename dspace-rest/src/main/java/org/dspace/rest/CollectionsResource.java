@@ -273,19 +273,17 @@ public class CollectionsResource extends Resource
                     headers, request, context);
 
             items = new ArrayList<Item>();
-            Iterator<org.dspace.content.Item> dspaceItems = itemService.findByCollection(context, dspaceCollection);
-            for (int i = 0; (dspaceItems.hasNext()) && (i < (limit + offset)); i++)
-            {
+            Iterator<org.dspace.content.Item> dspaceItems = itemService.findByCollection(context, dspaceCollection,
+                                                                                         limit, offset);
+
+            while (dspaceItems.hasNext()) {
                 org.dspace.content.Item dspaceItem = dspaceItems.next();
 
-                if (i >= offset)
+                if (itemService.isItemListedForUser(context, dspaceItem))
                 {
-                    if (itemService.isItemListedForUser(context, dspaceItem))
-                    {
-                        items.add(new Item(dspaceItem, servletContext, expand, context));
-                        writeStats(dspaceItem, UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor,
-                                headers, request, context);
-                    }
+                    items.add(new Item(dspaceItem, servletContext, expand, context));
+                    writeStats(dspaceItem, UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor,
+                               headers, request, context);
                 }
             }
 
