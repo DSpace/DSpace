@@ -1477,8 +1477,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                     if (type.equals(DiscoveryConfigurationParameters.TYPE_DATE)) {
                         Date date = MultiFormatDateParser.parse(value);
                         if (date != null) {
-                            final DateFormat solrDateFormatter = SolrUtils.getDateFormatter();
-                            String stringDate = solrDateFormatter.format(date);
+                            String stringDate = SolrUtils.getDateFormatter().format(date);
                             doc.addField(field + "_dt", stringDate);
                         } else {
                             log.warn("Error while indexing sort date field, item: " + item
