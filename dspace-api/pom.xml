@@ -759,6 +759,13 @@
             <version>20180130</version>
         </dependency>
 
+        <!-- Used for Solr core export/import -->
+        <dependency>
+            <groupId>com.opencsv</groupId>
+            <artifactId>opencsv</artifactId>
+            <version>4.5</version>
+        </dependency>
+
         <dependency>
             <groupId>org.apache.velocity</groupId>
             <artifactId>velocity-engine-core</artifactId>
