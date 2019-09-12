@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.submit.model;
+package org.dspace.app.rest.model.submit;
 
 /**
  * The SelectableMetadata REST Resource. It is not addressable directly, only
@@ -25,7 +25,7 @@ public class SelectableMetadata {
     private String metadata;
     private String label;
     private String authority;
-    private Boolean closed;
+    private Boolean closed = false;
 
     public String getMetadata() {
         return metadata;
