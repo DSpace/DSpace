@@ -62,6 +62,8 @@ public class OrcidWorkMetadata extends MappingMetadata {
 	public static final String URL = "url";
 	
 	public static final String EXTERNAL_IDENTIFIER = "external_identifier";
+	
+	public static final String EXTERNAL_IDENTIFIER_PARENT = "external_identifier_parent";
 
 	/**
 	 * Wrap the item, parse all configured fields and generate metadata field
@@ -121,6 +123,10 @@ public class OrcidWorkMetadata extends MappingMetadata {
 		
 		// EXTERNAL IDs
 		addMultiInvertedValues(EXTERNAL_IDENTIFIER);
+
+		// EXTERNAL PARENT IDs
+		addMultiInvertedValues(EXTERNAL_IDENTIFIER_PARENT);
+
 		
 		//TYPE
 		addSingleField(TYPE);
@@ -245,7 +251,13 @@ public class OrcidWorkMetadata extends MappingMetadata {
 		}
 		return new ArrayList<String>();
 	}
-	
+
+	public List<String> getExternalIdentifierParent() {
+		if (!metadataMappings.get(EXTERNAL_IDENTIFIER_PARENT).isEmpty()) {
+			return metadataMappings.get(EXTERNAL_IDENTIFIER_PARENT);
+		}
+		return new ArrayList<String>();
+	}
 	public String getExternalIdentifierType(String identifier) {
 		if (!metadataMappings.get(identifier).isEmpty()) {
 			return metadataMappings.get(identifier).get(0);
