@@ -32,6 +32,7 @@ import org.dspace.content.authority.Choices;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
 import org.dspace.core.PluginManager;
+import org.dspace.core.Utils;
 
 public class ValuePairsDisplayStrategy extends ASimpleDisplayStrategy
 {
@@ -156,12 +157,8 @@ public class ValuePairsDisplayStrategy extends ASimpleDisplayStrategy
                 String key = myInput.getPairsType();
                 if (StringUtils.isNotBlank(key))
                 {
-                    String inputField = myInput.getSchema() + "."
-                            + myInput.getElement();
-                    if (StringUtils.isNotBlank(myInput.getQualifier()))
-                    {
-                        inputField += "." + myInput.getQualifier();
-                    }
+                    
+                    String inputField = Utils.standardize(myInput.getSchema(), myInput.getElement(), myInput.getQualifier(), ".");
 
                     if (inputField.equals(field))
                     {

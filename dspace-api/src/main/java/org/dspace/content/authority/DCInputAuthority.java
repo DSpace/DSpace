@@ -16,6 +16,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
 import org.dspace.app.util.DCInputsReader;
@@ -51,6 +52,8 @@ public class DCInputAuthority extends SelfNamedPlugin implements ChoiceAuthority
     private String labels[] = null;
 
     private static Map<String, DCInputsReader> dcInputsReader = new HashMap<>();
+    private static Map<String, String[]> valuesMultilang = new HashMap<>();
+    private static Map<String, String[]> labelsMultilang = new HashMap<>();
     private static String pluginNames[] = null;
 
     public DCInputAuthority()
@@ -106,6 +109,9 @@ public class DCInputAuthority extends SelfNamedPlugin implements ChoiceAuthority
     // once-only load of values and labels
     private void init(String locale)
     {
+        if(StringUtils.isNotBlank(locale)) {
+            values = valuesMultilang.get(locale);
+        }
         if (values == null)
         {
             String pname = this.getPluginInstanceName();
@@ -119,6 +125,8 @@ public class DCInputAuthority extends SelfNamedPlugin implements ChoiceAuthority
                     labels[i/2] = pairs.get(i);
                     values[i/2] = pairs.get(i+1);
                 }
+                valuesMultilang.put(locale, values);
+                labelsMultilang.put(locale, labels);
                 log.debug("Found pairs for name="+pname);
             }
             else
@@ -137,7 +145,7 @@ public class DCInputAuthority extends SelfNamedPlugin implements ChoiceAuthority
         Choice v[] = new Choice[values.length];
         for (int i = 0; i < values.length; ++i)
         {
-            v[i] = new Choice(values[i], values[i], labels[i]);
+            v[i] = new Choice(values[i], valuesMultilang.get(locale)[i], labelsMultilang.get(locale)[i]);
             if (values[i].equalsIgnoreCase(query))
             {
                 dflt = i;
@@ -154,7 +162,7 @@ public class DCInputAuthority extends SelfNamedPlugin implements ChoiceAuthority
             if (text.equalsIgnoreCase(values[i]))
             {
                 Choice v[] = new Choice[1];
-                v[0] = new Choice(String.valueOf(i), values[i], labels[i]);
+                v[0] = new Choice(String.valueOf(i), valuesMultilang.get(locale)[i], labelsMultilang.get(locale)[i]);
                 return new Choices(v, 0, v.length, Choices.CF_UNCERTAIN, false, 0);
             }
         }
