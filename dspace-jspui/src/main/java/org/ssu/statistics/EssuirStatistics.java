@@ -80,19 +80,19 @@ public class EssuirStatistics {
         return getStatistics(STATISTICS.sequenceId.lessThan(0));
     }
 
-    private Long getTotalViews() {
+    private Integer getTotalViews() {
         return getViewStatistics()
                 .values()
                 .stream()
-                .mapToLong(Long::longValue)
+                .mapToInt(Long::intValue)
                 .sum();
     }
 
-    private Long getTotalDownloads() {
+    private Integer getTotalDownloads() {
         return getDownloadsStatistics()
                 .values()
                 .stream()
-                .mapToLong(Long::longValue)
+                .mapToInt(Long::intValue)
                 .sum();
     }
 

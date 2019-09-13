@@ -1,6 +1,9 @@
 package org.ssu;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.log4j.Logger;
 import org.dspace.app.webui.components.RecentSubmissionsException;
 import org.dspace.app.webui.components.RecentSubmissionsManager;
 import org.dspace.app.webui.servlet.CommunityListServlet;
@@ -19,7 +22,10 @@ import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.core.service.NewsService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 import org.ssu.entity.AuthorLocalization;
 import org.ssu.entity.response.CommunityResponse;
@@ -27,6 +33,8 @@ import org.ssu.entity.response.ItemTypeResponse;
 import org.ssu.entity.response.RecentItem;
 import org.ssu.localization.TypeLocalization;
 import org.ssu.statistics.EssuirStatistics;
+import org.ssu.statistics.GeneralStatisticsService;
+import org.ssu.statistics.ScheduledTasks;
 import org.ssu.statistics.StatisticsData;
 
 import javax.annotation.Resource;
@@ -42,7 +50,7 @@ import java.util.stream.Collectors;
 @RequestMapping("/")
 @Controller
 public class EssuirSiteController {
-
+    private static Logger log = Logger.getLogger(EssuirSiteController.class);
     @Resource
     private TypeLocalization typeLocalization;
 
@@ -51,6 +59,12 @@ public class EssuirSiteController {
 
     @Resource
     private EssuirStatistics essuirStatistics;
+
+    @Resource
+    private GeneralStatisticsService generalStatisticsService;
+
+    @Resource
+    private ScheduledTasks scheduledTasks;
 
     @RequestMapping("/")
     public ModelAndView homePage(ModelAndView model, HttpServletRequest request) throws SQLException, ItemCountException {
@@ -176,6 +190,25 @@ public class EssuirSiteController {
         return model;
     }
 
+    @RequestMapping(value = "/current", method = RequestMethod.GET)
+    @ResponseBody
+    public String getTotalStatistics(HttpServletRequest request) throws JsonProcessingException {
+        return new ObjectMapper()
+                .writeValueAsString(generalStatisticsService.collectGeneralStatistics());
+    }
+
+    @RequestMapping(value = "/general-statistics", method = RequestMethod.GET)
+    public String getGeneralStatistics(ModelMap model) {
+        model.addAttribute("listYearStatistics", generalStatisticsService.getListYearsStatistics());
+        return "pub_stat";
+    }
+
+
+    @RequestMapping(value = "/update-statistics", method = RequestMethod.GET)
+    public void update() {
+        scheduledTasks.finalizeMonthStatistics();
+    }
+  
     @RequestMapping("community-list")
     public ModelAndView getCommunityList(ModelAndView model, HttpServletRequest request, HttpServletResponse response) throws SQLException, ItemCountException {
         Context dspaceContext = UIUtil.obtainContext(request);
@@ -188,5 +221,6 @@ public class EssuirSiteController {
 
         model.setViewName("community-list");
         return model;
+
     }
 }

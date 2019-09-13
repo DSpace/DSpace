@@ -6,6 +6,7 @@ import org.dspace.core.ConfigurationManager;
 
 import org.hibernate.ejb.HibernatePersistence;
 import org.jooq.SQLDialect;
+import org.jooq.conf.Settings;
 import org.jooq.impl.DataSourceConnectionProvider;
 import org.jooq.impl.DefaultConfiguration;
 import org.jooq.impl.DefaultDSLContext;
@@ -65,8 +66,11 @@ public class DataConfig {
         DefaultConfiguration jooqConfiguration = new DefaultConfiguration();
         jooqConfiguration.set(connectionProvider());
 
+        Settings settings = new Settings().withUpdatablePrimaryKeys(true);
         SQLDialect dialect = SQLDialect.POSTGRES_9_3;
         jooqConfiguration.set(dialect);
+        jooqConfiguration.set(settings);
+
 
         return jooqConfiguration;
     }

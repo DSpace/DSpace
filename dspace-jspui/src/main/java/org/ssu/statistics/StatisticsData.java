@@ -1,10 +1,10 @@
 package org.ssu.statistics;
 
 public class StatisticsData {
-    private long totalCount = 0;
+    private Integer totalCount = 0;
     private String lastUpdate = "";
-    private long totalViews = 0;
-    private long totalDownloads = 0;
+    private Integer totalViews = 0;
+    private Integer totalDownloads = 0;
 
     private StatisticsData(Builder builder) {
         totalCount = builder.totalCount;
@@ -13,7 +13,7 @@ public class StatisticsData {
         totalDownloads = builder.totalDownloads;
     }
 
-    public long getTotalCount() {
+    public Integer getTotalCount() {
         return totalCount;
     }
 
@@ -21,20 +21,20 @@ public class StatisticsData {
         return lastUpdate;
     }
 
-    public long getTotalViews() {
+    public Integer getTotalViews() {
         return totalViews;
     }
 
-    public long getTotalDownloads() {
+    public Integer getTotalDownloads() {
         return totalDownloads;
     }
 
 
     public static final class Builder {
-        private long totalCount;
+        private Integer totalCount;
         private String lastUpdate;
-        private long totalViews;
-        private long totalDownloads;
+        private Integer totalViews;
+        private Integer totalDownloads;
 
         public Builder() {
         }
@@ -46,7 +46,7 @@ public class StatisticsData {
             this.totalDownloads = copy.getTotalDownloads();
         }
 
-        public Builder withTotalCount(long totalCount) {
+        public Builder withTotalCount(Integer totalCount) {
             this.totalCount = totalCount;
             return this;
         }
@@ -56,12 +56,12 @@ public class StatisticsData {
             return this;
         }
 
-        public Builder withTotalViews(long totalViews) {
+        public Builder withTotalViews(Integer totalViews) {
             this.totalViews = totalViews;
             return this;
         }
 
-        public Builder withTotalDownloads(long totalDownloads) {
+        public Builder withTotalDownloads(Integer totalDownloads) {
             this.totalDownloads = totalDownloads;
             return this;
         }

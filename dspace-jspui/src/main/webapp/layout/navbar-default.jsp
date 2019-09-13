@@ -126,7 +126,8 @@
                 <li><a href="<%= request.getContextPath() %>/recent-items"><fmt:message key="jsp.collection-home.recentsub"/></a></li>
                 <li><a href="<%= request.getContextPath() %>/faq"><fmt:message key="jsp.layout.navbar-default.faq"/></a></li>
                 <li><a href="<%= request.getContextPath() %>/top-publications">
-                    <fmt:message key="jsp.top50items">
+
+    <fmt:message key="jsp.top50items">
                         <fmt:param value="${topPublicationsCount}"/>
                     </fmt:message>
                 </a></li>
@@ -136,6 +137,7 @@
                     <fmt:param value="${topAuthorsCount}"/>
                 </fmt:message>
                 </a></li>
+                <li><a href="<%= request.getContextPath() %>/general-statistics"><fmt:message key="jsp.layout.navbar-admin.statistics"/></a></li>
     </ul>
           </li>
           <li class="<%= ( currentPage.endsWith( "/help" ) ? "active" : "" ) %>"><dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") %>"><fmt:message key="jsp.layout.navbar-default.help"/></dspace:popup></li>
