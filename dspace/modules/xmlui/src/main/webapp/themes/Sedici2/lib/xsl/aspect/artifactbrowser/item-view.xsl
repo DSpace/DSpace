@@ -607,20 +607,6 @@
 			</div>
 		</xsl:if>
 
-		<!-- relation-review-of row (es probable que sea uno solo) -->
-		<xsl:call-template name="render-normal-field">
-			<xsl:with-param name="name" select="'relation-review-of'"/>
-			<xsl:with-param name="elements" select="dim:field[@element='relation' and @qualifier='isReviewOf'] "/>
-			<xsl:with-param name="type">url</xsl:with-param>
-		</xsl:call-template>
-
-		<!-- relation-reviewed-by row (es probable que sea uno solo) -->
-		<xsl:call-template name="render-normal-field">
-			<xsl:with-param name="name" select="'relation-reviewed-by'"/>
-			<xsl:with-param name="elements" select="dim:field[@element='relation' and @qualifier='isReviewedBy'] "/>
-			<xsl:with-param name="type">url</xsl:with-param>
-		</xsl:call-template>
-		
 		<!-- relation.ispartof row -->
 		
         <xsl:call-template name="render-normal-field">

@@ -887,32 +887,6 @@
 					<type-bind>!Objeto Fisico</type-bind>
 				</field>
 
-		<!-- Es revisión de -->
-				<field>
-					<dc-schema>sedici</dc-schema>
-					<dc-element>relation</dc-element>
-					<dc-qualifier>isReviewOf</dc-qualifier>
-					<repeatable>true</repeatable>
-					<label>Es revisión de</label>
-					<input-type>onebox</input-type>
-					<hint>Link a un documento (puede ser externo a SeDiCI) del cual este documento es una revisión</hint>
-					<type-bind>Articulo</type-bind>
-					<visibility-on-group>Bibliotecarios</visibility-on-group>
-				</field>
-				
-				<!-- Tiene una revisión -->
-				<field>
-					<dc-schema>sedici</dc-schema>
-					<dc-element>relation</dc-element>
-					<dc-qualifier>isReviewedBy</dc-qualifier>
-					<repeatable>true</repeatable>
-					<label>Es revisado por</label>
-					<input-type>onebox</input-type>
-					<hint>Link a un documento (puede ser externo a SeDiCI) que es una revisión del recurso en proceso de carga</hint>
-					<visibility-on-group>Bibliotecarios</visibility-on-group>
-					<type-bind>!Objeto Fisico,Publicacion seriada</type-bind>
-				</field>
-
 				<!-- Se relaciona con -->
 				<field>
 					<dc-schema>sedici</dc-schema>

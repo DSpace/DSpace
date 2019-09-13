@@ -739,29 +739,6 @@
 				</rel:related_item>
 			</xsl:if>
 
-			<!-- sedici.relation.isReviewOf -->
-			<xsl:if
-				test="dspace:field[@mdschema='sedici' and @element='relation' and @qualifier='isReviewOf']">
-				<rel:related_item>
-					<rel:inter_work_relation
-						identifier-type="uri" relationship-type="isReviewOf">
-						<xsl:value-of
-							select="dspace:field[@mdschema='sedici' and @element='relation' and @qualifier='isReviewOf']" />
-					</rel:inter_work_relation>
-				</rel:related_item>
-			</xsl:if>
-
-			<!-- sedici.relation.isReviewedBy -->
-			<xsl:if
-				test="dspace:field[@mdschema='sedici' and @element='relation' and @qualifier='isReviewedBy']">
-				<rel:related_item>
-					<rel:inter_work_relation
-						identifier-type="uri" relationship-type="hasReview">
-						<xsl:value-of
-							select="dspace:field[@mdschema='sedici' and @element='relation' and @qualifier='isReviewedBy']" />
-					</rel:inter_work_relation>
-				</rel:related_item>
-			</xsl:if>
 		</rel:program>
 	</xsl:template>
 
