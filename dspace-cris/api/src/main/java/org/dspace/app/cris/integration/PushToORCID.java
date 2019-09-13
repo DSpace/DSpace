@@ -1813,6 +1813,24 @@ public class PushToORCID
             workExternalIdentifiers.getExternalId()
                     .add(workExternalIdentifierInternal);
         }
+        
+        // add parent external id
+        if (itemMetadata.getExternalIdentifierParent() != null
+                && !itemMetadata.getExternalIdentifierParent().isEmpty())
+        {
+            for (String valIdentifier : itemMetadata.getExternalIdentifierParent())
+            {
+                ExternalId workExternalIdentifier = new ExternalId();
+                workExternalIdentifier.setExternalIdValue(valIdentifier);
+                workExternalIdentifier.setExternalIdUrl(valIdentifier);
+                workExternalIdentifier.setExternalIdType(
+                        itemMetadata.getExternalIdentifierType(valIdentifier));
+                workExternalIdentifier.setExternalIdRelationship(RelationshipType.PART_OF);
+                workExternalIdentifiers.getExternalId()
+                        .add(workExternalIdentifier);
+            }
+        }
+
         orcidWork.setExternalIds(workExternalIdentifiers);
 
         // export if have an authority value

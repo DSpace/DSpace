@@ -19,14 +19,6 @@ import java.util.Locale;
 
 import javax.mail.MessagingException;
 
-import jxl.CellView;
-import jxl.Workbook;
-import jxl.write.Label;
-import jxl.write.WritableCellFormat;
-import jxl.write.WritableFont;
-import jxl.write.WritableSheet;
-import jxl.write.WritableWorkbook;
-
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
@@ -34,11 +26,16 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.Font;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.dspace.app.cris.model.StatSubscription;
 import org.dspace.app.cris.statistics.SummaryStatBean;
 import org.dspace.app.cris.statistics.service.StatSubscribeService;
 import org.dspace.app.cris.statistics.util.StatsConfig;
+import org.dspace.app.cris.util.UtilsXLS;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.Email;
@@ -176,10 +173,10 @@ public class ScriptStatSubscribe
         {
             os = new FileOutputStream(tmpfile);
 
-            WritableWorkbook workbook = Workbook.createWorkbook(os);
+            HSSFWorkbook workbook = new HSSFWorkbook();
 
             int r = 0;
-            WritableSheet sheet = null;
+            HSSFSheet sheet = null;
             int sheetNumber = 0;
 
             int oldType = -1;
@@ -204,46 +201,50 @@ public class ScriptStatSubscribe
 
                 if (changedType)
                 {
-                    sheet = workbook.createSheet(I18nUtil.getMessage("org.dspace.app.cris.batch.ScriptStatSubscribe.sheet." + statdetails.getType()),
-                            sheetNumber);
-                    WritableFont labelFont = new WritableFont(
-                            WritableFont.ARIAL, 10, WritableFont.BOLD);
-                    WritableCellFormat cfobj = new WritableCellFormat(labelFont);
-                    sheet.addCell(new Label(
+                    sheet = workbook.createSheet(I18nUtil.getMessage("org.dspace.app.cris.batch.ScriptStatSubscribe.sheet." + statdetails.getType())/*,
+                            sheetNumber*/);
+                    Font labelFont = workbook.createFont();
+                    labelFont.setFontName("Arial");
+                    labelFont.setFontHeight((short)10);
+                    labelFont.setBoldweight((short)10);
+                    // TODO: labelFont.setCharset(CP_WINDOWS_1252);
+                    CellStyle cfobj = workbook.createCellStyle();
+                    cfobj.setFont(labelFont);
+                    UtilsXLS.addCell(sheet,
                             0,
                             0,
                             I18nUtil.getMessage("org.dspace.app.cris.batch.ScriptStatSubscribe.type"),
-                            cfobj));
-                    sheet.addCell(new Label(
+                            cfobj);
+                    UtilsXLS.addCell(sheet,
                             1,
                             0,
                             I18nUtil.getMessage("org.dspace.app.cris.batch.ScriptStatSubscribe.name"),
-                            cfobj));
-                    sheet.addCell(new Label(
+                            cfobj);
+                    UtilsXLS.addCell(sheet,
                             2,
                             0,
                             I18nUtil.getMessage("org.dspace.app.cris.batch.ScriptStatSubscribe.url"),
-                            cfobj));
-                    sheet.addCell(new Label(
+                            cfobj);
+                    UtilsXLS.addCell(sheet,
                             3,
                             0,
                             I18nUtil.getMessage("org.dspace.app.cris.batch.ScriptStatSubscribe.totalView"),
-                            cfobj));
-                    sheet.addCell(new Label(4, 0, I18nUtil
+                            cfobj);
+                    UtilsXLS.addCell(sheet, 4, 0, I18nUtil
                             .getMessage("org.dspace.app.cris.batch.ScriptStatSubscribe."
-                                    + sfreq + "View"), cfobj));
+                                    + sfreq + "View"), cfobj);
 
                     int headerCell = 4;
                     if (statDataBean.isShowSelectedObjectDownload())
                     {
-                        sheet.addCell(new Label(
+                    	UtilsXLS.addCell(sheet,
                                 ++headerCell,
                                 0,
                                 I18nUtil.getMessage("org.dspace.app.cris.batch.ScriptStatSubscribe.totalDownload"),
-                                cfobj));
-                        sheet.addCell(new Label(++headerCell, 0, I18nUtil
+                                cfobj);
+                    	UtilsXLS.addCell(sheet, ++headerCell, 0, I18nUtil
                                 .getMessage("org.dspace.app.cris.batch.ScriptStatSubscribe."
-                                        + sfreq + "Download"), cfobj));
+                                        + sfreq + "Download"), cfobj);
                     }
                     for (String topKey : statDataBean
                             .getPeriodAndTotalTopView().keySet())
@@ -251,16 +252,16 @@ public class ScriptStatSubscribe
                         if (!statDataBean.getPeriodAndTotalTopView()
                                 .get(topKey).isEmpty())
                         {
-                            sheet.addCell(new Label(
+                        	UtilsXLS.addCell(sheet,
                                     ++headerCell,
                                     0,
                                     I18nUtil.getMessage("org.dspace.app.cris.batch.ScriptStatSubscribe.total"
-                                            + topKey + "View"), cfobj));
-                            sheet.addCell(new Label(
+                                            + topKey + "View"), cfobj);
+                        	UtilsXLS.addCell(sheet,
                                     ++headerCell,
                                     0,
                                     I18nUtil.getMessage("org.dspace.app.cris.batch.ScriptStatSubscribe."
-                                            + sfreq + topKey + "View"), cfobj));
+                                            + sfreq + topKey + "View"), cfobj);
                         }
                     }
                     for (String topKey : statDataBean
@@ -269,51 +270,49 @@ public class ScriptStatSubscribe
                         if (!statDataBean.getPeriodAndTotalTopDownload()
                                 .get(topKey).isEmpty())
                         {
-                            sheet.addCell(new Label(
+                        	UtilsXLS.addCell(sheet,
                                     ++headerCell,
                                     0,
                                     I18nUtil.getMessage("org.dspace.app.cris.batch.ScriptStatSubscribe.total"
-                                            + topKey + "Download"), cfobj));
-                            sheet.addCell(new Label(
+                                            + topKey + "Download"), cfobj);
+                        	UtilsXLS.addCell(sheet,
                                     ++headerCell,
                                     0,
                                     I18nUtil.getMessage("org.dspace.app.cris.batch.ScriptStatSubscribe."
-                                            + sfreq + topKey + "Download"), cfobj));
+                                            + sfreq + topKey + "Download"), cfobj);
                         }
                     }
                     for (int i = 0; i < headerCell; i++)
                     {
-                        final CellView view = sheet.getColumnView(i);
-                        view.setAutosize(true);
-                        sheet.setColumnView(i, view);
+                    	sheet.autoSizeColumn(i);
                     }
                     sheetNumber++;
                 }
-                sheet.addCell(new Label(0, r, I18nUtil
+                UtilsXLS.addCell(sheet, 0, r, I18nUtil
                         .getMessage("org.dspace.app.cris.batch.ScriptStatSubscribe.type."
-                                + statdetails.getType())));
-                sheet.addCell(new Label(1, r, statdetails.getObjectName()));
-                sheet.addCell(new Label(2, r, statdetails.getObjectURL()));
+                                + statdetails.getType()));
+                UtilsXLS.addCell(sheet, 1, r, statdetails.getObjectName());
+                UtilsXLS.addCell(sheet, 2, r, statdetails.getObjectURL());
                 if (statDataBean.getTotalSelectedView() == -1)
                 {
-                    sheet.addCell(new Label(3, r, I18nUtil
-                            .getMessage("org.dspace.app.cris.batch.ScriptStatSubscribe.na")));
+                	UtilsXLS.addCell(sheet, 3, r, I18nUtil
+                            .getMessage("org.dspace.app.cris.batch.ScriptStatSubscribe.na"));
                 }
                 else
                 {
-                    sheet.addCell(new Label(3, r, new Long(statDataBean
-                            .getTotalSelectedView()).toString()));
+                	UtilsXLS.addCell(sheet, 3, r, new Long(statDataBean
+                            .getTotalSelectedView()).toString());
                 }
 
                 if (statDataBean.getPeriodSelectedView() == -1)
                 {
-                    sheet.addCell(new Label(4, r, I18nUtil
-                            .getMessage("org.dspace.app.cris.batch.ScriptStatSubscribe.na")));
+                	UtilsXLS.addCell(sheet, 4, r, I18nUtil
+                            .getMessage("org.dspace.app.cris.batch.ScriptStatSubscribe.na"));
                 }
                 else
                 {
-                    sheet.addCell(new Label(4, r, new Long(statDataBean
-                            .getPeriodSelectedView()).toString()));
+                	UtilsXLS.addCell(sheet, 4, r, new Long(statDataBean
+                            .getPeriodSelectedView()).toString());
                 }
 
                 int countTopCell = 4;
@@ -321,29 +320,29 @@ public class ScriptStatSubscribe
                 {
                     if (statDataBean.getTotalSelectedDownload() == -1)
                     {
-                        sheet.addCell(new Label(
+                    	UtilsXLS.addCell(sheet,
                                 ++countTopCell,
                                 r,
-                                I18nUtil.getMessage("org.dspace.app.cris.batch.ScriptStatSubscribe.na")));
+                                I18nUtil.getMessage("org.dspace.app.cris.batch.ScriptStatSubscribe.na"));
                     }
                     else
                     {
-                        sheet.addCell(new Label(++countTopCell, r, new Long(
+                    	UtilsXLS.addCell(sheet, ++countTopCell, r, new Long(
                                 statDataBean.getTotalSelectedDownload())
-                                .toString()));
+                                .toString());
                     }
                     if (statDataBean.getPeriodSelectedDownload() == -1)
                     {
-                        sheet.addCell(new Label(
+                    	UtilsXLS.addCell(sheet,
                                 ++countTopCell,
                                 r,
-                                I18nUtil.getMessage("org.dspace.app.cris.batch.ScriptStatSubscribe.na")));
+                                I18nUtil.getMessage("org.dspace.app.cris.batch.ScriptStatSubscribe.na"));
                     }
                     else
                     {
-                        sheet.addCell(new Label(++countTopCell, r, new Long(
+                    	UtilsXLS.addCell(sheet, ++countTopCell, r, new Long(
                                 statDataBean.getPeriodSelectedDownload())
-                                .toString()));
+                                .toString());
                     }
 
                 }
@@ -356,30 +355,30 @@ public class ScriptStatSubscribe
                     {
                         if (tmpList.get(1) == null)
                         {
-                            sheet.addCell(new Label(
+                        	UtilsXLS.addCell(sheet,
                                     ++countTopCell,
                                     r,
-                                    I18nUtil.getMessage("org.dspace.app.cris.batch.ScriptStatSubscribe.na")));
+                                    I18nUtil.getMessage("org.dspace.app.cris.batch.ScriptStatSubscribe.na"));
                         }
                         else
                         {
-                            sheet.addCell(new Label(++countTopCell, r,
-                                    new Long(tmpList.get(1)).toString()));
+                        	UtilsXLS.addCell(sheet, ++countTopCell, r,
+                                    new Long(tmpList.get(1)).toString());
                         }
                     }
                     if (!tmpList.isEmpty())
                     {
                         if (tmpList.get(0) == null)
                         {
-                            sheet.addCell(new Label(
+                        	UtilsXLS.addCell(sheet,
                                     ++countTopCell,
                                     r,
-                                    I18nUtil.getMessage("org.dspace.app.cris.batch.ScriptStatSubscribe.na")));
+                                    I18nUtil.getMessage("org.dspace.app.cris.batch.ScriptStatSubscribe.na"));
                         }
                         else
                         {
-                            sheet.addCell(new Label(++countTopCell, r,
-                                    new Long(tmpList.get(0)).toString()));
+                        	UtilsXLS.addCell(sheet, ++countTopCell, r,
+                                    new Long(tmpList.get(0)).toString());
                         }
                     }
                 }
@@ -392,37 +391,36 @@ public class ScriptStatSubscribe
                     {
                         if (tmpList.get(1) == null)
                         {
-                            sheet.addCell(new Label(
+                        	UtilsXLS.addCell(sheet,
                                     ++countTopCell,
                                     r,
-                                    I18nUtil.getMessage("org.dspace.app.cris.batch.ScriptStatSubscribe.na")));
+                                    I18nUtil.getMessage("org.dspace.app.cris.batch.ScriptStatSubscribe.na"));
                         }
                         else
                         {
-                            sheet.addCell(new Label(++countTopCell, r,
-                                    new Long(tmpList.get(1)).toString()));
+                        	UtilsXLS.addCell(sheet, ++countTopCell, r,
+                                    new Long(tmpList.get(1)).toString());
                         }
                     }
                     if (!tmpList.isEmpty())
                     {
                         if (tmpList.get(0) == null)
                         {
-                            sheet.addCell(new Label(
+                        	UtilsXLS.addCell(sheet,
                                     ++countTopCell,
                                     r,
-                                    I18nUtil.getMessage("org.dspace.app.cris.batch.ScriptStatSubscribe.na")));
+                                    I18nUtil.getMessage("org.dspace.app.cris.batch.ScriptStatSubscribe.na"));
                         }
                         else
                         {
-                            sheet.addCell(new Label(++countTopCell, r,
-                                    new Long(tmpList.get(0)).toString()));
+                        	UtilsXLS.addCell(sheet, ++countTopCell, r,
+                                    new Long(tmpList.get(0)).toString());
                         }
                     }
                 }
 
             }
-            workbook.write();
-            workbook.close();
+            workbook.write(os);
         }
         catch (Exception e)
         {

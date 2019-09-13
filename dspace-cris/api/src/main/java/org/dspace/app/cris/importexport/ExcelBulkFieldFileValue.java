@@ -10,9 +10,7 @@ package org.dspace.app.cris.importexport;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import jxl.Cell;
-
-import org.dspace.app.cris.util.UtilsXML;
+import org.apache.poi.ss.usermodel.Cell;
 import org.w3c.dom.Element;
 
 public class ExcelBulkFieldFileValue extends ExcelBulkFieldValue implements IBulkChangeFieldFileValue {
@@ -25,7 +23,7 @@ public class ExcelBulkFieldFileValue extends ExcelBulkFieldValue implements IBul
 	private boolean delete = false;
 	public ExcelBulkFieldFileValue(Cell element, int position) {
 		super(element, position);
-		String val = element.getContents().split(ExcelBulkField.REGEX_REPEATABLE_SPLIT)[position];
+		String val = element.getStringCellValue().split(ExcelBulkField.REGEX_REPEATABLE_SPLIT)[position];
 		Matcher tagmatch = pattern.matcher(val);
 		if (tagmatch.find()) {
 			this.local = Boolean.parseBoolean(tagmatch.group(1));

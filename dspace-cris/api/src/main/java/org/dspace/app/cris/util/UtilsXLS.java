@@ -21,12 +21,12 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
 
-import jxl.write.Label;
-import jxl.write.WritableSheet;
-import jxl.write.WriteException;
-import jxl.write.biff.RowsExceededException;
-
 import org.apache.commons.lang.StringUtils;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.DataFormatter;
+import org.apache.poi.ss.usermodel.Row;
 import org.dspace.app.cris.importexport.ExcelBulkChangesService;
 import org.dspace.app.cris.model.ACrisObject;
 import org.dspace.app.cris.model.ResearcherPage;
@@ -59,16 +59,14 @@ public class UtilsXLS {
 
 	public static int createCell(ApplicationService applicationService, int y,
 			int i, ADecoratorPropertiesDefinition decorator,
-			ACrisObject researcher, WritableSheet sheet) throws IOException,
-			RowsExceededException, WriteException {
+			ACrisObject researcher, HSSFSheet sheet) throws IOException {
 		return createElement(applicationService, y, i, decorator.getReal(),
 				decorator.getRendering(), researcher, sheet);
 	}
 
 	private static int createElement(ApplicationService applicationService,
 			int y, int i, Object preal, AWidget rendering,
-			ACrisObject researcher, WritableSheet sheet) throws IOException,
-			RowsExceededException, WriteException {
+			ACrisObject researcher, HSSFSheet sheet) throws IOException {
 		
 	        PropertiesDefinition real = (PropertiesDefinition)preal;
 			return createSimpleElement(applicationService, y, i,
@@ -81,7 +79,7 @@ public class UtilsXLS {
 	private static int createSimpleElement(
 			ApplicationService applicationService, int y, int i,
 			String shortName, List<Property> proprietaDellaTipologia,
-			WritableSheet sheet) throws RowsExceededException, WriteException {
+			HSSFSheet sheet) {
 		String field_value = "";
 		boolean first = true;
 		for (Property rr : proprietaDellaTipologia) {
@@ -104,19 +102,17 @@ public class UtilsXLS {
 
 		}
 		y = y + 1;
-		Label label_v = new Label(y, i, field_value);
-		sheet.addCell(label_v);
-		Label labelCaption = new Label(y, 0, shortName);
-		sheet.addCell(labelCaption);
+		addCell(sheet, y, i, field_value);
+		addCell(sheet, y, 0, shortName);
 		
 		return y;
 	}
 
 	public static int createCell(ApplicationService applicationService, int y,
 			int i, DecoratorRestrictedField decorator,
-			ACrisObject researcher, WritableSheet sheet)
+			ACrisObject researcher, HSSFSheet sheet)
 			throws IllegalArgumentException, IllegalAccessException,
-			InvocationTargetException, RowsExceededException, WriteException {
+			InvocationTargetException {
 		String shortName = decorator.getShortName();
 		Method[] methods = researcher.getClass().getMethods();
 		Object field = null;
@@ -149,72 +145,62 @@ public class UtilsXLS {
 
 			}
 			y = y + 1;
-			Label label_v = new Label(y, i, field_value);
-			Label labelCaption = new Label(y, 0, decorator.getShortName());
-			sheet.addCell(labelCaption);
+			addCell(sheet, y, 0, decorator.getShortName());
+			
 			y = y + 1;
-			Label label_vv = new Label(y, i, field_visibility);
-			labelCaption = new Label(y, 0, decorator.getShortName()
+			addCell(sheet, y, 0, decorator.getShortName()
 					+ ImportExportUtils.LABELCAPTION_VISIBILITY_SUFFIX);
-			sheet.addCell(labelCaption);
 
-			sheet.addCell(label_v);
-			sheet.addCell(label_vv);
+			addCell(sheet, y, i, field_value);
+			addCell(sheet, y, i, field_visibility);
 
 		} else if (method.getReturnType().isAssignableFrom(String.class)) {
 			y = y + 1;
-			sheet.addCell(new Label(y, i, (String) field));
-			Label labelCaption = new Label(y, 0, decorator.getShortName());
-			sheet.addCell(labelCaption);
+			addCell(sheet, y, i, (String) field);
+			addCell(sheet, y, 0, decorator.getShortName());
 		} else {
 			if (RestrictedFieldLocalOrRemoteFile.class.isAssignableFrom(method
 					.getReturnType())) {
 				RestrictedFieldLocalOrRemoteFile rflor = (RestrictedFieldLocalOrRemoteFile) field;
 				y = y + 1;
 				if (StringUtils.isNotEmpty(rflor.getRemoteUrl())) {
-					sheet.addCell(new Label(y, i, rflor.getRemoteUrl()));
+					addCell(sheet, y, i, rflor.getRemoteUrl());
 				} else {
-					sheet.addCell(new Label(y, i, rflor.getMimeType()
-							+ STOPFIELDS_EXCEL + rflor.getValue()));
+					addCell(sheet, y, i, rflor.getMimeType()
+							+ STOPFIELDS_EXCEL + rflor.getValue());
 				}
-				Label labelCaption = new Label(y, 0, decorator.getShortName());
-				sheet.addCell(labelCaption);
+				addCell(sheet, y, 0, decorator.getShortName());
 				y = y + 1;
-				sheet.addCell(new Label(y, i, VisibilityConstants
-						.getDescription(rflor.getVisibility())));
-				labelCaption = new Label(y, 0, decorator.getShortName()
+				addCell(sheet, y, i, VisibilityConstants
+						.getDescription(rflor.getVisibility()));
+				addCell(sheet, y, 0, decorator.getShortName()
 						+ ImportExportUtils.LABELCAPTION_VISIBILITY_SUFFIX);
-				sheet.addCell(labelCaption);
 			} else if (RestrictedFieldFile.class.isAssignableFrom(method
 					.getReturnType())) {
 				RestrictedFieldFile rflor = (RestrictedFieldFile) field;
 				y = y + 1;
-				Label labelCaption = new Label(y, 0, decorator.getShortName());
-				sheet.addCell(labelCaption);
+				addCell(sheet, y, 0, decorator.getShortName());
 				if (StringUtils.isNotEmpty(rflor.getValue())) {
-					sheet.addCell(new Label(y, i, rflor.getMimeType()
-							+ STOPFIELDS_EXCEL + rflor.getValue()));
+					addCell(sheet, y, i, rflor.getMimeType()
+							+ STOPFIELDS_EXCEL + rflor.getValue());
 				}
 				y = y + 1;
-				labelCaption = new Label(y, 0, decorator.getShortName()
+				addCell(sheet, y, 0, decorator.getShortName()
 						+ ImportExportUtils.LABELCAPTION_VISIBILITY_SUFFIX);
-				sheet.addCell(labelCaption);
 				if (StringUtils.isNotEmpty(rflor.getValue())) {
-					sheet.addCell(new Label(y, i, VisibilityConstants
-							.getDescription(rflor.getVisibility())));
+					addCell(sheet, y, i, VisibilityConstants
+							.getDescription(rflor.getVisibility()));
 				}
 			} else {
 				RestrictedField rr = (RestrictedField) field;
 				y = y + 1;
-				sheet.addCell(new Label(y, i, rr.getValue()));
-				Label labelCaption = new Label(y, 0, decorator.getShortName());
-				sheet.addCell(labelCaption);
+				addCell(sheet, y, i, rr.getValue());
+				addCell(sheet, y, 0, decorator.getShortName());
 				y = y + 1;
-				sheet.addCell(new Label(y, i, VisibilityConstants
-						.getDescription(rr.getVisibility())));
-				labelCaption = new Label(y, 0, decorator.getShortName()
+				addCell(sheet, y, i, VisibilityConstants
+						.getDescription(rr.getVisibility()));
+				addCell(sheet, y, 0, decorator.getShortName()
 						+ ImportExportUtils.LABELCAPTION_VISIBILITY_SUFFIX);
-				sheet.addCell(labelCaption);
 			}
 		}
 		return y;
@@ -222,8 +208,7 @@ public class UtilsXLS {
 
     public static int createCell(ApplicationService applicationService, int yy,
             int ii, IContainable containable,
-            ACrisNestedObject rp, WritableSheet sheetNested) throws IOException,
-        RowsExceededException, WriteException
+            ACrisNestedObject rp, HSSFSheet sheetNested) throws IOException
     {
         String field_value = "";
         boolean first = true;
@@ -250,11 +235,62 @@ public class UtilsXLS {
 
         }
         yy = yy + 1;
-        Label label_v = new Label(yy, ii, field_value);
-        sheetNested.addCell(label_v);
-        Label labelCaption = new Label(yy, 0, containable.getShortName());
-        sheetNested.addCell(labelCaption);
+        addCell(sheetNested, yy, ii, field_value);
+        addCell(sheetNested, yy, 0, containable.getShortName());
         
         return yy;
+    }
+    
+    /***
+     * Add a cell to the worksheet. A row is created if necessary.
+     * 
+     * @param sheet The worksheet
+     * @param colIndex The column of the new cell
+     * @param rowIndex The row of the new cell
+     * @param value The string value assigned to the cell
+     * @return The cell
+     */
+    public static Cell addCell(HSSFSheet sheet, int colIndex, int rowIndex, String value) {
+    	Row row = sheet.getRow(rowIndex);
+    	if (row == null)
+    		row = sheet.createRow(rowIndex);
+    	
+    	Cell cell = row.createCell(colIndex);
+        cell.setCellValue(value);
+        
+        return cell;
+    }
+    
+    /***
+     * Add a cell to the worksheet. A row is created if necessary.
+     * 
+     * @param sheet The worksheet
+     * @param colIndex The column of the new cell
+     * @param rowIndex The row of the new cell
+     * @param value The string value assigned to the cell
+     * @param style The cell style
+     * @return The cell
+     */
+    public static Cell addCell(HSSFSheet sheet, int colIndex, int rowIndex, String value, CellStyle style) {
+    	Cell cell = addCell(sheet, colIndex, rowIndex, value);
+        cell.setCellStyle(style);
+        
+        return cell;
+    }
+    
+    /***
+     * Convert cell value to String.
+     * 
+     * It is used for instance, to avoid error when calling getStringCellValue and cell hold numeric value.
+     * Exception rised:
+     * 	 java.lang.IllegalStateException: Cannot get a text value from a numeric cell poi
+     * 
+     * @param cell
+     * @return
+     */
+    public static String stringCellValue(Cell cell) {
+    	DataFormatter f = new DataFormatter();
+    	
+    	return f.formatCellValue(cell);
     }
 }
