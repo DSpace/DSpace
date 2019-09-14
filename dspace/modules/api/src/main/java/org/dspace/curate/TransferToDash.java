@@ -84,7 +84,6 @@ public class TransferToDash extends AbstractCurationTask {
             log.info("performing on " + packageDOI);
 
             dashService.putDataset(pkg);
-            dashService.migrateProvenances(pkg);
             if(!packageDOI.equals(versionlessPackageDOI)) {
                 // when we're dealing with a versioned item, delete any existing data
                 // files and replace them with the set of data files in the new item
@@ -94,6 +93,7 @@ public class TransferToDash extends AbstractCurationTask {
                 dashService.deleteDataFiles(pkg);
             }
             dashService.postDataFileReferences(context, dataPackage);
+            dashService.migrateProvenances(pkg);
             dashService.setEmbargoStatus(pkg);
             dashService.submitDashDataset(versionlessPackageDOI);
                         
