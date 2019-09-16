@@ -473,6 +473,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                                           .withName("Parent Community")
                                           .withLogo("ThisIsSomeDummyText")
                                           .build();
+        context.restoreAuthSystemState();
 
         ObjectMapper mapper = new ObjectMapper();
         CollectionRest collectionRest = new CollectionRest();
@@ -551,6 +552,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         // ADD authorization on parent community
         context.setCurrentUser(eperson);
         authorizeService.addPolicy(context, parentCommunity, Constants.ADD, eperson);
+        context.restoreAuthSystemState();
 
         String authToken = getAuthToken(eperson.getEmail(), password);
 
@@ -611,6 +613,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                 new MetadataValueRest("Title Text")));
 
         context.setCurrentUser(eperson);
+        context.restoreAuthSystemState();
+
         // User doesn't have add permission on the collection.
         String authToken = getAuthToken(eperson.getEmail(), password);
 
