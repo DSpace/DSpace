@@ -106,7 +106,12 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient().perform(get("/api/core/bundles/" + bundle1.getID()))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
-                   .andExpect(jsonPath("$", BundleMatcher.matchBundle(bundle1)))
+                   .andExpect(jsonPath("$", BundleMatcher.matchBundle(bundle1.getName(),
+                                                                      bundle1.getID(),
+                                                                      bundle1.getHandle(),
+                                                                      bundle1.getType(),
+                                                                      bundle1.getBitstreams())
+                   ))
                    .andExpect(jsonPath("$._embedded.bitstreams._embedded.bitstreams", containsInAnyOrder(
                            BitstreamMatcher.matchBitstreamEntry(bitstream1.getID(), bitstream1.getSizeBytes())))
                    )
@@ -139,8 +144,18 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$._embedded.bundles", Matchers.hasItems(
-                           BundleMatcher.matchBundle(bundle1),
-                           BundleMatcher.matchBundle(bundle2)
+                           BundleMatcher.matchBundle(bundle1.getName(),
+                                                     bundle1.getID(),
+                                                     bundle1.getHandle(),
+                                                     bundle1.getType(),
+                                                     bundle1.getBitstreams())
+                           ,
+                           BundleMatcher.matchBundle(bundle2.getName(),
+                                                     bundle2.getID(),
+                                                     bundle2.getHandle(),
+                                                     bundle2.getType(),
+                                                     bundle2.getBitstreams())
+
                    )))
                    .andExpect(jsonPath("$._links.self.href", endsWith("/api/core/items/" + item.getID() + "/bundles")))
         ;

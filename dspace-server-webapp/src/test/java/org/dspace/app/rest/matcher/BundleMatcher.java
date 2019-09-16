@@ -17,23 +17,13 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.dspace.content.Bitstream;
-import org.dspace.content.Bundle;
 import org.dspace.core.Constants;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 
 public class BundleMatcher {
 
-    private BundleMatcher() { }
-
-    public static Matcher<? super Object> matchBundle(Bundle bundle) {
-        return matchBundle(
-            bundle.getName(),
-            bundle.getID(),
-            bundle.getHandle(),
-            bundle.getType(),
-            bundle.getBitstreams()
-        );
+    private BundleMatcher() {
     }
 
 
