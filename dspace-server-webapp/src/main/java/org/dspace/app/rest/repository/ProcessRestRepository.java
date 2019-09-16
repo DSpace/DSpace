@@ -62,6 +62,11 @@ public class ProcessRestRepository extends AbstractDSpaceRestRepository {
         return processConverter.fromModel(process);
     }
 
+    /**
+     * This method will return an integer describing the total amount of Process objects in the database
+     * @return  The total amount of Process objects in the database
+     * @throws SQLException If something goes wrong
+     */
     public int getTotalAmountOfProcesses() throws SQLException {
         return processService.countTotal(obtainContext());
     }

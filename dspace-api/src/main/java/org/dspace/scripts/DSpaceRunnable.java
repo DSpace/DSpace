@@ -137,6 +137,13 @@ public abstract class DSpaceRunnable implements Runnable {
      */
     public abstract void setup() throws ParseException;
 
+    /**
+     * This method will return if the script is allowed to execute in the given context. This is by default set
+     * to the currentUser in the context being an admin, however this can be overwritten by each script individually
+     * if different rules apply
+     * @param context   The relevant DSpace context
+     * @return          A boolean indicating whether the script is allowed to execute or not
+     */
     public boolean isAllowedToExecute(Context context) {
         try {
             return authorizeService.isAdmin(context);

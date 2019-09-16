@@ -35,13 +35,11 @@ import org.dspace.content.service.ProcessService;
 import org.dspace.core.Context;
 import org.dspace.scripts.DSpaceCommandLineParameter;
 import org.dspace.scripts.DSpaceRunnable;
-import org.dspace.utils.DSpace;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
-import org.springframework.web.multipart.MultipartFile;
 
 /**
  * This is the REST repository dealing with the Script logic
@@ -128,6 +126,7 @@ public class ScriptRestRepository extends DSpaceRestRepository<ScriptRest, Strin
         }
         return null;
     }
+
     private List<DSpaceCommandLineParameter> processPropertiesToDSpaceCommandLineParameters(String propertiesJson)
         throws IOException {
         List<ParameterValueRest> parameterValueRestList = new LinkedList<>();

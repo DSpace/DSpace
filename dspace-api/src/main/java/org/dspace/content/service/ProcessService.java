@@ -127,6 +127,12 @@ public interface ProcessService {
      */
     public List<DSpaceCommandLineParameter> getParameters(Process process);
 
+    /**
+     * Returns the total amount of Process objects in the dataase
+     * @param context   The relevant DSpace context
+     * @return          An integer that describes the amount of Process objects in the database
+     * @throws SQLException If something goes wrong
+     */
     int countTotal(Context context) throws SQLException;
 
 }
