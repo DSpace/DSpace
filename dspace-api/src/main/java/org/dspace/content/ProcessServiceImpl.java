@@ -18,9 +18,9 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.dao.ProcessDAO;
-import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.ProcessService;
 import org.dspace.core.Context;
+import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.scripts.DSpaceCommandLineParameter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,8 +42,9 @@ public class ProcessServiceImpl implements ProcessService {
         process.setParameters(DSpaceCommandLineParameter.concatenate(parameters));
         process.setCreationTime(new Date());
         Process createdProcess = processDAO.create(context, process);
-        log.info("Process has been created for eperson with email: " + ePerson.getEmail() + " with ID: "
-                     + createdProcess.getID() + " and scriptName: " + scriptName + " and parameters: " + parameters);
+        log.info(LogManager.getHeader(context, "process_create",
+            "Process has been created for eperson with email " + ePerson.getEmail() + " with ID " +
+                    createdProcess.getID() + " and scriptName " + scriptName + " and parameters " + parameters));
         return createdProcess;
     }
 
@@ -82,7 +83,8 @@ public class ProcessServiceImpl implements ProcessService {
         process.setProcessStatus(ProcessStatus.RUNNING);
         process.setStartTime(new Date());
         update(context, process);
-        log.info("Process with ID: " + process.getID() + " and name: " + process.getName() + " has started");
+        log.info(LogManager.getHeader(context, "process_start", "Process with ID " + process.getID()
+            + " and name " + process.getName() + " has started"));
 
     }
 
@@ -91,7 +93,8 @@ public class ProcessServiceImpl implements ProcessService {
         process.setProcessStatus(ProcessStatus.FAILED);
         process.setFinishedTime(new Date());
         update(context, process);
-        log.info("Process with ID: " + process.getID() + " and name: " + process.getName() + " has failed");
+        log.info(LogManager.getHeader(context, "process_fail", "Process with ID " + process.getID()
+            + " and name " + process.getName() + " has failed"));
 
     }
 
@@ -100,14 +103,16 @@ public class ProcessServiceImpl implements ProcessService {
         process.setProcessStatus(ProcessStatus.COMPLETED);
         process.setFinishedTime(new Date());
         update(context, process);
-        log.info("Process with ID: " + process.getID() + " and name: " + process.getName() + " has been completed");
+        log.info(LogManager.getHeader(context, "process_complete", "Process with ID " + process.getID()
+            + " and name " + process.getName() + " has been completed"));
 
     }
 
     @Override
     public void delete(Context context, Process process) throws SQLException {
         processDAO.delete(context, process);
-        log.info("Process with ID: " + process.getID() + " and name: " + process.getName() + " has been deleted");
+        log.info(LogManager.getHeader(context, "process_delete", "Process with ID " + process.getID()
+            + " and name " + process.getName() + " has been deleted"));
 
     }
 

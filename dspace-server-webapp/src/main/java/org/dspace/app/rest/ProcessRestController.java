@@ -12,7 +12,6 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 import java.sql.SQLException;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -20,7 +19,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.link.HalLinkService;
 import org.dspace.app.rest.model.ProcessRest;
-import org.dspace.app.rest.model.hateoas.EmbeddedPage;
 import org.dspace.app.rest.model.hateoas.ProcessResource;
 import org.dspace.app.rest.repository.ProcessRestRepository;
 import org.springframework.beans.factory.InitializingBean;
@@ -66,7 +64,7 @@ public class ProcessRestController implements InitializingBean {
      * This method is called by a GET request to the system/processes endpoint. This will return an embeddedPage object
      * containing all the Process objects in the database represented as a ProcessResource object
      * @param pageable  The pageable for the request
-     * @return          The embeddedPage containing all the Process objects from the database represented as
+     * @return The embeddedPage containing all the Process objects from the database represented as
      *                  ProcessResource objects
      * @throws Exception    If something goes wrong
      */
@@ -100,7 +98,7 @@ public class ProcessRestController implements InitializingBean {
      * This method will retrieve the Process object from the database that matches the given processId and it'll
      * send this back as a ProcessResource
      * @param processId     The process Id to be searched on
-     * @return              The ProcessResource object constructed from the Process retrieved by the id
+     * @return The ProcessResource object constructed from the Process retrieved by the id
      * @throws SQLException If something goes wrong
      */
     @RequestMapping(method = RequestMethod.GET, value = "/{processId}")
