@@ -766,6 +766,7 @@
             <version>4.5</version>
         </dependency>
 
+        <!-- Email templating -->
         <dependency>
             <groupId>org.apache.velocity</groupId>
             <artifactId>velocity-engine-core</artifactId>
@@ -779,6 +780,7 @@
             <version>2.6.2</version>
             <scope>test</scope>
         </dependency>
+
         <dependency>
             <groupId>org.hibernate.javax.persistence</groupId>
             <artifactId>hibernate-jpa-2.1-api</artifactId>
