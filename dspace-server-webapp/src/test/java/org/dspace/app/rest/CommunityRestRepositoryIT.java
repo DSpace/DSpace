@@ -179,7 +179,6 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
         // ADD authorization on parent community
         context.setCurrentUser(eperson);
         authorizeService.addPolicy(context, parentCommunity, Constants.ADD, eperson);
-
         context.restoreAuthSystemState();
 
         String authToken = getAuthToken(eperson.getEmail(), password);
