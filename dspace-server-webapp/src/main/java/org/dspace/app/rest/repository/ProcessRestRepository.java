@@ -13,6 +13,8 @@ import java.util.List;
 
 import org.dspace.app.rest.converter.processes.ProcessConverter;
 import org.dspace.app.rest.model.ProcessRest;
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Process;
 import org.dspace.content.service.ProcessService;
 import org.dspace.core.Context;
@@ -31,6 +33,9 @@ public class ProcessRestRepository extends AbstractDSpaceRestRepository {
 
     @Autowired
     private ProcessConverter processConverter;
+
+    @Autowired
+    private AuthorizeService authorizeService;
 
     /**
      * This method will return a list of all Process objects converted to ProcessRest objects
@@ -56,9 +61,12 @@ public class ProcessRestRepository extends AbstractDSpaceRestRepository {
      * @return              The converted ProcessRest object
      * @throws SQLException If something goes wrong
      */
-    public ProcessRest getProcessById(Integer processId) throws SQLException {
+    public ProcessRest getProcessById(Integer processId) throws SQLException, AuthorizeException {
         Context context = obtainContext();
         Process process = processService.find(context, processId);
+        if ((context.getCurrentUser() == null) || (!context.getCurrentUser().equals(process.getEPerson()) && !authorizeService.isAdmin(context))) {
+            throw new AuthorizeException("The current user is not eligible to view the process with id: " + processId);
+        }
         return processConverter.fromModel(process);
     }
 

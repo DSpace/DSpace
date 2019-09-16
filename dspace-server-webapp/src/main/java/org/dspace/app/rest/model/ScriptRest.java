@@ -10,7 +10,6 @@ package org.dspace.app.rest.model;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.dspace.app.rest.RestResourceController;
 
@@ -66,11 +65,6 @@ public class ScriptRest extends BaseObjectRest<String> {
 
     public void addToParameterRestList(ParameterRest parameter) {
         parameterRestList.add(parameter);
-    }
-
-    @JsonIgnore
-    public String getId() {
-        return id;
     }
 
 }

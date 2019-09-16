@@ -14,6 +14,10 @@ import org.dspace.app.rest.model.ScriptRest;
 import org.dspace.app.rest.model.hateoas.ProcessResource;
 import org.dspace.app.rest.repository.ScriptRestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.rest.webmvc.ControllerUtils;
+import org.springframework.hateoas.ResourceSupport;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -41,13 +45,13 @@ public class ScriptRestController {
      */
     @RequestMapping(method = RequestMethod.POST, value = "/{name}/processes")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ProcessResource startProcess(@PathVariable(name = "name") String scriptName) throws Exception {
+    public ResponseEntity<ResourceSupport> startProcess(@PathVariable(name = "name") String scriptName) throws Exception {
         if (log.isTraceEnabled()) {
             log.trace("Starting Process for Script with name: " + scriptName);
         }
         ProcessRest processRest = scriptRestRepository.startProcess(scriptName);
         ProcessResource processResource = new ProcessResource(processRest);
-        return processResource;
+        return ControllerUtils.toResponseEntity(HttpStatus.ACCEPTED, null, processResource);
     }
 
 }
