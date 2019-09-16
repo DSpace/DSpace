@@ -280,15 +280,15 @@
 					<i18n>true</i18n>
 				</field>
 
-				<!-- Título del libro (solo para capitulos de libro) -->
+				<!-- Título del libro para capitulos de libro o del libro de actas del congreso en caso de objeto de conferencia -->
 				<field>
 					<dc-schema>sedici</dc-schema>
 					<dc-element>relation</dc-element>
 					<dc-qualifier>bookTitle</dc-qualifier>
 					<label>Título del libro</label>
 					<input-type>onebox</input-type>
-					<hint>En el caso de capítulos, indicar aquí el título del libro al que pertenence</hint>
-					<type-bind>Libro</type-bind>
+					<hint>En el caso de capítulos de libro, indicar aquí el título del libro al que pertenence. En el caso de objetos de conferencia, indicar el título del libro de actas del congreso, si corresponde.</hint>
+					<type-bind>Libro,Objeto de conferencia</type-bind>
 					<visibility-on-group>Bibliotecarios</visibility-on-group>
 				</field>
 
@@ -605,7 +605,7 @@
 					<label>Título de la serie</label>
 					<input-type>onebox</input-type>
 					<hint>Título de la serie en la que el documento fué publicado</hint>
-					<type-bind>Articulo,Objeto de conferencia,Publicacion seriada</type-bind>
+					<type-bind>Articulo,Publicacion seriada</type-bind>
 				</field>
 				
 				<!-- Volumen y numero de la revista -->
