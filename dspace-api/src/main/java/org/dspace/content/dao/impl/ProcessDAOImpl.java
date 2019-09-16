@@ -45,6 +45,26 @@ public class ProcessDAOImpl extends AbstractHibernateDAO<Process> implements Pro
 
         return list(context, criteriaQuery, false, Process.class, -1, -1);
     }
+
+    public List<Process> findAll(Context context, int limit, int offset) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Process.class);
+        Root<Process> processRoot = criteriaQuery.from(Process.class);
+        criteriaQuery.select(processRoot);
+
+        return list(context, criteriaQuery, false, Process.class, limit, offset);
+    }
+
+    public int countRows(Context context) throws SQLException {
+
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Process.class);
+        Root<Process> processRoot = criteriaQuery.from(Process.class);
+        criteriaQuery.select(processRoot);
+
+        return count(context, criteriaQuery, criteriaBuilder, processRoot);
+
+    }
 }
 
 

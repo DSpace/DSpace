@@ -7,11 +7,16 @@
  */
 package org.dspace.scripts;
 
+import java.sql.SQLException;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.core.Context;
 import org.dspace.scripts.handler.DSpaceRunnableHandler;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Required;
 
 /**
@@ -41,6 +46,9 @@ public abstract class DSpaceRunnable implements Runnable {
      *  a CommandlineDSpaceRunnableHandler depending from where the script is called
      */
     protected DSpaceRunnableHandler handler;
+
+    @Autowired
+    private AuthorizeService authorizeService;
 
     public String getName() {
         return name;
@@ -128,4 +136,13 @@ public abstract class DSpaceRunnable implements Runnable {
      * @throws ParseException   If something goes wrong
      */
     public abstract void setup() throws ParseException;
+
+    public boolean isAllowedToExecute(Context context) {
+        try {
+            return authorizeService.isAdmin(context);
+        } catch (SQLException e) {
+            handler.logError("Error occured when trying to verify permissions for script: " + name);
+        }
+        return false;
+    }
 }

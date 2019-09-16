@@ -32,9 +32,6 @@ public class ProcessServiceImpl implements ProcessService {
     @Autowired
     private ProcessDAO processDAO;
 
-    @Autowired
-    private BitstreamService bitstreamService;
-
     @Override
     public Process create(Context context, EPerson ePerson, String scriptName,
                           List<DSpaceCommandLineParameter> parameters) throws SQLException {
@@ -58,6 +55,11 @@ public class ProcessServiceImpl implements ProcessService {
     @Override
     public List<Process> findAll(Context context) throws SQLException {
         return processDAO.findAll(context, Process.class);
+    }
+
+    @Override
+    public List<Process> findAll(Context context, int limit, int offset) throws SQLException {
+        return processDAO.findAll(context, limit, offset);
     }
 
     @Override
@@ -128,6 +130,10 @@ public class ProcessServiceImpl implements ProcessService {
         }
 
         return parameterList;
+    }
+
+    public int countTotal(Context context) throws SQLException {
+        return processDAO.countRows(context);
     }
 
 }

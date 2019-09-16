@@ -17,6 +17,7 @@ import org.dspace.content.Process;
 import org.dspace.content.service.ProcessService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 /**
@@ -36,9 +37,9 @@ public class ProcessRestRepository extends AbstractDSpaceRestRepository {
      * @return  The list of ProcessRest objects coming forth from all Process objects in the database
      * @throws SQLException If something goes wrong
      */
-    public List<ProcessRest> getAllProcesses() throws SQLException {
+    public List<ProcessRest> getAllProcesses(Pageable pageable) throws SQLException {
         Context context = obtainContext();
-        List<Process> list = processService.findAll(context);
+        List<Process> list = processService.findAll(context, pageable.getPageSize(), pageable.getOffset());
 
         List<ProcessRest> listToReturn = new LinkedList<>();
         for (Process process : list) {
@@ -59,5 +60,9 @@ public class ProcessRestRepository extends AbstractDSpaceRestRepository {
         Context context = obtainContext();
         Process process = processService.find(context, processId);
         return processConverter.fromModel(process);
+    }
+
+    public int getTotalAmountOfProcesses() throws SQLException {
+        return processService.countTotal(obtainContext());
     }
 }

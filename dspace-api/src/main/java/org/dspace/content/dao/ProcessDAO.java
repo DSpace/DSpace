@@ -31,4 +31,17 @@ public interface ProcessDAO extends GenericDAO<Process> {
      * @throws SQLException If something goes wrong
      */
     public List<Process> findAllSortByStartTime(Context context) throws SQLException;
+
+    /**
+     * Returns a list of all Process objects in the database
+     * @param context   The relevant DSpace context
+     * @param limit     The limit for the amount of Processes returned
+     * @param offset    The offset for the Processes to be returned
+     * @return The list of all Process objects in the Database
+     * @throws SQLException If something goes wrong
+     */
+    List<Process> findAll(Context context, int limit, int offset) throws SQLException;
+
+    int countRows(Context context) throws SQLException;
+
 }
