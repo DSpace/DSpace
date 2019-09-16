@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.dspace.app.rest.ProcessRestController;
 import org.dspace.content.ProcessStatus;
 
@@ -40,7 +41,9 @@ public class ProcessRest extends BaseObjectRest<UUID> {
     private UUID userId;
     private Integer processId;
     private Date startTime;
+    private Date endTime;
     private ProcessStatus processStatus;
+    @JsonProperty(value = "parameters")
     private List<ParameterValueRest> parameterRestList;
 
     public UUID getUserId() {
@@ -89,6 +92,14 @@ public class ProcessRest extends BaseObjectRest<UUID> {
 
     public void setScriptName(String scriptName) {
         this.scriptName = scriptName;
+    }
+
+    public Date getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(Date endTime) {
+        this.endTime = endTime;
     }
 
     @JsonIgnore

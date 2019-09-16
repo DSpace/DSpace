@@ -30,6 +30,7 @@ import org.dspace.app.rest.model.ScriptRest;
 import org.dspace.app.rest.model.hateoas.DSpaceResource;
 import org.dspace.app.rest.model.hateoas.ScriptResource;
 import org.dspace.app.rest.scripts.handler.impl.RestDSpaceRunnableHandler;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.service.ProcessService;
 import org.dspace.core.Context;
 import org.dspace.scripts.DSpaceCommandLineParameter;
@@ -40,6 +41,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * This is the REST repository dealing with the Script logic
@@ -100,37 +102,23 @@ public class ScriptRestRepository extends DSpaceRestRepository<ScriptRest, Strin
      * @throws SQLException If something goes wrong
      * @throws IOException  If something goes wrong
      */
-    public ProcessRest startProcess(String scriptName) throws SQLException, IOException {
+    public ProcessRest startProcess(String scriptName) throws SQLException, IOException, AuthorizeException {
         Context context = obtainContext();
-        List<ParameterValueRest> parameterValueRestList = new LinkedList<>();
-        ObjectMapper objectMapper = new ObjectMapper();
-        String propertiesJson = requestService.getCurrentRequest().getServletRequest().getParameter("properties");
-        if (StringUtils.isNotBlank(propertiesJson)) {
-            try {
-                parameterValueRestList = Arrays
-                    .asList(objectMapper.readValue(propertiesJson, ParameterValueRest[].class));
-            } catch (IOException e) {
-                log.error(
-                    "Couldn't convert the given properties to proper ParameterValueRest objects: " + propertiesJson, e);
-                throw e;
-            }
+        String properties = requestService.getCurrentRequest().getServletRequest().getParameter("properties");
+        List<DSpaceCommandLineParameter> dSpaceCommandLineParameters =
+            processPropertiesToDSpaceCommandLineParameters(properties);
+        DSpaceRunnable scriptToExecute = getdSpaceRunnableForName(scriptName);
+        if (scriptToExecute == null) {
+            throw new DSpaceBadRequestException("The script for name: " + scriptName + " wasn't found");
         }
-
-        List<DSpaceCommandLineParameter> dSpaceCommandLineParameters = new LinkedList<>();
-        dSpaceCommandLineParameters.addAll(
-            parameterValueRestList.stream().map(x -> dSpaceRunnableParameterConverter.toModel(x))
-                                  .collect(Collectors.toList()));
+        if (!scriptToExecute.isAllowedToExecute(context)) {
+            throw new AuthorizeException("Current user is not eligible to execute script with name: " + scriptName);
+        }
+        RestDSpaceRunnableHandler restDSpaceRunnableHandler = new RestDSpaceRunnableHandler(
+            context.getCurrentUser(), scriptName, dSpaceCommandLineParameters);
+        List<String> args = constructArgs(dSpaceCommandLineParameters);
         try {
-            RestDSpaceRunnableHandler restDSpaceRunnableHandler = new RestDSpaceRunnableHandler(
-                context.getCurrentUser(), scriptName, dSpaceCommandLineParameters);
-
-            List<String> args = new ArrayList<>();
-            args.add(scriptName);
-            for (DSpaceCommandLineParameter parameter : dSpaceCommandLineParameters) {
-                args.add(parameter.getName());
-                args.add(parameter.getValue());
-            }
-            runDSpaceScriptWithArgs(args.toArray(new String[0]), restDSpaceRunnableHandler, scriptName);
+            runDSpaceScript(scriptToExecute, restDSpaceRunnableHandler, args);
             context.complete();
             return processConverter.fromModel(restDSpaceRunnableHandler.getProcess());
         } catch (SQLException e) {
@@ -140,29 +128,55 @@ public class ScriptRestRepository extends DSpaceRestRepository<ScriptRest, Strin
         }
         return null;
     }
+    private List<DSpaceCommandLineParameter> processPropertiesToDSpaceCommandLineParameters(String propertiesJson)
+        throws IOException {
+        List<ParameterValueRest> parameterValueRestList = new LinkedList<>();
+        ObjectMapper objectMapper = new ObjectMapper();
+        if (StringUtils.isNotBlank(propertiesJson)) {
+            parameterValueRestList = Arrays.asList(objectMapper.readValue(propertiesJson, ParameterValueRest[].class));
+        }
 
-    /**
-     * This method will try to find the script to run and run if possible
-     * @param args                  The arguments to be passed along to the script
-     * @param dSpaceRunnableHandler The handler for the script, this will be a RestDSpaceRunnableHandler in this
-     *                              instance
-     * @param scriptName            The name of the script for which a process wants to be started
-     */
-    private void runDSpaceScriptWithArgs(String[] args, RestDSpaceRunnableHandler dSpaceRunnableHandler,
-                                         String scriptName) {
-        List<DSpaceRunnable> scripts = new DSpace().getServiceManager().getServicesByType(DSpaceRunnable.class);
-        for (DSpaceRunnable script : scripts) {
+        List<DSpaceCommandLineParameter> dSpaceCommandLineParameters = new LinkedList<>();
+        dSpaceCommandLineParameters.addAll(
+            parameterValueRestList.stream().map(x -> dSpaceRunnableParameterConverter.toModel(x))
+                                  .collect(Collectors.toList()));
+        return dSpaceCommandLineParameters;
+    }
+
+    private DSpaceRunnable getdSpaceRunnableForName(String scriptName) {
+        DSpaceRunnable scriptToExecute = null;
+        for (DSpaceRunnable script : dspaceRunnables) {
             if (StringUtils.equalsIgnoreCase(script.getName(), scriptName)) {
-                try {
-                    script.initialize(args, dSpaceRunnableHandler);
-                    dSpaceRunnableHandler.schedule(script);
-                } catch (ParseException e) {
-                    script.printHelp();
-                    dSpaceRunnableHandler
-                        .handleException("Failed to parse the arguments given to the script with name: " + scriptName
-                                             + " and args: " + Arrays.toString(args), e);
-                }
+                scriptToExecute = script;
+                break;
             }
         }
+        return scriptToExecute;
     }
+
+    private List<String> constructArgs(List<DSpaceCommandLineParameter> dSpaceCommandLineParameters) {
+        List<String> args = new ArrayList<>();
+        for (DSpaceCommandLineParameter parameter : dSpaceCommandLineParameters) {
+            args.add(parameter.getName());
+            if (parameter.getValue() != null) {
+                args.add(parameter.getValue());
+            }
+        }
+        return args;
+    }
+
+    private void runDSpaceScript(DSpaceRunnable scriptToExecute,
+                                 RestDSpaceRunnableHandler restDSpaceRunnableHandler, List<String> args) {
+        try {
+            scriptToExecute.initialize(args.toArray(new String[0]), restDSpaceRunnableHandler);
+            restDSpaceRunnableHandler.schedule(scriptToExecute);
+        } catch (ParseException e) {
+            scriptToExecute.printHelp();
+            restDSpaceRunnableHandler
+                .handleException(
+                    "Failed to parse the arguments given to the script with name: " + scriptToExecute.getName()
+                        + " and args: " + args, e);
+        }
+    }
+
 }

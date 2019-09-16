@@ -6,7 +6,7 @@
  * http://www.dspace.org/license/
  */
 
-package org.dspace.scripts;
+package org.dspace.discovery;
 
 import org.apache.commons.cli.CommandLine;
 

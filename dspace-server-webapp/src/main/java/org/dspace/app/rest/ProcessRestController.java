@@ -7,10 +7,14 @@
  */
 package org.dspace.app.rest;
 
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
+
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -24,7 +28,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.Link;
+import org.springframework.hateoas.PagedResources;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -63,29 +70,31 @@ public class ProcessRestController implements InitializingBean {
      *                  ProcessResource objects
      * @throws Exception    If something goes wrong
      */
+    @PreAuthorize("hasAuthority('ADMIN')")
     @RequestMapping(method = RequestMethod.GET)
-    public EmbeddedPage getProcesses(Pageable pageable) throws Exception {
+    public PagedResources<ProcessResource> getProcesses(Pageable pageable, PagedResourcesAssembler assembler)
+        throws Exception {
         if (log.isTraceEnabled()) {
             log.trace("Retrieving processes");
         }
 
-        List<ProcessRest> processRestList = processRestRepository.getAllProcesses();
-        List<ProcessResource> processResources = new LinkedList<>();
-        for (ProcessRest processRest : processRestList) {
-            ProcessResource processResource = new ProcessResource(processRest);
-            linkService.addLinks(processResource);
-            processResources.add(processResource);
+        List<ProcessResource> processResources = processRestRepository.getAllProcesses(pageable).stream()
+                                                                      .map(processRest -> {
+                                                                          ProcessResource processResource =
+                                                                              new ProcessResource(
+                                                                                  processRest);
+                                                                          linkService.addLinks(processResource);
+                                                                          return processResource;
+                                                                      }).collect(Collectors.toList());
 
-        }
+        Page page = new PageImpl<>(processResources, pageable, processRestRepository.getTotalAmountOfProcesses());
 
-        Page page = new PageImpl<>(processResources, pageable, processRestList.size());
+        Link link = linkTo(methodOn(this.getClass()).getProcesses(pageable, assembler)).withSelfRel();
+        PagedResources<ProcessResource> result = assembler.toResource(page, link);
 
-//        SearchResultsResourceHalLinkFactory linkFactory = new SearchResultsResourceHalLinkFactory();
-        EmbeddedPage embeddedPage = new EmbeddedPage("test",
-                                                     page, processResources, "scripts");
-
-        return embeddedPage;
+        return result;
     }
+
 
     /**
      * This method will retrieve the Process object from the database that matches the given processId and it'll

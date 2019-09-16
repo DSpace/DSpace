@@ -30,9 +30,6 @@ public class ScriptRestController {
     private static final Logger log = LogManager.getLogger();
 
     @Autowired
-    private DiscoverableEndpointsService discoverableEndpointsService;
-
-    @Autowired
     private ScriptRestRepository scriptRestRepository;
 
     /**
