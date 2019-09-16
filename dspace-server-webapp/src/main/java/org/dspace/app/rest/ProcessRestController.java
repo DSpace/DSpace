@@ -21,6 +21,7 @@ import org.dspace.app.rest.link.HalLinkService;
 import org.dspace.app.rest.model.ProcessRest;
 import org.dspace.app.rest.model.hateoas.ProcessResource;
 import org.dspace.app.rest.repository.ProcessRestRepository;
+import org.dspace.authorize.AuthorizeException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -102,7 +103,8 @@ public class ProcessRestController implements InitializingBean {
      * @throws SQLException If something goes wrong
      */
     @RequestMapping(method = RequestMethod.GET, value = "/{processId}")
-    public ProcessResource getProcessById(@PathVariable(name = "processId") Integer processId) throws SQLException {
+    public ProcessResource getProcessById(@PathVariable(name = "processId") Integer processId)
+        throws SQLException, AuthorizeException {
         if (log.isTraceEnabled()) {
             log.trace("Retrieving Process with ID: " + processId);
         }

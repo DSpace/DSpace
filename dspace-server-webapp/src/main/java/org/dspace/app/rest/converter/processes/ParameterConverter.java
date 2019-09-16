@@ -33,7 +33,7 @@ public class ParameterConverter {
         for (Option option : CollectionUtils.emptyIfNull(options.getOptions())) {
             ParameterRest parameterRest = new ParameterRest();
             parameterRest.setDescription(option.getDescription());
-            parameterRest.setName("-" + (option.getOpt() != null ? option.getOpt() : "-" + option.getLongOpt()));
+            parameterRest.setName((option.getOpt() != null ? "-" + option.getOpt() : "--" + option.getLongOpt()));
             parameterRest.setType(((Class) option.getType()).getSimpleName());
             listToReturn.add(parameterRest);
         }
