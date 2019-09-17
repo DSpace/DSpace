@@ -671,7 +671,7 @@ public class DashService {
 
     public int addCurationActivity(DryadDataPackage dataPackage, String status, String note,
                                    String createdAt, String processKeyword) {
-        return addCurationActivity(dataPackage, status, note, createdAt, processKeyword);
+        return addCurationActivity(dataPackage.getVersionlessIdentifier(), status, note, createdAt, processKeyword);
     }
 
     public int addCurationActivity(String dashDatasetDOI, String status, String note,
