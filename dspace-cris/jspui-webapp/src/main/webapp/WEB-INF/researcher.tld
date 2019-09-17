@@ -155,4 +155,11 @@
 	<function-class>org.dspace.app.webui.cris.web.tag.ResearcherTagLibraryFunctions</function-class>
 	<function-signature>java.lang.Object getPropertyDefinitionI18N(java.lang.Object, java.lang.String)</function-signature>
 </function>
+
+<function>
+	<description>Wrap the property definition to add i18n support (check contents on entity instance)</description>
+	<name>getPropertyDefinitionI18NByCrisObject</name>
+	<function-class>org.dspace.app.webui.cris.web.tag.ResearcherTagLibraryFunctions</function-class>
+	<function-signature>it.cilea.osd.jdyna.model.IPropertiesDefinition getPropertyDefinitionI18NByCrisObject(org.dspace.app.cris.model.ICrisObject, it.cilea.osd.jdyna.model.IContainable, java.lang.String)</function-signature>
+</function>
 </taglib>

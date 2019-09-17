@@ -94,7 +94,7 @@
 													<c:forEach
 														items="${propertiesDefinitionsInHolder[holder.shortName]}"
 														var="tipologiaDaVisualizzareNoI18n" varStatus="status">
-														<c:set var="tipologiaDaVisualizzare" value="${researcher:getPropertyDefinitionI18N(tipologiaDaVisualizzareNoI18n,currLocale)}" />
+														<c:set var="tipologiaDaVisualizzare" value="${researcher:getPropertyDefinitionI18NByCrisObject(anagraficaObject,tipologiaDaVisualizzareNoI18n,currLocale)}" />
 														<%!public URL fileFieldURL;%>
 							
 														<c:set var="urljspcustomfield"
@@ -111,7 +111,8 @@
 														%>
 														<c:if
 															test="${dyna:instanceOf(tipologiaDaVisualizzare,'it.cilea.osd.jdyna.model.ADecoratorTypeDefinition')}">
-															
+																<c:set var="tipologiaDaVisualizzare" value="${researcher:getPropertyDefinitionI18N(tipologiaDaVisualizzareNoI18n,currLocale)}" />
+																
 																<c:set var="totalHit" value="0"/>
 																<c:set var="limit" value="5"/>
 																<c:set var="offset" value="0"/>											
