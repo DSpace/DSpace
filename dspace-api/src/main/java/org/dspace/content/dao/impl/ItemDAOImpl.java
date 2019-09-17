@@ -320,6 +320,7 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
                 criteriaBuilder.isMember(collection, itemRoot.get(Item_.collections)),
                 criteriaBuilder.isTrue(itemRoot.get(Item_.inArchive))));
         criteriaQuery.orderBy(criteriaBuilder.asc(itemRoot.get(Item_.id)));
+        criteriaQuery.groupBy(itemRoot.get(Item_.id));
         return count(context, criteriaQuery, criteriaBuilder, itemRoot);
     }
 
