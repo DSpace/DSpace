@@ -108,6 +108,32 @@ public interface ChoiceAuthorityService {
                                 String locale);
 
     /**
+     * Wrapper that calls getTopChoices method of the plugin.
+     *
+     * @param authorityName authority name
+     * @param start         choice at which to start, 0 is first.
+     * @param limit         maximum number of choices to return, 0 for no limit.
+     * @param locale        explicit localization key if available, or null
+     * @return a Choices object (never null).
+     * @see org.dspace.content.authority.ChoiceAuthority#getTopChoices(java.lang.String, int, int, java.lang.String)
+     */
+    public Choices getTopChoices(String authorityName, int start, int limit, String locale);
+    
+    /**
+     * Wrapper that calls getChoicesByParent method of the plugin.
+     *
+     * @param authorityName authority name
+     * @param parentId      parent Id
+     * @param start         choice at which to start, 0 is first.
+     * @param limit         maximum number of choices to return, 0 for no limit.
+     * @param locale        explicit localization key if available, or null
+     * @return a Choices object (never null).
+     * @see org.dspace.content.authority.ChoiceAuthority#getChoicesByParent(java.lang.String, java.lang.String,
+     *  int, int, java.lang.String)
+     */
+    public Choices getChoicesByParent(String authorityName, String parentId, int start, int limit, String locale);
+
+    /**
      * Wrapper that calls getLabel method of the plugin corresponding to
      * the metadata field defined by schema,element,qualifier.
      *

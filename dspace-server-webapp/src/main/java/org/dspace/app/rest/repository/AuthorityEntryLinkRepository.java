@@ -14,9 +14,13 @@ import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
+import org.dspace.app.rest.SearchRestMethod;
+import org.dspace.app.rest.exception.PaginationException;
 import org.dspace.app.rest.model.AuthorityEntryRest;
 import org.dspace.app.rest.model.AuthorityRest;
+import org.dspace.app.rest.model.CollectionRest;
 import org.dspace.app.rest.model.hateoas.AuthorityEntryResource;
+import org.dspace.app.rest.model.hateoas.DSpaceResource;
 import org.dspace.app.rest.model.hateoas.HALResource;
 import org.dspace.app.rest.utils.AuthorityUtils;
 import org.dspace.content.Collection;
@@ -24,9 +28,11 @@ import org.dspace.content.authority.Choice;
 import org.dspace.content.authority.Choices;
 import org.dspace.content.authority.service.ChoiceAuthorityService;
 import org.dspace.content.service.CollectionService;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
@@ -80,7 +86,62 @@ public class AuthorityEntryLinkRepository extends AbstractDSpaceRestRepository
             }
         }
 
-        return utils.getPage(results, pageable);
+        Page<AuthorityEntryRest> resources;
+        try {
+            resources = utils.getPage(results, pageable);
+        } catch (PaginationException pe) {
+            resources = new PageImpl<AuthorityEntryRest>(new ArrayList<AuthorityEntryRest>(), pageable, pe.getTotal());
+        }
+        return resources;
+    }
+
+    @SearchRestMethod(name = "byParent")
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
+    public Page<AuthorityEntryRest> findByParent(HttpServletRequest request, String name,
+                                          Pageable pageable, String projection) {
+        Context context = obtainContext();
+        String id = request.getParameter("id");
+
+        List<AuthorityEntryRest> results = new ArrayList<AuthorityEntryRest>();
+        if (StringUtils.isNotBlank(id) && authorityUtils.isHierarchical(name)) {
+            Choices choices = cas.getChoicesByParent(name, id, pageable.getOffset(), pageable.getPageSize(),
+                    context.getCurrentLocale().toString());
+            
+            for (Choice value : choices.values) {
+                results.add(authorityUtils.convertEntry(value, name));
+            }
+        }
+
+        Page<AuthorityEntryRest> resources;
+        try {
+            resources = utils.getPage(results, pageable);
+        } catch (PaginationException pe) {
+            resources = new PageImpl<AuthorityEntryRest>(new ArrayList<AuthorityEntryRest>(), pageable, pe.getTotal());
+        }
+        return resources;
+    }
+
+    @SearchRestMethod(name = "top")
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
+    public Page<AuthorityEntryRest> findAllTop(String name, Pageable pageable, String projection) {
+        Context context = obtainContext();
+        List<AuthorityEntryRest> results = new ArrayList<AuthorityEntryRest>();
+        if (authorityUtils.isHierarchical(name)) {
+            Choices choices = cas.getTopChoices(name, pageable.getOffset(), pageable.getPageSize(),
+                    context.getCurrentLocale().toString());
+            
+            for (Choice value : choices.values) {
+                results.add(authorityUtils.convertEntry(value, name));
+            }
+        }
+
+        Page<AuthorityEntryRest> resources;
+        try {
+            resources = utils.getPage(results, pageable);
+        } catch (PaginationException pe) {
+            resources = new PageImpl<AuthorityEntryRest>(new ArrayList<AuthorityEntryRest>(), pageable, pe.getTotal());
+        }
+        return resources;
     }
 
 }

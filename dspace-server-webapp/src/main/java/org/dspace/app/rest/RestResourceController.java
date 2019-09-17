@@ -364,7 +364,7 @@ public class RestResourceController implements InitializingBean {
      * @return
      */
     @RequestMapping(method = RequestMethod.GET, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_STRING_VERSION_STRONG +
-        "/{rel}/{relid:[\\w+\\-]+}")
+        "/{rel}/{relid:^(?!.*?(?:search)).*$}")
     public ResourceSupport findRel(HttpServletRequest request, HttpServletResponse response,
                                    @PathVariable String apiCategory,
                                    @PathVariable String model, @PathVariable String id, @PathVariable String rel,
@@ -830,9 +830,14 @@ public class RestResourceController implements InitializingBean {
                         }
 
                         Page<HALResource> halResources = pageResult.map(linkRepository::wrapResource);
-                        halResources.forEach(linkService::addLinks);
+                        if (halResources.hasContent()) {
+                            halResources.forEach(linkService::addLinks);
 
-                        return assembler.toResource(halResources, link);
+                            return assembler.toResource(halResources, link);
+                        } else {
+                            response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+                            return null;                            
+                        }
                     } else {
                         RestModel object = (RestModel) linkMethod.invoke(linkRepository, request, uuid, page,
                                 projection);
