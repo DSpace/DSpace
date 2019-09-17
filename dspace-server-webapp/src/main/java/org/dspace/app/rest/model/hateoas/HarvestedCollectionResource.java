@@ -25,7 +25,7 @@ public class HarvestedCollectionResource extends HALResource<HarvestedCollection
 
     public HarvestedCollectionResource(HarvestedCollectionRest data) {
         super(data);
-        embedResource("metadata_configs", data.getMetadataConfigs());
+        embedResource("harvestermetadata", data.getMetadataConfigs());
     }
 
     private void embedResource(String relationship, HarvesterMetadataRest harvesterMetadataRest) {
