@@ -999,11 +999,26 @@
 
             <!-- DSpace third Party Dependencies -->
 
-            <!-- Solr introduces multiple versions of zookeeper. So, we specify the version we want -->
+            <!-- Solr introduces multiple versions of zookeeper. So,
+                 we specify the version we want -->
             <dependency>
                 <groupId>org.apache.zookeeper</groupId>
                 <artifactId>zookeeper</artifactId>
                 <version>3.4.11</version>
+            </dependency>
+
+            <!-- solr-cell and axiom-api disagree on versions -->
+            <dependency>
+                <groupId>org.apache.james</groupId>
+                <artifactId>apache-mime4j-core</artifactId>
+                <version>0.8.1</version>
+            </dependency>
+
+            <!-- solr-core, solr-cell disagree with nimbus-jose-jwt -->
+            <dependency>
+                <groupId>org.ow2.asm</groupId>
+                <artifactId>asm</artifactId>
+                <version>5.1</version>
             </dependency>
 
             <dependency>
