@@ -2173,7 +2173,7 @@
 	<message key="xmlui.dri2xhtml.METS-1.0.item-false-fulltext">Documento sem texto completo</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-files-name">Nome</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-format">Descrição física</message>
-	<message key="xmlui.dri2xhtml.METS-1.0.item-format-extent">Extensão</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.item-format-extent">Páginas</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-format-medium">Materiais</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-identifier-expediente">Número de Arquivo</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-identifier-other">Outros Identificadores</message>

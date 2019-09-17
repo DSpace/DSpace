@@ -2662,7 +2662,7 @@
 <message key="xmlui.dri2xhtml.METS-1.0.item-identifier-isbn">ISBN</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-location">Location</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-format">Physical description</message>
-<message key="xmlui.dri2xhtml.METS-1.0.item-format-extent">Extent</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-format-extent">Pages</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-format-medium">Materials/Techniques</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-subject-materias">Subjects</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-subject">Keywords</message>

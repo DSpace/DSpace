@@ -391,7 +391,7 @@
 					<dc-element>format</dc-element>
 					<dc-qualifier>extent</dc-qualifier>
 					<repeatable>true</repeatable>
-					<label>Extensión</label>
+					<label>Páginas</label>
 					<input-type>onebox</input-type>
 					<hint>Cantidad de páginas en forma de rango. Siempre indicar página inicial y página final separadas por un guión. Por ejemplo: 123-280 </hint>
 					<visibility-on-group>Bibliotecarios</visibility-on-group>
