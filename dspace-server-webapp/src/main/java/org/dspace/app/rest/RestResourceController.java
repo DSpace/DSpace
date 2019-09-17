@@ -830,9 +830,14 @@ public class RestResourceController implements InitializingBean {
                         }
 
                         Page<HALResource> halResources = pageResult.map(linkRepository::wrapResource);
-                        halResources.forEach(linkService::addLinks);
+                        if (halResources.hasContent()) {
+                            halResources.forEach(linkService::addLinks);
 
-                        return assembler.toResource(halResources, link);
+                            return assembler.toResource(halResources, link);
+                        } else {
+                            response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+                            return null;                            
+                        }
                     } else {
                         RestModel object = (RestModel) linkMethod.invoke(linkRepository, request, uuid, page,
                                 projection);
