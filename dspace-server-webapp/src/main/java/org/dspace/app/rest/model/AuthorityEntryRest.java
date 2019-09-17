@@ -22,6 +22,7 @@ public class AuthorityEntryRest implements RestAddressableModel {
     private String id;
     private String display;
     private String value;
+    private Boolean selectable;
     private Map<String, String> otherInformation;
 
     @JsonIgnore
@@ -59,6 +60,14 @@ public class AuthorityEntryRest implements RestAddressableModel {
         this.value = value;
     }
 
+    public Boolean isSelectable() {
+        return selectable;
+    }
+
+    public void setSelectable(Boolean selectable) {
+        this.selectable = selectable;
+    }
+
     public static String getName() {
         return NAME;
     }
@@ -78,7 +87,7 @@ public class AuthorityEntryRest implements RestAddressableModel {
 
     @Override
     public String getType() {
-        return AuthorityRest.NAME;
+        return AuthorityEntryRest.NAME;
     }
 
     @Override

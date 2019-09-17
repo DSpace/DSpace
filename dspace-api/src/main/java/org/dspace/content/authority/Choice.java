@@ -33,6 +33,11 @@ public class Choice {
      */
     public String value = null;
 
+    /**
+     * A boolean representing if choice entry value can selected 
+     */
+    public Boolean selectable = true;
+
     public Map<String, String> extras = new HashMap<String, String>();
 
     public Choice() {
@@ -49,5 +54,12 @@ public class Choice {
         this.label = label;
         this.value = value;
         this.extras = extras;
+    }
+    
+    public Choice(String authority, String label, String value, Boolean selectable) {
+        this.authority = authority;
+        this.label = label;
+        this.value = value;
+        this.selectable = selectable;
     }
 }
