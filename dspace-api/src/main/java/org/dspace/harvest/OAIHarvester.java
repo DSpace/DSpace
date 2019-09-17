@@ -914,7 +914,8 @@ public class OAIHarvester {
         List<Map<String,String>> configs = new ArrayList<>();
         String metaString = "oai.harvester.metadataformats.";
         Enumeration pe = Collections.enumeration(
-            DSpaceServicesFactory.getInstance().getConfigurationService().getPropertyKeys("oai")
+            DSpaceServicesFactory.getInstance().getConfigurationService()
+                                 .getPropertyKeys("oai.harvester.metadataformats")
         );
         while (pe.hasMoreElements()) {
             String key = (String) pe.nextElement();

@@ -135,10 +135,10 @@ public class CollectionHarvestSettingsControllerIT extends AbstractControllerInt
                 .andExpect(jsonPath("$.last_harvested", is(nullValue())))
                 .andExpect(jsonPath("$._links.self.href",
                     endsWith("api/core/collections/" + collection.getID() + "/harvester")))
-                .andExpect(jsonPath("$._embedded.metadata_configs",  Matchers.allOf(
+                .andExpect(jsonPath("$._embedded.harvestermetadata",  Matchers.allOf(
                     MetadataConfigsMatcher.matchMetadataConfigs(configs)
                 )))
-                .andExpect(jsonPath("$._embedded.metadata_configs._links.self.href",
+                .andExpect(jsonPath("$._embedded.harvestermetadata._links.self.href",
                     endsWith("/api/config/harvestermetadata")));
     }
 
@@ -171,6 +171,17 @@ public class CollectionHarvestSettingsControllerIT extends AbstractControllerInt
     }
 
     @Test
+    public void getAndPutCollectionHarvestSettingsUserNoWriteException() throws Exception {
+        JSONObject json = createHarvestSettingsJson("METADATA_ONLY", "https://dspace.org/oai/request", "col_1721.1_114174", "dc");
+
+        getClient().perform(
+            put("/api/core/collections/" + collection.getID() + "/harvester")
+                .contentType("application/json")
+                .content(json.toString()))
+                        .andExpect(status().isUnauthorized());
+    }
+
+    @Test
     public void getCollectionHarvestSettingsIfNotSet() throws Exception {
         String token = getAuthToken(admin.getEmail(), password);
 
@@ -189,10 +200,10 @@ public class CollectionHarvestSettingsControllerIT extends AbstractControllerInt
             .andExpect(jsonPath("$.last_harvested", is(nullValue())))
             .andExpect(jsonPath("$._links.self.href",
                 endsWith("api/core/collections/" + collectionNoHarvestSettings.getID() + "/harvester")))
-            .andExpect(jsonPath("$._embedded.metadata_configs",  Matchers.allOf(
+            .andExpect(jsonPath("$._embedded.harvestermetadata",  Matchers.allOf(
                 MetadataConfigsMatcher.matchMetadataConfigs(configs)
             )))
-            .andExpect(jsonPath("$._embedded.metadata_configs._links.self.href",
+            .andExpect(jsonPath("$._embedded.harvestermetadata._links.self.href",
                 endsWith("/api/config/harvestermetadata")));
     }
 
