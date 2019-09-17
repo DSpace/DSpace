@@ -63,6 +63,8 @@ public interface HierarchicalAuthority extends ChoiceAuthority {
      */
     public Choices getChoicesByParent(String authorityName, String parentId, int start, int limit, String locale);
 
+    public Integer getPreloadLevel();
+
     default boolean isHierarchical() {
         return true;
     }

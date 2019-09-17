@@ -69,7 +69,10 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
     protected InputSource vocabulary = null;
     protected Boolean suggestHierarchy = true;
     protected Boolean storeHierarchy = true;
+    protected Integer preloadLevel = 1;
     protected String hierarchyDelimiter = "::";
+    protected String rootNodeId = "";
+    
 
     public DSpaceControlledVocabulary() {
         super();
@@ -114,6 +117,7 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
             String configurationPrefix = "vocabulary.plugin." + vocabularyName;
             storeHierarchy = config.getBooleanProperty(configurationPrefix + ".hierarchy.store", storeHierarchy);
             suggestHierarchy = config.getBooleanProperty(configurationPrefix + ".hierarchy.suggest", suggestHierarchy);
+            preloadLevel = config.getIntProperty(configurationPrefix + ".hierarchy.preloadLevel", preloadLevel);
             String configuredDelimiter = config.getProperty(configurationPrefix + ".delimiter");
             if (configuredDelimiter != null) {
                 hierarchyDelimiter = configuredDelimiter.replaceAll("(^\"|\"$)", "");
@@ -121,6 +125,17 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
             String filename = vocabulariesPath + vocabularyName + ".xml";
             log.info("Loading " + filename);
             vocabulary = new InputSource(filename);
+            
+            XPath xpath = XPathFactory.newInstance().newXPath();
+            try {
+                Node rootNode = (Node) xpath.evaluate(rootTemplate, vocabulary, XPathConstants.NODE);
+                Node idAttr = rootNode.getAttributes().getNamedItem("id");
+                if (null != idAttr) { // 'id' is optional
+                    rootNodeId = idAttr.getNodeValue();
+                }
+            } catch (XPathExpressionException e) {
+                log.warn(e.getMessage(), e);
+            }
         }
     }
 
@@ -160,12 +175,13 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
             String[] values = new String[results.getLength()];
             String[] labels = new String[results.getLength()];
             String[] parent = new String[results.getLength()];
+            Boolean[] selectable = new Boolean[results.getLength()];
             ArrayList<String>[] children = new ArrayList[results.getLength()];
             String[] notes = new String[results.getLength()];
             for (int i = 0; i < results.getLength(); i++) {
                 Node node = results.item(i);
                 children[i] = new ArrayList<String>();
-                readNode(authorities, values, labels, parent, children[i], notes, i, node);
+                readNode(authorities, values, labels, parent, children[i], notes, selectable, i, node);
             }
             int resultCount = labels.length - start;
             // limit = 0 means no limit
@@ -175,7 +191,7 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
             
             if (resultCount > 0) {
                 for (int i = 0; i < resultCount; i++) {
-                    Choice choice = new Choice(authorities[start + i], values[start + i], labels[start + i]);
+                    Choice choice = new Choice(authorities[start + i], values[start + i], labels[start + i], selectable[start + i]);
                     if (StringUtils.isNotBlank(parent[i])) {
                         choice.extras.put("parent", parent[i]);
                     }
@@ -232,7 +248,7 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
     }
 
     private void readNode(String[] authorities, String[] values, String[] labels, String[] parent, List<String> children,
-            String[] notes, int i, Node node) {
+            String[] notes, Boolean[] selectable, int i, Node node) {
         String hierarchy = this.buildString(node);
         if (this.suggestHierarchy) {
             labels[i] = hierarchy;
@@ -256,6 +272,13 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
             }
         }
 
+        Node selectableAttr = node.getAttributes().getNamedItem("selectable");
+        if (null != selectableAttr) {
+            selectable[i] = Boolean.valueOf(selectableAttr.getNodeValue());
+        } else { // Default is true
+            selectable[i] = true;
+        }
+
         Node idAttr = node.getAttributes().getNamedItem("id");
         if (null != idAttr) { // 'id' is optional
             authorities[i] = idAttr.getNodeValue();
@@ -265,7 +288,7 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
                     parentN = parentN.getParentNode();
                     if (parentN != null) {
                         Node parentIdAttr = parentN.getAttributes().getNamedItem("id");
-                        if (null != parentIdAttr) {
+                        if (null != parentIdAttr && !parentIdAttr.getNodeValue().equals(rootNodeId)) {
                             parent[i] = parentIdAttr.getNodeValue();
                         }
                     }
@@ -301,10 +324,11 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
             String[] parent = new String[1];
             List<String> children = new ArrayList<String>();
             String[] note = new String[1];
-            readNode(authorities, values, labels, parent, children, note, 0, node);
+            Boolean[] selectable = new Boolean[1];
+            readNode(authorities, values, labels, parent, children, note, selectable, 0, node);
 
             if (values.length > 0) {
-                Choice choice = new Choice(authorities[0], values[0], labels[0]);
+                Choice choice = new Choice(authorities[0], values[0], labels[0], selectable[0]);
                 if (StringUtils.isNotBlank(parent[0])) {
                     choice.extras.put("parent", parent[0]);
                 }
@@ -358,5 +382,10 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
             log.warn(e.getMessage(), e);
         }
         return choices;
+    }
+
+    @Override
+    public Integer getPreloadLevel() {
+        return preloadLevel;
     }
 }
