@@ -98,6 +98,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
         Collection col2 = CollectionBuilder.createCollection(context, child2).withName("Collection 2").build();
 
+        context.restoreAuthSystemState();
 
         getClient().perform(get("/api/core/collections")
                                 .param("size", "1"))
@@ -147,6 +148,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
         Collection col2 = CollectionBuilder.createCollection(context, child2).withName("Collection 2").build();
 
+        context.restoreAuthSystemState();
 
         getClient().perform(get("/api/core/collections/" + col1.getID()))
                    .andExpect(status().isOk())
@@ -179,6 +181,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
                                            .withLogo("TestingContentForLogo").build();
         Collection col2 = CollectionBuilder.createCollection(context, child2).withName("Collection 2").build();
+
+        context.restoreAuthSystemState();
 
         getClient().perform(get("/api/core/collections/" + col1.getID()))
                    .andExpect(status().isOk())
@@ -225,6 +229,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
         Collection col2 = CollectionBuilder.createCollection(context, child2).withName("Collection 2").build();
 
+        context.restoreAuthSystemState();
+
         getClient().perform(get("/api/core/collections/search/findAuthorized"))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
@@ -253,6 +259,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
         Collection col2 = CollectionBuilder.createCollection(context, child2).withName("Collection 2").build();
+
+        context.restoreAuthSystemState();
 
         getClient().perform(get("/api/core/collections/search/findAuthorizedByCommunity")
                                 .param("uuid", parentCommunity.getID().toString()))
@@ -294,6 +302,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
         Collection col2 = CollectionBuilder.createCollection(context, child2).withName("Collection 2").build();
 
+        context.restoreAuthSystemState();
 
         getClient().perform(get("/api/core/collections/" + UUID.randomUUID()))
                    .andExpect(status().isNotFound());
@@ -317,6 +326,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
         Collection col2 = CollectionBuilder.createCollection(context, child2).withName("Collection 2").build();
+
+        context.restoreAuthSystemState();
 
         getClient().perform(get("/api/core/collections/" + col1.getID()))
                    .andExpect(status().isOk())
@@ -363,6 +374,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         collectionRest.setMetadata(new MetadataRest()
                 .put("dc.title", new MetadataValueRest("Electronic theses and dissertations")));
 
+        context.restoreAuthSystemState();
+
         getClient(token).perform(put("/api/core/collections/" + col1.getID().toString())
                                      .contentType(MediaType.APPLICATION_JSON)
                                      .content(mapper.writeValueAsBytes(collectionRest)))
@@ -408,6 +421,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
 
         String token = getAuthToken(admin.getEmail(), password);
 
+        context.restoreAuthSystemState();
+
         getClient(token).perform(get("/api/core/collections/" + col1.getID().toString()))
                         .andExpect(status().isOk())
                         .andExpect(content().contentType(contentType))
@@ -448,6 +463,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunityChild1)
                                            .withName("Collection 1")
                                            .build();
+
+        context.restoreAuthSystemState();
 
         getClient().perform(get("/api/core/collections/" + col1.getID().toString()))
                         .andExpect(status().isOk())
@@ -658,6 +675,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
 
         String token = getAuthToken(eperson.getEmail(), password);
 
+        context.restoreAuthSystemState();
+
         getClient(token).perform(get("/api/core/collections/" + col1.getID().toString()))
                         .andExpect(status().isOk())
                         .andExpect(content().contentType(contentType))
@@ -705,6 +724,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
 
         context.setCurrentUser(eperson);
         authorizeService.addPolicy(context, col1, Constants.WRITE, eperson);
+
+        context.restoreAuthSystemState();
 
         String token = getAuthToken(eperson.getEmail(), password);
         ObjectMapper mapper = new ObjectMapper();
@@ -783,6 +804,9 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                                             new MetadataValueRest("Title Text")));
 
         String authToken = getAuthToken(admin.getEmail(), password);
+
+        context.restoreAuthSystemState();
+
         getClient(authToken).perform(post("/api/core/collections")
                                          .content(mapper.writeValueAsBytes(collectionRest))
                                          .param("parent", "123")
@@ -822,6 +846,9 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                                             new MetadataValueRest("Title Text")));
 
         String authToken = getAuthToken(admin.getEmail(), password);
+
+        context.restoreAuthSystemState();
+
         getClient(authToken).perform(post("/api/core/collections")
                                          .content(mapper.writeValueAsBytes(collectionRest))
                                          .contentType(contentType))
