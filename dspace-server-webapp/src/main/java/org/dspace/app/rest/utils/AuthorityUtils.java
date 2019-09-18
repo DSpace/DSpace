@@ -82,7 +82,7 @@ public class AuthorityUtils {
         result.setName(authorityName);
         return result;
     }
-    
+
     /**
      * Get the configured "isHierarchical" value for this authority.
      *

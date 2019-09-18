@@ -118,7 +118,7 @@ public interface ChoiceAuthorityService {
      * @see org.dspace.content.authority.ChoiceAuthority#getTopChoices(java.lang.String, int, int, java.lang.String)
      */
     public Choices getTopChoices(String authorityName, int start, int limit, String locale);
-    
+
     /**
      * Wrapper that calls getChoicesByParent method of the plugin.
      *
