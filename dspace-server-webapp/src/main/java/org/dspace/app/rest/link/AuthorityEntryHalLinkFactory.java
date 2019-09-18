@@ -48,7 +48,7 @@ public class AuthorityEntryHalLinkFactory extends HalLinkFactory<AuthorityEntryR
             }
         }
         String selfLinkString = linkTo(
-            getMethodOn().findOne(entry.getCategory(), entry.getType(), entry.getAuthorityName(), null))
+            getMethodOn().findOne(entry.getCategory(), English.plural(entry.getType()), entry.getAuthorityName(), null))
             .toUriComponentsBuilder().build().toString() + "/entryValues/" + entry.getId();
         list.add(buildLink(Link.REL_SELF, selfLinkString));
     }
