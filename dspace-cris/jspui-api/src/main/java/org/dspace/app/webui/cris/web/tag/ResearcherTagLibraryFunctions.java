@@ -59,6 +59,7 @@ import org.dspace.app.cris.util.ResearcherPageUtils;
 import org.dspace.app.webui.cris.dto.AllMonthsStatsDTO;
 import org.dspace.core.ConfigurationManager;
 
+import it.cilea.osd.common.model.Identifiable;
 import it.cilea.osd.jdyna.components.IBeanSubComponent;
 import it.cilea.osd.jdyna.components.IComponent;
 import it.cilea.osd.jdyna.model.ADecoratorPropertiesDefinition;
@@ -994,32 +995,36 @@ public class ResearcherTagLibraryFunctions
     public static IPropertiesDefinition getPropertyDefinitionI18NByCrisObject(ICrisObject object,
             IContainable pd, String locale)
     {
-        
-        IContainable ipd = (IContainable) pd;
-        String shortname = ipd.getShortName() + "_" + locale;
+        String shortname = pd.getShortName() + "_" + locale;
         IContainable pdLocalized = applicationService
-                .findContainableByDecorable(ipd.getClass(), shortname);
-        
-        ICrisObject aobject = (ICrisObject)object;
-        
+                .findContainableByDecorable(pd.getClass(), shortname);
+
         List<IContainable> pdefs = new ArrayList<IContainable>();
-        //add localized
-        if(pdLocalized != null) {
+        // add localized
+        if (pdLocalized != null)
+        {
             pdefs.add(pdLocalized);
         }
-        //add normal property definition
-        pdefs.add(ipd);
-        String defaultLocales = ConfigurationManager.getProperty("webui.supported.locales");
-        if(defaultLocales!=null) {
+        // add normal property definition
+        pdefs.add(pd);
+        String defaultLocales = ConfigurationManager
+                .getProperty("webui.supported.locales");
+        if (defaultLocales != null)
+        {
             String[] splitted = defaultLocales.split(",");
-            //add all supported localized property definition minus the locale requested
-            for(String defaultLocale : splitted) {                
+            // add all supported localized property definition minus the locale
+            // requested
+            for (String defaultLocale : splitted)
+            {
                 String trim = defaultLocale.trim();
-                if(!trim.equals(locale)) {
-                    String defaultShortname = ipd.getShortName() + "_" + trim;
+                if (!trim.equals(locale))
+                {
+                    String defaultShortname = pd.getShortName() + "_" + trim;
                     IContainable pdSupportedLocale = applicationService
-                            .findContainableByDecorable(ipd.getClass(), defaultShortname);
-                    if(pdSupportedLocale != null) {
+                            .findContainableByDecorable(pd.getClass(),
+                                    defaultShortname);
+                    if (pdSupportedLocale != null)
+                    {
                         pdefs.add(pdSupportedLocale);
                     }
                 }
@@ -1029,16 +1034,26 @@ public class ResearcherTagLibraryFunctions
         IPropertiesDefinition result = null;
         for (IContainable pdef : pdefs)
         {
-            //return the first property definition found with values
-            result = internalGetPropertyDefinitionI18NByCrisObject(
-                    locale, aobject, pdef);
-            if (result != null)
-            {
-                return result;
+            if(pdef instanceof ADecoratorTypeDefinition) {            
+                // return the first nested type found with values
+                long countAll = getApplicationService().countNestedObjectsByParentIDAndTypoID(object.getID(), ((Identifiable)(((ADecoratorTypeDefinition) pdef).getReal())).getId(), ((ACrisObject)object).getClassNested());
+                if(countAll>0) {
+                    return (IPropertiesDefinition) PropertyDefinitionI18NWrapper
+                            .getWrapper((IPropertiesDefinition) pdef, locale);
+                }
+            }
+            else {
+                // return the first property definition found with values
+                result = internalGetPropertyDefinitionI18NByCrisObject(locale,
+                        object, pdef);
+                if (result != null)
+                {
+                    return result;
+                }
             }
         }
         return (IPropertiesDefinition) PropertyDefinitionI18NWrapper
-                .getWrapper((IPropertiesDefinition) ipd, locale);
+                .getWrapper((IPropertiesDefinition) pd, locale);
     }
 
     private static IPropertiesDefinition internalGetPropertyDefinitionI18NByCrisObject(String locale,

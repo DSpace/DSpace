@@ -32,7 +32,6 @@
 %>
 <c:set var="currLocale"><%= currLocale %></c:set>
 <c:set var="HIGH_ACCESS" value="<%=  AccessLevelConstants.HIGH_ACCESS %>"></c:set>
-<c:set var="decoratorPropertyDefinition" value="${researcher:getPropertyDefinitionI18N(decoratorPropertyDefinition,currLocale)}" />
 <div id="nestedDetailDiv_${decoratorPropertyDefinition.real.id}" class="dynaField">
 			<span class="spandatabind nestedinfo">${decoratorPropertyDefinition.real.id}</span>
 			<span id="nested_${decoratorPropertyDefinition.real.id}_totalHit" class="spandatabind">${totalHit}</span>
