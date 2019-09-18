@@ -136,10 +136,6 @@ public class AuthorityRestRepositoryIT extends AbstractControllerIntegrationTest
     }
 
     @Test
-    @Ignore
-    /**
-     * This functionality is currently broken, it is an empty value
-     */
     public void noResultsSrscValueTest() throws Exception {
         String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(
