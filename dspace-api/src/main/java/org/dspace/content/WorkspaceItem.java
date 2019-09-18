@@ -199,8 +199,16 @@ public class WorkspaceItem implements InProgressSubmission
 
             for (int n = 0; n < md.length; n++)
             {
-                item.addMetadata(md[n].schema, md[n].element, md[n].qualifier, md[n].language,
-                        md[n].value);
+                if (md[n].authority != null && !md[n].authority.isEmpty())
+                {
+                    item.addMetadata(md[n].schema, md[n].element, md[n].qualifier, md[n].language,
+                            md[n].value, md[n].authority, md[n].confidence);
+                }
+                else
+                {
+                    item.addMetadata(md[n].schema, md[n].element, md[n].qualifier, md[n].language,
+                            md[n].value);
+                }
             }
         }
 
