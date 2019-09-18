@@ -258,6 +258,8 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
 
         comm.setMetadata(metadataRest);
 
+        context.restoreAuthSystemState();
+
         // Anonymous user tries to create a community.
         // Should fail because user is not authenticated. Error 401.
         getClient().perform(post("/api/core/communities")
@@ -293,6 +295,8 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                                            .withLogo("Test Logo")
                                            .build();
 
+        context.restoreAuthSystemState();
+
         getClient().perform(get("/api/core/communities"))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
@@ -323,6 +327,8 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                                            .withName("Sub Community")
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        context.restoreAuthSystemState();
 
         getClient().perform(get("/api/core/communities")
                                 .param("size", "1"))
@@ -375,6 +381,8 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
 
+        context.restoreAuthSystemState();
+
         getClient().perform(get("/api/core/communities/" + parentCommunity.getID().toString()))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
@@ -406,6 +414,8 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                                            .withName("Sub Community")
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        context.restoreAuthSystemState();
 
         getClient().perform(get("/api/core/communities/" + parentCommunity.getID().toString()))
                    .andExpect(status().isOk())
@@ -484,6 +494,7 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                                             .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
 
+        context.restoreAuthSystemState();
 
         getClient().perform(get("/api/core/communities/search/top"))
                    .andExpect(status().isOk())
@@ -543,6 +554,8 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunityChild1)
                                            .withName("Collection 1")
                                            .build();
+
+        context.restoreAuthSystemState();
 
         getClient().perform(get("/api/core/communities/search/subCommunities")
                 .param("parent", parentCommunity.getID().toString()))
@@ -651,6 +664,8 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
 
+        context.restoreAuthSystemState();
+
         getClient().perform(get("/api/core/communities/" + UUID.randomUUID())).andExpect(status().isNotFound());
     }
 
@@ -692,6 +707,8 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
 
         communityRest.setMetadata(new MetadataRest()
                 .put("dc.title", new MetadataValueRest("Electronic theses and dissertations")));
+
+        context.restoreAuthSystemState();
 
         getClient(token).perform(put("/api/core/communities/" + parentCommunity.getID().toString())
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -750,6 +767,8 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                                            .build();
 
         String token = getAuthToken(admin.getEmail(), password);
+
+        context.restoreAuthSystemState();
 
         getClient(token).perform(get("/api/core/communities/" + parentCommunity.getID().toString()))
                         .andExpect(status().isOk())
@@ -810,6 +829,7 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                                            .withName("Collection 1")
                                            .build();
 
+        context.restoreAuthSystemState();
 
         getClient().perform(get("/api/core/communities/" + parentCommunity.getID().toString()))
                         .andExpect(status().isOk())
@@ -840,6 +860,8 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
         authorizeService.addPolicy(context, parentCommunity, Constants.DELETE, eperson);
 
         String token = getAuthToken(eperson.getEmail(), password);
+
+        context.restoreAuthSystemState();
 
         getClient(token).perform(get("/api/core/communities/" + parentCommunity.getID().toString()))
                         .andExpect(status().isOk())
@@ -898,6 +920,8 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
 
         context.setCurrentUser(eperson);
         authorizeService.addPolicy(context, parentCommunity, Constants.WRITE, eperson);
+
+        context.restoreAuthSystemState();
 
         String token = getAuthToken(eperson.getEmail(), password);
 
@@ -974,6 +998,8 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
         metadataRest.put("dc.title", title);
 
         comm.setMetadata(metadataRest);
+
+        context.restoreAuthSystemState();
 
         String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken).perform(post("/api/core/communities")
