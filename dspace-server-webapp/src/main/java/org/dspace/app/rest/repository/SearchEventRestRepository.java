@@ -8,9 +8,6 @@
 package org.dspace.app.rest.repository;
 
 import java.io.IOException;
-import java.sql.SQLException;
-import java.util.LinkedList;
-import java.util.List;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 
@@ -22,11 +19,9 @@ import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.PageRest;
 import org.dspace.app.rest.model.SearchEventRest;
 import org.dspace.app.rest.model.SearchResultsRest;
-import org.dspace.app.rest.parameter.SearchFilter;
-import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.services.EventService;
-import org.dspace.usage.RestUsageSearchEvent;
+import org.dspace.usage.UsageSearchEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -39,11 +34,10 @@ public class SearchEventRestRepository extends AbstractDSpaceRestRepository {
     @Autowired
     private SearchEventConverter searchEventConverter;
 
-    public SearchEventRest createSearchEvent() throws AuthorizeException, SQLException {
+    public SearchEventRest createSearchEvent() {
 
         Context context = obtainContext();
         HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
-        List<SearchFilter> result = new LinkedList<>();
 
         ObjectMapper mapper = new ObjectMapper();
         SearchEventRest searchEventRest = null;
@@ -55,8 +49,8 @@ public class SearchEventRestRepository extends AbstractDSpaceRestRepository {
         }
 
         checkSearchEventRestValidity(searchEventRest);
-        RestUsageSearchEvent restUsageSearchEvent = searchEventConverter.convert(context, req, searchEventRest);
-        eventService.fireEvent(restUsageSearchEvent);
+        UsageSearchEvent usageSearchEvent = searchEventConverter.convert(context, req, searchEventRest);
+        eventService.fireEvent(usageSearchEvent);
         return searchEventRest;
     }
 
