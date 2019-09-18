@@ -144,11 +144,7 @@ public class AuthorityRestRepositoryIT extends AbstractControllerIntegrationTest
         String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(
                 get("/api/integration/authorities/srsc/entryValues/DOESNTEXIST"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$._embedded.authorityEntries", Matchers.contains(
-                    AuthorityEntryMatcher.matchAuthorityEntry("", "", "")
-                )))
-                .andExpect(jsonPath("$.page.totalElements", Matchers.is(0)));
+                .andExpect(status().isNotFound());
     }
 
     @Test

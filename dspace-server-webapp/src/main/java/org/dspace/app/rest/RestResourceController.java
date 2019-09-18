@@ -780,7 +780,8 @@ public class RestResourceController implements InitializingBean {
                 // on the repository defined by the @PreAuthorize etc annotation to be absorbed by the reflection's
                 // InvocationTargetException and thrown as a RunTimeException when it was actually an AccessDenied
                 // Exception and it should be returned/shown as one
-                if (e.getTargetException() instanceof AccessDeniedException) {
+                if (e.getTargetException() instanceof AccessDeniedException ||
+                    e.getTargetException() instanceof ResourceNotFoundException) {
                     throw e.getTargetException();
                 } else {
                     throw new RuntimeException(e.getMessage(), e);
