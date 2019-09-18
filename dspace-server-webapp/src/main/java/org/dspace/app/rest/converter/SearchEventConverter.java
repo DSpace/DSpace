@@ -18,8 +18,8 @@ import org.dspace.app.rest.utils.ScopeResolver;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 import org.dspace.discovery.IndexableObject;
-import org.dspace.usage.RestUsageSearchEvent;
 import org.dspace.usage.UsageEvent;
+import org.dspace.usage.UsageSearchEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -29,40 +29,40 @@ public class SearchEventConverter {
     @Autowired
     private ScopeResolver scopeResolver;
 
-    public RestUsageSearchEvent convert(Context context, HttpServletRequest request, SearchEventRest searchEventRest) {
-        RestUsageSearchEvent restUsageSearchEvent = new RestUsageSearchEvent(UsageEvent.Action.SEARCH, request, context,
+    public UsageSearchEvent convert(Context context, HttpServletRequest request, SearchEventRest searchEventRest) {
+        UsageSearchEvent usageSearchEvent = new UsageSearchEvent(UsageEvent.Action.SEARCH, request, context,
                                                                              null);
-        restUsageSearchEvent.setQuery(searchEventRest.getQuery());
-        restUsageSearchEvent.setDsoType(searchEventRest.getDsoType());
+        usageSearchEvent.setQuery(searchEventRest.getQuery());
+        usageSearchEvent.setDsoType(searchEventRest.getDsoType());
         IndexableObject scopeObject = scopeResolver.resolveScope(context, String.valueOf(searchEventRest.getScope()));
         if (scopeObject instanceof DSpaceObject) {
-            restUsageSearchEvent.setScope((DSpaceObject) scopeObject);
+            usageSearchEvent.setScope((DSpaceObject) scopeObject);
         }
-        restUsageSearchEvent.setConfiguration(searchEventRest.getConfiguration());
+        usageSearchEvent.setConfiguration(searchEventRest.getConfiguration());
         if (searchEventRest.getAppliedFilters() != null) {
-            restUsageSearchEvent.setAppliedFilters(convertAppliedFilters(searchEventRest.getAppliedFilters()));
+            usageSearchEvent.setAppliedFilters(convertAppliedFilters(searchEventRest.getAppliedFilters()));
         }
-        restUsageSearchEvent.setSort(convertSort(searchEventRest.getSort()));
-        restUsageSearchEvent.setPage(convertPage(searchEventRest.getPage()));
+        usageSearchEvent.setSort(convertSort(searchEventRest.getSort()));
+        usageSearchEvent.setPage(convertPage(searchEventRest.getPage()));
 
-        return restUsageSearchEvent;
+        return usageSearchEvent;
 
     }
 
-    private RestUsageSearchEvent.Page convertPage(PageRest page) {
-        return new RestUsageSearchEvent.Page(page.getSize(), page.getTotalElements(), page.getTotalPages(),
+    private UsageSearchEvent.Page convertPage(PageRest page) {
+        return new UsageSearchEvent.Page(page.getSize(), page.getTotalElements(), page.getTotalPages(),
                                              page.getNumber());
     }
 
-    private RestUsageSearchEvent.Sort convertSort(SearchResultsRest.Sorting sort) {
-        return new RestUsageSearchEvent.Sort(sort.getBy(), sort.getOrder());
+    private UsageSearchEvent.Sort convertSort(SearchResultsRest.Sorting sort) {
+        return new UsageSearchEvent.Sort(sort.getBy(), sort.getOrder());
     }
 
-    private List<RestUsageSearchEvent.AppliedFilter> convertAppliedFilters(
+    private List<UsageSearchEvent.AppliedFilter> convertAppliedFilters(
         List<SearchResultsRest.AppliedFilter> appliedFilters) {
-        List<RestUsageSearchEvent.AppliedFilter> listToReturn = new LinkedList<>();
+        List<UsageSearchEvent.AppliedFilter> listToReturn = new LinkedList<>();
         for (SearchResultsRest.AppliedFilter appliedFilter : appliedFilters) {
-            RestUsageSearchEvent.AppliedFilter convertedAppliedFilter = new RestUsageSearchEvent.AppliedFilter(
+            UsageSearchEvent.AppliedFilter convertedAppliedFilter = new UsageSearchEvent.AppliedFilter(
                 appliedFilter.getFilter(), appliedFilter.getOperator(), appliedFilter.getValue(),
                 appliedFilter.getLabel());
             listToReturn.add(convertedAppliedFilter);
