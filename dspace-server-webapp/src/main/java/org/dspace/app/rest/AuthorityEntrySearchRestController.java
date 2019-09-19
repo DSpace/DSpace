@@ -163,7 +163,7 @@ public class AuthorityEntrySearchRestController {
             LinkRestRepository linkRepository = utils.getLinkResourceRepository(AuthorityRest.CATEGORY,
                     AuthorityEntrySearchRestController.MODEL, linkRest.name());
             Method linkMethod = repositoryUtils.getSearchMethod(searchMethodName, linkRepository);
- 
+
             String querystring = request.getQueryString();
             Link link;
             if (querystring != null && querystring.length() > 0) {
