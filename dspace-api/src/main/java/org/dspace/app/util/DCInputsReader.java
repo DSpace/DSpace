@@ -182,7 +182,7 @@ public class DCInputsReader {
 
     public List<DCInputSet> getInputsUploadByCollectionHandle(String collectionHandle)
             throws DCInputsReaderException {
-    	SubmissionConfig config;
+        SubmissionConfig config;
         try {
             config = new SubmissionConfigReader().getSubmissionConfigByCollection(collectionHandle);
             String formName = config.getSubmissionName();
@@ -193,9 +193,9 @@ public class DCInputsReader {
             for (int idx = 0; idx < config.getNumberOfSteps(); idx++) {
                 SubmissionStepConfig step = config.getStep(idx);
                 if (SubmissionStepConfig.UPLOAD_STEP_NAME.equals(step.getType())) {
-                	UploadConfigurationService uploadConfigurationService = new DSpace().getServiceManager()
+                    UploadConfigurationService uploadConfigurationService = new DSpace().getServiceManager()
                             .getServiceByName("uploadConfigurationService", UploadConfigurationService.class);
-                	UploadConfiguration uploadConfig = uploadConfigurationService.getMap().get(step.getId());
+                    UploadConfiguration uploadConfig = uploadConfigurationService.getMap().get(step.getId());
                     results.add(getInputsByFormName(uploadConfig.getMetadata()));
                 }
             }
@@ -203,12 +203,12 @@ public class DCInputsReader {
         } catch (SubmissionConfigReaderException e) {
             throw new DCInputsReaderException("No form designated as default", e);
         }
-    	
+
     }
-    
+
     public List<DCInputSet> getInputsGroupByCollectionHandle(String collectionHandle)
             throws DCInputsReaderException {
-    	SubmissionConfig config;
+        SubmissionConfig config;
         try {
             config = new SubmissionConfigReader().getSubmissionConfigByCollection(collectionHandle);
             String formName = config.getSubmissionName();
@@ -226,7 +226,7 @@ public class DCInputsReader {
         } catch (SubmissionConfigReaderException e) {
             throw new DCInputsReaderException("No form designated as default", e);
         }
-    	
+
     }
 
     public List<DCInputSet> getInputsBySubmissionName(String name)
@@ -284,31 +284,31 @@ public class DCInputsReader {
     public List<DCInputSet> getInputsByGroup(String formName)
             throws DCInputsReaderException {
 
-		List<DCInputSet> results = new ArrayList<DCInputSet>();
+        List<DCInputSet> results = new ArrayList<DCInputSet>();
 
         // cache miss - construct new DCInputSet
         List<List<Map<String, String>>> pages = formDefns.get(formName);
 
         Iterator<List<Map<String, String>>> iterator = pages.iterator();
- 
-        while(iterator.hasNext()) {
-        	List<Map<String, String>> input = iterator.next();
 
-			for(Map<String, String> entry : input) {
-                Set<Entry<String, String>> entrySet = 
-                		entry.entrySet();
-     
-                for(Entry<String, String> attr : entrySet) {
-                	if (attr.getKey().equals("input-type") && attr.getValue().equals("group")) {
-                		String schema = entry.get("dc-schema");
-                		String element = entry.get("dc-element");
-                		String qualifier = entry.get("dc-qualifier");
-                		String subFormName = formName + "-" + Utils.standardize(schema, element, qualifier, "-");
-                		results.add(getInputsByFormName(subFormName));
-                	}
+        while (iterator.hasNext()) {
+            List<Map<String, String>> input = iterator.next();
+
+            for (Map<String, String> entry : input) {
+                Set<Entry<String, String>> entrySet =
+                        entry.entrySet();
+
+                for (Entry<String, String> attr : entrySet) {
+                    if (attr.getKey().equals("input-type") && attr.getValue().equals("group")) {
+                        String schema = entry.get("dc-schema");
+                        String element = entry.get("dc-element");
+                        String qualifier = entry.get("dc-qualifier");
+                        String subFormName = formName + "-" + Utils.standardize(schema, element, qualifier, "-");
+                        results.add(getInputsByFormName(subFormName));
+                    }
                 }
             }
-        	
+
         }
 
         return results;
@@ -758,26 +758,26 @@ public class DCInputsReader {
 
     public String getInputFormNameByCollectionAndField(Collection collection, String field)
         throws DCInputsReaderException {
-    	ArrayList<List<DCInputSet>> arrayInputSets = new ArrayList<List<DCInputSet>>();
-    	arrayInputSets.add(getInputsByCollectionHandle(collection.getHandle()));
-    	arrayInputSets.add(getInputsGroupByCollectionHandle(collection.getHandle()));
-    	arrayInputSets.add(getInputsUploadByCollectionHandle(collection.getHandle()));
+        ArrayList<List<DCInputSet>> arrayInputSets = new ArrayList<List<DCInputSet>>();
+        arrayInputSets.add(getInputsByCollectionHandle(collection.getHandle()));
+        arrayInputSets.add(getInputsGroupByCollectionHandle(collection.getHandle()));
+        arrayInputSets.add(getInputsUploadByCollectionHandle(collection.getHandle()));
 
-		for (List<DCInputSet> inputSets: arrayInputSets) {
-	        for (DCInputSet inputSet : inputSets) {
-	            String[] tokenized = Utils.tokenize(field);
-	            String schema = tokenized[0];
-	            String element = tokenized[1];
-	            String qualifier = tokenized[2];
-	            if (StringUtils.isBlank(qualifier)) {
-	                qualifier = null;
-	            }
-	            String standardized = Utils.standardize(schema, element, qualifier, ".");
+        for (List<DCInputSet> inputSets: arrayInputSets) {
+            for (DCInputSet inputSet : inputSets) {
+                String[] tokenized = Utils.tokenize(field);
+                String schema = tokenized[0];
+                String element = tokenized[1];
+                String qualifier = tokenized[2];
+                if (StringUtils.isBlank(qualifier)) {
+                    qualifier = null;
+                }
+                String standardized = Utils.standardize(schema, element, qualifier, ".");
 
-	            if (inputSet.isFieldPresent(standardized)) {
-	                return inputSet.getFormName();
-	            }
-	        }
+                if (inputSet.isFieldPresent(standardized)) {
+                    return inputSet.getFormName();
+                }
+            }
         }
         throw new DCInputsReaderException("No field configuration found!");
     }
