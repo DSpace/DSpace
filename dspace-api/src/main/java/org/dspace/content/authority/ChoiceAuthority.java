@@ -85,7 +85,7 @@ public interface ChoiceAuthority {
     default boolean hasIdentifier() {
         return true;
     }
-    
+
     default Integer getPreloadLevel() {
         return 0;
     }

@@ -836,7 +836,7 @@ public class RestResourceController implements InitializingBean {
                             return assembler.toResource(halResources, link);
                         } else {
                             response.setStatus(HttpServletResponse.SC_NO_CONTENT);
-                            return null;                            
+                            return null;
                         }
                     } else {
                         RestModel object = (RestModel) linkMethod.invoke(linkRepository, request, uuid, page,

@@ -105,7 +105,7 @@ public class RestRepositoryUtils {
     public Method getSearchMethod(String searchMethodName, DSpaceRestRepository repository) {
         return _getSearchMethod(searchMethodName, repository);
     }
-    
+
     /**
      * @param searchMethodName
      * @param repository

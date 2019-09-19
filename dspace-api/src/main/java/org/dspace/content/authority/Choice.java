@@ -34,7 +34,7 @@ public class Choice {
     public String value = null;
 
     /**
-     * A boolean representing if choice entry value can selected 
+     * A boolean representing if choice entry value can selected
      */
     public Boolean selectable = true;
 
@@ -55,7 +55,7 @@ public class Choice {
         this.value = value;
         this.extras = extras;
     }
-    
+
     public Choice(String authority, String label, String value, Boolean selectable) {
         this.authority = authority;
         this.label = label;

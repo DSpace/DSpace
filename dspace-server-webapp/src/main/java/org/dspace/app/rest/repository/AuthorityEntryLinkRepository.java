@@ -18,9 +18,7 @@ import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.exception.PaginationException;
 import org.dspace.app.rest.model.AuthorityEntryRest;
 import org.dspace.app.rest.model.AuthorityRest;
-import org.dspace.app.rest.model.CollectionRest;
 import org.dspace.app.rest.model.hateoas.AuthorityEntryResource;
-import org.dspace.app.rest.model.hateoas.DSpaceResource;
 import org.dspace.app.rest.model.hateoas.HALResource;
 import org.dspace.app.rest.utils.AuthorityUtils;
 import org.dspace.content.Collection;
@@ -28,7 +26,6 @@ import org.dspace.content.authority.Choice;
 import org.dspace.content.authority.Choices;
 import org.dspace.content.authority.service.ChoiceAuthorityService;
 import org.dspace.content.service.CollectionService;
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -106,7 +103,7 @@ public class AuthorityEntryLinkRepository extends AbstractDSpaceRestRepository
         if (StringUtils.isNotBlank(id) && authorityUtils.isHierarchical(name)) {
             Choices choices = cas.getChoicesByParent(name, id, pageable.getOffset(), pageable.getPageSize(),
                     context.getCurrentLocale().toString());
-            
+
             for (Choice value : choices.values) {
                 results.add(authorityUtils.convertEntry(value, name));
             }
@@ -129,7 +126,7 @@ public class AuthorityEntryLinkRepository extends AbstractDSpaceRestRepository
         if (authorityUtils.isHierarchical(name)) {
             Choices choices = cas.getTopChoices(name, pageable.getOffset(), pageable.getPageSize(),
                     context.getCurrentLocale().toString());
-            
+
             for (Choice value : choices.values) {
                 results.add(authorityUtils.convertEntry(value, name));
             }

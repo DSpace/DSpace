@@ -7,8 +7,6 @@
  */
 package org.dspace.content.authority;
 
-import org.dspace.content.Collection;
-
 /**
  * Plugin interface that supplies an authority control mechanism for
  * one metadata field.

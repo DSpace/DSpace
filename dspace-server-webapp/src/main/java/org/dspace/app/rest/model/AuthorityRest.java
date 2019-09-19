@@ -32,7 +32,7 @@ public class AuthorityRest extends BaseObjectRest<String> {
     private boolean hierarchical;
 
     private boolean identifier;
-    
+
     private Integer preloadLevel;
 
     @Override

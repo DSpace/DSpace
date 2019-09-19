@@ -19,8 +19,6 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.collections4.CollectionUtils;
-import org.dspace.app.rest.exception.RepositorySearchNotFoundException;
 import org.dspace.app.rest.link.HalLinkService;
 import org.dspace.app.rest.model.AuthorityRest;
 import org.dspace.app.rest.model.LinkRest;
@@ -40,7 +38,6 @@ import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedResources;
 import org.springframework.hateoas.ResourceSupport;
-import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -60,7 +57,7 @@ public class AuthorityEntrySearchRestController {
     public static final String MODEL = "authorities";
 
     public static final String SEARCH = "search";
-    
+
     /**
      * Regular expression in the request mapping to accept a string as identifier but not the other kind of
      * identifier (digits or uuid)
@@ -114,7 +111,7 @@ public class AuthorityEntrySearchRestController {
         LinkRest linkRest = utils.getLinkRest(AuthorityRest.ENTRIES, domainClass);
 
         if (linkRest != null) {
-            LinkRestRepository linkRepository = utils.getLinkResourceRepository(AuthorityRest.CATEGORY, 
+            LinkRestRepository linkRepository = utils.getLinkResourceRepository(AuthorityRest.CATEGORY,
                     AuthorityEntrySearchRestController.MODEL, linkRest.name());
             Method linkMethod = repositoryUtils.getSearchMethod(searchMethodName, linkRepository);
             String querystring = request.getQueryString();
@@ -130,7 +127,7 @@ public class AuthorityEntrySearchRestController {
 
             Page<? extends RestModel> pageResult = (Page<? extends RestAddressableModel>) linkMethod
                     .invoke(linkRepository, id, pageable, projection);
-            
+
             Page<HALResource> halResources = pageResult.map(linkRepository::wrapResource);
             halResources.forEach(linkService::addLinks);
 
@@ -163,10 +160,10 @@ public class AuthorityEntrySearchRestController {
         LinkRest linkRest = utils.getLinkRest(AuthorityRest.ENTRIES, domainClass);
 
         if (linkRest != null) {
-            LinkRestRepository linkRepository = utils.getLinkResourceRepository(AuthorityRest.CATEGORY, 
+            LinkRestRepository linkRepository = utils.getLinkResourceRepository(AuthorityRest.CATEGORY,
                     AuthorityEntrySearchRestController.MODEL, linkRest.name());
             Method linkMethod = repositoryUtils.getSearchMethod(searchMethodName, linkRepository);
-            
+
             String querystring = request.getQueryString();
             Link link;
             if (querystring != null && querystring.length() > 0) {
@@ -180,7 +177,7 @@ public class AuthorityEntrySearchRestController {
 
             Page<? extends RestModel> pageResult = (Page<? extends RestAddressableModel>) linkMethod
                     .invoke(linkRepository, request, id, pageable, projection);
-            
+
             Page<HALResource> halResources = pageResult.map(linkRepository::wrapResource);
             halResources.forEach(linkService::addLinks);
 
