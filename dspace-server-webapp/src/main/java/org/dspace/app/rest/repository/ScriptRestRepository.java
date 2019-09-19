@@ -39,6 +39,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
 
 /**
@@ -68,7 +69,11 @@ public class ScriptRestRepository extends DSpaceRestRepository<ScriptRest, Strin
     public ScriptRest findOne(Context context, String name) {
         for (DSpaceRunnable dSpaceRunnable : dspaceRunnables) {
             if (StringUtils.equalsIgnoreCase(dSpaceRunnable.getName(), name)) {
-                return scriptConverter.fromModel(dSpaceRunnable);
+                if (dSpaceRunnable.isAllowedToExecute(context)) {
+                    return scriptConverter.fromModel(dSpaceRunnable);
+                } else {
+                    throw new AccessDeniedException("The current user was not authorized to access this script");
+                }
             }
         }
         throw new DSpaceBadRequestException("The script with name: " + name + " could not be found");
