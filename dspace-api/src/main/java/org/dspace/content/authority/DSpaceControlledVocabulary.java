@@ -66,8 +66,8 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
 
     protected String vocabularyName = null;
     protected InputSource vocabulary = null;
-    protected Boolean suggestHierarchy = true;
-    protected Boolean storeHierarchy = true;
+    protected Boolean suggestHierarchy = false;
+    protected Boolean storeHierarchy = false;
     protected Integer preloadLevel = 1;
     protected String hierarchyDelimiter = "::";
     protected String rootNodeId = "";
