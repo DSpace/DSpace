@@ -66,9 +66,24 @@ public abstract class SPARQLAuthorityProvider implements ChoiceAuthority {
 		// TODO hasMore??
 	}
 
+	/*
+	 * Busca en la base de autoridades choices (authorities) a partir de un string y
+	 * retorna el primero cuyo value o label coincida con el string buscado
+	 */
 	@Override
 	public final Choices getBestMatch(String field, String text, int collection, String locale) {
-		return this.getMatches(field, text, collection, 0, 1, locale);
+		Choices matches = this.getMatches(field, text, collection, 0, 0, locale);
+		for (Choice match : matches.values) {
+			// Con que el label o el value sea igual al valor buscado ya es suficiente
+			if (text.trim().equalsIgnoreCase(match.value.trim()) || text.trim().equalsIgnoreCase(match.label.trim())) {
+				Choice[] bestMatch = new Choice[1];
+				bestMatch[0] = match;
+				// Devuelvo el choice con confidence 500 porque no fue seteado por un humano
+				return new Choices(bestMatch, 0, 1, Choices.CF_UNCERTAIN, false);
+			}
+		}
+		// Si no se encontró ningún valor que coincida, devolvemos un array vacío de choices y confidence 300
+		return new Choices(new Choice[0], 0, 1, Choices.CF_NOTFOUND, false);
 	}
 
 	@Override
