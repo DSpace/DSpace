@@ -170,8 +170,8 @@ public class WorkflowOverviewTransformer extends AbstractDSpaceTransformer {
                 headerRow.addCellContent(" ");
                 headerRow.addCellContent(T_search_column1);
                 headerRow.addCellContent(T_search_column2);
-                headerRow.addCellContent(T_search_columnAuthor);
                 headerRow.addCellContent(T_search_column3);
+                headerRow.addCellContent(T_search_columnAuthor);
                 headerRow.addCellContent(T_search_column4);
                 headerRow.addCellContent(T_search_column5);
 
