@@ -171,7 +171,7 @@ public class CollectionHarvestSettingsControllerIT extends AbstractControllerInt
     }
 
     @Test
-    public void getAndPutCollectionHarvestSettingsUserNoWriteException() throws Exception {
+    public void getAndPutCollectionHarvestSettingsAnonymousUserException() throws Exception {
         JSONObject json = createHarvestSettingsJson("METADATA_ONLY", "https://dspace.org/oai/request", "col_1721.1_114174", "dc");
 
         getClient().perform(
@@ -179,6 +179,19 @@ public class CollectionHarvestSettingsControllerIT extends AbstractControllerInt
                 .contentType("application/json")
                 .content(json.toString()))
                         .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void GetAndPutCollectionHarvestSettingsIfUserHasNoWriteRightsException() throws Exception {
+        context.setCurrentUser(eperson);
+        String token = getAuthToken(eperson.getEmail(), password);
+        JSONObject json = createHarvestSettingsJson("METADATA_ONLY", "https://dspace.org/oai/request", "col_1721.1_114174", "dc");
+
+        getClient(token).perform(
+            put("/api/core/collections/" + collection.getID() + "/harvester")
+                .contentType("application/json")
+                .content(json.toString()))
+                   .andExpect(status().isForbidden());
     }
 
     @Test
