@@ -767,8 +767,8 @@ public class RestResourceController implements InitializingBean {
 
             try {
                 Object object = linkMethod.invoke(linkRepository, request, id, relid, page, projection);
-                Link link = linkTo(this.getClass(), apiCategory, English.plural(model)).slash(id)
-                                                                                       .slash(rel).withSelfRel();
+                Link link = linkTo(this.getClass(), apiCategory, model).slash(id).slash(rel).slash(relid).withSelfRel();
+
                 List result = new ArrayList();
                 result.add(object);
                 PageImpl<RestAddressableModel> pageResult = new PageImpl(result, page, 1);
