@@ -919,28 +919,25 @@ public class OAIHarvester {
         );
         while (pe.hasMoreElements()) {
             String key = (String) pe.nextElement();
-            if (key.startsWith(metaString)) {
+            String metadataString = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty(key);
 
-                String metadataString = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty(key);
+            String id = key.substring(metaString.length());
+            String label;
+            String namespace = "";
 
-                String id = key.substring(metaString.length());
-                String label;
-                String namespace = "";
-
-                if (metadataString.indexOf(',') != -1) {
-                    label = metadataString.substring(metadataString.indexOf(',') + 2);
-                    namespace = metadataString.substring(0, metadataString.indexOf(','));
-                } else {
-                    label = id + "(" + metadataString + ")";
-                }
-
-                Map<String,String> config = new HashMap<>();
-                config.put("id", id);
-                config.put("label", label);
-                config.put("namespace", namespace);
-
-                configs.add(config);
+            if (metadataString.indexOf(',') != -1) {
+                label = metadataString.substring(metadataString.indexOf(',') + 2);
+                namespace = metadataString.substring(0, metadataString.indexOf(','));
+            } else {
+                label = id + "(" + metadataString + ")";
             }
+
+            Map<String,String> config = new HashMap<>();
+            config.put("id", id);
+            config.put("label", label);
+            config.put("namespace", namespace);
+
+            configs.add(config);
         }
 
         return configs;

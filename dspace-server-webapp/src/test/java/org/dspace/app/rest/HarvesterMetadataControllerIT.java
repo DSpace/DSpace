@@ -50,5 +50,15 @@ public class HarvesterMetadataControllerIT extends AbstractControllerIntegration
                             MetadataConfigsMatcher.matchMetadataConfigs(configs)
                         )))
                         .andExpect(jsonPath("$._links.self.href", endsWith("/api/config/harvestermetadata")));
+
+        token = getAuthToken(eperson.getEmail(), password);
+        getClient(token).perform(
+            get("/api/config/harvestermetadata"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$", Matchers.allOf(
+                            MetadataConfigsMatcher.matchMetadataConfigs(configs)
+                        )))
+                        .andExpect(jsonPath("$._links.self.href", endsWith("/api/config/harvestermetadata")));
+
     }
 }
