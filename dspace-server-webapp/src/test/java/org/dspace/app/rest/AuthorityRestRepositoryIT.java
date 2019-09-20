@@ -11,9 +11,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.Date;
+import java.util.UUID;
+
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.response.QueryResponse;
-import org.dspace.app.rest.matcher.AuthorityEntryMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.authority.PersonAuthorityValue;
 import org.dspace.authority.factory.AuthorityServiceFactory;
@@ -48,18 +50,26 @@ public class AuthorityRestRepositoryIT extends AbstractControllerIntegrationTest
                 "dc.contributor.author");
 
         PersonAuthorityValue person1 = new PersonAuthorityValue();
+        person1.setId(String.valueOf(UUID.randomUUID()));
         person1.setLastName("Shirasaka");
         person1.setFirstName("Seiko");
         person1.setValue("Shirasaka, Seiko");
         person1.setField("dc_contributor_author");
+        person1.setLastModified(new Date());
+        person1.setCreationDate(new Date());
         AuthorityServiceFactory.getInstance().getAuthorityIndexingService().indexContent(person1);
 
         PersonAuthorityValue person2 = new PersonAuthorityValue();
+        person2.setId(String.valueOf(UUID.randomUUID()));
         person2.setLastName("Miller");
         person2.setFirstName("Tyler E");
         person2.setValue("Miller, Tyler E");
         person2.setField("dc_contributor_author");
+        person2.setLastModified(new Date());
+        person2.setCreationDate(new Date());
         AuthorityServiceFactory.getInstance().getAuthorityIndexingService().indexContent(person2);
+
+        AuthorityServiceFactory.getInstance().getAuthorityIndexingService().commit();
     }
 
     @Test
@@ -179,6 +189,14 @@ public class AuthorityRestRepositoryIT extends AbstractControllerIntegrationTest
     @Override
     public void destroy() throws Exception {
         AuthorityServiceFactory.getInstance().getAuthorityIndexingService().cleanIndex();
+        configurationService.setProperty("plugin.named.org.dspace.content.authority.ChoiceAuthority", null);
+
+        configurationService.setProperty("solr.authority.server", null);
+        configurationService.setProperty("choices.plugin.dc.contributor.author", null);
+        configurationService.setProperty("choices.presentation.dc.contributor.author", null);
+        configurationService.setProperty("authority.controlled.dc.contributor.author", null);
+
+        configurationService.setProperty("authority.author.indexer.field.1", null);
         super.destroy();
     }
 }
