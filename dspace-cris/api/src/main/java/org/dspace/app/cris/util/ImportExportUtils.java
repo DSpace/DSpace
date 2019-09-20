@@ -2341,7 +2341,7 @@ public class ImportExportUtils {
         	UtilsXLS.addCell(utilsdataSheet, 2, rowUtilsDataDynObjectsIdx, oType);
         	rowUtilsDataDynObjectsIdx++;
         	
-			List<? extends PropertiesDefinition> propDefs = applicationService.findMaskByShortName(DynamicTypeNestedObject.class,
+			List<? extends PropertiesDefinition> propDefs = applicationService.findMaskByShortName(DynamicObjectType.class,
                     oType);
             for (PropertiesDefinition propDef : propDefs) {
 	        		UtilsXLS.addCell(propertiesdefinitionSheet, 0, rowIdx, oType);
