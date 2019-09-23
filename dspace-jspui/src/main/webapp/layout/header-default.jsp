@@ -55,7 +55,10 @@
         <link rel="stylesheet" href="<%= request.getContextPath() %>/static/css/bootstrap/bootstrap-theme.min.css" type="text/css" />
         <link rel="stylesheet" href="<%= request.getContextPath() %>/static/css/bootstrap/dspace-theme.css" type="text/css" />
         <link rel="stylesheet" href="<%= request.getContextPath() %>/static/css/treeview.css" type="text/css"/>
-<%
+        <link rel="stylesheet" href="<%= request.getContextPath() %>/static/css/yearpicker.css">
+        <link rel="stylesheet" href="<%= request.getContextPath() %>/static/css/pagination.css">
+
+    <%
     if (!"NONE".equals(feedRef))
     {
         for (int i = 0; i < parts.size(); i+= 3)
@@ -80,14 +83,17 @@
         }
 %>
         
-        <script type='text/javascript' src="<%= request.getContextPath() %>/static/js/jquery/jquery-1.10.2.min.js"></script>
+        <%--<script type='text/javascript' src="<%= request.getContextPath() %>/static/js/jquery/jquery-1.10.2.min.js"></script>--%>
+        <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
         <script type='text/javascript' src='<%= request.getContextPath() %>/static/js/jquery/jquery-ui-1.10.3.custom.min.js'></script>
         <script type='text/javascript' src='<%= request.getContextPath() %>/static/js/bootstrap/bootstrap.min.js'></script>
         <script type='text/javascript' src='<%= request.getContextPath() %>/static/js/holder.js'></script>
         <script type="text/javascript" src="<%= request.getContextPath() %>/utils.js"></script>
         <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/choice-support.js"> </script>
         <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/bootstrap-tree.js"> </script>
-        <dspace:include page="/layout/google-analytics-snippet.jsp" />
+        <script src="<%= request.getContextPath() %>/static/js/yearpicker.js" async></script>
+
+    <dspace:include page="/layout/google-analytics-snippet.jsp" />
     <%
 
     if (extraHeadDataLast != null)

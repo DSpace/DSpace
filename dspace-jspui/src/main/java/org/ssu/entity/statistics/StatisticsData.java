@@ -1,4 +1,4 @@
-package org.ssu.statistics;
+package org.ssu.entity.statistics;
 
 public class StatisticsData {
     private Integer totalCount = 0;

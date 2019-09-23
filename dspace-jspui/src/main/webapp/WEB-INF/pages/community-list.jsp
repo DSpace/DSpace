@@ -9,7 +9,7 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib prefix="C" uri="http://java.sun.com/jsp/jstl/core" %>
 
-<%@taglib prefix="mytaglib" tagdir="/WEB-INF/tags/mytaglib"%>
+<%@taglib prefix="essuir" tagdir="/WEB-INF/tags/essuir"%>
 
 <%
     org.dspace.core.Context context = org.dspace.app.webui.util.UIUtil.obtainContext(request);
@@ -41,11 +41,11 @@
         <ul>
         <c:forEach items="${communities}" var="community">
 
-            <mytaglib:displayCommunity community="${community}" itemCounter="${itemCounter}"/>
+            <essuir:displayCommunity community="${community}" itemCounter="${itemCounter}"/>
             <li>
                 <ul>
                     <c:forEach items="${innerCommunities.get(community.ID.toString())}" var="inner">
-                        <mytaglib:displayCommunity community="${inner}" itemCounter="${itemCounter}"/>
+                        <essuir:displayCommunity community="${inner}" itemCounter="${itemCounter}"/>
                     </c:forEach>
                 </ul>
             </li>

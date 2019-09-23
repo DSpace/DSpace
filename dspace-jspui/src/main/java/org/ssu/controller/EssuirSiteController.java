@@ -1,4 +1,4 @@
-package org.ssu;
+package org.ssu.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -6,12 +6,8 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 import org.dspace.app.webui.components.RecentSubmissionsException;
 import org.dspace.app.webui.components.RecentSubmissionsManager;
-import org.dspace.app.webui.servlet.CommunityListServlet;
 import org.dspace.app.webui.util.UIUtil;
-import org.dspace.authorize.factory.AuthorizeServiceFactory;
-import org.dspace.authorize.service.AuthorizeService;
-import org.dspace.browse.ItemCountException;
-import org.dspace.browse.ItemCounter;
+import org.dspace.browse.*;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataSchema;
@@ -31,19 +27,18 @@ import org.ssu.entity.AuthorLocalization;
 import org.ssu.entity.response.CommunityResponse;
 import org.ssu.entity.response.ItemTypeResponse;
 import org.ssu.entity.response.RecentItem;
-import org.ssu.localization.TypeLocalization;
-import org.ssu.statistics.EssuirStatistics;
-import org.ssu.statistics.GeneralStatisticsService;
-import org.ssu.statistics.ScheduledTasks;
-import org.ssu.statistics.StatisticsData;
+import org.ssu.service.localization.TypeLocalization;
+import org.ssu.service.CommunityService;
+import org.ssu.service.statistics.EssuirStatistics;
+import org.ssu.service.GeneralStatisticsService;
+import org.ssu.service.statistics.ScheduledTasks;
+import org.ssu.entity.statistics.StatisticsData;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.sql.SQLException;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -208,7 +203,7 @@ public class EssuirSiteController {
     public void update() {
         scheduledTasks.finalizeMonthStatistics();
     }
-  
+
     @RequestMapping("community-list")
     public ModelAndView getCommunityList(ModelAndView model, HttpServletRequest request, HttpServletResponse response) throws SQLException, ItemCountException {
         Context dspaceContext = UIUtil.obtainContext(request);

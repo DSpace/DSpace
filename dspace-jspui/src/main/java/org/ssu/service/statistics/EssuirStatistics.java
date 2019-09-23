@@ -1,4 +1,4 @@
-package org.ssu.statistics;
+package org.ssu.service.statistics;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.jooq.Condition;
@@ -8,7 +8,8 @@ import org.jooq.lambda.Seq;
 import org.springframework.stereotype.Service;
 
 import org.ssu.entity.AuthorLocalization;
-import org.ssu.localization.AuthorsCache;
+import org.ssu.entity.statistics.StatisticsData;
+import org.ssu.service.localization.AuthorsCache;
 import org.ssu.repository.MetadatavalueRepository;
 
 import javax.annotation.Resource;
@@ -142,5 +143,13 @@ public class EssuirStatistics {
                 .collect(Collectors.toList());
     }
 
+
+    public Integer getViewsForItem(Integer itemId) {
+        return getStatistics(STATISTICS.sequenceId.lessThan(0).and(STATISTICS.itemId.eq(itemId))).getOrDefault(itemId, 0L).intValue();
+    }
+
+    public Integer getDownloadsForItem(Integer itemId) {
+        return getStatistics(STATISTICS.sequenceId.greaterOrEqual(0).and(STATISTICS.itemId.eq(itemId))).getOrDefault(itemId, 0L).intValue();
+    }
 
 }

@@ -2,7 +2,7 @@ package org.ssu.repository;
 
 import org.jooq.DSLContext;
 import org.springframework.stereotype.Service;
-import org.ssu.entity.GeneralStatistics;
+import org.ssu.entity.statistics.GeneralStatistics;
 
 import javax.annotation.Resource;
 import java.util.List;

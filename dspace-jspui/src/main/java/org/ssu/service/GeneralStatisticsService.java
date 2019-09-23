@@ -1,10 +1,12 @@
-package org.ssu.statistics;
+package org.ssu.service;
 
 import org.springframework.stereotype.Service;
-import org.ssu.entity.GeneralStatistics;
-import org.ssu.entity.YearStatistics;
+import org.ssu.entity.statistics.GeneralStatistics;
+import org.ssu.entity.statistics.YearStatistics;
 import org.ssu.entity.response.GeneralStatisticsResponse;
 import org.ssu.repository.GeneralStatisticsRepository;
+import org.ssu.service.statistics.EssuirStatistics;
+import org.ssu.entity.statistics.StatisticsData;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;

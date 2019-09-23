@@ -1,4 +1,4 @@
-package org.ssu.localization;
+package org.ssu.service.localization;
 
 import org.jooq.DSLContext;
 import org.springframework.stereotype.Service;

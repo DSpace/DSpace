@@ -1,10 +1,12 @@
-package org.ssu.statistics;
+package org.ssu.service.statistics;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.ssu.entity.GeneralStatistics;
+import org.ssu.entity.statistics.GeneralStatistics;
+import org.ssu.entity.statistics.StatisticsData;
 import org.ssu.repository.GeneralStatisticsRepository;
+import org.ssu.service.GeneralStatisticsService;
 
 import javax.annotation.Resource;
 import java.time.LocalDate;

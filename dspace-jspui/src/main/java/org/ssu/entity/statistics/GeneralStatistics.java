@@ -1,4 +1,4 @@
-package org.ssu.entity;
+package org.ssu.entity.statistics;
 
 import java.io.Serializable;
 

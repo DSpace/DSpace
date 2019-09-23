@@ -1,9 +1,9 @@
-package org.ssu.localization;
+package org.ssu.service.localization;
 
 import org.dspace.app.util.DCInputsReaderException;
 import org.springframework.stereotype.Service;
 import org.ssu.entity.response.ItemTypeResponse;
-import org.ssu.statistics.EssuirStatistics;
+import org.ssu.service.statistics.EssuirStatistics;
 
 import javax.annotation.Resource;
 import java.util.HashMap;
