@@ -1,0 +1,80 @@
+version: '3.7'
+networks:
+  dspacenet: 
+services:
+  dspace:
+    container_name: dspace
+    image: "${DOCKER_OWNER:-dspace}/dspace:${DSPACE_VER:-dspace-6_x-jdk8-test}"
+    build:
+      context: .
+      dockerfile: Dockerfile.jdk8-test
+    depends_on:
+    - dspacedb
+    networks:
+      dspacenet:
+    ports:
+    - published: 8080
+      target: 8080
+    stdin_open: true
+    tty: true
+    volumes:
+    - assetstore:/dspace/assetstore
+    - ./dspace/src/main/docker-compose/local.cfg:/dspace/config/local.cfg
+  dspace-angular:
+    container_name: dspace-angular
+    depends_on:
+    - dspace
+    environment:
+      DSPACE_HOST: dspace-angular
+      DSPACE_NAMESPACE: /
+      DSPACE_PORT: '3000'
+      DSPACE_REST_HOST: dspace
+      DSPACE_REST_NAMESPACE: /
+      DSPACE_REST_PORT: '8080'
+      DSPACE_REST_SSL: "false"
+      DSPACE_SSL: "false"
+    image: dspace/dspace-angular:latest
+    networks:
+      dspacenet: {}
+    ports:
+    - published: 3000
+      target: 3000
+    - published: 9876
+      target: 9876
+    stdin_open: true
+    tty: true
+    volumes:
+    - ./dspace/src/main/docker-compose/environment.dev.js:/app/config/environment.dev.js
+  dspacedb:
+    container_name: dspacedb
+    environment:
+      PGDATA: /pgdata
+    image: dspace/dspace-postgres-pgcrypto
+    networks:
+      dspacenet:
+    stdin_open: true
+    tty: true
+    volumes:
+    - pgdata:/pgdata
+  dspacesolr:
+    container_name: dspacesolr
+    image: dspace/dspace-solr
+    networks:
+      dspacenet:
+    ports:
+    - published: 8983
+      target: 8983
+    stdin_open: true
+    tty: true
+    volumes:
+    - solr_authority:/opt/solr/server/solr/authority/data
+    - solr_oai:/opt/solr/server/solr/oai/data
+    - solr_search:/opt/solr/server/solr/search/data
+    - solr_statistics:/opt/solr/server/solr/statistics/data
+volumes:
+  assetstore:
+  pgdata:
+  solr_authority:
+  solr_oai:
+  solr_search:
+  solr_statistics:
