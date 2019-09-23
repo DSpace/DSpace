@@ -58,7 +58,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/" + BitstreamRest.CATEGORY + "/" + BitstreamRest.PLURAL_NAME
         + REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID + "/" + BundleRest.NAME)
-public class BitstreamBundleController {
+public class BitstreamController {
 
     @Autowired
     BitstreamService bitstreamService;
@@ -150,6 +150,8 @@ public class BitstreamBundleController {
         BundleResource bundleResource = new BundleResource(dsoConverter.fromModel(targetBundle), utils);
         halLinkService.addLinks(bundleResource);
 
+        context.commit();
+
         return bundleResource;
 
     }
@@ -179,9 +181,8 @@ public class BitstreamBundleController {
             }
         }
 
-        context.commit();
 
-        return context.reloadEntity(targetBundle);
+        return targetBundle;
     }
 
     private boolean hasSufficientPermissions(final Context context, final List<Bundle> bundles,
