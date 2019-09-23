@@ -17,6 +17,7 @@
 <%@ taglib uri="researchertags" prefix="researcher"%>
 <%@page import="it.cilea.osd.jdyna.model.AccessLevelConstants"%>
 <%@ page import="org.dspace.app.webui.util.UIUtil" %>
+<%@ page import="java.net.URL"%>
 
 <% 
 	Integer offset = (Integer)request.getAttribute("offset");
@@ -81,7 +82,16 @@
 	</span>
 	</c:if>
 	
-	<dyna:display-nested values="${results}" typeDefinition="${decoratorPropertyDefinition}" editmode="${editmode}" parentID="${parentID}" specificPartPath="${specificContextPath}${specificPartPath}" admin="${admin}"/>
+	<c:set var="urljspcustom" value="/dspace-cris/jdyna/custom/${decoratorPropertyDefinition.real.shortName}.jsp" scope="request" />
+	<%
+		String filePath = (String)pageContext.getRequest().getAttribute("urljspcustom");
+		URL fileURL = pageContext.getServletContext().getResource(filePath);
+		if (((Boolean)pageContext.getRequest().getAttribute("editmode")) || fileURL == null) {
+	%>
+		<dyna:display-nested values="${results}" typeDefinition="${decoratorPropertyDefinition}" editmode="${editmode}" parentID="${parentID}" specificPartPath="${specificContextPath}${specificPartPath}" admin="${admin}"/>
+	<% } else { %>
+		<c:import url="${urljspcustom}" />
+	<% } %>
 	</c:if>	
 	<c:if test="${(editmode && admin) || ((editmode && decoratorPropertyDefinition.accessLevel eq HIGH_ACCESS) && ((editmode && decoratorPropertyDefinition.repeatable) || (editmode && empty results)))}">
 		<span class="glyphicon glyphicon-plus"id="nested_${decoratorPropertyDefinition.real.id}_addbutton" ></span>
