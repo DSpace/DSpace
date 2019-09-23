@@ -54,7 +54,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/core/bundles/{uuid}")
-public class BitstreamUploadController {
+public class BundleController {
 
     private static final Logger log = LogManager.getLogger();
 

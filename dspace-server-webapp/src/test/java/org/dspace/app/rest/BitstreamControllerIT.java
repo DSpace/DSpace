@@ -50,7 +50,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author Tom Desair (tom dot desair at atmire dot com)
  * @author Frederic Van Reet (frederic dot vanreet at atmire dot com)
  */
-public class BitstreamBundleControllerIT extends AbstractControllerIntegrationTest {
+public class BitstreamControllerIT extends AbstractControllerIntegrationTest {
 
     @Autowired
     BundleService bundleService;
@@ -58,7 +58,7 @@ public class BitstreamBundleControllerIT extends AbstractControllerIntegrationTe
     @Autowired
     BitstreamService bitstreamService;
 
-    private static final Logger log = LogManager.getLogger(BitstreamBundleControllerIT.class);
+    private static final Logger log = LogManager.getLogger(BitstreamControllerIT.class);
 
     @Test
     public void getBundle() throws Exception {

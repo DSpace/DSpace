@@ -21,6 +21,7 @@ import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 /**
@@ -41,6 +42,7 @@ public class BundleRestRepository extends DSpaceObjectRestRepository<Bundle, Bun
         this.bundleService = dsoService;
     }
 
+    @PreAuthorize("hasPermission(#uuid, 'BUNDLE', 'READ')")
     public BundleRest findOne(Context context, UUID uuid) {
         Bundle bundle = null;
         try {
@@ -55,7 +57,7 @@ public class BundleRestRepository extends DSpaceObjectRestRepository<Bundle, Bun
     }
 
     public Page<BundleRest> findAll(Context context, Pageable pageable) {
-        return null;
+        throw new RuntimeException("Method not allowed!");
     }
 
     public Class<BundleRest> getDomainClass() {

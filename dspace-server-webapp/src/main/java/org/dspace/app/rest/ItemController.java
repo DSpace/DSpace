@@ -11,8 +11,6 @@ import static org.dspace.app.rest.utils.RegexUtils.REGEX_REQUESTMAPPING_IDENTIFI
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -23,7 +21,6 @@ import org.dspace.app.rest.converter.MetadataConverter;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.BundleRest;
-import org.dspace.app.rest.model.MetadataValueRest;
 import org.dspace.app.rest.model.hateoas.BundleResource;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.rest.utils.Utils;
@@ -47,7 +44,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/core/items" + REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID + "/bundles")
-public class ItemBundleRestController {
+public class ItemController {
 
     @Autowired
     ItemService itemService;
@@ -91,23 +88,11 @@ public class ItemBundleRestController {
 
         Bundle bundle = bundleService.create(context, item, bundleRest.getName());
 
-        // Add metadata values
-        for (Map.Entry<String, List<MetadataValueRest>> entry : bundleRest.getMetadata().getMap().entrySet()) {
-            for (MetadataValueRest metadataValue : entry.getValue()) {
-                String[] fieldValues = entry.getKey().split("\\.");
-                bundleService.addMetadata(
-                        context,
-                        bundle,
-                        fieldValues[0],
-                        fieldValues[1],
-                        fieldValues.length == 2 ? "" : fieldValues[2],
-                        metadataValue.getLanguage(),
-                        metadataValue.getValue(),
-                        metadataValue.getAuthority(),
-                        metadataValue.getConfidence());
-            }
-        }
+        metadataConverter.setMetadata(context, bundle, bundleRest.getMetadata());
+        bundle.setName(context, bundleRest.getName());
+
         context.commit();
+
         BundleResource bundleResource = new BundleResource(converter.convert(bundle), utils);
         return ControllerUtils.toResponseEntity(HttpStatus.CREATED, null, bundleResource);
 

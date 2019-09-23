@@ -127,20 +127,20 @@ public class ItemOwningCollectionUpdateRestController {
      * This method will perform the item move based on the provided item uuid and the target collection
      *
      * @param context          The context Object
-     * @param uuid         The uuid of the item to be moved
+     * @param itemUuid         The uuid of the item to be moved
      * @param targetCollection The target collection
      * @return The new owning collection of the item when authorized or null when not authorized
      * @throws SQLException       If something goes wrong
      * @throws IOException        If something goes wrong
      * @throws AuthorizeException If the user is not authorized to perform the move action
      */
-    private Collection performItemMove(final Context context, final UUID uuid, final Collection targetCollection)
+    private Collection performItemMove(final Context context, final UUID itemUuid, final Collection targetCollection)
             throws SQLException, IOException, AuthorizeException {
 
-        Item item = itemService.find(context, uuid);
+        Item item = itemService.find(context, itemUuid);
 
         if (item == null) {
-            throw new ResourceNotFoundException("Item with id: " + uuid + " not found");
+            throw new ResourceNotFoundException("Item with id: " + itemUuid + " not found");
         }
         if (!(item.isArchived() || item.isWithdrawn())) {
             throw new DSpaceBadRequestException("Only archived or withdrawn items can be moved between collections");
