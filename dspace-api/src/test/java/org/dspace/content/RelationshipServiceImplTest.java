@@ -320,6 +320,12 @@ public class RelationshipServiceImplTest {
         Mockito.verify(relationshipDAO).save(context, relationship);
     }
 
+    @Test
+    public void testCountTotal() throws Exception {
+        when(relationshipDAO.countRows(context)).thenReturn(0);
+        assertEquals("TestCountTotal 1", 0, relationshipService.countTotal(context));
+    }
+
     /**
      * Helper method that returns a configured Relationship
      * @param leftItem Relationship's left item
