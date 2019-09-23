@@ -15,10 +15,7 @@
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
-<%@ page import="java.net.URLEncoder" %>
-<%@ page import="org.dspace.app.webui.util.UIUtil" %>
-
-<%
+        <%
     String sidebar = (String) request.getAttribute("dspace.layout.sidebar");
 %>
 
@@ -40,9 +37,24 @@
             <%-- Page footer --%>
              <footer class="navbar navbar-inverse navbar-bottom">
              <div id="designedby" class="container text-muted">
-             <fmt:message key="jsp.layout.footer-default.theme-by"/> <a href="http://www.cineca.it"><img
-                                    src="<%= request.getContextPath() %>/image/logo-cineca-small.png"
-                                    alt="Logo CINECA" /></a>
+
+    <!--PR -->
+    <a href="https://www.prchecker.info/" title="PRchecker.info" target="_blank" rel="nofollow">
+    <img src="https://pr-v2.prchecker.info/getpr.v2.php?codex=aHR0cDovL2Vzc3Vpci5zdW1kdS5lZHUudWEv&amp;tag=2"
+    alt="PRchecker.info" style="border:0;"></a>
+    <!--/PR -->
+    <!--LiveInternet counter--><script type="text/javascript"><!--
+    document.write("<a href='https://www.liveinternet.ru/click' "+
+    "target=_blank><img src='//counter.yadro.ru/hit?t14.6;r"+
+    escape(document.referrer)+((typeof(screen)=="undefined")?"":
+    ";s"+screen.width+"*"+screen.height+"*"+(screen.colorDepth?
+    screen.colorDepth:screen.pixelDepth))+";u"+escape(document.URL)+
+    ";"+Math.random()+
+    "' alt='' title='LiveInternet: показано число просмотров за 24"+
+    " часа, посетителей за 24 часа и за сегодня' "+
+    "border='0' width='88' height='31'><\/a>")
+    //--></script><!--/LiveInternet-->
+
 			<div id="footer_feedback" class="pull-right">                                    
                                 <p class="text-muted"><fmt:message key="jsp.layout.footer-default.text"/>&nbsp;-
                                 <a target="_blank" href="<%= request.getContextPath() %>/feedback"><fmt:message key="jsp.layout.footer-default.feedback"/></a>
