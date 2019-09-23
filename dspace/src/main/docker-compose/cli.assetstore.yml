@@ -1,0 +1,20 @@
+version: "3.7"
+
+services:
+  dspace-cli:
+    environment:
+      - LOADASSETS=https://www.dropbox.com/s/zv7lj8j2lp3egjs/assetstore.tar.gz?dl=1
+    entrypoint:
+      - /bin/bash
+      - '-c'
+      - |
+        if [ ! -z $${LOADASSETS} ]
+        then
+          curl $${LOADASSETS} -L -s --output /tmp/assetstore.tar.gz
+          cd /dspace
+          tar xvfz /tmp/assetstore.tar.gz
+        fi
+
+        /dspace/bin/dspace index-discovery
+        /dspace/bin/dspace oai import
+        /dspace/bin/dspace oai clean-cache
