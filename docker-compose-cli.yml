@@ -2,7 +2,7 @@ version: "3.7"
 
 services:
   dspace-cli:
-    image: dspace/dspace-cli:local-branch
+    image: "dspace/dspace-cli:${DSPACE_VER:-dspace-6_x}"
     container_name: dspace-cli
     build:
       context: .
