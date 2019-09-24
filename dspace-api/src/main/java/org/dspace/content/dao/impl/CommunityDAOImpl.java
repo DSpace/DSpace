@@ -8,9 +8,6 @@
 package org.dspace.content.dao.impl;
 
 import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import javax.persistence.Query;
@@ -63,11 +60,15 @@ public class CommunityDAOImpl extends AbstractHibernateDSODAO<Community> impleme
     public List<Community> findAll(Context context, MetadataField sortField, Integer limit, Integer offset)
         throws SQLException {
         StringBuilder queryBuilder = new StringBuilder();
-        queryBuilder.append("SELECT ").append(Community.class.getSimpleName()).append(" FROM Community as ")
-                    .append(Community.class.getSimpleName()).append(" ");
-        addMetadataLeftJoin(queryBuilder, Community.class.getSimpleName(), Arrays.asList(sortField));
-        addMetadataSortQuery(queryBuilder, Arrays.asList(sortField), Collections.EMPTY_LIST);
-
+        queryBuilder.append("SELECT c" +
+                                " FROM Community c" +
+                                " left join c.metadata title on title.metadataField = :sortField and" +
+                                " title.dSpaceObject = c.id and" +
+                                " title.place = (select min(internal.place) " +
+                                                "from c.metadata internal " +
+                                                "where internal.metadataField = :sortField and" +
+                                                    " internal.dSpaceObject = c.id)" +
+                                " ORDER BY LOWER(title.value)");
         Query query = createQuery(context, queryBuilder.toString());
         if (offset != null) {
             query.setFirstResult(offset);
@@ -75,11 +76,11 @@ public class CommunityDAOImpl extends AbstractHibernateDSODAO<Community> impleme
         if (limit != null) {
             query.setMaxResults(limit);
         }
-        query.setParameter(sortField.toString(), sortField.getID());
+        query.setParameter("sortField", sortField);
 
         // Convert List to HashSet and back again to filter out duplicates (e.g. a community
         // having multiple titles/translations), without changing the order of elements
-        return new LinkedList<Community>(new LinkedHashSet<>(list(query)));
+        return list(query);
     }
 
     @Override
@@ -95,18 +96,21 @@ public class CommunityDAOImpl extends AbstractHibernateDSODAO<Community> impleme
     @Override
     public List<Community> findAllNoParent(Context context, MetadataField sortField) throws SQLException {
         StringBuilder queryBuilder = new StringBuilder();
-        queryBuilder.append("SELECT community FROM Community as community ");
-        addMetadataLeftJoin(queryBuilder, Community.class.getSimpleName().toLowerCase(), Arrays.asList(sortField));
-        addMetadataValueWhereQuery(queryBuilder, Collections.EMPTY_LIST, null, " community.parentCommunities IS EMPTY");
-        addMetadataSortQuery(queryBuilder, Arrays.asList(sortField), Collections.EMPTY_LIST);
-
+        queryBuilder.append("SELECT c" +
+                                " FROM Community c" +
+                                " left join c.metadata title on title.metadataField = :sortField and" +
+                                " title.dSpaceObject = c.id and" +
+                                " title.place = (select min(internal.place) " +
+                                                "from c.metadata internal " +
+                                                "where internal.metadataField = :sortField and" +
+                                                        " internal.dSpaceObject = c.id)" +
+                                " WHERE c.parentCommunities IS EMPTY " +
+                                " ORDER BY LOWER(title.value)");
         Query query = createQuery(context, queryBuilder.toString());
-        query.setParameter(sortField.toString(), sortField.getID());
+        query.setParameter("sortField", sortField);
         query.setHint("org.hibernate.cacheable", Boolean.TRUE);
 
-        // Convert List to HashSet and back again to filter out duplicates (e.g. a community
-        // having multiple titles/translations), without changing the order of elements
-        return new LinkedList<Community>(new LinkedHashSet<>(findMany(context, query)));
+        return findMany(context, query);
     }
 
     @Override
