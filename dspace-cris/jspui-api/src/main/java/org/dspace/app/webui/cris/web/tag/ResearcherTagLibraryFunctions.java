@@ -1066,37 +1066,7 @@ public class ResearcherTagLibraryFunctions
                 .get(result.getShortName());
         if (!values.isEmpty())
         {
-            if (result.getRendering() instanceof WidgetPointer)
-            {
-                // check only the first. The code grant the user to filled the
-                // right contents for all languages
-                Property property = (Property) values.get(0);
-                if (property != null)
-                {
-                    PointerValue pointerValue = (PointerValue) (property
-                            .getValue());
-                    if (pointerValue != null)
-                    {
-                        ACrisObject acrispointer = (ACrisObject) pointerValue
-                                .getObject();
-                        if (acrispointer != null)
-                        {
-                            List valuesOfPointer = (List) acrispointer
-                                    .getAnagrafica4view()
-                                    .get(acrispointer.getMetadataFieldTitle()
-                                            + "_" + locale);
-                            if (!valuesOfPointer.isEmpty())
-                            {
-                                return result;
-                            }
-                        }
-                    }
-                }
-            }
-            else
-            {
-                return result;
-            }
+            return result;
         }
         return null;
     }
