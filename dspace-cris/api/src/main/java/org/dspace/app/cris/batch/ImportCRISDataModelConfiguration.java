@@ -1346,10 +1346,7 @@ public class ImportCRISDataModelConfiguration
 			List<String> metadata = new ArrayList<String>();
 			
 			for(int i = 0; i<riga.getLastCellNum() + 1; i++) {
-				if (riga.getCell(i) == null)
-					continue;
-				
-                metadata.add(UtilsXLS.stringCellValue(riga.getCell(i)).trim());
+				metadata.add(UtilsXLS.stringCellValue(riga.getCell(i)).trim());
 			}
 			insertInMap(widgetMap, key, metadata);
 
