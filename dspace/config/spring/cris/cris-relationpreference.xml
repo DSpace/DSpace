@@ -53,7 +53,7 @@
 	</bean>
 
 	<bean id="relationOUVSPJviaInvestigatorConfiguration" class="org.dspace.app.cris.configuration.RelationConfiguration">    										
-		<property name="relationName" value="crisou.projects" />		
+		<property name="relationName" value="crisou.iprojects" />		
 		<property name="relationClass" value="org.dspace.app.cris.model.Project" />		
 		<property name="query">
 			<value>projectinvestigators.dept_authority:{0}</value>
@@ -61,7 +61,7 @@
 	</bean>
 	
 	<bean id="relationOUVSOUConfiguration" class="org.dspace.app.cris.configuration.RelationConfiguration">    										
-		<property name="relationName" value="crisou.projects" />		
+		<property name="relationName" value="crisou.organisations" />		
 		<property name="relationClass" value="org.dspace.app.cris.model.OrganizationUnit" />		
 		<property name="query">
 			<value>crisou.parentorgunit_authority:{0}</value>
