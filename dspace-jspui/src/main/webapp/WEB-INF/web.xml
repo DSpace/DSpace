@@ -600,10 +600,10 @@
     <url-pattern>/feed/*</url-pattern>
   </servlet-mapping>
 
-  <servlet-mapping>
-    <servlet-name>feedback</servlet-name>
-    <url-pattern>/feedback</url-pattern>
-  </servlet-mapping>
+  <!--<servlet-mapping>-->
+    <!--<servlet-name>feedback</servlet-name>-->
+    <!--<url-pattern>/feedback</url-pattern>-->
+  <!--</servlet-mapping>-->
 
   <servlet-mapping>
     <servlet-name>forgot</servlet-name>
@@ -906,7 +906,11 @@
         <url-pattern>/browse/dateissued</url-pattern>
     </servlet-mapping>
 
-  <!-- Icon MIME type -->
+    <servlet-mapping>
+        <servlet-name>Spring MVC Servlet</servlet-name>
+        <url-pattern>/feedback</url-pattern>
+    </servlet-mapping>
+    <!-- Icon MIME type -->
   <mime-mapping>
     <extension>ico</extension>
     <mime-type>image/x-icon</mime-type>

@@ -2,7 +2,10 @@ package org.ssu.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.validator.routines.EmailValidator;
 import org.apache.log4j.Logger;
 import org.dspace.app.webui.components.RecentSubmissionsException;
 import org.dspace.app.webui.components.RecentSubmissionsManager;
@@ -12,16 +15,22 @@ import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataSchema;
 import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.core.Email;
 import org.dspace.core.I18nUtil;
 import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.core.service.NewsService;
+import org.dspace.eperson.EPerson;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.ModelAndView;
 import org.ssu.entity.AuthorLocalization;
 import org.ssu.entity.response.CommunityResponse;
@@ -35,8 +44,10 @@ import org.ssu.service.statistics.ScheduledTasks;
 import org.ssu.entity.statistics.StatisticsData;
 
 import javax.annotation.Resource;
+import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.function.Function;
@@ -217,5 +228,95 @@ public class EssuirSiteController {
         model.setViewName("community-list");
         return model;
 
+    }
+
+
+    @RequestMapping(value = "/feedback", method = RequestMethod.GET)
+    public ModelAndView feedbackPage(ModelAndView model,
+                                     HttpServletRequest request,
+                                     @RequestParam(value = "email", required = false) String email,
+                                     @RequestParam(value = "feedback", required = false) String feedback,
+                                     @RequestParam(value = "fakeVariable", required = false, defaultValue = "") String message,
+                                     @RequestParam(value = "fakeVariable", required = false, defaultValue = "true") String messageType) {
+        String recaptchaPublicKey = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("recaptcha.public");
+
+        model.addObject("recaptchaPublicKey", recaptchaPublicKey);
+        model.addObject("message", message);
+        model.addObject("messageClass", messageType);
+        model.addObject("email", StringEscapeUtils.escapeHtml(email));
+        model.addObject("feedback", StringEscapeUtils.escapeHtml(feedback));
+
+        model.setViewName("feedback");
+        return model;
+    }
+
+    private boolean checkGoogleRecaptcha(HttpServletRequest request) {
+        String host = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.hostname");
+        Map<String, String> googleRequestParameters = new HashMap<>();
+        googleRequestParameters.put("secret", DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("recaptcha.private"));
+        googleRequestParameters.put("response", request.getParameter("g-recaptcha-response"));
+        googleRequestParameters.put("remoteip", host);
+
+        ResponseEntity<Map> recaptchaResponseEntity = new RestTemplate()
+                .postForEntity("https://www.google.com/recaptcha/api/siteverify?secret={secret}&response={response}&remoteip={remoteip}", googleRequestParameters, Map.class, googleRequestParameters);
+        Map<String, Object> googleCaptchaVerifyRepsonse = recaptchaResponseEntity.getBody();
+       return (Boolean)googleCaptchaVerifyRepsonse.get("success");
+    }
+
+    @RequestMapping(value = "/feedback", method = RequestMethod.POST)
+    public ModelAndView sendFeedback(ModelAndView model,
+                                     HttpServletRequest request,
+                                     @RequestParam(value = "feedback", required = false) String feedback,
+                                     @RequestParam(value = "email", required = false) String email) throws SQLException, IOException {
+        Context dspaceContext = UIUtil.obtainContext(request);
+        Locale locale = dspaceContext.getCurrentLocale();
+
+        boolean verifyStatus = checkGoogleRecaptcha(request);
+        boolean isFeedbackTextFilled = !StringUtils.isEmpty(feedback);
+        boolean isEmailCorrect = EmailValidator.getInstance().isValid(email);
+
+        String message = "";
+        String messageType = "success";
+
+        if (!isEmailCorrect) {
+            message = I18nUtil.getMessage("feedback.email.incorrect", locale);
+            messageType = "warning";
+        }
+
+        if(!isFeedbackTextFilled) {
+            message = I18nUtil.getMessage("feedback.feedback.empty", locale);
+            messageType = "warning";
+        }
+
+        if(!verifyStatus) {
+            message = I18nUtil.getMessage("feedback.captcha.fail", locale);
+            messageType = "warning";
+        }
+
+        if(isFeedbackTextFilled && isEmailCorrect && verifyStatus) {
+            EPerson currentUser = dspaceContext.getCurrentUser();
+            Email emailTemplate = Email.getEmail(I18nUtil.getEmailFilename(dspaceContext.getCurrentLocale(), "feedback"));
+            emailTemplate.addRecipient(DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("feedback.recipient"));
+
+            emailTemplate.addArgument(new Date());
+            emailTemplate.addArgument(email);
+            emailTemplate.addArgument(Optional.ofNullable(currentUser).map(EPerson::getEmail).orElse(""));
+            emailTemplate.addArgument(request.getHeader("Referer"));
+            emailTemplate.addArgument(request.getHeader("User-Agent"));
+            emailTemplate.addArgument(request.getSession().getId());
+            emailTemplate.addArgument(feedback);
+            emailTemplate.setReplyTo(email);
+
+            message = I18nUtil.getMessage("feedback.sent.success", locale);
+            try {
+                emailTemplate.send();
+            } catch (MessagingException | IOException e) {
+                log.error(e);
+                message = I18nUtil.getMessage("jsp.error.integrity.list4", locale);
+                messageType = "danger";
+            }
+
+        }
+        return feedbackPage(model, request, email, feedback, message, messageType);
     }
 }
