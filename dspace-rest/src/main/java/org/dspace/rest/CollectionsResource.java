@@ -409,7 +409,98 @@ public class CollectionsResource extends Resource
         return returnItem;
     }
 
-    /**
+	/**
+	 * Request the enclosed entity to be stored under the supplied Request-URI. An existing item
+	 * will be added to a collection. An Item can be added without metadata as only the id of
+	 * the enclosed item will be matched against existing items.
+	 *
+	 * @param collectionId
+	 *            Id of collection in which the item will be added.
+	 * @param item
+	 *            Item filled only with id any metadata will taken from the existing item.
+	 * @param headers
+	 *            If you want to access to collection and item under logged user into
+	 *            context. In headers must be set header "rest-dspace-token"
+	 *            with passed token from login method.
+	 * @return Return status code with item. Return status (OK)200 if item was
+	 *         add successfully. NOT_FOUND(404) if id of collection does not exists.
+	 *         UNAUTHORIZED(401) if user have not permission to write items in
+	 *         collection.
+	 * @throws WebApplicationException
+	 *             It is thrown when was problem with database reading or
+	 *             writing (SQLException) or problem with creating
+	 *             context(ContextException) or problem with authorization to
+	 *             collection or IOException or problem with index item into
+	 *             browse index. It is thrown by NOT_FOUND and UNATHORIZED
+	 *             status codes, too.
+	 *
+	 */
+	@PUT
+	@Path("/{collection_id}/items")
+	@Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
+	public Item putCollectionItem(@PathParam("collection_id") String collectionId, Item item,
+	                              @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
+	                              @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
+			throws WebApplicationException
+	{
+
+		log.info("Adding item to collection(id=" + collectionId + ").");
+		org.dspace.core.Context context = null;
+		Item returnItem = null;
+
+		try
+		{
+			context = createContext();
+
+			//expect findCollection() to fail with a 404 or 500 if the item is not returned or unauthorized access
+			org.dspace.content.Collection dspaceCollection = findCollection(context, collectionId,
+					org.dspace.core.Constants.WRITE);
+
+			//expect findItem() to fail with a 404 or 500 if the item is not returned or unauthorized access
+			org.dspace.content.Item dspaceItem = findItem(context, item.getUUID(),
+					org.dspace.core.Constants.WRITE);
+
+			if(!itemService.isIn(dspaceItem, dspaceCollection)){
+
+				writeStats(dspaceCollection, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwardedfor, headers, request, context);
+
+				log.trace("Adding existing item to collection(id=" + collectionId + ").");
+				collectionService.addItem(context, dspaceCollection, dspaceItem);
+
+			}else {
+				//No reason to fail - item is already in the collection
+				log.trace("Item already exists in collection(id=" + collectionId + ").");
+			}
+
+			returnItem = new Item(dspaceItem, servletContext, "", context);
+			//return 200 (OK)
+			context.complete();
+
+		}
+		catch (SQLException e)
+		{
+			processException("Could not add item to collection(id=" + collectionId + "), SQLException. Message: " + e, context);
+		}
+		catch (AuthorizeException e)
+		{
+			processException("Could not add item to collection(id=" + collectionId + "), AuthorizeException. Message: " + e,
+					context);
+		}
+		catch (ContextException e)
+		{
+			processException("Could not add item to collection(id=" + collectionId + "), ContextException. Message: " + e.getMessage(),
+					context);
+		}
+		finally
+		{
+			processFinally(context);
+		}
+
+		log.info("Item successfully added to collection(id=" + collectionId + "). Item handle=" + ((returnItem != null)? returnItem.getHandle() : "<null>"));
+		return returnItem;
+	}
+
+	/**
      * Update collection. It replace all properties.
      * 
      * @param collectionId
@@ -776,4 +867,59 @@ public class CollectionsResource extends Resource
         }
         return collection;
     }
+
+	/**
+	 * Find item from DSpace database. It is an encapsulation of the method
+	 * itemService.findByIdOrLegacyId with checking if item exist and if
+	 * current user has permission to do passed action.
+	 *
+	 * @param context
+	 *            Context of actual logged user.
+	 * @param id
+	 *            Id or legacy id of item in DSpace.
+	 * @param action
+	 *            Constant from org.dspace.core.Constants
+	 *
+	 * @return DSpace Item found.
+	 *
+	 * @throws WebApplicationException
+	 *             Is thrown when item with passed id is not exists and if user
+	 *             has no permission to do passed action.
+	 */
+	private org.dspace.content.Item findItem(org.dspace.core.Context context, String id, int action)
+			throws WebApplicationException
+	{
+		org.dspace.content.Item item = null;
+		try
+		{
+			item = itemService.findByIdOrLegacyId(context, id);
+
+			if (item == null)
+			{
+				context.abort();
+				log.warn("Item(id=" + id + ") was not found!");
+				throw new WebApplicationException(Response.Status.NOT_FOUND);
+			}
+			else if (!authorizeService.authorizeActionBoolean(context, item, action))
+			{
+				context.abort();
+				if (context.getCurrentUser() != null)
+				{
+					log.error("User(" + context.getCurrentUser().getEmail() + ") does not have permission to "
+							+ getActionString(action) + " item!");
+				}
+				else
+				{
+					log.error("User(anonymous) does not have permission to " + getActionString(action) + " item!");
+				}
+				throw new WebApplicationException(Response.Status.UNAUTHORIZED);
+			}
+
+		}
+		catch (SQLException e)
+		{
+			processException("Something went wrong while finding item(id=" + id + "). SQLException, Message: " + e, context);
+		}
+		return item;
+	}
 }

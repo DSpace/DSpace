@@ -97,6 +97,9 @@ Find collection by name
 Update collection
 - PUT http://localhost:8080/rest/collections/:ID
 
+Add item in collection
+- PUT http://localhost:8080/rest/collections/:ID/items
+
 Delete collection
 - DELETE http://localhost:8080/rest/collections/:ID
 
