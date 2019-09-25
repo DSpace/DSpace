@@ -10,11 +10,16 @@ package org.dspace.app.rest.repository;
 import java.sql.SQLException;
 import java.util.UUID;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.dspace.app.rest.converter.BundleConverter;
 import org.dspace.app.rest.model.BundleRest;
 import org.dspace.app.rest.model.hateoas.BundleResource;
 import org.dspace.app.rest.model.hateoas.DSpaceResource;
+import org.dspace.app.rest.model.patch.Patch;
+import org.dspace.app.rest.repository.patch.BundlePatch;
 import org.dspace.app.rest.repository.patch.DSpaceObjectPatch;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bundle;
 import org.dspace.content.service.BundleService;
 import org.dspace.core.Context;
@@ -36,9 +41,13 @@ public class BundleRestRepository extends DSpaceObjectRestRepository<Bundle, Bun
     @Autowired
     private BundleService bundleService;
 
+    @Autowired
+    private BundlePatch bundlePatch;
+
     public BundleRestRepository(BundleService dsoService,
-                                BundleConverter dsoConverter) {
-        super(dsoService, dsoConverter, new DSpaceObjectPatch<BundleRest>() {});
+                                BundleConverter dsoConverter,
+                                BundlePatch dsoPatch) {
+        super(dsoService, dsoConverter, dsoPatch);
         this.bundleService = dsoService;
     }
 
@@ -58,6 +67,13 @@ public class BundleRestRepository extends DSpaceObjectRestRepository<Bundle, Bun
 
     public Page<BundleRest> findAll(Context context, Pageable pageable) {
         throw new RuntimeException("Method not allowed!");
+    }
+
+    @Override
+    @PreAuthorize("hasPermission(#uuid, 'BUNDLE', 'WRITE')")
+    protected void patch(Context context, HttpServletRequest request, String apiCategory, String model, UUID uuid,
+                         Patch patch) throws AuthorizeException, SQLException {
+        patchDSpaceObject(apiCategory, model, uuid, patch);
     }
 
     public Class<BundleRest> getDomainClass() {
