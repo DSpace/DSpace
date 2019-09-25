@@ -81,6 +81,9 @@ public class SearchResultsRest extends DiscoveryResultsRest {
             this.label = label;
         }
 
+        public AppliedFilter() {
+        }
+
         public String getFilter() {
             return filter;
         }
@@ -126,6 +129,9 @@ public class SearchResultsRest extends DiscoveryResultsRest {
         public Sorting(String by) {
             this.by = by;
             this.order = null;
+        }
+
+        public Sorting() {
         }
 
         public String getBy() {
