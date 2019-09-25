@@ -269,6 +269,30 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
     }
 
     @Override
+    public void moveBitstream(Context context, Bundle bundle, int from, int to)
+            throws AuthorizeException, SQLException {
+        List<Bitstream> bitstreams = bundle.getBitstreams();
+        if (bitstreams.size() < 1 || from >= bitstreams.size() || to >= bitstreams.size() || from < 0 || to < 0) {
+            throw new IllegalArgumentException(
+                    "Invalid 'from' and 'to' arguments supplied for moving a bitstream within bundle " +
+                            bundle.getID() + ". from: " + from + "; to: " + to
+            );
+        }
+        List<UUID> bitstreamIds = new LinkedList<>();
+        for (Bitstream bitstream : bitstreams) {
+            bitstreamIds.add(bitstream.getID());
+        }
+        if (from < to) {
+            bitstreamIds.add(to + 1, bitstreamIds.get(from));
+            bitstreamIds.remove(from);
+        } else {
+            bitstreamIds.add(to, bitstreamIds.get(from));
+            bitstreamIds.remove(from + 1);
+        }
+        setOrder(context, bundle, bitstreamIds.toArray(new UUID[bitstreamIds.size()]));
+    }
+
+    @Override
     public void setOrder(Context context, Bundle bundle, UUID[] bitstreamIds) throws AuthorizeException, SQLException {
         authorizeService.authorizeAction(context, bundle, Constants.WRITE);
 

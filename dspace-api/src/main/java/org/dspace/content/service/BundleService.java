@@ -110,6 +110,18 @@ public interface BundleService extends DSpaceObjectService<Bundle>, DSpaceObject
     public List<ResourcePolicy> getBundlePolicies(Context context, Bundle bundle) throws SQLException;
 
     /**
+     * Moves a bitstream within a bundle from one place to another, shifting all other bitstreams in the process
+     *
+     * @param context               DSpace Context
+     * @param bundle                The bitstream bundle
+     * @param from                  The index of the bitstream to move
+     * @param to                    The index to move the bitstream to
+     * @throws AuthorizeException   when an SQL error has occurred (querying DSpace)
+     * @throws SQLException         If the user can't make the changes
+     */
+    public void moveBitstream(Context context, Bundle bundle, int from, int to) throws AuthorizeException, SQLException;
+
+    /**
      * Changes bitstream order according to the array
      *
      * @param context      DSpace Context
