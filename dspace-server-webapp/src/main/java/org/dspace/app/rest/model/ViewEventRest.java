@@ -12,6 +12,9 @@ import java.util.UUID;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.dspace.app.rest.RestResourceController;
 
+/**
+ * This class acts as a REST representation for a ViewEvent in DSpace
+ */
 public class ViewEventRest extends BaseObjectRest<UUID> {
 
     public static final String NAME = "viewevent";

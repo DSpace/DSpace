@@ -13,6 +13,9 @@ import java.util.UUID;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.dspace.app.rest.RestResourceController;
 
+/**
+ * This class acts as a REST representation for a SearchEvent in DSpace
+ */
 public class SearchEventRest extends BaseObjectRest<UUID> {
 
     public static final String NAME = "searchevent";

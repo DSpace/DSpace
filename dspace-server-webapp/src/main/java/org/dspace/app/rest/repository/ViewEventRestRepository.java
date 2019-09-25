@@ -10,6 +10,7 @@ package org.dspace.app.rest.repository;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -36,6 +37,8 @@ public class ViewEventRestRepository extends AbstractDSpaceRestRepository {
     @Autowired
     private EventService eventService;
 
+    private List<String> typeList = Arrays.asList(Constants.typeText);
+
     public ViewEventRest createViewEvent() throws AuthorizeException, SQLException {
 
         Context context = obtainContext();
@@ -49,7 +52,7 @@ public class ViewEventRestRepository extends AbstractDSpaceRestRepository {
             throw new UnprocessableEntityException("Error parsing request body", e1);
         }
         if (viewEventRest.getTargetId() == null || StringUtils.isBlank(viewEventRest.getTargetType()) ||
-            !Arrays.asList(Constants.typeText).contains(viewEventRest.getTargetType().toUpperCase())) {
+            !typeList.contains(viewEventRest.getTargetType().toUpperCase())) {
             throw new DSpaceBadRequestException("The given ViewEvent was invalid, one or more properties are either" +
                                                     "wrong or missing");
         }

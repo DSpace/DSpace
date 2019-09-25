@@ -7,6 +7,9 @@
  */
 package org.dspace.app.rest.model;
 
+/**
+ * This class is a REST representation for the Page object that is used for Pagination
+ */
 public class PageRest {
 
     private int size;
