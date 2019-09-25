@@ -18,7 +18,6 @@ import org.dspace.app.rest.model.hateoas.BundleResource;
 import org.dspace.app.rest.model.hateoas.DSpaceResource;
 import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.repository.patch.BundlePatch;
-import org.dspace.app.rest.repository.patch.DSpaceObjectPatch;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bundle;
 import org.dspace.content.service.BundleService;
