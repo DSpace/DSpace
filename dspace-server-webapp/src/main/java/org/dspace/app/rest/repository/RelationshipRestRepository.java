@@ -9,6 +9,7 @@ package org.dspace.app.rest.repository;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -40,6 +41,7 @@ import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.AccessDeniedException;
@@ -82,13 +84,17 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
     }
 
     public Page<RelationshipRest> findAll(Context context, Pageable pageable) {
-        List<Relationship> relationships = null;
+        int total = 0;
+        List<Relationship> relationships = new ArrayList<>();
         try {
-            relationships = relationshipService.findAll(context);
+            total = relationshipService.countTotal(context);
+            relationships = relationshipService.findAll(context,
+                    pageable.getPageSize(), pageable.getOffset());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<RelationshipRest> page = utils.getPage(relationships, pageable).map(relationshipConverter);
+        Page<RelationshipRest> page = new PageImpl<Relationship>(relationships,
+                pageable, total).map(relationshipConverter);
         return page;
     }
 
@@ -300,6 +306,7 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
         }
     }
 
+
     /**
      * This method will find all the Relationship objects that a RelationshipType that corresponds to the given Label
      * It's also possible to pass a DSO along to this method with a parameter which will only return Relationship
@@ -316,12 +323,12 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
     public Page<RelationshipRest> findByLabel(@Parameter(value = "label", required = true) String label,
                                               @Parameter(value = "dso", required = false) UUID dsoId,
                                               Pageable pageable) throws SQLException {
-
         Context context = obtainContext();
 
         List<RelationshipType> relationshipTypeList =
             relationshipTypeService.findByLeftwardOrRightwardTypeName(context, label);
         List<Relationship> relationships = new LinkedList<>();
+        int total = 0;
         if (dsoId != null) {
 
             Item item = itemService.find(context, dsoId);
@@ -330,16 +337,20 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
                 throw new ResourceNotFoundException("The request DSO with id: " + dsoId + " was not found");
             }
             for (RelationshipType relationshipType : relationshipTypeList) {
-                relationships.addAll(relationshipService.findByItemAndRelationshipType(context,
-                                                                                       item, relationshipType));
+                total = relationshipService.countByItemAndRelationshipType(context,relationshipType,item);
+                relationships.addAll(relationshipService.findByItemAndRelationshipType(context, item, relationshipType,
+                        pageable.getPageSize(), pageable.getOffset()));
             }
         } else {
             for (RelationshipType relationshipType : relationshipTypeList) {
-                relationships.addAll(relationshipService.findByRelationshipType(context, relationshipType));
+                total = relationshipService.countByRelationshipType(context, relationshipType);
+                relationships.addAll(relationshipService.findByRelationshipType(context, relationshipType,
+                        pageable.getPageSize(), pageable.getOffset()));
             }
         }
 
-        Page<RelationshipRest> page = utils.getPage(relationships, pageable).map(relationshipConverter);
+        Page<RelationshipRest> page = new PageImpl<Relationship>(relationships,
+                pageable, total).map(relationshipConverter);;
         return page;
 
     }

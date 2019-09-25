@@ -10,7 +10,6 @@ package org.dspace.content;
 import java.sql.SQLException;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -295,13 +294,11 @@ public class RelationshipServiceImpl implements RelationshipService {
 
     @Override
     public List<Relationship> findAll(Context context) throws SQLException {
-
         return findAll(context, -1, -1);
     }
 
     @Override
     public List<Relationship> findAll(Context context, Integer limit, Integer offset) throws SQLException {
-
         return relationshipDAO.findAll(context, Relationship.class, limit, offset);
     }
 
@@ -382,8 +379,8 @@ public class RelationshipServiceImpl implements RelationshipService {
     private boolean checkMinCardinality(Context context, Item item,
                                         Relationship relationship,
                                         Integer minCardinality, boolean isLeft) throws SQLException {
-        List<Relationship> list = this
-            .findByItemAndRelationshipType(context, item, relationship.getRelationshipType(), isLeft);
+        List<Relationship> list = this.findByItemAndRelationshipType(context,item,relationship.getRelationshipType(),
+                                                                     -1, -1, isLeft);
         if (minCardinality != null && !(list.size() > minCardinality)) {
             return false;
         }
@@ -392,43 +389,37 @@ public class RelationshipServiceImpl implements RelationshipService {
 
     public List<Relationship> findByItemAndRelationshipType(Context context, Item item,
                                                             RelationshipType relationshipType, boolean isLeft)
-
         throws SQLException {
-        List<Relationship> list = this.findByItem(context, item);
-        List<Relationship> listToReturn = new LinkedList<>();
-        for (Relationship relationship : list) {
-            if (isLeft) {
-                if (StringUtils
-                    .equals(
-                        relationship.getRelationshipType().getLeftwardType(), relationshipType.getLeftwardType())
-                ) {
-                    listToReturn.add(relationship);
-                }
-            } else {
-                if (StringUtils
-                    .equals(
-                        relationship.getRelationshipType().getRightwardType(), relationshipType.getRightwardType())
-                ) {
-                    listToReturn.add(relationship);
-                }
-            }
-        }
-        return listToReturn;
+        List<Relationship> list = this.findByItemAndRelationshipType(context,item,relationshipType,-1,-1,isLeft);
+        return list;
     }
 
     @Override
     public List<Relationship> findByItemAndRelationshipType(Context context, Item item,
                                                             RelationshipType relationshipType)
-
         throws SQLException {
-        List<Relationship> list = this.findByItem(context, item);
-        List<Relationship> listToReturn = new LinkedList<>();
-        for (Relationship relationship : list) {
-            if (relationship.getRelationshipType().equals(relationshipType)) {
-                listToReturn.add(relationship);
-            }
-        }
-        return listToReturn;
+        List<Relationship> list = relationshipDAO.
+                findByItemAndRelationshipType(context,relationshipType,-1,-1,item);
+        return list;
+    }
+
+    @Override
+    public List<Relationship> findByItemAndRelationshipType(Context context, Item item,
+                                                            RelationshipType relationshipType, int limit, int offset)
+            throws SQLException {
+        List<Relationship> list = relationshipDAO.
+                findByItemAndRelationshipType(context,relationshipType,limit,offset,item);
+        return list;
+    }
+
+    @Override
+    public List<Relationship> findByItemAndRelationshipType(Context context, Item item,
+                                                            RelationshipType relationshipType, int limit, int offset,
+                                                            boolean isLeft)
+            throws SQLException {
+        List<Relationship> list = relationshipDAO.
+                findByItemAndRelationshipType(context,relationshipType,limit,offset,item);
+        return list;
     }
 
     @Override
@@ -445,5 +436,24 @@ public class RelationshipServiceImpl implements RelationshipService {
         return relationshipDAO.findByRelationshipType(context, relationshipType, limit, offset);
     }
 
+    @Override
+    public int countTotal(Context context) throws SQLException {
+        return relationshipDAO.countRows(context);
+    }
 
+    @Override
+    public int countByItem(Context context, Item item) throws SQLException {
+        return relationshipDAO.countByItem(context, item);
+    }
+
+    @Override
+    public int countByRelationshipType(Context context, RelationshipType relationshipType) throws SQLException {
+        return relationshipDAO.countByRelationshipType(context, relationshipType);
+    }
+
+    @Override
+    public int countByItemAndRelationshipType(Context context, RelationshipType relationshipType, Item item)
+            throws SQLException {
+        return relationshipDAO.countByItemAndRelationshipType(context, relationshipType, item);
+    }
 }
