@@ -84,4 +84,6 @@ public interface PluginService {
      * @return instance of plugin
      */
     public Object getSinglePlugin(Class interfaceClass);
+
+    public void clearNamedPluginClasses();
 }
