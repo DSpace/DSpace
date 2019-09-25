@@ -98,4 +98,81 @@ public interface RelationshipDAO extends GenericDAO<Relationship> {
      */
     List<Relationship> findByRelationshipType(Context context, RelationshipType relationshipType,
                                               Integer limit, Integer offset) throws SQLException;
+
+    /**
+     * This method returns a list of Relationship objects for the given RelationshipType object.
+     * It will construct a list of all Relationship objects that have the given RelationshipType object
+     * as the relationshipType property
+     * @param context           The relevant DSpace context
+     * @param relationshipType  The RelationshipType object to be checked on
+     * @param limit             paging limit
+     * @param offset            paging offset
+     * @param item              item to filter by
+     * @return  A list of Relationship objects that have the given RelationshipType object as the
+     *          relationshipType property
+     * @throws SQLException If something goes wrong
+     */
+    List<Relationship> findByItemAndRelationshipType(Context context, RelationshipType relationshipType,
+                                              Integer limit, Integer offset, Item item) throws SQLException;
+
+    /**
+     * This method returns a list of Relationship objects for the given RelationshipType object.
+     * It will construct a list of all Relationship objects that have the given RelationshipType object
+     * as the relationshipType property
+     * @param context           The relevant DSpace context
+     * @param relationshipType  The RelationshipType object to be checked on
+     * @param limit             paging limit
+     * @param offset            paging offset
+     * @param item              item to filter by
+     * @param isLeft            Is item left or right
+     * @return  A list of Relationship objects that have the given RelationshipType object as the
+     *          relationshipType property
+     * @throws SQLException If something goes wrong
+     */
+    List<Relationship> findByItemAndRelationshipType(Context context, RelationshipType relationshipType,
+                                                     Integer limit, Integer offset, Item item, boolean isLeft)
+            throws SQLException;
+
+    /**
+     * Count total number of relationships (rows in relationship table)
+     *
+     * @param context context
+     * @return total count
+     * @throws SQLException if database error
+     */
+    int countRows(Context context) throws SQLException;
+
+    /**
+     * Count total number of relationships (rows in relationship table) by a relationship type
+     *
+     * @param context context
+     * @param relationshipType relationship type to filter by
+     * @return total count
+     * @throws SQLException if database error
+     */
+    int countByRelationshipType(Context context, RelationshipType relationshipType) throws SQLException;
+
+    /**
+     * This method returns a count of Relationship objects that have the given Item object
+     * as a leftItem or a rightItem
+     * @param context   The relevant DSpace context
+     * @param item      The item that should be either a leftItem or a rightItem of all
+     *                  the Relationship objects in the returned list
+     * @return          The list of Relationship objects that contain either a left or a
+     *                  right item that is equal to the given item
+     * @throws SQLException If something goes wrong
+     */
+    int countByItem(Context context,Item item) throws SQLException;
+
+    /**
+     * Count total number of relationships (rows in relationship table) by an item and a relationship type
+     *
+     * @param context context
+     * @param relationshipType relationship type to filter by
+     * @param item item to filter by
+     * @return total count
+     * @throws SQLException if database error
+     */
+    int countByItemAndRelationshipType(Context context, RelationshipType relationshipType, Item item)
+            throws SQLException;
 }
