@@ -12,6 +12,7 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -19,8 +20,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+
+import javax.ws.rs.core.MediaType;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.codec.CharEncoding;
@@ -38,6 +42,8 @@ import org.dspace.app.rest.matcher.MetadataMatcher;
 import org.dspace.app.rest.model.BundleRest;
 import org.dspace.app.rest.model.MetadataRest;
 import org.dspace.app.rest.model.MetadataValueRest;
+import org.dspace.app.rest.model.patch.MoveOperation;
+import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.content.Bitstream;
@@ -361,5 +367,60 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
                    )));
     }
 
+    @Test
+    public void patchMoveBitstreams() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        String bitstreamContent = "Dummy content";
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream1 = BitstreamBuilder.createBitstream(context, item, is)
+                    .withName("Bitstream")
+                    .withDescription("Description")
+                    .withMimeType("text/plain")
+                    .build();
+            bitstream2 = BitstreamBuilder.createBitstream(context, item, is)
+                    .withName("Bitstream2")
+                    .withDescription("Description2")
+                    .withMimeType("text/plain")
+                    .build();
+        }
+
+        bundle1 = BundleBuilder.createBundle(context, item)
+                .withName("testname")
+                .withBitstream(bitstream1)
+                .withBitstream(bitstream2)
+                .build();
+
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/api/core/bundles/" + bundle1.getID() + "/bitstreams"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._embedded.bitstreams", Matchers.contains(
+                        BitstreamMatcher.matchBitstreamEntry(bitstream1),
+                        BitstreamMatcher.matchBitstreamEntry(bitstream2)
+                )));
+
+        List<Operation> ops = new ArrayList<Operation>();
+        MoveOperation moveOperation = new MoveOperation("/_links/bitstreams/0/href",
+                "/_links/bitstreams/1/href");
+        ops.add(moveOperation);
+        String patchBody = getPatchContent(ops);
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token).perform(patch("/api/core/bundles/" + bundle1.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                    .andExpect(status().isOk());
+
+        getClient().perform(get("/api/core/bundles/" + bundle1.getID() + "/bitstreams"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._embedded.bitstreams", Matchers.contains(
+                        BitstreamMatcher.matchBitstreamEntry(bitstream2),
+                        BitstreamMatcher.matchBitstreamEntry(bitstream1)
+                )));
+    }
 
 }
