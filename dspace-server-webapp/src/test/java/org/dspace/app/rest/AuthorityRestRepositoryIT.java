@@ -19,6 +19,7 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.authority.PersonAuthorityValue;
 import org.dspace.authority.factory.AuthorityServiceFactory;
+import org.dspace.content.authority.service.ChoiceAuthorityService;
 import org.dspace.core.service.PluginService;
 import org.dspace.services.ConfigurationService;
 import org.hamcrest.Matchers;
@@ -34,6 +35,9 @@ public class AuthorityRestRepositoryIT extends AbstractControllerIntegrationTest
 
     @Autowired
     private PluginService pluginService;
+
+    @Autowired
+    private ChoiceAuthorityService cas;
 
     @Before
     public void setup() throws Exception {
@@ -53,8 +57,11 @@ public class AuthorityRestRepositoryIT extends AbstractControllerIntegrationTest
         configurationService.setProperty("authority.author.indexer.field.1",
                 "dc.contributor.author");
 
+
+        //TODO Comments
         pluginService.clearNamedPluginClasses();
-        
+        cas.clearController();
+
         PersonAuthorityValue person1 = new PersonAuthorityValue();
         person1.setId(String.valueOf(UUID.randomUUID()));
         person1.setLastName("Shirasaka");

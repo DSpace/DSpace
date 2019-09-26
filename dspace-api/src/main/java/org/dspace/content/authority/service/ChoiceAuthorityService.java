@@ -168,4 +168,6 @@ public interface ChoiceAuthorityService {
 
     public ChoiceAuthority getChoiceAuthorityByAuthorityName(String authorityName);
 
+    public void clearController();
+
 }
