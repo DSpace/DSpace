@@ -25,6 +25,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.mail.MessagingException;
 import javax.ws.rs.core.Response.Status.Family;
@@ -139,6 +141,7 @@ import it.cilea.osd.jdyna.value.EmbeddedLinkValue;
 import it.cilea.osd.jdyna.value.TextValue;
 import it.cilea.osd.jdyna.widget.WidgetLink;
 import it.cilea.osd.jdyna.widget.WidgetPointer;
+import it.cilea.osd.jdyna.widget.WidgetTesto;
 
 /**
  * @author Pascarelli
@@ -2603,9 +2606,32 @@ public class PushToORCID
                         ExternalIdentifier externalIdentifier = new ExternalIdentifier();
                         externalIdentifier.setExternalIdRelationship(
                                 RelationshipType.SELF);
-                        externalIdentifier.setExternalIdUrl(value);
-                        externalIdentifier.setExternalIdType(rpPD.getLabel());
-                        externalIdentifier.setExternalIdValue(value);
+                        
+                        String[] splittedLink = value.split("###");
+                        if (splittedLink.length == 2) {
+                            externalIdentifier
+                                    .setExternalIdValue(StringUtils.isNotBlank(splittedLink[0]) ? splittedLink[0] : splittedLink[1]);
+                            externalIdentifier.setExternalIdUrl(splittedLink[1]);
+                            externalIdentifier.setExternalIdType(rpPD.getLabel());
+                        }
+                        else {
+                            externalIdentifier.setExternalIdUrl(value);
+                            if(rpPD.getRendering() instanceof WidgetTesto) {
+                                String format = ((WidgetTesto)rpPD.getRendering()).getDisplayFormat();
+                                if(StringUtils.isNotBlank(format)) {
+                                    Pattern p = Pattern.compile("href=\"([^\"]*)\"", Pattern.DOTALL);
+                                    Matcher m = p.matcher(format);
+                                    if (m.find()) {
+                                        externalIdentifier.setExternalIdUrl(MessageFormat.format(m.group(1), value));
+                                    }
+                                    else {
+                                        externalIdentifier.setExternalIdUrl(MessageFormat.format(format, value));
+                                    }
+                                }
+                            }
+                            externalIdentifier.setExternalIdType(rpPD.getLabel());
+                            externalIdentifier.setExternalIdValue(value);
+                        }
                         externalIdentifiers.add(externalIdentifier);
                     }
                 }
@@ -2636,8 +2662,26 @@ public class PushToORCID
 	                researcherUrl.setUrl(url);
 				}
 				else {
+	                RPPropertiesDefinition rpPD = applicationService
+	                        .findPropertiesDefinitionByShortName(
+	                                RPPropertiesDefinition.class,
+	                                orcidMetadataConfiguration.get("researcher-urls"));
+	                
 					researcherUrl.setUrlName(l);
 	                url.setValue(l);
+                    if(rpPD.getRendering() instanceof WidgetTesto) {
+                        String format = ((WidgetTesto)rpPD.getRendering()).getDisplayFormat();
+                        if(StringUtils.isNotBlank(format)) {
+                            Pattern p = Pattern.compile("href=\"([^\"]*)\"", Pattern.DOTALL);
+                            Matcher m = p.matcher(format);
+                            if (m.find()) {
+                                url.setValue(MessageFormat.format(m.group(1), l));
+                            }
+                            else {
+                                url.setValue(MessageFormat.format(format, l));
+                            }
+                        }
+                    }
 	                researcherUrl.setUrl(url);
 				}
                 researcherUrls.add(researcherUrl);
@@ -2658,10 +2702,32 @@ public class PushToORCID
                     if (StringUtils.isNotBlank(value))
                     {
                         ResearcherUrl researcherUrl = new ResearcherUrl();
-                        researcherUrl.setUrlName(rpPD.getLabel());
+                        String[] splittedLink = value.split("###");
                         Url url = new Url();
-                        url.setValue(value);
-                        researcherUrl.setUrl(url);
+                        if (splittedLink.length == 2) {
+                            researcherUrl
+                                    .setUrlName(StringUtils.isNotBlank(splittedLink[0]) ? splittedLink[0] : splittedLink[1]);
+                            url.setValue(splittedLink[1]);
+                            researcherUrl.setUrl(url);
+                        }
+                        else {
+                            researcherUrl.setUrlName(rpPD.getLabel());
+                            url.setValue(value);
+                            if(rpPD.getRendering() instanceof WidgetTesto) {
+                                String format = ((WidgetTesto)rpPD.getRendering()).getDisplayFormat();
+                                if(StringUtils.isNotBlank(format)) {
+                                    Pattern p = Pattern.compile("href=\"([^\"]*)\"", Pattern.DOTALL);
+                                    Matcher m = p.matcher(format);
+                                    if (m.find()) {
+                                        url.setValue(MessageFormat.format(m.group(1), value));
+                                    }
+                                    else {
+                                        url.setValue(MessageFormat.format(format, value));
+                                    }
+                                }
+                            }
+                            researcherUrl.setUrl(url);
+                        }
                         researcherUrls.add(researcherUrl);
                     }
                 }
