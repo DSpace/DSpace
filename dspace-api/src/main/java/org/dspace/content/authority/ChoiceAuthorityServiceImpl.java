@@ -222,6 +222,7 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
 
     public void clearController() {
         controller.clear();
+        authorities.clear();
     }
     private void loadChoiceAuthorityConfigurations() {
         // Get all configuration keys starting with a given prefix
