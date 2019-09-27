@@ -20,6 +20,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -129,6 +131,14 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
         Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
 
+        List<Item> items = new ArrayList();
+
+        Comparator<Item> compareByUUID = new Comparator<Item>() {
+            @Override
+            public int compare(Item i1, Item i2) {
+                return i1.getID().toString().compareTo(i2.getID().toString());
+            }
+        };
         //2. Three public items that are readable by Anonymous with different subjects
         Item publicItem1 = ItemBuilder.createItem(context, col1)
                                       .withTitle("Public item 1")
@@ -136,6 +146,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                       .withAuthor("Smith, Donald").withAuthor("Doe, John")
                                       .withSubject("ExtraEntry")
                                       .build();
+        items.add(publicItem1);
 
         Item publicItem2 = ItemBuilder.createItem(context, col2)
                                       .withTitle("Public item 2")
@@ -143,6 +154,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                       .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
                                       .withSubject("TestingForMore").withSubject("ExtraEntry")
                                       .build();
+        items.add(publicItem2);
 
         Item publicItem3 = ItemBuilder.createItem(context, col2)
                                       .withTitle("Public item 3")
@@ -151,6 +163,8 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                       .withSubject("AnotherTest").withSubject("TestingForMore")
                                       .withSubject("ExtraEntry")
                                       .build();
+        items.add(publicItem3);
+        Collections.sort(items, compareByUUID);
 
         String token = getAuthToken(admin.getEmail(), password);
 
@@ -158,15 +172,12 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                    .param("size", "2"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$._embedded.items", Matchers.containsInAnyOrder(
-                       ItemMatcher.matchItemWithTitleAndDateIssued(publicItem1,
-                               "Public item 1", "2017-10-17"),
-                       ItemMatcher.matchItemWithTitleAndDateIssued(publicItem2,
-                               "Public item 2", "2016-02-13")
+                            ItemMatcher.matchItemProperties(items.get(0)),
+                            ItemMatcher.matchItemProperties(items.get(1))
                    )))
                    .andExpect(jsonPath("$._embedded.items", Matchers.not(
                            Matchers.contains(
-                               ItemMatcher.matchItemWithTitleAndDateIssued(publicItem3,
-                                       "Public item 3", "2016-02-13")
+                                ItemMatcher.matchItemProperties(items.get(2))
                            )
                    )))
                    .andExpect(jsonPath("$._links.self.href",
@@ -178,15 +189,12 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                    .param("page", "1"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$._embedded.items", Matchers.contains(
-                       ItemMatcher.matchItemWithTitleAndDateIssued(publicItem3,
-                               "Public item 3", "2016-02-13")
+                            ItemMatcher.matchItemProperties(items.get(2))
                    )))
                    .andExpect(jsonPath("$._embedded.items", Matchers.not(
                        Matchers.contains(
-                           ItemMatcher.matchItemWithTitleAndDateIssued(publicItem1,
-                                   "Public item 1", "2017-10-17"),
-                           ItemMatcher.matchItemWithTitleAndDateIssued(publicItem2,
-                                   "Public item 2", "2016-02-13")
+                                ItemMatcher.matchItemProperties(items.get(0)),
+                                ItemMatcher.matchItemProperties(items.get(1))
                        )
                    )))
                    .andExpect(jsonPath("$._links.self.href",
