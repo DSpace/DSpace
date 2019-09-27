@@ -37,7 +37,6 @@ import org.dspace.scripts.DSpaceCommandLineParameter;
 import org.dspace.scripts.DSpaceRunnable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
@@ -81,8 +80,9 @@ public class ScriptRestRepository extends DSpaceRestRepository<ScriptRest, Strin
 
     @Override
     public Page<ScriptRest> findAll(Context context, Pageable pageable) {
-        return utils.getPage(dspaceRunnables.stream().filter(dSpaceRunnable -> dSpaceRunnable.isAllowedToExecute(context)).collect(
-            Collectors.toList()), pageable).map(scriptConverter);
+        return utils.getPage(dspaceRunnables.stream().filter(
+            dSpaceRunnable -> dSpaceRunnable.isAllowedToExecute(context)).collect(Collectors.toList()), pageable)
+                    .map(scriptConverter);
     }
 
     @Override
