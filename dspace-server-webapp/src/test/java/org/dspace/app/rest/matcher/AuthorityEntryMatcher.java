@@ -14,6 +14,9 @@ import static org.hamcrest.Matchers.is;
 
 import org.hamcrest.Matcher;
 
+/**
+ * This matcher has been created so that we can use a predefined Matcher class to verify Authority Entries
+ */
 public class AuthorityEntryMatcher {
 
     private AuthorityEntryMatcher() {

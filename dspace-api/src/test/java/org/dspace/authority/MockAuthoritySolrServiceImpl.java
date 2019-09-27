@@ -10,6 +10,9 @@ package org.dspace.authority;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Service;
 
+/**
+ * This class has been created so that we can mock our AuthoritySolrSeviceImpl
+ */
 @Service
 public class MockAuthoritySolrServiceImpl extends AuthoritySolrServiceImpl implements InitializingBean {
 

@@ -220,6 +220,7 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
         return controller;
     }
 
+    @Override
     public void clearController() {
         controller.clear();
         authorities.clear();
