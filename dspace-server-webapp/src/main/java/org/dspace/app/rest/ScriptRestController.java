@@ -9,6 +9,7 @@ package org.dspace.app.rest;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.rest.link.HalLinkService;
 import org.dspace.app.rest.model.ProcessRest;
 import org.dspace.app.rest.model.ScriptRest;
 import org.dspace.app.rest.model.hateoas.ProcessResource;
@@ -36,6 +37,9 @@ public class ScriptRestController {
     @Autowired
     private ScriptRestRepository scriptRestRepository;
 
+    @Autowired
+    private HalLinkService halLinkService;
+
     /**
      * This method can be called by sending a POST request to the system/scripts/{name}/processes endpoint
      * This will start a process for the script that matches the given name
@@ -45,12 +49,14 @@ public class ScriptRestController {
      */
     @RequestMapping(method = RequestMethod.POST, value = "/{name}/processes")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<ResourceSupport> startProcess(@PathVariable(name = "name") String scriptName) throws Exception {
+    public ResponseEntity<ResourceSupport> startProcess(@PathVariable(name = "name") String scriptName)
+        throws Exception {
         if (log.isTraceEnabled()) {
             log.trace("Starting Process for Script with name: " + scriptName);
         }
         ProcessRest processRest = scriptRestRepository.startProcess(scriptName);
         ProcessResource processResource = new ProcessResource(processRest);
+        halLinkService.addLinks(processResource);
         return ControllerUtils.toResponseEntity(HttpStatus.ACCEPTED, null, processResource);
     }
 

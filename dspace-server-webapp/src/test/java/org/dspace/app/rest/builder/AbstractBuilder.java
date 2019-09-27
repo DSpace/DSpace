@@ -17,6 +17,7 @@ import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.Bitstream;
 import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.factory.ProcessServiceFactory;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.BundleService;
@@ -27,6 +28,7 @@ import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.MetadataSchemaService;
+import org.dspace.content.service.ProcessService;
 import org.dspace.content.service.RelationshipService;
 import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.content.service.SiteService;
@@ -82,6 +84,7 @@ public abstract class AbstractBuilder<T, S> {
     static RelationshipService relationshipService;
     static RelationshipTypeService relationshipTypeService;
     static EntityTypeService entityTypeService;
+    static ProcessService processService;
 
     protected Context context;
 
@@ -127,6 +130,7 @@ public abstract class AbstractBuilder<T, S> {
         relationshipService = ContentServiceFactory.getInstance().getRelationshipService();
         relationshipTypeService = ContentServiceFactory.getInstance().getRelationshipTypeService();
         entityTypeService = ContentServiceFactory.getInstance().getEntityTypeService();
+        processService = ProcessServiceFactory.getInstance().getProcessService();
 
         // Temporarily disabled
         claimedTaskService = XmlWorkflowServiceFactory.getInstance().getClaimedTaskService();
@@ -162,6 +166,8 @@ public abstract class AbstractBuilder<T, S> {
         relationshipService = null;
         relationshipTypeService = null;
         entityTypeService = null;
+        processService = null;
+
     }
 
     public static void cleanupObjects() throws Exception {
