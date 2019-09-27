@@ -101,8 +101,8 @@ public class SyndicationFeed
     private static String descriptionFields[] =
         getDefaultedConfiguration("webui.feed.item.description", defaultDescriptionFields).split("\\s*,\\s*");
 
-    private static String authorField =
-        getDefaultedConfiguration("webui.feed.item.author", defaultAuthorField);
+    private static String authorFields[] =
+        getDefaultedConfiguration("webui.feed.item.author", defaultAuthorField).split("\\s*,\\s*");
 
     // metadata field for Podcast external media source url
     private static String externalSourceField = getDefaultedConfiguration("webui.feed.podcast.sourceuri", defaultExternalMedia);
@@ -299,16 +299,20 @@ public class SyndicationFeed
                 }
 
                 // This gets the authors into an ATOM feed
-                Metadatum authors[] = item.getMetadataByMetadataString(authorField);
-                if (authors.length > 0)
-                {
-                    List<SyndPerson> creators = new ArrayList<SyndPerson>();
-                    for (Metadatum author : authors)
+                List<SyndPerson> creators = new ArrayList<SyndPerson>();
+                for (String authorField : authorFields) {
+                    Metadatum authors[] = item.getMetadataByMetadataString(authorField);
+                    if (authors.length > 0)
                     {
-                        SyndPerson sp = new SyndPersonImpl();
-                        sp.setName(author.value);
-                        creators.add(sp);
+                        for (Metadatum author : authors)
+                        {
+                            SyndPerson sp = new SyndPersonImpl();
+                            sp.setName(author.value);
+                            creators.add(sp);
+                        }
                     }
+                }
+                if (creators.size() > 0) {
                     entry.setAuthors(creators);
                 }
 
@@ -322,12 +326,12 @@ public class SyndicationFeed
                         Metadatum dcAuthors[] = item.getMetadataByMetadataString(dcCreatorField);
                         if (dcAuthors.length > 0)
                         {
-                            List<String> creators = new ArrayList<String>();
+                            List<String> dcCreators = new ArrayList<String>();
                             for (Metadatum author : dcAuthors)
                             {
-                                creators.add(author.value);
+                                dcCreators.add(author.value);
                             }
-                            dc.setCreators(creators);
+                            dc.setCreators(dcCreators);
                         }
                     }
                     if (dcDateField != null && !hasDate)
@@ -403,7 +407,7 @@ public class SyndicationFeed
                     // Get iTunes specific fields: author, subtitle, summary, duration, keywords
                     EntryInformation itunes = new EntryInformationImpl();
 
-                    String author = getOneDC(item, authorField);
+                    String author = getOneDC(item, authorFields[0]);
                     if (author != null && author.length() > 0) {
                         itunes.setAuthor(author);                               // <itunes:author>
                     }
