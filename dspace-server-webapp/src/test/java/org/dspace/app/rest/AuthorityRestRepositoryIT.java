@@ -28,6 +28,10 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+/**
+ * This class handles all Authority related IT. It alters some config to run the tests, but it gets cleared again
+ * after every test
+ */
 public class AuthorityRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Autowired

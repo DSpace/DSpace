@@ -168,6 +168,9 @@ public interface ChoiceAuthorityService {
 
     public ChoiceAuthority getChoiceAuthorityByAuthorityName(String authorityName);
 
+    /**
+     * This method has been created to have a way of clearing the cache kept inside the service
+     */
     public void clearController();
 
 }

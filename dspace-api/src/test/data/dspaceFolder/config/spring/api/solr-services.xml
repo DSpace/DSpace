@@ -23,6 +23,7 @@
 
     <alias name="org.dspace.discovery.SearchService" alias="org.dspace.discovery.IndexingService"/>
 
+    <!-- These beans have been added so that we can mock our AuthoritySearchService in the tests-->
     <bean class="org.dspace.authority.MockAuthoritySolrServiceImpl" id="org.dspace.authority.AuthoritySearchService"/>
     <alias name="org.dspace.authority.AuthoritySearchService" alias="org.dspace.authority.indexer.AuthorityIndexingService"/>
 

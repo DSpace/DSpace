@@ -85,5 +85,8 @@ public interface PluginService {
      */
     public Object getSinglePlugin(Class interfaceClass);
 
+    /**
+     * This method has been created to have a way of clearing the cache kept in the PluginService
+     */
     public void clearNamedPluginClasses();
 }
