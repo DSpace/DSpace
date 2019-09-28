@@ -1,0 +1,47 @@
+<dspace-dc-types>
+
+    <dspace-header>
+        <title>DSpace Cris researcher's page Types</title>
+    </dspace-header>
+
+    <dc-schema>
+        <name>crisequipment</name>
+        <namespace>http://dspace.org/crisequipment</namespace>
+    </dc-schema>
+
+    <dc-type>
+        <schema>crisequipment</schema>
+        <element>acronym</element>
+        <qualifier></qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>crisequipment</schema>
+        <element>identifier</element>
+        <qualifier></qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>crisequipment</schema>
+        <element>ownerou</element>
+        <qualifier></qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>crisequipment</schema>
+        <element>ownerrp</element>
+        <qualifier></qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>crisequipment</schema>
+        <element>description</element>
+        <qualifier></qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+</dspace-dc-types>

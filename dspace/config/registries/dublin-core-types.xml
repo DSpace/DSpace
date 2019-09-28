@@ -640,4 +640,116 @@
         <scope_note></scope_note>
     </dc-type>
 
+  <dc-type>
+	<schema>dc</schema>
+    <element>acronym</element>
+    <qualifier></qualifier>
+    <scope_note></scope_note>
+  </dc-type>
+  
+  <dc-type>
+	<schema>dc</schema>
+    <element>relation</element>
+    <qualifier>publication</qualifier>
+    <scope_note></scope_note>
+  </dc-type>
+  
+  <dc-type>
+	<schema>dc</schema>
+    <element>relation</element>
+    <qualifier>isbn</qualifier>
+    <scope_note></scope_note>
+  </dc-type>
+  
+  <dc-type>
+	<schema>dc</schema>
+    <element>relation</element>
+    <qualifier>doi</qualifier>
+    <scope_note></scope_note>
+  </dc-type>
+
+  <dc-type>
+	<schema>dc</schema>
+    <element>relation</element>
+    <qualifier>issn</qualifier>
+    <scope_note></scope_note>
+  </dc-type>
+  
+  <dc-type>
+	<schema>dc</schema>
+    <element>relation</element>
+    <qualifier>equipment</qualifier>
+    <scope_note></scope_note>
+  </dc-type>
+
+  <dc-type>
+	<schema>dc</schema>
+    <element>relation</element>
+    <qualifier>references</qualifier>
+    <scope_note></scope_note>
+  </dc-type>
+
+  <dc-type>
+	<schema>dc</schema>
+    <element>relation</element>
+    <qualifier>patent</qualifier>
+    <scope_note></scope_note>
+  </dc-type>
+
+  <dc-type>
+	<schema>dc</schema>
+    <element>coverage</element>
+    <qualifier>publication</qualifier>
+    <scope_note></scope_note>
+  </dc-type>
+  
+  <dc-type>
+	<schema>dc</schema>
+    <element>coverage</element>
+    <qualifier>isbn</qualifier>
+    <scope_note></scope_note>
+  </dc-type>
+  
+  <dc-type>
+	<schema>dc</schema>
+    <element>coverage</element>
+    <qualifier>doi</qualifier>
+    <scope_note></scope_note>
+  </dc-type>
+  
+  <dc-type>
+	<schema>dc</schema>
+    <element>description</element>
+    <qualifier>volume</qualifier>
+    <scope_note></scope_note>
+  </dc-type>
+  
+  <dc-type>
+	<schema>dc</schema>
+    <element>description</element>
+    <qualifier>issue</qualifier>
+    <scope_note></scope_note>
+  </dc-type>
+  
+  <dc-type>
+	<schema>dc</schema>
+    <element>description</element>
+    <qualifier>startpage</qualifier>
+    <scope_note></scope_note>
+  </dc-type>
+  
+  <dc-type>
+	<schema>dc</schema>
+    <element>description</element>
+    <qualifier>endpage</qualifier>
+    <scope_note></scope_note>
+  </dc-type>
+  
+  <dc-type>
+	<schema>dc</schema>
+    <element>identifier</element>
+    <qualifier>patentno</qualifier>
+    <scope_note></scope_note>
+  </dc-type>
+
 </dspace-dc-types>

@@ -1,0 +1,110 @@
+<dspace-dc-types>
+
+    <dspace-header>
+        <title>DSpace Cris Events Types</title>
+    </dspace-header>
+
+    <dc-schema>
+        <name>crisevent</name>
+        <namespace>http://dspace.org/crisevent</namespace>
+    </dc-schema>
+
+    <dc-type>
+        <schema>crisevent</schema>
+        <element>acronym</element>
+        <qualifier></qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>crisevent</schema>
+        <element>type</element>
+        <qualifier></qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>crisevent</schema>
+        <element>date</element>
+        <qualifier>start</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>crisevent</schema>
+        <element>date</element>
+        <qualifier>end</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>crisevent</schema>
+        <element>place</element>
+        <qualifier>country</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>crisevent</schema>
+        <element>place</element>
+        <qualifier>location</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>crisevent</schema>
+        <element>organizerou</element>
+        <qualifier></qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>crisevent</schema>
+        <element>organizerpj</element>
+        <qualifier></qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>crisevent</schema>
+        <element>sponsorou</element>
+        <qualifier></qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>crisevent</schema>
+        <element>sponsorpj</element>
+        <qualifier></qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>crisevent</schema>
+        <element>partnerou</element>
+        <qualifier></qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>crisevent</schema>
+        <element>partnerpj</element>
+        <qualifier></qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>crisevent</schema>
+        <element>description</element>
+        <qualifier></qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>crisevent</schema>
+        <element>description</element>
+        <qualifier>keywords</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+</dspace-dc-types>
