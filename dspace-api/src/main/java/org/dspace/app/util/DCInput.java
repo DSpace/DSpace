@@ -505,4 +505,8 @@ public class DCInput {
 
         return true;
     }
+    
+    public List<String> getTypeBindList() {
+        return typeBind;
+    }
 }

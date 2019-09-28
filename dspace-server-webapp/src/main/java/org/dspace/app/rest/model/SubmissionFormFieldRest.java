@@ -93,6 +93,11 @@ public class SubmissionFormFieldRest {
     private List<LanguageFormField> languageCodes;
 
     /**
+     * The list of type bind value
+     */
+    private List<String> typeBind;
+
+    /**
      * Getter for {@link #selectableMetadata}
      * 
      * @return {@link #selectableMetadata}
@@ -290,6 +295,14 @@ public class SubmissionFormFieldRest {
      */
     public void setRows(SubmissionFormRest rows) {
         this.rows = rows;
+    }
+
+    public List<String> getTypeBind() {
+        return typeBind;
+    }
+
+    public void setTypeBind(List<String> typeBind) {
+        this.typeBind = typeBind;
     }
 
 }

@@ -146,6 +146,7 @@ public class SubmissionFormConverter implements DSpaceConverter<DCInputSet, Subm
         }
         inputField.setInput(inputRest);
         inputField.setSelectableMetadata(selectableMetadata);
+        inputField.setTypeBind(dcinput.getTypeBindList());
         return inputField;
     }
 
