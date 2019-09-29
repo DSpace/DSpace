@@ -20,31 +20,6 @@ services:
     volumes:
     - assetstore:/dspace/assetstore
     - ./dspace/src/main/docker-compose/local.cfg:/dspace/config/local.cfg
-  dspace-angular:
-    container_name: dspace-angular
-    depends_on:
-    - dspace
-    environment:
-      DSPACE_HOST: dspace-angular
-      DSPACE_NAMESPACE: /
-      DSPACE_PORT: '3000'
-      DSPACE_REST_HOST: dspace
-      DSPACE_REST_NAMESPACE: /
-      DSPACE_REST_PORT: '8080'
-      DSPACE_REST_SSL: "false"
-      DSPACE_SSL: "false"
-    image: dspace/dspace-angular:latest
-    networks:
-      dspacenet: {}
-    ports:
-    - published: 3000
-      target: 3000
-    - published: 9876
-      target: 9876
-    stdin_open: true
-    tty: true
-    volumes:
-    - ./dspace/src/main/docker-compose/environment.dev.js:/app/config/environment.dev.js
   dspacedb:
     container_name: dspacedb
     environment:
