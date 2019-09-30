@@ -1072,7 +1072,8 @@ public class ResearcherTagLibraryFunctions
             return result;
         }
         return null;
-
+    }
+    
     public static String getTranslatedName(
             ACrisObject cris, String locale)
     {
