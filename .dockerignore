@@ -4,3 +4,4 @@
 */target/
 dspace/modules/*/target/
 Dockerfile.*
+dspace/modules/src/main/docker
