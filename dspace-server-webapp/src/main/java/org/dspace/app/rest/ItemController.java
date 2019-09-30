@@ -18,16 +18,15 @@ import javax.servlet.http.HttpServletResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.app.rest.converter.BundleConverter;
 import org.dspace.app.rest.converter.MetadataConverter;
-import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.BundleRest;
 import org.dspace.app.rest.model.hateoas.BundleResource;
+import org.dspace.app.rest.repository.ItemRestRepository;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bundle;
 import org.dspace.content.Item;
-import org.dspace.content.service.BundleService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,13 +49,14 @@ public class ItemController {
     ItemService itemService;
 
     @Autowired
-    BundleService bundleService;
+    ItemRestRepository itemRestRepository;
 
     @Autowired
     BundleConverter converter;
 
     @Autowired
     MetadataConverter metadataConverter;
+
 
     @Autowired
     Utils utils;
@@ -82,16 +82,7 @@ public class ItemController {
             throw new UnprocessableEntityException("Could not parse request body");
         }
 
-        if (item.getBundles(bundleRest.getName()).size() > 0) {
-            throw new DSpaceBadRequestException("The bundle name already exists in the item");
-        }
-
-        Bundle bundle = bundleService.create(context, item, bundleRest.getName());
-
-        metadataConverter.setMetadata(context, bundle, bundleRest.getMetadata());
-        bundle.setName(context, bundleRest.getName());
-
-        context.commit();
+        Bundle bundle = itemRestRepository.addBundleToItem(context, item, bundleRest);
 
         BundleResource bundleResource = new BundleResource(converter.convert(bundle), utils);
         return ControllerUtils.toResponseEntity(HttpStatus.CREATED, null, bundleResource);
