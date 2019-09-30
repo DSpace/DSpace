@@ -1,0 +1,25 @@
+version: '3.7'
+networks:
+  dspacenet:
+services:
+  dspace-angular:
+    container_name: dspace-angular
+    depends_on:
+    - dspace
+    environment:
+      DSPACE_HOST: dspace-angular
+      DSPACE_NAMESPACE: /
+      DSPACE_PORT: '3000'
+      DSPACE_SSL: "false"
+    image: dspace/dspace-angular:latest
+    networks:
+      dspacenet: {}
+    ports:
+    - published: 3000
+      target: 3000
+    - published: 9876
+      target: 9876
+    stdin_open: true
+    tty: true
+    volumes:
+    - ./environment.dev.js:/app/config/environment.dev.js
