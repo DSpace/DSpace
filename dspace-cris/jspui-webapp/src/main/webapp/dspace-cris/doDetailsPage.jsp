@@ -15,6 +15,7 @@
 <%@ taglib uri="http://displaytag.sf.net" prefix="display"%>
 
 <%@ page import="org.dspace.app.webui.util.UIUtil" %>
+<%@ page import="java.util.Locale"%>
 
 <%@ taglib uri="jdynatags" prefix="dyna"%>
 <%@ taglib uri="researchertags" prefix="researcher"%>
@@ -37,6 +38,12 @@
 	</c:if>
 </c:forEach>
 <%
+	Locale sessionLocale = UIUtil.getSessionLocale(request);
+	String currLocale = null;
+	if (sessionLocale != null) {
+		currLocale = sessionLocale.toString();
+	}
+
 	// Is the logged in user an admin
 	Boolean admin = (Boolean)request.getAttribute("isAdmin");
 	boolean isAdmin = (admin == null ? false : admin.booleanValue());
@@ -55,6 +62,7 @@
 
 %>
 <c:set var="admin" scope="request"><%= isAdmin %></c:set>
+<c:set var="currLocale"><%= currLocale %></c:set>
 
 <c:set var="dspace.layout.head.last" scope="request">
 	
@@ -175,14 +183,20 @@
     
 </c:set>
 
-<dspace:layout title="${entity.typo.label} ${entity.name}">
+<c:set var="name" value="${researcher:getTranslatedName(entity, currLocale)}" />
+<fmt:message var="title" key='jsp.layout.do.${entity.typo.label}.detail.name'><fmt:param>${entity.typo.label}</fmt:param><fmt:param>${name}</fmt:param></fmt:message>
+<c:if test="${title eq 'jsp.layout.do.${entity.typo.label}.detail.name'}">
+	<c:set var="title"><fmt:message key='jsp.layout.do.detail.name'><fmt:param>${entity.typo.label}</fmt:param><fmt:param>${name}</fmt:param></fmt:message></c:set>
+</c:if>
+
+<dspace:layout title="${title}">
 
 <div id="content">
 <div class="row">
 	<div class="col-lg-12">
 		<div class="form-inline">
 	         <div class="form-group">
-				 <h1><fmt:message key="jsp.layout.do.detail.name" /> ${entity.name}</h1>
+				 <h1><c:out value="${title}" /></h1>
 			      <%
 			      if (isAdmin) {
 				  %>		
