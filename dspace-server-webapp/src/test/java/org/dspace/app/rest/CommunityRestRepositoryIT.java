@@ -288,16 +288,46 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                 .withTitle(titles.get(3))
                 .build();
 
-        getClient().perform(get("/api/core/communities"))
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+
+
+        getClient().perform(get("/api/core/communities").param("size", "2"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$._embedded.communities", Matchers.contains(
+                .andExpect(jsonPath("$._embedded.communities", Matchers.containsInAnyOrder(
                         CommunityMatcher.matchCommunityEntryMultipleTitles(titles, parentCommunity.getID(),
-                                parentCommunity.getHandle())
+                                parentCommunity.getHandle()),
+                        CommunityMatcher.matchCommunityEntry(child1.getID(), child1.getHandle())
                 )))
                 .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/communities")))
-                .andExpect(jsonPath("$.page.totalElements", is(1)));
+                .andExpect(jsonPath("$.page.totalElements", is(2)))
+                .andExpect(jsonPath("$.page.totalPages", is(1)));
     }
+
+    @Test
+    public void findAllNoDuplicatesOnMultipleCommunityTitlesPaginationTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        List<String> titles = Arrays.asList("First title", "Second title", "Third title", "Fourth title");
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName(titles.get(0))
+                                          .withTitle(titles.get(1))
+                                          .withTitle(titles.get(2))
+                                          .withTitle(titles.get(3))
+                                          .build();
+
+        getClient().perform(get("/api/core/communities"))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$._embedded.communities", Matchers.contains(
+                       CommunityMatcher.matchCommunityEntryMultipleTitles(titles, parentCommunity.getID(),
+                                                                          parentCommunity.getHandle())
+                   )))
+                   .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/communities")))
+                   .andExpect(jsonPath("$.page.totalElements", is(1)));
+    }
+
 
     @Test
     public void findAllNoNameCommunityIsReturned() throws Exception {

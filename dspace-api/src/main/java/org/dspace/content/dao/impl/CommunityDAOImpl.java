@@ -60,6 +60,11 @@ public class CommunityDAOImpl extends AbstractHibernateDSODAO<Community> impleme
     public List<Community> findAll(Context context, MetadataField sortField, Integer limit, Integer offset)
         throws SQLException {
         StringBuilder queryBuilder = new StringBuilder();
+
+        // The query has to be rather complex because we want to sort the retrieval of Communities based on the title
+        // We'll join the Communities with the metadata fields on the sortfield specified in the parameters
+        // then we'll sort on this metadata field (this is usually the title). We're also making sure that the place
+        // is the lowest place in the metadata fields list so that we avoid the duplication bug
         queryBuilder.append("SELECT c" +
                                 " FROM Community c" +
                                 " left join c.metadata title on title.metadataField = :sortField and" +
@@ -78,8 +83,6 @@ public class CommunityDAOImpl extends AbstractHibernateDSODAO<Community> impleme
         }
         query.setParameter("sortField", sortField);
 
-        // Convert List to HashSet and back again to filter out duplicates (e.g. a community
-        // having multiple titles/translations), without changing the order of elements
         return list(query);
     }
 
@@ -96,6 +99,12 @@ public class CommunityDAOImpl extends AbstractHibernateDSODAO<Community> impleme
     @Override
     public List<Community> findAllNoParent(Context context, MetadataField sortField) throws SQLException {
         StringBuilder queryBuilder = new StringBuilder();
+
+        // The query has to be rather complex because we want to sort the retrieval of Communities based on the title
+        // We'll join the Communities with the metadata fields on the sortfield specified in the parameters
+        // then we'll sort on this metadata field (this is usually the title). We're also making sure that the place
+        // is the lowest place in the metadata fields list so that we avoid the duplication bug
+        // This query has the added where clause to enforce that the community cannot have any parent communities
         queryBuilder.append("SELECT c" +
                                 " FROM Community c" +
                                 " left join c.metadata title on title.metadataField = :sortField and" +
