@@ -127,10 +127,12 @@ public class BundleControllerIT extends AbstractEntityIntegrationTest {
         Map<String, Object> map = mapper.readValue(content, Map.class);
         String bitstreamId = String.valueOf(map.get("id"));
 
+
         getClient(token).perform(get("/api/core/bundles/" + bundle.getID() + "/bitstreams"))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("_embedded.bitstreams", Matchers.hasItem(
-                                BitstreamMatcher.matchBitstreamEntry(UUID.fromString(bitstreamId), file.getSize()))));
+                                BitstreamMatcher.matchBitstreamEntry(UUID.fromString(bitstreamId), file.getSize(),
+                                                                     bitstreamRest.getName(), "description"))));
 
     }
 
