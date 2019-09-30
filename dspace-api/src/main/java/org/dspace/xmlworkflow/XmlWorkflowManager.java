@@ -7,13 +7,36 @@
  */
 package org.dspace.xmlworkflow;
 
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.MissingResourceException;
+import javax.mail.MessagingException;
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.authorize.ResourcePolicy;
-import org.dspace.content.*;
+import org.dspace.content.Bitstream;
+import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
-import org.dspace.core.*;
+import org.dspace.content.DCDate;
+import org.dspace.content.InstallItem;
+import org.dspace.content.Item;
+import org.dspace.content.MetadataSchema;
+import org.dspace.content.Metadatum;
+import org.dspace.content.WorkspaceItem;
+import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Constants;
+import org.dspace.core.Context;
+import org.dspace.core.Email;
+import org.dspace.core.I18nUtil;
+import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.handle.HandleManager;
@@ -23,15 +46,13 @@ import org.dspace.usage.UsageWorkflowEvent;
 import org.dspace.utils.DSpace;
 import org.dspace.xmlworkflow.state.Step;
 import org.dspace.xmlworkflow.state.Workflow;
-import org.dspace.xmlworkflow.state.actions.*;
-import org.dspace.xmlworkflow.storedcomponents.*;
+import org.dspace.xmlworkflow.state.actions.Action;
+import org.dspace.xmlworkflow.state.actions.ActionResult;
+import org.dspace.xmlworkflow.state.actions.WorkflowActionConfig;
+import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
+import org.dspace.xmlworkflow.storedcomponents.PoolTask;
+import org.dspace.xmlworkflow.storedcomponents.WorkflowItemRole;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
-
-import javax.mail.MessagingException;
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.*;
 
 /**
  * When an item is submitted and is somewhere in a workflow, it has a row in the
@@ -75,6 +96,7 @@ public class XmlWorkflowManager {
             //Get our next step, if none is found, archive our item
             firstStep = wf.getNextStep(context, wfi, firstStep, ActionResult.OUTCOME_COMPLETE);
             if(firstStep == null){
+                recordStart(wfi.getItem(), null);
                 archive(context, wfi);
             }else{
                 activateFirstStep(context, wf, firstStep, wfi);
@@ -825,35 +847,52 @@ public class XmlWorkflowManager {
         return submitter;
     }
 
-    // Create workflow start provenance message
+    // Create workflow start provenance message and add it to the item's metadata
     private static void recordStart(Item myitem, Action action)
             throws SQLException, IOException, AuthorizeException
     {
+        // Build start provenance message
+        String provmessage = buildStartProvenanceMessage(myitem, action);
+
+        // Add provenance message to the DC
+        myitem.addMetadata(MetadataSchema.DC_SCHEMA, "description", "provenance", "en", provmessage);
+        myitem.update();
+    }
+
+    // Build workflow start provenance message
+    private static String buildStartProvenanceMessage(Item myitem, Action action) throws SQLException {
         // get date
         DCDate now = DCDate.getCurrent();
 
         // Create provenance description
-        String provmessage = "";
+        StringBuilder provMessage = new StringBuilder();
 
+        // Submitted by
+        provMessage.append("Submitted by ");
         if (myitem.getSubmitter() != null)
         {
-            provmessage = "Submitted by " + myitem.getSubmitter().getFullName()
-                    + " (" + myitem.getSubmitter().getEmail() + ") on "
-                    + now.toString() + " workflow start=" + action.getProvenanceStartId() + "\n";
+            provMessage.append(myitem.getSubmitter().getFullName()).append(" (")
+                    .append(myitem.getSubmitter().getEmail()).append(")");
         }
         else
         // null submitter
         {
-            provmessage = "Submitted by unknown (probably automated) on"
-                    + now.toString() + " workflow start=" + action.getProvenanceStartId() + "\n";
+            provMessage.append("unknown (probably automated)");
         }
 
-        // add sizes and checksums of bitstreams
-        provmessage += InstallItem.getBitstreamProvenanceMessage(myitem);
+        // Submission date
+        provMessage.append(" on ").append(now.toString());
 
-        // Add message to the DC
-        myitem.addMetadata(MetadataSchema.DC_SCHEMA, "description", "provenance", "en", provmessage);
-        myitem.update();
+        // Workflow start (when present)
+        if (action != null) {
+            provMessage.append(" workflow start=").append(action.getProvenanceStartId());
+        }
+        provMessage.append("\n");
+
+        // add sizes and checksums of bitstreams
+        provMessage.append(InstallItem.getBitstreamProvenanceMessage(myitem));
+
+        return provMessage.toString();
     }
 
     private static void notifyOfReject(Context c, XmlWorkflowItem wi, EPerson e,
