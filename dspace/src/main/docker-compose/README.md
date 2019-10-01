@@ -1,5 +1,13 @@
 # Docker Compose Resources
 
+## root directory Resources
+- docker-compose.yml
+  - Docker compose file to orchestrate DSpace 7 REST components
+- docker-compose-cli
+  - Docker compose file to run DSpace CLI tasks within a running DSpace instance in Docker
+
+## dspace/src/main/docker-compose resources
+
 - cli.assetstore.yml
   - Docker compose file that will download and install a default assetstore.
 - cli.ingest.yml
@@ -13,26 +21,52 @@
 - environment.dev.js
   - Default angular environment when testing DSpace-angular from this repo
 
-## To run a published DSpace image from your branch
-
-## Option 1: Start DSpace with an empty repository
-
-Start with empty repository.
+## Run DSpace 7 REST from a published Image
 ```
-docker-compose -p d7 up --build -d
+docker-compose -p d7 up -d
 ```
 
-## Option 2: Ingesting test content from AIP
-
-Start with empty repository.
+## Build and Run DSpace 7 REST from your current branch
 ```
-docker-compose -p d7 up --build -d
+docker-compose -p d7 up -d --build
 ```
 
-Compile your local changes for the DSpace CLI container
+## Build DSpace 7 CLI from your current branch (this is used for ingest tasks)
 ```
 docker-compose -p d7 -f docker-compose-cli.yml build
 ```
+
+## Run DSpace 7 REST and Angular using published images
+
+```
+docker-compose -p d7 -f docker-compose.yml -f dspace/src/main/docker-compose/docker-compose-angular.yml up -d
+```
+
+## Build and Run DSpace 7 REST from the current branch along with a published image for DSpace Angular
+
+```
+docker-compose -p d7 -f docker-compose.yml -f dspace/src/main/docker-compose/docker-compose-angular.yml up -d --build
+```
+
+## Build and Run DSpace 7 REST and Angular from local branches
+
+_The system will be started in 2 steps. Each step shares the same docker network._
+
+From DSpace/DSpace
+```
+docker-compose -p d7 up --build -d
+```
+
+From DSpace/DSpace-angular
+```
+docker-compose -p d7 up --build -d
+```
+
+## Ingest Option 1: Ingesting test content from AIP files into a running DSpace 7 instance
+
+Prerequisites
+- Start DSpace 7 using one of the options listed above
+- Build the DSpace CLI image if needed.  See the instructions above.
 
 Create an admin account.  By default, the dspace-cli container runs the dspace command.
 ```
@@ -41,12 +75,12 @@ docker-compose -p d7 -f docker-compose-cli.yml run dspace-cli create-administrat
 
 Download a Zip file of AIP content and ingest test data
 ```
-docker-compose -p d7 -f docker-compose-cli.yml -f dspace/src/main/docker-compose/cli.ingest.yml run dspace-cli run dspace-cli
+docker-compose -p d7 -f docker-compose-cli.yml -f dspace/src/main/docker-compose/cli.ingest.yml run dspace-cli
 ```
 
-## Option 3: Ingest Entities Test Data
+## Ingest Option 2: Ingest Entities Test Data
 
-Start with a postgres database dump downloaded from the internet.
+Start DSpace REST with a postgres database dump downloaded from the internet.
 ```
 docker-compose -p d7 -f dspace/src/main/docker-compose/db.entities.yml up --build -d
 ```
