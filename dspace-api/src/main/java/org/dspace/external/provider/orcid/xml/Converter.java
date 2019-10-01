@@ -5,11 +5,10 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.authority.orcid.xml;
+package org.dspace.external.provider.orcid.xml;
 
 import java.io.InputStream;
 import java.net.URISyntaxException;
-
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;

@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.authority.rest;
+package org.dspace.external;
 
 import java.io.InputStream;
 import java.util.Scanner;
@@ -23,16 +23,16 @@ import org.apache.logging.log4j.Logger;
  * @author Ben Bosman (ben at atmire dot com)
  * @author Mark Diggory (markd at atmire dot com)
  */
-public class RESTConnector {
+public class OrcidRestConnector {
 
     /**
      * log4j logger
      */
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(RESTConnector.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(OrcidRestConnector.class);
 
     private String url;
 
-    public RESTConnector(String url) {
+    public OrcidRestConnector(String url) {
         this.url = url;
     }
 

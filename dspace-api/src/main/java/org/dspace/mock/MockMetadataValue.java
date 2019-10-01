@@ -5,11 +5,12 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.content.crosswalk;
+package org.dspace.mock;
 
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
 import org.dspace.content.MetadataValue;
+import org.dspace.content.authority.Choices;
 
 /**
  * Metadata Value is bound to a database, the dissemination crosswalk require mock metadata just need for desimanation
@@ -26,7 +27,7 @@ public class MockMetadataValue {
     private String language;
     private String value;
     private String authority;
-    private int confidence;
+    private int confidence = Choices.CF_UNSET;
 
     public MockMetadataValue(MetadataValue metadataValue) {
         MetadataField metadataField = metadataValue.getMetadataField();
@@ -41,6 +42,42 @@ public class MockMetadataValue {
     }
 
     public MockMetadataValue() {
+    }
+
+    /**
+     * Constructor for the MockMetadataValue class
+     * @param schema        The schema to be assigned to this MockMetadataValue object
+     * @param element       The element to be assigned to this MockMetadataValue object
+     * @param qualifier     The qualifier to be assigned to this MockMetadataValue object
+     * @param language      The language to be assigend to this MockMetadataValue object
+     * @param value         The value to be assigned to this MockMetadataValue object
+     * @param authority     The authority to be assigned to this MockMetadataValue object
+     * @param confidence    The confidence to be assigned to this MockMetadataValue object
+     */
+    public MockMetadataValue(String schema, String element, String qualifier, String language, String value,
+                             String authority, int confidence) {
+        this.schema = schema;
+        this.element = element;
+        this.qualifier = qualifier;
+        this.language = language;
+        this.value = value;
+        this.authority = authority;
+        this.confidence = confidence;
+    }
+    /**
+     * Constructor for the MockMetadataValue class
+     * @param schema        The schema to be assigned to this MockMetadataValue object
+     * @param element       The element to be assigned to this MockMetadataValue object
+     * @param qualifier     The qualifier to be assigned to this MockMetadataValue object
+     * @param language      The language to be assigend to this MockMetadataValue object
+     * @param value         The value to be assigned to this MockMetadataValue object
+     */
+    public MockMetadataValue(String schema, String element, String qualifier, String language, String value) {
+        this.schema = schema;
+        this.element = element;
+        this.qualifier = qualifier;
+        this.language = language;
+        this.value = value;
     }
 
     public String getSchema() {

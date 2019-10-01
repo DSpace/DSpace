@@ -5,27 +5,32 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.content.authority;
+package org.dspace.external.provider.impl;
 
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.dspace.content.Collection;
 import org.dspace.content.DCPersonName;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.external.model.ExternalDataObject;
+import org.dspace.external.provider.ExternalDataProvider;
+import org.dspace.mock.MockMetadataValue;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -56,11 +61,11 @@ import org.xml.sax.helpers.DefaultHandler;
  * @author Larry Stone
  * @version $Revision $
  */
-public class LCNameAuthority implements ChoiceAuthority {
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(LCNameAuthority.class);
+public class LCNameDataProvider implements ExternalDataProvider {
+    private static final Logger log = LogManager.getLogger(LCNameDataProvider.class);
 
-    // get these from configuration
-    protected static String url = null;
+    private String url;
+    private String sourceIdentifier;
 
     // NS URI for SRU respones
     protected static final String NS_SRU = "http://www.loc.gov/zing/srw/";
@@ -68,53 +73,53 @@ public class LCNameAuthority implements ChoiceAuthority {
     // NS URI for MARC/XML
     protected static final String NS_MX = "http://www.loc.gov/MARC21/slim";
 
-    // constructor does static init too..
-    public LCNameAuthority() {
-        if (url == null) {
-            url = ConfigurationManager.getProperty("lcname.url");
 
-            // sanity check
-            if (url == null) {
-                throw new IllegalStateException("Missing DSpace configuration keys for LCName Query");
-            }
-        }
+    public String getSourceIdentifier() {
+        return sourceIdentifier;
     }
 
-    // punt!  this is a poor implementation..
-    @Override
-    public Choices getBestMatch(String field, String text, Collection collection, String locale) {
-        return getMatches(field, text, collection, 0, 2, locale);
+    public Optional<ExternalDataObject> getExternalDataObject(String id) {
+
+        StringBuilder query = new StringBuilder();
+        query.append("local.LCCN = \"").append(id).append("\"");
+        List<ExternalDataObject> list = doLookup(0, 10, query);
+        if (list.size() > 0) {
+            return Optional.of(list.get(0));
+        } else {
+            return Optional.empty();
+        }
+
     }
 
     /**
-     * Match a proposed value against name authority records
-     * Value is assumed to be in "Lastname, Firstname" format.
+     * Generic getter for the url
+     * @return the url value of this LCNameDataProvider
      */
-    @Override
-    public Choices getMatches(String field, String text, Collection collection, int start, int limit, String locale) {
-        Choices result = queryPerson(text, start, limit);
-        if (result == null) {
-            result = new Choices(true);
-        }
-
-        return result;
-    }
-
-    // punt; supposed to get the canonical display form of a metadata authority key
-    // XXX FIXME implement this with a query on the authority key, cache results
-    @Override
-    public String getLabel(String field, String key, String locale) {
-        return key;
+    public String getUrl() {
+        return url;
     }
 
     /**
-     * Guts of the implementation, returns a complete Choices result, or
-     * null for a failure.
+     * Generic setter for the url
+     * @param url   The url to be set on this LCNameDataProvider
      */
-    private Choices queryPerson(String text, int start, int limit) {
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    /**
+     * Generic setter for the sourceIdentifier
+     * @param sourceIdentifier   The sourceIdentifier to be set on this LCNameDataProvider
+     */
+    public void setSourceIdentifier(String sourceIdentifier) {
+        this.sourceIdentifier = sourceIdentifier;
+    }
+
+    @Override
+    public List<ExternalDataObject> searchExternalDataObjects(String text, int start, int limit) {
         // punt if there is no query text
         if (text == null || text.trim().length() == 0) {
-            return new Choices(true);
+            return Collections.EMPTY_LIST;
         }
 
         // 1. build CQL query
@@ -123,7 +128,11 @@ public class LCNameAuthority implements ChoiceAuthority {
         query.append("local.FirstName = \"").append(pn.getFirstNames()).
             append("\" and local.FamilyName = \"").append(pn.getLastName()).
                  append("\"");
+        return doLookup(start, limit, query);
 
+    }
+
+    private List<ExternalDataObject> doLookup(int start, int limit, StringBuilder query) {
         // XXX arbitrary default limit - should be configurable?
         if (limit == 0) {
             limit = 50;
@@ -141,7 +150,7 @@ public class LCNameAuthority implements ChoiceAuthority {
             sruUri = builder.build();
         } catch (URISyntaxException e) {
             log.error("SRU query failed: ", e);
-            return new Choices(true);
+            return Collections.EMPTY_LIST;
         }
         HttpGet get = new HttpGet(sruUri);
 
@@ -155,7 +164,7 @@ public class LCNameAuthority implements ChoiceAuthority {
                 SAXParserFactory spf = SAXParserFactory.newInstance();
                 SAXParser sp = spf.newSAXParser();
                 XMLReader xr = sp.getXMLReader();
-                SRUHandler handler = new SRUHandler();
+                SRUHandler handler = new SRUHandler(sourceIdentifier);
 
                 // XXX FIXME: should turn off validation here explicitly, but
                 //  it seems to be off by default.
@@ -177,30 +186,25 @@ public class LCNameAuthority implements ChoiceAuthority {
                 // XXX good, stop it.
                 // handler.result.add(new Choice("", text, "Non-Authority: \""+text+"\""));
 
-                int confidence;
-                if (handler.hits == 0) {
-                    confidence = Choices.CF_NOTFOUND;
-                } else if (handler.hits == 1) {
-                    confidence = Choices.CF_UNCERTAIN;
-                } else {
-                    confidence = Choices.CF_AMBIGUOUS;
-                }
-                return new Choices(handler.result.toArray(new Choice[handler.result.size()]),
-                                   start, handler.hits, confidence, more);
+                return handler.result;
             }
         } catch (IOException e) {
             log.error("SRU query failed: ", e);
-            return new Choices(true);
+            return Collections.EMPTY_LIST;
         } catch (ParserConfigurationException e) {
             log.warn("Failed parsing SRU result: ", e);
-            return new Choices(true);
+            return Collections.EMPTY_LIST;
         } catch (SAXException e) {
             log.warn("Failed parsing SRU result: ", e);
-            return new Choices(true);
+            return Collections.EMPTY_LIST;
         } finally {
             get.releaseConnection();
         }
-        return new Choices(true);
+        return Collections.EMPTY_LIST;
+    }
+
+    public boolean supports(String source) {
+        return StringUtils.equalsIgnoreCase(sourceIdentifier, source);
     }
 
     /**
@@ -212,13 +216,20 @@ public class LCNameAuthority implements ChoiceAuthority {
      */
     private static class SRUHandler
         extends DefaultHandler {
-        private List<Choice> result = new ArrayList<Choice>();
+        private String sourceIdentifier;
+        private List<ExternalDataObject> result = new ArrayList<ExternalDataObject>();
         private int hits = -1;
         private String textValue = null;
         private String name = null;
+        private String birthDate = null;
         private String lccn = null;
         private String lastTag = null;
         private String lastCode = null;
+
+        public SRUHandler(String sourceIdentifier) {
+            super();
+            this.sourceIdentifier = sourceIdentifier;
+        }
 
         // NOTE:  text value MAY be presented in multiple calls, even if
         // it all one word, so be ready to splice it together.
@@ -259,14 +270,30 @@ public class LCNameAuthority implements ChoiceAuthority {
                         name = name.substring(0, name.length() - 1);
                     }
 
-                    // XXX DEBUG
-                    // log.debug("Got result, name="+name+", lccn="+lccn);
-                    result.add(new Choice(lccn, name, name));
+                    ExternalDataObject externalDataObject = new ExternalDataObject(sourceIdentifier);
+                    externalDataObject.setDisplayValue(name);
+                    externalDataObject.setValue(name);
+                    externalDataObject.setId(lccn);
+                    String[] names = name.split(", ");
+                    String familyName = names[0];
+                    String givenName = names.length > 1 ? names[1] : null;
+                    if (StringUtils.isNotBlank(familyName)) {
+                        externalDataObject.addMetadata(new MockMetadataValue("person", "familyName", null, null, familyName));
+                    }
+                    if (StringUtils.isNotBlank(givenName)) {
+                        externalDataObject.addMetadata(new MockMetadataValue("person", "givenName", null, null, givenName));
+                    }
+                    if (StringUtils.isNotBlank(birthDate)) {
+                        externalDataObject.addMetadata(new MockMetadataValue("person", "date", "birth", null, birthDate));
+                    }
+                    externalDataObject.addMetadata(new MockMetadataValue("person", "identifier", "lccn", null, lccn));
+                    result.add(externalDataObject);
                 } else {
                     log.warn("Got anomalous result, at least one of these null: lccn=" + lccn + ", name=" + name);
                 }
                 name = null;
                 lccn = null;
+                birthDate = null;
             } else if (localName.equals("subfield") && namespaceURI.equals(NS_MX)) {
                 if (lastTag != null && lastCode != null) {
                     if (lastTag.equals("010") && lastCode.equals("a")) {
@@ -276,9 +303,8 @@ public class LCNameAuthority implements ChoiceAuthority {
                         // 100.a is the personal name
                         name = textValue;
                     }
-
-                    if (lastTag.equals("100") && lastCode.equals("d") && (name != null)) {
-                        name = name + "  " + textValue;
+                    if (lastTag.equals("100") && lastCode.equals("d")) {
+                        birthDate = textValue;
                     }
                 }
             }
