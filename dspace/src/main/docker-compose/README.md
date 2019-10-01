@@ -15,23 +15,23 @@
 - xmlui.xconf
   - Brings up the XMLUI Mirage2 theme by default.
 
-## To run a published DSpace image from your branch
+## To refresh / pull DSpace images from Dockerhub
+```
+docker-compose -f docker-compose.yml -f docker-compose-cli.yml pull
+```
+
+## To build DSpace images using code in your branch
+```
+docker-compose -f docker-compose.yml -f docker-compose-cli.yml build
+```
+
+## To run DSpace from your branch
 
 ```
 docker-compose -p d6 up -d
 ```
 
-## To build start DSpace from your branch
-```
-docker-compose -p d6 up --build -d
-```
-
 ## Ingesting test content
-
-Compile your local changes for the DSpace CLI container
-```
-docker-compose -p d6 -f docker-compose-cli.yml build
-```
 
 Create an admin account.  By default, the dspace-cli container runs the dspace command.
 ```
