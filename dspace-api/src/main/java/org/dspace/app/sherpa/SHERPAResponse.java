@@ -14,7 +14,9 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.XMLUtils;
+import org.dspace.external.provider.impl.SherpaJournalDataProvider;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -24,7 +26,7 @@ import org.w3c.dom.Element;
  * @author Andrea Bollini
  */
 public class SHERPAResponse {
-    private boolean error;
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(SHERPAResponse.class);
 
     private String message;
 
@@ -58,11 +60,6 @@ public class SHERPAResponse {
                                                                   "publishers");
 
             message = XMLUtils.getElementValue(headersElement, "message");
-
-            if (StringUtils.isNotBlank(message)) {
-                error = true;
-                return;
-            }
 
             license = XMLUtils.getElementValue(headersElement, "license");
             licenseURL = XMLUtils.getElementValue(headersElement, "licenseurl");
@@ -112,9 +109,8 @@ public class SHERPAResponse {
 
                     Element copyrightlinksElement = XMLUtils.getSingleElement(
                         publisherElement, "copyrightlinks");
-
                     publishers
-                        .add(new SHERPAPublisher(XMLUtils.getElementValue(
+                        .add(new SHERPAPublisher(publisherElement.getAttribute("id"), XMLUtils.getElementValue(
                             publisherElement, "name"),
                                                  XMLUtils.getElementValue(publisherElement,
                                                                           "alias"), XMLUtils.getElementValue(
@@ -162,17 +158,12 @@ public class SHERPAResponse {
                 }
             }
         } catch (Exception e) {
-            error = true;
+            log.error(e.getMessage(), e);
         }
     }
 
     public SHERPAResponse(String message) {
         this.message = message;
-        this.error = true;
-    }
-
-    public boolean isError() {
-        return error;
     }
 
     public String getMessage() {

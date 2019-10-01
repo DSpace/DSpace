@@ -38,6 +38,7 @@ import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
+import org.dspace.mock.MockMetadataValue;
 import org.jdom.Element;
 import org.jdom.Namespace;
 

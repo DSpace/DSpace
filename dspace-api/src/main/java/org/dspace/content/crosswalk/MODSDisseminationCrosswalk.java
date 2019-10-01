@@ -39,6 +39,7 @@ import org.dspace.core.Context;
 import org.dspace.core.SelfNamedPlugin;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
+import org.dspace.mock.MockMetadataValue;
 import org.jdom.Attribute;
 import org.jdom.Document;
 import org.jdom.Element;
