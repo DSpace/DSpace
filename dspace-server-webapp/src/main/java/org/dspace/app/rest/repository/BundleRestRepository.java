@@ -108,6 +108,16 @@ public class BundleRestRepository extends DSpaceObjectRestRepository<Bundle, Bun
         patchDSpaceObject(apiCategory, model, uuid, patch);
     }
 
+    /**
+     * Method to upload a bitstream to a bundle.
+     *
+     * @param context         The context
+     * @param bundle          The bundle where the bitstream should be stored
+     * @param fileName        The filename as it was uploaded
+     * @param fileInputStream The input stream used to create the bitstream
+     * @param properties      The properties to be assigned to the bitstream
+     * @return The uploaded bitstream
+     */
     public Bitstream uploadBitstream(Context context, Bundle bundle, String fileName, InputStream fileInputStream,
                                      String properties) {
         Item item = null;
