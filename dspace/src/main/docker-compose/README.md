@@ -42,18 +42,18 @@ docker-compose -p d7 up -d
 docker-compose -p d7 -f docker-compose.yml -f dspace/src/main/docker-compose/docker-compose-angular.yml up -d
 ```
 
-## Build and Run DSpace 7 REST and Angular from local branches
+## Run DSpace 7 REST and Angular from local branches
 
 _The system will be started in 2 steps. Each step shares the same docker network._
 
 From DSpace/DSpace
 ```
-docker-compose -p d7 up --build -d
+docker-compose -p d7 up -d
 ```
 
-From DSpace/DSpace-angular
+From DSpace/DSpace-angular (build as needed)
 ```
-docker-compose -p d7 up --build -d
+docker-compose -p d7 up -d
 ```
 
 ## Ingest Option 1: Ingesting test content from AIP files into a running DSpace 7 instance
@@ -73,10 +73,11 @@ docker-compose -p d7 -f docker-compose-cli.yml -f dspace/src/main/docker-compose
 ```
 
 ## Ingest Option 2: Ingest Entities Test Data
+_Remove your d7 volumes if you already ingested content into your docker volumes_
 
 Start DSpace REST with a postgres database dump downloaded from the internet.
 ```
-docker-compose -p d7 -f dspace/src/main/docker-compose/db.entities.yml up --build -d
+docker-compose -p d7 -f docker-compose.yml -f dspace/src/main/docker-compose/db.entities.yml up -d
 ```
 
 Download an assetstore from a tar file on the internet.
