@@ -166,15 +166,17 @@ public class BitstreamRestRepository extends DSpaceObjectRestRepository<Bitstrea
         return is;
     }
 
-    public Bundle performBitstreamMove(final Context context, final UUID uuid, final Bundle targetBundle)
+    /**
+     * Method that will move the bitsream corresponding to the uuid to the target bundle
+     *
+     * @param context      The context
+     * @param bitstream    The bitstream to be moved
+     * @param targetBundle The target bundle
+     * @return The target bundle with the bitstream attached
+     */
+    public Bundle performBitstreamMove(Context context, Bitstream bitstream, Bundle targetBundle)
             throws SQLException, IOException, AuthorizeException {
 
-        Bitstream bitstream = bs.find(context, uuid);
-
-
-        if (bitstream == null) {
-            throw new ResourceNotFoundException("Bitstream with id: " + uuid + " not found");
-        }
         if (bitstream.getBundles().contains(targetBundle)) {
             throw new DSpaceBadRequestException("The provided bitstream is already in the target bundle");
         }
@@ -195,6 +197,15 @@ public class BitstreamRestRepository extends DSpaceObjectRestRepository<Bitstrea
         return targetBundle;
     }
 
+    /**
+     * Verifies if the context (user) has sufficient rights to the bundles in order to move a bitstream
+     *
+     * @param context      The context
+     * @param bundles      The current bundles in which the bitstream resides
+     * @param targetBundle The target bundle
+     * @return true when the context has sufficient rights
+     * @throws AuthorizeException When one of the necessary rights is not present
+     */
     private boolean hasSufficientMovePermissions(final Context context, final List<Bundle> bundles,
                                                  final Bundle targetBundle) throws SQLException, AuthorizeException {
         for (Bundle bundle : bundles) {

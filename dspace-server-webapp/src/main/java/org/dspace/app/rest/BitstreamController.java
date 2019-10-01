@@ -140,7 +140,12 @@ public class BitstreamController {
                                                            "or the data cannot be resolved to a bundle.");
         }
 
-        Bundle targetBundle = bitstreamRestRepository.performBitstreamMove(context, uuid, (Bundle) dsoList.get(0));
+        Bitstream bitstream = bitstreamService.find(context, uuid);
+        if (bitstream == null) {
+            throw new ResourceNotFoundException("Bitstream with id: " + uuid + " not found");
+        }
+
+        Bundle targetBundle = bitstreamRestRepository.performBitstreamMove(context, bitstream, (Bundle) dsoList.get(0));
 
         if (targetBundle == null) {
             return null;

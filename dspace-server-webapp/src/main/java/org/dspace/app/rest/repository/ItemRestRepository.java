@@ -255,6 +255,14 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
         return dsoConverter.fromModel(item);
     }
 
+    /**
+     * Method to add a bundle to an item
+     *
+     * @param context    The context
+     * @param item       The item to which the bundle has to be added
+     * @param bundleRest The bundleRest that needs to be added to the item
+     * @return The added bundle
+     */
     public Bundle addBundleToItem(Context context, Item item, BundleRest bundleRest)
             throws SQLException, AuthorizeException {
         if (item.getBundles(bundleRest.getName()).size() > 0) {
