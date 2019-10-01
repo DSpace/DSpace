@@ -67,6 +67,9 @@ public class RelationshipTypeDAOImplTest extends AbstractIntegrationTest {
     protected RelationshipService relationshipService = ContentServiceFactory.getInstance().getRelationshipService();
     protected EntityTypeService entityTypeService = ContentServiceFactory.getInstance().getEntityTypeService();
 
+    /**
+     * Initalize DSpace objects used for testing for each test
+     */
     @Before
     @Override
     public void init() {
@@ -97,6 +100,9 @@ public class RelationshipTypeDAOImplTest extends AbstractIntegrationTest {
         }
     }
 
+    /**
+     * Delete all initalized DSpace objects after each test
+     */
     @After
     @Override
     public void destroy() {
@@ -117,21 +123,39 @@ public class RelationshipTypeDAOImplTest extends AbstractIntegrationTest {
 
     }
 
+    /**
+     * Test findbyTypesAndLabels should return our defined RelationshipType given our test Entities entityTypeTwo and
+     * entityTypeOne with the affiliated labels isAuthorOfPublication and isPublicationOfAuthor
+     *
+     * @throws Exception
+     */
     @Test
     public void testFindByTypesAndLabels() throws Exception {
-        assertEquals("TestFindByItem 0", relationshipType, relationshipTypeService.findbyTypesAndLabels(context,
-                entityTypeTwo, entityTypeOne, "isAuthorOfPublication", "isPublicationOfAuthor"));
+        assertEquals("TestFindbyTypesAndLabels 0", relationshipType, relationshipTypeService
+                .findbyTypesAndLabels(context, entityTypeTwo, entityTypeOne, "isAuthorOfPublication",
+                        "isPublicationOfAuthor"));
     }
 
+    /**
+     * Test findByLeftOrRightLabel should return our defined relationshipTypeList given one of our affiliated labels
+     *
+     * @throws Exception
+     */
     @Test
     public void testFindByLeftOrRightLabel() throws Exception {
-        assertEquals("TestFindByItem 0", relationshipTypeList, relationshipTypeService.findByLeftOrRightLabel(context,
-                "isAuthorOfPublication", -1, -1));
+        assertEquals("TestFindByLeftOrRightLabel 0", relationshipTypeList, relationshipTypeService.
+                findByLeftOrRightLabel(context, "isAuthorOfPublication", -1, -1));
     }
 
+    /**
+     * Test findByEntityType should return our defined relationshipsList given one our defined EntityTypes
+     * entityTypeOne
+     *
+     * @throws Exception
+     */
     @Test
     public void testFindByEntityType() throws Exception {
-        assertEquals("TestFindByItem 0", relationshipTypeList, relationshipTypeService.findByEntityType(context,
+        assertEquals("TestFindByEntityType 0", relationshipTypeList, relationshipTypeService.findByEntityType(context,
                 entityTypeOne));
     }
 }

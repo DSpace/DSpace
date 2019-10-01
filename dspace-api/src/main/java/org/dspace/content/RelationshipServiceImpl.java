@@ -379,7 +379,7 @@ public class RelationshipServiceImpl implements RelationshipService {
     private boolean checkMinCardinality(Context context, Item item,
                                         Relationship relationship,
                                         Integer minCardinality, boolean isLeft) throws SQLException {
-        List<Relationship> list = this.findByItemAndRelationshipType(context,item,relationship.getRelationshipType(),
+        List<Relationship> list = this.findByItemAndRelationshipType(context, item, relationship.getRelationshipType(),
                                                                      -1, -1, isLeft);
         if (minCardinality != null && !(list.size() > minCardinality)) {
             return false;
@@ -390,7 +390,7 @@ public class RelationshipServiceImpl implements RelationshipService {
     public List<Relationship> findByItemAndRelationshipType(Context context, Item item,
                                                             RelationshipType relationshipType, boolean isLeft)
         throws SQLException {
-        List<Relationship> list = this.findByItemAndRelationshipType(context,item,relationshipType,-1,-1,isLeft);
+        List<Relationship> list = this.findByItemAndRelationshipType(context, item, relationshipType, -1, -1, isLeft);
         return list;
     }
 
@@ -399,7 +399,7 @@ public class RelationshipServiceImpl implements RelationshipService {
                                                             RelationshipType relationshipType)
         throws SQLException {
         List<Relationship> list = relationshipDAO.
-                findByItemAndRelationshipType(context,relationshipType,-1,-1,item);
+                findByItemAndRelationshipType(context, relationshipType, -1, -1, item);
         return list;
     }
 
@@ -408,7 +408,7 @@ public class RelationshipServiceImpl implements RelationshipService {
                                                             RelationshipType relationshipType, int limit, int offset)
             throws SQLException {
         List<Relationship> list = relationshipDAO.
-                findByItemAndRelationshipType(context,relationshipType,limit,offset,item);
+                findByItemAndRelationshipType(context, relationshipType, limit, offset, item);
         return list;
     }
 
@@ -418,7 +418,7 @@ public class RelationshipServiceImpl implements RelationshipService {
                                                             boolean isLeft)
             throws SQLException {
         List<Relationship> list = relationshipDAO.
-                findByItemAndRelationshipType(context,relationshipType,limit,offset,item);
+                findByItemAndRelationshipType(context, relationshipType, limit, offset, item);
         return list;
     }
 

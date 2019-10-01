@@ -71,6 +71,9 @@ public class RelationshipDAOImplTest extends AbstractIntegrationTest {
     protected RelationshipService relationshipService = ContentServiceFactory.getInstance().getRelationshipService();
     protected EntityTypeService entityTypeService = ContentServiceFactory.getInstance().getEntityTypeService();
 
+    /**
+     * Initalize DSpace objects used for testing for each test
+     */
     @Before
     @Override
     public void init() {
@@ -102,6 +105,9 @@ public class RelationshipDAOImplTest extends AbstractIntegrationTest {
         }
     }
 
+    /**
+     * Delete all initalized DSpace objects after each test
+     */
     @After
     @Override
     public void destroy() {
@@ -121,29 +127,56 @@ public class RelationshipDAOImplTest extends AbstractIntegrationTest {
 
     }
 
+    /**
+     * Test findItem should return our defined relationshipsList given our test Item itemOne.
+     *
+     * @throws Exception
+     */
     @Test
     public void testFindByItem() throws Exception {
         assertEquals("TestFindByItem 0", relationshipsList, relationshipService.findByItem(context, itemOne, -1, -1));
     }
 
+    /**
+     * Test findLeftPlaceByLeftItem should return 0 given our test left Item itemOne.
+     *
+     * @throws Exception
+     */
     @Test
     public void testFindLeftPlaceByLeftItem() throws Exception {
         assertEquals("TestLeftPlaceByLeftItem 0", 0, relationshipService.findLeftPlaceByLeftItem(context,
                 itemOne));
     }
 
+    /**
+     * Test findRightPlaceByRightItem should return 0 given our test right Item itemTwo.
+     *
+     * @throws Exception
+     */
     @Test
     public void testFindRightPlaceByRightItem() throws Exception {
         assertEquals("TestRightPlaceByRightItem 0", 0, relationshipService.findRightPlaceByRightItem(context,
                 itemTwo));
     }
 
+    /**
+     * Test findByRelationshipType should return our defined relationshipsList given our test RelationshipType
+     * relationshipType
+     *
+     * @throws Exception
+     */
     @Test
     public void testFindByRelationshipType() throws Exception {
         assertEquals("TestByRelationshipType 0", relationshipsList, relationshipService.findByRelationshipType(context,
                 relationshipType));
     }
 
+    /**
+     * Test countTotal should return our defined relationshipsList's size given our test Context
+     * context
+     *
+     * @throws Exception
+     */
     @Test
     public void testCountRows() throws Exception {
         assertEquals("TestByRelationshipType 0", relationshipsList.size(), relationshipService.countTotal(context));

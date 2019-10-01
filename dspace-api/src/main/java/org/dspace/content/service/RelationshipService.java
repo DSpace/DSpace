@@ -30,7 +30,7 @@ public interface RelationshipService extends DSpaceCRUDService<Relationship> {
      * @return          The list of relationships for which each relationship adheres to the above listed constraint
      * @throws SQLException If something goes wrong
      */
-    public List<Relationship> findByItem(Context context,Item item) throws SQLException;
+    public List<Relationship> findByItem(Context context, Item item) throws SQLException;
 
     /**
      * Retrieves the list of Relationships currently in the system for which the given Item is either
@@ -257,7 +257,7 @@ public interface RelationshipService extends DSpaceCRUDService<Relationship> {
      *                  right item that is equal to the given item
      * @throws SQLException If something goes wrong
      */
-    int countByItem(Context context,Item item) throws SQLException;
+    int countByItem(Context context, Item item) throws SQLException;
 
     /**
      * Count total number of relationships (rows in relationship table) by a relationship type

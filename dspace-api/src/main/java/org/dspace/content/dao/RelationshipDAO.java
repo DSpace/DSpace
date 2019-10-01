@@ -34,7 +34,7 @@ public interface RelationshipDAO extends GenericDAO<Relationship> {
      *                  right item that is equal to the given item
      * @throws SQLException If something goes wrong
      */
-    List<Relationship> findByItem(Context context,Item item) throws SQLException;
+    List<Relationship> findByItem(Context context, Item item) throws SQLException;
 
     /**
      * This method returns a list of Relationship objects that have the given Item object
@@ -59,7 +59,7 @@ public interface RelationshipDAO extends GenericDAO<Relationship> {
      *                  that have the given item as leftItem
      * @throws SQLException If something goes wrong
      */
-    int findLeftPlaceByLeftItem(Context context,Item item) throws SQLException;
+    int findLeftPlaceByLeftItem(Context context, Item item) throws SQLException;
 
     /**
      * This method returns the highest rightplace integer for all the relationships where this
@@ -70,7 +70,7 @@ public interface RelationshipDAO extends GenericDAO<Relationship> {
      *                  that have the given item as rightItem
      * @throws SQLException If something goes wrong
      */
-    int findRightPlaceByRightItem(Context context,Item item) throws SQLException;
+    int findRightPlaceByRightItem(Context context, Item item) throws SQLException;
 
     /**
      * This method returns a list of Relationship objects for the given RelationshipType object.
@@ -162,7 +162,7 @@ public interface RelationshipDAO extends GenericDAO<Relationship> {
      *                  right item that is equal to the given item
      * @throws SQLException If something goes wrong
      */
-    int countByItem(Context context,Item item) throws SQLException;
+    int countByItem(Context context, Item item) throws SQLException;
 
     /**
      * Count total number of relationships (rows in relationship table) by an item and a relationship type
