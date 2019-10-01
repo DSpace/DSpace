@@ -30,4 +30,4 @@ services:
     stdin_open: true
     tty: true
     volumes:
-    - ./environment.dev.js:/app/config/environment.dev.js
+    - ./dspace/src/main/docker-compose/environment.dev.js:/app/config/environment.dev.js
