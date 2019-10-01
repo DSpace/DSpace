@@ -54,13 +54,13 @@ public interface RelationshipTypeDAO extends GenericDAO<RelationshipType> {
      * This method will return a list of RelationshipType objects for which the given label is equal to
      * either the leftLabel or rightLabel.
      * @param context   The relevant DSpace context
-     * @param label     The label that will be used to check on
+     * @param type     The label that will be used to check on
      * @param limit     paging limit
      * @param offset    paging offset
      * @return A list of RelationshipType objects that have the given label as either the leftLabel or rightLabel
      * @throws SQLException If something goes wrong
      */
-    List<RelationshipType> findByLeftwardOrRightwardTypeName(Context context, String label, Integer limit, Integer offset)
+    List<RelationshipType> findByLeftwardOrRightwardTypeName(Context context, String type, Integer limit, Integer offset)
             throws SQLException;
 
     /**
