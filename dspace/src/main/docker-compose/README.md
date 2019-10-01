@@ -1,5 +1,13 @@
 # Docker Compose Resources
 
+## Root directory
+- docker-compose.yml
+  - Docker compose file to orchestrate DSpace 6 components
+- docker-compose-cli
+  - Docker compose file to run DSpace CLI tasks within a running DSpace instance in Docker
+
+## dspace/src/main/docker-compose
+
 - cli.ingest.yml
   - Docker compose file that will run an AIP ingest into DSpace 6.
 - local.cfg
