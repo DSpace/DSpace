@@ -21,31 +21,25 @@
 - environment.dev.js
   - Default angular environment when testing DSpace-angular from this repo
 
-## Run DSpace 7 REST from a published Image
+## To refresh / pull DSpace images from Dockerhub
+```
+docker-compose -f docker-compose.yml -f docker-compose-cli.yml pull
+```
+
+## To build DSpace images using code in your branch
+```
+docker-compose -f docker-compose.yml -f docker-compose-cli.yml build
+```
+
+## Run DSpace 7 REST from your current branch
 ```
 docker-compose -p d7 up -d
 ```
 
-## Build and Run DSpace 7 REST from your current branch
-```
-docker-compose -p d7 up -d --build
-```
-
-## Build DSpace 7 CLI from your current branch (this is used for ingest tasks)
-```
-docker-compose -p d7 -f docker-compose-cli.yml build
-```
-
-## Run DSpace 7 REST and Angular using published images
+## Run DSpace 7 REST and Angular from your branch
 
 ```
 docker-compose -p d7 -f docker-compose.yml -f dspace/src/main/docker-compose/docker-compose-angular.yml up -d
-```
-
-## Build and Run DSpace 7 REST from the current branch along with a published image for DSpace Angular
-
-```
-docker-compose -p d7 -f docker-compose.yml -f dspace/src/main/docker-compose/docker-compose-angular.yml up -d --build
 ```
 
 ## Build and Run DSpace 7 REST and Angular from local branches
