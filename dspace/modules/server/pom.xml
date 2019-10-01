@@ -104,6 +104,17 @@ just adding new jar in the classloader</description>
             <artifactId>dspace-server-webapp</artifactId>
             <type>war</type>
         </dependency>
+        <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-server-webapp</artifactId>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
 </project>

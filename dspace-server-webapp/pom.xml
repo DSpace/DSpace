@@ -150,6 +150,40 @@
         </profile>
     </profiles>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <configuration>
+                    <attachClasses>true</attachClasses>
+                    <!-- In version 2.1-alpha-1, this was incorrectly named warSourceExcludes -->
+                    <packagingExcludes>WEB-INF/lib/*.jar</packagingExcludes>
+                    <warSourceExcludes>WEB-INF/lib/*.jar</warSourceExcludes>
+                    <!-- Filter the web.xml (needed for IDE compatibility/debugging) -->
+                    <filteringDeploymentDescriptors>true</filteringDeploymentDescriptors>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>prepare-package</phase>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.2</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>test-jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
     <dependencyManagement>
         <dependencies>
             <dependency>
