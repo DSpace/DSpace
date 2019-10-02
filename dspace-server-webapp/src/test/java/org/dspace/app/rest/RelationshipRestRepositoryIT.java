@@ -2158,6 +2158,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         Relationship relationship3 = RelationshipBuilder
             .createRelationshipBuilder(context, publication1, author1, isAuthorOfPublicationRelationshipType).build();
 
+        context.restoreAuthSystemState();
         // Perform a GET request to the searchByLabel endpoint, asking for Relationships of type isOrgUnitOfPerson
         // With an extra parameter namely DSO which resolves to the author(Smith, Donald) in the first
         // relationship created.

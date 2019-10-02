@@ -11,6 +11,10 @@ import java.util.List;
 
 import org.dspace.content.virtual.VirtualMetadataPopulator;
 
+/**
+ * Interface used for the {@link RelationshipMetadataServiceImpl}
+ * This will define methods regarding the RelationshipMetadata
+ */
 public interface RelationshipMetadataService {
 
     /**
