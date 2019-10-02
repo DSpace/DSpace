@@ -53,7 +53,7 @@ docker-compose -p d7 up -d
 
 From DSpace/DSpace-angular (build as needed)
 ```
-docker-compose -p d7 up -d
+docker-compose -p d7 -f docker/docker-compose.yml up -d
 ```
 
 ## Ingest Option 1: Ingesting test content from AIP files into a running DSpace 7 instance
