@@ -64,12 +64,12 @@ Prerequisites
 
 Create an admin account.  By default, the dspace-cli container runs the dspace command.
 ```
-docker-compose -p d7 -f docker-compose-cli.yml run dspace-cli create-administrator -e test@test.edu -f admin -l user -p admin -c en
+docker-compose -p d7 -f docker-compose-cli.yml run --rm dspace-cli create-administrator -e test@test.edu -f admin -l user -p admin -c en
 ```
 
 Download a Zip file of AIP content and ingest test data
 ```
-docker-compose -p d7 -f docker-compose-cli.yml -f dspace/src/main/docker-compose/cli.ingest.yml run dspace-cli
+docker-compose -p d7 -f docker-compose-cli.yml -f dspace/src/main/docker-compose/cli.ingest.yml run --rm dspace-cli
 ```
 
 ## Ingest Option 2: Ingest Entities Test Data
