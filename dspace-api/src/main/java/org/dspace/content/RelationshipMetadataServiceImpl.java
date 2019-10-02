@@ -268,6 +268,8 @@ public class RelationshipMetadataServiceImpl implements RelationshipMetadataServ
     }
 
 
+    // This method will create the Relationship Metadatavalue that describes the relationship type and has the ID
+    // of the other item as value
     private RelationshipMetadataValue getRelationMetadataFromOtherItem(Context context, Item otherItem,
                                                                        String relationName,
                                                                        Integer relationshipId, int place) {

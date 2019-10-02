@@ -113,6 +113,9 @@ public class RelationshipMetadataServiceTest extends AbstractUnitTest {
                     null, null, null, null);
 
         Relationship relationship = relationshipService.create(context, item, authorItem, isAuthorOfPublication, 0, 0);
+
+        context.restoreAuthSystemState();
+
         List<MetadataValue> authorList = itemService.getMetadata(item, "dc", "contributor", "author", Item.ANY);
         assertThat(authorList.size(), equalTo(1));
         assertThat(authorList.get(0).getValue(), equalTo("familyName, firstName"));
@@ -135,6 +138,5 @@ public class RelationshipMetadataServiceTest extends AbstractUnitTest {
         assertThat(list.get(1).getMetadataField().getElement(), equalTo("isAuthorOfPublication"));
         assertThat(list.get(1).getAuthority(), equalTo("virtual::" + relationship.getID()));
 
-        context.restoreAuthSystemState();
     }
 }
