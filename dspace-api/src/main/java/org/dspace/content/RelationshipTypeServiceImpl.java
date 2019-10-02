@@ -48,8 +48,8 @@ public class RelationshipTypeServiceImpl implements RelationshipTypeService {
 
     @Override
     public RelationshipType findbyTypesAndLabels(Context context,EntityType leftType,EntityType rightType,
-                                                 String leftLabel,String rightLabel) throws SQLException {
-        return relationshipTypeDAO.findByTypesAndLabels(context, leftType, rightType, leftLabel, rightLabel);
+                                                 String leftwardType,String rightwardType) throws SQLException {
+        return relationshipTypeDAO.findByTypesAndLabels(context, leftType, rightType, leftwardType, rightwardType);
     }
 
     @Override
@@ -58,8 +58,8 @@ public class RelationshipTypeServiceImpl implements RelationshipTypeService {
     }
 
     @Override
-    public List<RelationshipType> findByLeftOrRightLabel(Context context, String label) throws SQLException {
-        return relationshipTypeDAO.findByLeftOrRightLabel(context, label);
+    public List<RelationshipType> findByLeftwardOrRightwardTypeName(Context context, String label) throws SQLException {
+        return relationshipTypeDAO.findByLeftwardOrRightwardTypeName(context, label);
     }
 
     @Override
@@ -69,15 +69,15 @@ public class RelationshipTypeServiceImpl implements RelationshipTypeService {
 
     @Override
     public RelationshipType create(Context context, EntityType leftEntityType, EntityType rightEntityType,
-                                   String leftLabel, String rightLabel, Integer leftCardinalityMinInteger,
+                                   String leftwardType, String rightwardType, Integer leftCardinalityMinInteger,
                                    Integer leftCardinalityMaxInteger, Integer rightCardinalityMinInteger,
                                    Integer rightCardinalityMaxInteger)
         throws SQLException, AuthorizeException {
         RelationshipType relationshipType = new RelationshipType();
         relationshipType.setLeftType(leftEntityType);
         relationshipType.setRightType(rightEntityType);
-        relationshipType.setLeftLabel(leftLabel);
-        relationshipType.setRightLabel(rightLabel);
+        relationshipType.setLeftwardType(leftwardType);
+        relationshipType.setRightwardType(rightwardType);
         relationshipType.setLeftMinCardinality(leftCardinalityMinInteger);
         relationshipType.setLeftMaxCardinality(leftCardinalityMaxInteger);
         relationshipType.setRightMinCardinality(rightCardinalityMinInteger);
