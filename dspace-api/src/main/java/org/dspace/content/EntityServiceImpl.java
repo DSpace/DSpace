@@ -83,8 +83,8 @@ public class EntityServiceImpl implements EntityService {
         List<Relationship> relationshipList = relationshipService.findAll(context);
         for (Relationship relationship : relationshipList) {
             RelationshipType relationshipType = relationship.getRelationshipType();
-            if (StringUtils.equals(relationshipType.getLeftLabel(),label) ||
-                StringUtils.equals(relationshipType.getRightLabel(),label)) {
+            if (StringUtils.equals(relationshipType.getLeftwardType(),label) ||
+                StringUtils.equals(relationshipType.getRightwardType(),label)) {
                 listToReturn.add(relationship);
             }
         }
@@ -129,11 +129,11 @@ public class EntityServiceImpl implements EntityService {
     }
 
     @Override
-    public List<RelationshipType> getRelationshipTypesByLabel(Context context, String label) throws SQLException {
+    public List<RelationshipType> getRelationshipTypesByTypeName(Context context, String label) throws SQLException {
         List<RelationshipType> listToReturn = new LinkedList<>();
         for (RelationshipType relationshipType : relationshipTypeService.findAll(context)) {
-            if (StringUtils.equals(relationshipType.getLeftLabel(),label) ||
-                StringUtils.equals(relationshipType.getRightLabel(),label)) {
+            if (StringUtils.equals(relationshipType.getLeftwardType(),label) ||
+                StringUtils.equals(relationshipType.getRightwardType(),label)) {
                 listToReturn.add(relationshipType);
             }
         }
