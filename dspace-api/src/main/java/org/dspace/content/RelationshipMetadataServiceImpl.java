@@ -211,6 +211,8 @@ public class RelationshipMetadataServiceImpl implements RelationshipMetadataServ
         return resultingMetadataValueList;
     }
 
+    //This method will construct a RelationshipMetadataValue object with proper schema, element, qualifier,
+    //authority, item, place and useForPlace based on the key String parameter passed along to it
     private RelationshipMetadataValue constructRelationshipMetadataValue(Context context, Item item,
                                                                          Integer relationshipId, int place,
                                                                          String key,
@@ -257,6 +259,7 @@ public class RelationshipMetadataServiceImpl implements RelationshipMetadataServ
     }
 
 
+    //This method will update a RelationshipMetadataValue object with authority info and relation to the item
     private RelationshipMetadataValue constructResultingMetadataValue(Item item, String value,
                                                                       RelationshipMetadataValue metadataValue,
                                                                       Integer relationshipId) {
