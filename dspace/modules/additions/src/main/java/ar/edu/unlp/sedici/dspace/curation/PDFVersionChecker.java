@@ -79,7 +79,7 @@ public class PDFVersionChecker extends AbstractCurationTask {
 	}
 
 	private void reportOldPDFVersion(float pdfVersion, Bitstream bitstream, String itemHandle, StringBuilder reporter) {
-		String errorMsge = "PDF version not allowed: " + pdfVersion;
+		String errorMsge = "PDF version not allowed " + pdfVersion;
 		reportError(errorMsge, bitstream, itemHandle, reporter);
 	}
 
@@ -99,12 +99,12 @@ public class PDFVersionChecker extends AbstractCurationTask {
 	private void reportError(String errorMessage, Bitstream bitstream, String itemHandle, StringBuilder reporter) {
 		reporter.append("- ERROR: ");
 		reporter.append(errorMessage);
-		reporter.append(". Item #");
+		reporter.append(", Item:\"");
 		reporter.append(itemHandle);
-		reporter.append("#. Bitstream with id #");
+		reporter.append("\", Bitstream id:\"");
 		reporter.append(bitstream.getID());
-		reporter.append("# and name #");
+		reporter.append("\", Bitstream:\"");
 		reporter.append(bitstream.getDescription());
-		reporter.append("#\n");
+		reporter.append("\"\n");
 	}
 }
