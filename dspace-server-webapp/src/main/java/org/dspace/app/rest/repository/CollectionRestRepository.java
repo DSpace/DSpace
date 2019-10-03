@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.CollectionConverter;
@@ -32,8 +33,10 @@ import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.repository.patch.DSpaceObjectPatch;
 import org.dspace.app.rest.utils.CollectionRestEqualityUtils;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.core.Constants;
@@ -46,6 +49,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * This is the repository responsible to manage Item Rest object
@@ -56,7 +60,8 @@ import org.springframework.stereotype.Component;
 @Component(CollectionRest.CATEGORY + "." + CollectionRest.NAME)
 public class CollectionRestRepository extends DSpaceObjectRestRepository<Collection, CollectionRest> {
 
-    private final CollectionService cs;
+    private static final Logger log = org.apache.logging.log4j.LogManager
+            .getLogger(CollectionRestRepository.class);
 
     @Autowired
     CommunityService communityService;
@@ -70,11 +75,15 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
     @Autowired
     CollectionRestEqualityUtils collectionRestEqualityUtils;
 
+    @Autowired
+    private CollectionService cs;
+
+    @Autowired
+    private BitstreamService bitstreamService;
 
     public CollectionRestRepository(CollectionService dsoService,
                                     CollectionConverter dsoConverter) {
         super(dsoService, dsoConverter, new DSpaceObjectPatch<CollectionRest>() {});
-        this.cs = dsoService;
     }
 
     @Override
@@ -260,5 +269,48 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
         } catch (IOException e) {
             throw new RuntimeException("Unable to delete collection because the logo couldn't be deleted", e);
         }
+    }
+
+    public Bitstream createLogo(Context context, UUID uuid, MultipartFile uploadfile)
+            throws IOException, AuthorizeException, SQLException {
+
+        Collection collection = null;
+        try {
+            collection = cs.find(context, uuid);
+        } catch (SQLException e) {
+            log.error("Something went wrong trying to find the collection with uuid: " + uuid, e);
+        }
+
+        if (collection == null) {
+            throw new ResourceNotFoundException(
+                    "The given uuid did not resolve to a collection on the server: " + uuid);
+        }
+
+        if (collection.getLogo() != null) {
+            throw new UnprocessableEntityException("The collection with the given uuid already has a logo: " + uuid);
+        }
+
+        Bitstream bitstream = cs.setLogo(context, collection, uploadfile.getInputStream());
+        cs.update(context, collection);
+        bitstreamService.update(context, bitstream);
+        context.complete();
+
+        return bitstream;
+    }
+
+    public Bitstream getLogo(Context context, UUID uuid) {
+        Collection collection = null;
+        try {
+            collection = cs.find(context, uuid);
+        } catch (SQLException e) {
+            log.error("Something went wrong trying to find the collection with uuid: " + uuid, e);
+        }
+
+        if (collection == null) {
+            throw new ResourceNotFoundException(
+                    "The given uuid did not resolve to a collection on the server: " + uuid);
+        }
+
+        return collection.getLogo();
     }
 }

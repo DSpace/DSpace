@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.CommunityConverter;
@@ -31,7 +32,9 @@ import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.repository.patch.DSpaceObjectPatch;
 import org.dspace.app.rest.utils.CommunityRestEqualityUtils;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.Bitstream;
 import org.dspace.content.Community;
+import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.core.Context;
 import org.dspace.util.UUIDUtils;
@@ -42,6 +45,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * This is the repository responsible to manage Community Rest object
@@ -52,7 +56,8 @@ import org.springframework.stereotype.Component;
 @Component(CommunityRest.CATEGORY + "." + CommunityRest.NAME)
 public class CommunityRestRepository extends DSpaceObjectRestRepository<Community, CommunityRest> {
 
-    private final CommunityService cs;
+    private static final Logger log = org.apache.logging.log4j.LogManager
+            .getLogger(CommunityRestRepository.class);
 
     @Autowired
     CommunityConverter converter;
@@ -63,10 +68,15 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
     @Autowired
     CommunityRestEqualityUtils communityRestEqualityUtils;
 
+    @Autowired
+    private CommunityService cs;
+
+    @Autowired
+    private BitstreamService bitstreamService;
+
     public CommunityRestRepository(CommunityService dsoService,
                                    CommunityConverter dsoConverter) {
         super(dsoService, dsoConverter, new DSpaceObjectPatch<CommunityRest>() {});
-        this.cs = dsoService;
     }
 
     @Override
@@ -241,5 +251,46 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
         } catch (IOException e) {
             throw new RuntimeException("Unable to delete community because the logo couldn't be deleted", e);
         }
+    }
+
+    public Bitstream createLogo(Context context, UUID uuid, MultipartFile uploadfile)
+            throws IOException, AuthorizeException, SQLException {
+
+        Community community = null;
+        try {
+            community = cs.find(context, uuid);
+        } catch (SQLException e) {
+            log.error("Something went wrong trying to find the community with uuid: " + uuid, e);
+        }
+
+        if (community == null) {
+            throw new ResourceNotFoundException("The given uuid did not resolve to a community on the server: " + uuid);
+        }
+
+        if (community.getLogo() != null) {
+            throw new UnprocessableEntityException("The community with the given uuid already has a logo: " + uuid);
+        }
+
+        Bitstream bitstream = cs.setLogo(context, community, uploadfile.getInputStream());
+        cs.update(context, community);
+        bitstreamService.update(context, bitstream);
+        context.complete();
+
+        return bitstream;
+    }
+
+    public Bitstream getLogo(Context context, UUID uuid) {
+        Community community = null;
+        try {
+            community = cs.find(context, uuid);
+        } catch (SQLException e) {
+            log.error("Something went wrong trying to find the community with uuid: " + uuid, e);
+        }
+
+        if (community == null) {
+            throw new ResourceNotFoundException("The given uuid did not resolve to a community on the server: " + uuid);
+        }
+
+        return community.getLogo();
     }
 }
