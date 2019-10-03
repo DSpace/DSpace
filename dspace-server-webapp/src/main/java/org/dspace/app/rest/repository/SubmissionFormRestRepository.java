@@ -63,7 +63,7 @@ public class SubmissionFormRestRepository extends DSpaceRestRepository<Submissio
         List<DCInputSet> subConfs = new ArrayList<DCInputSet>();
         int total = inputReader.countInputs();
         try {
-            subConfs = inputReader.getAllInputs(pageable.getPageSize(), pageable.getOffset());
+            subConfs = inputReader.getAllInputs(pageable.getPageSize(), Math.toIntExact(pageable.getOffset()));
         } catch (DCInputsReaderException e) {
             throw new IllegalStateException(e.getMessage(), e);
         }

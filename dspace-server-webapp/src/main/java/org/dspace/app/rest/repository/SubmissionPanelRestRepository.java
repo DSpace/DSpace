@@ -59,7 +59,7 @@ public class SubmissionPanelRestRepository extends DSpaceRestRepository<Submissi
     @Override
     public Page<SubmissionSectionRest> findAll(Context context, Pageable pageable) {
         List<SubmissionConfig> subConfs = new ArrayList<SubmissionConfig>();
-        subConfs = submissionConfigReader.getAllSubmissionConfigs(pageable.getPageSize(), pageable.getOffset());
+        subConfs = submissionConfigReader.getAllSubmissionConfigs(pageable.getPageSize(), Math.toIntExact(pageable.getOffset()));
         int total = 0;
         List<SubmissionStepConfig> stepConfs = new ArrayList<>();
         for (SubmissionConfig config : subConfs) {

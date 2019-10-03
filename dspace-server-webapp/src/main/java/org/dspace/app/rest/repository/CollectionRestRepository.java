@@ -99,7 +99,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
         int total = 0;
         try {
             total = cs.countTotal(context);
-            it = cs.findAll(context, pageable.getPageSize(), pageable.getOffset());
+            it = cs.findAll(context, pageable.getPageSize(), Math.toIntExact(pageable.getOffset()));
             for (Collection c : it) {
                 collections.add(c);
             }

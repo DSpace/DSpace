@@ -134,7 +134,7 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
         int total = 0;
         try {
             total = cs.countTotal(context);
-            it = cs.findAll(context, pageable.getPageSize(), pageable.getOffset());
+            it = cs.findAll(context, pageable.getPageSize(), Math.toIntExact(pageable.getOffset()));
             for (Community c : it) {
                 communities.add(c);
             }
