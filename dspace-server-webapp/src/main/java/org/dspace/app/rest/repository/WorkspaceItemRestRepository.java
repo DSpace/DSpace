@@ -134,7 +134,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
         int total = 0;
         try {
             total = wis.countTotal(context);
-            witems = wis.findAll(context, pageable.getPageSize(), pageable.getOffset());
+            witems = wis.findAll(context, pageable.getPageSize(), Math.toIntExact(pageable.getOffset()));
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -151,7 +151,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
         try {
             Context context = obtainContext();
             EPerson ep = epersonService.find(context, submitterID);
-            witems = wis.findByEPerson(context, ep, pageable.getPageSize(), pageable.getOffset());
+            witems = wis.findByEPerson(context, ep, pageable.getPageSize(), Math.toIntExact(pageable.getOffset()));
             total = wis.countByEPerson(context, ep);
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);

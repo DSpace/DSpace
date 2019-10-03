@@ -104,7 +104,7 @@ public class GroupRestRepository extends DSpaceObjectRestRepository<Group, Group
         int total = 0;
         try {
             total = gs.countTotal(context);
-            groups = gs.findAll(context, null, pageable.getPageSize(), pageable.getOffset());
+            groups = gs.findAll(context, null, pageable.getPageSize(), Math.toIntExact(pageable.getOffset()));
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }

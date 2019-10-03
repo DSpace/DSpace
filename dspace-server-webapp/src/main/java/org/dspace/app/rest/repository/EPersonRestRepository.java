@@ -126,7 +126,7 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
                         "The EPerson collection endpoint is reserved to system administrators");
             }
             total = es.countTotal(context);
-            epersons = es.findAll(context, EPerson.EMAIL, pageable.getPageSize(), pageable.getOffset());
+            epersons = es.findAll(context, EPerson.EMAIL, pageable.getPageSize(), Math.toIntExact(pageable.getOffset()));
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -151,7 +151,7 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
         int total = 0;
         try {
             Context context = obtainContext();
-            epersons = es.search(context, q, pageable.getOffset(), pageable.getOffset() + pageable.getPageSize());
+            epersons = es.search(context, q, Math.toIntExact(pageable.getOffset()), pageable.getOffset() + pageable.getPageSize());
             total = es.searchResultCount(context, q);
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);

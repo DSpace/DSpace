@@ -18,6 +18,7 @@ import java.lang.reflect.Method;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
@@ -239,16 +240,16 @@ public class RestResourceController implements InitializingBean {
                                                                                            String projection) {
         checkModelPluralForm(apiCategory, model);
         DSpaceRestRepository<RestAddressableModel, ID> repository = utils.getResourceRepository(apiCategory, model);
-        RestAddressableModel modelObject = null;
+        Optional<RestAddressableModel> modelObject = Optional.empty();
         try {
-            modelObject = repository.findOne(id);
+            modelObject = repository.findById(id);
         } catch (ClassCastException e) {
             // ignore, as handled below
         }
-        if (modelObject == null) {
+        if (!modelObject.isPresent()) {
             throw new ResourceNotFoundException(apiCategory + "." + model + " with id: " + id + " not found");
         }
-        DSpaceResource result = repository.wrapResource(modelObject);
+        DSpaceResource result = repository.wrapResource(modelObject.get());
         linkService.addLinks(result);
         return result;
     }
@@ -847,7 +848,7 @@ public class RestResourceController implements InitializingBean {
                 }
             }
         }
-        RestAddressableModel modelObject = repository.findOne(uuid);
+        RestAddressableModel modelObject = repository.findById(uuid).orElse(null);
 
         if (modelObject == null) {
             throw new ResourceNotFoundException(apiCategory + "." + model + " with id: " + uuid + " not found");
@@ -889,7 +890,7 @@ public class RestResourceController implements InitializingBean {
                 result = assembler.toResource(pageResult);
                 return result;
             }
-            int start = page.getOffset();
+            int start = Math.toIntExact(page.getOffset());
             int end = (start + page.getPageSize()) > fullList.size() ? fullList.size() : (start + page.getPageSize());
             DSpaceRestRepository<RestAddressableModel, ?> resourceRepository = utils
                 .getResourceRepository(fullList.get(0).getCategory(), fullList.get(0).getType());
@@ -1076,7 +1077,7 @@ public class RestResourceController implements InitializingBean {
                                                                                      ID id) {
         checkModelPluralForm(apiCategory, model);
         DSpaceRestRepository<RestAddressableModel, ID> repository = utils.getResourceRepository(apiCategory, model);
-        repository.delete(id);
+        repository.deleteById(id);
         return ControllerUtils.toEmptyResponse(HttpStatus.NO_CONTENT);
     }
 

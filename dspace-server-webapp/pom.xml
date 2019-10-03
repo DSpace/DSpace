@@ -211,7 +211,7 @@
         <dependency>
             <groupId>org.springframework.data</groupId>
             <artifactId>spring-data-rest-hal-browser</artifactId>
-            <version>2.5.7.RELEASE</version>
+            <version>3.1.10.RELEASE</version>
             <!-- if you get a java.util.zip.ZipException: invalid LOC
                  header (bad signature) during the tomcat startup
                  force the use of the previous version as the jar file

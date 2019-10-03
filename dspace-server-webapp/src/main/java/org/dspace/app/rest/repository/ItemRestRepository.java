@@ -108,7 +108,7 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
         int total = 0;
         try {
             total = is.countTotal(context);
-            it = is.findAll(context, pageable.getPageSize(), pageable.getOffset());
+            it = is.findAll(context, pageable.getPageSize(), Math.toIntExact(pageable.getOffset()));
             while (it.hasNext()) {
                 Item i = it.next();
                 items.add(i);
