@@ -60,17 +60,4 @@ public class CommunityRestController {
         return ControllerUtils.toResponseEntity(HttpStatus.CREATED,  null,
                 new BitstreamResource(bitstreamConverter.fromModel(bitstream), utils));
     }
-
-    /*@RequestMapping(method = RequestMethod.GET,
-            value = "{uuid:[0-9a-fxA-FX]{8}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{12}}/logo")
-    public BitstreamResource getLogo(HttpServletRequest request, @PathVariable UUID uuid) {
-
-        Context context = ContextUtil.obtainContext(request);
-        Bitstream bitstream = communityRestRepository.getLogo(context, uuid);
-
-        if (bitstream == null) {
-            throw new ResourceNotFoundException("");
-        }
-        return new BitstreamResource(bitstreamConverter.fromModel(bitstream), utils);
-    }*/
 }
