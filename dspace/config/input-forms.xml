@@ -905,6 +905,7 @@
 					<dc-schema>sedici</dc-schema>
 					<dc-element>description</dc-element>
 					<dc-qualifier>note</dc-qualifier>
+					<repeatable>true</repeatable>
 					<label>Otras notas</label>
 					<input-type>textarea</input-type>
 					<hint>
@@ -918,6 +919,7 @@
 					<dc-schema>sedici</dc-schema>
 					<dc-element>description</dc-element>
 					<dc-qualifier>note</dc-qualifier>
+					<repeatable>true</repeatable>
 					<label>Otras notas</label>
 					<repeatable>true</repeatable>
 					<input-type>textarea</input-type>
