@@ -124,11 +124,6 @@
 				<dc:publisher><xsl:value-of select="." /></dc:publisher>
 			</xsl:for-each>
 			
-			<!--  dc.coverage.(spatial|temporal) -->
-			<xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='coverage']/doc:element/doc:element/doc:field[@name='value']">
-				<dc:coverage><xsl:value-of select="." /></dc:coverage>
-			</xsl:for-each>
-			
 			<!--dc.language = language -->
 			<xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='language']/doc:element/doc:field[@name='value']">
 				<dc:language><xsl:value-of select="." /></dc:language>

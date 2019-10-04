@@ -727,42 +727,18 @@
 				</rel:related_item>
 			</xsl:if>
 
-			<!-- sedici.relation.isPartOfSeries -->
+			<!-- dc.relation.ispartof -->
 			<xsl:if
-				test="dspace:field[@mdschema='sedici' and @element='relation' and @qualifier='isPartOfSeries']">
+				test="dspace:field[@mdschema='dc' and @element='relation' and @qualifier='ispartof'and contains(., 'Serie: ') ]">
 				<rel:related_item>
 					<rel:description>Series which the item is part of</rel:description>
 					<rel:inter_work_relation
 						identifier-type="other" relationship-type="isPartOf">
-						<xsl:value-of
-							select="dspace:field[@mdschema='sedici' and @element='relation' and @qualifier='isPartOfSeries']" />
+						<xsl:value-of select="substring-after(dspace:field[@mdschema='dc' and @element='relation' and @qualifier='ispartof' and contains(., 'Serie: ')]/text(),'Serie: ')" />
 					</rel:inter_work_relation>
 				</rel:related_item>
 			</xsl:if>
 
-			<!-- sedici.relation.isReviewOf -->
-			<xsl:if
-				test="dspace:field[@mdschema='sedici' and @element='relation' and @qualifier='isReviewOf']">
-				<rel:related_item>
-					<rel:inter_work_relation
-						identifier-type="uri" relationship-type="isReviewOf">
-						<xsl:value-of
-							select="dspace:field[@mdschema='sedici' and @element='relation' and @qualifier='isReviewOf']" />
-					</rel:inter_work_relation>
-				</rel:related_item>
-			</xsl:if>
-
-			<!-- sedici.relation.isReviewedBy -->
-			<xsl:if
-				test="dspace:field[@mdschema='sedici' and @element='relation' and @qualifier='isReviewedBy']">
-				<rel:related_item>
-					<rel:inter_work_relation
-						identifier-type="uri" relationship-type="hasReview">
-						<xsl:value-of
-							select="dspace:field[@mdschema='sedici' and @element='relation' and @qualifier='isReviewedBy']" />
-					</rel:inter_work_relation>
-				</rel:related_item>
-			</xsl:if>
 		</rel:program>
 	</xsl:template>
 
@@ -824,11 +800,13 @@
 		<doi_data xmlns="http://www.crossref.org/schema/4.4.2">
 
 			<doi>
-				<!-- Solo seteo el doi si ya existe alguno en sedici.identifier.doi, sino se setea uno nuevo despúes, por afuera del xsl -->
+				<!-- Solo seteo el doi si ya existe alguno en sedici.identifier.other, sino se setea uno nuevo despúes, por afuera del xsl -->
 				<xsl:if
-				test="dspace:field[@mdschema='sedici' and @element='identifier' and @qualifier='doi' and contains(., '10.')]">
+					test="dspace:field[@mdschema='sedici' and @element='identifier' and @qualifier='other'
+						and java:ar.edu.unlp.sedici.dspace.utils.Utils.isDoi(text())]">
 					<xsl:variable name="doi"
-					select="dspace:field[@mdschema='sedici' and @element='identifier' and @qualifier='doi']" />
+					select="dspace:field[@mdschema='sedici' and @element='identifier' and @qualifier='other'
+						and java:ar.edu.unlp.sedici.dspace.utils.Utils.isDoi(text())]" />
 					<xsl:variable name="doiStartIndex"
 					select="string-length(substring-before($doi,'10.'))+1" />
 					<xsl:value-of select="substring($doi,$doiStartIndex)" />

@@ -83,8 +83,14 @@ public class DOIConsumer implements Consumer
         }
         catch (IdentifierNotFoundException ex)
         {
-            log.warn("DOIConsumer cannot handles items without DOIs, skipping: "
-                    + event.toString());
+            if (provider.isEligibleDSO(dso)) {
+                log.warn("DOIConsumer cannot handles items without DOIs, skipping: "
+                        + event.toString());
+            }
+            else {
+                log.debug("DOIConsumer cannot handles items without DOIs, skipping: "
+                        + event.toString());
+            }
             //When items is IN ARCHIVED and does not have DOI assigned by the DOI Provider, then finalize consumer at this point...
             return;
         }

@@ -164,7 +164,7 @@ public class IdentifierServiceImpl implements IdentifierService {
             }
             catch (IdentifierNotFoundException ex)
             {
-                log.info(service.getClass().getName() + " doesn't find an "
+                log.debug(service.getClass().getName() + " doesn't find an "
                         + "Identifier for " + dso.getTypeText() + ", " 
                         + Integer.toString(dso.getID()) + ".");
                 log.debug(ex.getMessage(), ex);

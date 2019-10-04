@@ -419,11 +419,11 @@ No redefino todos los templates, solo los que necesito redefinir.
 
 	  <xsl:choose>
 
-	  	<xsl:when test="$confidence='accepted'">
+		<xsl:when test="$confidence='accepted' or $confidence='uncertain'">
 	  	  <xsl:choose>
-	  	  <xsl:when test="$authLabel = $value">
+			<xsl:when test="normalize-space($authLabel) = normalize-space($value)">
 			 <xsl:call-template name="authorityConfidenceIcon">
-                <xsl:with-param name="confidence">accepted</xsl:with-param>
+				<xsl:with-param name="confidence" select="$confidence" />
                 <xsl:with-param name="id" select="$confidenceIndicatorID"/>
              </xsl:call-template>
 			</xsl:when>	

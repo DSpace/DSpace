@@ -14,11 +14,12 @@
          
      <!-- Se crea un grupo por cada colección (celda en la columna 4) que se mustra en la dri:table correspondiente a las tareas que todavía 
      no fueron asignadas a nadie para su realización.-->
-     <xsl:key name="unasignedGroups" match="dri:table[@id='aspect.xmlworkflow.Submissions.table.workflow-tasks'][position()=2]/dri:row [not(@role='header') and dri:cell[position()=4]/dri:xref]" use="./dri:cell[position()=4]/dri:xref/text()"/>
+     <xsl:key name="unasignedGroups" match="dri:table[@id='aspect.xmlworkflow.Submissions.table.workflow-tasks'][position()=2]/dri:row [not(@role='header') and dri:cell[position()=4]/dri:xref]" use="substring-before(./dri:cell[position()=4]/dri:xref/@target, '/xmlworkflow')"/>
 
     <xsl:template match="dri:table[@id='aspect.xmlworkflow.Submissions.table.workflow-tasks'][position()=2]">
 
     	<xsl:variable name="nameCollectionAutoarchive" select="'Autoarchivo'"/>
+    	<xsl:variable name="idCollectionAutoarchive" select="'/handle/10915/50'"/>
     	
     	<xsl:apply-templates select="dri:head"/>
 	 	
@@ -38,23 +39,27 @@
 				    <tbody>	
 				    	<xsl:call-template name="createFirstRowGroup">
 							<xsl:with-param name="nameFirstRowGroup" select="$nameCollectionAutoarchive"/>
-							<xsl:with-param name="quantityRowsGroup" select="count(key('unasignedGroups',$nameCollectionAutoarchive))"/>
+							<xsl:with-param name="quantityRowsGroup" select="count(key('unasignedGroups',$idCollectionAutoarchive))"/>
 						</xsl:call-template>
 				    	<xsl:call-template name="beginApplyTemplates">
-				    		<xsl:with-param name="targetNodes" select="key('unasignedGroups',$nameCollectionAutoarchive)"/>
+							<xsl:with-param name="targetNodes" select="key('unasignedGroups',$idCollectionAutoarchive)"/>
 				    	</xsl:call-template>
 					</tbody>
 			 		<!-- Luego iteramos sobre el resto de las colecciones. -->
-			 		<!-- El siguiente XPath me devuelve los nombres de cada coleccion: "dri:row/dri:cell[position()=4]/dri:xref[not(text()=following::dri:xref/text())]" -->
-			    	<xsl:for-each select="dri:row/dri:cell[position()=4]/dri:xref[not(text()=following::dri:xref/text())]"> 
-			  			<xsl:variable name="collec" select="./text()"/> 			 		
-			  			<xsl:if test="$collec != $nameCollectionAutoarchive">
+					<!-- El siguiente XPath devuelve un nodo de cada coleccion: "dri:row[generate-id()
+							= generate-id(key('unasignedGroups',substring-before(./dri:cell[position()=4]/dri:xref/@target,
+							'/xmlworkflow'))[1])] /dri:cell[position()=4]/dri:xref" -->
+					<xsl:for-each
+						select="dri:row[generate-id() = generate-id(key('unasignedGroups',substring-before(./dri:cell[position()=4]/dri:xref/@target, '/xmlworkflow'))[1])]/dri:cell[position()=4]/dri:xref">
+						<xsl:variable name="collecId" select="substring-before(@target, '/xmlworkflow')"/>
+						<xsl:variable name="collecName" select="./text()"/>
+						<xsl:if test="$collecName != $nameCollectionAutoarchive">
 			  				<tbody>
 			  					<xsl:call-template name="createFirstRowGroup">
-									<xsl:with-param name="nameFirstRowGroup" select="$collec"/>
-									<xsl:with-param name="quantityRowsGroup" select="count(key('unasignedGroups',$collec))"/>
+									<xsl:with-param name="nameFirstRowGroup" select="$collecName"/>
+									<xsl:with-param name="quantityRowsGroup" select="count(key('unasignedGroups',$collecId))"/>
 								</xsl:call-template>
-				  				<xsl:for-each select="key('unasignedGroups',$collec)">
+								<xsl:for-each select="key('unasignedGroups',$collecId)">
 										<xsl:call-template name="beginApplyTemplates">
 					    					<xsl:with-param name="targetNodes" select="."/>
 					    				</xsl:call-template>

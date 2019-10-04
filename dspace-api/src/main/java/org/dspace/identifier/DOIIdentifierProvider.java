@@ -195,7 +195,7 @@ public class DOIIdentifierProvider
      * @param dso
      * @return false if the item does not apply any filters conditions. Else, return true.
      */
-    private boolean isEligibleDSO(DSpaceObject dso) {
+    public boolean isEligibleDSO(DSpaceObject dso) {
         if(this.typeFilter != null && this.typeFilter.size() > 0) {
             Metadatum[] metadataList = dso.getMetadata("sedici", "subtype", null, Item.ANY);
 	        for (String subtipology : typeFilter) {

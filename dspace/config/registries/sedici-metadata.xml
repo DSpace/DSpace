@@ -34,12 +34,6 @@
 	<dc-type>
 		<schema>sedici</schema>
 		<element>identifier</element>
-		<qualifier>doi</qualifier>
-		<scope_note>Identificador persistente DOI</scope_note>
-	</dc-type>
-	<dc-type>
-		<schema>sedici</schema>
-		<element>identifier</element>
 		<qualifier>handle</qualifier>
 		<scope_note>Identificador persistente Handle (ajeno al handle de SeDiCI)</scope_note>
 	</dc-type>
@@ -128,18 +122,6 @@
 		<!-- sin calificar -->
 		<scope_note>Anotaciones del usuario o administrador, aclarando algún aspecto sobre el documento y su catalogación</scope_note>
 	</dc-type>	
-	<dc-type>
-		<schema>dc</schema>
-		<element>coverage</element>
-		<qualifier>spatial</qualifier>
-		<scope_note>Identificadores geográficos a los cuales se hace alusión en el contenido del documento</scope_note>
-	</dc-type>
-	<dc-type>
-		<schema>dc</schema>
-		<element>coverage</element>
-		<qualifier>temporal</qualifier>
-		<scope_note>Fechas y períodos de tiempo a los que se hace referencia en el contenido del documento</scope_note>
-	</dc-type>
 	<dc-type>
 		<schema>dc</schema>
 		<element>format</element>
@@ -294,12 +276,6 @@
 	</dc-type>
 	<dc-type>
 		<schema>sedici</schema>
-		<element>relation</element>
-		<qualifier>dossier</qualifier>
-		<scope_note>Nombre del dossier en el que un artículo fue publicado</scope_note>
-	</dc-type>
-	<dc-type>
-		<schema>sedici</schema>
 		<element>acta</element>
 		<!-- sin calificar -->
 		<scope_note>Numero de acta de una tesis</scope_note>
@@ -333,24 +309,6 @@
 		<element>identifier</element>
 		<qualifier>expediente</qualifier>
 		<scope_note>Numero de expediente asociado a un documento institucional</scope_note>
-	</dc-type>
-	<dc-type>
-		<schema>sedici</schema>
-		<element>relation</element>
-		<qualifier>isPartOfSeries</qualifier>
-		<scope_note>Titulo y número de la serie en la que el libro fué publicado</scope_note>
-	</dc-type>
-	<dc-type>
-		<schema>sedici</schema>
-		<element>relation</element>
-		<qualifier>isReviewOf</qualifier>
-		<scope_note>Indica el link al documento del cual este recurso es una revisión</scope_note>
-	</dc-type>
-	<dc-type>
-		<schema>sedici</schema>
-		<element>relation</element>
-		<qualifier>isReviewedBy</qualifier>
-		<scope_note>Contiene el link de un documento que es una revision de este recurso</scope_note>
 	</dc-type>
 	<dc-type>
 		<schema>sedici</schema>

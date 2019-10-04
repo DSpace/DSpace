@@ -562,18 +562,6 @@
 			<xsl:with-param name="acotar" select="'true'"/>
 		</xsl:call-template>
 
-		<!-- coverage.spatial row -->
-		<xsl:call-template name="render-normal-field">
-			<xsl:with-param name="name" select="'coverage-spatial'"/>
-			<xsl:with-param name="elements" select="dim:field[@element='coverage' and @qualifier='spatial'] "/>
-		</xsl:call-template>
-
-		<!-- coverage.temporal row -->
-		<xsl:call-template name="render-normal-field">
-			<xsl:with-param name="name" select="'coverage-temporal'"/>
-			<xsl:with-param name="elements" select="dim:field[@element='coverage' and @qualifier='temporal'] "/>
-		</xsl:call-template>
-		
 		<!-- dc.audience -->
 		<xsl:call-template name="render-normal-field">
 			<xsl:with-param name="name" select="'audience'"/>
@@ -619,25 +607,11 @@
 			</div>
 		</xsl:if>
 
-		<!-- relation-review-of row (es probable que sea uno solo) -->
-		<xsl:call-template name="render-normal-field">
-			<xsl:with-param name="name" select="'relation-review-of'"/>
-			<xsl:with-param name="elements" select="dim:field[@element='relation' and @qualifier='isReviewOf'] "/>
-			<xsl:with-param name="type">url</xsl:with-param>
-		</xsl:call-template>
-
-		<!-- relation-reviewed-by row (es probable que sea uno solo) -->
-		<xsl:call-template name="render-normal-field">
-			<xsl:with-param name="name" select="'relation-reviewed-by'"/>
-			<xsl:with-param name="elements" select="dim:field[@element='relation' and @qualifier='isReviewedBy'] "/>
-			<xsl:with-param name="type">url</xsl:with-param>
-		</xsl:call-template>
-		
-		<!-- relation.isPartOfSeries row -->
+		<!-- relation.ispartof row -->
 		
         <xsl:call-template name="render-normal-field">
-    		<xsl:with-param name="name" select="'relation-isPartOfSeries'"/>
-    		<xsl:with-param name="elements"    select="dim:field[@element='relation' and @qualifier='isPartOfSeries'] "/>
+    		<xsl:with-param name="name" select="'relation-ispartof'"/>
+    		<xsl:with-param name="elements"    select="dim:field[@element='relation' and @qualifier='ispartof'] "/>
 		</xsl:call-template>
 
 		<!-- Mostramos los documentos relacionados (es probable que sean muchos) -->

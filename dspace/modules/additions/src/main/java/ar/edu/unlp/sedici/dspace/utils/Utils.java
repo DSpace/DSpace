@@ -10,6 +10,7 @@ import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.dspace.identifier.DOI;
 
 public class Utils {
 	
@@ -59,6 +60,16 @@ public class Utils {
 
 	public static boolean matchRegex(String text, String regex) {
 		return java.util.regex.Pattern.matches(regex, text);
+	}
+
+	/*
+	 * Devuelve verdadero si el string cumple con el formato de doi.
+	 * Es decir, si cumple con algunos de los formatos siguientes:
+	 * http(s)://doi.org/10.XXXX/XXXX,http(s)://dx.doi.org/10.XXXX/XXXX o doi:10.XXXX/XXXX
+	 */
+	public static boolean isDoi(String identifier) {
+		String doiRegex = "((https?:\\/\\/(dx\\.)?doi.org\\/)|(doi:))10\\.[0-9]{4,9}\\/.{1,200}";
+		return java.util.regex.Pattern.matches(doiRegex, identifier);
 	}
 
 }

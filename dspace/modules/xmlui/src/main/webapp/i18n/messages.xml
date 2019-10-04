@@ -2482,12 +2482,6 @@
   <message key="xmlui.ChoiceLookupTransformer.field.dc_contributor_author.title">LC Name Authority author lookup</message>
   <message key="xmlui.ChoiceLookupTransformer.field.dc_contributor_author.nonauthority">Local value "@1@" (not in Naming Authority)</message>
 
-  
-  <message key="xmlui.ChoiceLookupTransformer.field.dc_coverage_spatial.help">Geographic location name</message>
-  <message key="xmlui.ChoiceLookupTransformer.field.dc_coverage_spatial.title">Geographic locations</message>
-  <message key="xmlui.ChoiceLookupTransformer.field.dc_coverage_spatial.nonauthority">Use "@1@" (no controlled)</message>
-
-
   <!-- mobile theme -->
   <message key="xmlui.mobile.home_mobile">DSpace Mobile</message>
   <message key="xmlui.mobile.search_all">Search ALL</message>
@@ -2667,10 +2661,8 @@
 <message key="xmlui.dri2xhtml.METS-1.0.item-identifier-issn">ISSN</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-identifier-isbn">ISBN</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-location">Location</message>
-<message key="xmlui.dri2xhtml.METS-1.0.item-coverage-spatial">Geographical references</message>
-<message key="xmlui.dri2xhtml.METS-1.0.item-coverage-temporal">Temporal references</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-format">Physical description</message>
-<message key="xmlui.dri2xhtml.METS-1.0.item-format-extent">Extent</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-format-extent">Pages</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-format-medium">Materials/Techniques</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-subject-materias">Subjects</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-subject">Keywords</message>

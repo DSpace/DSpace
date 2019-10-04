@@ -39,3 +39,47 @@ GrapeshotCrawler\/2\.0
 studylib download bot
 Altmetribot
 WBSearchBot\/1\.1
+Unpaywall
+Mozilla\/5\.0 \(compatible; OAI; \+http:\/\/www\.openaire\.eu\)
+jetmon\/[0-9]+\.[0-9]+
+^pyoai$
+^curl$
+Automattic Feed Fetcher [0-9]\.[0-9]
+Isidore\|Huma-Num Thumb Server
+GoogleImageProxy
+Moreover\/[0-9]+\.[0-9]+
+Bloglovin\/[0-9]+\.[0-9]+
+metha\/[0-9]+\.[0-9]+
+Net::OAI::Harvester
+Apache-HttpClient\/[0-9]+\.[0-9]+
+^Ruby$
+^Scoop\.it$
+SimplePie\/[0-9]+\.[0-9]+
+PDF Drive Crawler [0-9]\.[0-9]
+^Google-Test2$
+^BaiduSpider$
+^SEMrushBot$
+OAIHarvesterObj 31 University of Illinois Library
+um-IC\/[0-9]+\.[0-9]+
+aiohttp\/[0-9]+\.[0-9]+
+Faraday v[0-9]\.[0-9]
+IABot
+FeedlyBot\/[0-9]+\.[0-9]+
+lua-resty-http\/[0-9]+\.[0-9]+
+FeedBurner\/[0-9]+\.[0-9]+
+SimplePie\/[0-9]+\.[0-9]+
+LinkedInBot\/[0-9]+\.[0-9]+
+cortex\/[0-9]+\.[0-9]+
+TelegramBot
+mindUpBot
+Screaming Frog SEO Spider\/[0-9]+\.[0-9]+
+adreview\/[0-9]+\.[0-9]+
+ArcGIS Client Using WinInet
+TrendsmapResolver\/[0-9]+\.[0-9]+
+PocketParser\/[0-9]+\.[0-9]+
+Shareaholic\/[0-9]+\.[0-9]+
+metadataparser\/[0-9]+\.[0-9]+
+BootCaT\/[0-9]+\.[0-9]+
+BoardReader Blog Indexer
+YisouSpider
+JetBrains Omea Reader [0-9]+\.[0-9]+

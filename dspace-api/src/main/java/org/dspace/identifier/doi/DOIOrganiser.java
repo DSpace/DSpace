@@ -21,6 +21,7 @@ import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.log4j.Logger;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
@@ -362,29 +363,30 @@ public class DOIOrganiser {
         
         if(line.hasOption("update-doi"))
         {
-            String identifier = line.getOptionValue("update-doi");
+            String identifiers = line.getOptionValue("update-doi");
             
-            if(null == identifier)
+            if(null == identifiers)
             {
                 helpformater.printHelp("\nDOI organiser\n", options);
             }
             else
             {
-                try {
-                    TableRow doiRow = organiser.findTableRow(identifier);
-                    DSpaceObject dso = DSpaceObject.find(
-                            context, 
-                            doiRow.getIntColumn("resource_type_id"), 
-                            doiRow.getIntColumn("resource_id"));
-                    organiser.update(doiRow, dso);
-                } catch (SQLException ex) {
-                    LOG.error(ex);
-                } catch (IllegalArgumentException ex) {
-                    LOG.error(ex);
-                } catch (IllegalStateException ex) {
-                    LOG.error(ex);
-                } catch (IdentifierException ex) {
-                    LOG.error(ex);
+                String[] identifiersList = identifiers.split(",");
+                for (String identifier: identifiersList) {
+                    try {
+                        if (!line.hasOption('q')) {
+                            System.out.println("Registering identifier " + identifier);
+                        }
+                        TableRow doiRow = organiser.findTableRow(identifier.trim());
+                        DSpaceObject dso = DSpaceObject.find(
+                                context,
+                                doiRow.getIntColumn("resource_type_id"),
+                                doiRow.getIntColumn("resource_id"));
+                        organiser.update(doiRow, dso);
+                    } catch (Exception ex) {
+                        LOG.error(ex);
+                        ex.printStackTrace(System.err);
+                    }
                 }
             }
         }
@@ -528,8 +530,7 @@ public class DOIOrganiser {
             {
                 sendAlertMail("Register", dso,
                               DOI.SCHEME + doiRow.getStringColumn("doi"),
-                              doiIdentifierException.codeToString(doiIdentifierException
-                                                                    .getCode())); 
+                              ExceptionUtils.getStackTrace(doiIdentifierException));
             }
             catch (IOException ioe) 
             {
@@ -611,8 +612,7 @@ public class DOIOrganiser {
             {
                 sendAlertMail("Reserve", dso,
                               DOI.SCHEME + doiRow.getStringColumn("doi"),
-                              DOIIdentifierException.codeToString(
-                                    doiIdentifierException.getCode()));
+                              ExceptionUtils.getStackTrace(doiIdentifierException));
             } 
             catch (IOException ioe) 
             {
@@ -690,8 +690,7 @@ public class DOIOrganiser {
             {
                 sendAlertMail("Update", dso,
                               DOI.SCHEME + doiRow.getStringColumn("doi"),
-                              doiIdentifierException.codeToString(doiIdentifierException
-                                                                    .getCode()));
+                              ExceptionUtils.getStackTrace(doiIdentifierException));
             } 
             catch (IOException ioe) 
             {
@@ -704,13 +703,10 @@ public class DOIOrganiser {
                     + doiIdentifierException
                         .codeToString(doiIdentifierException.getCode()), ex);
            
-            if(!quiet)
-            {
-                System.err.println("It wasn't possible to update this identifier: " 
-                                 + DOI.SCHEME + doiRow.getStringColumn("doi"));
-            }
-            
-        } 
+            System.err.println("It wasn't possible to update this identifier: "
+                             + DOI.SCHEME + doiRow.getStringColumn("doi"));
+            ex.printStackTrace(System.err);
+        }
         catch (IllegalArgumentException ex) 
         {
             LOG.error("Database table DOI contains a DOI that is not valid: "
@@ -720,6 +716,7 @@ public class DOIOrganiser {
             {
                 System.err.println("It wasn't possible to update this identifier: " 
                                  + DOI.SCHEME + doiRow.getStringColumn("doi"));
+                ex.printStackTrace(System.err);
             }
              
             throw new IllegalStateException("Database table DOI contains a DOI "

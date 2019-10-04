@@ -665,7 +665,7 @@ implements DOIConnector
                         + dso.getID());
             }
             throw new DOIIdentifierException("CrosswalkException occurred while "
-                    + "converting " + dso.getTypeText() + "/" + dso.getID()
+                    + "converting " + dso.getTypeText() + " with id " + dso.getID()
                     + " using crosswalk " + this.CROSSWALK_NAME + ". "
                     + errors,
                     DOIIdentifierException.CONVERSION_ERROR);
