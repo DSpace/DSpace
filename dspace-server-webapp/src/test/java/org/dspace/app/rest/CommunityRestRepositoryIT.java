@@ -36,6 +36,7 @@ import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.converter.CommunityConverter;
 import org.dspace.app.rest.matcher.CommunityMatcher;
 import org.dspace.app.rest.matcher.MetadataMatcher;
+import org.dspace.app.rest.matcher.PageMatcher;
 import org.dspace.app.rest.model.CommunityRest;
 import org.dspace.app.rest.model.MetadataRest;
 import org.dspace.app.rest.model.MetadataValueRest;
@@ -316,16 +317,34 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                                           .withTitle(titles.get(2))
                                           .withTitle(titles.get(3))
                                           .build();
+        Community childCommunity = CommunityBuilder.createSubCommunity(context, parentCommunity).build();
+        Community secondParentCommunity = CommunityBuilder.createCommunity(context).withName("testing").build();
+        Community thirdParentCommunity = CommunityBuilder.createCommunity(context).withName("testingTitleTwo").build();
 
-        getClient().perform(get("/api/core/communities"))
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/api/core/communities").param("size", "2"))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
-                   .andExpect(jsonPath("$._embedded.communities", Matchers.contains(
+                   .andExpect(jsonPath("$._embedded.communities", Matchers.containsInAnyOrder(
                        CommunityMatcher.matchCommunityEntryMultipleTitles(titles, parentCommunity.getID(),
-                                                                          parentCommunity.getHandle())
+                                                                          parentCommunity.getHandle()),
+                       CommunityMatcher.matchCommunityEntry(childCommunity.getID(), childCommunity.getHandle())
+                       )))
+                   .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/communities")))
+                   .andExpect(jsonPath("$.page", PageMatcher.pageEntryWithTotalPagesAndElements(0, 2, 2, 4)));
+
+        getClient().perform(get("/api/core/communities").param("size", "2").param("page", "1"))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$._embedded.communities", Matchers.containsInAnyOrder(
+                       CommunityMatcher.matchCommunityEntry(secondParentCommunity.getID(),
+                                                            secondParentCommunity.getHandle()),
+                       CommunityMatcher.matchCommunityEntry(thirdParentCommunity.getID(),
+                                                            thirdParentCommunity.getHandle())
                    )))
                    .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/communities")))
-                   .andExpect(jsonPath("$.page.totalElements", is(1)));
+                   .andExpect(jsonPath("$.page", PageMatcher.pageEntryWithTotalPagesAndElements(1, 2, 2, 4)));
     }
 
 
