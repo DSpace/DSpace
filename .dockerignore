@@ -5,3 +5,4 @@
 dspace/modules/*/target/
 Dockerfile.*
 dspace/src/main/docker
+dspace/modules/src/main/docker-compose

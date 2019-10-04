@@ -54,6 +54,7 @@
     <bean class="org.dspace.content.EntityTypeServiceImpl"/>
     <bean class="org.dspace.content.EntityServiceImpl"/>
     <bean class="org.dspace.content.RelationshipTypeServiceImpl"/>
+    <bean class="org.dspace.content.RelationshipMetadataServiceImpl"/>
 
     <bean class="org.dspace.content.authority.ChoiceAuthorityServiceImpl"/>
     <bean class="org.dspace.content.authority.MetadataAuthorityServiceImpl" lazy-init="true"/>
