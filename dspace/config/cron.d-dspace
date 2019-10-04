@@ -68,6 +68,9 @@ DSPACE=/var/dspace/install
 #0 5 2 * *	dspace	ant -f $DSPACE-src/distribution/target/dspace-sedici-distribution-bin/build.xml update_geolite
 0 6 2 * *	dspace	wget http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz -q -O - | gunzip > $DSPACE/config/GeoLiteCity.dat
 
+#UPDATE and REGISTER DOIs every 20 minutes from 7 through 19 hs, every day-of-week from Monday through Friday.
+00,20,40 7-19 * * 1-5 dspace $DSPACE/bin/dspace doi-organiser -u -q; $DSPACE/bin/dspace doi-organiser -r -q
+
 # ########## POSTGRES ######################
 # Clean up the database nightly at 4.20am 
 # 20 4 * * *	dspace	vacuumdb --analyze dspace > /dev/null 2>&1
