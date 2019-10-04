@@ -69,7 +69,8 @@ docker push dspace/dspace-cli:dspace-7_x
 
 This is a postgres docker image containing the pgcrypto extension used in DSpace 6 and DSpace 7.
 ```
-docker build -t dspace/dspace-postgres-pgcrypto -f dspace/src/main/docker/dspace-postgres-pgcrypto/Dockerfile .
+cd dspace/src/main/docker/dspace-postgres-pgcrypto
+docker build -t dspace/dspace-postgres-pgcrypto .
 ```
 
 This image is built manually.  It should be rebuilt as needed.
@@ -86,7 +87,8 @@ docker push dspace/dspace-postgres-pgcrypto
 This is a postgres docker image containing the pgcrypto extension used in DSpace 6 and DSpace 7.
 This image also contains curl.  The image is pre-configured to load a postgres database dump on initialization.
 ```
-docker build -t dspace/dspace-postgres-pgcrypto:loadsql -f dspace/src/main/docker/dspace-postgres-pgcrypto-curl/Dockerfile .
+cd dspace/src/main/docker/dspace-postgres-pgcrypto-curl
+docker build -t dspace/dspace-postgres-pgcrypto:loadsql .
 ```
 
 This image is built manually.  It should be rebuilt as needed.
@@ -102,7 +104,8 @@ docker push dspace/dspace-postgres-pgcrypto:loadsql
 
 This is a standalone solr image containing DSpace solr schemas used in DSpace 7.
 ```
-docker build -t dspace/dspace-solr -f dspace/src/main/docker/solr/Dockerfile .
+cd dspace/src/main/docker/solr
+docker build -t dspace/dspace-solr .
 ```
 
 This image is built manually.  It should be rebuilt as solr schemas change or as new releases of solr are incorporated.
