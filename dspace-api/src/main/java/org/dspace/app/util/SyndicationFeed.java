@@ -299,7 +299,7 @@ public class SyndicationFeed
                 }
 
                 // This gets the authors into an ATOM feed
-                List<SyndPerson> creators = new ArrayList<SyndPerson>();
+                List<SyndPerson> atomCreators = new ArrayList<SyndPerson>();
                 for (String authorField : authorFields) {
                     Metadatum authors[] = item.getMetadataByMetadataString(authorField);
                     if (authors.length > 0)
@@ -308,12 +308,12 @@ public class SyndicationFeed
                         {
                             SyndPerson sp = new SyndPersonImpl();
                             sp.setName(author.value);
-                            creators.add(sp);
+                            atomCreators.add(sp);
                         }
                     }
                 }
-                if (creators.size() > 0) {
-                    entry.setAuthors(creators);
+                if (atomCreators.size() > 0) {
+                    entry.setAuthors(atomCreators);
                 }
 
                 // only add DC module if any DC fields are configured
@@ -326,12 +326,12 @@ public class SyndicationFeed
                         Metadatum dcAuthors[] = item.getMetadataByMetadataString(dcCreatorField);
                         if (dcAuthors.length > 0)
                         {
-                            List<String> dcCreators = new ArrayList<String>();
+                            List<String> creators = new ArrayList<String>();
                             for (Metadatum author : dcAuthors)
                             {
-                                dcCreators.add(author.value);
+                                creators.add(author.value);
                             }
-                            dc.setCreators(dcCreators);
+                            dc.setCreators(creators);
                         }
                     }
                     if (dcDateField != null && !hasDate)
