@@ -198,8 +198,11 @@ public abstract class DSpaceObject
                             {
                                 String auth = tr.getStringColumn("authority");
                                 int conf = tr.getIntColumn("confidence");
-                                if (!((dcv.authority == null && auth == null) ||
-                                        (dcv.authority != null && auth != null && dcv.authority.equals(auth))
+                                // Parche sedici para que se pueda actualizar el confidence cuando authority is null
+                                // Antes la lógica era !(A || (B && C)), ahora es  !((A || B) && C)
+                                // Se hizo para ticket #5657
+                                if (!(((dcv.authority == null && auth == null) ||
+                                        (dcv.authority != null && auth != null && dcv.authority.equals(auth)))
                                                 && dcv.confidence == conf))
                                 {
                                     matched = false;
