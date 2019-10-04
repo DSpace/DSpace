@@ -2041,20 +2041,6 @@ You can leave out the day and/or month if they aren't applicable.</hint>
         </field>
       </row>
     </form>
-    <form name="institute-selection">
-      <row>
-        <field>
-          <dc-schema>publica</dc-schema>
-          <dc-element>fhg</dc-element>
-          <dc-qualifier>institute</dc-qualifier>
-          <label>Select an institute</label>
-          <input-type value-pairs-name="library_list">list</input-type>
-          <repeatable>false</repeatable>
-          <required>You must select an institute.</required>
-          <hint>Select the institute to which you want to proceed with the submission.</hint>
-        </field>
-      </row>
-    </form>
   </form-definitions>
   <form-value-pairs>
     <value-pairs value-pairs-name="patent_types" dc-term="patent_types">
@@ -2561,20 +2547,6 @@ You can leave out the day and/or month if they aren't applicable.</hint>
       <pair>
         <displayed-value>Pound sterling</displayed-value>
         <stored-value>Pound sterling</stored-value>
-      </pair>
-    </value-pairs>
-    <value-pairs value-pairs-name="library_list" dc-term="library_list">
-      <pair>
-        <displayed-value>Institute A</displayed-value>
-        <stored-value>69a76aed-5eaa-425e-95fd-8ea12037dd45</stored-value>
-      </pair>
-      <pair>
-        <displayed-value>Institute B</displayed-value>
-        <stored-value>471ded71-f331-4929-8c0e-22f482b6c463</stored-value>
-      </pair>
-      <pair>
-        <displayed-value>No Institute library</displayed-value>
-        <stored-value>e17f7650-97f5-4b48-b7fa-7744bf4af4cc</stored-value>
       </pair>
     </value-pairs>
   </form-value-pairs>

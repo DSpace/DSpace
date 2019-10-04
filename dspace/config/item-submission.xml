@@ -12,6 +12,12 @@
       <type>collection</type>
       <scope visibility="hidden" visibilityOutside="hidden">submission</scope>
     </step>
+    <step id="extraction">
+	  <heading></heading>
+	  <processing-class>org.dspace.app.rest.submit.step.ExtractMetadataStep</processing-class>
+	  <type>utils</type>
+	  <scope visibility="hidden" visibilityOutside="hidden">submission</scope>
+	</step>
     <step id="upload" mandatory="true">
       <heading>submit.progressbar.upload</heading>
       <processing-class>org.dspace.app.rest.submit.step.UploadStep</processing-class>
@@ -102,11 +108,6 @@
       <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
       <type>submission-form</type>
     </step>
-    <step id="institute-selection" mandatory="true">
-      <heading>submit.progressbar.describe.institute-selection</heading>
-      <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
-      <type>submission-form</type>
-    </step>
   </step-definitions>
   <submission-definitions>
     <submission-process name="product">
@@ -137,7 +138,7 @@
     </submission-process>
     <submission-process name="publication">
       <step id="collection" />
-      <step id="institute-selection" />
+      <step id="extraction" />
       <step id="publication" />
       <step id="publication_indexing" />
       <step id="publication_bibliographic_details" />
