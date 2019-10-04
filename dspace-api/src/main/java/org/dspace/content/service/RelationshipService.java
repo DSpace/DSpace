@@ -89,7 +89,7 @@ public interface RelationshipService extends DSpaceCRUDService<Relationship> {
 
     /**
      * This method will update the place for the Relationship and all other relationships found by the items and
-     * relationship type of the given Relatonship. It will give this Relationship the last place in both the
+     * relationship type of the given Relationship. It will give this Relationship the last place in both the
      * left and right place determined by querying for the list of leftRelationships and rightRelationships
      * by the leftItem, rightItem and relationshipType of the given Relationship.
      * @param context           The relevant DSpace context
@@ -116,7 +116,7 @@ public interface RelationshipService extends DSpaceCRUDService<Relationship> {
 
 
     /**
-     * This method returns a list of Relationship objets for which the relationshipType property is equal to the given
+     * This method returns a list of Relationship objects for which the relationshipType property is equal to the given
      * RelationshipType object
      * @param context           The relevant DSpace context
      * @param relationshipType  The RelationshipType object that will be used to check the Relationship on
@@ -134,11 +134,31 @@ public interface RelationshipService extends DSpaceCRUDService<Relationship> {
      * @param relationshipType  The RelationshipType object for the relationship
      * @param leftPlace         The leftPlace integer for the relationship
      * @param rightPlace        The rightPlace integer for the relationship
+     * @param leftwardValue     The leftwardValue string for the relationship
+     * @param rightwardValue    The rightwardValue string for the relationship
+     * @return                  The created Relationship object with the given properties
+     * @throws AuthorizeException   If something goes wrong
+     * @throws SQLException         If something goes wrong
+     */
+    Relationship create(Context c, Item leftItem, Item rightItem, RelationshipType relationshipType,
+                        int leftPlace, int rightPlace, String leftwardValue, String rightwardValue)
+        throws AuthorizeException, SQLException;
+
+
+    /**
+     * This method is used to construct a Relationship object with all it's variables,
+     * except the leftward and rightward labels
+     * @param c                 The relevant DSpace context
+     * @param leftItem          The leftItem Item object for the relationship
+     * @param rightItem         The rightItem Item object for the relationship
+     * @param relationshipType  The RelationshipType object for the relationship
+     * @param leftPlace         The leftPlace integer for the relationship
+     * @param rightPlace        The rightPlace integer for the relationship
      * @return                  The created Relationship object with the given properties
      * @throws AuthorizeException   If something goes wrong
      * @throws SQLException         If something goes wrong
      */
     Relationship create(Context c, Item leftItem, Item rightItem, RelationshipType relationshipType,
                         int leftPlace, int rightPlace)
-        throws AuthorizeException, SQLException;
+            throws AuthorizeException, SQLException;
 }
