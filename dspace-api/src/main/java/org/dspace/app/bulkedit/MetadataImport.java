@@ -662,7 +662,7 @@ public class MetadataImport {
 
             if (StringUtils.equals(schema, MetadataSchemaEnum.RELATION.getName())) {
                 List<RelationshipType> relationshipTypeList = relationshipTypeService
-                    .findByLeftOrRightLabel(c, element);
+                    .findByLeftwardOrRightwardTypeName(c, element);
                 for (RelationshipType relationshipType : relationshipTypeList) {
                     for (Relationship relationship : relationshipService
                         .findByItemAndRelationshipType(c, item, relationshipType)) {
@@ -750,7 +750,7 @@ public class MetadataImport {
                 null, Item.ANY).get(0).getValue();
 
         // Get the correct RelationshipType based on label
-        List<RelationshipType> relType = relationshipTypeService.findByLeftOrRightLabel(c, label);
+        List<RelationshipType> relType = relationshipTypeService.findByLeftwardOrRightwardTypeName(c, label);
         RelationshipType foundRelationshipType = matchRelationshipType(relType,
                 itemRelationshipType,relationEntityRelationshipType);
 
@@ -762,7 +762,7 @@ public class MetadataImport {
                     "with label: " + label);
         }
 
-        if (foundRelationshipType.getLeftLabel().equalsIgnoreCase(label)) {
+        if (foundRelationshipType.getLeftwardType().equalsIgnoreCase(label)) {
             left = true;
         }
 
@@ -1794,7 +1794,7 @@ public class MetadataImport {
         try {
             RelationshipType foundRelationshipType = null;
             List<RelationshipType> relationshipTypeList = relationshipTypeService.
-                    findByLeftOrRightLabel(c, label.split("\\.")[1]);
+                    findByLeftwardOrRightwardTypeName(c, label.split("\\.")[1]);
             // Validate described relationship form the CSV.
             foundRelationshipType = matchRelationshipType(relationshipTypeList, targetType, originType);
             if (foundRelationshipType == null) {
