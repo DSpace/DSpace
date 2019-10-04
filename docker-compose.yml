@@ -1,0 +1,53 @@
+#
+# The contents of this file are subject to the license and copyright
+# detailed in the LICENSE and NOTICE files at the root of the source
+# tree and available online at
+#
+# http://www.dspace.org/license/
+#
+
+version: '3.7'
+networks:
+  dspacenet:
+services:
+  dspace:
+    container_name: dspace
+    depends_on:
+    - dspacedb
+    image: "${DOCKER_OWNER:-dspace}/dspace:${DSPACE_VER:-dspace-6_x-jdk8-test}"
+    build:
+      context: .
+      dockerfile: Dockerfile.jdk8-test
+    networks:
+      dspacenet:
+    ports:
+    - published: 8080
+      target: 8080
+    stdin_open: true
+    tty: true
+    volumes:
+    - ./dspace/src/main/docker-compose/local.cfg:/dspace/config/local.cfg
+    - ./dspace/src/main/docker-compose/xmlui.xconf:/dspace/config/xmlui.xconf
+    - assetstore:/dspace/assetstore
+    - solr_authority:/dspace/solr/authority/data
+    - solr_oai:/dspace/solr/oai/data
+    - solr_search:/dspace/solr/search/data
+    - solr_statistics:/dspace/solr/statistics/data
+  dspacedb:
+    container_name: dspacedb
+    environment:
+      PGDATA: /pgdata
+    image: dspace/dspace-postgres-pgcrypto
+    networks:
+      dspacenet:
+    stdin_open: true
+    tty: true
+    volumes:
+    - pgdata:/pgdata
+volumes:
+  assetstore:
+  pgdata:
+  solr_authority:
+  solr_oai:
+  solr_search:
+  solr_statistics:
