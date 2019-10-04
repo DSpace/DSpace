@@ -208,6 +208,7 @@ public class MetadataImport {
             c.setMode(Context.Mode.BATCH_EDIT);
 
             // Process each change
+            rowCount = 1;
             for (DSpaceCSVLine line : toImport) {
                 // Resolve target references to other items
                 populateRefAndRowMap(line, line.getID());

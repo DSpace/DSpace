@@ -433,7 +433,19 @@ public class CSVMetadataImportReferenceTest extends AbstractEntityIntegrationTes
         assertRelationship(testItemTwo, testItemThree, 1, "left", 0);
     }
 
-
+    /**
+     * Test relationship validation with invalid relationship definition and with archived target reference
+     */
+    @Test
+    public void testDuplicateRowNameReferences() throws Exception {
+        String[] csv = {"id,relationship.type,relation.isAuthorOfPublication,collection,dc.identifier.other,rowName",
+                "+,Person,," + col1.getHandle() + ",0,value",
+                "+,Publication,rowName:value," + col1.getHandle() + ",1,1",
+                "+,Publication,rowName:value," + col1.getHandle() + ",2,2"};
+        Item[] items = runImport(csv);
+        assertRelationship(items[1], items[0], 1, "left", 0);
+        assertRelationship(items[2], items[0], 1, "left", 0);
+    }
 
     /**
      * Import mocked CSVs to test item creation behavior, deleting temporary file afterward.
