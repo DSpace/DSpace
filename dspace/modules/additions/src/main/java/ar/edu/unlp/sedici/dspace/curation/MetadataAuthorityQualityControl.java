@@ -163,6 +163,8 @@ public class MetadataAuthorityQualityControl extends AbstractCurationTask {
 				// do not fix because can be either a false positive or variant
 				report(reporter, mt, "INFO", "Recommended value <<", choices.values[0].authority, ">> with confidence ",
 						String.valueOf(choices.confidence));
+				// As we didn't set the authority, confidence shouldn't be greater than 300 (not found)
+				assertConfidenceNotFound(reporter, mt);
 			}
 		} else {
 			// Authority not found from the text_value, just check confidence
