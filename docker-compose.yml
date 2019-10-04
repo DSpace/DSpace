@@ -20,6 +20,13 @@ services:
     volumes:
     - assetstore:/dspace/assetstore
     - ./dspace/src/main/docker-compose/local.cfg:/dspace/config/local.cfg
+    # Ensure that the database is ready before starting tomcat
+    entrypoint:
+    - /bin/bash
+    - '-c'
+    - |
+      /dspace/bin/dspace database migrate
+      catalina.sh run
   dspacedb:
     container_name: dspacedb
     environment:
