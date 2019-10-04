@@ -16,10 +16,13 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.event.Consumer;
 import org.dspace.event.Event;
+import org.dspace.identifier.DOI;
 import org.dspace.identifier.DOIIdentifierProvider;
 import org.dspace.identifier.IdentifierException;
 import org.dspace.identifier.IdentifierNotFoundException;
 import org.dspace.search.SearchConsumer;
+import org.dspace.storage.rdbms.DatabaseManager;
+import org.dspace.storage.rdbms.TableRow;
 import org.dspace.utils.DSpace;
 
 /**
@@ -92,6 +95,14 @@ public class DOIConsumer implements Consumer
                         + event.toString());
             }
             //When items is IN ARCHIVED and does not have DOI assigned by the DOI Provider, then finalize consumer at this point...
+            return;
+        }
+
+        TableRow doiRow = DatabaseManager.findByUnique(ctx, "Doi", "doi", doi.substring(DOI.SCHEME.length()));
+        if (doiRow != null && DOIIdentifierProvider.TO_BE_REGISTERED == doiRow.getIntColumn("status")) {
+            //TICKET#6122 :Avoiding to update DOI status of an item that is not registered yet at registration agency.
+            log.warn("DOIConsumer will not handle item (" + dso.getHandle() +") that is not registered yet, skipping: "
+                    + event.toString());
             return;
         }
         try
