@@ -60,7 +60,8 @@ public interface RelationshipTypeDAO extends GenericDAO<RelationshipType> {
      * @return A list of RelationshipType objects that have the given label as either the leftLabel or rightLabel
      * @throws SQLException If something goes wrong
      */
-    List<RelationshipType> findByLeftwardOrRightwardTypeName(Context context, String type, Integer limit, Integer offset)
+    List<RelationshipType> findByLeftwardOrRightwardTypeName(Context context, String type, Integer limit,
+                                                             Integer offset)
             throws SQLException;
 
     /**
