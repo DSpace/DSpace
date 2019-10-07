@@ -271,7 +271,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
         }
     }
 
-    public Bitstream createLogo(Context context, UUID uuid, MultipartFile uploadfile)
+    public Bitstream setLogo(Context context, UUID uuid, MultipartFile uploadfile)
             throws IOException, AuthorizeException, SQLException {
 
         Collection collection = null;
@@ -286,11 +286,22 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
                     "The given uuid did not resolve to a collection on the server: " + uuid);
         }
 
-        if (collection.getLogo() != null) {
-            throw new UnprocessableEntityException("The collection with the given uuid already has a logo: " + uuid);
+        Bitstream bitstream;
+        if (uploadfile != null) {
+            if (collection.getLogo() != null) {
+                throw new UnprocessableEntityException(
+                        "The collection with the given uuid already has a logo: " + uuid);
+            }
+            bitstream = cs.setLogo(context, collection, uploadfile.getInputStream());
+        } else {
+            if (collection.getLogo() == null) {
+                throw new UnprocessableEntityException(
+                        "The collection with the given uuid didn't have a logo: " + uuid);
+            }
+            bitstream = collection.getLogo();
+            cs.setLogo(context, collection, null);
         }
 
-        Bitstream bitstream = cs.setLogo(context, collection, uploadfile.getInputStream());
         cs.update(context, collection);
         bitstreamService.update(context, bitstream);
         context.complete();
@@ -298,7 +309,13 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
         return bitstream;
     }
 
-    public Bitstream getLogo(Context context, UUID uuid) {
+    public Bitstream removeLogo(Context context, UUID uuid) throws SQLException, IOException, AuthorizeException {
+        return setLogo(context, uuid, null);
+    }
+
+    public Bitstream updateLogo(Context context, UUID uuid, MultipartFile uploadfile)
+            throws SQLException, IOException, AuthorizeException {
+
         Collection collection = null;
         try {
             collection = cs.find(context, uuid);
@@ -311,6 +328,17 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
                     "The given uuid did not resolve to a collection on the server: " + uuid);
         }
 
-        return collection.getLogo();
+        if (collection.getLogo() == null) {
+            throw new UnprocessableEntityException("The collection with the given uuid didn't have a logo: " + uuid);
+        }
+        Bitstream oldBitstream = collection.getLogo();
+        Bitstream newBitstream = cs.setLogo(context, collection, uploadfile.getInputStream());
+
+        cs.update(context, collection);
+        bitstreamService.update(context, newBitstream);
+        bitstreamService.update(context, oldBitstream);
+        context.complete();
+
+        return newBitstream;
     }
 }
