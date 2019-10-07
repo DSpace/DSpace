@@ -46,7 +46,8 @@ public class RelationshipTypeDAOImpl extends AbstractHibernateDAO<RelationshipTy
     }
 
     @Override
-    public List<RelationshipType> findByLeftwardOrRightwardTypeName(Context context, String type, Integer limit, Integer offset)
+    public List<RelationshipType> findByLeftwardOrRightwardTypeName(Context context, String type, Integer limit,
+                                                                    Integer offset)
             throws SQLException {
 
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);

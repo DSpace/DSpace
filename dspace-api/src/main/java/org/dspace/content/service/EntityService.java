@@ -190,25 +190,25 @@ public interface EntityService {
      * Retrieves a list of RelationshipType objects for which either their left or right label is equal to the
      * label parameter that's being passed along
      * @param context   The relevant DSpace context
-     * @param label     The label for which the relationshiptype's labels must be checked
+     * @param type     The label for which the relationshiptype's labels must be checked
      * @return The list of relationshiptypes that each contain a left or right label that is equal
      *                  to the given label parameter
      * @throws SQLException If something goes wrong
      */
-    List<RelationshipType> getRelationshipTypesByTypeName(Context context, String label) throws SQLException;
+    List<RelationshipType> getRelationshipTypesByTypeName(Context context, String type) throws SQLException;
 
     /**
      * Retrieves a list of RelationshipType objects for which either their left or right label is equal to the
      * label parameter that's being passed along
      * @param context   The relevant DSpace context
-     * @param label     The label for which the relationshiptype's labels must be checked
+     * @param type     The label for which the relationshiptype's labels must be checked
      * @param limit     paging limit
      * @param offset    paging offset
      * @return The list of relationshiptypes that each contain a left or right label that is equal
      *                  to the given label parameter
      * @throws SQLException If something goes wrong
      */
-    List<RelationshipType> getRelationshipTypesByLabel(Context context, String label,
+    List<RelationshipType> getRelationshipTypesByTypeName(Context context, String type,
                                                        Integer limit, Integer offset) throws SQLException;
 
 }

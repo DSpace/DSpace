@@ -172,18 +172,18 @@ public class EntityServiceImpl implements EntityService {
     }
 
     @Override
-    public List<RelationshipType> getRelationshipTypesByLabel(Context context, String label) throws SQLException {
+    public List<RelationshipType> getRelationshipTypesByTypeName(Context context, String type) throws SQLException {
 
-        return getRelationshipTypesByLabel(context, label, -1, -1);
+        return getRelationshipTypesByTypeName(context, type, -1, -1);
     }
 
     @Override
-    public List<RelationshipType> getRelationshipTypesByTypeName(Context context, String label,
+    public List<RelationshipType> getRelationshipTypesByTypeName(Context context, String type,
                                                                  Integer limit, Integer offset) throws SQLException {
         List<RelationshipType> listToReturn = new LinkedList<>();
         for (RelationshipType relationshipType : relationshipTypeService.findAll(context, limit, offset)) {
-            if (StringUtils.equals(relationshipType.getLeftwardType(),label) ||
-                StringUtils.equals(relationshipType.getRightwardType(),label)) {
+            if (StringUtils.equals(relationshipType.getLeftwardType(),type) ||
+                StringUtils.equals(relationshipType.getRightwardType(),type)) {
                 listToReturn.add(relationshipType);
             }
         }
