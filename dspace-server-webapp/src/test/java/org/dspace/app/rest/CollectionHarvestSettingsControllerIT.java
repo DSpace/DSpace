@@ -245,7 +245,7 @@ public class CollectionHarvestSettingsControllerIT extends AbstractControllerInt
     public void PutUnProcessableEntityIfIncorrectSettings() throws Exception {
         String token = getAuthToken(admin.getEmail(), password);
 
-        JSONObject json = createHarvestSettingsJson("METADATA_ONLY", "https://dspace.mit.edu/iao/request", "col_1721.1_114174", "bc");
+        JSONObject json = createHarvestSettingsJson("METADATA_ONLY", "https://mydspace.edu/oai/request", "col_1721.1_114174", "bc");
 
         getClient(token).perform(
             put("/api/core/collections/" + collection.getID() + "/harvester")
@@ -301,7 +301,7 @@ public class CollectionHarvestSettingsControllerIT extends AbstractControllerInt
     public void PutUnprocessableEntityIfHarvestTypeIncorrect() throws Exception {
         String token = getAuthToken(admin.getEmail(), password);
 
-        JSONObject json = createHarvestSettingsJson("INCORRECT_HARVEST_TYPE", "https://dspace.mit.edu/oai/request", "col_1721.1_114174", "dc");
+        JSONObject json = createHarvestSettingsJson("INCORRECT_HARVEST_TYPE", "https://mydspace.edu/oai/request", "col_1721.1_114174", "dc");
 
         getClient(token).perform(
             put("/api/core/collections/" + collection.getID() + "/harvester")
