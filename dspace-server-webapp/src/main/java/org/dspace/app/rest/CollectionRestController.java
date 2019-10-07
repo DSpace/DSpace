@@ -39,6 +39,12 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/api/" + CollectionRest.CATEGORY + "/" + CollectionRest.PLURAL_NAME)
 public class CollectionRestController {
 
+    /**
+     * Regular expression in the request mapping to accept UUID as identifier
+     */
+    private static final String REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID =
+            "{uuid:[0-9a-fxA-FX]{8}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{12}}";
+
     @Autowired
     protected Utils utils;
 
@@ -50,16 +56,41 @@ public class CollectionRestController {
 
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
     @RequestMapping(method = RequestMethod.POST,
-            value = "{uuid:[0-9a-fxA-FX]{8}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{12}}/logo",
+            value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID + "/logo",
             headers = "content-type=multipart/form-data")
     public ResponseEntity<ResourceSupport> createLogo(HttpServletRequest request, @PathVariable UUID uuid,
                                                       @RequestParam("file") MultipartFile uploadfile)
             throws SQLException, IOException, AuthorizeException {
 
         Context context = ContextUtil.obtainContext(request);
-        Bitstream bitstream = collectionRestRepository.createLogo(context, uuid, uploadfile);
+        Bitstream bitstream = collectionRestRepository.setLogo(context, uuid, uploadfile);
 
         return ControllerUtils.toResponseEntity(HttpStatus.CREATED,  null,
                 new BitstreamResource(bitstreamConverter.fromModel(bitstream), utils));
+    }
+
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
+    @RequestMapping(method = RequestMethod.PUT,
+            value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID + "/logo",
+            headers = "content-type=multipart/form-data")
+    public ResponseEntity<ResourceSupport> updateLogo(HttpServletRequest request, @PathVariable UUID uuid,
+                                                      @RequestParam("file") MultipartFile uploadfile)
+            throws SQLException, IOException, AuthorizeException {
+
+        Context context = ContextUtil.obtainContext(request);
+        Bitstream bitstream = collectionRestRepository.updateLogo(context, uuid, uploadfile);
+        return ControllerUtils.toResponseEntity(HttpStatus.CREATED,  null,
+                new BitstreamResource(bitstreamConverter.fromModel(bitstream), utils));
+    }
+
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
+    @RequestMapping(method = RequestMethod.DELETE,
+            value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID + "/logo")
+    public ResponseEntity<ResourceSupport> deleteProcessById(HttpServletRequest request, @PathVariable UUID uuid)
+            throws SQLException, IOException, AuthorizeException {
+
+        Context context = ContextUtil.obtainContext(request);
+        collectionRestRepository.removeLogo(context, uuid);
+        return ControllerUtils.toEmptyResponse(HttpStatus.NO_CONTENT);
     }
 }

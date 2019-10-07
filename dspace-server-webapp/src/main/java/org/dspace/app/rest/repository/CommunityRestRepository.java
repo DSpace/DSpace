@@ -253,7 +253,7 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
         }
     }
 
-    public Bitstream createLogo(Context context, UUID uuid, MultipartFile uploadfile)
+    public Bitstream setLogo(Context context, UUID uuid, MultipartFile uploadfile)
             throws IOException, AuthorizeException, SQLException {
 
         Community community = null;
@@ -267,11 +267,20 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
             throw new ResourceNotFoundException("The given uuid did not resolve to a community on the server: " + uuid);
         }
 
-        if (community.getLogo() != null) {
-            throw new UnprocessableEntityException("The community with the given uuid already has a logo: " + uuid);
+        Bitstream bitstream;
+        if (uploadfile != null) {
+            if (community.getLogo() != null) {
+                throw new UnprocessableEntityException("The community with the given uuid already has a logo: " + uuid);
+            }
+            bitstream = cs.setLogo(context, community, uploadfile.getInputStream());
+        } else {
+            if (community.getLogo() == null) {
+                throw new UnprocessableEntityException("The community with the given uuid didn't have a logo: " + uuid);
+            }
+            bitstream = community.getLogo();
+            cs.setLogo(context, community, null);
         }
 
-        Bitstream bitstream = cs.setLogo(context, community, uploadfile.getInputStream());
         cs.update(context, community);
         bitstreamService.update(context, bitstream);
         context.complete();
@@ -279,7 +288,13 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
         return bitstream;
     }
 
-    public Bitstream getLogo(Context context, UUID uuid) {
+    public Bitstream removeLogo(Context context, UUID uuid) throws SQLException, IOException, AuthorizeException {
+        return setLogo(context, uuid, null);
+    }
+
+    public Bitstream updateLogo(Context context, UUID uuid, MultipartFile uploadfile)
+            throws SQLException, IOException, AuthorizeException {
+
         Community community = null;
         try {
             community = cs.find(context, uuid);
@@ -291,6 +306,17 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
             throw new ResourceNotFoundException("The given uuid did not resolve to a community on the server: " + uuid);
         }
 
-        return community.getLogo();
+        if (community.getLogo() == null) {
+            throw new UnprocessableEntityException("The community with the given uuid didn't have a logo: " + uuid);
+        }
+        Bitstream oldBitstream = community.getLogo();
+        Bitstream newBitstream = cs.setLogo(context, community, uploadfile.getInputStream());
+
+        cs.update(context, community);
+        bitstreamService.update(context, newBitstream);
+        bitstreamService.update(context, oldBitstream);
+        context.complete();
+
+        return newBitstream;
     }
 }
