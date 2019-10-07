@@ -40,6 +40,14 @@ public class BundleMoveOperation extends MovePatchOperation<BundleRest, Integer>
     @Autowired
     RequestService requestService;
 
+    /**
+     * Executes the move patch operation.
+     *
+     * @param resource  the rest model.
+     * @param operation the move patch operation.
+     * @return the updated rest model.
+     * @throws DSpaceBadRequestException
+     */
     @Override
     public BundleRest move(BundleRest resource, Operation operation) {
         Context context = ContextUtil.obtainContext(requestService.getCurrentRequest().getServletRequest());
@@ -49,7 +57,7 @@ public class BundleMoveOperation extends MovePatchOperation<BundleRest, Integer>
 
             if (totalAmount < 1) {
                 throw new DSpaceBadRequestException(
-                        createMoveExceptionMessage(bundle, from, to, "No sub-communities found.")
+                        createMoveExceptionMessage(bundle, from, to, "No bitstreams found.")
                 );
             }
             if (from >= totalAmount) {
@@ -73,16 +81,37 @@ public class BundleMoveOperation extends MovePatchOperation<BundleRest, Integer>
         return resource;
     }
 
+    /**
+     * This method should return the typed array to be used in the
+     * LateObjectEvaluator evaluation of json arrays.
+     *
+     * @return
+     */
     @Override
     protected Class<Integer[]> getArrayClassForEvaluation() {
         return Integer[].class;
     }
 
+    /**
+     * This method should return the object type to be used in the
+     * LateObjectEvaluator evaluation of json objects.
+     *
+     * @return
+     */
     @Override
     protected Class<Integer> getClassForEvaluation() {
         return Integer.class;
     }
 
+    /**
+     * Create an exception message for the move operation
+     *
+     * @param bundle    The bundle we're performing a move operation on
+     * @param from      The "from" location
+     * @param to        The "to" location
+     * @param message   A message to add after the prefix
+     * @return The created message
+     */
     private String createMoveExceptionMessage(Bundle bundle, int from, int to, String message) {
         return "Failed moving bitstreams of bundle with id " +
                 bundle.getID() + " from location " + from + " to " + to + ": " + message;

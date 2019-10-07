@@ -101,6 +101,18 @@ public class BundleRestRepository extends DSpaceObjectRestRepository<Bundle, Bun
         throw new RuntimeException("Method not allowed!");
     }
 
+    /**
+     * Apply a patch operation to a bundle
+     *
+     * @param context       The context
+     * @param request       The http request
+     * @param apiCategory   The API category e.g. "api"
+     * @param model         The DSpace model e.g. "metadatafield"
+     * @param uuid          The UUID of the bundle to perform patch operations on
+     * @param patch         The JSON Patch (https://tools.ietf.org/html/rfc6902) operation
+     * @throws AuthorizeException
+     * @throws SQLException
+     */
     @Override
     @PreAuthorize("hasPermission(#uuid, 'BUNDLE', 'WRITE')")
     protected void patch(Context context, HttpServletRequest request, String apiCategory, String model, UUID uuid,
