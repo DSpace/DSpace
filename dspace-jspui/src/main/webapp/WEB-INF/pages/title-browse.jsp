@@ -30,9 +30,9 @@
                     <div class="modal-header">
 
                         <h4 class="modal-title" id="searchModalLabel"><fmt:message key="jsp.search.filter.applied"/>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
                         </h4>
                     </div>
                     <div class="modal-body">
@@ -40,12 +40,12 @@
                         <essuir:sortOrderField sortOrder="${sortOrder}" />
                         <essuir:resultsPerPageField rpp="${rpp}" />
 
-                    <div class="form-group row">
-                        <label for="year" class="col-sm-6 col-form-label"><fmt:message key="browse.nav.date.jump"/></label>
-                        <div class="col-sm-6">
-                            <input type="text" class="yearpicker form-control" value="${selectedYear}" name="year" id="year"/>
+                        <div class="form-group row">
+                            <label for="starts_with" class="col-sm-6 col-form-label"><fmt:message key="browse.nav.date.jump"/></label>
+                            <div class="col-sm-6">
+                                <input type="text" class="form-control" value="${selectedYear}" name="starts_with" id="starts_with"/>
+                            </div>
                         </div>
-                    </div>
 
                     </div>
                     <div class="modal-footer">
@@ -57,10 +57,4 @@
         </div>
     </div>
 
-    <script>
-        $(document).ready(function(){
-            $('.yearpicker').yearpicker();
-            $('.yearpicker').val("${selectedYear}");
-        });
-    </script>
 </dspace:layout>
