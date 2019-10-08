@@ -19,6 +19,9 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.ResourcePolicy;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
@@ -27,6 +30,7 @@ import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.BundleService;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.disseminate.factory.DisseminateServiceFactory;
 import org.dspace.disseminate.service.CitationDocumentService;
@@ -71,7 +75,8 @@ public class CitationPage extends AbstractCurationTask {
 
     protected BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
     protected BundleService bundleService = ContentServiceFactory.getInstance().getBundleService();
-
+    protected ResourcePolicyService resourcePolicyService = AuthorizeServiceFactory.getInstance().getResourcePolicyService();
+    
     /**
      * {@inheritDoc}
      * @see CurationTask#perform(DSpaceObject)
@@ -97,10 +102,15 @@ public class CitationPage extends AbstractCurationTask {
     protected void performItem(Item item) throws SQLException {
         //Determine if the DISPLAY bundle exits. If not, create it.
         List<Bundle> dBundles = itemService.getBundles(item, CitationPage.DISPLAY_BUNDLE_NAME);
+        Bundle original = itemService.getBundles(item, "ORIGINAL").get(0);
         Bundle dBundle = null;
         if (dBundles == null || dBundles.size() == 0) {
             try {
+            	
                 dBundle = bundleService.create(Curator.curationContext(), item ,CitationPage.DISPLAY_BUNDLE_NAME);
+                
+                clonePolicies(Curator.curationContext(), original, dBundle);
+                		
             } catch (AuthorizeException e) {
                 log.error("User not authroized to create bundle on item \""
                         + item.getName() + "\": " + e.getMessage());
@@ -129,6 +139,7 @@ public class CitationPage extends AbstractCurationTask {
         } else {
             try {
                 pBundle = bundleService.create(Curator.curationContext(), item, CitationPage.PRESERVATION_BUNDLE_NAME);
+                clonePolicies(Curator.curationContext(), original, pBundle);
             } catch (AuthorizeException e) {
                 log.error("User not authroized to create bundle on item \""
                         + item.getName() + "\": " + e.getMessage());
@@ -227,6 +238,7 @@ public class CitationPage extends AbstractCurationTask {
             bundleService.removeBitstream(context, dBundle, displayMap.get(bitstream.getName()));
         }
         Bitstream citedBitstream = bitstreamService.create(context, dBundle, inp);
+        
         inp.close(); //Close up the temporary InputStream
 
         //Setup a good name for our bitstream and make
@@ -234,7 +246,8 @@ public class CitationPage extends AbstractCurationTask {
         citedBitstream.setName(context, bitstream.getName());
         bitstreamService.setFormat(context, citedBitstream, bitstream.getFormat(Curator.curationContext()));
         citedBitstream.setDescription(context, bitstream.getDescription());
-
+        
+        clonePolicies(context, bitstream, citedBitstream);
         this.resBuilder.append(" Added "
                 + citedBitstream.getName()
                 + " to the " + CitationPage.DISPLAY_BUNDLE_NAME + " bundle.\n");
@@ -243,5 +256,16 @@ public class CitationPage extends AbstractCurationTask {
         //database.
         itemService.update(context, item);
         this.status = Curator.CURATE_SUCCESS;
+    }
+    
+    private void clonePolicies(Context context, DSpaceObject source,DSpaceObject target) throws SQLException, AuthorizeException {
+        resourcePolicyService.removeAllPolicies(context, target);
+        for(ResourcePolicy rp: source.getResourcePolicies()) {
+	        ResourcePolicy newPolicy = resourcePolicyService.clone(context, rp);
+	        newPolicy.setdSpaceObject(target);
+	        newPolicy.setAction(rp.getAction());
+	        resourcePolicyService.update(context, newPolicy);
+        }
+
     }
 }
