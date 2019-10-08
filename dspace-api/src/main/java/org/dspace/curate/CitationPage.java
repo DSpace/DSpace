@@ -77,6 +77,8 @@ public class CitationPage extends AbstractCurationTask {
     protected BundleService bundleService = ContentServiceFactory.getInstance().getBundleService();
     protected ResourcePolicyService resourcePolicyService = AuthorizeServiceFactory.getInstance().getResourcePolicyService();
     
+    private Map<String,Bitstream> displayMap = new HashMap<String,Bitstream>();
+    
     /**
      * {@inheritDoc}
      * @see CurationTask#perform(DSpaceObject)
@@ -121,7 +123,7 @@ public class CitationPage extends AbstractCurationTask {
 
         //Create a map of the bitstreams in the displayBundle. This is used to
         //check if the bundle being cited is already in the display bundle.
-        Map<String,Bitstream> displayMap = new HashMap<String,Bitstream>();
+        
         for (Bitstream bs : dBundle.getBitstreams()) {
             displayMap.put(bs.getName(), bs);
         }
@@ -168,7 +170,8 @@ public class CitationPage extends AbstractCurationTask {
                         File citedDocument = citationDocument.makeCitedDocument(Curator.curationContext(), bitstream);
                         //Add the cited document to the approiate bundle
                         this.addCitedPageToItem(citedDocument, bundle, pBundle,
-                                dBundle, displayMap, item, bitstream);
+                                dBundle, item, bitstream);
+
                     } catch (Exception e) {
                         //Could be many things, but nothing that should be
                         //expected.
@@ -216,7 +219,7 @@ public class CitationPage extends AbstractCurationTask {
      * @throws IOException if IO error
      */
     protected void addCitedPageToItem(File citedTemp, Bundle bundle, Bundle pBundle,
-                                    Bundle dBundle, Map<String,Bitstream> displayMap, Item item,
+                                    Bundle dBundle, Item item,
                                     Bitstream bitstream) throws SQLException, AuthorizeException, IOException {
         //If we are modifying a file that is not in the
         //preservation bundle then we have to move it there.
@@ -246,6 +249,7 @@ public class CitationPage extends AbstractCurationTask {
         citedBitstream.setName(context, bitstream.getName());
         bitstreamService.setFormat(context, citedBitstream, bitstream.getFormat(Curator.curationContext()));
         citedBitstream.setDescription(context, bitstream.getDescription());
+        displayMap.put(bitstream.getName(), citedBitstream);        
         
         clonePolicies(context, bitstream, citedBitstream);
         this.resBuilder.append(" Added "
