@@ -110,10 +110,10 @@
     <url-pattern>/view-workspaceitem</url-pattern>
   </filter-mapping>
 
-  <filter-mapping>
-      <filter-name>rdf-content-negotiation</filter-name>
-      <url-pattern>/handle/*</url-pattern>
-  </filter-mapping>
+  <!--<filter-mapping>-->
+      <!--<filter-name>rdf-content-negotiation</filter-name>-->
+      <!--<url-pattern>/handle/*</url-pattern>-->
+  <!--</filter-mapping>-->
 
 
     <!-- Listener to initialise / clean up the application -->
@@ -270,10 +270,10 @@
     <servlet-class>org.dspace.app.webui.servlet.admin.BitstreamFormatRegistry</servlet-class>
   </servlet>
 
-  <servlet>
-    <servlet-name>handle</servlet-name>
-    <servlet-class>org.dspace.app.webui.servlet.HandleServlet</servlet-class>
-  </servlet>
+  <!--<servlet>-->
+    <!--<servlet-name>handle</servlet-name>-->
+    <!--<servlet-class>org.dspace.app.webui.servlet.HandleServlet</servlet-class>-->
+  <!--</servlet>-->
 
   <servlet>
     <servlet-name>html</servlet-name>
@@ -620,10 +620,10 @@
     <url-pattern>/tools/group-edit</url-pattern>
   </servlet-mapping>
 
-  <servlet-mapping>
-    <servlet-name>handle</servlet-name>
-    <url-pattern>/handle/*</url-pattern>
-  </servlet-mapping>
+  <!--<servlet-mapping>-->
+    <!--<servlet-name>handle</servlet-name>-->
+    <!--<url-pattern>/handle/*</url-pattern>-->
+  <!--</servlet-mapping>-->
 
   <servlet-mapping>
     <servlet-name>html</servlet-name>
@@ -904,6 +904,16 @@
     <servlet-mapping>
         <servlet-name>Spring MVC Servlet</servlet-name>
         <url-pattern>/browse/dateissued</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>Spring MVC Servlet</servlet-name>
+        <url-pattern>/handle/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>Spring MVC Servlet</servlet-name>
+        <url-pattern>/item-download/*</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>

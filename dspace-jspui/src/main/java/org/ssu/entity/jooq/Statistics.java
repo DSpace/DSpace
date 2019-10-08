@@ -2,8 +2,13 @@ package org.ssu.entity.jooq;
 
 import org.jooq.Record;
 import org.jooq.TableField;
+import org.jooq.UniqueKey;
+import org.jooq.impl.Internal;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
+
+import java.util.Collections;
+import java.util.List;
 
 public class Statistics extends TableImpl<Record> {
     public static final Statistics TABLE = new Statistics();
@@ -24,5 +29,15 @@ public class Statistics extends TableImpl<Record> {
     @Override
     public Statistics as(String alias) {
         return new Statistics(this, alias);
+    }
+
+    @Override
+    public UniqueKey<Record> getPrimaryKey() {
+        return Internal.createUniqueKey(TABLE, itemId, sequenceId, countryCode);
+    }
+
+    @Override
+    public List<UniqueKey<Record>> getKeys() {
+        return Collections.singletonList(Internal.createUniqueKey(TABLE, itemId, sequenceId, countryCode));
     }
 }

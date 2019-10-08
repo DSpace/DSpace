@@ -9,10 +9,14 @@ import org.springframework.stereotype.Service;
 
 import org.ssu.entity.AuthorLocalization;
 import org.ssu.entity.statistics.StatisticsData;
+import org.ssu.service.GeoIpService;
 import org.ssu.service.localization.AuthorsCache;
 import org.ssu.repository.MetadatavalueRepository;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
@@ -35,6 +39,9 @@ public class EssuirStatistics {
 
     @Resource
     private DSLContext dsl;
+
+    @Resource
+    private GeoIpService geoIpService;
 
     private String getLastUpdate() {
         return dsl.select(METADATAVALUE.value)
@@ -152,4 +159,49 @@ public class EssuirStatistics {
         return getStatistics(STATISTICS.sequenceId.greaterOrEqual(0).and(STATISTICS.itemId.eq(itemId))).getOrDefault(itemId, 0L).intValue();
     }
 
+    public void updateItemViews(HttpServletRequest request, Integer itemId) {
+        String countryCode = geoIpService.getCountryCode(request);
+
+        dsl.insertInto(STATISTICS)
+                .set(STATISTICS.itemId, itemId)
+                .set(STATISTICS.sequenceId, -1)
+                .set(STATISTICS.countryCode, countryCode)
+                .set(STATISTICS.viewCount, 1)
+                .onDuplicateKeyUpdate()
+                .set(STATISTICS.viewCount, STATISTICS.viewCount.plus(1))
+                .execute();
+    }
+
+    public void updateItemDownloads(HttpServletRequest request, Integer itemId) {
+        String countryCode = geoIpService.getCountryCode(request);
+
+        dsl.insertInto(STATISTICS)
+                .set(STATISTICS.itemId, itemId)
+                .set(STATISTICS.sequenceId, 1)
+                .set(STATISTICS.countryCode, countryCode)
+                .set(STATISTICS.viewCount, 1)
+                .onDuplicateKeyUpdate()
+                .set(STATISTICS.viewCount, STATISTICS.viewCount.plus(1))
+                .execute();
+    }
+
+    public Map<String, Integer> getItemViewsByCountry(Integer itemId) {
+        return dsl.select(STATISTICS.countryCode, DSL.sum(STATISTICS.viewCount))
+                .from(STATISTICS)
+                .where(STATISTICS.itemId.eq(itemId).and(STATISTICS.sequenceId.lessThan(0)))
+                .groupBy(STATISTICS.countryCode)
+                .fetch()
+                .stream()
+                .collect(Collectors.toMap(entry -> entry.get(STATISTICS.countryCode), entry -> entry.get(DSL.sum(STATISTICS.viewCount)).intValue()));
+    }
+
+    public Map<String, Integer> getItemDownloadsByCountry(Integer itemId) {
+        return dsl.select(STATISTICS.countryCode, DSL.sum(STATISTICS.viewCount))
+                .from(STATISTICS)
+                .where(STATISTICS.itemId.eq(itemId).and(STATISTICS.sequenceId.greaterOrEqual(0)))
+                .groupBy(STATISTICS.countryCode)
+                .fetch()
+                .stream()
+                .collect(Collectors.toMap(entry -> entry.get(STATISTICS.countryCode), entry -> entry.get(DSL.sum(STATISTICS.viewCount)).intValue()));
+    }
 }
