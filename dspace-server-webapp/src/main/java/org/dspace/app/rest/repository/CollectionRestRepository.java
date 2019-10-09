@@ -17,11 +17,11 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.BitstreamConverter;
 import org.dspace.app.rest.converter.CollectionConverter;
+import org.dspace.app.rest.converter.ItemConverter;
 import org.dspace.app.rest.converter.MetadataConverter;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
@@ -29,6 +29,7 @@ import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.CollectionRest;
 import org.dspace.app.rest.model.CommunityRest;
+import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.hateoas.CollectionResource;
 import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.repository.patch.DSpaceObjectPatch;
@@ -38,8 +39,10 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.service.BitstreamService;
+import org.dspace.content.Item;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,9 +62,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Component(CollectionRest.CATEGORY + "." + CollectionRest.NAME)
 public class CollectionRestRepository extends DSpaceObjectRestRepository<Collection, CollectionRest> {
-
-    private static final Logger log = org.apache.logging.log4j.LogManager
-            .getLogger(CollectionRestRepository.class);
 
     @Autowired
     CommunityService communityService;
@@ -83,6 +83,16 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
 
     @Autowired
     private BitstreamService bitstreamService;
+
+    @Autowired
+    private ItemConverter itemConverter;
+
+    @Autowired
+    private ItemService itemService;
+
+    @Autowired
+    private ObjectMapper mapper;
+
 
     public CollectionRestRepository(CollectionService dsoService,
                                     CollectionConverter dsoConverter) {
@@ -249,17 +259,8 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
     @Override
     @PreAuthorize("hasPermission(#id, 'COLLECTION', 'DELETE')")
     protected void delete(Context context, UUID id) throws AuthorizeException {
-        Collection collection = null;
         try {
-            collection = cs.find(context, id);
-            if (collection == null) {
-                throw new ResourceNotFoundException(
-                    CollectionRest.CATEGORY + "." + CollectionRest.NAME + " with id: " + id + " not found");
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException("Unable to find Collection with id = " + id, e);
-        }
-        try {
+            Collection collection = getCollection(context, id);
             cs.delete(context, collection);
         } catch (SQLException e) {
             throw new RuntimeException("Unable to delete Collection with id = " + id, e);
@@ -280,15 +281,71 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
      * @throws SQLException
      */
     public BitstreamRest setLogo(Context context, Collection collection, MultipartFile uploadfile)
-            throws IOException, AuthorizeException, SQLException {
+        throws IOException, AuthorizeException, SQLException {
 
         if (collection.getLogo() != null) {
             throw new UnprocessableEntityException(
-                    "The collection with the given uuid already has a logo: " + collection.getID());
+                "The collection with the given uuid already has a logo: " + collection.getID());
         }
         Bitstream bitstream = cs.setLogo(context, collection, uploadfile.getInputStream());
         cs.update(context, collection);
         bitstreamService.update(context, bitstream);
         return bitstreamConverter.fromModel(context.reloadEntity(bitstream));
+    }
+
+    public ItemRest createTemplateItem(Context context, UUID uuid) throws SQLException, AuthorizeException {
+        Collection collection = getCollection(context, uuid);
+
+        if (collection.getTemplateItem() != null) {
+            throw new UnprocessableEntityException("Collection with ID " + uuid + " already contains a template item");
+        }
+
+        HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
+        ItemRest inputItemRest;
+        try {
+            ServletInputStream input = req.getInputStream();
+            inputItemRest = mapper.readValue(input, ItemRest.class);
+        } catch (IOException e1) {
+            throw new UnprocessableEntityException("Error parsing request body", e1);
+        }
+
+        if (inputItemRest.getInArchive() || inputItemRest.getDiscoverable() || inputItemRest.getWithdrawn()) {
+            throw new UnprocessableEntityException(
+                    "The template item should not be archived, discoverable or withdrawn");
+        }
+
+        cs.createTemplateItem(context, collection);
+        Item templateItem = collection.getTemplateItem();
+        metadataConverter.setMetadata(context, templateItem, inputItemRest.getMetadata());
+        templateItem.setDiscoverable(false);
+
+        cs.update(context, collection);
+        itemService.update(context, templateItem);
+        context.commit();
+
+        return itemConverter.fromModel(templateItem);
+    }
+
+    public ItemRest getTemplateItem(Context context, UUID uuid) throws SQLException {
+        Collection collection = getCollection(context, uuid);
+
+        Item item = collection.getTemplateItem();
+        if (item == null) {
+            throw new ResourceNotFoundException(
+                    "TemplateItem from " + CollectionRest.CATEGORY + "." + CollectionRest.NAME + " with id: "
+                            + uuid + " not found");
+        }
+
+        return itemConverter.fromModel(item);
+    }
+
+    private Collection getCollection(Context context, UUID uuid) throws SQLException {
+        Collection collection = null;
+        collection = cs.find(context, uuid);
+        if (collection == null) {
+            throw new ResourceNotFoundException(
+                    CollectionRest.CATEGORY + "." + CollectionRest.NAME + " with id: " + uuid + " not found");
+        }
+        return collection;
     }
 }
