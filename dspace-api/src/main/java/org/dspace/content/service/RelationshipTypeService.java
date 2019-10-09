@@ -36,8 +36,8 @@ public interface RelationshipTypeService extends DSpaceCRUDService<RelationshipT
      * @param context       The relevant DSpace context
      * @param leftType      The rightType EntityType that needs to match for the returned RelationshipType
      * @param rightType     The rightType EntityType that needs to match for the returned RelationshipType
-     * @param leftwardType     The leftLabel String that needs to match for the returned RelationshipType
-     * @param rightwardType    The rightLabel String that needs to match for the returned RelationshipType
+     * @param leftwardType     The leftwardType String that needs to match for the returned RelationshipType
+     * @param rightwardType    The rightwardType String that needs to match for the returned RelationshipType
      * @return
      * @throws SQLException If something goes wrong
      */
@@ -78,14 +78,14 @@ public interface RelationshipTypeService extends DSpaceCRUDService<RelationshipT
      * Retrieves all RelationshipType objects that have a left or right label that is
      * equal to the given String
      * @param context   The relevant DSpace context
-     * @param label     The label that has to match
+     * @param typeName  The typeName that has to match
      * @param limit     paging limit
      * @param offset    paging offset
      * @return          The list of all RelationshipType objects that have a left or right label
      *                  that is equal to the given label param
      * @throws SQLException If something goes wrong
      */
-    List<RelationshipType> findByLeftwardOrRightwardTypeName(Context context, String label, Integer limit,
+    List<RelationshipType> findByLeftwardOrRightwardTypeName(Context context, String typeName, Integer limit,
                                                              Integer offset)
             throws SQLException;
 
