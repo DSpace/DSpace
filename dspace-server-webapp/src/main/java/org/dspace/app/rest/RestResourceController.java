@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -391,14 +392,17 @@ public class RestResourceController implements InitializingBean {
      * @param request       The relevant request
      * @param apiCategory   The apiCategory to be used
      * @param model         The model to be used
+     * @param parent        Optional parent identifier
      * @return              The relevant ResponseEntity for this request
      * @throws HttpRequestMethodNotSupportedException   If something goes wrong
      */
     @RequestMapping(method = RequestMethod.POST, consumes = {"application/json", "application/hal+json"})
-    public ResponseEntity<ResourceSupport> post(HttpServletRequest request, @PathVariable String apiCategory,
-                                                @PathVariable String model)
+    public ResponseEntity<ResourceSupport> post(HttpServletRequest request,
+                                                @PathVariable String apiCategory,
+                                                @PathVariable String model,
+                                                @RequestParam(required = false) String parent)
         throws HttpRequestMethodNotSupportedException {
-        return postJsonInternal(request, apiCategory, model);
+        return postJsonInternal(request, apiCategory, model, parent);
     }
 
     /**
@@ -433,21 +437,21 @@ public class RestResourceController implements InitializingBean {
      * @param request       The relevant request
      * @param apiCategory   The apiCategory to be used
      * @param model         The model to be used
+     * @param parent        The parent object id (optional)
      * @return              The relevant ResponseEntity for this request
      * @throws HttpRequestMethodNotSupportedException   If something goes wrong
      */
     public <ID extends Serializable> ResponseEntity<ResourceSupport> postJsonInternal(HttpServletRequest request,
                                                                                   String apiCategory,
-                                                                                  String model)
+                                                                                  String model, String parent)
         throws HttpRequestMethodNotSupportedException {
         checkModelPluralForm(apiCategory, model);
         DSpaceRestRepository<RestAddressableModel, ID> repository = utils.getResourceRepository(apiCategory, model);
 
-        String parentCommunityString = request.getParameter("parent");
         RestAddressableModel modelObject;
-        if (parentCommunityString != null) {
-            UUID parentCommunityUuid = UUIDUtils.fromString(parentCommunityString);
-            modelObject = repository.createAndReturn(parentCommunityUuid);
+        if (parent != null) {
+            UUID parentUuid = UUIDUtils.fromString(parent);
+            modelObject = repository.createAndReturn(parentUuid);
         } else {
             modelObject = repository.createAndReturn();
         }
