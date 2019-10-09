@@ -682,20 +682,20 @@ public class MetadataImport {
 
     /**
      *
-     * Adds multiple relationships with the same label to an item.
+     * Adds multiple relationships with a matching typeName to an item.
      *
      * @param c             The relevant DSpace context
      * @param item          The item to which this metadatavalue belongs to
-     * @param label       The element for the metadatavalue
+     * @param typeName       The element for the metadatavalue
      * @param values to iterate over
      * @throws SQLException If something goes wrong
      * @throws AuthorizeException   If something goes wrong
      */
-    private void addRelationships(Context c, Item item, String label, List<String> values)
+    private void addRelationships(Context c, Item item, String typeName, List<String> values)
             throws SQLException, AuthorizeException,
                                         MetadataImportException {
         for (String value : values) {
-            addRelationship(c, item, label, value);
+            addRelationship(c, item, typeName, value);
         }
     }
 
@@ -728,12 +728,12 @@ public class MetadataImport {
      *
      * @param c         The relevant DSpace context
      * @param item      The item that the relationships will be made for
-     * @param label     The relationship label
+     * @param typeName     The relationship typeName
      * @param value    The value for the relationship
      * @throws SQLException If something goes wrong
      * @throws AuthorizeException   If something goes wrong
      */
-    private void addRelationship(Context c, Item item, String label, String value)
+    private void addRelationship(Context c, Item item, String typeName, String value)
         throws SQLException, AuthorizeException, MetadataImportException {
         if (value.isEmpty()) {
             return;
@@ -749,20 +749,20 @@ public class MetadataImport {
         String itemRelationshipType = itemService.getMetadata(item, "relationship", "type",
                 null, Item.ANY).get(0).getValue();
 
-        // Get the correct RelationshipType based on label
-        List<RelationshipType> relType = relationshipTypeService.findByLeftwardOrRightwardTypeName(c, label);
+        // Get the correct RelationshipType based on typeName
+        List<RelationshipType> relType = relationshipTypeService.findByLeftwardOrRightwardTypeName(c, typeName);
         RelationshipType foundRelationshipType = matchRelationshipType(relType,
-                itemRelationshipType,relationEntityRelationshipType);
+                relationEntityRelationshipType, itemRelationshipType, typeName);
 
         if (foundRelationshipType == null) {
             throw new MetadataImportException("Error on CSV row " + rowCount + ":" + "\n" +
                     "No Relationship type found for:\n" +
                     "Target type: " + relationEntityRelationshipType + "\n" +
                     "Origin referer type: " + itemRelationshipType + "\n" +
-                    "with label: " + label);
+                    "with typeName: " + typeName);
         }
 
-        if (foundRelationshipType.getLeftwardType().equalsIgnoreCase(label)) {
+        if (foundRelationshipType.getLeftwardType().equalsIgnoreCase(typeName)) {
             left = true;
         }
 
@@ -1480,32 +1480,32 @@ public class MetadataImport {
     }
 
     /**
-     * Populate the entityRelationMap with all target references and it's asscoiated labels
+     * Populate the entityRelationMap with all target references and it's asscoiated typeNames
      * to their respective origins
      *
      * @param refUUID the target reference UUID for the relation
-     * @param relationField the field of the label to relate
+     * @param relationField the field of the typeNames to relate from
      */
     private void populateEntityRelationMap(String refUUID, String relationField, String originId) {
-        HashMap<String, ArrayList<String>> labels = null;
+        HashMap<String, ArrayList<String>> typeNames = null;
         if (entityRelationMap.get(refUUID) == null) {
-            labels = new HashMap<>();
+            typeNames = new HashMap<>();
             ArrayList<String> originIds = new ArrayList<>();
             originIds.add(originId);
-            labels.put(relationField, originIds);
-            entityRelationMap.put(refUUID, labels);
+            typeNames.put(relationField, originIds);
+            entityRelationMap.put(refUUID, typeNames);
         } else {
-            labels = entityRelationMap.get(refUUID);
-            if (labels.get(relationField) == null) {
+            typeNames = entityRelationMap.get(refUUID);
+            if (typeNames.get(relationField) == null) {
                 ArrayList<String> originIds = new ArrayList<>();
                 originIds.add(originId);
-                labels.put(relationField, originIds);
+                typeNames.put(relationField, originIds);
             } else {
-                ArrayList<String> originIds =  labels.get(relationField);
+                ArrayList<String> originIds =  typeNames.get(relationField);
                 originIds.add(originId);
-                labels.put(relationField, originIds);
+                typeNames.put(relationField, originIds);
             }
-            entityRelationMap.put(refUUID, labels);
+            entityRelationMap.put(refUUID, typeNames);
         }
     }
 
@@ -1718,10 +1718,10 @@ public class MetadataImport {
                 if (targetType == null) {
                     continue;
                 }
-                // Get labels for each origin referer of this target.
-                for (String label : entityRelationMap.get(targetUUID).keySet()) {
+                // Get typeNames for each origin referer of this target.
+                for (String typeName : entityRelationMap.get(targetUUID).keySet()) {
                     // Resolve Entity Type for each origin referer.
-                    for (String originRefererUUID : entityRelationMap.get(targetUUID).get(label)) {
+                    for (String originRefererUUID : entityRelationMap.get(targetUUID).get(typeName)) {
                         // Evaluate row number for origin referer.
                         String originRow = "N/A";
                         if (csvRowMap.containsValue(UUID.fromString(originRefererUUID))) {
@@ -1733,11 +1733,11 @@ public class MetadataImport {
                             }
                         }
                         String originType = "";
-                        // Validate target type and origin type pairing with label or add to errors.
+                        // Validate target type and origin type pairing with typeName or add to errors.
                         // Attempt lookup in processed map first before looking in archive.
                         if (entityTypeMap.get(UUID.fromString(originRefererUUID)) != null) {
                             originType = entityTypeMap.get(UUID.fromString(originRefererUUID));
-                            validateTypesByTypeByLabel(targetType, originType, label, originRow);
+                            validateTypesByTypeByTypeName(targetType, originType, typeName, originRow);
                         } else {
                             // Origin item may be archived; check there.
                             // Add to errors if Realtionship.type cannot be derived.
@@ -1750,7 +1750,7 @@ public class MetadataImport {
                                 if (relTypes.size() > 0) {
                                     relTypeValue = relTypes.get(0).getValue();
                                     originType = entityTypeService.findByEntityType(c, relTypeValue).getLabel();
-                                    validateTypesByTypeByLabel(targetType, originType, label, originRow);
+                                    validateTypesByTypeByTypeName(targetType, originType, typeName, originRow);
                                 } else {
                                     relationValidationErrors.add("Error on CSV row " + originRow + ":" + "\n" +
                                             "Cannot resolve Entity type for reference: "
@@ -1781,28 +1781,28 @@ public class MetadataImport {
     }
 
     /**
-     * Generates a list of potenital Relationship Types given a label and attempts to match the given
+     * Generates a list of potenital Relationship Types given a typeName and attempts to match the given
      * targetType and originType to a Relationship Type in the list.
      *
      * @param targetType entity type of target.
      * @param originType entity type of origin referer.
-     * @param label left or right label of the respective Relationship.
+     * @param typeName left or right typeName of the respective Relationship.
      * @return the UUID of the item.
      */
-    private void validateTypesByTypeByLabel(String targetType, String originType, String label, String originRow)
+    private void validateTypesByTypeByTypeName(String targetType, String originType, String typeName, String originRow)
             throws MetadataImportException {
         try {
             RelationshipType foundRelationshipType = null;
             List<RelationshipType> relationshipTypeList = relationshipTypeService.
-                    findByLeftwardOrRightwardTypeName(c, label.split("\\.")[1]);
+                    findByLeftwardOrRightwardTypeName(c, typeName.split("\\.")[1]);
             // Validate described relationship form the CSV.
-            foundRelationshipType = matchRelationshipType(relationshipTypeList, targetType, originType);
+            foundRelationshipType = matchRelationshipType(relationshipTypeList, targetType, originType, typeName);
             if (foundRelationshipType == null) {
                 relationValidationErrors.add("Error on CSV row " + originRow + ":" + "\n" +
                         "No Relationship type found for:\n" +
                         "Target type: " + targetType + "\n" +
                         "Origin referer type: " + originType + "\n" +
-                        "with label: " + label);
+                        "with typeName: " + typeName + " for type: " + originType);
             }
         } catch (SQLException sqle) {
             throw new MetadataImportException("Error interacting with database!", sqle);
@@ -1813,19 +1813,39 @@ public class MetadataImport {
      * Matches two Entity types to a Relationship Type from a set of Relationship Types.
      *
      * @param relTypes set of Relationship Types.
-     * @param typeOne first type to be used in matching.
-     * @param typeTwo second item to be used in matching.
+     * @param targetType entity type of target.
+     * @param originType entity type of origin referer.
      * @return null or matched Relationship Type.
      */
     private RelationshipType matchRelationshipType(List<RelationshipType> relTypes,
-                                                   String typeOne, String typeTwo) {
+                                                   String targetType, String originType, String originTypeName) {
         RelationshipType foundRelationshipType = null;
+        if (originTypeName.split("\\.").length > 1) {
+            originTypeName = originTypeName.split("\\.")[1];
+        }
         for (RelationshipType relationshipType : relTypes) {
-            if (relationshipType.getLeftType().getLabel().equalsIgnoreCase(typeOne) &&
-                    relationshipType.getRightType().getLabel().equalsIgnoreCase(typeTwo) ||
-                            relationshipType.getLeftType().getLabel().equalsIgnoreCase(typeTwo) &&
-                    relationshipType.getRightType().getLabel().equalsIgnoreCase(typeOne)) {
-                foundRelationshipType = relationshipType;
+            // Is origin type leftward or righward
+            boolean isLeft = false;
+            if (relationshipType.getLeftType().getLabel().equalsIgnoreCase(originType)) {
+                isLeft = true;
+            }
+            if (isLeft) {
+                // Validate typeName reference
+                if (!relationshipType.getLeftwardType().equalsIgnoreCase(originTypeName)) {
+                    continue;
+                }
+                if (relationshipType.getLeftType().getLabel().equalsIgnoreCase(originType) &&
+                        relationshipType.getRightType().getLabel().equalsIgnoreCase(targetType)) {
+                    foundRelationshipType = relationshipType;
+                }
+            } else {
+                if (!relationshipType.getRightwardType().equalsIgnoreCase(originTypeName)) {
+                    continue;
+                }
+                if (relationshipType.getLeftType().getLabel().equalsIgnoreCase(targetType) &&
+                        relationshipType.getRightType().getLabel().equalsIgnoreCase(originType)) {
+                    foundRelationshipType = relationshipType;
+                }
             }
         }
         return foundRelationshipType;

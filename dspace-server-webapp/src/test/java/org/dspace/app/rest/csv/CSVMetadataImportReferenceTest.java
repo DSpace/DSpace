@@ -384,7 +384,7 @@ public class CSVMetadataImportReferenceTest extends AbstractEntityIntegrationTes
                 .build();
         context.restoreAuthSystemState();
         String[] csv = {"id,relationship.type,relation.isAuthorOfPublication,collection,rowName",
-                "+,Person,," + col1.getHandle() + ",1",
+                "+,Person,," + col1.getHandle() + ",1" +
                 testItem.getID().toString() + ",,rowName:1," + col1.getHandle() + ",2"};
         assertEquals(1, performImportScript(csv, false));
     }
@@ -400,7 +400,7 @@ public class CSVMetadataImportReferenceTest extends AbstractEntityIntegrationTes
                 .build();
         context.restoreAuthSystemState();
         String[] csv = {"id,relationship.type,relation.isAuthorOfPublication,collection,rowName",
-                testItem.getID().toString() + ",Person,," + col1.getHandle() + ",1",
+                testItem.getID().toString() + ",Person,," + col1.getHandle() + ",1" +
                 "+,OrgUnit,rowName:1," + col1.getHandle() + ",2"};
         assertEquals(1, performImportScript(csv, false));
     }
@@ -434,7 +434,7 @@ public class CSVMetadataImportReferenceTest extends AbstractEntityIntegrationTes
     }
 
     /**
-     * Test relationship validation with invalid relationship definition and with archived target reference
+     * Test relationship validation with valid relationship definition using the same rowName more than once
      */
     @Test
     public void testDuplicateRowNameReferences() throws Exception {
@@ -445,6 +445,23 @@ public class CSVMetadataImportReferenceTest extends AbstractEntityIntegrationTes
         Item[] items = runImport(csv);
         assertRelationship(items[1], items[0], 1, "left", 0);
         assertRelationship(items[2], items[0], 1, "left", 0);
+    }
+
+    /**
+     * Test relationship validation with invalid relationship definition by incorrect typeName usage
+     */
+    @Test
+    public void testInvalidTypeNameDefined() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Item testItem = ItemBuilder.createItem(context, col1)
+                .withRelationshipType("Publication")
+                .build();
+        context.restoreAuthSystemState();
+        String[] csv = {"id,collection,relationship.type,dc.title," +
+                "relation.isProjectOfPublication,relation.isPublicationOfProject",
+                "+," + col1.getHandle() + ",Project,Title," +
+                testItem.getID().toString() + "," + testItem.getID().toString() };
+        assertEquals(1, performImportScript(csv, true));
     }
 
     /**
