@@ -135,8 +135,8 @@ public interface RelationshipService extends DSpaceCRUDService<Relationship> {
      * @throws SQLException If something goes wrong
      */
     public List<Relationship> findByItemAndRelationshipType(Context context, Item item,
-                                                            RelationshipType relationshipType, int limit, int offset,
-                                                            boolean isLeft)
+                                                            RelationshipType relationshipType, boolean isLeft,
+                                                            int limit, int offset)
             throws SQLException;
 
     /**
@@ -267,6 +267,6 @@ public interface RelationshipService extends DSpaceCRUDService<Relationship> {
      * @return total count
      * @throws SQLException if database error
      */
-    int countByItemAndRelationshipType(Context context, RelationshipType relationshipType, Item item)
+    int countByItemAndRelationshipType(Context context, Item item, RelationshipType relationshipType)
             throws SQLException;
 }

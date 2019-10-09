@@ -110,8 +110,9 @@ public class RelationshipDAOImpl extends AbstractHibernateDAO<Relationship> impl
     }
 
     @Override
-    public List<Relationship> findByItemAndRelationshipType(Context context, RelationshipType relationshipType,
-                                                     Integer limit, Integer offset, Item item)
+    public List<Relationship> findByItemAndRelationshipType(Context context, Item item,
+                                                            RelationshipType relationshipType, Integer limit,
+                                                            Integer offset)
             throws SQLException {
 
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
@@ -127,8 +128,9 @@ public class RelationshipDAOImpl extends AbstractHibernateDAO<Relationship> impl
     }
 
     @Override
-    public List<Relationship> findByItemAndRelationshipType(Context context, RelationshipType relationshipType,
-                                                            Integer limit, Integer offset, Item item, boolean isLeft)
+    public List<Relationship> findByItemAndRelationshipType(Context context, Item item,
+                                                            RelationshipType relationshipType, boolean isLeft,
+                                                            Integer limit, Integer offset)
             throws SQLException {
 
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
@@ -171,7 +173,7 @@ public class RelationshipDAOImpl extends AbstractHibernateDAO<Relationship> impl
     }
 
     @Override
-    public int countByItemAndRelationshipType(Context context, RelationshipType relationshipType, Item item)
+    public int countByItemAndRelationshipType(Context context, Item item, RelationshipType relationshipType)
             throws SQLException {
 
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);

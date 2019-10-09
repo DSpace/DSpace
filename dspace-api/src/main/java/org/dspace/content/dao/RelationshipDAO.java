@@ -112,8 +112,8 @@ public interface RelationshipDAO extends GenericDAO<Relationship> {
      *          relationshipType property
      * @throws SQLException If something goes wrong
      */
-    List<Relationship> findByItemAndRelationshipType(Context context, RelationshipType relationshipType,
-                                              Integer limit, Integer offset, Item item) throws SQLException;
+    List<Relationship> findByItemAndRelationshipType(Context context, Item item, RelationshipType relationshipType,
+                                              Integer limit, Integer offset) throws SQLException;
 
     /**
      * This method returns a list of Relationship objects for the given RelationshipType object.
@@ -129,8 +129,8 @@ public interface RelationshipDAO extends GenericDAO<Relationship> {
      *          relationshipType property
      * @throws SQLException If something goes wrong
      */
-    List<Relationship> findByItemAndRelationshipType(Context context, RelationshipType relationshipType,
-                                                     Integer limit, Integer offset, Item item, boolean isLeft)
+    List<Relationship> findByItemAndRelationshipType(Context context, Item item, RelationshipType relationshipType,
+                                                     boolean isLeft, Integer limit, Integer offset)
             throws SQLException;
 
     /**
@@ -173,6 +173,6 @@ public interface RelationshipDAO extends GenericDAO<Relationship> {
      * @return total count
      * @throws SQLException if database error
      */
-    int countByItemAndRelationshipType(Context context, RelationshipType relationshipType, Item item)
+    int countByItemAndRelationshipType(Context context, Item item, RelationshipType relationshipType)
             throws SQLException;
 }
