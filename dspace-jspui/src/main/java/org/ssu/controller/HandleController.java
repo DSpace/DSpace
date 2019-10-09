@@ -1,17 +1,21 @@
 package org.ssu.controller;
 
 import org.dspace.app.webui.util.UIUtil;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
-import org.dspace.content.Bitstream;
-import org.dspace.content.Bundle;
-import org.dspace.content.DSpaceObject;
-import org.dspace.content.Item;
+import org.dspace.browse.ItemCountException;
+import org.dspace.browse.ItemCounter;
+import org.dspace.content.*;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.core.factory.CoreServiceFactory;
+import org.dspace.core.service.PluginService;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
+import org.dspace.plugin.CommunityHomeProcessor;
+import org.dspace.plugin.PluginException;
 import org.dspace.statistics.util.LocationUtils;
 import org.jvnet.jaxb2_commons.xml.bind.model.MList;
 import org.springframework.stereotype.Controller;
@@ -20,12 +24,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 import org.ssu.entity.response.BitstreamResponse;
+import org.ssu.entity.response.CountedCommunityResponse;
 import org.ssu.entity.response.CountryStatisticsResponse;
 import org.ssu.service.ItemService;
 import org.ssu.service.statistics.EssuirStatistics;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
 import java.util.*;
@@ -44,8 +50,22 @@ public class HandleController {
     @Resource
     private EssuirStatistics essuirStatistics;
 
+    @RequestMapping(value = "/123456789/{itemId}/browse")
+    public ModelAndView browseInCommunity(ModelAndView model, HttpServletRequest request) {
+        System.out.println("in browse page");
+
+        return model;
+    }
+
+    @RequestMapping(value = "/123456789/{itemId}/simple-search")
+    public ModelAndView simpleSearchInCommunity(ModelAndView model, HttpServletRequest request) {
+        System.out.println("in search query");
+
+        return model;
+    }
+
     @RequestMapping(value = "/123456789/{itemId}")
-    public ModelAndView entrypoint(HttpServletRequest request, @PathVariable("itemId") String itemId, ModelAndView model) throws SQLException {
+    public ModelAndView entrypoint(HttpServletRequest request, HttpServletResponse response,  @PathVariable("itemId") String itemId, ModelAndView model) throws SQLException, ItemCountException, PluginException, AuthorizeException {
         Context dspaceContext = UIUtil.obtainContext(request);
         DSpaceObject dSpaceObject = handleService.resolveToObject(dspaceContext, "123456789/" + itemId);
         Locale locale = dspaceContext.getCurrentLocale();
@@ -53,10 +73,68 @@ public class HandleController {
             if (dSpaceObject.getType() == Constants.ITEM) {
                 return displayItem(request, model, (Item) dSpaceObject, locale);
             }
-
+            if (dSpaceObject.getType() == Constants.COMMUNITY) {
+                return displayCommunity(request, response, model, (Community) dSpaceObject, locale);
+            }
             System.out.println(dSpaceObject.getType());
         }
         return null;
+    }
+
+
+
+    private ModelAndView displayCommunity(HttpServletRequest request, HttpServletResponse response, ModelAndView model, Community community, Locale locale) throws SQLException, ItemCountException, PluginException, AuthorizeException {
+        Context dspaceContext = UIUtil.obtainContext(request);
+        ItemCounter ic = new ItemCounter(dspaceContext);
+
+        List<CountedCommunityResponse> subCommunities = community.getSubcommunities()
+                .stream()
+                .map(subCommunity -> {
+                    try {
+                        return new CountedCommunityResponse.Builder()
+                                .withTitle(subCommunity.getName())
+                                .withHandle(subCommunity.getHandle())
+                                .withItemCount(ic.getCount(subCommunity))
+                                .build();
+                    } catch (ItemCountException e) {
+                        e.printStackTrace();
+                    }
+                    return null;
+                })
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+
+        List<CountedCommunityResponse> collections = community.getCollections()
+                .stream()
+                .map(subCommunity -> {
+                    try {
+                        return new CountedCommunityResponse.Builder()
+                                .withTitle(subCommunity.getName())
+                                .withHandle(subCommunity.getHandle())
+                                .withItemCount(ic.getCount(subCommunity))
+                                .build();
+                    } catch (ItemCountException e) {
+                        e.printStackTrace();
+                    }
+                    return null;
+                })
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+        PluginService pluginService = CoreServiceFactory.getInstance().getPluginService();
+        CommunityHomeProcessor[] chp = (CommunityHomeProcessor[]) pluginService.getPluginSequence(CommunityHomeProcessor.class);
+        for (int i = 0; i < chp.length; i++)
+        {
+            chp[i].process(dspaceContext, request, response, community);
+        }
+
+        model.setViewName("community-display");
+        request.setAttribute("community", community);
+        model.addObject("title", community.getName());
+        model.addObject("handle", community.getHandle());
+        model.addObject("subCommunities", subCommunities);
+        model.addObject("collections", collections);
+        model.addObject("itemCount", ic.getCount(community));
+        return model;
     }
 
     @RequestMapping("/item-download/{itemId}/{bitstreamId}")
