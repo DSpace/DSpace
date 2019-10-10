@@ -8,6 +8,7 @@
 package org.dspace.content;
 
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -94,6 +95,9 @@ public class EntityServiceImpl implements EntityService {
     @Override
     public List<RelationshipType> getAllRelationshipTypes(Context context, Entity entity) throws SQLException {
         EntityType entityType = this.getType(context, entity);
+        if (entityType == null) {
+            return Collections.emptyList();
+        }
         List<RelationshipType> listToReturn = new LinkedList<>();
         for (RelationshipType relationshipType : relationshipTypeService.findAll(context)) {
             if (relationshipType.getLeftType().getID() == entityType.getID() ||
