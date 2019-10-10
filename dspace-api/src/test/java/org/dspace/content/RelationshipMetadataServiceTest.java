@@ -8,6 +8,7 @@
 package org.dspace.content;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
@@ -51,6 +52,7 @@ public class RelationshipMetadataServiceTest extends AbstractUnitTest {
 
     Item item;
     Item authorItem;
+    Relationship relationship;
 
     /**
      * This method will be run before every test as per @Before. It will
@@ -73,6 +75,19 @@ public class RelationshipMetadataServiceTest extends AbstractUnitTest {
 
             item = installItemService.installItem(context, is);
             authorItem = installItemService.installItem(context, authorIs);
+
+            itemService.addMetadata(context, item, "relationship", "type", null, null, "Publication");
+            itemService.addMetadata(context, authorItem, "relationship", "type", null, null, "Author");
+            itemService.addMetadata(context, authorItem, "person", "familyName", null, null, "familyName");
+            itemService.addMetadata(context, authorItem, "person", "givenName", null, null, "firstName");
+            EntityType publicationEntityType = entityTypeService.create(context, "Publication");
+            EntityType authorEntityType = entityTypeService.create(context, "Author");
+            RelationshipType isAuthorOfPublication = relationshipTypeService
+                    .create(context, publicationEntityType, authorEntityType,
+                            "isAuthorOfPublication", "isPublicationOfAuthor",
+                            null, null, null, null);
+
+            relationship = relationshipService.create(context, item, authorItem, isAuthorOfPublication, 0, 0);
             context.restoreAuthSystemState();
         } catch (AuthorizeException ex) {
             log.error("Authorization Error in init", ex);
@@ -81,7 +96,6 @@ public class RelationshipMetadataServiceTest extends AbstractUnitTest {
             log.error("SQL Error in init", ex);
             fail("SQL Error in init: " + ex.getMessage());
         }
-
     }
 
     /**
@@ -100,22 +114,7 @@ public class RelationshipMetadataServiceTest extends AbstractUnitTest {
 
 
     @Test
-    public void testGetRelationshipMetadata() throws Exception {
-        context.turnOffAuthorisationSystem();
-        itemService.addMetadata(context, item, "relationship", "type", null, null, "Publication");
-        itemService.addMetadata(context, authorItem, "relationship", "type", null, null, "Author");
-        itemService.addMetadata(context, authorItem, "person", "familyName", null, null, "familyName");
-        itemService.addMetadata(context, authorItem, "person", "givenName", null, null, "firstName");
-        EntityType publicationEntityType = entityTypeService.create(context, "Publication");
-        EntityType authorEntityType = entityTypeService.create(context, "Author");
-        RelationshipType isAuthorOfPublication = relationshipTypeService
-            .create(context, publicationEntityType, authorEntityType, "isAuthorOfPublication", "isPublicationOfAuthor",
-                    null, null, null, null);
-
-        Relationship relationship = relationshipService.create(context, item, authorItem, isAuthorOfPublication, 0, 0);
-
-        context.restoreAuthSystemState();
-
+    public void testGetAuthorRelationshipMetadata() {
         List<MetadataValue> authorList = itemService.getMetadata(item, "dc", "contributor", "author", Item.ANY);
         assertThat(authorList.size(), equalTo(1));
         assertThat(authorList.get(0).getValue(), equalTo("familyName, firstName"));
@@ -137,6 +136,57 @@ public class RelationshipMetadataServiceTest extends AbstractUnitTest {
         assertThat(list.get(1).getMetadataField().getMetadataSchema().getName(), equalTo("relation"));
         assertThat(list.get(1).getMetadataField().getElement(), equalTo("isAuthorOfPublication"));
         assertThat(list.get(1).getAuthority(), equalTo("virtual::" + relationship.getID()));
+    }
 
+    @Test
+    public void testDeleteAuthorRelationshipCopyToLeftItem() throws Exception {
+        context.turnOffAuthorisationSystem();
+        relationshipService.delete(context, relationship, true, false);
+        context.restoreAuthSystemState();
+
+        List<MetadataValue> authorList = itemService.getMetadata(item, "dc", "contributor", "author", Item.ANY);
+        assertThat(authorList.size(), equalTo(1));
+        assertThat(authorList.get(0).getValue(), equalTo("familyName, firstName"));
+        assertThat(authorList.get(0).getMetadataField().getMetadataSchema().getName(), equalTo("dc"));
+        assertThat(authorList.get(0).getMetadataField().getElement(), equalTo("contributor"));
+        assertThat(authorList.get(0).getMetadataField().getQualifier(), equalTo("author"));
+        assertNull(authorList.get(0).getAuthority());
+
+        List<MetadataValue> relationshipMetadataList = itemService
+                .getMetadata(item, "relation", "isAuthorOfPublication", null, Item.ANY);
+        assertThat(relationshipMetadataList.size(), equalTo(0));
+    }
+
+    @Test
+    public void testAuthorDeleteRelationshipCopyToRightItem() throws Exception {
+        context.turnOffAuthorisationSystem();
+        relationshipService.delete(context, relationship, false, true);
+        context.restoreAuthSystemState();
+
+        List<MetadataValue> authorList = itemService.getMetadata(item, "dc", "contributor", "author", Item.ANY);
+        assertThat(authorList.size(), equalTo(0));
+
+        List<MetadataValue> relationshipMetadataList = itemService
+                .getMetadata(item, "relation", "isAuthorOfPublication", null, Item.ANY);
+        assertThat(relationshipMetadataList.size(), equalTo(0));
+    }
+
+    @Test
+    public void testDeleteAuthorRelationshipCopyToBothItems() throws Exception {
+        context.turnOffAuthorisationSystem();
+        relationshipService.delete(context, relationship, true, true);
+        context.restoreAuthSystemState();
+
+        List<MetadataValue> authorList = itemService.getMetadata(item, "dc", "contributor", "author", Item.ANY);
+        assertThat(authorList.size(), equalTo(1));
+        assertThat(authorList.get(0).getValue(), equalTo("familyName, firstName"));
+        assertThat(authorList.get(0).getMetadataField().getMetadataSchema().getName(), equalTo("dc"));
+        assertThat(authorList.get(0).getMetadataField().getElement(), equalTo("contributor"));
+        assertThat(authorList.get(0).getMetadataField().getQualifier(), equalTo("author"));
+        assertNull(authorList.get(0).getAuthority());
+
+        List<MetadataValue> relationshipMetadataList = itemService
+                .getMetadata(item, "relation", "isAuthorOfPublication", null, Item.ANY);
+        assertThat(relationshipMetadataList.size(), equalTo(0));
     }
 }
