@@ -9,6 +9,7 @@ package org.dspace.app.rest;
 
 import static com.jayway.jsonpath.JsonPath.read;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
+import static junit.framework.TestCase.assertEquals;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
@@ -21,8 +22,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -31,6 +36,7 @@ import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.converter.CommunityConverter;
 import org.dspace.app.rest.matcher.CommunityMatcher;
 import org.dspace.app.rest.matcher.MetadataMatcher;
+import org.dspace.app.rest.matcher.PageMatcher;
 import org.dspace.app.rest.model.CommunityRest;
 import org.dspace.app.rest.model.MetadataRest;
 import org.dspace.app.rest.model.MetadataValueRest;
@@ -43,9 +49,12 @@ import org.dspace.content.service.CommunityService;
 import org.dspace.core.Constants;
 import org.dspace.eperson.EPerson;
 import org.hamcrest.Matchers;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MvcResult;
 
 /**
  * Integration Tests against the /api/core/communities endpoint (including any subpaths)
@@ -267,6 +276,125 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                    .andExpect(jsonPath("$.page.size", is(20)))
                    .andExpect(jsonPath("$.page.totalElements", is(2)))
         ;
+    }
+
+    @Test
+    public void findAllNoDuplicatesOnMultipleCommunityTitlesTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        List<String> titles = Arrays.asList("First title", "Second title", "Third title", "Fourth title");
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName(titles.get(0))
+                .withTitle(titles.get(1))
+                .withTitle(titles.get(2))
+                .withTitle(titles.get(3))
+                .build();
+
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+
+
+        getClient().perform(get("/api/core/communities").param("size", "2"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._embedded.communities", Matchers.containsInAnyOrder(
+                        CommunityMatcher.matchCommunityEntryMultipleTitles(titles, parentCommunity.getID(),
+                                parentCommunity.getHandle()),
+                        CommunityMatcher.matchCommunityEntry(child1.getID(), child1.getHandle())
+                )))
+                .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/communities")))
+                .andExpect(jsonPath("$.page.totalElements", is(2)))
+                .andExpect(jsonPath("$.page.totalPages", is(1)));
+    }
+
+    @Test
+    public void findAllNoDuplicatesOnMultipleCommunityTitlesPaginationTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        List<String> titles = Arrays.asList("First title", "Second title", "Third title", "Fourth title");
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName(titles.get(0))
+                                          .withTitle(titles.get(1))
+                                          .withTitle(titles.get(2))
+                                          .withTitle(titles.get(3))
+                                          .build();
+        Community childCommunity = CommunityBuilder.createSubCommunity(context, parentCommunity).build();
+        Community secondParentCommunity = CommunityBuilder.createCommunity(context).withName("testing").build();
+        Community thirdParentCommunity = CommunityBuilder.createCommunity(context).withName("testingTitleTwo").build();
+
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/api/core/communities").param("size", "2"))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$._embedded.communities", Matchers.containsInAnyOrder(
+                       CommunityMatcher.matchCommunityEntryMultipleTitles(titles, parentCommunity.getID(),
+                                                                          parentCommunity.getHandle()),
+                       CommunityMatcher.matchCommunityEntry(childCommunity.getID(), childCommunity.getHandle())
+                       )))
+                   .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/communities")))
+                   .andExpect(jsonPath("$.page", PageMatcher.pageEntryWithTotalPagesAndElements(0, 2, 2, 4)));
+
+        getClient().perform(get("/api/core/communities").param("size", "2").param("page", "1"))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$._embedded.communities", Matchers.containsInAnyOrder(
+                       CommunityMatcher.matchCommunityEntry(secondParentCommunity.getID(),
+                                                            secondParentCommunity.getHandle()),
+                       CommunityMatcher.matchCommunityEntry(thirdParentCommunity.getID(),
+                                                            thirdParentCommunity.getHandle())
+                   )))
+                   .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/communities")))
+                   .andExpect(jsonPath("$.page", PageMatcher.pageEntryWithTotalPagesAndElements(1, 2, 2, 4)));
+    }
+
+
+    @Test
+    public void findAllNoNameCommunityIsReturned() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context).build();
+
+        getClient().perform(get("/api/core/communities"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._embedded.communities", Matchers.contains(
+                        CommunityMatcher.matchCommunityEntry(parentCommunity.getID(),
+                                parentCommunity.getHandle())
+                )))
+                .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/communities")))
+                .andExpect(jsonPath("$.page.totalElements", is(1)));
+    }
+
+    @Test
+    public void findAllCommunitiesAreReturnedInCorrectOrder() throws Exception {
+        // The hibernate query for finding all communities is "SELECT ... ORDER BY STR(dc_title.value)"
+        // So the communities should be returned in alphabetical order
+
+        context.turnOffAuthorisationSystem();
+
+        List<String> orderedTitles = Arrays.asList("Abc", "Bcd", "Cde");
+
+        Community community1 = CommunityBuilder.createCommunity(context)
+            .withName(orderedTitles.get(0))
+            .build();
+
+        Community community2 = CommunityBuilder.createCommunity(context)
+            .withName(orderedTitles.get(1))
+            .build();
+
+        Community community3 = CommunityBuilder.createCommunity(context)
+            .withName(orderedTitles.get(2))
+            .build();
+
+        ObjectMapper mapper = new ObjectMapper();
+        MvcResult result = getClient().perform(get("/api/core/communities")).andReturn();
+        String response = result.getResponse().getContentAsString();
+        JSONArray communities = new JSONObject(response).getJSONObject("_embedded").getJSONArray("communities");
+        List<String> responseTitles = StreamSupport.stream(communities.spliterator(), false)
+                                        .map(JSONObject.class::cast)
+                                        .map(x -> x.getString("name"))
+                                        .collect(Collectors.toList());
+
+        assertEquals(orderedTitles, responseTitles);
     }
 
     @Test
