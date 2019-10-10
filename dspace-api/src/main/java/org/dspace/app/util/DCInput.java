@@ -13,8 +13,8 @@ import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import org.apache.commons.lang.StringUtils;
-import org.dspace.content.MetadataSchema;
+import org.apache.commons.lang3.StringUtils;
+import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.core.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -134,6 +134,12 @@ public class DCInput {
      */
     private List<String> typeBind = null;
 
+    private boolean isRelationshipField = false;
+    private boolean isMetadataField = false;
+    private String relationshipType = null;
+    private String searchConfiguration = null;
+    private String filter;
+
     /**
      * The scope of the input sets, this restricts hidden metadata fields from
      * view during workflow processing.
@@ -160,7 +166,7 @@ public class DCInput {
         // Default the schema to dublin core
         dcSchema = fieldMap.get("dc-schema");
         if (dcSchema == null) {
-            dcSchema = MetadataSchema.DC_SCHEMA;
+            dcSchema = MetadataSchemaEnum.DC.getName();
         }
 
         //check if the input have a language tag
@@ -206,6 +212,11 @@ public class DCInput {
             }
         }
         style = fieldMap.get("style");
+        isRelationshipField = fieldMap.containsKey("relationship-type");
+        isMetadataField = fieldMap.containsKey("dc-schema");
+        relationshipType = fieldMap.get("relationship-type");
+        searchConfiguration = fieldMap.get("search-configuration");
+        filter = fieldMap.get("filter");
     }
 
     /**
@@ -481,6 +492,18 @@ public class DCInput {
         return Utils.standardize(this.getSchema(), this.getElement(), this.getQualifier(), ".");
     }
 
+    public String getRelationshipType() {
+        return relationshipType;
+    }
+
+    public String getSearchConfiguration() {
+        return searchConfiguration;
+    }
+
+    public String getFilter() {
+        return filter;
+    }
+
     public boolean isQualdropValue() {
         if ("qualdrop_value".equals(getInputType())) {
             return true;
@@ -504,5 +527,23 @@ public class DCInput {
         }
 
         return true;
+    }
+
+    /**
+     * Verify whether the current field contains an entity relationship
+     * This also implies a relationship type is defined for this field
+     * The field can contain both an entity relationship and a metadata field simultaneously
+     */
+    public boolean isRelationshipField() {
+        return isRelationshipField;
+    }
+
+    /**
+     * Verify whether the current field contains a metadata field
+     * This also implies a field type is defined for this field
+     * The field can contain both an entity relationship and a metadata field simultaneously
+     */
+    public boolean isMetadataField() {
+        return isMetadataField;
     }
 }

@@ -12,11 +12,12 @@ import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.service.ItemService;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
@@ -37,7 +38,7 @@ public class BasicWorkflowItemServiceImpl implements BasicWorkflowItemService {
     /**
      * log4j category
      */
-    protected static Logger log = Logger.getLogger(BasicWorkflowItem.class);
+    protected static Logger log = org.apache.logging.log4j.LogManager.getLogger(BasicWorkflowItem.class);
 
     @Autowired(required = true)
     protected BasicWorkflowItemDAO workflowItemDAO;
@@ -50,6 +51,11 @@ public class BasicWorkflowItemServiceImpl implements BasicWorkflowItemService {
 
     protected BasicWorkflowItemServiceImpl() {
 
+    }
+
+    @Override
+    public int getSupportsIndexableObjectTypeConstant() {
+        return Constants.WORKFLOWITEM;
     }
 
     @Override
@@ -82,6 +88,14 @@ public class BasicWorkflowItemServiceImpl implements BasicWorkflowItemService {
             }
         }
         return workflowItem;
+    }
+
+    @Override
+    public BasicWorkflowItem findIndexableObject(Context context, Integer id) throws SQLException {
+        if (id != null) {
+            return find(context, id);
+        }
+        return null;
     }
 
     @Override

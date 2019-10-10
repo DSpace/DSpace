@@ -17,6 +17,7 @@ import javax.persistence.criteria.Root;
 import org.dspace.content.Collection;
 import org.dspace.core.AbstractHibernateDAO;
 import org.dspace.core.Context;
+import org.dspace.eperson.Group;
 import org.dspace.xmlworkflow.storedcomponents.CollectionRole;
 import org.dspace.xmlworkflow.storedcomponents.CollectionRole_;
 import org.dspace.xmlworkflow.storedcomponents.dao.CollectionRoleDAO;
@@ -40,6 +41,16 @@ public class CollectionRoleDAOImpl extends AbstractHibernateDAO<CollectionRole> 
         Root<CollectionRole> collectionRoleRoot = criteriaQuery.from(CollectionRole.class);
         criteriaQuery.select(collectionRoleRoot);
         criteriaQuery.where(criteriaBuilder.equal(collectionRoleRoot.get(CollectionRole_.collection), collection));
+        return list(context, criteriaQuery, false, CollectionRole.class, -1, -1);
+    }
+
+    @Override
+    public List<CollectionRole> findByGroup(Context context, Group group) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, CollectionRole.class);
+        Root<CollectionRole> collectionRoleRoot = criteriaQuery.from(CollectionRole.class);
+        criteriaQuery.select(collectionRoleRoot);
+        criteriaQuery.where(criteriaBuilder.equal(collectionRoleRoot.get(CollectionRole_.group), group));
         return list(context, criteriaQuery, false, CollectionRole.class, -1, -1);
     }
 

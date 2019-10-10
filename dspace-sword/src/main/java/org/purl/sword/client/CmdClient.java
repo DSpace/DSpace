@@ -15,7 +15,7 @@ import java.net.URL;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.purl.sword.atom.Author;
 import org.purl.sword.atom.Content;
 import org.purl.sword.atom.Contributor;
@@ -54,7 +54,7 @@ public class CmdClient implements ClientType {
     /**
      * The logger.
      */
-    private static Logger log = Logger.getLogger(CmdClient.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(CmdClient.class);
 
     /**
      * Create a new instance of the class and create an instance of the

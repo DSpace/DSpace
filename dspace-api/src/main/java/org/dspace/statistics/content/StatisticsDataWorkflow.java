@@ -17,10 +17,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.PropertiesConfiguration;
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.commons.configuration2.PropertiesConfiguration;
+import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
+import org.apache.commons.configuration2.builder.fluent.Configurations;
+import org.apache.commons.configuration2.ex.ConfigurationException;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
@@ -36,7 +38,7 @@ import org.dspace.statistics.SolrLoggerServiceImpl;
 import org.dspace.statistics.content.filter.StatisticsFilter;
 
 /**
- * A workflow data implementation that will query the statistics backend for workflow information
+ * A workflow data implementation that will query the statistics backend for workflow information.
  *
  * @author Kevin Van de Velde (kevin at atmire dot com)
  * @author Ben Bosman (ben at atmire dot com)
@@ -44,7 +46,7 @@ import org.dspace.statistics.content.filter.StatisticsFilter;
  */
 public class StatisticsDataWorkflow extends StatisticsData {
 
-    private static final Logger log = Logger.getLogger(StatisticsDataWorkflow.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(StatisticsDataWorkflow.class);
 
     /**
      * Current DSpaceObject for which to generate the statistics.
@@ -164,19 +166,21 @@ public class StatisticsDataWorkflow extends StatisticsData {
      * @param typeGenerator the type generator
      * @return counts for each facet by name.
      * @throws org.apache.solr.client.solrj.SolrServerException passed through.
+     * @throws java.io.IOException passed through.
      */
-    protected Map<String, Long> getTotalFacetCounts(DatasetTypeGenerator typeGenerator) throws SolrServerException {
+    protected Map<String, Long> getTotalFacetCounts(DatasetTypeGenerator typeGenerator)
+            throws SolrServerException, IOException {
         ObjectCount[] objectCounts = solrLoggerService
             .queryFacetField(getQuery(), null, typeGenerator.getType(), -1, false, null);
-        Map<String, Long> result = new HashMap<String, Long>();
+        Map<String, Long> result = new HashMap<>();
         for (ObjectCount objectCount : objectCounts) {
             result.put(objectCount.getValue(), objectCount.getCount());
         }
         return result;
     }
 
-
-    protected Date getOldestWorkflowItemDate() throws SolrServerException {
+    protected Date getOldestWorkflowItemDate()
+            throws SolrServerException, IOException {
         ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
         String workflowStartDate = configurationService.getProperty("usage-statistics.workflow-start-date");
         if (workflowStartDate == null) {
@@ -188,15 +192,16 @@ public class StatisticsDataWorkflow extends StatisticsData {
                 Date oldestDate = (Date) solrDocument.getFieldValue("time");
                 //Store the date, we only need to retrieve this once !
                 try {
-                    //Also store it in the solr-statics configuration file, the reason for this being that the sort
-                    // query
-                    //can be very time consuming & we do not want this delay each time we want to see workflow
+                    // Also store it in the solr-statics configuration file, the reason for this being that the sort
+                    // query can be very time consuming & we do not want this delay each time we want to see workflow
                     // statistics
                     String solrConfigDir = configurationService.getProperty("dspace.dir") + File.separator + "config"
                         + File.separator + "modules" + File.separator + "usage-statistics.cfg";
-                    PropertiesConfiguration config = new PropertiesConfiguration(solrConfigDir);
+                    FileBasedConfigurationBuilder<PropertiesConfiguration> builder = new Configurations()
+                        .propertiesBuilder(solrConfigDir);
+                    PropertiesConfiguration config = builder.getConfiguration();
                     config.setProperty("workflow-start-date", new DCDate(oldestDate));
-                    config.save();
+                    builder.save();
                 } catch (ConfigurationException e) {
                     log.error("Error while storing workflow start date", e);
                 }

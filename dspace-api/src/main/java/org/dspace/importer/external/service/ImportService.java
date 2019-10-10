@@ -15,7 +15,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.Item;
 import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.datamodel.Query;
@@ -36,7 +36,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class ImportService implements Destroyable {
     private HashMap<String, MetadataSource> importSources = new HashMap<>();
 
-    Logger log = Logger.getLogger(ImportService.class);
+    Logger log = org.apache.logging.log4j.LogManager.getLogger(ImportService.class);
 
     /**
      * Constructs an empty ImportService class object

@@ -11,7 +11,7 @@ import static org.junit.Assert.fail;
 
 import java.sql.SQLException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
@@ -43,7 +43,7 @@ public class AbstractUnitTest extends AbstractDSpaceTest {
     /**
      * log4j category
      */
-    private static final Logger log = Logger.getLogger(AbstractUnitTest.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(AbstractUnitTest.class);
 
     /**
      * Context mock object to use in the tests.

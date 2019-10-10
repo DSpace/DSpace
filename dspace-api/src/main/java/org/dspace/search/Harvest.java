@@ -14,7 +14,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Collection;
@@ -28,6 +28,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.discovery.DiscoverQuery;
 import org.dspace.discovery.DiscoverResult;
+import org.dspace.discovery.IndexableObject;
 import org.dspace.discovery.SearchServiceException;
 import org.dspace.discovery.SearchUtils;
 import org.dspace.eperson.Group;
@@ -46,7 +47,7 @@ public class Harvest {
     /**
      * log4j logger
      */
-    private static final Logger log = Logger.getLogger(Harvest.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(Harvest.class);
 
     protected static final AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance()
                                                                                       .getAuthorizeService();
@@ -139,9 +140,10 @@ public class Harvest {
             DiscoverResult discoverResult = SearchUtils.getSearchService().search(context, discoverQuery);
 
             // Process results of query into HarvestedItemInfo objects
-            Iterator<DSpaceObject> dsoIterator = discoverResult.getDspaceObjects().iterator();
+            Iterator<IndexableObject> dsoIterator = discoverResult.getIndexableObjects().iterator();
             while (dsoIterator.hasNext() && ((limit == 0) || (itemCounter < limit))) {
-                DSpaceObject dso = dsoIterator.next();
+                // the query is limited to ITEM
+                DSpaceObject dso = (DSpaceObject) dsoIterator.next();
                 HarvestedItemInfo itemInfo = new HarvestedItemInfo();
                 itemInfo.context = context;
                 itemInfo.handle = dso.getHandle();

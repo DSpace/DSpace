@@ -9,7 +9,7 @@ package org.dspace.xoai.controller;
 
 import static java.util.Arrays.asList;
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
-import static org.apache.log4j.Logger.getLogger;
+import static org.apache.logging.log4j.LogManager.getLogger;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -28,7 +28,7 @@ import com.lyncode.xoai.dataprovider.core.XOAIManager;
 import com.lyncode.xoai.dataprovider.exceptions.InvalidContextException;
 import com.lyncode.xoai.dataprovider.exceptions.OAIException;
 import com.lyncode.xoai.dataprovider.exceptions.WritingXmlException;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.core.Context;
 import org.dspace.xoai.services.api.cache.XOAICacheService;
 import org.dspace.xoai.services.api.config.XOAIManagerResolver;
@@ -40,6 +40,7 @@ import org.dspace.xoai.services.api.xoai.ItemRepositoryResolver;
 import org.dspace.xoai.services.api.xoai.SetRepositoryResolver;
 import org.dspace.xoai.services.impl.xoai.DSpaceResumptionTokenFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -49,6 +50,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
  * @author Lyncode Development Team (dspace at lyncode dot com)
  */
 @Controller
+// Use the configured "oai.path" for all requests, or "/oai" by default
+@RequestMapping("/${oai.path:oai}")
+// Only enable this controller if "oai.enabled=true"
+@ConditionalOnProperty("oai.enabled")
 public class DSpaceOAIDataProvider {
     private static final Logger log = getLogger(DSpaceOAIDataProvider.class);
 
@@ -67,7 +72,7 @@ public class DSpaceOAIDataProvider {
 
     private DSpaceResumptionTokenFormatter resumptionTokenFormat = new DSpaceResumptionTokenFormatter();
 
-    @RequestMapping("/")
+    @RequestMapping({"", "/"})
     public String indexAction(HttpServletResponse response, Model model) throws ServletException {
         try {
             XOAIManager manager = xoaiManagerResolver.getManager();

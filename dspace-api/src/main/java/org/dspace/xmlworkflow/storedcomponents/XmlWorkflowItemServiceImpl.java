@@ -12,14 +12,16 @@ import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.service.ItemService;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
+import org.dspace.xmlworkflow.service.WorkflowRequirementsService;
 import org.dspace.xmlworkflow.storedcomponents.dao.XmlWorkflowItemDAO;
 import org.dspace.xmlworkflow.storedcomponents.service.ClaimedTaskService;
 import org.dspace.xmlworkflow.storedcomponents.service.PoolTaskService;
@@ -47,16 +49,23 @@ public class XmlWorkflowItemServiceImpl implements XmlWorkflowItemService {
     @Autowired(required = true)
     protected PoolTaskService poolTaskService;
     @Autowired(required = true)
+    protected WorkflowRequirementsService workflowRequirementsService;
+    @Autowired(required = true)
     protected WorkflowItemRoleService workflowItemRoleService;
 
     /*
      * The current step in the workflow system in which this workflow item is present
      */
-    private Logger log = Logger.getLogger(XmlWorkflowItemServiceImpl.class);
+    private Logger log = org.apache.logging.log4j.LogManager.getLogger(XmlWorkflowItemServiceImpl.class);
 
 
     protected XmlWorkflowItemServiceImpl() {
 
+    }
+
+    @Override
+    public int getSupportsIndexableObjectTypeConstant() {
+        return Constants.WORKFLOWITEM;
     }
 
     @Override
@@ -71,7 +80,6 @@ public class XmlWorkflowItemServiceImpl implements XmlWorkflowItemService {
     @Override
     public XmlWorkflowItem find(Context context, int id) throws SQLException {
         XmlWorkflowItem workflowItem = xmlWorkflowItemDAO.findByID(context, XmlWorkflowItem.class, id);
-
 
         if (workflowItem == null) {
             if (log.isDebugEnabled()) {
@@ -88,18 +96,30 @@ public class XmlWorkflowItemServiceImpl implements XmlWorkflowItemService {
     }
 
     @Override
+    public XmlWorkflowItem findIndexableObject(Context context, Integer id) throws SQLException {
+        if (id != null) {
+            return find(context, id);
+        }
+        return null;
+    }
+
+    @Override
     public List<XmlWorkflowItem> findAll(Context context) throws SQLException {
         return xmlWorkflowItemDAO.findAll(context, XmlWorkflowItem.class);
     }
 
     @Override
-    public List<XmlWorkflowItem> findAll(Context context, Integer offset, Integer pagesize) throws SQLException {
-        return findAllInCollection(context, offset, pagesize, null);
+    public List<XmlWorkflowItem> findAll(Context context, Integer page, Integer pagesize) throws SQLException {
+        return findAllInCollection(context, page, pagesize, null);
     }
 
     @Override
-    public List<XmlWorkflowItem> findAllInCollection(Context context, Integer offset, Integer pagesize,
+    public List<XmlWorkflowItem> findAllInCollection(Context context, Integer page, Integer pagesize,
                                                      Collection collection) throws SQLException {
+        Integer offset = null;
+        if (page != null && pagesize != null) {
+            offset = page * pagesize;
+        }
         return xmlWorkflowItemDAO.findAllInCollection(context, offset, pagesize, collection);
     }
 
@@ -116,6 +136,21 @@ public class XmlWorkflowItemServiceImpl implements XmlWorkflowItemService {
     @Override
     public List<XmlWorkflowItem> findBySubmitter(Context context, EPerson ep) throws SQLException {
         return xmlWorkflowItemDAO.findBySubmitter(context, ep);
+    }
+
+    @Override
+    public List<XmlWorkflowItem> findBySubmitter(Context context, EPerson ep, Integer pageNumber, Integer pageSize)
+            throws SQLException {
+        Integer offset = null;
+        if (pageNumber != null && pageSize != null) {
+            offset = pageNumber * pageSize;
+        }
+        return xmlWorkflowItemDAO.findBySubmitter(context, ep, pageNumber, pageSize);
+    }
+
+    @Override
+    public int countBySubmitter(Context context, EPerson ep) throws SQLException {
+        return xmlWorkflowItemDAO.countBySubmitter(context, ep);
     }
 
     @Override
@@ -175,6 +210,7 @@ public class XmlWorkflowItemServiceImpl implements XmlWorkflowItemService {
         }
 
         poolTaskService.deleteByWorkflowItem(context, workflowItem);
+        workflowRequirementsService.clearInProgressUsers(context, workflowItem);
         claimedTaskService.deleteByWorkflowItem(context, workflowItem);
 
         // FIXME - auth?

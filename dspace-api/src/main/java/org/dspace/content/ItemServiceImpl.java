@@ -11,14 +11,18 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authorize.AuthorizeConfiguration;
 import org.dspace.authorize.AuthorizeException;
@@ -27,6 +31,7 @@ import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.authority.Choices;
 import org.dspace.content.dao.ItemDAO;
+import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.BundleService;
@@ -35,7 +40,9 @@ import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataSchemaService;
+import org.dspace.content.service.RelationshipService;
 import org.dspace.content.service.WorkspaceItemService;
+import org.dspace.content.virtual.VirtualMetadataPopulator;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -49,6 +56,7 @@ import org.dspace.identifier.service.IdentifierService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.versioning.service.VersioningService;
 import org.dspace.workflow.WorkflowItemService;
+import org.dspace.workflow.factory.WorkflowServiceFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -63,7 +71,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     /**
      * log4j category
      */
-    private static final Logger log = Logger.getLogger(Item.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(Item.class);
 
     @Autowired(required = true)
     protected ItemDAO itemDAO;
@@ -100,6 +108,14 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     @Autowired(required = true)
     protected WorkflowItemService workflowItemService;
 
+    @Autowired(required = true)
+    protected RelationshipService relationshipService;
+
+    @Autowired(required = true)
+    protected VirtualMetadataPopulator virtualMetadataPopulator;
+
+    @Autowired(required = true)
+    private RelationshipMetadataService relationshipMetadataService;
 
     protected ItemServiceImpl() {
         super();
@@ -154,6 +170,15 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         }
 
         return item;
+    }
+
+    @Override
+    /**
+     * This method is an alias of the find method needed to avoid ambiguity between the IndexableObjectService interface
+     * and the DSpaceObjectService interface
+     */
+    public Item findIndexableObject(Context context, UUID id) throws SQLException {
+        return find(context, id);
     }
 
     @Override
@@ -219,10 +244,10 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         throws SQLException {
 
         MetadataField metadataField = metadataFieldService
-            .findByElement(context, MetadataSchema.DC_SCHEMA, "date", "accessioned");
+            .findByElement(context, MetadataSchemaEnum.DC.getName(), "date", "accessioned");
         if (metadataField == null) {
             throw new IllegalArgumentException(
-                "Required metadata field '" + MetadataSchema.DC_SCHEMA + ".date.accessioned' doesn't exist!");
+                "Required metadata field '" + MetadataSchemaEnum.DC.getName() + ".date.accessioned' doesn't exist!");
         }
 
         return itemDAO.findBySubmitter(context, eperson, metadataField, limit);
@@ -237,6 +262,17 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     public Iterator<Item> findByCollection(Context context, Collection collection, Integer limit, Integer offset)
         throws SQLException {
         return itemDAO.findArchivedByCollection(context, collection, limit, offset);
+    }
+
+    @Override
+    public Iterator<Item> findByCollectionMapping(Context context, Collection collection, Integer limit, Integer offset)
+        throws SQLException {
+        return itemDAO.findArchivedByCollectionExcludingOwning(context, collection, limit, offset);
+    }
+
+    @Override
+    public int countByCollectionMapping(Context context, Collection collection) throws SQLException {
+        return itemDAO.countArchivedByCollectionExcludingOwning(context, collection);
     }
 
     @Override
@@ -460,7 +496,8 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
         super.update(context, item);
 
-        // Set sequence IDs for bitstreams in item
+        // Set sequence IDs for bitstreams in Item. To guarantee uniqueness,
+        // sequence IDs are assigned in sequential order (starting with 1)
         int sequence = 0;
         List<Bundle> bunds = item.getBundles();
 
@@ -477,8 +514,6 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
         // start sequencing bitstreams without sequence IDs
         sequence++;
-
-
         for (Bundle bund : bunds) {
             List<Bitstream> streams = bund.getBitstreams();
 
@@ -543,7 +578,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
         prov.append(installItemService.getBitstreamProvenanceMessage(context, item));
 
-        addMetadata(context, item, MetadataSchema.DC_SCHEMA, "description", "provenance", "en", prov.toString());
+        addMetadata(context, item, MetadataSchemaEnum.DC.getName(), "description", "provenance", "en", prov.toString());
 
         // Update item in DB
         update(context, item);
@@ -598,7 +633,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         // bitstream checksums
         prov.append(installItemService.getBitstreamProvenanceMessage(context, item));
 
-        addMetadata(context, item, MetadataSchema.DC_SCHEMA, "description", "provenance", "en", prov.toString());
+        addMetadata(context, item, MetadataSchemaEnum.DC.getName(), "description", "provenance", "en", prov.toString());
 
         // Update item in DB
         update(context, item);
@@ -640,6 +675,15 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     @Override
     public int getSupportsTypeConstant() {
         return Constants.ITEM;
+    }
+
+    @Override
+    /**
+     * This method is an alias of the getSupportsTypeConstant method needed to avoid ambiguity between the
+     * IndexableObjectService interface and the DSpaceObjectService interface
+     */
+    public int getSupportsIndexableObjectTypeConstant() {
+        return getSupportsTypeConstant();
     }
 
     protected void rawDelete(Context context, Item item) throws AuthorizeException, SQLException, IOException {
@@ -1109,6 +1153,16 @@ prevent the generation of resource policy entry values with null dspace_object a
         if (ownCollection != null) {
             return ownCollection;
         } else {
+            InProgressSubmission inprogress = ContentServiceFactory.getInstance().getWorkspaceItemService()
+                                                                   .findByItem(context,
+                                                                               item);
+            if (inprogress == null) {
+                inprogress = WorkflowServiceFactory.getInstance().getWorkflowItemService().findByItem(context, item);
+            }
+
+            if (inprogress != null) {
+                return inprogress.getCollection();
+            }
             // is a template item?
             return item.getTemplateItemOf();
         }
@@ -1176,7 +1230,7 @@ prevent the generation of resource policy entry values with null dspace_object a
     @Override
     public int countAllItems(Context context, Collection collection) throws SQLException {
         return itemDAO.countItems(context, collection, true, false) + itemDAO.countItems(context, collection,
-            false, true);
+                                                                                         false, true);
     }
 
     @Override
@@ -1195,7 +1249,7 @@ prevent the generation of resource policy entry values with null dspace_object a
 
         // Now, lets count unique items across that list of collections
         return itemDAO.countItems(context, collections, true, false) + itemDAO.countItems(context, collections,
-            false, true);
+                                                                                          false, true);
     }
 
     @Override
@@ -1238,6 +1292,12 @@ prevent the generation of resource policy entry values with null dspace_object a
     }
 
     @Override
+    public int countArchivedItems(Context context) throws SQLException {
+        // return count of items in archive and also not withdrawn
+        return itemDAO.countItems(context, true, false);
+    }
+
+    @Override
     public int countWithdrawnItems(Context context) throws SQLException {
         // return count of items that are not in archive and withdrawn
         return itemDAO.countItems(context, false, true);
@@ -1257,4 +1317,95 @@ prevent the generation of resource policy entry values with null dspace_object a
 
         return false;
     }
+
+    /**
+     * This method will return a list of MetadataValue objects that contains all the regular
+     * metadata of the item passed along in the parameters as well as all the virtual metadata
+     * which will be generated and processed together with the {@link VirtualMetadataPopulator}
+     * by processing the item's relationships
+     * @param item         the Item to be processed
+     * @param schema       the schema for the metadata field. <em>Must</em> match
+     *                     the <code>name</code> of an existing metadata schema.
+     * @param element      the element name. <code>DSpaceObject.ANY</code> matches any
+     *                     element. <code>null</code> doesn't really make sense as all
+     *                     metadata must have an element.
+     * @param qualifier    the qualifier. <code>null</code> means unqualified, and
+     *                     <code>DSpaceObject.ANY</code> means any qualifier (including
+     *                     unqualified.)
+     * @param lang         the ISO639 language code, optionally followed by an underscore
+     *                     and the ISO3166 country code. <code>null</code> means only
+     *                     values with no language are returned, and
+     *                     <code>DSpaceObject.ANY</code> means values with any country code or
+     *                     no country code are returned.
+     * @return
+     */
+    @Override
+    public List<MetadataValue> getMetadata(Item item, String schema, String element, String qualifier, String lang) {
+        return this.getMetadata(item, schema, element, qualifier, lang, true);
+    }
+
+    @Override
+    public List<MetadataValue> getMetadata(Item item, String schema, String element, String qualifier, String lang,
+                                           boolean enableVirtualMetadata) {
+        //Fields of the relation schema are virtual metadata
+        //except for relation.type which is the type of item in the model
+        if (StringUtils.equals(schema, MetadataSchemaEnum.RELATION.getName()) && !StringUtils.equals(element, "type")) {
+
+            List<RelationshipMetadataValue> relationMetadata = relationshipMetadataService
+                .getRelationshipMetadata(item, false);
+            List<MetadataValue> listToReturn = new LinkedList<>();
+            for (MetadataValue metadataValue : relationMetadata) {
+                if (StringUtils.equals(metadataValue.getMetadataField().getElement(), element)) {
+                    listToReturn.add(metadataValue);
+                }
+            }
+            listToReturn = sortMetadataValueList(listToReturn);
+
+            return listToReturn;
+
+        } else {
+            List<MetadataValue> dbMetadataValues = super.getMetadata(item, schema, element, qualifier, lang);
+
+            List<MetadataValue> fullMetadataValueList = new LinkedList<>();
+            if (enableVirtualMetadata) {
+                fullMetadataValueList.addAll(relationshipMetadataService.getRelationshipMetadata(item, true));
+
+            }
+            fullMetadataValueList.addAll(dbMetadataValues);
+
+            List<MetadataValue> finalList = new LinkedList<>();
+            for (MetadataValue metadataValue : fullMetadataValueList) {
+                if (match(schema, element, qualifier, lang, metadataValue)) {
+                    finalList.add(metadataValue);
+                }
+            }
+            finalList = sortMetadataValueList(finalList);
+            return finalList;
+        }
+
+    }
+
+    /**
+     * This method will sort the List of MetadataValue objects based on the MetadataSchema, MetadataField Element,
+     * MetadataField Qualifier and MetadataField Place in that order.
+     * @param listToReturn  The list to be sorted
+     * @return The list sorted on those criteria
+     */
+    private List<MetadataValue> sortMetadataValueList(List<MetadataValue> listToReturn) {
+        Comparator<MetadataValue> comparator = Comparator.comparing(
+            metadataValue -> metadataValue.getMetadataField().getMetadataSchema().getName(),
+            Comparator.nullsFirst(Comparator.naturalOrder()));
+        comparator = comparator.thenComparing(metadataValue -> metadataValue.getMetadataField().getElement(),
+                                              Comparator.nullsFirst(Comparator.naturalOrder()));
+        comparator = comparator.thenComparing(metadataValue -> metadataValue.getMetadataField().getQualifier(),
+                                              Comparator.nullsFirst(Comparator.naturalOrder()));
+        comparator = comparator.thenComparing(metadataValue -> metadataValue.getPlace(),
+                                              Comparator.nullsFirst(Comparator.naturalOrder()));
+
+        Stream<MetadataValue> metadataValueStream = listToReturn.stream().sorted(comparator);
+        listToReturn = metadataValueStream.collect(Collectors.toList());
+        return listToReturn;
+    }
+
+
 }

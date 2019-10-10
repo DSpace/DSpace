@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.UUID;
 import javax.persistence.Query;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.dspace.content.MetadataField;
 import org.dspace.core.AbstractHibernateDSODAO;
@@ -167,7 +167,7 @@ public class GroupDAOImpl extends AbstractHibernateDSODAO<Group> implements Grou
     @Override
     public void delete(Context context, Group group) throws SQLException {
         Query query = getHibernateSession(context)
-            .createSQLQuery("DELETE FROM group2group WHERE parent_id=:groupId or child_id=:groupId");
+            .createNativeQuery("DELETE FROM group2group WHERE parent_id=:groupId or child_id=:groupId");
         query.setParameter("groupId", group.getID());
         query.executeUpdate();
         super.delete(context, group);

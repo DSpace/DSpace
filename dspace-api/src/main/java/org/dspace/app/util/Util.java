@@ -23,8 +23,8 @@ import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.collections4.ListUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
@@ -44,7 +44,7 @@ public class Util {
     // cache for source version result
     private static String sourceVersion = null;
 
-    private static Logger log = Logger.getLogger(Util.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(Util.class);
 
     /**
      * Default constructor. Must be protected as org.dspace.xmlworkflow.WorkflowUtils extends it
@@ -471,6 +471,26 @@ public class Util {
             }
         }
         return toReturn;
+    }
+
+    /**
+     * Split a list in an array of i sub-lists uniformly sized
+     * 
+     * @param idsList the list to split
+     * @param i the number of sublists to return
+     * 
+     * @return an array of sub-lists of fixed size
+     */
+    public static <T> List<T>[] splitList(List<T> idsList, int i) {
+        int setmin = idsList.size() / i;
+        List<T>[] result = new List[i];
+        int offset = 0;
+        for (int idx = 0; idx < i - 1; idx++) {
+            result[idx] = idsList.subList(offset, offset + setmin);
+            offset += setmin;
+        }
+        result[i - 1] = idsList.subList(offset, idsList.size());
+        return result;
     }
 
     public static List<String> differenceInSubmissionFields(Collection fromCollection, Collection toCollection)

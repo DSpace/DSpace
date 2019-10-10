@@ -12,7 +12,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.SQLException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.AbstractDSpaceTest;
 import org.dspace.AbstractIntegrationTest;
 import org.dspace.authorize.AuthorizeException;
@@ -47,6 +47,7 @@ import org.hamcrest.CoreMatchers;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -57,12 +58,13 @@ import org.junit.Test;
  * @author Pascal-Nicolas Becker
  * @author Terry Brady
  */
+@Ignore
 public class BasicWorkflowAuthorizationIT
     extends AbstractIntegrationTest {
     /**
      * log4j category
      */
-    private static final Logger log = Logger.getLogger(BasicWorkflowAuthorizationIT.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(BasicWorkflowAuthorizationIT.class);
 
     protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
     protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
@@ -206,7 +208,8 @@ public class BasicWorkflowAuthorizationIT
         } finally {
             context.restoreAuthSystemState();
         }
-        Assert.assertThat("testsetWorkflowGroupSetsPermission 0", collectionService.getWorkflowGroup(collection, step),
+        Assert.assertThat("testsetWorkflowGroupSetsPermission 0",
+                collectionService.getWorkflowGroup(context, collection, step),
                           CoreMatchers.equalTo(group));
         Assert.assertTrue(groupService.isDirectMember(group, member));
         Assert.assertTrue("testsetWorkflowGroupSetsPermission 1", authorizeService
@@ -228,7 +231,8 @@ public class BasicWorkflowAuthorizationIT
             context.restoreAuthSystemState();
         }
         Assert
-            .assertThat("testsetWorkflowGroupRevokesPermission 0", collectionService.getWorkflowGroup(collection, step),
+                .assertThat("testsetWorkflowGroupRevokesPermission 0",
+                        collectionService.getWorkflowGroup(context, collection, step),
                         CoreMatchers
                             .equalTo(group));
         Assert.assertTrue("testsetWorkflowGroupRevokesPermission 1", authorizeService
@@ -241,7 +245,8 @@ public class BasicWorkflowAuthorizationIT
             context.restoreAuthSystemState();
         }
         Assert
-            .assertThat("testsetWorkflowGroupRevokesPermission 2", collectionService.getWorkflowGroup(collection, step),
+                .assertThat("testsetWorkflowGroupRevokesPermission 2",
+                        collectionService.getWorkflowGroup(context, collection, step),
                         CoreMatchers
                             .nullValue());
         Assert.assertFalse("testsetWorkflowGroupRevokesPermission 3", authorizeService
