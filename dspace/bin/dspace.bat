@@ -2,7 +2,7 @@
 @REM # The contents of this file are subject to the license and copyright
 @REM # detailed in the LICENSE and NOTICE files at the root of the source
 @REM # tree and available online at
-@REM # 
+@REM #
 @REM # http://www.dspace.org/license/
 @REM ###########################################################################
 @REM # 'dspace.bat' script
