@@ -171,6 +171,6 @@ public interface ChoiceAuthorityService {
     /**
      * This method has been created to have a way of clearing the cache kept inside the service
      */
-    public void clearController();
+    public void clearCache();
 
 }
