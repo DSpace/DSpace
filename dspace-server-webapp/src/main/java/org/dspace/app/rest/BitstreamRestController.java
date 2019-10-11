@@ -233,9 +233,6 @@ public class BitstreamRestController {
         if (bitstream == null) {
             throw new ResourceNotFoundException("Bitstream with id: " + uuid + " not found");
         }
-        if (bitstreamFormat.equals(bitstream.getFormat(context))) {
-            throw new DSpaceBadRequestException("The provided bitstream format is already the bitstream format");
-        }
 
         bitstream.setFormat(context, bitstreamFormat);
 
