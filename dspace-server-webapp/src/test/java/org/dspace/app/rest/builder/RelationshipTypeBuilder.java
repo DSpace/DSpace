@@ -74,28 +74,30 @@ public class RelationshipTypeBuilder extends AbstractBuilder<RelationshipType, R
     }
 
     public static RelationshipTypeBuilder createRelationshipTypeBuilder(Context context, EntityType leftType,
-                                                                        EntityType rightType, String leftLabel,
-                                                                        String rightLabel, Integer leftCardinalityMin,
+                                                                        EntityType rightType,
+                                                                        String leftwardType,
+                                                                        String rightwardType,
+                                                                        Integer leftCardinalityMin,
                                                                         Integer leftCardinalityMax,
                                                                         Integer rightCardinalityMin,
                                                                         Integer rightCardinalityMax) {
         RelationshipTypeBuilder relationshipBuilder = new RelationshipTypeBuilder(context);
         return relationshipBuilder.create(context, leftType,
-                                          rightType, leftLabel,
-                                          rightLabel, leftCardinalityMin,
+                                          rightType, leftwardType,
+                                          rightwardType, leftCardinalityMin,
                                           leftCardinalityMax, rightCardinalityMin,
                                           rightCardinalityMax);
     }
 
     private RelationshipTypeBuilder create(Context context, EntityType leftEntityType, EntityType rightEntityType,
-                                           String leftLabel, String rightLabel, Integer leftCardinalityMin,
+                                           String leftwardType, String rightwardType, Integer leftCardinalityMin,
                                            Integer leftCardinalityMax, Integer rightCardinalityMin,
                                            Integer rightCardinalityMax) {
         try {
 
             this.context = context;
             this.relationshipType = relationshipTypeService
-                    .create(context, leftEntityType, rightEntityType, leftLabel, rightLabel, leftCardinalityMin,
+                    .create(context, leftEntityType, rightEntityType, leftwardType, rightwardType, leftCardinalityMin,
                             leftCardinalityMax, rightCardinalityMin, rightCardinalityMax);
 
         } catch (SQLException | AuthorizeException e) {

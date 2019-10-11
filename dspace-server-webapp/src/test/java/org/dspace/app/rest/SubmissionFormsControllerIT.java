@@ -45,13 +45,13 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                    .andExpect(content().contentType(contentType))
                    //The configuration file for the test env includes 3 forms
                    .andExpect(jsonPath("$.page.size", is(20)))
-                   .andExpect(jsonPath("$.page.totalElements", equalTo(3)))
+                   .andExpect(jsonPath("$.page.totalElements", equalTo(4)))
                    .andExpect(jsonPath("$.page.totalPages", equalTo(1)))
                    .andExpect(jsonPath("$.page.number", is(0)))
                    .andExpect(
                        jsonPath("$._links.self.href", Matchers.startsWith(REST_SERVER_URL + "config/submissionforms")))
                    //The array of submissionforms should have a size of 3
-                   .andExpect(jsonPath("$._embedded.submissionforms", hasSize(equalTo(3))))
+                   .andExpect(jsonPath("$._embedded.submissionforms", hasSize(equalTo(4))))
         ;
     }
 
@@ -77,8 +77,8 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                        .startsWith(REST_SERVER_URL + "config/submissionforms/traditionalpageone")))
                    // check the first two rows
                    .andExpect(jsonPath("$.rows[0].fields", contains(
-                        SubmissionFormFieldMatcher.matchFormFieldDefinition("lookup-name", "Authors", null, true,
-                                "Enter the names of the authors of this item.", "dc.contributor.author"))))
+                        SubmissionFormFieldMatcher.matchFormFieldDefinition("lookup-name", "Author",
+                null, true, "Add an author", "dc.contributor.author"))))
                    .andExpect(jsonPath("$.rows[1].fields", contains(
                         SubmissionFormFieldMatcher.matchFormFieldDefinition("onebox", "Title",
                                 "You must enter a main title for this item.", false,
@@ -93,6 +93,53 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                                 SubmissionFormFieldMatcher.matchFormFieldDefinition("onebox", "Publisher", null, false,
                                         "Enter the name of", "col-sm-8",
                                         "dc.publisher"))))
+        ;
+    }
+
+    @Test
+    public void findOpenRelationshipConfig() throws Exception {
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token).perform(get("/api/config/submissionforms/traditionalpageone"))
+                        //The status has to be 200 OK
+                        .andExpect(status().isOk())
+                        //We expect the content type to be "application/hal+json;charset=UTF-8"
+                        .andExpect(content().contentType(contentType))
+                        //Check that the JSON root matches the expected "traditionalpageone" input forms
+                        .andExpect(jsonPath("$.id", is("traditionalpageone")))
+                        .andExpect(jsonPath("$.name", is("traditionalpageone")))
+                        .andExpect(jsonPath("$.type", is("submissionform")))
+                        .andExpect(jsonPath("$._links.self.href", Matchers
+                            .startsWith(REST_SERVER_URL + "config/submissionforms/traditionalpageone")))
+                        // check the first two rows
+                        .andExpect(jsonPath("$.rows[0].fields", contains(
+                            SubmissionFormFieldMatcher.matchFormOpenRelationshipFieldDefinition("lookup-name",
+                        "Author", null, true, "Add an author",
+                    "dc.contributor.author", "isAuthorOfPublication", null,
+            "personConfiguration"))))
+        ;
+    }
+
+    @Test
+    public void findClosedRelationshipConfig() throws Exception {
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token).perform(get("/api/config/submissionforms/journalVolumeStep"))
+                        //The status has to be 200 OK
+                        .andExpect(status().isOk())
+                        //We expect the content type to be "application/hal+json;charset=UTF-8"
+                        .andExpect(content().contentType(contentType))
+                        //Check that the JSON root matches the expected "traditionalpageone" input forms
+                        .andExpect(jsonPath("$.id", is("journalVolumeStep")))
+                        .andExpect(jsonPath("$.name", is("journalVolumeStep")))
+                        .andExpect(jsonPath("$.type", is("submissionform")))
+                        .andExpect(jsonPath("$._links.self.href", Matchers
+                            .startsWith(REST_SERVER_URL + "config/submissionforms/journalVolumeStep")))
+                        // check the first two rows
+                        .andExpect(jsonPath("$.rows[0].fields", contains(
+                            SubmissionFormFieldMatcher.matchFormClosedRelationshipFieldDefinition("Journal", null,
+                    false, "Select the journal related to this volume.", "isVolumeOfJournal",
+                        "creativework.publisher:somepublishername", "periodicalConfiguration"))))
         ;
     }
 }

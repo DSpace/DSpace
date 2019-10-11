@@ -59,12 +59,21 @@ public class RelationshipServiceImpl implements RelationshipService {
     @Override
     public Relationship create(Context c, Item leftItem, Item rightItem, RelationshipType relationshipType,
                                int leftPlace, int rightPlace) throws AuthorizeException, SQLException {
+        return create(c, leftItem, rightItem, relationshipType, leftPlace, rightPlace, null, null);
+    }
+
+    @Override
+    public Relationship create(Context c, Item leftItem, Item rightItem, RelationshipType relationshipType,
+                               int leftPlace, int rightPlace, String leftwardValue, String rightwardValue)
+            throws AuthorizeException, SQLException {
         Relationship relationship = new Relationship();
         relationship.setLeftItem(leftItem);
         relationship.setRightItem(rightItem);
         relationship.setRelationshipType(relationshipType);
         relationship.setLeftPlace(leftPlace);
         relationship.setRightPlace(rightPlace);
+        relationship.setLeftwardValue(leftwardValue);
+        relationship.setRightwardValue(rightwardValue);
         return create(c, relationship);
     }
 
@@ -99,7 +108,7 @@ public class RelationshipServiceImpl implements RelationshipService {
                                                                               false);
 
         context.turnOffAuthorisationSystem();
-        //If useForPlace for the leftlabel is false for the relationshipType,
+        //If useForPlace for the leftwardType is false for the relationshipType,
         // we need to sort the relationships here based on leftplace.
         if (!virtualMetadataPopulator.isUseForPlaceTrueForRelationshipType(relationship.getRelationshipType(), true)) {
             if (!leftRelationships.isEmpty()) {
@@ -116,7 +125,7 @@ public class RelationshipServiceImpl implements RelationshipService {
 
         }
 
-        //If useForPlace for the rightLabel is false for the relationshipType,
+        //If useForPlace for the rightwardType is false for the relationshipType,
         // we need to sort the relationships here based on the rightplace.
         if (!virtualMetadataPopulator.isUseForPlaceTrueForRelationshipType(relationship.getRelationshipType(), false)) {
             if (!rightRelationships.isEmpty()) {
@@ -221,8 +230,8 @@ public class RelationshipServiceImpl implements RelationshipService {
 
     private void logRelationshipTypeDetailsForError(RelationshipType relationshipType) {
         log.warn("The relationshipType's ID is: " + relationshipType.getID());
-        log.warn("The relationshipType's left label is: " + relationshipType.getLeftLabel());
-        log.warn("The relationshipType's right label is: " + relationshipType.getRightLabel());
+        log.warn("The relationshipType's leftward type is: " + relationshipType.getLeftwardType());
+        log.warn("The relationshipType's rightward type is: " + relationshipType.getRightwardType());
         log.warn("The relationshipType's left entityType label is: " + relationshipType.getLeftType().getLabel());
         log.warn("The relationshipType's right entityType label is: " + relationshipType.getRightType().getLabel());
         log.warn("The relationshipType's left min cardinality is: " + relationshipType.getLeftMinCardinality());
@@ -262,8 +271,8 @@ public class RelationshipServiceImpl implements RelationshipService {
         List<Relationship> list = relationshipDAO.findByItem(context, item);
 
         list.sort((o1, o2) -> {
-            int relationshipType = o1.getRelationshipType().getLeftLabel()
-                                     .compareTo(o2.getRelationshipType().getLeftLabel());
+            int relationshipType = o1.getRelationshipType().getLeftwardType()
+                                     .compareTo(o2.getRelationshipType().getLeftwardType());
             if (relationshipType != 0) {
                 return relationshipType;
             } else {
@@ -376,12 +385,16 @@ public class RelationshipServiceImpl implements RelationshipService {
         for (Relationship relationship : list) {
             if (isLeft) {
                 if (StringUtils
-                    .equals(relationship.getRelationshipType().getLeftLabel(), relationshipType.getLeftLabel())) {
+                    .equals(
+                        relationship.getRelationshipType().getLeftwardType(), relationshipType.getLeftwardType())
+                ) {
                     listToReturn.add(relationship);
                 }
             } else {
                 if (StringUtils
-                    .equals(relationship.getRelationshipType().getRightLabel(), relationshipType.getRightLabel())) {
+                    .equals(
+                        relationship.getRelationshipType().getRightwardType(), relationshipType.getRightwardType())
+                ) {
                     listToReturn.add(relationship);
                 }
             }
