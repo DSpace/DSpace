@@ -537,7 +537,7 @@
 
 		<xsl:call-template name="render-normal-field">
 			<xsl:with-param name="name" select="'identifier-other'"/>
-			<xsl:with-param name="elements" select="dim:field[@element='identifier' and @qualifier='other'] "/>
+			<xsl:with-param name="elements" select="dim:field[@element='identifier' and @qualifier='other' and not(java:ar.edu.unlp.sedici.dspace.utils.Utils.isDoi(text()))] "/>
 			<xsl:with-param name="separator" select="' | '"/>
 			<xsl:with-param name="type" select="'url'"/>
 		</xsl:call-template>
@@ -688,10 +688,10 @@
 		</xsl:if>
 		
 		<!-- Info about how to cite this document -->
-		<xsl:if test="./dim:field[@element='identifier'][@qualifier='uri']">
+		<xsl:if test="./dim:field[@mdschema='dc'][@element='identifier'][@qualifier='uri'] or ./dim:field[@mdschema='sedici' and @element='identifier' and @qualifier='other' and java:ar.edu.unlp.sedici.dspace.utils.Utils.isDoi(text())]">
 			<div id="item-URI-suggestion">
 				<b><i18n:text>sedici.items.handle.utilizacion_URI</i18n:text></b>
-				<xsl:for-each select="dim:field[@element='identifier' and @qualifier='uri']">
+				<xsl:for-each select="dim:field[(@mdschema='dc' and @element='identifier' and @qualifier='uri') or (@mdschema='sedici' and @element='identifier' and @qualifier='other' and java:ar.edu.unlp.sedici.dspace.utils.Utils.isDoi(text()))]">
 					<li>
 						<a target="_blank"><xsl:attribute name="href"><xsl:value-of select="." /></xsl:attribute><xsl:value-of select="." /></a>
 					</li>
