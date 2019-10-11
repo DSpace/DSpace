@@ -9,7 +9,9 @@ package org.dspace.app.rest;
 
 import static java.util.UUID.randomUUID;
 
+import static org.apache.commons.codec.CharEncoding.UTF_8;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
+import static org.apache.commons.io.IOUtils.toInputStream;
 import static org.dspace.app.rest.builder.BitstreamBuilder.createBitstream;
 import static org.dspace.app.rest.builder.BitstreamFormatBuilder.createBitstreamFormat;
 import static org.dspace.app.rest.builder.CollectionBuilder.createCollection;
@@ -47,7 +49,6 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.util.UUID;
 
-import com.amazonaws.util.StringInputStream;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.CharEncoding;
 import org.apache.commons.lang3.StringUtils;
@@ -66,6 +67,7 @@ import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
+import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.core.Constants;
 import org.dspace.disseminate.CitationDocumentServiceImpl;
@@ -102,6 +104,9 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
     @Autowired
     private ResourcePolicyService resourcePolicyService;
 
+    @Autowired
+    private BitstreamFormatService bitstreamFormatService;
+
     private Bitstream bitstream;
     private BitstreamFormat supportedFormat;
     private BitstreamFormat knownFormat;
@@ -128,14 +133,9 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
         Collection collection = createCollection(context, community).build();
         Item item = createItem(context, collection).build();
 
-        bitstream = createBitstream(context, item, new StringInputStream("test")).build();
+        bitstream = createBitstream(context, item, toInputStream("test", UTF_8)).build();
 
-        unknownFormat = createBitstreamFormat(context)
-                .withMimeType("unknown test mime type")
-                .withDescription("unknown test description")
-                .withShortDescription("unknown test short description")
-                .withSupportLevel(UNKNOWN)
-                .build();
+        unknownFormat = bitstreamFormatService.findUnknown(context);
 
         knownFormat = createBitstreamFormat(context)
                 .withMimeType("known test mime type")
@@ -542,8 +542,8 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
                 put("/api/core/bitstreams/" + bitstream.getID() + "/format")
                         .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
                         .content(
-                                REST_SERVER_URL + "/api/core/bitstreamformat/" + knownFormat.getID()
-                                        + "\n https://localhost:8080/spring-rest/api/core/bitstreamformat/"
+                                REST_SERVER_URL + "/api/core/bitstreamformat/" + knownFormat.getID() + "\n"
+                                        + REST_SERVER_URL + "/api/core/bitstreamformat/"
                                         + supportedFormat.getID()
                         )
         ).andExpect(status().isBadRequest());

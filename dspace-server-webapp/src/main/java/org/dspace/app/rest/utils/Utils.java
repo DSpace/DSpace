@@ -249,9 +249,9 @@ public class Utils {
      * This method will construct a List of BitstreamFormats out of a request.
      * It will call the {@link Utils#getStringListFromRequest(HttpServletRequest)} method to retrieve a list of links
      * out of the request.
-     * The method will iterate over this list of links and parse the links to retrieve the UUID from it.
-     * It will then look through all the DSpaceObjectServices to try and match this UUID to a DSpaceObject.
-     * If one is found, this DSpaceObject is added to the List of DSpaceObjects that we will return.
+     * The method will iterate over this list of links and parse the links to retrieve the integer ID from it.
+     * It will then retrieve the BitstreamFormat corresponding to this ID.
+     * If one is found, this BitstreamFormat is added to the List of BitstreamFormats that we will return.
      *
      * @param request   The request out of which we'll create the List of BitstreamFormats
      * @param context   The relevant DSpace context
