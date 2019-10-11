@@ -30,8 +30,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 /**
- * An authenicated user is allowed to view, update or delete his or her own data. This {@link RestPermissionEvaluatorPlugin}
- * implemenents that requirement.
+ * An authenticated user is allowed to view, update or delete his or her own data. This {@link RestPermissionEvaluatorPlugin}
+ * implements that requirement.
  */
 @Component
 public class EPersonRestPermissionEvaluatorPlugin extends RestObjectPermissionEvaluatorPlugin {

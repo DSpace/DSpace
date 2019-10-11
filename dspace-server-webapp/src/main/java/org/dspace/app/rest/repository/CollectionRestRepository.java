@@ -17,7 +17,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.CollectionConverter;
@@ -38,7 +37,6 @@ import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.util.UUIDUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -169,8 +167,19 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
     }
 
     @Override
-    @PreAuthorize("hasAuthority('ADMIN')")
     protected CollectionRest createAndReturn(Context context) throws AuthorizeException {
+        throw new DSpaceBadRequestException("Cannot create a Collection without providing a parent Community.");
+    }
+
+    @Override
+    @PreAuthorize("hasPermission(#id, 'COMMUNITY', 'ADD')")
+    protected CollectionRest createAndReturn(Context context, UUID id) throws AuthorizeException {
+
+        if (id == null) {
+            throw new DSpaceBadRequestException("Parent Community UUID is null. " +
+                "Cannot create a Collection without providing a parent Community");
+        }
+
         HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
         ObjectMapper mapper = new ObjectMapper();
         CollectionRest collectionRest;
@@ -178,38 +187,21 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
             ServletInputStream input = req.getInputStream();
             collectionRest = mapper.readValue(input, CollectionRest.class);
         } catch (IOException e1) {
-            throw new UnprocessableEntityException("Error parsing request body: " + e1.toString());
+            throw new UnprocessableEntityException("Error parsing request body.", e1);
         }
 
         Collection collection;
-
-
-        String parentCommunityString = req.getParameter("parent");
         try {
-            Community parent = null;
-            if (StringUtils.isNotBlank(parentCommunityString)) {
-
-                UUID parentCommunityUuid = UUIDUtils.fromString(parentCommunityString);
-                if (parentCommunityUuid == null) {
-                    throw new DSpaceBadRequestException("The given parent was invalid: "
-                            + parentCommunityString);
-                }
-
-                parent = communityService.find(context, parentCommunityUuid);
-                if (parent == null) {
-                    throw new UnprocessableEntityException("Parent community for id: "
-                            + parentCommunityUuid + " not found");
-                }
-            } else {
-                throw new DSpaceBadRequestException("The parent parameter cannot be left empty," +
-                                                  "collections require a parent community.");
+            Community parent = communityService.find(context, id);
+            if (parent == null) {
+                throw new UnprocessableEntityException("Parent community for id: "
+                    + id + " not found");
             }
             collection = cs.create(context, parent);
             cs.update(context, collection);
             metadataConverter.setMetadata(context, collection, collectionRest.getMetadata());
         } catch (SQLException e) {
-            throw new RuntimeException("Unable to create new Collection under parent Community " +
-                                           parentCommunityString, e);
+            throw new RuntimeException("Unable to create new Collection under parent Community " + id, e);
         }
         return converter.convert(collection);
     }

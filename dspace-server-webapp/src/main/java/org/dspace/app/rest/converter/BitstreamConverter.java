@@ -38,6 +38,7 @@ public class BitstreamConverter
     @Override
     public BitstreamRest fromModel(org.dspace.content.Bitstream obj) {
         BitstreamRest b = super.fromModel(obj);
+        b.setSequenceId(obj.getSequenceID());
         List<Bundle> bundles = null;
         try {
             bundles = obj.getBundles();

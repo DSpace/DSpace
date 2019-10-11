@@ -105,6 +105,7 @@ import org.dspace.handle.service.HandleService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.storage.rdbms.DatabaseUtils;
 import org.dspace.util.MultiFormatDateParser;
+import org.dspace.util.SolrUtils;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.xmlworkflow.WorkflowConfigurationException;
 import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
@@ -1055,7 +1056,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         doc.addField("archived", item.isArchived());
         doc.addField("withdrawn", item.isWithdrawn());
         doc.addField("discoverable", item.isDiscoverable());
-        doc.addField("lastModified", item.getLastModified());
+        doc.addField("lastModified", SolrUtils.getDateFormatter().format(item.getLastModified()));
 
         EPerson submitter = item.getSubmitter();
         if (submitter != null) {
@@ -1476,7 +1477,8 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                     if (type.equals(DiscoveryConfigurationParameters.TYPE_DATE)) {
                         Date date = MultiFormatDateParser.parse(value);
                         if (date != null) {
-                            doc.addField(field + "_dt", date);
+                            String stringDate = SolrUtils.getDateFormatter().format(date);
+                            doc.addField(field + "_dt", stringDate);
                         } else {
                             log.warn("Error while indexing sort date field, item: " + item
                                 .getHandle() + " metadata field: " + field + " date value: " + date);
@@ -1741,7 +1743,8 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                                         List<String> locations) {
         // want to be able to check when last updated
         // (not tokenized, but it is indexed)
-        doc.addField(LAST_INDEXED_FIELD, new Date());
+        doc.addField(LAST_INDEXED_FIELD,
+                SolrUtils.getDateFormatter().format(new Date()));
 
         // New fields to weaken the dependence on handles, and allow for faster
         // list display

@@ -63,6 +63,10 @@ public class CommunityBuilder extends AbstractDSpaceObjectBuilder<Community> {
         return setMetadataSingleValue(community, MetadataSchemaEnum.DC.getName(), "title", null, communityName);
     }
 
+    public CommunityBuilder withTitle(final String communityTitle) {
+        return addMetadataValue(community, MetadataSchemaEnum.DC.getName(), "title", null, communityTitle);
+    }
+
     public CommunityBuilder withLogo(String content) throws AuthorizeException, IOException, SQLException {
         try (InputStream is = IOUtils.toInputStream(content, CharEncoding.UTF_8)) {
             communityService.setLogo(context, community, is);

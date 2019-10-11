@@ -8,7 +8,6 @@
 package org.dspace.statistics;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -17,7 +16,10 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
+import java.net.URI;
 import java.net.URLEncoder;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -45,14 +47,18 @@ import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.apache.solr.client.solrj.impl.HttpSolrClient.RemoteSolrException;
 import org.apache.solr.client.solrj.request.AbstractUpdateRequest;
 import org.apache.solr.client.solrj.request.ContentStreamUpdateRequest;
 import org.apache.solr.client.solrj.request.CoreAdminRequest;
 import org.apache.solr.client.solrj.request.LukeRequest;
+import org.apache.solr.client.solrj.response.CoreAdminResponse;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.LukeResponse;
 import org.apache.solr.client.solrj.response.QueryResponse;
@@ -64,10 +70,12 @@ import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.luke.FieldFlag;
 import org.apache.solr.common.params.CommonParams;
+import org.apache.solr.common.params.CoreAdminParams.CoreAdminAction;
 import org.apache.solr.common.params.FacetParams;
 import org.apache.solr.common.params.MapSolrParams;
 import org.apache.solr.common.params.ModifiableSolrParams;
 import org.apache.solr.common.params.ShardParams;
+import org.apache.solr.common.util.NamedList;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
@@ -103,8 +111,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBean {
 
-    private static final org.apache.logging.log4j.Logger log =
-            org.apache.logging.log4j.LogManager.getLogger(SolrLoggerServiceImpl.class);
+    private static final Logger log = LogManager.getLogger();
 
     private static final String MULTIPLE_VALUES_SPLITTER = "|";
     protected SolrClient solr;
@@ -128,6 +135,12 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
     private ConfigurationService configurationService;
     @Autowired(required = true)
     private ClientInfoService clientInfoService;
+
+    /** URL to the current-year statistics core.  Prior-year shards will have a year suffixed. */
+    private String statisticsCoreURL;
+
+    /** Name of the current-year statistics core.  Prior-year shards will have a year suffixed. */
+    private String statisticsCoreBase;
 
     public static enum StatisticsType {
         VIEW("view"),
@@ -153,14 +166,26 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        log.info("solr-statistics.server:" + configurationService.getProperty("solr-statistics.server"));
-        log.info("usage-statistics.dbfile:" + configurationService.getProperty("usage-statistics.dbfile"));
+        statisticsCoreURL = configurationService.getProperty("solr-statistics.server");
+
+        if (null != statisticsCoreURL) {
+            Path statisticsPath = Paths.get(new URI(statisticsCoreURL).getPath());
+            statisticsCoreBase = statisticsPath
+                    .getName(statisticsPath.getNameCount() - 1)
+                    .toString();
+        } else {
+            statisticsCoreBase = null;
+        }
+
+        log.info("solr-statistics.server:  {}", statisticsCoreURL);
+        log.info("usage-statistics.dbfile:  {}",
+                configurationService.getProperty("usage-statistics.dbfile"));
 
         HttpSolrClient server = null;
 
-        if (configurationService.getProperty("solr-statistics.server") != null) {
+        if (statisticsCoreURL != null) {
             try {
-                server = new HttpSolrClient.Builder(configurationService.getProperty("solr-statistics.server")).build();
+                server = new HttpSolrClient.Builder(statisticsCoreURL).build();
             } catch (Exception e) {
                 log.error("Error accessing Solr server configured in 'solr-statistics.server'", e);
             }
@@ -1159,7 +1184,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
             filterQuery.append(")");
 
 
-            Map<String, String> yearQueryParams = new HashMap<String, String>();
+            Map<String, String> yearQueryParams = new HashMap<>();
             yearQueryParams.put(CommonParams.Q, "*:*");
             yearQueryParams.put(CommonParams.ROWS, String.valueOf(10000));
             yearQueryParams.put(CommonParams.FQ, filterQuery.toString());
@@ -1170,7 +1195,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
             yearQueryParams.put("csv.mv.separator", MULTIPLE_VALUES_SPLITTER);
 
             //Start by creating a new core
-            String coreName = "statistics-" + dcStart.getYearUTC();
+            String coreName = statisticsCoreBase + "-" + dcStart.getYearUTC();
             HttpSolrClient statisticsYearServer = createCore((HttpSolrClient) solr, coreName);
 
             System.out.println("Moving: " + totalRecords + " into core " + coreName);
@@ -1198,12 +1223,12 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
 
             for (File tempCsv : filesToUpload) {
                 //Upload the data in the csv files to our new solr core
-                ContentStreamUpdateRequest contentStreamUpdateRequest = new ContentStreamUpdateRequest("/update/csv");
-                contentStreamUpdateRequest.setParam("stream.contentType", "text/plain;charset=utf-8");
+                ContentStreamUpdateRequest contentStreamUpdateRequest = new ContentStreamUpdateRequest("/update");
+                contentStreamUpdateRequest.setParam("stream.contentType", "text/csv;charset=utf-8");
                 contentStreamUpdateRequest.setParam("escape", "\\");
                 contentStreamUpdateRequest.setParam("skip", "_version_");
                 contentStreamUpdateRequest.setAction(AbstractUpdateRequest.ACTION.COMMIT, true, true);
-                contentStreamUpdateRequest.addFile(tempCsv, "text/plain;charset=utf-8");
+                contentStreamUpdateRequest.addFile(tempCsv, "text/csv;charset=utf-8");
 
                 //Add parsing directives for the multivalued fields so that they are stored as separate values
                 // instead of one value
@@ -1223,39 +1248,42 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
             solr.deleteByQuery(filterQuery.toString());
             solr.commit(true, true);
 
-            log.info("Moved " + totalRecords + " records into core: " + coreName);
+            log.info("Moved {} records into core: {}", totalRecords, coreName);
         }
 
         FileUtils.deleteDirectory(tempDirectory);
     }
 
-    protected HttpSolrClient createCore(HttpSolrClient solr, String coreName) throws IOException, SolrServerException {
-        String solrDir = configurationService.getProperty("dspace.dir") + File.separator + "solr" + File.separator;
-        String baseSolrUrl = solr.getBaseURL().replace("statistics", "");
+    protected HttpSolrClient createCore(HttpSolrClient solr, String coreName)
+            throws IOException, SolrServerException {
+        String baseSolrUrl = solr.getBaseURL().replace(statisticsCoreBase, ""); // Has trailing slash
 
-        //DS-3458: Test to see if a solr core already exists.  If it exists, return that server.  Otherwise create a
-        // new one.
-        HttpSolrClient returnServer = new HttpSolrClient.Builder(baseSolrUrl + "/" + coreName).build();
+        //DS-3458: Test to see if a solr core already exists.  If it exists,
+        // return a connection to that core.  Otherwise create a new core and
+        // return a connection to it.
+        HttpSolrClient returnServer = new HttpSolrClient.Builder(baseSolrUrl + coreName).build();
         try {
             SolrPingResponse ping = returnServer.ping();
-            log.debug(String.format("Ping of Solr Core [%s] Returned with Status [%d]", coreName, ping.getStatus()));
+            log.debug("Ping of Solr Core {} returned with Status {}",
+                    coreName, ping.getStatus());
             return returnServer;
-        } catch (Exception e) {
-            log.debug(String.format("Ping of Solr Core [%s] Failed with [%s].  New Core Will be Created", coreName,
-                                    e.getClass().getName()));
+        } catch (IOException | RemoteSolrException | SolrServerException e) {
+            log.debug("Ping of Solr Core {} failed with {}.  New Core Will be Created",
+                    coreName, e.getClass().getName());
         }
 
         //Unfortunately, this class is documented as "experimental and subject to change" on the Lucene website.
         //http://lucene.apache.org/solr/4_4_0/solr-solrj/org/apache/solr/client/solrj/request/CoreAdminRequest.html
         CoreAdminRequest.Create create = new CoreAdminRequest.Create();
         create.setCoreName(coreName);
+        String configSetName = configurationService
+                .getProperty("solr-statistics.configset", "statistics");
+        create.setConfigSet(configSetName);
+        create.setInstanceDir(coreName);
 
-        //The config files for a statistics shard reside wihtin the statistics repository
-        create.setInstanceDir("statistics");
-        create.setDataDir(solrDir + coreName + File.separator + "data");
         HttpSolrClient solrServer = new HttpSolrClient.Builder(baseSolrUrl).build();
         create.process(solrServer);
-        log.info("Created core with name: " + coreName);
+        log.info("Created core with name: {} from configset {}", coreName, configSetName);
         return returnServer;
     }
 
@@ -1390,10 +1418,10 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
 
             //Add all the separate csv files
             for (File tempCsv : tempCsvFiles) {
-                ContentStreamUpdateRequest contentStreamUpdateRequest = new ContentStreamUpdateRequest("/update/csv");
-                contentStreamUpdateRequest.setParam("stream.contentType", "text/plain;charset=utf-8");
+                ContentStreamUpdateRequest contentStreamUpdateRequest = new ContentStreamUpdateRequest("/update");
+                contentStreamUpdateRequest.setParam("stream.contentType", "text/csv;charset=utf-8");
                 contentStreamUpdateRequest.setAction(AbstractUpdateRequest.ACTION.COMMIT, true, true);
-                contentStreamUpdateRequest.addFile(tempCsv, "text/plain;charset=utf-8");
+                contentStreamUpdateRequest.addFile(tempCsv, "text/csv;charset=utf-8");
 
                 solr.request(contentStreamUpdateRequest);
             }
@@ -1520,43 +1548,49 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
     }
 
     /*
-     * The statistics shards should not be initialized until all tomcat webapps are fully initialized.
-     * DS-3457 uncovered an issue in DSpace 6x in which this code triggered tomcat to hang when statistics shards are
-     * present.
-     * This code is synchonized in the event that 2 threads trigger the initialization at the same time.
+     * The statistics shards should not be initialized until all tomcat webapps
+     * are fully initialized.  DS-3457 uncovered an issue in DSpace 6x in which
+     * this code triggered Tomcat to hang when statistics shards are present.
+     * This code is synchonized in the event that 2 threads trigger the
+     * initialization at the same time.
      */
     protected synchronized void initSolrYearCores() {
         if (statisticYearCoresInit || !(solr instanceof HttpSolrClient)) {
             return;
         }
-        try {
+
+        //Base url should like : http://localhost:{port.number}/solr
+        String baseSolrUrl = ((HttpSolrClient) solr).getBaseURL().replace(statisticsCoreBase, "");
+
+        try (HttpSolrClient enumClient = new HttpSolrClient.Builder(baseSolrUrl).build();) {
             //Attempt to retrieve all the statistic year cores
-            File solrDir = new File(
-                configurationService.getProperty("dspace.dir") + File.separator + "solr" + File.separator);
-            File[] solrCoreFiles = solrDir.listFiles(new FileFilter() {
-
-                @Override
-                public boolean accept(File file) {
-                    //Core name example: statistics-2008
-                    return file.getName().matches("statistics-\\d\\d\\d\\d");
+            CoreAdminRequest coresRequest = new CoreAdminRequest();
+            coresRequest.setAction(CoreAdminAction.STATUS);
+            CoreAdminResponse coresResponse = coresRequest.process(enumClient);
+            NamedList<Object> response = coresResponse.getResponse();
+            NamedList<Object> coreStatuses = (NamedList<Object>) response.get("status");
+            List<String> statCoreNames = new ArrayList<>(coreStatuses.size());
+            for (Map.Entry<String, Object> coreStatus : coreStatuses) {
+                String coreName = coreStatus.getKey();
+                if (coreName.startsWith(statisticsCoreBase)) {
+                    statCoreNames.add(coreName);
                 }
-            });
-            //Base url should like : http://localhost:{port.number}/solr
-            String baseSolrUrl = ((HttpSolrClient) solr).getBaseURL().replace("statistics", "");
-            for (File solrCoreFile : solrCoreFiles) {
-                log.info("Loading core with name: " + solrCoreFile.getName());
+            }
 
-                createCore((HttpSolrClient) solr, solrCoreFile.getName());
+            for (String statCoreName : statCoreNames) {
+                log.info("Loading core with name: " + statCoreName);
+
+                createCore((HttpSolrClient) solr, statCoreName);
                 //Add it to our cores list so we can query it !
                 statisticYearCores
-                    .add(baseSolrUrl.replace("http://", "").replace("https://", "") + solrCoreFile.getName());
+                    .add(baseSolrUrl.replace("http://", "").replace("https://", "") + statCoreName);
             }
             //Also add the core containing the current year !
             statisticYearCores.add(((HttpSolrClient) solr)
                     .getBaseURL()
                     .replace("http://", "")
                     .replace("https://", ""));
-        } catch (Exception e) {
+        } catch (IOException | SolrServerException e) {
             log.error(e.getMessage(), e);
         }
         statisticYearCoresInit = true;

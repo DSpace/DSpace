@@ -48,18 +48,22 @@
    </form>      
    
    <form name="traditionalpageone">
-     <row>
-       <field>
-         <dc-schema>dc</dc-schema>
-         <dc-element>contributor</dc-element>
-         <dc-qualifier>author</dc-qualifier>
-         <repeatable>true</repeatable>
-         <label>Authors</label>
-         <input-type>name</input-type>
-         <hint>Enter the names of the authors of this item.</hint>
-         <required></required>
-       </field>
-     </row>
+            <row>
+                <relation-field>
+                    <relationship-type>isAuthorOfPublication</relationship-type>
+                    <search-configuration>personConfiguration</search-configuration>
+                    <repeatable>true</repeatable>
+                    <label>Author</label>
+                    <hint>Add an author</hint>
+                    <linked-metadata-field>
+                        <dc-schema>dc</dc-schema>
+                        <dc-element>contributor</dc-element>
+                        <dc-qualifier>author</dc-qualifier>
+                        <input-type>name</input-type>
+                    </linked-metadata-field>
+                    <required></required>
+                </relation-field>
+            </row>
      <row>
        <field>
          <dc-schema>dc</dc-schema>
@@ -225,6 +229,53 @@ it, please enter the types and the actual numbers or codes.</hint>
          <input-type>textarea</input-type>
          <hint>Enter any other description or comments in this box. </hint>
          <required></required>
+       </field>
+     </row>
+   </form>
+   <form name="journalVolumeStep">
+     <row>
+       <relation-field>
+         <relationship-type>isVolumeOfJournal</relationship-type>
+         <search-configuration>periodicalConfiguration</search-configuration>
+         <filter>creativework.publisher:somepublishername</filter>
+         <label>Journal</label>
+         <hint>Select the journal related to this volume.</hint>
+       </relation-field>
+     </row>
+     <row>
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>title</dc-element>
+         <label>Name</label>
+         <input-type>onebox</input-type>
+         <hint>Enter the name of the journal volume</hint>
+       </field>
+     </row>
+     <row>
+       <field>
+         <dc-schema>publicationVolume</dc-schema>
+         <dc-element>volumeNumber</dc-element>
+         <label>Volume</label>
+         <input-type>onebox</input-type>
+         <hint>Enter the volume of the journal volume</hint>
+       </field>
+     </row>
+     <row>
+       <field>
+         <dc-schema>creativework</dc-schema>
+         <dc-element>datePublished</dc-element>
+         <label>Issue date</label>
+         <input-type>date</input-type>
+         <hint>Enter the issue date of the journal volume</hint>
+       </field>
+     </row>
+     <row>
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>description</dc-element>
+         <label>Description</label>
+         <input-type>textarea</input-type>
+         <hint>Enter the description of the journal volume</hint>
        </field>
      </row>
    </form>

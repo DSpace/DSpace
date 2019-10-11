@@ -122,6 +122,6 @@ public interface EntityService {
      *                  to the given label parameter
      * @throws SQLException If something goes wrong
      */
-    List<RelationshipType> getRelationshipTypesByLabel(Context context, String label) throws SQLException;
+    List<RelationshipType> getRelationshipTypesByTypeName(Context context, String label) throws SQLException;
 
 }

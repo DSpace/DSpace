@@ -7,12 +7,15 @@
  */
 package org.dspace.app.rest.repository;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.log4j.Logger;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
@@ -109,11 +112,14 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
             RelationshipType relationshipType = relationshipTypeService
                 .find(context, Integer.parseInt(req.getParameter("relationshipType")));
 
+            String leftwardValue = req.getParameter("leftwardValue");
+            String rightwardValue = req.getParameter("rightwardValue");
+
             EPerson ePerson = context.getCurrentUser();
             if (authorizeService.authorizeActionBoolean(context, leftItem, Constants.WRITE) ||
                 authorizeService.authorizeActionBoolean(context, rightItem, Constants.WRITE)) {
                 Relationship relationship = relationshipService.create(context, leftItem, rightItem,
-                                                                       relationshipType, 0, 0);
+                    relationshipType, 0, 0, leftwardValue, rightwardValue);
                 // The above if check deals with the case that a Relationship can be created if the user has write
                 // rights on one of the two items. The following updateItem calls can however call the
                 // ItemService.update() functions which would fail if the user doesn't have permission on both items.
@@ -199,6 +205,66 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
     }
 
     /**
+     * Method to replace the metadata of a relationship (the left/right places and the leftward/rightward labels)
+     * @param context     the dspace context
+     * @param request
+     * @param apiCategory the API category e.g. "api"
+     * @param model       the DSpace model e.g. "metadatafield"
+     * @param id          the ID of the target REST object
+     * @param jsonNode    the part of the request body representing the updated rest object
+     * @return
+     * @throws RepositoryMethodNotImplementedException
+     * @throws SQLException
+     * @throws AuthorizeException
+     */
+    @Override
+    protected RelationshipRest put(Context context, HttpServletRequest request, String apiCategory, String model,
+                                   Integer id, JsonNode jsonNode)
+        throws RepositoryMethodNotImplementedException, SQLException, AuthorizeException {
+
+        Relationship relationship;
+        try {
+            relationship = relationshipService.find(context, id);
+        } catch (SQLException e) {
+            throw new ResourceNotFoundException("Relationship" + " with id: " + id + " not found");
+        }
+
+        if (relationship == null) {
+            throw new ResourceNotFoundException("Relationship" + " with id: " + id + " not found");
+        }
+
+        try {
+
+            RelationshipRest relationshipRest;
+
+            try {
+                relationshipRest = new ObjectMapper().readValue(jsonNode.toString(), RelationshipRest.class);
+            } catch (IOException e) {
+                throw new UnprocessableEntityException("Error parsing request body: " + e.toString());
+            }
+
+            relationship.setLeftwardValue(relationshipRest.getLeftwardValue());
+            relationship.setRightwardValue(relationshipRest.getRightwardValue());
+
+            if (jsonNode.hasNonNull("rightPlace")) {
+                relationship.setRightPlace(relationshipRest.getRightPlace());
+            }
+
+            if (jsonNode.hasNonNull("leftPlace")) {
+                relationship.setRightPlace(relationshipRest.getLeftPlace());
+            }
+
+            relationshipService.update(context, relationship);
+            context.commit();
+            context.reloadEntity(relationship);
+
+            return relationshipConverter.fromModel(relationship);
+        } catch (AuthorizeException e) {
+            throw new AccessDeniedException("You do not have write rights on this relationship's metadata");
+        }
+    }
+
+    /**
      * This method will check with the current user has write rights on both one of the original items and one of the
      * new items for the relationship.
      * @param context       The relevant DSpace context
@@ -253,7 +319,8 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
 
         Context context = obtainContext();
 
-        List<RelationshipType> relationshipTypeList = relationshipTypeService.findByLeftOrRightLabel(context, label);
+        List<RelationshipType> relationshipTypeList =
+            relationshipTypeService.findByLeftwardOrRightwardTypeName(context, label);
         List<Relationship> relationships = new LinkedList<>();
         if (dsoId != null) {
 

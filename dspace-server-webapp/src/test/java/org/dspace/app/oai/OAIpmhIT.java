@@ -9,6 +9,7 @@
 package org.dspace.app.oai;
 
 import static org.hamcrest.Matchers.startsWith;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
@@ -18,6 +19,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.xpath;
 
+import java.util.Calendar;
 import java.util.Date;
 
 import com.lyncode.xoai.dataprovider.core.XOAIManager;
@@ -27,6 +29,7 @@ import com.lyncode.xoai.dataprovider.services.impl.BaseDateProvider;
 import com.lyncode.xoai.dataprovider.xml.xoaiconfig.Configuration;
 import com.lyncode.xoai.dataprovider.xml.xoaiconfig.ContextConfiguration;
 
+import org.apache.commons.lang3.time.DateUtils;
 import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
@@ -142,10 +145,11 @@ public class OAIpmhIT extends AbstractControllerIntegrationTest {
     @Test
     public void requestForIdentifyShouldReturnTheConfiguredValues() throws Exception {
 
-        // Get current date/time and store as "now"
+        // Get current date/time and store as "now", then round to nearest second (as OAI-PMH ignores milliseconds)
         Date now = new Date();
-        // Return "now" when "getEarliestDate()" is called for the currently loaded EarliestDateResolver bean
-        doReturn(now).when(earliestDateResolver).getEarliestDate(context);
+        Date nowToNearestSecond = DateUtils.round(now, Calendar.SECOND);
+        // Return "nowToNearestSecond" when "getEarliestDate()" is called for currently loaded EarliestDateResolver bean
+        doReturn(nowToNearestSecond).when(earliestDateResolver).getEarliestDate(any());
 
         // Attempt to make an Identify request to root context
         getClient().perform(get(DEFAULT_CONTEXT).param("verb", "Identify"))
@@ -168,7 +172,7 @@ public class OAIpmhIT extends AbstractControllerIntegrationTest {
                                   .string(configurationService.getProperty("oai.url") + "/" + DEFAULT_CONTEXT_PATH))
                    // Expect earliestDatestamp to be "now", i.e. current date, (as mocked above)
                    .andExpect(xpath("OAI-PMH/Identify/earliestDatestamp")
-                                  .string(baseDateProvider.format(now)))
+                                  .string(baseDateProvider.format(nowToNearestSecond)))
         ;
     }
 
