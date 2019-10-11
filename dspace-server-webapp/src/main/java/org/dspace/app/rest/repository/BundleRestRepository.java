@@ -19,6 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.converter.BundleConverter;
+import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.BundleRest;
@@ -98,7 +99,7 @@ public class BundleRestRepository extends DSpaceObjectRestRepository<Bundle, Bun
     }
 
     public Page<BundleRest> findAll(Context context, Pageable pageable) {
-        throw new RuntimeException("Method not allowed!");
+        throw new RepositoryMethodNotImplementedException(BundleRest.NAME, "findAll");
     }
 
     /**
