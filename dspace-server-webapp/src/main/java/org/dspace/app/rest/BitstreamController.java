@@ -136,7 +136,7 @@ public class BitstreamController {
         List<DSpaceObject> dsoList = utils.constructDSpaceObjectList(context, utils.getStringListFromRequest(request));
 
         if (dsoList.size() != 1 || dsoList.get(0).getType() != BUNDLE) {
-            throw new UnprocessableEntityException("The bundle doesn't exist " +
+            throw new UnprocessableEntityException("No bundle has been specified " +
                                                            "or the data cannot be resolved to a bundle.");
         }
 
