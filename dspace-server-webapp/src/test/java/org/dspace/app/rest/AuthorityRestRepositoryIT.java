@@ -62,9 +62,10 @@ public class AuthorityRestRepositoryIT extends AbstractControllerIntegrationTest
                 "dc.contributor.author");
 
 
-        //TODO Comments
+        // These clears have to happen so that the config is actually reloaded in those classes. This is needed for
+        // the properties that we're altering above and this is only used within the tests
         pluginService.clearNamedPluginClasses();
-        cas.clearController();
+        cas.clearCache();
 
         PersonAuthorityValue person1 = new PersonAuthorityValue();
         person1.setId(String.valueOf(UUID.randomUUID()));

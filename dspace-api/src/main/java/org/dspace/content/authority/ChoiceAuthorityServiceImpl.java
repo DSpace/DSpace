@@ -221,7 +221,7 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
     }
 
     @Override
-    public void clearController() {
+    public void clearCache() {
         controller.clear();
         authorities.clear();
     }
