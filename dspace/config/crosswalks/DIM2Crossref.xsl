@@ -277,7 +277,7 @@
 						<xsl:call-template name="setISBN" />
 					</xsl:when>
 					<xsl:when test="java:ar.edu.unlp.sedici.dspace.utils.Utils.trimAndLowercase($isbn) = $no-isbn-internal-flag">
-					   <xsl:variable name="issued_dt" select="dspace:field[@mdschema='dc' and @element='date' and @qualifier='issued'][1]"/>
+					   <xsl:variable name="issued_dt" select="substring(dspace:field[@mdschema='dc' and @element='date' and @qualifier='issued'][1]/text(),1,4)"/>
 					   <xsl:call-template name="setNoISBN">
 					       <xsl:with-param name="reason">
 					           <xsl:choose>
