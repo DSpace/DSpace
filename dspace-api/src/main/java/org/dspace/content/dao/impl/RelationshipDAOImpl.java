@@ -8,6 +8,7 @@
 package org.dspace.content.dao.impl;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -18,6 +19,8 @@ import org.dspace.content.Relationship;
 import org.dspace.content.RelationshipType;
 import org.dspace.content.Relationship_;
 import org.dspace.content.dao.RelationshipDAO;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.core.AbstractHibernateDAO;
 import org.dspace.core.Context;
 
@@ -152,6 +155,29 @@ public class RelationshipDAOImpl extends AbstractHibernateDAO<Relationship> impl
     }
 
     @Override
+    public List<Relationship> findByTypeName(Context context, String typeName)
+            throws SQLException {
+        return this.findByTypeName(context, typeName, -1, -1);
+    }
+
+    @Override
+    public List<Relationship> findByTypeName(Context context, String typeName, Integer limit, Integer offset)
+            throws SQLException {
+        RelationshipTypeService relationshipTypeService = ContentServiceFactory.getInstance()
+                .getRelationshipTypeService();
+        List<RelationshipType> relTypes = relationshipTypeService.findByLeftwardOrRightwardTypeName(context, typeName);
+        List<Integer> ids = new ArrayList<>();
+        for ( RelationshipType relationshipType : relTypes) {
+            ids.add(relationshipType.getID());
+        }
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Relationship.class);
+        Root<Relationship> relationshipRoot = criteriaQuery.from(Relationship.class);
+        criteriaQuery.where(relationshipRoot.get(Relationship_.relationshipType).in(ids));
+        return list(context, criteriaQuery, true, Relationship.class, limit, offset);
+    }
+
+    @Override
     public int countByRelationshipType(Context context, RelationshipType relationshipType) throws SQLException {
 
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
@@ -185,6 +211,23 @@ public class RelationshipDAOImpl extends AbstractHibernateDAO<Relationship> impl
                         relationshipType), criteriaBuilder.or
                         (criteriaBuilder.equal(relationshipRoot.get(Relationship_.leftItem), item),
                         criteriaBuilder.equal(relationshipRoot.get(Relationship_.rightItem), item)));
+        return count(context, criteriaQuery, criteriaBuilder, relationshipRoot);
+    }
+
+    @Override
+    public int countByTypeName(Context context, String typeName)
+            throws SQLException {
+        RelationshipTypeService relationshipTypeService = ContentServiceFactory.getInstance()
+                .getRelationshipTypeService();
+        List<RelationshipType> relTypes = relationshipTypeService.findByLeftwardOrRightwardTypeName(context, typeName);
+        List<Integer> ids = new ArrayList<>();
+        for ( RelationshipType relationshipType : relTypes) {
+            ids.add(relationshipType.getID());
+        }
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Relationship.class);
+        Root<Relationship> relationshipRoot = criteriaQuery.from(Relationship.class);
+        criteriaQuery.where(relationshipRoot.get(Relationship_.relationshipType).in(ids));
         return count(context, criteriaQuery, criteriaBuilder, relationshipRoot);
     }
 

@@ -41,7 +41,7 @@ public interface RelationshipTypeService extends DSpaceCRUDService<RelationshipT
      * @return
      * @throws SQLException If something goes wrong
      */
-    RelationshipType findbyTypesAndLabels(Context context, EntityType leftType, EntityType rightType,
+    RelationshipType findbyTypesAndTypeName(Context context, EntityType leftType, EntityType rightType,
                                           String leftwardType, String rightwardType)
                                             throws SQLException;
 
@@ -67,12 +67,12 @@ public interface RelationshipTypeService extends DSpaceCRUDService<RelationshipT
      * Retrieves all RelationshipType objects that have a left or right type that is
      * equal to the given String
      * @param context   The relevant DSpace context
-     * @param label     The label that has to match
+     * @param typeName     The label that has to match
      * @return          The list of all RelationshipType objects that have a left or right label
      *                  that is equal to the given label param
      * @throws SQLException If something goes wrong
      */
-    List<RelationshipType> findByLeftwardOrRightwardTypeName(Context context, String label) throws SQLException;
+    List<RelationshipType> findByLeftwardOrRightwardTypeName(Context context, String typeName) throws SQLException;
 
     /**
      * Retrieves all RelationshipType objects that have a left or right label that is
@@ -103,6 +103,38 @@ public interface RelationshipTypeService extends DSpaceCRUDService<RelationshipT
     List<RelationshipType> findByEntityType(Context context, EntityType entityType, Integer limit, Integer offset)
             throws SQLException;
 
+
+    /**
+     * This method will return a list of RelationshipType objects for which the given EntityType object is equal
+     * to the leftType or rightType
+     * @param context       The relevant DSpace context
+     * @param entityType    The EntityType object that will be used to check on
+     * @param isLeft        Boolean value used to filter by left_type or right_type. If true left_type results only
+     *                      else right_type results.
+     * @return  The list of RelationshipType objects that have the given EntityType object
+     *          as either a leftType or rightType
+     * @throws SQLException If something goes wrong
+     */
+    List<RelationshipType> findByEntityType(Context context, EntityType entityType, boolean isLeft)
+            throws SQLException;
+
+
+    /**
+     * This method will return a list of RelationshipType objects for which the given EntityType object is equal
+     * to the leftType or rightType
+     * @param context       The relevant DSpace context
+     * @param entityType    The EntityType object that will be used to check on
+     * @param isLeft        Boolean value used to filter by left_type or right_type. If true left_type results only
+     *                      else right_type results.
+     * @param limit         paging limit
+     * @param offset        paging offset
+     * @return  The list of RelationshipType objects that have the given EntityType object
+     *          as either a leftType or rightType
+     * @throws SQLException If something goes wrong
+     */
+    List<RelationshipType> findByEntityType(Context context, EntityType entityType, boolean isLeft,
+                                            Integer limit, Integer offset)
+            throws SQLException;
     /**
      * This method will support the creation of a RelationshipType object with the given parameters
      * @param context                       The relevant DSpace context

@@ -229,6 +229,30 @@ public interface RelationshipService extends DSpaceCRUDService<Relationship> {
         throws AuthorizeException, SQLException;
 
     /**
+     * This method returns a list of Relationship objects for the given typeName
+     * @param context           The relevant DSpace context
+     * @param typeName          The leftward or rightward typeName of the relationship type
+     * @return  A list of Relationship objects that have the given RelationshipType object as the
+     *          relationshipType property
+     * @throws SQLException If something goes wrong
+     */
+    List<Relationship> findByTypeName(Context context, String typeName) throws SQLException;
+
+    /**
+     * This method returns a list of Relationship objects for the given typeName
+     * @param context           The relevant DSpace context
+     * @param typeName          The leftward or rightward typeName of the relationship type
+     * @param limit             paging limit
+     * @param offset            paging offset
+     * @return  A list of Relationship objects that have the given RelationshipType object as the
+     *          relationshipType property
+     * @throws SQLException If something goes wrong
+     */
+    List<Relationship> findByTypeName(Context context, String typeName, Integer limit, Integer offset)
+            throws SQLException;
+
+
+    /**
      * counts all relationships
      *
      * @param context DSpace context object
@@ -268,5 +292,17 @@ public interface RelationshipService extends DSpaceCRUDService<Relationship> {
      * @throws SQLException if database error
      */
     int countByItemAndRelationshipType(Context context, Item item, RelationshipType relationshipType)
+            throws SQLException;
+
+    /**
+     * Count total number of relationships (rows in relationship table)
+     * by a relationship leftward or rightward typeName
+     *
+     * @param context context
+     * @param typeName typeName of relationship
+     * @return total count
+     * @throws SQLException if database error
+     */
+    int countByTypeName(Context context, String typeName)
             throws SQLException;
 }
