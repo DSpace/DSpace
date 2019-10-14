@@ -13,6 +13,8 @@ import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 
+import javax.annotation.Nullable;
+
 import org.hamcrest.Matcher;
 
 /**
@@ -47,7 +49,8 @@ public class SubmissionFormFieldMatcher {
      * @return a Matcher for all the condition above
      */
     public static Matcher<? super Object> matchFormFieldDefinition(String type, String label, String mandatoryMessage,
-                                                                   boolean repeatable, String hints, String metadata) {
+                                                                   boolean repeatable,
+                                                                   String hints, String metadata) {
         return matchFormFieldDefinition(type, label, mandatoryMessage, repeatable, hints, null, metadata);
     }
 
@@ -73,8 +76,8 @@ public class SubmissionFormFieldMatcher {
      * @return a Matcher for all the condition above
      */
     public static Matcher<? super Object> matchFormFieldDefinition(String type, String label, String mandatoryMessage,
-                                                                   boolean repeatable, String hints, String style,
-                                                                   String metadata) {
+                                                                   boolean repeatable,
+                                                                   String hints, String style, String metadata) {
         return allOf(
             // check each field definition
             hasJsonPath("$.input.type", is(type)),
@@ -113,19 +116,26 @@ public class SubmissionFormFieldMatcher {
      *            the optional filter to be used for the lookup
      * @param searchConfiguration
      *            the searchConfiguration to be used for the lookup
+     * @param nameVariants
+     *            the optional name variants allowed flag
      * @return a Matcher for all the condition above
      */
     public static Matcher<? super Object> matchFormOpenRelationshipFieldDefinition(String type, String label,
                                                                                    String mandatoryMessage,
-                                                                                   boolean repeatable, String hints,
+                                                                                   boolean repeatable,
+                                                                                   String hints,
                                                                                    String metadata,
                                                                                    String relationshipType,
                                                                                    String filter,
-                                                                                   String searchConfiguration) {
+                                                                                   String searchConfiguration,
+                                                                                   @Nullable Boolean nameVariants) {
         return allOf(
             hasJsonPath("$.selectableRelationship.relationshipType", is(relationshipType)),
             hasJsonPath("$.selectableRelationship.filter", is(filter)),
             hasJsonPath("$.selectableRelationship.searchConfiguration", is(searchConfiguration)),
+                nameVariants != null ?
+                        hasJsonPath("$.selectableRelationship.nameVariants", is(nameVariants.toString()))
+                        : hasNoJsonPath("$.selectableRelationship.nameVariants"),
             matchFormFieldDefinition(type, label, mandatoryMessage, repeatable, hints, metadata));
     }
 
@@ -148,18 +158,25 @@ public class SubmissionFormFieldMatcher {
      *            the optional filter to be used for the lookup
      * @param searchConfiguration
      *            the searchConfiguration to be used for the lookup
+     * @param nameVariants
+     *            the optional name variants allowed flag
      * @return a Matcher for all the condition above
      */
     public static Matcher<? super Object> matchFormClosedRelationshipFieldDefinition(String label,
                                                                                      String mandatoryMessage,
-                                                                                     boolean repeatable, String hints,
+                                                                                     boolean repeatable,
+                                                                                     String hints,
                                                                                      String relationshipType,
                                                                                      String filter,
-                                                                                     String searchConfiguration) {
+                                                                                     String searchConfiguration,
+                                                                                     @Nullable Boolean nameVariants) {
         return allOf(
             hasJsonPath("$.selectableRelationship.relationshipType", is(relationshipType)),
             hasJsonPath("$.selectableRelationship.filter", is(filter)),
             hasJsonPath("$.selectableRelationship.searchConfiguration", is(searchConfiguration)),
+                nameVariants != null ?
+                        hasJsonPath("$.selectableRelationship.nameVariants", is(nameVariants.toString()))
+                        : hasNoJsonPath("$.selectableRelationship.nameVariants"),
             hasJsonPath("$.label", is(label)),
             mandatoryMessage != null ? hasJsonPath("$.mandatoryMessage", containsString(mandatoryMessage)) :
                 hasNoJsonPath("$.mandatoryMessage"),
