@@ -132,7 +132,7 @@ public class RelationshipTypeDAOImplTest extends AbstractIntegrationTest {
     @Test
     public void testFindByTypesAndLabels() throws Exception {
         assertEquals("TestFindbyTypesAndLabels 0", relationshipType, relationshipTypeService
-                .findbyTypesAndLabels(context, entityTypeTwo, entityTypeOne, "isAuthorOfPublication",
+                .findbyTypesAndTypeName(context, entityTypeTwo, entityTypeOne, "isAuthorOfPublication",
                         "isPublicationOfAuthor"));
     }
 

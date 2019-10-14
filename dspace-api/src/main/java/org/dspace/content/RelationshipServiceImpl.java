@@ -430,6 +430,19 @@ public class RelationshipServiceImpl implements RelationshipService {
     }
 
     @Override
+    public List<Relationship> findByTypeName(Context context, String typeName)
+            throws SQLException {
+        return this.findByTypeName(context, typeName, -1, -1);
+    }
+
+    @Override
+    public List<Relationship> findByTypeName(Context context, String typeName, Integer limit, Integer offset)
+            throws SQLException {
+        return relationshipDAO.findByTypeName(context, typeName, limit, offset);
+    }
+
+
+    @Override
     public int countTotal(Context context) throws SQLException {
         return relationshipDAO.countRows(context);
     }
@@ -448,5 +461,11 @@ public class RelationshipServiceImpl implements RelationshipService {
     public int countByItemAndRelationshipType(Context context, Item item, RelationshipType relationshipType)
             throws SQLException {
         return relationshipDAO.countByItemAndRelationshipType(context, item, relationshipType);
+    }
+
+    @Override
+    public int countByTypeName(Context context, String typeName)
+            throws SQLException {
+        return relationshipDAO.countByTypeName(context, typeName);
     }
 }

@@ -87,11 +87,11 @@ public class RelationshipTypeTest {
     @Test
     public void testRelationshipTypeFindByTypesAndLabels() throws Exception {
         // Mock DAO to return our firstRelationshipType
-        when(relationshipTypeDAO.findByTypesAndLabels(any(), any(), any(), any(), any()))
+        when(relationshipTypeDAO.findbyTypesAndTypeName(any(), any(), any(), any(), any()))
                 .thenReturn(firstRelationshipType);
 
         // Declare objects utilized for this test
-        RelationshipType found = relationshipTypeService.findbyTypesAndLabels(context, mock(EntityType.class),
+        RelationshipType found = relationshipTypeService.findbyTypesAndTypeName(context, mock(EntityType.class),
                 mock(EntityType.class),
                 "mock", "mock");
 
