@@ -14,11 +14,12 @@
  <!-- Each form set contains an ordered set of pages; each page defines    -->
  <!-- one submission metadata entry screen. Each page has an ordered list  -->
  <!-- of field definitions, Each field definition corresponds to one       -->
- <!-- metadata entry (a so-called row), which has a DC element name, a    -->
+ <!-- metadata entry (a so-called row), which has a DC element name, a     -->
  <!-- displayed label, a text string prompt which is called a hint, and    -->
  <!-- an input-type. Each field also may hold optional elements: DC        -->
- <!-- qualifier name, a repeatable flag, and a text string whose presence  -->
- <!-- serves as a 'this field is required' flag.                           -->
+ <!-- qualifier name, a repeatable flag, an optional name-variants allowed -->
+ <!-- flag, and a text string whose presence  &ndash;&gt; serves as a      -->
+ <!-- 'this field is required' flag.                                       -->
 
  <form-definitions>
     <form name="bitstream-metadata">
@@ -53,6 +54,7 @@
                     <relationship-type>isAuthorOfPublication</relationship-type>
                     <search-configuration>personConfiguration</search-configuration>
                     <repeatable>true</repeatable>
+                    <name-variants>true</name-variants>
                     <label>Author</label>
                     <hint>Add an author</hint>
                     <linked-metadata-field>
