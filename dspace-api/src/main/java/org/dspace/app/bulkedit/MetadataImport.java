@@ -812,8 +812,8 @@ public class MetadataImport {
             leftItem = otherItem;
         }
         RelationshipType relationshipType = acceptedRelationshipType;
-        int leftPlace = relationshipService.findLeftPlaceByLeftItem(c, leftItem) + 1;
-        int rightPlace = relationshipService.findRightPlaceByRightItem(c, rightItem) + 1;
+        int leftPlace = relationshipService.findNextLeftPlaceByLeftItem(c, leftItem) ;
+        int rightPlace = relationshipService.findNextRightPlaceByRightItem(c, rightItem);
         Relationship persistedRelationship = relationshipService.create(c, leftItem, rightItem,
                                                                         relationshipType, leftPlace, rightPlace);
         relationshipService.update(c, persistedRelationship);

@@ -60,7 +60,7 @@ public interface RelationshipService extends DSpaceCRUDService<Relationship> {
      *                  that have the given item as a leftitem property
      * @throws SQLException If something goes wrong
      */
-    int findLeftPlaceByLeftItem(Context context, Item item) throws SQLException;
+    int findNextLeftPlaceByLeftItem(Context context, Item item) throws SQLException;
 
     /**
      * Retrieves the highest integer value for the rightplace property of a Relationship for all relationships
@@ -71,7 +71,7 @@ public interface RelationshipService extends DSpaceCRUDService<Relationship> {
      *                  that have the given item as a rightitem property
      * @throws SQLException If something goes wrong
      */
-    int findRightPlaceByRightItem(Context context, Item item) throws SQLException;
+    int findNextRightPlaceByRightItem(Context context, Item item) throws SQLException;
 
     /**
      * This method returns a list of Relationships for which the leftItem or rightItem is equal to the given
@@ -95,10 +95,9 @@ public interface RelationshipService extends DSpaceCRUDService<Relationship> {
      * @param context           The relevant DSpace context
      * @param relationship      The Relationship object that will have it's place updated and that will be used
      *                          to retrieve the other relationships whose place might need to be updated
-     * @param isCreation        Is the relationship new or did it already exist
      * @throws SQLException     If something goes wrong
      */
-    public void updatePlaceInRelationship(Context context, Relationship relationship, boolean isCreation)
+    public void updatePlaceInRelationship(Context context, Relationship relationship)
             throws SQLException, AuthorizeException;
 
     /**
