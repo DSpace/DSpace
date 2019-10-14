@@ -2,7 +2,7 @@
 @REM # The contents of this file are subject to the license and copyright
 @REM # detailed in the LICENSE and NOTICE files at the root of the source
 @REM # tree and available online at
-@REM # 
+@REM #
 @REM # http://www.dspace.org/license/
 @REM ###########################################################################
 @REM # 'dspace.bat' script
@@ -26,7 +26,8 @@ echo Using DSpace installation in: %cd%
 
 REM Build a CLASSPATH including all classes in oai webapp, all libraries in [dspace]/lib and the config folder.
 set DSPACE_CLASSPATH=%CLASSPATH%;config;webapps\oai\WEB-INF\classes\
-for %%f in (lib\*.jar) DO CALL bin\buildpath.bat %%f
+REM for %%f in (lib\*.jar) DO CALL bin\buildpath.bat %%f
+set DSPACE_CLASSPATH=%DSPACE_CLASSPATH%;%CURRENT_DIR%\..\lib\*
 
 REM If the user only wants the CLASSPATH, just give it now.
 if not "%1"=="classpath" goto javaOpts
