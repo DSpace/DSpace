@@ -250,7 +250,8 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
                 }
             }
             MetadataValue metadataValue = metadataValueService.create(context, dso, metadataField);
-            //Set place to list length
+            //Set place to list length of all metadatavalues for the given schema.element.qualifier combination.
+            // Subtract one to adhere to the 0 as first element rule
             metadataValue.setPlace(
                 this.getMetadata(dso, metadataField.getMetadataSchema().getName(), metadataField.getElement(),
                                  metadataField.getQualifier(), Item.ANY).size() - 1);
