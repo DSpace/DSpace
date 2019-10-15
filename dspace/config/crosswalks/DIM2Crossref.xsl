@@ -281,11 +281,11 @@
 					   <xsl:call-template name="setNoISBN">
 					       <xsl:with-param name="reason">
 					           <xsl:choose>
-					               <!-- if book publication date is lesser than 1966 (the creation of ISBN agency)... -->
-		                           <xsl:when test="$issued_dt &lt; 1966"><xsl:value-of select="'archive_volume'" /></xsl:when>
-		                           <!-- when issued date is greater than 1966 or the book has no issued, then define this as a 'monograph'-->
-		                           <xsl:otherwise><xsl:value-of select="'monograph'"/></xsl:otherwise>
-		                       </xsl:choose>
+					               	<!-- if book publication date is lesser than 1966 (the creation of ISBN agency)... -->
+						   	<xsl:when test="$issued_dt &lt; 1966"><xsl:value-of select="'archive_volume'" /></xsl:when>
+						   	<!-- when issued date is greater than 1966 or the book has no issued, then define this as a 'monograph'-->
+						   	<xsl:otherwise><xsl:value-of select="'monograph'"/></xsl:otherwise>
+					    	   </xsl:choose>
 					       </xsl:with-param>
 					   </xsl:call-template>
 					</xsl:when>
