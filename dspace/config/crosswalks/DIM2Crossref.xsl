@@ -11,6 +11,9 @@
 
 	<xsl:output method="xml" indent="yes" encoding="utf-8" />
 
+    <!-- Internal repository flag to indicate that an specified item has no ISBN -->
+    <xsl:variable name="no-isbn-internal-flag"><xsl:value-of select="'no posee'" /></xsl:variable>
+
 	<xsl:template match="@* | text()" />
 
 	<xsl:template match="/dspace:dim[@dspaceType='ITEM']">
@@ -272,6 +275,19 @@
 					<xsl:when
 						test="java:ar.edu.unlp.sedici.dspace.utils.Utils.matchRegex($isbn, '(978-)?\d[\d \-]+[\dX]')">
 						<xsl:call-template name="setISBN" />
+					</xsl:when>
+					<xsl:when test="java:ar.edu.unlp.sedici.dspace.utils.Utils.trimAndLowercase($isbn) = $no-isbn-internal-flag">
+					   <xsl:variable name="issued_dt" select="substring(dspace:field[@mdschema='dc' and @element='date' and @qualifier='issued'][1]/text(),1,4)"/>
+					   <xsl:call-template name="setNoISBN">
+					       <xsl:with-param name="reason">
+					           <xsl:choose>
+					               	<!-- if book publication date is lesser than 1966 (the creation of ISBN agency)... -->
+						   	<xsl:when test="$issued_dt &lt; 1966"><xsl:value-of select="'archive_volume'" /></xsl:when>
+						   	<!-- when issued date is greater than 1966 or the book has no issued, then define this as a 'monograph'-->
+						   	<xsl:otherwise><xsl:value-of select="'monograph'"/></xsl:otherwise>
+					    	   </xsl:choose>
+					       </xsl:with-param>
+					   </xsl:call-template>
 					</xsl:when>
 					<xsl:otherwise>
 						<dspaceCrswalk:error>Error: sedici.identifier.isbn not valid</dspaceCrswalk:error>
@@ -656,6 +672,14 @@
 				</isbn>
 			</xsl:if>
 		</xsl:for-each>
+	</xsl:template>
+	
+	<xsl:template name="setNoISBN">
+	   <!-- reason = archive_volume|monograph|simple_series -->
+	   <xsl:param name="reason"/>
+	   <noisbn xmlns="http://www.crossref.org/schema/4.4.2">
+	       <xsl:attribute name="reason"><xsl:value-of select="$reason"/></xsl:attribute>
+	   </noisbn>
 	</xsl:template>
 
 	<xsl:template name="setAIProgram">

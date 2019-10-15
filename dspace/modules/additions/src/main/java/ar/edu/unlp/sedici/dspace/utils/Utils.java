@@ -71,5 +71,13 @@ public class Utils {
 		String doiRegex = "((https?:\\/\\/(dx\\.)?doi.org\\/)|(doi:))10\\.[0-9]{4,9}\\/.{1,200}";
 		return java.util.regex.Pattern.matches(doiRegex, identifier);
 	}
+	
+	public static String trimAndLowercase(String value) {
+	    return value.trim().toLowerCase();
+	}
+	
+	public static String lowercase(String value) {
+	    return value.toLowerCase();
+	}
 
 }
