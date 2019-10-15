@@ -82,6 +82,8 @@ public class RelationshipServiceImpl implements RelationshipService {
         if (isRelationshipValidToCreate(context, relationship)) {
             if (authorizeService.authorizeActionBoolean(context, relationship.getLeftItem(), Constants.WRITE) ||
                 authorizeService.authorizeActionBoolean(context, relationship.getRightItem(), Constants.WRITE)) {
+                // This order of execution should be handled in the creation (create, updateplace, update relationship)
+                // for a proper place allocation
                 Relationship relationshipToReturn = relationshipDAO.create(context, relationship);
                 updatePlaceInRelationship(context, relationshipToReturn);
                 update(context, relationshipToReturn);
@@ -100,6 +102,8 @@ public class RelationshipServiceImpl implements RelationshipService {
     public void updatePlaceInRelationship(Context context, Relationship relationship)
         throws SQLException, AuthorizeException {
         Item leftItem = relationship.getLeftItem();
+        // Max value is used to ensure that these will get added to the back of the list and thus receive the highest
+        // (last) place as it's set to a -1 for creation
         if (relationship.getLeftPlace() == -1) {
             relationship.setLeftPlace(Integer.MAX_VALUE);
         }
