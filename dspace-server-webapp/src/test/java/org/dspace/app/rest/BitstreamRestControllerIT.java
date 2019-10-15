@@ -21,7 +21,6 @@ import static org.dspace.app.rest.builder.ResourcePolicyBuilder.createResourcePo
 import static org.dspace.app.rest.matcher.BitstreamFormatMatcher.matchBitstreamFormat;
 import static org.dspace.content.BitstreamFormat.KNOWN;
 import static org.dspace.content.BitstreamFormat.SUPPORTED;
-import static org.dspace.content.BitstreamFormat.UNKNOWN;
 import static org.dspace.core.Constants.READ;
 import static org.dspace.core.Constants.WRITE;
 import static org.hamcrest.CoreMatchers.not;
@@ -133,7 +132,9 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
         Collection collection = createCollection(context, community).build();
         Item item = createItem(context, collection).build();
 
-        bitstream = createBitstream(context, item, toInputStream("test", UTF_8)).build();
+        bitstream = createBitstream(context, item, toInputStream("test", UTF_8))
+                .withFormat("test format")
+                .build();
 
         unknownFormat = bitstreamFormatService.findUnknown(context);
 
@@ -596,8 +597,6 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
                 .withDspaceObject(bitstream)
                 .build();
 
-        bitstreamService.addMetadata(context, bitstream, "dc", "format", null, null, "test format");
-
         context.restoreAuthSystemState();
 
         getClient(getAuthToken(eperson.getEmail(), password)).perform(
@@ -620,8 +619,6 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
     public void updateBitstreamFormatAdmin() throws Exception {
 
         context.turnOffAuthorisationSystem();
-
-        bitstreamService.addMetadata(context, bitstream, "dc", "format", null, null, "another test format");
 
         context.restoreAuthSystemState();
 
