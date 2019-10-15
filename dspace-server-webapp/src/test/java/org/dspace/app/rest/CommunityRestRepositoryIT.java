@@ -9,6 +9,7 @@ package org.dspace.app.rest;
 
 import static com.jayway.jsonpath.JsonPath.read;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
+import static junit.framework.TestCase.assertEquals;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
@@ -21,8 +22,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -31,6 +36,7 @@ import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.converter.CommunityConverter;
 import org.dspace.app.rest.matcher.CommunityMatcher;
 import org.dspace.app.rest.matcher.MetadataMatcher;
+import org.dspace.app.rest.matcher.PageMatcher;
 import org.dspace.app.rest.model.CommunityRest;
 import org.dspace.app.rest.model.MetadataRest;
 import org.dspace.app.rest.model.MetadataValueRest;
@@ -43,9 +49,12 @@ import org.dspace.content.service.CommunityService;
 import org.dspace.core.Constants;
 import org.dspace.eperson.EPerson;
 import org.hamcrest.Matchers;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MvcResult;
 
 /**
  * Integration Tests against the /api/core/communities endpoint (including any subpaths)
@@ -132,7 +141,7 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
     }
 
     @Test
-    public void createWithParentTest() throws Exception {
+    public void createSubCommunityUnAuthorizedTest() throws Exception {
         //We turn off the authorization system in order to create the structure as defined below
         context.turnOffAuthorisationSystem();
 
@@ -140,6 +149,7 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
         parentCommunity = CommunityBuilder.createCommunity(context)
                                           .withName("Parent Community")
                                           .build();
+
         context.restoreAuthSystemState();
 
         ObjectMapper mapper = new ObjectMapper();
@@ -147,26 +157,65 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
         // We send a name but the created community should set this to the title
         comm.setName("Test Sub-Level Community");
 
-        comm.setMetadata(new MetadataRest()
-                .put("dc.description",
-                        new MetadataValueRest("<p>Some cool HTML code here</p>"))
-                .put("dc.description.abstract",
-                        new MetadataValueRest("Sample top-level community created via the REST API"))
-                .put("dc.description.tableofcontents",
-                        new MetadataValueRest("<p>HTML News</p>"))
-                .put("dc.rights",
-                        new MetadataValueRest("Custom Copyright Text"))
-                .put("dc.title",
-                        new MetadataValueRest("Title Text")));
+        // Anonymous user tries to create a community.
+        // Should fail because user is not authenticated. Error 401.
+        getClient().perform(post("/api/core/communities")
+            .content(mapper.writeValueAsBytes(comm))
+            .param("parent", parentCommunity.getID().toString())
+            .contentType(contentType))
+                   .andExpect(status().isUnauthorized());
 
-        String authToken = getAuthToken(admin.getEmail(), password);
-         // Capture the UUID of the created Community (see andDo() below)
+        // Non-admin Eperson tries to create a community.
+        // Should fail because user doesn't have permissions. Error 403.
+        String authToken = getAuthToken(eperson.getEmail(), password);
+        getClient(authToken).perform(post("/api/core/communities")
+            .content(mapper.writeValueAsBytes(comm))
+            .param("parent", parentCommunity.getID().toString())
+            .contentType(contentType))
+                            .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void createSubCommunityAuthorizedTest() throws Exception {
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+
+        // Create a parent community to POST a new sub-community to
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        // ADD authorization on parent community
+        context.setCurrentUser(eperson);
+        authorizeService.addPolicy(context, parentCommunity, Constants.ADD, eperson);
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+
+        ObjectMapper mapper = new ObjectMapper();
+        CommunityRest comm = new CommunityRest();
+        // We send a name but the created community should set this to the title
+        comm.setName("Test Sub-Level Community");
+
+        comm.setMetadata(new MetadataRest()
+            .put("dc.description",
+                new MetadataValueRest("<p>Some cool HTML code here</p>"))
+            .put("dc.description.abstract",
+                new MetadataValueRest("Sample top-level community created via the REST API"))
+            .put("dc.description.tableofcontents",
+                new MetadataValueRest("<p>HTML News</p>"))
+            .put("dc.rights",
+                new MetadataValueRest("Custom Copyright Text"))
+            .put("dc.title",
+                new MetadataValueRest("Title Text")));
+
+        // Capture the UUID of the created Community (see andDo() below)
         AtomicReference<UUID> idRef = new AtomicReference<UUID>();
         try {
             getClient(authToken).perform(post("/api/core/communities")
-                                         .content(mapper.writeValueAsBytes(comm))
-                                         .param("parent", parentCommunity.getID().toString())
-                                         .contentType(contentType))
+                .content(mapper.writeValueAsBytes(comm))
+                .param("parent", parentCommunity.getID().toString())
+                .contentType(contentType))
                                 .andExpect(status().isCreated())
                                 .andExpect(content().contentType(contentType))
                                 .andExpect(jsonPath("$", Matchers.allOf(
@@ -181,15 +230,15 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                                     hasJsonPath("$._links.self.href", not(empty())),
                                     hasJsonPath("$.metadata", Matchers.allOf(
                                         MetadataMatcher.matchMetadata("dc.description",
-                                                "<p>Some cool HTML code here</p>"),
+                                            "<p>Some cool HTML code here</p>"),
                                         MetadataMatcher.matchMetadata("dc.description.abstract",
-                                                "Sample top-level community created via the REST API"),
+                                            "Sample top-level community created via the REST API"),
                                         MetadataMatcher.matchMetadata("dc.description.tableofcontents",
-                                                "<p>HTML News</p>"),
+                                            "<p>HTML News</p>"),
                                         MetadataMatcher.matchMetadata("dc.rights",
-                                                "Custom Copyright Text"),
+                                            "Custom Copyright Text"),
                                         MetadataMatcher.matchMetadata("dc.title",
-                                                "Title Text")
+                                            "Title Text")
                                         )
                                     )
                                 )))
@@ -217,6 +266,8 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
         metadataRest.put("dc.title", title);
 
         comm.setMetadata(metadataRest);
+
+        context.restoreAuthSystemState();
 
         // Anonymous user tries to create a community.
         // Should fail because user is not authenticated. Error 401.
@@ -253,6 +304,8 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                                            .withLogo("Test Logo")
                                            .build();
 
+        context.restoreAuthSystemState();
+
         getClient().perform(get("/api/core/communities"))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
@@ -270,6 +323,125 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
     }
 
     @Test
+    public void findAllNoDuplicatesOnMultipleCommunityTitlesTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        List<String> titles = Arrays.asList("First title", "Second title", "Third title", "Fourth title");
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName(titles.get(0))
+                .withTitle(titles.get(1))
+                .withTitle(titles.get(2))
+                .withTitle(titles.get(3))
+                .build();
+
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+
+
+        getClient().perform(get("/api/core/communities").param("size", "2"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._embedded.communities", Matchers.containsInAnyOrder(
+                        CommunityMatcher.matchCommunityEntryMultipleTitles(titles, parentCommunity.getID(),
+                                parentCommunity.getHandle()),
+                        CommunityMatcher.matchCommunityEntry(child1.getID(), child1.getHandle())
+                )))
+                .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/communities")))
+                .andExpect(jsonPath("$.page.totalElements", is(2)))
+                .andExpect(jsonPath("$.page.totalPages", is(1)));
+    }
+
+    @Test
+    public void findAllNoDuplicatesOnMultipleCommunityTitlesPaginationTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        List<String> titles = Arrays.asList("First title", "Second title", "Third title", "Fourth title");
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName(titles.get(0))
+                                          .withTitle(titles.get(1))
+                                          .withTitle(titles.get(2))
+                                          .withTitle(titles.get(3))
+                                          .build();
+        Community childCommunity = CommunityBuilder.createSubCommunity(context, parentCommunity).build();
+        Community secondParentCommunity = CommunityBuilder.createCommunity(context).withName("testing").build();
+        Community thirdParentCommunity = CommunityBuilder.createCommunity(context).withName("testingTitleTwo").build();
+
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/api/core/communities").param("size", "2"))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$._embedded.communities", Matchers.containsInAnyOrder(
+                       CommunityMatcher.matchCommunityEntryMultipleTitles(titles, parentCommunity.getID(),
+                                                                          parentCommunity.getHandle()),
+                       CommunityMatcher.matchCommunityEntry(childCommunity.getID(), childCommunity.getHandle())
+                       )))
+                   .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/communities")))
+                   .andExpect(jsonPath("$.page", PageMatcher.pageEntryWithTotalPagesAndElements(0, 2, 2, 4)));
+
+        getClient().perform(get("/api/core/communities").param("size", "2").param("page", "1"))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$._embedded.communities", Matchers.containsInAnyOrder(
+                       CommunityMatcher.matchCommunityEntry(secondParentCommunity.getID(),
+                                                            secondParentCommunity.getHandle()),
+                       CommunityMatcher.matchCommunityEntry(thirdParentCommunity.getID(),
+                                                            thirdParentCommunity.getHandle())
+                   )))
+                   .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/communities")))
+                   .andExpect(jsonPath("$.page", PageMatcher.pageEntryWithTotalPagesAndElements(1, 2, 2, 4)));
+    }
+
+
+    @Test
+    public void findAllNoNameCommunityIsReturned() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context).build();
+
+        getClient().perform(get("/api/core/communities"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._embedded.communities", Matchers.contains(
+                        CommunityMatcher.matchCommunityEntry(parentCommunity.getID(),
+                                parentCommunity.getHandle())
+                )))
+                .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/communities")))
+                .andExpect(jsonPath("$.page.totalElements", is(1)));
+    }
+
+    @Test
+    public void findAllCommunitiesAreReturnedInCorrectOrder() throws Exception {
+        // The hibernate query for finding all communities is "SELECT ... ORDER BY STR(dc_title.value)"
+        // So the communities should be returned in alphabetical order
+
+        context.turnOffAuthorisationSystem();
+
+        List<String> orderedTitles = Arrays.asList("Abc", "Bcd", "Cde");
+
+        Community community1 = CommunityBuilder.createCommunity(context)
+            .withName(orderedTitles.get(0))
+            .build();
+
+        Community community2 = CommunityBuilder.createCommunity(context)
+            .withName(orderedTitles.get(1))
+            .build();
+
+        Community community3 = CommunityBuilder.createCommunity(context)
+            .withName(orderedTitles.get(2))
+            .build();
+
+        ObjectMapper mapper = new ObjectMapper();
+        MvcResult result = getClient().perform(get("/api/core/communities")).andReturn();
+        String response = result.getResponse().getContentAsString();
+        JSONArray communities = new JSONObject(response).getJSONObject("_embedded").getJSONArray("communities");
+        List<String> responseTitles = StreamSupport.stream(communities.spliterator(), false)
+                                        .map(JSONObject.class::cast)
+                                        .map(x -> x.getString("name"))
+                                        .collect(Collectors.toList());
+
+        assertEquals(orderedTitles, responseTitles);
+    }
+
+    @Test
     public void findAllPaginationTest() throws Exception {
         //We turn off the authorization system in order to create the structure as defined below
         context.turnOffAuthorisationSystem();
@@ -283,6 +455,8 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                                            .withName("Sub Community")
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        context.restoreAuthSystemState();
 
         getClient().perform(get("/api/core/communities")
                                 .param("size", "1"))
@@ -335,6 +509,8 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
 
+        context.restoreAuthSystemState();
+
         getClient().perform(get("/api/core/communities/" + parentCommunity.getID().toString()))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
@@ -366,6 +542,8 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                                            .withName("Sub Community")
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        context.restoreAuthSystemState();
 
         getClient().perform(get("/api/core/communities/" + parentCommunity.getID().toString()))
                    .andExpect(status().isOk())
@@ -444,6 +622,7 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                                             .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
 
+        context.restoreAuthSystemState();
 
         getClient().perform(get("/api/core/communities/search/top"))
                    .andExpect(status().isOk())
@@ -503,6 +682,8 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunityChild1)
                                            .withName("Collection 1")
                                            .build();
+
+        context.restoreAuthSystemState();
 
         getClient().perform(get("/api/core/communities/search/subCommunities")
                 .param("parent", parentCommunity.getID().toString()))
@@ -611,6 +792,8 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
 
+        context.restoreAuthSystemState();
+
         getClient().perform(get("/api/core/communities/" + UUID.randomUUID())).andExpect(status().isNotFound());
     }
 
@@ -652,6 +835,8 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
 
         communityRest.setMetadata(new MetadataRest()
                 .put("dc.title", new MetadataValueRest("Electronic theses and dissertations")));
+
+        context.restoreAuthSystemState();
 
         getClient(token).perform(put("/api/core/communities/" + parentCommunity.getID().toString())
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -710,6 +895,8 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                                            .build();
 
         String token = getAuthToken(admin.getEmail(), password);
+
+        context.restoreAuthSystemState();
 
         getClient(token).perform(get("/api/core/communities/" + parentCommunity.getID().toString()))
                         .andExpect(status().isOk())
@@ -770,6 +957,7 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                                            .withName("Collection 1")
                                            .build();
 
+        context.restoreAuthSystemState();
 
         getClient().perform(get("/api/core/communities/" + parentCommunity.getID().toString()))
                         .andExpect(status().isOk())
@@ -800,6 +988,8 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
         authorizeService.addPolicy(context, parentCommunity, Constants.DELETE, eperson);
 
         String token = getAuthToken(eperson.getEmail(), password);
+
+        context.restoreAuthSystemState();
 
         getClient(token).perform(get("/api/core/communities/" + parentCommunity.getID().toString()))
                         .andExpect(status().isOk())
@@ -858,6 +1048,8 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
 
         context.setCurrentUser(eperson);
         authorizeService.addPolicy(context, parentCommunity, Constants.WRITE, eperson);
+
+        context.restoreAuthSystemState();
 
         String token = getAuthToken(eperson.getEmail(), password);
 
@@ -934,6 +1126,8 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
         metadataRest.put("dc.title", title);
 
         comm.setMetadata(metadataRest);
+
+        context.restoreAuthSystemState();
 
         String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken).perform(post("/api/core/communities")

@@ -24,31 +24,31 @@ public class RelationshipTypeDAOImpl extends AbstractHibernateDAO<RelationshipTy
 
     @Override
     public RelationshipType findByTypesAndLabels(Context context, EntityType leftType, EntityType rightType,
-                                                 String leftLabel, String rightLabel)
+                                                 String leftwardType, String rightwardType)
         throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, RelationshipType.class);
         Root<RelationshipType> relationshipTypeRoot = criteriaQuery.from(RelationshipType.class);
         criteriaQuery.select(relationshipTypeRoot);
         criteriaQuery.where(
-            criteriaBuilder.and(criteriaBuilder.equal(relationshipTypeRoot.get(RelationshipType_.leftType), leftType),
-                                criteriaBuilder.equal(relationshipTypeRoot.get(RelationshipType_.rightType), rightType),
-                                criteriaBuilder.equal(relationshipTypeRoot.get(RelationshipType_.leftLabel), leftLabel),
-                                criteriaBuilder
-                                    .equal(relationshipTypeRoot.get(RelationshipType_.rightLabel), rightLabel)));
+            criteriaBuilder.and(
+                criteriaBuilder.equal(relationshipTypeRoot.get(RelationshipType_.leftType), leftType),
+                criteriaBuilder.equal(relationshipTypeRoot.get(RelationshipType_.rightType), rightType),
+                criteriaBuilder.equal(relationshipTypeRoot.get(RelationshipType_.leftwardType), leftwardType),
+                criteriaBuilder.equal(relationshipTypeRoot.get(RelationshipType_.rightwardType), rightwardType)));
         return uniqueResult(context, criteriaQuery, false, RelationshipType.class, -1, -1);
     }
 
     @Override
-    public List<RelationshipType> findByLeftOrRightLabel(Context context, String label) throws SQLException {
+    public List<RelationshipType> findByLeftwardOrRightwardTypeName(Context context, String type) throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, RelationshipType.class);
         Root<RelationshipType> relationshipTypeRoot = criteriaQuery.from(RelationshipType.class);
         criteriaQuery.select(relationshipTypeRoot);
         criteriaQuery.where(
             criteriaBuilder.or(
-                criteriaBuilder.equal(relationshipTypeRoot.get(RelationshipType_.leftLabel), label),
-                criteriaBuilder.equal(relationshipTypeRoot.get(RelationshipType_.rightLabel), label)
+                criteriaBuilder.equal(relationshipTypeRoot.get(RelationshipType_.leftwardType), type),
+                criteriaBuilder.equal(relationshipTypeRoot.get(RelationshipType_.rightwardType), type)
             )
         );
         return list(context, criteriaQuery, true, RelationshipType.class, -1, -1);
