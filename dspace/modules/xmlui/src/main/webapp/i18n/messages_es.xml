@@ -3171,7 +3171,7 @@ Cuando se usa QDC para los elementos de DSpace se recomienda el uso de crosswalk
 
 <message key="xmlui.administrative.Navigation.context_in_edit_item_workflow">En edición por {0}</message>
 
-<message key="xmlui.bitstream.downloadName">documento</message>
+<message key="xmlui.bitstream.downloadName">Documento</message>
 <message key="xmlui.bitstream.download">Descargar archivo</message>
 
 <message key="xmlui.forms.remove">Eliminar</message>

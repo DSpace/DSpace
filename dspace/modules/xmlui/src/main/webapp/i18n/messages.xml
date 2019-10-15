@@ -2769,7 +2769,7 @@
 
 <message key="xmlui.administrative.Navigation.context_in_edit_item_workflow">In edition by {0}</message>
 
-<message key="xmlui.bitstream.downloadName">document</message>
+<message key="xmlui.bitstream.downloadName">Document</message>
 <message key="xmlui.bitstream.download">Download file</message>
 
 <message key="xmlui.forms.remove">Remove</message>
