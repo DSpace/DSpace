@@ -14,6 +14,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.junit.Test;
 
+/**
+ * This IT serves as an example of how & where to add integration tests for local customizations to the DSpace REST API.
+ * See {@link ExampleController} for the Controller of which the functionality is tested.
+ */
 public class ExampleControllerIT extends AbstractControllerIntegrationTest {
 
     @Test
