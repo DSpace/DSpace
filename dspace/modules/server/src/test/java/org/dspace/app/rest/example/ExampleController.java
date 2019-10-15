@@ -10,6 +10,10 @@ package org.dspace.app.rest.example;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * This Controller serves as an example of how & where to add local customizations to the DSpace REST API.
+ * See {@link ExampleControllerIT} for the integration tests for this controller.
+ */
 @RestController
 @RequestMapping("example")
 public class ExampleController {
