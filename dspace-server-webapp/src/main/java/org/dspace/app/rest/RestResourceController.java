@@ -51,6 +51,7 @@ import org.dspace.app.rest.repository.LinkRestRepository;
 import org.dspace.app.rest.utils.RestRepositoryUtils;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.util.UUIDUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -390,14 +391,17 @@ public class RestResourceController implements InitializingBean {
      * @param request       The relevant request
      * @param apiCategory   The apiCategory to be used
      * @param model         The model to be used
+     * @param parent        Optional parent identifier
      * @return              The relevant ResponseEntity for this request
      * @throws HttpRequestMethodNotSupportedException   If something goes wrong
      */
     @RequestMapping(method = RequestMethod.POST, consumes = {"application/json", "application/hal+json"})
-    public ResponseEntity<ResourceSupport> post(HttpServletRequest request, @PathVariable String apiCategory,
-                                                @PathVariable String model)
+    public ResponseEntity<ResourceSupport> post(HttpServletRequest request,
+                                                @PathVariable String apiCategory,
+                                                @PathVariable String model,
+                                                @RequestParam(required = false) String parent)
         throws HttpRequestMethodNotSupportedException {
-        return postJsonInternal(request, apiCategory, model);
+        return postJsonInternal(request, apiCategory, model, parent);
     }
 
     /**
@@ -432,16 +436,24 @@ public class RestResourceController implements InitializingBean {
      * @param request       The relevant request
      * @param apiCategory   The apiCategory to be used
      * @param model         The model to be used
+     * @param parent        The parent object id (optional)
      * @return              The relevant ResponseEntity for this request
      * @throws HttpRequestMethodNotSupportedException   If something goes wrong
      */
     public <ID extends Serializable> ResponseEntity<ResourceSupport> postJsonInternal(HttpServletRequest request,
                                                                                   String apiCategory,
-                                                                                  String model)
+                                                                                  String model, String parent)
         throws HttpRequestMethodNotSupportedException {
         checkModelPluralForm(apiCategory, model);
         DSpaceRestRepository<RestAddressableModel, ID> repository = utils.getResourceRepository(apiCategory, model);
-        RestAddressableModel modelObject = repository.createAndReturn();
+
+        RestAddressableModel modelObject;
+        if (parent != null) {
+            UUID parentUuid = UUIDUtils.fromString(parent);
+            modelObject = repository.createAndReturn(parentUuid);
+        } else {
+            modelObject = repository.createAndReturn();
+        }
         if (modelObject == null) {
             return ControllerUtils.toEmptyResponse(HttpStatus.CREATED);
         }
