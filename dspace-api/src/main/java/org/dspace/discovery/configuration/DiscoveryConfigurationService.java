@@ -76,6 +76,11 @@ public class DiscoveryConfigurationService {
         }
     }
 
+    /**
+     * Retrieves a list of all DiscoveryConfiguration objects where
+     * {@link org.dspace.discovery.configuration.DiscoveryConfiguration#isIndexAlways()} is true
+     * These configurations should always be included when indexing
+     */
     public List<DiscoveryConfiguration> getIndexAlwaysConfigurations() {
         List<DiscoveryConfiguration> configs = new ArrayList<>();
         for (String key : map.keySet()) {
