@@ -116,7 +116,8 @@ public class SubmissionFormConverter implements DSpaceConverter<DCInputSet, Subm
                 SelectableMetadata selMd = new SelectableMetadata();
 
                 inputRest.setType(inputType);
-                if (StringUtils.equalsIgnoreCase(dcinput.getInputType(), "group")) {
+                if (StringUtils.equalsIgnoreCase(dcinput.getInputType(), "group") ||
+                        StringUtils.equalsIgnoreCase(dcinput.getInputType(), "inline-group")) {
                     inputField.setRows(submissionFormRestRepository.findOne(formName + "-" + Utils
                         .standardize(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier(), "-")));
                 } else if (authorityUtils.isChoice(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier())) {
