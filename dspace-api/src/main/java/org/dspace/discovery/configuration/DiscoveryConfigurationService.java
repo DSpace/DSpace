@@ -7,6 +7,7 @@
  */
 package org.dspace.discovery.configuration;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -73,6 +74,22 @@ public class DiscoveryConfigurationService {
         } else {
             return getDiscoveryConfiguration(dso);
         }
+    }
+
+    /**
+     * Retrieves a list of all DiscoveryConfiguration objects where
+     * {@link org.dspace.discovery.configuration.DiscoveryConfiguration#isIndexAlways()} is true
+     * These configurations should always be included when indexing
+     */
+    public List<DiscoveryConfiguration> getIndexAlwaysConfigurations() {
+        List<DiscoveryConfiguration> configs = new ArrayList<>();
+        for (String key : map.keySet()) {
+            DiscoveryConfiguration config = map.get(key);
+            if (config.isIndexAlways()) {
+                configs.add(config);
+            }
+        }
+        return configs;
     }
 
     public static void main(String[] args) {
