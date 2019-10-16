@@ -80,12 +80,12 @@ public class RelationshipServiceImplPlaceTest extends AbstractUnitTest {
             itemService.addMetadata(context, item, "relationship", "type", null, null, "Publication");
 
             authorItem = installItemService.installItem(context, authorIs);
-            itemService.addMetadata(context, authorItem, "relationship", "type", null, null, "Author");
+            itemService.addMetadata(context, authorItem, "relationship", "type", null, null, "Person");
             itemService.addMetadata(context, authorItem, "person", "familyName", null, null, "familyName");
             itemService.addMetadata(context, authorItem, "person", "givenName", null, null, "firstName");
 
             publicationEntityType = entityTypeService.create(context, "Publication");
-            authorEntityType = entityTypeService.create(context, "Author");
+            authorEntityType = entityTypeService.create(context, "Person");
             isAuthorOfPublication = relationshipTypeService
                 .create(context, publicationEntityType, authorEntityType,
                         "isAuthorOfPublication", "isPublicationOfAuthor",
@@ -132,6 +132,7 @@ public class RelationshipServiceImplPlaceTest extends AbstractUnitTest {
         assertMetadataValue(authorQualifier, contributorElement, dcSchema, "test, two", null, 1, list.get(1));
         assertMetadataValue(authorQualifier, contributorElement, dcSchema, "familyName, firstName",
                             "virtual::" + relationship.getID(), 2, list.get(2));
+        assertThat(relationship.getLeftPlace(), equalTo(2));
 
         context.turnOffAuthorisationSystem();
 
@@ -140,7 +141,7 @@ public class RelationshipServiceImplPlaceTest extends AbstractUnitTest {
 
         WorkspaceItem authorIs = workspaceItemService.create(context, col, false);
         Item secondAuthorItem = installItemService.installItem(context, authorIs);
-        itemService.addMetadata(context, secondAuthorItem, "relationship", "type", null, null, "Author");
+        itemService.addMetadata(context, secondAuthorItem, "relationship", "type", null, null, "Person");
         itemService.addMetadata(context, secondAuthorItem, "person", "familyName", null, null, "familyNameTwo");
         itemService.addMetadata(context, secondAuthorItem, "person", "givenName", null, null, "firstNameTwo");
         Relationship relationshipTwo = relationshipService
@@ -154,10 +155,13 @@ public class RelationshipServiceImplPlaceTest extends AbstractUnitTest {
         assertMetadataValue(authorQualifier, contributorElement, dcSchema, "test, two", null, 1, list.get(1));
         assertMetadataValue(authorQualifier, contributorElement, dcSchema, "familyName, firstName",
                             "virtual::" + relationship.getID(), 2, list.get(2));
+        assertThat(relationship.getLeftPlace(), equalTo(2));
         assertMetadataValue(authorQualifier, contributorElement, dcSchema, "test, three", null, 3, list.get(3));
         assertMetadataValue(authorQualifier, contributorElement, dcSchema, "test, four", null, 4, list.get(4));
         assertMetadataValue(authorQualifier, contributorElement, dcSchema, "familyNameTwo, firstNameTwo",
                             "virtual::" + relationshipTwo.getID(), 5, list.get(5));
+        assertThat(relationshipTwo.getLeftPlace(), equalTo(5));
+
     }
 
     @Test
@@ -179,6 +183,7 @@ public class RelationshipServiceImplPlaceTest extends AbstractUnitTest {
         assertMetadataValue(authorQualifier, contributorElement, dcSchema, "test, two", null, 1, list.get(1));
         assertMetadataValue(authorQualifier, contributorElement, dcSchema, "familyName, firstName",
                             "virtual::" + relationship.getID(), 2, list.get(2));
+        assertThat(relationship.getLeftPlace(), equalTo(2));
 
         context.turnOffAuthorisationSystem();
 
@@ -187,7 +192,7 @@ public class RelationshipServiceImplPlaceTest extends AbstractUnitTest {
 
         WorkspaceItem authorIs = workspaceItemService.create(context, col, false);
         Item secondAuthorItem = installItemService.installItem(context, authorIs);
-        itemService.addMetadata(context, secondAuthorItem, "relationship", "type", null, null, "Author");
+        itemService.addMetadata(context, secondAuthorItem, "relationship", "type", null, null, "Person");
         itemService.addMetadata(context, secondAuthorItem, "person", "familyName", null, null, "familyNameTwo");
         itemService.addMetadata(context, secondAuthorItem, "person", "givenName", null, null, "firstNameTwo");
         Relationship relationshipTwo = relationshipService
@@ -201,10 +206,14 @@ public class RelationshipServiceImplPlaceTest extends AbstractUnitTest {
         assertMetadataValue(authorQualifier, contributorElement, dcSchema, "test, two", null, 1, list.get(1));
         assertMetadataValue(authorQualifier, contributorElement, dcSchema, "familyName, firstName",
                             "virtual::" + relationship.getID(), 2, list.get(2));
+        assertThat(relationship.getLeftPlace(), equalTo(2));
+
         assertMetadataValue(authorQualifier, contributorElement, dcSchema, "test, three", null, 3, list.get(3));
         assertMetadataValue(authorQualifier, contributorElement, dcSchema, "test, four", null, 4, list.get(4));
         assertMetadataValue(authorQualifier, contributorElement, dcSchema, "familyNameTwo, firstNameTwo",
                             "virtual::" + relationshipTwo.getID(), 5, list.get(5));
+        assertThat(relationshipTwo.getLeftPlace(), equalTo(5));
+
     }
 
 
@@ -227,6 +236,8 @@ public class RelationshipServiceImplPlaceTest extends AbstractUnitTest {
             .getMetadata(item, dcSchema, contributorElement, authorQualifier, Item.ANY);
         assertThat(list.size(), equalTo(2));
 
+        // Check that these places are still intact after the deletion as the place doesn't get updated until an
+        // item.update has been called
         assertMetadataValue(authorQualifier, contributorElement, dcSchema, "test, one", null, 0, list.get(0));
         assertMetadataValue(authorQualifier, contributorElement, dcSchema, "test, three", null, 2, list.get(1));
 
@@ -242,6 +253,8 @@ public class RelationshipServiceImplPlaceTest extends AbstractUnitTest {
         assertMetadataValue(authorQualifier, contributorElement, dcSchema, "test, one", null, 0, list.get(0));
         assertMetadataValue(authorQualifier, contributorElement, dcSchema, "familyName, firstName",
                             "virtual::" + relationship.getID(), 1, list.get(1));
+        assertThat(relationship.getLeftPlace(), equalTo(1));
+
         assertMetadataValue(authorQualifier, contributorElement, dcSchema, "test, three", null, 2, list.get(2));
 
         context.turnOffAuthorisationSystem();
@@ -249,6 +262,7 @@ public class RelationshipServiceImplPlaceTest extends AbstractUnitTest {
         itemService.addMetadata(context, item, dcSchema, contributorElement, authorQualifier, null, "test, four");
         itemService.addMetadata(context, item, dcSchema, contributorElement, authorQualifier, null, "test, five");
 
+        //This is author "test, four" that we're removing
         metadataValueToRemove = itemService.getMetadata(item, "dc", "contributor", "author", Item.ANY).get(3);
         item.removeMetadata(metadataValueToRemove);
         metadataValueService.delete(context, metadataValueToRemove);
@@ -257,9 +271,13 @@ public class RelationshipServiceImplPlaceTest extends AbstractUnitTest {
 
         list = itemService.getMetadata(item, dcSchema, contributorElement, authorQualifier, Item.ANY);
 
+        // Check that these places are still intact after the deletion as the place doesn't get updated until an
+        // item.update has been called
         assertMetadataValue(authorQualifier, contributorElement, dcSchema, "test, one", null, 0, list.get(0));
         assertMetadataValue(authorQualifier, contributorElement, dcSchema, "familyName, firstName",
                             "virtual::" + relationship.getID(), 1, list.get(1));
+        assertThat(relationship.getLeftPlace(), equalTo(1));
+
         assertMetadataValue(authorQualifier, contributorElement, dcSchema, "test, three", null, 2, list.get(2));
         assertMetadataValue(authorQualifier, contributorElement, dcSchema, "test, five", null, 4, list.get(3));
 
@@ -267,7 +285,7 @@ public class RelationshipServiceImplPlaceTest extends AbstractUnitTest {
 
         WorkspaceItem authorIs = workspaceItemService.create(context, col, false);
         Item secondAuthorItem = installItemService.installItem(context, authorIs);
-        itemService.addMetadata(context, secondAuthorItem, "relationship", "type", null, null, "Author");
+        itemService.addMetadata(context, secondAuthorItem, "relationship", "type", null, null, "Person");
         itemService.addMetadata(context, secondAuthorItem, "person", "familyName", null, null, "familyNameTwo");
         itemService.addMetadata(context, secondAuthorItem, "person", "givenName", null, null, "firstNameTwo");
         Relationship relationshipTwo = relationshipService
@@ -280,9 +298,13 @@ public class RelationshipServiceImplPlaceTest extends AbstractUnitTest {
         assertMetadataValue(authorQualifier, contributorElement, dcSchema, "test, one", null, 0, list.get(0));
         assertMetadataValue(authorQualifier, contributorElement, dcSchema, "familyName, firstName",
                             "virtual::" + relationship.getID(), 1, list.get(1));
+        assertThat(relationship.getLeftPlace(), equalTo(1));
+
         assertMetadataValue(authorQualifier, contributorElement, dcSchema, "test, three", null, 2, list.get(2));
         assertMetadataValue(authorQualifier, contributorElement, dcSchema, "familyNameTwo, firstNameTwo",
                             "virtual::" + relationshipTwo.getID(), 3, list.get(3));
+        assertThat(relationshipTwo.getLeftPlace(), equalTo(3));
+
         assertMetadataValue(authorQualifier, contributorElement, dcSchema, "test, five", null, 4, list.get(4));
 
     }
@@ -309,11 +331,16 @@ public class RelationshipServiceImplPlaceTest extends AbstractUnitTest {
         assertMetadataValue(authorQualifier, contributorElement, dcSchema, "test, three", null, 2, list.get(2));
         assertMetadataValue(authorQualifier, contributorElement, dcSchema, "familyName, firstName",
                             "virtual::" + relationship.getID(), 3, list.get(3));
+        assertThat(relationship.getLeftPlace(), equalTo(3));
+
 
         context.turnOffAuthorisationSystem();
 
         MetadataValue metadataValueToUpdate = itemService.getMetadata(item, "dc", "contributor", "author", Item.ANY)
                                                          .get(1);
+
+        // Switching the places of this relationship and metadata value to verify in the test later on that this
+        // updating works
         metadataValueToUpdate.setPlace(3);
         metadataValueService.update(context, metadataValueToUpdate);
         relationship.setLeftPlace(1);
@@ -328,6 +355,8 @@ public class RelationshipServiceImplPlaceTest extends AbstractUnitTest {
         assertMetadataValue(authorQualifier, contributorElement, dcSchema, "test, three", null, 2, list.get(2));
         assertMetadataValue(authorQualifier, contributorElement, dcSchema, "familyName, firstName",
                             "virtual::" + relationship.getID(), 1, list.get(1));
+        assertThat(relationship.getLeftPlace(), equalTo(1));
+
 
     }
 
