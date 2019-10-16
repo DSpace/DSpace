@@ -1,5 +1,6 @@
 package org.ssu.service;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.browse.BrowseException;
@@ -21,6 +22,7 @@ import java.sql.SQLException;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class CommunityService {
@@ -74,7 +76,15 @@ public class CommunityService {
         }
     }
 
-
+    public List<ItemResponse> getShortList(Context context, BrowseInfo browserInfo) {
+        Locale locale = context.getCurrentLocale();
+        return Arrays.stream(browserInfo.getStringResults())
+                .map(item -> new ItemResponse.Builder()
+                .withTitle(StringEscapeUtils.escapeHtml(item[0]))
+                .withViews(Integer.valueOf(item[2]))
+                .build())
+                .collect(Collectors.toList());
+    }
     public List<ItemResponse> getItems(Context context, BrowseInfo browserInfo) throws BrowseException {
         Locale locale = context.getCurrentLocale();
 

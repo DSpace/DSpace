@@ -8,6 +8,7 @@ public class BrowseRequestParameters {
     private Optional<String> startsWith;
     private Integer page;
     private Integer itemsPerPage;
+    private Boolean isExtendedTable;
 
     private BrowseRequestParameters(Builder builder) {
         sortBy = builder.sortBy;
@@ -15,6 +16,7 @@ public class BrowseRequestParameters {
         startsWith = builder.startsWith;
         page = builder.page;
         itemsPerPage = builder.itemsPerPage;
+        isExtendedTable = builder.isExtendedTable;
     }
 
 
@@ -38,6 +40,10 @@ public class BrowseRequestParameters {
         return itemsPerPage;
     }
 
+    public Boolean getExtendedTable() {
+        return isExtendedTable;
+    }
+
 
     public static final class Builder {
         private Integer sortBy;
@@ -45,6 +51,7 @@ public class BrowseRequestParameters {
         private Optional<String> startsWith;
         private Integer page;
         private Integer itemsPerPage;
+        private Boolean isExtendedTable;
 
         public Builder() {
         }
@@ -55,6 +62,7 @@ public class BrowseRequestParameters {
             this.startsWith = copy.getStartsWith();
             this.page = copy.getPage();
             this.itemsPerPage = copy.getItemsPerPage();
+            this.isExtendedTable = copy.getExtendedTable();
         }
 
         public Builder withSortBy(Integer sortBy) {
@@ -79,6 +87,11 @@ public class BrowseRequestParameters {
 
         public Builder withItemsPerPage(Integer itemsPerPage) {
             this.itemsPerPage = itemsPerPage;
+            return this;
+        }
+
+        public Builder withIsExtendedTable(Boolean isExtendedTable) {
+            this.isExtendedTable = isExtendedTable;
             return this;
         }
 

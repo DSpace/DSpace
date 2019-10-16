@@ -515,10 +515,10 @@
     <url-pattern>/exportdownload/*</url-pattern>
   </servlet-mapping>
 
-  <servlet-mapping>
-    <servlet-name>browse</servlet-name>
-    <url-pattern>/browse</url-pattern>
-  </servlet-mapping>
+  <!--<servlet-mapping>-->
+    <!--<servlet-name>browse</servlet-name>-->
+    <!--<url-pattern>/browse</url-pattern>-->
+  <!--</servlet-mapping>-->
 
   <servlet-mapping>
     <servlet-name>browsewithdrawn</servlet-name>
@@ -901,10 +901,7 @@
         <url-pattern>/update-statistics</url-pattern>
     </servlet-mapping>
 
-    <servlet-mapping>
-        <servlet-name>Spring MVC Servlet</servlet-name>
-        <url-pattern>/browse/dateissued</url-pattern>
-    </servlet-mapping>
+
 
     <servlet-mapping>
         <servlet-name>Spring MVC Servlet</servlet-name>
@@ -921,10 +918,21 @@
         <url-pattern>/feedback</url-pattern>
     </servlet-mapping>
 
+    <!--<servlet-mapping>-->
+        <!--<servlet-name>Spring MVC Servlet</servlet-name>-->
+        <!--<url-pattern>/browse/dateissued</url-pattern>-->
+    <!--</servlet-mapping>-->
+    <!--<servlet-mapping>-->
+        <!--<servlet-name>Spring MVC Servlet</servlet-name>-->
+        <!--<url-pattern>/browse/title</url-pattern>-->
+    <!--</servlet-mapping>-->
+
+
     <servlet-mapping>
         <servlet-name>Spring MVC Servlet</servlet-name>
-        <url-pattern>/browse/title</url-pattern>
+        <url-pattern>/browse</url-pattern>
     </servlet-mapping>
+
   <!-- Icon MIME type -->
   <mime-mapping>
     <extension>ico</extension>

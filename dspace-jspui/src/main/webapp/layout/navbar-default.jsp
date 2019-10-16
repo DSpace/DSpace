@@ -116,7 +116,7 @@
 						BrowseIndex bix = bis[i];
 						String key = "browse.menu." + bix.getName();
 					%>
-				      			<li><a href="<%= request.getContextPath() %>/browse/<%= bix.getName() %>"><fmt:message key="<%= key %>"/></a></li>
+				      			<li><a href="<%= request.getContextPath() %>/browse?type=<%= bix.getName() %>"><fmt:message key="<%= key %>"/></a></li>
 					<%	
 					}
 				%>
