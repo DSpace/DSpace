@@ -271,74 +271,27 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
         }
     }
 
-    public Bitstream setLogo(Context context, UUID uuid, MultipartFile uploadfile)
+    /**
+     * Method to install a logo on a Collection which doesn't have a logo
+     * Called by request mappings in CollectionRestController
+     * @param context
+     * @param collection    The collection on which to install the logo
+     * @param uploadfile    The new logo
+     * @return              The created bitstream containing the new logo
+     * @throws IOException
+     * @throws AuthorizeException
+     * @throws SQLException
+     */
+    public Bitstream setLogo(Context context, Collection collection, MultipartFile uploadfile)
             throws IOException, AuthorizeException, SQLException {
 
-        Collection collection = null;
-        try {
-            collection = cs.find(context, uuid);
-        } catch (SQLException e) {
-            log.error("Something went wrong trying to find the collection with uuid: " + uuid, e);
+        if (collection.getLogo() != null) {
+            throw new UnprocessableEntityException(
+                    "The collection with the given uuid already has a logo: " + collection.getID());
         }
-
-        if (collection == null) {
-            throw new ResourceNotFoundException(
-                    "The given uuid did not resolve to a collection on the server: " + uuid);
-        }
-
-        Bitstream bitstream;
-        if (uploadfile != null) {
-            if (collection.getLogo() != null) {
-                throw new UnprocessableEntityException(
-                        "The collection with the given uuid already has a logo: " + uuid);
-            }
-            bitstream = cs.setLogo(context, collection, uploadfile.getInputStream());
-        } else {
-            if (collection.getLogo() == null) {
-                throw new UnprocessableEntityException(
-                        "The collection with the given uuid didn't have a logo: " + uuid);
-            }
-            bitstream = collection.getLogo();
-            cs.setLogo(context, collection, null);
-        }
-
+        Bitstream bitstream = cs.setLogo(context, collection, uploadfile.getInputStream());
         cs.update(context, collection);
         bitstreamService.update(context, bitstream);
-        context.complete();
-
         return bitstream;
-    }
-
-    public Bitstream removeLogo(Context context, UUID uuid) throws SQLException, IOException, AuthorizeException {
-        return setLogo(context, uuid, null);
-    }
-
-    public Bitstream updateLogo(Context context, UUID uuid, MultipartFile uploadfile)
-            throws SQLException, IOException, AuthorizeException {
-
-        Collection collection = null;
-        try {
-            collection = cs.find(context, uuid);
-        } catch (SQLException e) {
-            log.error("Something went wrong trying to find the collection with uuid: " + uuid, e);
-        }
-
-        if (collection == null) {
-            throw new ResourceNotFoundException(
-                    "The given uuid did not resolve to a collection on the server: " + uuid);
-        }
-
-        if (collection.getLogo() == null) {
-            throw new UnprocessableEntityException("The collection with the given uuid didn't have a logo: " + uuid);
-        }
-        Bitstream oldBitstream = collection.getLogo();
-        Bitstream newBitstream = cs.setLogo(context, collection, uploadfile.getInputStream());
-
-        cs.update(context, collection);
-        bitstreamService.update(context, newBitstream);
-        bitstreamService.update(context, oldBitstream);
-        context.complete();
-
-        return newBitstream;
     }
 }
