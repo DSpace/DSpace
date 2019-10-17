@@ -219,6 +219,91 @@ public class ItemTest extends AbstractDSpaceObjectTest
     }
 
     /**
+     * Test of findInArchiveOrWithdrawnDiscoverable method, of class Item.
+     */
+    @Test
+    public void testFindInArchiveOrWithdrawnDiscoverable() throws Exception {
+        // Init item to be both withdrawn and discoverable
+        it.setWithdrawn(true);
+        it.setArchived(false);
+        it.setDiscoverable(true);
+
+        // Test 0: With withdrawn = true, archived = false and discoverable = true we should get non-null list with our item
+        Iterator<Item> all = itemService.findInArchiveOrWithdrawnDiscoverable(context);
+        assertThat("Returned list should not be null", all, notNullValue());
+
+        boolean added = false;
+        while(all.hasNext()) {
+            Item tmp = all.next();
+            if(tmp.equals(it)) {
+                added = true;
+            }
+        }
+
+        // Test 1: we should find our item in this list
+        assertTrue("List should contain item when discoverable is true", added);
+
+        // Repeat Tests 0, 1 with withdrawn = false and archived = true as this should result in same behaviour
+        it.setWithdrawn(false);
+        it.setArchived(true);
+
+        // Test 2: With withdrawn = false, archived = true and discoverable = true we should get non-null list with our item
+        all = itemService.findInArchiveOrWithdrawnDiscoverable(context);
+        assertThat("Returned list should not be null", all, notNullValue());
+
+        added = false;
+        while(all.hasNext()) {
+            Item tmp = all.next();
+            if(tmp.equals(it)) {
+                added = true;
+            }
+        }
+
+        // Test 3: we should find our item in this list
+        assertTrue("List should contain item when discoverable is true", added);
+
+
+        // Repeat Tests 0-3 with discoverable set to false
+        it.setWithdrawn(true);
+        it.setArchived(false);
+        it.setDiscoverable(false);
+
+        // Test 4: With withdrawn = true, archived = false and discoverable = true we should get non-null list with our item
+        all = itemService.findInArchiveOrWithdrawnDiscoverable(context);
+        assertThat("Returned list should not be null", all, notNullValue());
+
+        added = false;
+        while(all.hasNext()) {
+            Item tmp = all.next();
+            if(tmp.equals(it)) {
+                added = true;
+            }
+        }
+
+        // Test 5: we should not find our item in this list
+        assertFalse("List should not contain item when discoverable is false", added);
+
+        // Repeat Tests 4, 5 with withdrawn = false and archived = true as this should result in same behaviour
+        it.setWithdrawn(false);
+        it.setArchived(true);
+
+        // Test 6: With withdrawn = false, archived = true and discoverable = true we should get non-null list with our item
+        all = itemService.findInArchiveOrWithdrawnDiscoverable(context);
+        assertThat("Returned list should not be null", all, notNullValue());
+
+        added = false;
+        while(all.hasNext()) {
+            Item tmp = all.next();
+            if(tmp.equals(it)) {
+                added = true;
+            }
+        }
+
+        // Test 7: we should not find our item in this list
+        assertFalse("List should not contain item when discoverable is false", added);
+    }
+
+    /**
      * Test of findInArchiveOrWithdrawnDiscoverableModifiedSince method, of class Item.
      */
     @Test
