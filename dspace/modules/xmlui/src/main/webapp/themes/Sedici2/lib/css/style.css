@@ -4081,3 +4081,8 @@ table.dropdown-table.ui-accordion tr:hover td{
 	overflow-y: auto;
 	overflow-x: hidden;
 }
+
+.multiple-metadata-display-block {
+	display: block;
+	margin-left: 15px;
+}
