@@ -2931,6 +2931,6 @@
 <message key="sedici.home.slide_pairs_contact.title">Institutional documents</message>
 <message key="sedici.home.slide_pairs_contact.info">Institutional, informative, normative and administrative documents of the University</message>
 
-<message key="sedici.items.handle.utilizacion_URI">Please, use this identificator(URI) for cite o linking this item: </message>
+<message key="sedici.items.handle.utilizacion_URI">Please, use one of this identificators(URI) for cite o linking this item: </message>
 <message key="sedici.common.camposObligatorios">(*) Mandatory fields</message>
 </catalogue>

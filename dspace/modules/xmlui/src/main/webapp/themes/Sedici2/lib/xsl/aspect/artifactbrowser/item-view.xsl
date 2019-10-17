@@ -537,8 +537,9 @@
 
 		<xsl:call-template name="render-normal-field">
 			<xsl:with-param name="name" select="'identifier-other'"/>
-			<xsl:with-param name="elements" select="dim:field[@element='identifier' and @qualifier='other'] "/>
-			<xsl:with-param name="separator" select="' | '"/>
+			<xsl:with-param name="elements" select="dim:field[@element='identifier' and @qualifier='other' and not(java:ar.edu.unlp.sedici.dspace.utils.Utils.isDoi(text()))] "/>
+			<xsl:with-param name="separator" select="''"/>
+			<xsl:with-param name="custom-mdt-classes" select="'multiple-metadata-display-block'"/>
 			<xsl:with-param name="type" select="'url'"/>
 		</xsl:call-template>
 
@@ -688,10 +689,10 @@
 		</xsl:if>
 		
 		<!-- Info about how to cite this document -->
-		<xsl:if test="./dim:field[@element='identifier'][@qualifier='uri']">
+		<xsl:if test="./dim:field[@mdschema='dc'][@element='identifier'][@qualifier='uri'] or ./dim:field[@mdschema='sedici' and @element='identifier' and @qualifier='other' and java:ar.edu.unlp.sedici.dspace.utils.Utils.isDoi(text())]">
 			<div id="item-URI-suggestion">
 				<b><i18n:text>sedici.items.handle.utilizacion_URI</i18n:text></b>
-				<xsl:for-each select="dim:field[@element='identifier' and @qualifier='uri']">
+				<xsl:for-each select="dim:field[(@mdschema='dc' and @element='identifier' and @qualifier='uri') or (@mdschema='sedici' and @element='identifier' and @qualifier='other' and java:ar.edu.unlp.sedici.dspace.utils.Utils.isDoi(text()))]">
 					<li>
 						<a target="_blank"><xsl:attribute name="href"><xsl:value-of select="." /></xsl:attribute><xsl:value-of select="." /></a>
 					</li>
@@ -872,6 +873,7 @@
 		<xsl:param name="acotar"/>
 		<xsl:param name="filter" select="''"/>
 		<xsl:param name="operator" select="'equals'"/>
+		<xsl:param name="custom-mdt-classes" select="''"/>
 
 		<!-- Generamos salida solo si hay algun elemento para mostrar -->
 		<xsl:if test="count($elements) &gt; 0">
@@ -891,6 +893,7 @@
 					<xsl:with-param name="acotar" select="$acotar"/>
 					<xsl:with-param name="filter" select="$filter"/>
 					<xsl:with-param name="operator" select="$operator"/>
+					<xsl:with-param name="custom-mdt-classes" select="$custom-mdt-classes"/>
 				</xsl:call-template>
 
 			</div>
@@ -911,8 +914,13 @@
 		<xsl:param name="acotar"/>
 		<xsl:param name="filter"/>
 		<xsl:param name="operator" select="'equals'"/>
+		<xsl:param name="custom-mdt-classes"/>
 
-		<span class="metadata-value">
+		<span>
+			<xsl:attribute name="class">
+		        <xsl:value-of select="'metadata-value '"/>
+				<xsl:if test="$custom-mdt-classes != ''"> <xsl:value-of select="$custom-mdt-classes"/> </xsl:if>
+			</xsl:attribute>
 
 			<xsl:choose>
 				<xsl:when test="$type='url'">
@@ -983,6 +991,7 @@
 				<xsl:with-param name="type" select="$type"/>
 				<xsl:with-param name="acotar" select="$acotar"/>
 				<xsl:with-param name="filter" select="$filter"/>
+				<xsl:with-param name="custom-mdt-classes" select="$custom-mdt-classes"/>
 			</xsl:call-template>
 		</xsl:if>
 	</xsl:template>

@@ -3134,7 +3134,7 @@ Cuando se usa QDC para los elementos de DSpace se recomienda el uso de crosswalk
 <message key="sedici.home.slide_pairs_contact.title">Documentos institucionales</message>
 <message key="sedici.home.slide_pairs_contact.info">Documentos de carácter institucional, informativos, normativos y administrativos de la Universidad</message>
 
-<message key="sedici.items.handle.utilizacion_URI">Por favor, utilice este identificador(URI) para citar o enlazar este ítem: </message>
+<message key="sedici.items.handle.utilizacion_URI">Por favor, utilice uno de estos identificadores(URI) para citar o enlazar este ítem: </message>
 
 
 <!-- Creative Commons mensajes -->
