@@ -211,7 +211,7 @@ public class GenerateSitemaps
             c.uncacheEntity(coll);
         }
 
-        Iterator<Item> allItems = itemService.findAll(c);
+        Iterator<Item> allItems = itemService.findInArchiveOrWithdrawnDiscoverable(c);
         int itemCount = 0;
 
         while (allItems.hasNext())

@@ -127,6 +127,15 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
     public Iterator<Item> findByCollection(Context context, Collection collection, Integer limit, Integer offset) throws SQLException;
 
     /**
+     * Get all Items installed or withdrawn, and discoverable.
+     * @param context context
+     * @return an iterator over the items in the collection.
+     * @throws SQLException if database error
+     */
+    public Iterator<Item> findInArchiveOrWithdrawnDiscoverable(Context context)
+            throws SQLException;
+
+    /**
      * Get all Items installed or withdrawn, discoverable, and modified since a Date.
      * @param context context
      * @param since earliest interesting last-modified date, or null for no date test.
