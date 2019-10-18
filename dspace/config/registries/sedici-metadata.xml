@@ -347,6 +347,12 @@
 	  	<!-- unqualified -->
 	  	<scope_note>A class of entity for whom the resource is intended or useful. The real namespace for this metadata is "dcterms" instead "dc".</scope_note>
   	</dc-type>
+	<dc-type>
+		<schema>sedici</schema>
+		<element>rights</element>
+		<qualifier>sherpa</qualifier>
+		<scope_note>Contiene la descripción de la licencia del journal según Sherpa</scope_note>
+	</dc-type>
 
 
 </dspace-dc-types>
