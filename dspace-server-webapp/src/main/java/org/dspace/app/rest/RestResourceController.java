@@ -71,6 +71,7 @@ import org.springframework.hateoas.UriTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -365,13 +366,13 @@ public class RestResourceController implements InitializingBean {
      * @return
      */
     @RequestMapping(method = RequestMethod.GET, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_STRING_VERSION_STRONG +
-        "/{rel}/{relid:[\\w+\\-]+}")
+        "/{rel}/{relid}")
     public ResourceSupport findRel(HttpServletRequest request, HttpServletResponse response,
                                    @PathVariable String apiCategory,
                                    @PathVariable String model, @PathVariable String id, @PathVariable String rel,
                                    @PathVariable String relid,
                                    Pageable page, PagedResourcesAssembler assembler,
-                                   @RequestParam(required = false) String projection) {
+                                   @RequestParam(required = false) String projection) throws Throwable {
         return findRelEntryInternal(request, response, apiCategory, model, id, rel, relid, page, assembler, projection);
     }
 
@@ -766,7 +767,7 @@ public class RestResourceController implements InitializingBean {
                                                                            String id, String rel, String relid,
                                                                            Pageable page,
                                                                            PagedResourcesAssembler assembler,
-                                                                           String projection) {
+                                                                           String projection) throws Throwable {
         checkModelPluralForm(apiCategory, model);
         DSpaceRestRepository<RestAddressableModel, ID> repository = utils.getResourceRepository(apiCategory, model);
         Class<RestAddressableModel> domainClass = repository.getDomainClass();
@@ -778,15 +779,26 @@ public class RestResourceController implements InitializingBean {
 
             try {
                 Object object = linkMethod.invoke(linkRepository, request, id, relid, page, projection);
-                Link link = linkTo(this.getClass(), apiCategory, English.plural(model)).slash(id)
-                                                                                       .slash(rel).withSelfRel();
+                Link link = linkTo(this.getClass(), apiCategory, model).slash(id).slash(rel).slash(relid).withSelfRel();
+
                 List result = new ArrayList();
                 result.add(object);
                 PageImpl<RestAddressableModel> pageResult = new PageImpl(result, page, 1);
                 Page<HALResource> halResources = pageResult.map(linkRepository::wrapResource);
                 halResources.forEach(linkService::addLinks);
                 return assembler.toResource(halResources, link);
-            } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+            } catch (InvocationTargetException e) {
+                // This catch has been made to resolve the issue that caused AuthorizeDenied exceptions for the methods
+                // on the repository defined by the @PreAuthorize etc annotation to be absorbed by the reflection's
+                // InvocationTargetException and thrown as a RunTimeException when it was actually an AccessDenied
+                // Exception and it should be returned/shown as one
+                if (e.getTargetException() instanceof AccessDeniedException ||
+                    e.getTargetException() instanceof ResourceNotFoundException) {
+                    throw e.getTargetException();
+                } else {
+                    throw new RuntimeException(e.getMessage(), e);
+                }
+            } catch (IllegalAccessException | IllegalArgumentException e) {
                 throw new RuntimeException(e.getMessage(), e);
             }
         }
