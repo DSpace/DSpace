@@ -1,3 +1,13 @@
+# Request for open access email to admin
+#
+# Parameters: {0} Name of file
+#             {1} Document Handle
+#             {2} Request token
+#             {3} Name of the requester of the file
+#             {4} The email of the requester of the file
+#
+# See org.dspace.core.Email for information on the format of this file.
+#
 Subject: Request for Open Access
 
 {3}, with address {4},

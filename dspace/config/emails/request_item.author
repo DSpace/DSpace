@@ -1,3 +1,19 @@
+# Request an item email to the author
+#
+# Parameters: {0} Name of the requester of the file
+#             {1} The email of the requester of the file
+#             {2} Either the term "All files" or the URL to a single file
+#             {3} URL to the item
+#             {4} Title of the item
+#             {5} The message that the requester entered
+#             {6} The link for the submitter/admin where they can reply
+#             {7} The name of the user receiving this email
+#             {8} The email of the user receiving this email
+#             {9} The DSpace repository name (dspace.name config property)
+#             {10} The helpdesk email address (mail.helpdesk config property)
+#
+# See org.dspace.core.Email for information on the format of this file.
+#
 Subject: Request copy of document
 
 Dear {7},
