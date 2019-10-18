@@ -207,14 +207,6 @@ public class AuthorityRestRepositoryIT extends AbstractControllerIntegrationTest
     @Override
     public void destroy() throws Exception {
         AuthorityServiceFactory.getInstance().getAuthorityIndexingService().cleanIndex();
-        configurationService.setProperty("plugin.named.org.dspace.content.authority.ChoiceAuthority", null);
-
-        configurationService.setProperty("solr.authority.server", null);
-        configurationService.setProperty("choices.plugin.dc.contributor.author", null);
-        configurationService.setProperty("choices.presentation.dc.contributor.author", null);
-        configurationService.setProperty("authority.controlled.dc.contributor.author", null);
-
-        configurationService.setProperty("authority.author.indexer.field.1", null);
         super.destroy();
     }
 }
