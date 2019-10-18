@@ -833,7 +833,7 @@ public class ItemListTag extends TagSupport
                 Bitstream original = thumbnail.getOriginal();
                 String link = hrq.getContextPath() + "/bitstream/" + item.getHandle() + "/" + original.getSequenceID() + "/" +
                                 UIUtil.encodeBitstreamName(original.getName(), Constants.DEFAULT_ENCODING);
-                thumbFrag.append("<a target=\"_blank\" href=\"" + link + "\" />");
+                thumbFrag.append("<a target=\"_blank\" rel=\"noopener\" href=\"" + link + "\" />");
             }
             else
             {

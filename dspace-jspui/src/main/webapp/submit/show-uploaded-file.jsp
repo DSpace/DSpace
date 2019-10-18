@@ -123,7 +123,7 @@
             </tr>
             <tr>
                 <td headers="t1" class="evenRowOddCol">
-                	<a href="<%= request.getContextPath() %>/retrieve/<%= bitstream.getID() %>/<%= org.dspace.app.webui.util.UIUtil.encodeBitstreamName(bitstream.getName()) %>" target="_blank"><%= bitstream.getName() %></a>
+                	<a href="<%= request.getContextPath() %>/retrieve/<%= bitstream.getID() %>/<%= org.dspace.app.webui.util.UIUtil.encodeBitstreamName(bitstream.getName()) %>" target="_blank" rel="noopener"><%= bitstream.getName() %></a>
                 	<%-- <input type="submit" name="submit_remove_<%= bitstream.getID() %>" value="Click here if this is the wrong file"> --%>
 					<input class="btn btn-danger pull-right" type="submit" name="submit_remove_<%= bitstream.getID() %>" value="<fmt:message key="jsp.submit.show-uploaded-file.click2.button"/>" />
                 </td>

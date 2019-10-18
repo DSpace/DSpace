@@ -116,7 +116,7 @@
 							
 							<div class="sherpaCopyright">
 								<fmt:message key="jsp.sherpa.copyright" />
-								<ul><c:forEach var="copyright" items="${r[1].copyright}"><li><a href="${copyright[1]}" target="_blank">${copyright[0]}</a></li></c:forEach></ul>
+								<ul><c:forEach var="copyright" items="${r[1].copyright}"><li><a href="${copyright[1]}" target="_blank" rel="noopener">${copyright[0]}</a></li></c:forEach></ul>
 							</div>
 							
 							<div class="sherpaColor">
