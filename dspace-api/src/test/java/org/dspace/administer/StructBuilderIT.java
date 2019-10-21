@@ -184,7 +184,7 @@ public class StructBuilderIT
                 = new ByteArrayOutputStream(IMPORT_DOCUMENT.length() * 2 * 2);
         byte[] inputBytes = IMPORT_DOCUMENT.getBytes(StandardCharsets.UTF_8);
         context.turnOffAuthorisationSystem();
-        try (InputStream input = new ByteArrayInputStream(inputBytes);) {
+        try (InputStream input = new ByteArrayInputStream(inputBytes)) {
             StructBuilder.importStructure(context, input, outputDocument, null);
         } catch (IOException | SQLException
                 | ParserConfigurationException | TransformerException ex) {
@@ -242,7 +242,7 @@ public class StructBuilderIT
             = new ByteArrayOutputStream(IMPORT_DOCUMENT.length() * 2 * 2);
         byte[] inputBytes = IMPORT_DOCUMENT.getBytes(StandardCharsets.UTF_8);
         context.turnOffAuthorisationSystem();
-        try (InputStream input = new ByteArrayInputStream(inputBytes);) {
+        try (InputStream input = new ByteArrayInputStream(inputBytes)) {
             StructBuilder.importStructure(context, input, outputDocument, parent);
         } catch (IOException | SQLException
             | ParserConfigurationException | TransformerException ex) {
