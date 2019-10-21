@@ -24,8 +24,9 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class BrowseIndexConverter implements DSpaceConverter<BrowseIndex, BrowseIndexRest> {
+
     @Override
-    public BrowseIndexRest fromModel(BrowseIndex obj) {
+    public BrowseIndexRest convert(BrowseIndex obj) {
         BrowseIndexRest bir = new BrowseIndexRest();
         bir.setId(obj.getName());
         bir.setOrder(obj.getDefaultOrder());
@@ -53,7 +54,7 @@ public class BrowseIndexConverter implements DSpaceConverter<BrowseIndex, Browse
     }
 
     @Override
-    public BrowseIndex toModel(BrowseIndexRest obj) {
-        return null;
+    public Class<BrowseIndex> getModelClass() {
+        return BrowseIndex.class;
     }
 }

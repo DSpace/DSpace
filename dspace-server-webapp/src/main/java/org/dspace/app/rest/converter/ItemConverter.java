@@ -44,51 +44,38 @@ public class ItemConverter
     extends DSpaceObjectConverter<org.dspace.content.Item, org.dspace.app.rest.model.ItemRest>
     implements IndexableObjectConverter<Item, ItemRest> {
 
-    @Autowired(required = true)
-    private CollectionConverter collectionConverter;
-    @Autowired(required = true)
-    private BitstreamConverter bitstreamConverter;
+    @Autowired
+    private ConverterService converter;
+    @Autowired
+    private MetadataConverter metadataConverter;
     @Autowired
     private RequestService requestService;
     @Autowired
     private RelationshipService relationshipService;
     @Autowired
-    private RelationshipConverter relationshipConverter;
-    @Autowired
     private ItemService itemService;
-    @Autowired
-    private MetadataConverter metadataConverter;
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(ItemConverter.class);
 
     @Override
-    public ItemRest fromModel(org.dspace.content.Item obj) {
-        ItemRest item = super.fromModel(obj);
+    public ItemRest convert(org.dspace.content.Item obj) {
+        ItemRest item = super.convert(obj);
         item.setInArchive(obj.isArchived());
         item.setDiscoverable(obj.isDiscoverable());
         item.setWithdrawn(obj.isWithdrawn());
         item.setLastModified(obj.getLastModified());
-        try {
-            Collection c = obj.getOwningCollection();
-            if (c != null) {
-                item.setOwningCollection(collectionConverter.fromModel(c));
-            }
-        } catch (Exception e) {
-            log.error("Error setting owning collection for item" + item.getHandle(), e);
+        Collection owningCollection = obj.getOwningCollection();
+        if (owningCollection != null) {
+            item.setOwningCollection(converter.toRest(owningCollection));
         }
-        try {
-            Collection c = obj.getTemplateItemOf();
-            if (c != null) {
-                item.setTemplateItemOf(collectionConverter.fromModel(c));
-            }
-        } catch (Exception e) {
-            log.error("Error setting template item of for item " + item.getHandle(), e);
+        Collection templateItemOf = obj.getTemplateItemOf();
+        if (templateItemOf != null) {
+            item.setTemplateItemOf(converter.toRest(templateItemOf));
         }
-        List<BitstreamRest> bitstreams = new ArrayList<BitstreamRest>();
+        List<BitstreamRest> bitstreams = new ArrayList<>();
         for (Bundle bun : obj.getBundles()) {
             for (Bitstream bit : bun.getBitstreams()) {
-                BitstreamRest bitrest = bitstreamConverter.fromModel(bit);
-                bitstreams.add(bitrest);
+                bitstreams.add(converter.toRest(bit));
             }
         }
         item.setBitstreams(bitstreams);
@@ -108,24 +95,15 @@ public class ItemConverter
         }
         List<RelationshipRest> relationshipRestList = new LinkedList<>();
         for (Relationship relationship : relationships) {
-            RelationshipRest relationshipRest = relationshipConverter.fromModel(relationship);
+            RelationshipRest relationshipRest = converter.toRest(relationship);
             relationshipRestList.add(relationshipRest);
         }
         item.setRelationships(relationshipRestList);
 
-        List<MetadataValue> fullList = new LinkedList<>();
-        fullList = itemService.getMetadata(obj, Item.ANY, Item.ANY, Item.ANY, Item.ANY, true);
-
+        List<MetadataValue> fullList = itemService.getMetadata(obj, Item.ANY, Item.ANY, Item.ANY, Item.ANY, true);
         item.setMetadata(metadataConverter.convert(fullList));
 
-
         return item;
-    }
-
-    @Override
-    public org.dspace.content.Item toModel(ItemRest obj) {
-        // TODO Auto-generated method stub
-        return null;
     }
 
     @Override
@@ -134,7 +112,7 @@ public class ItemConverter
     }
 
     @Override
-    protected Class<Item> getModelClass() {
+    public Class<Item> getModelClass() {
         return Item.class;
     }
 

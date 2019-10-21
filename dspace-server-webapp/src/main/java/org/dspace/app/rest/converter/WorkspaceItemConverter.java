@@ -28,16 +28,20 @@ public class WorkspaceItemConverter
     }
 
     @Override
-    public WorkspaceItemRest fromModel(org.dspace.content.WorkspaceItem obj) {
+    public WorkspaceItemRest convert(org.dspace.content.WorkspaceItem obj) {
         WorkspaceItemRest witem = new WorkspaceItemRest();
 
         fillFromModel(obj, witem);
         return witem;
     }
 
-    @Override
     public org.dspace.content.WorkspaceItem toModel(WorkspaceItemRest obj) {
         return null;
+    }
+
+    @Override
+    public Class<WorkspaceItem> getModelClass() {
+        return WorkspaceItem.class;
     }
 
     @Override

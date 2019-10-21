@@ -18,12 +18,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
-import org.dspace.app.rest.converter.EPersonConverter;
-import org.dspace.app.rest.converter.MetadataConverter;
 import org.dspace.app.rest.exception.RESTAuthorizationException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.EPersonRest;
-import org.dspace.app.rest.model.hateoas.EPersonResource;
 import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.repository.patch.EPersonPatch;
 import org.dspace.authorize.AuthorizeException;
@@ -54,15 +51,11 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
     private final EPersonService es;
 
     @Autowired
-    MetadataConverter metadataConverter;
-
-    @Autowired
     EPersonPatch epersonPatch;
 
     public EPersonRestRepository(EPersonService dsoService,
-                                 EPersonConverter dsoConverter,
                                  EPersonPatch dsoPatch) {
-        super(dsoService, dsoConverter, dsoPatch);
+        super(dsoService, dsoPatch);
         this.es = dsoService;
     }
 
@@ -97,7 +90,7 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
             throw new RuntimeException(e.getMessage(), e);
         }
 
-        return dsoConverter.convert(eperson);
+        return converter.toRest(eperson);
     }
 
     @Override
@@ -112,7 +105,7 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
         if (eperson == null) {
             return null;
         }
-        return dsoConverter.fromModel(eperson);
+        return converter.toRest(eperson);
     }
 
     @Override
@@ -130,7 +123,7 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<EPersonRest> page = new PageImpl<EPerson>(epersons, pageable, total).map(dsoConverter);
+        Page<EPersonRest> page = new PageImpl<>(epersons, pageable, total).map(converter::toRest);
         return page;
     }
 
@@ -156,7 +149,7 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<EPersonRest> page = new PageImpl<EPerson>(epersons, pageable, total).map(dsoConverter);
+        Page<EPersonRest> page = new PageImpl<>(epersons, pageable, total).map(converter::toRest);
         return page;
     }
 
@@ -166,8 +159,6 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
      *
      * @param email
      *            is the *required* email address
-     * @param pageable
-     *            contains the pagination information
      * @return a Page of EPersonRest instances matching the user query
      */
     @SearchRestMethod(name = "byEmail")
@@ -182,7 +173,7 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
         if (eperson == null) {
             return null;
         }
-        return dsoConverter.fromModel(eperson);
+        return converter.toRest(eperson);
     }
 
     @Override
@@ -242,10 +233,4 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
     public Class<EPersonRest> getDomainClass() {
         return EPersonRest.class;
     }
-
-    @Override
-    public EPersonResource wrapResource(EPersonRest eperson, String... rels) {
-        return new EPersonResource(eperson, utils, rels);
-    }
-
 }

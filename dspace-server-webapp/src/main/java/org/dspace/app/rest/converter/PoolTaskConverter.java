@@ -25,26 +25,20 @@ public class PoolTaskConverter
     implements IndexableObjectConverter<PoolTask, org.dspace.app.rest.model.PoolTaskRest> {
 
     @Autowired
-    private WorkflowItemConverter workflowItemConverter;
-
-    @Autowired
-    private EPersonConverter epersonConverter;
-
-    @Autowired
-    private GroupConverter groupConverter;
+    private ConverterService converter;
 
     @Override
-    public PoolTaskRest fromModel(PoolTask obj) {
+    public PoolTaskRest convert(PoolTask obj) {
         PoolTaskRest taskRest = new PoolTaskRest();
 
         XmlWorkflowItem witem = obj.getWorkflowItem();
         taskRest.setId(obj.getID());
-        taskRest.setWorkflowitem(workflowItemConverter.convert(witem));
+        taskRest.setWorkflowitem(converter.toRest(witem));
         if (obj.getEperson() != null) {
-            taskRest.setEperson(epersonConverter.convert(obj.getEperson()));
+            taskRest.setEperson(converter.toRest(obj.getEperson()));
         }
         if (obj.getGroup() != null) {
-            taskRest.setGroup(groupConverter.convert(obj.getGroup()));
+            taskRest.setGroup(converter.toRest(obj.getGroup()));
         }
         taskRest.setAction(obj.getActionID());
         taskRest.setStep(obj.getStepID());
@@ -52,8 +46,8 @@ public class PoolTaskConverter
     }
 
     @Override
-    public PoolTask toModel(PoolTaskRest obj) {
-        return null;
+    public Class<PoolTask> getModelClass() {
+        return PoolTask.class;
     }
 
     @Override

@@ -7,7 +7,6 @@
  */
 package org.dspace.app.rest.converter;
 
-import org.apache.commons.lang3.NotImplementedException;
 import org.dspace.app.rest.model.AuthorityEntryRest;
 import org.dspace.app.rest.utils.AuthorityUtils;
 import org.dspace.content.authority.Choice;
@@ -25,7 +24,7 @@ import org.springframework.stereotype.Component;
 public class AuthorityEntryRestConverter implements DSpaceConverter<Choice, AuthorityEntryRest> {
 
     @Override
-    public AuthorityEntryRest fromModel(Choice choice) {
+    public AuthorityEntryRest convert(Choice choice) {
         AuthorityEntryRest entry = new AuthorityEntryRest();
         entry.setValue(choice.value);
         entry.setDisplay(choice.label);
@@ -35,7 +34,7 @@ public class AuthorityEntryRestConverter implements DSpaceConverter<Choice, Auth
     }
 
     @Override
-    public Choice toModel(AuthorityEntryRest obj) {
-        throw new NotImplementedException("Method not implemented");
+    public Class<Choice> getModelClass() {
+        return Choice.class;
     }
 }

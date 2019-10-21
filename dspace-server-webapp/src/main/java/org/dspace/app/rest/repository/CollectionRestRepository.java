@@ -19,14 +19,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
-import org.dspace.app.rest.converter.CollectionConverter;
-import org.dspace.app.rest.converter.MetadataConverter;
+import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.CollectionRest;
 import org.dspace.app.rest.model.CommunityRest;
-import org.dspace.app.rest.model.hateoas.CollectionResource;
 import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.repository.patch.DSpaceObjectPatch;
 import org.dspace.app.rest.utils.CollectionRestEqualityUtils;
@@ -60,18 +58,13 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
     CommunityService communityService;
 
     @Autowired
-    CollectionConverter converter;
-
-    @Autowired
-    MetadataConverter metadataConverter;
+    ConverterService converter;
 
     @Autowired
     CollectionRestEqualityUtils collectionRestEqualityUtils;
 
-
-    public CollectionRestRepository(CollectionService dsoService,
-                                    CollectionConverter dsoConverter) {
-        super(dsoService, dsoConverter, new DSpaceObjectPatch<CollectionRest>() {});
+    public CollectionRestRepository(CollectionService dsoService) {
+        super(dsoService, new DSpaceObjectPatch<CollectionRest>() {});
         this.cs = dsoService;
     }
 
@@ -87,7 +80,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
         if (collection == null) {
             return null;
         }
-        return dsoConverter.fromModel(collection);
+        return converter.toRest(collection);
     }
 
     @Override
@@ -104,7 +97,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<CollectionRest> page = new PageImpl<Collection>(collections, pageable, total).map(dsoConverter);
+        Page<CollectionRest> page = new PageImpl<>(collections, pageable, total).map(converter::toRest);
         return page;
     }
 
@@ -128,7 +121,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<CollectionRest> page = utils.getPage(collections, pageable).map(dsoConverter);
+        Page<CollectionRest> page = utils.getPage(collections, pageable).map(converter::toRest);
         return page;
     }
 
@@ -145,7 +138,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<CollectionRest> page = utils.getPage(collections, pageable).map(dsoConverter);
+        Page<CollectionRest> page = utils.getPage(collections, pageable).map(converter::toRest);
         return page;
     }
 
@@ -159,11 +152,6 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
     @Override
     public Class<CollectionRest> getDomainClass() {
         return CollectionRest.class;
-    }
-
-    @Override
-    public CollectionResource wrapResource(CollectionRest collection, String... rels) {
-        return new CollectionResource(collection, utils, rels);
     }
 
     @Override
@@ -203,7 +191,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
         } catch (SQLException e) {
             throw new RuntimeException("Unable to create new Collection under parent Community " + id, e);
         }
-        return converter.convert(collection);
+        return converter.toRest(collection);
     }
 
 
@@ -222,7 +210,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
         if (collection == null) {
             throw new ResourceNotFoundException(apiCategory + "." + model + " with id: " + id + " not found");
         }
-        CollectionRest originalCollectionRest = converter.fromModel(collection);
+        CollectionRest originalCollectionRest = converter.toRest(collection);
         if (collectionRestEqualityUtils.isCollectionRestEqualWithoutMetadata(originalCollectionRest, collectionRest)) {
             metadataConverter.setMetadata(context, collection, collectionRest.getMetadata());
         } else {
@@ -230,7 +218,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
                                                    + id + ", "
                                                    + collectionRest.getId());
         }
-        return converter.fromModel(collection);
+        return converter.toRest(collection);
     }
     @Override
     @PreAuthorize("hasPermission(#id, 'COLLECTION', 'DELETE')")

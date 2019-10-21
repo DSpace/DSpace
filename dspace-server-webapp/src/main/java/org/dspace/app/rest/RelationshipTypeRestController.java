@@ -13,7 +13,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.dspace.app.rest.converter.RelationshipTypeConverter;
+import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.link.HalLinkService;
 import org.dspace.app.rest.model.RelationshipTypeRest;
 import org.dspace.app.rest.model.RelationshipTypeRestWrapper;
@@ -48,7 +48,7 @@ public class RelationshipTypeRestController {
     private EntityTypeService entityTypeService;
 
     @Autowired
-    private RelationshipTypeConverter relationshipTypeConverter;
+    private ConverterService converter;
 
     @Autowired
     private Utils utils;
@@ -76,7 +76,7 @@ public class RelationshipTypeRestController {
         List<RelationshipTypeRest> relationshipTypeRests = new LinkedList<>();
 
         for (RelationshipType relationshipType : list) {
-            relationshipTypeRests.add(relationshipTypeConverter.fromModel(relationshipType));
+            relationshipTypeRests.add(converter.toRest(relationshipType));
         }
 
 
@@ -85,9 +85,8 @@ public class RelationshipTypeRestController {
         relationshipTypeRestWrapper.setEntityTypeLabel(entityType.getLabel());
         relationshipTypeRestWrapper.setRelationshipTypeRestList(relationshipTypeRests);
 
-        RelationshipTypeResourceWrapper relationshipTypeResourceWrapper = new RelationshipTypeResourceWrapper(
-            relationshipTypeRestWrapper, utils);
-        halLinkService.addLinks(relationshipTypeResourceWrapper);
+        RelationshipTypeResourceWrapper relationshipTypeResourceWrapper =
+                converter.toResource(relationshipTypeRestWrapper);
         return relationshipTypeResourceWrapper;
     }
 }

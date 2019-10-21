@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import javax.servlet.http.HttpServletRequest;
 
+import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.converter.EPersonConverter;
 import org.dspace.app.rest.link.HalLinkService;
 import org.dspace.app.rest.model.AuthenticationStatusRest;
@@ -50,6 +51,9 @@ public class AuthenticationRestController implements InitializingBean {
     DiscoverableEndpointsService discoverableEndpointsService;
 
     @Autowired
+    private ConverterService converter;
+
+    @Autowired
     private EPersonConverter ePersonConverter;
 
     @Autowired
@@ -65,9 +69,8 @@ public class AuthenticationRestController implements InitializingBean {
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    public AuthnResource authn() throws SQLException {
-        AuthnResource authnResource = new AuthnResource(new AuthnRest(), utils);
-        halLinkService.addLinks(authnResource);
+    public AuthnResource authn() {
+        AuthnResource authnResource = converter.toResource(new AuthnRest());
         return authnResource;
     }
 
@@ -79,10 +82,8 @@ public class AuthenticationRestController implements InitializingBean {
             ePersonRest = ePersonConverter.fromModelWithGroups(context, context.getCurrentUser());
         }
 
-        AuthenticationStatusResource authenticationStatusResource = new AuthenticationStatusResource(
-            new AuthenticationStatusRest(ePersonRest), utils);
-
-        halLinkService.addLinks(authenticationStatusResource);
+        AuthenticationStatusResource authenticationStatusResource = converter.toResource(
+                new AuthenticationStatusRest(ePersonRest));
 
         return authenticationStatusResource;
     }

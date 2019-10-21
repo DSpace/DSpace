@@ -21,11 +21,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
-import org.dspace.app.rest.converter.MetadataFieldConverter;
+import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.MetadataFieldRest;
-import org.dspace.app.rest.model.hateoas.MetadataFieldResource;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
@@ -55,7 +54,7 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
     MetadataSchemaService metadataSchemaService;
 
     @Autowired
-    MetadataFieldConverter converter;
+    ConverterService converter;
 
     public MetadataFieldRestRepository() {
     }
@@ -71,7 +70,7 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
         if (metadataField == null) {
             return null;
         }
-        return converter.fromModel(metadataField);
+        return converter.toRest(metadataField);
     }
 
     @Override
@@ -82,7 +81,7 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<MetadataFieldRest> page = utils.getPage(metadataField, pageable).map(converter);
+        Page<MetadataFieldRest> page = utils.getPage(metadataField, pageable).map(converter::toRest);
         return page;
     }
 
@@ -100,18 +99,13 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<MetadataFieldRest> page = utils.getPage(metadataFields, pageable).map(converter);
+        Page<MetadataFieldRest> page = utils.getPage(metadataFields, pageable).map(converter::toRest);
         return page;
     }
 
     @Override
     public Class<MetadataFieldRest> getDomainClass() {
         return MetadataFieldRest.class;
-    }
-
-    @Override
-    public MetadataFieldResource wrapResource(MetadataFieldRest bs, String... rels) {
-        return new MetadataFieldResource(bs, utils, rels);
     }
 
     @Override
@@ -163,7 +157,7 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
         }
 
         // return
-        return converter.convert(metadataField);
+        return converter.toRest(metadataField);
     }
 
     @Override
@@ -219,6 +213,6 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
             throw new RuntimeException(e);
         }
 
-        return converter.fromModel(metadataField);
+        return converter.toRest(metadataField);
     }
 }

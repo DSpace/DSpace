@@ -21,11 +21,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 public abstract class DSpaceObjectConverter<M extends DSpaceObject, R extends org.dspace.app.rest.model
     .DSpaceObjectRest> implements DSpaceConverter<M, R> {
 
-    @Autowired(required = true)
+    @Autowired
     private MetadataConverter metadataConverter;
 
     @Override
-    public R fromModel(M obj) {
+    public R convert(M obj) {
         R resource = newInstance();
         resource.setHandle(obj.getHandle());
         if (obj.getID() != null) {
@@ -36,17 +36,5 @@ public abstract class DSpaceObjectConverter<M extends DSpaceObject, R extends or
         return resource;
     }
 
-    @Override
-    public M toModel(R obj) {
-        return null;
-    }
-
-    public boolean supportsModel(DSpaceObject object) {
-        return object != null && object.getClass().equals(getModelClass());
-    }
-
     protected abstract R newInstance();
-
-    protected abstract Class<M> getModelClass();
-
 }

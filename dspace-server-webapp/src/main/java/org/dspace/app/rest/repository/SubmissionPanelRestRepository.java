@@ -10,10 +10,9 @@ package org.dspace.app.rest.repository;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.dspace.app.rest.converter.SubmissionSectionConverter;
+import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.model.SubmissionDefinitionRest;
 import org.dspace.app.rest.model.SubmissionSectionRest;
-import org.dspace.app.rest.model.hateoas.SubmissionSectionResource;
 import org.dspace.app.util.SubmissionConfig;
 import org.dspace.app.util.SubmissionConfigReader;
 import org.dspace.app.util.SubmissionConfigReaderException;
@@ -37,7 +36,7 @@ public class SubmissionPanelRestRepository extends DSpaceRestRepository<Submissi
     private SubmissionConfigReader submissionConfigReader;
 
     @Autowired
-    private SubmissionSectionConverter converter;
+    private ConverterService converter;
 
     public SubmissionPanelRestRepository() throws SubmissionConfigReaderException {
         submissionConfigReader = new SubmissionConfigReader();
@@ -48,7 +47,7 @@ public class SubmissionPanelRestRepository extends DSpaceRestRepository<Submissi
     public SubmissionSectionRest findOne(Context context, String id) {
         try {
             SubmissionStepConfig step = submissionConfigReader.getStepConfig(id);
-            return converter.convert(step);
+            return converter.toRest(step);
         } catch (SubmissionConfigReaderException e) {
             //TODO wrap with a specific exception
             throw new RuntimeException(e.getMessage(), e);
@@ -69,8 +68,7 @@ public class SubmissionPanelRestRepository extends DSpaceRestRepository<Submissi
                 stepConfs.add(step);
             }
         }
-        Page<SubmissionSectionRest> page = new PageImpl<SubmissionStepConfig>(stepConfs, pageable, total)
-            .map(converter);
+        Page<SubmissionSectionRest> page = new PageImpl<>(stepConfs, pageable, total).map(converter::toRest);
         return page;
     }
 
@@ -78,10 +76,4 @@ public class SubmissionPanelRestRepository extends DSpaceRestRepository<Submissi
     public Class<SubmissionSectionRest> getDomainClass() {
         return SubmissionSectionRest.class;
     }
-
-    @Override
-    public SubmissionSectionResource wrapResource(SubmissionSectionRest model, String... rels) {
-        return new SubmissionSectionResource(model, utils, rels);
-    }
-
 }

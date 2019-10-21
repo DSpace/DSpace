@@ -13,9 +13,7 @@ import java.util.List;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
-import org.dspace.app.rest.converter.SiteConverter;
 import org.dspace.app.rest.model.SiteRest;
-import org.dspace.app.rest.model.hateoas.SiteResource;
 import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.repository.patch.DSpaceObjectPatch;
 import org.dspace.authorize.AuthorizeException;
@@ -41,9 +39,8 @@ public class SiteRestRepository extends DSpaceObjectRestRepository<Site, SiteRes
     private final SiteService sitesv;
 
     @Autowired
-    public SiteRestRepository(SiteService dsoService,
-                              SiteConverter dsoConverter) {
-        super(dsoService, dsoConverter, new DSpaceObjectPatch<SiteRest>() {});
+    public SiteRestRepository(SiteService dsoService) {
+        super(dsoService, new DSpaceObjectPatch<SiteRest>() {});
         this.sitesv = dsoService;
     }
 
@@ -58,7 +55,7 @@ public class SiteRestRepository extends DSpaceObjectRestRepository<Site, SiteRes
         if (site == null) {
             return null;
         }
-        return dsoConverter.fromModel(site);
+        return converter.toRest(site);
     }
 
     @Override
@@ -70,7 +67,7 @@ public class SiteRestRepository extends DSpaceObjectRestRepository<Site, SiteRes
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<SiteRest> page = new PageImpl<Site>(sites, pageable, total).map(dsoConverter);
+        Page<SiteRest> page = new PageImpl<Site>(sites, pageable, total).map(converter::toRest);
         return page;
     }
 
@@ -85,10 +82,4 @@ public class SiteRestRepository extends DSpaceObjectRestRepository<Site, SiteRes
     public Class<SiteRest> getDomainClass() {
         return SiteRest.class;
     }
-
-    @Override
-    public SiteResource wrapResource(SiteRest site, String... rels) {
-        return new SiteResource(site, utils, rels);
-    }
-
 }

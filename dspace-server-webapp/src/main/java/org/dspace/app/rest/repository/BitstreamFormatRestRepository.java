@@ -15,11 +15,10 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.dspace.app.rest.converter.BitstreamFormatConverter;
+import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.BitstreamFormatRest;
-import org.dspace.app.rest.model.hateoas.BitstreamFormatResource;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.service.BitstreamFormatService;
@@ -44,7 +43,7 @@ public class BitstreamFormatRestRepository extends DSpaceRestRepository<Bitstrea
     BitstreamFormatService bitstreamFormatService;
 
     @Autowired
-    BitstreamFormatConverter converter;
+    ConverterService converter;
 
 
     public BitstreamFormatRestRepository() {
@@ -62,7 +61,7 @@ public class BitstreamFormatRestRepository extends DSpaceRestRepository<Bitstrea
         if (bit == null) {
             return null;
         }
-        return converter.fromModel(bit);
+        return converter.toRest(bit);
     }
 
     @Override
@@ -73,7 +72,7 @@ public class BitstreamFormatRestRepository extends DSpaceRestRepository<Bitstrea
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<BitstreamFormatRest> page = utils.getPage(bit, pageable).map(converter);
+        Page<BitstreamFormatRest> page = utils.getPage(bit, pageable).map(converter::toRest);
         return page;
     }
 
@@ -100,7 +99,7 @@ public class BitstreamFormatRestRepository extends DSpaceRestRepository<Bitstrea
                     + bitstreamFormatRest.getShortDescription(), e);
         }
 
-        return converter.convert(bitstreamFormat);
+        return converter.toRest(bitstreamFormat);
     }
 
     @Override
@@ -127,7 +126,7 @@ public class BitstreamFormatRestRepository extends DSpaceRestRepository<Bitstrea
         if (id.equals(bitstreamFormatRest.getId())) {
             this.setAllValuesOfRest(context, bitstreamFormat, bitstreamFormatRest);
             bitstreamFormatService.update(context, bitstreamFormat);
-            return converter.fromModel(bitstreamFormat);
+            return converter.toRest(bitstreamFormat);
         } else {
             throw new IllegalArgumentException("The id in the Json and the id in the url do not match: "
                     + id + ", "
@@ -184,10 +183,5 @@ public class BitstreamFormatRestRepository extends DSpaceRestRepository<Bitstrea
     @Override
     public Class<BitstreamFormatRest> getDomainClass() {
         return BitstreamFormatRest.class;
-    }
-
-    @Override
-    public BitstreamFormatResource wrapResource(BitstreamFormatRest bs, String... rels) {
-        return new BitstreamFormatResource(bs, utils, rels);
     }
 }

@@ -24,23 +24,16 @@ public class EntityTypeConverter implements DSpaceConverter<org.dspace.content.E
      * @param obj   The EntityType model object to be converted
      * @return      The EntityType REST object that is made from the model object
      */
-    public EntityTypeRest fromModel(EntityType obj) {
+    @Override
+    public EntityTypeRest convert(EntityType obj) {
         EntityTypeRest entityTypeRest = new EntityTypeRest();
         entityTypeRest.setId(obj.getID());
         entityTypeRest.setLabel(obj.getLabel());
         return entityTypeRest;
     }
 
-    /**
-     * This method converts the EntityType REST object that is passed along in the params to the model
-     * representation of this object
-     * @param obj   The EntityType REST object to be converted
-     * @return      The EntityType model object that is made from the REST object
-     */
-    public EntityType toModel(EntityTypeRest obj) {
-        EntityType entityType = new EntityType();
-        entityType.setId(obj.getId());
-        entityType.setLabel(obj.getLabel());
-        return entityType;
+    @Override
+    public Class<EntityType> getModelClass() {
+        return EntityType.class;
     }
 }

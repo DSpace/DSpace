@@ -47,21 +47,12 @@ public abstract class AInprogressItemConverter<T extends InProgressSubmission<ID
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(AInprogressItemConverter.class);
 
     @Autowired
-    private EPersonConverter epersonConverter;
-
-    @Autowired
-    private ItemConverter itemConverter;
-
-    @Autowired
-    private CollectionConverter collectionConverter;
-
-    protected SubmissionConfigReader submissionConfigReader;
-
-    @Autowired
-    private SubmissionDefinitionConverter submissionDefinitionConverter;
+    private ConverterService converter;
 
     @Autowired
     private SubmissionSectionConverter submissionSectionConverter;
+
+    protected SubmissionConfigReader submissionConfigReader;
 
     @Autowired
     SubmissionService submissionService;
@@ -81,17 +72,17 @@ public abstract class AInprogressItemConverter<T extends InProgressSubmission<ID
         }
 
         witem.setId(obj.getID());
-        witem.setCollection(collection != null ? collectionConverter.convert(collection) : null);
-        witem.setItem(itemConverter.convert(item));
-        witem.setSubmitter(epersonConverter.convert(submitter));
+        witem.setCollection(collection != null ? converter.toRest(collection) : null);
+        witem.setItem(converter.toRest(item));
+        witem.setSubmitter(converter.toRest(submitter));
 
         // 1. retrieve the submission definition
         // 2. iterate over the submission section to allow to plugin additional
         // info
 
         if (collection != null) {
-            SubmissionDefinitionRest def = submissionDefinitionConverter
-                .convert(submissionConfigReader.getSubmissionConfigByCollection(collection.getHandle()));
+            SubmissionDefinitionRest def = converter.toRest(
+                    submissionConfigReader.getSubmissionConfigByCollection(collection.getHandle()));
             witem.setSubmissionDefinition(def);
             for (SubmissionSectionRest sections : def.getPanels()) {
                 SubmissionStepConfig stepConfig = submissionSectionConverter.toModel(sections);

@@ -29,15 +29,15 @@ public class WorkflowItemConverter
     }
 
     @Override
-    public WorkflowItemRest fromModel(XmlWorkflowItem obj) {
+    public WorkflowItemRest convert(XmlWorkflowItem obj) {
         WorkflowItemRest witem = new WorkflowItemRest();
         fillFromModel(obj, witem);
         return witem;
     }
 
     @Override
-    public XmlWorkflowItem toModel(WorkflowItemRest obj) {
-        return null;
+    public Class<XmlWorkflowItem> getModelClass() {
+        return XmlWorkflowItem.class;
     }
 
     @Override

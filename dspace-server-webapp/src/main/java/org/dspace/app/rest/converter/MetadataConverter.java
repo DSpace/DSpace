@@ -39,7 +39,7 @@ public class MetadataConverter implements Converter<List<MetadataValue>, Metadat
     private ContentServiceFactory contentServiceFactory;
 
     @Autowired
-    private MetadataValueConverter valueConverter;
+    private ConverterService converter;
 
     /**
      * Gets a rest representation of the given list of domain metadata values.
@@ -58,7 +58,7 @@ public class MetadataConverter implements Converter<List<MetadataValue>, Metadat
                 set = new TreeSet<>(Comparator.comparingInt(MetadataValueRest::getPlace));
                 mapOfSortedSets.put(key, set);
             }
-            set.add(valueConverter.convert(metadataValue));
+            set.add(converter.toRest(metadataValue));
         }
 
         MetadataRest metadataRest = new MetadataRest();

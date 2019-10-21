@@ -26,6 +26,5 @@ public interface IndexableObjectConverter<M extends IndexableObject,
      *            the IndexableObject to check
      * @return true if the actual converter implementation is able to manage the supplied IndexableObject
      */
-    public boolean supportsModel(IndexableObject idxo);
-
+    boolean supportsModel(IndexableObject idxo);
 }

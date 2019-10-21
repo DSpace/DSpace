@@ -12,15 +12,12 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.atteo.evo.inflector.English;
-import org.dspace.app.rest.converter.BitstreamFormatConverter;
-import org.dspace.app.rest.converter.ResourcePolicyConverter;
-import org.dspace.app.rest.converter.WorkspaceItemConverter;
+import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.exception.RESTAuthorizationException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.BitstreamRest;
@@ -77,12 +74,8 @@ public class SubmissionService {
     protected WorkflowService<XmlWorkflowItem> workflowService;
     @Autowired
     private RequestService requestService;
-    @Autowired(required = true)
-    BitstreamFormatConverter bfConverter;
     @Autowired
-    WorkspaceItemConverter workspaceItemConverter;
-    @Autowired(required = true)
-    ResourcePolicyConverter aCConverter;
+    private ConverterService converter;
 
     /**
      * Create a workspaceitem using the information in the reqest
@@ -170,11 +163,11 @@ public class SubmissionService {
         }
 
         HttpServletRequest request = requestService.getCurrentRequest().getHttpServletRequest();
-        data.setFormat(bfConverter.convert(source.getFormat(ContextUtil.obtainContext(request))));
+        data.setFormat(converter.toRest(source.getFormat(ContextUtil.obtainContext(request))));
 
         for (ResourcePolicy rp : source.getResourcePolicies()) {
             if (ResourcePolicy.TYPE_CUSTOM.equals(rp.getRpType())) {
-                ResourcePolicyRest resourcePolicyRest = aCConverter.convert(rp);
+                ResourcePolicyRest resourcePolicyRest = converter.toRest(rp);
                 data.getAccessConditions().add(resourcePolicyRest);
             }
         }
@@ -225,7 +218,8 @@ public class SubmissionService {
         if (wsi == null) {
             throw new UnprocessableEntityException("Workspace item is not found");
         }
-        if (!workspaceItemConverter.convert(wsi).getErrors().isEmpty()) {
+        WorkspaceItemRest wsiRest = converter.toRest(wsi);
+        if (!wsiRest.getErrors().isEmpty()) {
             throw new UnprocessableEntityException(
                     "Start workflow failed due to validation error on workspaceitem");
         }

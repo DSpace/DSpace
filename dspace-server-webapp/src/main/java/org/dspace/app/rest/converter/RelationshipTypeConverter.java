@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
 public class RelationshipTypeConverter implements DSpaceConverter<RelationshipType, RelationshipTypeRest>  {
 
     @Autowired
-    private EntityTypeConverter entityTypeConverter;
+    private ConverterService converter;
 
     /**
      * This method converts the RelationshipType model object that is passed along in the params to the
@@ -28,7 +28,7 @@ public class RelationshipTypeConverter implements DSpaceConverter<RelationshipTy
      * @param obj   The RelationshipType model object to be converted
      * @return      The RelationshipType REST object that is made from the model object
      */
-    public RelationshipTypeRest fromModel(RelationshipType obj) {
+    public RelationshipTypeRest convert(RelationshipType obj) {
         RelationshipTypeRest relationshipTypeRest = new RelationshipTypeRest();
 
         relationshipTypeRest.setId(obj.getID());
@@ -38,20 +38,14 @@ public class RelationshipTypeConverter implements DSpaceConverter<RelationshipTy
         relationshipTypeRest.setLeftMaxCardinality(obj.getLeftMaxCardinality());
         relationshipTypeRest.setRightMinCardinality(obj.getRightMinCardinality());
         relationshipTypeRest.setRightMaxCardinality(obj.getRightMaxCardinality());
-        relationshipTypeRest.setLeftType(entityTypeConverter.fromModel(obj.getLeftType()));
-        relationshipTypeRest.setRightType(entityTypeConverter.fromModel(obj.getRightType()));
+        relationshipTypeRest.setLeftType(converter.toRest(obj.getLeftType()));
+        relationshipTypeRest.setRightType(converter.toRest(obj.getRightType()));
 
         return relationshipTypeRest;
     }
 
-    /**
-     * This method converts the RelationshipType REST object that is passed along in the params to the model
-     * representation of this object
-     * @param obj   The RelationshipType REST object to be converted
-     * @return      The RelationshipType model object that is made from the REST object
-     */
-    public RelationshipType toModel(RelationshipTypeRest obj) {
-
-        return null;
+    @Override
+    public Class<RelationshipType> getModelClass() {
+        return RelationshipType.class;
     }
 }

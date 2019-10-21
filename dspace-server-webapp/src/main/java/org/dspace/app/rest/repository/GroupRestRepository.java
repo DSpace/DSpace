@@ -11,16 +11,13 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
-
 import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.dspace.app.rest.converter.GroupConverter;
 import org.dspace.app.rest.converter.MetadataConverter;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.GroupRest;
-import org.dspace.app.rest.model.hateoas.GroupResource;
 import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.repository.patch.DSpaceObjectPatch;
 import org.dspace.authorize.AuthorizeException;
@@ -46,9 +43,8 @@ public class GroupRestRepository extends DSpaceObjectRestRepository<Group, Group
     GroupService gs;
 
     @Autowired
-    GroupRestRepository(GroupService dsoService,
-                        GroupConverter dsoConverter) {
-        super(dsoService, dsoConverter, new DSpaceObjectPatch<GroupRest>() {});
+    GroupRestRepository(GroupService dsoService) {
+        super(dsoService, new DSpaceObjectPatch<GroupRest>() {});
         this.gs = dsoService;
     }
 
@@ -79,7 +75,7 @@ public class GroupRestRepository extends DSpaceObjectRestRepository<Group, Group
             throw new RuntimeException(excSQL.getMessage(), excSQL);
         }
 
-        return dsoConverter.convert(group);
+        return converter.toRest(group);
     }
 
     @Override
@@ -94,7 +90,7 @@ public class GroupRestRepository extends DSpaceObjectRestRepository<Group, Group
         if (group == null) {
             return null;
         }
-        return dsoConverter.fromModel(group);
+        return converter.toRest(group);
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
@@ -108,7 +104,7 @@ public class GroupRestRepository extends DSpaceObjectRestRepository<Group, Group
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<GroupRest> page = new PageImpl<Group>(groups, pageable, total).map(dsoConverter);
+        Page<GroupRest> page = new PageImpl<Group>(groups, pageable, total).map(converter::toRest);
         return page;
     }
 
@@ -123,10 +119,4 @@ public class GroupRestRepository extends DSpaceObjectRestRepository<Group, Group
     public Class<GroupRest> getDomainClass() {
         return GroupRest.class;
     }
-
-    @Override
-    public GroupResource wrapResource(GroupRest eperson, String... rels) {
-        return new GroupResource(eperson, utils, rels);
-    }
-
 }

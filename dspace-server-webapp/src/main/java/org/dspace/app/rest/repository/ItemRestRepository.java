@@ -20,13 +20,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-import org.dspace.app.rest.converter.ItemConverter;
 import org.dspace.app.rest.converter.MetadataConverter;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.ItemRest;
-import org.dspace.app.rest.model.hateoas.ItemResource;
 import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.repository.patch.ItemPatch;
 import org.dspace.authorize.AuthorizeException;
@@ -78,10 +76,8 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
     @Autowired
     InstallItemService installItemService;
 
-    public ItemRestRepository(ItemService dsoService,
-                              ItemConverter dsoConverter,
-                              ItemPatch dsoPatch) {
-        super(dsoService, dsoConverter, dsoPatch);
+    public ItemRestRepository(ItemService dsoService, ItemPatch dsoPatch) {
+        super(dsoService, dsoPatch);
         this.is = dsoService;
     }
 
@@ -97,7 +93,7 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
         if (item == null) {
             return null;
         }
-        return dsoConverter.fromModel(item);
+        return converter.toRest(item);
     }
 
     @Override
@@ -116,7 +112,7 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<ItemRest> page = new PageImpl<Item>(items, pageable, total).map(dsoConverter);
+        Page<ItemRest> page = new PageImpl<Item>(items, pageable, total).map(converter::toRest);
         return page;
     }
 
@@ -149,11 +145,6 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
     @Override
     public Class<ItemRest> getDomainClass() {
         return ItemRest.class;
-    }
-
-    @Override
-    public ItemResource wrapResource(ItemRest item, String... rels) {
-        return new ItemResource(item, utils, rels);
     }
 
     @Override
@@ -217,7 +208,7 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
 
         Item itemToReturn = installItemService.installItem(context, workspaceItem);
 
-        return dsoConverter.fromModel(itemToReturn);
+        return converter.toRest(itemToReturn);
     }
 
     @Override
@@ -246,6 +237,6 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
                                                    + uuid + ", "
                                                    + itemRest.getId());
         }
-        return dsoConverter.fromModel(item);
+        return converter.toRest(item);
     }
 }

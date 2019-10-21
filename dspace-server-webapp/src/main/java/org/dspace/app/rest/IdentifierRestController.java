@@ -19,7 +19,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.atteo.evo.inflector.English;
-import org.dspace.app.rest.converter.GenericDSpaceObjectConverter;
+import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.model.DSpaceObjectRest;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.content.DSpaceObject;
@@ -53,7 +53,7 @@ public class IdentifierRestController implements InitializingBean {
             Logger.getLogger(IdentifierRestController.class);
 
     @Autowired
-    private GenericDSpaceObjectConverter converter;
+    private ConverterService converter;
 
     @Autowired
     private DiscoverableEndpointsService discoverableEndpointsService;
@@ -84,7 +84,7 @@ public class IdentifierRestController implements InitializingBean {
         try {
             dso = identifierService.resolve(context, id);
             if (dso != null) {
-                DSpaceObjectRest dsor = converter.convert(dso);
+                DSpaceObjectRest dsor = converter.toRest(dso);
                 URI link = linkTo(dsor.getController(), dsor.getCategory(),
                         English.plural(dsor.getType()))
                         .slash(dsor.getId()).toUri();

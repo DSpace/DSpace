@@ -10,9 +10,8 @@ package org.dspace.app.rest.repository;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.dspace.app.rest.converter.BrowseIndexConverter;
+import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.model.BrowseIndexRest;
-import org.dspace.app.rest.model.hateoas.BrowseIndexResource;
 import org.dspace.browse.BrowseException;
 import org.dspace.browse.BrowseIndex;
 import org.dspace.core.Context;
@@ -29,8 +28,9 @@ import org.springframework.stereotype.Component;
  */
 @Component(BrowseIndexRest.CATEGORY + "." + BrowseIndexRest.NAME)
 public class BrowseIndexRestRepository extends DSpaceRestRepository<BrowseIndexRest, String> {
+
     @Autowired
-    BrowseIndexConverter converter;
+    ConverterService converter;
 
     @Override
     public BrowseIndexRest findOne(Context context, String name) {
@@ -42,7 +42,7 @@ public class BrowseIndexRestRepository extends DSpaceRestRepository<BrowseIndexR
             throw new RuntimeException(e.getMessage(), e);
         }
         if (bix != null) {
-            bi = converter.convert(bix);
+            bi = converter.toRest(bix);
         }
         return bi;
     }
@@ -61,7 +61,7 @@ public class BrowseIndexRestRepository extends DSpaceRestRepository<BrowseIndexR
         } catch (BrowseException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<BrowseIndexRest> page = new PageImpl<BrowseIndex>(indexesList, pageable, total).map(converter);
+        Page<BrowseIndexRest> page = new PageImpl<BrowseIndex>(indexesList, pageable, total).map(converter::toRest);
         return page;
     }
 
@@ -69,10 +69,4 @@ public class BrowseIndexRestRepository extends DSpaceRestRepository<BrowseIndexR
     public Class<BrowseIndexRest> getDomainClass() {
         return BrowseIndexRest.class;
     }
-
-    @Override
-    public BrowseIndexResource wrapResource(BrowseIndexRest bix, String... rels) {
-        return new BrowseIndexResource(bix, utils, rels);
-    }
-
 }

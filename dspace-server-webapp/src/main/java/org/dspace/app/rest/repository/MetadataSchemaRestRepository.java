@@ -18,11 +18,10 @@ import javax.servlet.http.HttpServletRequest;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
-import org.dspace.app.rest.converter.MetadataSchemaConverter;
+import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.MetadataSchemaRest;
-import org.dspace.app.rest.model.hateoas.MetadataSchemaResource;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.MetadataSchema;
 import org.dspace.content.NonUniqueMetadataException;
@@ -47,7 +46,7 @@ public class MetadataSchemaRestRepository extends DSpaceRestRepository<MetadataS
     MetadataSchemaService metadataSchemaService;
 
     @Autowired
-    MetadataSchemaConverter converter;
+    ConverterService converter;
 
     public MetadataSchemaRestRepository() {
     }
@@ -63,7 +62,7 @@ public class MetadataSchemaRestRepository extends DSpaceRestRepository<MetadataS
         if (metadataSchema == null) {
             return null;
         }
-        return converter.fromModel(metadataSchema);
+        return converter.toRest(metadataSchema);
     }
 
     @Override
@@ -74,18 +73,13 @@ public class MetadataSchemaRestRepository extends DSpaceRestRepository<MetadataS
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<MetadataSchemaRest> page = utils.getPage(metadataSchema, pageable).map(converter);
+        Page<MetadataSchemaRest> page = utils.getPage(metadataSchema, pageable).map(converter::toRest);
         return page;
     }
 
     @Override
     public Class<MetadataSchemaRest> getDomainClass() {
         return MetadataSchemaRest.class;
-    }
-
-    @Override
-    public MetadataSchemaResource wrapResource(MetadataSchemaRest bs, String... rels) {
-        return new MetadataSchemaResource(bs, utils, rels);
     }
 
     @Override
@@ -125,7 +119,7 @@ public class MetadataSchemaRestRepository extends DSpaceRestRepository<MetadataS
         }
 
         // return
-        return converter.convert(metadataSchema);
+        return converter.toRest(metadataSchema);
     }
 
     @Override
@@ -181,6 +175,6 @@ public class MetadataSchemaRestRepository extends DSpaceRestRepository<MetadataS
                     + metadataSchemaRest.getPrefix() + "." + metadataSchemaRest.getNamespace() + " already exists");
         }
 
-        return converter.fromModel(metadataSchema);
+        return converter.toRest(metadataSchema);
     }
 }

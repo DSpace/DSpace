@@ -7,8 +7,7 @@
  */
 package org.dspace.app.rest.utils;
 
-import org.dspace.app.rest.converter.AuthorityEntryRestConverter;
-import org.dspace.app.rest.converter.AuthorityRestConverter;
+import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.model.AuthorityEntryRest;
 import org.dspace.app.rest.model.AuthorityRest;
 import org.dspace.content.authority.Choice;
@@ -35,10 +34,7 @@ public class AuthorityUtils {
     private ChoiceAuthorityService cas;
 
     @Autowired
-    private AuthorityEntryRestConverter entryConverter;
-
-    @Autowired
-    private AuthorityRestConverter authorityConverter;
+    private ConverterService converter;
 
 
     public boolean isChoice(String schema, String element, String qualifier) {
@@ -65,7 +61,7 @@ public class AuthorityUtils {
      * @return
      */
     public AuthorityEntryRest convertEntry(Choice choice, String authorityName) {
-        AuthorityEntryRest entry = entryConverter.convert(choice);
+        AuthorityEntryRest entry = converter.toRest(choice);
         entry.setAuthorityName(authorityName);
         return entry;
     }
@@ -74,11 +70,11 @@ public class AuthorityUtils {
      * TODO the authorityName MUST be a part of ChoiceAuthority model
      *
      * @param source
-     * @param name
+     * @param authorityName
      * @return
      */
     public AuthorityRest convertAuthority(ChoiceAuthority source, String authorityName) {
-        AuthorityRest result = authorityConverter.convert(source);
+        AuthorityRest result = converter.toRest(source);
         result.setName(authorityName);
         return result;
     }

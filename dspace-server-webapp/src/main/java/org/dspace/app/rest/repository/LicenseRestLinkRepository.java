@@ -13,8 +13,6 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.model.CollectionRest;
 import org.dspace.app.rest.model.LicenseRest;
-import org.dspace.app.rest.model.hateoas.HALResource;
-import org.dspace.app.rest.model.hateoas.LicenseResource;
 import org.dspace.content.Collection;
 import org.dspace.content.service.CollectionService;
 import org.dspace.core.Context;
@@ -31,18 +29,13 @@ import org.springframework.stereotype.Component;
  */
 @Component(CollectionRest.CATEGORY + "." + CollectionRest.NAME + "." + CollectionRest.LICENSE)
 public class LicenseRestLinkRepository extends AbstractDSpaceRestRepository
-    implements LinkRestRepository<LicenseRest> {
+    implements LinkRestRepository {
 
     @Autowired
     CollectionService collectionService;
 
     @Autowired
     LicenseService licenseService;
-
-    @Override
-    public HALResource wrapResource(LicenseRest model, String... rels) {
-        return new LicenseResource(model);
-    }
 
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
     public LicenseRest getLicenseCollection(HttpServletRequest request, UUID uuid, Pageable pageable, String projection)
@@ -62,7 +55,8 @@ public class LicenseRestLinkRepository extends AbstractDSpaceRestRepository
         return licenseRest;
     }
 
-    public boolean isEmbeddableRelation(LicenseRest data, String name) {
+    @Override
+    public boolean isEmbeddableRelation(Object data, String name) {
         return false;
     }
 }

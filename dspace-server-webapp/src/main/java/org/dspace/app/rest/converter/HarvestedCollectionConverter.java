@@ -18,7 +18,6 @@ import org.dspace.content.Collection;
 import org.dspace.harvest.HarvestedCollection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
  * This is the converter from/to the HarvestedCollection in the DSpace API data model and the REST data model
@@ -29,10 +28,10 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 public class HarvestedCollectionConverter implements DSpaceConverter<HarvestedCollection, HarvestedCollectionRest> {
 
     @Autowired
-    private CollectionConverter collectionConverter;
+    private ConverterService converter;
 
     @Override
-    public HarvestedCollectionRest fromModel(HarvestedCollection obj) {
+    public HarvestedCollectionRest convert(HarvestedCollection obj) {
         HarvestedCollectionRest harvestedCollectionRest = new HarvestedCollectionRest();
 
         if (obj != null) {
@@ -40,7 +39,7 @@ public class HarvestedCollectionConverter implements DSpaceConverter<HarvestedCo
             HarvestStatusEnum harvestStatusEnum = HarvestStatusEnum.fromInt(obj.getHarvestStatus());
 
             harvestedCollectionRest.setId(obj.getID());
-            harvestedCollectionRest.setCollection(collectionConverter.fromModel(obj.getCollection()));
+            harvestedCollectionRest.setCollection(converter.toRest(obj.getCollection()));
             harvestedCollectionRest.setHarvestType(harvestTypeEnum);
             harvestedCollectionRest.setHarvestStatus(harvestStatusEnum);
             harvestedCollectionRest.setMetadataConfigId(obj.getHarvestMetadataConfig());
@@ -60,11 +59,11 @@ public class HarvestedCollectionConverter implements DSpaceConverter<HarvestedCo
     public HarvestedCollectionRest fromModel(HarvestedCollection obj,
                                              Collection collection,
                                              List<Map<String,String>> metadata_configs) {
-        HarvestedCollectionRest harvestedCollectionRest = this.fromModel(obj);
+        HarvestedCollectionRest harvestedCollectionRest = this.convert(obj);
 
         // Add collectionRest to the empty HarvestedCollectionRest so that we can use its uuid later in the linkFactory
         if (obj == null) {
-            harvestedCollectionRest.setCollection(collectionConverter.fromModel(collection));
+            harvestedCollectionRest.setCollection(converter.toRest(collection));
         }
 
         HarvesterMetadataRest harvesterMetadataRest = new HarvesterMetadataRest();
@@ -76,7 +75,7 @@ public class HarvestedCollectionConverter implements DSpaceConverter<HarvestedCo
     }
 
     @Override
-    public HarvestedCollection toModel(HarvestedCollectionRest obj) {
-        throw new NotImplementedException();
+    public Class<HarvestedCollection> getModelClass() {
+        return HarvestedCollection.class;
     }
 }

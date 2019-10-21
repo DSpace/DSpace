@@ -15,7 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.dspace.app.rest.converter.ItemConverter;
+import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.link.HalLinkService;
 import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.MappedItemRestWrapper;
@@ -53,7 +53,7 @@ public class MappedItemRestController {
     private ItemService itemService;
 
     @Autowired
-    private ItemConverter itemConverter;
+    private ConverterService converter;
 
     @Autowired
     Utils utils;
@@ -95,7 +95,7 @@ public class MappedItemRestController {
         while (itemIterator.hasNext()) {
             Item item = itemIterator.next();
             if (item.getOwningCollection().getID() != uuid) {
-                mappedItemRestList.add(itemConverter.fromModel(item));
+                mappedItemRestList.add(converter.toRest(item));
             }
         }
 

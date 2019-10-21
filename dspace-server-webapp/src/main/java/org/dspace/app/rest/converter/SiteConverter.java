@@ -20,14 +20,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class SiteConverter
     extends DSpaceObjectConverter<org.dspace.content.Site, org.dspace.app.rest.model.SiteRest> {
-    @Override
-    public org.dspace.content.Site toModel(org.dspace.app.rest.model.SiteRest obj) {
-        return (org.dspace.content.Site) super.toModel(obj);
-    }
 
     @Override
-    public SiteRest fromModel(org.dspace.content.Site obj) {
-        return (SiteRest) super.fromModel(obj);
+    public SiteRest convert(org.dspace.content.Site obj) {
+        return super.convert(obj);
     }
 
     @Override
@@ -36,7 +32,7 @@ public class SiteConverter
     }
 
     @Override
-    protected Class<Site> getModelClass() {
+    public Class<Site> getModelClass() {
         return Site.class;
     }
 }
