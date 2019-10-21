@@ -10,12 +10,12 @@ package org.dspace.app.rest.builder;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.dspace.content.Process;
 import org.dspace.content.ProcessStatus;
-import org.dspace.content.service.ProcessService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.scripts.DSpaceCommandLineParameter;
+import org.dspace.scripts.Process;
+import org.dspace.scripts.service.ProcessService;
 
 public class ProcessBuilder extends AbstractBuilder<Process, ProcessService> {
 

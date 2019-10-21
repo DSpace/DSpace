@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.content;
+package org.dspace.scripts;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -17,14 +17,17 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
+import org.dspace.content.ProcessStatus;
 import org.dspace.content.dao.ProcessDAO;
-import org.dspace.content.service.ProcessService;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
-import org.dspace.scripts.DSpaceCommandLineParameter;
+import org.dspace.scripts.service.ProcessService;
 import org.springframework.beans.factory.annotation.Autowired;
 
+/**
+ * The implementation for the {@link ProcessService} class
+ */
 public class ProcessServiceImpl implements ProcessService {
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(ProcessService.class);
@@ -37,14 +40,15 @@ public class ProcessServiceImpl implements ProcessService {
                           List<DSpaceCommandLineParameter> parameters) throws SQLException {
 
         Process process = new Process();
-        process.setePerson(ePerson);
+        process.setEPerson(ePerson);
         process.setName(scriptName);
         process.setParameters(DSpaceCommandLineParameter.concatenate(parameters));
         process.setCreationTime(new Date());
         Process createdProcess = processDAO.create(context, process);
         log.info(LogManager.getHeader(context, "process_create",
-            "Process has been created for eperson with email " + ePerson.getEmail() + " with ID " +
-                    createdProcess.getID() + " and scriptName " + scriptName + " and parameters " + parameters));
+                                      "Process has been created for eperson with email " + ePerson.getEmail()
+                                          + " with ID " + createdProcess.getID() + " and scriptName " +
+                                          scriptName + " and parameters " + parameters));
         return createdProcess;
     }
 

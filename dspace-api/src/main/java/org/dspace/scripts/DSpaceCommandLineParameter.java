@@ -41,7 +41,7 @@ public class DSpaceCommandLineParameter {
      * String into the key "-c" and value "test" to then call the other constructor with those parameters
      * @param parameter The String parameter
      */
-    public DSpaceCommandLineParameter(String parameter) {
+    protected DSpaceCommandLineParameter(String parameter) {
         this(StringUtils.substringBefore(parameter, " "), StringUtils.substringAfter(parameter, " "));
     }
 

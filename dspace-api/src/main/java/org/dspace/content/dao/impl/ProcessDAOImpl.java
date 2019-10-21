@@ -13,12 +13,15 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
-import org.dspace.content.Process;
-import org.dspace.content.Process_;
 import org.dspace.content.dao.ProcessDAO;
 import org.dspace.core.AbstractHibernateDAO;
 import org.dspace.core.Context;
+import org.dspace.scripts.Process;
+import org.dspace.scripts.Process_;
 
+/**
+ * Implementation class for {@link ProcessDAO}
+ */
 public class ProcessDAOImpl extends AbstractHibernateDAO<Process> implements ProcessDAO {
 
     @Override
@@ -46,6 +49,7 @@ public class ProcessDAOImpl extends AbstractHibernateDAO<Process> implements Pro
         return list(context, criteriaQuery, false, Process.class, -1, -1);
     }
 
+    @Override
     public List<Process> findAll(Context context, int limit, int offset) throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Process.class);
@@ -55,6 +59,7 @@ public class ProcessDAOImpl extends AbstractHibernateDAO<Process> implements Pro
         return list(context, criteriaQuery, false, Process.class, limit, offset);
     }
 
+    @Override
     public int countRows(Context context) throws SQLException {
 
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);

@@ -16,18 +16,25 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.sql.SQLException;
 import java.util.LinkedList;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.dspace.app.rest.builder.ProcessBuilder;
 import org.dspace.app.rest.matcher.PageMatcher;
 import org.dspace.app.rest.matcher.ProcessMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
-import org.dspace.content.Process;
 import org.dspace.content.ProcessStatus;
 import org.dspace.scripts.DSpaceCommandLineParameter;
+import org.dspace.scripts.Process;
+import org.dspace.scripts.service.ProcessService;
 import org.hamcrest.Matchers;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class ProcessRestRepositoryIT extends AbstractControllerIntegrationTest {
+
+    @Autowired
+    private ProcessService processService;
 
     Process process;
 
@@ -37,7 +44,7 @@ public class ProcessRestRepositoryIT extends AbstractControllerIntegrationTest {
     @Before
     public void setup() throws SQLException {
         parameters.add(new DSpaceCommandLineParameter("-r", "test"));
-        parameters.add(new DSpaceCommandLineParameter("-i"));
+        parameters.add(new DSpaceCommandLineParameter("-i", null));
 
         process = ProcessBuilder.createProcess(context, admin, "mock-script", parameters).build();
     }
@@ -192,5 +199,17 @@ public class ProcessRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         getClient(token).perform(get("/api/system/processes/"))
                         .andExpect(status().isForbidden());
+    }
+
+    @After
+    public void destroy() throws Exception {
+        CollectionUtils.emptyIfNull(processService.findAll(context)).stream().forEach(process -> {
+            try {
+                processService.delete(context, process);
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        super.destroy();
     }
 }

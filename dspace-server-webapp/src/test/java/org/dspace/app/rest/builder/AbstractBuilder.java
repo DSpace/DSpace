@@ -28,7 +28,6 @@ import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.MetadataSchemaService;
-import org.dspace.content.service.ProcessService;
 import org.dspace.content.service.RelationshipService;
 import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.content.service.SiteService;
@@ -39,6 +38,7 @@ import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.eperson.service.RegistrationDataService;
+import org.dspace.scripts.service.ProcessService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.versioning.factory.VersionServiceFactory;
 import org.dspace.versioning.service.VersionHistoryService;
@@ -53,6 +53,8 @@ import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
 /**
  * Abstract builder class that holds references to all available services
  *
+ * @param <T>   This param represents the Model object for the Builder
+ * @param <S>   This param represents the Service object for the builder
  * @author Jonas Van Goolen - (jonas@atmire.com)
  */
 public abstract class AbstractBuilder<T, S> {

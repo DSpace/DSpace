@@ -10,10 +10,13 @@ package org.dspace.content.dao;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.dspace.content.Process;
 import org.dspace.core.Context;
 import org.dspace.core.GenericDAO;
+import org.dspace.scripts.Process;
 
+/**
+ * This is the Data Access Object for the {@link Process} object
+ */
 public interface ProcessDAO extends GenericDAO<Process> {
 
     /**
@@ -25,7 +28,8 @@ public interface ProcessDAO extends GenericDAO<Process> {
     public List<Process> findAllSortByScript(Context context) throws SQLException;
 
     /**
-     * This method will return all the Process objects in the database in a list and it'll be sorted by start time
+     * This method will return all the Process objects in the database in a list and it'll be sorted by start time.
+     * The most recent one will be shown first
      * @param context   The relevant DSpace context
      * @return          The list of all Process objects in the database sorted by starttime
      * @throws SQLException If something goes wrong

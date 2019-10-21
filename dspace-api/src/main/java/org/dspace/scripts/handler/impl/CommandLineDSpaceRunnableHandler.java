@@ -12,6 +12,10 @@ import org.apache.commons.cli.Options;
 import org.apache.logging.log4j.Logger;
 import org.dspace.scripts.handler.DSpaceRunnableHandler;
 
+/**
+ * This is an implementation for the CommandLineDSpaceRunnables which means that these implementations
+ * are used by DSpaceRunnables which are called from the CommandLine
+ */
 public class CommandLineDSpaceRunnableHandler implements DSpaceRunnableHandler {
     private static final Logger log = org.apache.logging.log4j.LogManager
         .getLogger(CommandLineDSpaceRunnableHandler.class);

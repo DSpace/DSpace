@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Required;
 /**
  * This abstract class is the class that should be extended by each script.
  * it provides the basic variables to be hold by the script as well as the means to initialize, parse and run the script
+ * Every DSpaceRunnable that is implemented in this way should be defined in the scripts.xml config file as a bean
  */
 public abstract class DSpaceRunnable implements Runnable {
 

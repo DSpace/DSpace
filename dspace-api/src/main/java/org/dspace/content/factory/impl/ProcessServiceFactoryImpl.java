@@ -8,7 +8,7 @@
 package org.dspace.content.factory.impl;
 
 import org.dspace.content.factory.ProcessServiceFactory;
-import org.dspace.content.service.ProcessService;
+import org.dspace.scripts.service.ProcessService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**

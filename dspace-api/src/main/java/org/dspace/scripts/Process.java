@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.content;
+package org.dspace.scripts;
 
 import java.util.Date;
 import java.util.List;
@@ -28,6 +28,8 @@ import javax.persistence.TemporalType;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.dspace.content.Bitstream;
+import org.dspace.content.ProcessStatus;
 import org.dspace.core.ReloadableEntity;
 import org.dspace.eperson.EPerson;
 
@@ -81,6 +83,10 @@ public class Process implements ReloadableEntity<Integer> {
     protected Process() {
     }
 
+    /**
+     * This method returns the ID that the Process holds within the Database
+     * @return  The ID that the process holds within the database
+     */
     public Integer getID() {
         return processId;
     }
@@ -89,14 +95,22 @@ public class Process implements ReloadableEntity<Integer> {
         this.processId = processId;
     }
 
+    /**
+     * This method returns an EPerson object. This EPerson object is the EPerson that initially created the process
+     * @return  The EPerson that created the process
+     */
     public EPerson getEPerson() {
         return ePerson;
     }
 
-    public void setePerson(EPerson ePerson) {
+    public void setEPerson(EPerson ePerson) {
         this.ePerson = ePerson;
     }
 
+    /**
+     * This method returns the Start time for the Process. This reflects the time when the Process was actually started
+     * @return  The start time for the Process
+     */
     public Date getStartTime() {
         return startTime;
     }
@@ -105,6 +119,10 @@ public class Process implements ReloadableEntity<Integer> {
         this.startTime = startTime;
     }
 
+    /**
+     * This method returns the time that Process was finished
+     * @return  The finished time for the Process
+     */
     public Date getFinishedTime() {
         return finishedTime;
     }
@@ -113,6 +131,10 @@ public class Process implements ReloadableEntity<Integer> {
         this.finishedTime = finishedTime;
     }
 
+    /**
+     * This method returns the name of the Process. For example filter-media
+     * @return  The name of the Process
+     */
     public String getName() {
         return name;
     }
@@ -121,6 +143,11 @@ public class Process implements ReloadableEntity<Integer> {
         this.name = name;
     }
 
+    /**
+     * This method returns a ProcessStatus value that represents the current state of the Process. These values
+     * can be found within the {@link ProcessStatus} enum
+     * @return  The status of the Process
+     */
     public ProcessStatus getProcessStatus() {
         return processStatus;
     }
@@ -131,6 +158,7 @@ public class Process implements ReloadableEntity<Integer> {
 
     /**
      * To get the parameters, use ProcessService.getParameters() to get a parsed list of DSpaceCommandLineParameters
+     * This String representation is the parameter in an unparsed fashion. For example "-c test"
      */
     protected String getParameters() {
         return parameters;
@@ -140,6 +168,11 @@ public class Process implements ReloadableEntity<Integer> {
         this.parameters = parameters;
     }
 
+    /**
+     * This method returns a list of Bitstreams that will be used or created by the Process. This list contains both
+     * input and output bitstreams.
+     * @return  The Bitstreams that are used or created by the process
+     */
     public List<Bitstream> getBitstreams() {
         return bitstreams;
     }
@@ -160,6 +193,11 @@ public class Process implements ReloadableEntity<Integer> {
         this.creationTime = creationTime;
     }
 
+    /**
+     * This method will return the time when the Process was created. Note that this is potentially different from
+     * the StartTime (for example if the Process was queued)
+     * @return  The creation time of the Process
+     */
     public Date getCreationTime() {
         return creationTime;
     }

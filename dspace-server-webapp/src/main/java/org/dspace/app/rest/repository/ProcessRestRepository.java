@@ -15,9 +15,9 @@ import org.dspace.app.rest.converter.processes.ProcessConverter;
 import org.dspace.app.rest.model.ProcessRest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
-import org.dspace.content.Process;
-import org.dspace.content.service.ProcessService;
 import org.dspace.core.Context;
+import org.dspace.scripts.Process;
+import org.dspace.scripts.service.ProcessService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
@@ -40,7 +40,8 @@ public class ProcessRestRepository extends AbstractDSpaceRestRepository {
 
     /**
      * This method will return a list of all Process objects converted to ProcessRest objects
-     * @return  The list of ProcessRest objects coming forth from all Process objects in the database
+     * @param pageable  This is the page object for this call
+     * @return The list of ProcessRest objects coming forth from all Process objects in the database
      * @throws SQLException If something goes wrong
      */
     public List<ProcessRest> getAllProcesses(Pageable pageable) throws SQLException {
@@ -59,7 +60,7 @@ public class ProcessRestRepository extends AbstractDSpaceRestRepository {
      * This method will return a ProcessRest object that comes forth from the Process object found by the given id
      * @param processId     The id that will be used to retrieve a Process object to then convert that into a
      *                      ProcessRest object
-     * @return              The converted ProcessRest object
+     * @return The converted ProcessRest object
      * @throws SQLException If something goes wrong
      */
     public ProcessRest getProcessById(Integer processId) throws SQLException, AuthorizeException {
@@ -77,7 +78,7 @@ public class ProcessRestRepository extends AbstractDSpaceRestRepository {
 
     /**
      * This method will return an integer describing the total amount of Process objects in the database
-     * @return  The total amount of Process objects in the database
+     * @return The total amount of Process objects in the database
      * @throws SQLException If something goes wrong
      */
     public int getTotalAmountOfProcesses() throws SQLException {

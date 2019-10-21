@@ -12,8 +12,8 @@ import java.util.stream.Collectors;
 import org.dspace.app.rest.converter.DSpaceConverter;
 import org.dspace.app.rest.converter.DSpaceRunnableParameterConverter;
 import org.dspace.app.rest.model.ProcessRest;
-import org.dspace.content.Process;
-import org.dspace.content.service.ProcessService;
+import org.dspace.scripts.Process;
+import org.dspace.scripts.service.ProcessService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

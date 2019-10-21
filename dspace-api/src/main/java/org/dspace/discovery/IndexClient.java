@@ -26,6 +26,9 @@ import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.scripts.DSpaceRunnable;
 import org.springframework.beans.factory.annotation.Autowired;
 
+/**
+ * Class used to reindex dspace communities/collections/items into discovery
+ */
 public class IndexClient extends DSpaceRunnable {
 
     private Context context;
@@ -132,33 +135,12 @@ public class IndexClient extends DSpaceRunnable {
         indexClientOptions = IndexClientOptions.getIndexClientOption(commandLine);
     }
 
+    /**
+     * Constructor for this class. This will ensure that the Options are created and set appropriately.
+     */
     private IndexClient() {
-        Options options = constructOptions();
+        Options options = IndexClientOptions.constructOptions();
         this.options = options;
-    }
-
-    private Options constructOptions() {
-        Options options = new Options();
-
-        options
-            .addOption("r", "remove", true, "remove an Item, Collection or Community from index based on its handle");
-        options.getOption("r").setType(String.class);
-        options.addOption("i", "index", true,
-                          "add or update an Item, Collection or Community based on its handle or uuid");
-        options.getOption("i").setType(boolean.class);
-        options.addOption("c", "clean", false,
-                          "clean existing index removing any documents that no longer exist in the db");
-        options.getOption("c").setType(boolean.class);
-        options.addOption("b", "build", false, "(re)build index, wiping out current one if it exists");
-        options.getOption("b").setType(boolean.class);
-        options.addOption("s", "spellchecker", false, "Rebuild the spellchecker, can be combined with -b and -f.");
-        options.getOption("s").setType(boolean.class);
-        options.addOption("f", "force", false,
-                          "if updating existing index, force each handle to be reindexed even if uptodate");
-        options.getOption("f").setType(boolean.class);
-        options.addOption("h", "help", false, "print this help message");
-        options.getOption("h").setType(boolean.class);
-        return options;
     }
 
     /**

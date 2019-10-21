@@ -24,7 +24,7 @@ CREATE TABLE process
     creation_time           TIMESTAMP NOT NULL,
     script                  VARCHAR(256) NOT NULL,
     status                  VARCHAR(32),
-    parameters              VARCHAR (512)
+    parameters              VARCHAR(512)
 );
 
 CREATE TABLE process2bitstream
