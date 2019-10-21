@@ -57,6 +57,11 @@ public class MockDataProvider implements ExternalDataProvider {
         return StringUtils.equalsIgnoreCase(sourceIdentifier, source);
     }
 
+    @Override
+    public int getNumberOfResults(String query) {
+        return 0;
+    }
+
     /**
      * Generic setter for the sourceIdentifier
      * @param sourceIdentifier   The sourceIdentifier to be set on this MockDataProvider

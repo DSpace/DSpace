@@ -41,6 +41,7 @@ public class ExternalDataServiceImpl implements ExternalDataService {
         return provider.searchExternalDataObjects(query, start, limit);
     }
 
+
     @Override
     public List<ExternalDataProvider> getExternalDataProviders() {
         return externalDataProviders;
@@ -56,4 +57,12 @@ public class ExternalDataServiceImpl implements ExternalDataService {
         return null;
     }
 
+    @Override
+    public int getNumberOfResults(String source, String query) {
+        ExternalDataProvider provider = getExternalDataProvider(source);
+        if (provider == null) {
+            throw new IllegalArgumentException("Provider for: " + source + " couldn't be found");
+        }
+        return provider.getNumberOfResults(query);
+    }
 }

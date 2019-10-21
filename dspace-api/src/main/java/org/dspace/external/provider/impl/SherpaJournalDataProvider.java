@@ -141,14 +141,9 @@ public class SherpaJournalDataProvider implements ExternalDataProvider {
     @Override
     public List<ExternalDataObject> searchExternalDataObjects(String query, int start, int limit) {
         // query args to add to SHERPA/RoMEO request URL
-        List<BasicNameValuePair> args = new ArrayList<BasicNameValuePair>();
-        args.add(new BasicNameValuePair("jtitle", query));
-        args.add(new BasicNameValuePair("qtype", "contains"));
-        args.add(new BasicNameValuePair("ak", apiKey));
-        HttpClient hc = new DefaultHttpClient();
-        String srUrl = url + "?" + URLEncodedUtils.format(args, "UTF8");
-        HttpGet get = new HttpGet(srUrl);
+        HttpGet get = constructHttpGet(query);
         try {
+            HttpClient hc = new DefaultHttpClient();
             HttpResponse response = hc.execute(get);
             if (response.getStatusLine().getStatusCode() == 200) {
 
@@ -156,7 +151,9 @@ public class SherpaJournalDataProvider implements ExternalDataProvider {
                 List<ExternalDataObject> list = sherpaResponse.getJournals().stream().map(
                     sherpaJournal -> constructExternalDataObjectFromSherpaJournal(sherpaJournal)).collect(
                     Collectors.toList());
-                return list;
+                // This is because Sherpa returns everything by default so we can't specifiy a start and limit
+                // in the query itself
+                return list.subList(start, Math.min(start + limit, list.size()));
             }
         } catch (IOException e) {
             log.error("SHERPA/RoMEO query failed: ", e);
@@ -167,9 +164,38 @@ public class SherpaJournalDataProvider implements ExternalDataProvider {
         return null;
     }
 
+    private HttpGet constructHttpGet(String query) {
+        List<BasicNameValuePair> args = new ArrayList<BasicNameValuePair>();
+        args.add(new BasicNameValuePair("jtitle", query));
+        args.add(new BasicNameValuePair("qtype", "contains"));
+        args.add(new BasicNameValuePair("ak", apiKey));
+        String srUrl = url + "?" + URLEncodedUtils.format(args, "UTF8");
+        return new HttpGet(srUrl);
+    }
+
     @Override
     public boolean supports(String source) {
         return StringUtils.equalsIgnoreCase(sourceIdentifier, source);
+    }
+
+    @Override
+    public int getNumberOfResults(String query) {
+        HttpGet get = constructHttpGet(query);
+        try {
+            HttpClient hc = new DefaultHttpClient();
+            HttpResponse response = hc.execute(get);
+            if (response.getStatusLine().getStatusCode() == 200) {
+
+                SHERPAResponse sherpaResponse = new SHERPAResponse(response.getEntity().getContent());
+                return sherpaResponse.getNumHits();
+            }
+        } catch (IOException e) {
+            log.error("SHERPA/RoMEO query failed: ", e);
+            return 0;
+        } finally {
+            get.releaseConnection();
+        }
+        return 0;
     }
 
     /**

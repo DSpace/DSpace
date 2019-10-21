@@ -138,41 +138,13 @@ public class LCNameDataProvider implements ExternalDataProvider {
             limit = 50;
         }
 
-        URI sruUri;
-        try {
-            URIBuilder builder = new URIBuilder(url);
-            builder.addParameter("operation", "searchRetrieve");
-            builder.addParameter("version", "1.1");
-            builder.addParameter("recordSchema", "info:srw/schema/1/marcxml-v1.1");
-            builder.addParameter("query", query.toString());
-            builder.addParameter("maximumRecords", String.valueOf(limit));
-            builder.addParameter("startRecord", String.valueOf(start + 1));
-            sruUri = builder.build();
-        } catch (URISyntaxException e) {
-            log.error("SRU query failed: ", e);
-            return Collections.EMPTY_LIST;
-        }
-        HttpGet get = new HttpGet(sruUri);
-
-        log.debug("Trying SRU query, URL=" + sruUri);
-
+        HttpGet get = constructHttpGet(query, start, limit);
         // 2. web request
         try {
             HttpClient hc = new DefaultHttpClient();
             HttpResponse response = hc.execute(get);
             if (response.getStatusLine().getStatusCode() == 200) {
-                SAXParserFactory spf = SAXParserFactory.newInstance();
-                SAXParser sp = spf.newSAXParser();
-                XMLReader xr = sp.getXMLReader();
-                SRUHandler handler = new SRUHandler(sourceIdentifier);
-
-                // XXX FIXME: should turn off validation here explicitly, but
-                //  it seems to be off by default.
-                xr.setFeature("http://xml.org/sax/features/namespaces", true);
-                xr.setContentHandler(handler);
-                xr.setErrorHandler(handler);
-                HttpEntity responseBody = response.getEntity();
-                xr.parse(new InputSource(responseBody.getContent()));
+                SRUHandler handler = parseResponseToSRUHandler(response);
 
                 // this probably just means more results available..
                 if (handler.hits != handler.result.size()) {
@@ -205,6 +177,85 @@ public class LCNameDataProvider implements ExternalDataProvider {
 
     public boolean supports(String source) {
         return StringUtils.equalsIgnoreCase(sourceIdentifier, source);
+    }
+
+    private HttpGet constructHttpGet(StringBuilder query, int start, int limit) {
+        URI sruUri;
+        try {
+            URIBuilder builder = new URIBuilder(url);
+            builder.addParameter("operation", "searchRetrieve");
+            builder.addParameter("version", "1.1");
+            builder.addParameter("recordSchema", "info:srw/schema/1/marcxml-v1.1");
+            builder.addParameter("query", query.toString());
+            builder.addParameter("maximumRecords", String.valueOf(limit));
+            builder.addParameter("startRecord", String.valueOf(start + 1));
+            sruUri = builder.build();
+        } catch (URISyntaxException e) {
+            log.error("SRU query failed: ", e);
+            return null;
+        }
+        HttpGet get = new HttpGet(sruUri);
+
+        log.debug("Trying SRU query, URL=" + sruUri);
+        return get;
+    }
+
+    @Override
+    public int getNumberOfResults(String query) {
+        // punt if there is no query text
+        if (query == null || query.trim().length() == 0) {
+            return 0;
+        }
+
+        // 1. build CQL query
+        DCPersonName pn = new DCPersonName(query);
+        StringBuilder queryStringBuilder = new StringBuilder();
+        queryStringBuilder.append("local.FirstName = \"").append(pn.getFirstNames()).
+            append("\" and local.FamilyName = \"").append(pn.getLastName()).
+                 append("\"");
+
+        HttpGet get = constructHttpGet(queryStringBuilder, 0, 1);
+
+        // 2. web request
+        try {
+            HttpClient hc = new DefaultHttpClient();
+            HttpResponse response = hc.execute(get);
+            if (response.getStatusLine().getStatusCode() == 200) {
+                SRUHandler handler = parseResponseToSRUHandler(response);
+
+                // XXX add non-auth option; perhaps the UI should do this?
+                // XXX it's really a policy matter if they allow unauth result.
+                // XXX good, stop it.
+                // handler.result.add(new Choice("", text, "Non-Authority: \""+text+"\""));
+
+                return handler.hits;
+            }
+        } catch (IOException | ParserConfigurationException | SAXException e) {
+            return 0;
+        } finally {
+            get.releaseConnection();
+        }
+        return 0;
+
+
+    }
+
+    private SRUHandler parseResponseToSRUHandler(HttpResponse response)
+        throws ParserConfigurationException, SAXException, IOException {
+        SAXParserFactory spf = SAXParserFactory.newInstance();
+        SAXParser sp = spf.newSAXParser();
+        XMLReader xr = sp.getXMLReader();
+        SRUHandler handler = new SRUHandler(sourceIdentifier);
+
+        // XXX FIXME: should turn off validation here explicitly, but
+        //  it seems to be off by default.
+        xr.setFeature("http://xml.org/sax/features/namespaces", true);
+        xr.setContentHandler(handler);
+        xr.setErrorHandler(handler);
+        HttpEntity responseBody = response.getEntity();
+        xr.parse(new InputSource(responseBody.getContent()));
+
+        return handler;
     }
 
     /**
