@@ -19,6 +19,7 @@ import org.dspace.external.provider.ExternalDataProvider;
 import org.dspace.external.service.ExternalDataService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Component;
@@ -100,8 +101,9 @@ public class ExternalSourceRestRepository extends AbstractDSpaceRestRepository {
         }
         List<ExternalDataObject> externalDataObjects = externalDataService
             .searchExternalDataObjects(authorityName, query, pageable.getOffset(), pageable.getPageSize());
-        Page<ExternalSourceEntryRest> page = utils.getPage(externalDataObjects, pageable)
-                                                  .map(externalSourceEntryRestConverter);
+        int numberOfResults = externalDataService.getNumberOfResults(authorityName, query);
+        Page<ExternalSourceEntryRest> page = new PageImpl(externalDataObjects, pageable, numberOfResults)
+                                                .map(externalSourceEntryRestConverter);
         return page;
     }
 }

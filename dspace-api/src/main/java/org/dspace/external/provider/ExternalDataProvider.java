@@ -49,4 +49,12 @@ public interface ExternalDataProvider {
      * @return       A boolean indicating whether this ExternalDataProvider can deal with this source or not
      */
     public boolean supports(String source);
+
+    /**
+     * Returns the total amount of results that this source can return for the given query
+     * @param query The query to be search on and give the total amount of results
+     * @return      The total amount of results that the source can return for the given query
+     */
+    public int getNumberOfResults(String query);
+
 }

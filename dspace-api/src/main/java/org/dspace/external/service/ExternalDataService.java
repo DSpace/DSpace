@@ -52,4 +52,11 @@ public interface ExternalDataService {
      */
     public List<ExternalDataObject> searchExternalDataObjects(String source, String query, int start, int limit);
 
+    /**
+     * This method wil return the total amount of results that will be found for the given query in the given source
+     * @param source    The source in which the query will happen to return the number of results
+     * @param query     The query to be ran in this source to retrieve the total amount of results
+     * @return          The total amount of results that can be returned for this query in the given source
+     */
+    public int getNumberOfResults(String source, String query);
 }

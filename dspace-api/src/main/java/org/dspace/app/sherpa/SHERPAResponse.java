@@ -28,6 +28,8 @@ import org.w3c.dom.Element;
 public class SHERPAResponse {
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(SHERPAResponse.class);
 
+    private int numHits;
+
     private String message;
 
     private String license;
@@ -59,6 +61,12 @@ public class SHERPAResponse {
             Element publishersElement = XMLUtils.getSingleElement(xmlRoot,
                                                                   "publishers");
 
+            String numhitsString = XMLUtils.getElementValue(headersElement, "numhits");
+            if (StringUtils.isNotBlank(numhitsString)) {
+                numHits = Integer.parseInt(numhitsString);
+            } else {
+                numHits = 0;
+            }
             message = XMLUtils.getElementValue(headersElement, "message");
 
             license = XMLUtils.getElementValue(headersElement, "license");
@@ -188,5 +196,9 @@ public class SHERPAResponse {
 
     public List<SHERPAPublisher> getPublishers() {
         return publishers;
+    }
+
+    public int getNumHits() {
+        return numHits;
     }
 }

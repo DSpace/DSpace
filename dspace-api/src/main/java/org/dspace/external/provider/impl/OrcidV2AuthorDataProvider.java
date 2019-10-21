@@ -218,6 +218,15 @@ public class OrcidV2AuthorDataProvider implements ExternalDataProvider {
         return StringUtils.equalsIgnoreCase(sourceIdentifier, source);
     }
 
+    @Override
+    public int getNumberOfResults(String query) {
+        String searchPath = "search?q=" + URLEncoder.encode(query) + "&start=" + 0 + "&rows=" + 0;
+        log.debug("queryBio searchPath=" + searchPath + " accessToken=" + accessToken);
+        InputStream bioDocument = orcidRestConnector.get(searchPath, accessToken);
+        XMLtoBio converter = new XMLtoBio();
+        return converter.getNumberOfResultsFromXml(bioDocument);
+    }
+
 
     /**
      * Generic setter for the sourceIdentifier
