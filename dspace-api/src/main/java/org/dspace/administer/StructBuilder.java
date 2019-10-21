@@ -34,15 +34,19 @@ import org.apache.xpath.XPathAPI;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
 import org.jdom.Element;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
@@ -101,6 +105,8 @@ public class StructBuilder {
             = ContentServiceFactory.getInstance().getCollectionService();
     protected static EPersonService ePersonService
             = EPersonServiceFactory.getInstance().getEPersonService();
+    protected static HandleService handleService
+            = HandleServiceFactory.getInstance().getHandleService();
 
     /**
      * Default constructor
@@ -149,6 +155,10 @@ public class StructBuilder {
                 .desc("File to receive the structure map ('-' for standard out).")
                 .hasArg().argName("output").required().build());
 
+        options.addOption(Option.builder("p").longOpt("parent")
+                .desc("Parent community or handle (optional)")
+                .hasArg().argName("parent").required(false).build());
+
         // Parse the command line.
         CommandLineParser parser = new DefaultParser();
         CommandLine line = null;
@@ -182,6 +192,11 @@ public class StructBuilder {
             outputStream = new FileOutputStream(output);
         }
 
+        String parentID = null;
+        if (line.hasOption('p')) {
+            parentID = line.getOptionValue('p');
+        }
+
         // create a context
         Context context = new Context();
 
@@ -192,6 +207,33 @@ public class StructBuilder {
         } catch (SQLException ex) {
             System.err.format("That user could not be found:  %s%n", ex.getMessage());
             System.exit(1);
+        }
+
+        // Resolve optional "parent community" ID or handle to a community
+        Community parent = null;
+        if(parentID != null) {
+            DSpaceObject dso = handleService.resolveToObject(context, parentID);
+            if (dso != null) {
+                if (dso.getType() == Constants.COMMUNITY) {
+                    parent = (Community) dso;
+                }
+                else {
+                    System.out.println("The handle provided for the -p option does not resolve to a community. " +
+                        parentID + " is an object of type: " + Constants.typeText[dso.getType()]);
+                    System.exit(0);
+                }
+            }
+            else {
+                // Not a handle, see if it is an ID
+                Community community = communityService.findByIdOrLegacyId(context, parentID);
+                if(community != null) {
+                    parent = community;
+                }
+                else {
+                    System.out.println("The value provided for -p is not a valid community ID or handle: " + parentID);
+                    System.exit(0);
+                }
+            }
         }
 
         // Export? Import?
@@ -211,7 +253,7 @@ public class StructBuilder {
                 inputStream = new FileInputStream(input);
             }
 
-            importStructure(context, inputStream, outputStream);
+            importStructure(context, inputStream, outputStream, parent);
             // save changes from import
             context.complete();
         }
@@ -230,7 +272,7 @@ public class StructBuilder {
      * @throws TransformerException
      * @throws SQLException
      */
-    static void importStructure(Context context, InputStream input, OutputStream output)
+    static void importStructure(Context context, InputStream input, OutputStream output, Community parent)
             throws IOException, ParserConfigurationException, SQLException, TransformerException {
 
         // load the XML
@@ -281,7 +323,7 @@ public class StructBuilder {
             NodeList first = XPathAPI.selectNodeList(document, "/import_structure/community");
 
             // run the import starting with the top level communities
-            elements = handleCommunities(context, first, null);
+            elements = handleCommunities(context, first, parent);
         } catch (TransformerException ex) {
             System.err.format("Input content not understood:  %s%n", ex.getMessage());
             System.exit(1);
