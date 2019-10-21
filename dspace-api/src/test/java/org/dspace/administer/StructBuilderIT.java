@@ -25,6 +25,7 @@ import org.dspace.AbstractIntegrationTest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.MetadataSchema;
 import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
@@ -115,6 +116,31 @@ public class StructBuilderIT
             "  </community>\n" +
             "</import_structure>\n";
 
+    private static final String IMPORT_DOCUMENT_WITH_PARENT =
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+            "<import_structure>\n" +
+            "  <community>\n" +
+            "    <name>Parent Community 0</name>\n" +
+            "    <description/><intro/><copyright/><sidebar/>" +
+            "    <community>\n" +
+            "      <name>Top Community 0</name>\n" +
+            "      <description/><intro/><copyright/><sidebar/>" +
+            "      <community>\n" +
+            "        <name>Sub Community 0.0</name>\n" +
+            "        <description/><intro/><copyright/><sidebar/>" +
+            "        <collection>\n" +
+            "          <name>Collection 0.0.0</name>\n" +
+            "          <description/><intro/><copyright/><sidebar/><license/><provenance/>" +
+            "        </collection>\n" +
+            "      </community>\n" +
+            "      <collection>\n" +
+            "        <name>Collection 0.1</name>\n" +
+            "        <description/><intro/><copyright/><sidebar/><license/><provenance/>" +
+            "      </collection>\n" +
+            "    </community>\n" +
+            "  </community>\n" +
+            "</import_structure>\n";
+
     private static final String EXPORT_DOCUMENT =
             "<?xml version='1.0' encoding='UTF-8'?>\n" +
             "<import_structure>\n" +
@@ -159,7 +185,7 @@ public class StructBuilderIT
         byte[] inputBytes = IMPORT_DOCUMENT.getBytes(StandardCharsets.UTF_8);
         context.turnOffAuthorisationSystem();
         try (InputStream input = new ByteArrayInputStream(inputBytes);) {
-            StructBuilder.importStructure(context, input, outputDocument);
+            StructBuilder.importStructure(context, input, outputDocument, null);
         } catch (IOException | SQLException
                 | ParserConfigurationException | TransformerException ex) {
             System.err.println(ex.getMessage());
@@ -195,6 +221,65 @@ public class StructBuilderIT
         assertFalse("Output does not match input.", isDifferent(myDiff));
 
         // TODO spot-check some objects.
+    }
+
+    @Test
+    public void testImportStructureWithParent()
+            throws Exception {
+        System.out.println("importStructure (to parent community)");
+
+        // Create a temporary parent community to import beneath
+        context.turnOffAuthorisationSystem();;
+        Community parent = communityService.create(null, context);
+        communityService.setMetadataSingleValue(context, parent,
+                MetadataSchemaEnum.DC.getName(), "title", null,
+                null, "Parent Community 0");
+        context.restoreAuthSystemState();
+
+
+        // Run the method under test and collect its output.
+        ByteArrayOutputStream outputDocument
+            = new ByteArrayOutputStream(IMPORT_DOCUMENT.length() * 2 * 2);
+        byte[] inputBytes = IMPORT_DOCUMENT.getBytes(StandardCharsets.UTF_8);
+        context.turnOffAuthorisationSystem();
+        try (InputStream input = new ByteArrayInputStream(inputBytes);) {
+            StructBuilder.importStructure(context, input, outputDocument, parent);
+        } catch (IOException | SQLException
+            | ParserConfigurationException | TransformerException ex) {
+            System.err.println(ex.getMessage());
+            System.exit(1);
+        } finally {
+            context.restoreAuthSystemState();
+        }
+
+        // Compare import's output with its input.
+        // Because this test has imported beneath an existing parent community,
+        // the output is compared to a different document which includes the
+        // parent community, which will be exported along with the rest.
+        // N.B. here we rely on StructBuilder to emit communities and
+        // collections in the same order as the input document.  If that changes,
+        // we will need a smarter NodeMatcher, probably based on <name> children.
+        Source output = new StreamSource(
+            new ByteArrayInputStream(outputDocument.toByteArray()));
+        Source reference = new StreamSource(
+            new ByteArrayInputStream(
+                IMPORT_DOCUMENT_WITH_PARENT.getBytes(StandardCharsets.UTF_8)));
+        Diff myDiff = DiffBuilder.compare(reference).withTest(output)
+            .normalizeWhitespace()
+//                .withNodeFilter(new MyNodeFilter())
+            .withAttributeFilter((Attr attr) ->
+                !attr.getName().equals("identifier"))
+            .checkForIdentical()
+            .build();
+
+        // Was there a difference?
+        // Always output differences -- one is expected.
+        ComparisonFormatter formatter = new DefaultComparisonFormatter();
+        for (Difference difference : myDiff.getDifferences()) {
+            System.err.println(difference.toString(formatter));
+        }
+        // Test for *significant* differences.
+        assertFalse("Output does not match input.", isDifferent(myDiff));
     }
 
     /**
