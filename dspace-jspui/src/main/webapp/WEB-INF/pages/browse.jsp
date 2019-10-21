@@ -58,11 +58,18 @@
                         <c:choose>
                             <c:when test="${\"dateissued\" == type}">
                                 <div class="form-group row">
-                                    <label for="starts_with" class="col-sm-6 col-form-label"><fmt:message key="browse.nav.date.jump"/></label>
+                                    <label for="year" class="col-sm-6 col-form-label"><fmt:message key="browse.nav.date.jump"/></label>
                                     <div class="col-sm-6">
-                                        <input type="text" class="form-control" value="${selectedYear}" name="starts_with" id="starts_with"/>
+                                        <input type="text" class="yearpicker form-control" value="${selectedYear}" name="year" id="year"/>
                                     </div>
                                 </div>
+
+                                <script>
+                                    $(document).ready(function(){
+                                        $('.yearpicker').yearpicker();
+                                        $('.yearpicker').val("${selectedYear}");
+                                    });
+                                </script>
                             </c:when>
                             <c:otherwise>
                                 <div class="form-group row">
