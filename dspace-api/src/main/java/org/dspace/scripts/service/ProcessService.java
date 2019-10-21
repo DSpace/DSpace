@@ -5,15 +5,15 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.content.service;
+package org.dspace.scripts.service;
 
 import java.sql.SQLException;
 import java.util.List;
 
-import org.dspace.content.Process;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.scripts.DSpaceCommandLineParameter;
+import org.dspace.scripts.Process;
 
 /**
  * An interface for the ProcessService with methods regarding the Process workload
@@ -70,6 +70,7 @@ public interface ProcessService {
 
     /**
      * Returns a list of all Process objects in the database sorted by start time
+     * The most recent one will be shown first
      * @param context   The relevant DSpace context
      * @return The list of all Process objects sorted by start time
      * @throws SQLException If something goes wrong
@@ -78,7 +79,7 @@ public interface ProcessService {
 
     /**
      * This method will perform the logic needed to update the Process object in the database to represent a
-     * started state
+     * started state. A started state refers to {@link org.dspace.content.ProcessStatus#RUNNING}
      * @param context   The relevant DSpace context
      * @param process   The Process object to be updated
      * @throws SQLException If something goes wrong

@@ -17,9 +17,12 @@ public class MockDSpaceRunnableScript extends DSpaceRunnable {
         Options options = constructOptions();
         this.options = options;
     }
+
+    @Override
     public void internalRun() throws Exception {
     }
 
+    @Override
     public void setup() throws ParseException {
         if (!commandLine.hasOption("i")) {
             throw new ParseException("-i is a mandatory parameter");

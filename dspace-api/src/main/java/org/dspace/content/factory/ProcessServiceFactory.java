@@ -7,7 +7,7 @@
  */
 package org.dspace.content.factory;
 
-import org.dspace.content.service.ProcessService;
+import org.dspace.scripts.service.ProcessService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**

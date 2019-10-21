@@ -9,9 +9,10 @@ package org.dspace.app.rest.model.hateoas;
 
 import org.dspace.app.rest.model.ProcessRest;
 import org.dspace.app.rest.model.hateoas.annotations.RelNameDSpaceResource;
+import org.dspace.scripts.Process;
 
 /**
- * The Resource representation of a {@link org.dspace.content.Process} object
+ * The Resource representation of a {@link Process} object
  */
 @RelNameDSpaceResource(ProcessRest.NAME)
 public class ProcessResource extends HALResource<ProcessRest> {

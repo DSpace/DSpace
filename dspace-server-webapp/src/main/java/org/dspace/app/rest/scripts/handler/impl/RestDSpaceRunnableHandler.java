@@ -16,15 +16,15 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.logging.log4j.Logger;
-import org.dspace.content.Process;
 import org.dspace.content.ProcessStatus;
 import org.dspace.content.factory.ProcessServiceFactory;
-import org.dspace.content.service.ProcessService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.scripts.DSpaceCommandLineParameter;
 import org.dspace.scripts.DSpaceRunnable;
+import org.dspace.scripts.Process;
 import org.dspace.scripts.handler.DSpaceRunnableHandler;
+import org.dspace.scripts.service.ProcessService;
 
 /**
  * The {@link DSpaceRunnableHandler} dealing with Scripts started from the REST api
@@ -178,7 +178,7 @@ public class RestDSpaceRunnableHandler implements DSpaceRunnableHandler {
 
     /**
      * This method will return the process created by this handler
-     * @return  The Process database object created by this handler
+     * @return The Process database object created by this handler
      */
     public Process getProcess() {
         Context context = new Context();

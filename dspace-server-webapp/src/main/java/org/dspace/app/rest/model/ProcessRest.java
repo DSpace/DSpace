@@ -15,9 +15,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.dspace.app.rest.ProcessRestController;
 import org.dspace.content.ProcessStatus;
+import org.dspace.scripts.Process;
 
 /**
- * This class serves as a REST representation for the {@link org.dspace.content.Process} class
+ * This class serves as a REST representation for the {@link Process} class
  */
 public class ProcessRest extends BaseObjectRest<UUID> {
     public static final String NAME = "process";
