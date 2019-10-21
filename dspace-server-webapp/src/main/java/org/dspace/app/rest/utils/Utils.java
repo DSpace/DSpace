@@ -12,6 +12,9 @@ import static java.util.stream.Collectors.toList;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -19,25 +22,38 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Scanner;
-
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
+import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.exception.PaginationException;
 import org.dspace.app.rest.exception.RepositoryNotFoundException;
 import org.dspace.app.rest.model.AuthorityRest;
+import org.dspace.app.rest.model.BaseObjectRest;
 import org.dspace.app.rest.model.CommunityRest;
 import org.dspace.app.rest.model.LinkRest;
 import org.dspace.app.rest.model.LinksRest;
 import org.dspace.app.rest.model.ResourcePolicyRest;
 import org.dspace.app.rest.model.RestAddressableModel;
+import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.hateoas.DSpaceResource;
+import org.dspace.app.rest.model.hateoas.EmbeddedPage;
+import org.dspace.app.rest.model.hateoas.HALResource;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.repository.DSpaceRestRepository;
 import org.dspace.app.rest.repository.LinkRestRepository;
 import org.dspace.content.BitstreamFormat;
@@ -50,8 +66,10 @@ import org.dspace.util.UUIDUtils;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.Link;
 import org.springframework.stereotype.Component;
@@ -67,6 +85,8 @@ public class Utils {
 
     private static final Logger log = Logger.getLogger(Utils.class);
 
+    private static final int EMBEDDED_PAGE_SIZE = 20;
+
     @Autowired
     ApplicationContext applicationContext;
 
@@ -75,6 +95,9 @@ public class Utils {
 
     @Autowired
     private BitstreamFormatService bitstreamFormatService;
+
+    @Autowired
+    private ConverterService converter;
 
     public <T> Page<T> getPage(List<T> fullContents, Pageable pageable) {
         int total = fullContents.size();
@@ -158,23 +181,13 @@ public class Utils {
 
     /**
      * @param rel
-     * @param domainClass
-     * @return the LinkRest annotation corresponding to the specified rel in the
-     * domainClass. Null if not found
+     * @param restClass
+     * @return the LinkRest annotation corresponding to the specified rel in the rest class, or null if not found.
      */
-    public LinkRest getLinkRest(String rel, Class<RestAddressableModel> domainClass) {
-        LinkRest linkRest = null;
-        LinksRest linksAnnotation = domainClass.getDeclaredAnnotation(LinksRest.class);
-        if (linksAnnotation != null) {
-            LinkRest[] links = linksAnnotation.links();
-            for (LinkRest l : links) {
-                if (StringUtils.equals(rel, l.name())) {
-                    linkRest = l;
-                    break;
-                }
-            }
-        }
-        return linkRest;
+    public LinkRest getClassLevelLinkRest(String rel, Class<? extends RestAddressableModel> restClass) {
+        Optional<LinkRest> optionalLinkRest = getLinkRests(restClass).stream().filter((linkRest) ->
+                rel.equals(linkRest.name())).findFirst();
+        return optionalLinkRest.isPresent() ? optionalLinkRest.get() : null;
     }
 
     /**
@@ -225,7 +238,7 @@ public class Utils {
 
     /**
      * Return the filename part from a multipartFile upload that could eventually contains the fullpath on the client
-     * filesystem
+
      * 
      * @param multipartFile
      *            the file uploaded
@@ -354,5 +367,207 @@ public class Utils {
             log.error("Something went wrong with reading in the inputstream from the request", e);
         }
         return list;
+    }
+
+    public <T extends HALResource> T toResource(RestModel restObject) {
+        return converter.toResource(restObject);
+    }
+
+    /**
+     * Gets the alphanumerically sorted union of multiple string arrays.
+     *
+     * @param arrays the string arrays.
+     * @return the sorted union of them, with no duplicate values.
+     */
+    public String[] getSortedUnion(String[]... arrays) {
+        Set<String> set = new TreeSet<>();
+        for (String[] array : arrays) {
+            for (String string : array) {
+                set.add(string);
+            }
+        }
+        return set.toArray(arrays[0]);
+    }
+
+    /**
+     * Gets the method with the given name in the given class.
+     *
+     * @param clazz the class.
+     * @param name the method name.
+     * @return the first method found with the given name.
+     * @throws IllegalArgumentException if no such method is found.
+     */
+    public Method requireMethod(Class clazz, String name) {
+        for (Method method : clazz.getMethods()) {
+            if (method.getName().equals(name)) {
+                return method;
+            }
+        }
+        throw new IllegalArgumentException("No such method in " + clazz + ": " + name);
+    }
+
+    /**
+     * Adds embeds or links for all class-level LinkRel annotations for which embeds or links are allowed.
+     *
+     * @param halResource the resource.
+     */
+    public void embedOrLinkClassLevelRels(HALResource<RestAddressableModel> halResource) {
+        Projection projection = halResource.getContent().getProjection();
+        getLinkRests(halResource.getContent().getClass()).stream().forEach((linkRest) -> {
+            Link link = linkToSubResource(halResource.getContent(), linkRest.name());
+            if (!linkRest.embedOptional() || projection.allowOptionalEmbed(halResource, linkRest)) {
+                embedRelFromRepository(halResource, linkRest.name(), link, linkRest.method());
+            } else if (!linkRest.linkOptional() || projection.allowOptionalLink(halResource, linkRest)) {
+                halResource.add(link);
+            }
+        });
+    }
+
+    private List<LinkRest> getLinkRests(Class<? extends RestAddressableModel> restClass) {
+        List<LinkRest> list = new ArrayList<>();
+        LinksRest linksAnnotation = restClass.getDeclaredAnnotation(LinksRest.class);
+        if (linksAnnotation != null) {
+            list.addAll(Arrays.asList(linksAnnotation.links()));
+        }
+        return list;
+    }
+
+    /**
+     * Embeds a rel whose value comes from a {@LinkRestRepository}.
+     *
+     * @param resource the resource.
+     * @param rel the name of the rel.
+     * @param link the link.
+     * @param methodName the method name in the link repository.
+     */
+    private void embedRelFromRepository(HALResource<? extends RestAddressableModel> resource,
+                                        String rel, Link link, String methodName) {
+        LinkRestRepository linkRepository = getLinkResourceRepository(resource.getContent().getCategory(),
+                resource.getContent().getType(), rel);
+        if (linkRepository.isEmbeddableRelation(resource.getContent(), rel)) {
+            Method method = requireMethod(linkRepository.getClass(), methodName);
+            Object contentId = getContentIdForLinkMethod(resource.getContent(), method);
+            try {
+                Object linkedObject = method.invoke(linkRepository, null, contentId, null, null);
+                resource.embedResource(rel, wrapForEmbedding(linkedObject, link));
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    /**
+     * Adds embeds for all properties annotated with {@code @LinkRel} or whose return types are
+     * {@link RestAddressableModel} subclasses.
+     */
+    public void embedMethodLevelRels(HALResource<? extends RestAddressableModel> resource) {
+        try {
+            for (PropertyDescriptor pd : Introspector.getBeanInfo(
+                    resource.getContent().getClass()).getPropertyDescriptors()) {
+                Method readMethod = pd.getReadMethod();
+                String propertyName = pd.getName();
+                if (readMethod != null && !"class".equals(propertyName)) {
+                    embedMethodLevelRel(resource, readMethod, propertyName);
+                }
+            }
+        } catch (IntrospectionException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Adds an embed for the given property read method. If the @LinkRel annotation is present and
+     * specifies a method name, the value will come from invoking that method in the appropriate link
+     * rest repository. Otherwise, the value will come from invoking the method directly on the wrapped
+     * rest object.
+     *
+     * @param readMethod the property read method.
+     * @param propertyName the property name, which will be used as the rel/embed name unless the @LinkRel
+     *                     annotation is present and specifies a different name.
+     */
+    private void embedMethodLevelRel(HALResource<? extends RestAddressableModel> resource,
+                                     Method readMethod,
+                                     String propertyName) {
+        String rel = propertyName;
+        LinkRest linkRest = AnnotationUtils.findAnnotation(readMethod, LinkRest.class);
+        try {
+            if (linkRest != null) {
+                if (linkRest.embedOptional()
+                        && !resource.getContent().getProjection().allowOptionalEmbed(resource, linkRest)) {
+                    return; // projection disallows this optional method-level embed
+                }
+                if (StringUtils.isNotBlank(linkRest.name())) {
+                    rel = linkRest.name();
+                }
+                Link link = linkToSubResource(resource.getContent(), rel);
+                if (StringUtils.isBlank(linkRest.method())) {
+                    resource.embedResource(rel, wrapForEmbedding(readMethod.invoke(resource.getContent()), link));
+                } else {
+                    embedRelFromRepository(resource, rel, link, linkRest.method());
+                }
+            } else if (RestAddressableModel.class.isAssignableFrom(readMethod.getReturnType())) {
+                RestAddressableModel linkedObject = (RestAddressableModel) readMethod.invoke(resource.getContent());
+                resource.embedResource(rel, linkedObject == null ? null :
+                        wrapForEmbedding(linkedObject, linkToSubResource(resource.getContent(), rel)));
+            }
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Wraps the given linked object (retrieved from a link repository or link method on the rest item)
+     * in an object that is appropriate for embedding, if needed.
+     *
+     * @param linkedObject the linked object.
+     * @param link the link, which is used if the linked object is a list or page, to determine the self link
+     *             and embed property name to use for the subresource.
+     * @return the wrapped object.
+     */
+    private Object wrapForEmbedding(Object linkedObject, Link link) {
+        if (linkedObject instanceof RestAddressableModel) {
+            return converter.toResource((RestAddressableModel) linkedObject);
+        } else if (linkedObject instanceof Page || linkedObject instanceof List) {
+            List<RestAddressableModel> list = linkedObject instanceof Page ? ((Page) linkedObject).getContent()
+                            : (List<RestAddressableModel>) linkedObject;
+            if (list.size() > 0) {
+                PageImpl<RestAddressableModel> page = new PageImpl(
+                        list.subList(0, list.size() > EMBEDDED_PAGE_SIZE ? EMBEDDED_PAGE_SIZE : list.size()),
+                        new PageRequest(0, EMBEDDED_PAGE_SIZE), list.size());
+                return new EmbeddedPage(link.getHref(), page.map(converter::toResource), list, link.getRel());
+            } else {
+                PageImpl<RestAddressableModel> page = new PageImpl(list);
+                return new EmbeddedPage(link.getHref(), page, list, link.getRel());
+            }
+        } else {
+            return linkedObject;
+        }
+    }
+
+    /**
+     * Gets an object representing the id of the wrapped object, whose runtime time matches the second
+     * (id) argument of the given link method. This is necessary because it is possible for the rest
+     * object's id to be a string while the domain object's id may be a uuid or numeric type.
+     *
+     * @param linkMethod the link method.
+     * @return the id, which may be a UUID, Integer, or Long.
+     */
+    private Object getContentIdForLinkMethod(RestAddressableModel restObject, Method linkMethod) {
+        Object contentId = ((BaseObjectRest) restObject).getId();
+        Class requiredIdType = linkMethod.getParameterTypes()[1];
+        if (!requiredIdType.isAssignableFrom(contentId.getClass())) {
+            if (requiredIdType.equals(UUID.class)) {
+                contentId = UUID.fromString(contentId.toString());
+            } else if (requiredIdType.equals(Integer.class)) {
+                contentId = Integer.parseInt(contentId.toString());
+            } else if (requiredIdType.equals(Long.class)) {
+                contentId = Long.parseLong(contentId.toString());
+            } else {
+                throw new IllegalArgumentException("Cannot cast " + restObject.getClass()
+                        + " id type " + contentId.getClass() + " to id type required by "
+                        + linkMethod.getDeclaringClass() + "#" + linkMethod.getName() + ": " + requiredIdType);
+            }
+        }
+        return contentId;
     }
 }

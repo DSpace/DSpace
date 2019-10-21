@@ -28,5 +28,7 @@ public @interface LinkRest {
 
     Class linkClass();
 
-    boolean optional() default false;
+    boolean embedOptional() default false;
+
+    boolean linkOptional() default false;
 }

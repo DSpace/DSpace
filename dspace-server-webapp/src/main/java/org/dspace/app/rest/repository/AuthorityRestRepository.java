@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.dspace.app.rest.model.AuthorityRest;
-import org.dspace.app.rest.model.hateoas.AuthorityResource;
 import org.dspace.app.rest.utils.AuthorityUtils;
 import org.dspace.content.authority.ChoiceAuthority;
 import org.dspace.content.authority.service.ChoiceAuthorityService;
@@ -63,10 +62,4 @@ public class AuthorityRestRepository extends DSpaceRestRepository<AuthorityRest,
     public Class<AuthorityRest> getDomainClass() {
         return AuthorityRest.class;
     }
-
-    @Override
-    public AuthorityResource wrapResource(AuthorityRest model, String... rels) {
-        return new AuthorityResource(model, utils, rels);
-    }
-
 }

@@ -10,9 +10,8 @@ package org.dspace.app.rest.repository;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.dspace.app.rest.converter.SubmissionFormConverter;
+import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.model.SubmissionFormRest;
-import org.dspace.app.rest.model.hateoas.SubmissionFormResource;
 import org.dspace.app.util.DCInputSet;
 import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.util.DCInputsReaderException;
@@ -31,12 +30,12 @@ import org.springframework.stereotype.Component;
  */
 @Component(SubmissionFormRest.CATEGORY + "." + SubmissionFormRest.NAME)
 public class SubmissionFormRestRepository extends DSpaceRestRepository<SubmissionFormRest, String>
-    implements LinkRestRepository<SubmissionFormRest> {
+    implements LinkRestRepository {
 
     private DCInputsReader inputReader;
 
     @Autowired
-    private SubmissionFormConverter converter;
+    private ConverterService converter;
 
     public SubmissionFormRestRepository() throws DCInputsReaderException {
         inputReader = new DCInputsReader();
@@ -54,7 +53,7 @@ public class SubmissionFormRestRepository extends DSpaceRestRepository<Submissio
         if (inputConfig == null) {
             return null;
         }
-        return converter.convert(inputConfig);
+        return converter.toRest(inputConfig);
     }
 
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
@@ -67,17 +66,12 @@ public class SubmissionFormRestRepository extends DSpaceRestRepository<Submissio
         } catch (DCInputsReaderException e) {
             throw new IllegalStateException(e.getMessage(), e);
         }
-        Page<SubmissionFormRest> page = new PageImpl<DCInputSet>(subConfs, pageable, total).map(converter);
+        Page<SubmissionFormRest> page = new PageImpl<>(subConfs, pageable, total).map(converter::toRest);
         return page;
     }
 
     @Override
     public Class<SubmissionFormRest> getDomainClass() {
         return SubmissionFormRest.class;
-    }
-
-    @Override
-    public SubmissionFormResource wrapResource(SubmissionFormRest sd, String... rels) {
-        return new SubmissionFormResource(sd, utils, rels);
     }
 }

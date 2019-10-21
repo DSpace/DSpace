@@ -11,14 +11,12 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.converter.ItemConverter;
 import org.dspace.app.rest.model.BrowseIndexRest;
 import org.dspace.app.rest.model.ItemRest;
-import org.dspace.app.rest.model.hateoas.ItemResource;
 import org.dspace.app.rest.utils.ScopeResolver;
 import org.dspace.browse.BrowseEngine;
 import org.dspace.browse.BrowseException;
@@ -47,12 +45,9 @@ import org.springframework.stereotype.Component;
  */
 @Component(BrowseIndexRest.CATEGORY + "." + BrowseIndexRest.NAME + "." + BrowseIndexRest.ITEMS)
 public class BrowseItemLinkRepository extends AbstractDSpaceRestRepository
-    implements LinkRestRepository<ItemRest> {
+    implements LinkRestRepository {
     @Autowired
     ItemConverter converter;
-
-    @Autowired
-    ItemRestRepository itemRestRepository;
 
     @Autowired
     ScopeResolver scopeResolver;
@@ -158,11 +153,6 @@ public class BrowseItemLinkRepository extends AbstractDSpaceRestRepository
         }
         Page<ItemRest> page = new PageImpl<Item>(tmpResult, pageResultInfo, binfo.getTotal()).map(converter);
         return page;
-    }
-
-    @Override
-    public ItemResource wrapResource(ItemRest item, String... rels) {
-        return itemRestRepository.wrapResource(item, rels);
     }
 
     @Override

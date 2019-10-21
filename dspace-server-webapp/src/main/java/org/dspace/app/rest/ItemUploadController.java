@@ -17,7 +17,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.dspace.app.rest.converter.BitstreamConverter;
+import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.converter.MetadataConverter;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.BitstreamRest;
@@ -58,7 +58,7 @@ public class ItemUploadController {
     private BitstreamService bitstreamService;
 
     @Autowired
-    private BitstreamConverter bitstreamConverter;
+    private ConverterService converter;
 
     @Autowired
     private MetadataConverter metadataConverter;
@@ -109,7 +109,7 @@ public class ItemUploadController {
             log.error(message, e);
             throw new RuntimeException(message, e);
         }
-        return new BitstreamResource(bitstreamConverter.fromModel(bitstream), utils);
+        return converter.toResource(converter.toRest(bitstream));
     }
 
     /**

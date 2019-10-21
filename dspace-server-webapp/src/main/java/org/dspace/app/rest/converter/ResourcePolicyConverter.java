@@ -26,7 +26,7 @@ public class ResourcePolicyConverter implements DSpaceConverter<ResourcePolicy, 
     ResourcePolicyService resourcePolicyService;
 
     @Override
-    public ResourcePolicyRest fromModel(ResourcePolicy obj) {
+    public ResourcePolicyRest convert(ResourcePolicy obj) {
 
         ResourcePolicyRest model = new ResourcePolicyRest();
 
@@ -52,9 +52,8 @@ public class ResourcePolicyConverter implements DSpaceConverter<ResourcePolicy, 
     }
 
     @Override
-    public ResourcePolicy toModel(ResourcePolicyRest obj) {
-        // TODO Auto-generated method stub
-        return null;
+    public Class<ResourcePolicy> getModelClass() {
+        return ResourcePolicy.class;
     }
 
 }

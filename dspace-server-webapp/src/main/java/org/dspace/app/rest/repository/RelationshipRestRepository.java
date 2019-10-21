@@ -20,13 +20,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.log4j.Logger;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
-import org.dspace.app.rest.converter.RelationshipConverter;
-import org.dspace.app.rest.converter.RelationshipTypeConverter;
+import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.RelationshipRest;
-import org.dspace.app.rest.model.hateoas.DSpaceResource;
-import org.dspace.app.rest.model.hateoas.RelationshipResource;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.DSpaceObject;
@@ -66,23 +63,21 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
     private RelationshipTypeService relationshipTypeService;
 
     @Autowired
-    private RelationshipConverter relationshipConverter;
-
-    @Autowired
-    private RelationshipTypeConverter relationshipTypeConverter;
+    private ConverterService converter;
 
     @Autowired
     private AuthorizeService authorizeService;
 
-
+    @Override
     public RelationshipRest findOne(Context context, Integer integer) {
         try {
-            return relationshipConverter.fromModel(relationshipService.find(context, integer));
+            return converter.toRest(relationshipService.find(context, integer));
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
 
+    @Override
     public Page<RelationshipRest> findAll(Context context, Pageable pageable) {
         int total = 0;
         List<Relationship> relationships = new ArrayList<>();
@@ -93,17 +88,13 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<RelationshipRest> page = new PageImpl<Relationship>(relationships,
-                pageable, total).map(relationshipConverter);
+        Page<RelationshipRest> page = new PageImpl<>(relationships, pageable, total).map(converter::toRest);
         return page;
     }
 
+    @Override
     public Class<RelationshipRest> getDomainClass() {
         return RelationshipRest.class;
-    }
-
-    public DSpaceResource<RelationshipRest> wrapResource(RelationshipRest model, String... rels) {
-        return new RelationshipResource(model, utils, rels);
     }
 
     @Override
@@ -135,7 +126,7 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
                 relationshipService.updateItem(context, relationship.getLeftItem());
                 relationshipService.updateItem(context, relationship.getRightItem());
                 context.restoreAuthSystemState();
-                return relationshipConverter.fromModel(relationship);
+                return converter.toRest(relationship);
             } else {
                 throw new AccessDeniedException("You do not have write rights on this relationship's items");
             }
@@ -200,7 +191,7 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
                     throw new AccessDeniedException("You do not have write rights on this relationship's items");
                 }
 
-                return relationshipConverter.fromModel(relationship);
+                return converter.toRest(relationship);
             } else {
                 throw new AccessDeniedException("You do not have write rights on this relationship's items");
             }
@@ -264,7 +255,7 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
             context.commit();
             context.reloadEntity(relationship);
 
-            return relationshipConverter.fromModel(relationship);
+            return converter.toRest(relationship);
         } catch (AuthorizeException e) {
             throw new AccessDeniedException("You do not have write rights on this relationship's metadata");
         }
@@ -349,8 +340,7 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
             }
         }
 
-        Page<RelationshipRest> page = new PageImpl<Relationship>(relationships,
-                pageable, total).map(relationshipConverter);
+        Page<RelationshipRest> page = new PageImpl<>(relationships, pageable, total).map(converter::toRest);
         return page;
 
     }

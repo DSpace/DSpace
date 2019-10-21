@@ -25,27 +25,24 @@ public class ClaimedTaskConverter
     implements IndexableObjectConverter<ClaimedTask, org.dspace.app.rest.model.ClaimedTaskRest> {
 
     @Autowired
-    private WorkflowItemConverter workflowItemConverter;
-
-    @Autowired
-    private EPersonConverter epersonConverter;
+    private ConverterService converter;
 
     @Override
-    public ClaimedTaskRest fromModel(ClaimedTask obj) {
+    public ClaimedTaskRest convert(ClaimedTask obj) {
         ClaimedTaskRest taskRest = new ClaimedTaskRest();
 
         XmlWorkflowItem witem = obj.getWorkflowItem();
         taskRest.setId(obj.getID());
-        taskRest.setWorkflowitem(workflowItemConverter.convert(witem));
+        taskRest.setWorkflowitem(converter.toRest(witem));
         taskRest.setAction(obj.getActionID());
         taskRest.setStep(obj.getStepID());
-        taskRest.setOwner(epersonConverter.convert(obj.getOwner()));
+        taskRest.setOwner(converter.toRest(obj.getOwner()));
         return taskRest;
     }
 
     @Override
-    public ClaimedTask toModel(ClaimedTaskRest obj) {
-        return null;
+    public Class<ClaimedTask> getModelClass() {
+        return ClaimedTask.class;
     }
 
     @Override

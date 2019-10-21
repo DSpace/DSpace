@@ -7,7 +7,6 @@
  */
 package org.dspace.app.rest.converter;
 
-import org.apache.commons.lang3.NotImplementedException;
 import org.dspace.app.rest.model.AuthorityRest;
 import org.dspace.app.rest.utils.AuthorityUtils;
 import org.dspace.content.authority.ChoiceAuthority;
@@ -26,7 +25,7 @@ import org.springframework.stereotype.Component;
 public class AuthorityRestConverter implements DSpaceConverter<ChoiceAuthority, AuthorityRest> {
 
     @Override
-    public AuthorityRest fromModel(ChoiceAuthority step) {
+    public AuthorityRest convert(ChoiceAuthority step) {
         AuthorityRest authorityRest = new AuthorityRest();
         authorityRest.setHierarchical(step.isHierarchical());
         authorityRest.setScrollable(step.isScrollable());
@@ -35,7 +34,7 @@ public class AuthorityRestConverter implements DSpaceConverter<ChoiceAuthority, 
     }
 
     @Override
-    public ChoiceAuthority toModel(AuthorityRest obj) {
-        throw new NotImplementedException("Method not implemented");
+    public Class<ChoiceAuthority> getModelClass() {
+        return ChoiceAuthority.class;
     }
 }

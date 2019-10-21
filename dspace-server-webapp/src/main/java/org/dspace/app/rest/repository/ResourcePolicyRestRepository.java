@@ -9,10 +9,9 @@ package org.dspace.app.rest.repository;
 
 import java.sql.SQLException;
 
-import org.dspace.app.rest.converter.ResourcePolicyConverter;
+import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.model.ResourcePolicyRest;
-import org.dspace.app.rest.model.hateoas.ResourcePolicyResource;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.ResourcePolicyService;
@@ -35,7 +34,7 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
     ResourcePolicyService resourcePolicyService;
 
     @Autowired
-    ResourcePolicyConverter resourcePolicyConverter;
+    ConverterService converter;
 
     @Autowired
     Utils utils;
@@ -52,7 +51,7 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
         if (source == null) {
             return null;
         }
-        return resourcePolicyConverter.convert(source);
+        return converter.toRest(source);
     }
 
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
@@ -66,11 +65,4 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
     public Class<ResourcePolicyRest> getDomainClass() {
         return ResourcePolicyRest.class;
     }
-
-
-    @Override
-    public ResourcePolicyResource wrapResource(ResourcePolicyRest model, String... rels) {
-        return new ResourcePolicyResource(model, utils, rels);
-    }
-
 }

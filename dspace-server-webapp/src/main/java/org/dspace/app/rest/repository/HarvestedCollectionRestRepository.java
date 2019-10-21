@@ -75,7 +75,7 @@ public class HarvestedCollectionRestRepository extends AbstractDSpaceRestReposit
         if (harvestedCollectionRest.getHarvestType() == HarvestTypeEnum.NONE.getValue()
             && harvestedCollection != null) {
             harvestedCollectionService.delete(context, harvestedCollection);
-            return harvestedCollectionConverter.fromModel(null);
+            return harvestedCollectionConverter.convert(null);
 
         } else if (harvestedCollectionRest.getHarvestType() != HarvestTypeEnum.NONE.getValue()) {
             List<String> errors = testHarvestSettings(harvestedCollectionRest);

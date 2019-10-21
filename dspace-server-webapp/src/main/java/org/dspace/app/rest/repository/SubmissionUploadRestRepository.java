@@ -14,7 +14,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.AccessConditionOptionRest;
 import org.dspace.app.rest.model.SubmissionUploadRest;
-import org.dspace.app.rest.model.hateoas.SubmissionUploadResource;
 import org.dspace.app.rest.utils.DateMathParser;
 import org.dspace.app.util.SubmissionConfig;
 import org.dspace.app.util.SubmissionConfigReader;
@@ -41,7 +40,7 @@ import org.springframework.stereotype.Component;
  */
 @Component(SubmissionUploadRest.CATEGORY + "." + SubmissionUploadRest.NAME)
 public class SubmissionUploadRestRepository extends DSpaceRestRepository<SubmissionUploadRest, String>
-    implements LinkRestRepository<SubmissionUploadRest> {
+    implements LinkRestRepository {
 
     private static final Logger log = org.apache.logging.log4j.LogManager
             .getLogger(SubmissionUploadRestRepository.class);
@@ -102,11 +101,6 @@ public class SubmissionUploadRestRepository extends DSpaceRestRepository<Submiss
     @Override
     public Class<SubmissionUploadRest> getDomainClass() {
         return SubmissionUploadRest.class;
-    }
-
-    @Override
-    public SubmissionUploadResource wrapResource(SubmissionUploadRest sd, String... rels) {
-        return new SubmissionUploadResource(sd, utils, rels);
     }
 
     private SubmissionUploadRest convert(Context context, UploadConfiguration config) throws Exception {

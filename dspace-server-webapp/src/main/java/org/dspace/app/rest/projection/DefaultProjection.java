@@ -5,10 +5,14 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.rest.converter;
+package org.dspace.app.rest.projection;
 
-import org.springframework.core.convert.converter.Converter;
+public class DefaultProjection extends AbstractProjection {
 
-public interface DSpaceConverter<M, R> extends Converter<M, R> {
-    Class<M> getModelClass();
+    public final static String NAME = "default";
+
+    @Override
+    public String getName() {
+        return NAME;
+    }
 }

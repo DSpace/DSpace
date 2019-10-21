@@ -14,12 +14,11 @@ import java.net.URI;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.UUID;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.dspace.app.rest.converter.GenericDSpaceObjectConverter;
+import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.model.DSpaceObjectRest;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.content.DSpaceObject;
@@ -64,7 +63,7 @@ public class UUIDLookupRestController implements InitializingBean {
     private DiscoverableEndpointsService discoverableEndpointsService;
 
     @Autowired
-    private GenericDSpaceObjectConverter converter;
+    private ConverterService converter;
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -92,7 +91,7 @@ public class UUIDLookupRestController implements InitializingBean {
                     .getDSpaceObjectServices()) {
                 DSpaceObject dso = dSpaceObjectService.find(context, uuid);
                 if (dso != null) {
-                    DSpaceObjectRest dsor = converter.convert(dso);
+                    DSpaceObjectRest dsor = converter.toRest(dso);
                     URI link = linkTo(dsor.getController(), dsor.getCategory(), dsor.getTypePlural())
                             .slash(dsor.getId()).toUri();
                     response.setStatus(HttpServletResponse.SC_FOUND);

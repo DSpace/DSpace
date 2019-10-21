@@ -18,7 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.dspace.app.rest.converter.CollectionConverter;
+import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.exception.MethodNotAllowedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.link.HalLinkService;
@@ -57,7 +57,7 @@ public class MappedCollectionRestController {
     private ItemService itemService;
 
     @Autowired
-    private CollectionConverter collectionConverter;
+    private ConverterService converter;
 
     @Autowired
     private CollectionService collectionService;
@@ -100,18 +100,15 @@ public class MappedCollectionRestController {
         List<CollectionRest> mappingCollectionRest = new LinkedList<>();
         for (Collection collection : collections) {
             if (collection.getID() != owningCollectionUuid) {
-                mappingCollectionRest.add(collectionConverter.fromModel(collection));
+                mappingCollectionRest.add(converter.toRest(collection));
             }
         }
 
         MappedCollectionRestWrapper mappingCollectionRestWrapper = new MappedCollectionRestWrapper();
         mappingCollectionRestWrapper.setMappedCollectionRestList(mappingCollectionRest);
         mappingCollectionRestWrapper.setItem(item);
-        MappedCollectionResourceWrapper mappingCollectionResourceWrapper = new MappedCollectionResourceWrapper(
-                mappingCollectionRestWrapper, utils, pageable);
-
-
-        halLinkService.addLinks(mappingCollectionResourceWrapper);
+        MappedCollectionResourceWrapper mappingCollectionResourceWrapper =
+                converter.toResource(mappingCollectionRestWrapper);
 
         return mappingCollectionResourceWrapper;
 

@@ -8,6 +8,7 @@
 package org.dspace.app.rest.converter;
 
 import org.dspace.app.rest.model.MetadataSchemaRest;
+import org.dspace.content.MetadataSchema;
 import org.springframework.stereotype.Component;
 
 /**
@@ -19,7 +20,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class MetadataSchemaConverter implements DSpaceConverter<org.dspace.content.MetadataSchema, MetadataSchemaRest> {
     @Override
-    public MetadataSchemaRest fromModel(org.dspace.content.MetadataSchema obj) {
+    public MetadataSchemaRest convert(org.dspace.content.MetadataSchema obj) {
         MetadataSchemaRest schema = new MetadataSchemaRest();
         schema.setId(obj.getID());
         schema.setNamespace(obj.getNamespace());
@@ -28,8 +29,7 @@ public class MetadataSchemaConverter implements DSpaceConverter<org.dspace.conte
     }
 
     @Override
-    public org.dspace.content.MetadataSchema toModel(MetadataSchemaRest obj) {
-        // TODO Auto-generated method stub
-        return null;
+    public Class<MetadataSchema> getModelClass() {
+        return MetadataSchema.class;
     }
 }

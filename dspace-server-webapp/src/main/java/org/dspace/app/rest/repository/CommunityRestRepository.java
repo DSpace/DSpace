@@ -19,13 +19,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
-import org.dspace.app.rest.converter.CommunityConverter;
-import org.dspace.app.rest.converter.MetadataConverter;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.CommunityRest;
-import org.dspace.app.rest.model.hateoas.CommunityResource;
 import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.repository.patch.DSpaceObjectPatch;
 import org.dspace.app.rest.utils.CommunityRestEqualityUtils;
@@ -53,17 +50,10 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
     private final CommunityService cs;
 
     @Autowired
-    CommunityConverter converter;
-
-    @Autowired
-    MetadataConverter metadataConverter;
-
-    @Autowired
     CommunityRestEqualityUtils communityRestEqualityUtils;
 
-    public CommunityRestRepository(CommunityService dsoService,
-                                   CommunityConverter dsoConverter) {
-        super(dsoService, dsoConverter, new DSpaceObjectPatch<CommunityRest>() {});
+    public CommunityRestRepository(CommunityService dsoService) {
+        super(dsoService, new DSpaceObjectPatch<CommunityRest>() {});
         this.cs = dsoService;
     }
 
@@ -90,7 +80,7 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
             throw new RuntimeException(e.getMessage(), e);
         }
 
-        return dsoConverter.convert(community);
+        return converter.toRest(community);
     }
 
     @Override
@@ -127,7 +117,7 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
             throw new RuntimeException(e.getMessage(), e);
         }
 
-        return dsoConverter.convert(community);
+        return converter.toRest(community);
     }
 
     @Override
@@ -142,7 +132,7 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
         if (community == null) {
             return null;
         }
-        return dsoConverter.fromModel(community);
+        return converter.toRest(community);
     }
 
     @Override
@@ -159,7 +149,7 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<CommunityRest> page = new PageImpl<Community>(communities, pageable, total).map(dsoConverter);
+        Page<CommunityRest> page = new PageImpl<Community>(communities, pageable, total).map(converter::toRest);
         return page;
     }
 
@@ -173,7 +163,7 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<CommunityRest> page = utils.getPage(topCommunities, pageable).map(dsoConverter);
+        Page<CommunityRest> page = utils.getPage(topCommunities, pageable).map(converter::toRest);
         return page;
     }
 
@@ -194,7 +184,7 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<CommunityRest> page = utils.getPage(subCommunities, pageable).map(dsoConverter);
+        Page<CommunityRest> page = utils.getPage(subCommunities, pageable).map(converter::toRest);
         return page;
     }
 
@@ -208,11 +198,6 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
     @Override
     public Class<CommunityRest> getDomainClass() {
         return CommunityRest.class;
-    }
-
-    @Override
-    public CommunityResource wrapResource(CommunityRest community, String... rels) {
-        return new CommunityResource(community, utils, rels);
     }
 
     @Override
@@ -230,14 +215,14 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
         if (community == null) {
             throw new ResourceNotFoundException(apiCategory + "." + model + " with id: " + id + " not found");
         }
-        CommunityRest originalCommunityRest = converter.fromModel(community);
+        CommunityRest originalCommunityRest = converter.toRest(community);
         if (communityRestEqualityUtils.isCommunityRestEqualWithoutMetadata(originalCommunityRest, communityRest)) {
             metadataConverter.setMetadata(context, community, communityRest.getMetadata());
         } else {
             throw new UnprocessableEntityException("The given JSON and the original Community differ more " +
                                                        "than just the metadata");
         }
-        return converter.fromModel(community);
+        return converter.toRest(community);
     }
     @Override
     @PreAuthorize("hasPermission(#id, 'COMMUNITY', 'DELETE')")

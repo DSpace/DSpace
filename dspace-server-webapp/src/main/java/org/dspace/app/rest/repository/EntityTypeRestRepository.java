@@ -10,10 +10,8 @@ package org.dspace.app.rest.repository;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.dspace.app.rest.converter.EntityTypeConverter;
+import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.model.EntityTypeRest;
-import org.dspace.app.rest.model.hateoas.DSpaceResource;
-import org.dspace.app.rest.model.hateoas.EntityTypeResource;
 import org.dspace.content.EntityType;
 import org.dspace.content.service.EntityTypeService;
 import org.dspace.core.Context;
@@ -33,7 +31,7 @@ public class EntityTypeRestRepository extends DSpaceRestRepository<EntityTypeRes
     private EntityTypeService entityTypeService;
 
     @Autowired
-    private EntityTypeConverter entityTypeConverter;
+    private ConverterService converter;
 
     public EntityTypeRest findOne(Context context, Integer integer) {
         try {
@@ -41,7 +39,7 @@ public class EntityTypeRestRepository extends DSpaceRestRepository<EntityTypeRes
             if (entityType == null) {
                 throw new ResourceNotFoundException("The entityType for ID: " + integer + " could not be found");
             }
-            return entityTypeConverter.fromModel(entityType);
+            return converter.toRest(entityType);
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -54,15 +52,11 @@ public class EntityTypeRestRepository extends DSpaceRestRepository<EntityTypeRes
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<EntityTypeRest> page = utils.getPage(entityTypeList, pageable).map(entityTypeConverter);
+        Page<EntityTypeRest> page = utils.getPage(entityTypeList, pageable).map(converter::toRest);
         return page;
     }
 
     public Class<EntityTypeRest> getDomainClass() {
         return EntityTypeRest.class;
-    }
-
-    public DSpaceResource<EntityTypeRest> wrapResource(EntityTypeRest model, String... rels) {
-        return new EntityTypeResource(model, utils, rels);
     }
 }

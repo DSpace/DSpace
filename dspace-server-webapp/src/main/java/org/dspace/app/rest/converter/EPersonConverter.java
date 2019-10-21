@@ -30,17 +30,17 @@ import org.springframework.stereotype.Component;
 @Component
 public class EPersonConverter extends DSpaceObjectConverter<EPerson, org.dspace.app.rest.model.EPersonRest> {
 
-    @Autowired(required = true)
-    private GroupConverter epersonGroupConverter;
+    @Autowired
+    private ConverterService converter;
 
-    @Autowired(required = true)
+    @Autowired
     private GroupService groupService;
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(EPersonConverter.class);
 
     @Override
-    public EPersonRest fromModel(EPerson obj) {
-        EPersonRest eperson = super.fromModel(obj);
+    public EPersonRest convert(EPerson obj) {
+        EPersonRest eperson = super.convert(obj);
         eperson.setLastActive(obj.getLastActive());
         eperson.setNetid(obj.getNetid());
         eperson.setCanLogIn(obj.canLogIn());
@@ -52,21 +52,15 @@ public class EPersonConverter extends DSpaceObjectConverter<EPerson, org.dspace.
     }
 
     public EPersonRest fromModelWithGroups(Context context, EPerson ePerson) throws SQLException {
-        EPersonRest eperson = fromModel(ePerson);
+        EPersonRest eperson = convert(ePerson);
 
-        List<GroupRest> groups = new ArrayList<GroupRest>();
+        List<GroupRest> groups = new ArrayList<>();
         for (Group g : groupService.allMemberGroups(context, ePerson)) {
-            groups.add(epersonGroupConverter.convert(g));
+            groups.add(converter.toRest(g));
         }
 
         eperson.setGroups(groups);
         return eperson;
-    }
-
-    @Override
-    public EPerson toModel(EPersonRest obj) {
-        // TODO Auto-generated method stub
-        return null;
     }
 
     @Override
@@ -75,7 +69,7 @@ public class EPersonConverter extends DSpaceObjectConverter<EPerson, org.dspace.
     }
 
     @Override
-    protected Class<EPerson> getModelClass() {
+    public Class<EPerson> getModelClass() {
         return EPerson.class;
     }
 

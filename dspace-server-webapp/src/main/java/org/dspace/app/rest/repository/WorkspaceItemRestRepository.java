@@ -14,7 +14,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
 import javax.servlet.http.HttpServletRequest;
 
 import gr.ekt.bte.core.TransformationEngine;
@@ -25,11 +24,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
+import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.converter.WorkspaceItemConverter;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.model.ErrorRest;
 import org.dspace.app.rest.model.WorkspaceItemRest;
-import org.dspace.app.rest.model.hateoas.WorkspaceItemResource;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.submit.AbstractRestProcessingStep;
@@ -93,7 +92,9 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
     ConfigurationService configurationService;
 
     @Autowired
-    WorkspaceItemConverter converter;
+    WorkspaceItemConverter workspaceItemConverter;
+    @Autowired
+    ConverterService converter;
 
     @Autowired
     SubmissionService submissionService;
@@ -124,7 +125,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
         if (witem == null) {
             return null;
         }
-        return converter.fromModel(witem);
+        return converter.toRest(witem);
     }
 
     //TODO @PreAuthorize("hasAuthority('ADMIN')")
@@ -138,7 +139,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<WorkspaceItemRest> page = new PageImpl<WorkspaceItem>(witems, pageable, total).map(converter);
+        Page<WorkspaceItemRest> page = new PageImpl<WorkspaceItem>(witems, pageable, total).map(converter::toRest);
         return page;
     }
 
@@ -156,21 +157,21 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<WorkspaceItemRest> page = new PageImpl<WorkspaceItem>(witems, pageable, total).map(converter);
+        Page<WorkspaceItemRest> page = new PageImpl<>(witems, pageable, total).map(converter::toRest);
         return page;
     }
 
     @Override
     protected WorkspaceItemRest createAndReturn(Context context) throws SQLException, AuthorizeException {
         WorkspaceItem source = submissionService.createWorkspaceItem(context, getRequestService().getCurrentRequest());
-        return converter.convert(source);
+        return converter.toRest(source);
     }
 
     @Override
     protected WorkspaceItemRest save(Context context, WorkspaceItemRest wsi) {
         SubmissionConfig submissionConfig = submissionConfigReader
             .getSubmissionConfigByName(submissionConfigReader.getDefaultSubmissionConfigName());
-        WorkspaceItem source = converter.toModel(wsi);
+        WorkspaceItem source = workspaceItemConverter.toModel(wsi);
         for (int stepNum = 0; stepNum < submissionConfig.getNumberOfSteps(); stepNum++) {
 
             SubmissionStepConfig stepConfig = submissionConfig.getStep(stepNum);
@@ -209,11 +210,6 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
     @Override
     public Class<WorkspaceItemRest> getDomainClass() {
         return WorkspaceItemRest.class;
-    }
-
-    @Override
-    public WorkspaceItemResource wrapResource(WorkspaceItemRest witem, String... rels) {
-        return new WorkspaceItemResource(witem, utils, rels);
     }
 
     //TODO @PreAuthorize("hasPermission(#id, 'WORKSPACEITEM', 'WRITE')")
@@ -256,7 +252,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
             }
 
         }
-        wsi = converter.convert(source);
+        wsi = converter.toRest(source);
 
         if (!errors.isEmpty()) {
             wsi.getErrors().addAll(errors);
@@ -475,7 +471,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
                             }
                         }
                     }
-                    WorkspaceItemRest wsi = converter.convert(wi);
+                    WorkspaceItemRest wsi = converter.toRest(wi);
                     if (result.size() == 1) {
                         if (!errors.isEmpty()) {
                             wsi.getErrors().addAll(errors);

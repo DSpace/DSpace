@@ -11,8 +11,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.dspace.app.rest.model.AuthorityEntryRest;
 import org.dspace.app.rest.model.AuthorityRest;
-import org.dspace.app.rest.model.hateoas.AuthorityEntryResource;
-import org.dspace.app.rest.model.hateoas.HALResource;
 import org.dspace.app.rest.utils.AuthorityUtils;
 import org.dspace.content.authority.Choice;
 import org.dspace.content.authority.ChoiceAuthority;
@@ -31,18 +29,13 @@ import org.springframework.stereotype.Component;
  */
 @Component(AuthorityRest.CATEGORY + "." + AuthorityRest.NAME + "." + AuthorityRest.ENTRY)
 public class AuthorityEntryValueLinkRepository extends AbstractDSpaceRestRepository
-    implements LinkRestRepository<AuthorityEntryRest> {
+    implements LinkRestRepository {
 
     @Autowired
     private ChoiceAuthorityService cas;
 
     @Autowired
     private AuthorityUtils authorityUtils;
-
-    @Override
-    public HALResource wrapResource(AuthorityEntryRest model, String... rels) {
-        return new AuthorityEntryResource(model);
-    }
 
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
     public AuthorityEntryRest getResource(HttpServletRequest request, String name, String relId,

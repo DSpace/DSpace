@@ -65,7 +65,14 @@ public class DSpaceResourceHalLinkFactory extends HalLinkFactory<DSpaceResource,
                                     .linkToSingleResource((RestAddressableModel) linkedObject, name);
                             }
 
-                            if (linkedObject != null || !linkAnnotation.optional()) {
+                            if (linkedObject != null || !linkAnnotation.linkOptional()) {
+
+                                if (linkAnnotation.linkOptional()
+                                        && !halResource.getContent().getProjection()
+                                        .allowOptionalLink(halResource, linkAnnotation)) {
+                                    continue; // projection disallows this optional method-level link
+                                }
+
                                 halResource.add(linkToSubResource);
                             }
                         }

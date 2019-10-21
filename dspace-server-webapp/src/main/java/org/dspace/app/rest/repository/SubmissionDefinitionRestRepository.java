@@ -8,15 +8,13 @@
 package org.dspace.app.rest.repository;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
-import org.dspace.app.rest.converter.SubmissionDefinitionConverter;
+import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.model.SubmissionDefinitionRest;
-import org.dspace.app.rest.model.hateoas.SubmissionDefinitionResource;
 import org.dspace.app.util.SubmissionConfig;
 import org.dspace.app.util.SubmissionConfigReader;
 import org.dspace.app.util.SubmissionConfigReaderException;
@@ -43,7 +41,7 @@ public class SubmissionDefinitionRestRepository extends DSpaceRestRepository<Sub
     private CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
 
     @Autowired
-    private SubmissionDefinitionConverter converter;
+    private ConverterService converter;
 
     public SubmissionDefinitionRestRepository() throws SubmissionConfigReaderException {
         submissionConfigReader = new SubmissionConfigReader();
@@ -56,16 +54,16 @@ public class SubmissionDefinitionRestRepository extends DSpaceRestRepository<Sub
         if (subConfig == null) {
             return null;
         }
-        return converter.convert(subConfig);
+        return converter.toRest(subConfig);
     }
 
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
     @Override
     public Page<SubmissionDefinitionRest> findAll(Context context, Pageable pageable) {
-        List<SubmissionConfig> subConfs = new ArrayList<SubmissionConfig>();
         int total = submissionConfigReader.countSubmissionConfigs();
-        subConfs = submissionConfigReader.getAllSubmissionConfigs(pageable.getPageSize(), pageable.getOffset());
-        Page<SubmissionDefinitionRest> page = new PageImpl<SubmissionConfig>(subConfs, pageable, total).map(converter);
+        List<SubmissionConfig> subConfs = submissionConfigReader.getAllSubmissionConfigs(
+                pageable.getPageSize(), pageable.getOffset());
+        Page<SubmissionDefinitionRest> page = new PageImpl<>(subConfs, pageable, total).map(converter::toRest);
         return page;
     }
 
@@ -78,17 +76,12 @@ public class SubmissionDefinitionRestRepository extends DSpaceRestRepository<Sub
             return null;
         }
         SubmissionDefinitionRest def = converter
-            .convert(submissionConfigReader.getSubmissionConfigByCollection(col.getHandle()));
+            .toRest(submissionConfigReader.getSubmissionConfigByCollection(col.getHandle()));
         return def;
     }
 
     @Override
     public Class<SubmissionDefinitionRest> getDomainClass() {
         return SubmissionDefinitionRest.class;
-    }
-
-    @Override
-    public SubmissionDefinitionResource wrapResource(SubmissionDefinitionRest sd, String... rels) {
-        return new SubmissionDefinitionResource(sd, utils, rels);
     }
 }

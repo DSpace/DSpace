@@ -31,38 +31,29 @@ public class CommunityConverter
     implements IndexableObjectConverter<Community, CommunityRest> {
 
     @Autowired
-    private BitstreamConverter bitstreamConverter;
-
-    @Autowired
-    private CollectionConverter collectionConverter;
+    private ConverterService converter;
 
     @Override
-    public org.dspace.content.Community toModel(org.dspace.app.rest.model.CommunityRest obj) {
-        return (org.dspace.content.Community) super.toModel(obj);
-    }
-
-    @Override
-    public CommunityRest fromModel(org.dspace.content.Community obj) {
-        CommunityRest com = (CommunityRest) super.fromModel(obj);
+    public CommunityRest convert(org.dspace.content.Community obj) {
+        CommunityRest com = super.convert(obj);
         Bitstream logo = obj.getLogo();
         if (logo != null) {
-            com.setLogo(bitstreamConverter.convert(logo));
+            com.setLogo(converter.toRest(logo));
         }
         List<Collection> collections = obj.getCollections();
-        List<CollectionRest> collectionsRest = new ArrayList<CollectionRest>();
+        List<CollectionRest> collectionsRest = new ArrayList<>();
         if (collections != null) {
             for (Collection col : collections) {
-                CollectionRest colrest = collectionConverter.fromModel(col);
-                collectionsRest.add(colrest);
+                collectionsRest.add(converter.toRest(col));
             }
         }
         com.setCollections(collectionsRest);
 
         List<Community> subCommunities = obj.getSubcommunities();
-        List<CommunityRest> communityRest = new ArrayList<CommunityRest>();
+        List<CommunityRest> communityRest = new ArrayList<>();
         if (subCommunities != null) {
             for (Community scom : subCommunities) {
-                CommunityRest scomrest = this.fromModel(scom);
+                CommunityRest scomrest = this.convert(scom);
                 communityRest.add(scomrest);
             }
         }
@@ -77,7 +68,7 @@ public class CommunityConverter
     }
 
     @Override
-    protected Class<org.dspace.content.Community> getModelClass() {
+    public Class<org.dspace.content.Community> getModelClass() {
         return org.dspace.content.Community.class;
     }
 

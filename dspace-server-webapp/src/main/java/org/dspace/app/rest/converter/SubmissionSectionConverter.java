@@ -30,7 +30,7 @@ public class SubmissionSectionConverter implements DSpaceConverter<SubmissionSte
     private SubmissionConfigReader submissionConfigReader;
 
     @Override
-    public SubmissionSectionRest fromModel(SubmissionStepConfig step) {
+    public SubmissionSectionRest convert(SubmissionStepConfig step) {
         SubmissionSectionRest sp = new SubmissionSectionRest();
         sp.setMandatory(step.isMandatory());
         sp.setHeader(step.getHeading());
@@ -41,7 +41,6 @@ public class SubmissionSectionConverter implements DSpaceConverter<SubmissionSte
         return sp;
     }
 
-    @Override
     public SubmissionStepConfig toModel(SubmissionSectionRest obj) {
         SubmissionStepConfig step;
 
@@ -51,6 +50,11 @@ public class SubmissionSectionConverter implements DSpaceConverter<SubmissionSte
             throw new RuntimeException(e);
         }
         return step;
+    }
+
+    @Override
+    public Class<SubmissionStepConfig> getModelClass() {
+        return SubmissionStepConfig.class;
     }
 
     public SubmissionConfigReader getSubmissionConfigReader() throws SubmissionConfigReaderException {

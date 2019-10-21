@@ -12,19 +12,17 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
-import org.dspace.app.rest.converter.WorkflowItemConverter;
+import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.RESTAuthorizationException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.ErrorRest;
 import org.dspace.app.rest.model.WorkflowItemRest;
-import org.dspace.app.rest.model.hateoas.WorkflowItemResource;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.submit.AbstractRestProcessingStep;
@@ -80,7 +78,7 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
     ConfigurationService configurationService;
 
     @Autowired
-    WorkflowItemConverter converter;
+    ConverterService converter;
 
     @Autowired
     SubmissionService submissionService;
@@ -108,7 +106,7 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
         if (witem == null) {
             return null;
         }
-        return converter.fromModel(witem);
+        return converter.toRest(witem);
     }
 
     @Override
@@ -122,7 +120,7 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<WorkflowItemRest> page = new PageImpl<XmlWorkflowItem>(witems, pageable, total).map(converter);
+        Page<WorkflowItemRest> page = new PageImpl<>(witems, pageable, total).map(converter::toRest);
         return page;
     }
 
@@ -139,7 +137,7 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<WorkflowItemRest> page = new PageImpl<XmlWorkflowItem>(witems, pageable, total).map(converter);
+        Page<WorkflowItemRest> page = new PageImpl<>(witems, pageable, total).map(converter::toRest);
         return page;
     }
 
@@ -163,17 +161,12 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
         if (source.getItem().isArchived()) {
             return null;
         }
-        return converter.convert(source);
+        return converter.toRest(source);
     }
 
     @Override
     public Class<WorkflowItemRest> getDomainClass() {
         return WorkflowItemRest.class;
-    }
-
-    @Override
-    public WorkflowItemResource wrapResource(WorkflowItemRest witem, String... rels) {
-        return new WorkflowItemResource(witem, utils, rels);
     }
 
     @Override
@@ -215,7 +208,7 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
             }
 
         }
-        wsi = converter.convert(source);
+        wsi = converter.toRest(source);
 
         if (!errors.isEmpty()) {
             wsi.getErrors().addAll(errors);

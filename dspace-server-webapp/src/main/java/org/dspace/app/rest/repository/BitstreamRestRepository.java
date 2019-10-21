@@ -16,10 +16,8 @@ import java.util.List;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
-import org.dspace.app.rest.converter.BitstreamConverter;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.BitstreamRest;
-import org.dspace.app.rest.model.hateoas.BitstreamResource;
 import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.repository.patch.DSpaceObjectPatch;
 import org.dspace.authorize.AuthorizeException;
@@ -47,9 +45,8 @@ public class BitstreamRestRepository extends DSpaceObjectRestRepository<Bitstrea
     private final BitstreamService bs;
 
     @Autowired
-    public BitstreamRestRepository(BitstreamService dsoService,
-                                   BitstreamConverter dsoConverter) {
-        super(dsoService, dsoConverter, new DSpaceObjectPatch<BitstreamRest>() { });
+    public BitstreamRestRepository(BitstreamService dsoService) {
+        super(dsoService, new DSpaceObjectPatch<BitstreamRest>() { });
         this.bs = dsoService;
     }
 
@@ -72,7 +69,7 @@ public class BitstreamRestRepository extends DSpaceObjectRestRepository<Bitstrea
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        return dsoConverter.fromModel(bit);
+        return converter.toRest(bit);
     }
 
     @Override
@@ -90,7 +87,7 @@ public class BitstreamRestRepository extends DSpaceObjectRestRepository<Bitstrea
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<BitstreamRest> page = new PageImpl<Bitstream>(bit, pageable, total).map(dsoConverter);
+        Page<BitstreamRest> page = new PageImpl<Bitstream>(bit, pageable, total).map(converter::toRest);
         return page;
     }
 
@@ -104,11 +101,6 @@ public class BitstreamRestRepository extends DSpaceObjectRestRepository<Bitstrea
     @Override
     public Class<BitstreamRest> getDomainClass() {
         return BitstreamRest.class;
-    }
-
-    @Override
-    public BitstreamResource wrapResource(BitstreamRest bs, String... rels) {
-        return new BitstreamResource(bs, utils, rels);
     }
 
     @Override

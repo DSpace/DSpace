@@ -26,7 +26,7 @@ public class BitstreamFormatConverter implements DSpaceConverter<BitstreamFormat
     BitstreamFormatService bitstreamFormatService;
 
     @Override
-    public BitstreamFormatRest fromModel(BitstreamFormat obj) {
+    public BitstreamFormatRest convert(BitstreamFormat obj) {
         BitstreamFormatRest bf = new BitstreamFormatRest();
         bf.setId(obj.getID());
         bf.setShortDescription(obj.getShortDescription());
@@ -43,8 +43,7 @@ public class BitstreamFormatConverter implements DSpaceConverter<BitstreamFormat
     }
 
     @Override
-    public BitstreamFormat toModel(BitstreamFormatRest obj) {
-        // TODO Auto-generated method stub
-        return null;
+    public Class<BitstreamFormat> getModelClass() {
+        return BitstreamFormat.class;
     }
 }

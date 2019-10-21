@@ -27,8 +27,8 @@ public class GroupConverter extends DSpaceObjectConverter<Group, org.dspace.app.
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(GroupConverter.class);
 
     @Override
-    public GroupRest fromModel(Group obj) {
-        GroupRest epersongroup = super.fromModel(obj);
+    public GroupRest convert(Group obj) {
+        GroupRest epersongroup = super.convert(obj);
         epersongroup.setPermanent(obj.isPermanent());
         List<GroupRest> groups = new ArrayList<GroupRest>();
         for (Group g : obj.getMemberGroups()) {
@@ -40,18 +40,12 @@ public class GroupConverter extends DSpaceObjectConverter<Group, org.dspace.app.
     }
 
     @Override
-    public Group toModel(GroupRest obj) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
     protected GroupRest newInstance() {
         return new GroupRest();
     }
 
     @Override
-    protected Class<Group> getModelClass() {
+    public Class<Group> getModelClass() {
         return Group.class;
     }
 
