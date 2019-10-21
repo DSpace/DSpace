@@ -19,8 +19,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import org.ssu.entity.response.ItemResponse;
 import org.ssu.service.BrowseContext;
-import org.ssu.service.CommunityService;
 import org.ssu.service.BrowseRequestProcessor;
+import org.ssu.service.CommunityService;
 
 import javax.annotation.Resource;
 import javax.servlet.ServletException;
@@ -38,7 +38,6 @@ public class BrowseController {
 
     @Resource
     private BrowseRequestProcessor browseRequestProcessor;
-
     private HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
     private AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
     private org.dspace.content.service.ItemService dspaceItemService = ContentServiceFactory.getInstance().getItemService();
@@ -47,9 +46,9 @@ public class BrowseController {
     public ModelAndView browseInCommunity(ModelAndView model, HttpServletRequest request, HttpServletResponse response, @PathVariable("itemId") String itemId) throws ServletException, AuthorizeException, IOException, SQLException, BrowseException, SortException {
         Context dspaceContext = UIUtil.obtainContext(request);
         DSpaceObject dSpaceObject = handleService.resolveToObject(dspaceContext, "123456789/" + itemId);
-        if(authorizeService.authorizeActionBoolean(dspaceContext, dSpaceObject, Constants.READ)) {
+        if (authorizeService.authorizeActionBoolean(dspaceContext, dSpaceObject, Constants.READ)) {
             if (dSpaceObject.getType() == Constants.COLLECTION) {
-                    request.setAttribute("dspace.collection", dSpaceObject);
+                request.setAttribute("dspace.collection", dSpaceObject);
             }
             if (dSpaceObject.getType() == Constants.COMMUNITY) {
                 request.setAttribute("dspace.community", dSpaceObject);
