@@ -205,22 +205,6 @@
     to a local collection instead of unqualified form.</scope_note>
   </dc-type>
 
-  <dc-type>
-    <schema>dc</schema>
-    <element>identifier</element>
-    <qualifier>sherpaPublisher</qualifier>
-    <scope_note>This metadata field serves the purpose of storing the ID of a publisher
-    from the sherpaRomeo Publisher endpoint</scope_note>
-  </dc-type>
-
-  <dc-type>
-    <schema>dc</schema>
-    <element>identifier</element>
-    <qualifier>orcid</qualifier>
-    <scope_note>This metadata field serves the purpose of storing the orcidId for an Orcid value returned
-    from the orcid endpoint</scope_note>
-  </dc-type>
-
   <!-- Used by system: do not remove -->
   <dc-type>
 	<schema>dc</schema>

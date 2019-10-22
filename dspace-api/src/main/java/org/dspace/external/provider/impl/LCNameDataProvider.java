@@ -56,8 +56,6 @@ import org.xml.sax.helpers.DefaultHandler;
  *
  * lcname.url = http://alcme.oclc.org/srw/search/lcnaf
  *
- * TODO: make # of results to ask for (and return) configurable.
- *
  * @author Larry Stone
  * @version $Revision $
  */
@@ -151,13 +149,6 @@ public class LCNameDataProvider implements ExternalDataProvider {
                     log.warn("Discrepency in results, result.length=" + handler.result.size() +
                                  ", yet expected results=" + handler.hits);
                 }
-                boolean more = handler.hits > (start + handler.result.size());
-
-                // XXX add non-auth option; perhaps the UI should do this?
-                // XXX it's really a policy matter if they allow unauth result.
-                // XXX good, stop it.
-                // handler.result.add(new Choice("", text, "Non-Authority: \""+text+"\""));
-
                 return handler.result;
             }
         } catch (IOException e) {
@@ -222,15 +213,10 @@ public class LCNameDataProvider implements ExternalDataProvider {
             HttpResponse response = hc.execute(get);
             if (response.getStatusLine().getStatusCode() == 200) {
                 SRUHandler handler = parseResponseToSRUHandler(response);
-
-                // XXX add non-auth option; perhaps the UI should do this?
-                // XXX it's really a policy matter if they allow unauth result.
-                // XXX good, stop it.
-                // handler.result.add(new Choice("", text, "Non-Authority: \""+text+"\""));
-
                 return handler.hits;
             }
         } catch (IOException | ParserConfigurationException | SAXException e) {
+            log.warn("Failed parsing SRU result: ", e);
             return 0;
         } finally {
             get.releaseConnection();
