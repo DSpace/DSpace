@@ -44,7 +44,6 @@ public class XMLtoBio extends Converter<List<Result>> {
     }
 
     public int getNumberOfResultsFromXml(InputStream xml) {
-        List<Result> bios = new ArrayList<>();
         try {
             Search search = (Search) unmarshall(xml, Search.class);
             return search.getNumFound().intValue();
