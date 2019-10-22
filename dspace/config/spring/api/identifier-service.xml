@@ -49,7 +49,7 @@
             <list>
                 <value>Tesis de doctorado</value>
                 <value>Tesis de maestria</value>
-                <value>Libro</value>
+                <!--<value>Libro</value>-->
             </list>
         </property>
     </bean>
