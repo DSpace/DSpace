@@ -46,7 +46,7 @@ public class SubmissionFormFieldRest {
     @JsonIgnoreProperties( { "name", "type", "id" })
     @JsonUnwrapped
     /**
-     * The list of rows for "group" field
+     * The list of rows for "group"/"inline-group" field
      */
     private SubmissionFormRest rows;
 

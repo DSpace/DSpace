@@ -299,7 +299,8 @@ public class DCInputsReader {
                         entry.entrySet();
 
                 for (Entry<String, String> attr : entrySet) {
-                    if (attr.getKey().equals("input-type") && attr.getValue().equals("group")) {
+                    if (attr.getKey().equals("input-type") &&
+                            (attr.getValue().equals("group") || attr.getValue().equals("inline-group"))) {
                         String schema = entry.get("dc-schema");
                         String element = entry.get("dc-element");
                         String qualifier = entry.get("dc-qualifier");
