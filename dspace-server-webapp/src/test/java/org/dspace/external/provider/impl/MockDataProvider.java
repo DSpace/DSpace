@@ -59,7 +59,7 @@ public class MockDataProvider implements ExternalDataProvider {
 
     @Override
     public int getNumberOfResults(String query) {
-        return 0;
+        return searchExternalDataObjects(query, 0, 100).size();
     }
 
     /**

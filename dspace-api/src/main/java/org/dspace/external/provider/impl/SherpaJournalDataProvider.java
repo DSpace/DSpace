@@ -33,10 +33,6 @@ import org.dspace.app.sherpa.SHERPAResponse;
 import org.dspace.external.model.ExternalDataObject;
 import org.dspace.external.provider.ExternalDataProvider;
 import org.dspace.mock.MockMetadataValue;
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
-import org.xml.sax.helpers.DefaultHandler;
 
 /**
  * This class is the implementation of the ExternalDataProvider interface that will deal with SherpaJournal External

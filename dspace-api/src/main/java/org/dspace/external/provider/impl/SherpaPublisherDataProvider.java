@@ -9,13 +9,9 @@ package org.dspace.external.provider.impl;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -31,12 +27,6 @@ import org.dspace.app.sherpa.SHERPAResponse;
 import org.dspace.external.model.ExternalDataObject;
 import org.dspace.external.provider.ExternalDataProvider;
 import org.dspace.mock.MockMetadataValue;
-import org.xml.sax.Attributes;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
-import org.xml.sax.XMLReader;
-import org.xml.sax.helpers.DefaultHandler;
 
 /**
  * This class is the implementation of the ExternalDataProvider interface that will deal with SherpaPublisher External
@@ -89,7 +79,8 @@ public class SherpaPublisherDataProvider implements ExternalDataProvider {
             HttpResponse response = hc.execute(get);
             if (response.getStatusLine().getStatusCode() == 200) {
                 SHERPAResponse sherpaResponse = new SHERPAResponse(response.getEntity().getContent());
-                List<ExternalDataObject> list = sherpaResponse.getPublishers().stream().map(sherpaPublisher -> constructExternalDataObjectFromSherpaPublisher(sherpaPublisher)).collect(
+                List<ExternalDataObject> list = sherpaResponse.getPublishers().stream().map(
+                    sherpaPublisher -> constructExternalDataObjectFromSherpaPublisher(sherpaPublisher)).collect(
                     Collectors.toList());
 
                 // This is because Sherpa returns everything by default so we can't specifiy a start and limit
@@ -125,7 +116,8 @@ public class SherpaPublisherDataProvider implements ExternalDataProvider {
         if (StringUtils.isNotBlank(sherpaPublisher.getId())) {
             externalDataObject.setId(sherpaPublisher.getId());
             externalDataObject
-                .addMetadata(new MockMetadataValue("dc", "identifier", "sherpaPublisher", null, sherpaPublisher.getId()));
+                .addMetadata(
+                    new MockMetadataValue("dc", "identifier", "sherpaPublisher", null, sherpaPublisher.getId()));
         }
 
         //Text value == homeurl
