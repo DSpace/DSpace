@@ -212,7 +212,7 @@ public class LCNameDataProvider implements ExternalDataProvider {
         StringBuilder queryStringBuilder = new StringBuilder();
         queryStringBuilder.append("local.FirstName = \"").append(pn.getFirstNames()).
             append("\" and local.FamilyName = \"").append(pn.getLastName()).
-                 append("\"");
+                              append("\"");
 
         HttpGet get = constructHttpGet(queryStringBuilder, 0, 1);
 
@@ -329,13 +329,16 @@ public class LCNameDataProvider implements ExternalDataProvider {
                     String familyName = names[0];
                     String givenName = names.length > 1 ? names[1] : null;
                     if (StringUtils.isNotBlank(familyName)) {
-                        externalDataObject.addMetadata(new MockMetadataValue("person", "familyName", null, null, familyName));
+                        externalDataObject
+                            .addMetadata(new MockMetadataValue("person", "familyName", null, null, familyName));
                     }
                     if (StringUtils.isNotBlank(givenName)) {
-                        externalDataObject.addMetadata(new MockMetadataValue("person", "givenName", null, null, givenName));
+                        externalDataObject
+                            .addMetadata(new MockMetadataValue("person", "givenName", null, null, givenName));
                     }
                     if (StringUtils.isNotBlank(birthDate)) {
-                        externalDataObject.addMetadata(new MockMetadataValue("person", "date", "birth", null, birthDate));
+                        externalDataObject
+                            .addMetadata(new MockMetadataValue("person", "date", "birth", null, birthDate));
                     }
                     externalDataObject.addMetadata(new MockMetadataValue("person", "identifier", "lccn", null, lccn));
                     result.add(externalDataObject);
