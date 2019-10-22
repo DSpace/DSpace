@@ -208,7 +208,7 @@ public class BitstreamRestController {
      *
      * @param uuid The UUID of the bitstream for which to update the bitstream format
      * @param request  The request object
-     * @return The wrapped resource containing the new bitstream format or null when the bitstream format wasn't changed
+     * @return The wrapped resource containing the bitstream which in turn contains the bitstream format
      * @throws SQLException       If something goes wrong in the database
      */
     @RequestMapping(method = PUT, consumes = {"text/uri-list"}, value = "format")
