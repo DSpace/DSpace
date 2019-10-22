@@ -19,8 +19,10 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeServiceImpl;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Context;
 import org.dspace.xmlworkflow.XmlWorkflowServiceImpl;
@@ -28,6 +30,7 @@ import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
 import org.dspace.xmlworkflow.service.XmlWorkflowService;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
+import org.hibernate.Session;
 
 import java.util.Map;
 
@@ -45,6 +48,7 @@ public class DeleteWorkflowItemsAction extends AbstractAction {
     protected XmlWorkflowService xmlWorkflowService = XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService();
     protected XmlWorkflowItemService xmlWorkflowItemService = XmlWorkflowServiceFactory.getInstance().getXmlWorkflowItemService();
     protected WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
+    protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
 
 
     @Override
@@ -59,10 +63,13 @@ public class DeleteWorkflowItemsAction extends AbstractAction {
         if(workflowIdentifiers != null){
             for (int workflowIdentifier : workflowIdentifiers) {
                 XmlWorkflowItem workflowItem = xmlWorkflowItemService.find(context, workflowIdentifier);
+
                 if (workflowItem != null) {
-                    WorkspaceItem workspaceItem = xmlWorkflowService.sendWorkflowItemBackSubmission(context, workflowItem, context.getCurrentUser(), "Item sent back to the submisson process by admin", null);
+                    xmlWorkflowItemService.delete(context, workflowItem);
+                    xmlWorkflowService.notifyOfReject(context, workflowItem, context.getCurrentUser(), "Item sent back to the submisson process by admin");
+//                    WorkspaceItem workspaceItem = xmlWorkflowService.sendWorkflowItemBackSubmission(context, workflowItem, context.getCurrentUser(), "Item sent back to the submisson process by admin", null);
                     //Delete the workspaceItem
-                    workspaceItemService.deleteAll(context, workspaceItem);
+//                    workspaceItemService.deleteAll(context, workspaceItem);
                 }
             }
         }

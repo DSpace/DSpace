@@ -924,9 +924,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
         itemService.update(context, myitem);
     }
 
-    protected void notifyOfReject(Context c, XmlWorkflowItem wi, EPerson e,
-        String reason)
-    {
+    public void notifyOfReject(Context c, XmlWorkflowItem wi, EPerson e, String reason) {
         try
         {
             // Get the item title
