@@ -25,7 +25,6 @@ import org.dspace.AbstractIntegrationTest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
-import org.dspace.content.MetadataSchema;
 import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;

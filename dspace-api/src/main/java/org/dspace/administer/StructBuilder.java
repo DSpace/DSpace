@@ -211,25 +211,22 @@ public class StructBuilder {
 
         // Resolve optional "parent community" ID or handle to a community
         Community parent = null;
-        if(parentID != null) {
+        if (parentID != null) {
             DSpaceObject dso = handleService.resolveToObject(context, parentID);
             if (dso != null) {
                 if (dso.getType() == Constants.COMMUNITY) {
                     parent = (Community) dso;
-                }
-                else {
+                } else {
                     System.out.println("The handle provided for the -p option does not resolve to a community. " +
                         parentID + " is an object of type: " + Constants.typeText[dso.getType()]);
                     System.exit(0);
                 }
-            }
-            else {
+            } else {
                 // Not a handle, see if it is an ID
                 Community community = communityService.findByIdOrLegacyId(context, parentID);
-                if(community != null) {
+                if (community != null) {
                     parent = community;
-                }
-                else {
+                } else {
                     System.out.println("The value provided for -p is not a valid community ID or handle: " + parentID);
                     System.exit(0);
                 }
