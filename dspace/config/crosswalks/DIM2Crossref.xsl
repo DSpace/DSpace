@@ -12,7 +12,7 @@
 	<xsl:output method="xml" indent="yes" encoding="utf-8" />
 
     <!-- Internal repository flag to indicate that an specified item has no ISBN -->
-    <xsl:variable name="no-isbn-internal-flag"><xsl:value-of select="'no posee'" /></xsl:variable>
+    <xsl:variable name="no-isbn-internal-flag-regex"><xsl:value-of select="'no posee|no corresponde|en tr[áa]mite'" /></xsl:variable>
 
 	<xsl:template match="@* | text()" />
 
@@ -271,12 +271,13 @@
 
 				<!-- isbn -->
 				<xsl:variable name="isbn" select="dspace:field[@mdschema='sedici' and @element='identifier' and @qualifier='isbn']" />
+				<xsl:variable name="isbn_lowercase" select="java:ar.edu.unlp.sedici.dspace.utils.Utils.trimAndLowercase($isbn)"/>
 				<xsl:choose>
 					<xsl:when
 						test="java:ar.edu.unlp.sedici.dspace.utils.Utils.matchRegex($isbn, '(978-)?\d[\d \-]+[\dX]')">
 						<xsl:call-template name="setISBN" />
 					</xsl:when>
-					<xsl:when test="java:ar.edu.unlp.sedici.dspace.utils.Utils.trimAndLowercase($isbn) = $no-isbn-internal-flag">
+					<xsl:when test="java:ar.edu.unlp.sedici.dspace.utils.Utils.matchRegex($isbn_lowercase, $no-isbn-internal-flag-regex)">
 					   <xsl:variable name="issued_dt" select="substring(dspace:field[@mdschema='dc' and @element='date' and @qualifier='issued'][1]/text(),1,4)"/>
 					   <xsl:call-template name="setNoISBN">
 					       <xsl:with-param name="reason">
