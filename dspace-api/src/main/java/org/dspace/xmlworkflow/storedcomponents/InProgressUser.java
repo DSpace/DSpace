@@ -35,7 +35,7 @@ public class InProgressUser implements ReloadableEntity<Integer> {
     @JoinColumn(name="user_id")
     private EPerson ePerson;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="workflowitem_id")
     private XmlWorkflowItem workflowItem;
 
