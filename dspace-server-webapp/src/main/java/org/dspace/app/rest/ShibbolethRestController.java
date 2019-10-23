@@ -48,7 +48,6 @@ public class ShibbolethRestController implements InitializingBean {
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    @PreAuthorize("hasAuthority('AUTHENTICATED')")
     public void shibboleth(HttpServletResponse response,
             @RequestParam(name = "redirectUrl", required = false) String redirectUrl) throws IOException {
         if (redirectUrl == null) {
