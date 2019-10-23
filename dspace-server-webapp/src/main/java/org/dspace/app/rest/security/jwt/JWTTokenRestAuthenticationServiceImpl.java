@@ -12,6 +12,8 @@ import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.Iterator;
 import java.util.List;
+
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -37,11 +39,13 @@ import org.springframework.stereotype.Component;
  *
  * @author Frederic Van Reet (frederic dot vanreet at atmire dot com)
  * @author Tom Desair (tom dot desair at atmire dot com)
+ * @author Giuseppe Digilio (giuseppe dot digilio at 4science dot it)
  */
 @Component
 public class JWTTokenRestAuthenticationServiceImpl implements RestAuthenticationService, InitializingBean {
 
     private static final Logger log = LoggerFactory.getLogger(RestAuthenticationService.class);
+    private static final String AUTHORIZATION_COOKIE = "Authorization-cookie";
     private static final String AUTHORIZATION_HEADER = "Authorization";
     private static final String AUTHORIZATION_TYPE = "Bearer";
 
@@ -141,17 +145,29 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
     }
 
     private void addTokenToResponse(final HttpServletResponse response, final String token) throws IOException {
+        Cookie cookie = new Cookie(AUTHORIZATION_COOKIE, token);
+        cookie.setHttpOnly(true);
+        response.addCookie(cookie);
         response.setHeader(AUTHORIZATION_HEADER, String.format("%s %s", AUTHORIZATION_TYPE, token));
     }
 
     private String getToken(HttpServletRequest request) {
+        String tokenValue = null;
         String authHeader = request.getHeader(AUTHORIZATION_HEADER);
         if (StringUtils.isNotBlank(authHeader)) {
-            String tokenValue = authHeader.replace(AUTHORIZATION_TYPE, "").trim();
-            return tokenValue;
+            tokenValue = authHeader.replace(AUTHORIZATION_TYPE, "").trim();
         } else {
-            return null;
+            Cookie[] cookies = request.getCookies();
+            if (cookies != null) {
+                for (Cookie cookie : cookies) {
+                    if (cookie.getName().equals(AUTHORIZATION_COOKIE) && StringUtils.isNotEmpty(cookie.getValue())) {
+                        tokenValue = cookie.getValue();
+                    }
+                }
+            }
         }
+
+        return tokenValue;
     }
 
 }
