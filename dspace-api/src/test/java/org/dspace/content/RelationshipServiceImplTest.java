@@ -66,7 +66,7 @@ public class RelationshipServiceImplTest {
     @Test
     public void testFindAll() throws Exception {
         // Mock DAO to return our mocked relationshipsList
-        when(relationshipDAO.findAll(context, Relationship.class)).thenReturn(relationshipsList);
+        when(relationshipDAO.findAll(context, Relationship.class, -1, -1)).thenReturn(relationshipsList);
         // The reported Relationship(s) should match our relationshipsList
         assertEquals("TestFindAll 0", relationshipsList, relationshipService.findAll(context));
     }
@@ -96,11 +96,10 @@ public class RelationshipServiceImplTest {
         relationshipTest.add(getRelationship(cindy, hank, hasFather,0,0));
         relationshipTest.add(getRelationship(fred, cindy, hasMother,0,0));
         relationshipTest.add(getRelationship(bob, cindy, hasMother,1,0));
-        when(relationshipService.findByItem(context, cindy)).thenReturn(relationshipTest);
-        when(relationshipDAO.findByItem(context, cindy)).thenReturn(relationshipTest);
+        when(relationshipService.findByItem(context, cindy, -1, -1)).thenReturn(relationshipTest);
 
         // Mock the state of objects utilized in findByItem() to meet the success criteria of the invocation
-        when(relationshipDAO.findByItem(context, cindy)).thenReturn(relationshipTest);
+        when(relationshipDAO.findByItem(context, cindy, -1, -1)).thenReturn(relationshipTest);
 
         List<Relationship> results = relationshipService.findByItem(context, cindy);
         assertEquals("TestFindByItem 0", relationshipTest, results);
@@ -271,6 +270,8 @@ public class RelationshipServiceImplTest {
         when(metsList.get(0).getValue()).thenReturn("Entitylabel");
         when(relationshipService.findByItemAndRelationshipType(context, leftItem, testRel, true))
                 .thenReturn(leftTypelist);
+        when(relationshipService.findByItemAndRelationshipType(context, rightItem, testRel, false))
+                .thenReturn(rightTypelist);
         when(itemService.getMetadata(leftItem, "relationship", "type", null, Item.ANY)).thenReturn(metsList);
         when(itemService.getMetadata(rightItem, "relationship", "type", null, Item.ANY)).thenReturn(metsList);
         when(relationshipDAO.create(any(), any())).thenReturn(relationship);
@@ -319,6 +320,12 @@ public class RelationshipServiceImplTest {
 
         // Verify RelationshipDAO.delete() ran once to confirm proper invocation of update()
         Mockito.verify(relationshipDAO).save(context, relationship);
+    }
+
+    @Test
+    public void testCountTotal() throws Exception {
+        when(relationshipDAO.countRows(context)).thenReturn(0);
+        assertEquals("TestCountTotal 1", 0, relationshipService.countTotal(context));
     }
 
     /**

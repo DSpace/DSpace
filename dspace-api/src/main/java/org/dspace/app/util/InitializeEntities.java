@@ -211,7 +211,7 @@ public class InitializeEntities {
             rightCardinalityMaxInteger = null;
         }
         RelationshipType relationshipType = relationshipTypeService
-            .findbyTypesAndLabels(context, leftEntityType, rightEntityType, leftwardType, rightwardType);
+            .findbyTypesAndTypeName(context, leftEntityType, rightEntityType, leftwardType, rightwardType);
         if (relationshipType == null) {
             relationshipTypeService.create(context, leftEntityType, rightEntityType, leftwardType, rightwardType,
                                            leftCardinalityMinInteger, leftCardinalityMaxInteger,
