@@ -63,9 +63,8 @@ public class DeleteWorkflowItemsAction extends AbstractAction {
         if(workflowIdentifiers != null){
             for (int workflowIdentifier : workflowIdentifiers) {
                 XmlWorkflowItem workflowItem = xmlWorkflowItemService.find(context, workflowIdentifier);
-
                 if (workflowItem != null) {
-                    xmlWorkflowItemService.delete(context, workflowItem);
+                    xmlWorkflowItemService.deleteWrapper(context, workflowItem);
                     xmlWorkflowService.notifyOfReject(context, workflowItem, context.getCurrentUser(), "Item sent back to the submisson process by admin");
 //                    WorkspaceItem workspaceItem = xmlWorkflowService.sendWorkflowItemBackSubmission(context, workflowItem, context.getCurrentUser(), "Item sent back to the submisson process by admin", null);
                     //Delete the workspaceItem
