@@ -94,8 +94,12 @@ public class CommunityRestController {
             value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID + "/logo",
             headers = "content-type=multipart/form-data")
     public ResponseEntity<ResourceSupport> createLogo(HttpServletRequest request, @PathVariable UUID uuid,
-                                                      @RequestParam("file") MultipartFile uploadfile)
+                                      @RequestParam(value = "file", required = false) MultipartFile uploadfile)
             throws SQLException, IOException, AuthorizeException {
+
+        if (uploadfile == null) {
+            throw new UnprocessableEntityException("No file was given");
+        }
 
         Context context = ContextUtil.obtainContext(request);
 
@@ -111,15 +115,4 @@ public class CommunityRestController {
         return ControllerUtils.toResponseEntity(HttpStatus.CREATED, null, bitstreamResource);
     }
 
-    /**
-     * This method is called when the user forgets to send a file
-     * @param uuid          The UUID of the community
-     */
-    @PreAuthorize("hasPermission(#uuid, 'COMMUNITY', 'WRITE')")
-    @RequestMapping(method = RequestMethod.POST,
-            value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID + "/logo")
-    public void createLogoInvalid(@PathVariable UUID uuid) {
-
-        throw new UnprocessableEntityException("No file was given");
-    }
 }
