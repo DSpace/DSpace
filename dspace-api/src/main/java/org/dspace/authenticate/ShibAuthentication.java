@@ -510,8 +510,16 @@ public class ShibAuthentication implements AuthenticationMethod {
             int port = request.getServerPort();
             String contextPath = request.getContextPath();
 
-            String returnURL = ConfigurationManager.getProperty("dspace.baseUrl") + "/api/authn/shibboleth?redirectUrl="
-                    + request.getHeader("Referer");
+            String redirectUrl = null;
+            if (request.getHeader("Referer") != null && StringUtils.isNotBlank(request.getHeader("Referer"))) {
+                redirectUrl = request.getHeader("Referer");
+            } else if (request.getHeader("X-Requested-With") != null
+                    && StringUtils.isNotBlank(request.getHeader("X-Requested-With"))) {
+                redirectUrl = request.getHeader("X-Requested-With");
+            }
+
+            String returnURL = ConfigurationManager.getProperty("dspace.baseUrl") + "/api/authn/shibboleth"
+                    + ((redirectUrl != null) ? "?redirectUrl=" + redirectUrl : "");
 
             try {
                 shibURL += "?target=" + URLEncoder.encode(returnURL, "UTF-8");
