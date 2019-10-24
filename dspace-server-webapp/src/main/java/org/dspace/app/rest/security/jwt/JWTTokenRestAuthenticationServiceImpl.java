@@ -103,12 +103,17 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
 
     @Override
     public boolean hasAuthenticationData(HttpServletRequest request) {
-        return StringUtils.isNotBlank(request.getHeader(AUTHORIZATION_HEADER));
+        return StringUtils.isNotBlank(request.getHeader(AUTHORIZATION_HEADER))
+                || StringUtils.isNotBlank(getAuthorizationCookie(request));
     }
 
     @Override
-    public void invalidateAuthenticationData(HttpServletRequest request, Context context) throws Exception {
+    public void invalidateAuthenticationData(HttpServletRequest request, HttpServletResponse response,
+                                             Context context) throws Exception {
         String token = getToken(request);
+        Cookie cookie = new Cookie(AUTHORIZATION_COOKIE, "");
+        cookie.setHttpOnly(true);
+        response.addCookie(cookie);
         jwtTokenHandler.invalidateToken(token, request, context);
     }
 
@@ -154,20 +159,27 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
     private String getToken(HttpServletRequest request) {
         String tokenValue = null;
         String authHeader = request.getHeader(AUTHORIZATION_HEADER);
+        String authCookie = getAuthorizationCookie(request);
         if (StringUtils.isNotBlank(authHeader)) {
             tokenValue = authHeader.replace(AUTHORIZATION_TYPE, "").trim();
-        } else {
-            Cookie[] cookies = request.getCookies();
-            if (cookies != null) {
-                for (Cookie cookie : cookies) {
-                    if (cookie.getName().equals(AUTHORIZATION_COOKIE) && StringUtils.isNotEmpty(cookie.getValue())) {
-                        tokenValue = cookie.getValue();
-                    }
-                }
-            }
+        } else if (StringUtils.isNotBlank(authCookie)){
+            tokenValue = authCookie;
         }
 
         return tokenValue;
+    }
+    
+    private String getAuthorizationCookie(HttpServletRequest request) {
+        String authCookie = "";
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals(AUTHORIZATION_COOKIE) && StringUtils.isNotEmpty(cookie.getValue())) {
+                    authCookie = cookie.getValue();
+                }
+            }
+        }
+        return authCookie;
     }
 
 }

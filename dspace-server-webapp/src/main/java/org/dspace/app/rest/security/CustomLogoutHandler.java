@@ -45,7 +45,7 @@ public class CustomLogoutHandler implements LogoutHandler {
                        Authentication authentication) {
         try {
             Context context = ContextUtil.obtainContext(httpServletRequest);
-            restAuthenticationService.invalidateAuthenticationData(httpServletRequest, context);
+            restAuthenticationService.invalidateAuthenticationData(httpServletRequest, httpServletResponse, context);
             context.commit();
 
         } catch (Exception e) {
