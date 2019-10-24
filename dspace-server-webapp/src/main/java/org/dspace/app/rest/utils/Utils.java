@@ -7,6 +7,9 @@
  */
 package org.dspace.app.rest.utils;
 
+import static java.lang.Integer.parseInt;
+import static java.util.stream.Collectors.toList;
+
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 
 import java.io.BufferedInputStream;
@@ -19,6 +22,7 @@ import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Scanner;
 
 import javax.servlet.http.HttpServletRequest;
@@ -36,7 +40,9 @@ import org.dspace.app.rest.model.RestAddressableModel;
 import org.dspace.app.rest.model.hateoas.DSpaceResource;
 import org.dspace.app.rest.repository.DSpaceRestRepository;
 import org.dspace.app.rest.repository.LinkRestRepository;
+import org.dspace.content.BitstreamFormat;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
@@ -67,6 +73,8 @@ public class Utils {
     @Autowired(required = true)
     private List<DSpaceObjectService<? extends DSpaceObject>> dSpaceObjectServices;
 
+    @Autowired
+    private BitstreamFormatService bitstreamFormatService;
 
     public <T> Page<T> getPage(List<T> fullContents, Pageable pageable) {
         int total = fullContents.size();
@@ -235,6 +243,39 @@ public class Utils {
         } else {
             return multipartFile.getName();
         }
+    }
+
+    /**
+     * This method will construct a List of BitstreamFormats out of a request.
+     * It will call the {@link Utils#getStringListFromRequest(HttpServletRequest)} method to retrieve a list of links
+     * out of the request.
+     * The method will iterate over this list of links and parse the links to retrieve the integer ID from it.
+     * It will then retrieve the BitstreamFormat corresponding to this ID.
+     * If one is found, this BitstreamFormat is added to the List of BitstreamFormats that we will return.
+     *
+     * @param request   The request out of which we'll create the List of BitstreamFormats
+     * @param context   The relevant DSpace context
+     * @return          The resulting list of BitstreamFormats that we parsed out of the request
+     */
+    public List<BitstreamFormat> constructBitstreamFormatList(HttpServletRequest request, Context context) {
+
+        return getStringListFromRequest(request).stream()
+                .map(link -> {
+                    if (link.endsWith("/")) {
+                        link = link.substring(0, link.length() - 1);
+                    }
+                    return link.substring(link.lastIndexOf('/') + 1);
+                })
+                .map(id -> {
+                    try {
+                        return bitstreamFormatService.find(context, parseInt(id));
+                    } catch (SQLException | NumberFormatException e) {
+                        log.error("Could not find bitstream format for id: " + id, e);
+                        return null;
+                    }
+                })
+                .filter(Objects::nonNull)
+                .collect(toList());
     }
 
     /**
