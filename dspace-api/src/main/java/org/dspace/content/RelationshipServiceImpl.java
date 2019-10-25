@@ -10,7 +10,6 @@ package org.dspace.content;
 import java.sql.SQLException;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -59,12 +58,21 @@ public class RelationshipServiceImpl implements RelationshipService {
     @Override
     public Relationship create(Context c, Item leftItem, Item rightItem, RelationshipType relationshipType,
                                int leftPlace, int rightPlace) throws AuthorizeException, SQLException {
+        return create(c, leftItem, rightItem, relationshipType, leftPlace, rightPlace, null, null);
+    }
+
+    @Override
+    public Relationship create(Context c, Item leftItem, Item rightItem, RelationshipType relationshipType,
+                               int leftPlace, int rightPlace, String leftwardValue, String rightwardValue)
+            throws AuthorizeException, SQLException {
         Relationship relationship = new Relationship();
         relationship.setLeftItem(leftItem);
         relationship.setRightItem(rightItem);
         relationship.setRelationshipType(relationshipType);
         relationship.setLeftPlace(leftPlace);
         relationship.setRightPlace(rightPlace);
+        relationship.setLeftwardValue(leftwardValue);
+        relationship.setRightwardValue(rightwardValue);
         return create(c, relationship);
     }
 
@@ -99,7 +107,7 @@ public class RelationshipServiceImpl implements RelationshipService {
                                                                               false);
 
         context.turnOffAuthorisationSystem();
-        //If useForPlace for the leftlabel is false for the relationshipType,
+        //If useForPlace for the leftwardType is false for the relationshipType,
         // we need to sort the relationships here based on leftplace.
         if (!virtualMetadataPopulator.isUseForPlaceTrueForRelationshipType(relationship.getRelationshipType(), true)) {
             if (!leftRelationships.isEmpty()) {
@@ -116,7 +124,7 @@ public class RelationshipServiceImpl implements RelationshipService {
 
         }
 
-        //If useForPlace for the rightLabel is false for the relationshipType,
+        //If useForPlace for the rightwardType is false for the relationshipType,
         // we need to sort the relationships here based on the rightplace.
         if (!virtualMetadataPopulator.isUseForPlaceTrueForRelationshipType(relationship.getRelationshipType(), false)) {
             if (!rightRelationships.isEmpty()) {
@@ -221,8 +229,8 @@ public class RelationshipServiceImpl implements RelationshipService {
 
     private void logRelationshipTypeDetailsForError(RelationshipType relationshipType) {
         log.warn("The relationshipType's ID is: " + relationshipType.getID());
-        log.warn("The relationshipType's left label is: " + relationshipType.getLeftLabel());
-        log.warn("The relationshipType's right label is: " + relationshipType.getRightLabel());
+        log.warn("The relationshipType's leftward type is: " + relationshipType.getLeftwardType());
+        log.warn("The relationshipType's rightward type is: " + relationshipType.getRightwardType());
         log.warn("The relationshipType's left entityType label is: " + relationshipType.getLeftType().getLabel());
         log.warn("The relationshipType's right entityType label is: " + relationshipType.getRightType().getLabel());
         log.warn("The relationshipType's left min cardinality is: " + relationshipType.getLeftMinCardinality());
@@ -259,11 +267,18 @@ public class RelationshipServiceImpl implements RelationshipService {
     @Override
     public List<Relationship> findByItem(Context context, Item item) throws SQLException {
 
-        List<Relationship> list = relationshipDAO.findByItem(context, item);
+        return findByItem(context, item, -1, -1);
+    }
+
+    @Override
+    public List<Relationship> findByItem(Context context, Item item, Integer limit, Integer offset)
+            throws SQLException {
+
+        List<Relationship> list = relationshipDAO.findByItem(context, item, limit, offset);
 
         list.sort((o1, o2) -> {
-            int relationshipType = o1.getRelationshipType().getLeftLabel()
-                                     .compareTo(o2.getRelationshipType().getLeftLabel());
+            int relationshipType = o1.getRelationshipType().getLeftwardType()
+                                     .compareTo(o2.getRelationshipType().getLeftwardType());
             if (relationshipType != 0) {
                 return relationshipType;
             } else {
@@ -279,7 +294,12 @@ public class RelationshipServiceImpl implements RelationshipService {
 
     @Override
     public List<Relationship> findAll(Context context) throws SQLException {
-        return relationshipDAO.findAll(context, Relationship.class);
+        return findAll(context, -1, -1);
+    }
+
+    @Override
+    public List<Relationship> findAll(Context context, Integer limit, Integer offset) throws SQLException {
+        return relationshipDAO.findAll(context, Relationship.class, limit, offset);
     }
 
     @Override
@@ -359,8 +379,8 @@ public class RelationshipServiceImpl implements RelationshipService {
     private boolean checkMinCardinality(Context context, Item item,
                                         Relationship relationship,
                                         Integer minCardinality, boolean isLeft) throws SQLException {
-        List<Relationship> list = this
-            .findByItemAndRelationshipType(context, item, relationship.getRelationshipType(), isLeft);
+        List<Relationship> list = this.findByItemAndRelationshipType(context, item, relationship.getRelationshipType(),
+                                                                     isLeft, -1, -1);
         if (minCardinality != null && !(list.size() > minCardinality)) {
             return false;
         }
@@ -369,46 +389,83 @@ public class RelationshipServiceImpl implements RelationshipService {
 
     public List<Relationship> findByItemAndRelationshipType(Context context, Item item,
                                                             RelationshipType relationshipType, boolean isLeft)
-
         throws SQLException {
-        List<Relationship> list = this.findByItem(context, item);
-        List<Relationship> listToReturn = new LinkedList<>();
-        for (Relationship relationship : list) {
-            if (isLeft) {
-                if (StringUtils
-                    .equals(relationship.getRelationshipType().getLeftLabel(), relationshipType.getLeftLabel())) {
-                    listToReturn.add(relationship);
-                }
-            } else {
-                if (StringUtils
-                    .equals(relationship.getRelationshipType().getRightLabel(), relationshipType.getRightLabel())) {
-                    listToReturn.add(relationship);
-                }
-            }
-        }
-        return listToReturn;
+        return this.findByItemAndRelationshipType(context, item, relationshipType, isLeft, -1, -1);
     }
 
     @Override
     public List<Relationship> findByItemAndRelationshipType(Context context, Item item,
                                                             RelationshipType relationshipType)
-
         throws SQLException {
-        List<Relationship> list = this.findByItem(context, item);
-        List<Relationship> listToReturn = new LinkedList<>();
-        for (Relationship relationship : list) {
-            if (relationship.getRelationshipType().equals(relationshipType)) {
-                listToReturn.add(relationship);
-            }
-        }
-        return listToReturn;
+        return relationshipDAO.findByItemAndRelationshipType(context, item, relationshipType, -1, -1);
+    }
+
+    @Override
+    public List<Relationship> findByItemAndRelationshipType(Context context, Item item,
+                                                            RelationshipType relationshipType, int limit, int offset)
+            throws SQLException {
+        return relationshipDAO.findByItemAndRelationshipType(context, item, relationshipType, limit, offset);
+    }
+
+    @Override
+    public List<Relationship> findByItemAndRelationshipType(Context context, Item item,
+                                                            RelationshipType relationshipType, boolean isLeft,
+                                                            int limit, int offset)
+            throws SQLException {
+        return relationshipDAO.findByItemAndRelationshipType(context, item, relationshipType, isLeft, limit, offset);
     }
 
     @Override
     public List<Relationship> findByRelationshipType(Context context, RelationshipType relationshipType)
         throws SQLException {
-        return relationshipDAO.findByRelationshipType(context, relationshipType);
+
+        return findByRelationshipType(context, relationshipType, -1, -1);
+    }
+
+    @Override
+    public List<Relationship> findByRelationshipType(Context context, RelationshipType relationshipType, Integer limit,
+                                                     Integer offset)
+        throws SQLException {
+        return relationshipDAO.findByRelationshipType(context, relationshipType, limit, offset);
+    }
+
+    @Override
+    public List<Relationship> findByTypeName(Context context, String typeName)
+            throws SQLException {
+        return this.findByTypeName(context, typeName, -1, -1);
+    }
+
+    @Override
+    public List<Relationship> findByTypeName(Context context, String typeName, Integer limit, Integer offset)
+            throws SQLException {
+        return relationshipDAO.findByTypeName(context, typeName, limit, offset);
     }
 
 
+    @Override
+    public int countTotal(Context context) throws SQLException {
+        return relationshipDAO.countRows(context);
+    }
+
+    @Override
+    public int countByItem(Context context, Item item) throws SQLException {
+        return relationshipDAO.countByItem(context, item);
+    }
+
+    @Override
+    public int countByRelationshipType(Context context, RelationshipType relationshipType) throws SQLException {
+        return relationshipDAO.countByRelationshipType(context, relationshipType);
+    }
+
+    @Override
+    public int countByItemAndRelationshipType(Context context, Item item, RelationshipType relationshipType)
+            throws SQLException {
+        return relationshipDAO.countByItemAndRelationshipType(context, item, relationshipType);
+    }
+
+    @Override
+    public int countByTypeName(Context context, String typeName)
+            throws SQLException {
+        return relationshipDAO.countByTypeName(context, typeName);
+    }
 }

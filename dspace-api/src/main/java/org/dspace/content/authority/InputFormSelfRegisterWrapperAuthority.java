@@ -65,7 +65,7 @@ public class InputFormSelfRegisterWrapperAuthority implements ChoiceAuthority {
                     }
                 }
                 if (!choices.isEmpty()) {
-                    Choice[] results = new Choice[choices.size() - 1];
+                    Choice[] results = new Choice[choices.size()];
                     choices.toArray(results);
                     return new Choices(results, 0, choices.size(), Choices.CF_AMBIGUOUS, false);
                 }
