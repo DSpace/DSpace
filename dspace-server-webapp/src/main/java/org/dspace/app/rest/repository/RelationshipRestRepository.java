@@ -38,6 +38,7 @@ import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.services.RequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -71,6 +72,9 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
 
     @Autowired
     private AuthorizeService authorizeService;
+
+    @Autowired
+    private RequestService requestService;
 
 
     public RelationshipRest findOne(Context context, Integer integer) {
@@ -285,12 +289,34 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
 
     @Override
     protected void delete(Context context, Integer id) throws AuthorizeException {
+        String copyVirtual =
+            requestService.getCurrentRequest().getServletRequest().getParameter("copyVirtualMetadata");
+        if (copyVirtual == null) {
+            copyVirtual = "none";
+        }
+
         Relationship relationship = null;
         try {
             relationship = relationshipService.find(context, id);
             if (relationship != null) {
                 try {
-                    relationshipService.delete(context, relationship);
+                    switch (copyVirtual) {
+                        case "all":
+                            relationshipService.delete(context, relationship, true, true);
+                            break;
+                        case "left":
+                            relationshipService.delete(context, relationship, true, false);
+                            break;
+                        case "right":
+                            relationshipService.delete(context, relationship, false, true);
+                            break;
+                        case "configured":
+                            relationshipService.delete(context, relationship);
+                            break;
+                        default:
+                            relationshipService.delete(context, relationship, false, false);
+                            break;
+                    }
                 } catch (AuthorizeException e) {
                     throw new AccessDeniedException("You do not have write rights on this relationship's items");
                 }
