@@ -8,6 +8,7 @@
 package org.dspace.xmlworkflow.cristin;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.factory.ContentServiceFactory;
@@ -41,6 +42,7 @@ import java.util.regex.Pattern;
  */
 public class LinkCollectionToWorkflow {
 
+    private static final Logger log = Logger.getLogger(LinkCollectionToWorkflow.class);
     private static HarvestedCollectionService harvestedCollectionService;
     private static ConfigurationService configurationService;
     private static Context context;
@@ -100,27 +102,16 @@ public class LinkCollectionToWorkflow {
                 continue;
             }
             final Collection collection = harvestedCollection.getCollection();
-            if (collection == null) {
-                continue;
-            }
-            List<Community> parentCommunities = ContentServiceFactory.getInstance().getCommunityService().getAllParents(context, collection);
-            if (parentCommunities.size() > 0) {
-                Community topCommunity = parentCommunities.get(parentCommunities.size() - 1);
-                if (topCommunity != null) {
-                    final String handle = collection.getHandle();
-                    appendMapping(themeSB, topCommunity.getName(), handle, collectionType);
-                }
+            if (collection != null) {
+                String name = collection.getCommunities().get(0) == null ? "NOT FOUND" :  collection.getCommunities().get(0).getName();
+                String collectionDescription = String.format("\"%s\" (%s) in community \"%s\"", collection.getName(), collection.getHandle(), name);
+                System.out.printf("Mapped %s to %s-workflow%n", collectionDescription, collectionType);
+                log.info("Mapped collectionDescription to collectionType-workflow");
+                themeSB.append("        ")
+                        .append("<name-map collection=\"").append(collection.getHandle()).append("\" workflow=\"").append(collectionType).append("\"/>")
+                        .append(" <!-- Import from ").append(collectionType).append(" - ").append(collectionDescription).append(" -->").append("\n");
             }
         }
     }
 
-    private static void appendMapping(StringBuilder themeSB, String name, String handle, String collectionType) {
-        System.out.println("Mapped to " + collectionType + " workflow: handle: " + handle + " Community: " + name);
-        // <name-map collection="11250.1/8550594" workflow="[cristin/inspera]"/> <!-- Import from [CRIStin/Inspera] - (Top) Community name -->
-        themeSB.append("        ")
-                .append("<name-map collection=\"").append(handle).append("\" workflow=\"").append(collectionType).append("\"/>")
-                .append(" <!-- Import from " + collectionType + " - ").append(name).append(" -->")
-                .append("\n");
-
-    }
 }
