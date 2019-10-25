@@ -269,6 +269,13 @@
     <scope_note>Uniform Resource Identifier</scope_note>
   </dc-type>
 
+  <dc-type>
+    <schema>dc</schema>
+    <element>identifier</element>
+    <qualifier>pubmed</qualifier>
+    <scope_note>Pubmed Identifier</scope_note>
+  </dc-type>
+
   <!-- Used by system: do not remove -->
   <dc-type>
 	<schema>dc</schema>

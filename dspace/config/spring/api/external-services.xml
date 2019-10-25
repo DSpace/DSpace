@@ -35,5 +35,11 @@
         <property name="url" value="http://alcme.oclc.org/srw/search/lcnaf"/>
         <property name="sourceIdentifier" value="lcname"/>
     </bean>
+
+    <bean class="org.dspace.external.provider.impl.PubmedArticleDataProvider">
+        <property name="sourceIdentifier" value="pubmed"/>
+        <property name="metadataFieldMapping" ref="PubmedMetadataFieldMapping"/>
+        <property name="baseAddress" value="https://eutils.ncbi.nlm.nih.gov/entrez/eutils/"/>
+    </bean>
 </beans>
 

@@ -11,4 +11,4 @@
  * Responsible for generating a set of specific metadata from the retrieved document.
  * @author Roeland Dillen (roeland at atmire dot com)
  */
-package org.dspace.importer.external.pubmed.metadatamapping;
+package org.dspace.external.provider.impl.pubmed.metadatamapping;

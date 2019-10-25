@@ -12,4 +12,4 @@
  * @author Roeland Dillen (roeland at atmire dot com)
  * @author Jonas Van Goolen (jonas at atmire dot com)
  */
-package org.dspace.importer.external.pubmed.metadatamapping.contributor;
+package org.dspace.external.provider.impl.pubmed.metadatamapping.contributor;

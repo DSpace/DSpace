@@ -6,7 +6,7 @@
  * http://www.dspace.org/license/
  */
 
-package org.dspace.importer.external.pubmed.metadatamapping;
+package org.dspace.external.provider.impl.pubmed.metadatamapping;
 
 import java.util.Map;
 import javax.annotation.Resource;

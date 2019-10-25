@@ -32,14 +32,8 @@
         Omitting this property will default to searching over all configured ImportService implementations
     -->
 
-    <bean id="PubmedImportService"
-          class="org.dspace.importer.external.pubmed.service.PubmedImportMetadataSourceServiceImpl" scope="singleton">
-        <property name="metadataFieldMapping" ref="PubmedMetadataFieldMapping"/>
-        <property name="baseAddress" value="https://eutils.ncbi.nlm.nih.gov/entrez/eutils/"/>
-
-    </bean>
     <bean id="PubmedMetadataFieldMapping"
-          class="org.dspace.importer.external.pubmed.metadatamapping.PubmedFieldMapping">
+          class="org.dspace.external.provider.impl.pubmed.metadatamapping.PubmedFieldMapping">
     </bean>
 
     <!-- Metadatafield used to check against if it's already imported or not during the JSONLookupSearcher-->

@@ -6,13 +6,15 @@
  * http://www.dspace.org/license/
  */
 
-package org.dspace.importer.external.pubmed.service;
+package org.dspace.external.provider.impl;
 
 import java.io.StringReader;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.Callable;
+import java.util.stream.Collectors;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Invocation;
@@ -24,11 +26,18 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMXMLBuilderFactory;
 import org.apache.axiom.om.OMXMLParserWrapper;
 import org.apache.axiom.om.xpath.AXIOMXPath;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.Item;
+import org.dspace.external.model.ExternalDataObject;
+import org.dspace.external.provider.ExternalDataProvider;
 import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.datamodel.Query;
 import org.dspace.importer.external.exception.MetadataSourceException;
+import org.dspace.importer.external.metadatamapping.MetadatumDTO;
 import org.dspace.importer.external.service.AbstractImportMetadataSourceService;
+import org.dspace.mock.MockMetadataValue;
 import org.jaxen.JaxenException;
 
 /**
@@ -36,7 +45,82 @@ import org.jaxen.JaxenException;
  *
  * @author Roeland Dillen (roeland at atmire dot com)
  */
-public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadataSourceService<OMElement> {
+public class PubmedArticleDataProvider extends AbstractImportMetadataSourceService<OMElement> implements ExternalDataProvider {
+
+    private static Logger log = LogManager.getLogger(PubmedArticleDataProvider.class);
+
+    private String sourceIdentifier;
+
+    @Override
+    public String getSourceIdentifier() {
+        return sourceIdentifier;
+    }
+
+    @Override
+    public Optional<ExternalDataObject> getExternalDataObject(String id) {
+        try {
+            ImportRecord importRecord = getRecord(id);
+            ExternalDataObject externalDataObject = getExternalDataObjectFromImportRecord(importRecord);
+
+            //TODO MetadatumDTO naar mockmetadata
+                //TODO Classes veranderen naar methods
+                //TODO dc.identifier.other veranderen naar dc.identifier.pubmed
+            return Optional.of(externalDataObject);
+        } catch (MetadataSourceException e) {
+            log.error(e.getMessage(), e);
+        }
+        return Optional.empty();
+    }
+
+    private ExternalDataObject getExternalDataObjectFromImportRecord(ImportRecord importRecord) {
+        List<MetadatumDTO> metadatumDTOList = importRecord.getValueList();
+        List<MockMetadataValue> metadataValues = metadatumDTOList.stream().map(
+            metadatumDTO -> new MockMetadataValue(metadatumDTO.getSchema(), metadatumDTO.getElement(),
+                                                  metadatumDTO.getQualifier(), null,
+                                                  metadatumDTO.getValue())).collect(Collectors.toList());
+        ExternalDataObject externalDataObject = new ExternalDataObject(sourceIdentifier);
+        externalDataObject.setMetadata(metadataValues);
+        for (MockMetadataValue mockMetadataValue : metadataValues) {
+            if (StringUtils.equals(mockMetadataValue.getSchema(), "dc") && StringUtils.equals(mockMetadataValue.getElement(), "title")) {
+               externalDataObject.setDisplayValue(mockMetadataValue.getValue());
+               externalDataObject.setValue(mockMetadataValue.getValue());
+            }
+            if (StringUtils.equals(mockMetadataValue.getSchema(), "dc") && StringUtils.equals(mockMetadataValue.getElement(), "identifier") && StringUtils.equals(mockMetadataValue.getQualifier(), "other")) {
+                mockMetadataValue.setQualifier("pubmed");
+                externalDataObject.setId(mockMetadataValue.getValue());
+            }
+        }
+        return externalDataObject;
+    }
+
+    @Override
+    public List<ExternalDataObject> searchExternalDataObjects(String query, int start, int limit) {
+        try {
+            Collection<ImportRecord> importRecords = getRecords(query, start, limit);
+            return importRecords.stream().map(importRecord -> getExternalDataObjectFromImportRecord(importRecord)).collect(
+                Collectors.toList());
+        } catch (MetadataSourceException e) {
+            log.error(e.getMessage(), e);
+        }
+        return null;
+    }
+
+    @Override
+    public boolean supports(String source) {
+        return StringUtils.equalsIgnoreCase(sourceIdentifier, source);
+    }
+
+    @Override
+    public int getNumberOfResults(String query) {
+        try {
+            return getNbRecords(query);
+        } catch (MetadataSourceException e) {
+            log.error(e.getMessage(), e);
+        }
+        return 0;
+    }
+
+
     private String baseAddress;
 
     private WebTarget pubmedWebTarget;
@@ -178,6 +262,10 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
      */
     public void setBaseAddress(String baseAddress) {
         this.baseAddress = baseAddress;
+    }
+
+    public void setSourceIdentifier(String sourceIdentifier) {
+        this.sourceIdentifier = sourceIdentifier;
     }
 
     private class GetNbRecords implements Callable<Integer> {

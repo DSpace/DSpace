@@ -6,7 +6,7 @@
  * http://www.dspace.org/license/
  */
 
-package org.dspace.importer.external.pubmed.metadatamapping.transform;
+package org.dspace.external.provider.impl.pubmed.metadatamapping.transform;
 
 import java.util.List;
 

@@ -6,7 +6,7 @@
  * http://www.dspace.org/license/
  */
 
-package org.dspace.importer.external.pubmed.metadatamapping.contributor;
+package org.dspace.external.provider.impl.pubmed.metadatamapping.contributor;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
