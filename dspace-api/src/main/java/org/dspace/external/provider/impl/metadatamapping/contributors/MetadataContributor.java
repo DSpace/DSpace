@@ -5,24 +5,16 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.importer.external.metadatamapping.contributor;
+package org.dspace.external.provider.impl.metadatamapping.contributors;
 
 import java.util.Collection;
 
-import org.dspace.importer.external.metadatamapping.MetadataFieldMapping;
-import org.dspace.importer.external.metadatamapping.MetadatumDTO;
+import org.dspace.mock.MockMetadataValue;
 
 /**
  * @author Roeland Dillen (roeland at atmire dot com)
  */
 public interface MetadataContributor<RecordType> {
-
-    /**
-     * Set the metadataFieldMapping
-     *
-     * @param rt the MetadataFieldMapping object to set to the MetadataContributor
-     */
-    public void setMetadataFieldMapping(MetadataFieldMapping<RecordType, MetadataContributor<RecordType>> rt);
 
     /**
      * Implementations have the responsibility to process/map their own type of metadata based on a given record
@@ -31,5 +23,5 @@ public interface MetadataContributor<RecordType> {
      * @param t The recordType object to retrieve metadata from
      * @return A collection of MetadatumDTO objects, retrieve from the recordtype
      */
-    public Collection<MetadatumDTO> contributeMetadata(RecordType t);
+    public Collection<MockMetadataValue> contributeMetadata(RecordType t);
 }

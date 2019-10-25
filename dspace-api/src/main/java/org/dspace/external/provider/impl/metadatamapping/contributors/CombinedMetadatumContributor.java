@@ -5,15 +5,15 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.importer.external.metadatamapping.contributor;
+package org.dspace.external.provider.impl.metadatamapping.contributors;
 
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.dspace.importer.external.metadatamapping.MetadataFieldConfig;
-import org.dspace.importer.external.metadatamapping.MetadataFieldMapping;
-import org.dspace.importer.external.metadatamapping.MetadatumDTO;
+import org.dspace.mock.MockMetadataField;
+import org.dspace.external.provider.impl.pubmed.metadatamapping.utils.MetadatumContributorUtils;
+import org.dspace.mock.MockMetadataValue;
 
 /**
  * Wrapper class used to accommodate for the possibility of correlations between multiple MetadatumContributor objects
@@ -21,13 +21,12 @@ import org.dspace.importer.external.metadatamapping.MetadatumDTO;
  * @author Philip Vissenaekens (philip at atmire dot com)
  */
 public class CombinedMetadatumContributor<T> implements MetadataContributor<T> {
-    private MetadataFieldConfig field;
+
+    private MockMetadataField field;
 
     private LinkedList<MetadataContributor> metadatumContributors;
 
     private String separator;
-
-    private MetadataFieldMapping<T, MetadataContributor<T>> metadataFieldMapping;
 
     /**
      * Initialize an empty CombinedMetadatumContributor object
@@ -36,31 +35,18 @@ public class CombinedMetadatumContributor<T> implements MetadataContributor<T> {
     }
 
     /**
-     * @param field                 {@link org.dspace.importer.external.metadatamapping.MetadataFieldConfig} used in
+     * @param field                 {@link MockMetadataField} used in
      *                              mapping
      * @param metadatumContributors A list of MetadataContributor
      * @param separator             A separator used to differentiate between different values
      */
-    public CombinedMetadatumContributor(MetadataFieldConfig field, List<MetadataContributor> metadatumContributors,
+    public CombinedMetadatumContributor(MockMetadataField field, List<MetadataContributor> metadatumContributors,
                                         String separator) {
         this.field = field;
         this.metadatumContributors = (LinkedList<MetadataContributor>) metadatumContributors;
         this.separator = separator;
     }
 
-    /**
-     * Set the metadatafieldMapping used in the transforming of a record to actual metadata
-     *
-     * @param metadataFieldMapping the new mapping.
-     */
-    @Override
-    public void setMetadataFieldMapping(MetadataFieldMapping<T, MetadataContributor<T>> metadataFieldMapping) {
-        this.metadataFieldMapping = metadataFieldMapping;
-
-        for (MetadataContributor metadatumContributor : metadatumContributors) {
-            metadatumContributor.setMetadataFieldMapping(metadataFieldMapping);
-        }
-    }
 
     /**
      * a separate Metadatum object is created for each index of Metadatum returned from the calls to
@@ -71,13 +57,13 @@ public class CombinedMetadatumContributor<T> implements MetadataContributor<T> {
      * @return a collection of metadata composed by each MetadataContributor
      */
     @Override
-    public Collection<MetadatumDTO> contributeMetadata(T t) {
-        List<MetadatumDTO> values = new LinkedList<>();
+    public Collection<MockMetadataValue> contributeMetadata(T t) {
+        List<MockMetadataValue> values = new LinkedList<>();
 
-        LinkedList<LinkedList<MetadatumDTO>> metadatumLists = new LinkedList<>();
+        LinkedList<LinkedList<MockMetadataValue>> metadatumLists = new LinkedList<>();
 
         for (MetadataContributor metadatumContributor : metadatumContributors) {
-            LinkedList<MetadatumDTO> metadatums = (LinkedList<MetadatumDTO>) metadatumContributor.contributeMetadata(t);
+            LinkedList<MockMetadataValue> metadatums = (LinkedList<MockMetadataValue>) metadatumContributor.contributeMetadata(t);
             metadatumLists.add(metadatums);
         }
 
@@ -85,14 +71,14 @@ public class CombinedMetadatumContributor<T> implements MetadataContributor<T> {
 
             StringBuilder value = new StringBuilder();
 
-            for (LinkedList<MetadatumDTO> metadatums : metadatumLists) {
+            for (LinkedList<MockMetadataValue> metadatums : metadatumLists) {
                 value.append(metadatums.get(i).getValue());
 
                 if (!metadatums.equals(metadatumLists.getLast())) {
                     value.append(separator);
                 }
             }
-            values.add(metadataFieldMapping.toDCValue(field, value.toString()));
+            values.add(MetadatumContributorUtils.toMockMetadataValue(field, value.toString()));
         }
 
         return values;
@@ -103,7 +89,7 @@ public class CombinedMetadatumContributor<T> implements MetadataContributor<T> {
      *
      * @return MetadataFieldConfig
      */
-    public MetadataFieldConfig getField() {
+    public MockMetadataField getField() {
         return field;
     }
 
@@ -112,7 +98,7 @@ public class CombinedMetadatumContributor<T> implements MetadataContributor<T> {
      *
      * @param field MetadataFieldConfig used while retrieving MetadatumDTO
      */
-    public void setField(MetadataFieldConfig field) {
+    public void setField(MockMetadataField field) {
         this.field = field;
     }
 

@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.importer.external.metadatamapping;
+package org.dspace.mock;
 
 /**
  * A generalised configuration for metadatafields.
@@ -13,7 +13,7 @@ package org.dspace.importer.external.metadatamapping;
  *
  * @author Roeland Dillen (roeland at atmire dot com)
  */
-public class MetadataFieldConfig {
+public class MockMetadataField {
     private String schema;
     private String element;
     private String qualifier;
@@ -35,7 +35,7 @@ public class MetadataFieldConfig {
             return false;
         }
 
-        MetadataFieldConfig that = (MetadataFieldConfig) o;
+        MockMetadataField that = (MockMetadataField) o;
 
         if (!element.equals(that.element)) {
             return false;
@@ -81,23 +81,10 @@ public class MetadataFieldConfig {
         return result;
     }
 
-
-    /**
-     * Create a MetadataFieldConfig based on a given MetadatumDTO
-     * This MetadatumDTO object contains the schema, element and qualifier needed to initialize the MetadataFieldConfig
-     *
-     * @param value the DTO.
-     */
-    public MetadataFieldConfig(MetadatumDTO value) {
-        this.schema = value.getSchema();
-        this.element = value.getElement();
-        this.qualifier = value.getQualifier();
-    }
-
     /**
      * An empty initialization of MetadataFieldConfig
      */
-    public MetadataFieldConfig() {
+    public MockMetadataField() {
     }
 
     /**
@@ -107,7 +94,7 @@ public class MetadataFieldConfig {
      * @param element   The element to set to this object
      * @param qualifier The qualifier to set to this object
      */
-    public MetadataFieldConfig(String schema, String element, String qualifier) {
+    public MockMetadataField(String schema, String element, String qualifier) {
         this.schema = schema;
         this.element = element;
         this.qualifier = qualifier;
@@ -119,7 +106,7 @@ public class MetadataFieldConfig {
      *
      * @param full A string representing the schema.element.qualifier triplet
      */
-    public MetadataFieldConfig(String full) {
+    public MockMetadataField(String full) {
         String elements[] = full.split("\\.");
         if (elements.length == 2) {
             this.schema = elements[0];
@@ -139,7 +126,7 @@ public class MetadataFieldConfig {
      * @param schema  The schema to set to this object
      * @param element The element to set to this object
      */
-    public MetadataFieldConfig(String schema, String element) {
+    public MockMetadataField(String schema, String element) {
         this.schema = schema;
         this.element = element;
         this.qualifier = null;

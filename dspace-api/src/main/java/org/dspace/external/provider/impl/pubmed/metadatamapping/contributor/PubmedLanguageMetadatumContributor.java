@@ -15,10 +15,10 @@ import java.util.List;
 import java.util.Locale;
 
 import org.apache.logging.log4j.Logger;
-import org.dspace.importer.external.metadatamapping.MetadataFieldConfig;
-import org.dspace.importer.external.metadatamapping.MetadataFieldMapping;
-import org.dspace.importer.external.metadatamapping.MetadatumDTO;
-import org.dspace.importer.external.metadatamapping.contributor.MetadataContributor;
+import org.dspace.external.provider.impl.metadatamapping.contributors.MetadataContributor;
+import org.dspace.mock.MockMetadataField;
+import org.dspace.external.provider.impl.pubmed.metadatamapping.utils.MetadatumContributorUtils;
+import org.dspace.mock.MockMetadataValue;
 
 /**
  * Pubmed specific implementation of {@link MetadataContributor}
@@ -29,10 +29,9 @@ import org.dspace.importer.external.metadatamapping.contributor.MetadataContribu
 public class PubmedLanguageMetadatumContributor<T> implements MetadataContributor<T> {
     Logger log = org.apache.logging.log4j.LogManager.getLogger(PubmedDateMetadatumContributor.class);
 
-    private MetadataFieldMapping<T, MetadataContributor<T>> metadataFieldMapping;
     private HashMap<String, String> iso3toIso2;
 
-    private MetadataFieldConfig field;
+    private MockMetadataField field;
     private MetadataContributor language;
 
     /**
@@ -49,27 +48,16 @@ public class PubmedLanguageMetadatumContributor<T> implements MetadataContributo
 
     /**
      * Initialize the PubmedLanguageMetadatumContributor class using a
-     * {@link org.dspace.importer.external.metadatamapping.MetadataFieldConfig} and a language
-     * -{@link org.dspace.importer.external.metadatamapping.contributor.MetadataContributor}
+     * {@link MockMetadataField} and a language
+     * -{@link MetadataContributor}
      *
-     * @param field    {@link org.dspace.importer.external.metadatamapping.MetadataFieldConfig} used in mapping
+     * @param field    {@link MockMetadataField} used in mapping
      * @param language the language.
      */
-    public PubmedLanguageMetadatumContributor(MetadataFieldConfig field, MetadataContributor language) {
+    public PubmedLanguageMetadatumContributor(MockMetadataField field, MetadataContributor language) {
         this();
         this.field = field;
         this.language = language;
-    }
-
-    /**
-     * Set the metadatafieldMapping used in the transforming of a record to actual metadata
-     *
-     * @param metadataFieldMapping the new mapping.
-     */
-    @Override
-    public void setMetadataFieldMapping(MetadataFieldMapping<T, MetadataContributor<T>> metadataFieldMapping) {
-        this.metadataFieldMapping = metadataFieldMapping;
-        language.setMetadataFieldMapping(metadataFieldMapping);
     }
 
     /**
@@ -77,15 +65,15 @@ public class PubmedLanguageMetadatumContributor<T> implements MetadataContributo
      * @return a collection of import records. Only the identifier of the found records may be put in the record.
      */
     @Override
-    public Collection<MetadatumDTO> contributeMetadata(T t) {
-        List<MetadatumDTO> values = new LinkedList<MetadatumDTO>();
+    public Collection<MockMetadataValue> contributeMetadata(T t) {
+        List<MockMetadataValue> values = new LinkedList<MockMetadataValue>();
 
         try {
-            LinkedList<MetadatumDTO> languageList = (LinkedList<MetadatumDTO>) language.contributeMetadata(t);
+            LinkedList<MockMetadataValue> languageList = (LinkedList<MockMetadataValue>) language.contributeMetadata(t);
 
-            for (MetadatumDTO metadatum : languageList) {
+            for (MockMetadataValue mockMetadataValue : languageList) {
                 // Add the iso2 language code corresponding to the retrieved iso3 code to the metadata
-                values.add(metadataFieldMapping.toDCValue(field, iso3toIso2.get(metadatum.getValue().toLowerCase())));
+                values.add(MetadatumContributorUtils.toMockMetadataValue(field, iso3toIso2.get(mockMetadataValue.getValue().toLowerCase())));
             }
         } catch (Exception e) {
             log.error("Error", e);
@@ -117,7 +105,7 @@ public class PubmedLanguageMetadatumContributor<T> implements MetadataContributo
      *
      * @return MetadataFieldConfig
      */
-    public MetadataFieldConfig getField() {
+    public MockMetadataField getField() {
         return field;
     }
 
@@ -126,7 +114,7 @@ public class PubmedLanguageMetadatumContributor<T> implements MetadataContributo
      *
      * @param field MetadataFieldConfig used while retrieving MetadatumDTO
      */
-    public void setField(MetadataFieldConfig field) {
+    public void setField(MockMetadataField field) {
         this.field = field;
     }
 }

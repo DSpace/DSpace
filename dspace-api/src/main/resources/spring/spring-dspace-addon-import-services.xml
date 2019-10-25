@@ -19,11 +19,6 @@
 
     <context:annotation-config/> <!-- allows us to use spring annotations in beans -->
 
-    <bean id="importService" class="org.dspace.importer.external.service.ImportService" scope="singleton"
-          lazy-init="false" autowire="byType" destroy-method="destroy">
-
-    </bean>
-
     <!--If multiple importServices have been configured here but only one is to be used during the lookup step (StartSubmissionLookupStep),
         this can be accomplished by specifying the property "publication-lookup.url" to the baseAddress of the required importService
         So for example
@@ -32,12 +27,8 @@
         Omitting this property will default to searching over all configured ImportService implementations
     -->
 
-    <bean id="PubmedMetadataFieldMapping"
-          class="org.dspace.external.provider.impl.pubmed.metadatamapping.PubmedFieldMapping">
-    </bean>
-
     <!-- Metadatafield used to check against if it's already imported or not during the JSONLookupSearcher-->
-    <bean id="lookupID" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+    <bean id="lookupID" class="org.dspace.mock.MockMetadataField">
         <constructor-arg value="dc.identifier.other"/>
     </bean>
 

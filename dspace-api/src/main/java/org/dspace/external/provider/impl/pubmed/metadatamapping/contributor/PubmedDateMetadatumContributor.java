@@ -17,10 +17,10 @@ import java.util.List;
 
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.DCDate;
-import org.dspace.importer.external.metadatamapping.MetadataFieldConfig;
-import org.dspace.importer.external.metadatamapping.MetadataFieldMapping;
-import org.dspace.importer.external.metadatamapping.MetadatumDTO;
-import org.dspace.importer.external.metadatamapping.contributor.MetadataContributor;
+import org.dspace.external.provider.impl.metadatamapping.contributors.MetadataContributor;
+import org.dspace.mock.MockMetadataField;
+import org.dspace.external.provider.impl.pubmed.metadatamapping.utils.MetadatumContributorUtils;
+import org.dspace.mock.MockMetadataValue;
 import org.springframework.beans.factory.annotation.Required;
 
 /**
@@ -31,8 +31,6 @@ import org.springframework.beans.factory.annotation.Required;
  */
 public class PubmedDateMetadatumContributor<T> implements MetadataContributor<T> {
     Logger log = org.apache.logging.log4j.LogManager.getLogger(PubmedDateMetadatumContributor.class);
-
-    private MetadataFieldMapping<T, MetadataContributor<T>> metadataFieldMapping;
 
     /* A list of all the dateFormats to attempt.  These should be configured to
        have the most specific first and the more lenient at the back. */
@@ -48,23 +46,10 @@ public class PubmedDateMetadatumContributor<T> implements MetadataContributor<T>
         this.dateFormatsToAttempt = dateFormatsToAttempt;
     }
 
-    private MetadataFieldConfig field;
+    private MockMetadataField field;
     private MetadataContributor day;
     private MetadataContributor month;
     private MetadataContributor year;
-
-    /**
-     * Set the metadatafieldMapping used in the transforming of a record to actual metadata.
-     *
-     * @param metadataFieldMapping the new mapping.
-     */
-    @Override
-    public void setMetadataFieldMapping(MetadataFieldMapping<T, MetadataContributor<T>> metadataFieldMapping) {
-        this.metadataFieldMapping = metadataFieldMapping;
-        day.setMetadataFieldMapping(metadataFieldMapping);
-        month.setMetadataFieldMapping(metadataFieldMapping);
-        year.setMetadataFieldMapping(metadataFieldMapping);
-    }
 
     /**
      * Initialize an empty PubmedDateMetadatumContributor object
@@ -73,12 +58,12 @@ public class PubmedDateMetadatumContributor<T> implements MetadataContributor<T>
     }
 
     /**
-     * @param field {@link org.dspace.importer.external.metadatamapping.MetadataFieldConfig} used in mapping
+     * @param field {@link MockMetadataField} used in mapping
      * @param day   a MetadataContributor, representing a day
      * @param month a {@link MetadataContributor}, representing a month
      * @param year  a {@link MetadataContributor}, representing a year
      */
-    public PubmedDateMetadatumContributor(MetadataFieldConfig field, MetadataContributor day, MetadataContributor month,
+    public PubmedDateMetadatumContributor(MockMetadataField field, MetadataContributor day, MetadataContributor month,
                                           MetadataContributor year) {
         this.field = field;
         this.day = day;
@@ -97,14 +82,14 @@ public class PubmedDateMetadatumContributor<T> implements MetadataContributor<T>
      * @return a collection of import records. Only the identifier of the found records may be put in the record.
      */
     @Override
-    public Collection<MetadatumDTO> contributeMetadata(T t) {
-        List<MetadatumDTO> values = new LinkedList<>();
+    public Collection<MockMetadataValue> contributeMetadata(T t) {
+        List<MockMetadataValue> values = new LinkedList<>();
 
 
         try {
-            LinkedList<MetadatumDTO> yearList = (LinkedList<MetadatumDTO>) year.contributeMetadata(t);
-            LinkedList<MetadatumDTO> monthList = (LinkedList<MetadatumDTO>) month.contributeMetadata(t);
-            LinkedList<MetadatumDTO> dayList = (LinkedList<MetadatumDTO>) day.contributeMetadata(t);
+            LinkedList<MockMetadataValue> yearList = (LinkedList<MockMetadataValue>) year.contributeMetadata(t);
+            LinkedList<MockMetadataValue> monthList = (LinkedList<MockMetadataValue>) month.contributeMetadata(t);
+            LinkedList<MockMetadataValue> dayList = (LinkedList<MockMetadataValue>) day.contributeMetadata(t);
 
             for (int i = 0; i < yearList.size(); i++) {
                 DCDate dcDate = null;
@@ -138,7 +123,7 @@ public class PubmedDateMetadatumContributor<T> implements MetadataContributor<T>
                 }
 
                 if (dcDate != null) {
-                    values.add(metadataFieldMapping.toDCValue(field, dcDate.toString()));
+                    values.add(MetadatumContributorUtils.toMockMetadataValue(field, dcDate.toString()));
                 }
             }
         } catch (Exception e) {
@@ -152,7 +137,7 @@ public class PubmedDateMetadatumContributor<T> implements MetadataContributor<T>
      *
      * @return MetadataFieldConfig
      */
-    public MetadataFieldConfig getField() {
+    public MockMetadataField getField() {
         return field;
     }
 
@@ -161,7 +146,7 @@ public class PubmedDateMetadatumContributor<T> implements MetadataContributor<T>
      *
      * @param field MetadataFieldConfig used while retrieving MetadatumDTO
      */
-    public void setField(MetadataFieldConfig field) {
+    public void setField(MockMetadataField field) {
         this.field = field;
     }
 
