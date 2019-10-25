@@ -373,7 +373,7 @@ public class CristinFileManager {
             bundleService.addBitstream(context, targetBundle, bitstream);
             bundleService.update(context, targetBundle);
         } else {
-            throw new CrosswalkException("Could not retrieve bitstream");
+            throw new CrosswalkException("Could not retrieve bitstream" + bsName + " href: " + href);
         }
 
         return bitstream;

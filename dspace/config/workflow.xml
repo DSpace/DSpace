@@ -8,21 +8,12 @@
     </workflow-map>
 
     <!-- cristin ingest workflow -->
-    <workflow start="bitstreamstep" id="cristin">
+    <workflow start="editstep" id="cristin">
         <roles>
-            <role id="filemanager" name="File Manager" description="The people responsible for this step are able to edit the ordering of bitstreams and content of bundles" />
             <role id="editor" name="Editor" description="The people responsible for this step are able to edit the metadata of incoming submissions, and then accept or reject them." />
             <role id="assigner" name="Collection Assigner" description="people responsible for assigning the item to collections"/>
         </roles>
 
-        <step id="bitstreamstep" role="filemanager" userSelectionMethod="claimaction">
-            <outcomes>
-                <step status="0">editstep</step>
-            </outcomes>
-            <actions>
-                <action id="bitstreamaction"/>
-            </actions>
-        </step>
         <step id="editstep" role="editor" userSelectionMethod="claimaction">
             <outcomes>
                 <step status="0">assignment</step>
