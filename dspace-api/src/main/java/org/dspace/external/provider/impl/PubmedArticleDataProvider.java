@@ -13,7 +13,6 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -58,19 +57,32 @@ public class PubmedArticleDataProvider extends AbstractImportMetadataSourceServi
 
     @Override
     public Optional<ExternalDataObject> getExternalDataObject(String id) {
-        try {
-            ImportRecord importRecord = getRecord(id);
-            ExternalDataObject externalDataObject = getExternalDataObjectFromImportRecord(importRecord);
+        ImportRecord importRecord = getRecord(id);
+        ExternalDataObject externalDataObject = getExternalDataObjectFromImportRecord(importRecord);
 
-            //TODO MetadatumDTO naar mockmetadata
-                //TODO Classes veranderen naar methods
-                //TODO dc.identifier.other veranderen naar dc.identifier.pubmed
-            return Optional.of(externalDataObject);
-        } catch (MetadataSourceException e) {
-            log.error(e.getMessage(), e);
-        }
-        return Optional.empty();
+        //TODO MetadatumDTO naar mockmetadata
+            //TODO Classes veranderen naar methods
+            //TODO dc.identifier.other veranderen naar dc.identifier.pubmed
+        return Optional.of(externalDataObject);
     }
+
+    @Override
+    public List<ExternalDataObject> searchExternalDataObjects(String query, int start, int limit) {
+        Collection<ImportRecord> importRecords = getRecords(query, start, limit);
+        return importRecords.stream().map(importRecord -> getExternalDataObjectFromImportRecord(importRecord)).collect(
+            Collectors.toList());
+    }
+
+    @Override
+    public boolean supports(String source) {
+        return StringUtils.equalsIgnoreCase(sourceIdentifier, source);
+    }
+
+    @Override
+    public int getNumberOfResults(String query) {
+        return getNbRecords(query);
+    }
+
 
     private ExternalDataObject getExternalDataObjectFromImportRecord(ImportRecord importRecord) {
         List<MetadatumDTO> metadatumDTOList = importRecord.getValueList();
@@ -82,8 +94,8 @@ public class PubmedArticleDataProvider extends AbstractImportMetadataSourceServi
         externalDataObject.setMetadata(metadataValues);
         for (MockMetadataValue mockMetadataValue : metadataValues) {
             if (StringUtils.equals(mockMetadataValue.getSchema(), "dc") && StringUtils.equals(mockMetadataValue.getElement(), "title")) {
-               externalDataObject.setDisplayValue(mockMetadataValue.getValue());
-               externalDataObject.setValue(mockMetadataValue.getValue());
+                externalDataObject.setDisplayValue(mockMetadataValue.getValue());
+                externalDataObject.setValue(mockMetadataValue.getValue());
             }
             if (StringUtils.equals(mockMetadataValue.getSchema(), "dc") && StringUtils.equals(mockMetadataValue.getElement(), "identifier") && StringUtils.equals(mockMetadataValue.getQualifier(), "other")) {
                 mockMetadataValue.setQualifier("pubmed");
@@ -93,111 +105,9 @@ public class PubmedArticleDataProvider extends AbstractImportMetadataSourceServi
         return externalDataObject;
     }
 
-    @Override
-    public List<ExternalDataObject> searchExternalDataObjects(String query, int start, int limit) {
-        try {
-            Collection<ImportRecord> importRecords = getRecords(query, start, limit);
-            return importRecords.stream().map(importRecord -> getExternalDataObjectFromImportRecord(importRecord)).collect(
-                Collectors.toList());
-        } catch (MetadataSourceException e) {
-            log.error(e.getMessage(), e);
-        }
-        return null;
-    }
-
-    @Override
-    public boolean supports(String source) {
-        return StringUtils.equalsIgnoreCase(sourceIdentifier, source);
-    }
-
-    @Override
-    public int getNumberOfResults(String query) {
-        try {
-            return getNbRecords(query);
-        } catch (MetadataSourceException e) {
-            log.error(e.getMessage(), e);
-        }
-        return 0;
-    }
-
-
     private String baseAddress;
 
     private WebTarget pubmedWebTarget;
-
-    /**
-     * Find the number of records matching a query;
-     *
-     * @param query a query string to base the search on.
-     * @return the sum of the matching records over this import source
-     * @throws MetadataSourceException if the underlying methods throw any exception.
-     */
-    @Override
-    public int getNbRecords(String query) throws MetadataSourceException {
-        return retry(new GetNbRecords(query));
-    }
-
-    /**
-     * Find the number of records matching a query;
-     *
-     * @param query a query object to base the search on.
-     * @return the sum of the matching records over this import source
-     * @throws MetadataSourceException if the underlying methods throw any exception.
-     */
-    @Override
-    public int getNbRecords(Query query) throws MetadataSourceException {
-        return retry(new GetNbRecords(query));
-    }
-
-    /**
-     * Find the number of records matching a string query. Supports pagination
-     *
-     * @param query a query string to base the search on.
-     * @param start offset to start at
-     * @param count number of records to retrieve.
-     * @return a set of records. Fully transformed.
-     * @throws MetadataSourceException if the underlying methods throw any exception.
-     */
-    @Override
-    public Collection<ImportRecord> getRecords(String query, int start, int count) throws MetadataSourceException {
-        return retry(new GetRecords(query, start, count));
-    }
-
-    /**
-     * Find records based on a object query.
-     *
-     * @param query a query object to base the search on.
-     * @return a set of records. Fully transformed.
-     * @throws MetadataSourceException if the underlying methods throw any exception.
-     */
-    @Override
-    public Collection<ImportRecord> getRecords(Query query) throws MetadataSourceException {
-        return retry(new GetRecords(query));
-    }
-
-    /**
-     * Get a single record from the source.
-     *
-     * @param id identifier for the record
-     * @return the first matching record
-     * @throws MetadataSourceException if the underlying methods throw any exception.
-     */
-    @Override
-    public ImportRecord getRecord(String id) throws MetadataSourceException {
-        return retry(new GetRecord(id));
-    }
-
-    /**
-     * Get a single record from the source.
-     *
-     * @param query a query matching a single record
-     * @return the first matching record
-     * @throws MetadataSourceException if the underlying methods throw any exception.
-     */
-    @Override
-    public ImportRecord getRecord(Query query) throws MetadataSourceException {
-        return retry(new GetRecord(query));
-    }
 
     /**
      * The string that identifies this import implementation. Preferable a URI
@@ -209,30 +119,6 @@ public class PubmedArticleDataProvider extends AbstractImportMetadataSourceServi
         return "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/";
     }
 
-    /**
-     * Finds records based on an item
-     *
-     * @param item an item to base the search on
-     * @return a collection of import records. Only the identifier of the found records may be put in the record.
-     * @throws MetadataSourceException if the underlying methods throw any exception.
-     */
-    @Override
-    public Collection<ImportRecord> findMatchingRecords(Item item) throws MetadataSourceException {
-        return retry(new FindMatchingRecords(item));
-    }
-
-    /**
-     * Finds records based on query object.
-     * Delegates to one or more MetadataSource implementations based on the uri.  Results will be aggregated.
-     *
-     * @param query a query object to base the search on.
-     * @return a collection of import records. Only the identifier of the found records may be put in the record.
-     * @throws MetadataSourceException if the underlying methods throw any exception.
-     */
-    @Override
-    public Collection<ImportRecord> findMatchingRecords(Query query) throws MetadataSourceException {
-        return retry(new FindMatchingRecords(query));
-    }
 
     /**
      * Initialize the class
@@ -268,38 +154,44 @@ public class PubmedArticleDataProvider extends AbstractImportMetadataSourceServi
         this.sourceIdentifier = sourceIdentifier;
     }
 
-    private class GetNbRecords implements Callable<Integer> {
 
-        private GetNbRecords(String queryString) {
-            query = new Query();
-            query.addParameter("query", queryString);
-        }
-
-        private Query query;
-
-        public GetNbRecords(Query query) {
-            this.query = query;
-        }
-
-        @Override
-        public Integer call() throws Exception {
-            WebTarget getRecordIdsTarget = pubmedWebTarget
-                .queryParam("term", query.getParameterAsClass("query", String.class));
-
-            getRecordIdsTarget = getRecordIdsTarget.path("esearch.fcgi");
-
-            Invocation.Builder invocationBuilder = getRecordIdsTarget.request(MediaType.TEXT_PLAIN_TYPE);
-
-            Response response = invocationBuilder.get();
-
-            String responseString = response.readEntity(String.class);
-
-            String count = getSingleElementValue(responseString, "Count");
-
-            return Integer.parseInt(count);
-        }
+    /**
+     * Find the number of records matching a query;
+     *
+     * @param query a query object to base the search on.
+     * @return the sum of the matching records over this import source
+     * @throws MetadataSourceException if the underlying methods throw any exception.
+     */
+    @Override
+    public int getNbRecords(Query query) throws MetadataSourceException {
+        String queryString = query.getParameterAsClass("query", String.class);
+        return getNbRecords(queryString);
     }
 
+    /**
+     * Find the number of records matching a query;
+     *
+     * @param query a query string to base the search on.
+     * @return the sum of the matching records over this import source
+     * @throws MetadataSourceException if the underlying methods throw any exception.
+     */
+    @Override
+    public int getNbRecords(String query) {
+
+        WebTarget getRecordIdsTarget = pubmedWebTarget.queryParam("term", query);
+
+        getRecordIdsTarget = getRecordIdsTarget.path("esearch.fcgi");
+
+        Invocation.Builder invocationBuilder = getRecordIdsTarget.request(MediaType.TEXT_PLAIN_TYPE);
+
+        Response response = invocationBuilder.get();
+
+        String responseString = response.readEntity(String.class);
+
+        String count = getSingleElementValue(responseString, "Count");
+
+        return Integer.parseInt(count);
+    }
 
     private String getSingleElementValue(String src, String elementName) {
         OMXMLParserWrapper records = OMXMLBuilderFactory.createOMBuilder(new StringReader(src));
@@ -318,69 +210,74 @@ public class PubmedArticleDataProvider extends AbstractImportMetadataSourceServi
         return value;
     }
 
-    private class GetRecords implements Callable<Collection<ImportRecord>> {
+    /**
+     * Find records based on a object query.
+     *
+     * @param query a query object to base the search on.
+     * @return a set of records. Fully transformed.
+     * @throws MetadataSourceException if the underlying methods throw any exception.
+     */
+    @Override
+    public Collection<ImportRecord> getRecords(Query query) throws MetadataSourceException {
+        String queryString = query.getParameterAsClass("query", String.class);
+        Integer start = query.getParameterAsClass("start", Integer.class);
+        Integer count = query.getParameterAsClass("count", Integer.class);
+        return getRecords(queryString, start, count);
+    }
 
-        private Query query;
+    /**
+     * Find the number of records matching a string query. Supports pagination
+     *
+     * @param queryString a query string to base the search on.
+     * @param start offset to start at
+     * @param count number of records to retrieve.
+     * @return a set of records. Fully transformed.
+     * @throws MetadataSourceException if the underlying methods throw any exception.
+     */
+    @Override
+    public Collection<ImportRecord> getRecords(String queryString, int start, int count) {
 
-        private GetRecords(String queryString, int start, int count) {
-            query = new Query();
-            query.addParameter("query", queryString);
-            query.addParameter("start", start);
-            query.addParameter("count", count);
+        if (count < 0) {
+            count = 10;
         }
 
-        private GetRecords(Query q) {
-            this.query = q;
+        if (start < 0) {
+            start = 0;
         }
 
-        @Override
-        public Collection<ImportRecord> call() throws Exception {
-            String queryString = query.getParameterAsClass("query", String.class);
-            Integer start = query.getParameterAsClass("start", Integer.class);
-            Integer count = query.getParameterAsClass("count", Integer.class);
+        List<ImportRecord> records = new LinkedList<ImportRecord>();
 
-            if (count == null || count < 0) {
-                count = 10;
-            }
+        WebTarget getRecordIdsTarget = pubmedWebTarget.queryParam("term", queryString);
+        getRecordIdsTarget = getRecordIdsTarget.queryParam("retstart", start);
+        getRecordIdsTarget = getRecordIdsTarget.queryParam("retmax", count);
+        getRecordIdsTarget = getRecordIdsTarget.queryParam("usehistory", "y");
+        getRecordIdsTarget = getRecordIdsTarget.path("esearch.fcgi");
 
-            if (start == null || start < 0) {
-                start = 0;
-            }
+        Invocation.Builder invocationBuilder = getRecordIdsTarget.request(MediaType.TEXT_PLAIN_TYPE);
 
-            List<ImportRecord> records = new LinkedList<ImportRecord>();
+        Response response = invocationBuilder.get();
+        String responseString = response.readEntity(String.class);
 
-            WebTarget getRecordIdsTarget = pubmedWebTarget.queryParam("term", queryString);
-            getRecordIdsTarget = getRecordIdsTarget.queryParam("retstart", start);
-            getRecordIdsTarget = getRecordIdsTarget.queryParam("retmax", count);
-            getRecordIdsTarget = getRecordIdsTarget.queryParam("usehistory", "y");
-            getRecordIdsTarget = getRecordIdsTarget.path("esearch.fcgi");
+        String queryKey = getSingleElementValue(responseString, "QueryKey");
+        String webEnv = getSingleElementValue(responseString, "WebEnv");
 
-            Invocation.Builder invocationBuilder = getRecordIdsTarget.request(MediaType.TEXT_PLAIN_TYPE);
+        WebTarget getRecordsTarget = pubmedWebTarget.queryParam("WebEnv", webEnv);
+        getRecordsTarget = getRecordsTarget.queryParam("query_key", queryKey);
+        getRecordsTarget = getRecordsTarget.queryParam("retmode", "xml");
+        getRecordsTarget = getRecordsTarget.path("efetch.fcgi");
+        getRecordsTarget = getRecordsTarget.queryParam("retmax", count);
+        getRecordsTarget = getRecordsTarget.queryParam("retstart", start);
 
-            Response response = invocationBuilder.get();
-            String responseString = response.readEntity(String.class);
+        invocationBuilder = getRecordsTarget.request(MediaType.TEXT_PLAIN_TYPE);
+        response = invocationBuilder.get();
 
-            String queryKey = getSingleElementValue(responseString, "QueryKey");
-            String webEnv = getSingleElementValue(responseString, "WebEnv");
+        List<OMElement> omElements = splitToRecords(response.readEntity(String.class));
 
-            WebTarget getRecordsTarget = pubmedWebTarget.queryParam("WebEnv", webEnv);
-            getRecordsTarget = getRecordsTarget.queryParam("query_key", queryKey);
-            getRecordsTarget = getRecordsTarget.queryParam("retmode", "xml");
-            getRecordsTarget = getRecordsTarget.path("efetch.fcgi");
-            getRecordsTarget = getRecordsTarget.queryParam("retmax", count);
-            getRecordsTarget = getRecordsTarget.queryParam("retstart", start);
-
-            invocationBuilder = getRecordsTarget.request(MediaType.TEXT_PLAIN_TYPE);
-            response = invocationBuilder.get();
-
-            List<OMElement> omElements = splitToRecords(response.readEntity(String.class));
-
-            for (OMElement record : omElements) {
-                records.add(transformSourceRecords(record));
-            }
-
-            return records;
+        for (OMElement record : omElements) {
+            records.add(transformSourceRecords(record));
         }
+
+        return records;
     }
 
     private List<OMElement> splitToRecords(String recordsSrc) {
@@ -396,87 +293,103 @@ public class PubmedArticleDataProvider extends AbstractImportMetadataSourceServi
         }
     }
 
-    private class GetRecord implements Callable<ImportRecord> {
 
-        private Query query;
-
-        private GetRecord(String id) {
-            query = new Query();
-            query.addParameter("id", id);
-        }
-
-        public GetRecord(Query q) {
-            query = q;
-        }
-
-        @Override
-        public ImportRecord call() throws Exception {
-            String id = query.getParameterAsClass("id", String.class);
-
-            WebTarget getRecordTarget = pubmedWebTarget.queryParam("id", id);
-            getRecordTarget = getRecordTarget.queryParam("retmode", "xml");
-            getRecordTarget = getRecordTarget.path("efetch.fcgi");
-
-            Invocation.Builder invocationBuilder = getRecordTarget.request(MediaType.TEXT_PLAIN_TYPE);
-
-            Response response = invocationBuilder.get();
-
-            List<OMElement> omElements = splitToRecords(response.readEntity(String.class));
-
-            if (omElements.size() == 0) {
-                return null;
-            }
-
-            return transformSourceRecords(omElements.get(0));
-        }
+    /**
+     * Get a single record from the source.
+     *
+     * @param query a query matching a single record
+     * @return the first matching record
+     * @throws MetadataSourceException if the underlying methods throw any exception.
+     */
+    @Override
+    public ImportRecord getRecord(Query query) throws MetadataSourceException {
+        String id = query.getParameterAsClass("id", String.class);
+        return getRecord(id);
     }
 
-    private class FindMatchingRecords implements Callable<Collection<ImportRecord>> {
 
-        private Query query;
+    /**
+     * Get a single record from the source.
+     *
+     * @param id identifier for the record
+     * @return the first matching record
+     * @throws MetadataSourceException if the underlying methods throw any exception.
+     */
+    @Override
+    public ImportRecord getRecord(String id) {
 
-        private FindMatchingRecords(Item item) throws MetadataSourceException {
-            query = getGenerateQueryForItem().generateQueryForItem(item);
+        WebTarget getRecordTarget = pubmedWebTarget.queryParam("id", id);
+        getRecordTarget = getRecordTarget.queryParam("retmode", "xml");
+        getRecordTarget = getRecordTarget.path("efetch.fcgi");
+
+        Invocation.Builder invocationBuilder = getRecordTarget.request(MediaType.TEXT_PLAIN_TYPE);
+
+        Response response = invocationBuilder.get();
+
+        List<OMElement> omElements = splitToRecords(response.readEntity(String.class));
+
+        if (omElements.size() == 0) {
+            return null;
         }
 
-        public FindMatchingRecords(Query q) {
-            query = q;
+        return transformSourceRecords(omElements.get(0));
+    }
+
+
+    /**
+     * Finds records based on an item
+     *
+     * @param item an item to base the search on
+     * @return a collection of import records. Only the identifier of the found records may be put in the record.
+     * @throws MetadataSourceException if the underlying methods throw any exception.
+     */
+    @Override
+    public Collection<ImportRecord> findMatchingRecords(Item item) throws MetadataSourceException {
+        Query query = getGenerateQueryForItem().generateQueryForItem(item);
+        return findMatchingRecords(query);
+    }
+
+    /**
+     * Finds records based on query object.
+     * Delegates to one or more MetadataSource implementations based on the uri.  Results will be aggregated.
+     *
+     * @param query a query object to base the search on.
+     * @return a collection of import records. Only the identifier of the found records may be put in the record.
+     * @throws MetadataSourceException if the underlying methods throw any exception.
+     */
+    @Override
+    public Collection<ImportRecord> findMatchingRecords(Query query) {
+        List<ImportRecord> records = new LinkedList<ImportRecord>();
+
+        WebTarget getRecordIdsTarget = pubmedWebTarget
+            .queryParam("term", query.getParameterAsClass("term", String.class));
+        getRecordIdsTarget = getRecordIdsTarget
+            .queryParam("field", query.getParameterAsClass("field", String.class));
+        getRecordIdsTarget = getRecordIdsTarget.queryParam("usehistory", "y");
+        getRecordIdsTarget = getRecordIdsTarget.path("esearch.fcgi");
+
+        Invocation.Builder invocationBuilder = getRecordIdsTarget.request(MediaType.TEXT_PLAIN_TYPE);
+
+        Response response = invocationBuilder.get();
+        String responseString = response.readEntity(String.class);
+
+        String queryKey = getSingleElementValue(responseString, "QueryKey");
+        String webEnv = getSingleElementValue(responseString, "WebEnv");
+
+        WebTarget getRecordsTarget = pubmedWebTarget.queryParam("WebEnv", webEnv);
+        getRecordsTarget = getRecordsTarget.queryParam("query_key", queryKey);
+        getRecordsTarget = getRecordsTarget.queryParam("retmode", "xml");
+        getRecordsTarget = getRecordsTarget.path("efetch.fcgi");
+
+        invocationBuilder = getRecordsTarget.request(MediaType.TEXT_PLAIN_TYPE);
+        response = invocationBuilder.get();
+
+        List<OMElement> omElements = splitToRecords(response.readEntity(String.class));
+
+        for (OMElement record : omElements) {
+            records.add(transformSourceRecords(record));
         }
 
-        @Override
-        public Collection<ImportRecord> call() throws Exception {
-            List<ImportRecord> records = new LinkedList<ImportRecord>();
-
-            WebTarget getRecordIdsTarget = pubmedWebTarget
-                .queryParam("term", query.getParameterAsClass("term", String.class));
-            getRecordIdsTarget = getRecordIdsTarget
-                .queryParam("field", query.getParameterAsClass("field", String.class));
-            getRecordIdsTarget = getRecordIdsTarget.queryParam("usehistory", "y");
-            getRecordIdsTarget = getRecordIdsTarget.path("esearch.fcgi");
-
-            Invocation.Builder invocationBuilder = getRecordIdsTarget.request(MediaType.TEXT_PLAIN_TYPE);
-
-            Response response = invocationBuilder.get();
-            String responseString = response.readEntity(String.class);
-
-            String queryKey = getSingleElementValue(responseString, "QueryKey");
-            String webEnv = getSingleElementValue(responseString, "WebEnv");
-
-            WebTarget getRecordsTarget = pubmedWebTarget.queryParam("WebEnv", webEnv);
-            getRecordsTarget = getRecordsTarget.queryParam("query_key", queryKey);
-            getRecordsTarget = getRecordsTarget.queryParam("retmode", "xml");
-            getRecordsTarget = getRecordsTarget.path("efetch.fcgi");
-
-            invocationBuilder = getRecordsTarget.request(MediaType.TEXT_PLAIN_TYPE);
-            response = invocationBuilder.get();
-
-            List<OMElement> omElements = splitToRecords(response.readEntity(String.class));
-
-            for (OMElement record : omElements) {
-                records.add(transformSourceRecords(record));
-            }
-
-            return records;
-        }
+        return records;
     }
 }

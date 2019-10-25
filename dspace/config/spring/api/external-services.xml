@@ -36,7 +36,7 @@
         <property name="sourceIdentifier" value="lcname"/>
     </bean>
 
-    <bean class="org.dspace.external.provider.impl.PubmedArticleDataProvider">
+    <bean class="org.dspace.external.provider.impl.PubmedArticleDataProvider" init-method="init">
         <property name="sourceIdentifier" value="pubmed"/>
         <property name="metadataFieldMapping" ref="PubmedMetadataFieldMapping"/>
         <property name="baseAddress" value="https://eutils.ncbi.nlm.nih.gov/entrez/eutils/"/>
