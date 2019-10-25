@@ -79,7 +79,8 @@ public class SubmissionUploadRestRepository extends DSpaceRestRepository<Submiss
     @Override
     public Page<SubmissionUploadRest> findAll(Context context, Pageable pageable) {
         List<SubmissionConfig> subConfs = new ArrayList<SubmissionConfig>();
-        subConfs = submissionConfigReader.getAllSubmissionConfigs(pageable.getPageSize(), Math.toIntExact(pageable.getOffset()));
+        subConfs = submissionConfigReader.getAllSubmissionConfigs(pageable.getPageSize(),
+                Math.toIntExact(pageable.getOffset()));
         List<SubmissionUploadRest> results = new ArrayList<>();
         for (SubmissionConfig config : subConfs) {
             for (int i = 0; i < config.getNumberOfSteps(); i++) {
@@ -136,7 +137,7 @@ public class SubmissionUploadRestRepository extends DSpaceRestRepository<Submiss
             optionRest.setName(option.getName());
             result.getAccessConditionOptions().add(optionRest);
         }
-        result.setMetadata(submissionFormRestRepository.findOne(config.getMetadata()));
+        result.setMetadata(submissionFormRestRepository.findOne(context, config.getMetadata()));
         result.setMaxSize(config.getMaxSize());
         result.setRequired(config.isRequired());
         result.setName(config.getName());
