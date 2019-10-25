@@ -9,6 +9,7 @@ package org.dspace.app.rest.converter;
 
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
@@ -42,26 +43,26 @@ public class MockMetadataConverter implements Converter<List<MockMetadataValue>,
     @Override
     public MetadataRest convert(List<MockMetadataValue> metadataValueList) {
         // Convert each value to a DTO while retaining place order in a map of key -> SortedSet
-        Map<String, SortedSet<MetadataValueRest>> mapOfSortedSets = new HashMap<>();
+        Map<String, List<MetadataValueRest>> mapOfLists = new HashMap<>();
         for (MockMetadataValue metadataValue : metadataValueList) {
             String key = metadataValue.getSchema() + "." + metadataValue.getElement();
             if (StringUtils.isNotBlank(metadataValue.getQualifier())) {
                 key += "." + metadataValue.getQualifier();
             }
-            SortedSet<MetadataValueRest> set = mapOfSortedSets.get(key);
-            if (set == null) {
-                set = new TreeSet<>(Comparator.comparingInt(MetadataValueRest::getPlace));
-                mapOfSortedSets.put(key, set);
+            List<MetadataValueRest> list = mapOfLists.get(key);
+            if (list == null) {
+                list = new LinkedList();
+                mapOfLists.put(key, list);
             }
-            set.add(valueConverter.convert(metadataValue));
+            list.add(valueConverter.convert(metadataValue));
         }
 
         MetadataRest metadataRest = new MetadataRest();
 
         // Populate MetadataRest's map of key -> List while respecting SortedSet's order
-        Map<String, List<MetadataValueRest>> mapOfLists = metadataRest.getMap();
-        for (Map.Entry<String, SortedSet<MetadataValueRest>> entry : mapOfSortedSets.entrySet()) {
-            mapOfLists.put(entry.getKey(), entry.getValue().stream().collect(Collectors.toList()));
+        Map<String, List<MetadataValueRest>> metadataRestMap = metadataRest.getMap();
+        for (Map.Entry<String, List<MetadataValueRest>> entry : mapOfLists.entrySet()) {
+            metadataRestMap.put(entry.getKey(), entry.getValue().stream().collect(Collectors.toList()));
         }
 
         return metadataRest;
