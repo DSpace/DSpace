@@ -23,22 +23,40 @@
     <Appenders>
         <!-- A1 is for most DSpace activity -->
         <Appender name='A1'
-                  filePattern="iedemenne"
-		  type='RollingFile'
+                  filePattern="${log.dir}/dspace.log-%d{yyyy-MM-dd}"
+                  type='RollingFile'
                   fileName='${log.dir}/dspace.log'
 
         >
             <Layout type='PatternLayout'
-		    pattern='%d %-5p %c @ %m%n'/>
+                    pattern='%d %-5p %c @ %m%n'/>
+            <policies>
+                <policy type='TimeBasedTriggeringPolicy'>yyyy-MM-dd</policy>
+                <!-- Sample deletion policy:  keep last 30 archived files
+                <Delete basePath='${log.dir}'>
+                            <IfFileName glob='dspace.log-*'/>
+                            <IfAccumulatedFileCount exceeds='30'/>
+                </Delete>
+                -->
+            </policies>
         </Appender>
 
         <!-- A2 is for the checksum checker -->
         <Appender name='A2'
-                  filePattern="iedemenne"
-		  type='RollingFile'
+                  filePattern="${log.dir}/checker.log-%d{yyyy-MM-dd}"
+                  type='RollingFile'
                   fileName='${log.dir}/checker.log'>
             <Layout type='PatternLayout'
-		    pattern='%m%n'/>
+                    pattern='%m%n'/>
+            <policies>
+                <policy type='TimeBasedTriggeringPolicy'>yyyy-MM-dd</policy>
+                <!-- Sample deletion policy:  keep last 30 archived files
+                <Delete basePath='${log.dir}'>
+                            <IfFileName glob='dspace.log-*'/>
+                            <IfAccumulatedFileCount exceeds='30'/>
+                </Delete>
+                -->
+            </policies>
         </Appender>
     </Appenders>
 
@@ -60,20 +78,20 @@
 
         # Block services logging except on exceptions
         <Logger name='org.dspace.kernel'
-		level='ERROR'/>
+                level='ERROR'/>
         <Logger name='org.dspace.services'
-		level='ERROR'/>
+                level='ERROR'/>
         <Logger name='org.dspace.servicemanager'
-		level='ERROR'/>
+                level='ERROR'/>
         <Logger name='org.dspace.providers'
-		level='ERROR'/>
+                level='ERROR'/>
         <Logger name='org.dspace.utils'
-		level='ERROR'/>
+                level='ERROR'/>
 
         # Block passwords from being exposed in Axis logs.
         # (DEBUG exposes passwords in Basic Auth)
         <Logger name='org.apache.axis.handlers.http.HTTPAuthHandler'
-		level='INFO'/>
+                level='INFO'/>
         <!-- Anything not a part of DSpace -->
         <Root level='${loglevel.other}'>
             <AppenderRef ref='A1'/>
