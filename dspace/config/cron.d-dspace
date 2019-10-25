@@ -45,6 +45,9 @@ DSPACE=/var/dspace/install
 #Actualizo el indice discovery a las 23hs todos lso dias para optimizarlo y quitarle todos los docs que ya no existen
 0 20 * * *	dspace	$DSPACE/bin/dspace index-discovery -co > /dev/null
 
+#actualizo el indice de discovery cada hora
+1 * * * *       dspace  $DSPACE/bin/dspace index-discovery > /dev/null
+
 #Reconstruye el indice discovery el dia 2 de cada mes a las 22hs y lo optimiza
 #0 22 2 * *	dspace	$DSPACE/bin/dspace update-discovery-index -bo > /dev/null
 
