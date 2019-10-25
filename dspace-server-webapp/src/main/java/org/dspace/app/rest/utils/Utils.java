@@ -77,7 +77,8 @@ public class Utils {
             if (pageable.getOffset() + pageable.getPageSize() > total) {
                 pageContent = fullContents.subList(Math.toIntExact(pageable.getOffset()), total);
             } else {
-                pageContent = fullContents.subList(Math.toIntExact(pageable.getOffset()), Math.toIntExact(pageable.getOffset()) + pageable.getPageSize());
+                pageContent = fullContents.subList(Math.toIntExact(pageable.getOffset()),
+                        Math.toIntExact(pageable.getOffset()) + pageable.getPageSize());
             }
             return new PageImpl<T>(pageContent, pageable, total);
         }

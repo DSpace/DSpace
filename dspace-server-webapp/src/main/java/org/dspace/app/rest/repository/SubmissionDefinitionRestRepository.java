@@ -64,7 +64,8 @@ public class SubmissionDefinitionRestRepository extends DSpaceRestRepository<Sub
     public Page<SubmissionDefinitionRest> findAll(Context context, Pageable pageable) {
         List<SubmissionConfig> subConfs = new ArrayList<SubmissionConfig>();
         int total = submissionConfigReader.countSubmissionConfigs();
-        subConfs = submissionConfigReader.getAllSubmissionConfigs(pageable.getPageSize(), Math.toIntExact(pageable.getOffset()));
+        subConfs = submissionConfigReader.getAllSubmissionConfigs(pageable.getPageSize(),
+                Math.toIntExact(pageable.getOffset()));
         Page<SubmissionDefinitionRest> page = new PageImpl<SubmissionConfig>(subConfs, pageable, total).map(converter);
         return page;
     }

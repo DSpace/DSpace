@@ -68,6 +68,7 @@ import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.ResourceSupport;
 import org.springframework.hateoas.Resources;
 import org.springframework.hateoas.UriTemplate;
+import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -449,7 +450,7 @@ public class RestResourceController implements InitializingBean {
         DSpaceResource result = repository.wrapResource(modelObject);
         linkService.addLinks(result);
         //TODO manage HTTPHeader
-        return ControllerUtils.toResponseEntity(HttpStatus.CREATED, null, result);
+        return ControllerUtils.toResponseEntity(HttpStatus.CREATED, new HttpHeaders(), result);
     }
 
     /**
@@ -482,7 +483,7 @@ public class RestResourceController implements InitializingBean {
         DSpaceResource result = repository.wrapResource(modelObject);
         linkService.addLinks(result);
         //TODO manage HTTPHeader
-        return ControllerUtils.toResponseEntity(HttpStatus.CREATED, null, result);
+        return ControllerUtils.toResponseEntity(HttpStatus.CREATED, new HttpHeaders(), result);
     }
 
 
@@ -520,7 +521,7 @@ public class RestResourceController implements InitializingBean {
         if (modelObject != null) {
             DSpaceResource result = repository.wrapResource(modelObject);
             linkService.addLinks(result);
-            return ControllerUtils.toResponseEntity(HttpStatus.CREATED, null, result);
+            return ControllerUtils.toResponseEntity(HttpStatus.CREATED, new HttpHeaders(), result);
         } else {
             return ControllerUtils.toEmptyResponse(HttpStatus.NO_CONTENT);
         }
@@ -612,7 +613,7 @@ public class RestResourceController implements InitializingBean {
         }
         DSpaceResource result = repository.wrapResource(modelObject);
         linkService.addLinks(result);
-        return ControllerUtils.toResponseEntity(HttpStatus.CREATED, null, result);
+        return ControllerUtils.toResponseEntity(HttpStatus.CREATED, new HttpHeaders(), result);
     }
 
     /**
@@ -652,7 +653,7 @@ public class RestResourceController implements InitializingBean {
             linkService.addLinks(result);
             resources.add(result);
         }
-        return ControllerUtils.toResponseEntity(HttpStatus.OK, null, Resources.wrap(resources));
+        return ControllerUtils.toResponseEntity(HttpStatus.OK, new HttpHeaders(), Resources.wrap(resources));
     }
 
     /**
@@ -731,7 +732,7 @@ public class RestResourceController implements InitializingBean {
         DSpaceResource result = repository.wrapResource(modelObject);
         linkService.addLinks(result);
         //TODO manage HTTPHeader
-        return ControllerUtils.toResponseEntity(HttpStatus.OK, null, result);
+        return ControllerUtils.toResponseEntity(HttpStatus.OK, new HttpHeaders(), result);
 
     }
 
@@ -934,19 +935,24 @@ public class RestResourceController implements InitializingBean {
                                                                                       @RequestParam(required = false)
                                                                                               String projection,
                                                                                       HttpServletResponse response) {
+
         DSpaceRestRepository<T, ?> repository = utils.getResourceRepository(apiCategory, model);
-        Link link = linkTo(methodOn(this.getClass(), apiCategory, model).findAll(apiCategory, model,
-                                                                                 page, assembler, projection, response))
-            .withSelfRel();
+
+        RestResourceController restResourceController = methodOn(this.getClass(), apiCategory, model);
+
+        PagedResources<DSpaceResource<RestAddressableModel>> all = restResourceController
+                .findAll(apiCategory, model, page, assembler, projection, response);
+
+        ControllerLinkBuilder controllerLinkBuilder = linkTo(all);
+
+        Link link = controllerLinkBuilder.withSelfRel();
 
         Page<DSpaceResource<T>> resources;
         try {
             resources = repository.findAll(page).map(repository::wrapResource);
             resources.forEach(linkService::addLinks);
         } catch (PaginationException pe) {
-            resources = new PageImpl<DSpaceResource<T>>(new ArrayList<DSpaceResource<T>>(), page, pe.getTotal());
-        } catch (RepositoryMethodNotImplementedException mne) {
-            throw mne;
+            resources = new PageImpl<>(new ArrayList<>(), page, pe.getTotal());
         }
         PagedResources<DSpaceResource<T>> result = assembler.toResource(resources, link);
         if (repositoryUtils.haveSearchMethods(repository)) {

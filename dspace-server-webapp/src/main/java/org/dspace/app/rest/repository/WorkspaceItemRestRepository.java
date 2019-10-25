@@ -222,7 +222,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
                                     MultipartFile file) throws Exception {
 
         Context context = obtainContext();
-        WorkspaceItemRest wsi = findOne(id);
+        WorkspaceItemRest wsi = findOne(context, id);
         WorkspaceItem source = wis.find(context, id);
         List<ErrorRest> errors = new ArrayList<ErrorRest>();
         SubmissionConfig submissionConfig =
@@ -271,7 +271,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
     public void patch(Context context, HttpServletRequest request, String apiCategory, String model, Integer id,
                       Patch patch) throws SQLException, AuthorizeException {
         List<Operation> operations = patch.getOperations();
-        WorkspaceItemRest wsi = findOne(id);
+        WorkspaceItemRest wsi = findOne(context, id);
         WorkspaceItem source = wis.find(context, id);
         for (Operation op : operations) {
             //the value in the position 0 is a null value

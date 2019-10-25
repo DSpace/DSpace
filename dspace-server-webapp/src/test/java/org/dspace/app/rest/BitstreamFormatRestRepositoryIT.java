@@ -63,7 +63,7 @@ public class BitstreamFormatRestRepositoryIT extends AbstractControllerIntegrati
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$.page.size", is(20)))
                    .andExpect(jsonPath("$._links.self.href", startsWith(REST_SERVER_URL)))
-                   .andExpect(jsonPath("$._links.self.href", endsWith("/api/core/bitstreamformats")))
+                   .andExpect(jsonPath("$._links.self.href", endsWith("/api/core/bitstreamformats{?projection}")))
         ;
     }
 
