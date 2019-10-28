@@ -18,8 +18,8 @@ import java.util.List;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.DCDate;
 import org.dspace.external.provider.impl.metadatamapping.contributors.MetadataContributor;
-import org.dspace.mock.MockMetadataField;
 import org.dspace.external.provider.impl.pubmed.metadatamapping.utils.MetadatumContributorUtils;
+import org.dspace.mock.MockMetadataField;
 import org.dspace.mock.MockMetadataValue;
 import org.springframework.beans.factory.annotation.Required;
 

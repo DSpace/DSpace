@@ -101,7 +101,8 @@ public class SimpleXpathMetadatumContributor implements MetadataContributor<OMEl
                 if (el instanceof OMElement) {
                     values.add(MetadatumContributorUtils.toMockMetadataValue(field, ((OMElement) el).getText()));
                 } else if (el instanceof OMAttribute) {
-                    values.add(MetadatumContributorUtils.toMockMetadataValue(field, ((OMAttribute) el).getAttributeValue()));
+                    values.add(MetadatumContributorUtils.toMockMetadataValue(field,
+                                                                             ((OMAttribute) el).getAttributeValue()));
                 } else if (el instanceof String) {
                     values.add(MetadatumContributorUtils.toMockMetadataValue(field, (String) el));
                 } else if (el instanceof OMText) {
@@ -116,7 +117,4 @@ public class SimpleXpathMetadatumContributor implements MetadataContributor<OMEl
         }
 
     }
-
-
-
 }

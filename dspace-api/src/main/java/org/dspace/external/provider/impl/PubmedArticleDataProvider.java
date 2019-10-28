@@ -35,8 +35,6 @@ import org.jaxen.JaxenException;
 
 /**
  * Implements a data source for querying PubMed Central
- *
- * @author Roeland Dillen (roeland at atmire dot com)
  */
 public class PubmedArticleDataProvider implements ExternalDataProvider {
 
@@ -60,8 +58,8 @@ public class PubmedArticleDataProvider implements ExternalDataProvider {
     @Override
     public List<ExternalDataObject> searchExternalDataObjects(String query, int start, int limit) {
         List<List<MockMetadataValue>> metadataValuesList = getRecords(query, start, limit);
-        return metadataValuesList.stream().map(metadataValues -> getExternalDataObjectFromMetadataValues(metadataValues)).collect(
-            Collectors.toList());
+        return metadataValuesList.stream().map(metadataValues ->
+                getExternalDataObjectFromMetadataValues(metadataValues)).collect(Collectors.toList());
     }
 
     @Override
@@ -75,15 +73,25 @@ public class PubmedArticleDataProvider implements ExternalDataProvider {
     }
 
 
+    /**
+     * This method will take a list of MockMetadataValues and transform that list into an appropriate
+     * {@link ExternalDataObject}. This is done by straight up copying the metadata list into the externalDataObject's
+     * list of metadata as well as grabbing relevant Metadata and setting properties with them like the title
+     * @param metadataValues    The list of MetadataValues to be processed
+     * @return                  An ExternalDataObject with the given Metadata and properties filled in
+     */
     private ExternalDataObject getExternalDataObjectFromMetadataValues(List<MockMetadataValue> metadataValues) {
         ExternalDataObject externalDataObject = new ExternalDataObject(sourceIdentifier);
         externalDataObject.setMetadata(metadataValues);
         for (MockMetadataValue mockMetadataValue : metadataValues) {
-            if (StringUtils.equals(mockMetadataValue.getSchema(), "dc") && StringUtils.equals(mockMetadataValue.getElement(), "title")) {
+            if (StringUtils.equals(mockMetadataValue.getSchema(), "dc") &&
+                StringUtils.equals(mockMetadataValue.getElement(), "title")) {
                 externalDataObject.setDisplayValue(mockMetadataValue.getValue());
                 externalDataObject.setValue(mockMetadataValue.getValue());
             }
-            if (StringUtils.equals(mockMetadataValue.getSchema(), "dc") && StringUtils.equals(mockMetadataValue.getElement(), "identifier") && StringUtils.equals(mockMetadataValue.getQualifier(), "pubmed")) {
+            if (StringUtils.equals(mockMetadataValue.getSchema(), "dc") &&
+                StringUtils.equals(mockMetadataValue.getElement(), "identifier") &&
+                StringUtils.equals(mockMetadataValue.getQualifier(), "pubmed")) {
                 externalDataObject.setId(mockMetadataValue.getValue());
             }
         }
@@ -123,15 +131,27 @@ public class PubmedArticleDataProvider implements ExternalDataProvider {
         this.baseAddress = baseAddress;
     }
 
+    /**
+     * Generic setter for the sourceIdentifier property
+     * @param sourceIdentifier  the String sourceIdentifier to be set
+     */
     public void setSourceIdentifier(String sourceIdentifier) {
         this.sourceIdentifier = sourceIdentifier;
     }
 
 
+    /**
+     * Generic setter for the metadataFieldMapping property
+     * @param metadataFieldMapping  The List of MetadataContributors to be set in this object
+     */
     public void setMetadataFieldMapping(List<MetadataContributor> metadataFieldMapping) {
         this.metadataFieldMapping = metadataFieldMapping;
     }
 
+    /**
+     * Generic getter for the metadataFieldMapping property
+     * @return  The list with the MetadataContributor for this object
+     */
     public List<MetadataContributor> getMetadataFieldMapping() {
         return metadataFieldMapping;
     }
@@ -158,6 +178,12 @@ public class PubmedArticleDataProvider implements ExternalDataProvider {
         return Integer.parseInt(count);
     }
 
+    /**
+     * This method grabs the value of an element in the XML structure
+     * @param src           The source in which the element is to be found
+     * @param elementName   The name of the element that should have its value returned
+     * @return              The value for the element in the given source
+     */
     private String getSingleElementValue(String src, String elementName) {
         OMXMLParserWrapper records = OMXMLBuilderFactory.createOMBuilder(new StringReader(src));
         OMElement element = records.getDocumentElement();
@@ -229,6 +255,11 @@ public class PubmedArticleDataProvider implements ExternalDataProvider {
         return metadataValuesList;
     }
 
+    /**
+     * This method takes a String representation of all the records and turns it into a list of OMElement objects
+     * @param recordsSrc    The source String representation to be parsed
+     * @return              The list of parsed OMElement objects
+     */
     private List<OMElement> splitToRecords(String recordsSrc) {
         OMXMLParserWrapper records = OMXMLBuilderFactory.createOMBuilder(new StringReader(recordsSrc));
         OMElement element = records.getDocumentElement();
@@ -267,6 +298,11 @@ public class PubmedArticleDataProvider implements ExternalDataProvider {
         return constructMetadataValueListFromOMElement(omElements.get(0));
     }
 
+    /**
+     * This method will transform an OMElement record into a list of MockMetadataValues
+     * @param record    The OMElement object to be transformed
+     * @return          The list of MockMetadataValues resulting from this OMElement object
+     */
     private List<MockMetadataValue> constructMetadataValueListFromOMElement(OMElement record) {
         List<MockMetadataValue> values = new LinkedList<>();
         for (MetadataContributor<OMElement> metadataContributor : metadataFieldMapping) {

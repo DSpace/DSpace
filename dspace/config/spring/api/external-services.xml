@@ -38,6 +38,7 @@
 
     <bean class="org.dspace.external.provider.impl.PubmedArticleDataProvider" init-method="init">
         <property name="sourceIdentifier" value="pubmed"/>
+        <!-- this bean is found in pubmed-integration.xml in order to keep this file clean and not bloated -->
         <property name="metadataFieldMapping" ref="pubmedMetadataFieldList"/>
         <property name="baseAddress" value="https://eutils.ncbi.nlm.nih.gov/entrez/eutils/"/>
     </bean>

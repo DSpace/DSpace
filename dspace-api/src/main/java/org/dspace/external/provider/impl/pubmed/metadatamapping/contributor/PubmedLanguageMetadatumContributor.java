@@ -16,8 +16,8 @@ import java.util.Locale;
 
 import org.apache.logging.log4j.Logger;
 import org.dspace.external.provider.impl.metadatamapping.contributors.MetadataContributor;
-import org.dspace.mock.MockMetadataField;
 import org.dspace.external.provider.impl.pubmed.metadatamapping.utils.MetadatumContributorUtils;
+import org.dspace.mock.MockMetadataField;
 import org.dspace.mock.MockMetadataValue;
 
 /**
@@ -73,7 +73,8 @@ public class PubmedLanguageMetadatumContributor<T> implements MetadataContributo
 
             for (MockMetadataValue mockMetadataValue : languageList) {
                 // Add the iso2 language code corresponding to the retrieved iso3 code to the metadata
-                values.add(MetadatumContributorUtils.toMockMetadataValue(field, iso3toIso2.get(mockMetadataValue.getValue().toLowerCase())));
+                values.add(MetadatumContributorUtils
+                               .toMockMetadataValue(field, iso3toIso2.get(mockMetadataValue.getValue().toLowerCase())));
             }
         } catch (Exception e) {
             log.error("Error", e);

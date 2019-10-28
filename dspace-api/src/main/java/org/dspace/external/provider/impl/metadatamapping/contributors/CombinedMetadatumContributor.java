@@ -11,8 +11,8 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.dspace.mock.MockMetadataField;
 import org.dspace.external.provider.impl.pubmed.metadatamapping.utils.MetadatumContributorUtils;
+import org.dspace.mock.MockMetadataField;
 import org.dspace.mock.MockMetadataValue;
 
 /**
@@ -63,7 +63,8 @@ public class CombinedMetadatumContributor<T> implements MetadataContributor<T> {
         LinkedList<LinkedList<MockMetadataValue>> metadatumLists = new LinkedList<>();
 
         for (MetadataContributor metadatumContributor : metadatumContributors) {
-            LinkedList<MockMetadataValue> metadatums = (LinkedList<MockMetadataValue>) metadatumContributor.contributeMetadata(t);
+            LinkedList<MockMetadataValue> metadatums = (LinkedList<MockMetadataValue>) metadatumContributor
+                .contributeMetadata(t);
             metadatumLists.add(metadatums);
         }
 
