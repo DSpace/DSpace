@@ -17,6 +17,7 @@ import org.hibernate.Criteria;
 import org.hibernate.criterion.Restrictions;
 
 import java.sql.SQLException;
+import java.util.List;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the HarvestedItem object.
@@ -42,13 +43,17 @@ public class HarvestedItemDAOImpl extends AbstractHibernateDAO<HarvestedItem> im
     @Override
     public HarvestedItem findByOAIId(Context context, String itemOaiID, Collection collection) throws SQLException {
         Criteria criteria = createCriteria(context, HarvestedItem.class);
-        criteria.createAlias("item", "i");
-        criteria.add(
-                Restrictions.and(
-                        Restrictions.eq("oaiId", itemOaiID),
-                        Restrictions.eq("i.owningCollection", collection)
-                )
-        );
-        return singleResult(criteria);
+        criteria.add(Restrictions.eq("oaiId", itemOaiID));
+        HarvestedItem harvestedItem = singleResult(criteria);
+        if (harvestedItem != null && harvestedItem.getItem() != null) {
+            List<Collection> collections = harvestedItem.getItem().getCollections();
+            if (collections != null && !collections.isEmpty()) {
+                Collection collectionOfHarvested = collections.get(0);
+                if (!collectionOfHarvested.equals(collection)) {
+                    harvestedItem = null;
+                }
+            }
+        }
+        return harvestedItem;
     }
 }
