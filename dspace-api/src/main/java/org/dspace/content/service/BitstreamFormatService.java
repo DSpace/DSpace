@@ -147,4 +147,17 @@ public interface BitstreamFormatService extends DSpaceCRUDService<BitstreamForma
      * @throws SQLException if database error
      */
     public BitstreamFormat guessFormat(Context context, Bitstream bitstream) throws SQLException;
+    
+    /**
+     * Attempt to identify the format of a particular bitstream. If the format
+     * is unknown, null is returned.
+     *
+     * @param context context
+     * @param filename
+     *            the filename to identify the format of
+     *
+     * @return a format from the bitstream format registry, or null
+     * @throws SQLException if database error
+     */
+    public BitstreamFormat guessFormat(Context context, String filename) throws SQLException;
 }

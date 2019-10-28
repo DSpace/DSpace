@@ -457,14 +457,14 @@ public class BitstreamResource extends Resource
             log.trace("Updating bitstream metadata.");
 
             dspaceBitstream.setDescription(context, bitstream.getDescription());
-            if (getMimeType(bitstream.getName()) == null)
+            BitstreamFormat guessedFormat = bitstreamFormatService.guessFormat(context, bitstream.getName());
+            if (guessedFormat == null)
             {
                 BitstreamFormat unknownFormat = bitstreamFormatService.findUnknown(context);
                 bitstreamService.setFormat(context, dspaceBitstream, unknownFormat);
             }
             else
             {
-                BitstreamFormat guessedFormat = bitstreamFormatService.findByMIMEType(context, getMimeType(bitstream.getName()));
                 bitstreamService.setFormat(context, dspaceBitstream, guessedFormat);
             }
             dspaceBitstream.setName(context, bitstream.getName());
@@ -720,18 +720,6 @@ public class BitstreamResource extends Resource
         }
 
         return Response.status(Status.OK).build();
-    }
-
-    /**
-     * Return the MIME type of the file, by file extension.
-     *
-     * @param name
-     *            Name of file.
-     * @return String filled with type of file in MIME style.
-     */
-    static String getMimeType(String name)
-    {
-        return URLConnection.guessContentTypeFromName(name);
     }
 
     /**
