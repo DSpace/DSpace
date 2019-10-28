@@ -248,4 +248,51 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
         }
         return dsoConverter.fromModel(item);
     }
+
+    public ItemRest patchTemplateItem(Context context, UUID uuid, JsonNode jsonNode)
+        throws SQLException, AuthorizeException {
+        Collection collection = getCollection(context, uuid);
+
+        Item item = collection.getTemplateItem();
+        if (item == null) {
+            throw new UnprocessableEntityException(
+                "TemplateItem from " + CollectionRest.CATEGORY + "." + CollectionRest.NAME + " with id: "
+                    + uuid + " not found");
+        }
+
+        JsonPatchConverter patchConverter = new JsonPatchConverter(mapper);
+        Patch patch = patchConverter.convert(jsonNode);
+        for (Operation operation : patch.getOperations()) {
+            if (operation.getPath().equals("/inArchive")
+                || operation.getPath().equals("/discoverable")
+                || operation.getPath().equals("/withdrawn")) {
+                throw new UnprocessableEntityException(
+                    "The template item should not be archived, discoverable or withdrawn."
+                        + " Therefore editing these values is not allowed.");
+            }
+        }
+
+        ItemRest patchedItemRest = itemPatch.patch(itemConverter.fromModel(item), patch.getOperations());
+        if (!itemConverter.fromModel(item).getMetadata().equals(patchedItemRest.getMetadata())) {
+            metadataConverter.setMetadata(obtainContext(), item, patchedItemRest.getMetadata());
+        }
+        context.commit();
+
+        return itemConverter.fromModel(item);
+    }
+
+    public void removeTemplateItem(Context context, UUID uuid) throws SQLException, IOException, AuthorizeException {
+        Collection collection = getCollection(context, uuid);
+
+        Item item = collection.getTemplateItem();
+        if (item == null) {
+            throw new UnprocessableEntityException(
+                "TemplateItem from " + CollectionRest.CATEGORY + "." + CollectionRest.NAME + " with id: "
+                    + uuid + " not found");
+        }
+
+        cs.removeTemplateItem(context, collection);
+        cs.update(context, collection);
+        context.commit();
+    }
 }
