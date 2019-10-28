@@ -78,7 +78,7 @@
       <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
       <type>submission-form</type>
     </step>
-    <step id="publication_indexing" mandatory="true">
+    <step id="publication_indexing" mandatory="false">
       <heading>submit.progressbar.describe.publication_indexing</heading>
       <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
       <type>submission-form</type>
@@ -88,7 +88,7 @@
       <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
       <type>submission-form</type>
     </step>
-    <step id="publication_references" mandatory="true">
+    <step id="publication_references" mandatory="false">
       <heading>submit.progressbar.describe.publication_references</heading>
       <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
       <type>submission-form</type>

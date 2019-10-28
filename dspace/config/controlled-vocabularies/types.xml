@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<node id="ResourceTypeGenres" label="Controlled Vocabulary for Resource Type Genres">
+	<isComposedBy>
+		<node id="c_e9a0" label="interactive resource">
+			<isComposedBy>
+				<node id="c_7ad9" label="website">
+					<hasNote>A website, also written as web site or simply site, is a set of related web pages typically served from a single web domain. A website is hosted on at least one web server, accessible via a network such as the Internet or a private local area network through an Internet address known as a uniform resource locator (URL). All publicly accessible websites collectively constitute the World Wide Web.</hasNote>
+				</node>
+			</isComposedBy>
+			<hasNote>A resource requiring interaction from the user to be understood, executed, or experienced. Examples include forms on Web pages, applets, multimedia learning objects, chat services, or virtual reality environments.</hasNote>
+		</node>
+	    <node id="c_ddb1" label="dataset">
+			<isComposedBy>
+				<node id="c_26e4" label="interview">
+					<hasNote>A discussion between a reporter, host, panel, or audience and a newsmaker, author, or celebrity, recorded (edited or unedited) in print, on film or video, as transcript or as a sound recording.</hasNote>
+				</node>
+			</isComposedBy>
+			<hasNote>A collection of related facts and data encoded in a defined structure.</hasNote>
+		</node>
+	    <node id="c_c513" label="image">
+			<isComposedBy>
+				<node id="c_8a7e" label="moving image">
+					<isComposedBy>
+						<node id="c_12ce" label="video">
+							<hasNote>A recording of visual images, usually in motion and with sound accompaniment.</hasNote>
+						</node>
+					</isComposedBy>
+					<hasNote>A moving display, either generated dynamically by a computer program or formed from a series of pre-recorded still images imparting an impression of motion when shown in succession.</hasNote>
+				</node>
+				<node id="c_ecc8" label="still image">
+					<hasNote>A recorded static visual representation. This class of image includes diagrams, drawings, graphs, graphic designs, plans, photographs and prints.</hasNote>
+				</node>
+			</isComposedBy>
+			<hasNote>A visual representation other than text, including all types of moving image and still image.</hasNote>
+		</node>
+	    <node id="c_1843" label="other">
+			<hasNote>A rest category which may cover text, interactive, sound, or image-based resources not explicitly addressed in any concept in this vocabulary.</hasNote>
+		</node>
+	    <node id="c_5ce6" label="software">
+			<isComposedBy>
+				<node id="c_c950" label="research software">
+					<hasNote>Research software (as opposed to simply software) is software that is developed within academia and used for the purposes of research: to generate, process and analyse results. </hasNote>
+				</node>
+			</isComposedBy>
+			<hasNote>A computer program in source code (text) or compiled form.</hasNote>
+		</node>
+	    <node id="c_393c" label="workflow">
+			<hasNote>A recorded sequence of connected steps, which may be automated, specifying a reliably repeatable sequence of operations to be undertaken when conducting a particular job, for example an in silico investigation that extracts and processes information from a number of bioinformatics databases.</hasNote>
+		</node>
+	    <node id="c_12cc" label="cartographic material">
+			<isComposedBy>
+				<node id="c_12cd" label="map">
+					<hasNote>Defined as a representation normally to scale and on a flat medium, of a selection of material or abstract features on, or in relation to, the surface of the earth or of another celestial body.</hasNote>
+				</node>
+			</isComposedBy>
+			<hasNote>Any material representing the whole or part of the earth or any celestial body at any scale. Cartographic materials include two- and three-dimensional maps and plans (including maps of imaginary places); aeronautical, navigational, and celestial charts; atlases; globes; block diagrams; sections; aerial photographs with a cartographic purpose; bird's-eye views (map views), etc.</hasNote>
+		</node>
+	    <node id="c_18cc" label="sound">
+			<isComposedBy>
+				<node id="c_18cd" label="musical composition">
+					<hasNote>Musical composition can refer to an original piece of music, the structure of a musical piece, or the process of creating a new piece of music.</hasNote>
+				</node>
+			</isComposedBy>
+			<hasNote>A resource primarily intended to be heard. Examples include a music playback file format, an audio compact disc, and recorded speech or sounds.</hasNote>
+		</node>
+	    <node id="c_18cf" label="text">
+			<isComposedBy>
+				<node id="c_1162" label="annotation">
+					<hasNote>An annotation in the sense of a legal note is a legally explanatory comment on a decision handed down by a court or arbitral tribunal.</hasNote>
+				</node>
+				<node id="c_86bc" label="bibliography">
+					<hasNote>A systematic list or enumeration of written works by a specific author or on a given subject.</hasNote>
+				</node>
+				<node id="c_2f33" label="book">
+					<isComposedBy>
+						<node id="c_3248" label="book part">
+							<hasNote>A defined chapter or section of a book, usually with a separate title or number.</hasNote>
+						</node>
+					</isComposedBy>
+					<hasNote>A non-serial publication that is complete in one volume or a designated finite number of volumes.</hasNote>
+				</node>
+				<node id="c_c94f" label="conference object">
+					<isComposedBy>
+						<node id="c_f744" label="conference proceedings">
+							<isComposedBy>
+								<node id="c_5794" label="conference paper">
+									<hasNote>A conference paper that is submitted to a conference and presented to the audience. The conference paper is published in proceedings.</hasNote>
+								</node>
+								<node id="c_6670" label="conference poster">
+									<hasNote>A conference poster that is submitted to a conference and presented there at a poster presentation. The conference poster is published in proceedings.</hasNote>
+								</node>
+							</isComposedBy>
+							<hasNote>Conference proceedings is the official record of a conference meeting. It is a collection of documents which corresponds to the presentations given at the conference. It may include additional content.</hasNote>
+						</node>
+						<node id="c_18cp" label="conference paper not in proceedings">
+							<hasNote>A conference paper that is submitted to a conference and presented to the audience. The conference paper is not published in proceedings.</hasNote>
+						</node>
+						<node id="c_18co" label="conference poster not in proceedings">
+							<hasNote>A display poster, typically containing text with illustrative figures and/or tables, usually reporting research results or proposing hypotheses, submitted for acceptance to and/or presented at a conference, seminar, symposium, workshop or similar event. </hasNote>
+						</node>
+					</isComposedBy>
+					<hasNote>All kind of digital resources contributed to a conference, like conference presentation (slides), conference report, conference lecture, abstracts, demonstrations. For conference papers, posters or proceedings the specific concepts should be used</hasNote>
+				</node>
+				<node id="c_8544" label="lecture">
+					<hasNote>A transcription of a talk delivered during an academic event.</hasNote>
+				</node>
+				<node id="c_0857" label="letter">
+					<hasNote></hasNote>
+				</node>
+				<node id="c_2659" label="periodical">
+					<isComposedBy>
+						<node id="c_0640" label="journal">
+							<isComposedBy>
+								<node id="c_3e5a" label="contribution to journal">
+									<isComposedBy>
+										<node id="c_6501" label="journal article">
+											<isComposedBy>
+												<node id="c_beb9" label="data paper">
+													<hasNote>A data paper is a scholarly publication describing a particular dataset or group of dataset, published in the form of a peer-reviewed article in a scholarly journal.</hasNote>
+												</node>
+												<node id="c_dcae04bc" label="review article">
+													<hasNote>A review article is a secondary source, that is, it is written about other articles, and does not report original research of its own.</hasNote>
+												</node>
+												<node id="c_2df8fbb1" label="research article">
+													<hasNote>A research article is a primary source, that is, it reports the methods and results of an original study performed by the authors.</hasNote>
+												</node>
+												<node id="c_7acd" label="corrigendum">
+													<hasNote>A formal correction to an error introduced by the author into a previously published document.</hasNote>
+												</node>
+												<node id="c_7bab" label="software paper">
+													<hasNote>A software paper should include the rationale for the development of the tool and details of the code used for its construction</hasNote>
+												</node>
+											</isComposedBy>
+											<hasNote>An article on a particular topic and published in a journal issue.</hasNote>
+										</node>
+										<node id="c_b239" label="editorial">
+											<hasNote>A brief essay expressing the opinion or position of the chief editor(s) of a (academic) journal with respect to a current political, social, cultural, or professional issue.</hasNote>
+										</node>
+										<node id="c_545b" label="letter to the editor">
+											<hasNote>A letter to the editor is a letter sent to a periodical about issues of concern from its readers.</hasNote>
+										</node>
+									</isComposedBy>
+									<hasNote>A contribution to a journal denotes a work published in a journal. If applicable sub-terms should be chosen.</hasNote>
+								</node>
+								<node id="c_2fe3" label="newspaper">
+									<isComposedBy>
+										<node id="c_998f" label="newspaper article">
+											<hasNote>Work consisting of a news item appearing in a general-interest newspaper or other general news periodical, containing information of current and timely interest in a field</hasNote>
+										</node>
+									</isComposedBy>
+									<hasNote>A newspaper is a printed publication (usually issued daily or weekly) consisting of folded unstapled sheets and containing news, articles, advertisements, and correspondence.</hasNote>
+								</node>
+								<node id="c_2cd9" label="magazine">
+									<hasNote>A popular interest periodical usually containing articles on a variety of topics, written by various authors in a nonscholarly style or a trade publication, unlike a consumer publication, covers a specific topic for people who work in that particular field or industry.</hasNote>
+								</node>
+							</isComposedBy>
+							<hasNote>A journal is a serial publication devoted to disseminating original research and current developments on a subject.</hasNote>
+						</node>
+						<node id="" label="">
+							<hasNote></hasNote>
+						</node>
+						<node id="" label="">
+							<hasNote></hasNote>
+						</node>
+					</isComposedBy>
+					<hasNote>A periodical is a serial publication with its own distinctive title, characterized by a variety of contents and contributors, and issued at regular intervals.</hasNote>
+				</node>
+				<node id="c_15cd" label="patent">
+					<hasNote>A patent or patent application.</hasNote>
+				</node>
+				<node id="c_816b" label="preprint">
+					<hasNote>Pre-print describes the first draft of the article - before peer-review, even before any contact with a publisher.</hasNote>
+				</node>
+				<node id="c_93fc" label="report">
+					<isComposedBy>
+						<node id="c_ba1f" label="report part">
+							<hasNote>Part of a report</hasNote>
+						</node>
+						<node id="c_18ww" label="internal report">
+							<hasNote>An internal report is a record of findings collected for internal use. It is not designed to be made public and may include confidential or proprietary information.</hasNote>
+						</node>
+						<node id="c_18wz" label="memorandum">
+							<hasNote>It is a note, document or other communication that helps the memory by recording events or observations on a topic. A memorandum can have only a certain number of formats; it may have a format specific to an office or institution.</hasNote>
+						</node>
+						<node id="c_18wq" label="other type of report">
+							<hasNote>Other types of report.</hasNote>
+						</node>
+						<node id="c_186u" label="policy report">
+							<hasNote>A policy report is a type of report that provides an in-depth look at major policy developments and events.</hasNote>
+						</node>
+						<node id="c_18op" label="project deliverable">
+							<isComposedBy>
+								<node id="c_ab20" label="data management plan">
+									<hasNote>A formal document that outlines how and where data will be collected and managed, both during and after a research project.</hasNote>
+								</node>
+							</isComposedBy>
+							<hasNote>A project deliverable is an “outcome” as a result of a project that is intended to be delivered to a customer (e.g. funder). Examples of deliverable are report, document, work package or any other building block of an overall project.</hasNote>
+						</node>
+						<node id="c_18hj" label="report to funding agency">
+							<hasNote>A report to a funding agency is a document written by beneficiaries of project grants.</hasNote>
+						</node>
+						<node id="c_18ws" label="research report">
+							<hasNote>Research Reports are reports that typically provide an in-depth study of a particular topic or describe the results of a research project. </hasNote>
+						</node>
+						<node id="c_18gh" label="technical report">
+							<hasNote>A technical report is a document that records the procedure adopted and results obtained from a scientific or technical activity or investigation.</hasNote>
+						</node>
+					</isComposedBy>
+					<hasNote>A report is a separately published record of research findings, research still in progress, policy developments and events, or other technical findings, usually bearing a report number and sometimes a grant number assigned by the funding agency.</hasNote>
+				</node>
+				<node id="c_baaf" label="research proposal">
+					<hasNote>A research proposal is a document proposing a research project, generally in the sciences or academia, and generally constitutes a request for sponsorship of that research.</hasNote>
+				</node>
+				<node id="c_efa0" label="review">
+					<isComposedBy>
+						<node id="c_ba08" label="book review">
+							<hasNote>A written review and critical analysis of the content, scope and quality of a book or other monographic work.</hasNote>
+						</node>
+					</isComposedBy>
+					<hasNote>A review of others' published work.</hasNote>
+				</node>
+				<node id="c_71bd" label="technical documentation">
+					<hasNote>Technical documentation refers to any type of documentation that describes handling, functionality and architecture of a technical product or a product under development or use.</hasNote>
+				</node>
+				<node id="c_8042" label="working paper">
+					<hasNote>An unpublished paper, usually circulated privately among a small group of peers, to provide information or with a request for comments or editorial improvement.</hasNote>
+				</node>
+				<node id="c_46ec" label="thesis">
+					<isComposedBy>
+						<node id="c_7a1f" label="bachelor thesis">
+							<hasNote>A thesis reporting a research project undertaken as part of an undergraduate course of education leading to a bachelor's degree.</hasNote>
+						</node>
+						<node id="c_db06" label="doctoral thesis">
+							<hasNote>A thesis reporting the research undertaken during a period of graduate study leading to a doctoral degree.</hasNote>
+						</node>
+						<node id="c_bdcc" label="master thesis">
+							<hasNote>A thesis reporting a research project undertaken as part of a graduate course of education leading to a master's degree.</hasNote>
+						</node>
+					</isComposedBy>
+					<hasNote>A thesis or dissertation is a document submitted in support of candidature for an academic degree or professional qualification presenting the author's research and findings.</hasNote>
+				</node>
+				<node id="c_18cw" label="musical notation">
+					<hasNote>Musical notation is any system used to visually represent aurally perceived music through the use of written symbols, including ancient or modern musical symbols.</hasNote>
+				</node>
+				<node id="c_6947" label="blog post">
+					<hasNote>A piece of writing or other item of content published on a blog.</hasNote>
+				</node>
+				<node id="c_0040" label="manuscript">
+					<hasNote>A manuscript is a work of any kind (text, inscription, music score, map, etc.) written entirely by hand.</hasNote>
+				</node>
+			</isComposedBy>
+			<hasNote>A resource consisting primarily of words for reading. Examples include books, letters, dissertations, poems, newspapers, articles, archives of mailing lists. Note that facsimiles or images of texts are still of the genre Text.</hasNote>
+		</node>
+	    <node id="c_e059" label="learning object">
+			<hasNote></hasNote>
+		</node>
+	    <node id="c_cb28" label="clinical trial">
+			<hasNote></hasNote>
+		</node>
+	    <node id="c_7877" label="clinical study">
+			<hasNote></hasNote>
+		</node>
+	</isComposedBy>
+	<hasNote>The Resource Type vocabulary defines concepts to identify the genre of a resource. Such resources, like publications, research data, audio and video objects, are typically deposited in institutional and thematic repositories or published in ejournals. This vocabulary supports a hierarchical model that relates narrower and broader concepts. Multilingual labels regard regional distinctions in language and term. Concepts of this vocabulary are mapped with terms and concepts of similar vocabularies and dictionaries.</hasNote>
+</node>
