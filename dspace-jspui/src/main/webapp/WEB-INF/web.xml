@@ -716,7 +716,7 @@
   </servlet-mapping>
 
   <servlet-mapping>
-    <servlet-name>simple-search</servlet-name>
+    <servlet-name>Spring MVC Servlet</servlet-name>
     <url-pattern>/simple-search</url-pattern>
   </servlet-mapping>
   

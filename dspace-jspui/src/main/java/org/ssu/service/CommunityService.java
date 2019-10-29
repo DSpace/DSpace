@@ -13,22 +13,14 @@ import org.dspace.core.Context;
 import org.springframework.stereotype.Service;
 import org.ssu.entity.response.CommunityResponse;
 import org.ssu.entity.response.ItemResponse;
-import org.ssu.service.localization.AuthorsCache;
-import org.ssu.service.localization.TypeLocalization;
-import org.ssu.service.statistics.EssuirStatistics;
 
 import javax.annotation.Resource;
 import java.sql.SQLException;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 public class CommunityService {
-
-    @Resource
-    private EssuirStatistics essuirStatistics;
 
     @Resource
     private ItemService itemService;
@@ -77,7 +69,6 @@ public class CommunityService {
     }
 
     public List<ItemResponse> getShortList(Context context, BrowseInfo browserInfo) {
-        Locale locale = context.getCurrentLocale();
         return Arrays.stream(browserInfo.getStringResults())
                 .map(item -> new ItemResponse.Builder()
                 .withTitle(StringEscapeUtils.escapeHtml(item[0]))
@@ -85,27 +76,12 @@ public class CommunityService {
                 .build())
                 .collect(Collectors.toList());
     }
-    public List<ItemResponse> getItems(Context context, BrowseInfo browserInfo) throws BrowseException {
+    public List<ItemResponse> getItems(Context context, BrowseInfo browserInfo) {
         Locale locale = context.getCurrentLocale();
-
-        Function<Item, String> extractAuthorListForItem = (item) ->
-            itemService.extractAuthorListForItem(item)
-                    .stream()
-                    .map(author -> String.format("%s, %s", author.getSurname(locale), author.getInitials(locale)))
-                    .map(author -> String.format("<a href=\"/browse?type=author&value=%s\">%s</a>", author, author))
-                    .collect(Collectors.joining("; "));
 
         return browserInfo.getBrowseItemResults()
                 .stream()
-                .map(item -> new ItemResponse.Builder()
-                .withTitle(item.getName())
-                        .withYear(itemService.extractIssuedYearForItem(item))
-                        .withHandle(item.getHandle())
-                        .withAuthors(extractAuthorListForItem.apply(item))
-                        .withType(itemService.getItemTypeLocalized(item, locale))
-                        .withViews(essuirStatistics.getViewsForItem(item.getLegacyId()))
-                        .withDownloads(essuirStatistics.getDownloadsForItem(item.getLegacyId()))
-                        .build())
+                .map(item -> itemService.fetchItemresponseDataForItem(item, locale))
                 .filter(item -> item.getYear() != null)
                 .collect(Collectors.toList());
     }

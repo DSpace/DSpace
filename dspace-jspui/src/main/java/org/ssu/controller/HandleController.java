@@ -76,13 +76,6 @@ public class HandleController {
     @Resource
     private AuthorsCache authorsCache;
 
-    @RequestMapping(value = "/123456789/{itemId}/simple-search")
-    public ModelAndView simpleSearchInCommunity(ModelAndView model, HttpServletRequest request) {
-        System.out.println("in search query");
-
-        return model;
-    }
-
     @RequestMapping(value = "/123456789/{itemId}")
     public ModelAndView entrypoint(HttpServletRequest request, HttpServletResponse response,  @PathVariable("itemId") String itemId, ModelAndView model) throws SQLException, ItemCountException, PluginException, AuthorizeException, ServletException, BrowseException, IOException, SortException, CrosswalkException {
         Context dspaceContext = UIUtil.obtainContext(request);

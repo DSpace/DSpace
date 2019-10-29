@@ -11,12 +11,13 @@
     <div class="col-sm-6">
         <select id = "order" name="order" class="form-control">
             <option value="ASC"
-                    <c:if test="${\"ACS\".equals(sortOrder)}">
+                    <c:if test="${\"ASC\".equals(sortOrder.toUpperCase())}">
                         selected="selected"
                     </c:if>
             ><fmt:message key="browse.order.asc" /></option>
+
             <option value="DESC"
-                    <c:if test="${\"DESC\".equals(sortOrder)}">
+                    <c:if test="${\"DESC\".equals(sortOrder.toUpperCase())}">
                         selected="selected"
                     </c:if>
             ><fmt:message key="browse.order.desc" /></option>
