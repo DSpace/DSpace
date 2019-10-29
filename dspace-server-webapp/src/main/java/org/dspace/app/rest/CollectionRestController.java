@@ -35,7 +35,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-
+/**
+ * This RestController takes care of the creation and deletion of Collection's nested objects
+ * This class will typically receive the UUID of a Collection and it'll perform logic on its nested objects
+ */
 @RestController
 @RequestMapping("/api/" + CollectionRest.CATEGORY + "/" + CollectionRest.PLURAL_NAME)
 public class CollectionRestController {
