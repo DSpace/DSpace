@@ -14,6 +14,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.hamcrest.Matchers;
 import org.junit.Test;
 
 /**
@@ -23,6 +24,20 @@ import org.junit.Test;
  * @author Tom Desair (tom dot desair at atmire dot com)
  */
 public class RootRestResourceControllerIT extends AbstractControllerIntegrationTest {
+
+    @Test
+    public void serverPropertiesTest() throws Exception {
+      //When we call the root endpoint
+        getClient().perform(get("/api"))
+                   //The status has to be 200 OK
+                   .andExpect(status().isOk())
+                   //We expect the content type to be "application/hal+json;charset=UTF-8"
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$.dspaceURL", Matchers.is("http://localhost:3000")))
+                   .andExpect(jsonPath("$.dspaceName", Matchers.is("DSpace at My University")))
+                   .andExpect(jsonPath("$.dspaceRest", Matchers.is(BASE_REST_SERVER_URL)))
+                   .andExpect(jsonPath("$.type", Matchers.is("root")));
+    }
 
     @Test
     public void listDefinedEndpoint() throws Exception {

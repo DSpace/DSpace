@@ -68,12 +68,12 @@ public class MappedItemRestController {
      * returning only items that belong to a different collection but are mapped to the given one.
      * These Items are then encapsulated in a MappedItemResourceWrapper and returned
      *
-     * curl -X GET http://<dspace.restUrl>/api/core/collections/{uuid}/mappedItems
+     * curl -X GET http://<dspace.baseUrl>/api/core/collections/{uuid}/mappedItems
      *
      * Example:
      * <pre>
      * {@code
-     *      curl -X GET http://<dspace.restUrl>/api/core/collections/8b632938-77c2-487c-81f0-e804f63e68e6/mappedItems
+     *      curl -X GET http://<dspace.baseUrl>/api/core/collections/8b632938-77c2-487c-81f0-e804f63e68e6/mappedItems
      * }
      * </pre>
      *

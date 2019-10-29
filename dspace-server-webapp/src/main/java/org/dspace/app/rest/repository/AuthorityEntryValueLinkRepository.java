@@ -20,6 +20,7 @@ import org.dspace.content.authority.service.ChoiceAuthorityService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
@@ -49,6 +50,9 @@ public class AuthorityEntryValueLinkRepository extends AbstractDSpaceRestReposit
         Context context = obtainContext();
         ChoiceAuthority choiceAuthority = cas.getChoiceAuthorityByAuthorityName(name);
         Choice choice = choiceAuthority.getChoice(null, relId, context.getCurrentLocale().toString());
+        if (choice == null) {
+            throw new ResourceNotFoundException("The authority was not found");
+        }
         return authorityUtils.convertEntry(choice, name);
     }
 
