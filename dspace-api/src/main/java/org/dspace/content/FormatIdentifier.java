@@ -40,6 +40,21 @@ public class FormatIdentifier
         // FIXME: Just setting format to first guess
         // For now just get the file name       
 
+        return guessFormat(context, filename);
+    }
+    
+    /**
+     * Attempt to identify the format of a particular file by filename. If the format
+     * is unknown, null is returned.
+     * 
+     * @param filename
+     *            the name of the bitstream to identify the format of
+     * 
+     * @return a format from the bitstream format registry, or null
+     */
+    public static BitstreamFormat guessFormat(Context context,
+            String filename) throws SQLException
+    {
         // Gracefully handle the null case
         if (filename == null)
         {
