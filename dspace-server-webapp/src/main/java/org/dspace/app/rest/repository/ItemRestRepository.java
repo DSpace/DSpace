@@ -28,6 +28,7 @@ import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.hateoas.ItemResource;
 import org.dspace.app.rest.model.patch.Patch;
+import org.dspace.app.rest.repository.handler.service.UriListHandlerService;
 import org.dspace.app.rest.repository.patch.ItemPatch;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
@@ -38,6 +39,7 @@ import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Context;
+import org.dspace.external.service.ExternalDataService;
 import org.dspace.util.UUIDUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -77,6 +79,12 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
 
     @Autowired
     InstallItemService installItemService;
+
+    @Autowired
+    private ExternalDataService externalDataService;
+
+    @Autowired
+    private UriListHandlerService uriListHandlerService;
 
     public ItemRestRepository(ItemService dsoService,
                               ItemConverter dsoConverter,
@@ -129,7 +137,7 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
 
     @Override
     protected void updateDSpaceObject(Item item, ItemRest itemRest)
-            throws AuthorizeException, SQLException  {
+        throws AuthorizeException, SQLException {
         super.updateDSpaceObject(item, itemRest);
 
         Context context = obtainContext();
@@ -168,11 +176,11 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
             }
             if (is.isInProgressSubmission(context, item)) {
                 throw new UnprocessableEntityException("The item cannot be deleted. "
-                        + "It's part of a in-progress submission.");
+                                                           + "It's part of a in-progress submission.");
             }
             if (item.getTemplateItemOf() != null) {
                 throw new UnprocessableEntityException("The item cannot be deleted. "
-                        + "It's a template for a collection");
+                                                           + "It's a template for a collection");
             }
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
@@ -205,7 +213,7 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
         Collection collection = collectionService.find(context, owningCollectionUuid);
         if (collection == null) {
             throw new DSpaceBadRequestException("The given owningCollection parameter is invalid: "
-                                              + owningCollectionUuid);
+                                                    + owningCollectionUuid);
         }
         WorkspaceItem workspaceItem = workspaceItemService.create(context, collection, false);
         Item item = workspaceItem.getItem();
@@ -224,7 +232,7 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
     @PreAuthorize("hasPermission(#id, 'ITEM', 'WRITE')")
     protected ItemRest put(Context context, HttpServletRequest request, String apiCategory, String model, UUID uuid,
                            JsonNode jsonNode)
-            throws RepositoryMethodNotImplementedException, SQLException, AuthorizeException {
+        throws RepositoryMethodNotImplementedException, SQLException, AuthorizeException {
         HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
         ObjectMapper mapper = new ObjectMapper();
         ItemRest itemRest = null;
@@ -246,6 +254,16 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
                                                    + uuid + ", "
                                                    + itemRest.getId());
         }
+        return dsoConverter.fromModel(item);
+    }
+
+
+    @Override
+    protected ItemRest createAndReturn(Context context, List<String> stringList)
+        throws AuthorizeException, SQLException, RepositoryMethodNotImplementedException {
+
+        HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
+        Item item = uriListHandlerService.handle(context, req, stringList, Item.class);
         return dsoConverter.fromModel(item);
     }
 }
