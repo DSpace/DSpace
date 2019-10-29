@@ -79,12 +79,24 @@ public class CollectionRestControllerIT extends AbstractControllerIntegrationTes
         patchBody = getPatchContent(ops);
     }
 
+    private String installTestTemplate() throws Exception {
+        MvcResult mvcResult = getClient(adminAuthToken).perform(post(
+            getCollectionTemplateItemUrlTemplate(childCollection.getID().toString()))
+            .content(mapper.writeValueAsBytes(testTemplateItem)).contentType(contentType))
+            .andExpect(status().isCreated())
+            .andReturn();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        Map<String,Object> map = mapper.readValue(content, Map.class);
+        return String.valueOf(map.get("uuid"));
+    }
+
     @Test
     public void createTemplateItemNotLoggedIn() throws Exception {
         setupTestTemplate();
 
         getClient().perform(post(
-                getTemplateItemUrlTemplate(childCollection.getID().toString()))
+                getCollectionTemplateItemUrlTemplate(childCollection.getID().toString()))
                 .content(mapper.writeValueAsBytes(testTemplateItem)).contentType(contentType))
                 .andExpect(status().isUnauthorized());
     }
@@ -92,63 +104,38 @@ public class CollectionRestControllerIT extends AbstractControllerIntegrationTes
     @Test
     public void createTemplateItem() throws Exception {
         setupTestTemplate();
-
-        MvcResult mvcResult = getClient(adminAuthToken).perform(post(
-                getTemplateItemUrlTemplate(childCollection.getID().toString()))
-                .content(mapper.writeValueAsBytes(testTemplateItem)).contentType(contentType))
-                .andExpect(status().isCreated())
-                .andReturn();
-
-        String content = mvcResult.getResponse().getContentAsString();
-        Map<String,Object> map = mapper.readValue(content, Map.class);
-        String itemUuidString = String.valueOf(map.get("uuid"));
-
-        getClient(adminAuthToken).perform(get(getTemplateItemUrlTemplate(childCollection.getID().toString())))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$", Matchers.allOf(
-                        hasJsonPath("$.id", is(itemUuidString)),
-                        hasJsonPath("$.uuid", is(itemUuidString)),
-                        hasJsonPath("$.type", is("item")),
-                        hasJsonPath("$.inArchive", is(false)),
-                        hasJsonPath("$.discoverable", is(false)),
-                        hasJsonPath("$.withdrawn", is(false)),
-                        hasJsonPath("$.metadata", Matchers.allOf(
-                                MetadataMatcher.matchMetadata("dc.description",
-                                        "dc description content"),
-                                MetadataMatcher.matchMetadata("dc.description.abstract",
-                                        "dc description abstract content")
-                        )))));
+        installTestTemplate();
     }
 
     @Test
-    public void createIllegal1TemplateItem() throws Exception {
+    public void createIllegalInArchiveTemplateItem() throws Exception {
         setupTestTemplate();
         testTemplateItem.setInArchive(true);
 
         getClient(adminAuthToken).perform(post(
-                getTemplateItemUrlTemplate(childCollection.getID().toString()))
+                getCollectionTemplateItemUrlTemplate(childCollection.getID().toString()))
                 .content(mapper.writeValueAsBytes(testTemplateItem)).contentType(contentType))
                 .andExpect(status().isUnprocessableEntity());
     }
 
     @Test
-    public void createIllegal2TemplateItem() throws Exception {
+    public void createIllegalDiscoverableTemplateItem() throws Exception {
         setupTestTemplate();
         testTemplateItem.setDiscoverable(true);
 
         getClient(adminAuthToken).perform(post(
-                getTemplateItemUrlTemplate(childCollection.getID().toString()))
+                getCollectionTemplateItemUrlTemplate(childCollection.getID().toString()))
                 .content(mapper.writeValueAsBytes(testTemplateItem)).contentType(contentType))
                 .andExpect(status().isUnprocessableEntity());
     }
 
     @Test
-    public void createIllegal3TemplateItem() throws Exception {
+    public void createIllegalWithdrawnTemplateItem() throws Exception {
         setupTestTemplate();
         testTemplateItem.setWithdrawn(true);
 
         getClient(adminAuthToken).perform(post(
-                getTemplateItemUrlTemplate(childCollection.getID().toString()))
+                getCollectionTemplateItemUrlTemplate(childCollection.getID().toString()))
                 .content(mapper.writeValueAsBytes(testTemplateItem)).contentType(contentType))
                 .andExpect(status().isUnprocessableEntity());
     }
@@ -159,7 +146,7 @@ public class CollectionRestControllerIT extends AbstractControllerIntegrationTes
 
         String userToken = getAuthToken(eperson.getEmail(), password);
         getClient(userToken).perform(post(
-                getTemplateItemUrlTemplate(childCollection.getID().toString()))
+                getCollectionTemplateItemUrlTemplate(childCollection.getID().toString()))
                 .content(mapper.writeValueAsBytes(testTemplateItem)).contentType(contentType))
                 .andExpect(status().isForbidden());
     }
@@ -168,13 +155,10 @@ public class CollectionRestControllerIT extends AbstractControllerIntegrationTes
     public void createDuplicateTemplateItem() throws Exception {
         setupTestTemplate();
 
-        getClient(adminAuthToken).perform(post(
-                getTemplateItemUrlTemplate(childCollection.getID().toString()))
-                .content(mapper.writeValueAsBytes(testTemplateItem)).contentType(contentType))
-                .andExpect(status().isCreated());
+        installTestTemplate();
 
         getClient(adminAuthToken).perform(post(
-                getTemplateItemUrlTemplate(childCollection.getID().toString()))
+                getCollectionTemplateItemUrlTemplate(childCollection.getID().toString()))
                 .content(mapper.writeValueAsBytes(testTemplateItem)).contentType(contentType))
                 .andExpect(status().isUnprocessableEntity());
     }
@@ -184,16 +168,62 @@ public class CollectionRestControllerIT extends AbstractControllerIntegrationTes
         setupTestTemplate();
 
         getClient(adminAuthToken).perform(post(
-                getTemplateItemUrlTemplate("16a4b65b-3b3f-4ef5-8058-ef6f5a653ef9"))
+                getCollectionTemplateItemUrlTemplate("16a4b65b-3b3f-4ef5-8058-ef6f5a653ef9"))
                 .content(mapper.writeValueAsBytes(testTemplateItem)).contentType(contentType))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void getTemplateItemFromCollection() throws Exception {
+        setupTestTemplate();
+        String itemUuidString = installTestTemplate();
+
+        getClient(adminAuthToken).perform(get(getCollectionTemplateItemUrlTemplate(childCollection.getID().toString())))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", Matchers.allOf(
+                hasJsonPath("$.id", is(itemUuidString)),
+                hasJsonPath("$.uuid", is(itemUuidString)),
+                hasJsonPath("$.type", is("item")),
+                hasJsonPath("$.inArchive", is(false)),
+                hasJsonPath("$.discoverable", is(false)),
+                hasJsonPath("$.withdrawn", is(false)),
+                hasJsonPath("$.metadata", Matchers.allOf(
+                    MetadataMatcher.matchMetadata("dc.description",
+                        "dc description content"),
+                    MetadataMatcher.matchMetadata("dc.description.abstract",
+                        "dc description abstract content")
+                )))));
+    }
+
+    @Test
+    public void getTemplateItemFromItemId() throws Exception {
+        setupTestTemplate();
+        String itemUuidString = installTestTemplate();
+
+        getClient(adminAuthToken).perform(get(getTemplateItemUrlTemplate(itemUuidString)))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", Matchers.allOf(
+                hasJsonPath("$.id", is(itemUuidString)),
+                hasJsonPath("$.uuid", is(itemUuidString)),
+                hasJsonPath("$.type", is("item")),
+                hasJsonPath("$.inArchive", is(false)),
+                hasJsonPath("$.discoverable", is(false)),
+                hasJsonPath("$.withdrawn", is(false)),
+                hasJsonPath("$.metadata", Matchers.allOf(
+                    MetadataMatcher.matchMetadata("dc.description",
+                        "dc description content"),
+                    MetadataMatcher.matchMetadata("dc.description.abstract",
+                        "dc description abstract content")
+                )))));
     }
 
     @Test
     public void patchTemplateItemNotLoggedIn() throws Exception {
         setupTestTemplate();
 
-        getClient().perform(patch(getTemplateItemUrlTemplate(childCollection.getID().toString()))
+        String itemId = installTestTemplate();
+
+        getClient().perform(patch(getTemplateItemUrlTemplate(itemId))
                 .content(patchBody)
                 .contentType(contentType))
                 .andExpect(status().isUnauthorized());
@@ -203,11 +233,9 @@ public class CollectionRestControllerIT extends AbstractControllerIntegrationTes
     public void patchTemplateItem() throws Exception {
         setupTestTemplate();
 
-        getClient(adminAuthToken).perform(post(
-                getTemplateItemUrlTemplate(childCollection.getID().toString()))
-                .content(mapper.writeValueAsBytes(testTemplateItem)).contentType(contentType));
+        String itemId = installTestTemplate();
 
-        getClient(adminAuthToken).perform(patch(getTemplateItemUrlTemplate(childCollection.getID().toString()))
+        getClient(adminAuthToken).perform(patch(getTemplateItemUrlTemplate(itemId))
                 .content(patchBody)
                 .contentType(contentType))
                 .andExpect(status().isOk())
@@ -225,7 +253,7 @@ public class CollectionRestControllerIT extends AbstractControllerIntegrationTes
                                         "table of contents")
                         )))));
 
-        getClient(adminAuthToken).perform(get(getTemplateItemUrlTemplate(childCollection.getID().toString())))
+        getClient(adminAuthToken).perform(get(getCollectionTemplateItemUrlTemplate(childCollection.getID().toString())))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", Matchers.allOf(
                         hasJsonPath("$.type", is("item")),
@@ -243,57 +271,51 @@ public class CollectionRestControllerIT extends AbstractControllerIntegrationTes
     }
 
     @Test
-    public void patchIllegal1TemplateItem() throws Exception {
+    public void patchIllegalInArchiveTemplateItem() throws Exception {
         setupTestTemplate();
 
-        getClient(adminAuthToken).perform(post(
-                getTemplateItemUrlTemplate(childCollection.getID().toString()))
-                .content(mapper.writeValueAsBytes(testTemplateItem)).contentType(contentType));
+        String itemId = installTestTemplate();
 
         List<Operation> ops = new ArrayList<Operation>();
         ReplaceOperation replaceOperation = new ReplaceOperation("/inArchive", true);
         ops.add(replaceOperation);
         String illegalPatchBody = getPatchContent(ops);
 
-        getClient(adminAuthToken).perform(patch(getTemplateItemUrlTemplate(childCollection.getID().toString()))
+        getClient(adminAuthToken).perform(patch(getTemplateItemUrlTemplate(itemId))
                 .content(illegalPatchBody)
                 .contentType(contentType))
-                .andExpect(status().isUnprocessableEntity());
+                .andExpect(status().isBadRequest());
     }
 
     @Test
-    public void patchIllegal2TemplateItem() throws Exception {
+    public void patchIllegalDiscoverableTemplateItem() throws Exception {
         setupTestTemplate();
 
-        getClient(adminAuthToken).perform(post(
-                getTemplateItemUrlTemplate(childCollection.getID().toString()))
-                .content(mapper.writeValueAsBytes(testTemplateItem)).contentType(contentType));
+        String itemId = installTestTemplate();
 
         List<Operation> ops = new ArrayList<Operation>();
         ReplaceOperation replaceOperation = new ReplaceOperation("/discoverable", true);
         ops.add(replaceOperation);
         String illegalPatchBody = getPatchContent(ops);
 
-        getClient(adminAuthToken).perform(patch(getTemplateItemUrlTemplate(childCollection.getID().toString()))
+        getClient(adminAuthToken).perform(patch(getTemplateItemUrlTemplate(itemId))
                 .content(illegalPatchBody)
                 .contentType(contentType))
                 .andExpect(status().isUnprocessableEntity());
     }
 
     @Test
-    public void patchIllegal3TemplateItem() throws Exception {
+    public void patchIllegalWithdrawnTemplateItem() throws Exception {
         setupTestTemplate();
 
-        getClient(adminAuthToken).perform(post(
-                getTemplateItemUrlTemplate(childCollection.getID().toString()))
-                .content(mapper.writeValueAsBytes(testTemplateItem)).contentType(contentType));
+        String itemId = installTestTemplate();
 
         List<Operation> ops = new ArrayList<Operation>();
         ReplaceOperation replaceOperation = new ReplaceOperation("/withdrawn", true);
         ops.add(replaceOperation);
         String illegalPatchBody = getPatchContent(ops);
 
-        getClient(adminAuthToken).perform(patch(getTemplateItemUrlTemplate(childCollection.getID().toString()))
+        getClient(adminAuthToken).perform(patch(getTemplateItemUrlTemplate(itemId))
                 .content(illegalPatchBody)
                 .contentType(contentType))
                 .andExpect(status().isUnprocessableEntity());
@@ -303,30 +325,17 @@ public class CollectionRestControllerIT extends AbstractControllerIntegrationTes
     public void patchTemplateItemNoRights() throws Exception {
         setupTestTemplate();
 
-        getClient(adminAuthToken).perform(post(
-                getTemplateItemUrlTemplate(childCollection.getID().toString()))
-                .content(mapper.writeValueAsBytes(testTemplateItem)).contentType(contentType));
+        String itemId = installTestTemplate();
 
         String userToken = getAuthToken(eperson.getEmail(), password);
-        getClient(userToken).perform(patch(getTemplateItemUrlTemplate(childCollection.getID().toString()))
-                .content(patchBody)
-                .contentType(contentType));
-        // TODO: this should be forbidden
-        //        .andExpect(status().isForbidden());
-    }
-
-    @Test
-    public void patchMissingTemplateItem() throws Exception {
-        setupTestTemplate();
-
-        getClient(adminAuthToken).perform(patch(getTemplateItemUrlTemplate(childCollection.getID().toString()))
+        getClient(userToken).perform(patch(getTemplateItemUrlTemplate(itemId))
                 .content(patchBody)
                 .contentType(contentType))
-                .andExpect(status().isUnprocessableEntity());
+                .andExpect(status().isForbidden());
     }
 
     @Test
-    public void patchTemplateItemForNonexisting() throws Exception {
+    public void patchTemplateItemNonexisting() throws Exception {
         setupTestTemplate();
 
         getClient(adminAuthToken).perform(patch(getTemplateItemUrlTemplate("16a4b65b-3b3f-4ef5-8058-ef6f5a653ef9"))
@@ -337,7 +346,11 @@ public class CollectionRestControllerIT extends AbstractControllerIntegrationTes
 
     @Test
     public void deleteTemplateItemNotLoggedIn() throws Exception {
-        getClient().perform(delete(getTemplateItemUrlTemplate(childCollection.getID().toString())))
+        setupTestTemplate();
+
+        String itemId = installTestTemplate();
+
+        getClient().perform(delete(getTemplateItemUrlTemplate(itemId)))
                 .andExpect(status().isUnauthorized());
     }
 
@@ -345,11 +358,9 @@ public class CollectionRestControllerIT extends AbstractControllerIntegrationTes
     public void deleteTemplateItem() throws Exception {
         setupTestTemplate();
 
-        getClient(adminAuthToken).perform(post(
-                getTemplateItemUrlTemplate(childCollection.getID().toString()))
-                .content(mapper.writeValueAsBytes(testTemplateItem)).contentType(contentType));
+        String itemId = installTestTemplate();
 
-        getClient(adminAuthToken).perform(delete(getTemplateItemUrlTemplate(childCollection.getID().toString())))
+        getClient(adminAuthToken).perform(delete(getTemplateItemUrlTemplate(itemId)))
                 .andExpect(status().isNoContent());
     }
 
@@ -357,19 +368,11 @@ public class CollectionRestControllerIT extends AbstractControllerIntegrationTes
     public void deleteTemplateItemNoRights() throws Exception {
         setupTestTemplate();
 
-        getClient(adminAuthToken).perform(post(
-                getTemplateItemUrlTemplate(childCollection.getID().toString()))
-                .content(mapper.writeValueAsBytes(testTemplateItem)).contentType(contentType));
+        String itemId = installTestTemplate();
 
         String userToken = getAuthToken(eperson.getEmail(), password);
-        getClient(userToken).perform(delete(getTemplateItemUrlTemplate(childCollection.getID().toString())))
+        getClient(userToken).perform(delete(getTemplateItemUrlTemplate(itemId)))
                 .andExpect(status().isForbidden());
-    }
-
-    @Test
-    public void deleteMissingTemplateItem() throws Exception {
-        getClient(adminAuthToken).perform(delete(getTemplateItemUrlTemplate(childCollection.getID().toString())))
-                .andExpect(status().isUnprocessableEntity());
     }
 
     @Test
@@ -378,7 +381,11 @@ public class CollectionRestControllerIT extends AbstractControllerIntegrationTes
                 .andExpect(status().isNotFound());
     }
 
-    private String getTemplateItemUrlTemplate(String uuid) {
+    private String getCollectionTemplateItemUrlTemplate(String uuid) {
         return "/api/core/collections/" + uuid + "/itemtemplate";
+    }
+
+    private String getTemplateItemUrlTemplate(String uuid) {
+        return "/api/core/itemtemplates/" + uuid;
     }
 }
