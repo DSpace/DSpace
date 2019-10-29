@@ -110,11 +110,10 @@
             <list>
                 <ref bean="searchFilterTitle" />
                 <ref bean="searchFilterAuthor" />
+                <ref bean="searchFilterType" />
                 <ref bean="searchFilterSubject" />
+                <ref bean="searchFilterLanguage" />
                 <ref bean="searchFilterIssued" />
-		        <ref bean="searchFilterContentInOriginalBundle"/>
-                <ref bean="searchFilterFileNameInOriginalBundle" />
-                <ref bean="searchFilterFileDescriptionInOriginalBundle" />
             </list>
         </property>
         <!--The sort filters for the discovery search-->
@@ -132,12 +131,12 @@
             </bean>
         </property>
         <!--Any default filter queries, these filter queries will be used for all queries done by discovery for this configuration-->
-        <!--<property name="defaultFilterQueries">-->
-            <!--<list>-->
+        <property name="defaultFilterQueries">
+            <list>
                 <!--Only find items-->
-                <!--<value>search.resourcetype:2</value>-->
-            <!--</list>-->
-        <!--</property>-->
+                <value>search.resourcetype:2</value>
+            </list>
+        </property>
         <!--The configuration for the recent submissions-->
         <property name="recentSubmissionConfiguration">
             <bean class="org.dspace.discovery.configuration.DiscoveryRecentSubmissionsConfiguration">
@@ -169,13 +168,13 @@
                             <property name="snippets" value="2"/>
                         </bean>
                         <!-- By default, full text snippets are disabled, as snippets of embargoed/restricted bitstreams
-                             may appear in search results when the Item is public. See DS-3498
+                             may appear in search results when the Item is public. See DS-3498 -->
                         <bean class="org.dspace.discovery.configuration.DiscoveryHitHighlightFieldConfiguration">
                             <property name="field" value="fulltext"/>
                             <property name="maxSize" value="250"/>
                             <property name="snippets" value="2"/>
                         </bean>
-                        -->
+
                     </list>
                 </property>
             </bean>
@@ -223,11 +222,10 @@
             <list>
                 <ref bean="searchFilterTitle" />
                 <ref bean="searchFilterAuthor" />
+                <ref bean="searchFilterType" />
                 <ref bean="searchFilterSubject" />
+                <ref bean="searchFilterLanguage" />
                 <ref bean="searchFilterIssued" />
-		        <ref bean="searchFilterContentInOriginalBundle"/>
-                <ref bean="searchFilterFileNameInOriginalBundle" />
-                <ref bean="searchFilterFileDescriptionInOriginalBundle" />
             </list>
         </property>
         <!--The sort filters for the discovery search (same as defaultConfiguration above)-->
@@ -424,7 +422,25 @@
         <property name="sortOrderSidebar" value="COUNT"/>
         <property name="sortOrderFilterPage" value="COUNT"/>
     </bean>
-    
+
+    <bean id="searchFilterType" class="org.dspace.discovery.configuration.DiscoverySearchFilter">
+        <property name="indexFieldName" value="type"/>
+        <property name="metadataFields">
+            <list>
+                <value>dc.type</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="searchFilterLanguage" class="org.dspace.discovery.configuration.DiscoverySearchFilter">
+        <property name="indexFieldName" value="language"/>
+        <property name="metadataFields">
+            <list>
+                <value>dc.language.iso</value>
+            </list>
+        </property>
+    </bean>
+
     <bean id="searchFilterContentInOriginalBundle" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
         <property name="indexFieldName" value="has_content_in_original_bundle"/>
         <property name="metadataFields">

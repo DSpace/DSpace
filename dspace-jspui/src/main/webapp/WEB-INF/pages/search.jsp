@@ -110,7 +110,8 @@
 
 
                             <div class="form-group">
-                                <input type="text" value="${appliedFilter[1]}" name="filter_type_${filterIndex.count}" class="form-control" readonly="">
+
+                                <input type="text" value="<fmt:message key="jsp.search.filter.op.${appliedFilter[1]}"/>" name="filter_type_${filterIndex.count}" class="form-control" readonly="">
                             </div>
                             <div class="form-group">
                                 <input type="text" id="filter_value_${filterIndex.count}_display" name="filter_value_${filterIndex.count}_display" value="${appliedFilter[2]}" size="45" readonly="" class="form-control">
