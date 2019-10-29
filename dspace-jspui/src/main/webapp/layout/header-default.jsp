@@ -154,7 +154,7 @@
     {
 %>
 <div class="container" style = "position:relative;">
-    <dspace:include page="/layout/location-bar.jsp" />
+    <dspace:include page="/essuir/layout/location-bar.jsp" />
 </div>                
 <%
     }
