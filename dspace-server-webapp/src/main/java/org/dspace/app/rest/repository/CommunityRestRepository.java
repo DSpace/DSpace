@@ -17,7 +17,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.CommunityConverter;
@@ -34,7 +33,6 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Community;
 import org.dspace.content.service.CommunityService;
 import org.dspace.core.Context;
-import org.dspace.util.UUIDUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -83,25 +81,45 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
         }
 
         Community community;
-
-
         try {
-            Community parent = null;
-            String parentCommunityString = req.getParameter("parent");
-            if (StringUtils.isNotBlank(parentCommunityString)) {
+            // top-level community
+            community = cs.create(null, context);
+            cs.update(context, community);
+            metadataConverter.setMetadata(context, community, communityRest.getMetadata());
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
 
-                UUID parentCommunityUuid = UUIDUtils.fromString(parentCommunityString);
-                if (parentCommunityUuid == null) {
-                    throw new DSpaceBadRequestException("The given parent parameter was invalid: "
-                            + parentCommunityString);
-                }
+        return dsoConverter.convert(community);
+    }
 
-                parent = cs.find(context, parentCommunityUuid);
-                if (parent == null) {
-                    throw new UnprocessableEntityException("Parent community for id: "
-                            + parentCommunityUuid + " not found");
-                }
+    @Override
+    @PreAuthorize("hasPermission(#id, 'COMMUNITY', 'ADD')")
+    protected CommunityRest createAndReturn(Context context, UUID id) throws AuthorizeException {
+
+        if (id == null) {
+            throw new DSpaceBadRequestException("Parent Community UUID is null. " +
+                "Cannot create a SubCommunity without providing a parent Community.");
+        }
+
+        HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
+        ObjectMapper mapper = new ObjectMapper();
+        CommunityRest communityRest;
+        try {
+            ServletInputStream input = req.getInputStream();
+            communityRest = mapper.readValue(input, CommunityRest.class);
+        } catch (IOException e1) {
+            throw new UnprocessableEntityException("Error parsing request body.", e1);
+        }
+
+        Community community;
+        try {
+            Community parent = cs.find(context, id);
+            if (parent == null) {
+                throw new UnprocessableEntityException("Parent community for id: "
+                    + id + " not found");
             }
+            // sub-community
             community = cs.create(parent, context);
             cs.update(context, community);
             metadataConverter.setMetadata(context, community, communityRest.getMetadata());

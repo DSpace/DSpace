@@ -9,9 +9,13 @@ package org.dspace.app.rest;
 
 import static org.dspace.app.rest.utils.RegexUtils.REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID;
 
+import static org.dspace.app.rest.utils.ContextUtil.obtainContext;
+import static org.springframework.web.bind.annotation.RequestMethod.PUT;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -20,12 +24,17 @@ import javax.ws.rs.core.Response;
 import org.apache.catalina.connector.ClientAbortException;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.rest.converter.BitstreamConverter;
+import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.model.BitstreamRest;
+import org.dspace.app.rest.model.hateoas.BitstreamResource;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.rest.utils.MultipartFileSender;
+import org.dspace.app.rest.utils.Utils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
+import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.core.Context;
 import org.dspace.disseminate.service.CitationDocumentService;
@@ -33,6 +42,8 @@ import org.dspace.services.ConfigurationService;
 import org.dspace.services.EventService;
 import org.dspace.usage.UsageEvent;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -56,17 +67,20 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/api/" + BitstreamRest.CATEGORY + "/" + BitstreamRest.PLURAL_NAME
-    + REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID + "/content")
-public class BitstreamContentRestController {
+    + REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID)
+public class BitstreamRestController {
 
     private static final Logger log = org.apache.logging.log4j.LogManager
-            .getLogger(BitstreamContentRestController.class);
+            .getLogger(BitstreamRestController.class);
 
     //Most file systems are configured to use block sizes of 4096 or 8192 and our buffer should be a multiple of that.
     private static final int BUFFER_SIZE = 4096 * 10;
 
     @Autowired
     private BitstreamService bitstreamService;
+
+    @Autowired
+    BitstreamFormatService bitstreamFormatService;
 
     @Autowired
     private EventService eventService;
@@ -77,8 +91,14 @@ public class BitstreamContentRestController {
     @Autowired
     private ConfigurationService configurationService;
 
+    @Autowired
+    BitstreamConverter converter;
+
+    @Autowired
+    Utils utils;
+
     @PreAuthorize("hasPermission(#uuid, 'BITSTREAM', 'READ')")
-    @RequestMapping(method = {RequestMethod.GET, RequestMethod.HEAD})
+    @RequestMapping( method = {RequestMethod.GET, RequestMethod.HEAD}, value = "content")
     public void retrieve(@PathVariable UUID uuid, HttpServletResponse response,
                          HttpServletRequest request) throws IOException, SQLException, AuthorizeException {
 
@@ -183,5 +203,44 @@ public class BitstreamContentRestController {
         Response.Status.Family responseCode = Response.Status.Family.familyOf(response.getStatus());
         return responseCode.equals(Response.Status.Family.SUCCESSFUL)
             || responseCode.equals(Response.Status.Family.REDIRECTION);
+    }
+
+    /**
+     * This method will update the bitstream format of the bitstream that corresponds to the provided bitstream uuid.
+     *
+     * @param uuid The UUID of the bitstream for which to update the bitstream format
+     * @param request  The request object
+     * @return The wrapped resource containing the bitstream which in turn contains the bitstream format
+     * @throws SQLException       If something goes wrong in the database
+     */
+    @RequestMapping(method = PUT, consumes = {"text/uri-list"}, value = "format")
+    @PreAuthorize("hasPermission(#uuid, 'BITSTREAM','WRITE')")
+    @PostAuthorize("returnObject != null")
+    public BitstreamResource updateBitstreamFormat(@PathVariable UUID uuid,
+                                                   HttpServletRequest request) throws SQLException {
+
+        Context context = obtainContext(request);
+
+        List<BitstreamFormat> bitstreamFormats = utils.constructBitstreamFormatList(request, context);
+
+        if (bitstreamFormats.size() > 1) {
+            throw new DSpaceBadRequestException("Only one bitstream format is allowed");
+        }
+
+        BitstreamFormat bitstreamFormat = bitstreamFormats.stream().findFirst()
+                .orElseThrow(() -> new DSpaceBadRequestException("No valid bitstream format was provided"));
+
+        Bitstream bitstream = bitstreamService.find(context, uuid);
+
+        if (bitstream == null) {
+            throw new ResourceNotFoundException("Bitstream with id: " + uuid + " not found");
+        }
+
+        bitstream.setFormat(context, bitstreamFormat);
+
+        context.commit();
+
+        return (BitstreamResource) utils.getResourceRepository(BitstreamRest.CATEGORY, BitstreamRest.NAME)
+                .wrapResource(converter.fromModel(context.reloadEntity(bitstream)));
     }
 }
