@@ -1,5 +1,6 @@
 package org.ssu.controller;
 
+import com.google.common.collect.Lists;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
@@ -61,6 +62,7 @@ public class HandleController {
     private org.dspace.content.service.ItemService dspaceItemService = ContentServiceFactory.getInstance().getItemService();
     private final transient PluginService pluginService = CoreServiceFactory.getInstance().getPluginService();
     private final transient DisseminationCrosswalk xHTMLHeadCrosswalk = (DisseminationCrosswalk) pluginService.getNamedPlugin(DisseminationCrosswalk.class, "XHTML_HEAD_ITEM");
+    private final transient org.dspace.content.service.CommunityService dspaceCommunityService = ContentServiceFactory.getInstance().getCommunityService();
     @Resource
     private ItemService itemService;
 
@@ -81,19 +83,35 @@ public class HandleController {
         Context dspaceContext = UIUtil.obtainContext(request);
         DSpaceObject dSpaceObject = handleService.resolveToObject(dspaceContext, "123456789/" + itemId);
         Locale locale = dspaceContext.getCurrentLocale();
+        ModelAndView result = new ModelAndView();
         if(authorizeService.authorizeActionBoolean(dspaceContext, dSpaceObject, Constants.READ)) {
+            Community parentCommunity = null;
+            boolean includeCurrentCommunityInResult = false;
             if (dSpaceObject.getType() == Constants.ITEM) {
-                return displayItem(request, model, (Item) dSpaceObject, locale);
+                Item item = (Item) dSpaceObject;
+                request.setAttribute("dspace.collection", item.getOwningCollection());
+                parentCommunity = item.getOwningCollection().getCommunities().get(0);
+                includeCurrentCommunityInResult = true;
+                result = displayItem(request, model, item, locale);
             }
             if (dSpaceObject.getType() == Constants.COMMUNITY) {
-                return displayCommunity(request, response, model, (Community) dSpaceObject, locale);
+                Community community = (Community) dSpaceObject;
+                parentCommunity = community;
+                includeCurrentCommunityInResult = false;
+                result = displayCommunity(request, response, model, community, locale);
             }
             if (dSpaceObject.getType() == Constants.COLLECTION) {
-                return displayCollection(request, response, model, (Collection)dSpaceObject,locale);
+                parentCommunity = ((Collection)dSpaceObject).getCommunities().get(0);
+                includeCurrentCommunityInResult = true;
+                result = displayCollection(request, response, model, (Collection)dSpaceObject, locale);
             }
-            System.out.println(dSpaceObject.getType());
+            request.setAttribute("dspace.community", parentCommunity);
+            request.setAttribute("dspace.communities", getParents(dspaceContext, parentCommunity, includeCurrentCommunityInResult));
+        } else {
+            System.out.println("Unauthorized action");
         }
-        return null;
+
+        return result;
     }
 
 
@@ -298,5 +316,18 @@ public class HandleController {
 
         model.setViewName("item-display");
         return model;
+    }
+
+    private List<Community> getParents(Context context, Community c, boolean include)
+            throws SQLException
+    {
+        // Find all the "parent" communities for the community
+        List<Community> parents = dspaceCommunityService .getAllParents(context, c);
+        parents = Lists.reverse(parents);
+        if (include)
+        {
+            parents.add(c);
+        }
+        return parents;
     }
 }
