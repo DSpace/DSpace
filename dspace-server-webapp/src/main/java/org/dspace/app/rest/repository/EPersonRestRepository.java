@@ -25,7 +25,7 @@ import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.EPersonRest;
 import org.dspace.app.rest.model.hateoas.EPersonResource;
 import org.dspace.app.rest.model.patch.Patch;
-import org.dspace.app.rest.repository.patch.EPersonPatch;
+import org.dspace.app.rest.repository.patch.ResourcePatch;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Context;
@@ -57,12 +57,12 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
     MetadataConverter metadataConverter;
 
     @Autowired
-    EPersonPatch epersonPatch;
+    ResourcePatch resourcePatch;
 
     public EPersonRestRepository(EPersonService dsoService,
                                  EPersonConverter dsoConverter,
-                                 EPersonPatch dsoPatch) {
-        super(dsoService, dsoConverter, dsoPatch);
+                                 ResourcePatch resourcePatch) {
+        super(dsoService, dsoConverter, resourcePatch);
         this.es = dsoService;
     }
 

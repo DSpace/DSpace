@@ -13,13 +13,29 @@ import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.patch.Operation;
+import org.dspace.app.rest.repository.patch.factories.impl.AddPatchOperation;
+import org.dspace.app.rest.repository.patch.factories.impl.DspaceObjectMetadataOperation;
+import org.dspace.app.rest.repository.patch.factories.impl.PatchOperation;
+import org.dspace.app.rest.repository.patch.factories.impl.ReplacePatchOperation;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * The base class for resource PATCH operations.
  *
  * @author Michael Spalti
  */
-public abstract class AbstractResourcePatch<R extends RestModel> {
+@Component
+public class ResourcePatch<R extends RestModel> {
+
+//    @Autowired
+//    private List<AddPatchOperation> addOperations;
+    @Autowired
+    private List<ReplacePatchOperation> replaceOperations;
+//    @Autowired
+//    private List<AddPatchOperation> removeOperations;
+    @Autowired
+    private DspaceObjectMetadataOperation metadataOperation;
 
     /**
      * Handles the patch operations. Patch implementations are provided by subclasses.
@@ -34,7 +50,13 @@ public abstract class AbstractResourcePatch<R extends RestModel> {
 
         // Note: the list of possible operations is taken from JsonPatchConverter class. Does not implement
         // test https://tools.ietf.org/html/rfc6902#section-4.6
+        System.out.println("restModel: " + restModel);
+        System.out.println("ops: " + operations);
         ops: for (Operation op : operations) {
+            if (metadataOperation.supports(restModel, op.getPath())) {
+                metadataOperation.perform(restModel, op);
+                continue ops;
+            }
             switch (op.getOp()) {
                 case "add":
                     restModel = add(restModel, op);
@@ -64,37 +86,52 @@ public abstract class AbstractResourcePatch<R extends RestModel> {
 
     protected R add(R restModel, Operation operation)
             throws UnprocessableEntityException, DSpaceBadRequestException {
+//        for (PatchOperation patchOperation: addOperations) {
+//            if (patchOperation.supports(restModel, operation.getPath())) {
+//                return (R) patchOperation.perform(restModel, operation);
+//            }
+//        }
         throw new UnprocessableEntityException(
-                "The add operation is not supported."
+                "The add operation for " + restModel.getClass() + " is not supported."
         );
     }
 
     protected R replace(R restModel, Operation operation)
             throws UnprocessableEntityException, DSpaceBadRequestException {
+        for (PatchOperation patchOperation: replaceOperations) {
+            if (patchOperation.supports(restModel, operation.getPath())) {
+                return (R) patchOperation.perform(restModel, operation);
+            }
+        }
         throw new UnprocessableEntityException(
-                "The replace operation is not supported."
+                "The replace operation for " + restModel.getClass() + " is not supported."
         );
     }
 
     protected R remove(R restModel, Operation operation)
 
             throws UnprocessableEntityException, DSpaceBadRequestException {
+//        for (PatchOperation patchOperation: removeOperations) {
+//            if (patchOperation.supports(restModel, operation.getPath())) {
+//                return (R) patchOperation.perform(restModel, operation);
+//            }
+//        }
         throw new UnprocessableEntityException(
-                "The remove operation is not supported."
+                "The remove operation for " + restModel.getClass() + " is not supported."
         );
     }
 
     protected R copy(R restModel, Operation operation)
             throws UnprocessableEntityException, DSpaceBadRequestException {
         throw new UnprocessableEntityException(
-                "The copy operation is not supported."
+                "The copy operation for " + restModel.getClass() + " is not supported."
         );
     }
 
     protected R move(R restModel, Operation operation)
             throws UnprocessableEntityException, DSpaceBadRequestException {
         throw new UnprocessableEntityException(
-                "The move operation is not supported."
+                "The copy operation is not supported."
         );
     }
 
