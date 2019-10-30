@@ -1591,11 +1591,6 @@
                 <version>1.2.5</version>
             </dependency>
             <dependency>
-                <groupId>org.dspace</groupId>
-                <artifactId>dspace</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>net.bytebuddy</groupId>
                 <artifactId>byte-buddy</artifactId>
                 <version>1.9.5</version>
