@@ -6,9 +6,19 @@
 
     <bean class="org.dspace.external.service.impl.ExternalDataServiceImpl"/>
 
-    <bean class="org.dspace.external.provider.impl.MockDataProvider" init-method="init">
+    <bean class="org.dspace.external.provider.metadata.service.impl.MetadataSuggestionProviderServiceImpl"/>
+
+    <bean name="mockDataProvider" class="org.dspace.external.provider.impl.MockDataProvider" init-method="init">
         <property name="sourceIdentifier" value="mock"/>
 
+    </bean>
+
+    <bean class="org.dspace.external.provider.metadata.impl.MockMetadataSuggestionProvider">
+        <property name="externalDataProvider" ref="mockDataProvider"/>
+        <property name="id" value="pubmed"/>
+        <property name="fileBased" value="false"/>
+        <property name="metadataBased" value="true"/>
+        <property name="queryBased" value="true"/>
     </bean>
 </beans>
 
