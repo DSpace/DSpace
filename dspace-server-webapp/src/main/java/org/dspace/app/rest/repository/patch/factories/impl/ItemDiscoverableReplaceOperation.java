@@ -10,6 +10,7 @@ package org.dspace.app.rest.repository.patch.factories.impl;
 import org.apache.log4j.Logger;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.model.ItemRest;
+import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.patch.Operation;
 import org.springframework.stereotype.Component;
 
@@ -28,7 +29,7 @@ import org.springframework.stereotype.Component;
 public class ItemDiscoverableReplaceOperation extends ReplacePatchOperation<ItemRest, Boolean> {
 
     private static final Logger log = Logger.getLogger(ItemDiscoverableReplaceOperation.class);
-
+    private static final String OPERATION_PATH_DISCOVERABLE = "/discoverable";
 
     @Override
     public ItemRest replace(ItemRest item, Operation operation) {
@@ -52,6 +53,10 @@ public class ItemDiscoverableReplaceOperation extends ReplacePatchOperation<Item
 
     protected Class<Boolean> getClassForEvaluation() {
         return Boolean.class;
+    }
+
+    public boolean supports(RestModel R, String path) {
+        return (R instanceof ItemRest && path.trim().equalsIgnoreCase(OPERATION_PATH_DISCOVERABLE));
     }
 
 }

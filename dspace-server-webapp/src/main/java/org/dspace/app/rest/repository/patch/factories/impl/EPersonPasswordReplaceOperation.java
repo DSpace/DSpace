@@ -8,6 +8,7 @@
 package org.dspace.app.rest.repository.patch.factories.impl;
 
 import org.dspace.app.rest.model.EPersonRest;
+import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.patch.Operation;
 import org.springframework.stereotype.Component;
 
@@ -25,6 +26,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class EPersonPasswordReplaceOperation extends ReplacePatchOperation<EPersonRest, String> {
 
+    private static final String OPERATION_PATH_PASSWORD = "/password";
+
     @Override
     EPersonRest replace(EPersonRest eperson, Operation operation) {
 
@@ -41,6 +44,10 @@ public class EPersonPasswordReplaceOperation extends ReplacePatchOperation<EPers
          * operations are not allowed on non-existent values, but that
          * would prevent the password update from ever taking place.
          */
+    }
+
+    public boolean supports(RestModel R, String path) {
+        return (R instanceof EPersonRest && path.trim().equalsIgnoreCase(OPERATION_PATH_PASSWORD));
     }
 
     @Override

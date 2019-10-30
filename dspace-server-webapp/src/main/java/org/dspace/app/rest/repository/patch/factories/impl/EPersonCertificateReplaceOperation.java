@@ -9,6 +9,7 @@ package org.dspace.app.rest.repository.patch.factories.impl;
 
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.model.EPersonRest;
+import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.patch.Operation;
 import org.springframework.stereotype.Component;
 
@@ -27,6 +28,8 @@ import org.springframework.stereotype.Component;
 public class EPersonCertificateReplaceOperation extends ReplacePatchOperation<EPersonRest, Boolean>
         implements ResourcePatchOperation<EPersonRest> {
 
+    private static final String OPERATION_PATH_CERTIFICATE = "/certificate";
+
     @Override
     public EPersonRest replace(EPersonRest eperson, Operation operation) {
 
@@ -44,6 +47,10 @@ public class EPersonCertificateReplaceOperation extends ReplacePatchOperation<EP
         if ((Object) resource.isRequireCertificate() == null) {
             throw new DSpaceBadRequestException("Attempting to replace a non-existent value.");
         }
+    }
+
+    public boolean supports(RestModel R, String path) {
+        return (R instanceof EPersonRest && path.trim().equalsIgnoreCase(OPERATION_PATH_CERTIFICATE));
     }
 
     @Override

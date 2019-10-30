@@ -79,4 +79,12 @@ public abstract class PatchOperation<R extends RestModel, T>
      */
     protected abstract Class<T> getClassForEvaluation();
 
+    /**
+     * TODO
+     * @param R
+     * @param path
+     * @return
+     */
+    public abstract boolean supports(RestModel R, String path);
+
 }

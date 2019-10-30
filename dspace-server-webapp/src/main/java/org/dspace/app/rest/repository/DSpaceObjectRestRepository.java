@@ -15,7 +15,7 @@ import org.dspace.app.rest.converter.MetadataConverter;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.DSpaceObjectRest;
 import org.dspace.app.rest.model.patch.Patch;
-import org.dspace.app.rest.repository.patch.DSpaceObjectPatch;
+import org.dspace.app.rest.repository.patch.ResourcePatch;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.service.DSpaceObjectService;
@@ -32,7 +32,7 @@ public abstract class DSpaceObjectRestRepository<M extends DSpaceObject, R exten
         extends DSpaceRestRepository<R, UUID> {
 
     final DSpaceObjectService<M> dsoService;
-    final DSpaceObjectPatch<R> dsoPatch;
+    final ResourcePatch<R> resourcePatch;
     final DSpaceObjectConverter<M, R> dsoConverter;
 
     @Autowired
@@ -40,9 +40,9 @@ public abstract class DSpaceObjectRestRepository<M extends DSpaceObject, R exten
 
     DSpaceObjectRestRepository(DSpaceObjectService<M> dsoService,
                                DSpaceObjectConverter<M, R> dsoConverter,
-                               DSpaceObjectPatch<R> dsoPatch) {
+                               ResourcePatch<R> resourcePatch) {
         this.dsoService = dsoService;
-        this.dsoPatch = dsoPatch;
+        this.resourcePatch = resourcePatch;
         this.dsoConverter = dsoConverter;
     }
 
@@ -64,7 +64,7 @@ public abstract class DSpaceObjectRestRepository<M extends DSpaceObject, R exten
         if (dso == null) {
             throw new ResourceNotFoundException(apiCategory + "." + model + " with id: " + id + " not found");
         }
-        R dsoRest = dsoPatch.patch(findOne(id), patch.getOperations());
+        R dsoRest = resourcePatch.patch(findOne(id), patch.getOperations());
         updateDSpaceObject(dso, dsoRest);
     }
 

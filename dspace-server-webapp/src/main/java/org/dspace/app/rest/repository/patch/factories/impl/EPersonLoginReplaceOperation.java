@@ -9,6 +9,7 @@ package org.dspace.app.rest.repository.patch.factories.impl;
 
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.model.EPersonRest;
+import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.patch.Operation;
 import org.springframework.stereotype.Component;
 
@@ -27,6 +28,8 @@ import org.springframework.stereotype.Component;
 public class EPersonLoginReplaceOperation extends ReplacePatchOperation<EPersonRest, Boolean>
         implements ResourcePatchOperation<EPersonRest> {
 
+    private static final String OPERATION_PATH_PASSWORD = "/canLogin";
+
     @Override
     public EPersonRest replace(EPersonRest eperson, Operation operation) {
 
@@ -40,6 +43,10 @@ public class EPersonLoginReplaceOperation extends ReplacePatchOperation<EPersonR
         if ((Object) resource.isCanLogIn() == null) {
             throw new DSpaceBadRequestException("Attempting to replace a non-existent value.");
         }
+    }
+
+    public boolean supports(RestModel R, String path) {
+        return (R instanceof EPersonRest && path.trim().equalsIgnoreCase(OPERATION_PATH_PASSWORD));
     }
 
     @Override

@@ -26,7 +26,7 @@ import org.dspace.app.rest.model.patch.Patch;
  *
  * @param <R> the type of DSpaceObjectRest object the class is applicable to.
  */
-public abstract class DSpaceObjectPatch<R extends DSpaceObjectRest> extends AbstractResourcePatch<R> {
+public abstract class DSpaceObjectPatch<R extends DSpaceObjectRest> extends ResourcePatch<R> {
 
     private static final String METADATA_PATH = "/metadata";
 

@@ -63,5 +63,13 @@ public abstract class ReplacePatchOperation<R extends RestModel, T>
      */
     abstract void checkModelForExistingValue(R resource, Operation operation);
 
+//    /**
+//     * TODO
+//     * @param R
+//     * @param path
+//     * @return
+//     */
+//    public abstract boolean supports(RestModel R, String path);
+
 
 }

@@ -11,6 +11,7 @@ import org.apache.log4j.Logger;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.ItemRest;
+import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.patch.Operation;
 import org.springframework.stereotype.Component;
 
@@ -29,6 +30,7 @@ import org.springframework.stereotype.Component;
 public class ItemWithdrawReplaceOperation extends ReplacePatchOperation<ItemRest, Boolean> {
 
     private static final Logger log = Logger.getLogger(ItemWithdrawReplaceOperation.class);
+    private static final String OPERATION_PATH_WITHDRAW = "/withdrawn";
 
     @Override
     public ItemRest replace(ItemRest item, Operation operation) {
@@ -67,6 +69,10 @@ public class ItemWithdrawReplaceOperation extends ReplacePatchOperation<ItemRest
         if ((Object) resource.getWithdrawn() == null) {
             throw new DSpaceBadRequestException("Attempting to replace a non-existent value.");
         }
+    }
+
+    public boolean supports(RestModel R, String path) {
+        return (R instanceof ItemRest && path.trim().equalsIgnoreCase(OPERATION_PATH_WITHDRAW));
     }
 
     protected Class<Boolean[]> getArrayClassForEvaluation() {
