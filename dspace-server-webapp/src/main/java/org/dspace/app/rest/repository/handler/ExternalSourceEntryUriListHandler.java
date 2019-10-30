@@ -76,10 +76,15 @@ public class ExternalSourceEntryUriListHandler implements UriListHandler<Item> {
         if (clazz != Item.class) {
             return false;
         }
-        if (!request.getParameterMap().containsKey("owningCollection")) {
+        String owningCollectionString = request.getParameter("owningCollection");
+        if (StringUtils.isBlank(owningCollectionString)) {
             return false;
         }
         try {
+            Collection collection = collectionService.find(context, UUID.fromString(owningCollectionString));
+            if (collection == null) {
+                return false;
+            }
             if (!authorizeService.isAdmin(context)) {
                 return false;
             }
@@ -102,6 +107,7 @@ public class ExternalSourceEntryUriListHandler implements UriListHandler<Item> {
             item = externalDataService.createItemFromExternalDataObject(context, dataObject, collection);
         } catch (AuthorizeException | SQLException e) {
             log.error(e.getMessage(), e);
+            throw new RuntimeException(e);
         }
         return item;
     }

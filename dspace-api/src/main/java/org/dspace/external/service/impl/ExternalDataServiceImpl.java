@@ -13,6 +13,7 @@ import java.util.Optional;
 
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
@@ -44,6 +45,9 @@ public class ExternalDataServiceImpl implements ExternalDataService {
 
     @Autowired
     private InstallItemService installItemService;
+
+    @Autowired
+    private AuthorizeService authorizeService;
 
     @Override
     public Optional<ExternalDataObject> getExternalDataObject(String source, String id) {
@@ -93,7 +97,10 @@ public class ExternalDataServiceImpl implements ExternalDataService {
     public Item createItemFromExternalDataObject(Context context, ExternalDataObject externalDataObject,
                                                  Collection collection)
         throws AuthorizeException, SQLException {
-        WorkspaceItem workspaceItem = workspaceItemService.create(context, collection, false);
+        if (!authorizeService.isAdmin(context)) {
+            throw new AuthorizeException("You have to be an admin to create an Item from an ExternalDataObject");
+        }
+        WorkspaceItem workspaceItem = workspaceItemService.create(context, collection, true);
         Item item = workspaceItem.getItem();
         for (MockMetadataValue mockMetadataValue : externalDataObject.getMetadata()) {
             itemService.addMetadata(context, item, mockMetadataValue.getSchema(), mockMetadataValue.getElement(),
