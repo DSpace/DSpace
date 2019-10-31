@@ -53,6 +53,7 @@ import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.hateoas.DSpaceResource;
 import org.dspace.app.rest.model.hateoas.EmbeddedPage;
 import org.dspace.app.rest.model.hateoas.HALResource;
+import org.dspace.app.rest.projection.ListProjection;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.repository.DSpaceRestRepository;
 import org.dspace.app.rest.repository.LinkRestRepository;
@@ -534,7 +535,9 @@ public class Utils {
                 PageImpl<RestAddressableModel> page = new PageImpl(
                         list.subList(0, list.size() > EMBEDDED_PAGE_SIZE ? EMBEDDED_PAGE_SIZE : list.size()),
                         new PageRequest(0, EMBEDDED_PAGE_SIZE), list.size());
-                return new EmbeddedPage(link.getHref(), page.map(converter::toResource), list, link.getRel());
+                return new EmbeddedPage(link.getHref(),
+                        page.map((restObject) -> converter.toResource(restObject, ListProjection.NAME)),
+                        list, link.getRel());
             } else {
                 PageImpl<RestAddressableModel> page = new PageImpl(list);
                 return new EmbeddedPage(link.getHref(), page, list, link.getRel());
