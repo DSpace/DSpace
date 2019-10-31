@@ -7,6 +7,10 @@
  */
 package org.dspace.app.rest.repository.patch.factories.impl;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -18,10 +22,6 @@ import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.Patch;
 import org.springframework.stereotype.Component;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Class for PATCH operations on Dspace Objects' metadata
@@ -46,7 +46,6 @@ public class DspaceObjectMetadataOperation<R extends RestModel, T> extends Patch
      */
     @Override
     public R perform(R resource, Operation operation) {
-        checkOperationValue(operation.getValue());
         DSpaceObjectRest dSpaceObjectRest = (DSpaceObjectRest) resource;
         List<Operation> operations = new ArrayList<Operation>();
         operations.add(operation);

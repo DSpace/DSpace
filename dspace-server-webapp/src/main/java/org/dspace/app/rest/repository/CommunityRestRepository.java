@@ -27,7 +27,6 @@ import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.CommunityRest;
 import org.dspace.app.rest.model.hateoas.CommunityResource;
 import org.dspace.app.rest.model.patch.Patch;
-import org.dspace.app.rest.repository.patch.DSpaceObjectPatch;
 import org.dspace.app.rest.utils.CommunityRestEqualityUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Community;
@@ -63,7 +62,7 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
 
     public CommunityRestRepository(CommunityService dsoService,
                                    CommunityConverter dsoConverter) {
-        super(dsoService, dsoConverter, new DSpaceObjectPatch<CommunityRest>() {});
+        super(dsoService, dsoConverter);
         this.cs = dsoService;
     }
 

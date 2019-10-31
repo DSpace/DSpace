@@ -22,7 +22,6 @@ import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.GroupRest;
 import org.dspace.app.rest.model.hateoas.GroupResource;
 import org.dspace.app.rest.model.patch.Patch;
-import org.dspace.app.rest.repository.patch.DSpaceObjectPatch;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.eperson.Group;
@@ -48,7 +47,7 @@ public class GroupRestRepository extends DSpaceObjectRestRepository<Group, Group
     @Autowired
     GroupRestRepository(GroupService dsoService,
                         GroupConverter dsoConverter) {
-        super(dsoService, dsoConverter, new DSpaceObjectPatch<GroupRest>() {});
+        super(dsoService, dsoConverter);
         this.gs = dsoService;
     }
 

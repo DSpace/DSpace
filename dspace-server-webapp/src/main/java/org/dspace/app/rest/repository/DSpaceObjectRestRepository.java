@@ -32,17 +32,16 @@ public abstract class DSpaceObjectRestRepository<M extends DSpaceObject, R exten
         extends DSpaceRestRepository<R, UUID> {
 
     final DSpaceObjectService<M> dsoService;
-    final ResourcePatch<R> resourcePatch;
     final DSpaceObjectConverter<M, R> dsoConverter;
 
+    @Autowired
+    ResourcePatch<R> resourcePatch;
     @Autowired
     MetadataConverter metadataConverter;
 
     DSpaceObjectRestRepository(DSpaceObjectService<M> dsoService,
-                               DSpaceObjectConverter<M, R> dsoConverter,
-                               ResourcePatch<R> resourcePatch) {
+                               DSpaceObjectConverter<M, R> dsoConverter) {
         this.dsoService = dsoService;
-        this.resourcePatch = resourcePatch;
         this.dsoConverter = dsoConverter;
     }
 

@@ -17,7 +17,6 @@ import org.dspace.app.rest.converter.SiteConverter;
 import org.dspace.app.rest.model.SiteRest;
 import org.dspace.app.rest.model.hateoas.SiteResource;
 import org.dspace.app.rest.model.patch.Patch;
-import org.dspace.app.rest.repository.patch.DSpaceObjectPatch;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Site;
 import org.dspace.content.service.SiteService;
@@ -43,7 +42,7 @@ public class SiteRestRepository extends DSpaceObjectRestRepository<Site, SiteRes
     @Autowired
     public SiteRestRepository(SiteService dsoService,
                               SiteConverter dsoConverter) {
-        super(dsoService, dsoConverter, new DSpaceObjectPatch<SiteRest>() {});
+        super(dsoService, dsoConverter);
         this.sitesv = dsoService;
     }
 
