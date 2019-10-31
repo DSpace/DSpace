@@ -26,6 +26,8 @@ import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.patch.Patch;
+import org.dspace.app.rest.projection.ListProjection;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.repository.patch.ItemPatch;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
@@ -112,7 +114,8 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<ItemRest> page = new PageImpl<Item>(items, pageable, total).map(converter::toRest);
+        Page<ItemRest> page = new PageImpl<>(items, pageable, total).map(
+                (item) -> converter.toRest(item, ListProjection.NAME));
         return page;
     }
 
