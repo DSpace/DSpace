@@ -11,6 +11,9 @@ import org.dspace.app.rest.model.LinkRest;
 import org.dspace.app.rest.model.hateoas.HALResource;
 import org.springframework.stereotype.Component;
 
+/**
+ * A projection that provides an abbreviated form of any resource that omits all optional embeds.
+ */
 @Component
 public class ListProjection extends AbstractProjection {
 

@@ -11,6 +11,9 @@ import org.dspace.app.rest.model.LinkRest;
 import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.hateoas.HALResource;
 
+/**
+ * Abstract base class for projections. By default each method has no effect unless overridden by a subclass.
+ */
 public abstract class AbstractProjection implements Projection {
 
     @Override

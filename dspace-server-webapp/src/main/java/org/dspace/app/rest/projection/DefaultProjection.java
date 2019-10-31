@@ -7,6 +7,9 @@
  */
 package org.dspace.app.rest.projection;
 
+/**
+ * The default projection, which has no effect.
+ */
 public class DefaultProjection extends AbstractProjection {
 
     public final static String NAME = "default";
