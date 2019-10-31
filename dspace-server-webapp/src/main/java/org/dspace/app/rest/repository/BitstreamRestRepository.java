@@ -21,7 +21,6 @@ import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.hateoas.BitstreamResource;
 import org.dspace.app.rest.model.patch.Patch;
-import org.dspace.app.rest.repository.patch.DSpaceObjectPatch;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.service.BitstreamService;
@@ -49,7 +48,7 @@ public class BitstreamRestRepository extends DSpaceObjectRestRepository<Bitstrea
     @Autowired
     public BitstreamRestRepository(BitstreamService dsoService,
                                    BitstreamConverter dsoConverter) {
-        super(dsoService, dsoConverter, new DSpaceObjectPatch<BitstreamRest>() { });
+        super(dsoService, dsoConverter);
         this.bs = dsoService;
     }
 

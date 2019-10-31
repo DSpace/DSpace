@@ -28,7 +28,6 @@ import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.hateoas.ItemResource;
 import org.dspace.app.rest.model.patch.Patch;
-import org.dspace.app.rest.repository.patch.ResourcePatch;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
@@ -64,9 +63,6 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
     MetadataConverter metadataConverter;
 
     @Autowired
-    ResourcePatch resourcePatch;
-
-    @Autowired
     WorkspaceItemService workspaceItemService;
 
     @Autowired
@@ -79,9 +75,8 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
     InstallItemService installItemService;
 
     public ItemRestRepository(ItemService dsoService,
-                              ItemConverter dsoConverter,
-                              ResourcePatch resourcePatch) {
-        super(dsoService, dsoConverter, resourcePatch);
+                              ItemConverter dsoConverter) {
+        super(dsoService, dsoConverter);
         this.is = dsoService;
     }
 

@@ -60,9 +60,8 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
     ResourcePatch resourcePatch;
 
     public EPersonRestRepository(EPersonService dsoService,
-                                 EPersonConverter dsoConverter,
-                                 ResourcePatch resourcePatch) {
-        super(dsoService, dsoConverter, resourcePatch);
+                                 EPersonConverter dsoConverter) {
+        super(dsoService, dsoConverter);
         this.es = dsoService;
     }
 

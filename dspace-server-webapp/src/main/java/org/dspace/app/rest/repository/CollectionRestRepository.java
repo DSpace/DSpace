@@ -28,7 +28,6 @@ import org.dspace.app.rest.model.CollectionRest;
 import org.dspace.app.rest.model.CommunityRest;
 import org.dspace.app.rest.model.hateoas.CollectionResource;
 import org.dspace.app.rest.model.patch.Patch;
-import org.dspace.app.rest.repository.patch.DSpaceObjectPatch;
 import org.dspace.app.rest.utils.CollectionRestEqualityUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
@@ -71,7 +70,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
 
     public CollectionRestRepository(CollectionService dsoService,
                                     CollectionConverter dsoConverter) {
-        super(dsoService, dsoConverter, new DSpaceObjectPatch<CollectionRest>() {});
+        super(dsoService, dsoConverter);
         this.cs = dsoService;
     }
 
