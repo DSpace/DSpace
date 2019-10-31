@@ -22,7 +22,7 @@ import javax.ws.rs.core.Response;
 import org.apache.catalina.connector.ClientAbortException;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.Logger;
-import org.dspace.app.rest.converter.BitstreamConverter;
+import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.hateoas.BitstreamResource;
@@ -90,7 +90,7 @@ public class BitstreamRestController {
     private ConfigurationService configurationService;
 
     @Autowired
-    BitstreamConverter converter;
+    ConverterService converter;
 
     @Autowired
     Utils utils;
@@ -238,7 +238,6 @@ public class BitstreamRestController {
 
         context.commit();
 
-        return (BitstreamResource) utils.getResourceRepository(BitstreamRest.CATEGORY, BitstreamRest.NAME)
-                .wrapResource(converter.fromModel(context.reloadEntity(bitstream)));
+        return converter.toResource(converter.toRest(context.reloadEntity(bitstream)));
     }
 }
