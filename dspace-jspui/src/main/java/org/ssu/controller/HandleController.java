@@ -1,6 +1,7 @@
 package org.ssu.controller;
 
 import com.google.common.collect.Lists;
+import org.dspace.app.webui.util.Authenticate;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
@@ -84,6 +85,7 @@ public class HandleController {
         DSpaceObject dSpaceObject = handleService.resolveToObject(dspaceContext, "123456789/" + itemId);
         Locale locale = dspaceContext.getCurrentLocale();
         ModelAndView result = new ModelAndView();
+//        authorizeService.authorizeAction(dspaceContext, dSpaceObject, Constants.READ);
         if(authorizeService.authorizeActionBoolean(dspaceContext, dSpaceObject, Constants.READ)) {
             Community parentCommunity = null;
             boolean includeCurrentCommunityInResult = false;
@@ -108,7 +110,10 @@ public class HandleController {
             request.setAttribute("dspace.community", parentCommunity);
             request.setAttribute("dspace.communities", getParents(dspaceContext, parentCommunity, includeCurrentCommunityInResult));
         } else {
-            System.out.println("Unauthorized action");
+            request.setAttribute("dspace.original.url", "/handle/123456789/" + itemId);
+            Authenticate.startAuthentication(dspaceContext, request, response);
+            result = new ModelAndView();
+            result.setViewName("home");
         }
 
         return result;
