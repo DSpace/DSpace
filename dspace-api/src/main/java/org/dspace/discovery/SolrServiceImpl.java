@@ -2072,7 +2072,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             if("equals".equals(operator) || "notequals".equals(operator))
             {
                 //DO NOT ESCAPE RANGE QUERIES !
-                if(!value.matches("\\[.*TO.*\\]"))
+                if(!value.matches("\\[.* TO .*\\]"))
                 {
                     value = ClientUtils.escapeQueryChars(value);
                     filterQuery.append(value);
@@ -2090,7 +2090,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             }
             else{
                 //DO NOT ESCAPE RANGE QUERIES !
-                if(!value.matches("\\[.*TO.*\\]"))
+                if(!value.matches("\\[.* TO .*\\]"))
                 {
                     value = ClientUtils.escapeQueryChars(value);
                     filterQuery.append("(").append(value).append(")");
