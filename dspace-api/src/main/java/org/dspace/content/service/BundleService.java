@@ -122,6 +122,18 @@ public interface BundleService extends DSpaceObjectService<Bundle>, DSpaceObject
     public void moveBitstream(Context context, Bundle bundle, int from, int to) throws AuthorizeException, SQLException;
 
     /**
+     * Moves a bitstream from its current bundle to a new target bundle
+     * @param context               DSpace Context
+     * @param targetBundle          The target bundle where bitstream will be moved to
+     * @param bitstream             The bitstream being moved
+     * @throws SQLException         if database error
+     * @throws AuthorizeException   if authorization error
+     * @throws IOException          if IO error
+     */
+    public void  moveBitstreamToBundle(Context context, Bundle targetBundle, Bitstream bitstream) throws SQLException,
+            AuthorizeException, IOException;
+
+    /**
      * Changes bitstream order according to the array
      *
      * @param context      DSpace Context
