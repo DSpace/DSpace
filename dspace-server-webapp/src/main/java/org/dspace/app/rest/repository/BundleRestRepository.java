@@ -215,4 +215,29 @@ public class BundleRestRepository extends DSpaceObjectRestRepository<Bundle, Bun
     public DSpaceResource<BundleRest> wrapResource(BundleRest model, String... rels) {
         return new BundleResource(model, utils, rels);
     }
+
+    /**
+     * Deletes a bundle whose uuid is given and deletes all the bitstreams it contains in BundleService.delete
+     * @param context
+     *            the dspace context
+     * @param id
+     *            the id of the bundle to delete
+     */
+    @Override
+    protected void delete(Context context, UUID id) {
+        Bundle bundleToDelete = null;
+        try {
+            bundleToDelete = bundleService.find(context, id);
+        } catch (SQLException e) {
+            throw new RuntimeException("Can't find a bundle with id: " + id, e);
+        }
+        try {
+            bundleService.delete(context, bundleToDelete);
+        } catch (AuthorizeException e) {
+            throw new AccessDeniedException("You do not have the right access rights to delete this bundle " +
+                    "with id: " + id, e);
+        } catch (IOException | SQLException e) {
+            throw new RuntimeException("Something went wrong trying to delete bundle with id: " + id, e);
+        }
+    }
 }
