@@ -146,7 +146,7 @@
   </listener>
 
     <servlet>
-        <servlet-name>Spring MVC Servlet</servlet-name>
+        <servlet-name>essuir-servlet</servlet-name>
         <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
         <init-param>
             <param-name>contextConfigLocation</param-name>
@@ -531,7 +531,7 @@
   </servlet-mapping>
 
   <servlet-mapping>
-    <servlet-name>Spring MVC Servlet</servlet-name>
+    <servlet-name>essuir-servlet</servlet-name>
     <url-pattern>/community-list</url-pattern>
   </servlet-mapping>
 
@@ -701,7 +701,7 @@
   </servlet-mapping>
   
   <servlet-mapping>
-    <servlet-name>profile</servlet-name>
+    <servlet-name>essuir-servlet</servlet-name>
     <url-pattern>/profile</url-pattern>
   </servlet-mapping>
 
@@ -716,7 +716,7 @@
   </servlet-mapping>
 
   <servlet-mapping>
-    <servlet-name>Spring MVC Servlet</servlet-name>
+    <servlet-name>essuir-servlet</servlet-name>
     <url-pattern>/simple-search</url-pattern>
   </servlet-mapping>
   
@@ -826,95 +826,95 @@
   </servlet-mapping>
 
     <servlet-mapping>
-        <servlet-name>Spring MVC Servlet</servlet-name>
+        <servlet-name>essuir-servlet</servlet-name>
         <url-pattern>/recent-items</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>
-        <servlet-name>Spring MVC Servlet</servlet-name>
+        <servlet-name>essuir-servlet</servlet-name>
         <url-pattern></url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>
-        <servlet-name>Spring MVC Servlet</servlet-name>
+        <servlet-name>essuir-servlet</servlet-name>
         <url-pattern>/about</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>
-        <servlet-name>Spring MVC Servlet</servlet-name>
+        <servlet-name>essuir-servlet</servlet-name>
         <url-pattern>/contacts</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>
-        <servlet-name>Spring MVC Servlet</servlet-name>
+        <servlet-name>essuir-servlet</servlet-name>
         <url-pattern>/instruction</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>
-        <servlet-name>Spring MVC Servlet</servlet-name>
+        <servlet-name>essuir-servlet</servlet-name>
         <url-pattern>/provision</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>
-        <servlet-name>Spring MVC Servlet</servlet-name>
+        <servlet-name>essuir-servlet</servlet-name>
         <url-pattern>/application1</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>
-        <servlet-name>Spring MVC Servlet</servlet-name>
+        <servlet-name>essuir-servlet</servlet-name>
         <url-pattern>/application2</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>
-        <servlet-name>Spring MVC Servlet</servlet-name>
+        <servlet-name>essuir-servlet</servlet-name>
         <url-pattern>/structure</url-pattern>
     </servlet-mapping>
 
 
     <servlet-mapping>
-        <servlet-name>Spring MVC Servlet</servlet-name>
+        <servlet-name>essuir-servlet</servlet-name>
         <url-pattern>/faq</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>
-        <servlet-name>Spring MVC Servlet</servlet-name>
+        <servlet-name>essuir-servlet</servlet-name>
         <url-pattern>/top-authors</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>
-        <servlet-name>Spring MVC Servlet</servlet-name>
+        <servlet-name>essuir-servlet</servlet-name>
         <url-pattern>/top-publications</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>
-        <servlet-name>Spring MVC Servlet</servlet-name>
+        <servlet-name>essuir-servlet</servlet-name>
         <url-pattern>/general-statistics</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>
-        <servlet-name>Spring MVC Servlet</servlet-name>
+        <servlet-name>essuir-servlet</servlet-name>
         <url-pattern>/current</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>
-        <servlet-name>Spring MVC Servlet</servlet-name>
+        <servlet-name>essuir-servlet</servlet-name>
         <url-pattern>/update-statistics</url-pattern>
     </servlet-mapping>
 
 
 
     <servlet-mapping>
-        <servlet-name>Spring MVC Servlet</servlet-name>
+        <servlet-name>essuir-servlet</servlet-name>
         <url-pattern>/handle/*</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>
-        <servlet-name>Spring MVC Servlet</servlet-name>
+        <servlet-name>essuir-servlet</servlet-name>
         <url-pattern>/item-download/*</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>
-        <servlet-name>Spring MVC Servlet</servlet-name>
+        <servlet-name>essuir-servlet</servlet-name>
         <url-pattern>/feedback</url-pattern>
     </servlet-mapping>
 
@@ -929,7 +929,7 @@
 
 
     <servlet-mapping>
-        <servlet-name>Spring MVC Servlet</servlet-name>
+        <servlet-name>essuir-servlet</servlet-name>
         <url-pattern>/browse</url-pattern>
     </servlet-mapping>
 
