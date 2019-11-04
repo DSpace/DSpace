@@ -11,6 +11,7 @@ import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.is;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -421,6 +422,128 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
                         BitstreamMatcher.matchBitstreamEntry(bitstream2),
                         BitstreamMatcher.matchBitstreamEntry(bitstream1)
                 )));
+    }
+
+    @Test
+    public void deleteBundle() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        String bitstreamContent = "Dummy content";
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream1 = BitstreamBuilder.createBitstream(context, item, is)
+                    .withName("Bitstream")
+                    .withDescription("Description")
+                    .withMimeType("text/plain")
+                    .build();
+            bitstream2 = BitstreamBuilder.createBitstream(context, item, is)
+                    .withName("Bitstream2")
+                    .withDescription("Description2")
+                    .withMimeType("text/plain")
+                    .build();
+        }
+
+        bundle1 = BundleBuilder.createBundle(context, item)
+                .withName("testname")
+                .withBitstream(bitstream1)
+                .withBitstream(bitstream2)
+                .build();
+
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        // Check if bundle is present
+        getClient().perform(get("/api/core/bundles/" + bundle1.getID() + "/bitstreams"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._embedded.bitstreams", Matchers.hasItems(
+                        BitstreamMatcher.matchBitstreamEntry(bitstream1),
+                        BitstreamMatcher.matchBitstreamEntry(bitstream2)
+                )));
+
+        // Delete bundle with admin auth token
+        getClient(token).perform(delete("/api/core/bundles/" + bundle1.getID()))
+                .andExpect(status().is(204));
+
+        // Verify 404 after delete for bundle AND its bitstreams
+        getClient(token).perform(get("/api/core/bundles/" + bundle1.getID()))
+                .andExpect(status().isNotFound());
+        getClient(token).perform(get("/api/core/bitstreams/" + bitstream1.getID()))
+                .andExpect(status().isNotFound());
+        getClient(token).perform(get("/api/core/bitstreams/" + bitstream2.getID()))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void deleteBundle_Forbidden() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        String bitstreamContent = "Dummy content";
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream1 = BitstreamBuilder.createBitstream(context, item, is)
+                    .withName("Bitstream")
+                    .withDescription("Description")
+                    .withMimeType("text/plain")
+                    .build();
+            bitstream2 = BitstreamBuilder.createBitstream(context, item, is)
+                    .withName("Bitstream2")
+                    .withDescription("Description2")
+                    .withMimeType("text/plain")
+                    .build();
+        }
+
+        bundle1 = BundleBuilder.createBundle(context, item)
+                .withName("testname")
+                .withBitstream(bitstream1)
+                .withBitstream(bitstream2)
+                .build();
+
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(eperson.getEmail(), password);
+
+        // Try to delete bundle with eperson auth token
+        getClient(token).perform(delete("/api/core/bundles/" + bundle1.getID()))
+                .andExpect(status().isForbidden());
+
+        // Verify the bundle is still here
+        getClient(token).perform(get("/api/core/bundles/" + bundle1.getID()))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void deleteBundle_NoAuthToken() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        String bitstreamContent = "Dummy content";
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream1 = BitstreamBuilder.createBitstream(context, item, is)
+                    .withName("Bitstream")
+                    .withDescription("Description")
+                    .withMimeType("text/plain")
+                    .build();
+            bitstream2 = BitstreamBuilder.createBitstream(context, item, is)
+                    .withName("Bitstream2")
+                    .withDescription("Description2")
+                    .withMimeType("text/plain")
+                    .build();
+        }
+
+        bundle1 = BundleBuilder.createBundle(context, item)
+                .withName("testname")
+                .withBitstream(bitstream1)
+                .withBitstream(bitstream2)
+                .build();
+
+        context.restoreAuthSystemState();
+
+        // Try to delete bundle without auth token
+        getClient().perform(delete("/api/core/bundles/" + bundle1.getID()))
+                .andExpect(status().isUnauthorized());
+
+        // Verify the bundle is still here
+        getClient().perform(get("/api/core/bundles/" + bundle1.getID()))
+                .andExpect(status().isOk());
     }
 
 }
