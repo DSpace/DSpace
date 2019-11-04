@@ -26,7 +26,7 @@ import org.springframework.stereotype.Component;
  *  @author Michael Spalti
  */
 @Component
-public class ItemDiscoverableReplaceOperation extends ReplacePatchOperation<ItemRest, Boolean> {
+public class ItemDiscoverableReplaceOperation extends ReplacePatchOperation<ItemRest> {
 
     private static final Logger log = Logger.getLogger(ItemDiscoverableReplaceOperation.class);
     private static final String OPERATION_PATH_DISCOVERABLE = "/discoverable";
@@ -45,14 +45,6 @@ public class ItemDiscoverableReplaceOperation extends ReplacePatchOperation<Item
         if ((Object) resource.getDiscoverable() == null) {
             throw new DSpaceBadRequestException("Attempting to replace a non-existent value.");
         }
-    }
-
-    protected Class<Boolean[]> getArrayClassForEvaluation() {
-        return Boolean[].class;
-    }
-
-    protected Class<Boolean> getClassForEvaluation() {
-        return Boolean.class;
     }
 
     public boolean supports(RestModel R, String path) {

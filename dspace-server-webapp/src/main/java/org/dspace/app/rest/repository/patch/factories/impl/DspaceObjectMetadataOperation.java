@@ -29,7 +29,7 @@ import org.springframework.stereotype.Component;
  * @author Maria Verdonck (Atmire) on 30/10/2019
  */
 @Component
-public class DspaceObjectMetadataOperation<R extends RestModel, T> extends PatchOperation<R, T> {
+public class DspaceObjectMetadataOperation<R extends RestModel> extends PatchOperation<R> {
 
     private static final String METADATA_PATH = "/metadata";
     private ObjectMapper objectMapper = new ObjectMapper();
@@ -37,8 +37,6 @@ public class DspaceObjectMetadataOperation<R extends RestModel, T> extends Patch
 
     /**
      * Implements the patch operation for metadata operations.
-     * Before performing the metadata operation this method checks
-     * for a non-null operation value.
      *
      * @param resource  the rest model.
      * @param operation the metadata patch operation.
@@ -65,14 +63,6 @@ public class DspaceObjectMetadataOperation<R extends RestModel, T> extends Patch
         } catch (IOException e) {
             throw new IllegalArgumentException(e);
         }
-    }
-
-    protected Class<T[]> getArrayClassForEvaluation() {
-        return null;
-    }
-
-    protected Class<T> getClassForEvaluation() {
-        return null;
     }
 
     public boolean supports(RestModel R, String path) {

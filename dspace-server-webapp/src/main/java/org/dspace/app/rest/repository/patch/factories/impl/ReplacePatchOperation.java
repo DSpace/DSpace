@@ -17,8 +17,8 @@ import org.dspace.app.rest.model.patch.Operation;
  *
  * @author Michael Spalti
  */
-public abstract class ReplacePatchOperation<R extends RestModel, T>
-        extends PatchOperation<R, T> {
+public abstract class ReplacePatchOperation<R extends RestModel>
+        extends PatchOperation<R> {
 
     /**
      * Implements the patch operation for replace operations.

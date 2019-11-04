@@ -24,7 +24,7 @@ import org.springframework.stereotype.Component;
  * @author Michael Spalti
  */
 @Component
-public class EPersonPasswordReplaceOperation extends ReplacePatchOperation<EPersonRest, String> {
+public class EPersonPasswordReplaceOperation extends ReplacePatchOperation<EPersonRest> {
 
     private static final String OPERATION_PATH_PASSWORD = "/password";
 
@@ -48,17 +48,5 @@ public class EPersonPasswordReplaceOperation extends ReplacePatchOperation<EPers
 
     public boolean supports(RestModel R, String path) {
         return (R instanceof EPersonRest && path.trim().equalsIgnoreCase(OPERATION_PATH_PASSWORD));
-    }
-
-    @Override
-    protected Class<String[]> getArrayClassForEvaluation() {
-
-        return String[].class;
-    }
-
-    @Override
-    protected Class<String> getClassForEvaluation() {
-
-        return String.class;
     }
 }

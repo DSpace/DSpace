@@ -17,7 +17,7 @@ import org.dspace.app.rest.model.patch.Operation;
  *
  * @author Michael Spalti
  */
-public abstract class PatchOperation<R extends RestModel, T>
+public abstract class PatchOperation<R extends RestModel>
         implements ResourcePatchOperation<R> {
 
     /**
@@ -64,26 +64,10 @@ public abstract class PatchOperation<R extends RestModel, T>
     }
 
     /**
-     * This method should return the typed array to be used in the
-     * LateObjectEvaluator evaluation of json arrays.
-     *
-     * @return
-     */
-    protected abstract Class<T[]> getArrayClassForEvaluation();
-
-    /**
-     * This method should return the object type to be used in the
-     * LateObjectEvaluator evaluation of json objects.
-     *
-     * @return
-     */
-    protected abstract Class<T> getClassForEvaluation();
-
-    /**
-     * TODO
-     * @param R
-     * @param path
-     * @return
+     * Determines whether or not this Patch Operation can do this patch (RestModel and path gets checked)
+     * @param R         RestModel, whose class must be instance of dso for which this PatchOperation was created
+     * @param path      Path given to the patch body, should match this type of Patch Operation
+     * @return          True if this PatchOperation class can do the patch for this given RestModel and Path
      */
     public abstract boolean supports(RestModel R, String path);
 

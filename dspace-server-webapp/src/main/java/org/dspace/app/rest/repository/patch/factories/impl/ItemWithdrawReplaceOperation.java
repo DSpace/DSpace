@@ -27,7 +27,7 @@ import org.springframework.stereotype.Component;
  * @author Michael Spalti
  */
 @Component
-public class ItemWithdrawReplaceOperation extends ReplacePatchOperation<ItemRest, Boolean> {
+public class ItemWithdrawReplaceOperation extends ReplacePatchOperation<ItemRest> {
 
     private static final Logger log = Logger.getLogger(ItemWithdrawReplaceOperation.class);
     private static final String OPERATION_PATH_WITHDRAW = "/withdrawn";
@@ -73,14 +73,6 @@ public class ItemWithdrawReplaceOperation extends ReplacePatchOperation<ItemRest
 
     public boolean supports(RestModel R, String path) {
         return (R instanceof ItemRest && path.trim().equalsIgnoreCase(OPERATION_PATH_WITHDRAW));
-    }
-
-    protected Class<Boolean[]> getArrayClassForEvaluation() {
-        return Boolean[].class;
-    }
-
-    protected Class<Boolean> getClassForEvaluation() {
-        return Boolean.class;
     }
 
 }
