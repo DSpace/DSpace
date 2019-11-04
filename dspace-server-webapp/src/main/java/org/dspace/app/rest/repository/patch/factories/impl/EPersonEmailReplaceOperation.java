@@ -25,7 +25,7 @@ import org.springframework.stereotype.Component;
  * @author Michael Spalti
  */
 @Component
-public class EPersonEmailReplaceOperation extends ReplacePatchOperation<EPersonRest, String>
+public class EPersonEmailReplaceOperation extends ReplacePatchOperation<EPersonRest>
         implements ResourcePatchOperation<EPersonRest> {
 
     private static final String OPERATION_PATH_EMAIL = "/email";
@@ -45,17 +45,5 @@ public class EPersonEmailReplaceOperation extends ReplacePatchOperation<EPersonR
 
     public boolean supports(RestModel R, String path) {
         return (R instanceof EPersonRest && path.trim().equalsIgnoreCase(OPERATION_PATH_EMAIL));
-    }
-
-    @Override
-    protected Class<String[]> getArrayClassForEvaluation() {
-
-        return String[].class;
-    }
-
-    @Override
-    protected Class<String> getClassForEvaluation() {
-
-        return String.class;
     }
 }

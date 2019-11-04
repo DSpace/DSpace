@@ -25,7 +25,7 @@ import org.springframework.stereotype.Component;
  * @author Michael Spalti
  */
 @Component
-public class EPersonCertificateReplaceOperation extends ReplacePatchOperation<EPersonRest, Boolean>
+public class EPersonCertificateReplaceOperation extends ReplacePatchOperation<EPersonRest>
         implements ResourcePatchOperation<EPersonRest> {
 
     private static final String OPERATION_PATH_CERTIFICATE = "/certificate";
@@ -51,15 +51,5 @@ public class EPersonCertificateReplaceOperation extends ReplacePatchOperation<EP
 
     public boolean supports(RestModel R, String path) {
         return (R instanceof EPersonRest && path.trim().equalsIgnoreCase(OPERATION_PATH_CERTIFICATE));
-    }
-
-    @Override
-    protected Class<Boolean[]> getArrayClassForEvaluation() {
-        return Boolean[].class;
-    }
-
-    @Override
-    protected Class<Boolean> getClassForEvaluation() {
-        return Boolean.class;
     }
 }
