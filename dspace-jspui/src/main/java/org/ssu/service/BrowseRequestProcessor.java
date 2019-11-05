@@ -43,7 +43,7 @@ public class BrowseRequestProcessor {
         model.addObject("rpp", perPage);
         model.addObject("selectedYear", Optional.ofNullable(request.getParameter("starts_with")).map(String::valueOf).orElse(""));
         model.addObject("sortOptions", SortOption.getSortOptions().stream().filter(SortOption::isVisible).collect(Collectors.toSet()));
-
+        model.addObject("queryString", request.getQueryString());
         model.addObject("isExtended", isExtendedTable);
 
         model = paginationProcessor.fillModelWithPaginationData(model, request, browseInfo);

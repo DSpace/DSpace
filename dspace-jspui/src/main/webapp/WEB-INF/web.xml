@@ -64,12 +64,30 @@
       <filter-class>org.dspace.rdf.negotiation.NegotiationFilter</filter-class>
   </filter>
 
+    <filter>
+        <filter-name>characterEncodingFilter</filter-name>
+        <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+        <init-param>
+            <param-name>encoding</param-name>
+            <param-value>UTF-8</param-value>
+        </init-param>
+        <init-param>
+            <param-name>forceEncoding</param-name>
+            <param-value>true</param-value>
+        </init-param>
+    </filter>
+
+
   <!-- Filter mappings -->
   <filter-mapping>
         <filter-name>dspace.request</filter-name>
         <url-pattern>/*</url-pattern>
   </filter-mapping>
-    
+
+    <filter-mapping>
+        <filter-name>characterEncodingFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
   <filter-mapping>
     <filter-name>admin-only</filter-name>
     <url-pattern>/dspace-admin/*</url-pattern>
@@ -918,15 +936,10 @@
         <url-pattern>/feedback</url-pattern>
     </servlet-mapping>
 
-    <!--<servlet-mapping>-->
-        <!--<servlet-name>Spring MVC Servlet</servlet-name>-->
-        <!--<url-pattern>/browse/dateissued</url-pattern>-->
-    <!--</servlet-mapping>-->
-    <!--<servlet-mapping>-->
-        <!--<servlet-name>Spring MVC Servlet</servlet-name>-->
-        <!--<url-pattern>/browse/title</url-pattern>-->
-    <!--</servlet-mapping>-->
-
+    <servlet-mapping>
+        <servlet-name>essuir-servlet</servlet-name>
+        <url-pattern>/export/user</url-pattern>
+    </servlet-mapping>
 
     <servlet-mapping>
         <servlet-name>essuir-servlet</servlet-name>

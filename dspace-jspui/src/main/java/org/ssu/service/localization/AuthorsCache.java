@@ -36,13 +36,13 @@ public class AuthorsCache {
                 .collect(Collectors.toList());
 
         englishMapping = authorLocalizations.stream()
-                .collect(Collectors.toMap(author -> String.format("%s, %s", author.getSurname(Locale.ENGLISH), author.getInitials(Locale.ENGLISH)), author -> author, (a, b) -> a));
+                .collect(Collectors.toMap(author -> author.getFormattedAuthorData("%s, %s", Locale.ENGLISH), author -> author, (a, b) -> a));
 
         russianMapping = authorLocalizations.stream()
-                .collect(Collectors.toMap(author -> String.format("%s, %s", author.getSurname(Locale.forLanguageTag("ru")), author.getInitials(Locale.forLanguageTag("ru"))), author -> author, (a, b) -> a));
+                .collect(Collectors.toMap(author -> author.getFormattedAuthorData("%s, %s", Locale.forLanguageTag("ru")), author -> author, (a, b) -> a));
 
         ukrainianMapping = authorLocalizations.stream()
-                .collect(Collectors.toMap(author -> String.format("%s, %s", author.getSurname(Locale.forLanguageTag("uk")), author.getInitials(Locale.forLanguageTag("uk"))), author -> author, (a, b) -> a));
+                .collect(Collectors.toMap(author -> author.getFormattedAuthorData("%s, %s", Locale.forLanguageTag("uk")), author -> author, (a, b) -> a));
     }
 
     public AuthorLocalization getAuthorLocalization(String name) {

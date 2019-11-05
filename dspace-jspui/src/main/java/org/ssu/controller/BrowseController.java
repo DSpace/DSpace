@@ -13,7 +13,6 @@ import org.dspace.core.Context;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
 import org.dspace.sort.SortException;
-import org.dspace.sort.SortOption;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -59,7 +58,7 @@ public class BrowseController {
     }
 
     @RequestMapping("/browse")
-    public ModelAndView getBrowseItems(ModelAndView model, HttpServletRequest request, HttpServletResponse response) throws SQLException, BrowseException, SortException, ServletException, IOException, AuthorizeException {
+    public ModelAndView getBrowseItems(ModelAndView model, HttpServletRequest request, HttpServletResponse response) throws SQLException, SortException, ServletException, IOException, AuthorizeException {
         String type = request.getParameter("type");
         String value = request.getParameter("value");
 
@@ -70,10 +69,10 @@ public class BrowseController {
         List<ItemResponse> items;
         if (("author".equals(type) || "subject".equals(type)) && (value == null || value.isEmpty())) {
             items = communityService.getShortList(dspaceContext, browseInfo);
-
         } else {
             items = communityService.getItems(dspaceContext, browseInfo);
             isExtendedTable = true;
+            model.addObject("searchQuery", value);
         }
 
         browseRequestProcessor.fillModelWithData(model, items, browseInfo, request, isExtendedTable);

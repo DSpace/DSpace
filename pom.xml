@@ -32,6 +32,7 @@
         <solr.version>4.10.4</solr.version>
         <jena.version>2.13.0</jena.version>
         <slf4j.version>1.7.14</slf4j.version>
+        <poi-version>3.9</poi-version>
         <!--
             Hibernate version pinned to 4.2, 4.3 does not work with the spring version we are currently using
             Upgrading the spring version will make the XMLUI crash
@@ -1213,18 +1214,31 @@
             <dependency>
                 <groupId>org.apache.poi</groupId>
                 <artifactId>poi</artifactId>
-                <version>3.17</version>
+                <version>${poi-version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.poi</groupId>
                 <artifactId>poi-scratchpad</artifactId>
-                <version>3.17</version>
+                <version>${poi-version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.poi</groupId>
                 <artifactId>poi-ooxml</artifactId>
-                <version>3.17</version>
+                <version>${poi-version}</version>
             </dependency>
+            <!--<dependency>-->
+                <!--<groupId>org.apache.poi</groupId>-->
+                <!--<artifactId>poi-ooxml-schemas</artifactId>-->
+                <!--<version>${poi-version}</version>-->
+            <!--</dependency>-->
+            <!-- https://mvnrepository.com/artifact/org.apache.poi/ooxml-schemas -->
+            <dependency>
+                <groupId>org.apache.poi</groupId>
+                <artifactId>ooxml-schemas</artifactId>
+                <version>1.1</version>
+            </dependency>
+
+
             <dependency>
                 <groupId>rome</groupId>
                 <artifactId>rome</artifactId>

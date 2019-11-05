@@ -55,6 +55,10 @@ public class AuthorLocalization {
         return authorLocalizations.get(locale.getLanguage()).getInitials();
     }
 
+    public String getFormattedAuthorData(String format, Locale locale) {
+        return String.format(format, getSurname(locale), getInitials(locale));
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

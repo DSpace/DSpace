@@ -233,7 +233,7 @@ public class HandleController {
             googleMetadata.setAuthors(googleMetadata.getAuthors().stream()
                     .map(author -> authorsCache.getAuthorLocalization(author))
                     .distinct()
-                    .map(authorLocalized -> String.format("%s, %s", authorLocalized.getSurname(authorLocalizationLocale), authorLocalized.getInitials(authorLocalizationLocale)))
+                    .map(authorLocalized -> authorLocalized.getFormattedAuthorData("%s, %s", authorLocalizationLocale))
                     .collect(Collectors.toList()));
             metaTags.addAll(googleMetadata.disseminateList());
         }
@@ -275,7 +275,7 @@ public class HandleController {
                 .collect(Collectors.toList());
 
         List<String> authors = itemService.extractAuthorListForItem(item).stream()
-                .map(author -> String.format("%s, %s", author.getSurname(locale), author.getInitials(locale)))
+                .map(author -> author.getFormattedAuthorData("%s, %s", locale))
                 .collect(Collectors.toList());
 
         Function<Bitstream, String> getBitstreamFormat = (bitstream) -> {

@@ -11,6 +11,23 @@
     </c:if>
 
     <div class="${divClass}">
+        <h2>
+
+
+            <form action="/export/user?${queryString}" method="post" enctype="application/json" accept-charset="utf-8">
+                <fmt:message key="browse.full.header"><fmt:param value=""/></fmt:message> <fmt:message key="browse.type.metadata.${type}"/> ${searchQuery}
+                <c:if test="${isExtended}">
+                        <%--<input type="hidden" name = "publications" id = "publications" value="${exportPublications}">--%>
+                    <input type="hidden" name = "author" id = "author" value="${searchQuery}">
+                    <button type="submit" class="btn btn-default btn-sm">
+                        <span class="glyphicon glyphicon-import"></span>
+                    </button>
+                </c:if>
+            </form>
+
+        </h2>
+
+
         <div class="panel panel-primary">
             <div class="panel-heading text-center">
                 <fmt:message key="browse.full.range">

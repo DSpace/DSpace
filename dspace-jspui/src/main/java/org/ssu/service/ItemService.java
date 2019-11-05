@@ -113,7 +113,7 @@ public class ItemService {
         Function<Item, String> extractAuthorListForItem = (currentItem) ->
                 extractAuthorListForItem(currentItem)
                         .stream()
-                        .map(author -> String.format("%s, %s", author.getSurname(locale), author.getInitials(locale)))
+                        .map(author -> author.getFormattedAuthorData("%s, %s", locale))
                         .map(author -> String.format("<a href=\"/browse?type=author&value=%s\">%s</a>", author, author))
                         .collect(Collectors.joining("; "));
 
