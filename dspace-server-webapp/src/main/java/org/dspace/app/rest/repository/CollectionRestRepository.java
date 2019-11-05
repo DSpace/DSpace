@@ -26,6 +26,7 @@ import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.CollectionRest;
 import org.dspace.app.rest.model.CommunityRest;
 import org.dspace.app.rest.model.patch.Patch;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.repository.patch.DSpaceObjectPatch;
 import org.dspace.app.rest.utils.CollectionRestEqualityUtils;
 import org.dspace.authorize.AuthorizeException;
@@ -80,7 +81,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
         if (collection == null) {
             return null;
         }
-        return converter.toRest(collection);
+        return converter.toRest(collection, utils.obtainProjection());
     }
 
     @Override
@@ -97,7 +98,9 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<CollectionRest> page = new PageImpl<>(collections, pageable, total).map(converter::toRest);
+        Projection projection = utils.obtainProjection(true);
+        Page<CollectionRest> page = new PageImpl<>(collections, pageable, total)
+                .map((object) -> converter.toRest(object, projection));
         return page;
     }
 
@@ -121,7 +124,8 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<CollectionRest> page = utils.getPage(collections, pageable).map(converter::toRest);
+        Page<CollectionRest> page = utils.getPage(collections, pageable)
+                .map((object) -> converter.toRest(object, utils.obtainProjection()));
         return page;
     }
 
@@ -138,7 +142,8 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<CollectionRest> page = utils.getPage(collections, pageable).map(converter::toRest);
+        Page<CollectionRest> page = utils.getPage(collections, pageable)
+                .map((object) -> converter.toRest(object, utils.obtainProjection()));
         return page;
     }
 
@@ -191,7 +196,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
         } catch (SQLException e) {
             throw new RuntimeException("Unable to create new Collection under parent Community " + id, e);
         }
-        return converter.toRest(collection);
+        return converter.toRest(collection, Projection.DEFAULT);
     }
 
 
@@ -210,7 +215,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
         if (collection == null) {
             throw new ResourceNotFoundException(apiCategory + "." + model + " with id: " + id + " not found");
         }
-        CollectionRest originalCollectionRest = converter.toRest(collection);
+        CollectionRest originalCollectionRest = converter.toRest(collection, Projection.DEFAULT);
         if (collectionRestEqualityUtils.isCollectionRestEqualWithoutMetadata(originalCollectionRest, collectionRest)) {
             metadataConverter.setMetadata(context, collection, collectionRest.getMetadata());
         } else {
@@ -218,7 +223,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
                                                    + id + ", "
                                                    + collectionRest.getId());
         }
-        return converter.toRest(collection);
+        return converter.toRest(collection, Projection.DEFAULT);
     }
     @Override
     @PreAuthorize("hasPermission(#id, 'COLLECTION', 'DELETE')")

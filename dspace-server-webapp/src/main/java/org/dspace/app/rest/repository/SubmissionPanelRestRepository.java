@@ -13,6 +13,7 @@ import java.util.List;
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.model.SubmissionDefinitionRest;
 import org.dspace.app.rest.model.SubmissionSectionRest;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.util.SubmissionConfig;
 import org.dspace.app.util.SubmissionConfigReader;
 import org.dspace.app.util.SubmissionConfigReaderException;
@@ -47,7 +48,7 @@ public class SubmissionPanelRestRepository extends DSpaceRestRepository<Submissi
     public SubmissionSectionRest findOne(Context context, String id) {
         try {
             SubmissionStepConfig step = submissionConfigReader.getStepConfig(id);
-            return converter.toRest(step);
+            return converter.toRest(step, utils.obtainProjection());
         } catch (SubmissionConfigReaderException e) {
             //TODO wrap with a specific exception
             throw new RuntimeException(e.getMessage(), e);
@@ -68,7 +69,9 @@ public class SubmissionPanelRestRepository extends DSpaceRestRepository<Submissi
                 stepConfs.add(step);
             }
         }
-        Page<SubmissionSectionRest> page = new PageImpl<>(stepConfs, pageable, total).map(converter::toRest);
+        Projection projection = utils.obtainProjection(true);
+        Page<SubmissionSectionRest> page = new PageImpl<>(stepConfs, pageable, total)
+                .map((object) -> converter.toRest(object, projection));
         return page;
     }
 

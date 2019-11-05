@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 
 import org.dspace.app.rest.model.MetadataRest;
 import org.dspace.app.rest.model.MetadataValueRest;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
@@ -58,7 +59,7 @@ public class MetadataConverter implements Converter<List<MetadataValue>, Metadat
                 set = new TreeSet<>(Comparator.comparingInt(MetadataValueRest::getPlace));
                 mapOfSortedSets.put(key, set);
             }
-            set.add(converter.toRest(metadataValue));
+            set.add(converter.toRest(metadataValue, Projection.DEFAULT));
         }
 
         MetadataRest metadataRest = new MetadataRest();

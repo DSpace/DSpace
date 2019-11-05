@@ -17,6 +17,7 @@ import org.dspace.app.rest.model.AInprogressSubmissionRest;
 import org.dspace.app.rest.model.ErrorRest;
 import org.dspace.app.rest.model.SubmissionDefinitionRest;
 import org.dspace.app.rest.model.SubmissionSectionRest;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.submit.AbstractRestProcessingStep;
 import org.dspace.app.rest.submit.SubmissionService;
 import org.dspace.app.util.SubmissionConfigReader;
@@ -61,7 +62,7 @@ public abstract class AInprogressItemConverter<T extends InProgressSubmission<ID
         submissionConfigReader = new SubmissionConfigReader();
     }
 
-    protected void fillFromModel(T obj, R witem) {
+    protected void fillFromModel(T obj, R witem, Projection projection) {
         Collection collection = obj.getCollection();
         Item item = obj.getItem();
         EPerson submitter = null;
@@ -72,9 +73,9 @@ public abstract class AInprogressItemConverter<T extends InProgressSubmission<ID
         }
 
         witem.setId(obj.getID());
-        witem.setCollection(collection != null ? converter.toRest(collection) : null);
-        witem.setItem(converter.toRest(item));
-        witem.setSubmitter(converter.toRest(submitter));
+        witem.setCollection(collection != null ? converter.toRest(collection, projection) : null);
+        witem.setItem(converter.toRest(item, projection));
+        witem.setSubmitter(converter.toRest(submitter, projection));
 
         // 1. retrieve the submission definition
         // 2. iterate over the submission section to allow to plugin additional
@@ -82,7 +83,7 @@ public abstract class AInprogressItemConverter<T extends InProgressSubmission<ID
 
         if (collection != null) {
             SubmissionDefinitionRest def = converter.toRest(
-                    submissionConfigReader.getSubmissionConfigByCollection(collection.getHandle()));
+                    submissionConfigReader.getSubmissionConfigByCollection(collection.getHandle()), projection);
             witem.setSubmissionDefinition(def);
             for (SubmissionSectionRest sections : def.getPanels()) {
                 SubmissionStepConfig stepConfig = submissionSectionConverter.toModel(sections);

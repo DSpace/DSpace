@@ -18,7 +18,6 @@ import org.dspace.app.rest.model.HarvesterMetadataRest;
 import org.dspace.app.rest.model.hateoas.HarvesterMetadataResource;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.harvest.OAIHarvester;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -50,10 +49,11 @@ public class HarvesterMetadataController {
      */
     @RequestMapping(method = RequestMethod.GET)
     public HarvesterMetadataResource get(HttpServletRequest request,
-                                     HttpServletResponse response) {
+                                         HttpServletResponse response) {
         List<Map<String,String>> configs = OAIHarvester.getAvailableMetadataFormats();
 
         HarvesterMetadataRest data = new HarvesterMetadataRest();
+        data.setProjection(utils.obtainProjection());
         data.setConfigs(configs);
 
         HarvesterMetadataResource resource = converter.toResource(data);

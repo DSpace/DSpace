@@ -17,6 +17,7 @@ import org.dspace.app.rest.converter.BrowseEntryConverter;
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.model.BrowseEntryRest;
 import org.dspace.app.rest.model.BrowseIndexRest;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.utils.ScopeResolver;
 import org.dspace.browse.BrowseEngine;
 import org.dspace.browse.BrowseException;
@@ -55,7 +56,7 @@ public class BrowseEntryLinkRepository extends AbstractDSpaceRestRepository
 
     // FIXME It will be nice to drive arguments binding by annotation as in normal spring controller methods
     public Page<BrowseEntryRest> listBrowseEntries(HttpServletRequest request, String browseName,
-                                                   Pageable pageable, String projection)
+                                                   Pageable pageable, Projection projection)
         throws BrowseException, SQLException {
         // FIXME this should be bind automatically and available as method
         // argument
@@ -122,7 +123,7 @@ public class BrowseEntryLinkRepository extends AbstractDSpaceRestRepository
                                                   binfo.getResultsPerPage());
         Page<BrowseEntryRest> page = new PageImpl<>(Arrays.asList(binfo.getStringResults()), pageResultInfo,
                                                             binfo.getTotal()).map(browseEntryConverter);
-        BrowseIndexRest biRest = converter.toRest(bi);
+        BrowseIndexRest biRest = converter.toRest(bi, projection);
         page.forEach(t -> t.setBrowseIndex(biRest));
         return page;
     }

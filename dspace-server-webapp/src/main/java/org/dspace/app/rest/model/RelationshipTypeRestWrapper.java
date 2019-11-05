@@ -26,8 +26,6 @@ public class RelationshipTypeRestWrapper extends RestAddressableModel {
     private String entityTypeLabel;
     private Integer entityTypeId;
 
-
-
     public List<RelationshipTypeRest> getRelationshipTypeRestList() {
         return relationshipTypeRestList;
     }

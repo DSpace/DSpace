@@ -14,9 +14,10 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
-import org.dspace.app.rest.converter.ItemConverter;
+import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.model.BrowseIndexRest;
 import org.dspace.app.rest.model.ItemRest;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.utils.ScopeResolver;
 import org.dspace.browse.BrowseEngine;
 import org.dspace.browse.BrowseException;
@@ -47,13 +48,13 @@ import org.springframework.stereotype.Component;
 public class BrowseItemLinkRepository extends AbstractDSpaceRestRepository
     implements LinkRestRepository {
     @Autowired
-    ItemConverter converter;
+    ConverterService converter;
 
     @Autowired
     ScopeResolver scopeResolver;
 
     public Page<ItemRest> listBrowseItems(HttpServletRequest request, String browseName, Pageable pageable,
-                                          String projection)
+                                          Projection projection)
         throws BrowseException, SQLException {
         //FIXME these should be bind automatically and available as method arguments
         String scope = null;
@@ -151,7 +152,9 @@ public class BrowseItemLinkRepository extends AbstractDSpaceRestRepository
         for (IndexableObject bb : binfo.getBrowseItemResults()) {
             tmpResult.add((Item) bb);
         }
-        Page<ItemRest> page = new PageImpl<Item>(tmpResult, pageResultInfo, binfo.getTotal()).map(converter);
+
+        Page<ItemRest> page = new PageImpl<Item>(tmpResult, pageResultInfo, binfo.getTotal())
+                .map((object) -> converter.toRest(object, projection));
         return page;
     }
 

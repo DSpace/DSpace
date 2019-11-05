@@ -11,6 +11,7 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.SubmissionSectionRest;
 import org.dspace.app.rest.model.SubmissionVisibilityRest;
 import org.dspace.app.rest.model.VisibilityEnum;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.util.SubmissionConfigReader;
 import org.dspace.app.util.SubmissionConfigReaderException;
 import org.dspace.app.util.SubmissionStepConfig;
@@ -30,8 +31,9 @@ public class SubmissionSectionConverter implements DSpaceConverter<SubmissionSte
     private SubmissionConfigReader submissionConfigReader;
 
     @Override
-    public SubmissionSectionRest convert(SubmissionStepConfig step) {
+    public SubmissionSectionRest convert(SubmissionStepConfig step, Projection projection) {
         SubmissionSectionRest sp = new SubmissionSectionRest();
+        sp.setProjection(projection);
         sp.setMandatory(step.isMandatory());
         sp.setHeader(step.getHeading());
         sp.setSectionType(step.getType());

@@ -22,6 +22,7 @@ import org.dspace.app.rest.exception.RESTAuthorizationException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.EPersonRest;
 import org.dspace.app.rest.model.patch.Patch;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.repository.patch.EPersonPatch;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
@@ -90,7 +91,7 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
             throw new RuntimeException(e.getMessage(), e);
         }
 
-        return converter.toRest(eperson);
+        return converter.toRest(eperson, Projection.DEFAULT);
     }
 
     @Override
@@ -105,7 +106,7 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
         if (eperson == null) {
             return null;
         }
-        return converter.toRest(eperson);
+        return converter.toRest(eperson, utils.obtainProjection());
     }
 
     @Override
@@ -123,7 +124,9 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<EPersonRest> page = new PageImpl<>(epersons, pageable, total).map(converter::toRest);
+        Projection projection = utils.obtainProjection(true);
+        Page<EPersonRest> page = new PageImpl<>(epersons, pageable, total)
+                .map((object) -> converter.toRest(object, projection));
         return page;
     }
 
@@ -149,7 +152,8 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<EPersonRest> page = new PageImpl<>(epersons, pageable, total).map(converter::toRest);
+        Page<EPersonRest> page = new PageImpl<>(epersons, pageable, total)
+                .map((object) -> converter.toRest(object, utils.obtainProjection()));
         return page;
     }
 
@@ -173,7 +177,7 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
         if (eperson == null) {
             return null;
         }
-        return converter.toRest(eperson);
+        return converter.toRest(eperson, utils.obtainProjection());
     }
 
     @Override

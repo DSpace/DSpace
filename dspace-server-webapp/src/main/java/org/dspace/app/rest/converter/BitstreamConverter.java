@@ -12,6 +12,7 @@ import java.util.List;
 
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.CheckSumRest;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,15 +25,14 @@ import org.springframework.stereotype.Component;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @Component
-public class BitstreamConverter
-    extends DSpaceObjectConverter<org.dspace.content.Bitstream, org.dspace.app.rest.model.BitstreamRest> {
+public class BitstreamConverter extends DSpaceObjectConverter<Bitstream, BitstreamRest> {
 
     @Autowired
     ConverterService converter;
 
     @Override
-    public BitstreamRest convert(org.dspace.content.Bitstream obj) {
-        BitstreamRest b = super.convert(obj);
+    public BitstreamRest convert(org.dspace.content.Bitstream obj, Projection projection) {
+        BitstreamRest b = super.convert(obj, projection);
         b.setSequenceId(obj.getSequenceID());
         List<Bundle> bundles = null;
         try {
@@ -49,7 +49,7 @@ public class BitstreamConverter
         checksum.setValue(obj.getChecksum());
         b.setCheckSum(checksum);
         try {
-            b.setFormat(converter.toRest(obj.getFormat(null)));
+            b.setFormat(converter.toRest(obj.getFormat(null), projection));
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

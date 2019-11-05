@@ -26,6 +26,7 @@ import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.hateoas.BitstreamResource;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.rest.utils.MultipartFileSender;
 import org.dspace.app.rest.utils.Utils;
@@ -238,6 +239,7 @@ public class BitstreamRestController {
 
         context.commit();
 
-        return converter.toResource(converter.toRest(context.reloadEntity(bitstream)));
+        BitstreamRest bitstreamRest = converter.toRest(context.reloadEntity(bitstream), Projection.DEFAULT);
+        return converter.toResource(bitstreamRest);
     }
 }

@@ -21,6 +21,7 @@ import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.exception.RESTAuthorizationException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.PoolTaskRest;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.service.ItemService;
@@ -88,7 +89,7 @@ public class PoolTaskRestRepository extends DSpaceRestRepository<PoolTaskRest, I
         if (task == null) {
             return null;
         }
-        return converter.toRest(task);
+        return converter.toRest(task, utils.obtainProjection());
     }
 
     @SearchRestMethod(name = "findByUser")
@@ -114,7 +115,9 @@ public class PoolTaskRestRepository extends DSpaceRestRepository<PoolTaskRest, I
         } catch (SQLException | IOException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<PoolTaskRest> page = utils.getPage(tasks, pageable).map(converter::toRest);
+        Projection projection = utils.obtainProjection(true);
+        Page<PoolTaskRest> page = utils.getPage(tasks, pageable)
+                .map((object) -> converter.toRest(object, projection));
         return page;
     }
 

@@ -12,6 +12,7 @@ import java.util.List;
 
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.model.SubmissionFormRest;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.util.DCInputSet;
 import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.util.DCInputsReaderException;
@@ -53,7 +54,7 @@ public class SubmissionFormRestRepository extends DSpaceRestRepository<Submissio
         if (inputConfig == null) {
             return null;
         }
-        return converter.toRest(inputConfig);
+        return converter.toRest(inputConfig, utils.obtainProjection());
     }
 
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
@@ -66,7 +67,9 @@ public class SubmissionFormRestRepository extends DSpaceRestRepository<Submissio
         } catch (DCInputsReaderException e) {
             throw new IllegalStateException(e.getMessage(), e);
         }
-        Page<SubmissionFormRest> page = new PageImpl<>(subConfs, pageable, total).map(converter::toRest);
+        Projection projection = utils.obtainProjection(true);
+        Page<SubmissionFormRest> page = new PageImpl<>(subConfs, pageable, total)
+                .map((object) -> converter.toRest(object, projection));
         return page;
     }
 

@@ -10,6 +10,7 @@ package org.dspace.app.rest.utils;
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.model.AuthorityEntryRest;
 import org.dspace.app.rest.model.AuthorityRest;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.content.authority.Choice;
 import org.dspace.content.authority.ChoiceAuthority;
 import org.dspace.content.authority.service.ChoiceAuthorityService;
@@ -58,10 +59,11 @@ public class AuthorityUtils {
      *
      * @param choice
      * @param authorityName
+     * @param projection the name of the projection to use, or {@code null}.
      * @return
      */
-    public AuthorityEntryRest convertEntry(Choice choice, String authorityName) {
-        AuthorityEntryRest entry = converter.toRest(choice);
+    public AuthorityEntryRest convertEntry(Choice choice, String authorityName, Projection projection) {
+        AuthorityEntryRest entry = converter.toRest(choice, projection);
         entry.setAuthorityName(authorityName);
         return entry;
     }
@@ -71,10 +73,11 @@ public class AuthorityUtils {
      *
      * @param source
      * @param authorityName
+     * @param projection the projecton to use.
      * @return
      */
-    public AuthorityRest convertAuthority(ChoiceAuthority source, String authorityName) {
-        AuthorityRest result = converter.toRest(source);
+    public AuthorityRest convertAuthority(ChoiceAuthority source, String authorityName, Projection projection) {
+        AuthorityRest result = converter.toRest(source, projection);
         result.setName(authorityName);
         return result;
     }

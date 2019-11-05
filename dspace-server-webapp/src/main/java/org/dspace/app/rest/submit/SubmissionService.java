@@ -26,6 +26,7 @@ import org.dspace.app.rest.model.MetadataValueRest;
 import org.dspace.app.rest.model.ResourcePolicyRest;
 import org.dspace.app.rest.model.WorkspaceItemRest;
 import org.dspace.app.rest.model.step.UploadBitstreamRest;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
@@ -163,11 +164,11 @@ public class SubmissionService {
         }
 
         HttpServletRequest request = requestService.getCurrentRequest().getHttpServletRequest();
-        data.setFormat(converter.toRest(source.getFormat(ContextUtil.obtainContext(request))));
+        data.setFormat(converter.toRest(source.getFormat(ContextUtil.obtainContext(request)), Projection.DEFAULT));
 
         for (ResourcePolicy rp : source.getResourcePolicies()) {
             if (ResourcePolicy.TYPE_CUSTOM.equals(rp.getRpType())) {
-                ResourcePolicyRest resourcePolicyRest = converter.toRest(rp);
+                ResourcePolicyRest resourcePolicyRest = converter.toRest(rp, Projection.DEFAULT);
                 data.getAccessConditions().add(resourcePolicyRest);
             }
         }
@@ -218,7 +219,7 @@ public class SubmissionService {
         if (wsi == null) {
             throw new UnprocessableEntityException("Workspace item is not found");
         }
-        WorkspaceItemRest wsiRest = converter.toRest(wsi);
+        WorkspaceItemRest wsiRest = converter.toRest(wsi, Projection.DEFAULT);
         if (!wsiRest.getErrors().isEmpty()) {
             throw new UnprocessableEntityException(
                     "Start workflow failed due to validation error on workspaceitem");

@@ -24,6 +24,7 @@ import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.CommunityRest;
 import org.dspace.app.rest.model.patch.Patch;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.repository.patch.DSpaceObjectPatch;
 import org.dspace.app.rest.utils.CommunityRestEqualityUtils;
 import org.dspace.authorize.AuthorizeException;
@@ -80,7 +81,7 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
             throw new RuntimeException(e.getMessage(), e);
         }
 
-        return converter.toRest(community);
+        return converter.toRest(community, Projection.DEFAULT);
     }
 
     @Override
@@ -117,7 +118,7 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
             throw new RuntimeException(e.getMessage(), e);
         }
 
-        return converter.toRest(community);
+        return converter.toRest(community, Projection.DEFAULT);
     }
 
     @Override
@@ -132,7 +133,7 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
         if (community == null) {
             return null;
         }
-        return converter.toRest(community);
+        return converter.toRest(community, utils.obtainProjection());
     }
 
     @Override
@@ -149,7 +150,9 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<CommunityRest> page = new PageImpl<Community>(communities, pageable, total).map(converter::toRest);
+        Projection projection = utils.obtainProjection(true);
+        Page<CommunityRest> page = new PageImpl<>(communities, pageable, total)
+                .map((object) -> converter.toRest(object, projection));
         return page;
     }
 
@@ -163,7 +166,8 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<CommunityRest> page = utils.getPage(topCommunities, pageable).map(converter::toRest);
+        Page<CommunityRest> page = utils.getPage(topCommunities, pageable)
+                .map((object) -> converter.toRest(object, utils.obtainProjection()));
         return page;
     }
 
@@ -184,7 +188,8 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<CommunityRest> page = utils.getPage(subCommunities, pageable).map(converter::toRest);
+        Page<CommunityRest> page = utils.getPage(subCommunities, pageable)
+                .map((object) -> converter.toRest(object, utils.obtainProjection()));
         return page;
     }
 
@@ -215,14 +220,14 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
         if (community == null) {
             throw new ResourceNotFoundException(apiCategory + "." + model + " with id: " + id + " not found");
         }
-        CommunityRest originalCommunityRest = converter.toRest(community);
+        CommunityRest originalCommunityRest = converter.toRest(community, Projection.DEFAULT);
         if (communityRestEqualityUtils.isCommunityRestEqualWithoutMetadata(originalCommunityRest, communityRest)) {
             metadataConverter.setMetadata(context, community, communityRest.getMetadata());
         } else {
             throw new UnprocessableEntityException("The given JSON and the original Community differ more " +
                                                        "than just the metadata");
         }
-        return converter.toRest(community);
+        return converter.toRest(community, Projection.DEFAULT);
     }
     @Override
     @PreAuthorize("hasPermission(#id, 'COMMUNITY', 'DELETE')")

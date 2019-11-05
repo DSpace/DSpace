@@ -19,6 +19,7 @@ import org.dspace.app.rest.model.AuthnRest;
 import org.dspace.app.rest.model.EPersonRest;
 import org.dspace.app.rest.model.hateoas.AuthenticationStatusResource;
 import org.dspace.app.rest.model.hateoas.AuthnResource;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.core.Context;
@@ -70,20 +71,23 @@ public class AuthenticationRestController implements InitializingBean {
 
     @RequestMapping(method = RequestMethod.GET)
     public AuthnResource authn() {
-        AuthnResource authnResource = converter.toResource(new AuthnRest());
-        return authnResource;
+        AuthnRest authnRest = new AuthnRest();
+        authnRest.setProjection(utils.obtainProjection());
+        return converter.toResource(authnRest);
     }
 
     @RequestMapping(value = "/status", method = RequestMethod.GET)
     public AuthenticationStatusResource status(HttpServletRequest request) throws SQLException {
         Context context = ContextUtil.obtainContext(request);
         EPersonRest ePersonRest = null;
+        Projection projection = utils.obtainProjection();
         if (context.getCurrentUser() != null) {
-            ePersonRest = ePersonConverter.fromModelWithGroups(context, context.getCurrentUser());
+            ePersonRest = ePersonConverter.fromModelWithGroups(context, context.getCurrentUser(), projection);
         }
 
-        AuthenticationStatusResource authenticationStatusResource = converter.toResource(
-                new AuthenticationStatusRest(ePersonRest));
+        AuthenticationStatusRest authenticationStatusRest = new AuthenticationStatusRest(ePersonRest);
+        authenticationStatusRest.setProjection(projection);
+        AuthenticationStatusResource authenticationStatusResource = converter.toResource(authenticationStatusRest);
 
         return authenticationStatusResource;
     }

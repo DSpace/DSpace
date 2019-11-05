@@ -22,6 +22,7 @@ import org.dspace.app.rest.converter.MetadataConverter;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.hateoas.BitstreamResource;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.authorize.AuthorizeException;
@@ -109,7 +110,7 @@ public class ItemUploadController {
             log.error(message, e);
             throw new RuntimeException(message, e);
         }
-        return converter.toResource(converter.toRest(bitstream));
+        return converter.toResource(converter.toRest(bitstream, Projection.DEFAULT));
     }
 
     /**

@@ -17,6 +17,7 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.CollectionRest;
 import org.dspace.app.rest.model.SubmissionDefinitionRest;
 import org.dspace.app.rest.model.SubmissionSectionRest;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.util.SubmissionConfig;
 import org.dspace.app.util.SubmissionConfigReaderException;
@@ -49,14 +50,15 @@ public class SubmissionDefinitionConverter implements DSpaceConverter<Submission
     private ConverterService converter;
 
     @Override
-    public SubmissionDefinitionRest convert(SubmissionConfig obj) {
+    public SubmissionDefinitionRest convert(SubmissionConfig obj, Projection projection) {
         SubmissionDefinitionRest sd = new SubmissionDefinitionRest();
+        sd.setProjection(projection);
         sd.setName(obj.getSubmissionName());
         sd.setDefaultConf(obj.isDefaultConf());
         List<SubmissionSectionRest> panels = new LinkedList<SubmissionSectionRest>();
         for (int idx = 0; idx < obj.getNumberOfSteps(); idx++) {
             SubmissionStepConfig step = obj.getStep(idx);
-            SubmissionSectionRest sp = converter.toRest(step);
+            SubmissionSectionRest sp = converter.toRest(step, projection);
             panels.add(sp);
         }
 
@@ -68,7 +70,8 @@ public class SubmissionDefinitionConverter implements DSpaceConverter<Submission
                                                          .getCollectionsBySubmissionConfig(context,
                                                                                            obj.getSubmissionName());
             DSpaceConverter<Collection, CollectionRest> cc = converter.getConverter(Collection.class);
-            List<CollectionRest> collectionsRest = collections.stream().map(cc::convert).collect(Collectors.toList());
+            List<CollectionRest> collectionsRest = collections.stream().map((collection) ->
+                    cc.convert(collection, projection)).collect(Collectors.toList());
             sd.setCollections(collectionsRest);
         } catch (SQLException | IllegalStateException | SubmissionConfigReaderException e) {
             log.error(e.getMessage(), e);

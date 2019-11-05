@@ -12,6 +12,7 @@ import java.util.List;
 
 import org.dspace.app.rest.model.CollectionRest;
 import org.dspace.app.rest.model.CommunityRest;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -34,17 +35,17 @@ public class CommunityConverter
     private ConverterService converter;
 
     @Override
-    public CommunityRest convert(org.dspace.content.Community obj) {
-        CommunityRest com = super.convert(obj);
+    public CommunityRest convert(org.dspace.content.Community obj, Projection projection) {
+        CommunityRest com = super.convert(obj, projection);
         Bitstream logo = obj.getLogo();
         if (logo != null) {
-            com.setLogo(converter.toRest(logo));
+            com.setLogo(converter.toRest(logo, projection));
         }
         List<Collection> collections = obj.getCollections();
         List<CollectionRest> collectionsRest = new ArrayList<>();
         if (collections != null) {
             for (Collection col : collections) {
-                collectionsRest.add(converter.toRest(col));
+                collectionsRest.add(converter.toRest(col, projection));
             }
         }
         com.setCollections(collectionsRest);
@@ -53,7 +54,7 @@ public class CommunityConverter
         List<CommunityRest> communityRest = new ArrayList<>();
         if (subCommunities != null) {
             for (Community scom : subCommunities) {
-                CommunityRest scomrest = this.convert(scom);
+                CommunityRest scomrest = this.convert(scom, projection);
                 communityRest.add(scomrest);
             }
         }

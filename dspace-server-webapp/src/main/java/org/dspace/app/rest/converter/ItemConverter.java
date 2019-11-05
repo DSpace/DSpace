@@ -13,6 +13,7 @@ import java.util.List;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.ItemRest;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
@@ -31,7 +32,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class ItemConverter
-    extends DSpaceObjectConverter<org.dspace.content.Item, org.dspace.app.rest.model.ItemRest>
+    extends DSpaceObjectConverter<Item, ItemRest>
     implements IndexableObjectConverter<Item, ItemRest> {
 
     @Autowired
@@ -44,24 +45,24 @@ public class ItemConverter
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(ItemConverter.class);
 
     @Override
-    public ItemRest convert(org.dspace.content.Item obj) {
-        ItemRest item = super.convert(obj);
+    public ItemRest convert(Item obj, Projection projection) {
+        ItemRest item = super.convert(obj, projection);
         item.setInArchive(obj.isArchived());
         item.setDiscoverable(obj.isDiscoverable());
         item.setWithdrawn(obj.isWithdrawn());
         item.setLastModified(obj.getLastModified());
         Collection owningCollection = obj.getOwningCollection();
         if (owningCollection != null) {
-            item.setOwningCollection(converter.toRest(owningCollection));
+            item.setOwningCollection(converter.toRest(owningCollection, projection));
         }
         Collection templateItemOf = obj.getTemplateItemOf();
         if (templateItemOf != null) {
-            item.setTemplateItemOf(converter.toRest(templateItemOf));
+            item.setTemplateItemOf(converter.toRest(templateItemOf, projection));
         }
         List<BitstreamRest> bitstreams = new ArrayList<>();
         for (Bundle bun : obj.getBundles()) {
             for (Bitstream bit : bun.getBitstreams()) {
-                bitstreams.add(converter.toRest(bit));
+                bitstreams.add(converter.toRest(bit, projection));
             }
         }
         item.setBitstreams(bitstreams);

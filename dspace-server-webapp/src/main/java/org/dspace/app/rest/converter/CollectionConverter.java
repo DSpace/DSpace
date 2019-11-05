@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.CollectionRest;
 import org.dspace.app.rest.model.ResourcePolicyRest;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.AuthorizeService;
@@ -53,19 +54,19 @@ public class CollectionConverter
     private AuthorizeService authorizeService;
 
     @Override
-    public CollectionRest convert(org.dspace.content.Collection obj) {
-        CollectionRest col = super.convert(obj);
+    public CollectionRest convert(org.dspace.content.Collection obj, Projection projection) {
+        CollectionRest col = super.convert(obj, projection);
         Bitstream logo = obj.getLogo();
         if (logo != null) {
-            col.setLogo(converter.toRest(logo));
+            col.setLogo(converter.toRest(logo, projection));
         }
 
-        col.setDefaultAccessConditions(getDefaultBitstreamPoliciesForCollection(obj.getID()));
+        col.setDefaultAccessConditions(getDefaultBitstreamPoliciesForCollection(obj.getID(), projection));
 
         return col;
     }
 
-    private List<ResourcePolicyRest> getDefaultBitstreamPoliciesForCollection(UUID uuid) {
+    private List<ResourcePolicyRest> getDefaultBitstreamPoliciesForCollection(UUID uuid, Projection projection) {
 
         Context context = null;
         Request currentRequest = requestService.getCurrentRequest();
@@ -88,7 +89,7 @@ public class CollectionConverter
         List<ResourcePolicyRest> results = new ArrayList<ResourcePolicyRest>();
 
         for (ResourcePolicy pp : defaultCollectionPolicies) {
-            ResourcePolicyRest accessCondition = converter.toRest(pp);
+            ResourcePolicyRest accessCondition = converter.toRest(pp, projection);
             if (accessCondition != null) {
                 results.add(accessCondition);
             }

@@ -31,6 +31,7 @@ import org.dspace.app.rest.model.ErrorRest;
 import org.dspace.app.rest.model.WorkspaceItemRest;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.Patch;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.submit.AbstractRestProcessingStep;
 import org.dspace.app.rest.submit.SubmissionService;
 import org.dspace.app.rest.submit.UploadableStep;
@@ -125,7 +126,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
         if (witem == null) {
             return null;
         }
-        return converter.toRest(witem);
+        return converter.toRest(witem, utils.obtainProjection());
     }
 
     //TODO @PreAuthorize("hasAuthority('ADMIN')")
@@ -139,7 +140,9 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<WorkspaceItemRest> page = new PageImpl<WorkspaceItem>(witems, pageable, total).map(converter::toRest);
+        Projection projection = utils.obtainProjection(true);
+        Page<WorkspaceItemRest> page = new PageImpl<>(witems, pageable, total)
+                .map((object) -> converter.toRest(object, projection));
         return page;
     }
 
@@ -157,14 +160,16 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<WorkspaceItemRest> page = new PageImpl<>(witems, pageable, total).map(converter::toRest);
+        Projection projection = utils.obtainProjection(true);
+        Page<WorkspaceItemRest> page = new PageImpl<>(witems, pageable, total)
+                .map((object) -> converter.toRest(object, projection));
         return page;
     }
 
     @Override
     protected WorkspaceItemRest createAndReturn(Context context) throws SQLException, AuthorizeException {
         WorkspaceItem source = submissionService.createWorkspaceItem(context, getRequestService().getCurrentRequest());
-        return converter.toRest(source);
+        return converter.toRest(source, Projection.DEFAULT);
     }
 
     @Override
@@ -252,7 +257,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
             }
 
         }
-        wsi = converter.toRest(source);
+        wsi = converter.toRest(source, Projection.DEFAULT);
 
         if (!errors.isEmpty()) {
             wsi.getErrors().addAll(errors);
@@ -471,7 +476,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
                             }
                         }
                     }
-                    WorkspaceItemRest wsi = converter.toRest(wi);
+                    WorkspaceItemRest wsi = converter.toRest(wi, Projection.DEFAULT);
                     if (result.size() == 1) {
                         if (!errors.isEmpty()) {
                             wsi.getErrors().addAll(errors);

@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest.converter;
 
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.content.DSpaceObject;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -25,8 +26,9 @@ public abstract class DSpaceObjectConverter<M extends DSpaceObject, R extends or
     private MetadataConverter metadataConverter;
 
     @Override
-    public R convert(M obj) {
+    public R convert(M obj, Projection projection) {
         R resource = newInstance();
+        resource.setProjection(projection);
         resource.setHandle(obj.getHandle());
         if (obj.getID() != null) {
             resource.setUuid(obj.getID().toString());

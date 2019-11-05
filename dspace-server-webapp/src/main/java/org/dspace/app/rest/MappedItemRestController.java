@@ -95,11 +95,12 @@ public class MappedItemRestController {
         while (itemIterator.hasNext()) {
             Item item = itemIterator.next();
             if (item.getOwningCollection().getID() != uuid) {
-                mappedItemRestList.add(converter.toRest(item));
+                mappedItemRestList.add(converter.toRest(item, utils.obtainProjection()));
             }
         }
 
         MappedItemRestWrapper mappedItemRestWrapper = new MappedItemRestWrapper();
+        mappedItemRestWrapper.setProjection(utils.obtainProjection());
         mappedItemRestWrapper.setMappedItemRestList(mappedItemRestList);
         mappedItemRestWrapper.setCollectionUuid(uuid);
         MappedItemResourceWrapper mappedItemResourceWrapper =

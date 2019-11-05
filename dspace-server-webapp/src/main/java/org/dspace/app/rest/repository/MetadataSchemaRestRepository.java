@@ -22,6 +22,7 @@ import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.MetadataSchemaRest;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.MetadataSchema;
 import org.dspace.content.NonUniqueMetadataException;
@@ -62,7 +63,7 @@ public class MetadataSchemaRestRepository extends DSpaceRestRepository<MetadataS
         if (metadataSchema == null) {
             return null;
         }
-        return converter.toRest(metadataSchema);
+        return converter.toRest(metadataSchema, utils.obtainProjection());
     }
 
     @Override
@@ -73,7 +74,9 @@ public class MetadataSchemaRestRepository extends DSpaceRestRepository<MetadataS
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<MetadataSchemaRest> page = utils.getPage(metadataSchema, pageable).map(converter::toRest);
+        Projection projection = utils.obtainProjection(true);
+        Page<MetadataSchemaRest> page = utils.getPage(metadataSchema, pageable)
+                .map((object) -> converter.toRest(object, projection));
         return page;
     }
 
@@ -119,7 +122,7 @@ public class MetadataSchemaRestRepository extends DSpaceRestRepository<MetadataS
         }
 
         // return
-        return converter.toRest(metadataSchema);
+        return converter.toRest(metadataSchema, Projection.DEFAULT);
     }
 
     @Override
@@ -175,6 +178,6 @@ public class MetadataSchemaRestRepository extends DSpaceRestRepository<MetadataS
                     + metadataSchemaRest.getPrefix() + "." + metadataSchemaRest.getNamespace() + " already exists");
         }
 
-        return converter.toRest(metadataSchema);
+        return converter.toRest(metadataSchema, Projection.DEFAULT);
     }
 }

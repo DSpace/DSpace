@@ -8,6 +8,7 @@
 package org.dspace.app.rest.converter;
 
 import org.dspace.app.rest.model.ClaimedTaskRest;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.discovery.IndexableObject;
 import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
@@ -22,21 +23,21 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class ClaimedTaskConverter
-    implements IndexableObjectConverter<ClaimedTask, org.dspace.app.rest.model.ClaimedTaskRest> {
+        implements IndexableObjectConverter<ClaimedTask, ClaimedTaskRest> {
 
     @Autowired
     private ConverterService converter;
 
     @Override
-    public ClaimedTaskRest convert(ClaimedTask obj) {
+    public ClaimedTaskRest convert(ClaimedTask obj, Projection projection) {
         ClaimedTaskRest taskRest = new ClaimedTaskRest();
-
+        taskRest.setProjection(projection);
         XmlWorkflowItem witem = obj.getWorkflowItem();
         taskRest.setId(obj.getID());
-        taskRest.setWorkflowitem(converter.toRest(witem));
+        taskRest.setWorkflowitem(converter.toRest(witem, projection));
         taskRest.setAction(obj.getActionID());
         taskRest.setStep(obj.getStepID());
-        taskRest.setOwner(converter.toRest(obj.getOwner()));
+        taskRest.setOwner(converter.toRest(obj.getOwner(), projection));
         return taskRest;
     }
 

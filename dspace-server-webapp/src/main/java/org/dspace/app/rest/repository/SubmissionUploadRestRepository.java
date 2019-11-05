@@ -12,8 +12,10 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.model.AccessConditionOptionRest;
 import org.dspace.app.rest.model.SubmissionUploadRest;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.utils.DateMathParser;
 import org.dspace.app.util.SubmissionConfig;
 import org.dspace.app.util.SubmissionConfigReader;
@@ -56,6 +58,9 @@ public class SubmissionUploadRestRepository extends DSpaceRestRepository<Submiss
     @Autowired
     GroupService groupService;
 
+    @Autowired
+    ConverterService converter;
+
     DateMathParser dateMathParser = new DateMathParser();
 
     public SubmissionUploadRestRepository() throws SubmissionConfigReaderException {
@@ -67,7 +72,7 @@ public class SubmissionUploadRestRepository extends DSpaceRestRepository<Submiss
     public SubmissionUploadRest findOne(Context context, String submitName) {
         UploadConfiguration config = uploadConfigurationService.getMap().get(submitName);
         try {
-            return convert(context, config);
+            return convert(context, config, utils.obtainProjection());
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
@@ -79,6 +84,7 @@ public class SubmissionUploadRestRepository extends DSpaceRestRepository<Submiss
     public Page<SubmissionUploadRest> findAll(Context context, Pageable pageable) {
         List<SubmissionConfig> subConfs = new ArrayList<SubmissionConfig>();
         subConfs = submissionConfigReader.getAllSubmissionConfigs(pageable.getPageSize(), pageable.getOffset());
+        Projection projection = utils.obtainProjection(true);
         List<SubmissionUploadRest> results = new ArrayList<>();
         for (SubmissionConfig config : subConfs) {
             for (int i = 0; i < config.getNumberOfSteps(); i++) {
@@ -87,7 +93,7 @@ public class SubmissionUploadRestRepository extends DSpaceRestRepository<Submiss
                     UploadConfiguration uploadConfig = uploadConfigurationService.getMap().get(step.getId());
                     if (uploadConfig != null) {
                         try {
-                            results.add(convert(context, uploadConfig));
+                            results.add(convert(context, uploadConfig, projection));
                         } catch (Exception e) {
                             log.error(e.getMessage(), e);
                         }
@@ -103,8 +109,10 @@ public class SubmissionUploadRestRepository extends DSpaceRestRepository<Submiss
         return SubmissionUploadRest.class;
     }
 
-    private SubmissionUploadRest convert(Context context, UploadConfiguration config) throws Exception {
+    private SubmissionUploadRest convert(Context context, UploadConfiguration config, Projection projection)
+            throws Exception {
         SubmissionUploadRest result = new SubmissionUploadRest();
+        result.setProjection(projection);
         for (AccessConditionOption option : config.getOptions()) {
             AccessConditionOptionRest optionRest = new AccessConditionOptionRest();
             if (option.getGroupName() != null) {

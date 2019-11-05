@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.dspace.app.rest.model.AuthorityEntryRest;
 import org.dspace.app.rest.model.AuthorityRest;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.utils.AuthorityUtils;
 import org.dspace.content.authority.Choice;
 import org.dspace.content.authority.ChoiceAuthority;
@@ -39,14 +40,14 @@ public class AuthorityEntryValueLinkRepository extends AbstractDSpaceRestReposit
 
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
     public AuthorityEntryRest getResource(HttpServletRequest request, String name, String relId,
-                                          Pageable pageable, String projection) {
+                                          Pageable pageable, Projection projection) {
         Context context = obtainContext();
         ChoiceAuthority choiceAuthority = cas.getChoiceAuthorityByAuthorityName(name);
         Choice choice = choiceAuthority.getChoice(null, relId, context.getCurrentLocale().toString());
         if (choice == null) {
             throw new ResourceNotFoundException("The authority was not found");
         }
-        return authorityUtils.convertEntry(choice, name);
+        return authorityUtils.convertEntry(choice, name, projection);
     }
 
 }

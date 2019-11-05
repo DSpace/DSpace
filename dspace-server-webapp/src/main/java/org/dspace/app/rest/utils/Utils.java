@@ -9,7 +9,6 @@ package org.dspace.app.rest.utils;
 
 import static java.lang.Integer.parseInt;
 import static java.util.stream.Collectors.toList;
-
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 
 import java.beans.IntrospectionException;
@@ -53,6 +52,7 @@ import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.hateoas.DSpaceResource;
 import org.dspace.app.rest.model.hateoas.EmbeddedPage;
 import org.dspace.app.rest.model.hateoas.HALResource;
+import org.dspace.app.rest.projection.DefaultProjection;
 import org.dspace.app.rest.projection.ListProjection;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.repository.DSpaceRestRepository;
@@ -63,6 +63,7 @@ import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.services.RequestService;
 import org.dspace.util.UUIDUtils;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -90,6 +91,9 @@ public class Utils {
 
     @Autowired
     ApplicationContext applicationContext;
+
+    @Autowired
+    RequestService requestService;
 
     @Autowired(required = true)
     private List<DSpaceObjectService<? extends DSpaceObject>> dSpaceObjectServices;
@@ -197,7 +201,6 @@ public class Utils {
      *
      * @param schema
      * @param element
-     * @param object
      * @return
      */
     public String getMetadataKey(String schema, String element, String qualifier) {
@@ -299,7 +302,6 @@ public class Utils {
      * It will then look through all the DSpaceObjectServices to try and match this UUID to a DSpaceObject.
      * If one is found, this DSpaceObject is added to the List of DSpaceObjects that we will return.
      * @param context   The relevant DSpace context
-     * @param request   The request out of which we'll create the List of DSpaceObjects
      * @return          The resulting list of DSpaceObjects that we parsed out of the request
      */
     public List<DSpaceObject> constructDSpaceObjectList(Context context, List<String> list) {
@@ -408,6 +410,33 @@ public class Utils {
     }
 
     /**
+     * Gets the projection requested by the current servlet request, or a default projection if none is specified.
+     *
+     * @param defaultToList whether to return {@link ListProjection} by default. If false, the no-op
+     *                      {@link DefaultProjection} will be returned by default.
+     * @return the requested or default projection, never {@code null}.
+     * @throws IllegalArgumentException if the request specifies an unknown projection name.
+     */
+    public Projection obtainProjection(boolean defaultToList) {
+        String projectionName = requestService.getCurrentRequest().getServletRequest().getParameter("projection");
+        if (projectionName == null && defaultToList) {
+            projectionName = ListProjection.NAME;
+        }
+        return converter.getProjection(projectionName);
+    }
+
+    /**
+     * Gets the projection requested by the current servlet request, or {@link DefaultProjection} if none
+     * is specified.
+     *
+     * @return the requested or default projection, never {@code null}.
+     * @throws IllegalArgumentException if the request specifies an unknown projection name.
+     */
+    public Projection obtainProjection() {
+        return obtainProjection(false);
+    }
+
+    /**
      * Adds embeds or links for all class-level LinkRel annotations for which embeds or links are allowed.
      *
      * @param halResource the resource.
@@ -445,11 +474,12 @@ public class Utils {
                                         String rel, Link link, String methodName) {
         LinkRestRepository linkRepository = getLinkResourceRepository(resource.getContent().getCategory(),
                 resource.getContent().getType(), rel);
+        Projection projection = resource.getContent().getProjection();
         if (linkRepository.isEmbeddableRelation(resource.getContent(), rel)) {
             Method method = requireMethod(linkRepository.getClass(), methodName);
             Object contentId = getContentIdForLinkMethod(resource.getContent(), method);
             try {
-                Object linkedObject = method.invoke(linkRepository, null, contentId, null, null);
+                Object linkedObject = method.invoke(linkRepository, null, contentId, null, projection);
                 resource.embedResource(rel, wrapForEmbedding(linkedObject, link));
             } catch (IllegalAccessException | InvocationTargetException e) {
                 throw new RuntimeException(e);
@@ -536,7 +566,7 @@ public class Utils {
                         list.subList(0, list.size() > EMBEDDED_PAGE_SIZE ? EMBEDDED_PAGE_SIZE : list.size()),
                         new PageRequest(0, EMBEDDED_PAGE_SIZE), list.size());
                 return new EmbeddedPage(link.getHref(),
-                        page.map((restObject) -> converter.toResource(restObject, ListProjection.NAME)),
+                        page.map((restObject) -> converter.toResource(restObject)),
                         list, link.getRel());
             } else {
                 PageImpl<RestAddressableModel> page = new PageImpl(list);

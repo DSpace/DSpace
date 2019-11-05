@@ -14,6 +14,7 @@ import org.dspace.app.rest.model.HarvestStatusEnum;
 import org.dspace.app.rest.model.HarvestTypeEnum;
 import org.dspace.app.rest.model.HarvestedCollectionRest;
 import org.dspace.app.rest.model.HarvesterMetadataRest;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.content.Collection;
 import org.dspace.harvest.HarvestedCollection;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,15 +32,16 @@ public class HarvestedCollectionConverter implements DSpaceConverter<HarvestedCo
     private ConverterService converter;
 
     @Override
-    public HarvestedCollectionRest convert(HarvestedCollection obj) {
+    public HarvestedCollectionRest convert(HarvestedCollection obj, Projection projection) {
         HarvestedCollectionRest harvestedCollectionRest = new HarvestedCollectionRest();
+        harvestedCollectionRest.setProjection(projection);
 
         if (obj != null) {
             HarvestTypeEnum harvestTypeEnum = HarvestTypeEnum.fromInt(obj.getHarvestType());
             HarvestStatusEnum harvestStatusEnum = HarvestStatusEnum.fromInt(obj.getHarvestStatus());
 
             harvestedCollectionRest.setId(obj.getID());
-            harvestedCollectionRest.setCollection(converter.toRest(obj.getCollection()));
+            harvestedCollectionRest.setCollection(converter.toRest(obj.getCollection(), projection));
             harvestedCollectionRest.setHarvestType(harvestTypeEnum);
             harvestedCollectionRest.setHarvestStatus(harvestStatusEnum);
             harvestedCollectionRest.setMetadataConfigId(obj.getHarvestMetadataConfig());
@@ -58,17 +60,18 @@ public class HarvestedCollectionConverter implements DSpaceConverter<HarvestedCo
 
     public HarvestedCollectionRest fromModel(HarvestedCollection obj,
                                              Collection collection,
-                                             List<Map<String,String>> metadata_configs) {
-        HarvestedCollectionRest harvestedCollectionRest = this.convert(obj);
+                                             List<Map<String,String>> metadata_configs,
+                                             Projection projection) {
+        HarvestedCollectionRest harvestedCollectionRest = this.convert(obj, projection);
 
         // Add collectionRest to the empty HarvestedCollectionRest so that we can use its uuid later in the linkFactory
         if (obj == null) {
-            harvestedCollectionRest.setCollection(converter.toRest(collection));
+            harvestedCollectionRest.setCollection(converter.toRest(collection, projection));
         }
 
         HarvesterMetadataRest harvesterMetadataRest = new HarvesterMetadataRest();
+        harvesterMetadataRest.setProjection(projection);
         harvesterMetadataRest.setConfigs(metadata_configs);
-
         harvestedCollectionRest.setMetadataConfigs(harvesterMetadataRest);
 
         return harvestedCollectionRest;

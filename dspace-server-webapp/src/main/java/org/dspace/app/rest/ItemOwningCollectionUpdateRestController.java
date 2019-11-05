@@ -20,6 +20,7 @@ import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.CollectionRest;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.authorize.AuthorizeException;
@@ -97,7 +98,7 @@ public class ItemOwningCollectionUpdateRestController {
         if (targetCollection == null) {
             return null;
         }
-        return converter.toRest(targetCollection);
+        return converter.toRest(targetCollection, Projection.DEFAULT);
 
     }
 

@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.sql.SQLException;
 import java.util.Arrays;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -22,6 +21,7 @@ import org.atteo.evo.inflector.English;
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.model.DSpaceObjectRest;
 import org.dspace.app.rest.utils.ContextUtil;
+import org.dspace.app.rest.utils.Utils;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 import org.dspace.identifier.IdentifierNotFoundException;
@@ -56,6 +56,9 @@ public class IdentifierRestController implements InitializingBean {
     private ConverterService converter;
 
     @Autowired
+    private Utils utils;
+
+    @Autowired
     private DiscoverableEndpointsService discoverableEndpointsService;
 
     @Override
@@ -84,7 +87,7 @@ public class IdentifierRestController implements InitializingBean {
         try {
             dso = identifierService.resolve(context, id);
             if (dso != null) {
-                DSpaceObjectRest dsor = converter.toRest(dso);
+                DSpaceObjectRest dsor = converter.toRest(dso, utils.obtainProjection());
                 URI link = linkTo(dsor.getController(), dsor.getCategory(),
                         English.plural(dsor.getType()))
                         .slash(dsor.getId()).toUri();

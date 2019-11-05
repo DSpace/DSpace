@@ -8,6 +8,7 @@
 package org.dspace.app.rest.converter;
 
 import org.dspace.app.rest.model.SiteRest;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.content.Site;
 import org.springframework.stereotype.Component;
 
@@ -18,12 +19,11 @@ import org.springframework.stereotype.Component;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @Component
-public class SiteConverter
-    extends DSpaceObjectConverter<org.dspace.content.Site, org.dspace.app.rest.model.SiteRest> {
+public class SiteConverter extends DSpaceObjectConverter<Site, SiteRest> {
 
     @Override
-    public SiteRest convert(org.dspace.content.Site obj) {
-        return super.convert(obj);
+    public SiteRest convert(Site obj, Projection projection) {
+        return super.convert(obj, projection);
     }
 
     @Override
