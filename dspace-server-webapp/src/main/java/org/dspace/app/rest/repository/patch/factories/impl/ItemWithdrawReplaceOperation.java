@@ -29,7 +29,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class ItemWithdrawReplaceOperation extends ReplacePatchOperation<ItemRest> {
 
-    private static final Logger log = Logger.getLogger(ItemWithdrawReplaceOperation.class);
+    /**
+     * Path in json body of patch that uses this operation
+     */
     private static final String OPERATION_PATH_WITHDRAW = "/withdrawn";
 
     @Override
@@ -71,6 +73,7 @@ public class ItemWithdrawReplaceOperation extends ReplacePatchOperation<ItemRest
         }
     }
 
+    @Override
     public boolean supports(RestModel R, String path) {
         return (R instanceof ItemRest && path.trim().equalsIgnoreCase(OPERATION_PATH_WITHDRAW));
     }

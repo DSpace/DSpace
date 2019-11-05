@@ -25,12 +25,41 @@ import org.springframework.stereotype.Component;
 
 /**
  * Class for PATCH operations on Dspace Objects' metadata
+ * Options (can be done on other dso than Item also):
+ *      - ADD metadata (with schema.identifier.qualifier) value of a dso (here: Item)
+ *          <code>
+ *              curl -X PATCH http://${dspace.url}/api/items/<:id-item> -H "
+ *              Content-Type: application/json" -d '[{ "op": "add", "path": "
+ *              /metadata/schema.identifier.qualifier(/0|-)}", "value": "metadataValue"]'
+ *          </code>
+ *      - REMOVE metadata
+ *          <code>
+ *              curl -X PATCH http://${dspace.url}/api/items/<:id-item> -H "
+ *              Content-Type: application/json" -d '[{ "op": "remove",
+ *              "path": "/metadata/schema.identifier.qualifier(/0|-)}"]'
+ *          </code>
+ *      - REPLACE metadata
+ *          <code>
+ *              curl -X PATCH http://${dspace.url}/api/items/<:id-item> -H "
+ *              Content-Type: application/json" -d '[{ "op": "replace", "path": "
+ *              /metadata/schema.identifier.qualifier}", "value": "metadataValue"]'
+ *          </code>
+ *      - ORDERING metadata
+ *          <code>
+ *              curl -X PATCH http://${dspace.url}/api/items/<:id-item> -H "
+ *              Content-Type: application/json" -d '[{ "op": "move",
+ *              "from": "/metadata/schema.identifier.qualifier/index"
+ *              "path": "/metadata/schema.identifier.qualifier/newIndex"}]'
+ *          </code>
  *
  * @author Maria Verdonck (Atmire) on 30/10/2019
  */
 @Component
 public class DspaceObjectMetadataOperation<R extends RestModel> extends PatchOperation<R> {
 
+    /**
+     * Path in json body of patch that uses this operation
+     */
     private static final String METADATA_PATH = "/metadata";
     private ObjectMapper objectMapper = new ObjectMapper();
     private JsonPatchConverter jsonPatchConverter = new JsonPatchConverter(objectMapper);
@@ -53,6 +82,13 @@ public class DspaceObjectMetadataOperation<R extends RestModel> extends PatchOpe
         return (R) dSpaceObjectRest;
     }
 
+    /**
+     * Apply the actual metadata patch by replacing the original metadata node
+     *  with the newly created one based on the patch body
+     * @param patch             Metadata patch used for the replacement
+     * @param metadataRest      Original metadata rest object
+     * @return  Newly created metadata node
+     */
     private MetadataRest applyMetadataPatch(JsonNode patch, MetadataRest metadataRest) {
         try {
             ObjectNode objectNode = objectMapper.createObjectNode();
@@ -65,6 +101,7 @@ public class DspaceObjectMetadataOperation<R extends RestModel> extends PatchOpe
         }
     }
 
+    @Override
     public boolean supports(RestModel R, String path) {
         return ((path.equals(METADATA_PATH) || path.startsWith(METADATA_PATH + "/")) && R instanceof DSpaceObjectRest);
     }
