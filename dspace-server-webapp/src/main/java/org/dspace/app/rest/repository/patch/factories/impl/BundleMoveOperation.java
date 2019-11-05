@@ -73,7 +73,7 @@ public class BundleMoveOperation extends MovePatchOperation<BundleRest, Integer>
                 );
             }
 
-            bundleService.moveBitstream(context, bundle, from, to);
+            bundleService.updateBitstreamOrder(context, bundle, from, to);
         } catch (SQLException | AuthorizeException e) {
             throw new DSpaceBadRequestException(e.getMessage(), e);
         }
