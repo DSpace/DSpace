@@ -1112,55 +1112,66 @@
             </dependency>
 
             <dependency>
-                <artifactId>spring-expression</artifactId>
                 <groupId>org.springframework</groupId>
+                <artifactId>spring-expression</artifactId>
                 <version>${spring.version}</version>
+                <scope>test</scope>
             </dependency>
 
             <dependency>
-                <artifactId>spring-test</artifactId>
                 <groupId>org.springframework</groupId>
+                <artifactId>spring-test</artifactId>
                 <version>${spring.version}</version>
+                <scope>test</scope>
             </dependency>
 
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-test</artifactId>
                 <version>${spring-boot.version}</version>
+                <exclusions>
+                    <!-- Temporary exclusion to avoid dependency conflict with version of org.json:json used by dspace-api.
+                         NOTE: THIS CAN BE REMOVED ONCE WE UPGRADE TO SPRING-BOOT v1.5 (or above), see DS-3802
+                         As of Spring-Boot 1.5, org.json:json is no longer used by spring-boot-starter-test -->
+                    <exclusion>
+                        <groupId>org.json</groupId>
+                        <artifactId>json</artifactId>
+                    </exclusion>
+                    <!-- More recent version used for testing below -->
+                    <exclusion>
+                        <groupId>com.jayway.jsonpath</groupId>
+                        <artifactId>json-path</artifactId>
+                    </exclusion>
+                </exclusions>
+                <scope>test</scope>
             </dependency>
 
             <dependency>
                 <groupId>org.apache.solr</groupId>
                 <artifactId>solr-cell</artifactId>
                 <version>${solr.client.version}</version>
+                <scope>test</scope>
             </dependency>
+            <!-- Reminder: Keep icu4j (in Parent POM) synced with version used by lucene-analyzers-icu below,
+             otherwise ICUFoldingFilterFactory may throw errors in tests.  -->
             <dependency>
                 <groupId>org.apache.lucene</groupId>
                 <artifactId>lucene-analyzers-icu</artifactId>
                 <version>${solr.client.version}</version>
+                <scope>test</scope>
             </dependency>
 
             <dependency>
                 <groupId>com.jayway.jsonpath</groupId>
                 <artifactId>json-path-assert</artifactId>
                 <version>${json-path.version}</version>
+                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>com.jayway.jsonpath</groupId>
                 <artifactId>json-path</artifactId>
                 <version>${json-path.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.json</groupId>
-                <artifactId>json</artifactId>
-                <version>20180130</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.ow2.asm</groupId>
-                <artifactId>asm</artifactId>
-                <version>5.1</version>
+                <scope>test</scope>
             </dependency>
 
             <dependency>
