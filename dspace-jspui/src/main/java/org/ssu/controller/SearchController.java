@@ -171,8 +171,8 @@ public class SearchController {
         model.addObject("appliedFilterQueries", appliedFilterQueries);
         model.addObject("availableFilters", discoveryConfiguration.getSearchFilters());
         model.addObject("totalItems", qResults.getTotalSearchResults());
-        model.addObject("startIndex", qResults.getStart());
-        model.addObject("finishIndex", qResults.getStart()+qResults.getMaxResults());
+        model.addObject("startIndex", Math.max(qResults.getStart(), 1));
+        model.addObject("finishIndex", Math.min(qResults.getStart()+qResults.getMaxResults(), qResults.getTotalSearchResults()));
         model.addObject("rpp", queryArgs.getMaxResults());
         model.addObject("httpFilters", httpFilters);
         model.addObject("order", queryArgs.getSortOrder().toString());

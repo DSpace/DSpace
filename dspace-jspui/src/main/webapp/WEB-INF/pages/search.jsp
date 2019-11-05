@@ -30,7 +30,7 @@
                 .autocomplete({
                     source: function( request, response ) {
                         jQ.ajax({
-                            <%--url: "<%= request.getContextPath() %>/json/discovery/autocomplete?query=<%= URLEncoder.encode(query,"UTF-8")%><%= httpFilters.replaceAll("&amp;","&") %>",--%>
+                            url: "${handle}/json/discovery/autocomplete?query=${queryEncoded}${httpFilters.replaceAll("&amp;", "&")}",
                             dataType: "json",
                             cache: false,
                             data: {
@@ -204,6 +204,14 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <form action="" method="get" autocomplete="off">
+                    <c:forEach items="${appliedFilters}" var="appliedFilterModal" varStatus="appliedFilterIndexModal">
+                        <input type="hidden" value="${appliedFilterModal[0]}" name="filter_field_${appliedFilterIndexModal.count}">
+                        <input type="hidden" value="${appliedFilterModal[1]}" name="filter_type_${appliedFilterIndexModal.count}">
+                        <input type="hidden" value="${appliedFilterModal[2]}" name="filter_value_${appliedFilterIndexModal.count}">
+                    </c:forEach>
+
+                    <input type="hidden" value="${queryEncoded}" name="query" />
+
                     <div class="modal-header">
 
                         <h4 class="modal-title" id="searchModalLabel"><fmt:message key="jsp.search.filter.applied"/>
