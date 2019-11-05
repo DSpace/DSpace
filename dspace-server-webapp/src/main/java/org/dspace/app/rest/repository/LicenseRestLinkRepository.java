@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.model.CollectionRest;
 import org.dspace.app.rest.model.LicenseRest;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.content.Collection;
 import org.dspace.content.service.CollectionService;
 import org.dspace.core.Context;
@@ -38,7 +39,8 @@ public class LicenseRestLinkRepository extends AbstractDSpaceRestRepository
     LicenseService licenseService;
 
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
-    public LicenseRest getLicenseCollection(HttpServletRequest request, UUID uuid, Pageable pageable, String projection)
+    public LicenseRest getLicenseCollection(HttpServletRequest request, UUID uuid, Pageable pageable,
+                                            Projection projection)
         throws Exception {
         Context context = obtainContext();
         Collection collection = collectionService.find(context, uuid);

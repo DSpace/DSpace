@@ -51,7 +51,7 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
         if (source == null) {
             return null;
         }
-        return converter.toRest(source);
+        return converter.toRest(source, utils.obtainProjection());
     }
 
     @PreAuthorize("hasAuthority('AUTHENTICATED')")

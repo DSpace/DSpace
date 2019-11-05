@@ -30,6 +30,7 @@ import org.dspace.app.rest.matcher.MetadataMatcher;
 import org.dspace.app.rest.model.CollectionRest;
 import org.dspace.app.rest.model.MetadataRest;
 import org.dspace.app.rest.model.MetadataValueRest;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.app.rest.test.MetadataPatchSuite;
 import org.dspace.authorize.service.AuthorizeService;
@@ -369,7 +370,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
 
         ObjectMapper mapper = new ObjectMapper();
 
-        CollectionRest collectionRest = converter.toRest(col1);
+        CollectionRest collectionRest = converter.toRest(col1, Projection.DEFAULT);
 
         collectionRest.setMetadata(new MetadataRest()
                 .put("dc.title", new MetadataValueRest("Electronic theses and dissertations")));
@@ -730,7 +731,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         String token = getAuthToken(eperson.getEmail(), password);
         ObjectMapper mapper = new ObjectMapper();
 
-        CollectionRest collectionRest = converter.toRest(col1);
+        CollectionRest collectionRest = converter.toRest(col1, Projection.DEFAULT);
 
         collectionRest.setMetadata(new MetadataRest()
                 .put("dc.title", new MetadataValueRest("Electronic theses and dissertations")));

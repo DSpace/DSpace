@@ -25,6 +25,7 @@ import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.MetadataFieldRest;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
@@ -70,7 +71,7 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
         if (metadataField == null) {
             return null;
         }
-        return converter.toRest(metadataField);
+        return converter.toRest(metadataField, utils.obtainProjection());
     }
 
     @Override
@@ -81,7 +82,9 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<MetadataFieldRest> page = utils.getPage(metadataField, pageable).map(converter::toRest);
+        Projection projection = utils.obtainProjection(true);
+        Page<MetadataFieldRest> page = utils.getPage(metadataField, pageable)
+                .map((object) -> converter.toRest(object, projection));
         return page;
     }
 
@@ -99,7 +102,9 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<MetadataFieldRest> page = utils.getPage(metadataFields, pageable).map(converter::toRest);
+        Projection projection = utils.obtainProjection(true);
+        Page<MetadataFieldRest> page = utils.getPage(metadataFields, pageable)
+                .map((object) -> converter.toRest(object, projection));
         return page;
     }
 
@@ -157,7 +162,7 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
         }
 
         // return
-        return converter.toRest(metadataField);
+        return converter.toRest(metadataField, Projection.DEFAULT);
     }
 
     @Override
@@ -213,6 +218,6 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
             throw new RuntimeException(e);
         }
 
-        return converter.toRest(metadataField);
+        return converter.toRest(metadataField, Projection.DEFAULT);
     }
 }

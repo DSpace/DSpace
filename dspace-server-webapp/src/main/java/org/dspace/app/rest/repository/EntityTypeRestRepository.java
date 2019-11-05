@@ -12,6 +12,7 @@ import java.util.List;
 
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.model.EntityTypeRest;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.content.EntityType;
 import org.dspace.content.service.EntityTypeService;
 import org.dspace.core.Context;
@@ -39,7 +40,7 @@ public class EntityTypeRestRepository extends DSpaceRestRepository<EntityTypeRes
             if (entityType == null) {
                 throw new ResourceNotFoundException("The entityType for ID: " + integer + " could not be found");
             }
-            return converter.toRest(entityType);
+            return converter.toRest(entityType, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -52,7 +53,9 @@ public class EntityTypeRestRepository extends DSpaceRestRepository<EntityTypeRes
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<EntityTypeRest> page = utils.getPage(entityTypeList, pageable).map(converter::toRest);
+        Projection projection = utils.obtainProjection(true);
+        Page<EntityTypeRest> page = utils.getPage(entityTypeList, pageable)
+                .map((object) -> converter.toRest(object, projection));
         return page;
     }
 

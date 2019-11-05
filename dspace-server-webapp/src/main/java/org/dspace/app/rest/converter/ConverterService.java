@@ -61,36 +61,17 @@ public class ConverterService {
     private List<Projection> projections;
 
     /**
-     * Converts the given model object to rest object, using the appropriate {@link DSpaceConverter}.
-     *
-     * @param modelObject the model object, which may be a JPA entity or other class provided by the DSpace
-     *                   service layer.
-     * @param <M> the type of model object. A converter {@link Component} must exist that takes this as input.
-     * @param <R> the inferred return type.
-     * @return the converted object. If it's a {@link RestAddressableModel}, its
-     *         {@link RestAddressableModel#getProjection()} will be {@link DefaultProjection}.
-     * @throws IllegalArgumentException if there is no compatible converter.
-     * @throws ClassCastException if the converter's return type is not compatible with the inferred return type.
-     */
-    public <M, R> R toRest(M modelObject) {
-        return toRest(modelObject, null);
-    }
-
-    /**
-     * Converts the given model object to a rest object, using the appropriate {@link DSpaceConverter}.
+     * Converts the given model object to a rest object, using the appropriate {@link DSpaceConverter} and
+     * the given projection.
      * <p>
      * The projection's {@link Projection#transformModel(Object)} method will be automatically applied
      * before conversion. If the rest object is a {@link RestModel}, the projection's
      * {@link Projection#transformRest(RestModel)} method will be automatically called after conversion.
-     * If the rest object is a {@link RestAddressableModel}, its {@code projection} field will also be set so
-     * that a subsequent call to {@link #toResource(RestModel)} will respect the projection without it
-     * having to be provided as an argument again.
      * </p>
      *
      * @param modelObject the model object, which may be a JPA entity or other class provided by the DSpace
      *                   service layer.
-     * @param projectionName the name of the projection to use. If given as {@code null}, the default no-op
-     *                       projection, {@link DefaultProjection} will be used.
+     * @param projection the projection to use.
      * @param <M> the type of model object. A converter {@link Component} must exist that takes this as input.
      * @param <R> the inferred return type.
      * @return the converted object. If it's a {@link RestAddressableModel}, its
@@ -98,17 +79,11 @@ public class ConverterService {
      * @throws IllegalArgumentException if there is no compatible converter or no such projection.
      * @throws ClassCastException if the converter's return type is not compatible with the inferred return type.
      */
-    public <M, R> R toRest(M modelObject, @Nullable String projectionName) {
-        Projection projection = projectionName == null ? Projection.DEFAULT : requireProjection(projectionName);
+    public <M, R> R toRest(M modelObject, Projection projection) {
         M transformedModel = projection.transformModel(modelObject);
         DSpaceConverter<M, R> converter = requireConverter(modelObject.getClass());
-        R restObject = converter.convert(transformedModel);
+        R restObject = converter.convert(transformedModel, projection);
         if (restObject instanceof RestModel) {
-            if (restObject instanceof RestAddressableModel) {
-                RestAddressableModel ram = projection.transformRest((RestAddressableModel) restObject);
-                ram.setProjection(projection);
-                return (R) ram;
-            }
             return (R) projection.transformRest((RestModel) restObject);
         }
         return restObject;
@@ -125,26 +100,6 @@ public class ConverterService {
      */
     <M, R> DSpaceConverter<M, R> getConverter(Class<M> sourceClass) {
         return (DSpaceConverter<M, R>) requireConverter(sourceClass);
-    }
-
-    /**
-     * Converts the given rest object to a {@link HALResource} object, assigning the named projection beforehand,
-     * if it is a {@link RestAddressableModel}.
-     * <p>
-     * After the projection is assigned, behavior of this method is exactly the same as {@link #toResource(RestModel)}.
-     * </p>
-     *
-     * @param restObject the input rest object.
-     * @param projectionName the name of the projection to assign and use.
-     * @param <T> the return type, a subclass of {@link HALResource}.
-     * @return the fully converted resource, with all automatic links and embeds applied.
-     * @throws IllegalArgumentException if there is no such projection.
-     */
-    public <T extends HALResource> T toResource(RestModel restObject, String projectionName) {
-        if (restObject instanceof RestAddressableModel) {
-            ((RestAddressableModel) restObject).setProjection(requireProjection(projectionName));
-        }
-        return toResource(restObject);
     }
 
     /**
@@ -175,6 +130,17 @@ public class ConverterService {
             halLinkService.addLinks(halResource);
         }
         return halResource;
+    }
+
+    /**
+     * Gets the projection with the given name, or the default (no-op) projection if null is given.
+     *
+     * @param projectionName the projection name, or {@code null}.
+     * @return the projection with the given name, or {@link DefaultProjection} if {@code null} is given.
+     * @throws IllegalArgumentException if a name is provided and such a projection cannot be found.
+     */
+    public Projection getProjection(@Nullable String projectionName) {
+        return projectionName == null ? Projection.DEFAULT : requireProjection(projectionName);
     }
 
     /**

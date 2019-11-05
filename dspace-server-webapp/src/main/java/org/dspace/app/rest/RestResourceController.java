@@ -160,15 +160,13 @@ public class RestResourceController implements InitializingBean {
      * @param apiCategory
      * @param model
      * @param id
-     * @param projection
      * @return
      */
     @RequestMapping(method = RequestMethod.GET, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_DIGIT)
     @SuppressWarnings("unchecked")
     public DSpaceResource<RestAddressableModel> findOne(@PathVariable String apiCategory, @PathVariable String model,
-                                                        @PathVariable Integer id,
-                                                        @RequestParam(required = false) String projection) {
-        return findOneInternal(apiCategory, model, id, projection);
+                                                        @PathVariable Integer id) {
+        return findOneInternal(apiCategory, model, id);
     }
 
     /**
@@ -194,15 +192,13 @@ public class RestResourceController implements InitializingBean {
      * @param apiCategory
      * @param model
      * @param id
-     * @param projection
      * @return
      */
     @RequestMapping(method = RequestMethod.GET, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_STRING_VERSION_STRONG)
     @SuppressWarnings("unchecked")
     public DSpaceResource<RestAddressableModel> findOne(@PathVariable String apiCategory, @PathVariable String model,
-                                                        @PathVariable String id,
-                                                        @RequestParam(required = false) String projection) {
-        return findOneInternal(apiCategory, model, id, projection);
+                                                        @PathVariable String id) {
+        return findOneInternal(apiCategory, model, id);
     }
 
     /**
@@ -217,15 +213,13 @@ public class RestResourceController implements InitializingBean {
      * @param apiCategory
      * @param model
      * @param uuid
-     * @param projection
      * @return
      */
     @RequestMapping(method = RequestMethod.GET, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID)
     @SuppressWarnings("unchecked")
     public DSpaceResource<RestAddressableModel> findOne(@PathVariable String apiCategory, @PathVariable String model,
-                                                        @PathVariable UUID uuid,
-                                                        @RequestParam(required = false) String projection) {
-        return findOneInternal(apiCategory, model, uuid, projection);
+                                                        @PathVariable UUID uuid) {
+        return findOneInternal(apiCategory, model, uuid);
     }
 
     /**
@@ -234,13 +228,10 @@ public class RestResourceController implements InitializingBean {
      * @param apiCategory
      * @param model
      * @param id
-     * @param projection
      * @return
      */
     private <ID extends Serializable> DSpaceResource<RestAddressableModel> findOneInternal(String apiCategory,
-                                                                                           String model, ID id,
-                                                                                           String projection) {
-        checkModelPluralForm(apiCategory, model);
+                                                                                           String model, ID id) {
         DSpaceRestRepository<RestAddressableModel, ID> repository = utils.getResourceRepository(apiCategory, model);
         RestAddressableModel modelObject = null;
         try {
@@ -266,7 +257,6 @@ public class RestResourceController implements InitializingBean {
      * @param rel
      * @param page
      * @param assembler
-     * @param projection
      * @return
      */
     @RequestMapping(method = RequestMethod.GET, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_DIGIT + "/{rel}")
@@ -274,9 +264,8 @@ public class RestResourceController implements InitializingBean {
                                    @PathVariable String apiCategory,
                                    @PathVariable String model, @PathVariable Integer id, @PathVariable String rel,
                                    Pageable page,
-                                   PagedResourcesAssembler assembler,
-                                   @RequestParam(required = false) String projection) {
-        return findRelInternal(request, response, apiCategory, model, id, rel, page, assembler, projection);
+                                   PagedResourcesAssembler assembler) {
+        return findRelInternal(request, response, apiCategory, model, id, rel, page, assembler);
     }
 
     /**
@@ -292,7 +281,6 @@ public class RestResourceController implements InitializingBean {
      * @param rel
      * @param page
      * @param assembler
-     * @param projection
      * @return
      */
     @RequestMapping(method = RequestMethod.GET, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_STRING_VERSION_STRONG +
@@ -301,9 +289,8 @@ public class RestResourceController implements InitializingBean {
                                    @PathVariable String apiCategory,
                                    @PathVariable String model, @PathVariable String id, @PathVariable String rel,
                                    Pageable page,
-                                   PagedResourcesAssembler assembler,
-                                   @RequestParam(required = false) String projection) {
-        return findRelInternal(request, response, apiCategory, model, id, rel, page, assembler, projection);
+                                   PagedResourcesAssembler assembler) {
+        return findRelInternal(request, response, apiCategory, model, id, rel, page, assembler);
     }
 
     /**
@@ -318,7 +305,6 @@ public class RestResourceController implements InitializingBean {
      * @param rel
      * @param page
      * @param assembler
-     * @param projection
      * @return
      */
     @RequestMapping(method = RequestMethod.GET, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID + "/{rel}")
@@ -326,9 +312,8 @@ public class RestResourceController implements InitializingBean {
                                    @PathVariable String apiCategory,
                                    @PathVariable String model, @PathVariable UUID uuid, @PathVariable String rel,
                                    Pageable page,
-                                   PagedResourcesAssembler assembler,
-                                   @RequestParam(required = false) String projection) {
-        return findRelInternal(request, response, apiCategory, model, uuid, rel, page, assembler, projection);
+                                   PagedResourcesAssembler assembler) {
+        return findRelInternal(request, response, apiCategory, model, uuid, rel, page, assembler);
     }
 
     /**
@@ -361,7 +346,6 @@ public class RestResourceController implements InitializingBean {
      * @param relid
      * @param page
      * @param assembler
-     * @param projection
      * @return
      */
     @RequestMapping(method = RequestMethod.GET, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_STRING_VERSION_STRONG +
@@ -370,9 +354,8 @@ public class RestResourceController implements InitializingBean {
                                    @PathVariable String apiCategory,
                                    @PathVariable String model, @PathVariable String id, @PathVariable String rel,
                                    @PathVariable String relid,
-                                   Pageable page, PagedResourcesAssembler assembler,
-                                   @RequestParam(required = false) String projection) throws Throwable {
-        return findRelEntryInternal(request, response, apiCategory, model, id, rel, relid, page, assembler, projection);
+                                   Pageable page, PagedResourcesAssembler assembler) throws Throwable {
+        return findRelEntryInternal(request, response, apiCategory, model, id, rel, relid, page, assembler);
     }
 
 
@@ -751,7 +734,6 @@ public class RestResourceController implements InitializingBean {
      * @param relid
      * @param page
      * @param assembler
-     * @param projection
      * @return
      */
     private <ID extends Serializable> ResourceSupport findRelEntryInternal(HttpServletRequest request,
@@ -759,8 +741,8 @@ public class RestResourceController implements InitializingBean {
                                                                            String apiCategory, String model,
                                                                            String id, String rel, String relid,
                                                                            Pageable page,
-                                                                           PagedResourcesAssembler assembler,
-                                                                           String projection) throws Throwable {
+                                                                           PagedResourcesAssembler assembler)
+            throws Throwable {
         checkModelPluralForm(apiCategory, model);
         DSpaceRestRepository<RestAddressableModel, ID> repository = utils.getResourceRepository(apiCategory, model);
         Class<RestAddressableModel> domainClass = repository.getDomainClass();
@@ -770,7 +752,7 @@ public class RestResourceController implements InitializingBean {
             LinkRestRepository linkRepository = utils.getLinkResourceRepository(apiCategory, model, linkRest.name());
             Method linkMethod = utils.requireMethod(linkRepository.getClass(), "getResource");
             try {
-                Object object = linkMethod.invoke(linkRepository, request, id, relid, page, projection);
+                Object object = linkMethod.invoke(linkRepository, request, id, relid, page, utils.obtainProjection());
                 Link link = linkTo(this.getClass(), apiCategory, model).slash(id).slash(rel).slash(relid).withSelfRel();
 
                 List result = new ArrayList();
@@ -803,17 +785,15 @@ public class RestResourceController implements InitializingBean {
      * @param apiCategory
      * @param model
      * @param uuid
-     * @param rel
      * @param page
      * @param assembler
-     * @param projection
      * @return
      */
     private <ID extends Serializable> ResourceSupport findRelInternal(HttpServletRequest request,
                                                                       HttpServletResponse response, String apiCategory,
                                                                       String model, ID uuid, String subpath,
-                                                                      Pageable page, PagedResourcesAssembler assembler,
-                                                                      String projection) {
+                                                                      Pageable page,
+                                                                      PagedResourcesAssembler assembler) {
         checkModelPluralForm(apiCategory, model);
         DSpaceRestRepository<RestAddressableModel, ID> repository = utils.getResourceRepository(apiCategory, model);
         Class<RestAddressableModel> domainClass = repository.getDomainClass();
@@ -827,7 +807,7 @@ public class RestResourceController implements InitializingBean {
             try {
                 if (Page.class.isAssignableFrom(linkMethod.getReturnType())) {
                     Page<? extends RestModel> pageResult = (Page<? extends RestAddressableModel>) linkMethod
-                            .invoke(linkRepository, request, uuid, page, projection);
+                            .invoke(linkRepository, request, uuid, page, utils.obtainProjection(true));
 
                     Link link = null;
                     String querystring = request.getQueryString();
@@ -842,7 +822,7 @@ public class RestResourceController implements InitializingBean {
                     return assembler.toResource(halResources, link);
                 } else {
                     RestModel object = (RestModel) linkMethod.invoke(linkRepository, request, uuid, page,
-                            projection);
+                            utils.obtainProjection());
                     Link link = linkTo(this.getClass(), apiCategory, model).slash(uuid).slash(subpath)
                             .withSelfRel();
                     HALResource tmpresult = converter.toResource(object);
@@ -917,7 +897,6 @@ public class RestResourceController implements InitializingBean {
      * @param model
      * @param page
      * @param assembler
-     * @param projection
      * @return
      */
     @RequestMapping(method = RequestMethod.GET)
@@ -926,12 +905,10 @@ public class RestResourceController implements InitializingBean {
                                                                                       @PathVariable String model,
                                                                                       Pageable page,
                                                                                       PagedResourcesAssembler assembler,
-                                                                                      @RequestParam(required = false)
-                                                                                              String projection,
                                                                                       HttpServletResponse response) {
         DSpaceRestRepository<T, ?> repository = utils.getResourceRepository(apiCategory, model);
         Link link = linkTo(methodOn(this.getClass(), apiCategory, model).findAll(apiCategory, model,
-                                                                                 page, assembler, projection, response))
+                                                                                 page, assembler, response))
             .withSelfRel();
 
         Page<DSpaceResource<T>> resources;

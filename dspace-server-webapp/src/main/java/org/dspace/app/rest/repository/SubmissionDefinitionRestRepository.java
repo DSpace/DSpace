@@ -15,6 +15,7 @@ import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.model.SubmissionDefinitionRest;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.util.SubmissionConfig;
 import org.dspace.app.util.SubmissionConfigReader;
 import org.dspace.app.util.SubmissionConfigReaderException;
@@ -54,7 +55,7 @@ public class SubmissionDefinitionRestRepository extends DSpaceRestRepository<Sub
         if (subConfig == null) {
             return null;
         }
-        return converter.toRest(subConfig);
+        return converter.toRest(subConfig, utils.obtainProjection());
     }
 
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
@@ -63,7 +64,9 @@ public class SubmissionDefinitionRestRepository extends DSpaceRestRepository<Sub
         int total = submissionConfigReader.countSubmissionConfigs();
         List<SubmissionConfig> subConfs = submissionConfigReader.getAllSubmissionConfigs(
                 pageable.getPageSize(), pageable.getOffset());
-        Page<SubmissionDefinitionRest> page = new PageImpl<>(subConfs, pageable, total).map(converter::toRest);
+        Projection projection = utils.obtainProjection(true);
+        Page<SubmissionDefinitionRest> page = new PageImpl<>(subConfs, pageable, total)
+                .map((object) -> converter.toRest(object, projection));
         return page;
     }
 
@@ -76,7 +79,8 @@ public class SubmissionDefinitionRestRepository extends DSpaceRestRepository<Sub
             return null;
         }
         SubmissionDefinitionRest def = converter
-            .toRest(submissionConfigReader.getSubmissionConfigByCollection(col.getHandle()));
+            .toRest(submissionConfigReader.getSubmissionConfigByCollection(col.getHandle()),
+                    utils.obtainProjection());
         return def;
     }
 

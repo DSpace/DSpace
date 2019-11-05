@@ -100,11 +100,12 @@ public class MappedCollectionRestController {
         List<CollectionRest> mappingCollectionRest = new LinkedList<>();
         for (Collection collection : collections) {
             if (collection.getID() != owningCollectionUuid) {
-                mappingCollectionRest.add(converter.toRest(collection));
+                mappingCollectionRest.add(converter.toRest(collection, utils.obtainProjection()));
             }
         }
 
         MappedCollectionRestWrapper mappingCollectionRestWrapper = new MappedCollectionRestWrapper();
+        mappingCollectionRestWrapper.setProjection(utils.obtainProjection());
         mappingCollectionRestWrapper.setMappedCollectionRestList(mappingCollectionRest);
         mappingCollectionRestWrapper.setItem(item);
         MappedCollectionResourceWrapper mappingCollectionResourceWrapper =

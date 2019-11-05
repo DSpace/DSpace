@@ -8,6 +8,7 @@
 package org.dspace.app.rest.converter;
 
 import org.dspace.app.rest.model.WorkflowItemRest;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.util.SubmissionConfigReaderException;
 import org.dspace.discovery.IndexableObject;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
@@ -29,9 +30,10 @@ public class WorkflowItemConverter
     }
 
     @Override
-    public WorkflowItemRest convert(XmlWorkflowItem obj) {
+    public WorkflowItemRest convert(XmlWorkflowItem obj, Projection projection) {
         WorkflowItemRest witem = new WorkflowItemRest();
-        fillFromModel(obj, witem);
+        witem.setProjection(projection);
+        fillFromModel(obj, witem, projection);
         return witem;
     }
 

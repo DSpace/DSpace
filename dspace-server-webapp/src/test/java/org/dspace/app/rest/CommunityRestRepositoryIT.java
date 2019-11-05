@@ -39,6 +39,7 @@ import org.dspace.app.rest.matcher.PageMatcher;
 import org.dspace.app.rest.model.CommunityRest;
 import org.dspace.app.rest.model.MetadataRest;
 import org.dspace.app.rest.model.MetadataValueRest;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.app.rest.test.MetadataPatchSuite;
 import org.dspace.authorize.service.AuthorizeService;
@@ -830,7 +831,7 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
 
         ObjectMapper mapper = new ObjectMapper();
 
-        CommunityRest communityRest = converter.toRest(parentCommunity);
+        CommunityRest communityRest = converter.toRest(parentCommunity, Projection.DEFAULT);
 
         communityRest.setMetadata(new MetadataRest()
                 .put("dc.title", new MetadataValueRest("Electronic theses and dissertations")));
@@ -1040,7 +1041,7 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
 
         ObjectMapper mapper = new ObjectMapper();
 
-        CommunityRest communityRest = converter.toRest(parentCommunity);
+        CommunityRest communityRest = converter.toRest(parentCommunity, Projection.DEFAULT);
 
         communityRest.setMetadata(new MetadataRest()
                 .put("dc.title", new MetadataValueRest("Electronic theses and dissertations")));

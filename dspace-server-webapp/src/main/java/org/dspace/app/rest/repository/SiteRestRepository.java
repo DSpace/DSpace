@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.dspace.app.rest.model.SiteRest;
 import org.dspace.app.rest.model.patch.Patch;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.repository.patch.DSpaceObjectPatch;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Site;
@@ -55,7 +56,7 @@ public class SiteRestRepository extends DSpaceObjectRestRepository<Site, SiteRes
         if (site == null) {
             return null;
         }
-        return converter.toRest(site);
+        return converter.toRest(site, utils.obtainProjection());
     }
 
     @Override
@@ -67,7 +68,9 @@ public class SiteRestRepository extends DSpaceObjectRestRepository<Site, SiteRes
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<SiteRest> page = new PageImpl<Site>(sites, pageable, total).map(converter::toRest);
+        Projection projection = utils.obtainProjection(true);
+        Page<SiteRest> page = new PageImpl<Site>(sites, pageable, total)
+                .map((object) -> converter.toRest(object, projection));
         return page;
     }
 

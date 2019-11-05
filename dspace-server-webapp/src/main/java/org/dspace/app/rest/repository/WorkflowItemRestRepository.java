@@ -25,6 +25,7 @@ import org.dspace.app.rest.model.ErrorRest;
 import org.dspace.app.rest.model.WorkflowItemRest;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.Patch;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.submit.AbstractRestProcessingStep;
 import org.dspace.app.rest.submit.SubmissionService;
 import org.dspace.app.rest.submit.UploadableStep;
@@ -106,7 +107,7 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
         if (witem == null) {
             return null;
         }
-        return converter.toRest(witem);
+        return converter.toRest(witem, utils.obtainProjection());
     }
 
     @Override
@@ -120,7 +121,9 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<WorkflowItemRest> page = new PageImpl<>(witems, pageable, total).map(converter::toRest);
+        Projection projection = utils.obtainProjection(true);
+        Page<WorkflowItemRest> page = new PageImpl<>(witems, pageable, total)
+                .map((object) -> converter.toRest(object, projection));
         return page;
     }
 
@@ -137,7 +140,9 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<WorkflowItemRest> page = new PageImpl<>(witems, pageable, total).map(converter::toRest);
+        Projection projection = utils.obtainProjection(true);
+        Page<WorkflowItemRest> page = new PageImpl<>(witems, pageable, total)
+                .map((object) -> converter.toRest(object, projection));
         return page;
     }
 
@@ -161,7 +166,7 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
         if (source.getItem().isArchived()) {
             return null;
         }
-        return converter.toRest(source);
+        return converter.toRest(source, Projection.DEFAULT);
     }
 
     @Override
@@ -208,7 +213,7 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
             }
 
         }
-        wsi = converter.toRest(source);
+        wsi = converter.toRest(source, Projection.DEFAULT);
 
         if (!errors.isEmpty()) {
             wsi.getErrors().addAll(errors);

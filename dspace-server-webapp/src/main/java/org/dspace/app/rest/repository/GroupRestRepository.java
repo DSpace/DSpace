@@ -19,6 +19,7 @@ import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.GroupRest;
 import org.dspace.app.rest.model.patch.Patch;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.repository.patch.DSpaceObjectPatch;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
@@ -75,7 +76,7 @@ public class GroupRestRepository extends DSpaceObjectRestRepository<Group, Group
             throw new RuntimeException(excSQL.getMessage(), excSQL);
         }
 
-        return converter.toRest(group);
+        return converter.toRest(group, Projection.DEFAULT);
     }
 
     @Override
@@ -90,7 +91,7 @@ public class GroupRestRepository extends DSpaceObjectRestRepository<Group, Group
         if (group == null) {
             return null;
         }
-        return converter.toRest(group);
+        return converter.toRest(group, utils.obtainProjection());
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
@@ -104,7 +105,9 @@ public class GroupRestRepository extends DSpaceObjectRestRepository<Group, Group
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<GroupRest> page = new PageImpl<Group>(groups, pageable, total).map(converter::toRest);
+        Projection projection = utils.obtainProjection(true);
+        Page<GroupRest> page = new PageImpl<Group>(groups, pageable, total)
+                .map((object) -> converter.toRest(object, projection));
         return page;
     }
 

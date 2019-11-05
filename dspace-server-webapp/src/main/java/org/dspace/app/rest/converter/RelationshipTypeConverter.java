@@ -8,6 +8,7 @@
 package org.dspace.app.rest.converter;
 
 import org.dspace.app.rest.model.RelationshipTypeRest;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.content.RelationshipType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -22,14 +23,10 @@ public class RelationshipTypeConverter implements DSpaceConverter<RelationshipTy
     @Autowired
     private ConverterService converter;
 
-    /**
-     * This method converts the RelationshipType model object that is passed along in the params to the
-     * REST representation of this object
-     * @param obj   The RelationshipType model object to be converted
-     * @return      The RelationshipType REST object that is made from the model object
-     */
-    public RelationshipTypeRest convert(RelationshipType obj) {
+    @Override
+    public RelationshipTypeRest convert(RelationshipType obj, Projection projection) {
         RelationshipTypeRest relationshipTypeRest = new RelationshipTypeRest();
+        relationshipTypeRest.setProjection(projection);
 
         relationshipTypeRest.setId(obj.getID());
         relationshipTypeRest.setLeftwardType(obj.getLeftwardType());
@@ -38,8 +35,8 @@ public class RelationshipTypeConverter implements DSpaceConverter<RelationshipTy
         relationshipTypeRest.setLeftMaxCardinality(obj.getLeftMaxCardinality());
         relationshipTypeRest.setRightMinCardinality(obj.getRightMinCardinality());
         relationshipTypeRest.setRightMaxCardinality(obj.getRightMaxCardinality());
-        relationshipTypeRest.setLeftType(converter.toRest(obj.getLeftType()));
-        relationshipTypeRest.setRightType(converter.toRest(obj.getRightType()));
+        relationshipTypeRest.setLeftType(converter.toRest(obj.getLeftType(), projection));
+        relationshipTypeRest.setRightType(converter.toRest(obj.getRightType(), projection));
 
         return relationshipTypeRest;
     }

@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.RelationshipRest;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.content.Item;
 import org.dspace.content.Relationship;
 import org.dspace.content.service.ItemService;
@@ -48,7 +49,7 @@ public class ItemRelationshipLinkRepository extends AbstractDSpaceRestRepository
     public Page<RelationshipRest> getItemRelationships(@Nullable HttpServletRequest request,
                                                        UUID itemId,
                                                        @Nullable Pageable optionalPageable,
-                                                       @Nullable String projection) {
+                                                       Projection projection) {
         try {
             Context context = obtainContext();
             Item item = itemService.find(context, itemId);
@@ -60,7 +61,8 @@ public class ItemRelationshipLinkRepository extends AbstractDSpaceRestRepository
             Integer offset = pageable == null ? null : pageable.getOffset();
             int total = relationshipService.countByItem(context, item);
             List<Relationship> relationships = relationshipService.findByItem(context, item, limit, offset);
-            return new PageImpl<>(relationships, pageable, total).map(converter::toRest);
+            return new PageImpl<>(relationships, pageable, total)
+                    .map((object) -> converter.toRest(object, projection));
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

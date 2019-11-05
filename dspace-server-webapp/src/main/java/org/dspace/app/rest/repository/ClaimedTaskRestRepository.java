@@ -93,7 +93,7 @@ public class ClaimedTaskRestRepository extends DSpaceRestRepository<ClaimedTaskR
         if (task == null) {
             return null;
         }
-        return converter.toRest(task);
+        return converter.toRest(task, utils.obtainProjection());
     }
 
     @SearchRestMethod(name = "findByUser")
@@ -118,7 +118,8 @@ public class ClaimedTaskRestRepository extends DSpaceRestRepository<ClaimedTaskR
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<ClaimedTaskRest> page = utils.getPage(tasks, pageable).map(converter::toRest);
+        Page<ClaimedTaskRest> page = utils.getPage(tasks, pageable)
+                .map((object) -> converter.toRest(object, utils.obtainProjection()));
         return page;
     }
 

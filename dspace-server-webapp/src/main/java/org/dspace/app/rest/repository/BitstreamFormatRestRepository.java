@@ -19,6 +19,7 @@ import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.BitstreamFormatRest;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.service.BitstreamFormatService;
@@ -61,7 +62,7 @@ public class BitstreamFormatRestRepository extends DSpaceRestRepository<Bitstrea
         if (bit == null) {
             return null;
         }
-        return converter.toRest(bit);
+        return converter.toRest(bit, utils.obtainProjection());
     }
 
     @Override
@@ -72,7 +73,9 @@ public class BitstreamFormatRestRepository extends DSpaceRestRepository<Bitstrea
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<BitstreamFormatRest> page = utils.getPage(bit, pageable).map(converter::toRest);
+        Projection projection = utils.obtainProjection(true);
+        Page<BitstreamFormatRest> page = utils.getPage(bit, pageable)
+                .map((object) -> converter.toRest(object, projection));
         return page;
     }
 
@@ -99,7 +102,7 @@ public class BitstreamFormatRestRepository extends DSpaceRestRepository<Bitstrea
                     + bitstreamFormatRest.getShortDescription(), e);
         }
 
-        return converter.toRest(bitstreamFormat);
+        return converter.toRest(bitstreamFormat, Projection.DEFAULT);
     }
 
     @Override
@@ -126,7 +129,7 @@ public class BitstreamFormatRestRepository extends DSpaceRestRepository<Bitstrea
         if (id.equals(bitstreamFormatRest.getId())) {
             this.setAllValuesOfRest(context, bitstreamFormat, bitstreamFormatRest);
             bitstreamFormatService.update(context, bitstreamFormat);
-            return converter.toRest(bitstreamFormat);
+            return converter.toRest(bitstreamFormat, Projection.DEFAULT);
         } else {
             throw new IllegalArgumentException("The id in the Json and the id in the url do not match: "
                     + id + ", "

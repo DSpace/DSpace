@@ -13,15 +13,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.converter.HarvestedCollectionConverter;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.HarvestTypeEnum;
 import org.dspace.app.rest.model.HarvestedCollectionRest;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.content.Collection;
 import org.dspace.core.Context;
 import org.dspace.harvest.HarvestedCollection;
@@ -45,6 +46,9 @@ public class HarvestedCollectionRestRepository extends AbstractDSpaceRestReposit
     @Autowired
     HarvestedCollectionConverter harvestedCollectionConverter;
 
+    @Autowired
+    ConverterService converter;
+
     public HarvestedCollectionRest findOne(Collection collection) throws SQLException {
         Context context = obtainContext();
 
@@ -54,7 +58,8 @@ public class HarvestedCollectionRestRepository extends AbstractDSpaceRestReposit
 
         HarvestedCollection harvestedCollection = harvestedCollectionService.find(context, collection);
         List<Map<String,String>> configs = OAIHarvester.getAvailableMetadataFormats();
-        return harvestedCollectionConverter.fromModel(harvestedCollection, collection, configs);
+        return harvestedCollectionConverter.fromModel(harvestedCollection, collection, configs,
+                utils.obtainProjection());
     }
 
     /**
@@ -75,7 +80,7 @@ public class HarvestedCollectionRestRepository extends AbstractDSpaceRestReposit
         if (harvestedCollectionRest.getHarvestType() == HarvestTypeEnum.NONE.getValue()
             && harvestedCollection != null) {
             harvestedCollectionService.delete(context, harvestedCollection);
-            return harvestedCollectionConverter.convert(null);
+            return harvestedCollectionConverter.convert(null, utils.obtainProjection());
 
         } else if (harvestedCollectionRest.getHarvestType() != HarvestTypeEnum.NONE.getValue()) {
             List<String> errors = testHarvestSettings(harvestedCollectionRest);
@@ -89,7 +94,8 @@ public class HarvestedCollectionRestRepository extends AbstractDSpaceRestReposit
                 harvestedCollection = harvestedCollectionService.find(context, collection);
                 List<Map<String,String>> configs = OAIHarvester.getAvailableMetadataFormats();
 
-                return harvestedCollectionConverter.fromModel(harvestedCollection, collection, configs);
+                return harvestedCollectionConverter.fromModel(harvestedCollection, collection, configs,
+                        Projection.DEFAULT);
             } else {
                 throw new UnprocessableEntityException(
                     "Incorrect harvest settings in request. The following errors were found: " + errors.toString()
@@ -147,7 +153,6 @@ public class HarvestedCollectionRestRepository extends AbstractDSpaceRestReposit
 
     /**
      * Function used to verify that the harvest settings work
-     * @param collection                 The collection to which the harvest settings should be aplied
      * @param harvestedCollectionRest    A object containg the harvest settings to be tested
      * @return
      */

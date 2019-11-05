@@ -12,6 +12,7 @@ import java.util.List;
 
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.model.BrowseIndexRest;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.browse.BrowseException;
 import org.dspace.browse.BrowseIndex;
 import org.dspace.core.Context;
@@ -42,7 +43,7 @@ public class BrowseIndexRestRepository extends DSpaceRestRepository<BrowseIndexR
             throw new RuntimeException(e.getMessage(), e);
         }
         if (bix != null) {
-            bi = converter.toRest(bix);
+            bi = converter.toRest(bix, utils.obtainProjection());
         }
         return bi;
     }
@@ -61,7 +62,9 @@ public class BrowseIndexRestRepository extends DSpaceRestRepository<BrowseIndexR
         } catch (BrowseException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<BrowseIndexRest> page = new PageImpl<BrowseIndex>(indexesList, pageable, total).map(converter::toRest);
+        Projection projection = utils.obtainProjection(true);
+        Page<BrowseIndexRest> page = new PageImpl<>(indexesList, pageable, total)
+                .map((object) -> converter.toRest(object, projection));
         return page;
     }
 

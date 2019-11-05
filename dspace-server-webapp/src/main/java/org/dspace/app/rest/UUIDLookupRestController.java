@@ -21,6 +21,7 @@ import org.apache.log4j.Logger;
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.model.DSpaceObjectRest;
 import org.dspace.app.rest.utils.ContextUtil;
+import org.dspace.app.rest.utils.Utils;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.DSpaceObjectService;
@@ -55,6 +56,9 @@ public class UUIDLookupRestController implements InitializingBean {
 
     @Autowired
     private ContentServiceFactory contentServiceFactory;
+
+    @Autowired
+    private Utils utils;
 
     private static final Logger log =
             Logger.getLogger(UUIDLookupRestController.class);
@@ -91,7 +95,7 @@ public class UUIDLookupRestController implements InitializingBean {
                     .getDSpaceObjectServices()) {
                 DSpaceObject dso = dSpaceObjectService.find(context, uuid);
                 if (dso != null) {
-                    DSpaceObjectRest dsor = converter.toRest(dso);
+                    DSpaceObjectRest dsor = converter.toRest(dso, utils.obtainProjection());
                     URI link = linkTo(dsor.getController(), dsor.getCategory(), dsor.getTypePlural())
                             .slash(dsor.getId()).toUri();
                     response.setStatus(HttpServletResponse.SC_FOUND);

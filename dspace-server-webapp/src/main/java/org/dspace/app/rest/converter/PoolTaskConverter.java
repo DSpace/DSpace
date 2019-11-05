@@ -8,6 +8,7 @@
 package org.dspace.app.rest.converter;
 
 import org.dspace.app.rest.model.PoolTaskRest;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.discovery.IndexableObject;
 import org.dspace.xmlworkflow.storedcomponents.PoolTask;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
@@ -28,17 +29,18 @@ public class PoolTaskConverter
     private ConverterService converter;
 
     @Override
-    public PoolTaskRest convert(PoolTask obj) {
+    public PoolTaskRest convert(PoolTask obj, Projection projection) {
         PoolTaskRest taskRest = new PoolTaskRest();
+        taskRest.setProjection(projection);
 
         XmlWorkflowItem witem = obj.getWorkflowItem();
         taskRest.setId(obj.getID());
-        taskRest.setWorkflowitem(converter.toRest(witem));
+        taskRest.setWorkflowitem(converter.toRest(witem, projection));
         if (obj.getEperson() != null) {
-            taskRest.setEperson(converter.toRest(obj.getEperson()));
+            taskRest.setEperson(converter.toRest(obj.getEperson(), projection));
         }
         if (obj.getGroup() != null) {
-            taskRest.setGroup(converter.toRest(obj.getGroup()));
+            taskRest.setGroup(converter.toRest(obj.getGroup(), projection));
         }
         taskRest.setAction(obj.getActionID());
         taskRest.setStep(obj.getStepID());

@@ -8,6 +8,7 @@
 package org.dspace.app.rest.converter;
 
 import org.dspace.app.rest.model.BitstreamFormatRest;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.service.BitstreamFormatService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,8 +27,9 @@ public class BitstreamFormatConverter implements DSpaceConverter<BitstreamFormat
     BitstreamFormatService bitstreamFormatService;
 
     @Override
-    public BitstreamFormatRest convert(BitstreamFormat obj) {
+    public BitstreamFormatRest convert(BitstreamFormat obj, Projection projection) {
         BitstreamFormatRest bf = new BitstreamFormatRest();
+        bf.setProjection(projection);
         bf.setId(obj.getID());
         bf.setShortDescription(obj.getShortDescription());
         bf.setDescription(obj.getDescription());

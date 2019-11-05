@@ -16,6 +16,7 @@ import org.dspace.app.rest.model.SearchFacetEntryRest;
 import org.dspace.app.rest.model.SearchFacetValueRest;
 import org.dspace.app.rest.model.SearchResultsRest;
 import org.dspace.app.rest.parameter.SearchFilter;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.core.Context;
 import org.dspace.discovery.DiscoverQuery;
 import org.dspace.discovery.DiscoverResult;
@@ -39,13 +40,15 @@ public class DiscoverFacetsConverter {
 
     public SearchResultsRest convert(Context context, String query, String dsoType, String configurationName,
                                      String dsoScope, List<SearchFilter> searchFilters, final Pageable page,
-                                     DiscoveryConfiguration configuration, DiscoverResult searchResult) {
+                                     DiscoveryConfiguration configuration, DiscoverResult searchResult,
+                                     Projection projection) {
 
         SearchResultsRest searchResultsRest = new SearchResultsRest();
+        searchResultsRest.setProjection(projection);
 
         setRequestInformation(context, query, dsoType, configurationName, dsoScope, searchFilters, page,
                               searchResultsRest);
-        addFacetValues(context, searchResult, searchResultsRest, configuration);
+        addFacetValues(context, searchResult, searchResultsRest, configuration, projection);
 
         return searchResultsRest;
     }
@@ -64,13 +67,14 @@ public class DiscoverFacetsConverter {
      *            The DiscoveryConfiguration applied to the query
      */
     public void addFacetValues(Context context, final DiscoverResult searchResult, final SearchResultsRest resultsRest,
-            final DiscoveryConfiguration configuration) {
+            final DiscoveryConfiguration configuration, final Projection projection) {
 
         List<DiscoverySearchFilterFacet> facets = configuration.getSidebarFacets();
         for (DiscoverySearchFilterFacet field : CollectionUtils.emptyIfNull(facets)) {
             List<DiscoverResult.FacetResult> facetValues = searchResult.getFacetResult(field);
 
             SearchFacetEntryRest facetEntry = new SearchFacetEntryRest(field.getIndexFieldName());
+            facetEntry.setProjection(projection);
             int valueCount = 0;
             facetEntry.setHasMore(false);
             facetEntry.setFacetLimit(field.getFacetLimit());
@@ -84,7 +88,7 @@ public class DiscoverFacetsConverter {
                 // are
                 // more results available.
                 if (valueCount < field.getFacetLimit()) {
-                    SearchFacetValueRest valueRest = facetValueConverter.convert(value);
+                    SearchFacetValueRest valueRest = facetValueConverter.convert(value, projection);
 
                     facetEntry.addValue(valueRest);
                 } else {

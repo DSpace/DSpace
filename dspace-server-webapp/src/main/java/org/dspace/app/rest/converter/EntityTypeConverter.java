@@ -8,6 +8,7 @@
 package org.dspace.app.rest.converter;
 
 import org.dspace.app.rest.model.EntityTypeRest;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.content.EntityType;
 import org.springframework.stereotype.Component;
 
@@ -18,15 +19,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class EntityTypeConverter implements DSpaceConverter<org.dspace.content.EntityType, EntityTypeRest> {
 
-    /**
-     * This method converts the EntityType model object that is passed along in the params to the
-     * REST representation of this object
-     * @param obj   The EntityType model object to be converted
-     * @return      The EntityType REST object that is made from the model object
-     */
     @Override
-    public EntityTypeRest convert(EntityType obj) {
+    public EntityTypeRest convert(EntityType obj, Projection projection) {
         EntityTypeRest entityTypeRest = new EntityTypeRest();
+        entityTypeRest.setProjection(projection);
         entityTypeRest.setId(obj.getID());
         entityTypeRest.setLabel(obj.getLabel());
         return entityTypeRest;

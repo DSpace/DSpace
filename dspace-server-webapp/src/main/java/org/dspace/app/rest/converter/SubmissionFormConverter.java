@@ -21,6 +21,7 @@ import org.dspace.app.rest.model.SubmissionVisibilityRest;
 import org.dspace.app.rest.model.VisibilityEnum;
 import org.dspace.app.rest.model.submit.SelectableMetadata;
 import org.dspace.app.rest.model.submit.SelectableRelationship;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.repository.SubmissionFormRestRepository;
 import org.dspace.app.rest.utils.AuthorityUtils;
 import org.dspace.app.util.DCInput;
@@ -50,8 +51,9 @@ public class SubmissionFormConverter implements DSpaceConverter<DCInputSet, Subm
     private SubmissionFormRestRepository submissionFormRestRepository;
 
     @Override
-    public SubmissionFormRest convert(DCInputSet obj) {
+    public SubmissionFormRest convert(DCInputSet obj, Projection projection) {
         SubmissionFormRest sd = new SubmissionFormRest();
+        sd.setProjection(projection);
         sd.setName(obj.getFormName());
         DCInput[][] step = obj.getFields();
         List<SubmissionFormRowRest> rows = getPage(step, obj.getFormName());

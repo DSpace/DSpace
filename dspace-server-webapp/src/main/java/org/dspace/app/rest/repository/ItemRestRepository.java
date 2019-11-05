@@ -26,7 +26,7 @@ import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.patch.Patch;
-import org.dspace.app.rest.projection.ListProjection;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.repository.patch.ItemPatch;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
@@ -94,7 +94,7 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
         if (item == null) {
             return null;
         }
-        return converter.toRest(item);
+        return converter.toRest(item, utils.obtainProjection());
     }
 
     @Override
@@ -113,7 +113,8 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        return new PageImpl<>(items, pageable, total).map((item) -> converter.toRest(item, ListProjection.NAME));
+        Projection projection = utils.obtainProjection(true);
+        return new PageImpl<>(items, pageable, total).map((object) -> converter.toRest(object, projection));
     }
 
     @Override
@@ -208,7 +209,7 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
 
         Item itemToReturn = installItemService.installItem(context, workspaceItem);
 
-        return converter.toRest(itemToReturn);
+        return converter.toRest(itemToReturn, Projection.DEFAULT);
     }
 
     @Override
@@ -237,6 +238,6 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
                                                    + uuid + ", "
                                                    + itemRest.getId());
         }
-        return converter.toRest(item);
+        return converter.toRest(item, Projection.DEFAULT);
     }
 }

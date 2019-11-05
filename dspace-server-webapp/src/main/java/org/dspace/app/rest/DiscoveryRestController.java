@@ -143,9 +143,8 @@ public class DiscoveryRestController implements InitializingBean {
         }
 
         //Get the Search results in JSON format
-        SearchResultsRest searchResultsRest = null;
-        searchResultsRest = discoveryRestRepository
-            .getSearchObjects(query, dsoType, dsoScope, configuration, searchFilters, page);
+        SearchResultsRest searchResultsRest = discoveryRestRepository
+            .getSearchObjects(query, dsoType, dsoScope, configuration, searchFilters, page, utils.obtainProjection());
 
         //Convert the Search JSON results to paginated HAL resources
         SearchResultsResource searchResultsResource = new SearchResultsResource(searchResultsRest, utils, page);
