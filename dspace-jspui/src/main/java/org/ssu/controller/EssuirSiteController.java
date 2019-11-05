@@ -96,7 +96,7 @@ public class EssuirSiteController {
                 }));
 
         StatisticsData totalStatistic = essuirStatistics.getTotalStatistic();
-        List<ItemTypeResponse> submissionStatisticsByType = typeLocalization.getSubmissionStatisticsByType(locale);
+        List<ItemTypeResponse> submissionStatisticsByType = typeLocalization.getSubmissionStatisticsByType(locale).stream().sorted(Comparator.comparing(ItemTypeResponse::getTitle)).collect(Collectors.toList());
         model.addObject("topNews", String.format(topNews, totalStatistic.getTotalCount(), totalStatistic.getLastUpdate()));
         model.addObject("sideNews", sideNews);
         model.addObject("submissions", submissionStatisticsByType);
