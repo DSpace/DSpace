@@ -34,7 +34,6 @@ public abstract class ReplacePatchOperation<R extends RestModel>
      */
     @Override
     public R perform(R resource, Operation operation) {
-
         checkOperationValue(operation.getValue());
         checkModelForExistingValue(resource, operation);
         return replace(resource, operation);
@@ -62,14 +61,5 @@ public abstract class ReplacePatchOperation<R extends RestModel>
      * @throws DSpaceBadRequestException
      */
     abstract void checkModelForExistingValue(R resource, Operation operation);
-
-//    /**
-//     * TODO
-//     * @param R
-//     * @param path
-//     * @return
-//     */
-//    public abstract boolean supports(RestModel R, String path);
-
 
 }

@@ -28,6 +28,9 @@ import org.springframework.stereotype.Component;
 public class EPersonNetidReplaceOperation extends ReplacePatchOperation<EPersonRest>
         implements ResourcePatchOperation<EPersonRest> {
 
+    /**
+     * Path in json body of patch that uses this operation
+     */
     private static final String OPERATION_PATH_NETID = "/netid";
 
     @Override
@@ -45,6 +48,7 @@ public class EPersonNetidReplaceOperation extends ReplacePatchOperation<EPersonR
         }
     }
 
+    @Override
     public boolean supports(RestModel R, String path) {
         return (R instanceof EPersonRest && path.trim().equalsIgnoreCase(OPERATION_PATH_NETID));
     }

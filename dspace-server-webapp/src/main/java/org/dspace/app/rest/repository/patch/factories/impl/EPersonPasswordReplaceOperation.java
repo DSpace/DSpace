@@ -26,6 +26,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class EPersonPasswordReplaceOperation extends ReplacePatchOperation<EPersonRest> {
 
+    /**
+     * Path in json body of patch that uses this operation
+     */
     private static final String OPERATION_PATH_PASSWORD = "/password";
 
     @Override
@@ -46,6 +49,7 @@ public class EPersonPasswordReplaceOperation extends ReplacePatchOperation<EPers
          */
     }
 
+    @Override
     public boolean supports(RestModel R, String path) {
         return (R instanceof EPersonRest && path.trim().equalsIgnoreCase(OPERATION_PATH_PASSWORD));
     }
