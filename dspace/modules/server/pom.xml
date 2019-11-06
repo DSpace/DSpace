@@ -246,6 +246,20 @@ just adding new jar in the classloader</description>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
+            <exclusions>
+                <!-- Temporary exclusion to avoid dependency conflict with version of org.json:json used by dspace-api.
+                     NOTE: THIS CAN BE REMOVED ONCE WE UPGRADE TO SPRING-BOOT v1.5 (or above), see DS-3802
+                     As of Spring-Boot 1.5, org.json:json is no longer used by spring-boot-starter-test -->
+                <exclusion>
+                    <groupId>org.json</groupId>
+                    <artifactId>json</artifactId>
+                </exclusion>
+                <!-- More recent version used for testing below -->
+                <exclusion>
+                    <groupId>com.jayway.jsonpath</groupId>
+                    <artifactId>json-path</artifactId>
+                </exclusion>
+            </exclusions>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -273,6 +287,8 @@ just adding new jar in the classloader</description>
             <artifactId>solr-cell</artifactId>
             <scope>test</scope>
         </dependency>
+        <!-- Reminder: Keep icu4j (in Parent POM) synced with version used by lucene-analyzers-icu below,
+             otherwise ICUFoldingFilterFactory may throw errors in tests.  -->
         <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-analyzers-icu</artifactId>
