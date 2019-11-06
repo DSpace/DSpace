@@ -119,7 +119,8 @@ public interface BundleService extends DSpaceObjectService<Bundle>, DSpaceObject
      * @throws AuthorizeException   when an SQL error has occurred (querying DSpace)
      * @throws SQLException         If the user can't make the changes
      */
-    public void updateBitstreamOrder(Context context, Bundle bundle, int from, int to) throws AuthorizeException, SQLException;
+    public void updateBitstreamOrder(Context context, Bundle bundle, int from, int to) throws AuthorizeException,
+            SQLException;
 
     /**
      * Moves a bitstream from its current bundle to a new target bundle

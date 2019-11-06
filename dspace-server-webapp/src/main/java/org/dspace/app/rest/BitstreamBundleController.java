@@ -53,7 +53,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/" + BitstreamRest.CATEGORY + "/" + BitstreamRest.PLURAL_NAME
         + REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID + "/" + BundleRest.NAME)
-public class BitstreamController {
+public class BitstreamBundleController {
 
     @Autowired
     BitstreamService bitstreamService;
