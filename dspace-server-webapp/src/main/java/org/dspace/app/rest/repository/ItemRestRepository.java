@@ -10,9 +10,11 @@ package org.dspace.app.rest.repository;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 
@@ -32,10 +34,14 @@ import org.dspace.app.rest.repository.patch.ItemPatch;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.content.Relationship;
+import org.dspace.content.RelationshipType;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
+import org.dspace.content.service.RelationshipService;
+import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Context;
 import org.dspace.util.UUIDUtils;
@@ -77,6 +83,12 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
 
     @Autowired
     InstallItemService installItemService;
+
+    @Autowired
+    RelationshipService relationshipService;
+
+    @Autowired
+    RelationshipTypeService relationshipTypeService;
 
     public ItemRestRepository(ItemService dsoService,
                               ItemConverter dsoConverter,
@@ -159,6 +171,9 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
     @Override
     @PreAuthorize("hasAuthority('ADMIN')")
     protected void delete(Context context, UUID id) throws AuthorizeException {
+        String[] copyVirtual =
+            requestService.getCurrentRequest().getServletRequest().getParameterValues("copyVirtualMetadata");
+
         Item item = null;
         try {
             item = is.find(context, id);
@@ -178,10 +193,54 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
             throw new RuntimeException(e.getMessage(), e);
         }
         try {
+            deleteMultipleRelationshipsCopyVirtualMetadata(context, copyVirtual, item);
             is.delete(context, item);
         } catch (SQLException | IOException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
+    }
+
+    private void deleteMultipleRelationshipsCopyVirtualMetadata(Context context, String[] copyVirtual, Item item)
+        throws SQLException, AuthorizeException {
+
+        if (copyVirtual == null) {
+            return;
+        }
+        if (copyVirtual.length == 1 && StringUtils.equals("all", copyVirtual[0])) {
+            for (Relationship relationship : relationshipService.findByItem(context, item)) {
+                deleteRelationshipCopyVirtualMetadata(item, relationship);
+            }
+        } else if (copyVirtual.length == 1 && StringUtils.equals("configured", copyVirtual[0])) {
+            for (Relationship relationship : relationshipService.findByItem(context, item)) {
+                relationshipService.delete(obtainContext(), relationship);
+            }
+        } else if (copyVirtual.length > 0) {
+            List<Integer> relationshipIds =
+                Arrays.stream(copyVirtual).filter(StringUtils::isNumeric).collect(Collectors.toList())
+                    .stream().map(Integer::parseInt).collect(Collectors.toList());
+            for (Integer relationshipId : relationshipIds) {
+                RelationshipType relationshipType = relationshipTypeService.find(context, relationshipId);
+                for (Relationship relationship : relationshipService
+                    .findByItemAndRelationshipType(context, item, relationshipType)) {
+
+                    deleteRelationshipCopyVirtualMetadata(item, relationship);
+                }
+            }
+        }
+    }
+
+    private void deleteRelationshipCopyVirtualMetadata(Item itemToDelete, Relationship relationshipToDelete)
+        throws SQLException, AuthorizeException {
+
+        boolean copyToLeft = relationshipToDelete.getRightItem().equals(itemToDelete);
+        boolean copyToRight = relationshipToDelete.getLeftItem().equals(itemToDelete);
+
+        if (copyToLeft && copyToRight) {
+            copyToLeft = false;
+            copyToRight = false;
+        }
+
+        relationshipService.delete(obtainContext(), relationshipToDelete, copyToLeft, copyToRight);
     }
 
     @Override

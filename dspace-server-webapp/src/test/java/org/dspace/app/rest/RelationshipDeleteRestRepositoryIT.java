@@ -8,6 +8,7 @@
 package org.dspace.app.rest;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.startsWith;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -17,6 +18,7 @@ import java.util.List;
 
 import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
+import org.dspace.app.rest.builder.GroupBuilder;
 import org.dspace.app.rest.builder.ItemBuilder;
 import org.dspace.app.rest.builder.RelationshipBuilder;
 import org.dspace.app.rest.test.AbstractEntityIntegrationTest;
@@ -29,6 +31,10 @@ import org.dspace.content.RelationshipType;
 import org.dspace.content.service.EntityTypeService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.RelationshipTypeService;
+import org.dspace.core.I18nUtil;
+import org.dspace.eperson.EPerson;
+import org.dspace.eperson.service.EPersonService;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,12 +50,21 @@ public class RelationshipDeleteRestRepositoryIT extends AbstractEntityIntegratio
     @Autowired
     private RelationshipTypeService relationshipTypeService;
 
+    @Autowired
+    private EPersonService ePersonService;
+
     private Item leftItem;
     private Item rightItem;
     private Collection collection;
     private RelationshipType relationshipType;
     private Relationship relationship;
     private String adminAuthToken;
+    private EPerson collectionAdmin;
+    private Item personItem;
+    private Item projectItem;
+    private Item publicationItem;
+    private RelationshipType personProjectRelationshipType;
+    private RelationshipType publicationPersonRelationshipType;
 
     @Before
     @Override
@@ -58,13 +73,45 @@ public class RelationshipDeleteRestRepositoryIT extends AbstractEntityIntegratio
         adminAuthToken = getAuthToken(admin.getEmail(), password);
 
         context.turnOffAuthorisationSystem();
+
+        collectionAdmin = ePersonService.findByEmail(context, "collectionAdminTest@email.com");
+        if (collectionAdmin == null) {
+            // This EPerson creation should only happen once (i.e. for first test run)
+            collectionAdmin = ePersonService.create(context);
+            collectionAdmin.setFirstName(context, "first");
+            collectionAdmin.setLastName(context, "last");
+            collectionAdmin.setEmail("collectionAdminTest@email.com");
+            collectionAdmin.setCanLogIn(true);
+            collectionAdmin.setLanguage(context, I18nUtil.getDefaultLocale().getLanguage());
+            ePersonService.setPassword(collectionAdmin, password);
+            // actually save the eperson to unit testing DB
+            ePersonService.update(context, collectionAdmin);
+        }
+
         Community community = CommunityBuilder.createCommunity(context)
             .withName("Parent community")
             .build();
         collection = CollectionBuilder.createCollection(context, community)
             .withName("Collection")
+            .withAdminGroup(collectionAdmin)
             .build();
         context.restoreAuthSystemState();
+    }
+
+    @After
+    @Override
+    public void destroy() throws Exception {
+        try {
+            context.turnOffAuthorisationSystem();
+            collectionAdmin = ePersonService.findByEmail(context, "collectionAdminTest@email.com");
+            if (collectionAdmin != null) {
+                ePersonService.delete(context, collectionAdmin);
+                context.commit();
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        super.destroy();
     }
 
     private void initPublicationAuthor() throws Exception {
@@ -113,6 +160,63 @@ public class RelationshipDeleteRestRepositoryIT extends AbstractEntityIntegratio
             .build();
 
         context.restoreAuthSystemState();
+    }
+
+    private void initPersonProjectPublication() throws Exception {
+        context.turnOffAuthorisationSystem();
+        personItem = ItemBuilder.createItem(context, collection)
+            .withTitle("Person 1")
+            .withPersonIdentifierFirstName("Donald")
+            .withPersonIdentifierLastName("Smith")
+            .withRelationshipType("Person")
+            .build();
+        projectItem = ItemBuilder.createItem(context, collection)
+            .withTitle("Project 1")
+            .withRelationshipType("Project")
+            .build();
+        publicationItem = ItemBuilder.createItem(context, collection)
+            .withTitle("Publication 1")
+            .withRelationshipType("Publication")
+            .build();
+        personProjectRelationshipType = relationshipTypeService.findbyTypesAndLabels(context,
+            entityTypeService.findByEntityType(context, "Person"),
+            entityTypeService.findByEntityType(context, "Project"),
+            "isProjectOfPerson",
+            "isPersonOfProject");
+        publicationPersonRelationshipType = relationshipTypeService.findbyTypesAndLabels(context,
+            entityTypeService.findByEntityType(context, "Publication"),
+            entityTypeService.findByEntityType(context, "Person"),
+            "isAuthorOfPublication",
+            "isPublicationOfAuthor");
+        RelationshipBuilder
+            .createRelationshipBuilder(context, personItem, projectItem, personProjectRelationshipType)
+            .withLeftPlace(0)
+            .build();
+        RelationshipBuilder
+            .createRelationshipBuilder(context, publicationItem, personItem, publicationPersonRelationshipType)
+            .withLeftPlace(0)
+            .build();
+        context.restoreAuthSystemState();
+
+        publicationItem = itemService.find(context, publicationItem.getID());
+        List<MetadataValue> publicationAuthorList =
+            itemService.getMetadata(publicationItem, "dc", "contributor", "author", Item.ANY);
+        assertThat(publicationAuthorList.size(), equalTo(1));
+        assertThat(publicationAuthorList.get(0).getValue(), equalTo("Smith, Donald"));
+        assertThat(publicationAuthorList.get(0).getAuthority(), startsWith("virtual::"));
+        List<MetadataValue> publicationRelationships = itemService.getMetadata(publicationItem,
+            "relation", "isAuthorOfPublication", Item.ANY, Item.ANY);
+        assertThat(publicationRelationships.size(), equalTo(1));
+
+        projectItem = itemService.find(context, projectItem.getID());
+        List<MetadataValue> projectAuthorList =
+            itemService.getMetadata(projectItem, "project", "contributor", "author", Item.ANY);
+        assertThat(projectAuthorList.size(), equalTo(1));
+        assertThat(projectAuthorList.get(0).getValue(), equalTo("Smith, Donald"));
+        assertThat(projectAuthorList.get(0).getAuthority(), startsWith("virtual::"));
+        List<MetadataValue> projectRelationships = itemService.getMetadata(projectItem,
+            "relation", "isPersonOfProject", Item.ANY, Item.ANY);
+        assertThat(projectRelationships.size(), equalTo(1));
     }
 
     @Test
@@ -235,5 +339,146 @@ public class RelationshipDeleteRestRepositoryIT extends AbstractEntityIntegratio
             itemService.getMetadata(rightItem, "publicationissue", "issueNumber", null, Item.ANY);
         assertThat(issueList.size(), equalTo(1));
         assertThat(issueList.get(0).getValue(), equalTo("2"));
+    }
+
+    @Test
+    public void deleteItemCopyVirtualMetadataAll() throws Exception {
+        initPersonProjectPublication();
+
+        getClient(adminAuthToken).perform(
+            delete("/api/core/items/" + personItem.getID() + "?copyVirtualMetadata=all"))
+            .andExpect(status().isNoContent());
+
+        publicationItem = itemService.find(context, publicationItem.getID());
+        List<MetadataValue> publicationAuthorList = itemService.getMetadata(publicationItem,
+            "dc", "contributor", "author", Item.ANY);
+        assertThat(publicationAuthorList.size(), equalTo(1));
+        assertThat(publicationAuthorList.get(0).getValue(), equalTo("Smith, Donald"));
+        assertNull(publicationAuthorList.get(0).getAuthority());
+        List<MetadataValue> publicationRelationships = itemService.getMetadata(publicationItem,
+            "relation", "isAuthorOfPublication", Item.ANY, Item.ANY);
+        assertThat(publicationRelationships.size(), equalTo(0));
+
+        projectItem = itemService.find(context, projectItem.getID());
+        List<MetadataValue> projectAuthorList = itemService.getMetadata(projectItem,
+            "project", "contributor", "author", Item.ANY);
+        assertThat(projectAuthorList.size(), equalTo(1));
+        assertThat(projectAuthorList.get(0).getValue(), equalTo("Smith, Donald"));
+        assertNull(projectAuthorList.get(0).getAuthority());
+        List<MetadataValue> projectRelationships = itemService.getMetadata(projectItem,
+            "relation", "isPersonOfProject", Item.ANY, Item.ANY);
+        assertThat(projectRelationships.size(), equalTo(0));
+    }
+
+    @Test
+    public void deleteItemCopyVirtualMetadataOneType() throws Exception {
+        initPersonProjectPublication();
+
+        getClient(adminAuthToken).perform(
+            delete("/api/core/items/" + personItem.getID() + "?copyVirtualMetadata="
+                + publicationPersonRelationshipType.getID()))
+            .andExpect(status().isNoContent());
+
+        publicationItem = itemService.find(context, publicationItem.getID());
+        List<MetadataValue> publicationAuthorList = itemService.getMetadata(publicationItem,
+            "dc", "contributor", "author", Item.ANY);
+        assertThat(publicationAuthorList.size(), equalTo(1));
+        assertThat(publicationAuthorList.get(0).getValue(), equalTo("Smith, Donald"));
+        assertNull(publicationAuthorList.get(0).getAuthority());
+        List<MetadataValue> publicationRelationships = itemService.getMetadata(publicationItem,
+            "relation", "isAuthorOfPublication", Item.ANY, Item.ANY);
+        assertThat(publicationRelationships.size(), equalTo(0));
+
+        projectItem = itemService.find(context, projectItem.getID());
+        List<MetadataValue> projectAuthorList = itemService.getMetadata(projectItem,
+            "project", "contributor", "author", Item.ANY);
+        assertThat(projectAuthorList.size(), equalTo(0));
+        List<MetadataValue> projectRelationships = itemService.getMetadata(projectItem,
+            "relation", "isPersonOfProject", Item.ANY, Item.ANY);
+        assertThat(projectRelationships.size(), equalTo(0));
+    }
+
+    @Test
+    public void deleteItemCopyVirtualMetadataTwoTypes() throws Exception {
+        initPersonProjectPublication();
+
+        getClient(adminAuthToken).perform(
+            delete("/api/core/items/" + personItem.getID()
+                + "?copyVirtualMetadata=" + publicationPersonRelationshipType.getID()
+                + "&copyVirtualMetadata=" + personProjectRelationshipType.getID()))
+            .andExpect(status().isNoContent());
+
+        publicationItem = itemService.find(context, publicationItem.getID());
+        List<MetadataValue> publicationAuthorList = itemService.getMetadata(publicationItem,
+            "dc", "contributor", "author", Item.ANY);
+        assertThat(publicationAuthorList.size(), equalTo(1));
+        assertThat(publicationAuthorList.get(0).getValue(), equalTo("Smith, Donald"));
+        assertNull(publicationAuthorList.get(0).getAuthority());
+        List<MetadataValue> publicationRelationships = itemService.getMetadata(publicationItem,
+            "relation", "isAuthorOfPublication", Item.ANY, Item.ANY);
+        assertThat(publicationRelationships.size(), equalTo(0));
+
+        projectItem = itemService.find(context, projectItem.getID());
+        List<MetadataValue> projectAuthorList = itemService.getMetadata(projectItem,
+            "project", "contributor", "author", Item.ANY);
+        assertThat(projectAuthorList.size(), equalTo(1));
+        assertThat(projectAuthorList.get(0).getValue(), equalTo("Smith, Donald"));
+        assertNull(projectAuthorList.get(0).getAuthority());
+        List<MetadataValue> projectRelationships = itemService.getMetadata(projectItem,
+            "relation", "isPersonOfProject", Item.ANY, Item.ANY);
+        assertThat(projectRelationships.size(), equalTo(0));
+    }
+
+    @Test
+    public void deleteItemCopyVirtualMetadataNone() throws Exception {
+        initPersonProjectPublication();
+
+        getClient(adminAuthToken).perform(
+            delete("/api/core/items/" + personItem.getID()))
+            .andExpect(status().isNoContent());
+
+        publicationItem = itemService.find(context, publicationItem.getID());
+        List<MetadataValue> publicationAuthorList = itemService.getMetadata(publicationItem,
+            "dc", "contributor", "author", Item.ANY);
+        assertThat(publicationAuthorList.size(), equalTo(0));
+        List<MetadataValue> publicationRelationships = itemService.getMetadata(publicationItem,
+            "relation", "isAuthorOfPublication", Item.ANY, Item.ANY);
+        assertThat(publicationRelationships.size(), equalTo(0));
+
+        projectItem = itemService.find(context, projectItem.getID());
+        List<MetadataValue> projectAuthorList = itemService.getMetadata(projectItem,
+            "project", "contributor", "author", Item.ANY);
+        assertThat(projectAuthorList.size(), equalTo(0));
+        List<MetadataValue> projectRelationships = itemService.getMetadata(projectItem,
+            "relation", "isPersonOfProject", Item.ANY, Item.ANY);
+        assertThat(projectRelationships.size(), equalTo(0));
+    }
+
+    @Test
+    public void deleteItemCopyVirtualMetadataAllNoPermissions() throws Exception {
+        initPersonProjectPublication();
+
+        getClient(getAuthToken(eperson.getEmail(), password)).perform(
+            delete("/api/core/items/" + personItem.getID()))
+            .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void deleteItemCopyVirtualMetadataAllInsufficientPermissions() throws Exception {
+        initPersonProjectPublication();
+
+        getClient(getAuthToken(collectionAdmin.getEmail(), password)).perform(
+            delete("/api/core/items/" + personItem.getID()))
+            .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void deleteItemCopyVirtualMetadataTypeInsufficientPermissions() throws Exception {
+        initPersonProjectPublication();
+
+        getClient(getAuthToken(collectionAdmin.getEmail(), password)).perform(
+            delete("/api/core/items/" + personItem.getID()
+                + "?copyVirtualMetadata=" + publicationPersonRelationshipType.getID()))
+            .andExpect(status().isForbidden());
     }
 }
