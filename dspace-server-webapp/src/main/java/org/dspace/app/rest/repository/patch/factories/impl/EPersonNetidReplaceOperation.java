@@ -25,8 +25,7 @@ import org.springframework.stereotype.Component;
  * @author Michael Spalti
  */
 @Component
-public class EPersonNetidReplaceOperation extends ReplacePatchOperation<EPersonRest>
-        implements ResourcePatchOperation<EPersonRest> {
+public class EPersonNetidReplaceOperation extends PatchOperation<EPersonRest> {
 
     /**
      * Path in json body of patch that uses this operation
@@ -34,15 +33,14 @@ public class EPersonNetidReplaceOperation extends ReplacePatchOperation<EPersonR
     private static final String OPERATION_PATH_NETID = "/netid";
 
     @Override
-    EPersonRest replace(EPersonRest eperson, Operation operation) {
-
+    public EPersonRest perform(EPersonRest eperson, Operation operation) {
+        checkOperationValue(operation.getValue());
+        checkModelForExistingValue(eperson);
         eperson.setNetid((String) operation.getValue());
         return eperson;
     }
 
-
-    @Override
-    void checkModelForExistingValue(EPersonRest resource, Operation operation) {
+    void checkModelForExistingValue(EPersonRest resource) {
         if (resource.getNetid() == null) {
             throw new DSpaceBadRequestException("Attempting to replace a non-existent value.");
         }

@@ -25,8 +25,7 @@ import org.springframework.stereotype.Component;
  * @author Michael Spalti
  */
 @Component
-public class EPersonCertificateReplaceOperation extends ReplacePatchOperation<EPersonRest>
-        implements ResourcePatchOperation<EPersonRest> {
+public class EPersonCertificateReplaceOperation extends PatchOperation<EPersonRest> {
 
     /**
      * Path in json body of patch that uses this operation
@@ -34,16 +33,16 @@ public class EPersonCertificateReplaceOperation extends ReplacePatchOperation<EP
     private static final String OPERATION_PATH_CERTIFICATE = "/certificate";
 
     @Override
-    public EPersonRest replace(EPersonRest eperson, Operation operation) {
-
+    public EPersonRest perform(EPersonRest eperson, Operation operation) {
+        checkOperationValue(operation.getValue());
+        checkModelForExistingValue(eperson);
         Boolean requireCert = getBooleanOperationValue(operation.getValue());
         eperson.setRequireCertificate(requireCert);
         return eperson;
 
     }
 
-    @Override
-    void checkModelForExistingValue(EPersonRest resource, Operation operation) {
+    void checkModelForExistingValue(EPersonRest resource) {
         // TODO: many (all?) boolean values on the rest model should never be null.
         // So perhaps the error to throw in this case is different...IllegalStateException?
         // Or perhaps do nothing (no check is required).

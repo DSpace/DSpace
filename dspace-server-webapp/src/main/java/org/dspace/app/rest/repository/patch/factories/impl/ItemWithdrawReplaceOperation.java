@@ -7,7 +7,6 @@
  */
 package org.dspace.app.rest.repository.patch.factories.impl;
 
-import org.apache.log4j.Logger;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.ItemRest;
@@ -27,7 +26,7 @@ import org.springframework.stereotype.Component;
  * @author Michael Spalti
  */
 @Component
-public class ItemWithdrawReplaceOperation extends ReplacePatchOperation<ItemRest> {
+public class ItemWithdrawReplaceOperation extends PatchOperation<ItemRest> {
 
     /**
      * Path in json body of patch that uses this operation
@@ -35,7 +34,9 @@ public class ItemWithdrawReplaceOperation extends ReplacePatchOperation<ItemRest
     private static final String OPERATION_PATH_WITHDRAW = "/withdrawn";
 
     @Override
-    public ItemRest replace(ItemRest item, Operation operation) {
+    public ItemRest perform(ItemRest item, Operation operation) {
+        checkOperationValue(operation.getValue());
+        checkModelForExistingValue(item);
 
         Boolean withdraw = getBooleanOperationValue(operation.getValue());
 
@@ -66,8 +67,7 @@ public class ItemWithdrawReplaceOperation extends ReplacePatchOperation<ItemRest
 
     }
 
-    @Override
-    void checkModelForExistingValue(ItemRest resource, Operation operation) {
+    void checkModelForExistingValue(ItemRest resource) {
         if ((Object) resource.getWithdrawn() == null) {
             throw new DSpaceBadRequestException("Attempting to replace a non-existent value.");
         }

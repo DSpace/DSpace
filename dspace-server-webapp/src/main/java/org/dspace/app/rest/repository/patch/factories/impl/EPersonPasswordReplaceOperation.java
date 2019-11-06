@@ -24,22 +24,22 @@ import org.springframework.stereotype.Component;
  * @author Michael Spalti
  */
 @Component
-public class EPersonPasswordReplaceOperation extends ReplacePatchOperation<EPersonRest> {
+public class EPersonPasswordReplaceOperation extends PatchOperation<EPersonRest> {
 
     /**
      * Path in json body of patch that uses this operation
      */
-    private static final String OPERATION_PATH_PASSWORD = "/password";
+    public static final String OPERATION_PASSWORD_CHANGE = "/password";
 
     @Override
-    EPersonRest replace(EPersonRest eperson, Operation operation) {
-
+    public EPersonRest perform(EPersonRest eperson, Operation operation) {
+        checkOperationValue(operation.getValue());
+        checkModelForExistingValue(eperson);
         eperson.setPassword((String) operation.getValue());
         return eperson;
     }
 
-    @Override
-    void checkModelForExistingValue(EPersonRest resource, Operation operation) {
+    void checkModelForExistingValue(EPersonRest resource) {
         /*
          * FIXME: the password field in eperson rest model is always null because
          * the value is not set in the rest converter.
@@ -51,6 +51,6 @@ public class EPersonPasswordReplaceOperation extends ReplacePatchOperation<EPers
 
     @Override
     public boolean supports(RestModel R, String path) {
-        return (R instanceof EPersonRest && path.trim().equalsIgnoreCase(OPERATION_PATH_PASSWORD));
+        return (R instanceof EPersonRest && path.trim().equalsIgnoreCase(OPERATION_PASSWORD_CHANGE));
     }
 }

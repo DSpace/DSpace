@@ -25,8 +25,7 @@ import org.springframework.stereotype.Component;
  * @author Michael Spalti
  */
 @Component
-public class EPersonLoginReplaceOperation extends ReplacePatchOperation<EPersonRest>
-        implements ResourcePatchOperation<EPersonRest> {
+public class EPersonLoginReplaceOperation extends PatchOperation<EPersonRest> {
 
     /**
      * Path in json body of patch that uses this operation
@@ -34,15 +33,15 @@ public class EPersonLoginReplaceOperation extends ReplacePatchOperation<EPersonR
     private static final String OPERATION_PATH_PASSWORD = "/canLogin";
 
     @Override
-    public EPersonRest replace(EPersonRest eperson, Operation operation) {
-
+    public EPersonRest perform(EPersonRest eperson, Operation operation) {
+        checkOperationValue(operation.getValue());
+        checkModelForExistingValue(eperson);
         Boolean canLogin = getBooleanOperationValue(operation.getValue());
         eperson.setCanLogIn(canLogin);
         return eperson;
     }
 
-    @Override
-    void checkModelForExistingValue(EPersonRest resource, Operation operation) {
+    void checkModelForExistingValue(EPersonRest resource) {
         if ((Object) resource.isCanLogIn() == null) {
             throw new DSpaceBadRequestException("Attempting to replace a non-existent value.");
         }
