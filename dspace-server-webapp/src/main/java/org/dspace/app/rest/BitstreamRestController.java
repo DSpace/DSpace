@@ -9,6 +9,7 @@ package org.dspace.app.rest;
 
 import static org.dspace.app.rest.utils.ContextUtil.obtainContext;
 import static org.dspace.app.rest.utils.RegexUtils.REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID;
+import static org.dspace.core.Constants.BUNDLE;
 import static org.springframework.web.bind.annotation.RequestMethod.PUT;
 
 import java.io.IOException;
@@ -24,15 +25,23 @@ import org.apache.catalina.connector.ClientAbortException;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.converter.BitstreamConverter;
+import org.dspace.app.rest.converter.DSpaceObjectConverter;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
+import org.dspace.app.rest.exception.UnprocessableEntityException;
+import org.dspace.app.rest.link.HalLinkService;
 import org.dspace.app.rest.model.BitstreamRest;
+import org.dspace.app.rest.model.BundleRest;
 import org.dspace.app.rest.model.hateoas.BitstreamResource;
+import org.dspace.app.rest.model.hateoas.BundleResource;
+import org.dspace.app.rest.repository.BitstreamRestRepository;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.rest.utils.MultipartFileSender;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
+import org.dspace.content.Bundle;
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.core.Context;
@@ -41,7 +50,11 @@ import org.dspace.services.ConfigurationService;
 import org.dspace.services.EventService;
 import org.dspace.usage.UsageEvent;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.rest.webmvc.ControllerUtils;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+import org.springframework.hateoas.ResourceSupport;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -82,6 +95,12 @@ public class BitstreamRestController {
     BitstreamFormatService bitstreamFormatService;
 
     @Autowired
+    BitstreamRestRepository bitstreamRestRepository;
+
+    @Autowired
+    DSpaceObjectConverter<Bundle, BundleRest> dsoConverter;
+
+    @Autowired
     private EventService eventService;
 
     @Autowired
@@ -95,6 +114,9 @@ public class BitstreamRestController {
 
     @Autowired
     Utils utils;
+
+    @Autowired
+    HalLinkService halLinkService;
 
     @PreAuthorize("hasPermission(#uuid, 'BITSTREAM', 'READ')")
     @RequestMapping( method = {RequestMethod.GET, RequestMethod.HEAD}, value = "content")
@@ -241,5 +263,88 @@ public class BitstreamRestController {
 
         return (BitstreamResource) utils.getResourceRepository(BitstreamRest.CATEGORY, BitstreamRest.NAME)
                 .wrapResource(converter.fromModel(context.reloadEntity(bitstream)));
+    }
+
+    /**
+     * This method gets the bundle of the bitstream that corresponds to to the provided bitstream uuid. When multiple
+     * bundles are present, only the first will be returned.
+     *
+     * @param uuid     The UUID of the bitstream for which the bundle will be retrieved
+     * @param response The response object
+     * @param request  The request object
+     * @return The wrapped resource containing the first bundle of the bitstream
+     * @throws IOException
+     * @throws SQLException
+     * @throws AuthorizeException
+     */
+    @PreAuthorize("hasPermission(#uuid, 'BITSTREAM', 'READ')")
+    @RequestMapping(method = {RequestMethod.GET, RequestMethod.HEAD}, value = "/bundle")
+    public ResponseEntity<ResourceSupport> getBundle(@PathVariable UUID uuid, HttpServletResponse response,
+                                                     HttpServletRequest request)
+            throws IOException, SQLException, AuthorizeException {
+
+        Context context = ContextUtil.obtainContext(request);
+
+        Bitstream bitstream = bitstreamService.find(context, uuid);
+        if (bitstream == null) {
+            throw new ResourceNotFoundException(
+                    BitstreamRest.CATEGORY + "." + BitstreamRest.NAME + " with id: " + uuid + " not found");
+        }
+
+        List<Bundle> bundles = bitstream.getBundles();
+
+        if (bundles.isEmpty()) {
+            return ControllerUtils.toEmptyResponse(HttpStatus.NO_CONTENT);
+        }
+
+        BundleResource bundleResource = new BundleResource(dsoConverter.fromModel(bundles.get(0)), utils);
+        halLinkService.addLinks(bundleResource);
+
+        return ControllerUtils.toResponseEntity(HttpStatus.OK, null, bundleResource);
+    }
+
+    /**
+     * This method moves the bitstream to the bundle corresponding the the link provided in the body of the put request
+     *
+     * @param uuid     The UUID of the bitstream for which the bundle will be retrieved
+     * @param response The response object
+     * @param request  The request object
+     * @return The wrapped resource containing the new bundle of the bitstream
+     * @throws SQLException
+     * @throws IOException
+     * @throws AuthorizeException
+     */
+    @RequestMapping(method = RequestMethod.PUT, value = "/bundle", consumes = {"text/uri-list"})
+    @PreAuthorize("hasPermission(#uuid, 'BITSTREAM','WRITE')")
+    @PostAuthorize("returnObject != null")
+    public BundleResource move(@PathVariable UUID uuid, HttpServletResponse response,
+                               HttpServletRequest request)
+            throws SQLException, IOException, AuthorizeException {
+        Context context = ContextUtil.obtainContext(request);
+
+        List<DSpaceObject> dsoList = utils.constructDSpaceObjectList(context, utils.getStringListFromRequest(request));
+
+        if (dsoList.size() != 1 || dsoList.get(0).getType() != BUNDLE) {
+            throw new UnprocessableEntityException("No bundle has been specified " +
+                                                           "or the data cannot be resolved to a bundle.");
+        }
+
+        Bitstream bitstream = bitstreamService.find(context, uuid);
+        if (bitstream == null) {
+            throw new ResourceNotFoundException("Bitstream with id: " + uuid + " not found");
+        }
+
+        Bundle targetBundle = bitstreamRestRepository.performBitstreamMove(context, bitstream, (Bundle) dsoList.get(0));
+
+        if (targetBundle == null) {
+            return null;
+        }
+        BundleResource bundleResource = new BundleResource(dsoConverter.fromModel(targetBundle), utils);
+        halLinkService.addLinks(bundleResource);
+
+        context.commit();
+
+        return bundleResource;
+
     }
 }
