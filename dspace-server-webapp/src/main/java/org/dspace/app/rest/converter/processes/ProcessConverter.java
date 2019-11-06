@@ -32,6 +32,7 @@ public class ProcessConverter implements DSpaceConverter<Process, ProcessRest> {
     @Override
     public ProcessRest fromModel(Process process) {
         ProcessRest processRest = new ProcessRest();
+        processRest.setId(process.getID());
         processRest.setScriptName(process.getName());
         processRest.setProcessId(process.getID());
         processRest.setUserId(process.getEPerson().getID());

@@ -13,14 +13,14 @@ import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.dspace.app.rest.ProcessRestController;
+import org.dspace.app.rest.RestResourceController;
 import org.dspace.content.ProcessStatus;
 import org.dspace.scripts.Process;
 
 /**
  * This class serves as a REST representation for the {@link Process} class
  */
-public class ProcessRest extends BaseObjectRest<UUID> {
+public class ProcessRest extends BaseObjectRest<Integer> {
     public static final String NAME = "process";
     public static final String PLURAL_NAME = "processes";
     public static final String CATEGORY = RestAddressableModel.SYSTEM;
@@ -31,7 +31,7 @@ public class ProcessRest extends BaseObjectRest<UUID> {
     }
 
     public Class getController() {
-        return ProcessRestController.class;
+        return RestResourceController.class;
     }
 
     public String getType() {
@@ -105,7 +105,7 @@ public class ProcessRest extends BaseObjectRest<UUID> {
 
     @JsonIgnore
     @Override
-    public UUID getId() {
+    public Integer getId() {
         return id;
     }
 }
