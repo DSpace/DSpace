@@ -112,18 +112,31 @@ public class RelationshipServiceImplPlaceTest extends AbstractUnitTest {
         super.destroy();
     }
 
+    /**
+     * This test will test the use case of having an item to which we add some metadata. After that, we'll add a single
+     * relationship to this Item. We'll test whether the places are correct, in this case it'll be the two metadata
+     * values that we created first, has to have place 0 and 1. The Relationship that we just created needs to have
+     * leftPlace 2 and the metadata value resulting from that Relationship needs to also have place 2.
+     * Once these assertions succeed, we basically repeat said process with new metadata values and a new relationship.
+     * We then test if the old assertions still hold true like they should and that the new ones behave as expected
+     * as well.
+     * @throws Exception    If something goes wrong
+     */
     @Test
     public void addMetadataAndRelationshipTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
+        // Here we add the first set of metadata to the item
         itemService.addMetadata(context, item, dcSchema, contributorElement, authorQualifier, null, "test, one");
         itemService.addMetadata(context, item, dcSchema, contributorElement, authorQualifier, null, "test, two");
 
+        // Here we create the first Relationship to the item
         Relationship relationship = relationshipService
             .create(context, item, authorItem, isAuthorOfPublication, -1, -1);
 
         context.restoreAuthSystemState();
 
+        // The code below performs the mentioned assertions to ensure the place is correct
         List<MetadataValue> list = itemService
             .getMetadata(item, dcSchema, contributorElement, authorQualifier, Item.ANY);
         assertThat(list.size(), equalTo(3));
@@ -136,9 +149,11 @@ public class RelationshipServiceImplPlaceTest extends AbstractUnitTest {
 
         context.turnOffAuthorisationSystem();
 
+        // This is where we add the second set of metadata values
         itemService.addMetadata(context, item, dcSchema, contributorElement, authorQualifier, null, "test, three");
         itemService.addMetadata(context, item, dcSchema, contributorElement, authorQualifier, null, "test, four");
 
+        // Here we create an Item so that we can create another relationship with this item
         WorkspaceItem authorIs = workspaceItemService.create(context, col, false);
         Item secondAuthorItem = installItemService.installItem(context, authorIs);
         itemService.addMetadata(context, secondAuthorItem, "relationship", "type", null, null, "Person");
@@ -149,6 +164,7 @@ public class RelationshipServiceImplPlaceTest extends AbstractUnitTest {
 
         context.restoreAuthSystemState();
 
+        // Here we retrieve the list of metadata again to perform the assertions on the places below as mentioned
         list = itemService.getMetadata(item, dcSchema, contributorElement, authorQualifier, Item.ANY);
 
         assertMetadataValue(authorQualifier, contributorElement, dcSchema, "test, one", null, 0, list.get(0));
@@ -164,17 +180,28 @@ public class RelationshipServiceImplPlaceTest extends AbstractUnitTest {
 
     }
 
+    /**
+     * This test is virtually the same as above, only this time we'll add Relationships with leftPlaces already set
+     * equal to what they HAVE to be. So in the first test addMetadataAndRelationshipTest, we didn't specify a place
+     * and left it up to the Service to determine it, here we provide a correct place already.
+     * We perform the exact same logic except that we give a proper place already to the Relationships and we
+     * perform the same checks
+     * @throws Exception    If something goes wrong
+     */
     @Test
     public void AddMetadataAndRelationshipWithSpecificPlaceTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
+        // Here we add the first set of metadata to the item
         itemService.addMetadata(context, item, dcSchema, contributorElement, authorQualifier, null, "test, one");
         itemService.addMetadata(context, item, dcSchema, contributorElement, authorQualifier, null, "test, two");
 
+        // Here we create the first Relationship to the item with the specific leftPlace: 2
         Relationship relationship = relationshipService.create(context, item, authorItem, isAuthorOfPublication, 2, -1);
 
         context.restoreAuthSystemState();
 
+        // The code below performs the mentioned assertions to ensure the place is correct
         List<MetadataValue> list = itemService
             .getMetadata(item, dcSchema, contributorElement, authorQualifier, Item.ANY);
         assertThat(list.size(), equalTo(3));
@@ -187,9 +214,12 @@ public class RelationshipServiceImplPlaceTest extends AbstractUnitTest {
 
         context.turnOffAuthorisationSystem();
 
+        // This is where we add the second set of metadata values
         itemService.addMetadata(context, item, dcSchema, contributorElement, authorQualifier, null, "test, three");
         itemService.addMetadata(context, item, dcSchema, contributorElement, authorQualifier, null, "test, four");
 
+        // Here we create an Item so that we can create another relationship with this item. We'll give this
+        // Relationship a specific place as well
         WorkspaceItem authorIs = workspaceItemService.create(context, col, false);
         Item secondAuthorItem = installItemService.installItem(context, authorIs);
         itemService.addMetadata(context, secondAuthorItem, "relationship", "type", null, null, "Person");
@@ -200,6 +230,7 @@ public class RelationshipServiceImplPlaceTest extends AbstractUnitTest {
 
         context.restoreAuthSystemState();
 
+        // Here we retrieve the list of metadata again to perform the assertions on the places below as mentioned
         list = itemService.getMetadata(item, dcSchema, contributorElement, authorQualifier, Item.ANY);
 
         assertMetadataValue(authorQualifier, contributorElement, dcSchema, "test, one", null, 0, list.get(0));
@@ -217,6 +248,12 @@ public class RelationshipServiceImplPlaceTest extends AbstractUnitTest {
     }
 
 
+    /**
+     * In this test, our goal will be to add a bunch of metadata values to then remove one of them. We'll check the list
+     * of metadata values for the item and check that the places have not been altered for the metadata values IF an
+     * item.update hadn't been called yet. We'll then create a Relationship (by which a 
+     * @throws Exception
+     */
     @Test
     public void AddAndRemoveMetadataAndRelationshipsTest() throws Exception {
         context.turnOffAuthorisationSystem();
