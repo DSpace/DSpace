@@ -14,13 +14,13 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.dspace.app.rest.converter.BitstreamConverter;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
+import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.CollectionRest;
 import org.dspace.app.rest.model.hateoas.BitstreamResource;
 import org.dspace.app.rest.repository.CollectionRestRepository;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.service.CollectionService;
 import org.dspace.core.Context;
@@ -106,9 +106,9 @@ public class CollectionRestController {
             throw new ResourceNotFoundException(
                     "The given uuid did not resolve to a collection on the server: " + uuid);
         }
-        Bitstream bitstream = collectionRestRepository.setLogo(context, collection, uploadfile);
+        BitstreamRest bitstream = collectionRestRepository.setLogo(context, collection, uploadfile);
 
-        BitstreamResource bitstreamResource = new BitstreamResource(bitstreamConverter.fromModel(bitstream), utils);
+        BitstreamResource bitstreamResource = new BitstreamResource(bitstream, utils);
         context.complete();
         return ControllerUtils.toResponseEntity(HttpStatus.CREATED, null, bitstreamResource);
     }
