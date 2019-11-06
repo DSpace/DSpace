@@ -1150,7 +1150,6 @@
                 <groupId>org.apache.solr</groupId>
                 <artifactId>solr-cell</artifactId>
                 <version>${solr.client.version}</version>
-                <scope>test</scope>
             </dependency>
             <!-- Reminder: Keep icu4j (in Parent POM) synced with version used by lucene-analyzers-icu below,
              otherwise ICUFoldingFilterFactory may throw errors in tests.  -->
