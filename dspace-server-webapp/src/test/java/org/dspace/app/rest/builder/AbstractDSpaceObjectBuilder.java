@@ -226,7 +226,12 @@ public abstract class AbstractDSpaceObjectBuilder<T extends DSpaceObject>
             if (attachedDso != null) {
                 getService().delete(c, attachedDso);
             }
-            c.complete();
+            try {
+                c.complete();
+            }
+            catch (Exception e) {
+                throw new RuntimeException(e);
+            }
         }
 
         indexingService.commit();
