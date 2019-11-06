@@ -8,9 +8,10 @@
 package org.dspace.app.rest.repository.patch.factories.impl;
 
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
-import org.dspace.app.rest.model.ItemRest;
-import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.patch.Operation;
+import org.dspace.content.DSpaceObject;
+import org.dspace.content.Item;
+import org.dspace.core.Context;
 import org.springframework.stereotype.Component;
 
 /**
@@ -21,11 +22,9 @@ import org.springframework.stereotype.Component;
  * Content-Type: application/json" -d '[{ "op": "replace", "path": "
  * /discoverable", "value": true|false]'
  * </code>
- *
- *  @author Michael Spalti
  */
 @Component
-public class ItemDiscoverableReplaceOperation extends PatchOperation<ItemRest> {
+public class ItemDiscoverableReplaceOperation extends PatchOperation<Item> {
 
     /**
      * Path in json body of patch that uses this operation
@@ -33,7 +32,7 @@ public class ItemDiscoverableReplaceOperation extends PatchOperation<ItemRest> {
     private static final String OPERATION_PATH_DISCOVERABLE = "/discoverable";
 
     @Override
-    public ItemRest perform(ItemRest item, Operation operation) {
+    public Item perform(Context context, Item item, Operation operation) {
         checkOperationValue(operation.getValue());
         checkModelForExistingValue(item);
         Boolean discoverable = getBooleanOperationValue(operation.getValue());
@@ -42,15 +41,15 @@ public class ItemDiscoverableReplaceOperation extends PatchOperation<ItemRest> {
 
     }
 
-    void checkModelForExistingValue(ItemRest resource) {
-        if ((Object) resource.getDiscoverable() == null) {
+    void checkModelForExistingValue(Item resource) {
+        if ((Object) resource.isDiscoverable() == null) {
             throw new DSpaceBadRequestException("Attempting to replace a non-existent value.");
         }
     }
 
     @Override
-    public boolean supports(RestModel R, String path) {
-        return (R instanceof ItemRest && path.trim().equalsIgnoreCase(OPERATION_PATH_DISCOVERABLE));
+    public boolean supports(DSpaceObject R, String path) {
+        return (R instanceof Item && path.trim().equalsIgnoreCase(OPERATION_PATH_DISCOVERABLE));
     }
 
 }

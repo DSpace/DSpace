@@ -8,9 +8,10 @@
 package org.dspace.app.rest.repository.patch.factories.impl;
 
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
-import org.dspace.app.rest.model.EPersonRest;
-import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.patch.Operation;
+import org.dspace.content.DSpaceObject;
+import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
 import org.springframework.stereotype.Component;
 
 /**
@@ -21,11 +22,9 @@ import org.springframework.stereotype.Component;
  * Content-Type: application/json" -d '[{ "op": "replace", "path": "
  * /canLogin", "value": true|false]'
  * </code>
- *
- * @author Michael Spalti
  */
 @Component
-public class EPersonLoginReplaceOperation extends PatchOperation<EPersonRest> {
+public class EPersonLoginReplaceOperation extends PatchOperation<EPerson> {
 
     /**
      * Path in json body of patch that uses this operation
@@ -33,7 +32,7 @@ public class EPersonLoginReplaceOperation extends PatchOperation<EPersonRest> {
     private static final String OPERATION_PATH_PASSWORD = "/canLogin";
 
     @Override
-    public EPersonRest perform(EPersonRest eperson, Operation operation) {
+    public EPerson perform(Context context, EPerson eperson, Operation operation) {
         checkOperationValue(operation.getValue());
         checkModelForExistingValue(eperson);
         Boolean canLogin = getBooleanOperationValue(operation.getValue());
@@ -41,14 +40,14 @@ public class EPersonLoginReplaceOperation extends PatchOperation<EPersonRest> {
         return eperson;
     }
 
-    void checkModelForExistingValue(EPersonRest resource) {
-        if ((Object) resource.isCanLogIn() == null) {
+    void checkModelForExistingValue(EPerson resource) {
+        if ((Object) resource.canLogIn() == null) {
             throw new DSpaceBadRequestException("Attempting to replace a non-existent value.");
         }
     }
 
     @Override
-    public boolean supports(RestModel R, String path) {
-        return (R instanceof EPersonRest && path.trim().equalsIgnoreCase(OPERATION_PATH_PASSWORD));
+    public boolean supports(DSpaceObject R, String path) {
+        return (R instanceof EPerson && path.trim().equalsIgnoreCase(OPERATION_PATH_PASSWORD));
     }
 }

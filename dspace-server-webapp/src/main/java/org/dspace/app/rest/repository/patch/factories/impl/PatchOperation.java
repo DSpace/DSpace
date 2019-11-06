@@ -9,26 +9,26 @@ package org.dspace.app.rest.repository.patch.factories.impl;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
-import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.patch.Operation;
+import org.dspace.content.DSpaceObject;
+import org.dspace.core.Context;
 
 /**
  * Base class for all resource patch operations.
- *
- * @author Michael Spalti
  */
-public abstract class PatchOperation<R extends RestModel>
-        implements ResourcePatchOperation<R> {
+public abstract class PatchOperation<M extends DSpaceObject>
+        implements ResourcePatchOperation<M> {
 
     /**
      * Updates the rest model by applying the patch operation.
      *
-     * @param resource  the rest model.
+     * @param context   context of patch operation
+     * @param resource  the dso.
      * @param operation the patch operation.
-     * @return the updated rest model.
+     * @return the patched dso
      * @throws DSpaceBadRequestException
      */
-    public abstract R perform(R resource, Operation operation);
+    public abstract M perform(Context context, M resource, Operation operation);
 
     /**
      * Throws PatchBadRequestException for missing operation value.
@@ -65,10 +65,10 @@ public abstract class PatchOperation<R extends RestModel>
 
     /**
      * Determines whether or not this Patch Operation can do this patch (RestModel and path gets checked)
-     * @param R         RestModel, whose class must be instance of dso for which this PatchOperation was created
+     * @param M         dso, whose class must be instance of dso for which this PatchOperation was created
      * @param path      Path given to the patch body, should match this type of Patch Operation
-     * @return          True if this PatchOperation class can do the patch for this given RestModel and Path
+     * @return          True if this PatchOperation class can do the patch for this given dso type and Path
      */
-    public abstract boolean supports(RestModel R, String path);
+    public abstract boolean supports(DSpaceObject M, String path);
 
 }

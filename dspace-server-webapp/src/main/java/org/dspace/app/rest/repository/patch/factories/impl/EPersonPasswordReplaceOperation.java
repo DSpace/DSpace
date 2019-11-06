@@ -7,9 +7,12 @@
  */
 package org.dspace.app.rest.repository.patch.factories.impl;
 
-import org.dspace.app.rest.model.EPersonRest;
-import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.patch.Operation;
+import org.dspace.content.DSpaceObject;
+import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.EPersonService;
 import org.springframework.stereotype.Component;
 
 /**
@@ -20,26 +23,25 @@ import org.springframework.stereotype.Component;
  * Content-Type: application/json" -d '[{ "op": "replace", "path": "
  * /password", "value": "newpassword"]'
  * </code>
- *
- * @author Michael Spalti
  */
 @Component
-public class EPersonPasswordReplaceOperation extends PatchOperation<EPersonRest> {
+public class EPersonPasswordReplaceOperation extends PatchOperation<EPerson> {
 
     /**
      * Path in json body of patch that uses this operation
      */
     public static final String OPERATION_PASSWORD_CHANGE = "/password";
+    protected EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
 
     @Override
-    public EPersonRest perform(EPersonRest eperson, Operation operation) {
+    public EPerson perform(Context context, EPerson eperson, Operation operation) {
         checkOperationValue(operation.getValue());
         checkModelForExistingValue(eperson);
-        eperson.setPassword((String) operation.getValue());
+        ePersonService.setPassword(eperson, (String) operation.getValue());
         return eperson;
     }
 
-    void checkModelForExistingValue(EPersonRest resource) {
+    void checkModelForExistingValue(EPerson resource) {
         /*
          * FIXME: the password field in eperson rest model is always null because
          * the value is not set in the rest converter.
@@ -50,7 +52,7 @@ public class EPersonPasswordReplaceOperation extends PatchOperation<EPersonRest>
     }
 
     @Override
-    public boolean supports(RestModel R, String path) {
-        return (R instanceof EPersonRest && path.trim().equalsIgnoreCase(OPERATION_PASSWORD_CHANGE));
+    public boolean supports(DSpaceObject R, String path) {
+        return (R instanceof EPerson && path.trim().equalsIgnoreCase(OPERATION_PASSWORD_CHANGE));
     }
 }

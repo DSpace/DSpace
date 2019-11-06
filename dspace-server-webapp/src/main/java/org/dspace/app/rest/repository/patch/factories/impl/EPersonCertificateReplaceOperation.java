@@ -8,9 +8,10 @@
 package org.dspace.app.rest.repository.patch.factories.impl;
 
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
-import org.dspace.app.rest.model.EPersonRest;
-import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.patch.Operation;
+import org.dspace.content.DSpaceObject;
+import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
 import org.springframework.stereotype.Component;
 
 /**
@@ -21,11 +22,9 @@ import org.springframework.stereotype.Component;
  * Content-Type: application/json" -d '[{ "op": "replace", "path": "
  * /certificate", "value": true|false]'
  * </code>
- *
- * @author Michael Spalti
  */
 @Component
-public class EPersonCertificateReplaceOperation extends PatchOperation<EPersonRest> {
+public class EPersonCertificateReplaceOperation extends PatchOperation<EPerson> {
 
     /**
      * Path in json body of patch that uses this operation
@@ -33,7 +32,7 @@ public class EPersonCertificateReplaceOperation extends PatchOperation<EPersonRe
     private static final String OPERATION_PATH_CERTIFICATE = "/certificate";
 
     @Override
-    public EPersonRest perform(EPersonRest eperson, Operation operation) {
+    public EPerson perform(Context context, EPerson eperson, Operation operation) {
         checkOperationValue(operation.getValue());
         checkModelForExistingValue(eperson);
         Boolean requireCert = getBooleanOperationValue(operation.getValue());
@@ -42,17 +41,17 @@ public class EPersonCertificateReplaceOperation extends PatchOperation<EPersonRe
 
     }
 
-    void checkModelForExistingValue(EPersonRest resource) {
+    void checkModelForExistingValue(EPerson resource) {
         // TODO: many (all?) boolean values on the rest model should never be null.
         // So perhaps the error to throw in this case is different...IllegalStateException?
         // Or perhaps do nothing (no check is required).
-        if ((Object) resource.isRequireCertificate() == null) {
+        if ((Object) resource.getRequireCertificate() == null) {
             throw new DSpaceBadRequestException("Attempting to replace a non-existent value.");
         }
     }
 
     @Override
-    public boolean supports(RestModel R, String path) {
-        return (R instanceof EPersonRest && path.trim().equalsIgnoreCase(OPERATION_PATH_CERTIFICATE));
+    public boolean supports(DSpaceObject R, String path) {
+        return (R instanceof EPerson && path.trim().equalsIgnoreCase(OPERATION_PATH_CERTIFICATE));
     }
 }

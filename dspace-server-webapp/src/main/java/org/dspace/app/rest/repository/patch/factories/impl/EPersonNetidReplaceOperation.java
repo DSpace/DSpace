@@ -8,9 +8,10 @@
 package org.dspace.app.rest.repository.patch.factories.impl;
 
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
-import org.dspace.app.rest.model.EPersonRest;
-import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.patch.Operation;
+import org.dspace.content.DSpaceObject;
+import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
 import org.springframework.stereotype.Component;
 
 /**
@@ -21,11 +22,9 @@ import org.springframework.stereotype.Component;
  * Content-Type: application/json" -d '[{ "op": "replace", "path": "
  * /netid", "value": "newNetId"]'
  * </code>
- *
- * @author Michael Spalti
  */
 @Component
-public class EPersonNetidReplaceOperation extends PatchOperation<EPersonRest> {
+public class EPersonNetidReplaceOperation extends PatchOperation<EPerson> {
 
     /**
      * Path in json body of patch that uses this operation
@@ -33,21 +32,21 @@ public class EPersonNetidReplaceOperation extends PatchOperation<EPersonRest> {
     private static final String OPERATION_PATH_NETID = "/netid";
 
     @Override
-    public EPersonRest perform(EPersonRest eperson, Operation operation) {
+    public EPerson perform(Context context, EPerson eperson, Operation operation) {
         checkOperationValue(operation.getValue());
         checkModelForExistingValue(eperson);
         eperson.setNetid((String) operation.getValue());
         return eperson;
     }
 
-    void checkModelForExistingValue(EPersonRest resource) {
+    void checkModelForExistingValue(EPerson resource) {
         if (resource.getNetid() == null) {
             throw new DSpaceBadRequestException("Attempting to replace a non-existent value.");
         }
     }
 
     @Override
-    public boolean supports(RestModel R, String path) {
-        return (R instanceof EPersonRest && path.trim().equalsIgnoreCase(OPERATION_PATH_NETID));
+    public boolean supports(DSpaceObject R, String path) {
+        return (R instanceof EPerson && path.trim().equalsIgnoreCase(OPERATION_PATH_NETID));
     }
 }
