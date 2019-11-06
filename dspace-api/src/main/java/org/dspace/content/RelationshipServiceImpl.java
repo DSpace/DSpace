@@ -118,6 +118,8 @@ public class RelationshipServiceImpl implements RelationshipService {
                                                                               relationship.getRelationshipType(),
                                                                               false);
 
+        // These relationships are only deleted from the temporary lists incase they're present in them so that we can
+        // properly perform our place calculation later down the line in this method.
         if (leftRelationships.contains(relationship)) {
             leftRelationships.remove(relationship);
         }
