@@ -10,7 +10,6 @@ package org.dspace.app.rest.repository;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
@@ -185,31 +184,6 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
     protected void patch(Context context, HttpServletRequest request, String apiCategory, String model, UUID uuid,
                          Patch patch) throws AuthorizeException, SQLException {
         patchDSpaceObject(apiCategory, model, uuid, patch);
-    }
-
-    @Override
-    protected void updateDSpaceObject(EPerson ePerson, EPersonRest ePersonRest)
-            throws AuthorizeException, SQLException {
-        super.updateDSpaceObject(ePerson, ePersonRest);
-
-        Context context = obtainContext();
-        if (ePersonRest.getPassword() != null) {
-            es.setPassword(ePerson, ePersonRest.getPassword());
-        }
-        if (ePersonRest.isRequireCertificate() != ePerson.getRequireCertificate()) {
-            ePerson.setRequireCertificate(ePersonRest.isRequireCertificate());
-        }
-        if (ePersonRest.isCanLogIn() != ePerson.canLogIn()) {
-            ePerson.setCanLogIn(ePersonRest.isCanLogIn());
-        }
-        if (!Objects.equals(ePersonRest.getEmail(), ePerson.getEmail())) {
-            ePerson.setEmail(ePersonRest.getEmail());
-        }
-        if (!Objects.equals(ePersonRest.getNetid(), ePerson.getNetid())) {
-            ePerson.setNetid(ePersonRest.getNetid());
-        }
-
-        es.update(context, ePerson);
     }
 
     @Override

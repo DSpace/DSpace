@@ -123,25 +123,6 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
     }
 
     @Override
-    protected void updateDSpaceObject(Item item, ItemRest itemRest)
-            throws AuthorizeException, SQLException  {
-        super.updateDSpaceObject(item, itemRest);
-
-        Context context = obtainContext();
-        if (itemRest.getWithdrawn() != item.isWithdrawn()) {
-            if (itemRest.getWithdrawn()) {
-                is.withdraw(context, item);
-            } else {
-                is.reinstate(context, item);
-            }
-        }
-        if (itemRest.getDiscoverable() != item.isDiscoverable()) {
-            item.setDiscoverable(itemRest.getDiscoverable());
-            is.update(context, item);
-        }
-    }
-
-    @Override
     public Class<ItemRest> getDomainClass() {
         return ItemRest.class;
     }

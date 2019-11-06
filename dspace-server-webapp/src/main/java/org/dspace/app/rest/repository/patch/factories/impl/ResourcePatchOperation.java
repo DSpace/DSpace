@@ -8,16 +8,17 @@
 package org.dspace.app.rest.repository.patch.factories.impl;
 
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
-import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.patch.Operation;
+import org.dspace.content.DSpaceObject;
+import org.dspace.core.Context;
 
 /**
  * The patch interface used by repository classes.
- * @param <R>
+ * @param <M>
  */
-public interface ResourcePatchOperation<R extends RestModel> {
+public interface ResourcePatchOperation<M extends DSpaceObject> {
 
-    R perform(R resource, Operation operation)
+    M perform(Context context, M resource, Operation operation)
             throws DSpaceBadRequestException;
 
 }

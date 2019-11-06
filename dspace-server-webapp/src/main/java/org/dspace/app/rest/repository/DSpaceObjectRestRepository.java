@@ -35,7 +35,7 @@ public abstract class DSpaceObjectRestRepository<M extends DSpaceObject, R exten
     final DSpaceObjectConverter<M, R> dsoConverter;
 
     @Autowired
-    ResourcePatch<R> resourcePatch;
+    ResourcePatch<M> resourcePatch;
     @Autowired
     MetadataConverter metadataConverter;
 
@@ -63,23 +63,7 @@ public abstract class DSpaceObjectRestRepository<M extends DSpaceObject, R exten
         if (dso == null) {
             throw new ResourceNotFoundException(apiCategory + "." + model + " with id: " + id + " not found");
         }
-        R dsoRest = resourcePatch.patch(findOne(id), patch.getOperations());
-        updateDSpaceObject(dso, dsoRest);
-    }
-
-    /**
-     * Applies the changes in the given rest DSpace object to the model DSpace object.
-     * The default implementation updates metadata if needed. Subclasses should extend
-     * to support updates of additional properties.
-     *
-     * @param dso the dso to apply changes to.
-     * @param dsoRest the rest representation of the new desired state.
-     */
-    protected void updateDSpaceObject(M dso, R dsoRest)
-            throws AuthorizeException, SQLException {
-        R origDsoRest = dsoConverter.fromModel(dso);
-        if (!origDsoRest.getMetadata().equals(dsoRest.getMetadata())) {
-            metadataConverter.setMetadata(obtainContext(), dso, dsoRest.getMetadata());
-        }
+        resourcePatch.patch(obtainContext(), dso, patch.getOperations());
+        dsoService.update(obtainContext(), dso);
     }
 }

@@ -370,6 +370,26 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
 
     public void delete(Context context, T dso) throws SQLException, AuthorizeException, IOException;
 
+    /**
+     * Add a single metadata field. Whether it's appended or prepended depends on index parameter.
+     * Use <code>clearDC</code> to remove values.
+     *
+     * @param context    DSpace context
+     * @param dso        DSpaceObject
+     * @param schema     the schema for the metadata field. <em>Must</em> match
+     *                   the <code>name</code> of an existing metadata schema.
+     * @param element    the metadata element name
+     * @param qualifier  the metadata qualifier, or <code>null</code> for
+     *                   unqualified
+     * @param lang       the ISO639 language code, optionally followed by an underscore
+     *                   and the ISO3166 country code. <code>null</code> means the
+     *                   value has no language (for example, a date).
+     * @param value      the value to add.
+     * @param authority  the external authority key for this value (or null)
+     * @param confidence the authority confidence (default 0)
+     * @param index      the index at which this metadata is added (0: first place, -1 for last)
+     * @throws SQLException if database error
+     */
     void addAndShiftRightMetadata(Context context, T dso, String schema, String element, String qualifier, String lang,
                                   String value, String authority, int confidence, int index) throws SQLException;
 
