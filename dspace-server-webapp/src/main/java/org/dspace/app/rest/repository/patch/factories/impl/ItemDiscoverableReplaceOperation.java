@@ -7,7 +7,6 @@
  */
 package org.dspace.app.rest.repository.patch.factories.impl;
 
-import org.apache.log4j.Logger;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.RestModel;
@@ -26,7 +25,7 @@ import org.springframework.stereotype.Component;
  *  @author Michael Spalti
  */
 @Component
-public class ItemDiscoverableReplaceOperation extends ReplacePatchOperation<ItemRest> {
+public class ItemDiscoverableReplaceOperation extends PatchOperation<ItemRest> {
 
     /**
      * Path in json body of patch that uses this operation
@@ -34,16 +33,16 @@ public class ItemDiscoverableReplaceOperation extends ReplacePatchOperation<Item
     private static final String OPERATION_PATH_DISCOVERABLE = "/discoverable";
 
     @Override
-    public ItemRest replace(ItemRest item, Operation operation) {
-
+    public ItemRest perform(ItemRest item, Operation operation) {
+        checkOperationValue(operation.getValue());
+        checkModelForExistingValue(item);
         Boolean discoverable = getBooleanOperationValue(operation.getValue());
         item.setDiscoverable(discoverable);
         return item;
 
     }
 
-    @Override
-    void checkModelForExistingValue(ItemRest resource, Operation operation) {
+    void checkModelForExistingValue(ItemRest resource) {
         if ((Object) resource.getDiscoverable() == null) {
             throw new DSpaceBadRequestException("Attempting to replace a non-existent value.");
         }

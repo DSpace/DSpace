@@ -32,8 +32,8 @@ public class ResourcePatch<R extends RestModel> {
      * Handles the patch operations. Patch implementations are provided by subclasses.
      * The default methods throw an UnprocessableEntityException.
      *
-     * @param restModel the rest resource to patch
-     * @param operations list of patch operations
+     * @param restModel     the rest resource to patch
+     * @param operations    list of patch operations
      * @throws UnprocessableEntityException
      * @throws DSpaceBadRequestException
      */
@@ -45,11 +45,17 @@ public class ResourcePatch<R extends RestModel> {
 
     }
 
+    /**
+     * Checks with all possible patch operations whether they support this operation
+     *      (based on instanceof restModel and operation.path
+     * @param restModel     the rest resource to patch
+     * @param operation     the patch operation
+     * @throws DSpaceBadRequestException
+     */
     protected void performPatchOperation(R restModel, Operation operation)
             throws DSpaceBadRequestException {
         for (PatchOperation patchOperation: patchOperations) {
             if (patchOperation.supports(restModel, operation.getPath())) {
-                System.out.println(patchOperation.getClass());
                 patchOperation.perform(restModel, operation);
                 return;
             }

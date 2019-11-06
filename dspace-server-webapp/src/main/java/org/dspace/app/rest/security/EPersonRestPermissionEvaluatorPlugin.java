@@ -14,7 +14,7 @@ import java.util.UUID;
 
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.Patch;
-import org.dspace.app.rest.repository.patch.factories.EPersonOperationFactory;
+import org.dspace.app.rest.repository.patch.factories.impl.EPersonPasswordReplaceOperation;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Constants;
@@ -37,6 +37,7 @@ import org.springframework.stereotype.Component;
 public class EPersonRestPermissionEvaluatorPlugin extends RestObjectPermissionEvaluatorPlugin {
 
     private static final Logger log = LoggerFactory.getLogger(EPersonRestPermissionEvaluatorPlugin.class);
+    public static final String OPERATION_PASSWORD_CHANGE = "/password";
 
     @Autowired
     AuthorizeService authorizeService;
@@ -105,7 +106,7 @@ public class EPersonRestPermissionEvaluatorPlugin extends RestObjectPermissionEv
          * update their own password.
          */
         for (Operation op: operations) {
-            if (!op.getPath().contentEquals(EPersonOperationFactory.OPERATION_PASSWORD_CHANGE)) {
+            if (!op.getPath().contentEquals(EPersonPasswordReplaceOperation.OPERATION_PASSWORD_CHANGE)) {
                 return false;
             }
         }
