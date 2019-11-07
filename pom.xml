@@ -938,12 +938,6 @@
                 <version>7.0-SNAPSHOT</version>
             </dependency>
             <dependency>
-                <groupId>org.dspace</groupId>
-                <artifactId>dspace-api</artifactId>
-                <type>test-jar</type>
-                <version>7.0-SNAPSHOT</version>
-            </dependency>
-            <dependency>
                 <groupId>org.dspace.modules</groupId>
                 <artifactId>additions</artifactId>
                 <version>7.0-SNAPSHOT</version>
@@ -990,14 +984,9 @@
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-server-webapp</artifactId>
-                <type>test-jar</type>
                 <version>7.0-SNAPSHOT</version>
-            </dependency>
-            <dependency>
-                <groupId>org.dspace</groupId>
-                <artifactId>dspace-server-webapp</artifactId>
+                <type>jar</type>
                 <classifier>classes</classifier>
-                <version>7.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
