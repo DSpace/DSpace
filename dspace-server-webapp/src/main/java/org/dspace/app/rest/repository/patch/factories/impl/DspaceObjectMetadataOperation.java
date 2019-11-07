@@ -2,7 +2,7 @@
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
- * <p>
+ *
  * http://www.dspace.org/license/
  */
 package org.dspace.app.rest.repository.patch.factories.impl;
@@ -19,6 +19,7 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.converter.JsonPatchConverter;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
+import org.dspace.app.rest.model.patch.CopyOperation;
 import org.dspace.app.rest.model.patch.JsonValueEvaluator;
 import org.dspace.app.rest.model.patch.MoveOperation;
 import org.dspace.app.rest.model.patch.Operation;
@@ -58,6 +59,13 @@ import org.springframework.stereotype.Component;
  *              "from": "/metadata/schema.identifier.qualifier/index"
  *              "path": "/metadata/schema.identifier.qualifier/newIndex"}]'
  *          </code>
+ *      - COPY metadata
+ *          <code>
+ *              curl -X PATCH http://${dspace.url}/api/items/<:id-item> -H "
+ *              Content-Type: application/json" -d '[{ "op": "copy",
+ *              "from": "/metadata/schema.identifier.qualifier/indexToCopyFrom"
+ *              "path": "/metadata/schema.identifier.qualifier/-"}]'
+ *          </code>
  *
  * @author Maria Verdonck (Atmire) on 30/10/2019
  */
@@ -70,6 +78,7 @@ public class DspaceObjectMetadataOperation<R extends DSpaceObject> extends Patch
      * Path in json body of patch that uses this operation
      */
     private static final String METADATA_PATH = "/metadata";
+
     private ObjectMapper objectMapper = new ObjectMapper();
     private JsonPatchConverter jsonPatchConverter = new JsonPatchConverter(objectMapper);
 
@@ -137,13 +146,18 @@ public class DspaceObjectMetadataOperation<R extends DSpaceObject> extends Patch
                             metadataValue, indexInPath, propertyOfMd, valueMdAttribute);
                     return;
                 case "move":
-                    String[] partsFrom = ((MoveOperation) operation).getFrom().split("/");
-                    String indexTo = (partsFrom.length > 3) ? partsFrom[3] : null;
-                    move(context, dso, dsoService, schema, element, qualifier, indexInPath, indexTo);
+                    String[] partsFromMove = ((MoveOperation) operation).getFrom().split("/");
+                    String indexToMoveFrom = (partsFromMove.length > 3) ? partsFromMove[3] : null;
+                    move(context, dso, dsoService, schema, element, qualifier, indexInPath, indexToMoveFrom);
+                    return;
+                case "copy":
+                    String[] partsFromCopy = ((CopyOperation) operation).getFrom().split("/");
+                    String indexToCopyFrom = (partsFromCopy.length > 3) ? partsFromCopy[3] : null;
+                    copy(context, dso, dsoService, schema, element, qualifier, indexToCopyFrom);
                     return;
                 default:
                     throw new DSpaceBadRequestException(
-                            "This operation is not supported."
+                            "This operation (" + operation.getOp() + ") is not supported."
                     );
             }
         } catch (IOException e) {
@@ -245,7 +259,6 @@ public class DspaceObjectMetadataOperation<R extends DSpaceObject> extends Patch
         if (schema == null) {
             try {
                 dsoService.clearMetadata(context, dso, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
-                // TODO How to add new md value if exists? No knowledge of seq
             } catch (SQLException e) {
                 log.error("SQLException in DspaceObjectMetadataOperation.replace trying to remove" +
                         "and replace metadata from dso.", e);
@@ -331,6 +344,35 @@ public class DspaceObjectMetadataOperation<R extends DSpaceObject> extends Patch
                     Integer.parseInt(indexFrom), Integer.parseInt(indexTo));
         } catch (SQLException e) {
             log.error("SQLException in DspaceObjectMetadataOperation.move trying to move metadata in dso.", e);
+        }
+    }
+
+    /**
+     * Copies metadata of the dso from indexFrom to new index at end of md
+     * @param context           context patch is being performed in
+     * @param dso               dso being patched
+     * @param dsoService        service doing the patch in db
+     * @param schema            schema of md field being patched
+     * @param element           element of md field being patched
+     * @param qualifier         qualifier of md field being patched
+     * @param indexToCopyFrom   index we're copying metadata from
+     */
+    private void copy(Context context, DSpaceObject dso,
+                      DSpaceObjectService dsoService, String schema, String element,
+                      String qualifier, String indexToCopyFrom) {
+        List<MetadataValue> metadataValues = dsoService.getMetadata(dso, schema, element, qualifier, Item.ANY);
+        try {
+            int indexToCopyFromInt = Integer.parseInt(indexToCopyFrom);
+            if (indexToCopyFromInt >= 0 && metadataValues.size() >indexToCopyFromInt
+                    && metadataValues.get(indexToCopyFromInt) != null) {
+                MetadataValue metadataValueToCopy = metadataValues.get(indexToCopyFromInt);
+                // Add mdv to end of md list
+                this.add(context, dso, dsoService, schema, element, qualifier, metadataValueToCopy, "-");
+            } else {
+                throw new UnprocessableEntityException("There is no metadata of this type at that index");
+            }
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("This index (" + indexToCopyFrom + ") is not valid nr", e);
         }
     }
 
