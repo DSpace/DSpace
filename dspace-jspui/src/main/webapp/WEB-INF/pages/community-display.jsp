@@ -23,6 +23,7 @@
 <%@ page import="org.dspace.services.ConfigurationService" %>
 <%@ page import="org.dspace.services.factory.DSpaceServicesFactory" %>
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
+<%@ page import="org.dspace.app.webui.servlet.MyDSpaceServlet" %>
 
 <%
     int discovery_panel_cols = 12;
@@ -61,4 +62,62 @@
             </ul>
         </div>
     </div>
+
+    <dspace:sidebar>
+        <c:if test="${addButton or editorButton}">
+        <div class="panel panel-warning">
+            <div class="panel-heading">
+                <fmt:message key="jsp.admintools"/>
+                <span class="pull-right">
+             		<dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.site-admin\")%>"><fmt:message key="jsp.adminhelp"/></dspace:popup>
+             	</span>
+            </div>
+            <div class="panel-body">
+
+                <c:if test="${editorButton}">
+                <form method="post" action="<%=request.getContextPath()%>/tools/edit-communities">
+                    <input type="hidden" name="community_id" value="${community.ID}" />
+                    <input type="hidden" name="action" value="<%=EditCommunitiesServlet.START_EDIT_COMMUNITY%>" />
+                        <%--<input type="submit" value="Edit..." />--%>
+                    <input class="btn btn-default col-md-12" type="submit" value="<fmt:message key="jsp.general.edit.button"/>" />
+                </form>
+                </c:if>
+
+                <c:if test="${addButton}">
+                <form method="post" action="<%=request.getContextPath()%>/tools/collection-wizard">
+                    <input type="hidden" name="community_id" value="${community.ID}" />
+                    <input class="btn btn-default col-md-12" type="submit" value="<fmt:message key="jsp.community-home.create1.button"/>" />
+                </form>
+
+                <form method="post" action="<%=request.getContextPath()%>/tools/edit-communities">
+                    <input type="hidden" name="action" value="<%= EditCommunitiesServlet.START_CREATE_COMMUNITY%>" />
+                    <input type="hidden" name="community_id" value="${community.ID}" />
+                        <%--<input type="submit" name="submit" value="Create Sub-community" />--%>
+                    <input class="btn btn-default col-md-12" type="submit" name="submit" value="<fmt:message key="jsp.community-home.create2.button"/>" />
+                </form>
+                </c:if>
+
+                <c:if test="${editorButton}">
+                <form method="post" action="<%=request.getContextPath()%>/mydspace">
+                    <input type="hidden" name="community_id" value="${community.ID}" />
+                    <input type="hidden" name="step" value="<%= MyDSpaceServlet.REQUEST_EXPORT_ARCHIVE %>" />
+                    <input class="btn btn-default col-md-12" type="submit" value="<fmt:message key="jsp.mydspace.request.export.community"/>" />
+                </form>
+                <form method="post" action="<%=request.getContextPath()%>/mydspace">
+                    <input type="hidden" name="community_id" value="${community.ID}" />
+                    <input type="hidden" name="step" value="<%= MyDSpaceServlet.REQUEST_MIGRATE_ARCHIVE %>" />
+                    <input class="btn btn-default col-md-12" type="submit" value="<fmt:message key="jsp.mydspace.request.export.migratecommunity"/>" />
+                </form>
+                <form method="post" action="<%=request.getContextPath()%>/dspace-admin/metadataexport">
+                    <input type="hidden" name="handle" value="${handle}" />
+                    <input class="btn btn-default col-md-12" type="submit" value="<fmt:message key="jsp.general.metadataexport.button"/>" />
+                </form>
+                </c:if>
+
+            </div>
+        </div>
+        </c:if>
+
+    </dspace:sidebar>
+
 </dspace:layout>
