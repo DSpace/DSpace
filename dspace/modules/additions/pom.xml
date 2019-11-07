@@ -154,7 +154,17 @@
                </plugin>
             </plugins>
          </build>
-
+         <dependencies>
+            <!-- When running tests, also include test classes from dspace-api
+                     (this test-jar is only built when tests are enabled). -->
+            <dependency>
+               <groupId>org.dspace</groupId>
+               <artifactId>dspace-api</artifactId>
+               <version>7.0-SNAPSHOT</version>
+               <type>test-jar</type>
+               <scope>test</scope>
+            </dependency>
+         </dependencies>
       </profile>
    </profiles>
 
@@ -187,13 +197,6 @@
          </exclusions>
       </dependency>
 
-      <dependency>
-         <groupId>org.dspace</groupId>
-         <artifactId>dspace-api</artifactId>
-         <version>7.0-SNAPSHOT</version>
-         <type>test-jar</type>
-         <scope>test</scope>
-      </dependency>
       <!-- Keep jmockit before junit -->
       <dependency>
          <groupId>org.jmockit</groupId>
