@@ -2,7 +2,7 @@
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
- *
+ * <p>
  * http://www.dspace.org/license/
  */
 package org.dspace.app.rest.repository.patch.factories.impl;
@@ -111,12 +111,17 @@ public class DspaceObjectMetadataOperation<R extends DSpaceObject> extends Patch
 
         try {
             MetadataValue metadataValue = null;
+            String valueMdAttribute = null;
             if (operation.getValue() != null) {
-                JsonNode valueNode = ((JsonValueEvaluator) operation.getValue()).getValueNode();
-                if (valueNode.isArray()) {
-                    metadataValue = objectMapper.treeToValue(valueNode.get(0), MetadataValue.class);
+                if (operation.getValue() instanceof String) {
+                    valueMdAttribute = (String) operation.getValue();
                 } else {
-                    metadataValue = objectMapper.treeToValue(valueNode, MetadataValue.class);
+                    JsonNode valueNode = ((JsonValueEvaluator) operation.getValue()).getValueNode();
+                    if (valueNode.isArray()) {
+                        metadataValue = objectMapper.treeToValue(valueNode.get(0), MetadataValue.class);
+                    } else {
+                        metadataValue = objectMapper.treeToValue(valueNode, MetadataValue.class);
+                    }
                 }
             }
 
@@ -129,10 +134,10 @@ public class DspaceObjectMetadataOperation<R extends DSpaceObject> extends Patch
                     return;
                 case "replace":
                     replace(context, dso, dsoService, schema, element, qualifier,
-                            metadataValue, indexInPath, propertyOfMd);
+                            metadataValue, indexInPath, propertyOfMd, valueMdAttribute);
                     return;
                 case "move":
-                    String[] partsFrom = ((MoveOperation)operation).getFrom().split("/");
+                    String[] partsFrom = ((MoveOperation) operation).getFrom().split("/");
                     String indexTo = (partsFrom.length > 3) ? partsFrom[3] : null;
                     move(context, dso, dsoService, schema, element, qualifier, indexInPath, indexTo);
                     return;
@@ -185,8 +190,8 @@ public class DspaceObjectMetadataOperation<R extends DSpaceObject> extends Patch
      * @param index             index at where we want to delete metadata
      */
     private void remove(Context context, DSpaceObject dso,
-                     DSpaceObjectService dsoService, String schema, String element,
-                     String qualifier, String index) {
+                        DSpaceObjectService dsoService, String schema, String element,
+                        String qualifier, String index) {
         if (index == null) {
             //remove all metadata of this type
             try {
@@ -233,9 +238,9 @@ public class DspaceObjectMetadataOperation<R extends DSpaceObject> extends Patch
      * @param qualifier         qualifier of md field being patched
      * @param metadataValue     value of md element
      */
-    private void replace(Context context, DSpaceObject dso,
-                     DSpaceObjectService dsoService, String schema, String element,
-                     String qualifier, MetadataValue metadataValue, String index, String propertyOfMd) {
+    private void replace(Context context, DSpaceObject dso, DSpaceObjectService dsoService, String schema,
+                         String element, String qualifier, MetadataValue metadataValue, String index,
+                         String propertyOfMd, String valueMdAttribute) {
         // replace entire set of metadata
         if (schema == null) {
             try {
@@ -286,22 +291,23 @@ public class DspaceObjectMetadataOperation<R extends DSpaceObject> extends Patch
                     // Alter only asked propertyOfMd
                     MetadataValue existingMdv = metadataValues.get(indexInt);
                     if (propertyOfMd.equals("authority")) {
-                        existingMdv.setAuthority(metadataValue.getAuthority());
+                        existingMdv.setAuthority(valueMdAttribute);
                     }
                     if (propertyOfMd.equals("confidence")) {
-                        existingMdv.setConfidence(metadataValue.getConfidence());
+                        existingMdv.setConfidence(Integer.valueOf(valueMdAttribute));
                     }
                     if (propertyOfMd.equals("language")) {
-                        existingMdv.setLanguage(metadataValue.getLanguage());
+                        existingMdv.setLanguage(valueMdAttribute);
                     }
                     if (propertyOfMd.equals("value")) {
-                        existingMdv.setValue(metadataValue.getValue());
+                        existingMdv.setValue(valueMdAttribute);
                     }
                 } else {
                     throw new UnprocessableEntityException("There is no metadata of this type at that index");
                 }
             } catch (NumberFormatException e) {
-                throw new IllegalArgumentException("This index (" + index + ") is not valid nr", e);
+                throw new IllegalArgumentException("Not all numbers are valid numbers. " +
+                        "(Index and confidence should be nr)", e);
             }
         }
     }
@@ -318,8 +324,8 @@ public class DspaceObjectMetadataOperation<R extends DSpaceObject> extends Patch
      * @param indexTo         index we're moving metadata to
      */
     private void move(Context context, DSpaceObject dso,
-                     DSpaceObjectService dsoService, String schema, String element,
-                     String qualifier, String indexFrom, String indexTo) {
+                      DSpaceObjectService dsoService, String schema, String element,
+                      String qualifier, String indexFrom, String indexTo) {
         try {
             dsoService.moveMetadata(context, dso, schema, element, qualifier,
                     Integer.parseInt(indexFrom), Integer.parseInt(indexTo));
