@@ -42,6 +42,7 @@ import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
@@ -224,18 +225,19 @@ public class BundleRestRepository extends DSpaceObjectRestRepository<Bundle, Bun
      *            the id of the bundle to delete
      */
     @Override
-    protected void delete(Context context, UUID id) {
+    @PreAuthorize("hasPermission(#id, 'BUNDLE', 'DELETE')")
+    protected void delete(Context context, UUID id) throws AuthorizeException {
         Bundle bundleToDelete = null;
         try {
             bundleToDelete = bundleService.find(context, id);
+            if (bundleToDelete == null) {
+                throw new ResourceNotFoundException("Bundle with id: " + id + " not found");
+            }
         } catch (SQLException e) {
             throw new RuntimeException("Can't find a bundle with id: " + id, e);
         }
         try {
             bundleService.delete(context, bundleToDelete);
-        } catch (AuthorizeException e) {
-            throw new AccessDeniedException("You do not have the right access rights to delete this bundle " +
-                    "with id: " + id, e);
         } catch (IOException | SQLException e) {
             throw new RuntimeException("Something went wrong trying to delete bundle with id: " + id, e);
         }
