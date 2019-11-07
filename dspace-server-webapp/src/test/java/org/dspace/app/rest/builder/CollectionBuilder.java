@@ -131,7 +131,6 @@ public class CollectionBuilder extends AbstractDSpaceObjectBuilder<Collection> {
     @Override
     public void cleanup() throws Exception {
         deleteWorkflowGroups(collection);
-        //collectionService.removeAdministrators(context, collection);
         delete(collection);
     }
 

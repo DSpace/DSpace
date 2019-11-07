@@ -18,7 +18,6 @@ import java.util.List;
 
 import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
-import org.dspace.app.rest.builder.GroupBuilder;
 import org.dspace.app.rest.builder.ItemBuilder;
 import org.dspace.app.rest.builder.RelationshipBuilder;
 import org.dspace.app.rest.test.AbstractEntityIntegrationTest;
@@ -106,7 +105,6 @@ public class RelationshipDeleteRestRepositoryIT extends AbstractEntityIntegratio
             collectionAdmin = ePersonService.findByEmail(context, "collectionAdminTest@email.com");
             if (collectionAdmin != null) {
                 ePersonService.delete(context, collectionAdmin);
-                context.commit();
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -455,12 +453,64 @@ public class RelationshipDeleteRestRepositoryIT extends AbstractEntityIntegratio
     }
 
     @Test
+    public void deleteItemCopyVirtualMetadataInvalid() throws Exception {
+        initPersonProjectPublication();
+
+        getClient(adminAuthToken).perform(
+            delete("/api/core/items/" + personItem.getID()
+                + "?copyVirtualMetadata=" + publicationPersonRelationshipType.getID()
+                + "&copyVirtualMetadata=" + personProjectRelationshipType.getID()
+                + "&copyVirtualMetadata=SomeThingWrong"))
+            .andExpect(status().isBadRequest());
+
+        publicationItem = itemService.find(context, publicationItem.getID());
+        List<MetadataValue> publicationAuthorList =
+            itemService.getMetadata(publicationItem, "dc", "contributor", "author", Item.ANY);
+        assertThat(publicationAuthorList.size(), equalTo(1));
+        assertThat(publicationAuthorList.get(0).getValue(), equalTo("Smith, Donald"));
+        assertThat(publicationAuthorList.get(0).getAuthority(), startsWith("virtual::"));
+        List<MetadataValue> publicationRelationships = itemService.getMetadata(publicationItem,
+            "relation", "isAuthorOfPublication", Item.ANY, Item.ANY);
+        assertThat(publicationRelationships.size(), equalTo(1));
+
+        projectItem = itemService.find(context, projectItem.getID());
+        List<MetadataValue> projectAuthorList =
+            itemService.getMetadata(projectItem, "project", "contributor", "author", Item.ANY);
+        assertThat(projectAuthorList.size(), equalTo(1));
+        assertThat(projectAuthorList.get(0).getValue(), equalTo("Smith, Donald"));
+        assertThat(projectAuthorList.get(0).getAuthority(), startsWith("virtual::"));
+        List<MetadataValue> projectRelationships = itemService.getMetadata(projectItem,
+            "relation", "isPersonOfProject", Item.ANY, Item.ANY);
+        assertThat(projectRelationships.size(), equalTo(1));
+    }
+
+    @Test
     public void deleteItemCopyVirtualMetadataAllNoPermissions() throws Exception {
         initPersonProjectPublication();
 
         getClient(getAuthToken(eperson.getEmail(), password)).perform(
             delete("/api/core/items/" + personItem.getID()))
             .andExpect(status().isForbidden());
+
+        publicationItem = itemService.find(context, publicationItem.getID());
+        List<MetadataValue> publicationAuthorList =
+            itemService.getMetadata(publicationItem, "dc", "contributor", "author", Item.ANY);
+        assertThat(publicationAuthorList.size(), equalTo(1));
+        assertThat(publicationAuthorList.get(0).getValue(), equalTo("Smith, Donald"));
+        assertThat(publicationAuthorList.get(0).getAuthority(), startsWith("virtual::"));
+        List<MetadataValue> publicationRelationships = itemService.getMetadata(publicationItem,
+            "relation", "isAuthorOfPublication", Item.ANY, Item.ANY);
+        assertThat(publicationRelationships.size(), equalTo(1));
+
+        projectItem = itemService.find(context, projectItem.getID());
+        List<MetadataValue> projectAuthorList =
+            itemService.getMetadata(projectItem, "project", "contributor", "author", Item.ANY);
+        assertThat(projectAuthorList.size(), equalTo(1));
+        assertThat(projectAuthorList.get(0).getValue(), equalTo("Smith, Donald"));
+        assertThat(projectAuthorList.get(0).getAuthority(), startsWith("virtual::"));
+        List<MetadataValue> projectRelationships = itemService.getMetadata(projectItem,
+            "relation", "isPersonOfProject", Item.ANY, Item.ANY);
+        assertThat(projectRelationships.size(), equalTo(1));
     }
 
     @Test
@@ -470,6 +520,26 @@ public class RelationshipDeleteRestRepositoryIT extends AbstractEntityIntegratio
         getClient(getAuthToken(collectionAdmin.getEmail(), password)).perform(
             delete("/api/core/items/" + personItem.getID()))
             .andExpect(status().isForbidden());
+
+        publicationItem = itemService.find(context, publicationItem.getID());
+        List<MetadataValue> publicationAuthorList =
+            itemService.getMetadata(publicationItem, "dc", "contributor", "author", Item.ANY);
+        assertThat(publicationAuthorList.size(), equalTo(1));
+        assertThat(publicationAuthorList.get(0).getValue(), equalTo("Smith, Donald"));
+        assertThat(publicationAuthorList.get(0).getAuthority(), startsWith("virtual::"));
+        List<MetadataValue> publicationRelationships = itemService.getMetadata(publicationItem,
+            "relation", "isAuthorOfPublication", Item.ANY, Item.ANY);
+        assertThat(publicationRelationships.size(), equalTo(1));
+
+        projectItem = itemService.find(context, projectItem.getID());
+        List<MetadataValue> projectAuthorList =
+            itemService.getMetadata(projectItem, "project", "contributor", "author", Item.ANY);
+        assertThat(projectAuthorList.size(), equalTo(1));
+        assertThat(projectAuthorList.get(0).getValue(), equalTo("Smith, Donald"));
+        assertThat(projectAuthorList.get(0).getAuthority(), startsWith("virtual::"));
+        List<MetadataValue> projectRelationships = itemService.getMetadata(projectItem,
+            "relation", "isPersonOfProject", Item.ANY, Item.ANY);
+        assertThat(projectRelationships.size(), equalTo(1));
     }
 
     @Test
@@ -480,5 +550,25 @@ public class RelationshipDeleteRestRepositoryIT extends AbstractEntityIntegratio
             delete("/api/core/items/" + personItem.getID()
                 + "?copyVirtualMetadata=" + publicationPersonRelationshipType.getID()))
             .andExpect(status().isForbidden());
+
+        publicationItem = itemService.find(context, publicationItem.getID());
+        List<MetadataValue> publicationAuthorList =
+            itemService.getMetadata(publicationItem, "dc", "contributor", "author", Item.ANY);
+        assertThat(publicationAuthorList.size(), equalTo(1));
+        assertThat(publicationAuthorList.get(0).getValue(), equalTo("Smith, Donald"));
+        assertThat(publicationAuthorList.get(0).getAuthority(), startsWith("virtual::"));
+        List<MetadataValue> publicationRelationships = itemService.getMetadata(publicationItem,
+            "relation", "isAuthorOfPublication", Item.ANY, Item.ANY);
+        assertThat(publicationRelationships.size(), equalTo(1));
+
+        projectItem = itemService.find(context, projectItem.getID());
+        List<MetadataValue> projectAuthorList =
+            itemService.getMetadata(projectItem, "project", "contributor", "author", Item.ANY);
+        assertThat(projectAuthorList.size(), equalTo(1));
+        assertThat(projectAuthorList.get(0).getValue(), equalTo("Smith, Donald"));
+        assertThat(projectAuthorList.get(0).getAuthority(), startsWith("virtual::"));
+        List<MetadataValue> projectRelationships = itemService.getMetadata(projectItem,
+            "relation", "isPersonOfProject", Item.ANY, Item.ANY);
+        assertThat(projectRelationships.size(), equalTo(1));
     }
 }
