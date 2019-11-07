@@ -10,11 +10,10 @@ package org.dspace.app.rest.repository;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 
@@ -64,7 +63,9 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
 
     private static final Logger log = Logger.getLogger(ItemRestRepository.class);
 
-    private final ItemService is;
+    private static final String[] COPYVIRTUAL_ALL = {"all"};
+    private static final String[] COPYVIRTUAL_CONFIGURED = {"configured"};
+    private static final String REQUESTPARAMETER_COPYVIRTUALMETADATA = "copyVirtualMetadata";
 
     @Autowired
     MetadataConverter metadataConverter;
@@ -94,7 +95,6 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
                               ItemConverter dsoConverter,
                               ItemPatch dsoPatch) {
         super(dsoService, dsoConverter, dsoPatch);
-        this.is = dsoService;
     }
 
     @Override
@@ -102,7 +102,7 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
     public ItemRest findOne(Context context, UUID id) {
         Item item = null;
         try {
-            item = is.find(context, id);
+            item = itemService.find(context, id);
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -119,8 +119,8 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
         List<Item> items = new ArrayList<Item>();
         int total = 0;
         try {
-            total = is.countTotal(context);
-            it = is.findAll(context, pageable.getPageSize(), pageable.getOffset());
+            total = itemService.countTotal(context);
+            it = itemService.findAll(context, pageable.getPageSize(), pageable.getOffset());
             while (it.hasNext()) {
                 Item i = it.next();
                 items.add(i);
@@ -147,14 +147,14 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
         Context context = obtainContext();
         if (itemRest.getWithdrawn() != item.isWithdrawn()) {
             if (itemRest.getWithdrawn()) {
-                is.withdraw(context, item);
+                itemService.withdraw(context, item);
             } else {
-                is.reinstate(context, item);
+                itemService.reinstate(context, item);
             }
         }
         if (itemRest.getDiscoverable() != item.isDiscoverable()) {
             item.setDiscoverable(itemRest.getDiscoverable());
-            is.update(context, item);
+            itemService.update(context, item);
         }
     }
 
@@ -172,16 +172,17 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
     @PreAuthorize("hasAuthority('ADMIN')")
     protected void delete(Context context, UUID id) throws AuthorizeException {
         String[] copyVirtual =
-            requestService.getCurrentRequest().getServletRequest().getParameterValues("copyVirtualMetadata");
+            requestService.getCurrentRequest().getServletRequest()
+                .getParameterValues(REQUESTPARAMETER_COPYVIRTUALMETADATA);
 
         Item item = null;
         try {
-            item = is.find(context, id);
+            item = itemService.find(context, id);
             if (item == null) {
                 throw new ResourceNotFoundException(ItemRest.CATEGORY + "." + ItemRest.NAME +
                                                         " with id: " + id + " not found");
             }
-            if (is.isInProgressSubmission(context, item)) {
+            if (itemService.isInProgressSubmission(context, item)) {
                 throw new UnprocessableEntityException("The item cannot be deleted. "
                         + "It's part of a in-progress submission.");
             }
@@ -194,7 +195,7 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
         }
         try {
             deleteMultipleRelationshipsCopyVirtualMetadata(context, copyVirtual, item);
-            is.delete(context, item);
+            itemService.delete(context, item);
         } catch (SQLException | IOException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -203,21 +204,31 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
     private void deleteMultipleRelationshipsCopyVirtualMetadata(Context context, String[] copyVirtual, Item item)
         throws SQLException, AuthorizeException {
 
-        if (copyVirtual == null) {
+        if (copyVirtual == null || copyVirtual.length == 0) {
+            // Don't delete nor copy any metadata here if the "copyVirtualMetadata" parameter wasn't passed. The
+            // relationships not deleted in this method will be deleted implicitly by the this.delete() method
+            // anyway.
             return;
         }
-        if (copyVirtual.length == 1 && StringUtils.equals("all", copyVirtual[0])) {
+        if (Objects.deepEquals(copyVirtual, COPYVIRTUAL_ALL)) {
+            // Option 1: Copy all virtual metadata of this item to its related items. Iterate over all of the item's
+            //           relationships and copy their data.
             for (Relationship relationship : relationshipService.findByItem(context, item)) {
                 deleteRelationshipCopyVirtualMetadata(item, relationship);
             }
-        } else if (copyVirtual.length == 1 && StringUtils.equals("configured", copyVirtual[0])) {
+        } else if (Objects.deepEquals(copyVirtual, COPYVIRTUAL_CONFIGURED)) {
+            // Option 2: Use a configuration value to determine if virtual metadata needs to be copied. Iterate over all
+            //           of the item's relationships and copy their data depending on the
+            //           configuration.
             for (Relationship relationship : relationshipService.findByItem(context, item)) {
                 relationshipService.delete(obtainContext(), relationship);
             }
-        } else if (copyVirtual.length > 0) {
-            List<Integer> relationshipIds =
-                Arrays.stream(copyVirtual).filter(StringUtils::isNumeric).collect(Collectors.toList())
-                    .stream().map(Integer::parseInt).collect(Collectors.toList());
+        } else {
+            // Option 3: Copy the virtual metadata of selected types of this item to its related items. The copyVirtual
+            //           array should only contain numeric values at this point. These values are used to select the
+            //           types. Iterate over all selected types and copy the corresponding values to this item's
+            //           relatives.
+            List<Integer> relationshipIds = parseVirtualMetadataTypes(copyVirtual);
             for (Integer relationshipId : relationshipIds) {
                 RelationshipType relationshipType = relationshipTypeService.find(context, relationshipId);
                 for (Relationship relationship : relationshipService
@@ -227,6 +238,19 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
                 }
             }
         }
+    }
+
+    private List<Integer> parseVirtualMetadataTypes(String[] copyVirtual) {
+        List<Integer> types = new ArrayList<>();
+        for (String typeString: copyVirtual) {
+            if (!StringUtils.isNumeric(typeString)) {
+                throw new DSpaceBadRequestException("parameter " + REQUESTPARAMETER_COPYVIRTUALMETADATA
+                    + " should only contain a single value '" + COPYVIRTUAL_ALL[0] + "', '" + COPYVIRTUAL_CONFIGURED[0]
+                    + "' or a list of numbers.");
+            }
+            types.add(Integer.parseInt(typeString));
+        }
+        return types;
     }
 
     private void deleteRelationshipCopyVirtualMetadata(Item itemToDelete, Relationship relationshipToDelete)
