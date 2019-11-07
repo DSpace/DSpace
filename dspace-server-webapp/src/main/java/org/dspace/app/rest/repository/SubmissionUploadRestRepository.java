@@ -12,7 +12,6 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
-import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.model.AccessConditionOptionRest;
 import org.dspace.app.rest.model.SubmissionUploadRest;
 import org.dspace.app.rest.projection.Projection;
@@ -57,9 +56,6 @@ public class SubmissionUploadRestRepository extends DSpaceRestRepository<Submiss
 
     @Autowired
     GroupService groupService;
-
-    @Autowired
-    ConverterService converter;
 
     DateMathParser dateMathParser = new DateMathParser();
 

@@ -14,7 +14,6 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
-import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.model.BrowseIndexRest;
 import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.projection.Projection;
@@ -31,7 +30,6 @@ import org.dspace.sort.SortException;
 import org.dspace.sort.SortOption;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -47,8 +45,6 @@ import org.springframework.stereotype.Component;
 @Component(BrowseIndexRest.CATEGORY + "." + BrowseIndexRest.NAME + "." + BrowseIndexRest.ITEMS)
 public class BrowseItemLinkRepository extends AbstractDSpaceRestRepository
     implements LinkRestRepository {
-    @Autowired
-    ConverterService converter;
 
     @Autowired
     ScopeResolver scopeResolver;
@@ -153,9 +149,7 @@ public class BrowseItemLinkRepository extends AbstractDSpaceRestRepository
             tmpResult.add((Item) bb);
         }
 
-        Page<ItemRest> page = new PageImpl<Item>(tmpResult, pageResultInfo, binfo.getTotal())
-                .map((object) -> converter.toRest(object, projection));
-        return page;
+        return converter.toRestPage(tmpResult, pageResultInfo, binfo.getTotal(), projection);
     }
 
     @Override

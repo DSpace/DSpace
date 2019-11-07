@@ -14,7 +14,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.converter.BrowseEntryConverter;
-import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.model.BrowseEntryRest;
 import org.dspace.app.rest.model.BrowseIndexRest;
 import org.dspace.app.rest.projection.Projection;
@@ -44,9 +43,6 @@ import org.springframework.stereotype.Component;
 @Component(BrowseIndexRest.CATEGORY + "." + BrowseIndexRest.NAME + "." + BrowseIndexRest.ENTRIES)
 public class BrowseEntryLinkRepository extends AbstractDSpaceRestRepository
     implements LinkRestRepository {
-
-    @Autowired
-    ConverterService converter;
 
     @Autowired
     BrowseEntryConverter browseEntryConverter;

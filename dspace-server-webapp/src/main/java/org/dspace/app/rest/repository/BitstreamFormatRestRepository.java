@@ -15,7 +15,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.BitstreamFormatRest;
@@ -43,14 +42,6 @@ public class BitstreamFormatRestRepository extends DSpaceRestRepository<Bitstrea
     @Autowired
     BitstreamFormatService bitstreamFormatService;
 
-    @Autowired
-    ConverterService converter;
-
-
-    public BitstreamFormatRestRepository() {
-        System.out.println("Repository initialized by Spring");
-    }
-
     @Override
     public BitstreamFormatRest findOne(Context context, Integer id) {
         BitstreamFormat bit = null;
@@ -67,16 +58,12 @@ public class BitstreamFormatRestRepository extends DSpaceRestRepository<Bitstrea
 
     @Override
     public Page<BitstreamFormatRest> findAll(Context context, Pageable pageable) {
-        List<BitstreamFormat> bit = null;
         try {
-            bit = bitstreamFormatService.findAll(context);
+            List<BitstreamFormat> bit = bitstreamFormatService.findAll(context);
+            return converter.toRestPage(utils.getPage(bit, pageable), utils.obtainProjection(true));
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Projection projection = utils.obtainProjection(true);
-        Page<BitstreamFormatRest> page = utils.getPage(bit, pageable)
-                .map((object) -> converter.toRest(object, projection));
-        return page;
     }
 
     @Override

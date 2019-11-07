@@ -9,7 +9,6 @@ package org.dspace.app.rest.repository;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import javax.servlet.ServletInputStream;
@@ -33,7 +32,6 @@ import org.dspace.content.service.CommunityService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -138,37 +136,25 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
 
     @Override
     public Page<CommunityRest> findAll(Context context, Pageable pageable) {
-        List<Community> it = null;
-        List<Community> communities = new ArrayList<Community>();
-        int total = 0;
         try {
-            total = cs.countTotal(context);
-            it = cs.findAll(context, pageable.getPageSize(), pageable.getOffset());
-            for (Community c : it) {
-                communities.add(c);
-            }
+            long total = cs.countTotal(context);
+            List<Community> communities = cs.findAll(context, pageable.getPageSize(), pageable.getOffset());
+            return converter.toRestPage(communities, pageable, total, utils.obtainProjection(true));
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Projection projection = utils.obtainProjection(true);
-        Page<CommunityRest> page = new PageImpl<>(communities, pageable, total)
-                .map((object) -> converter.toRest(object, projection));
-        return page;
     }
 
     // TODO: Add methods in dspace api to support pagination of top level
     // communities
     @SearchRestMethod(name = "top")
     public Page<CommunityRest> findAllTop(Pageable pageable) {
-        List<Community> topCommunities = null;
         try {
-            topCommunities = cs.findAllTop(obtainContext());
+            List<Community> communities = cs.findAllTop(obtainContext());
+            return converter.toRestPage(utils.getPage(communities, pageable), utils.obtainProjection(true));
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<CommunityRest> page = utils.getPage(topCommunities, pageable)
-                .map((object) -> converter.toRest(object, utils.obtainProjection()));
-        return page;
     }
 
     // TODO: add method in dspace api to support direct query for subcommunities
@@ -177,20 +163,17 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
     public Page<CommunityRest> findSubCommunities(@Parameter(value = "parent", required = true) UUID parentCommunity,
             Pageable pageable) {
         Context context = obtainContext();
-        List<Community> subCommunities = new ArrayList<Community>();
         try {
             Community community = cs.find(context, parentCommunity);
             if (community == null) {
                 throw new ResourceNotFoundException(
                     CommunityRest.CATEGORY + "." + CommunityRest.NAME + " with id: " + parentCommunity + " not found");
             }
-            subCommunities = community.getSubcommunities();
+            List<Community> subCommunities = community.getSubcommunities();
+            return converter.toRestPage(utils.getPage(subCommunities, pageable), utils.obtainProjection(true));
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<CommunityRest> page = utils.getPage(subCommunities, pageable)
-                .map((object) -> converter.toRest(object, utils.obtainProjection()));
-        return page;
     }
 
     @Override

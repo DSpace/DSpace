@@ -10,9 +10,7 @@ package org.dspace.app.rest.repository;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.model.RelationshipTypeRest;
-import org.dspace.app.rest.projection.Projection;
 import org.dspace.content.RelationshipType;
 import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.core.Context;
@@ -30,9 +28,6 @@ public class RelationshipTypeRestRepository extends DSpaceRestRepository<Relatio
     @Autowired
     private RelationshipTypeService relationshipTypeService;
 
-    @Autowired
-    private ConverterService converter;
-
     @Override
     public RelationshipTypeRest findOne(Context context, Integer integer) {
         try {
@@ -44,16 +39,12 @@ public class RelationshipTypeRestRepository extends DSpaceRestRepository<Relatio
 
     @Override
     public Page<RelationshipTypeRest> findAll(Context context, Pageable pageable) {
-        List<RelationshipType> relationshipTypeList = null;
         try {
-            relationshipTypeList = relationshipTypeService.findAll(context);
+            List<RelationshipType> relationshipTypes = relationshipTypeService.findAll(context);
+            return converter.toRestPage(utils.getPage(relationshipTypes, pageable), utils.obtainProjection(true));
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Projection projection = utils.obtainProjection(true);
-        Page<RelationshipTypeRest> page = utils.getPage(relationshipTypeList, pageable)
-                .map((object) -> converter.toRest(object, projection));
-        return page;
     }
 
     @Override

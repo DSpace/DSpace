@@ -40,7 +40,6 @@ import org.dspace.core.Context;
 import org.dspace.util.UUIDUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -100,21 +99,17 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
     @Override
     @PreAuthorize("hasAuthority('ADMIN')")
     public Page<ItemRest> findAll(Context context, Pageable pageable) {
-        Iterator<Item> it = null;
-        List<Item> items = new ArrayList<Item>();
-        int total = 0;
         try {
-            total = is.countTotal(context);
-            it = is.findAll(context, pageable.getPageSize(), pageable.getOffset());
+            long total = is.countTotal(context);
+            Iterator<Item> it = is.findAll(context, pageable.getPageSize(), pageable.getOffset());
+            List<Item> items = new ArrayList<>();
             while (it.hasNext()) {
-                Item i = it.next();
-                items.add(i);
+                items.add(it.next());
             }
+            return converter.toRestPage(items, pageable, total, utils.obtainProjection(true));
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Projection projection = utils.obtainProjection(true);
-        return new PageImpl<>(items, pageable, total).map((object) -> converter.toRest(object, projection));
     }
 
     @Override

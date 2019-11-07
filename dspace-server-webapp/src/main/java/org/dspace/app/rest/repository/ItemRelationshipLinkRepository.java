@@ -13,7 +13,6 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletRequest;
 
-import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.RelationshipRest;
 import org.dspace.app.rest.projection.Projection;
@@ -24,7 +23,6 @@ import org.dspace.content.service.RelationshipService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
@@ -42,9 +40,6 @@ public class ItemRelationshipLinkRepository extends AbstractDSpaceRestRepository
     @Autowired
     ItemService itemService;
 
-    @Autowired
-    ConverterService converter;
-
     //@PreAuthorize("hasPermission(#itemId, 'ITEM', 'READ')")
     public Page<RelationshipRest> getItemRelationships(@Nullable HttpServletRequest request,
                                                        UUID itemId,
@@ -61,8 +56,7 @@ public class ItemRelationshipLinkRepository extends AbstractDSpaceRestRepository
             Integer offset = pageable == null ? null : pageable.getOffset();
             int total = relationshipService.countByItem(context, item);
             List<Relationship> relationships = relationshipService.findByItem(context, item, limit, offset);
-            return new PageImpl<>(relationships, pageable, total)
-                    .map((object) -> converter.toRest(object, projection));
+            return converter.toRestPage(relationships, pageable, total, projection);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

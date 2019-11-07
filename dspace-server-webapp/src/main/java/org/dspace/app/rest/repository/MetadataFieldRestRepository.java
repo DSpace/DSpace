@@ -21,7 +21,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
-import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.MetadataFieldRest;
@@ -54,12 +53,6 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
     @Autowired
     MetadataSchemaService metadataSchemaService;
 
-    @Autowired
-    ConverterService converter;
-
-    public MetadataFieldRestRepository() {
-    }
-
     @Override
     public MetadataFieldRest findOne(Context context, Integer id) {
         MetadataField metadataField = null;
@@ -76,36 +69,28 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
 
     @Override
     public Page<MetadataFieldRest> findAll(Context context, Pageable pageable) {
-        List<MetadataField> metadataField = null;
         try {
-            metadataField = metadataFieldService.findAll(context);
+            List<MetadataField> metadataFields = metadataFieldService.findAll(context);
+            return converter.toRestPage(utils.getPage(metadataFields, pageable), utils.obtainProjection(true));
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Projection projection = utils.obtainProjection(true);
-        Page<MetadataFieldRest> page = utils.getPage(metadataField, pageable)
-                .map((object) -> converter.toRest(object, projection));
-        return page;
     }
 
     @SearchRestMethod(name = "bySchema")
     public Page<MetadataFieldRest> findBySchema(@Parameter(value = "schema", required = true) String schemaName,
                                                 Pageable pageable) {
-        Context context = obtainContext();
-        List<MetadataField> metadataFields = null;
         try {
+            Context context = obtainContext();
             MetadataSchema schema = metadataSchemaService.find(context, schemaName);
             if (schema == null) {
                 return null;
             }
-            metadataFields = metadataFieldService.findAllInSchema(context, schema);
+            List<MetadataField> metadataFields = metadataFieldService.findAllInSchema(context, schema);
+            return converter.toRestPage(utils.getPage(metadataFields, pageable), utils.obtainProjection(true));
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Projection projection = utils.obtainProjection(true);
-        Page<MetadataFieldRest> page = utils.getPage(metadataFields, pageable)
-                .map((object) -> converter.toRest(object, projection));
-        return page;
     }
 
     @Override

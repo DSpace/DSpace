@@ -8,14 +8,13 @@
 package org.dspace.app.rest.repository;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
 import org.dspace.app.rest.model.SiteRest;
 import org.dspace.app.rest.model.patch.Patch;
-import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.repository.patch.DSpaceObjectPatch;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Site;
@@ -23,7 +22,6 @@ import org.dspace.content.service.SiteService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
@@ -61,17 +59,12 @@ public class SiteRestRepository extends DSpaceObjectRestRepository<Site, SiteRes
 
     @Override
     public Page<SiteRest> findAll(Context context, Pageable pageable) {
-        List<Site> sites = new ArrayList<Site>();
-        int total = 1;
         try {
-            sites.add(sitesv.findSite(context));
+            List<Site> sites = Arrays.asList(sitesv.findSite(context));
+            return converter.toRestPage(sites, pageable, 1L, utils.obtainProjection(true));
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Projection projection = utils.obtainProjection(true);
-        Page<SiteRest> page = new PageImpl<Site>(sites, pageable, total)
-                .map((object) -> converter.toRest(object, projection));
-        return page;
     }
 
     @Override

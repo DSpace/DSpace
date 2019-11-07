@@ -7,18 +7,14 @@
  */
 package org.dspace.app.rest.repository;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.model.BrowseIndexRest;
-import org.dspace.app.rest.projection.Projection;
 import org.dspace.browse.BrowseException;
 import org.dspace.browse.BrowseIndex;
 import org.dspace.core.Context;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
@@ -29,9 +25,6 @@ import org.springframework.stereotype.Component;
  */
 @Component(BrowseIndexRest.CATEGORY + "." + BrowseIndexRest.NAME)
 public class BrowseIndexRestRepository extends DSpaceRestRepository<BrowseIndexRest, String> {
-
-    @Autowired
-    ConverterService converter;
 
     @Override
     public BrowseIndexRest findOne(Context context, String name) {
@@ -50,22 +43,12 @@ public class BrowseIndexRestRepository extends DSpaceRestRepository<BrowseIndexR
 
     @Override
     public Page<BrowseIndexRest> findAll(Context context, Pageable pageable) {
-        List<BrowseIndexRest> it = null;
-        List<BrowseIndex> indexesList = new ArrayList<BrowseIndex>();
-        int total = 0;
         try {
-            BrowseIndex[] indexes = BrowseIndex.getBrowseIndices();
-            total = indexes.length;
-            for (BrowseIndex bix : indexes) {
-                indexesList.add(bix);
-            }
+            List<BrowseIndex> indexes = Arrays.asList(BrowseIndex.getBrowseIndices());
+            return converter.toRestPage(indexes, pageable, indexes.size(), utils.obtainProjection(true));
         } catch (BrowseException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Projection projection = utils.obtainProjection(true);
-        Page<BrowseIndexRest> page = new PageImpl<>(indexesList, pageable, total)
-                .map((object) -> converter.toRest(object, projection));
-        return page;
     }
 
     @Override

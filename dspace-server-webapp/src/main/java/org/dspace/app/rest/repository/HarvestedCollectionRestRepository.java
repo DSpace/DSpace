@@ -17,7 +17,6 @@ import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.converter.HarvestedCollectionConverter;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.HarvestTypeEnum;
@@ -45,9 +44,6 @@ public class HarvestedCollectionRestRepository extends AbstractDSpaceRestReposit
 
     @Autowired
     HarvestedCollectionConverter harvestedCollectionConverter;
-
-    @Autowired
-    ConverterService converter;
 
     public HarvestedCollectionRest findOne(Collection collection) throws SQLException {
         Context context = obtainContext();

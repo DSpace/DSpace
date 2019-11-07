@@ -9,7 +9,6 @@ package org.dspace.app.rest.repository;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import javax.servlet.ServletInputStream;
@@ -19,7 +18,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
-import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
@@ -38,7 +36,6 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -57,9 +54,6 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
 
     @Autowired
     CommunityService communityService;
-
-    @Autowired
-    ConverterService converter;
 
     @Autowired
     CollectionRestEqualityUtils collectionRestEqualityUtils;
@@ -86,65 +80,42 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
 
     @Override
     public Page<CollectionRest> findAll(Context context, Pageable pageable) {
-        List<Collection> it = null;
-        List<Collection> collections = new ArrayList<Collection>();
-        int total = 0;
         try {
-            total = cs.countTotal(context);
-            it = cs.findAll(context, pageable.getPageSize(), pageable.getOffset());
-            for (Collection c : it) {
-                collections.add(c);
-            }
+            long total = cs.countTotal(context);
+            List<Collection> collections = cs.findAll(context, pageable.getPageSize(), pageable.getOffset());
+            return converter.toRestPage(collections, pageable, total, utils.obtainProjection(true));
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Projection projection = utils.obtainProjection(true);
-        Page<CollectionRest> page = new PageImpl<>(collections, pageable, total)
-                .map((object) -> converter.toRest(object, projection));
-        return page;
     }
 
     @SearchRestMethod(name = "findAuthorizedByCommunity")
     public Page<CollectionRest> findAuthorizedByCommunity(
             @Parameter(value = "uuid", required = true) UUID communityUuid, Pageable pageable) {
-        Context context = obtainContext();
-        List<Collection> it = null;
-        List<Collection> collections = new ArrayList<Collection>();
         try {
+            Context context = obtainContext();
             Community com = communityService.find(context, communityUuid);
             if (com == null) {
                 throw new ResourceNotFoundException(
                         CommunityRest.CATEGORY + "." + CommunityRest.NAME + " with id: " + communityUuid
                         + " not found");
             }
-            it = cs.findAuthorized(context, com, Constants.ADD);
-            for (Collection c : it) {
-                collections.add(c);
-            }
+            List<Collection> collections = cs.findAuthorized(context, com, Constants.ADD);
+            return converter.toRestPage(utils.getPage(collections, pageable), utils.obtainProjection(true));
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<CollectionRest> page = utils.getPage(collections, pageable)
-                .map((object) -> converter.toRest(object, utils.obtainProjection()));
-        return page;
     }
 
     @SearchRestMethod(name = "findAuthorized")
     public Page<CollectionRest> findAuthorized(Pageable pageable) {
-        Context context = obtainContext();
-        List<Collection> it = null;
-        List<Collection> collections = new ArrayList<Collection>();
         try {
-            it = cs.findAuthorizedOptimized(context, Constants.ADD);
-            for (Collection c : it) {
-                collections.add(c);
-            }
+            Context context = obtainContext();
+            List<Collection> collections = cs.findAuthorizedOptimized(context, Constants.ADD);
+            return converter.toRestPage(utils.getPage(collections, pageable), utils.obtainProjection(true));
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<CollectionRest> page = utils.getPage(collections, pageable)
-                .map((object) -> converter.toRest(object, utils.obtainProjection()));
-        return page;
     }
 
     @Override

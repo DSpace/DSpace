@@ -18,7 +18,6 @@ import javax.servlet.http.HttpServletRequest;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
-import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.MetadataSchemaRest;
@@ -46,12 +45,6 @@ public class MetadataSchemaRestRepository extends DSpaceRestRepository<MetadataS
     @Autowired
     MetadataSchemaService metadataSchemaService;
 
-    @Autowired
-    ConverterService converter;
-
-    public MetadataSchemaRestRepository() {
-    }
-
     @Override
     public MetadataSchemaRest findOne(Context context, Integer id) {
         MetadataSchema metadataSchema = null;
@@ -68,16 +61,12 @@ public class MetadataSchemaRestRepository extends DSpaceRestRepository<MetadataS
 
     @Override
     public Page<MetadataSchemaRest> findAll(Context context, Pageable pageable) {
-        List<MetadataSchema> metadataSchema = null;
         try {
-            metadataSchema = metadataSchemaService.findAll(context);
+            List<MetadataSchema> metadataSchemas = metadataSchemaService.findAll(context);
+            return converter.toRestPage(utils.getPage(metadataSchemas, pageable), utils.obtainProjection(true));
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Projection projection = utils.obtainProjection(true);
-        Page<MetadataSchemaRest> page = utils.getPage(metadataSchema, pageable)
-                .map((object) -> converter.toRest(object, projection));
-        return page;
     }
 
     @Override

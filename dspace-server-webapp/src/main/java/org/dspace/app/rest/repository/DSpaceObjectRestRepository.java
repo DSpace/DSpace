@@ -10,7 +10,6 @@ package org.dspace.app.rest.repository;
 import java.sql.SQLException;
 import java.util.UUID;
 
-import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.converter.MetadataConverter;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.DSpaceObjectRest;
@@ -37,9 +36,6 @@ public abstract class DSpaceObjectRestRepository<M extends DSpaceObject, R exten
 
     @Autowired
     MetadataConverter metadataConverter;
-
-    @Autowired
-    ConverterService converter;
 
     DSpaceObjectRestRepository(DSpaceObjectService<M> dsoService,
                                DSpaceObjectPatch<R> dsoPatch) {
