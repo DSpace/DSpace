@@ -96,7 +96,6 @@ just adding new jar in the classloader</description>
                          install of DSpace, against which Tests can be run. -->
                     <plugin>
                         <artifactId>maven-dependency-plugin</artifactId>
-                        <version>2.8</version>
                         <configuration>
                             <outputDirectory>${project.build.directory}/testing</outputDirectory>
                             <artifactItems>
@@ -140,7 +139,6 @@ just adding new jar in the classloader</description>
                     <plugin>
                         <groupId>org.codehaus.gmaven</groupId>
                         <artifactId>groovy-maven-plugin</artifactId>
-                        <version>2.0</version>
                         <executions>
                             <execution>
                                 <id>setproperty</id>
@@ -189,7 +187,17 @@ just adding new jar in the classloader</description>
                     </plugin>
                 </plugins>
             </build>
-
+            <dependencies>
+                <!-- When running tests, also include test classes from dspace-server-webapp
+                     (this test-jar is only built when tests are enabled). -->
+                <dependency>
+                    <groupId>org.dspace</groupId>
+                    <artifactId>dspace-server-webapp</artifactId>
+                    <version>7.0-SNAPSHOT</version>
+                    <type>test-jar</type>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
         </profile>
         <profile>
             <id>oracle-support</id>
@@ -230,13 +238,6 @@ just adding new jar in the classloader</description>
             <artifactId>spring-boot-starter-tomcat</artifactId>
             <scope>provided</scope>
             <version>${spring-boot.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.dspace</groupId>
-            <artifactId>dspace-server-webapp</artifactId>
-            <type>test-jar</type>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
