@@ -114,6 +114,10 @@ function doWorkflow()
 {
     var contextPath = cocoon.request.getContextPath();
     var workflowItemId = cocoon.request.get("workflowID");
+    if (workflowItemId == null)
+    {
+        throw "Unable to find workflow, no workflow id supplied.";
+    }
     // Get the collection handle for this item.
     var xmlWorkflowItem = XmlWorkflowItem.find(getDSContext(), workflowItemId);
     if(xmlWorkflowItem == null) {
@@ -129,10 +133,7 @@ function doWorkflow()
     var step = workflow.getStep(cocoon.request.get("stepID"));
 
 
-    if (workflowItemId == null)
-    {
-        throw "Unable to find workflow, no workflow id supplied.";
-    }else if(step == null){
+    if(step == null){
         throw "Unable to find step, no step id supplied.";
     }
     var action = step.getActionConfig(cocoon.request.get("actionID"));
