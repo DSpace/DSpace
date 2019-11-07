@@ -27,7 +27,6 @@ import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
@@ -97,18 +96,13 @@ public class GroupRestRepository extends DSpaceObjectRestRepository<Group, Group
     @PreAuthorize("hasAuthority('ADMIN')")
     @Override
     public Page<GroupRest> findAll(Context context, Pageable pageable) {
-        List<Group> groups = null;
-        int total = 0;
         try {
-            total = gs.countTotal(context);
-            groups = gs.findAll(context, null, pageable.getPageSize(), pageable.getOffset());
+            long total = gs.countTotal(context);
+            List<Group> groups = gs.findAll(context, null, pageable.getPageSize(), pageable.getOffset());
+            return converter.toRestPage(groups, pageable, total, utils.obtainProjection(true));
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Projection projection = utils.obtainProjection(true);
-        Page<GroupRest> page = new PageImpl<Group>(groups, pageable, total)
-                .map((object) -> converter.toRest(object, projection));
-        return page;
     }
 
     @Override

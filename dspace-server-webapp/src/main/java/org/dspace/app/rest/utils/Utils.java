@@ -436,6 +436,8 @@ public class Utils {
         return obtainProjection(false);
     }
 
+
+
     /**
      * Adds embeds or links for all class-level LinkRel annotations for which embeds or links are allowed.
      *

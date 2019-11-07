@@ -9,10 +9,8 @@ package org.dspace.app.rest.repository;
 
 import java.sql.SQLException;
 
-import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.model.ResourcePolicyRest;
-import org.dspace.app.rest.utils.Utils;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.core.Context;
@@ -32,12 +30,6 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
 
     @Autowired
     ResourcePolicyService resourcePolicyService;
-
-    @Autowired
-    ConverterService converter;
-
-    @Autowired
-    Utils utils;
 
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
     @Override

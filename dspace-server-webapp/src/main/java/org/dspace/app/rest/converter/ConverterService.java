@@ -29,6 +29,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
 import org.springframework.core.type.filter.AssignableTypeFilter;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.Resource;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
@@ -87,6 +90,25 @@ public class ConverterService {
             return (R) projection.transformRest((RestModel) restObject);
         }
         return restObject;
+    }
+
+    /**
+     * Converts a list of model objects to a page of rest objects using the given {@link Projection}.
+     *
+     * @param modelObjects
+     * @param pageable
+     * @param total
+     * @param projection
+     * @param <T>
+     * @param <D>
+     * @return
+     */
+    public <T, D> Page<T> toRestPage(List<D> modelObjects, Pageable pageable, long total, Projection projection) {
+        return new PageImpl<>(modelObjects, pageable, total).map((object) -> toRest(object, projection));
+    }
+
+    public <T, D> Page<T> toRestPage(Page<D> modelObjects, Projection projection) {
+        return modelObjects.map((object) -> toRest(object, projection));
     }
 
     /**

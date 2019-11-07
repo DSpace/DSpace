@@ -153,9 +153,9 @@ public class RestResourceController implements InitializingBean {
      *
      * Note that the regular expression in the request mapping accept a number as identifier;
      *
-     * Please see {@link RestResourceController#findOne(String, String, String, String)} for findOne with string as
+     * Please see {@link RestResourceController#findOne(String, String, String)} for findOne with string as
      * identifier
-     * and see {@link RestResourceController#findOne(String, String, UUID, String)} for uuid as identifier
+     * and see {@link RestResourceController#findOne(String, String, UUID)} for uuid as identifier
      *
      * @param apiCategory
      * @param model
@@ -185,9 +185,9 @@ public class RestResourceController implements InitializingBean {
      * </pre>
      *
      *
-     * Please see {@link RestResourceController#findOne(String, String, Integer, String)} for findOne with number as
+     * Please see {@link RestResourceController#findOne(String, String, Integer)} for findOne with number as
      * identifier
-     * and see {@link RestResourceController#findOne(String, String, UUID, String)} for uuid as identifier
+     * and see {@link RestResourceController#findOne(String, String, UUID)} for uuid as identifier
      *
      * @param apiCategory
      * @param model
@@ -206,9 +206,9 @@ public class RestResourceController implements InitializingBean {
      *
      * Note that the regular expression in the request mapping accept a UUID as identifier;
      *
-     * Please see {@link RestResourceController#findOne(String, String, Integer, String)} for findOne with number as
+     * Please see {@link RestResourceController#findOne(String, String, Integer)} for findOne with number as
      * identifier
-     * and see {@link RestResourceController#findOne(String, String, String, String)} for string as identifier
+     * and see {@link RestResourceController#findOne(String, String, String)} for string as identifier
      *
      * @param apiCategory
      * @param model

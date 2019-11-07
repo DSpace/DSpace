@@ -24,7 +24,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
-import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.converter.WorkspaceItemConverter;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.model.ErrorRest;
@@ -63,7 +62,6 @@ import org.dspace.submit.lookup.SubmissionLookupService;
 import org.dspace.submit.util.ItemSubmissionLookupDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.json.patch.PatchException;
 import org.springframework.stereotype.Component;
@@ -83,22 +81,25 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
 
     @Autowired
     WorkspaceItemService wis;
+
     @Autowired
     ItemService itemService;
+
     @Autowired
     BitstreamService bitstreamService;
+
     @Autowired
     BitstreamFormatService bitstreamFormatService;
+
     @Autowired
     ConfigurationService configurationService;
 
     @Autowired
     WorkspaceItemConverter workspaceItemConverter;
-    @Autowired
-    ConverterService converter;
 
     @Autowired
     SubmissionService submissionService;
+
     @Autowired
     EPersonServiceImpl epersonService;
 
@@ -132,38 +133,28 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
     //TODO @PreAuthorize("hasAuthority('ADMIN')")
     @Override
     public Page<WorkspaceItemRest> findAll(Context context, Pageable pageable) {
-        List<WorkspaceItem> witems = null;
-        int total = 0;
         try {
-            total = wis.countTotal(context);
-            witems = wis.findAll(context, pageable.getPageSize(), pageable.getOffset());
+            long total = wis.countTotal(context);
+            List<WorkspaceItem> witems = wis.findAll(context, pageable.getPageSize(), pageable.getOffset());
+            return converter.toRestPage(witems, pageable, total, utils.obtainProjection(true));
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Projection projection = utils.obtainProjection(true);
-        Page<WorkspaceItemRest> page = new PageImpl<>(witems, pageable, total)
-                .map((object) -> converter.toRest(object, projection));
-        return page;
     }
 
     //TODO @PreAuthorize("hasPermission(#submitterID, 'EPERSON', 'READ')")
     @SearchRestMethod(name = "findBySubmitter")
     public Page<WorkspaceItemRest> findBySubmitter(@Parameter(value = "uuid", required = true) UUID submitterID,
             Pageable pageable) {
-        List<WorkspaceItem> witems = null;
-        int total = 0;
         try {
             Context context = obtainContext();
             EPerson ep = epersonService.find(context, submitterID);
-            witems = wis.findByEPerson(context, ep, pageable.getPageSize(), pageable.getOffset());
-            total = wis.countByEPerson(context, ep);
+            long total = wis.countByEPerson(context, ep);
+            List<WorkspaceItem> witems = wis.findByEPerson(context, ep, pageable.getPageSize(), pageable.getOffset());
+            return converter.toRestPage(witems, pageable, total, utils.obtainProjection(true));
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Projection projection = utils.obtainProjection(true);
-        Page<WorkspaceItemRest> page = new PageImpl<>(witems, pageable, total)
-                .map((object) -> converter.toRest(object, projection));
-        return page;
     }
 
     @Override
@@ -203,7 +194,6 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
                                             + " Therefore it cannot be used by the Configurable Submission as the " +
                                             "<processing-class>!");
                 }
-
             } catch (Exception e) {
                 log.error(e.getMessage(), e);
             }

@@ -10,18 +10,14 @@ package org.dspace.app.rest.repository;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.model.SubmissionDefinitionRest;
 import org.dspace.app.rest.model.SubmissionSectionRest;
-import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.util.SubmissionConfig;
 import org.dspace.app.util.SubmissionConfigReader;
 import org.dspace.app.util.SubmissionConfigReaderException;
 import org.dspace.app.util.SubmissionStepConfig;
 import org.dspace.core.Context;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
@@ -35,9 +31,6 @@ import org.springframework.stereotype.Component;
 public class SubmissionPanelRestRepository extends DSpaceRestRepository<SubmissionSectionRest, String> {
 
     private SubmissionConfigReader submissionConfigReader;
-
-    @Autowired
-    private ConverterService converter;
 
     public SubmissionPanelRestRepository() throws SubmissionConfigReaderException {
         submissionConfigReader = new SubmissionConfigReader();
@@ -58,9 +51,9 @@ public class SubmissionPanelRestRepository extends DSpaceRestRepository<Submissi
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
     @Override
     public Page<SubmissionSectionRest> findAll(Context context, Pageable pageable) {
-        List<SubmissionConfig> subConfs = new ArrayList<SubmissionConfig>();
-        subConfs = submissionConfigReader.getAllSubmissionConfigs(pageable.getPageSize(), pageable.getOffset());
-        int total = 0;
+        List<SubmissionConfig> subConfs = submissionConfigReader.getAllSubmissionConfigs(
+                pageable.getPageSize(), pageable.getOffset());
+        long total = 0;
         List<SubmissionStepConfig> stepConfs = new ArrayList<>();
         for (SubmissionConfig config : subConfs) {
             total = +config.getNumberOfSteps();
@@ -69,10 +62,7 @@ public class SubmissionPanelRestRepository extends DSpaceRestRepository<Submissi
                 stepConfs.add(step);
             }
         }
-        Projection projection = utils.obtainProjection(true);
-        Page<SubmissionSectionRest> page = new PageImpl<>(stepConfs, pageable, total)
-                .map((object) -> converter.toRest(object, projection));
-        return page;
+        return converter.toRestPage(stepConfs, pageable, total, utils.obtainProjection(true));
     }
 
     @Override

@@ -10,9 +10,7 @@ package org.dspace.app.rest.repository;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.model.EntityTypeRest;
-import org.dspace.app.rest.projection.Projection;
 import org.dspace.content.EntityType;
 import org.dspace.content.service.EntityTypeService;
 import org.dspace.core.Context;
@@ -31,9 +29,6 @@ public class EntityTypeRestRepository extends DSpaceRestRepository<EntityTypeRes
     @Autowired
     private EntityTypeService entityTypeService;
 
-    @Autowired
-    private ConverterService converter;
-
     public EntityTypeRest findOne(Context context, Integer integer) {
         try {
             EntityType entityType = entityTypeService.find(context, integer);
@@ -47,16 +42,12 @@ public class EntityTypeRestRepository extends DSpaceRestRepository<EntityTypeRes
     }
 
     public Page<EntityTypeRest> findAll(Context context, Pageable pageable) {
-        List<EntityType> entityTypeList = null;
         try {
-            entityTypeList = entityTypeService.findAll(context);
+            List<EntityType> entityTypes = entityTypeService.findAll(context);
+            return converter.toRestPage(utils.getPage(entityTypes, pageable), utils.obtainProjection(true));
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Projection projection = utils.obtainProjection(true);
-        Page<EntityTypeRest> page = utils.getPage(entityTypeList, pageable)
-                .map((object) -> converter.toRest(object, projection));
-        return page;
     }
 
     public Class<EntityTypeRest> getDomainClass() {

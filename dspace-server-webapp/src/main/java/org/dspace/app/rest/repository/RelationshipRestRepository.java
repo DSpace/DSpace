@@ -9,7 +9,6 @@ package org.dspace.app.rest.repository;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -20,7 +19,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.log4j.Logger;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
-import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.RelationshipRest;
@@ -39,7 +37,6 @@ import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.AccessDeniedException;
@@ -53,7 +50,6 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
 
     private static final Logger log = Logger.getLogger(RelationshipRestRepository.class);
 
-
     @Autowired
     private ItemService itemService;
 
@@ -62,9 +58,6 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
 
     @Autowired
     private RelationshipTypeService relationshipTypeService;
-
-    @Autowired
-    private ConverterService converter;
 
     @Autowired
     private AuthorizeService authorizeService;
@@ -80,19 +73,14 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
 
     @Override
     public Page<RelationshipRest> findAll(Context context, Pageable pageable) {
-        int total = 0;
-        List<Relationship> relationships = new ArrayList<>();
         try {
-            total = relationshipService.countTotal(context);
-            relationships = relationshipService.findAll(context,
+            long total = relationshipService.countTotal(context);
+            List<Relationship> relationships = relationshipService.findAll(context,
                     pageable.getPageSize(), pageable.getOffset());
+            return converter.toRestPage(relationships, pageable, total, utils.obtainProjection(true));
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Projection projection = utils.obtainProjection(true);
-        Page<RelationshipRest> page = new PageImpl<>(relationships, pageable, total)
-                .map((object) -> converter.toRest(object, projection));
-        return page;
     }
 
     @Override
@@ -343,10 +331,6 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
             }
         }
 
-        Projection projection = utils.obtainProjection(true);
-        Page<RelationshipRest> page = new PageImpl<>(relationships, pageable, total)
-                .map((object) -> converter.toRest(object, projection));
-        return page;
-
+        return converter.toRestPage(relationships, pageable, total, utils.obtainProjection(true));
     }
 }

@@ -18,7 +18,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
-import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.exception.RESTAuthorizationException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
@@ -70,9 +69,6 @@ public class ClaimedTaskRestRepository extends DSpaceRestRepository<ClaimedTaskR
     ClaimedTaskService claimedTaskService;
 
     @Autowired
-    ConverterService converter;
-
-    @Autowired
     XmlWorkflowService workflowService;
 
     @Autowired
@@ -100,7 +96,6 @@ public class ClaimedTaskRestRepository extends DSpaceRestRepository<ClaimedTaskR
     public Page<ClaimedTaskRest> findByUser(@Parameter(value = "uuid", required = true) UUID userID,
             Pageable pageable) {
         //FIXME this should be secured with annotation but they are currently ignored by search methods
-        List<ClaimedTask> tasks = null;
         try {
             Context context = obtainContext();
             EPerson currentUser = context.getCurrentUser();
@@ -111,16 +106,14 @@ public class ClaimedTaskRestRepository extends DSpaceRestRepository<ClaimedTaskR
             }
             if (authorizeService.isAdmin(context) || userID.equals(currentUser.getID())) {
                 EPerson ep = epersonService.find(context, userID);
-                tasks = claimedTaskService.findByEperson(context, ep);
+                List<ClaimedTask> tasks = claimedTaskService.findByEperson(context, ep);
+                return converter.toRestPage(utils.getPage(tasks, pageable), utils.obtainProjection(true));
             } else {
                 throw new RESTAuthorizationException("Only administrators can search for claimed tasks of other users");
             }
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<ClaimedTaskRest> page = utils.getPage(tasks, pageable)
-                .map((object) -> converter.toRest(object, utils.obtainProjection()));
-        return page;
     }
 
     @Override
