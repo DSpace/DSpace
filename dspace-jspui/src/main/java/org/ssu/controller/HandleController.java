@@ -13,6 +13,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.crosswalk.DisseminationCrosswalk;
 import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -65,6 +66,7 @@ public class HandleController {
     private final transient PluginService pluginService = CoreServiceFactory.getInstance().getPluginService();
     private final transient DisseminationCrosswalk xHTMLHeadCrosswalk = (DisseminationCrosswalk) pluginService.getNamedPlugin(DisseminationCrosswalk.class, "XHTML_HEAD_ITEM");
     private final transient org.dspace.content.service.CommunityService dspaceCommunityService = ContentServiceFactory.getInstance().getCommunityService();
+    private final transient CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
 
     @Resource
     private ItemService itemService;
@@ -140,6 +142,11 @@ public class HandleController {
         request.setAttribute("collection", collection);
         request.setAttribute("community", collection.getCommunities().get(0));
         model.addObject("title", collection.getName());
+        model.addObject("collection", collection);
+        model.addObject("community", collection.getCommunities().get(0));
+        model.addObject("submitters", collection.getSubmitters());
+        model.addObject("editorButton", collectionService.canEditBoolean(dspaceContext, collection, true));
+        model.addObject("adminButton", authorizeService.authorizeActionBoolean(dspaceContext, collection, Constants.ADMIN));
         model.addObject("handle", collection.getHandle());
         model.addObject("itemCount", ic.getCount(collection));
         model.addObject("browseIndices", Arrays.asList(BrowseIndex.getBrowseIndices()));
