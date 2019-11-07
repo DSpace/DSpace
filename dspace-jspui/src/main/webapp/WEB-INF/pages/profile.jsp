@@ -97,6 +97,14 @@
             </div>
         </div>
 
+        <c:if test="${isAuthorLocalized}">
+            <div class="form-group">
+                <label class="col-md-offset-3 col-md-2 control-label" for="orcid">ORCID</label>
+                <div class="col-md-3">
+                    <input class="form-control" name="orcid" id="orcid" size="24" value="${orcid}"/>
+                </div>
+            </div>
+        </c:if>
 
         <p class="alert"><fmt:message key="jsp.register.edit-profile.info5"/></p>
         <div class="form-group">
@@ -105,6 +113,7 @@
                 <input class="form-control" type="password" name="password" id="tpassword" />
             </div>
         </div>
+
         <div class="form-group">
             <label class="col-md-offset-3 col-md-2 control-label" for="tpassword_confirm"><fmt:message key="jsp.register.edit-profile.confirm.field"/></label>
             <div class="col-md-3">

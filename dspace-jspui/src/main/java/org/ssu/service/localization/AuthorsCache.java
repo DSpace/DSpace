@@ -45,6 +45,10 @@ public class AuthorsCache {
                 .collect(Collectors.toMap(author -> author.getFormattedAuthorData("%s, %s", Locale.forLanguageTag("uk")), author -> author, (a, b) -> a));
     }
 
+    public boolean isAuthorLocalizationPresent(String author) {
+        return Stream.of(englishMapping.get(author), ukrainianMapping.get(author), russianMapping.get(author)).anyMatch(Objects::nonNull);
+    }
+
     public AuthorLocalization getAuthorLocalization(String name) {
         List<String> authorData = Arrays.asList(name.split(","));
         String surname = authorData.get(0).trim();

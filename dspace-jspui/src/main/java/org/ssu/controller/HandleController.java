@@ -1,6 +1,7 @@
 package org.ssu.controller;
 
 import com.google.common.collect.Lists;
+import org.apache.commons.lang3.tuple.Pair;
 import org.dspace.app.webui.util.Authenticate;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
@@ -85,7 +86,6 @@ public class HandleController {
         DSpaceObject dSpaceObject = handleService.resolveToObject(dspaceContext, "123456789/" + itemId);
         Locale locale = dspaceContext.getCurrentLocale();
         ModelAndView result = new ModelAndView();
-//        authorizeService.authorizeAction(dspaceContext, dSpaceObject, Constants.READ);
         if(authorizeService.authorizeActionBoolean(dspaceContext, dSpaceObject, Constants.READ)) {
             Community parentCommunity = null;
             boolean includeCurrentCommunityInResult = false;
@@ -274,8 +274,8 @@ public class HandleController {
                 .sorted(Comparator.comparing(CountryStatisticsResponse::getCountryName))
                 .collect(Collectors.toList());
 
-        List<String> authors = itemService.extractAuthorListForItem(item).stream()
-                .map(author -> author.getFormattedAuthorData("%s, %s", locale))
+        List<Pair<String, String>> authors = itemService.extractAuthorListForItem(item).stream()
+                .map(author -> Pair.of(author.getFormattedAuthorData("%s, %s", locale), author.getOrcid()))
                 .collect(Collectors.toList());
 
         Function<Bitstream, String> getBitstreamFormat = (bitstream) -> {
