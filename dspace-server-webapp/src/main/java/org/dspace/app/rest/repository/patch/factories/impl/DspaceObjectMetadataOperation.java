@@ -85,15 +85,14 @@ public class DspaceObjectMetadataOperation<R extends DSpaceObject> extends Patch
     /**
      * Implements the patch operation for metadata operations.
      * @param context   context we're performing patch in
-     * @param resource  the dso.
+     * @param dso       the dso.
      * @param operation the metadata patch operation.
      * @return the updated dso
      */
     @Override
-    public R perform(Context context, R resource, Operation operation) {
-        DSpaceObject dSpaceObject = (DSpaceObject) resource;
-        performPatchOperation(context, dSpaceObject, operation);
-        return (R) dSpaceObject;
+    public R perform(Context context, R dso, Operation operation) {
+        performPatchOperation(context, dso, operation);
+        return dso;
     }
 
     /**
@@ -242,8 +241,10 @@ public class DspaceObjectMetadataOperation<R extends DSpaceObject> extends Patch
      * Replaces metadata in the dso; 4 cases:
      *      - If we replace everything: clearMetadata & add the new ones
      *      - If we replace for a single field: clearMetadata on the field & add the new ones
-     *      - A single existing metadata value: Retrieve the metadatavalue object & make alerations directly on this object
-     *      - A single existing metadata property: Retrieve the metadatavalue object & make alerations directly on this object
+     *      - A single existing metadata value:
+     *              Retrieve the metadatavalue object & make alerations directly on this object
+     *      - A single existing metadata property:
+     *              Retrieve the metadatavalue object & make alerations directly on this object
      * @param context           context patch is being performed in
      * @param dso               dso being patched
      * @param dsoService        service doing the patch in db
@@ -363,7 +364,7 @@ public class DspaceObjectMetadataOperation<R extends DSpaceObject> extends Patch
         List<MetadataValue> metadataValues = dsoService.getMetadata(dso, schema, element, qualifier, Item.ANY);
         try {
             int indexToCopyFromInt = Integer.parseInt(indexToCopyFrom);
-            if (indexToCopyFromInt >= 0 && metadataValues.size() >indexToCopyFromInt
+            if (indexToCopyFromInt >= 0 && metadataValues.size() > indexToCopyFromInt
                     && metadataValues.get(indexToCopyFromInt) != null) {
                 MetadataValue metadataValueToCopy = metadataValues.get(indexToCopyFromInt);
                 // Add mdv to end of md list
