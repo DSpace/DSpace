@@ -38,7 +38,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.test.web.servlet.MvcResult;
 
-public class CollectionRestControllerIT extends AbstractControllerIntegrationTest {
+public class ItemTemplateRestControllerIT extends AbstractControllerIntegrationTest {
 
     private ObjectMapper mapper;
     private String adminAuthToken;
