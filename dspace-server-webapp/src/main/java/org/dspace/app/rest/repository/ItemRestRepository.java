@@ -201,13 +201,21 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
         }
     }
 
+    /**
+     * Deletes relationships of an item which need virtual metadata to be copied to actual metadata
+     * This ensures a delete call is used which can copy the metadata prior to deleting the item
+     *
+     * @param context           The relevant DSpace context
+     * @param copyVirtual       The value(s) of the copyVirtualMetadata parameter
+     * @param item              The item to be deleted
+     */
     private void deleteMultipleRelationshipsCopyVirtualMetadata(Context context, String[] copyVirtual, Item item)
         throws SQLException, AuthorizeException {
 
         if (copyVirtual == null || copyVirtual.length == 0) {
             // Don't delete nor copy any metadata here if the "copyVirtualMetadata" parameter wasn't passed. The
             // relationships not deleted in this method will be deleted implicitly by the this.delete() method
-            // anyway.
+            // without copying the metadata anyway.
             return;
         }
         if (Objects.deepEquals(copyVirtual, COPYVIRTUAL_ALL)) {
@@ -253,6 +261,11 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
         return types;
     }
 
+    /**
+     * Deletes the relationship while copying the virtual metadata to the item which is **NOT** deleted
+     * @param itemToDelete              The item to be deleted
+     * @param relationshipToDelete      The relationship to be deleted
+     */
     private void deleteRelationshipCopyVirtualMetadata(Item itemToDelete, Relationship relationshipToDelete)
         throws SQLException, AuthorizeException {
 
@@ -260,6 +273,7 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
         boolean copyToRight = relationshipToDelete.getLeftItem().equals(itemToDelete);
 
         if (copyToLeft && copyToRight) {
+            //The item has a relationship with itself. Copying metadata is useless since the item will be deleted
             copyToLeft = false;
             copyToRight = false;
         }
