@@ -7,8 +7,6 @@
  */
 package org.dspace.app.rest;
 
-import static org.dspace.app.rest.utils.RegexUtils.REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID;
-
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.UUID;
@@ -40,8 +38,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/core/itemtemplates" + REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID)
+@RequestMapping("/api/core/itemtemplates" + ItemtemplateRestController.REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID)
 public class ItemtemplateRestController {
+
+    /**
+     * Regular expression in the request mapping to accept UUID as identifier
+     */
+    protected static final String REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID =
+        "/{uuid:[0-9a-fxA-FX]{8}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{12}}";
 
     @Autowired
     private Utils utils;

@@ -7,8 +7,6 @@
  */
 package org.dspace.app.rest;
 
-import static org.dspace.app.rest.utils.RegexUtils.REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID;
-
 import java.sql.SQLException;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
@@ -36,12 +34,19 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * This RestController takes care of the creation and deletion of Collection's nested objects
+ * This RestController takes care of the creation and deletion of Collection's Item templates
  * This class will typically receive the UUID of a Collection and it'll perform logic on its nested objects
  */
 @RestController
-@RequestMapping("/api/" + CollectionRest.CATEGORY + "/" + CollectionRest.PLURAL_NAME)
-public class CollectionRestController {
+@RequestMapping("/api/" + CollectionRest.CATEGORY + "/" + CollectionRest.PLURAL_NAME
+    + CollectionItemtemplateController.REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID + "/itemtemplate")
+public class CollectionItemtemplateController {
+
+    /**
+     * Regular expression in the request mapping to accept UUID as identifier
+     */
+    protected static final String REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID =
+        "/{uuid:[0-9a-fxA-FX]{8}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{12}}";
 
     @Autowired
     private Utils utils;
@@ -86,8 +91,7 @@ public class CollectionRestController {
      * @throws AuthorizeException
      */
     @PreAuthorize("hasPermission(#uuid, 'COLLECTION', 'WRITE')")
-    @RequestMapping(method = RequestMethod.POST,
-            value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID + "/itemtemplate")
+    @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<ResourceSupport> createTemplateItem(HttpServletRequest request, @PathVariable UUID uuid)
             throws SQLException, AuthorizeException {
 
@@ -116,8 +120,7 @@ public class CollectionRestController {
      * @throws SQLException
      */
     @PreAuthorize("hasPermission(#uuid, 'COLLECTION', 'READ')")
-    @RequestMapping(method = RequestMethod.GET,
-            value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID + "/itemtemplate")
+    @RequestMapping(method = RequestMethod.GET)
     public ItemResource getTemplateItem(HttpServletRequest request, @PathVariable UUID uuid)
             throws SQLException {
 
