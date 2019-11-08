@@ -31,10 +31,13 @@ public interface RelationshipMetadataService {
     public List<RelationshipMetadataValue> getRelationshipMetadata(Item item, boolean enableVirtualMetadata);
 
     /**
+     * Retrieves the list of RelationshipMetadataValue objects specific to only one Relationship of the item.
+     *
      * This method processes one Relationship of an Item and will return a list of RelationshipMetadataValue objects
      * that are generated for this specific relationship for the item through the config in VirtualMetadataPopulator
      *
      * It returns a combination of the output of the findVirtualMetadataFromConfiguration method and
+     * the getRelationMetadataFromOtherItem method.
      *
      * @param context               The context
      * @param item                  The item whose virtual metadata is requested

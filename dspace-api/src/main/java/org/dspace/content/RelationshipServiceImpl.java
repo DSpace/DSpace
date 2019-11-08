@@ -319,6 +319,7 @@ public class RelationshipServiceImpl implements RelationshipService {
 
     @Override
     public void delete(Context context, Relationship relationship) throws SQLException, AuthorizeException {
+        //TODO: retrieve default settings from configuration
         delete(context, relationship, false, false);
     }
 
@@ -347,6 +348,14 @@ public class RelationshipServiceImpl implements RelationshipService {
         }
     }
 
+    /**
+     * Converts virtual metadata from RelationshipMetadataValue objects to actual item metadata.
+     *
+     * @param context           The relevant DSpace context
+     * @param relationship      The relationship containing the left and right items
+     * @param copyToLeftItem    The boolean indicating whether we want to write to left item or not
+     * @param copyToRightItem   The boolean indicating whether we want to write to right item or not
+     */
     private void copyMetadataValues(Context context, Relationship relationship, boolean copyToLeftItem,
                                     boolean copyToRightItem)
         throws SQLException, AuthorizeException {
