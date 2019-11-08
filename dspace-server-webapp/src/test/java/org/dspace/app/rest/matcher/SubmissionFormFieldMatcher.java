@@ -13,8 +13,6 @@ import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 
-import javax.annotation.Nullable;
-
 import org.hamcrest.Matcher;
 
 /**
@@ -128,14 +126,12 @@ public class SubmissionFormFieldMatcher {
                                                                                    String relationshipType,
                                                                                    String filter,
                                                                                    String searchConfiguration,
-                                                                                   @Nullable Boolean nameVariants) {
+                                                                                   boolean nameVariants) {
         return allOf(
             hasJsonPath("$.selectableRelationship.relationshipType", is(relationshipType)),
             hasJsonPath("$.selectableRelationship.filter", is(filter)),
             hasJsonPath("$.selectableRelationship.searchConfiguration", is(searchConfiguration)),
-                nameVariants != null ?
-                        hasJsonPath("$.selectableRelationship.nameVariants", is(nameVariants.toString()))
-                        : hasNoJsonPath("$.selectableRelationship.nameVariants"),
+            hasJsonPath("$.selectableRelationship.nameVariants", is(String.valueOf(nameVariants))),
             matchFormFieldDefinition(type, label, mandatoryMessage, repeatable, hints, metadata));
     }
 
@@ -169,14 +165,12 @@ public class SubmissionFormFieldMatcher {
                                                                                      String relationshipType,
                                                                                      String filter,
                                                                                      String searchConfiguration,
-                                                                                     @Nullable Boolean nameVariants) {
+                                                                                     boolean nameVariants) {
         return allOf(
             hasJsonPath("$.selectableRelationship.relationshipType", is(relationshipType)),
             hasJsonPath("$.selectableRelationship.filter", is(filter)),
             hasJsonPath("$.selectableRelationship.searchConfiguration", is(searchConfiguration)),
-                nameVariants != null ?
-                        hasJsonPath("$.selectableRelationship.nameVariants", is(nameVariants.toString()))
-                        : hasNoJsonPath("$.selectableRelationship.nameVariants"),
+            hasJsonPath("$.selectableRelationship.nameVariants", is(String.valueOf(nameVariants))),
             hasJsonPath("$.label", is(label)),
             mandatoryMessage != null ? hasJsonPath("$.mandatoryMessage", containsString(mandatoryMessage)) :
                 hasNoJsonPath("$.mandatoryMessage"),
