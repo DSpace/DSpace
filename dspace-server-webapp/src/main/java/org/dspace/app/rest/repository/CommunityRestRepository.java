@@ -20,11 +20,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
+import org.dspace.app.rest.converter.BitstreamConverter;
 import org.dspace.app.rest.converter.CommunityConverter;
 import org.dspace.app.rest.converter.MetadataConverter;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
+import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.CommunityRest;
 import org.dspace.app.rest.model.hateoas.CommunityResource;
 import org.dspace.app.rest.model.patch.Patch;
@@ -59,6 +61,9 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
 
     @Autowired
     CommunityConverter converter;
+
+    @Autowired
+    BitstreamConverter bitstreamConverter;
 
     @Autowired
     MetadataConverter metadataConverter;
@@ -273,7 +278,7 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
 
     /**
      * Method to install a logo on a Community which doesn't have a logo
-     * Called by request mappings in CommunityRestController
+     * Called by request mappings in CommunityLogoController
      * @param context
      * @param community     The community on which to install the logo
      * @param uploadfile    The new logo
@@ -282,7 +287,7 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
      * @throws AuthorizeException
      * @throws SQLException
      */
-    public Bitstream setLogo(Context context, Community community, MultipartFile uploadfile)
+    public BitstreamRest setLogo(Context context, Community community, MultipartFile uploadfile)
             throws IOException, AuthorizeException, SQLException {
 
         if (community.getLogo() != null) {
@@ -292,6 +297,6 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
         Bitstream bitstream = cs.setLogo(context, community, uploadfile.getInputStream());
         cs.update(context, community);
         bitstreamService.update(context, bitstream);
-        return bitstream;
+        return bitstreamConverter.fromModel(context.reloadEntity(bitstream));
     }
 }

@@ -14,10 +14,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
-import org.dspace.content.Collection;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.MediaType;
@@ -25,13 +23,12 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-public class CollectionRestControllerIT extends AbstractControllerIntegrationTest {
+public class CommunityLogoControllerIT extends AbstractControllerIntegrationTest {
 
     private ObjectMapper mapper;
     private String adminAuthToken;
     private String bitstreamContent;
     private MockMultipartFile bitstreamFile;
-    private Collection childCollection;
 
     @Before
     public void createStructure() throws Exception {
@@ -39,8 +36,6 @@ public class CollectionRestControllerIT extends AbstractControllerIntegrationTes
         parentCommunity = CommunityBuilder.createCommunity(context)
                 .withName("Parent Community")
                 .build();
-        childCollection = CollectionBuilder.createCollection(context, parentCommunity)
-                .withName("Collection 1").build();
         adminAuthToken = getAuthToken(admin.getEmail(), password);
         bitstreamContent = "Hello, World!";
         bitstreamFile = new MockMultipartFile("file",
@@ -51,7 +46,7 @@ public class CollectionRestControllerIT extends AbstractControllerIntegrationTes
 
     private String createLogoInternal() throws Exception {
         MvcResult mvcPostResult = getClient(adminAuthToken).perform(
-                MockMvcRequestBuilders.fileUpload(getLogoUrlTemplate(childCollection.getID().toString()))
+                MockMvcRequestBuilders.fileUpload(getLogoUrlTemplate(parentCommunity.getID().toString()))
                         .file(bitstreamFile))
                 .andExpect(status().isCreated())
                 .andReturn();
@@ -64,8 +59,8 @@ public class CollectionRestControllerIT extends AbstractControllerIntegrationTes
     @Test
     public void createLogoNotLoggedIn() throws Exception {
         getClient().perform(
-                MockMvcRequestBuilders.fileUpload(getLogoUrlTemplate(childCollection.getID().toString()))
-                        .file(bitstreamFile))
+                MockMvcRequestBuilders.fileUpload(getLogoUrlTemplate(parentCommunity.getID().toString()))
+                .file(bitstreamFile))
                 .andExpect(status().isUnauthorized());
     }
 
@@ -74,7 +69,7 @@ public class CollectionRestControllerIT extends AbstractControllerIntegrationTes
         String postUuid = createLogoInternal();
         assert (postUuid != null);
 
-        MvcResult mvcGetResult = getClient().perform(get(getLogoUrlTemplate(childCollection.getID().toString())))
+        MvcResult mvcGetResult = getClient().perform(get(getLogoUrlTemplate(parentCommunity.getID().toString())))
                 .andExpect(status().is2xxSuccessful())
                 .andReturn();
 
@@ -88,7 +83,7 @@ public class CollectionRestControllerIT extends AbstractControllerIntegrationTes
     public void createLogoNoRights() throws Exception {
         String userToken = getAuthToken(eperson.getEmail(), password);
         getClient(userToken).perform(
-                MockMvcRequestBuilders.fileUpload(getLogoUrlTemplate(childCollection.getID().toString()))
+                MockMvcRequestBuilders.fileUpload(getLogoUrlTemplate(parentCommunity.getID().toString()))
                         .file(bitstreamFile))
                 .andExpect(status().isForbidden());
     }
@@ -96,12 +91,12 @@ public class CollectionRestControllerIT extends AbstractControllerIntegrationTes
     @Test
     public void createDuplicateLogo() throws Exception {
         getClient(adminAuthToken).perform(
-                MockMvcRequestBuilders.fileUpload(getLogoUrlTemplate(childCollection.getID().toString()))
+                MockMvcRequestBuilders.fileUpload(getLogoUrlTemplate(parentCommunity.getID().toString()))
                         .file(bitstreamFile))
                 .andExpect(status().isCreated());
 
         getClient(adminAuthToken).perform(
-                MockMvcRequestBuilders.fileUpload(getLogoUrlTemplate(childCollection.getID().toString()))
+                MockMvcRequestBuilders.fileUpload(getLogoUrlTemplate(parentCommunity.getID().toString()))
                         .file(bitstreamFile))
                 .andExpect(status().isUnprocessableEntity());
     }
@@ -129,7 +124,7 @@ public class CollectionRestControllerIT extends AbstractControllerIntegrationTes
         getClient(adminAuthToken).perform(delete(getBitstreamUrlTemplate(postUuid)))
                 .andExpect(status().isNoContent());
 
-        getClient(adminAuthToken).perform(get(getLogoUrlTemplate(childCollection.getID().toString())))
+        getClient(adminAuthToken).perform(get(getLogoUrlTemplate(parentCommunity.getID().toString())))
                 .andExpect(status().isNoContent());
     }
 
@@ -143,7 +138,7 @@ public class CollectionRestControllerIT extends AbstractControllerIntegrationTes
     }
 
     private String getLogoUrlTemplate(String uuid) {
-        return "/api/core/collections/" + uuid + "/logo";
+        return "/api/core/communities/" + uuid + "/logo";
     }
 
     private String getBitstreamUrlTemplate(String uuid) {

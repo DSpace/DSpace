@@ -270,7 +270,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
 
     /**
      * Method to install a logo on a Collection which doesn't have a logo
-     * Called by request mappings in CollectionRestController
+     * Called by request mappings in CollectionLogoController
      * @param context
      * @param collection    The collection on which to install the logo
      * @param uploadfile    The new logo
