@@ -12,7 +12,6 @@ import java.sql.SQLException;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
-import org.dspace.app.rest.converter.BitstreamConverter;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.CollectionRest;
@@ -43,20 +42,18 @@ import org.springframework.web.multipart.MultipartFile;
  * This class will typically receive the UUID of a Collection and it'll perform logic on its nested objects
  */
 @RestController
-@RequestMapping("/api/" + CollectionRest.CATEGORY + "/" + CollectionRest.PLURAL_NAME)
-public class CollectionRestController {
+@RequestMapping("/api/" + CollectionRest.CATEGORY + "/" + CollectionRest.PLURAL_NAME
+    + CollectionLogoController.REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID + "/logo")
+public class CollectionLogoController {
 
     /**
      * Regular expression in the request mapping to accept UUID as identifier
      */
-    private static final String REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID =
-            "{uuid:[0-9a-fxA-FX]{8}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{12}}";
+    protected static final String REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID =
+            "/{uuid:[0-9a-fxA-FX]{8}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{12}}";
 
     @Autowired
     protected Utils utils;
-
-    @Autowired
-    private BitstreamConverter bitstreamConverter;
 
     @Autowired
     private CollectionRestRepository collectionRestRepository;
@@ -90,7 +87,6 @@ public class CollectionRestController {
      */
     @PreAuthorize("hasPermission(#uuid, 'COLLECTION', 'WRITE')")
     @RequestMapping(method = RequestMethod.POST,
-            value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID + "/logo",
             headers = "content-type=multipart/form-data")
     public ResponseEntity<ResourceSupport> createLogo(HttpServletRequest request, @PathVariable UUID uuid,
                                        @RequestParam(value = "file", required = false) MultipartFile uploadfile)
