@@ -208,7 +208,7 @@ public class RelationshipDeleteRestRepositoryIT extends AbstractEntityIntegratio
 
         projectItem = itemService.find(context, projectItem.getID());
         List<MetadataValue> projectAuthorList =
-            itemService.getMetadata(projectItem, "project", "contributor", "author", Item.ANY);
+            itemService.getMetadata(projectItem, "dc", "contributor", "author", Item.ANY);
         assertThat(projectAuthorList.size(), equalTo(1));
         assertThat(projectAuthorList.get(0).getValue(), equalTo("Smith, Donald"));
         assertThat(projectAuthorList.get(0).getAuthority(), startsWith("virtual::"));
@@ -359,7 +359,7 @@ public class RelationshipDeleteRestRepositoryIT extends AbstractEntityIntegratio
 
         projectItem = itemService.find(context, projectItem.getID());
         List<MetadataValue> projectAuthorList = itemService.getMetadata(projectItem,
-            "project", "contributor", "author", Item.ANY);
+            "dc", "contributor", "author", Item.ANY);
         assertThat(projectAuthorList.size(), equalTo(1));
         assertThat(projectAuthorList.get(0).getValue(), equalTo("Smith, Donald"));
         assertNull(projectAuthorList.get(0).getAuthority());
@@ -389,7 +389,7 @@ public class RelationshipDeleteRestRepositoryIT extends AbstractEntityIntegratio
 
         projectItem = itemService.find(context, projectItem.getID());
         List<MetadataValue> projectAuthorList = itemService.getMetadata(projectItem,
-            "project", "contributor", "author", Item.ANY);
+            "dc", "contributor", "author", Item.ANY);
         assertThat(projectAuthorList.size(), equalTo(0));
         List<MetadataValue> projectRelationships = itemService.getMetadata(projectItem,
             "relation", "isPersonOfProject", Item.ANY, Item.ANY);
@@ -418,7 +418,7 @@ public class RelationshipDeleteRestRepositoryIT extends AbstractEntityIntegratio
 
         projectItem = itemService.find(context, projectItem.getID());
         List<MetadataValue> projectAuthorList = itemService.getMetadata(projectItem,
-            "project", "contributor", "author", Item.ANY);
+            "dc", "contributor", "author", Item.ANY);
         assertThat(projectAuthorList.size(), equalTo(1));
         assertThat(projectAuthorList.get(0).getValue(), equalTo("Smith, Donald"));
         assertNull(projectAuthorList.get(0).getAuthority());
@@ -445,7 +445,7 @@ public class RelationshipDeleteRestRepositoryIT extends AbstractEntityIntegratio
 
         projectItem = itemService.find(context, projectItem.getID());
         List<MetadataValue> projectAuthorList = itemService.getMetadata(projectItem,
-            "project", "contributor", "author", Item.ANY);
+            "dc", "contributor", "author", Item.ANY);
         assertThat(projectAuthorList.size(), equalTo(0));
         List<MetadataValue> projectRelationships = itemService.getMetadata(projectItem,
             "relation", "isPersonOfProject", Item.ANY, Item.ANY);
@@ -475,7 +475,7 @@ public class RelationshipDeleteRestRepositoryIT extends AbstractEntityIntegratio
 
         projectItem = itemService.find(context, projectItem.getID());
         List<MetadataValue> projectAuthorList =
-            itemService.getMetadata(projectItem, "project", "contributor", "author", Item.ANY);
+            itemService.getMetadata(projectItem, "dc", "contributor", "author", Item.ANY);
         assertThat(projectAuthorList.size(), equalTo(1));
         assertThat(projectAuthorList.get(0).getValue(), equalTo("Smith, Donald"));
         assertThat(projectAuthorList.get(0).getAuthority(), startsWith("virtual::"));
@@ -504,7 +504,7 @@ public class RelationshipDeleteRestRepositoryIT extends AbstractEntityIntegratio
 
         projectItem = itemService.find(context, projectItem.getID());
         List<MetadataValue> projectAuthorList =
-            itemService.getMetadata(projectItem, "project", "contributor", "author", Item.ANY);
+            itemService.getMetadata(projectItem, "dc", "contributor", "author", Item.ANY);
         assertThat(projectAuthorList.size(), equalTo(1));
         assertThat(projectAuthorList.get(0).getValue(), equalTo("Smith, Donald"));
         assertThat(projectAuthorList.get(0).getAuthority(), startsWith("virtual::"));
@@ -533,7 +533,7 @@ public class RelationshipDeleteRestRepositoryIT extends AbstractEntityIntegratio
 
         projectItem = itemService.find(context, projectItem.getID());
         List<MetadataValue> projectAuthorList =
-            itemService.getMetadata(projectItem, "project", "contributor", "author", Item.ANY);
+            itemService.getMetadata(projectItem, "dc", "contributor", "author", Item.ANY);
         assertThat(projectAuthorList.size(), equalTo(1));
         assertThat(projectAuthorList.get(0).getValue(), equalTo("Smith, Donald"));
         assertThat(projectAuthorList.get(0).getAuthority(), startsWith("virtual::"));
@@ -563,7 +563,7 @@ public class RelationshipDeleteRestRepositoryIT extends AbstractEntityIntegratio
 
         projectItem = itemService.find(context, projectItem.getID());
         List<MetadataValue> projectAuthorList =
-            itemService.getMetadata(projectItem, "project", "contributor", "author", Item.ANY);
+            itemService.getMetadata(projectItem, "dc", "contributor", "author", Item.ANY);
         assertThat(projectAuthorList.size(), equalTo(1));
         assertThat(projectAuthorList.get(0).getValue(), equalTo("Smith, Donald"));
         assertThat(projectAuthorList.get(0).getAuthority(), startsWith("virtual::"));
