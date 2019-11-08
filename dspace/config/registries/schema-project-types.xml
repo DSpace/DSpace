@@ -17,18 +17,4 @@
         - project.identifier.expectedcompletion > NOT FOUND
     -->
 
-    <dc-type>
-        <schema>project</schema>
-        <element>contributor</element>
-        <qualifier>author</qualifier>
-        <scope_note>Virtual metadata field that holds the full name of the author</scope_note>
-    </dc-type>
-
-    <dc-type>
-        <schema>project</schema>
-        <element>contributor</element>
-        <qualifier>other</qualifier>
-        <scope_note>Virtual metadata field that holds the value of organization.legalName</scope_note>
-    </dc-type>
-
 </dspace-dc-types>
