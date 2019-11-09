@@ -560,9 +560,13 @@ public class Utils {
     private Object wrapForEmbedding(Object linkedObject, Link link) {
         if (linkedObject instanceof RestAddressableModel) {
             return converter.toResource((RestAddressableModel) linkedObject);
-        } else if (linkedObject instanceof Page || linkedObject instanceof List) {
-            List<RestAddressableModel> list = linkedObject instanceof Page ? ((Page) linkedObject).getContent()
-                            : (List<RestAddressableModel>) linkedObject;
+        } else if (linkedObject instanceof Page) {
+            // The first page has already been constructed by a link repository and we only need to wrap it
+            Page<RestAddressableModel> page = (Page<RestAddressableModel>) linkedObject;
+            return new EmbeddedPage(link.getHref(), page.map(converter::toResource), null, link.getRel());
+        } else if (linkedObject instanceof List) {
+            // The full list has been retrieved and we need to provide the first page for embedding
+            List<RestAddressableModel> list = (List<RestAddressableModel>) linkedObject;
             if (list.size() > 0) {
                 PageImpl<RestAddressableModel> page = new PageImpl(
                         list.subList(0, list.size() > EMBEDDED_PAGE_SIZE ? EMBEDDED_PAGE_SIZE : list.size()),
