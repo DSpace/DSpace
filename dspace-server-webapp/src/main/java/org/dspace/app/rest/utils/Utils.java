@@ -449,6 +449,7 @@ public class Utils {
             Link link = linkToSubResource(halResource.getContent(), linkRest.name());
             if (!linkRest.embedOptional() || projection.allowOptionalEmbed(halResource, linkRest)) {
                 embedRelFromRepository(halResource, linkRest.name(), link, linkRest.method());
+                halResource.add(link); // unconditionally link if embedding was allowed
             } else if (!linkRest.linkOptional() || projection.allowOptionalLink(halResource, linkRest)) {
                 halResource.add(link);
             }
