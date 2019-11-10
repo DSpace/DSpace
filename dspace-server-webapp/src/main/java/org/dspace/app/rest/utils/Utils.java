@@ -26,14 +26,17 @@ import java.lang.reflect.Method;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
+import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
@@ -103,6 +106,9 @@ public class Utils {
 
     @Autowired
     private ConverterService converter;
+
+    /** Cache to support fast lookups of LinkRest method annotation information. */
+    private Map<Method, Optional<LinkRest>> linkAnnotationForMethod = new HashMap<>();
 
     public <T> Page<T> getPage(List<T> fullContents, Pageable pageable) {
         int total = fullContents.size();
@@ -510,6 +516,22 @@ public class Utils {
     }
 
     /**
+     * Gets the LinkRest annotation for the given method, if any.
+     *
+     * @param readMethod the method.
+     * @return the annotation, or {@code null} if not found.
+     */
+    public @Nullable LinkRest findLinkAnnotation(Method readMethod) {
+        Optional<LinkRest> optional = linkAnnotationForMethod.get(readMethod);
+        if (optional == null) {
+            LinkRest linkRest = AnnotationUtils.findAnnotation(readMethod, LinkRest.class);
+            optional = linkRest != null ? Optional.of(linkRest) : Optional.empty();
+            linkAnnotationForMethod.put(readMethod, optional);
+        }
+        return optional.isPresent() ? optional.get() : null;
+    }
+
+    /**
      * Adds an embed for the given property read method. If the @LinkRel annotation is present and
      * specifies a method name, the value will come from invoking that method in the appropriate link
      * rest repository. Otherwise, the value will come from invoking the method directly on the wrapped
@@ -523,7 +545,7 @@ public class Utils {
                                      Method readMethod,
                                      String propertyName) {
         String rel = propertyName;
-        LinkRest linkRest = AnnotationUtils.findAnnotation(readMethod, LinkRest.class);
+        LinkRest linkRest = findLinkAnnotation(readMethod);
         try {
             if (linkRest != null) {
                 if (linkRest.embedOptional()
