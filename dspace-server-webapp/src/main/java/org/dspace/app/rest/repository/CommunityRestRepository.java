@@ -16,18 +16,22 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
+import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.CommunityRest;
 import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.repository.patch.DSpaceObjectPatch;
 import org.dspace.app.rest.utils.CommunityRestEqualityUtils;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.Bitstream;
 import org.dspace.content.Community;
+import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +40,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * This is the repository responsible to manage Community Rest object
@@ -46,7 +51,13 @@ import org.springframework.stereotype.Component;
 @Component(CommunityRest.CATEGORY + "." + CommunityRest.NAME)
 public class CommunityRestRepository extends DSpaceObjectRestRepository<Community, CommunityRest> {
 
+    private static final Logger log = org.apache.logging.log4j.LogManager
+            .getLogger(CommunityRestRepository.class);
+
     private final CommunityService cs;
+
+    @Autowired
+    BitstreamService bitstreamService;
 
     @Autowired
     CommunityRestEqualityUtils communityRestEqualityUtils;
@@ -232,5 +243,29 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
         } catch (IOException e) {
             throw new RuntimeException("Unable to delete community because the logo couldn't be deleted", e);
         }
+    }
+
+    /**
+     * Method to install a logo on a Community which doesn't have a logo
+     * Called by request mappings in CommunityLogoController
+     * @param context
+     * @param community     The community on which to install the logo
+     * @param uploadfile    The new logo
+     * @return              The created bitstream containing the new logo
+     * @throws IOException
+     * @throws AuthorizeException
+     * @throws SQLException
+     */
+    public BitstreamRest setLogo(Context context, Community community, MultipartFile uploadfile)
+            throws IOException, AuthorizeException, SQLException {
+
+        if (community.getLogo() != null) {
+            throw new UnprocessableEntityException(
+                    "The community with the given uuid already has a logo: " + community.getID());
+        }
+        Bitstream bitstream = cs.setLogo(context, community, uploadfile.getInputStream());
+        cs.update(context, community);
+        bitstreamService.update(context, bitstream);
+        return converter.toRest(context.reloadEntity(bitstream), Projection.DEFAULT);
     }
 }
