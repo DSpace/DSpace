@@ -11,7 +11,7 @@ import org.dspace.app.rest.projection.Projection;
 
 public interface DSpaceConverter<M, R> {
 
-    R convert(M restObject, Projection projection);
+    R convert(M modelObject, Projection projection);
 
     Class<M> getModelClass();
 }
