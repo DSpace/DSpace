@@ -329,24 +329,42 @@ public class DSpaceWorkspaceItemOutputGenerator implements OutputGenerator
         return false;
     }
 
+    // check whether a certain field is configured for the named form in input-forms.xml
     protected DCInput getDCInput(String formName, String schema, String element,
             String qualifier) throws DCInputsReaderException
     {
         DCInputSet dcinputset = new DCInputsReader().getInputs(formName);
+        // check all form pages
         for (int idx = 0; idx < dcinputset.getNumberPages(); idx++)
         {
+            // check each row of each page
             for (DCInput dcinput : dcinputset.getPageRows(idx, true, true))
             {
-                if (dcinput.getSchema().equals(schema)
-                        && dcinput.getElement().equals(element)
-                        && ((dcinput.getQualifier() != null && dcinput
-                                .getQualifier().equals(qualifier))
-                        || (dcinput.getQualifier() == null && qualifier == null)))
-                {
-                    return dcinput;
+                // look for the right schema and element
+                if (dcinput.getSchema().equals(schema) && dcinput.getElement().equals(element)) {
+                    // if a qualifier is set in the form and if it equals our qualifier, return that form row
+                    if (dcinput.getQualifier() != null && dcinput.getQualifier().equals(qualifier)) {
+                        return dcinput;
+                    }
+                    // it no qualifier is set in neither the form nor in our configuration, return that form row
+                    if (dcinput.getQualifier() == null && qualifier == null) {
+                        return dcinput;
+                    }
+                    // if we expect an qualifier, and no qualifier is set in the form, but value pairs are used, check
+                    // if the qualifier is configured in those value pairs
+                    if (StringUtils.isNotBlank(qualifier)
+                            && dcinput.getQualifier() == null
+                            && StringUtils.isNotBlank(dcinput.getPairsType()))
+                    {
+                        // return the form row if there is a display string to select our qualifier in the value pairs
+                        if( StringUtils.isNotBlank(dcinput.getDisplayString(dcinput.getPairsType(), qualifier))) {
+                            return dcinput;
+                        }
+                    }
                 }
             }
         }
+        // no match found
         return null;
     }
 
