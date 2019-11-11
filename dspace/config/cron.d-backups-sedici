@@ -41,4 +41,5 @@ DATEMTH=date +%m
 #rotación de backups de drupal (todos los dias a las 05:00hs). Se eliminan aquellos mas antiguos a 15 dias de creación pero se conservan los de primero de cada mes
 0 5 * * 1,2,3,4,5       root  find $DSPACE_BACKUP_DIR/auth -maxdepth 1 -name "auth.20??-??-??*.tar.gz" -mtime +15 -not -name "auth.20??-??-01*.tar.gz" -exec rm {} \; > /dev/null
 
-
+# Ejecución de tarea de cron para Drupal (lunes a viernes a las 6:00AM)
+00 6 * * 1,2,3,4,5      root    /usr/local/bin/drush -r /var/www/auth cron
