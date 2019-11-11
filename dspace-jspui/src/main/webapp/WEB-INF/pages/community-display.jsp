@@ -43,28 +43,51 @@
     </div>
 
     <div class="row">
-        <div class=" col-md-6">
-            <h3><fmt:message key="jsp.community-home.heading3"/></h3>
-            <ul class="list-group">
-                <c:forEach items="${subCommunities}" var="community">
-                    <li class="list-group-item"><a href = "/handle/${community.handle}">${community.title} </a><span class="badge">${community.itemCount}</span></li>
-                </c:forEach>
-            </ul>
-        </div>
+        <c:if test="${not empty subCommunities}">
+            <div class=" col-md-6">
+                <h3><fmt:message key="jsp.community-home.heading3"/></h3>
+                <ul class="list-group">
+                    <c:forEach items="${subCommunities}" var="subCommunity">
+                        <li class="list-group-item"><a href = "/handle/${subCommunity.handle}">${subCommunity.title} </a><span class="badge">${subCommunity.itemCount}</span>
+                            <c:if test="${removeButton}">
+                                <form class="btn-group" method="post" action="<%=request.getContextPath()%>/tools/edit-communities">
+                                    <input type="hidden" name="parent_community_id" value="${community.ID}" />
+                                    <input type="hidden" name="community_id" value="${subCommunity.id}" />
+                                    <input type="hidden" name="action" value="<%=EditCommunitiesServlet.START_DELETE_COMMUNITY%>" />
+                                    <button type="submit" class="btn btn-xs btn-danger"><span class="glyphicon glyphicon-trash"></span></button>
+                                </form>
+                            </c:if>
+                        </li>
+                    </c:forEach>
+                </ul>
+            </div>
+        </c:if>
+        <c:if test="${not empty collections}">
+            <div class=" col-md-6">
+                <h3><fmt:message key="jsp.community-home.heading2"/></h3>
+                <ul class="list-group">
+                    <c:forEach items="${collections}" var="collection">
 
-        <div class=" col-md-6">
-            <h3><fmt:message key="jsp.community-home.heading2"/></h3>
-            <ul class="list-group">
-                <c:forEach items="${collections}" var="collection">
-
-                    <li class="list-group-item"><a href = "/handle/${collection.handle}">${collection.title} </a><span class="badge">${collection.itemCount}</span></li>
-                </c:forEach>
-            </ul>
-        </div>
+                        <li class="list-group-item"><a href = "/handle/${collection.handle}">${collection.title} </a><span class="badge">${collection.itemCount}</span>
+                            <c:if test="${removeButton}">
+                                <form class="btn-group" method="post" action="<%=request.getContextPath()%>/tools/edit-communities">
+                                    <input type="hidden" name="parent_community_id" value="${community.ID}" />
+                                    <input type="hidden" name="community_id" value="${community.ID}" />
+                                    <input type="hidden" name="collection_id" value="${collection.id}" />
+                                    <input type="hidden" name="action" value="<%=EditCommunitiesServlet.START_DELETE_COLLECTION%>" />
+                                    <button type="submit" class="btn btn-xs btn-danger"><span class="glyphicon glyphicon-trash"></span></button>
+                                </form>
+                            </c:if>
+                        </li>
+                    </c:forEach>
+                </ul>
+            </div>
+        </c:if>
     </div>
 
+    <c:if test="${addButton or editorButton}">
     <dspace:sidebar>
-        <c:if test="${addButton or editorButton}">
+
         <div class="panel panel-warning">
             <div class="panel-heading">
                 <fmt:message key="jsp.admintools"/>
@@ -116,8 +139,8 @@
 
             </div>
         </div>
-        </c:if>
+
 
     </dspace:sidebar>
-
+</c:if>
 </dspace:layout>

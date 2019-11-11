@@ -1,14 +1,22 @@
 package org.ssu.entity.response;
 
+import java.util.UUID;
+
 public class CountedCommunityResponse {
+    private UUID id;
     private String title;
     private String handle;
     private Integer itemCount;
 
     private CountedCommunityResponse(Builder builder) {
+        id = builder.id;
         title = builder.title;
         handle = builder.handle;
         itemCount = builder.itemCount;
+    }
+
+    public UUID getId() {
+        return id;
     }
 
     public String getTitle() {
@@ -25,6 +33,7 @@ public class CountedCommunityResponse {
 
 
     public static final class Builder {
+        private UUID id;
         private String title;
         private String handle;
         private Integer itemCount;
@@ -33,9 +42,15 @@ public class CountedCommunityResponse {
         }
 
         public Builder(CountedCommunityResponse copy) {
+            this.id = copy.getId();
             this.title = copy.getTitle();
             this.handle = copy.getHandle();
             this.itemCount = copy.getItemCount();
+        }
+
+        public Builder withId(UUID id) {
+            this.id = id;
+            return this;
         }
 
         public Builder withTitle(String title) {

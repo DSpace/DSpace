@@ -4,7 +4,7 @@
 <%@ taglib uri='http://java.sun.com/jsp/jstl/core' prefix='c' %>
 <%@taglib prefix="essuir" tagdir="/WEB-INF/tags/essuir"%>
 
-<dspace:layout locbar="commLink" titlekey="browse.page-author">
+<dspace:layout locbar="commLink" titlekey="browse.page-title">
 
     <c:if test="${not isExtended}">
         <c:set var="divClass" value="col-md-offset-2 col-md-8"/>

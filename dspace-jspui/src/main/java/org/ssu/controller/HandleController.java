@@ -8,8 +8,8 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.browse.*;
-import org.dspace.content.*;
 import org.dspace.content.Collection;
+import org.dspace.content.*;
 import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.crosswalk.DisseminationCrosswalk;
 import org.dspace.content.factory.ContentServiceFactory;
@@ -39,9 +39,9 @@ import org.ssu.entity.response.CountedCommunityResponse;
 import org.ssu.entity.response.CountryStatisticsResponse;
 import org.ssu.entity.response.ItemResponse;
 import org.ssu.service.BrowseContext;
+import org.ssu.service.BrowseRequestProcessor;
 import org.ssu.service.CommunityService;
 import org.ssu.service.ItemService;
-import org.ssu.service.BrowseRequestProcessor;
 import org.ssu.service.localization.AuthorsCache;
 import org.ssu.service.statistics.EssuirStatistics;
 
@@ -56,6 +56,7 @@ import java.sql.SQLException;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Controller
 @RequestMapping("/")
@@ -111,7 +112,7 @@ public class HandleController {
                 result = displayCollection(request, response, model, (Collection)dSpaceObject, locale);
             }
             request.setAttribute("dspace.community", parentCommunity);
-            request.setAttribute("dspace.communities", getParents(dspaceContext, parentCommunity, includeCurrentCommunityInResult));
+            request.setAttribute("dspace.communities", getCommunityParents(dspaceContext, parentCommunity, includeCurrentCommunityInResult));
         } else {
             request.setAttribute("dspace.original.url", "/handle/123456789/" + itemId);
             Authenticate.startAuthentication(dspaceContext, request, response);
@@ -134,9 +135,8 @@ public class HandleController {
 
         PluginService pluginService = CoreServiceFactory.getInstance().getPluginService();
         CollectionHomeProcessor[] chp = (CollectionHomeProcessor[]) pluginService.getPluginSequence(CollectionHomeProcessor.class);
-        for (int i = 0; i < chp.length; i++)
-        {
-            chp[i].process(dspaceContext, request, response, collection);
+        for (CollectionHomeProcessor collectionHomeProcessor : chp) {
+            collectionHomeProcessor.process(dspaceContext, request, response, collection);
         }
 
         request.setAttribute("collection", collection);
@@ -158,44 +158,36 @@ public class HandleController {
         Context dspaceContext = UIUtil.obtainContext(request);
         ItemCounter ic = new ItemCounter(dspaceContext);
 
+        Function<DSpaceObject, CountedCommunityResponse> extractDataForCountedItem = (collection) -> {
+            try {
+                return new CountedCommunityResponse.Builder()
+                        .withTitle(collection.getName())
+                        .withHandle(collection.getHandle())
+                        .withItemCount(ic.getCount(collection))
+                        .withId(collection.getID())
+                        .build();
+            } catch (ItemCountException e) {
+                e.printStackTrace();
+            }
+            return null;
+        };
+
         List<CountedCommunityResponse> subCommunities = community.getSubcommunities()
                 .stream()
-                .map(subCommunity -> {
-                    try {
-                        return new CountedCommunityResponse.Builder()
-                                .withTitle(subCommunity.getName())
-                                .withHandle(subCommunity.getHandle())
-                                .withItemCount(ic.getCount(subCommunity))
-                                .build();
-                    } catch (ItemCountException e) {
-                        e.printStackTrace();
-                    }
-                    return null;
-                })
+                .map(extractDataForCountedItem)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
 
         List<CountedCommunityResponse> collections = community.getCollections()
                 .stream()
-                .map(subCommunity -> {
-                    try {
-                        return new CountedCommunityResponse.Builder()
-                                .withTitle(subCommunity.getName())
-                                .withHandle(subCommunity.getHandle())
-                                .withItemCount(ic.getCount(subCommunity))
-                                .build();
-                    } catch (ItemCountException e) {
-                        e.printStackTrace();
-                    }
-                    return null;
-                })
+                .map(extractDataForCountedItem)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
+
         PluginService pluginService = CoreServiceFactory.getInstance().getPluginService();
         CommunityHomeProcessor[] chp = (CommunityHomeProcessor[]) pluginService.getPluginSequence(CommunityHomeProcessor.class);
-        for (int i = 0; i < chp.length; i++)
-        {
-            chp[i].process(dspaceContext, request, response, community);
+        for (CommunityHomeProcessor communityHomeProcessor : chp) {
+            communityHomeProcessor.process(dspaceContext, request, response, community);
         }
 
         model.setViewName("community-display");
@@ -203,6 +195,7 @@ public class HandleController {
         model.addObject("title", community.getName());
         model.addObject("editorButton", dspaceCommunityService.canEditBoolean(dspaceContext, community));
         model.addObject("addButton", authorizeService.authorizeActionBoolean(dspaceContext, community, Constants.ADD));
+        model.addObject("removeButton", authorizeService.authorizeActionBoolean(dspaceContext, community, Constants.REMOVE));
         model.addObject("community", community);
         model.addObject("handle", community.getHandle());
         model.addObject("subCommunities", subCommunities);
@@ -334,16 +327,11 @@ public class HandleController {
         return model;
     }
 
-    private List<Community> getParents(Context context, Community c, boolean include)
-            throws SQLException
-    {
-        // Find all the "parent" communities for the community
-        List<Community> parents = dspaceCommunityService .getAllParents(context, c);
-        parents = Lists.reverse(parents);
-        if (include)
-        {
-            parents.add(c);
-        }
-        return parents;
+    private List<Community> getCommunityParents(Context context, Community currentCommunity, boolean includeCurrentCommunityInResult) throws SQLException {
+        Stream<Optional<Community>> previousCommunities = Lists.reverse(dspaceCommunityService.getAllParents(context, currentCommunity)).stream().map(Optional::ofNullable);
+        return Stream.concat(previousCommunities, Stream.of(Optional.ofNullable(currentCommunity).filter(com -> includeCurrentCommunityInResult)))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toList());
     }
 }
