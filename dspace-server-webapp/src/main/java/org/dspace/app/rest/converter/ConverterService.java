@@ -72,14 +72,13 @@ public class ConverterService {
      * {@link Projection#transformRest(RestModel)} method will be automatically called after conversion.
      * </p>
      *
-     * @param modelObject the model object, which may be a JPA entity or other class provided by the DSpace
-     *                   service layer.
+     * @param modelObject the model object, which may be a JPA entity any other class for which a converter exists.
      * @param projection the projection to use.
      * @param <M> the type of model object. A converter {@link Component} must exist that takes this as input.
      * @param <R> the inferred return type.
      * @return the converted object. If it's a {@link RestAddressableModel}, its
-     *         {@link RestAddressableModel#getProjection()} will be set to the named projection.
-     * @throws IllegalArgumentException if there is no compatible converter or no such projection.
+     *         {@link RestAddressableModel#getProjection()} will be set to the given projection.
+     * @throws IllegalArgumentException if there is no compatible converter.
      * @throws ClassCastException if the converter's return type is not compatible with the inferred return type.
      */
     public <M, R> R toRest(M modelObject, Projection projection) {
@@ -95,19 +94,32 @@ public class ConverterService {
     /**
      * Converts a list of model objects to a page of rest objects using the given {@link Projection}.
      *
-     * @param modelObjects
-     * @param pageable
-     * @param total
-     * @param projection
-     * @param <T>
-     * @param <D>
-     * @return
+     * @param modelObjects the list of model objects.
+     * @param pageable the pageable.
+     * @param total the total number of items.
+     * @param projection the projection to use.
+     * @param <M> the model object class.
+     * @param <R> the rest object class.
+     * @return the page.
+     * @throws IllegalArgumentException if there is no compatible converter.
+     * @throws ClassCastException if the converter's return type is not compatible with the inferred return type.
      */
-    public <T, D> Page<T> toRestPage(List<D> modelObjects, Pageable pageable, long total, Projection projection) {
+    public <M, R> Page<R> toRestPage(List<M> modelObjects, Pageable pageable, long total, Projection projection) {
         return new PageImpl<>(modelObjects, pageable, total).map((object) -> toRest(object, projection));
     }
 
-    public <T, D> Page<T> toRestPage(Page<D> modelObjects, Projection projection) {
+    /**
+     * Converts a list of model objects to a page of rest objects using the given {@link Projection}.
+     *
+     * @param modelObjects the page of model objects.
+     * @param projection the projection to use.
+     * @param <M> the model object class.
+     * @param <R> the rest object class.
+     * @return the page.
+     * @throws IllegalArgumentException if there is no compatible converter.
+     * @throws ClassCastException if the converter's return type is not compatible with the inferred return type.
+     */
+    public <M, R> Page<R> toRestPage(Page<M> modelObjects, Projection projection) {
         return modelObjects.map((object) -> toRest(object, projection));
     }
 
@@ -139,7 +151,8 @@ public class ConverterService {
      * @param restObject the input rest object.
      * @param <T> the return type, a subclass of {@link HALResource}.
      * @return the fully converted resource, with all automatic links and embeds applied.
-     * @throws IllegalArgumentException if there is no such projection.
+     * @throws IllegalArgumentException if there is no compatible resource constructor.
+     * @throws ClassCastException if the resource type is not compatible with the inferred return type.
      */
     public <T extends HALResource> T toResource(RestModel restObject) {
         T halResource = getResource(restObject);
@@ -180,6 +193,9 @@ public class ConverterService {
      */
     private <T extends HALResource> T getResource(RestModel restObject) {
         Constructor constructor = resourceConstructors.get(restObject.getClass());
+        if (constructor == null) {
+            throw new IllegalArgumentException("No constructor found to get resource class from " + restObject);
+        }
         try {
             if (constructor.getParameterCount() == 2) {
                 return (T) constructor.newInstance(restObject, utils);
