@@ -12,7 +12,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
-import org.apache.commons.lang3.StringUtils;
 import org.dspace.content.service.EntityService;
 import org.dspace.content.service.EntityTypeService;
 import org.dspace.content.service.ItemService;
@@ -37,8 +36,15 @@ public class EntityServiceImpl implements EntityService {
 
     @Override
     public Entity findByItemId(Context context, UUID itemId) throws SQLException {
+
+        return findByItemId(context, itemId, -1, -1);
+    }
+
+    @Override
+    public Entity findByItemId(Context context, UUID itemId, Integer limit, Integer offset) throws SQLException {
+
         Item item = itemService.find(context, itemId);
-        List<Relationship> relationshipList = relationshipService.findByItem(context, item);
+        List<Relationship> relationshipList = relationshipService.findByItem(context, item, limit, offset);
         return new Entity(item, relationshipList);
     }
 
@@ -78,65 +84,61 @@ public class EntityServiceImpl implements EntityService {
     }
 
     @Override
-    public List<Relationship> getRelationsByLabel(Context context, String label) throws SQLException {
-        List<Relationship> listToReturn = new LinkedList<>();
-        List<Relationship> relationshipList = relationshipService.findAll(context);
-        for (Relationship relationship : relationshipList) {
-            RelationshipType relationshipType = relationship.getRelationshipType();
-            if (StringUtils.equals(relationshipType.getLeftwardType(),label) ||
-                StringUtils.equals(relationshipType.getRightwardType(),label)) {
-                listToReturn.add(relationship);
-            }
-        }
-        return listToReturn;
+    public List<Relationship> getRelationsByTypeName(Context context, String typeName) throws SQLException {
+        return getRelationsByTypeName(context, typeName, -1, -1);
+    }
+
+    @Override
+    public List<Relationship> getRelationsByTypeName(Context context, String typeName, Integer limit, Integer offset)
+            throws SQLException {
+        return relationshipService.findByTypeName(context, typeName, limit, offset);
     }
 
     @Override
     public List<RelationshipType> getAllRelationshipTypes(Context context, Entity entity) throws SQLException {
-        EntityType entityType = this.getType(context, entity);
-        List<RelationshipType> listToReturn = new LinkedList<>();
-        for (RelationshipType relationshipType : relationshipTypeService.findAll(context)) {
-            if (relationshipType.getLeftType().getID() == entityType.getID() ||
-                relationshipType.getRightType().getID() == entityType.getID()) {
-                listToReturn.add(relationshipType);
-            }
-        }
-        return listToReturn;
+
+        return getAllRelationshipTypes(context, entity, -1, -1);
+    }
+
+    @Override
+    public List<RelationshipType> getAllRelationshipTypes(Context context, Entity entity, Integer limit, Integer offset)
+            throws SQLException {
+        return relationshipTypeService.findByEntityType(context, this.getType(context, entity), limit, offset);
     }
 
     @Override
     public List<RelationshipType> getLeftRelationshipTypes(Context context, Entity entity) throws SQLException {
-        EntityType entityType = this.getType(context, entity);
-        List<RelationshipType> listToReturn = new LinkedList<>();
-        for (RelationshipType relationshipType : relationshipTypeService.findAll(context)) {
-            if (relationshipType.getLeftType().getID() == entityType.getID()) {
-                listToReturn.add(relationshipType);
-            }
-        }
-        return listToReturn;
+
+        return getLeftRelationshipTypes(context, entity, true, -1, -1);
+    }
+
+    @Override
+    public List<RelationshipType> getLeftRelationshipTypes(Context context, Entity entity, boolean isLeft,
+                                                           Integer limit, Integer offset) throws SQLException {
+        return relationshipTypeService.findByEntityType(context, this.getType(context, entity), isLeft, limit, offset);
     }
 
     @Override
     public List<RelationshipType> getRightRelationshipTypes(Context context, Entity entity) throws SQLException {
-        EntityType entityType = this.getType(context, entity);
-        List<RelationshipType> listToReturn = new LinkedList<>();
-        for (RelationshipType relationshipType : relationshipTypeService.findAll(context)) {
-            if (relationshipType.getRightType().getID() == entityType.getID()) {
-                listToReturn.add(relationshipType);
-            }
-        }
-        return listToReturn;
+
+        return getRightRelationshipTypes(context, entity, false, -1, -1);
     }
 
     @Override
-    public List<RelationshipType> getRelationshipTypesByTypeName(Context context, String label) throws SQLException {
-        List<RelationshipType> listToReturn = new LinkedList<>();
-        for (RelationshipType relationshipType : relationshipTypeService.findAll(context)) {
-            if (StringUtils.equals(relationshipType.getLeftwardType(),label) ||
-                StringUtils.equals(relationshipType.getRightwardType(),label)) {
-                listToReturn.add(relationshipType);
-            }
-        }
-        return listToReturn;
+    public List<RelationshipType> getRightRelationshipTypes(Context context, Entity entity, boolean isLeft,
+                                                            Integer limit, Integer offset) throws SQLException {
+
+        return relationshipTypeService.findByEntityType(context, this.getType(context, entity), isLeft, limit, offset);
+    }
+
+    @Override
+    public List<RelationshipType> getRelationshipTypesByTypeName(Context context, String type) throws SQLException {
+        return getRelationshipTypesByTypeName(context, type, -1, -1);
+    }
+
+    @Override
+    public List<RelationshipType> getRelationshipTypesByTypeName(Context context, String typeName,
+                                                                 Integer limit, Integer offset) throws SQLException {
+        return relationshipTypeService.findByLeftwardOrRightwardTypeName(context, typeName, limit, offset);
     }
 }

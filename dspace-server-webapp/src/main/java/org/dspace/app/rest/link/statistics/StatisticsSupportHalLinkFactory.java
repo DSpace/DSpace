@@ -24,7 +24,7 @@ public class StatisticsSupportHalLinkFactory
 
         list.add(buildLink(Link.REL_SELF, getMethodOn().getStatisticsSupport()));
         list.add(buildLink("viewevents", getMethodOn().getViewEvents()));
-        list.add(buildLink("searchevents", getMethodOn().getViewEvents()));
+        list.add(buildLink("searchevents", getMethodOn().getSearchEvents()));
     }
 
     protected Class<StatisticsRestController> getControllerClass() {

@@ -459,7 +459,7 @@ public class Harvest {
         List<String> errors;
 
         System.out.print("Testing basic PMH access:  ");
-        errors = OAIHarvester.verifyOAIharvester(server, set,
+        errors = harvestedCollectionService.verifyOAIharvester(server, set,
                                                  (null != metadataFormat) ? metadataFormat : "dc", false);
         if (errors.isEmpty()) {
             System.out.println("OK");
@@ -470,7 +470,7 @@ public class Harvest {
         }
 
         System.out.print("Testing ORE support:  ");
-        errors = OAIHarvester.verifyOAIharvester(server, set,
+        errors = harvestedCollectionService.verifyOAIharvester(server, set,
                                                  (null != metadataFormat) ? metadataFormat : "dc", true);
         if (errors.isEmpty()) {
             System.out.println("OK");
