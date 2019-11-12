@@ -736,7 +736,7 @@
 
   <!-- specific type required by OpenAIRE4 Guidelines -->
   <dc-type>
-	<schema>dc</schema>
+    <schema>dc</schema>
     <element>subject</element>
     <qualifier>fos</qualifier>
     <scope_note>Fields of Science and Technology - OECD</scope_note>
