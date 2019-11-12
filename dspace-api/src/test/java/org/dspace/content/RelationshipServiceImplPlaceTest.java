@@ -251,26 +251,33 @@ public class RelationshipServiceImplPlaceTest extends AbstractUnitTest {
     /**
      * In this test, our goal will be to add a bunch of metadata values to then remove one of them. We'll check the list
      * of metadata values for the item and check that the places have not been altered for the metadata values IF an
-     * item.update hadn't been called yet. We'll then create a Relationship (by which a 
+     * item.update hadn't been called yet. We'll then create a Relationship (by which an item.update will be called)
+     * and then we check that the places are set correctly.
+     * We then repeat this process once more and check that everything works as intended
      * @throws Exception
      */
     @Test
     public void AddAndRemoveMetadataAndRelationshipsTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
+        // Here we add the first set of metadata to the item
         itemService.addMetadata(context, item, dcSchema, contributorElement, authorQualifier, null, "test, one");
         itemService.addMetadata(context, item, dcSchema, contributorElement, authorQualifier, null, "test, two");
         itemService.addMetadata(context, item, dcSchema, contributorElement, authorQualifier, null, "test, three");
 
+        // Get a specific metadatavlaue to remove
         MetadataValue metadataValueToRemove = itemService.getMetadata(item, "dc", "contributor", "author", Item.ANY)
                                                          .get(1);
+        // Remove the actual metadata value
         item.removeMetadata(metadataValueToRemove);
         metadataValueService.delete(context, metadataValueToRemove);
 
         context.restoreAuthSystemState();
 
+        // Retrieve the list of mdv again
         List<MetadataValue> list = itemService
             .getMetadata(item, dcSchema, contributorElement, authorQualifier, Item.ANY);
+        // Verify we only have 2 mdv left
         assertThat(list.size(), equalTo(2));
 
         // Check that these places are still intact after the deletion as the place doesn't get updated until an
@@ -280,13 +287,16 @@ public class RelationshipServiceImplPlaceTest extends AbstractUnitTest {
 
         context.turnOffAuthorisationSystem();
 
+        // Create a relationship with this item with a spcific place
         Relationship relationship = relationshipService.create(context, item, authorItem, isAuthorOfPublication, 1, -1);
 
         context.restoreAuthSystemState();
 
+        // Retrieve the list again and verify that the creation of the Relationship added an additional mdv
         list = itemService.getMetadata(item, dcSchema, contributorElement, authorQualifier, Item.ANY);
         assertThat(list.size(), equalTo(3));
 
+        // Assert that the mdv are well placed
         assertMetadataValue(authorQualifier, contributorElement, dcSchema, "test, one", null, 0, list.get(0));
         assertMetadataValue(authorQualifier, contributorElement, dcSchema, "familyName, firstName",
                             "virtual::" + relationship.getID(), 1, list.get(1));
@@ -296,6 +306,7 @@ public class RelationshipServiceImplPlaceTest extends AbstractUnitTest {
 
         context.turnOffAuthorisationSystem();
 
+        // Add two extra mdv
         itemService.addMetadata(context, item, dcSchema, contributorElement, authorQualifier, null, "test, four");
         itemService.addMetadata(context, item, dcSchema, contributorElement, authorQualifier, null, "test, five");
 
@@ -320,6 +331,7 @@ public class RelationshipServiceImplPlaceTest extends AbstractUnitTest {
 
         context.turnOffAuthorisationSystem();
 
+        // Create an additional item for another relationship
         WorkspaceItem authorIs = workspaceItemService.create(context, col, false);
         Item secondAuthorItem = installItemService.installItem(context, authorIs);
         itemService.addMetadata(context, secondAuthorItem, "relationship", "type", null, null, "Person");
@@ -330,6 +342,8 @@ public class RelationshipServiceImplPlaceTest extends AbstractUnitTest {
 
         context.restoreAuthSystemState();
 
+        // Check that the other mdv are still okay and that the creation of the relationship added
+        // another correct mdv to the item
         list = itemService.getMetadata(item, dcSchema, contributorElement, authorQualifier, Item.ANY);
 
         assertMetadataValue(authorQualifier, contributorElement, dcSchema, "test, one", null, 0, list.get(0));
@@ -350,6 +364,7 @@ public class RelationshipServiceImplPlaceTest extends AbstractUnitTest {
     public void AddAndUpdateMetadataAndRelationshipsTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
+        // Add metadata and relationships to the item
         itemService.addMetadata(context, item, dcSchema, contributorElement, authorQualifier, null, "test, one");
         itemService.addMetadata(context, item, dcSchema, contributorElement, authorQualifier, null, "test, two");
         itemService.addMetadata(context, item, dcSchema, contributorElement, authorQualifier, null, "test, three");
@@ -359,6 +374,7 @@ public class RelationshipServiceImplPlaceTest extends AbstractUnitTest {
 
         context.restoreAuthSystemState();
 
+        // Get the list of mdv and assert that they're correct
         List<MetadataValue> list = itemService
             .getMetadata(item, dcSchema, contributorElement, authorQualifier, Item.ANY);
         assertThat(list.size(), equalTo(4));
@@ -385,6 +401,7 @@ public class RelationshipServiceImplPlaceTest extends AbstractUnitTest {
 
         context.restoreAuthSystemState();
 
+        // Retrieve the list again and verify that the updating did indeed work
         list = itemService.getMetadata(item, dcSchema, contributorElement, authorQualifier, Item.ANY);
 
         assertMetadataValue(authorQualifier, contributorElement, dcSchema, "test, one", null, 0, list.get(0));
