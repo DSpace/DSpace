@@ -301,7 +301,7 @@ public class RelationshipMetadataServiceTest extends AbstractUnitTest {
         relationshipService.delete(context, relationship, true, false);
         context.restoreAuthSystemState();
 
-        //verify the publicationvolume.volumeNumber actual metadata
+        //verify the left item's publicationvolume.volumeNumber actual metadata
         List<MetadataValue> volumeList =
                 itemService.getMetadata(leftItem, "publicationvolume", "volumeNumber", null, Item.ANY);
         assertThat(volumeList.size(), equalTo(1));
@@ -317,13 +317,16 @@ public class RelationshipMetadataServiceTest extends AbstractUnitTest {
     public void testJournalDeleteRelationshipCopyToRightItem() throws SQLException, AuthorizeException {
         initJournalVolumeIssue();
         context.turnOffAuthorisationSystem();
+        //rightItem is the journal volume item
         relationshipService.delete(context, relationship, false, true);
         context.restoreAuthSystemState();
 
+        //verify the left item doesn't contain the publicationvolume.volumeNumber actual metadata
         List<MetadataValue> volumeList =
                 itemService.getMetadata(leftItem, "publicationvolume", "volumeNumber", null, Item.ANY);
         assertThat(volumeList.size(), equalTo(0));
 
+        //verify the right item's publicationissue.issueNumber actual metadata
         List<MetadataValue> issueList =
                 itemService.getMetadata(rightItem, "publicationissue", "issueNumber", null, Item.ANY);
         assertThat(issueList.size(), equalTo(1));
@@ -334,14 +337,18 @@ public class RelationshipMetadataServiceTest extends AbstractUnitTest {
     public void testDeleteJournalRelationshipCopyToBothItems() throws SQLException, AuthorizeException {
         initJournalVolumeIssue();
         context.turnOffAuthorisationSystem();
+        //leftItem is the journal issue item
+        //rightItem is the journal volume item
         relationshipService.delete(context, relationship, true, true);
         context.restoreAuthSystemState();
 
+        //verify the left item's publicationvolume.volumeNumber actual metadata
         List<MetadataValue> volumeList =
                 itemService.getMetadata(leftItem, "publicationvolume", "volumeNumber", null, Item.ANY);
         assertThat(volumeList.size(), equalTo(1));
         assertThat(volumeList.get(0).getValue(), equalTo("30"));
 
+        //verify the right item's publicationissue.issueNumber actual metadata
         List<MetadataValue> issueList =
                 itemService.getMetadata(rightItem, "publicationissue", "issueNumber", null, Item.ANY);
         assertThat(issueList.size(), equalTo(1));
