@@ -340,6 +340,15 @@ public class DOIIdentifierProvider
                     + "is marked as DELETED.", DOIIdentifierException.DOI_IS_DELETED);
         }
         
+        // In case register fails, status must not stay null
+        if (doiRow.isColumnNull("status")) {
+            doiRow.setColumn("status", TO_BE_REGISTERED);
+            if (0 == DatabaseManager.update(context, doiRow))
+            {
+                throw new RuntimeException("Cannot update DOI status in the database for unkown reason.");
+            }
+        }
+
         // register DOI Online
         try {
             connector.registerDOI(context, dso, doi);
