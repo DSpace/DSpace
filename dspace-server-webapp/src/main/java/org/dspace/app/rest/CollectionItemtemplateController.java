@@ -34,8 +34,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * This RestController takes care of the creation and deletion of Collection's Item templates
- * This class will typically receive the UUID of a Collection and it'll perform logic on its nested objects
+ * This RestController takes care of the creation and retrieval of Collection's Item templates
+ * This class will receive the UUID of a Collection and it'll perform actions on its nested objects
  */
 @RestController
 @RequestMapping("/api/" + CollectionRest.CATEGORY + "/" + CollectionRest.PLURAL_NAME
