@@ -15,7 +15,6 @@ import org.dspace.app.rest.converter.processes.ProcessConverter;
 import org.dspace.app.rest.model.ProcessRest;
 import org.dspace.app.rest.model.hateoas.DSpaceResource;
 import org.dspace.app.rest.model.hateoas.ProcessResource;
-import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Context;
 import org.dspace.scripts.Process;
@@ -23,7 +22,6 @@ import org.dspace.scripts.service.ProcessService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
@@ -54,15 +52,12 @@ public class ProcessRestRepository extends DSpaceRestRepository<ProcessRest, Int
     }
 
     @Override
-    public ProcessRest findOne(Context context, Integer integer) {
+    @PreAuthorize("hasPermission(#id, 'PROCESS', 'READ')")
+    public ProcessRest findOne(Context context, Integer id) {
         try {
-            Process process = processService.find(context, integer);
+            Process process = processService.find(context, id);
             if (process == null) {
-                throw new ResourceNotFoundException("The process with ID: " + integer + " wasn't found");
-            }
-            if ((context.getCurrentUser() == null) || (!context.getCurrentUser().equals(process.getEPerson())
-                && !authorizeService.isAdmin(context))) {
-                throw new AuthorizeException("The current user isn't eligible to view the process with id: " + integer);
+                return null;
             }
             return processConverter.fromModel(process);
         } catch (Exception e) {
