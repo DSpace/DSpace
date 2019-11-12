@@ -297,14 +297,17 @@ public class RelationshipMetadataServiceTest extends AbstractUnitTest {
     public void testDeleteJournalRelationshipCopyToLeftItem() throws SQLException, AuthorizeException {
         initJournalVolumeIssue();
         context.turnOffAuthorisationSystem();
+        //leftItem is the journal issue item
         relationshipService.delete(context, relationship, true, false);
         context.restoreAuthSystemState();
 
+        //verify the publicationvolume.volumeNumber actual metadata
         List<MetadataValue> volumeList =
                 itemService.getMetadata(leftItem, "publicationvolume", "volumeNumber", null, Item.ANY);
         assertThat(volumeList.size(), equalTo(1));
         assertThat(volumeList.get(0).getValue(), equalTo("30"));
 
+        //verify the right item doesn't contain the actual metadata
         List<MetadataValue> issueList =
                 itemService.getMetadata(rightItem, "publicationissue", "issueNumber", null, Item.ANY);
         assertThat(issueList.size(), equalTo(0));
