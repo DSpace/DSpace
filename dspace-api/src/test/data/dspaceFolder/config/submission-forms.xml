@@ -18,7 +18,7 @@
  <!-- displayed label, a text string prompt which is called a hint, and    -->
  <!-- an input-type. Each field also may hold optional elements: DC        -->
  <!-- qualifier name, a repeatable flag, an optional name-variants allowed -->
- <!-- flag, and a text string whose presence  &ndash;&gt; serves as a      -->
+ <!-- flag, and a text string whose presence serves as a                   -->
  <!-- 'this field is required' flag.                                       -->
 
  <form-definitions>
