@@ -24,7 +24,7 @@
     <dc-type>
         <schema>project</schema>
         <element>funder</element>
-		<element>name</element>
+        <qualifier>name</qualifier>
         <scope_note>Name of the funding provider.</scope_note>
     </dc-type>
 	
@@ -36,7 +36,7 @@
 	<dc-type>
         <schema>project</schema>
         <element>funder</element>
-		<element>identifier</element>
+        <qualifier>identifier</qualifier>
         <scope_note>Unique identifier of the funding entity.</scope_note>
     </dc-type>
 
