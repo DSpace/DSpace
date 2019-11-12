@@ -37,6 +37,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * This RestController takes care of the modification and retrieval of Collection's Item templates
+ * Contrary to CollectionItemtemplateController, this class will receive the UUID of an Item template
+ */
 @RestController
 @RequestMapping("/api/core/itemtemplates" + ItemtemplateRestController.REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID)
 public class ItemtemplateRestController {
