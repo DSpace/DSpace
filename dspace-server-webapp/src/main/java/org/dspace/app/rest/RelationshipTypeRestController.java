@@ -71,7 +71,7 @@ public class RelationshipTypeRestController {
                                                     HttpServletRequest request) throws SQLException {
         Context context = ContextUtil.obtainContext(request);
         EntityType entityType = entityTypeService.find(context, id);
-        List<RelationshipType> list = relationshipTypeService.findByEntityType(context, entityType);
+        List<RelationshipType> list = relationshipTypeService.findByEntityType(context, entityType, -1, -1);
 
         List<RelationshipTypeRest> relationshipTypeRests = new LinkedList<>();
 

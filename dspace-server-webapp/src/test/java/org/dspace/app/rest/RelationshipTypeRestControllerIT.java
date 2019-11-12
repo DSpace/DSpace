@@ -72,19 +72,19 @@ public class RelationshipTypeRestControllerIT extends AbstractEntityIntegrationT
         EntityType journalIssueEntityType = entityTypeService.findByEntityType(context, "journalIssue");
 
         RelationshipType relationshipType1 = relationshipTypeService
-            .findbyTypesAndLabels(context, publicationEntityType, personEntityType, "isAuthorOfPublication",
+            .findbyTypesAndTypeName(context, publicationEntityType, personEntityType, "isAuthorOfPublication",
                                   "isPublicationOfAuthor");
         RelationshipType relationshipType2 = relationshipTypeService
-            .findbyTypesAndLabels(context, publicationEntityType, projectEntityType, "isProjectOfPublication",
+            .findbyTypesAndTypeName(context, publicationEntityType, projectEntityType, "isProjectOfPublication",
                                   "isPublicationOfProject");
         RelationshipType relationshipType3 = relationshipTypeService
-            .findbyTypesAndLabels(context, publicationEntityType, orgunitEntityType, "isOrgUnitOfPublication",
+            .findbyTypesAndTypeName(context, publicationEntityType, orgunitEntityType, "isOrgUnitOfPublication",
                                   "isPublicationOfOrgUnit");
         RelationshipType relationshipType4 = relationshipTypeService
-            .findbyTypesAndLabels(context, journalIssueEntityType, publicationEntityType, "isPublicationOfJournalIssue",
-                                  "isJournalIssueOfPublication");
+            .findbyTypesAndTypeName(context, journalIssueEntityType, publicationEntityType,
+                    "isPublicationOfJournalIssue", "isJournalIssueOfPublication");
         RelationshipType relationshipType5 = relationshipTypeService
-            .findbyTypesAndLabels(context, publicationEntityType, orgunitEntityType, "isAuthorOfPublication",
+            .findbyTypesAndTypeName(context, publicationEntityType, orgunitEntityType, "isAuthorOfPublication",
                                   "isPublicationOfAuthor");
         getClient().perform(get("/api/core/entitytypes/" + publicationEntityType.getID() + "/relationshiptypes"))
                    .andExpect(status().isOk())
@@ -162,15 +162,15 @@ public class RelationshipTypeRestControllerIT extends AbstractEntityIntegrationT
                                        .build();
 
         RelationshipType isOrgUnitOfPersonRelationshipType = relationshipTypeService
-            .findbyTypesAndLabels(context, entityTypeService.findByEntityType(context, "Person"),
+            .findbyTypesAndTypeName(context, entityTypeService.findByEntityType(context, "Person"),
                                   entityTypeService.findByEntityType(context, "OrgUnit"),
                                   "isOrgUnitOfPerson", "isPersonOfOrgUnit");
         RelationshipType isOrgUnitOfProjectRelationshipType = relationshipTypeService
-            .findbyTypesAndLabels(context, entityTypeService.findByEntityType(context, "Project"),
+            .findbyTypesAndTypeName(context, entityTypeService.findByEntityType(context, "Project"),
                                   entityTypeService.findByEntityType(context, "OrgUnit"),
                                   "isOrgUnitOfProject", "isProjectOfOrgUnit");
         RelationshipType isAuthorOfPublicationRelationshipType = relationshipTypeService
-            .findbyTypesAndLabels(context, entityTypeService.findByEntityType(context, "Publication"),
+            .findbyTypesAndTypeName(context, entityTypeService.findByEntityType(context, "Publication"),
                                   entityTypeService.findByEntityType(context, "Person"),
                                   "isAuthorOfPublication", "isPublicationOfAuthor");
 

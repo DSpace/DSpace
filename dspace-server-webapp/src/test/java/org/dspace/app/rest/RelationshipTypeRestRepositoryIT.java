@@ -120,7 +120,7 @@ public class RelationshipTypeRestRepositoryIT extends AbstractEntityIntegrationT
     private void checkRelationshipType(String leftType, String rightType, String leftwardType, String rightwardType)
         throws SQLException {
         RelationshipType relationshipType = relationshipTypeService
-            .findbyTypesAndLabels(context, entityTypeService.findByEntityType(context, leftType),
+            .findbyTypesAndTypeName(context, entityTypeService.findByEntityType(context, leftType),
                                   entityTypeService.findByEntityType(context, rightType),
                                   leftwardType, rightwardType);
         assertNotNull(relationshipType);
@@ -190,7 +190,7 @@ public class RelationshipTypeRestRepositoryIT extends AbstractEntityIntegrationT
     @Test
     public void cardinalityOnAuthorPublicationRelationshipTypesTest() throws Exception {
         RelationshipType relationshipType = relationshipTypeService
-            .findbyTypesAndLabels(context, entityTypeService.findByEntityType(context, "Publication"),
+            .findbyTypesAndTypeName(context, entityTypeService.findByEntityType(context, "Publication"),
                                   entityTypeService.findByEntityType(context, "Person"), "isAuthorOfPublication",
                                   "isPublicationOfAuthor");
         assertEquals(((Integer) 0), relationshipType.getLeftMinCardinality());
@@ -235,7 +235,7 @@ public class RelationshipTypeRestRepositoryIT extends AbstractEntityIntegrationT
     @Test
     public void cardinalityOnIssueJournalJournalVolumeRelationshipTypesTest() throws Exception {
         RelationshipType relationshipType = relationshipTypeService
-            .findbyTypesAndLabels(context, entityTypeService.findByEntityType(context, "JournalVolume"),
+            .findbyTypesAndTypeName(context, entityTypeService.findByEntityType(context, "JournalVolume"),
                                   entityTypeService.findByEntityType(context, "JournalIssue"), "isIssueOfJournalVolume",
                                   "isJournalVolumeOfIssue");
         assertEquals(((Integer) 0), relationshipType.getLeftMinCardinality());
