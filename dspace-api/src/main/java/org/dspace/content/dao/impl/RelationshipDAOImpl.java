@@ -84,9 +84,9 @@ public class RelationshipDAOImpl extends AbstractHibernateDAO<Relationship> impl
         criteriaQuery.select(relationshipRoot);
         criteriaQuery.where(criteriaBuilder.equal(relationshipRoot.get(Relationship_.rightItem), item));
         List<Relationship> list = list(context, criteriaQuery, false, Relationship.class, -1, -1);
-        list.sort((o1, o2) -> o2.getLeftPlace() - o1.getLeftPlace());
+        list.sort((o1, o2) -> o2.getRightPlace() - o1.getRightPlace());
         if (!list.isEmpty()) {
-            return list.get(0).getLeftPlace() + 1;
+            return list.get(0).getRightPlace() + 1;
         } else {
             return 0;
         }
