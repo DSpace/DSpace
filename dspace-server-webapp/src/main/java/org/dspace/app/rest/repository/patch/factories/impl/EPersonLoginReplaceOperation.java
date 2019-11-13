@@ -23,7 +23,7 @@ import org.springframework.stereotype.Component;
  * </code>
  */
 @Component
-public class EPersonLoginReplaceOperation<R>extends PatchOperation<R> {
+public class EPersonLoginReplaceOperation<R> extends PatchOperation<R> {
 
     /**
      * Path in json body of patch that uses this operation
