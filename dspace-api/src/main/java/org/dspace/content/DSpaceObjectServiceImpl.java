@@ -756,4 +756,9 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
         }
     }
 
+    @Override
+    public void setMetadataModified(T dso) {
+        dso.setMetadataModified();
+    }
+
 }

@@ -12,11 +12,13 @@ import java.sql.SQLException;
 import java.util.List;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.dao.MetadataFieldDAO;
 import org.dspace.content.service.MetadataFieldService;
+import org.dspace.content.service.MetadataSchemaService;
 import org.dspace.content.service.MetadataValueService;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -42,6 +44,8 @@ public class MetadataFieldServiceImpl implements MetadataFieldService {
     protected AuthorizeService authorizeService;
     @Autowired(required = true)
     protected MetadataValueService metadataValueService;
+    @Autowired(required = true)
+    protected MetadataSchemaService metadataSchemaService;
 
     protected MetadataFieldServiceImpl() {
 
@@ -92,6 +96,20 @@ public class MetadataFieldServiceImpl implements MetadataFieldService {
     public MetadataField findByElement(Context context, String metadataSchemaName, String element, String qualifier)
         throws SQLException {
         return metadataFieldDAO.findByElement(context, metadataSchemaName, element, qualifier);
+    }
+
+    @Override
+    public MetadataField findByString(Context context, String mdString, char separator) throws SQLException {
+        String[] seq = StringUtils.split(mdString, separator);
+        String schema = seq.length > 1 ? seq[0] : null;
+        String element = seq.length > 1 ? seq[1] : null;
+        String qualifier = seq.length == 3 ? seq[2] : null;
+        if (schema == null || element == null) {
+            return null;
+        } else {
+            MetadataSchema metadataSchema = metadataSchemaService.find(context, schema);
+            return this.findByElement(context, metadataSchema, element, qualifier);
+        }
     }
 
     @Override
