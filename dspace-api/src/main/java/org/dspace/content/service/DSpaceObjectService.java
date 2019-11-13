@@ -405,4 +405,10 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
      * @return a org.dspace.core.Constants that represents a IndexableObject type
      */
     public int getSupportsTypeConstant();
+
+    /**
+     * Trigger the modifiedMetadata variable in DSpaceObject
+     * @param dso   DSpaceObject whose metadata has been modified
+     */
+    public void setMetadataModified(T dso);
 }
