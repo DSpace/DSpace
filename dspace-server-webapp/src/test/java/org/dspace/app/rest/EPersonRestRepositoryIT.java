@@ -979,6 +979,32 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
+    public void patchPasswordReplaceOnNonExistentValue() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        EPerson ePerson = EPersonBuilder.createEPerson(context)
+                .withNameInMetadata("John", "Doe")
+                .withEmail("Johndoe@fake-email.com")
+                .build();
+
+        String newPassword = "newpassword";
+
+        List<Operation> ops = new ArrayList<Operation>();
+        ReplaceOperation replaceOperation = new ReplaceOperation("/password", newPassword);
+        ops.add(replaceOperation);
+        String patchBody = getPatchContent(ops);
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        // replace of password should fail
+        getClient(token).perform(patch("/api/eperson/epersons/" + ePerson.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     public void patchCanLoginNonAdminUser() throws Exception {
         context.turnOffAuthorisationSystem();
 

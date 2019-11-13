@@ -38,10 +38,22 @@ public class EPersonPasswordReplaceOperation<R> extends PatchOperation<R> {
         checkOperationValue(operation.getValue());
         if (supports(object, operation.getPath())) {
             EPerson eperson = (EPerson) object;
+            checkModelForExistingValue(eperson);
             ePersonService.setPassword(eperson, (String) operation.getValue());
             return object;
         } else {
             throw new DSpaceBadRequestException("EPersonPasswordReplaceOperation does not support this operation");
+        }
+    }
+
+    /**
+     * Checks whether the ePerson has a password via the ePersonService to checking if it has a non null password hash
+     *      throws a DSpaceBadRequestException if not pw hash was present
+     * @param ePerson   Object on which patch is being performed
+     */
+    private void checkModelForExistingValue(EPerson ePerson) {
+        if (ePersonService.getPasswordHash(ePerson).getHash() == null) {
+            throw new DSpaceBadRequestException("Attempting to replace a non-existent value (netID).");
         }
     }
 

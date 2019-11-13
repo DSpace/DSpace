@@ -35,10 +35,21 @@ public class EPersonEmailReplaceOperation<R> extends PatchOperation<R> {
         checkOperationValue(operation.getValue());
         if (supports(object, operation.getPath())) {
             EPerson eperson = (EPerson) object;
+            checkModelForExistingValue(eperson);
             eperson.setEmail((String) operation.getValue());
             return object;
         } else {
             throw new DSpaceBadRequestException("EPersonEmailReplaceOperation does not support this operation");
+        }
+    }
+
+    /**
+     * Checks whether the email of Eperson has an existing value to replace
+     * @param ePerson   Object on which patch is being done
+     */
+    private void checkModelForExistingValue(EPerson ePerson) {
+        if (ePerson.getEmail() == null) {
+            throw new DSpaceBadRequestException("Attempting to replace a non-existent value (e-mail).");
         }
     }
 

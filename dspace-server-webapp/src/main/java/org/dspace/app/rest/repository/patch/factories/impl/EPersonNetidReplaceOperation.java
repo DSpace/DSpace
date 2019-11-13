@@ -35,10 +35,21 @@ public class EPersonNetidReplaceOperation<R> extends PatchOperation<R> {
         checkOperationValue(operation.getValue());
         if (supports(object, operation.getPath())) {
             EPerson eperson = (EPerson) object;
+            checkModelForExistingValue(eperson);
             eperson.setNetid((String) operation.getValue());
             return object;
         } else {
             throw new DSpaceBadRequestException("EPersonNetidReplaceOperation does not support this operation");
+        }
+    }
+
+    /**
+     * Checks whether the netID of Eperson has an existing value to replace
+     * @param ePerson   Object on which patch is being done
+     */
+    private void checkModelForExistingValue(EPerson ePerson) {
+        if (ePerson.getNetid() == null) {
+            throw new DSpaceBadRequestException("Attempting to replace a non-existent value (netID).");
         }
     }
 
