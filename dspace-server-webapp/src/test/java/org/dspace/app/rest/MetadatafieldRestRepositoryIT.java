@@ -74,7 +74,7 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
 
         getClient().perform(get("/api/core/metadatafields")
-                                .param("size", String.valueOf(100)))
+                                .param("size", String.valueOf(110)))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$._embedded.metadatafields", Matchers.hasItems(
