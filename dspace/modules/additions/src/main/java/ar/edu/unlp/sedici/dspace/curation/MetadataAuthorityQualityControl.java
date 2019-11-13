@@ -8,6 +8,10 @@ import org.dspace.content.authority.Choices;
 import org.dspace.content.authority.MetadataAuthorityManager;
 import org.dspace.curate.AbstractCurationTask;
 import org.dspace.curate.Curator;
+
+import com.hp.hpl.jena.sparql.engine.http.QueryExceptionHTTP;
+import com.hp.hpl.jena.sparql.expr.ExprException;
+
 import java.io.IOException;
 import java.sql.SQLException;
 
@@ -102,7 +106,12 @@ public class MetadataAuthorityQualityControl extends AbstractCurationTask {
 				mtFieldName = mt.getField().replace(".", "_");
 				if (authManager.isAuthorityControlled(mtFieldName) && !skipMetadata(mtFieldName)
 						&& isMetadataToCheck(mtFieldName)) {
-					checkMetadataAuthority(reporter, mt, item);
+					try {
+						checkMetadataAuthority(reporter, mt, item);
+					} catch (ExprException | QueryExceptionHTTP e) {
+						report(reporter, mt, "ERROR", "An error ocurred processing metadata: ", e.getMessage());
+						e.printStackTrace();
+					}
 				}
 			}
 
@@ -199,7 +208,7 @@ public class MetadataAuthorityQualityControl extends AbstractCurationTask {
 		}
 	}
 
-	private void assertConfidenceNotFound(StringBuilder reporter, Metadatum mt) throws IOException {
+	private void assertConfidenceNotFound(StringBuilder reporter, Metadatum mt) {
 		if (mt.confidence > Choices.CF_NOTFOUND) {
 			report(reporter, mt, "ERROR", "Invalid confidence ", String.valueOf(mt.confidence), ", expected ",
 					String.valueOf(Choices.CF_NOTFOUND));
