@@ -9,7 +9,6 @@ package org.dspace.app.rest.repository.patch.factories.impl;
 
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.model.patch.Operation;
-import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.springframework.stereotype.Component;
@@ -24,7 +23,7 @@ import org.springframework.stereotype.Component;
  * </code>
  */
 @Component
-public class EPersonNetidReplaceOperation extends PatchOperation<EPerson> {
+public class EPersonNetidReplaceOperation<R> extends PatchOperation<R> {
 
     /**
      * Path in json body of patch that uses this operation
@@ -32,21 +31,19 @@ public class EPersonNetidReplaceOperation extends PatchOperation<EPerson> {
     private static final String OPERATION_PATH_NETID = "/netid";
 
     @Override
-    public EPerson perform(Context context, EPerson eperson, Operation operation) {
+    public R perform(Context context, R object, Operation operation) {
         checkOperationValue(operation.getValue());
-        checkModelForExistingValue(eperson);
-        eperson.setNetid((String) operation.getValue());
-        return eperson;
-    }
-
-    void checkModelForExistingValue(EPerson resource) {
-        if (resource.getNetid() == null) {
-            throw new DSpaceBadRequestException("Attempting to replace a non-existent value.");
+        if (supports(object, operation.getPath())) {
+            EPerson eperson = (EPerson) object;
+            eperson.setNetid((String) operation.getValue());
+            return object;
+        } else {
+            throw new DSpaceBadRequestException("EPersonNetidReplaceOperation does not support this operation");
         }
     }
 
     @Override
-    public boolean supports(DSpaceObject R, String path) {
-        return (R instanceof EPerson && path.trim().equalsIgnoreCase(OPERATION_PATH_NETID));
+    public boolean supports(R objectToMatch, String path) {
+        return (objectToMatch instanceof EPerson && path.trim().equalsIgnoreCase(OPERATION_PATH_NETID));
     }
 }
