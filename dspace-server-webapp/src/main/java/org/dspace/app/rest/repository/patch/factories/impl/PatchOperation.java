@@ -10,13 +10,12 @@ package org.dspace.app.rest.repository.patch.factories.impl;
 import org.apache.commons.lang3.BooleanUtils;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.model.patch.Operation;
-import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 
 /**
  * Base class for all resource patch operations.
  */
-public abstract class PatchOperation<M extends DSpaceObject>
+public abstract class PatchOperation<M>
         implements ResourcePatchOperation<M> {
 
     /**
@@ -65,10 +64,11 @@ public abstract class PatchOperation<M extends DSpaceObject>
 
     /**
      * Determines whether or not this Patch Operation can do this patch (RestModel and path gets checked)
-     * @param M         dso, whose class must be instance of dso for which this PatchOperation was created
-     * @param path      Path given to the patch body, should match this type of Patch Operation
-     * @return          True if this PatchOperation class can do the patch for this given dso type and Path
+     * @param objectToMatch    Object whose class must be instance of type object
+     *                              for which this PatchOperation was created
+     * @param path             Path given to the patch body, should match this type of Patch Operation
+     * @return                 True if this PatchOperation class can do the patch for this given dso type and Path
      */
-    public abstract boolean supports(DSpaceObject M, String path);
+    public abstract boolean supports(M objectToMatch, String path);
 
 }

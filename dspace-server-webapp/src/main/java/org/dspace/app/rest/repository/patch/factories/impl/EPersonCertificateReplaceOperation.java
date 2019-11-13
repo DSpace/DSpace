@@ -9,7 +9,6 @@ package org.dspace.app.rest.repository.patch.factories.impl;
 
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.model.patch.Operation;
-import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.springframework.stereotype.Component;
@@ -24,7 +23,7 @@ import org.springframework.stereotype.Component;
  * </code>
  */
 @Component
-public class EPersonCertificateReplaceOperation extends PatchOperation<EPerson> {
+public class EPersonCertificateReplaceOperation<R> extends PatchOperation<R> {
 
     /**
      * Path in json body of patch that uses this operation
@@ -32,26 +31,20 @@ public class EPersonCertificateReplaceOperation extends PatchOperation<EPerson> 
     private static final String OPERATION_PATH_CERTIFICATE = "/certificate";
 
     @Override
-    public EPerson perform(Context context, EPerson eperson, Operation operation) {
+    public R perform(Context context, R object, Operation operation) {
         checkOperationValue(operation.getValue());
-        checkModelForExistingValue(eperson);
         Boolean requireCert = getBooleanOperationValue(operation.getValue());
-        eperson.setRequireCertificate(requireCert);
-        return eperson;
-
-    }
-
-    void checkModelForExistingValue(EPerson resource) {
-        // TODO: many (all?) boolean values on the rest model should never be null.
-        // So perhaps the error to throw in this case is different...IllegalStateException?
-        // Or perhaps do nothing (no check is required).
-        if ((Object) resource.getRequireCertificate() == null) {
-            throw new DSpaceBadRequestException("Attempting to replace a non-existent value.");
+        if (supports(object, operation.getPath())) {
+            EPerson eperson = (EPerson) object;
+            eperson.setRequireCertificate(requireCert);
+            return object;
+        } else {
+            throw new DSpaceBadRequestException("EPersonCertificateReplaceOperation does not support this operation.");
         }
     }
 
     @Override
-    public boolean supports(DSpaceObject R, String path) {
-        return (R instanceof EPerson && path.trim().equalsIgnoreCase(OPERATION_PATH_CERTIFICATE));
+    public boolean supports(R objectToMatch, String path) {
+        return (objectToMatch instanceof EPerson && path.trim().equalsIgnoreCase(OPERATION_PATH_CERTIFICATE));
     }
 }

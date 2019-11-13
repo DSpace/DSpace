@@ -7,8 +7,8 @@
  */
 package org.dspace.app.rest.repository.patch.factories.impl;
 
+import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.model.patch.Operation;
-import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
@@ -25,7 +25,7 @@ import org.springframework.stereotype.Component;
  * </code>
  */
 @Component
-public class EPersonPasswordReplaceOperation extends PatchOperation<EPerson> {
+public class EPersonPasswordReplaceOperation<R> extends PatchOperation<R> {
 
     /**
      * Path in json body of patch that uses this operation
@@ -34,25 +34,19 @@ public class EPersonPasswordReplaceOperation extends PatchOperation<EPerson> {
     protected EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
 
     @Override
-    public EPerson perform(Context context, EPerson eperson, Operation operation) {
+    public R perform(Context context, R object, Operation operation) {
         checkOperationValue(operation.getValue());
-        checkModelForExistingValue(eperson);
-        ePersonService.setPassword(eperson, (String) operation.getValue());
-        return eperson;
-    }
-
-    void checkModelForExistingValue(EPerson resource) {
-        /*
-         * FIXME: the password field in eperson rest model is always null because
-         * the value is not set in the rest converter.
-         * We would normally throw an exception here since replace
-         * operations are not allowed on non-existent values, but that
-         * would prevent the password update from ever taking place.
-         */
+        if (supports(object, operation.getPath())) {
+            EPerson eperson = (EPerson) object;
+            ePersonService.setPassword(eperson, (String) operation.getValue());
+            return object;
+        } else {
+            throw new DSpaceBadRequestException("EPersonPasswordReplaceOperation does not support this operation");
+        }
     }
 
     @Override
-    public boolean supports(DSpaceObject R, String path) {
-        return (R instanceof EPerson && path.trim().equalsIgnoreCase(OPERATION_PASSWORD_CHANGE));
+    public boolean supports(R objectToMatch, String path) {
+        return (objectToMatch instanceof EPerson && path.trim().equalsIgnoreCase(OPERATION_PASSWORD_CHANGE));
     }
 }

@@ -16,7 +16,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
-import org.dspace.app.rest.converter.JsonPatchConverter;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.patch.CopyOperation;
@@ -36,32 +35,32 @@ import org.springframework.stereotype.Component;
  * Options (can be done on other dso than Item also):
  *      - ADD metadata (with schema.identifier.qualifier) value of a dso (here: Item)
  *          <code>
- *              curl -X PATCH http://${dspace.url}/api/items/<:id-item> -H "
+ *              curl -X PATCH http://${dspace.url}/api/core/items/<:id-item> -H "
  *              Content-Type: application/json" -d '[{ "op": "add", "path": "
  *              /metadata/schema.identifier.qualifier(/0|-)}", "value": "metadataValue"]'
  *          </code>
  *      - REMOVE metadata
  *          <code>
- *              curl -X PATCH http://${dspace.url}/api/items/<:id-item> -H "
+ *              curl -X PATCH http://${dspace.url}/api/core/items/<:id-item> -H "
  *              Content-Type: application/json" -d '[{ "op": "remove",
  *              "path": "/metadata/schema.identifier.qualifier(/0|-)}"]'
  *          </code>
  *      - REPLACE metadata
  *          <code>
- *              curl -X PATCH http://${dspace.url}/api/items/<:id-item> -H "
+ *              curl -X PATCH http://${dspace.url}/api/core/items/<:id-item> -H "
  *              Content-Type: application/json" -d '[{ "op": "replace", "path": "
  *              /metadata/schema.identifier.qualifier}", "value": "metadataValue"]'
  *          </code>
  *      - ORDERING metadata
  *          <code>
- *              curl -X PATCH http://${dspace.url}/api/items/<:id-item> -H "
+ *              curl -X PATCH http://${dspace.url}/api/core/items/<:id-item> -H "
  *              Content-Type: application/json" -d '[{ "op": "move",
  *              "from": "/metadata/schema.identifier.qualifier/index"
  *              "path": "/metadata/schema.identifier.qualifier/newIndex"}]'
  *          </code>
  *      - COPY metadata
  *          <code>
- *              curl -X PATCH http://${dspace.url}/api/items/<:id-item> -H "
+ *              curl -X PATCH http://${dspace.url}/api/core/items/<:id-item> -H "
  *              Content-Type: application/json" -d '[{ "op": "copy",
  *              "from": "/metadata/schema.identifier.qualifier/indexToCopyFrom"
  *              "path": "/metadata/schema.identifier.qualifier/-"}]'
@@ -80,7 +79,6 @@ public class DspaceObjectMetadataOperation<R extends DSpaceObject> extends Patch
     private static final String METADATA_PATH = "/metadata";
 
     private ObjectMapper objectMapper = new ObjectMapper();
-    private JsonPatchConverter jsonPatchConverter = new JsonPatchConverter(objectMapper);
 
     /**
      * Implements the patch operation for metadata operations.
@@ -160,8 +158,8 @@ public class DspaceObjectMetadataOperation<R extends DSpaceObject> extends Patch
                     );
             }
         } catch (IOException e) {
-            log.error("IOException in DspaceObjectMetadataOperation.performPatchOperation trying " +
-                    "to map json from operation.value to MetadataValue class.", e);
+            throw new DSpaceBadRequestException("IOException in DspaceObjectMetadataOperation.performPatchOperation" +
+                    " trying to map json from operation.value to MetadataValue class.", e);
         }
     }
 
@@ -188,7 +186,8 @@ public class DspaceObjectMetadataOperation<R extends DSpaceObject> extends Patch
                     metadataValue.getLanguage(), metadataValue.getValue(),
                     metadataValue.getAuthority(), metadataValue.getConfidence(), indexInt);
         } catch (SQLException e) {
-            log.error("SQLException in DspaceObjectMetadataOperation.add trying to add metadata to dso.", e);
+            throw new DSpaceBadRequestException("SQLException in DspaceObjectMetadataOperation.add trying to add " +
+                    "metadata to dso.", e);
         }
     }
 
@@ -222,17 +221,18 @@ public class DspaceObjectMetadataOperation<R extends DSpaceObject> extends Patch
                         && metadataValues.get(indexInt) != null) {
                     //remove that metadata
                     dsoService.removeMetadataValues(context, dso,
-                            Arrays.asList(metadataValues.get(Integer.parseInt(index))));
+                            Arrays.asList(metadataValues.get(indexInt)));
                 } else {
-                    throw new UnprocessableEntityException("There is no metadata of this type at that index");
+                    throw new UnprocessableEntityException("UnprocessableEntityException - There is no metadata of " +
+                            "this type at that index");
                 }
             } catch (NumberFormatException e) {
                 throw new IllegalArgumentException("This index (" + index + ") is not valid nr", e);
             } catch (ArrayIndexOutOfBoundsException e) {
                 throw new UnprocessableEntityException("There is no metadata of this type at that index");
             } catch (SQLException e) {
-                log.error("SQLException in DspaceObjectMetadataOperation.remove trying to remove " +
-                        "metadata from dso.", e);
+                throw new DSpaceBadRequestException("SQLException in DspaceObjectMetadataOperation.remove trying to " +
+                        "remove metadata from dso.", e);
             }
         }
     }
@@ -261,8 +261,8 @@ public class DspaceObjectMetadataOperation<R extends DSpaceObject> extends Patch
             try {
                 dsoService.clearMetadata(context, dso, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
             } catch (SQLException e) {
-                log.error("SQLException in DspaceObjectMetadataOperation.replace trying to remove" +
-                        "and replace metadata from dso.", e);
+                throw new DSpaceBadRequestException("SQLException in DspaceObjectMetadataOperation.replace trying to " +
+                        "remove and replace metadata from dso.", e);
             }
         }
         // replace all metadata for existing key
@@ -271,8 +271,8 @@ public class DspaceObjectMetadataOperation<R extends DSpaceObject> extends Patch
                 dsoService.clearMetadata(context, dso, schema, element, qualifier, Item.ANY);
                 this.add(context, dso, dsoService, schema, element, qualifier, metadataValue, null);
             } catch (SQLException e) {
-                log.error("SQLException in DspaceObjectMetadataOperation.replace trying to remove " +
-                        "and replace metadata from dso.", e);
+                throw new DSpaceBadRequestException("SQLException in DspaceObjectMetadataOperation.replace trying to " +
+                        "remove and replace metadata from dso.", e);
             }
         }
         // replace single existing metadata value
@@ -344,7 +344,8 @@ public class DspaceObjectMetadataOperation<R extends DSpaceObject> extends Patch
             dsoService.moveMetadata(context, dso, schema, element, qualifier,
                     Integer.parseInt(indexFrom), Integer.parseInt(indexTo));
         } catch (SQLException e) {
-            log.error("SQLException in DspaceObjectMetadataOperation.move trying to move metadata in dso.", e);
+            throw new DSpaceBadRequestException("SQLException in DspaceObjectMetadataOperation.move trying to move " +
+                    "metadata in dso.", e);
         }
     }
 
@@ -378,7 +379,8 @@ public class DspaceObjectMetadataOperation<R extends DSpaceObject> extends Patch
     }
 
     @Override
-    public boolean supports(DSpaceObject R, String path) {
-        return ((path.startsWith(METADATA_PATH) || path.equals(METADATA_PATH)) && R instanceof DSpaceObject);
+    public boolean supports(R objectToMatch, String path) {
+        return ((path.startsWith(METADATA_PATH) || path.equals(METADATA_PATH))
+                && objectToMatch instanceof DSpaceObject);
     }
 }
