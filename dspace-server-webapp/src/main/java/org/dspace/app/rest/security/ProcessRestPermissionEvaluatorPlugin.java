@@ -25,6 +25,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
+/**
+ * This class will handle calls made to Process endpoints. It will return false if the current user is null or
+ * if the current user is not the eperson that's attached to the process and that user isn't an admin.
+ * This class is an implementation for {@link RestObjectPermissionEvaluatorPlugin} for Process endpoints.
+ */
 @Component
 public class ProcessRestPermissionEvaluatorPlugin extends RestObjectPermissionEvaluatorPlugin {
 
@@ -39,6 +44,7 @@ public class ProcessRestPermissionEvaluatorPlugin extends RestObjectPermissionEv
     @Autowired
     private AuthorizeService authorizeService;
 
+    @Override
     public boolean hasDSpacePermission(Authentication authentication, Serializable targetId, String targetType,
                                        DSpaceRestPermission restPermission) {
 

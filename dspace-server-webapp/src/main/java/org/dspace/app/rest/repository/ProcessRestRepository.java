@@ -15,12 +15,12 @@ import org.dspace.app.rest.converter.processes.ProcessConverter;
 import org.dspace.app.rest.model.ProcessRest;
 import org.dspace.app.rest.model.hateoas.DSpaceResource;
 import org.dspace.app.rest.model.hateoas.ProcessResource;
-import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Context;
 import org.dspace.scripts.Process;
 import org.dspace.scripts.service.ProcessService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
@@ -38,9 +38,6 @@ public class ProcessRestRepository extends DSpaceRestRepository<ProcessRest, Int
 
     @Autowired
     private ProcessConverter processConverter;
-
-    @Autowired
-    private AuthorizeService authorizeService;
 
     /**
      * This method will return an integer describing the total amount of Process objects in the database
@@ -70,12 +67,15 @@ public class ProcessRestRepository extends DSpaceRestRepository<ProcessRest, Int
     @PreAuthorize("hasAuthority('ADMIN')")
     public Page<ProcessRest> findAll(Context context, Pageable pageable) {
         List<Process> processes = null;
+        int total = 0;
         try {
-            processes = processService.findAll(context);
+            total = getTotalAmountOfProcesses();
+            processes = processService.findAll(context, pageable.getPageSize(), pageable.getOffset());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<ProcessRest> page = utils.getPage(processes, pageable).map(processConverter);
+        Page<ProcessRest> page = new PageImpl<>(processes, pageable, total).map(processConverter);
+
         return page;
     }
 
