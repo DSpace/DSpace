@@ -86,7 +86,7 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
                    .andExpect(jsonPath("$._links.next.href", Matchers.containsString("/api/core/metadatafields")))
                    .andExpect(jsonPath("$._links.last.href", Matchers.containsString("/api/core/metadatafields")))
 
-                   .andExpect(jsonPath("$.page.size", is(100)));
+                   .andExpect(jsonPath("$.page.size", is(110)));
     }
 
     @Test
