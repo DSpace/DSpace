@@ -454,7 +454,7 @@ public class Utils {
         getLinkRests(halResource.getContent().getClass()).stream().forEach((linkRest) -> {
             Link link = linkToSubResource(halResource.getContent(), linkRest.name());
             if (!linkRest.embedOptional() || projection.allowOptionalEmbed(halResource, linkRest)) {
-                embedRelFromRepository(halResource, linkRest.name(), link, linkRest.method());
+                embedRelFromRepository(halResource, linkRest.name(), link, linkRest);
                 halResource.add(link); // unconditionally link if embedding was allowed
             } else if (!linkRest.linkOptional() || projection.allowOptionalLink(halResource, linkRest)) {
                 halResource.add(link);
@@ -472,25 +472,44 @@ public class Utils {
     }
 
     /**
-     * Embeds a rel whose value comes from a {@LinkRestRepository}.
+     * Embeds a rel whose value comes from a {@link LinkRestRepository}.
+     * <p>
+     * The embed will be skipped if 1) the link repository reports that it is not embeddable or 2) the returned
+     * value is null and the LinkRest annotation has embedOptional = true.
+     * </p><p>
+     * Implementation note: The caller is responsible for ensuring that the projection allows the embed
+     * before calling this method.
+     * </p>
      *
      * @param resource the resource.
      * @param rel the name of the rel.
      * @param link the link.
-     * @param methodName the method name in the link repository.
+     * @param linkRest the LinkRest annotation (must have method defined).
+     * @throws RepositoryNotFoundException if the link repository could not be found.
+     * @throws IllegalArgumentException if the method specified by the LinkRest could not be found in the
+     * link repository.
+     * @throws RuntimeException if any other problem occurs when trying to invoke the method.
      */
     private void embedRelFromRepository(HALResource<? extends RestAddressableModel> resource,
-                                        String rel, Link link, String methodName) {
+                                        String rel, Link link, LinkRest linkRest) {
+        Projection projection = resource.getContent().getProjection();
         LinkRestRepository linkRepository = getLinkResourceRepository(resource.getContent().getCategory(),
                 resource.getContent().getType(), rel);
-        Projection projection = resource.getContent().getProjection();
         if (linkRepository.isEmbeddableRelation(resource.getContent(), rel)) {
-            Method method = requireMethod(linkRepository.getClass(), methodName);
+            Method method = requireMethod(linkRepository.getClass(), linkRest.method());
             Object contentId = getContentIdForLinkMethod(resource.getContent(), method);
             try {
                 Object linkedObject = method.invoke(linkRepository, null, contentId, null, projection);
-                resource.embedResource(rel, wrapForEmbedding(linkedObject, link));
-            } catch (IllegalAccessException | InvocationTargetException e) {
+                if (linkedObject != null || !linkRest.embedOptional()) {
+                    resource.embedResource(rel, wrapForEmbedding(linkedObject, link));
+                }
+            } catch (InvocationTargetException e) {
+                if (e.getTargetException() instanceof RuntimeException) {
+                    throw (RuntimeException) e.getTargetException();
+                } else {
+                    throw new RuntimeException(e);
+                }
+            } catch (IllegalAccessException e) {
                 throw new RuntimeException(e);
             }
         }
@@ -557,9 +576,12 @@ public class Utils {
                 }
                 Link link = linkToSubResource(resource.getContent(), rel);
                 if (StringUtils.isBlank(linkRest.method())) {
-                    resource.embedResource(rel, wrapForEmbedding(readMethod.invoke(resource.getContent()), link));
+                    Object linkedObject = readMethod.invoke(resource.getContent());
+                    if (linkedObject != null || !linkRest.embedOptional()) {
+                        resource.embedResource(rel, wrapForEmbedding(linkedObject, link));
+                    }
                 } else {
-                    embedRelFromRepository(resource, rel, link, linkRest.method());
+                    embedRelFromRepository(resource, rel, link, linkRest);
                 }
             } else if (RestAddressableModel.class.isAssignableFrom(readMethod.getReturnType())) {
                 RestAddressableModel linkedObject = (RestAddressableModel) readMethod.invoke(resource.getContent());
