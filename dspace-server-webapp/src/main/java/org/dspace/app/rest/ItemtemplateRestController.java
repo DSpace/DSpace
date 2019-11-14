@@ -151,7 +151,7 @@ public class ItemtemplateRestController {
      * @throws AuthorizeException
      * @throws IOException
      */
-    @PreAuthorize("hasPermission(#uuid, 'ITEM', 'WRITE')")
+    @PreAuthorize("hasPermission(#uuid, 'ITEM', 'DELETE')")
     @RequestMapping(method = RequestMethod.DELETE)
     public ResponseEntity<ResourceSupport> deleteTemplateItem(HttpServletRequest request, @PathVariable UUID uuid)
         throws SQLException, AuthorizeException, IOException {
