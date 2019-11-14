@@ -93,6 +93,11 @@
     <url-pattern>/dspace-admin/*</url-pattern>
   </filter-mapping>
 
+    <filter-mapping>
+        <filter-name>admin-only</filter-name>
+        <url-pattern>/report/*</url-pattern>
+    </filter-mapping>
+
   <filter-mapping>
     <filter-name>registered-only</filter-name>
     <url-pattern>/mydspace</url-pattern>
@@ -946,6 +951,22 @@
         <url-pattern>/browse</url-pattern>
     </servlet-mapping>
 
+    <servlet-mapping>
+        <servlet-name>essuir-servlet</servlet-name>
+        <url-pattern>/report</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>essuir-servlet</servlet-name>
+        <url-pattern>/report/recent-person</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>essuir-servlet</servlet-name>
+        <url-pattern>/report/general</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>essuir-servlet</servlet-name>
+        <url-pattern>/report/speciality</url-pattern>
+    </servlet-mapping>
   <!-- Icon MIME type -->
   <mime-mapping>
     <extension>ico</extension>
