@@ -123,7 +123,7 @@ public class IndexClient {
             checkRebuildSpellCheck(line, indexer);
         } else {
             log.info("Updating and Cleaning Index");
-            indexer.cleanIndex(line.hasOption("f"));
+            indexer.cleanIndex(false);
             indexer.updateIndex(context, line.hasOption("f"));
             checkRebuildSpellCheck(line, indexer);
         }
