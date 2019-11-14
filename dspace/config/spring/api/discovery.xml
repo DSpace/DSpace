@@ -53,7 +53,7 @@
                <!-- Used to show filters and results on MyDSpace -->
                 <entry key="workspace" value-ref="workspaceConfiguration" />
                 <entry key="workflow" value-ref="workflowConfiguration" />
-                <entry key="unDiscoverableItems" value-ref="unDiscoverableItemsConfiguration" />
+                <entry key="showUnDiscoverableItems" value-ref="unDiscoverableItemsConfiguration" />
                 <entry key="publication" value-ref="publication"/>
                 <entry key="person" value-ref="person"/>
                 <entry key="organization" value-ref="organization"/>
@@ -156,7 +156,7 @@
         <property name="defaultFilterQueries">
             <list>
                 <!--Only find items, communities and collections-->
-                <value>search.resourcetype:2 OR search.resourcetype:3 OR search.resourcetype:4</value>>
+                <value>search.resourcetype:2 OR search.resourcetype:3 OR search.resourcetype:4</value>
             </list>
         </property>
         <!--The configuration for the recent submissions-->
