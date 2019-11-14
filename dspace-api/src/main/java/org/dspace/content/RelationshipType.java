@@ -103,6 +103,17 @@ public class RelationshipType implements ReloadableEntity<Integer> {
     private Integer rightMaxCardinality;
 
     /**
+     * The boolean indicating whether the metadata should be copied on left item or not
+     */
+    @Column(name = "copy_left", nullable = false)
+    private boolean copyLeft;
+
+    /**
+     * The boolean indicating whether the metadata should be copied on right item or not
+     */
+    @Column(name = "copy_right", nullable = false)
+    private boolean copyRight;
+    /**
      * Protected constructor, create object using:
      * {@link org.dspace.content.service.RelationshipTypeService#create(Context)} }
      */
@@ -242,6 +253,38 @@ public class RelationshipType implements ReloadableEntity<Integer> {
      */
     public void setRightMaxCardinality(Integer rightMaxCardinality) {
         this.rightMaxCardinality = rightMaxCardinality;
+    }
+
+    /**
+     * Generic getter for the copyLeft
+     * @return the copyLeft value of this RelationshipType
+     */
+    public boolean isCopyLeft() {
+        return copyLeft;
+    }
+
+    /**
+     * Generic setter for the copyLeft
+     * @param copyLeft   The copyLeft to be set on this RelationshipType
+     */
+    public void setCopyLeft(boolean copyLeft) {
+        this.copyLeft = copyLeft;
+    }
+
+    /**
+     * Generic getter for the copyRight
+     * @return the copyRight value of this RelationshipType
+     */
+    public boolean isCopyRight() {
+        return copyRight;
+    }
+
+    /**
+     * Generic setter for the copyRight
+     * @param copyRight   The copyRight to be set on this RelationshipType
+     */
+    public void setCopyRight(boolean copyRight) {
+        this.copyRight = copyRight;
     }
 
     /**

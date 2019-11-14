@@ -106,4 +106,13 @@ public class RelationshipTypeBuilder extends AbstractBuilder<RelationshipType, R
 
         return this;
     }
+
+    public RelationshipTypeBuilder withCopyLeft(boolean copyLeft) throws SQLException {
+        relationshipType.setCopyLeft(copyLeft);
+        return this;
+    }
+    public RelationshipTypeBuilder withCopyRight(boolean copyRight) throws SQLException {
+        relationshipType.setCopyRight(copyRight);
+        return this;
+    }
 }

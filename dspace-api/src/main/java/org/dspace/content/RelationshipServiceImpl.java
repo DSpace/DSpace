@@ -330,8 +330,8 @@ public class RelationshipServiceImpl implements RelationshipService {
 
     @Override
     public void delete(Context context, Relationship relationship) throws SQLException, AuthorizeException {
-        //TODO: retrieve default settings from configuration
-        delete(context, relationship, false, false);
+        delete(context, relationship, relationship.getRelationshipType().isCopyLeft(),
+               relationship.getRelationshipType().isCopyRight());
     }
 
     @Override
