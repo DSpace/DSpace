@@ -130,7 +130,21 @@ public class InitializeEntities {
                     String rightType = eElement.getElementsByTagName("rightType").item(0).getTextContent();
                     String leftwardType = eElement.getElementsByTagName("leftwardType").item(0).getTextContent();
                     String rightwardType = eElement.getElementsByTagName("rightwardType").item(0).getTextContent();
+                    Node copyLeftNode = eElement.getElementsByTagName("copyLeft").item(0);
+                    Boolean copyLeft;
+                    if (copyLeftNode == null) {
+                        copyLeft = false;
+                    } else {
+                        copyLeft = Boolean.valueOf(copyLeftNode.getTextContent());
 
+                    }
+                    Node copyRightNode = eElement.getElementsByTagName("copyRight").item(0);
+                    Boolean copyRight;
+                    if (copyRightNode == null) {
+                        copyRight = false;
+                    } else {
+                        copyRight = Boolean.valueOf(copyRightNode.getTextContent());
+                    }
 
                     NodeList leftCardinalityList = eElement.getElementsByTagName("leftCardinality");
                     NodeList rightCardinalityList = eElement.getElementsByTagName("rightCardinality");
@@ -156,7 +170,7 @@ public class InitializeEntities {
                     }
                     populateRelationshipType(context, leftType, rightType, leftwardType, rightwardType,
                                              leftCardinalityMin, leftCardinalityMax,
-                                             rightCardinalityMin, rightCardinalityMax);
+                                             rightCardinalityMin, rightCardinalityMax, copyLeft, copyRight);
 
 
                 }
@@ -175,7 +189,8 @@ public class InitializeEntities {
 
     private void populateRelationshipType(Context context, String leftType, String rightType, String leftwardType,
                                           String rightwardType, String leftCardinalityMin, String leftCardinalityMax,
-                                          String rightCardinalityMin, String rightCardinalityMax)
+                                          String rightCardinalityMin, String rightCardinalityMax,
+                                          Boolean copyLeft, Boolean copyRight)
         throws SQLException, AuthorizeException {
 
         EntityType leftEntityType = entityTypeService.findByEntityType(context,leftType);
@@ -215,8 +230,10 @@ public class InitializeEntities {
         if (relationshipType == null) {
             relationshipTypeService.create(context, leftEntityType, rightEntityType, leftwardType, rightwardType,
                                            leftCardinalityMinInteger, leftCardinalityMaxInteger,
-                                           rightCardinalityMinInteger, rightCardinalityMaxInteger);
+                                           rightCardinalityMinInteger, rightCardinalityMaxInteger, copyLeft, copyRight);
         } else {
+            relationshipType.setCopyLeft(copyLeft);
+            relationshipType.setCopyRight(copyRight);
             relationshipType.setLeftMinCardinality(leftCardinalityMinInteger);
             relationshipType.setLeftMaxCardinality(leftCardinalityMaxInteger);
             relationshipType.setRightMinCardinality(rightCardinalityMinInteger);

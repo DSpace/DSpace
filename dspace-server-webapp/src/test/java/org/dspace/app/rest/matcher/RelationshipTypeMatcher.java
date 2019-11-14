@@ -45,13 +45,15 @@ public class RelationshipTypeMatcher {
                                                                               relationshipType.getRightMinCardinality(),
                                                                               relationshipType.getRightMaxCardinality(),
                                                                               leftEntityTypeId, leftEntityTypeLabel,
-                                                                              rightEntityTypeId, rightEntityTypeLabel);
+                                                                              rightEntityTypeId, rightEntityTypeLabel,
+                                                                              relationshipType.isCopyLeft(),
+                                                                              relationshipType.isCopyRight());
     }
 
     private static Matcher<? super Object> matchExplicitRelationshipTypeValuesAndExplicitEntityType(int id,
         String leftwardType, String rightwardType, Integer leftMinCardinality, Integer leftMaxCardinality,
         Integer rightMinCardinality, Integer rightMaxCardinality,
-        EntityType leftEntityType, EntityType rightEntityType) {
+        EntityType leftEntityType, EntityType rightEntityType, boolean copyLeft, boolean copyRight) {
         return matchExplicitRelationshipTypeValuesAndExplicitEntityTypeValues(id, leftwardType, rightwardType,
                                                                               leftMinCardinality, leftMaxCardinality,
                                                                               rightMinCardinality,
@@ -59,17 +61,20 @@ public class RelationshipTypeMatcher {
                                                                               leftEntityType.getID(),
                                                                               leftEntityType.getLabel(),
                                                                               rightEntityType.getID(),
-                                                                              rightEntityType.getLabel());
+                                                                              rightEntityType.getLabel(),
+                                                                              copyLeft, copyRight);
     }
 
     private static Matcher<? super Object> matchExplicitRelationshipTypeValuesAndExplicitEntityTypeValues(int id,
         String leftwardType, String rightwardType, Integer leftMinCardinality, Integer leftMaxCardinality,
         Integer rightMinCardinality, Integer rightMaxCardinality, int leftEntityTypeId, String leftEntityTypeLabel,
-        int rightEntityTypeId, String rightEntityTypeLabel) {
+        int rightEntityTypeId, String rightEntityTypeLabel, boolean copyLeft, boolean copyRight) {
         return allOf(
             hasJsonPath("$.id", is(id)),
             hasJsonPath("$.leftwardType", is(leftwardType)),
             hasJsonPath("$.rightwardType", is(rightwardType)),
+            hasJsonPath("$.copyLeft", is(copyLeft)),
+            hasJsonPath("$.copyRight", is(copyRight)),
             hasJsonPath("$.leftMinCardinality", is(leftMinCardinality)),
             hasJsonPath("$.leftMaxCardinality", is(leftMaxCardinality)),
             hasJsonPath("$.rightMinCardinality", is(rightMinCardinality)),

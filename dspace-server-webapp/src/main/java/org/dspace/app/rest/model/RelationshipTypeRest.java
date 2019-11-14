@@ -22,6 +22,8 @@ public class RelationshipTypeRest extends BaseObjectRest<Integer> {
 
     private String leftwardType;
     private String rightwardType;
+    private boolean copyLeft;
+    private boolean copyRight;
     private Integer leftMinCardinality;
     private Integer leftMaxCardinality;
     private Integer rightMinCardinality;
@@ -55,6 +57,38 @@ public class RelationshipTypeRest extends BaseObjectRest<Integer> {
 
     public void setRightwardType(String rightwardType) {
         this.rightwardType = rightwardType;
+    }
+
+    /**
+     * Generic getter for the copyLeft
+     * @return the copyLeft value of this RelationshipTypeRest
+     */
+    public boolean isCopyLeft() {
+        return copyLeft;
+    }
+
+    /**
+     * Generic setter for the copyLeft
+     * @param copyLeft   The copyLeft to be set on this RelationshipTypeRest
+     */
+    public void setCopyLeft(boolean copyLeft) {
+        this.copyLeft = copyLeft;
+    }
+
+    /**
+     * Generic getter for the copyRight
+     * @return the copyRight value of this RelationshipTypeRest
+     */
+    public boolean isCopyRight() {
+        return copyRight;
+    }
+
+    /**
+     * Generic setter for the copyRight
+     * @param copyRight   The copyRight to be set on this RelationshipTypeRest
+     */
+    public void setCopyRight(boolean copyRight) {
+        this.copyRight = copyRight;
     }
 
     public Integer getLeftMinCardinality() {

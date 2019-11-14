@@ -58,19 +58,19 @@ public class AbstractEntityIntegrationTest extends AbstractControllerIntegration
 
         RelationshipTypeBuilder.createRelationshipTypeBuilder(context, publication, person, "isAuthorOfPublication",
                                                               "isPublicationOfAuthor", 0, null, 0,
-                                                              null).build();
+                                                              null).withCopyLeft(false).withCopyRight(true).build();
 
         RelationshipTypeBuilder.createRelationshipTypeBuilder(context, publication, project, "isProjectOfPublication",
                                                               "isPublicationOfProject", 0, null, 0,
-                                                              null).build();
+                                                              null).withCopyRight(true).build();
 
         RelationshipTypeBuilder.createRelationshipTypeBuilder(context, publication, orgUnit, "isOrgUnitOfPublication",
                                                               "isPublicationOfOrgUnit", 0, null, 0,
-                                                              null).build();
+                                                              null).withCopyLeft(false).build();
 
         RelationshipTypeBuilder.createRelationshipTypeBuilder(context, person, project, "isProjectOfPerson",
                                                               "isPersonOfProject", 0, null, 0,
-                                                              null).build();
+                                                              null).withCopyLeft(true).withCopyRight(true).build();
 
         RelationshipTypeBuilder.createRelationshipTypeBuilder(context, person, orgUnit, "isOrgUnitOfPerson",
                                                               "isPersonOfOrgUnit", 0, null, 0,
@@ -82,7 +82,7 @@ public class AbstractEntityIntegrationTest extends AbstractControllerIntegration
 
         RelationshipTypeBuilder.createRelationshipTypeBuilder(context, journal, journalVolume, "isVolumeOfJournal",
                                                               "isJournalOfVolume", 0, null, 1,
-                                                              null).build();
+                                                              null).withCopyLeft(true).build();
 
         RelationshipTypeBuilder.createRelationshipTypeBuilder(context, journalVolume, journalIssue,
                                                               "isIssueOfJournalVolume", "isJournalVolumeOfIssue", 0,
