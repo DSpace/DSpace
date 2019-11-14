@@ -64,4 +64,41 @@ public class AuthorsCache {
                 .findFirst()
                 .orElse(defaultAuthorLocalization);
     }
+
+    public void updateAuthorOrcid(AuthorLocalization author) {
+        dsl.update(AUTHORS)
+                .set(AUTHORS.orcid, author.getOrcid())
+                .where(AUTHORS.initialsEnglish.eq(author.getInitials(Locale.ENGLISH)).and(AUTHORS.surnameEnglish.eq(author.getSurname(Locale.ENGLISH))))
+                .execute();
+        updateCache();
+    }
+
+    public void removeAuthorData(AuthorLocalization author) {
+        dsl.delete(AUTHORS)
+                .where(AUTHORS.initialsEnglish.eq(author.getInitials(Locale.ENGLISH)).and(AUTHORS.surnameEnglish.eq(author.getSurname(Locale.ENGLISH))))
+                .execute();
+        updateCache();
+    }
+
+    public void updateAuthorData(AuthorLocalization author) {
+        dsl.insertInto(AUTHORS)
+                .set(AUTHORS.surnameEnglish, author.getSurname(Locale.ENGLISH))
+                .set(AUTHORS.initialsEnglish, author.getInitials(Locale.ENGLISH))
+                .set(AUTHORS.surnameRussian, author.getSurname(Locale.forLanguageTag("ru")))
+                .set(AUTHORS.initialsRussian, author.getInitials(Locale.forLanguageTag("ru")))
+                .set(AUTHORS.surnameUkrainian, author.getSurname(Locale.forLanguageTag("uk")))
+                .set(AUTHORS.initialsUkrainian, author.getInitials(Locale.forLanguageTag("uk")))
+                .set(AUTHORS.orcid, author.getOrcid())
+                .onDuplicateKeyUpdate()
+                .set(AUTHORS.surnameRussian, author.getSurname(Locale.forLanguageTag("ru")))
+                .set(AUTHORS.initialsRussian, author.getInitials(Locale.forLanguageTag("ru")))
+                .set(AUTHORS.surnameUkrainian, author.getSurname(Locale.forLanguageTag("uk")))
+                .set(AUTHORS.initialsUkrainian, author.getInitials(Locale.forLanguageTag("uk")))
+                .set(AUTHORS.orcid, author.getOrcid())
+                .execute();
+        updateCache();
+    }
+    public List<AuthorLocalization> getAuthors() {
+        return new ArrayList<>(englishMapping.values());
+    }
 }

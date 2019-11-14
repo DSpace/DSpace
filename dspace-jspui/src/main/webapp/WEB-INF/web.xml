@@ -95,6 +95,11 @@
 
     <filter-mapping>
         <filter-name>admin-only</filter-name>
+        <url-pattern>/authors/*</url-pattern>
+    </filter-mapping>
+
+    <filter-mapping>
+        <filter-name>admin-only</filter-name>
         <url-pattern>/report/*</url-pattern>
     </filter-mapping>
 
@@ -893,6 +898,20 @@
         <url-pattern>/structure</url-pattern>
     </servlet-mapping>
 
+    <servlet-mapping>
+        <servlet-name>essuir-servlet</servlet-name>
+        <url-pattern>/authors/list</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>essuir-servlet</servlet-name>
+        <url-pattern>/authors/edit</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>essuir-servlet</servlet-name>
+        <url-pattern>/authors/delete</url-pattern>
+    </servlet-mapping>
 
     <servlet-mapping>
         <servlet-name>essuir-servlet</servlet-name>

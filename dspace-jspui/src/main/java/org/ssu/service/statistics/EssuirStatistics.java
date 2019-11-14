@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import org.ssu.entity.AuthorLocalization;
 import org.ssu.entity.statistics.StatisticsData;
+import org.ssu.service.AuthorsService;
 import org.ssu.service.GeoIpService;
 import org.ssu.service.localization.AuthorsCache;
 import org.ssu.repository.MetadatavalueRepository;
@@ -35,7 +36,7 @@ public class EssuirStatistics {
     private MetadatavalueRepository metadatavalueRepository;
 
     @Resource
-    private AuthorsCache authorsCache;
+    private AuthorsService authorsService;
 
     @Resource
     private DSLContext dsl;
@@ -143,7 +144,7 @@ public class EssuirStatistics {
         return Seq.seq(collect.entrySet())
                 .sorted((a, b) -> b.getValue().compareTo(a.getValue()))
                 .limit(5 * limit)
-                .map(item -> Pair.of(authorsCache.getAuthorLocalization(item.getKey()), item.getValue()))
+                .map(item -> Pair.of(authorsService.getAuthorLocalization(item.getKey()), item.getValue()))
                 .filter(item -> !item.getKey().getSurname(Locale.ENGLISH).toLowerCase().contains("litnarovych"))
                 .distinct(Pair::getKey)
                 .limit(limit)

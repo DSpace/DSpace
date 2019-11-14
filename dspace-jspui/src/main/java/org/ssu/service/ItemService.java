@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 @Service
 public class ItemService {
     @Resource
-    private AuthorsCache authorsCache;
+    private AuthorsService authorsService;
 
     @Resource
     private EssuirStatistics essuirStatistics;
@@ -79,7 +79,7 @@ public class ItemService {
         return itemService.getMetadata(item, MetadataSchema.DC_SCHEMA, "contributor", "*", Item.ANY)
                 .stream()
                 .map(MetadataValue::getValue)
-                .map(author -> authorsCache.getAuthorLocalization(author))
+                .map(author -> authorsService.getAuthorLocalization(author))
                 .distinct()
                 .collect(Collectors.toList());
     }

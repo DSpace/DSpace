@@ -38,10 +38,7 @@ import org.ssu.entity.response.BitstreamResponse;
 import org.ssu.entity.response.CountedCommunityResponse;
 import org.ssu.entity.response.CountryStatisticsResponse;
 import org.ssu.entity.response.ItemResponse;
-import org.ssu.service.BrowseContext;
-import org.ssu.service.BrowseRequestProcessor;
-import org.ssu.service.CommunityService;
-import org.ssu.service.ItemService;
+import org.ssu.service.*;
 import org.ssu.service.localization.AuthorsCache;
 import org.ssu.service.statistics.EssuirStatistics;
 
@@ -82,7 +79,7 @@ public class HandleController {
     private BrowseRequestProcessor browseRequestProcessor;
 
     @Resource
-    private AuthorsCache authorsCache;
+    private AuthorsService authorsService;
 
     @RequestMapping(value = "/123456789/{itemId}")
     public ModelAndView entrypoint(HttpServletRequest request, HttpServletResponse response,  @PathVariable("itemId") String itemId, ModelAndView model) throws SQLException, ItemCountException, PluginException, AuthorizeException, ServletException, BrowseException, IOException, SortException, CrosswalkException {
@@ -235,7 +232,7 @@ public class HandleController {
             String language = googleMetadata.getLanguage().stream().findFirst().orElse("en");
             Locale authorLocalizationLocale = Locale.forLanguageTag(language);
             googleMetadata.setAuthors(googleMetadata.getAuthors().stream()
-                    .map(author -> authorsCache.getAuthorLocalization(author))
+                    .map(author -> authorsService.getAuthorLocalization(author))
                     .distinct()
                     .map(authorLocalized -> authorLocalized.getFormattedAuthorData("%s, %s", authorLocalizationLocale))
                     .collect(Collectors.toList()));

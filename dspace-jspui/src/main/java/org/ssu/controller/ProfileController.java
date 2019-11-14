@@ -47,9 +47,6 @@ public class ProfileController {
     private AuthorsService authorsService;
 
     @Resource
-    private AuthorsCache authorsCache;
-
-    @Resource
     private EpersonService ePersonService;
 
     @Resource
@@ -73,8 +70,8 @@ public class ProfileController {
         Map<Integer, List<ChairEntity>> chairList = facultyService.getFacultyList().stream().collect(Collectors.toMap(FacultyEntity::getId, FacultyEntity::getChairs));
         model.addObject("lastName", lastName);
         model.addObject("firstName", firstName);
-        model.addObject("isAuthorLocalized", authorsCache.isAuthorLocalizationPresent(String.format("%s, %s", lastName, firstName)));
-        model.addObject("orcid", authorsCache.getAuthorLocalization(String.format("%s, %s", lastName, firstName)).getOrcid());
+        model.addObject("isAuthorLocalized", authorsService.isAuthorLocalizationPresent(String.format("%s, %s", lastName, firstName)));
+        model.addObject("orcid", authorsService.getAuthorLocalization(String.format("%s, %s", lastName, firstName)).getOrcid());
         model.addObject("phone", phone);
         model.addObject("language", language);
         model.addObject("position", currentUser.getPosition());
@@ -112,7 +109,7 @@ public class ProfileController {
         if (checkUserData) {
             Optional<String> orcid = Optional.ofNullable(request.getParameter("orcid")).map(param -> param.replaceAll("https://", "").replaceAll("http://", "").replaceAll("orcid.org/", ""));
             if(orcid.isPresent()) {
-                AuthorLocalization authorLocalization = authorsCache.getAuthorLocalization(String.format("%s, %s", eperson.getLastName(), eperson.getFirstName()));
+                AuthorLocalization authorLocalization = authorsService.getAuthorLocalization(String.format("%s, %s", eperson.getLastName(), eperson.getFirstName()));
                 authorLocalization.setOrcid(orcid.get());
                 authorsService.updateAuthorOrcid(authorLocalization);
             }

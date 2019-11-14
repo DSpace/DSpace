@@ -170,6 +170,7 @@
                 %>
 			   <li class="divider"></li>
                            <% if (isAdmin) {%>
+                                <li><a href="<%= request.getContextPath()%>/authors/list"><fmt:message key="jsp.layout.navbar-admin.autocomplete"/></a></li>
                                 <li><a href="<%= request.getContextPath()%>/report"><fmt:message key="jsp.layout.navbar-admin.report"/></a></li>
                                 <li><a href="<%= request.getContextPath()%>/dspace-admin">
                            <% } else if (isCommunityAdmin || isCollectionAdmin) {%>

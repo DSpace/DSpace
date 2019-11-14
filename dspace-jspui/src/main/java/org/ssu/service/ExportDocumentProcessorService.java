@@ -18,7 +18,7 @@ public class ExportDocumentProcessorService {
     Locale ukrainianLocale = Locale.forLanguageTag("uk");
 
     @Resource
-    private AuthorsCache authorsCache;
+    private AuthorsService authorsService;
 
     @Resource
     private ItemService itemService;
@@ -32,7 +32,7 @@ public class ExportDocumentProcessorService {
         pageMar.setRight(BigInteger.valueOf(455L));
         pageMar.setBottom(BigInteger.valueOf(455L));
 
-        createTitle(authorsCache.getAuthorLocalization(author).getFormattedAuthorData("%s %s", ukrainianLocale), document);
+        createTitle(authorsService.getAuthorLocalization(author).getFormattedAuthorData("%s %s", ukrainianLocale), document);
         createPublicationsTable(document, publications);
         document.createParagraph().setSpacingAfter(100);
         createBottomTable(document);
