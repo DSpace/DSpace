@@ -7,6 +7,8 @@
  */
 package org.dspace.app.rest;
 
+import static org.dspace.app.rest.utils.RegexUtils.REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
@@ -39,9 +41,24 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+/**
+ * Controller to upload bitstreams to a certain bundle, indicated by a uuid in the request
+ * Usage: POST /api/core/bundles/{uuid}/bitstreams (with file and properties of file in request)
+ * Example:
+ * <pre>
+ * {@code
+ * curl https://<dspace.server.url>/api/core/bundles/d3599177-0408-403b-9f8d-d300edd79edb/bitstreams
+ *  -XPOST -H 'Content-Type: multipart/form-data' \
+ *  -H 'Authorization: Bearer eyJhbGciOiJI...' \
+ *  -F "file=@Downloads/test.html" \
+ *  -F 'properties={ "name": "test.html", "metadata": { "dc.description": [ { "value": "example file", "language": null,
+ *          "authority": null, "confidence": -1, "place": 0 } ]}, "bundleName": "ORIGINAL" };type=application/json'
+ * }
+ * </pre>
+ */
 @RestController
-@RequestMapping("/api/core/bundles/{uuid}")
-public class BundleController {
+@RequestMapping("/api/core/bundles/" + REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID)
+public class BundleUploadBitstreamController {
 
     private static final Logger log = LogManager.getLogger();
 

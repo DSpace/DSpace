@@ -43,7 +43,7 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-public class BundleControllerIT extends AbstractEntityIntegrationTest {
+public class BundleUploadBitstreamControllerIT extends AbstractEntityIntegrationTest {
 
     @Autowired
     private AuthorizeService authorizeService;

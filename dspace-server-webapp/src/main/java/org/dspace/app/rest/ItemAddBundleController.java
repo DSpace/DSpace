@@ -41,9 +41,25 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * Controller to add bundles to a certain item, indicated by a uuid in the request
+ * Usage: POST /api/core/items/<:uuid>/bundles (with name and metadata of bundle in request json)
+ * Example:
+ * <pre>
+ * {@code
+ * curl -X POST https://<dspace.server.url>/api/core/items/1911e8a4-6939-490c-b58b-a5d70f8d91fb/bundles
+ *  -H 'Authorization: Bearer eyJhbGciOiJI...'
+ *  -H 'Content-Type: application/json
+ *  -d {
+ *      "name": "ORIGINAL",
+ *      "metadata": {...}
+ *     }
+ * }
+ * </pre>
+ */
 @RestController
 @RequestMapping("/api/core/items" + REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID + "/bundles")
-public class ItemController {
+public class ItemAddBundleController {
 
     @Autowired
     ItemService itemService;
@@ -61,6 +77,12 @@ public class ItemController {
     @Autowired
     Utils utils;
 
+    /**
+     * Method to add a Bundle to an Item with the given UUID in the URL. This will create a Bundle with the
+     * name provided in the request and attach this to the Item that matches the UUID in the URL.
+     *
+     * @return The created BundleResource
+     */
     @RequestMapping(method = RequestMethod.POST)
     @PreAuthorize("hasPermission(#uuid, 'ITEM', 'ADD')")
     public ResponseEntity<ResourceSupport> addBundleToItem(@PathVariable UUID uuid,
