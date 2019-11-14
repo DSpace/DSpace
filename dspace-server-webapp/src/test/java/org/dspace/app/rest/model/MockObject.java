@@ -18,6 +18,13 @@ public class MockObject {
 
     private String storedValue;
 
+    public static MockObject create(long id) {
+        MockObject mockObject = new MockObject();
+        mockObject.setStoredId(id);
+        mockObject.setStoredValue("value" + id);
+        return mockObject;
+    }
+
     public Long getStoredId() {
         return storedId;
     }

@@ -45,30 +45,30 @@ public class DSpaceResourceHalLinkFactory extends HalLinkFactory<DSpaceResource,
                 Method readMethod = pd.getReadMethod();
                 String name = pd.getName();
                 if (readMethod != null && !"class".equals(name)) {
-                    LinkRest linkAnnotation = utils.findLinkAnnotation(readMethod);
+                    LinkRest linkRest = utils.findLinkAnnotation(readMethod);
 
-                    if (linkAnnotation != null) {
-                        if (StringUtils.isNotBlank(linkAnnotation.name())) {
-                            name = linkAnnotation.name();
+                    if (linkRest != null) {
+                        if (StringUtils.isNotBlank(linkRest.name())) {
+                            name = linkRest.name();
                         }
 
                         Link linkToSubResource = utils.linkToSubResource(data, name);
                         // no method is specified to retrieve the linked object(s) so check if it is already here
-                        if (StringUtils.isBlank(linkAnnotation.method())) {
+                        if (StringUtils.isBlank(linkRest.method())) {
                             Object linkedObject = readMethod.invoke(data);
 
                             if (linkedObject instanceof RestAddressableModel
-                                    && linkAnnotation.linkClass().isAssignableFrom(linkedObject.getClass())) {
+                                    && linkRest.linkClass().isAssignableFrom(linkedObject.getClass())) {
 
                                 linkToSubResource = utils
                                     .linkToSingleResource((RestAddressableModel) linkedObject, name);
                             }
 
-                            if (linkedObject != null || !linkAnnotation.linkOptional()) {
+                            if (linkedObject != null || !linkRest.linkOptional() || !linkRest.embedOptional()) {
 
-                                if (linkAnnotation.linkOptional()
+                                if (linkRest.linkOptional() && linkRest.embedOptional()
                                         && !halResource.getContent().getProjection()
-                                        .allowOptionalLink(halResource, linkAnnotation)) {
+                                        .allowOptionalLink(halResource, linkRest)) {
                                     continue; // projection disallows this optional method-level link
                                 }
 
