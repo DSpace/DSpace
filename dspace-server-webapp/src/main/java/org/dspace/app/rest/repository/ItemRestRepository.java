@@ -65,9 +65,6 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
     MetadataConverter metadataConverter;
 
     @Autowired
-    ItemPatch itemPatch;
-
-    @Autowired
     WorkspaceItemService workspaceItemService;
 
     @Autowired
@@ -268,7 +265,7 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
         JsonPatchConverter patchConverter = new JsonPatchConverter(mapper);
         Patch patch = patchConverter.convert(jsonNode);
 
-        ItemRest patchedItemRest = itemPatch.patch(itemConverter.fromModel(item), patch.getOperations());
+        ItemRest patchedItemRest = dsoPatch.patch(itemConverter.fromModel(item), patch.getOperations());
         updateDSpaceObject(item, patchedItemRest);
 
         return itemConverter.fromModel(item);

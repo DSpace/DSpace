@@ -298,24 +298,16 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
      *
      * @param context
      * @param collection    The collection for which to make the item
+     * @param inputItemRest The new item
      * @return              The created item
      * @throws SQLException
      * @throws AuthorizeException
      */
-    public ItemRest createTemplateItem(Context context, Collection collection) throws SQLException, AuthorizeException {
+    public ItemRest createTemplateItem(Context context, Collection collection, ItemRest inputItemRest)
+        throws SQLException, AuthorizeException {
         if (collection.getTemplateItem() != null) {
             throw new UnprocessableEntityException("Collection with ID " + collection.getID()
                 + " already contains a template item");
-        }
-
-        HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
-        ItemRest inputItemRest;
-        try {
-            ServletInputStream input = req.getInputStream();
-            ObjectMapper mapper = new ObjectMapper();
-            inputItemRest = mapper.readValue(input, ItemRest.class);
-        } catch (IOException e1) {
-            throw new UnprocessableEntityException("Error parsing request body", e1);
         }
 
         if (inputItemRest.getInArchive() || inputItemRest.getDiscoverable() || inputItemRest.getWithdrawn()) {

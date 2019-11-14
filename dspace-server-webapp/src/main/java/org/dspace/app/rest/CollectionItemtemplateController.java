@@ -7,10 +7,15 @@
  */
 package org.dspace.app.rest;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.BadRequestException;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.CollectionRest;
 import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.hateoas.ItemResource;
@@ -29,6 +34,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -86,18 +92,34 @@ public class CollectionItemtemplateController {
      * </pre>
      * @param request   The request as described above
      * @param uuid      The UUID of the Collection for which the template item should be made
+     * @param itemBody  The new item
      * @return          The created template
      * @throws SQLException
      * @throws AuthorizeException
      */
     @PreAuthorize("hasPermission(#uuid, 'COLLECTION', 'WRITE')")
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity<ResourceSupport> createTemplateItem(HttpServletRequest request, @PathVariable UUID uuid)
+    public ResponseEntity<ResourceSupport> createTemplateItem(HttpServletRequest request,
+                                                              @PathVariable UUID uuid,
+                                                              @RequestBody(required = false) JsonNode itemBody)
             throws SQLException, AuthorizeException {
+
+        if (itemBody == null) {
+            throw new BadRequestException("The new item should be included as json in te body of this request");
+        }
 
         Context context = ContextUtil.obtainContext(request);
         Collection collection = getCollection(context, uuid);
-        ItemRest templateItem = collectionRestRepository.createTemplateItem(context, collection);
+
+        ItemRest inputItemRest;
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            inputItemRest = mapper.readValue(itemBody.toString(), ItemRest.class);
+        } catch (IOException e1) {
+            throw new UnprocessableEntityException("Error parsing request body", e1);
+        }
+
+        ItemRest templateItem = collectionRestRepository.createTemplateItem(context, collection, inputItemRest);
         context.commit();
 
         return ControllerUtils.toResponseEntity(HttpStatus.CREATED, null,
