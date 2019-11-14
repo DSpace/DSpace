@@ -220,18 +220,20 @@ public class GenerateSitemaps
                 Item i = allItems.next();
                 String url = handleURLStem + i.getHandle();
                 Date lastMod = i.getLastModified();
-
-                if (makeHTMLMap)
+                if( i.isDiscoverable() )
                 {
-                    html.addURL(url, lastMod);
-                }
-                if (makeSitemapOrg)
-                {
-                    sitemapsOrg.addURL(url, lastMod);
-                }
-                i.decache();
+                    if (makeHTMLMap)
+                    {
+                        html.addURL(url, lastMod);
+                    }
+                    if (makeSitemapOrg)
+                    {
+                        sitemapsOrg.addURL(url, lastMod);
+                    }
+                    i.decache();
 
-                itemCount++;
+                    itemCount++;
+                }
             }
 
             if (makeHTMLMap)
