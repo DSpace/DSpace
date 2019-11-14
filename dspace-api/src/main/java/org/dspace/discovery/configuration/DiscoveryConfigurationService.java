@@ -72,7 +72,7 @@ public class DiscoveryConfigurationService {
     public DiscoveryConfiguration getDiscoveryConfigurationByNameOrDso(final String configurationName,
                                                                        final IndexableObject dso) {
 
-        if (dso instanceof Community && configurationName.contentEquals("unDiscoverableItems")) {
+        if (dso instanceof Community && configurationName.contentEquals("showUnDiscoverableItems")) {
             // Use community-level configuration if it is defined. If not, fall back to configuration name.
             if (getMap().containsKey(configurationName + "." +((Community) dso).getHandle())) {
                 return getMap().get(configurationName +  "." +((Community) dso).getHandle());
