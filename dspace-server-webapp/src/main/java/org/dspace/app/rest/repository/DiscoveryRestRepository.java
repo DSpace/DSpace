@@ -102,7 +102,13 @@ public class DiscoveryRestRepository extends AbstractDSpaceRestRepository {
         try {
             discoverQuery = queryBuilder
                 .buildQuery(context, scopeObject, discoveryConfiguration, query, searchFilters, dsoType, page);
-            searchResult = searchService.search(context, scopeObject, discoverQuery);
+
+            if (configuration != null && configuration.contentEquals("unDiscoverableItems")) {
+                // Prevents the exclusion of withdrawn and private items for this configuration.
+                searchResult = searchService.search(context, scopeObject, discoverQuery, true);
+            } else {
+                searchResult = searchService.search(context, scopeObject, discoverQuery);
+            }
 
         } catch (SearchServiceException e) {
             log.error("Error while searching with Discovery", e);
