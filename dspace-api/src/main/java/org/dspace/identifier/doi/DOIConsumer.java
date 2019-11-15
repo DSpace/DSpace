@@ -66,6 +66,7 @@ public class DOIConsumer implements Consumer
         {
             log.warn("DOIConsumer got an event whose subject was not an item, "
                     + "skipping: " + event.toString());
+            return;
         }
         Item item = (Item) dso;
         
