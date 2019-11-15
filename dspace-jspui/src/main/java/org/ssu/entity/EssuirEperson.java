@@ -31,6 +31,9 @@ public class EssuirEperson {
         return ePerson.getFirstName();
     }
 
+    public String getEmail() {
+        return  ePerson.getEmail();
+    }
     public String getNetid() {
         return ePerson.getNetid();
     }
