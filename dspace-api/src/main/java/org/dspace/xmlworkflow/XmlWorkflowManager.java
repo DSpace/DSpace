@@ -344,7 +344,7 @@ public class XmlWorkflowManager {
         try {
             XmlWorkflowItem wi = XmlWorkflowItem.find(c, workflowItemId);
             Step currentStep = currentActionConfig.getStep();
-            if(currentActionConfig.getProcessingAction().isAuthorized(c, request, wi)){
+            if(wi != null && currentActionConfig.getProcessingAction().isAuthorized(c, request, wi)){
                 ActionResult outcome = currentActionConfig.getProcessingAction().execute(c, wi, currentStep, request);
                 return processOutcome(c, user, workflow, currentStep, currentActionConfig, outcome, wi, false);
             }else{

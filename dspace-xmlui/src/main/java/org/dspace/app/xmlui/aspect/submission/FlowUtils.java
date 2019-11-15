@@ -154,7 +154,8 @@ public class FlowUtils {
         }    
         else if(subInfo==null && submission==null)
         {
-            throw new SQLException("Unable to load Submission Information, since WorkspaceID (ID:" + workspaceID + ") is not a valid in-process submission.");
+            // Lanzo una Authorize exception en vez de una SQLException para que se retorne un 400 y no se genere una NPE
+            throw new AuthorizeException("Unable to load Submission Information, since WorkspaceID (ID:" + workspaceID + ") is not a valid in-process submission.");
         }
 
         return subInfo;

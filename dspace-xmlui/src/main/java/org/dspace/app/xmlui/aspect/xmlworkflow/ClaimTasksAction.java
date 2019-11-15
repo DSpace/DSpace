@@ -44,8 +44,10 @@ public class ClaimTasksAction extends AbstractAction {
                 XmlWorkflowItem workflowItem = XmlWorkflowItem.find(context, workflowID);
                 Workflow workflow = WorkflowFactory.getWorkflow(workflowItem.getCollection());
 
-                WorkflowActionConfig currentAction = workflow.getStep(poolTask.getStepID()).getActionConfig(poolTask.getActionID());
-                XmlWorkflowManager.doState(context, context.getCurrentUser(), request, workflowID, workflow, currentAction);
+                if (poolTask !=null) {
+                    WorkflowActionConfig currentAction = workflow.getStep(poolTask.getStepID()).getActionConfig(poolTask.getActionID());
+                    XmlWorkflowManager.doState(context, context.getCurrentUser(), request, workflowID, workflow, currentAction);
+                }
             }
             context.commit();
         }

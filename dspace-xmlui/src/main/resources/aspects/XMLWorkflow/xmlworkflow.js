@@ -122,9 +122,7 @@ function doWorkflow()
     var xmlWorkflowItem = XmlWorkflowItem.find(getDSContext(), workflowItemId);
     if(xmlWorkflowItem == null) {
         FlashMessagesUtil.setErrorMessage(getHttpRequest().getSession(), "sedici.XMLWorkflow.workflowitem.notfound");
-        cocoon.sendPage("xmlworkflow/finalize");
-        cocoon.redirectTo(contextPath+"/submissions",true);
-        cocoon.exit();
+        redirectToSubmissions();
     }
 
     var coll = xmlWorkflowItem.getCollection();
@@ -142,8 +140,10 @@ function doWorkflow()
     do{
         sendPageAndWait("handle/"+handle+"/xmlworkflow/getTask",{"workflowID":workflowItemId,"stepID":step.getId(),"actionID":action.getId()});
 
-        if (cocoon.request.get("submit_edit"))
-        {
+        if(action == null){
+            FlashMessagesUtil.setErrorMessage(getHttpRequest().getSession(), "sedici.XMLWorkflow.workflowitem.notfound");
+            redirectToSubmissions();
+        }else if (cocoon.request.get("submit_edit")) {
             var contextPath = cocoon.request.getContextPath();
             cocoon.sendPage("xmlworkflow/finalize");
             cocoon.redirectTo(contextPath+"/handle/"+handle+"/workflow_edit_metadata?"+"workflowID=X"+workflowItemId+"&stepID="+step.getId()+"&actionID="+action.getId(), true);
@@ -156,14 +156,16 @@ function doWorkflow()
         }else{
             action = XmlWorkflowManager.doState(getDSContext(), getDSContext().getCurrentUser(), getHttpRequest(), workflowItemId, workflow, action);
             if(action == null){
-                var contextPath = cocoon.request.getContextPath();
-                cocoon.sendPage("xmlworkflow/finalize");
-                cocoon.redirectTo(contextPath+"/submissions",true);
-                //getDSContext().complete();
-                cocoon.exit();
+                redirectToSubmissions();
             }
         }
-
     }while(true);
 
+}
+
+function redirectToSubmissions(){
+    var contextPath = cocoon.request.getContextPath();
+    cocoon.sendPage("xmlworkflow/finalize");
+    cocoon.redirectTo(contextPath+"/submissions",true);
+    cocoon.exit();
 }
