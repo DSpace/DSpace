@@ -13,8 +13,12 @@ import java.util.Arrays;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.link.HalLinkService;
+import org.dspace.app.rest.model.MetadataSuggestionEntryRest;
 import org.dspace.app.rest.model.MetadataSuggestionsSourceRest;
+import org.dspace.app.rest.model.hateoas.MetadataChangeResource;
+import org.dspace.app.rest.model.hateoas.MetadataSuggestionEntryResource;
 import org.dspace.app.rest.model.hateoas.MetadataSuggestionsSourceResource;
 import org.dspace.app.rest.repository.MetadataSuggestionsRestRepository;
 import org.dspace.app.rest.utils.ContextUtil;
@@ -124,4 +128,45 @@ public class MetadataSuggestionsRestController implements InitializingBean {
         return metadataSuggestionsSourceResource;
     }
 
+
+    /**
+     * This endpoint will return a {@link MetadataSuggestionEntryResource} object based on the given path values
+     * and parameters
+     * @param suggestionName    The name of the MetadataSuggestionProvider to be used
+     * @param entryId           The ID of the entry to be looked up in the relevant MetadataSuggestionProvider
+     * @param workspaceItemId   The ID of the Workspace item to be used if present
+     * @param workflowItemId    The ID of the Workflow item to be used if present
+     * @param response          The HttpServletResponse
+     * @param request           The HttpServletRequest
+     * @return                  The relevant MetadataSuggestionEntryResource
+     * @throws SQLException     If something goes wrong
+     */
+    @RequestMapping(method = RequestMethod.GET, value = "/{suggestionName}/entryValues/{entryId}")
+    public MetadataSuggestionEntryResource getMetadataSuggestionEntry(
+        @PathVariable("suggestionName") String suggestionName, @PathVariable("entryId") String entryId,
+        @RequestParam(name = "workspaceitem", required = false) Integer workspaceItemId,
+        @RequestParam(name = "workflowitem", required = false) Integer workflowItemId,
+        HttpServletResponse response, HttpServletRequest request) throws SQLException {
+
+        Context context = ContextUtil.obtainContext(request);
+        InProgressSubmission inProgressSubmission = resolveInProgressSubmission(workspaceItemId, workflowItemId,
+                                                                                context);
+        MetadataSuggestionEntryRest metadataSuggestionEntryRest = metadataSuggestionsRestRepository.getMetadataSuggestionEntry(suggestionName, entryId, inProgressSubmission);
+        MetadataSuggestionEntryResource metadataSuggestionEntryResource = new MetadataSuggestionEntryResource(
+            metadataSuggestionEntryRest);
+        linkService.addLinks(metadataSuggestionEntryResource);
+        return metadataSuggestionEntryResource;
+    }
+
+
+    //TODO implement method. This is already here for the linkFactory purposes
+    @RequestMapping(method = RequestMethod.GET, value = "/{suggestionName}/entryValues/{entryId}/changes")
+    public MetadataChangeResource getMetadataSuggestionEntryChanges(
+        @PathVariable("suggestionName") String suggestionName, @PathVariable("entryId") String entryId,
+        @RequestParam(name = "workspaceitem", required = false) Integer workspaceItemId,
+        @RequestParam(name = "workflowitem", required = false) Integer workflowItemId,
+        HttpServletResponse response, HttpServletRequest request) throws SQLException {
+
+        throw new RepositoryMethodNotImplementedException("", "Method not yet implemented");
+    }
 }

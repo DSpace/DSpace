@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.dspace.content.InProgressSubmission;
 import org.dspace.external.provider.metadata.MetadataSuggestionProvider;
+import org.dspace.external.provider.metadata.service.impl.MetadataItemSuggestions;
 
 /**
  * This is the interface for the MetadataSuggestionService implementation
@@ -20,15 +21,24 @@ public interface MetadataSuggestionProviderService {
     /**
      * This method will return a list of MetadataSuggestionProvider objects that support the given InProgressSubmission
      * @param inProgressSubmission  The given InProgressSubmission
-     * @return                      The list of MetadataSuggestionProvider objects that support the given parameter
+     * @return The list of MetadataSuggestionProvider objects that support the given parameter
      */
     List<MetadataSuggestionProvider> getMetadataSuggestionProviders(InProgressSubmission inProgressSubmission);
 
     /**
      * This method will return the MetadataSuggestionProvider that has the given id
      * @param id    The id of the MetadataSuggestionProvider that is to be returned
-     * @return      The MetadataSuggestionProvider that has the given id as its actual id
+     * @return The MetadataSuggestionProvider that has the given id as its actual id
      */
     MetadataSuggestionProvider getMetadataSuggestionProvider(String id);
 
+    /**
+     * This method will return a {@link MetadataItemSuggestions} object based on the given parameters
+     * @param suggestionName        The name of the MetadataSuggestionProvider to be used
+     * @param entryId               The ID of the entry to be searched for in the relevant MetadataSuggestionProvider
+     * @param inProgressSubmission  The InProgressSubmission for this suggestion
+     * @return                      The MetadataItemSuggestion
+     */
+    MetadataItemSuggestions getMetadataItemSuggestions(String suggestionName, String entryId,
+                                                       InProgressSubmission inProgressSubmission);
 }

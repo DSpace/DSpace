@@ -8,13 +8,18 @@
 package org.dspace.app.rest.repository;
 
 import java.util.List;
+import java.util.Optional;
 
+import org.dspace.app.rest.converter.MetadataSuggestionEntryConverter;
 import org.dspace.app.rest.converter.MetadataSuggestionsSourceRestConverter;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
+import org.dspace.app.rest.model.MetadataSuggestionEntryRest;
 import org.dspace.app.rest.model.MetadataSuggestionsSourceRest;
 import org.dspace.content.InProgressSubmission;
+import org.dspace.external.model.ExternalDataObject;
 import org.dspace.external.provider.metadata.MetadataSuggestionProvider;
 import org.dspace.external.provider.metadata.service.MetadataSuggestionProviderService;
+import org.dspace.external.provider.metadata.service.impl.MetadataItemSuggestions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -29,6 +34,9 @@ public class MetadataSuggestionsRestRepository extends AbstractDSpaceRestReposit
 
     @Autowired
     private MetadataSuggestionProviderService metadataSuggestionProviderService;
+
+    @Autowired
+    private MetadataSuggestionEntryConverter metadataSuggestionEntryConverter;
 
     @Autowired
     private MetadataSuggestionsSourceRestConverter metadataSuggestionsSourceRestConverter;
@@ -66,5 +74,18 @@ public class MetadataSuggestionsRestRepository extends AbstractDSpaceRestReposit
             throw new ResourceNotFoundException("MetadataSuggestionProvider for: " + id + " couldn't be found");
         }
         return metadataSuggestionsSourceRestConverter.fromModel(metadataSuggestionProvider);
+    }
+
+    /**
+     * This method constructs a {@link MetadataSuggestionEntryRest} object based on the given parameter
+     * @param suggestionName    The name of the MetadataSuggestionProvider to be used
+     * @param entryId           The ID of the entry to be looked up in the relevant MetadataSuggestionProvider
+     * @param inProgressSubmission  The InProgressSubmission to be used
+     * @return
+     */
+    public MetadataSuggestionEntryRest getMetadataSuggestionEntry(String suggestionName, String entryId, InProgressSubmission inProgressSubmission) {
+        //TODO Save Workspaceitem/workflowitemid in rest object so we can use it in the linkfactory
+        MetadataItemSuggestions metadataItemSuggestions = metadataSuggestionProviderService.getMetadataItemSuggestions(suggestionName, entryId, inProgressSubmission);
+        return metadataSuggestionEntryConverter.fromModel(metadataItemSuggestions);
     }
 }
