@@ -36,7 +36,7 @@ public class EPersonPasswordReplaceOperation<R> extends PatchOperation<R> {
     @Override
     public R perform(Context context, R object, Operation operation) {
         checkOperationValue(operation.getValue());
-        if (supports(object, operation.getPath())) {
+        if (supports(object, operation)) {
             EPerson eperson = (EPerson) object;
             checkModelForExistingValue(eperson);
             ePersonService.setPassword(eperson, (String) operation.getValue());
@@ -52,13 +52,15 @@ public class EPersonPasswordReplaceOperation<R> extends PatchOperation<R> {
      * @param ePerson   Object on which patch is being performed
      */
     private void checkModelForExistingValue(EPerson ePerson) {
-        if (ePersonService.getPasswordHash(ePerson).getHash() == null) {
+        if (ePersonService.getPasswordHash(ePerson) == null
+                || ePersonService.getPasswordHash(ePerson).getHash() == null) {
             throw new DSpaceBadRequestException("Attempting to replace a non-existent value (netID).");
         }
     }
 
     @Override
-    public boolean supports(R objectToMatch, String path) {
-        return (objectToMatch instanceof EPerson && path.trim().equalsIgnoreCase(OPERATION_PASSWORD_CHANGE));
+    public boolean supports(R objectToMatch, Operation operation) {
+        return (objectToMatch instanceof EPerson && operation.getOp().trim().equalsIgnoreCase(OPERATION_REPLACE)
+                && operation.getPath().trim().equalsIgnoreCase(OPERATION_PASSWORD_CHANGE));
     }
 }

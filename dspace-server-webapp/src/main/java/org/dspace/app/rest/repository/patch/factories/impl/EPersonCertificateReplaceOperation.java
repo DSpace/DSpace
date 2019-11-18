@@ -34,7 +34,7 @@ public class EPersonCertificateReplaceOperation<R> extends PatchOperation<R> {
     public R perform(Context context, R object, Operation operation) {
         checkOperationValue(operation.getValue());
         Boolean requireCert = getBooleanOperationValue(operation.getValue());
-        if (supports(object, operation.getPath())) {
+        if (supports(object, operation)) {
             EPerson eperson = (EPerson) object;
             eperson.setRequireCertificate(requireCert);
             return object;
@@ -44,7 +44,8 @@ public class EPersonCertificateReplaceOperation<R> extends PatchOperation<R> {
     }
 
     @Override
-    public boolean supports(R objectToMatch, String path) {
-        return (objectToMatch instanceof EPerson && path.trim().equalsIgnoreCase(OPERATION_PATH_CERTIFICATE));
+    public boolean supports(R objectToMatch, Operation operation) {
+        return (objectToMatch instanceof EPerson && operation.getOp().trim().equalsIgnoreCase(OPERATION_REPLACE)
+                && operation.getPath().trim().equalsIgnoreCase(OPERATION_PATH_CERTIFICATE));
     }
 }

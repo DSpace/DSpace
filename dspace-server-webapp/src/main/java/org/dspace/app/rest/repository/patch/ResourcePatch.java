@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest.repository.patch;
 
+import java.sql.SQLException;
 import java.util.List;
 
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
@@ -37,7 +38,7 @@ public class ResourcePatch<M extends DSpaceObject> {
      * @throws UnprocessableEntityException
      * @throws DSpaceBadRequestException
      */
-    public void patch(Context context, M dso, List<Operation> operations) {
+    public void patch(Context context, M dso, List<Operation> operations) throws SQLException {
         for (Operation operation: operations) {
             performPatchOperation(context, dso, operation);
         }
@@ -52,9 +53,9 @@ public class ResourcePatch<M extends DSpaceObject> {
      * @throws DSpaceBadRequestException
      */
     protected void performPatchOperation(Context context, M dso, Operation operation)
-            throws DSpaceBadRequestException {
+            throws DSpaceBadRequestException, SQLException {
         for (PatchOperation patchOperation: patchOperations) {
-            if (patchOperation.supports(dso, operation.getPath())) {
+            if (patchOperation.supports(dso, operation)) {
                 patchOperation.perform(context, dso, operation);
                 return;
             }
