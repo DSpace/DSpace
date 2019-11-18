@@ -28,13 +28,13 @@ public class EPersonLoginReplaceOperation<R> extends PatchOperation<R> {
     /**
      * Path in json body of patch that uses this operation
      */
-    private static final String OPERATION_PATH_PASSWORD = "/canLogin";
+    private static final String OPERATION_PATH_CANLOGIN = "/canLogin";
 
     @Override
     public R perform(Context context, R object, Operation operation) {
         checkOperationValue(operation.getValue());
         Boolean canLogin = getBooleanOperationValue(operation.getValue());
-        if (supports(object, operation.getPath())) {
+        if (supports(object, operation)) {
             EPerson eperson = (EPerson) object;
             eperson.setCanLogIn(canLogin);
             return object;
@@ -44,7 +44,8 @@ public class EPersonLoginReplaceOperation<R> extends PatchOperation<R> {
     }
 
     @Override
-    public boolean supports(R objectToMatch, String path) {
-        return (objectToMatch instanceof EPerson && path.trim().equalsIgnoreCase(OPERATION_PATH_PASSWORD));
+    public boolean supports(R objectToMatch, Operation operation) {
+        return (objectToMatch instanceof EPerson && operation.getOp().trim().equalsIgnoreCase(OPERATION_REPLACE)
+                && operation.getPath().trim().equalsIgnoreCase(OPERATION_PATH_CANLOGIN));
     }
 }

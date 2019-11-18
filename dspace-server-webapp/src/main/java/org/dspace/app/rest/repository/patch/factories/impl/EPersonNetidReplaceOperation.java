@@ -33,7 +33,7 @@ public class EPersonNetidReplaceOperation<R> extends PatchOperation<R> {
     @Override
     public R perform(Context context, R object, Operation operation) {
         checkOperationValue(operation.getValue());
-        if (supports(object, operation.getPath())) {
+        if (supports(object, operation)) {
             EPerson eperson = (EPerson) object;
             checkModelForExistingValue(eperson);
             eperson.setNetid((String) operation.getValue());
@@ -54,7 +54,8 @@ public class EPersonNetidReplaceOperation<R> extends PatchOperation<R> {
     }
 
     @Override
-    public boolean supports(R objectToMatch, String path) {
-        return (objectToMatch instanceof EPerson && path.trim().equalsIgnoreCase(OPERATION_PATH_NETID));
+    public boolean supports(R objectToMatch, Operation operation) {
+        return (objectToMatch instanceof EPerson && operation.getOp().trim().equalsIgnoreCase(OPERATION_REPLACE)
+                && operation.getPath().trim().equalsIgnoreCase(OPERATION_PATH_NETID));
     }
 }

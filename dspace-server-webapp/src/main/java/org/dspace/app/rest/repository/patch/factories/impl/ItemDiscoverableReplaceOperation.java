@@ -34,7 +34,7 @@ public class ItemDiscoverableReplaceOperation<R> extends PatchOperation<R> {
     public R perform(Context context, R object, Operation operation) {
         checkOperationValue(operation.getValue());
         Boolean discoverable = getBooleanOperationValue(operation.getValue());
-        if (supports(object, operation.getPath())) {
+        if (supports(object, operation)) {
             Item item = (Item) object;
             item.setDiscoverable(discoverable);
             return object;
@@ -44,8 +44,9 @@ public class ItemDiscoverableReplaceOperation<R> extends PatchOperation<R> {
     }
 
     @Override
-    public boolean supports(R objectToMatch, String path) {
-        return (objectToMatch instanceof Item && path.trim().equalsIgnoreCase(OPERATION_PATH_DISCOVERABLE));
+    public boolean supports(R objectToMatch, Operation operation) {
+        return (objectToMatch instanceof Item && operation.getOp().trim().equalsIgnoreCase(OPERATION_REPLACE)
+                && operation.getPath().trim().equalsIgnoreCase(OPERATION_PATH_DISCOVERABLE));
     }
 
 }

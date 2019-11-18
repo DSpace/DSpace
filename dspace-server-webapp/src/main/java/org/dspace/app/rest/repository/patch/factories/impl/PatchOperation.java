@@ -7,6 +7,8 @@
  */
 package org.dspace.app.rest.repository.patch.factories.impl;
 
+import java.sql.SQLException;
+
 import org.apache.commons.lang3.BooleanUtils;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.model.patch.Operation;
@@ -15,8 +17,14 @@ import org.dspace.core.Context;
 /**
  * Base class for all resource patch operations.
  */
-public abstract class PatchOperation<M>
-        implements ResourcePatchOperation<M> {
+public abstract class PatchOperation<M> {
+
+    // All PATCH operations's string (in operation.getOp())
+    protected static final String OPERATION_REPLACE = "replace";
+    protected static final String OPERATION_ADD = "add";
+    protected static final String OPERATION_COPY = "copy";
+    protected static final String OPERATION_MOVE = "move";
+    protected static final String OPERATION_REMOVE = "remove";
 
     /**
      * Updates the rest model by applying the patch operation.
@@ -27,7 +35,7 @@ public abstract class PatchOperation<M>
      * @return the patched dso
      * @throws DSpaceBadRequestException
      */
-    public abstract M perform(Context context, M resource, Operation operation);
+    public abstract M perform(Context context, M resource, Operation operation) throws SQLException;
 
     /**
      * Throws PatchBadRequestException for missing operation value.
@@ -66,9 +74,9 @@ public abstract class PatchOperation<M>
      * Determines whether or not this Patch Operation can do this patch (RestModel and path gets checked)
      * @param objectToMatch    Object whose class must be instance of type object
      *                              for which this PatchOperation was created
-     * @param path             Path given to the patch body, should match this type of Patch Operation
+     * @param operation        Operation of the patch, should match this type of Patch Operation
      * @return                 True if this PatchOperation class can do the patch for this given dso type and Path
      */
-    public abstract boolean supports(M objectToMatch, String path);
+    public abstract boolean supports(M objectToMatch, Operation operation);
 
 }
