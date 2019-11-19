@@ -1864,6 +1864,8 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
 
+        context.restoreAuthSystemState();
+
         ObjectMapper mapper = new ObjectMapper();
         ItemRest itemRest = new ItemRest();
         itemRest.setName("Practices of research data curation in institutional repositories:" +
