@@ -210,7 +210,7 @@ public class RelationshipTypeRestControllerIT extends AbstractEntityIntegrationT
 
         //verify paging
         getClient().perform(get("/api/core/relationships/search/byLabel?label=isAuthorOfPublication&dso="
-                                    + publication.getID()+"&size=1"))
+                                    + publication.getID() + "&size=1"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.page.totalElements", is(2)));
 
@@ -225,7 +225,7 @@ public class RelationshipTypeRestControllerIT extends AbstractEntityIntegrationT
 
         //verify paging
         getClient().perform(get("/api/core/relationships/search/byLabel?label=isAuthorOfPublication&dso="
-                                    + publication2.getID()+"&size=1"))
+                                    + publication2.getID() + "&size=1"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.page.totalElements", is(2)));
 
