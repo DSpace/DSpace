@@ -230,7 +230,8 @@ public class InitializeEntities {
         if (relationshipType == null) {
             relationshipTypeService.create(context, leftEntityType, rightEntityType, leftwardType, rightwardType,
                                            leftCardinalityMinInteger, leftCardinalityMaxInteger,
-                                           rightCardinalityMinInteger, rightCardinalityMaxInteger, copyLeft, copyRight);
+                                           rightCardinalityMinInteger, rightCardinalityMaxInteger,
+                                           copyLeft, copyRight);
         } else {
             relationshipType.setCopyLeft(copyLeft);
             relationshipType.setCopyRight(copyRight);
