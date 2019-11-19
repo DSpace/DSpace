@@ -116,6 +116,11 @@
     - xmlui
     - rest
 
+- name: Deploy maintenance scripts
+  copy:
+    src: ../customizations/maintenance-scripts
+    dest: /brage/{{ kunde }}/app/bibsys-scripts
+
 - name: Deploy FEIDE authentication properties
   copy:
     dest: /brage/{{ kunde }}/app/config/feide.properties
