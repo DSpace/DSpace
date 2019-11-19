@@ -13,6 +13,7 @@ import java.util.List;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.ItemRest;
+import org.dspace.app.rest.model.MetadataValueList;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
@@ -37,8 +38,7 @@ public class ItemConverter
 
     @Autowired
     private ConverterService converter;
-    @Autowired
-    private MetadataConverter metadataConverter;
+
     @Autowired
     private ItemService itemService;
 
@@ -68,7 +68,8 @@ public class ItemConverter
         item.setBitstreams(bitstreams);
 
         List<MetadataValue> fullList = itemService.getMetadata(obj, Item.ANY, Item.ANY, Item.ANY, Item.ANY, true);
-        item.setMetadata(metadataConverter.convert(fullList));
+        MetadataValueList metadataValues = new MetadataValueList(fullList);
+        item.setMetadata(converter.toRest(metadataValues, projection));
 
         return item;
     }
