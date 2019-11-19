@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest.converter;
 
+import org.dspace.app.rest.model.MetadataValueList;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.content.DSpaceObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +24,7 @@ public abstract class DSpaceObjectConverter<M extends DSpaceObject, R extends or
     .DSpaceObjectRest> implements DSpaceConverter<M, R> {
 
     @Autowired
-    private MetadataConverter metadataConverter;
+    ConverterService converter;
 
     @Override
     public R convert(M obj, Projection projection) {
@@ -34,7 +35,8 @@ public abstract class DSpaceObjectConverter<M extends DSpaceObject, R extends or
             resource.setUuid(obj.getID().toString());
         }
         resource.setName(obj.getName());
-        resource.setMetadata(metadataConverter.convert(obj.getMetadata()));
+        MetadataValueList metadataValues = new MetadataValueList(obj.getMetadata());
+        resource.setMetadata(converter.toRest(metadataValues, projection));
         return resource;
     }
 
