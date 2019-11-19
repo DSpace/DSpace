@@ -48,49 +48,57 @@
 	
     <dc-type>
         <schema>oaire</schema>
-        <element>citationTitle</element>
+        <element>citation</element>
+        <qualifier>title</qualifier>
         <scope_note>The title name of the container (e.g. journal, book, conference) this work is published in. This property is considered to be part of the bibliographic citation.</scope_note>
     </dc-type>
 	
     <dc-type>
         <schema>oaire</schema>
-        <element>citationVolume</element>
+        <element>citation</element>
+        <qualifier>volume</qualifier>
         <scope_note>The volume, typically a number, of the container (e.g. journal). This property is considered to be part of the bibliographic citation.</scope_note>
     </dc-type>
 	
     <dc-type>
         <schema>oaire</schema>
-        <element>citationIssue</element>
+        <element>citation</element>
+        <qualifier>issue</qualifier>
         <scope_note>The issue of the container (e.g. journal). This property is considered to be part of the bibliographic citation.</scope_note>
     </dc-type>
 	
     <dc-type>
         <schema>oaire</schema>
-        <element>citationStartPage</element>
+        <element>citation</element>
+        <qualifier>startPage</qualifier>
         <scope_note>The start page is part of the pagination information of the work published in a container (e.g. journal issue). This property is considered to be part of the bibliographic citation.</scope_note>
     </dc-type>
 	
     <dc-type>
         <schema>oaire</schema>
-        <element>citationEndPage</element>
+        <element>citation</element>
+        <qualifier>endPage</qualifier>
         <scope_note>The end page is part of the pagination information of the work published in a container (e.g. journal issue). This property is considered to be part of the bibliographic citation.</scope_note>
     </dc-type>
 	
     <dc-type>
         <schema>oaire</schema>
-        <element>citationEdition</element>
+        <element>citation</element>
+        <qualifier>edition</qualifier>
         <scope_note>The edition the work was published in (e.g. book edition). This property is considered to be part of the bibliographic citation.</scope_note>
     </dc-type>
 	
     <dc-type>
         <schema>oaire</schema>
-        <element>citationConferencePlace</element>
+        <element>citation</element>
+        <qualifier>conferencePlace</qualifier>
         <scope_note>The place where the conference took place. This property is considered to be part of the bibliographic citation.</scope_note>
     </dc-type>
 	
     <dc-type>
         <schema>oaire</schema>
-        <element>citationConferenceDate</element>
+        <element>citation</element>
+        <qualifier>conferenceDate</qualifier>
         <scope_note>The date when the conference took place. This property is considered to be part of the bibliographic citation. Recommended best practice for encoding the date value is defined in a profile of ISO 8601 [W3CDTF] and follows the YYYY-MM-DD format.</scope_note>
     </dc-type>	
 
