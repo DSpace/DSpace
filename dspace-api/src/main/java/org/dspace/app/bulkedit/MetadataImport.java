@@ -402,13 +402,15 @@ public class MetadataImport {
 
                         // Add the metadata to the item
                         for (BulkEditMetadataValue dcv : whatHasChanged.getAdds()) {
-                            itemService.addMetadata(c, item, dcv.getSchema(),
-                                                    dcv.getElement(),
-                                                    dcv.getQualifier(),
-                                                    dcv.getLanguage(),
-                                                    dcv.getValue(),
-                                                    dcv.getAuthority(),
-                                                    dcv.getConfidence());
+                            if (!StringUtils.equals(dcv.getSchema(), MetadataSchemaEnum.RELATION.getName())) {
+                                itemService.addMetadata(c, item, dcv.getSchema(),
+                                        dcv.getElement(),
+                                        dcv.getQualifier(),
+                                        dcv.getLanguage(),
+                                        dcv.getValue(),
+                                        dcv.getAuthority(),
+                                        dcv.getConfidence());
+                            }
                         }
                         //Add relations after all metadata has been processed
                         for (BulkEditMetadataValue dcv : whatHasChanged.getAdds()) {
