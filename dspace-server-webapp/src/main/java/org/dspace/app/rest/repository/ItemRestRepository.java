@@ -197,7 +197,7 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
     }
 
     @Override
-    @PreAuthorize("hasPermission(#id, 'ITEM', 'WRITE')")
+    @PreAuthorize("hasPermission(#uuid, 'ITEM', 'WRITE')")
     protected ItemRest put(Context context, HttpServletRequest request, String apiCategory, String model, UUID uuid,
                            JsonNode jsonNode)
             throws RepositoryMethodNotImplementedException, SQLException, AuthorizeException {
