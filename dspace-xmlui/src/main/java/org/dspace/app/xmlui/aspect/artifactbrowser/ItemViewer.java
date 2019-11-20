@@ -307,6 +307,16 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
 
             XMLOutputter xmlo = new XMLOutputter();
             xmlo.output(new Text("\n"), sw);
+
+            // Include noindex tag for robots if item is not discoverable
+            if (!item.isDiscoverable()) {
+                Element noindex = new Element("meta");
+                noindex.setAttribute("name", "robots");
+                noindex.setAttribute("content", "noindex");
+                xmlo.output(noindex, sw);
+                xmlo.output(new Text("\n"), sw);
+            }
+
             for (int i = 0; i < l.size(); i++)
             {
                 Element e = (Element) l.get(i);
