@@ -77,6 +77,6 @@ public abstract class PatchOperation<M> {
      * @param operation        Operation of the patch, should match this type of Patch Operation
      * @return                 True if this PatchOperation class can do the patch for this given dso type and Path
      */
-    public abstract boolean supports(M objectToMatch, Operation operation);
+    public abstract boolean supports(Object objectToMatch, Operation operation);
 
 }

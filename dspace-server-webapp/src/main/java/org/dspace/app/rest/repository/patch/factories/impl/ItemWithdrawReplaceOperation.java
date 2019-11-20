@@ -82,7 +82,7 @@ public class ItemWithdrawReplaceOperation<R> extends PatchOperation<R> {
     }
 
     @Override
-    public boolean supports(R objectToMatch, Operation operation) {
+    public boolean supports(Object objectToMatch, Operation operation) {
         return (objectToMatch instanceof Item && operation.getOp().trim().equalsIgnoreCase(OPERATION_REPLACE)
                 && operation.getPath().trim().equalsIgnoreCase(OPERATION_PATH_WITHDRAW));
     }

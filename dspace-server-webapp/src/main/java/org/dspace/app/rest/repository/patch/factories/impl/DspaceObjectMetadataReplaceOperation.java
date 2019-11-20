@@ -42,6 +42,7 @@ public class DspaceObjectMetadataReplaceOperation<R extends DSpaceObject> extend
     @Autowired
     DspaceObjectMetadataPatchUtils metadataPatchUtils;
 
+    @Override
     public R perform(Context context, R resource, Operation operation) throws SQLException {
         DSpaceObjectService dsoService = ContentServiceFactory.getInstance().getDSpaceObjectService(resource);
         MetadataField metadataField = metadataPatchUtils.getMetadataField(context, operation);
@@ -211,7 +212,8 @@ public class DspaceObjectMetadataReplaceOperation<R extends DSpaceObject> extend
         }
     }
 
-    public boolean supports(R objectToMatch, Operation operation) {
+    @Override
+    public boolean supports(Object objectToMatch, Operation operation) {
         return ((operation.getPath().startsWith(metadataPatchUtils.METADATA_PATH)
                 || operation.getPath().equals(metadataPatchUtils.METADATA_PATH))
                 && operation.getOp().trim().equalsIgnoreCase(OPERATION_REPLACE)

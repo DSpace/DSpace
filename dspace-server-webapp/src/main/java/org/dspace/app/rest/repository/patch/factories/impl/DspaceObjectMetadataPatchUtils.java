@@ -138,8 +138,7 @@ public final class DspaceObjectMetadataPatchUtils {
      */
     protected MetadataField getMetadataField(Context context, Operation operation) throws SQLException {
         String mdElement = this.extractMdFieldStringFromOperation(operation);
-        MetadataField metadataField = metadataFieldService.findByString(context, mdElement, '.');
-        return metadataField;
+        return metadataFieldService.findByString(context, mdElement, '.');
     }
 
     /**
