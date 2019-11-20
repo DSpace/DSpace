@@ -6,13 +6,14 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
+import org.ssu.entity.response.DepositorDivision;
 
 import javax.persistence.*;
 import java.util.List;
 
 @Entity
 @Table(name = "faculty")
-public class FacultyEntity {
+public class FacultyEntity implements DepositorDivision {
     @Id
     @Column(name = "faculty_id")
     @JsonProperty("id")

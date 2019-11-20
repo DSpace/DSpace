@@ -5,15 +5,17 @@ import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.core.Context;
 import org.jooq.DSLContext;
+import org.jooq.Record;
+import org.jooq.Result;
 import org.jooq.impl.DSL;
 import org.springframework.stereotype.Service;
+import org.ssu.entity.jooq.Metadatavalue;
 
 import javax.annotation.Resource;
 import java.sql.SQLException;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Spliterator;
-import java.util.Spliterators;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -44,6 +46,7 @@ public class MetadatavalueRepository {
                 .where(METADATAVALUE.metadataFieldId.eq(fieldTypeId).and(HANDLE.resourceLegacyId.eq(itemId)))
                 .fetchOne(METADATAVALUE.value);
     }
+
     public String getItemTitleByItemId(int itemId) {
         return getItemMetadataByFieldId(itemId, METADATAVALUE_TITLE_FIELD_ID);
     }
@@ -61,5 +64,13 @@ public class MetadatavalueRepository {
                 .stream()
                 .map(item -> Pair.of(item.get(METADATAVALUE.value), item.get(HANDLE.resourceLegacyId)))
                 .collect(Collectors.toList());
+    }
+
+    public Map<UUID, String> selectMetadataByFieldId(Integer fieldId) {
+        return dsl.select(METADATAVALUE.dspaceObjectId, METADATAVALUE.value)
+                .from(METADATAVALUE)
+                .where(METADATAVALUE.metadataFieldId.eq(fieldId))
+                .fetchStream()
+                .collect(Collectors.toMap(item -> item.get(METADATAVALUE.dspaceObjectId), item -> item.get(METADATAVALUE.value), (a, b) -> a));
     }
 }

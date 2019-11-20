@@ -10,7 +10,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import javax.persistence.*;
 
 @Entity
-public class Speciality implements Depositor {
+public class Speciality {
     @Id
     @Column(name = "id")
     @JsonProperty("id")

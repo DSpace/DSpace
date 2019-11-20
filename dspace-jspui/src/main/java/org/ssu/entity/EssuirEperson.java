@@ -1,10 +1,11 @@
 package org.ssu.entity;
 
 import org.dspace.eperson.EPerson;
+import org.ssu.entity.response.DepositorSimpleUnit;
 
 import javax.persistence.Column;
 
-public class EssuirEperson {
+public class EssuirEperson implements DepositorSimpleUnit {
     private EPerson ePerson;
     private String position;
     private ChairEntity chairEntity;
@@ -21,6 +22,11 @@ public class EssuirEperson {
 
     public ChairEntity getChairEntity() {
         return chairEntity;
+    }
+
+    @Override
+    public String getName() {
+        return getLastName() + " " + getFirstName();
     }
 
     public String getLastName() {

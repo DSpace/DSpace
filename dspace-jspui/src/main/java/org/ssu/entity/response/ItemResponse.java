@@ -1,5 +1,8 @@
 package org.ssu.entity.response;
 
+import org.dspace.eperson.EPerson;
+
+import java.time.LocalDate;
 import java.util.List;
 
 public class ItemResponse {
@@ -10,6 +13,8 @@ public class ItemResponse {
     private Integer year;
     private String authors;
     private String type;
+    private LocalDate dateAvailable;
+    private EPerson submitter;
 
     private ItemResponse(Builder builder) {
         handle = builder.handle;
@@ -19,8 +24,9 @@ public class ItemResponse {
         year = builder.year;
         authors = builder.authors;
         type = builder.type;
+        dateAvailable = builder.dateAvailable;
+        submitter = builder.submitter;
     }
-
 
     public String getHandle() {
         return handle;
@@ -50,6 +56,14 @@ public class ItemResponse {
         return type;
     }
 
+    public LocalDate getDateAvailable() {
+        return dateAvailable;
+    }
+
+    public EPerson getSubmitter() {
+        return submitter;
+    }
+
 
     public static final class Builder {
         private String handle;
@@ -59,6 +73,8 @@ public class ItemResponse {
         private Integer year;
         private String authors;
         private String type;
+        private LocalDate dateAvailable;
+        private EPerson submitter;
 
         public Builder() {
         }
@@ -71,6 +87,8 @@ public class ItemResponse {
             this.year = copy.getYear();
             this.authors = copy.getAuthors();
             this.type = copy.getType();
+            this.dateAvailable = copy.getDateAvailable();
+            this.submitter = copy.getSubmitter();
         }
 
         public Builder withHandle(String handle) {
@@ -105,6 +123,16 @@ public class ItemResponse {
 
         public Builder withType(String type) {
             this.type = type;
+            return this;
+        }
+
+        public Builder withDateAvailable(LocalDate dateAvailable) {
+            this.dateAvailable = dateAvailable;
+            return this;
+        }
+
+        public Builder withSubmitter(EPerson submitter) {
+            this.submitter = submitter;
             return this;
         }
 

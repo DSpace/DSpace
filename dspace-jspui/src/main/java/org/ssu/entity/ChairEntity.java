@@ -6,13 +6,14 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.ssu.entity.response.DepositorDivision;
 
 import javax.persistence.*;
 import java.util.List;
 
 @Entity
 @Table(name = "chair")
-public class ChairEntity {
+public class ChairEntity implements DepositorDivision {
     @Id
     @Column(name = "chair_id")
     @JsonProperty("id")
@@ -50,7 +51,7 @@ public class ChairEntity {
         this.id = id;
     }
 
-    public String getChairName() {
+    public String getName() {
         return chairName;
     }
 
@@ -108,7 +109,7 @@ public class ChairEntity {
 
         public Builder(ChairEntity copy) {
             this.id = copy.getId();
-            this.chairName = copy.getChairName();
+            this.chairName = copy.getName();
             this.facultyEntityName = copy.getFacultyEntity();
         }
 

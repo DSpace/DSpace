@@ -13,9 +13,8 @@ import org.ssu.entity.FacultyEntity;
 
 import javax.annotation.Resource;
 import java.sql.SQLException;
-import java.util.Collections;
+import java.util.*;
 import java.util.Comparator;
-import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;

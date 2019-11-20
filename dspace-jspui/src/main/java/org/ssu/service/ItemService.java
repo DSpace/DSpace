@@ -1,21 +1,23 @@
 package org.ssu.service;
 
-import org.dspace.content.DCDate;
-import org.dspace.content.Item;
-import org.dspace.content.MetadataSchema;
-import org.dspace.content.MetadataValue;
+import org.dspace.content.*;
 import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.MetadataFieldService;
+import org.dspace.content.service.MetadataValueService;
+import org.dspace.core.Context;
 import org.springframework.stereotype.Service;
 import org.ssu.entity.AuthorLocalization;
 import org.ssu.entity.response.ItemResponse;
-import org.ssu.service.localization.AuthorsCache;
+import org.ssu.repository.MetadatavalueRepository;
 import org.ssu.service.localization.TypeLocalization;
 import org.ssu.service.statistics.EssuirStatistics;
 
 import javax.annotation.Resource;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Locale;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -30,7 +32,16 @@ public class ItemService {
     @Resource
     private TypeLocalization typeLocalization;
 
+    @Resource
+    private MetadatavalueRepository metadatavalueRepository;
+
     transient private final org.dspace.content.service.ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+    transient private final MetadataFieldService metadataFieldService = ContentServiceFactory.getInstance().getMetadataFieldService();
+    transient private final MetadataValueService metadataValueService = ContentServiceFactory.getInstance().getMetadataValueService();
+
+    public Iterator<Item> findAll(Context context) throws SQLException {
+        return itemService.findAll(context);
+    }
 
     public Integer extractIssuedYearForItem(Item item) {
         List<MetadataValue> dateIssuedMetadata = itemService.getMetadata(item, MetadataSchema.DC_SCHEMA, "date", "issued", Item.ANY);
@@ -100,6 +111,26 @@ public class ItemService {
                 .collect(Collectors.toList());
     }
 
+    public Map<UUID, LocalDate> getAllDatesAvailable(Context context) throws SQLException, IOException {
+        MetadataField dateAvailableField = metadataFieldService.findByElement(context, MetadataSchema.DC_SCHEMA, "date", "available");
+        return metadatavalueRepository.selectMetadataByFieldId(dateAvailableField.getID())
+                .entrySet()
+                .stream()
+                .collect(Collectors.toMap(Map.Entry::getKey,
+                        item -> LocalDate.parse(item.getValue(), DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")),
+                        (a, b) -> a));
+    }
+
+    public LocalDate getDateAvailableForItem(Item item) {
+        return itemService.getMetadata(item, MetadataSchema.DC_SCHEMA, "date", "available", Item.ANY)
+                .stream()
+                .sorted(Comparator.comparingInt(MetadataValue::getPlace))
+                .map(MetadataValue::getValue)
+                .map(date -> LocalDate.parse(date.replace("Z", ""), DateTimeFormatter.ISO_LOCAL_DATE_TIME))
+                .findFirst()
+                .orElse(LocalDate.MIN);
+    }
+
     public String getItemTypeLocalized(Item item, Locale locale) {
         return itemService.getMetadata(item, MetadataSchema.DC_SCHEMA, "type", "*", Item.ANY)
                 .stream()
@@ -125,6 +156,8 @@ public class ItemService {
                 .withType(getItemTypeLocalized(item, locale))
                 .withViews(essuirStatistics.getViewsForItem(item.getLegacyId()))
                 .withDownloads(essuirStatistics.getDownloadsForItem(item.getLegacyId()))
+                .withDateAvailable(getDateAvailableForItem(item))
+                .withSubmitter(item.getSubmitter())
                 .build();
     }
 
