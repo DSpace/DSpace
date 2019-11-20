@@ -125,7 +125,8 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
             if (authorizeService.authorizeActionBoolean(context, leftItem, Constants.WRITE) ||
                 authorizeService.authorizeActionBoolean(context, rightItem, Constants.WRITE)) {
                 Relationship relationship = relationshipService.create(context, leftItem, rightItem,
-                    relationshipType, 0, 0, leftwardValue, rightwardValue);
+                                                                       relationshipType, -1, -1,
+                                                                       leftwardValue, rightwardValue);
                 // The above if check deals with the case that a Relationship can be created if the user has write
                 // rights on one of the two items. The following updateItem calls can however call the
                 // ItemService.update() functions which would fail if the user doesn't have permission on both items.
@@ -192,7 +193,7 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
                 relationship.setRightItem(rightItem);
 
                 try {
-                    relationshipService.updatePlaceInRelationship(context, relationship, false);
+                    relationshipService.updatePlaceInRelationship(context, relationship);
                     relationshipService.update(context, relationship);
                     context.commit();
                     context.reloadEntity(relationship);
