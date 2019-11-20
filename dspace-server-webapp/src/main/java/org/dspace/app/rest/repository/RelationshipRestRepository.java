@@ -56,6 +56,10 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
 
     private static final Logger log = Logger.getLogger(RelationshipRestRepository.class);
 
+    private static final String ALL = "all";
+    private static final String LEFT = "left";
+    private static final String RIGHT = "right";
+    private static final String CONFIGURED = "configured";
 
     @Autowired
     private ItemService itemService;
@@ -307,16 +311,16 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
             if (relationship != null) {
                 try {
                     switch (copyVirtual) {
-                        case "all":
+                        case ALL:
                             relationshipService.delete(context, relationship, true, true);
                             break;
-                        case "left":
+                        case LEFT:
                             relationshipService.delete(context, relationship, true, false);
                             break;
-                        case "right":
+                        case RIGHT:
                             relationshipService.delete(context, relationship, false, true);
                             break;
-                        case "configured":
+                        case CONFIGURED:
                             relationshipService.delete(context, relationship);
                             break;
                         default:

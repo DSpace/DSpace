@@ -225,6 +225,7 @@ public class RelationshipDeleteRestRepositoryIT extends AbstractEntityIntegratio
             delete("/api/core/relationships/" + relationship.getID() + "?copyVirtualMetadata=left"))
             .andExpect(status().isNoContent());
 
+        // Check left item to ensure that the metadata is copied
         leftItem = itemService.find(context, leftItem.getID());
         List<MetadataValue> authorList = itemService.getMetadata(leftItem, "dc", "contributor", "author", Item.ANY);
         assertThat(authorList.size(), equalTo(1));
@@ -234,8 +235,14 @@ public class RelationshipDeleteRestRepositoryIT extends AbstractEntityIntegratio
         assertThat(authorList.get(0).getMetadataField().getQualifier(), equalTo("author"));
         assertNull(authorList.get(0).getAuthority());
 
+
+        // Check that the relation metadata values are gone because the relationship is gone
         List<MetadataValue> relationshipMetadataList = itemService
             .getMetadata(leftItem, "relation", "isAuthorOfPublication", null, Item.ANY);
+        assertThat(relationshipMetadataList.size(), equalTo(0));
+
+        relationshipMetadataList = itemService
+            .getMetadata(rightItem, "relation", "isPublicationOfAuthor", null, Item.ANY);
         assertThat(relationshipMetadataList.size(), equalTo(0));
     }
 
@@ -247,13 +254,22 @@ public class RelationshipDeleteRestRepositoryIT extends AbstractEntityIntegratio
             delete("/api/core/relationships/" + relationship.getID() + "?copyVirtualMetadata=right"))
             .andExpect(status().isNoContent());
 
+        // Check left item to ensure that the metadata hadn't been copied
         leftItem = itemService.find(context, leftItem.getID());
         List<MetadataValue> authorList = itemService.getMetadata(leftItem, "dc", "contributor", "author", Item.ANY);
         assertThat(authorList.size(), equalTo(0));
 
+        // Check that the relation metadata values are gone because the relationship is gone
         List<MetadataValue> relationshipMetadataList = itemService
             .getMetadata(leftItem, "relation", "isAuthorOfPublication", null, Item.ANY);
         assertThat(relationshipMetadataList.size(), equalTo(0));
+
+        relationshipMetadataList = itemService
+            .getMetadata(rightItem, "relation", "isPublicationOfAuthor", null, Item.ANY);
+        assertThat(relationshipMetadataList.size(), equalTo(0));
+
+        // There is no additional Metadata to check on the rightItem because the configuration of the virtual
+        // metadata holds no config to display virtual metadata on the author of the publication
     }
 
     @Test
@@ -276,6 +292,16 @@ public class RelationshipDeleteRestRepositoryIT extends AbstractEntityIntegratio
         List<MetadataValue> relationshipMetadataList = itemService
             .getMetadata(leftItem, "relation", "isAuthorOfPublication", null, Item.ANY);
         assertThat(relationshipMetadataList.size(), equalTo(0));
+
+        relationshipMetadataList = itemService
+            .getMetadata(rightItem, "relation", "isPublicationOfAuthor", null, Item.ANY);
+        assertThat(relationshipMetadataList.size(), equalTo(0));
+
+        // There is no additional Metadata to check on the rightItem because the configuration of the virtual
+        // metadata holds no config to display virtual metadata on the author of the publication
+        // Verify testDeleteJournalRelationshipCopyToBothItems test for an example where metadata is actually configured
+        // to be displayed on both items for the relationship
+
     }
 
     @Test
@@ -286,12 +312,14 @@ public class RelationshipDeleteRestRepositoryIT extends AbstractEntityIntegratio
             delete("/api/core/relationships/" + relationship.getID() + "?copyVirtualMetadata=left"))
             .andExpect(status().isNoContent());
 
+        // Check the leftItem to ensure that the metadata is copied
         leftItem = itemService.find(context, leftItem.getID());
         List<MetadataValue> volumeList =
             itemService.getMetadata(leftItem, "publicationvolume", "volumeNumber", null, Item.ANY);
         assertThat(volumeList.size(), equalTo(1));
         assertThat(volumeList.get(0).getValue(), equalTo("30"));
 
+        // Check the rightItem to ensure that the metadata is not copied
         rightItem = itemService.find(context, rightItem.getID());
         List<MetadataValue> issueList =
             itemService.getMetadata(rightItem, "publicationissue", "issueNumber", null, Item.ANY);
@@ -306,11 +334,13 @@ public class RelationshipDeleteRestRepositoryIT extends AbstractEntityIntegratio
             delete("/api/core/relationships/" + relationship.getID() + "?copyVirtualMetadata=right"))
             .andExpect(status().isNoContent());
 
+        // Check the leftItem to ensure that the metadata is not copied
         leftItem = itemService.find(context, leftItem.getID());
         List<MetadataValue> volumeList =
             itemService.getMetadata(leftItem, "publicationvolume", "volumeNumber", null, Item.ANY);
         assertThat(volumeList.size(), equalTo(0));
 
+        // Check the right item to ensure that the metadata is copied
         rightItem = itemService.find(context, rightItem.getID());
         List<MetadataValue> issueList =
             itemService.getMetadata(rightItem, "publicationissue", "issueNumber", null, Item.ANY);
@@ -326,12 +356,14 @@ public class RelationshipDeleteRestRepositoryIT extends AbstractEntityIntegratio
             delete("/api/core/relationships/" + relationship.getID() + "?copyVirtualMetadata=all"))
             .andExpect(status().isNoContent());
 
+        // Check the left item to ensure that the metadata is copied
         leftItem = itemService.find(context, leftItem.getID());
         List<MetadataValue> volumeList =
             itemService.getMetadata(leftItem, "publicationvolume", "volumeNumber", null, Item.ANY);
         assertThat(volumeList.size(), equalTo(1));
         assertThat(volumeList.get(0).getValue(), equalTo("30"));
 
+        // Check the rightItem to ensure that the metadata is copied
         rightItem = itemService.find(context, rightItem.getID());
         List<MetadataValue> issueList =
             itemService.getMetadata(rightItem, "publicationissue", "issueNumber", null, Item.ANY);
