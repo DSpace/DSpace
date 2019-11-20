@@ -193,7 +193,7 @@ public class MetadataImport {
      * @param workflowNotify If the workflows should be used, whether to send notifications or not
      * @param useTemplate    Use collection template if create new item
      * @return An array of BulkEditChange elements representing the items that have changed
-     * @throws MetadataImportException if something goes wrong
+     * @throws MetadataImportException  if something goes wrong
      */
     public List<BulkEditChange> runImport(boolean change,
                                           boolean useWorkflow,
@@ -780,8 +780,8 @@ public class MetadataImport {
         }
 
         // Create the relationship
-        int leftPlace = relationshipService.findLeftPlaceByLeftItem(c, leftItem) + 1;
-        int rightPlace = relationshipService.findRightPlaceByRightItem(c, rightItem) + 1;
+        int leftPlace = relationshipService.findNextLeftPlaceByLeftItem(c, leftItem);
+        int rightPlace = relationshipService.findNextRightPlaceByRightItem(c, rightItem);
         Relationship persistedRelationship = relationshipService.create(c, leftItem, rightItem,
                 foundRelationshipType, leftPlace, rightPlace);
         relationshipService.update(c, persistedRelationship);
