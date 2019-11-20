@@ -290,18 +290,39 @@
              By default, return an Item record:
                 * If it is publicly accessible
                 * OR it has been withdrawn (in order to display a tombstone record).
+                * AND doesn't have a relationship.type field
+                * OR the relationship.type is a Publication
+                * limiting the results only to Publications as expected
              This filter is used by the default context ([oai]/request).
         -->
         <Filter id="defaultFilter">
             <Definition>
-                <Or>
-                    <LeftCondition>
-                        <Custom ref="itemAccessCondition"/>
-                    </LeftCondition>
-                    <RightCondition>
-                        <Custom ref="itemWithdrawnCondition"/>
-                    </RightCondition>
-                </Or>
+                <And>            
+                	<LeftCondition>
+		                <Or>
+		                    <LeftCondition>
+		                        <Custom ref="itemAccessCondition"/>
+		                    </LeftCondition>
+		                    <RightCondition>
+		                        <Custom ref="itemWithdrawnCondition"/>
+		                    </RightCondition>
+		                </Or>
+	                </LeftCondition>
+	                <RightCondition>
+		                <Or>
+		                    <LeftCondition>
+		                    	<Not>
+		                    		<Condition>
+		                    			<Custom ref="relationshipTypeExistsCondition"/>
+		                    		</Condition>
+		                    	</Not>
+		                    </LeftCondition>
+		                    <RightCondition>
+		                    	<Custom ref="isPublicationEntityCondition"/>
+		                    </RightCondition>
+		                </Or>
+	                </RightCondition>
+                </And>
             </Definition>
         </Filter>
 
@@ -398,6 +419,30 @@
                 <string name="value">info:eu-repo/grantAgreement/</string>
             </Configuration>
         </CustomCondition>
+                
+        <!-- This condition determines if an Item has a "relationship.type" -->
+        <CustomCondition id="relationshipTypeExistsCondition">
+            <Class>org.dspace.xoai.filter.DSpaceMetadataExistsFilter</Class>
+            <Configuration>
+                <string name="field">relationship.type</string>
+            </Configuration>
+        </CustomCondition>
+        
+        <!-- This condition determines if an Item has a "relationship.type" field
+             specifying one of the valid DRIVER document types. -->
+        <CustomCondition id="isPublicationEntityCondition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">relationship.type</string>
+                <string name="operator">equal</string>
+                <list name="values">
+                    <string>Publication</string>
+                    <string>publication</string>
+                    <!-- and other alternative names for publications types -->
+                </list>
+            </Configuration>
+        </CustomCondition>        
+        
     </Filters>
 
     <Sets>
