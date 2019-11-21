@@ -19,6 +19,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.converter.BitstreamConverter;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
+import org.dspace.app.rest.model.BitstreamRest;
+import org.dspace.app.rest.model.BundleRest;
 import org.dspace.app.rest.model.hateoas.BitstreamResource;
 import org.dspace.app.rest.repository.BundleRestRepository;
 import org.dspace.app.rest.utils.ContextUtil;
@@ -57,7 +59,8 @@ import org.springframework.web.multipart.MultipartFile;
  * </pre>
  */
 @RestController
-@RequestMapping("/api/core/bundles/" + REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID)
+@RequestMapping("/api/" + BundleRest.CATEGORY + "/" + BundleRest.PLURAL_NAME + "/"
+        + REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID + "/" + BitstreamRest.PLURAL_NAME)
 public class BundleUploadBitstreamController {
 
     private static final Logger log = LogManager.getLogger();
@@ -81,7 +84,7 @@ public class BundleUploadBitstreamController {
      *
      * @return The created BitstreamResource
      */
-    @RequestMapping(method = RequestMethod.POST, value = "/bitstreams", headers = "content-type=multipart/form-data")
+    @RequestMapping(method = RequestMethod.POST, headers = "content-type=multipart/form-data")
     @PreAuthorize("hasPermission(#uuid, 'BUNDLE', 'ADD') && hasPermission(#uuid, 'BUNDLE', 'WRITE')")
     public ResponseEntity<ResourceSupport> uploadBitstream(HttpServletRequest request, @PathVariable UUID uuid,
                                            @RequestParam("file") MultipartFile uploadfile,
