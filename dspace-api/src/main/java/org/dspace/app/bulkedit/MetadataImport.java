@@ -21,6 +21,7 @@ import java.util.Set;
 import java.util.UUID;
 import javax.annotation.Nullable;
 
+import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.lang3.StringUtils;
@@ -58,72 +59,42 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.handle.service.HandleService;
 import org.dspace.scripts.DSpaceRunnable;
-import org.dspace.workflow.WorkflowException;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowService;
 import org.dspace.workflow.factory.WorkflowServiceFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 
+/**
+ * Metadata importer to allow the batch import of metadata from a file
+ *
+ * @author Stuart Lewis
+ */
 public class MetadataImport extends DSpaceRunnable implements InitializingBean {
-
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(MetadataImport.class);
-
-
-    /**
-     * The authority controlled fields
-     */
-    protected Set<String> authorityControlled;
-
-    @Autowired
-    protected ItemService itemService;
-    @Autowired
-    protected InstallItemService installItemService;
-    @Autowired
-    protected CollectionService collectionService;
-    @Autowired
-    protected HandleService handleService;
-    @Autowired
-    protected WorkspaceItemService workspaceItemService;
-    @Autowired
-    protected RelationshipTypeService relationshipTypeService;
-    @Autowired
-    protected RelationshipService relationshipService;
-    @Autowired
-    protected EntityTypeService entityTypeService;
-    @Autowired
-    protected EntityService entityService;
-    @Autowired
-    protected AuthorityValueService authorityValueService;
-
-    /**
-     * The prefix of the authority controlled field
-     */
-    protected final String AC_PREFIX = "authority.controlled.";
-
-
-    private boolean useTemplate = false;
-    private String filename = null;
-    private boolean useWorkflow = false;
-    private boolean workflowNotify = false;
-    private boolean change = false;
-
     /**
      * The Context
      */
-    private Context c;
+    Context c;
 
     /**
      * The DSpaceCSV object we're processing
      */
-    private DSpaceCSV csv;
+    DSpaceCSV csv;
 
     /**
      * The lines to import
      */
-    private List<DSpaceCSVLine> toImport;
+    List<DSpaceCSVLine> toImport;
 
-    private boolean help = false;
+    /**
+     * The authority controlled fields
+     */
+    protected static Set<String> authorityControlled;
+
+    /**
+     * The prefix of the authority controlled field
+     */
+    protected static final String AC_PREFIX = "authority.controlled.";
 
     /**
      * Map of field:value to csv row number, used to resolve indirect entity target references.
@@ -164,7 +135,39 @@ public class MetadataImport extends DSpaceRunnable implements InitializingBean {
      */
     protected Integer rowCount = 1;
 
+    private boolean useTemplate = false;
+    private String filename = null;
+    private boolean useWorkflow = false;
+    private boolean workflowNotify = false;
+    private boolean change = false;
+    private boolean help = false;
     protected boolean validateOnly;
+
+    /**
+     * Logger
+     */
+    protected static final Logger log = org.apache.logging.log4j.LogManager.getLogger(MetadataImport.class);
+
+    @Autowired
+    protected ItemService itemService;
+    @Autowired
+    protected InstallItemService installItemService;
+    @Autowired
+    protected CollectionService collectionService;
+    @Autowired
+    protected HandleService handleService;
+    @Autowired
+    protected WorkspaceItemService workspaceItemService;
+    @Autowired
+    protected RelationshipTypeService relationshipTypeService;
+    @Autowired
+    protected RelationshipService relationshipService;
+    @Autowired
+    protected EntityTypeService entityTypeService;
+    @Autowired
+    protected EntityService entityService;
+    @Autowired
+    protected AuthorityValueService authorityValueService;
 
     /**
      * Create an instance of the metadata importer. Requires a context and an array of CSV lines
@@ -354,190 +357,6 @@ public class MetadataImport extends DSpaceRunnable implements InitializingBean {
     }
 
     /**
-     * Display the changes that have been detected, or that have been made
-     *
-     * @param changes The changes detected
-     * @param changed Whether or not the changes have been made
-     * @return The number of items that have changed
-     */
-    private int displayChanges(List<BulkEditChange> changes, boolean changed) {
-        // Display the changes
-        int changeCounter = 0;
-        for (BulkEditChange change : changes) {
-            // Get the changes
-            List<BulkEditMetadataValue> adds = change.getAdds();
-            List<BulkEditMetadataValue> removes = change.getRemoves();
-            List<Collection> newCollections = change.getNewMappedCollections();
-            List<Collection> oldCollections = change.getOldMappedCollections();
-            if ((adds.size() > 0) || (removes.size() > 0) ||
-                (newCollections.size() > 0) || (oldCollections.size() > 0) ||
-                (change.getNewOwningCollection() != null) || (change.getOldOwningCollection() != null) ||
-                (change.isDeleted()) || (change.isWithdrawn()) || (change.isReinstated())) {
-                // Show the item
-                Item i = change.getItem();
-
-                handler.logInfo("-----------------------------------------------------------");
-                if (!change.isNewItem()) {
-                    handler.logInfo("Changes for item: " + i.getID() + " (" + i.getHandle() + ")");
-                } else {
-                    handler.logInfo("New item: ");
-                    if (i != null) {
-                        if (i.getHandle() != null) {
-                            handler.logInfo(i.getID() + " (" + i.getHandle() + ")");
-                        } else {
-                            handler.logInfo(i.getID() + " (in workflow)");
-                        }
-                    }
-                }
-                changeCounter++;
-            }
-
-            // Show actions
-            if (change.isDeleted()) {
-                if (changed) {
-                    handler.logInfo(" - EXPUNGED!");
-                } else {
-                    handler.logInfo(" - EXPUNGE!");
-                }
-            }
-            if (change.isWithdrawn()) {
-                if (changed) {
-                    handler.logInfo(" - WITHDRAWN!");
-                } else {
-                    handler.logInfo(" - WITHDRAW!");
-                }
-            }
-            if (change.isReinstated()) {
-                if (changed) {
-                    handler.logInfo(" - REINSTATED!");
-                } else {
-                    handler.logInfo(" - REINSTATE!");
-                }
-            }
-
-            if (change.getNewOwningCollection() != null) {
-                Collection c = change.getNewOwningCollection();
-                if (c != null) {
-                    String cHandle = c.getHandle();
-                    String cName = c.getName();
-                    if (!changed) {
-                        handler.logInfo(" + New owning collection (" + cHandle + "): ");
-                    } else {
-                        handler.logInfo(" + New owning collection  (" + cHandle + "): ");
-                    }
-                    handler.logInfo(cName);
-                }
-
-                c = change.getOldOwningCollection();
-                if (c != null) {
-                    String cHandle = c.getHandle();
-                    String cName = c.getName();
-                    if (!changed) {
-                        handler.logInfo(" + Old owning collection (" + cHandle + "): ");
-                    } else {
-                        handler.logInfo(" + Old owning collection  (" + cHandle + "): ");
-                    }
-                    handler.logInfo(cName);
-                }
-            }
-
-            // Show new mapped collections
-            for (Collection c : newCollections) {
-                String cHandle = c.getHandle();
-                String cName = c.getName();
-                if (!changed) {
-                    handler.logInfo(" + Map to collection (" + cHandle + "): ");
-                } else {
-                    handler.logInfo(" + Mapped to collection  (" + cHandle + "): ");
-                }
-                handler.logInfo(cName);
-            }
-
-            // Show old mapped collections
-            for (Collection c : oldCollections) {
-                String cHandle = c.getHandle();
-                String cName = c.getName();
-                if (!changed) {
-                    handler.logInfo(" + Un-map from collection (" + cHandle + "): ");
-                } else {
-                    handler.logInfo(" + Un-mapped from collection  (" + cHandle + "): ");
-                }
-                handler.logInfo(cName);
-            }
-
-            // Show additions
-            for (BulkEditMetadataValue metadataValue : adds) {
-                String md = metadataValue.getSchema() + "." + metadataValue.getElement();
-                if (metadataValue.getQualifier() != null) {
-                    md += "." + metadataValue.getQualifier();
-                }
-                if (metadataValue.getLanguage() != null) {
-                    md += "[" + metadataValue.getLanguage() + "]";
-                }
-                if (!changed) {
-                    handler.logInfo(" + Add    (" + md + "): ");
-                } else {
-                    handler.logInfo(" + Added   (" + md + "): ");
-                }
-                handler.logInfo(metadataValue.getValue());
-                if (isAuthorityControlledField(md)) {
-                    handler.logInfo(", authority = " + metadataValue.getAuthority());
-                    handler.logInfo(", confidence = " + metadataValue.getConfidence());
-                }
-                handler.logInfo("");
-            }
-
-            // Show removals
-            for (BulkEditMetadataValue metadataValue : removes) {
-                String md = metadataValue.getSchema() + "." + metadataValue.getElement();
-                if (metadataValue.getQualifier() != null) {
-                    md += "." + metadataValue.getQualifier();
-                }
-                if (metadataValue.getLanguage() != null) {
-                    md += "[" + metadataValue.getLanguage() + "]";
-                }
-                if (!changed) {
-                    handler.logInfo(" - Remove (" + md + "): ");
-                } else {
-                    handler.logInfo(" - Removed (" + md + "): ");
-                }
-                handler.logInfo(metadataValue.getValue());
-                if (isAuthorityControlledField(md)) {
-                    handler.logInfo(", authority = " + metadataValue.getAuthority());
-                    handler.logInfo(", confidence = " + metadataValue.getConfidence());
-                }
-                handler.logInfo("");
-            }
-        }
-        return changeCounter;
-    }
-
-    /**
-     * is the field is defined as authority controlled
-     */
-    private boolean isAuthorityControlledField(String md) {
-        String mdf = StringUtils.substringAfter(md, ":");
-        mdf = StringUtils.substringBefore(mdf, "[");
-        return authorityControlled.contains(mdf);
-    }
-
-
-    /**
-     * Set authority controlled fields
-     */
-    private void setAuthorizedMetadataFields() {
-        authorityControlled = new HashSet<String>();
-        Enumeration propertyNames = ConfigurationManager.getProperties().propertyNames();
-        while (propertyNames.hasMoreElements()) {
-            String key = ((String) propertyNames.nextElement()).trim();
-            if (key.startsWith(AC_PREFIX)
-                && ConfigurationManager.getBooleanProperty(key, false)) {
-                authorityControlled.add(key.substring(AC_PREFIX.length()));
-            }
-        }
-    }
-
-    /**
      * Run an import. The import can either be read-only to detect changes, or
      * can write changes as it goes.
      *
@@ -546,13 +365,12 @@ public class MetadataImport extends DSpaceRunnable implements InitializingBean {
      * @param workflowNotify If the workflows should be used, whether to send notifications or not
      * @param useTemplate    Use collection template if create new item
      * @return An array of BulkEditChange elements representing the items that have changed
-     * @throws MetadataImportException if something goes wrong
+     * @throws MetadataImportException  if something goes wrong
      */
     public List<BulkEditChange> runImport(boolean change,
                                           boolean useWorkflow,
                                           boolean workflowNotify,
-                                          boolean useTemplate)
-        throws MetadataImportException, SQLException, AuthorizeException, WorkflowException, IOException {
+                                          boolean useTemplate) throws MetadataImportException {
         // Store the changes
         ArrayList<BulkEditChange> changes = new ArrayList<BulkEditChange>();
 
@@ -756,13 +574,15 @@ public class MetadataImport extends DSpaceRunnable implements InitializingBean {
 
                         // Add the metadata to the item
                         for (BulkEditMetadataValue dcv : whatHasChanged.getAdds()) {
-                            itemService.addMetadata(c, item, dcv.getSchema(),
-                                                    dcv.getElement(),
-                                                    dcv.getQualifier(),
-                                                    dcv.getLanguage(),
-                                                    dcv.getValue(),
-                                                    dcv.getAuthority(),
-                                                    dcv.getConfidence());
+                            if (!StringUtils.equals(dcv.getSchema(), MetadataSchemaEnum.RELATION.getName())) {
+                                itemService.addMetadata(c, item, dcv.getSchema(),
+                                                        dcv.getElement(),
+                                                        dcv.getQualifier(),
+                                                        dcv.getLanguage(),
+                                                        dcv.getValue(),
+                                                        dcv.getAuthority(),
+                                                        dcv.getConfidence());
+                            }
                         }
                         //Add relations after all metadata has been processed
                         for (BulkEditMetadataValue dcv : whatHasChanged.getAdds()) {
@@ -815,6 +635,8 @@ public class MetadataImport extends DSpaceRunnable implements InitializingBean {
             c.setMode(originalMode);
         } catch (MetadataImportException mie) {
             throw mie;
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
         // Return the changes
@@ -825,7 +647,7 @@ public class MetadataImport extends DSpaceRunnable implements InitializingBean {
     }
 
     /**
-     * Compare an item metadata with a line from CSV, and optionally update the item
+     * Compare an item metadata with a line from CSV, and optionally update the item.
      *
      * @param item    The current item metadata
      * @param fromCSV The metadata from the CSV file
@@ -1033,113 +855,6 @@ public class MetadataImport extends DSpaceRunnable implements InitializingBean {
     }
 
     /**
-     * Add an item metadata with a line from CSV, and optionally update the item
-     *
-     * @param fromCSV The metadata from the CSV file
-     * @param md      The element to compare
-     * @param changes The changes object to populate
-     * @throws SQLException       when an SQL error has occurred (querying DSpace)
-     * @throws AuthorizeException If the user can't make the changes
-     */
-    protected void add(String[] fromCSV, String md, BulkEditChange changes)
-        throws SQLException, AuthorizeException {
-        // Don't add owning collection or action
-        if (("collection".equals(md)) || ("action".equals(md))) {
-            return;
-        }
-
-        // Make a String array of the values
-        // First, strip of language if it is there
-        String language = null;
-        if (md.contains("[")) {
-            String[] bits = md.split("\\[");
-            language = bits[1].substring(0, bits[1].length() - 1);
-        }
-        AuthorityValue fromAuthority = authorityValueService.getAuthorityValueType(md);
-        if (md.indexOf(':') > 0) {
-            md = md.substring(md.indexOf(':') + 1);
-        }
-
-        String[] bits = md.split("\\.");
-        String schema = bits[0];
-        String element = bits[1];
-        // If there is a language on the element, strip if off
-        if (element.contains("[")) {
-            element = element.substring(0, element.indexOf('['));
-        }
-        String qualifier = null;
-        if (bits.length > 2) {
-            qualifier = bits[2];
-
-            // If there is a language, strip if off
-            if (qualifier.contains("[")) {
-                qualifier = qualifier.substring(0, qualifier.indexOf('['));
-            }
-        }
-
-        // Add all the values
-        for (String value : fromCSV) {
-            BulkEditMetadataValue dcv = getBulkEditValueFromCSV(language, schema, element, qualifier, value,
-                                                                fromAuthority);
-            if (fromAuthority != null) {
-                value = dcv.getValue() + csv.getAuthoritySeparator() + dcv.getAuthority() + csv
-                    .getAuthoritySeparator() + dcv.getConfidence();
-            }
-
-            // Add it
-            if ((value != null) && (!"".equals(value))) {
-                changes.registerAdd(dcv);
-            }
-        }
-    }
-
-    protected BulkEditMetadataValue getBulkEditValueFromCSV(String language, String schema, String element,
-                                                            String qualifier, String value,
-                                                            AuthorityValue fromAuthority) {
-        // Look to see if it should be removed
-        BulkEditMetadataValue dcv = new BulkEditMetadataValue();
-        dcv.setSchema(schema);
-        dcv.setElement(element);
-        dcv.setQualifier(qualifier);
-        dcv.setLanguage(language);
-        if (fromAuthority != null) {
-            if (value.indexOf(':') > 0) {
-                value = value.substring(0, value.indexOf(':'));
-            }
-
-            // look up the value and authority in solr
-            List<AuthorityValue> byValue = authorityValueService.findByValue(c, schema, element, qualifier, value);
-            AuthorityValue authorityValue = null;
-            if (byValue.isEmpty()) {
-                String toGenerate = fromAuthority.generateString() + value;
-                String field = schema + "_" + element + (StringUtils.isNotBlank(qualifier) ? "_" + qualifier : "");
-                authorityValue = authorityValueService.generate(c, toGenerate, value, field);
-                dcv.setAuthority(toGenerate);
-            } else {
-                authorityValue = byValue.get(0);
-                dcv.setAuthority(authorityValue.getId());
-            }
-
-            dcv.setValue(authorityValue.getValue());
-            dcv.setConfidence(Choices.CF_ACCEPTED);
-        } else if (value == null || !value.contains(csv.getAuthoritySeparator())) {
-            simplyCopyValue(value, dcv);
-        } else {
-            String[] parts = value.split(csv.getEscapedAuthoritySeparator());
-            dcv.setValue(parts[0]);
-            dcv.setAuthority(parts[1]);
-            dcv.setConfidence((parts.length > 2 ? Integer.valueOf(parts[2]) : Choices.CF_ACCEPTED));
-        }
-        return dcv;
-    }
-
-    protected void simplyCopyValue(String value, BulkEditMetadataValue dcv) {
-        dcv.setValue(value);
-        dcv.setAuthority(null);
-        dcv.setConfidence(Choices.CF_UNSET);
-    }
-
-    /**
      *
      * Adds multiple relationships with a matching typeName to an item.
      *
@@ -1210,7 +925,8 @@ public class MetadataImport extends DSpaceRunnable implements InitializingBean {
 
         // Get the correct RelationshipType based on typeName
         List<RelationshipType> relType = relationshipTypeService.findByLeftwardOrRightwardTypeName(c, typeName);
-        RelationshipType foundRelationshipType = matchRelationshipType(relType, relationEntityRelationshipType,
+        RelationshipType foundRelationshipType = matchRelationshipType(relType,
+                                                                       relationEntityRelationshipType,
                                                                        itemRelationshipType, typeName);
 
         if (foundRelationshipType == null) {
@@ -1237,8 +953,8 @@ public class MetadataImport extends DSpaceRunnable implements InitializingBean {
         }
 
         // Create the relationship
-        int leftPlace = relationshipService.findLeftPlaceByLeftItem(c, leftItem) + 1;
-        int rightPlace = relationshipService.findRightPlaceByRightItem(c, rightItem) + 1;
+        int leftPlace = relationshipService.findNextLeftPlaceByLeftItem(c, leftItem);
+        int rightPlace = relationshipService.findNextRightPlaceByRightItem(c, rightItem);
         Relationship persistedRelationship = relationshipService.create(c, leftItem, rightItem,
                                                                         foundRelationshipType, leftPlace, rightPlace);
         relationshipService.update(c, persistedRelationship);
@@ -1374,8 +1090,342 @@ public class MetadataImport extends DSpaceRunnable implements InitializingBean {
         }
     }
 
-    public void afterPropertiesSet() throws Exception {
-        setAuthorizedMetadataFields();
+    /**
+     * Add an item metadata with a line from CSV, and optionally update the item
+     *
+     * @param fromCSV The metadata from the CSV file
+     * @param md      The element to compare
+     * @param changes The changes object to populate
+     * @throws SQLException       when an SQL error has occurred (querying DSpace)
+     * @throws AuthorizeException If the user can't make the changes
+     */
+    protected void add(String[] fromCSV, String md, BulkEditChange changes)
+        throws SQLException, AuthorizeException {
+        // Don't add owning collection or action
+        if (("collection".equals(md)) || ("action".equals(md))) {
+            return;
+        }
+
+        // Make a String array of the values
+        // First, strip of language if it is there
+        String language = null;
+        if (md.contains("[")) {
+            String[] bits = md.split("\\[");
+            language = bits[1].substring(0, bits[1].length() - 1);
+        }
+        AuthorityValue fromAuthority = authorityValueService.getAuthorityValueType(md);
+        if (md.indexOf(':') > 0) {
+            md = md.substring(md.indexOf(':') + 1);
+        }
+
+        String[] bits = md.split("\\.");
+        String schema = bits[0];
+        String element = bits[1];
+        // If there is a language on the element, strip if off
+        if (element.contains("[")) {
+            element = element.substring(0, element.indexOf('['));
+        }
+        String qualifier = null;
+        if (bits.length > 2) {
+            qualifier = bits[2];
+
+            // If there is a language, strip if off
+            if (qualifier.contains("[")) {
+                qualifier = qualifier.substring(0, qualifier.indexOf('['));
+            }
+        }
+
+        // Add all the values
+        for (String value : fromCSV) {
+            BulkEditMetadataValue dcv = getBulkEditValueFromCSV(language, schema, element, qualifier, value,
+                                                                fromAuthority);
+            if (fromAuthority != null) {
+                value = dcv.getValue() + csv.getAuthoritySeparator() + dcv.getAuthority() + csv
+                    .getAuthoritySeparator() + dcv.getConfidence();
+            }
+
+            // Add it
+            if ((value != null) && (!"".equals(value))) {
+                changes.registerAdd(dcv);
+            }
+        }
+    }
+
+    protected BulkEditMetadataValue getBulkEditValueFromCSV(String language, String schema, String element,
+                                                            String qualifier, String value,
+                                                            AuthorityValue fromAuthority) {
+        // Look to see if it should be removed
+        BulkEditMetadataValue dcv = new BulkEditMetadataValue();
+        dcv.setSchema(schema);
+        dcv.setElement(element);
+        dcv.setQualifier(qualifier);
+        dcv.setLanguage(language);
+        if (fromAuthority != null) {
+            if (value.indexOf(':') > 0) {
+                value = value.substring(0, value.indexOf(':'));
+            }
+
+            // look up the value and authority in solr
+            List<AuthorityValue> byValue = authorityValueService.findByValue(c, schema, element, qualifier, value);
+            AuthorityValue authorityValue = null;
+            if (byValue.isEmpty()) {
+                String toGenerate = fromAuthority.generateString() + value;
+                String field = schema + "_" + element + (StringUtils.isNotBlank(qualifier) ? "_" + qualifier : "");
+                authorityValue = authorityValueService.generate(c, toGenerate, value, field);
+                dcv.setAuthority(toGenerate);
+            } else {
+                authorityValue = byValue.get(0);
+                dcv.setAuthority(authorityValue.getId());
+            }
+
+            dcv.setValue(authorityValue.getValue());
+            dcv.setConfidence(Choices.CF_ACCEPTED);
+        } else if (value == null || !value.contains(csv.getAuthoritySeparator())) {
+            simplyCopyValue(value, dcv);
+        } else {
+            String[] parts = value.split(csv.getEscapedAuthoritySeparator());
+            dcv.setValue(parts[0]);
+            dcv.setAuthority(parts[1]);
+            dcv.setConfidence((parts.length > 2 ? Integer.valueOf(parts[2]) : Choices.CF_ACCEPTED));
+        }
+        return dcv;
+    }
+
+    protected void simplyCopyValue(String value, BulkEditMetadataValue dcv) {
+        dcv.setValue(value);
+        dcv.setAuthority(null);
+        dcv.setConfidence(Choices.CF_UNSET);
+    }
+
+    /**
+     * Method to find if a String occurs in an array of Strings
+     *
+     * @param needle   The String to look for
+     * @param haystack The array of Strings to search through
+     * @return Whether or not it is contained
+     */
+    protected boolean contains(String needle, String[] haystack) {
+        // Look for the needle in the haystack
+        for (String examine : haystack) {
+            if (clean(examine).equals(clean(needle))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Clean elements before comparing
+     *
+     * @param in The element to clean
+     * @return The cleaned up element
+     */
+    protected String clean(String in) {
+        // Check for nulls
+        if (in == null) {
+            return null;
+        }
+
+        // Remove newlines as different operating systems sometimes use different formats
+        return in.replaceAll("\r\n", "").replaceAll("\n", "").trim();
+    }
+
+    /**
+     * Print the help message
+     *
+     * @param options  The command line options the user gave
+     * @param exitCode the system exit code to use
+     */
+    private static void printHelp(Options options, int exitCode) {
+        // print the help message
+        HelpFormatter myhelp = new HelpFormatter();
+        myhelp.printHelp("MetatadataImport\n", options);
+        System.out.println("\nmetadataimport: MetadataImport -f filename");
+        System.exit(exitCode);
+    }
+
+    /**
+     * Display the changes that have been detected, or that have been made
+     *
+     * @param changes The changes detected
+     * @param changed Whether or not the changes have been made
+     * @return The number of items that have changed
+     */
+    private static int displayChanges(List<BulkEditChange> changes, boolean changed) {
+        // Display the changes
+        int changeCounter = 0;
+        for (BulkEditChange change : changes) {
+            // Get the changes
+            List<BulkEditMetadataValue> adds = change.getAdds();
+            List<BulkEditMetadataValue> removes = change.getRemoves();
+            List<Collection> newCollections = change.getNewMappedCollections();
+            List<Collection> oldCollections = change.getOldMappedCollections();
+            if ((adds.size() > 0) || (removes.size() > 0) ||
+                (newCollections.size() > 0) || (oldCollections.size() > 0) ||
+                (change.getNewOwningCollection() != null) || (change.getOldOwningCollection() != null) ||
+                (change.isDeleted()) || (change.isWithdrawn()) || (change.isReinstated())) {
+                // Show the item
+                Item i = change.getItem();
+
+                System.out.println("-----------------------------------------------------------");
+                if (!change.isNewItem()) {
+                    System.out.println("Changes for item: " + i.getID() + " (" + i.getHandle() + ")");
+                } else {
+                    System.out.print("New item: ");
+                    if (i != null) {
+                        if (i.getHandle() != null) {
+                            System.out.print(i.getID() + " (" + i.getHandle() + ")");
+                        } else {
+                            System.out.print(i.getID() + " (in workflow)");
+                        }
+                    }
+                    System.out.println();
+                }
+                changeCounter++;
+            }
+
+            // Show actions
+            if (change.isDeleted()) {
+                if (changed) {
+                    System.out.println(" - EXPUNGED!");
+                } else {
+                    System.out.println(" - EXPUNGE!");
+                }
+            }
+            if (change.isWithdrawn()) {
+                if (changed) {
+                    System.out.println(" - WITHDRAWN!");
+                } else {
+                    System.out.println(" - WITHDRAW!");
+                }
+            }
+            if (change.isReinstated()) {
+                if (changed) {
+                    System.out.println(" - REINSTATED!");
+                } else {
+                    System.out.println(" - REINSTATE!");
+                }
+            }
+
+            if (change.getNewOwningCollection() != null) {
+                Collection c = change.getNewOwningCollection();
+                if (c != null) {
+                    String cHandle = c.getHandle();
+                    String cName = c.getName();
+                    if (!changed) {
+                        System.out.print(" + New owning collection (" + cHandle + "): ");
+                    } else {
+                        System.out.print(" + New owning collection  (" + cHandle + "): ");
+                    }
+                    System.out.println(cName);
+                }
+
+                c = change.getOldOwningCollection();
+                if (c != null) {
+                    String cHandle = c.getHandle();
+                    String cName = c.getName();
+                    if (!changed) {
+                        System.out.print(" + Old owning collection (" + cHandle + "): ");
+                    } else {
+                        System.out.print(" + Old owning collection  (" + cHandle + "): ");
+                    }
+                    System.out.println(cName);
+                }
+            }
+
+            // Show new mapped collections
+            for (Collection c : newCollections) {
+                String cHandle = c.getHandle();
+                String cName = c.getName();
+                if (!changed) {
+                    System.out.print(" + Map to collection (" + cHandle + "): ");
+                } else {
+                    System.out.print(" + Mapped to collection  (" + cHandle + "): ");
+                }
+                System.out.println(cName);
+            }
+
+            // Show old mapped collections
+            for (Collection c : oldCollections) {
+                String cHandle = c.getHandle();
+                String cName = c.getName();
+                if (!changed) {
+                    System.out.print(" + Un-map from collection (" + cHandle + "): ");
+                } else {
+                    System.out.print(" + Un-mapped from collection  (" + cHandle + "): ");
+                }
+                System.out.println(cName);
+            }
+
+            // Show additions
+            for (BulkEditMetadataValue metadataValue : adds) {
+                String md = metadataValue.getSchema() + "." + metadataValue.getElement();
+                if (metadataValue.getQualifier() != null) {
+                    md += "." + metadataValue.getQualifier();
+                }
+                if (metadataValue.getLanguage() != null) {
+                    md += "[" + metadataValue.getLanguage() + "]";
+                }
+                if (!changed) {
+                    System.out.print(" + Add    (" + md + "): ");
+                } else {
+                    System.out.print(" + Added   (" + md + "): ");
+                }
+                System.out.print(metadataValue.getValue());
+                if (isAuthorityControlledField(md)) {
+                    System.out.print(", authority = " + metadataValue.getAuthority());
+                    System.out.print(", confidence = " + metadataValue.getConfidence());
+                }
+                System.out.println("");
+            }
+
+            // Show removals
+            for (BulkEditMetadataValue metadataValue : removes) {
+                String md = metadataValue.getSchema() + "." + metadataValue.getElement();
+                if (metadataValue.getQualifier() != null) {
+                    md += "." + metadataValue.getQualifier();
+                }
+                if (metadataValue.getLanguage() != null) {
+                    md += "[" + metadataValue.getLanguage() + "]";
+                }
+                if (!changed) {
+                    System.out.print(" - Remove (" + md + "): ");
+                } else {
+                    System.out.print(" - Removed (" + md + "): ");
+                }
+                System.out.print(metadataValue.getValue());
+                if (isAuthorityControlledField(md)) {
+                    System.out.print(", authority = " + metadataValue.getAuthority());
+                    System.out.print(", confidence = " + metadataValue.getConfidence());
+                }
+                System.out.println("");
+            }
+        }
+        return changeCounter;
+    }
+
+    /**
+     * is the field is defined as authority controlled
+     */
+    private static boolean isAuthorityControlledField(String md) {
+        String mdf = StringUtils.substringAfter(md, ":");
+        mdf = StringUtils.substringBefore(mdf, "[");
+        return authorityControlled.contains(mdf);
+    }
+
+    /**
+     * Set authority controlled fields
+     */
+    private void setAuthorizedMetadataFields() {
+        authorityControlled = new HashSet<String>();
+        Enumeration propertyNames = ConfigurationManager.getProperties().propertyNames();
+        while (propertyNames.hasMoreElements()) {
+            String key = ((String) propertyNames.nextElement()).trim();
+            if (key.startsWith(AC_PREFIX)
+                && ConfigurationManager.getBooleanProperty(key, false)) {
+                authorityControlled.add(key.substring(AC_PREFIX.length()));
+            }
+        }
     }
 
     /**
@@ -1539,7 +1589,7 @@ public class MetadataImport extends DSpaceRunnable implements InitializingBean {
                     uuid = mdvVal.getDSpaceObject().getID();
                     if (mdv.hasNext()) {
                         throw new MetadataImportException("Error in CSV row " + rowCount + ":\n" +
-                                                              "Ambiguous reference; multiple matches in db: " + reference);
+                                                          "Ambiguous reference; multiple matches in db: " + reference);
                     }
                 }
             } catch (SQLException e) {
@@ -1560,16 +1610,17 @@ public class MetadataImport extends DSpaceRunnable implements InitializingBean {
                 return uuid; // one match from csv and db (same item)
             } else if (uuid != null) {
                 throw new MetadataImportException("Error in CSV row " + rowCount + ":\n" +
-                                                      "Ambiguous reference; multiple matches in db and csv: " + reference);
+                                                  "Ambiguous reference; multiple matches in db and csv: " + reference);
             } else {
                 return csvUUID; // one match from csv
             }
         } else { // size == 0; the reference does not exist throw an error
             if (uuid == null) {
                 throw new MetadataImportException("Error in CSV row " + rowCount + ":\n" +
-                                                      "No matches found for reference: " + reference +
-                                                      "\nKeep in mind you can only reference entries that " +
-                                                      "are listed before this one within the CSV.");
+                                                      "No matches found for reference: " + reference
+                                                      + "\nKeep in mind you can only reference entries that are " +
+                                                      "listed before " +
+                                                      "this one within the CSV.");
             } else {
                 return uuid; // one match from db
             }
@@ -1632,7 +1683,9 @@ public class MetadataImport extends DSpaceRunnable implements InitializingBean {
             try {
                 // Get the type of reference. Attempt lookup in processed map first before looking in archive.
                 if (entityTypeMap.get(UUID.fromString(targetUUID)) != null) {
-                    targetType = entityTypeService.findByEntityType(c, entityTypeMap.get(UUID.fromString(targetUUID)))
+                    targetType = entityTypeService.
+                                                      findByEntityType(c,
+                                                                       entityTypeMap.get(UUID.fromString(targetUUID)))
                                                   .getLabel();
                 } else {
                     // Target item may be archived; check there.
@@ -1640,8 +1693,9 @@ public class MetadataImport extends DSpaceRunnable implements InitializingBean {
                     Item targetItem = null;
                     if (itemService.find(c, UUID.fromString(targetUUID)) != null) {
                         targetItem = itemService.find(c, UUID.fromString(targetUUID));
-                        List<MetadataValue> relTypes = itemService.getMetadata(targetItem, "relationship",
-                                                                               "type", null, Item.ANY);
+                        List<MetadataValue> relTypes = itemService.
+                                                                      getMetadata(targetItem, "relationship", "type",
+                                                                                  null, Item.ANY);
                         String relTypeValue = null;
                         if (relTypes.size() > 0) {
                             relTypeValue = relTypes.get(0).getValue();
@@ -1684,8 +1738,9 @@ public class MetadataImport extends DSpaceRunnable implements InitializingBean {
                             Item originItem = null;
                             if (itemService.find(c, UUID.fromString(targetUUID)) != null) {
                                 originItem = itemService.find(c, UUID.fromString(originRefererUUID));
-                                List<MetadataValue> relTypes = itemService.getMetadata(originItem, "relationship",
-                                                                                       "type", null, Item.ANY);
+                                List<MetadataValue> relTypes = itemService.
+                                                                              getMetadata(originItem, "relationship",
+                                                                                          "type", null, Item.ANY);
                                 String relTypeValue = null;
                                 if (relTypes.size() > 0) {
                                     relTypeValue = relTypes.get(0).getValue();
@@ -1733,8 +1788,9 @@ public class MetadataImport extends DSpaceRunnable implements InitializingBean {
         throws MetadataImportException {
         try {
             RelationshipType foundRelationshipType = null;
-            List<RelationshipType> relationshipTypeList = relationshipTypeService
-                .findByLeftwardOrRightwardTypeName(c, typeName.split("\\.")[1]);
+            List<RelationshipType> relationshipTypeList = relationshipTypeService.
+                                                                                     findByLeftwardOrRightwardTypeName(
+                                                                                         c, typeName.split("\\.")[1]);
             // Validate described relationship form the CSV.
             foundRelationshipType = matchRelationshipType(relationshipTypeList, targetType, originType, typeName);
             if (foundRelationshipType == null) {
@@ -1791,36 +1847,7 @@ public class MetadataImport extends DSpaceRunnable implements InitializingBean {
         return foundRelationshipType;
     }
 
-    /**
-     * Method to find if a String occurs in an array of Strings
-     *
-     * @param needle   The String to look for
-     * @param haystack The array of Strings to search through
-     * @return Whether or not it is contained
-     */
-    protected boolean contains(String needle, String[] haystack) {
-        // Look for the needle in the haystack
-        for (String examine : haystack) {
-            if (clean(examine).equals(clean(needle))) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Clean elements before comparing
-     *
-     * @param in The element to clean
-     * @return The cleaned up element
-     */
-    protected String clean(String in) {
-        // Check for nulls
-        if (in == null) {
-            return null;
-        }
-
-        // Remove newlines as different operating systems sometimes use different formats
-        return in.replaceAll("\r\n", "").replaceAll("\n", "").trim();
+    public void afterPropertiesSet() throws Exception {
+        setAuthorizedMetadataFields();
     }
 }

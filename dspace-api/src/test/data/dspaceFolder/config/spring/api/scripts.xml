@@ -9,6 +9,11 @@
         <property name="description" value="Update Discovery Solr Search Index"/>
     </bean>
 
+    <bean id="MetadataImport" class="org.dspace.app.bulkedit.MetadataImport" scope="prototype">
+        <property name="name" value="metadata-import" />
+        <property name="description" value="Import metadata after batch editing" />
+    </bean>
+
     <bean id="MockScript" class="org.dspace.scripts.impl.MockDSpaceRunnableScript" scope="prototype">
         <property name="name" value="mock-script" />
         <property name="description" value="Mocking a script for testing purposes" />

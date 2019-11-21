@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -233,7 +234,7 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
     }
 
     /**
-     * Method to implement to support scroll of entity instances from the collection resource endpoin
+     * Method to implement to support scroll of entity instances from the collection resource endpoint
      *
      * @param context
      *            the dspace context
@@ -260,6 +261,46 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
     public abstract DSpaceResource<T> wrapResource(T model, String... rels);
 
     /**
+     * Create and return a new instance. Data are usually retrieved from the thread bound http request
+     *
+     * @return the created REST object
+     */
+    public T createAndReturn() {
+        Context context = null;
+        try {
+            context = obtainContext();
+            T entity = thisRepository.createAndReturn(context);
+            context.commit();
+            return entity;
+        } catch (AuthorizeException e) {
+            throw new RESTAuthorizationException(e);
+        } catch (SQLException ex) {
+            throw new RuntimeException(ex.getMessage(), ex);
+        }
+    }
+
+    /**
+     * Create and return a new instance after adding to the parent. Data are usually retrieved from
+     * the thread bound http request.
+     *
+     * @param uuid the id of the parent object
+     * @return the created REST object
+     */
+    public T createAndReturn(UUID uuid) {
+        Context context = null;
+        try {
+            context = obtainContext();
+            T entity = thisRepository.createAndReturn(context, uuid);
+            context.commit();
+            return entity;
+        } catch (AuthorizeException e) {
+            throw new RESTAuthorizationException(e);
+        } catch (SQLException ex) {
+            throw new RuntimeException(ex.getMessage(), ex);
+        }
+    }
+
+    /**
      * Create and return a new instance. Data is recovered from the thread bound HTTP request and the list
      * of DSpaceObjects provided in the uri-list body
      *
@@ -281,22 +322,22 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
     }
 
     /**
-     * Create and return a new instance. Data are usually retrieved from the thread bound http request
+     * Method to implement to support the creation of a new instance. Usually require to retrieve the http request from
+     * the thread bound attribute
      *
+     * @param context
+     *            the dspace context
+     * @param uuid
+     *            The uuid of the parent object retrieved from the query param.
      * @return the created REST object
+     * @throws AuthorizeException
+     * @throws SQLException
+     * @throws RepositoryMethodNotImplementedException
+     *             returned by the default implementation when the operation is not supported for the entity
      */
-    public T createAndReturn() {
-        Context context = null;
-        try {
-            context = obtainContext();
-            T entity = thisRepository.createAndReturn(context);
-            context.commit();
-            return entity;
-        } catch (AuthorizeException e) {
-            throw new RESTAuthorizationException(e);
-        } catch (SQLException ex) {
-            throw new RuntimeException(ex.getMessage(), ex);
-        }
+    protected T createAndReturn(Context context, UUID uuid)
+        throws AuthorizeException, SQLException, RepositoryMethodNotImplementedException {
+        throw new RepositoryMethodNotImplementedException("No implementation found; Method not allowed!", "");
     }
 
     /**

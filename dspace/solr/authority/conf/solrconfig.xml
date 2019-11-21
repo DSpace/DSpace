@@ -106,6 +106,7 @@
   <requestHandler name="standard" class="solr.SearchHandler" default="true">
      <lst name="defaults">
        <str name="echoParams">explicit</str>
+       <str name="df">all_labels</str>
      </lst>
   </requestHandler>
 

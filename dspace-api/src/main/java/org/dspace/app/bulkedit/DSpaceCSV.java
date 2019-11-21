@@ -9,8 +9,6 @@ package org.dspace.app.bulkedit;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -144,18 +142,18 @@ public class DSpaceCSV implements Serializable {
     /**
      * Create a new instance, reading the lines in from file
      *
-     * @param f The file to read from
+     * @param inputStream the inputstream to read from
      * @param c The DSpace Context
      * @throws Exception thrown if there is an error reading or processing the file
      */
-    public DSpaceCSV(File f, Context c) throws Exception {
+    public DSpaceCSV(InputStream inputStream, Context c) throws Exception {
         // Initialise the class
         init();
 
         // Open the CSV file
         BufferedReader input = null;
         try {
-            input = new BufferedReader(new InputStreamReader(new FileInputStream(f), "UTF-8"));
+            input = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
 
             // Read the heading line
             String head = input.readLine();
@@ -171,6 +169,9 @@ public class DSpaceCSV implements Serializable {
 
                 // Store the heading
                 if ("collection".equals(element)) {
+                    // Store the heading
+                    headings.add(element);
+                }   else if ("rowName".equals(element)) {
                     // Store the heading
                     headings.add(element);
                 } else if ("action".equals(element)) { // Store the action
