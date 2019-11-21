@@ -17,24 +17,27 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
+import org.dspace.app.rest.converter.BitstreamConverter;
 import org.dspace.app.rest.converter.CommunityConverter;
 import org.dspace.app.rest.converter.MetadataConverter;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
+import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.CommunityRest;
 import org.dspace.app.rest.model.hateoas.CommunityResource;
 import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.repository.patch.DSpaceObjectPatch;
 import org.dspace.app.rest.utils.CommunityRestEqualityUtils;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.Bitstream;
 import org.dspace.content.Community;
+import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.core.Context;
-import org.dspace.util.UUIDUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -42,6 +45,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * This is the repository responsible to manage Community Rest object
@@ -52,10 +56,14 @@ import org.springframework.stereotype.Component;
 @Component(CommunityRest.CATEGORY + "." + CommunityRest.NAME)
 public class CommunityRestRepository extends DSpaceObjectRestRepository<Community, CommunityRest> {
 
-    private final CommunityService cs;
+    private static final Logger log = org.apache.logging.log4j.LogManager
+            .getLogger(CommunityRestRepository.class);
 
     @Autowired
     CommunityConverter converter;
+
+    @Autowired
+    BitstreamConverter bitstreamConverter;
 
     @Autowired
     MetadataConverter metadataConverter;
@@ -63,10 +71,15 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
     @Autowired
     CommunityRestEqualityUtils communityRestEqualityUtils;
 
+    @Autowired
+    private CommunityService cs;
+
+    @Autowired
+    private BitstreamService bitstreamService;
+
     public CommunityRestRepository(CommunityService dsoService,
                                    CommunityConverter dsoConverter) {
         super(dsoService, dsoConverter, new DSpaceObjectPatch<CommunityRest>() {});
-        this.cs = dsoService;
     }
 
     @Override
@@ -83,25 +96,45 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
         }
 
         Community community;
-
-
         try {
-            Community parent = null;
-            String parentCommunityString = req.getParameter("parent");
-            if (StringUtils.isNotBlank(parentCommunityString)) {
+            // top-level community
+            community = cs.create(null, context);
+            cs.update(context, community);
+            metadataConverter.setMetadata(context, community, communityRest.getMetadata());
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
 
-                UUID parentCommunityUuid = UUIDUtils.fromString(parentCommunityString);
-                if (parentCommunityUuid == null) {
-                    throw new DSpaceBadRequestException("The given parent parameter was invalid: "
-                            + parentCommunityString);
-                }
+        return dsoConverter.convert(community);
+    }
 
-                parent = cs.find(context, parentCommunityUuid);
-                if (parent == null) {
-                    throw new UnprocessableEntityException("Parent community for id: "
-                            + parentCommunityUuid + " not found");
-                }
+    @Override
+    @PreAuthorize("hasPermission(#id, 'COMMUNITY', 'ADD')")
+    protected CommunityRest createAndReturn(Context context, UUID id) throws AuthorizeException {
+
+        if (id == null) {
+            throw new DSpaceBadRequestException("Parent Community UUID is null. " +
+                "Cannot create a SubCommunity without providing a parent Community.");
+        }
+
+        HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
+        ObjectMapper mapper = new ObjectMapper();
+        CommunityRest communityRest;
+        try {
+            ServletInputStream input = req.getInputStream();
+            communityRest = mapper.readValue(input, CommunityRest.class);
+        } catch (IOException e1) {
+            throw new UnprocessableEntityException("Error parsing request body.", e1);
+        }
+
+        Community community;
+        try {
+            Community parent = cs.find(context, id);
+            if (parent == null) {
+                throw new UnprocessableEntityException("Parent community for id: "
+                    + id + " not found");
             }
+            // sub-community
             community = cs.create(parent, context);
             cs.update(context, community);
             metadataConverter.setMetadata(context, community, communityRest.getMetadata());
@@ -241,5 +274,29 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
         } catch (IOException e) {
             throw new RuntimeException("Unable to delete community because the logo couldn't be deleted", e);
         }
+    }
+
+    /**
+     * Method to install a logo on a Community which doesn't have a logo
+     * Called by request mappings in CommunityLogoController
+     * @param context
+     * @param community     The community on which to install the logo
+     * @param uploadfile    The new logo
+     * @return              The created bitstream containing the new logo
+     * @throws IOException
+     * @throws AuthorizeException
+     * @throws SQLException
+     */
+    public BitstreamRest setLogo(Context context, Community community, MultipartFile uploadfile)
+            throws IOException, AuthorizeException, SQLException {
+
+        if (community.getLogo() != null) {
+            throw new UnprocessableEntityException(
+                    "The community with the given uuid already has a logo: " + community.getID());
+        }
+        Bitstream bitstream = cs.setLogo(context, community, uploadfile.getInputStream());
+        cs.update(context, community);
+        bitstreamService.update(context, bitstream);
+        return bitstreamConverter.fromModel(context.reloadEntity(bitstream));
     }
 }

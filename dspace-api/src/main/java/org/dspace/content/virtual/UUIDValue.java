@@ -38,4 +38,12 @@ public class UUIDValue implements VirtualMetadataConfiguration {
     public boolean getUseForPlace() {
         return useForPlace;
     }
+
+    @Override
+    public void setPopulateWithNameVariant(boolean populateWithNameVariant) { }
+
+    @Override
+    public boolean getPopulateWithNameVariant() {
+        return false;
+    }
 }

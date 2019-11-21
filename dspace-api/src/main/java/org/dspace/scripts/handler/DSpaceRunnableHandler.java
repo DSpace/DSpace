@@ -87,4 +87,7 @@ public interface DSpaceRunnableHandler {
 
     public void writeFilestream(Context context, String fileName, InputStream inputStream, String type)
         throws IOException;
+
+    boolean getUserValidation() throws IOException;
+
 }

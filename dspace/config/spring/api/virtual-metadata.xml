@@ -59,6 +59,7 @@
             <value>, </value>
         </property>
         <property name="useForPlace" value="true"/>
+        <property name="populateWithNameVariant" value="true"/>
     </bean>
 
     <!-- Config like this will tell our VirtualMetadataPopulator to include the virtual metadata field

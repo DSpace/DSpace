@@ -99,8 +99,12 @@ public class Bitstream extends DSpaceObject implements DSpaceObjectLegacySupport
     }
 
     /**
-     * Get the sequence ID of this bitstream
+     * Get the sequence ID of this bitstream. The sequence ID is a unique (within an Item) integer that references
+     * this bitstream. It acts as a "persistent" identifier within the Item for this Bitstream (as Bitstream names
+     * are not persistent). Because it is unique within an Item, sequence IDs are assigned by the ItemService.update()
+     * method.
      *
+     * @see org.dspace.content.ItemServiceImpl#update(Context, Item)
      * @return the sequence ID
      */
     public int getSequenceID() {
@@ -112,8 +116,12 @@ public class Bitstream extends DSpaceObject implements DSpaceObjectLegacySupport
     }
 
     /**
-     * Set the sequence ID of this bitstream
+     * Set the sequence ID of this bitstream. The sequence ID is a unique (within an Item) integer that references
+     * this bitstream. While this method is public, it should only be used by ItemService.update() or other methods
+     * which validate the uniqueness of the ID within the associated Item. This method itself does not validate
+     * uniqueness of the ID, nor does the underlying database table.
      *
+     * @see org.dspace.content.ItemServiceImpl#update(Context, Item)
      * @param sid the ID
      */
     public void setSequenceID(int sid) {

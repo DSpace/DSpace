@@ -9,7 +9,6 @@ package org.dspace.app.bulkedit;
 
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.dspace.app.bulkedit.DSpaceCSV;
 import org.dspace.content.service.MetadataExportService;
 import org.dspace.core.Context;
 import org.dspace.scripts.DSpaceRunnable;

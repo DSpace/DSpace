@@ -250,4 +250,9 @@ public class RestDSpaceRunnableHandler implements DSpaceRunnableHandler {
         }
         taskExecutor.execute(script);
     }
+
+    @Override
+    public boolean getUserValidation() throws IOException {
+        return true;
+    }
 }

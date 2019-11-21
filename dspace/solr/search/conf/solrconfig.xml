@@ -25,12 +25,15 @@
 <config>
   <luceneMatchVersion>7.2.1</luceneMatchVersion>
 
-  <!-- Include contributed analyzers that we use in DSpace. -->
+  <!-- Include contributed libraries that we use in DSpace. -->
   <lib dir='${solr.install.dir}/contrib/analysis-extras/lib/'
        regex='icu4j-.*\.jar'/>
   <lib dir='${solr.install.dir}/contrib/analysis-extras/lucene-libs/'
        regex='lucene-analyzers-icu-.*\.jar'/>
-  
+  <lib dir="${solr.install.dir}/contrib/extraction/lib" />
+  <lib dir="${solr.install.dir}/dist/"
+       regex="solr-cell-\d.*\.jar" />
+
   <dataDir>${solr.data.dir:}</dataDir>
 
   <directoryFactory name="DirectoryFactory" 

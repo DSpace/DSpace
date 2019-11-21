@@ -14,7 +14,7 @@
     <!-- Each form set contains an ordered set of pages; each page defines    -->
     <!-- one submission metadata entry screen. Each page has an ordered list  -->
     <!-- of field definitions, Each field definition corresponds to one       -->
-    <!-- metadata entry (a so-called row), which has a DC element name, a    -->
+    <!-- metadata entry (a so-called row), which has a DC element name, a     -->
     <!-- displayed label, a text string prompt which is called a hint, and    -->
     <!-- an input-type. Each field also may hold optional elements: DC        -->
     <!-- qualifier name, a repeatable flag, and a text string whose presence  -->
@@ -49,16 +49,20 @@
 
         <form name="traditionalpageone">
             <row>
-                <field>
-                    <dc-schema>dc</dc-schema>
-                    <dc-element>contributor</dc-element>
-                    <dc-qualifier>author</dc-qualifier>
+                <relation-field>
+                    <relationship-type>isAuthorOfPublication</relationship-type>
+                    <search-configuration>personConfiguration</search-configuration>
                     <repeatable>true</repeatable>
-                    <label>Authors</label>
-                    <input-type>name</input-type>
-                    <hint>Enter the names of the authors of this item.</hint>
-                    <required></required>
-                </field>
+                    <label>Author</label>
+                    <hint>Add an author</hint>
+                    <linked-metadata-field>
+                        <dc-schema>dc</dc-schema>
+                        <dc-element>contributor</dc-element>
+                        <dc-qualifier>author</dc-qualifier>
+                        <input-type>name</input-type>
+                    </linked-metadata-field>
+                    <required>At least one author (plain text or relationship) is required</required>
+                </relation-field>
             </row>
             <row>
                 <field>
@@ -484,6 +488,15 @@
         </form>
 
         <form name="journalVolumeStep">
+            <row>
+                <relation-field>
+                    <relationship-type>isVolumeOfJournal</relationship-type>
+                    <search-configuration>periodicalConfiguration</search-configuration>
+                    <filter>creativework.publisher:somepublishername</filter>
+                    <label>Journal</label>
+                    <hint>Select the journal related to this volume.</hint>
+                </relation-field>
+            </row>
             <row>
                 <field>
                     <dc-schema>dc</dc-schema>
