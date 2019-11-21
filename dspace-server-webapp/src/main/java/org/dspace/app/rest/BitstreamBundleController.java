@@ -56,7 +56,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/api/" + BitstreamRest.CATEGORY + "/" + BitstreamRest.PLURAL_NAME
-        + REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID)
+        + REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID + "/" + BundleRest.NAME)
 public class BitstreamBundleController {
 
     @Autowired
@@ -87,7 +87,7 @@ public class BitstreamBundleController {
      * @throws AuthorizeException
      */
     @PreAuthorize("hasPermission(#uuid, 'BITSTREAM', 'READ')")
-    @RequestMapping(method = {RequestMethod.GET, RequestMethod.HEAD}, value = "/bundle")
+    @RequestMapping(method = {RequestMethod.GET, RequestMethod.HEAD})
     public ResponseEntity<ResourceSupport> getBundle(@PathVariable UUID uuid, HttpServletResponse response,
                                                      HttpServletRequest request)
             throws IOException, SQLException, AuthorizeException {
@@ -123,7 +123,7 @@ public class BitstreamBundleController {
      * @throws IOException
      * @throws AuthorizeException
      */
-    @RequestMapping(method = RequestMethod.PUT, value = "/bundle", consumes = {"text/uri-list"})
+    @RequestMapping(method = RequestMethod.PUT, consumes = {"text/uri-list"})
     @PreAuthorize("hasPermission(#uuid, 'BITSTREAM','WRITE')")
     @PostAuthorize("returnObject != null")
     public BundleResource move(@PathVariable UUID uuid, HttpServletResponse response,
