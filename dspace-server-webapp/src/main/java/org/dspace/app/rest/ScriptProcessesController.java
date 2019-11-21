@@ -27,11 +27,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * This controller takes care of all the requests to the system/scripts endpoint
+ * This controller adds additional subresource methods to allow connecting scripts with processes
  */
 @RestController
-@RequestMapping("/api/" + ScriptRest.CATEGORY + "/" + ScriptRest.PLURAL_NAME)
-public class ScriptRestController {
+@RequestMapping("/api/" + ScriptRest.CATEGORY + "/" + ScriptRest.PLURAL_NAME + "/{name}/processes")
+public class ScriptProcessesController {
 
     private static final Logger log = LogManager.getLogger();
 
@@ -51,7 +51,7 @@ public class ScriptRestController {
      * @return              The ProcessResource object for the created process
      * @throws Exception    If something goes wrong
      */
-    @RequestMapping(method = RequestMethod.POST, value = "/{name}/processes")
+    @RequestMapping(method = RequestMethod.POST)
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<ResourceSupport> startProcess(@PathVariable(name = "name") String scriptName)
         throws Exception {
