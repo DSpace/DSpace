@@ -35,6 +35,7 @@ import org.dspace.app.rest.model.AuthorityRest;
 import org.dspace.app.rest.model.CommunityRest;
 import org.dspace.app.rest.model.LinkRest;
 import org.dspace.app.rest.model.LinksRest;
+import org.dspace.app.rest.model.ProcessRest;
 import org.dspace.app.rest.model.ResourcePolicyRest;
 import org.dspace.app.rest.model.RestAddressableModel;
 import org.dspace.app.rest.model.hateoas.DSpaceResource;
@@ -134,6 +135,9 @@ public class Utils {
         }
         if (modelPlural.equals("resourcePolicies")) {
             return ResourcePolicyRest.NAME;
+        }
+        if (StringUtils.equals(modelPlural, "processes")) {
+            return ProcessRest.NAME;
         }
         return modelPlural.replaceAll("s$", "");
     }
