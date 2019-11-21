@@ -7,36 +7,32 @@
  */
 package org.dspace.app.bulkedit;
 
-import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import javax.annotation.Nullable;
 
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.PosixParser;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authority.AuthorityValue;
-import org.dspace.authority.factory.AuthorityServiceFactory;
 import org.dspace.authority.service.AuthorityValueService;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Entity;
-import org.dspace.content.EntityType;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.Relationship;
@@ -49,6 +45,8 @@ import org.dspace.content.service.EntityService;
 import org.dspace.content.service.EntityTypeService;
 import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
+import org.dspace.content.service.MetadataFieldService;
+import org.dspace.content.service.MetadataValueService;
 import org.dspace.content.service.RelationshipService;
 import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.content.service.WorkspaceItemService;
@@ -58,64 +56,115 @@ import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
-import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
-import org.dspace.util.UUIDUtils;
+import org.dspace.scripts.DSpaceRunnable;
+import org.dspace.workflow.WorkflowException;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowService;
 import org.dspace.workflow.factory.WorkflowServiceFactory;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 
-/**
- * Metadata importer to allow the batch import of metadata from a file
- *
- * @author Stuart Lewis
- */
-public class MetadataImport {
-    /**
-     * The Context
-     */
-    Context c;
+public class MetadataImport extends DSpaceRunnable implements InitializingBean {
 
-    /**
-     * The DSpaceCSV object we're processing
-     */
-    DSpaceCSV csv;
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(MetadataImport.class);
 
-    /**
-     * The lines to import
-     */
-    List<DSpaceCSVLine> toImport;
 
     /**
      * The authority controlled fields
      */
-    protected static Set<String> authorityControlled;
+    protected Set<String> authorityControlled;
 
-    static {
-        setAuthorizedMetadataFields();
-    }
+    @Autowired
+    protected ItemService itemService;
+    @Autowired
+    protected InstallItemService installItemService;
+    @Autowired
+    protected CollectionService collectionService;
+    @Autowired
+    protected HandleService handleService;
+    @Autowired
+    protected WorkspaceItemService workspaceItemService;
+    @Autowired
+    protected RelationshipTypeService relationshipTypeService;
+    @Autowired
+    protected RelationshipService relationshipService;
+    @Autowired
+    protected EntityTypeService entityTypeService;
+    @Autowired
+    protected EntityService entityService;
+    @Autowired
+    protected AuthorityValueService authorityValueService;
 
     /**
      * The prefix of the authority controlled field
      */
-    protected static final String AC_PREFIX = "authority.controlled.";
+    protected final String AC_PREFIX = "authority.controlled.";
+
+
+    private boolean useTemplate = false;
+    private String filename = null;
+    private boolean useWorkflow = false;
+    private boolean workflowNotify = false;
+    private boolean change = false;
 
     /**
-     * Logger
+     * The Context
      */
-    protected static final Logger log = org.apache.logging.log4j.LogManager.getLogger(MetadataImport.class);
+    private Context c;
 
-    protected final AuthorityValueService authorityValueService;
+    /**
+     * The DSpaceCSV object we're processing
+     */
+    private DSpaceCSV csv;
 
-    protected final ItemService itemService;
-    protected final InstallItemService installItemService;
-    protected final CollectionService collectionService;
-    protected final HandleService handleService;
-    protected final WorkspaceItemService workspaceItemService;
-    protected final RelationshipTypeService relationshipTypeService;
-    protected final RelationshipService relationshipService;
-    protected final EntityTypeService entityTypeService;
-    protected final EntityService entityService;
+    /**
+     * The lines to import
+     */
+    private List<DSpaceCSVLine> toImport;
+
+    private boolean help = false;
+
+    /**
+     * Map of field:value to csv row number, used to resolve indirect entity target references.
+     *
+     * @see #populateRefAndRowMap(DSpaceCSVLine, UUID)
+     */
+    protected Map<String, Set<Integer>> csvRefMap = new HashMap<>();
+
+    /**
+     * Map of csv row number to UUID, used to resolve indirect entity target references.
+     *
+     * @see #populateRefAndRowMap(DSpaceCSVLine, UUID)
+     */
+    protected HashMap<Integer, UUID> csvRowMap = new HashMap<>();
+
+    /**
+     * Map of UUIDs to their entity types.
+     *
+     * @see #populateRefAndRowMap(DSpaceCSVLine, UUID)
+     */
+    protected static HashMap<UUID, String> entityTypeMap = new HashMap<>();
+
+    /**
+     * Map of UUIDs to their relations that are referenced within any import with their referers.
+     *
+     * @see #populateEntityRelationMap(String, String, String)
+     */
+    protected static HashMap<String, HashMap<String, ArrayList<String>>> entityRelationMap = new HashMap<>();
+
+
+    /**
+     * Collection of errors generated during relation validation process.
+     */
+    protected ArrayList<String> relationValidationErrors = new ArrayList<>();
+
+    /**
+     * Counter of rows proccssed in a CSV.
+     */
+    protected Integer rowCount = 1;
+
+    protected boolean validateOnly;
 
     /**
      * Create an instance of the metadata importer. Requires a context and an array of CSV lines
@@ -124,21 +173,368 @@ public class MetadataImport {
      * @param c        The context
      * @param toImport An array of CSV lines to examine
      */
-    public MetadataImport(Context c, DSpaceCSV toImport) {
+    public void initMetadataImport(Context c, DSpaceCSV toImport) {
         // Store the import settings
         this.c = c;
         csv = toImport;
         this.toImport = toImport.getCSVLines();
-        installItemService = ContentServiceFactory.getInstance().getInstallItemService();
-        itemService = ContentServiceFactory.getInstance().getItemService();
-        collectionService = ContentServiceFactory.getInstance().getCollectionService();
-        handleService = HandleServiceFactory.getInstance().getHandleService();
-        authorityValueService = AuthorityServiceFactory.getInstance().getAuthorityValueService();
-        workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
-        relationshipService = ContentServiceFactory.getInstance().getRelationshipService();
-        relationshipTypeService = ContentServiceFactory.getInstance().getRelationshipTypeService();
-        entityTypeService = ContentServiceFactory.getInstance().getEntityTypeService();
-        entityService = ContentServiceFactory.getInstance().getEntityService();
+    }
+
+    @Override
+    public void internalRun() throws Exception {
+        if (help) {
+            printHelp();
+            return;
+        }
+        // Read commandLines from the CSV file
+        try {
+
+            csv = new DSpaceCSV(handler.getFileStream(c, filename), c);
+        } catch (MetadataImportInvalidHeadingException miihe) {
+            throw miihe;
+        } catch (Exception e) {
+            throw new Exception("Error reading file: " + e.getMessage(), e);
+        }
+
+        // Perform the first import - just highlight differences
+        initMetadataImport(c, csv);
+        List<BulkEditChange> changes;
+
+        if (!commandLine.hasOption('s') || validateOnly) {
+            // See what has changed
+            try {
+                changes = runImport(false, useWorkflow, workflowNotify, useTemplate);
+            } catch (MetadataImportException mie) {
+                throw mie;
+            }
+
+            // Display the changes
+            int changeCounter = displayChanges(changes, false);
+
+            // If there were changes, ask if we should execute them
+            if (!validateOnly && changeCounter > 0) {
+                try {
+                    // Ask the user if they want to make the changes
+                    handler.logInfo("\n" + changeCounter + " item(s) will be changed\n");
+                    change = handler.getUserValidation();
+
+                } catch (IOException ioe) {
+                    throw new IOException("Error: " + ioe.getMessage() + ", No changes have been made", ioe);
+                }
+            } else {
+                handler.logInfo("There were no changes detected");
+            }
+        } else {
+            change = true;
+        }
+
+        try {
+            // If required, make the change
+            if (change && !validateOnly) {
+                try {
+                    // Make the changes
+                    changes = runImport(true, useWorkflow, workflowNotify, useTemplate);
+                } catch (MetadataImportException mie) {
+                    throw mie;
+                }
+
+                // Display the changes
+                displayChanges(changes, true);
+            }
+
+            // Finsh off and tidy up
+            c.restoreAuthSystemState();
+            c.complete();
+        } catch (Exception e) {
+            c.abort();
+            throw new Exception(
+                "Error committing changes to database: " + e.getMessage() + ", aborting most recent changes", e);
+        }
+
+    }
+
+    public void setup() throws ParseException {
+        useTemplate = false;
+        filename = null;
+        useWorkflow = false;
+        workflowNotify = false;
+
+        if (commandLine.hasOption('h')) {
+            help = true;
+        }
+
+        // Check a filename is given
+        if (!commandLine.hasOption('f')) {
+            throw new ParseException("Required parameter -f missing!");
+        }
+        filename = commandLine.getOptionValue('f');
+
+        // Option to apply template to new items
+        if (commandLine.hasOption('t')) {
+            useTemplate = true;
+        }
+
+        // Options for workflows, and workflow notifications for new items
+        if (commandLine.hasOption('w')) {
+            useWorkflow = true;
+            if (commandLine.hasOption('n')) {
+                workflowNotify = true;
+            }
+        } else if (commandLine.hasOption('n')) {
+            throw new ParseException(
+                "Invalid option 'n': (notify) can only be specified with the 'w' (workflow) option.");
+        }
+        validateOnly = commandLine.hasOption('v');
+
+
+        // Create a context
+        try {
+            c = new Context();
+            c.turnOffAuthorisationSystem();
+        } catch (Exception e) {
+            throw new ParseException("Unable to create a new DSpace Context: " + e.getMessage());
+        }
+
+        // Find the EPerson, assign to context
+        try {
+            if (commandLine.hasOption('e')) {
+                EPerson eperson;
+                String e = commandLine.getOptionValue('e');
+                if (e.indexOf('@') != -1) {
+                    eperson = EPersonServiceFactory.getInstance().getEPersonService().findByEmail(c, e);
+                } else {
+                    eperson = EPersonServiceFactory.getInstance().getEPersonService().find(c, UUID.fromString(e));
+                }
+
+                if (eperson == null) {
+                    throw new ParseException("Error, eperson cannot be found: " + e);
+                }
+                c.setCurrentUser(eperson);
+            }
+        } catch (Exception e) {
+            throw new ParseException("Unable to find DSpace user: " + e.getMessage());
+        }
+
+        // Is this a silent run?
+        change = false;
+    }
+
+    private MetadataImport() {
+        Options options = constructOptions();
+        this.options = options;
+    }
+
+    private Options constructOptions() {
+        Options options = new Options();
+
+        options.addOption("f", "file", true, "source file");
+        options.getOption("f").setType(InputStream.class);
+        options.getOption("f").setRequired(true);
+        options.addOption("e", "email", true, "email address or user id of user (required if adding new items)");
+        options.getOption("e").setType(String.class);
+        options.getOption("e").setRequired(true);
+        options.addOption("s", "silent", false,
+                          "silent operation - doesn't request confirmation of changes USE WITH CAUTION");
+        options.getOption("s").setType(boolean.class);
+        options.addOption("w", "workflow", false, "workflow - when adding new items, use collection workflow");
+        options.getOption("w").setType(boolean.class);
+        options.addOption("n", "notify", false,
+                          "notify - when adding new items using a workflow, send notification emails");
+        options.getOption("n").setType(boolean.class);
+        options.addOption("v", "validate-only", false,
+                          "validate - just validate the csv, don't run the import");
+        options.getOption("v").setType(boolean.class);
+        options.addOption("t", "template", false,
+                          "template - when adding new items, use the collection template (if it exists)");
+        options.getOption("t").setType(boolean.class);
+        options.addOption("h", "help", false, "help");
+        options.getOption("h").setType(boolean.class);
+
+        return options;
+    }
+
+    /**
+     * Display the changes that have been detected, or that have been made
+     *
+     * @param changes The changes detected
+     * @param changed Whether or not the changes have been made
+     * @return The number of items that have changed
+     */
+    private int displayChanges(List<BulkEditChange> changes, boolean changed) {
+        // Display the changes
+        int changeCounter = 0;
+        for (BulkEditChange change : changes) {
+            // Get the changes
+            List<BulkEditMetadataValue> adds = change.getAdds();
+            List<BulkEditMetadataValue> removes = change.getRemoves();
+            List<Collection> newCollections = change.getNewMappedCollections();
+            List<Collection> oldCollections = change.getOldMappedCollections();
+            if ((adds.size() > 0) || (removes.size() > 0) ||
+                (newCollections.size() > 0) || (oldCollections.size() > 0) ||
+                (change.getNewOwningCollection() != null) || (change.getOldOwningCollection() != null) ||
+                (change.isDeleted()) || (change.isWithdrawn()) || (change.isReinstated())) {
+                // Show the item
+                Item i = change.getItem();
+
+                handler.logInfo("-----------------------------------------------------------");
+                if (!change.isNewItem()) {
+                    handler.logInfo("Changes for item: " + i.getID() + " (" + i.getHandle() + ")");
+                } else {
+                    handler.logInfo("New item: ");
+                    if (i != null) {
+                        if (i.getHandle() != null) {
+                            handler.logInfo(i.getID() + " (" + i.getHandle() + ")");
+                        } else {
+                            handler.logInfo(i.getID() + " (in workflow)");
+                        }
+                    }
+                }
+                changeCounter++;
+            }
+
+            // Show actions
+            if (change.isDeleted()) {
+                if (changed) {
+                    handler.logInfo(" - EXPUNGED!");
+                } else {
+                    handler.logInfo(" - EXPUNGE!");
+                }
+            }
+            if (change.isWithdrawn()) {
+                if (changed) {
+                    handler.logInfo(" - WITHDRAWN!");
+                } else {
+                    handler.logInfo(" - WITHDRAW!");
+                }
+            }
+            if (change.isReinstated()) {
+                if (changed) {
+                    handler.logInfo(" - REINSTATED!");
+                } else {
+                    handler.logInfo(" - REINSTATE!");
+                }
+            }
+
+            if (change.getNewOwningCollection() != null) {
+                Collection c = change.getNewOwningCollection();
+                if (c != null) {
+                    String cHandle = c.getHandle();
+                    String cName = c.getName();
+                    if (!changed) {
+                        handler.logInfo(" + New owning collection (" + cHandle + "): ");
+                    } else {
+                        handler.logInfo(" + New owning collection  (" + cHandle + "): ");
+                    }
+                    handler.logInfo(cName);
+                }
+
+                c = change.getOldOwningCollection();
+                if (c != null) {
+                    String cHandle = c.getHandle();
+                    String cName = c.getName();
+                    if (!changed) {
+                        handler.logInfo(" + Old owning collection (" + cHandle + "): ");
+                    } else {
+                        handler.logInfo(" + Old owning collection  (" + cHandle + "): ");
+                    }
+                    handler.logInfo(cName);
+                }
+            }
+
+            // Show new mapped collections
+            for (Collection c : newCollections) {
+                String cHandle = c.getHandle();
+                String cName = c.getName();
+                if (!changed) {
+                    handler.logInfo(" + Map to collection (" + cHandle + "): ");
+                } else {
+                    handler.logInfo(" + Mapped to collection  (" + cHandle + "): ");
+                }
+                handler.logInfo(cName);
+            }
+
+            // Show old mapped collections
+            for (Collection c : oldCollections) {
+                String cHandle = c.getHandle();
+                String cName = c.getName();
+                if (!changed) {
+                    handler.logInfo(" + Un-map from collection (" + cHandle + "): ");
+                } else {
+                    handler.logInfo(" + Un-mapped from collection  (" + cHandle + "): ");
+                }
+                handler.logInfo(cName);
+            }
+
+            // Show additions
+            for (BulkEditMetadataValue metadataValue : adds) {
+                String md = metadataValue.getSchema() + "." + metadataValue.getElement();
+                if (metadataValue.getQualifier() != null) {
+                    md += "." + metadataValue.getQualifier();
+                }
+                if (metadataValue.getLanguage() != null) {
+                    md += "[" + metadataValue.getLanguage() + "]";
+                }
+                if (!changed) {
+                    handler.logInfo(" + Add    (" + md + "): ");
+                } else {
+                    handler.logInfo(" + Added   (" + md + "): ");
+                }
+                handler.logInfo(metadataValue.getValue());
+                if (isAuthorityControlledField(md)) {
+                    handler.logInfo(", authority = " + metadataValue.getAuthority());
+                    handler.logInfo(", confidence = " + metadataValue.getConfidence());
+                }
+                handler.logInfo("");
+            }
+
+            // Show removals
+            for (BulkEditMetadataValue metadataValue : removes) {
+                String md = metadataValue.getSchema() + "." + metadataValue.getElement();
+                if (metadataValue.getQualifier() != null) {
+                    md += "." + metadataValue.getQualifier();
+                }
+                if (metadataValue.getLanguage() != null) {
+                    md += "[" + metadataValue.getLanguage() + "]";
+                }
+                if (!changed) {
+                    handler.logInfo(" - Remove (" + md + "): ");
+                } else {
+                    handler.logInfo(" - Removed (" + md + "): ");
+                }
+                handler.logInfo(metadataValue.getValue());
+                if (isAuthorityControlledField(md)) {
+                    handler.logInfo(", authority = " + metadataValue.getAuthority());
+                    handler.logInfo(", confidence = " + metadataValue.getConfidence());
+                }
+                handler.logInfo("");
+            }
+        }
+        return changeCounter;
+    }
+
+    /**
+     * is the field is defined as authority controlled
+     */
+    private boolean isAuthorityControlledField(String md) {
+        String mdf = StringUtils.substringAfter(md, ":");
+        mdf = StringUtils.substringBefore(mdf, "[");
+        return authorityControlled.contains(mdf);
+    }
+
+
+    /**
+     * Set authority controlled fields
+     */
+    private void setAuthorizedMetadataFields() {
+        authorityControlled = new HashSet<String>();
+        Enumeration propertyNames = ConfigurationManager.getProperties().propertyNames();
+        while (propertyNames.hasMoreElements()) {
+            String key = ((String) propertyNames.nextElement()).trim();
+            if (key.startsWith(AC_PREFIX)
+                && ConfigurationManager.getBooleanProperty(key, false)) {
+                authorityControlled.add(key.substring(AC_PREFIX.length()));
+            }
+        }
     }
 
     /**
@@ -155,7 +551,8 @@ public class MetadataImport {
     public List<BulkEditChange> runImport(boolean change,
                                           boolean useWorkflow,
                                           boolean workflowNotify,
-                                          boolean useTemplate) throws MetadataImportException {
+                                          boolean useTemplate)
+        throws MetadataImportException, SQLException, AuthorizeException, WorkflowException, IOException {
         // Store the changes
         ArrayList<BulkEditChange> changes = new ArrayList<BulkEditChange>();
 
@@ -165,7 +562,11 @@ public class MetadataImport {
             c.setMode(Context.Mode.BATCH_EDIT);
 
             // Process each change
+            rowCount = 1;
             for (DSpaceCSVLine line : toImport) {
+                // Resolve target references to other items
+                populateRefAndRowMap(line, line.getID());
+                line = resolveEntityRefs(line);
                 // Get the DSpace item to compare with
                 UUID id = line.getID();
 
@@ -178,7 +579,7 @@ public class MetadataImport {
                 WorkflowItem wfItem = null;
                 Item item = null;
 
-                // Is this a new item?
+                // Is this an existing item?
                 if (id != null) {
                     // Get the item
                     item = itemService.find(c, id);
@@ -215,9 +616,8 @@ public class MetadataImport {
                                     }
                                 }
                             }
-
                             // Compare
-                            compare(item, fromCSV, change, md, whatHasChanged, line);
+                            compareAndUpdate(item, fromCSV, change, md, whatHasChanged, line);
                         }
                     }
 
@@ -278,7 +678,7 @@ public class MetadataImport {
                     BulkEditChange whatHasChanged = new BulkEditChange();
                     for (String md : line.keys()) {
                         // Get the values we already have
-                        if (!"id".equals(md)) {
+                        if (!"id".equals(md) && !"rowName".equals(md)) {
                             // Get the values from the CSV
                             String[] fromCSV = line.get(md).toArray(new String[line.get(md).size()]);
 
@@ -355,30 +755,23 @@ public class MetadataImport {
                         item = wsItem.getItem();
 
                         // Add the metadata to the item
-                        List<BulkEditMetadataValue> relationships = new LinkedList<>();
+                        for (BulkEditMetadataValue dcv : whatHasChanged.getAdds()) {
+                            itemService.addMetadata(c, item, dcv.getSchema(),
+                                                    dcv.getElement(),
+                                                    dcv.getQualifier(),
+                                                    dcv.getLanguage(),
+                                                    dcv.getValue(),
+                                                    dcv.getAuthority(),
+                                                    dcv.getConfidence());
+                        }
+                        //Add relations after all metadata has been processed
                         for (BulkEditMetadataValue dcv : whatHasChanged.getAdds()) {
                             if (StringUtils.equals(dcv.getSchema(), MetadataSchemaEnum.RELATION.getName())) {
-
-                                if (!StringUtils.equals(dcv.getElement(), "type")) {
-                                    relationships.add(dcv);
-                                } else {
-                                    handleRelationshipMetadataValueFromBulkEditMetadataValue(item, dcv);
-                                }
-
-                            } else {
-                                itemService.addMetadata(c, item, dcv.getSchema(),
-                                                        dcv.getElement(),
-                                                        dcv.getQualifier(),
-                                                        dcv.getLanguage(),
-                                                        dcv.getValue(),
-                                                        dcv.getAuthority(),
-                                                        dcv.getConfidence());
+                                addRelationship(c, item, dcv.getElement(), dcv.getValue());
                             }
                         }
 
-                        for (BulkEditMetadataValue relationship : relationships) {
-                            handleRelationshipMetadataValueFromBulkEditMetadataValue(item, relationship);
-                        }
+
                         // Should the workflow be used?
                         if (useWorkflow) {
                             WorkflowService workflowService = WorkflowServiceFactory.getInstance().getWorkflowService();
@@ -401,8 +794,6 @@ public class MetadataImport {
                             }
                         }
 
-                        // Commit changes to the object
-//                        c.commit();
                         whatHasChanged.setItem(item);
                     }
 
@@ -416,38 +807,21 @@ public class MetadataImport {
                     c.uncacheEntity(wfItem);
                     c.uncacheEntity(item);
                 }
+                populateRefAndRowMap(line, item == null ? null : item.getID());
+                // keep track of current rows processed
+                rowCount++;
             }
 
             c.setMode(originalMode);
         } catch (MetadataImportException mie) {
             throw mie;
-        } catch (Exception e) {
-            e.printStackTrace();
         }
 
         // Return the changes
+        if (!change) {
+            validateExpressedRelations();
+        }
         return changes;
-    }
-
-
-    /**
-     * This metod handles the BulkEditMetadataValue objects that correspond to Relationship metadatavalues
-     * @param item  The item to which this metadatavalue will belong
-     * @param dcv   The BulkEditMetadataValue to be processed
-     * @throws SQLException If something goes wrong
-     * @throws AuthorizeException   If something goes wrong
-     */
-    private void handleRelationshipMetadataValueFromBulkEditMetadataValue(Item item, BulkEditMetadataValue dcv)
-        throws SQLException, AuthorizeException {
-        LinkedList<String> values = new LinkedList<>();
-        values.add(dcv.getValue());
-        LinkedList<String> authorities = new LinkedList<>();
-        authorities.add(dcv.getAuthority());
-        LinkedList<Integer> confidences = new LinkedList<>();
-        confidences.add(dcv.getConfidence());
-        handleRelationMetadata(c, item, dcv.getSchema(), dcv.getElement(),
-                               dcv.getQualifier(),
-                               dcv.getLanguage(), values, authorities, confidences);
     }
 
     /**
@@ -461,10 +835,11 @@ public class MetadataImport {
      * @param line    line in CSV file
      * @throws SQLException       if there is a problem accessing a Collection from the database, from its handle
      * @throws AuthorizeException if there is an authorization problem with permissions
+     * @throws MetadataImportException custom exception for error handling within metadataimport
      */
-    protected void compare(Item item, String[] fromCSV, boolean change,
-                           String md, BulkEditChange changes, DSpaceCSVLine line)
-        throws SQLException, AuthorizeException {
+    protected void compareAndUpdate(Item item, String[] fromCSV, boolean change,
+                                    String md, BulkEditChange changes, DSpaceCSVLine line)
+        throws SQLException, AuthorizeException, MetadataImportException {
         // Log what metadata element we're looking at
         String all = "";
         for (String part : fromCSV) {
@@ -474,8 +849,8 @@ public class MetadataImport {
         log.debug(LogManager.getHeader(c, "metadata_import",
                                        "item_id=" + item.getID() + ",fromCSV=" + all));
 
-        // Don't compare collections  or actions
-        if (("collection".equals(md)) || ("action".equals(md))) {
+        // Don't compare collections or actions or rowNames
+        if (("collection".equals(md)) || ("action".equals(md)) || ("rowName".equals(md))) {
             return;
         }
 
@@ -637,10 +1012,9 @@ public class MetadataImport {
                 }
             }
 
-
             if (StringUtils.equals(schema, MetadataSchemaEnum.RELATION.getName())) {
                 List<RelationshipType> relationshipTypeList = relationshipTypeService
-                    .findByLeftOrRightLabel(c, element);
+                    .findByLeftwardOrRightwardTypeName(c, element);
                 for (RelationshipType relationshipType : relationshipTypeList) {
                     for (Relationship relationship : relationshipService
                         .findByItemAndRelationshipType(c, item, relationshipType)) {
@@ -648,7 +1022,7 @@ public class MetadataImport {
                         relationshipService.update(c, relationship);
                     }
                 }
-                handleRelationMetadata(c, item, schema, element, qualifier, language, values, authorities, confidences);
+                addRelationships(c, item, element, values);
             } else {
                 itemService.clearMetadata(c, item, schema, element, qualifier, language);
                 itemService.addMetadata(c, item, schema, element, qualifier,
@@ -659,231 +1033,215 @@ public class MetadataImport {
     }
 
     /**
-     * This method decides whether the metadatavalue is of type relation.type or if it corresponds to
-     * a relationship and handles it accordingly to their respective methods
+     * Add an item metadata with a line from CSV, and optionally update the item
+     *
+     * @param fromCSV The metadata from the CSV file
+     * @param md      The element to compare
+     * @param changes The changes object to populate
+     * @throws SQLException       when an SQL error has occurred (querying DSpace)
+     * @throws AuthorizeException If the user can't make the changes
+     */
+    protected void add(String[] fromCSV, String md, BulkEditChange changes)
+        throws SQLException, AuthorizeException {
+        // Don't add owning collection or action
+        if (("collection".equals(md)) || ("action".equals(md))) {
+            return;
+        }
+
+        // Make a String array of the values
+        // First, strip of language if it is there
+        String language = null;
+        if (md.contains("[")) {
+            String[] bits = md.split("\\[");
+            language = bits[1].substring(0, bits[1].length() - 1);
+        }
+        AuthorityValue fromAuthority = authorityValueService.getAuthorityValueType(md);
+        if (md.indexOf(':') > 0) {
+            md = md.substring(md.indexOf(':') + 1);
+        }
+
+        String[] bits = md.split("\\.");
+        String schema = bits[0];
+        String element = bits[1];
+        // If there is a language on the element, strip if off
+        if (element.contains("[")) {
+            element = element.substring(0, element.indexOf('['));
+        }
+        String qualifier = null;
+        if (bits.length > 2) {
+            qualifier = bits[2];
+
+            // If there is a language, strip if off
+            if (qualifier.contains("[")) {
+                qualifier = qualifier.substring(0, qualifier.indexOf('['));
+            }
+        }
+
+        // Add all the values
+        for (String value : fromCSV) {
+            BulkEditMetadataValue dcv = getBulkEditValueFromCSV(language, schema, element, qualifier, value,
+                                                                fromAuthority);
+            if (fromAuthority != null) {
+                value = dcv.getValue() + csv.getAuthoritySeparator() + dcv.getAuthority() + csv
+                    .getAuthoritySeparator() + dcv.getConfidence();
+            }
+
+            // Add it
+            if ((value != null) && (!"".equals(value))) {
+                changes.registerAdd(dcv);
+            }
+        }
+    }
+
+    protected BulkEditMetadataValue getBulkEditValueFromCSV(String language, String schema, String element,
+                                                            String qualifier, String value,
+                                                            AuthorityValue fromAuthority) {
+        // Look to see if it should be removed
+        BulkEditMetadataValue dcv = new BulkEditMetadataValue();
+        dcv.setSchema(schema);
+        dcv.setElement(element);
+        dcv.setQualifier(qualifier);
+        dcv.setLanguage(language);
+        if (fromAuthority != null) {
+            if (value.indexOf(':') > 0) {
+                value = value.substring(0, value.indexOf(':'));
+            }
+
+            // look up the value and authority in solr
+            List<AuthorityValue> byValue = authorityValueService.findByValue(c, schema, element, qualifier, value);
+            AuthorityValue authorityValue = null;
+            if (byValue.isEmpty()) {
+                String toGenerate = fromAuthority.generateString() + value;
+                String field = schema + "_" + element + (StringUtils.isNotBlank(qualifier) ? "_" + qualifier : "");
+                authorityValue = authorityValueService.generate(c, toGenerate, value, field);
+                dcv.setAuthority(toGenerate);
+            } else {
+                authorityValue = byValue.get(0);
+                dcv.setAuthority(authorityValue.getId());
+            }
+
+            dcv.setValue(authorityValue.getValue());
+            dcv.setConfidence(Choices.CF_ACCEPTED);
+        } else if (value == null || !value.contains(csv.getAuthoritySeparator())) {
+            simplyCopyValue(value, dcv);
+        } else {
+            String[] parts = value.split(csv.getEscapedAuthoritySeparator());
+            dcv.setValue(parts[0]);
+            dcv.setAuthority(parts[1]);
+            dcv.setConfidence((parts.length > 2 ? Integer.valueOf(parts[2]) : Choices.CF_ACCEPTED));
+        }
+        return dcv;
+    }
+
+    protected void simplyCopyValue(String value, BulkEditMetadataValue dcv) {
+        dcv.setValue(value);
+        dcv.setAuthority(null);
+        dcv.setConfidence(Choices.CF_UNSET);
+    }
+
+    /**
+     *
+     * Adds multiple relationships with a matching typeName to an item.
+     *
      * @param c             The relevant DSpace context
      * @param item          The item to which this metadatavalue belongs to
-     * @param schema        The schema for the metadatavalue
-     * @param element       The element for the metadatavalue
-     * @param qualifier     The qualifier for the metadatavalue
-     * @param language      The language for the metadatavalue
-     * @param values        The values for the metadatavalue
-     * @param authorities   The authorities for the metadatavalue
-     * @param confidences   The confidences for the metadatavalue
+     * @param typeName       The element for the metadatavalue
+     * @param values to iterate over
      * @throws SQLException If something goes wrong
      * @throws AuthorizeException   If something goes wrong
      */
-    private void handleRelationMetadata(Context c, Item item, String schema, String element, String qualifier,
-                                        String language, List<String> values, List<String> authorities,
-                                        List<Integer> confidences) throws SQLException, AuthorizeException {
-
-        if (StringUtils.equals(element, "type") && StringUtils.isBlank(qualifier)) {
-            handleRelationTypeMetadata(c, item, schema, element, qualifier, language, values, authorities, confidences);
-
-        } else {
-            for (String value : values) {
-                handleRelationOtherMetadata(c, item, element, value);
-            }
+    private void addRelationships(Context c, Item item, String typeName, List<String> values)
+        throws SQLException, AuthorizeException,
+        MetadataImportException {
+        for (String value : values) {
+            addRelationship(c, item, typeName, value);
         }
-
     }
 
     /**
-     * This method takes the item, element and values to determine what relationships should be built
-     * for these parameters and calls on the method to construct them
+     * Gets an existing entity from a target reference.
+     *
+     * @param context the context to use.
+     * @param targetReference the target reference which may be a UUID, metadata reference, or rowName reference.
+     * @return the entity, which is guaranteed to exist.
+     * @throws MetadataImportException if the target reference is badly formed or refers to a non-existing item.
+     */
+    private Entity getEntity(Context context, String targetReference) throws MetadataImportException {
+        Entity entity = null;
+        UUID uuid = resolveEntityRef(context, targetReference);
+        // At this point, we have a uuid, so we can get an entity
+        try {
+            entity = entityService.findByItemId(context, uuid);
+            if (entity.getItem() == null) {
+                throw new IllegalArgumentException("No item found in repository with uuid: " + uuid);
+            }
+            return entity;
+        } catch (SQLException sqle) {
+            throw new MetadataImportException("Unable to find entity using reference: " + targetReference, sqle);
+        }
+    }
+
+    /**
+     *
+     * Creates a relationship for the given item
+     *
      * @param c         The relevant DSpace context
      * @param item      The item that the relationships will be made for
-     * @param element   The string determining which relationshiptype is to be used
+     * @param typeName     The relationship typeName
      * @param value    The value for the relationship
      * @throws SQLException If something goes wrong
      * @throws AuthorizeException   If something goes wrong
      */
-    private void handleRelationOtherMetadata(Context c, Item item, String element, String value)
-        throws SQLException, AuthorizeException {
-        Entity entity = entityService.findByItemId(c, item.getID());
+    private void addRelationship(Context c, Item item, String typeName, String value)
+        throws SQLException, AuthorizeException, MetadataImportException {
+        if (value.isEmpty()) {
+            return;
+        }
         boolean left = false;
-        List<RelationshipType> acceptableRelationshipTypes = new LinkedList<>();
-        String url = handleService.resolveToURL(c, value);
-        UUID uuid = UUIDUtils.fromString(value);
-        if (uuid == null && StringUtils.isNotBlank(url)) {
-            return;
+
+        // Get entity from target reference
+        Entity relationEntity = getEntity(c, value);
+        // Get relationship type of entity and item
+        String relationEntityRelationshipType = itemService.getMetadata(relationEntity.getItem(),
+                                                                        "relationship", "type",
+                                                                        null, Item.ANY).get(0).getValue();
+        String itemRelationshipType = itemService.getMetadata(item, "relationship", "type",
+                                                              null, Item.ANY).get(0).getValue();
+
+        // Get the correct RelationshipType based on typeName
+        List<RelationshipType> relType = relationshipTypeService.findByLeftwardOrRightwardTypeName(c, typeName);
+        RelationshipType foundRelationshipType = matchRelationshipType(relType, relationEntityRelationshipType,
+                                                                       itemRelationshipType, typeName);
+
+        if (foundRelationshipType == null) {
+            throw new MetadataImportException("Error on CSV row " + rowCount + ":" + "\n" +
+                                                  "No Relationship type found for:\n" +
+                                                  "Target type: " + relationEntityRelationshipType + "\n" +
+                                                  "Origin referer type: " + itemRelationshipType + "\n" +
+                                                  "with typeName: " + typeName);
         }
 
-        Entity relationEntity = entityService.findByItemId(c, uuid);
-
-
-        List<RelationshipType> leftRelationshipTypesForEntity = entityService.getLeftRelationshipTypes(c, entity);
-        List<RelationshipType> rightRelationshipTypesForEntity = entityService.getRightRelationshipTypes(c, entity);
-
-        for (RelationshipType relationshipType : entityService.getAllRelationshipTypes(c, entity)) {
-            if (StringUtils.equalsIgnoreCase(relationshipType.getLeftLabel(), element)) {
-                left = handleLeftLabelEqualityRelationshipTypeElement(c, entity, relationEntity, left,
-                                                                      acceptableRelationshipTypes,
-                                                                      leftRelationshipTypesForEntity,
-                                                                      relationshipType);
-            } else if (StringUtils.equalsIgnoreCase(relationshipType.getRightLabel(), element)) {
-                left = handleRightLabelEqualityRelationshipTypeElement(c, entity, relationEntity, left,
-                                                                       acceptableRelationshipTypes,
-                                                                       rightRelationshipTypesForEntity,
-                                                                       relationshipType);
-            }
+        if (foundRelationshipType.getLeftwardType().equalsIgnoreCase(typeName)) {
+            left = true;
         }
 
-        if (acceptableRelationshipTypes.size() > 1) {
-            log.error("Ambiguous relationship_types were found");
-            return;
-        }
-        if (acceptableRelationshipTypes.size() == 0) {
-            log.error("no relationship_types were found");
-            return;
-        }
-
-        //There is exactly one
-        buildRelationObject(c, item, value, left, acceptableRelationshipTypes.get(0));
-    }
-
-    /**
-     * This method creates the relationship for the item and stores it in the database
-     * @param c         The relevant DSpace context
-     * @param item      The item for which this relationship will be constructed
-     * @param value    The value for the relationship
-     * @param left      A boolean indicating whether the item is the leftItem or the rightItem
-     * @param acceptedRelationshipType   The acceptable relationship type
-     * @throws SQLException If something goes wrong
-     * @throws AuthorizeException   If something goes wrong
-     */
-    private void buildRelationObject(Context c, Item item, String value, boolean left,
-                                     RelationshipType acceptedRelationshipType)
-        throws SQLException, AuthorizeException {
+        // Placeholder items for relation placing
         Item leftItem = null;
         Item rightItem = null;
         if (left) {
             leftItem = item;
-            rightItem = itemService.findByIdOrLegacyId(c, value);
+            rightItem = relationEntity.getItem();
         } else {
+            leftItem = relationEntity.getItem();
             rightItem = item;
-            leftItem = itemService.findByIdOrLegacyId(c, value);
         }
-        RelationshipType relationshipType = acceptedRelationshipType;
+
+        // Create the relationship
         int leftPlace = relationshipService.findLeftPlaceByLeftItem(c, leftItem) + 1;
         int rightPlace = relationshipService.findRightPlaceByRightItem(c, rightItem) + 1;
         Relationship persistedRelationship = relationshipService.create(c, leftItem, rightItem,
-                                                                        relationshipType, leftPlace, rightPlace);
+                                                                        foundRelationshipType, leftPlace, rightPlace);
         relationshipService.update(c, persistedRelationship);
-    }
-
-    /**
-     * This method will add RelationshipType objects to the acceptableRelationshipTypes list
-     * if applicable and valid RelationshipType objects are found. It will also return a boolean indicating
-     * whether we're dealing with a left Relationship or not
-     * @param c                                 The relevant DSpace context
-     * @param entity                            The Entity for which the RelationshipType has to be checked
-     * @param relationEntity                    The other Entity of the Relationship
-     * @param left                              Boolean indicating whether the Relationship is left or not
-     * @param acceptableRelationshipTypes       The list of RelationshipType objects that will be added to
-     * @param rightRelationshipTypesForEntity   The list of RelationshipType objects that are possible
-     *                                          for the right entity
-     * @param relationshipType                  The RelationshipType object that we want to check whether it's
-     *                                          valid to be added or not
-     * @return                                  A boolean indicating whether the relationship is left or right, will
-     *                                          be false in this case
-     * @throws SQLException                     If something goes wrong
-     */
-    private boolean handleRightLabelEqualityRelationshipTypeElement(Context c, Entity entity, Entity relationEntity,
-                                                                    boolean left,
-                                                                    List<RelationshipType> acceptableRelationshipTypes,
-                                                                    List<RelationshipType>
-                                                                        rightRelationshipTypesForEntity,
-                                                                    RelationshipType relationshipType)
-        throws SQLException {
-        if (StringUtils.equalsIgnoreCase(entityService.getType(c, entity).getLabel(),
-                                         relationshipType.getRightType().getLabel()) &&
-            StringUtils.equalsIgnoreCase(entityService.getType(c, relationEntity).getLabel(),
-                                         relationshipType.getLeftType().getLabel())) {
-
-            for (RelationshipType rightRelationshipType : rightRelationshipTypesForEntity) {
-                if (StringUtils.equalsIgnoreCase(rightRelationshipType.getLeftType().getLabel(),
-                                                 relationshipType.getLeftType().getLabel()) ||
-                    StringUtils.equalsIgnoreCase(rightRelationshipType.getRightType().getLabel(),
-                                                 relationshipType.getLeftType().getLabel())) {
-                    left = false;
-                    acceptableRelationshipTypes.add(relationshipType);
-                }
-            }
-        }
-        return left;
-    }
-
-    /**
-     * This method will add RelationshipType objects to the acceptableRelationshipTypes list
-     * if applicable and valid RelationshipType objects are found. It will also return a boolean indicating
-     * whether we're dealing with a left Relationship or not
-     * @param c                                 The relevant DSpace context
-     * @param entity                            The Entity for which the RelationshipType has to be checked
-     * @param relationEntity                    The other Entity of the Relationship
-     * @param left                              Boolean indicating whether the Relationship is left or not
-     * @param acceptableRelationshipTypes       The list of RelationshipType objects that will be added to
-     * @param leftRelationshipTypesForEntity    The list of RelationshipType objects that are possible
-     *                                          for the left entity
-     * @param relationshipType                  The RelationshipType object that we want to check whether it's
-     *                                          valid to be added or not
-     * @return                                  A boolean indicating whether the relationship is left or right, will
-     *                                          be true in this case
-     * @throws SQLException                     If something goes wrong
-     */
-    private boolean handleLeftLabelEqualityRelationshipTypeElement(Context c, Entity entity, Entity relationEntity,
-                                                                   boolean left,
-                                                                   List<RelationshipType> acceptableRelationshipTypes,
-                                                                   List<RelationshipType>
-                                                                       leftRelationshipTypesForEntity,
-                                                                   RelationshipType relationshipType)
-        throws SQLException {
-        if (StringUtils.equalsIgnoreCase(entityService.getType(c, entity).getLabel(),
-                                         relationshipType.getLeftType().getLabel()) &&
-            StringUtils.equalsIgnoreCase(entityService.getType(c, relationEntity).getLabel(),
-                                         relationshipType.getRightType().getLabel())) {
-            for (RelationshipType leftRelationshipType : leftRelationshipTypesForEntity) {
-                if (StringUtils.equalsIgnoreCase(leftRelationshipType.getRightType().getLabel(),
-                                                 relationshipType.getRightType().getLabel()) ||
-                    StringUtils.equalsIgnoreCase(leftRelationshipType.getLeftType().getLabel(),
-                                                 relationshipType.getRightType().getLabel())) {
-                    left = true;
-                    acceptableRelationshipTypes.add(relationshipType);
-                }
-            }
-        }
-        return left;
-    }
-
-    /**
-     * This method will add the relationship.type metadata to the item if an EntityType can be found for the value in
-     * the values list.
-     * @param c             The relevant DSpace context
-     * @param item          The item to which this metadatavalue will be added
-     * @param schema        The schema for the metadatavalue to be added
-     * @param element       The element for the metadatavalue to be added
-     * @param qualifier     The qualifier for the metadatavalue to be added
-     * @param language      The language for the metadatavalue to be added
-     * @param values        The value on which we'll search for EntityType object and it's the value
-     *                      for the metadatavalue that will be created
-     * @param authorities   The authority for the metadatavalue. This will be filled with the ID
-     *                      of the found EntityType for the value if it exists
-     * @param confidences   The confidence for the metadatavalue
-     * @throws SQLException If something goes wrong
-     * @throws AuthorizeException   If something goes wrong
-     */
-    private void handleRelationTypeMetadata(Context c, Item item, String schema, String element, String qualifier,
-                                            String language, List<String> values, List<String> authorities,
-                                            List<Integer> confidences)
-        throws SQLException, AuthorizeException {
-        EntityType entityType = entityTypeService.findByEntityType(c, values.get(0));
-        if (entityType != null) {
-            authorities.add(String.valueOf(entityType.getID()));
-            itemService.clearMetadata(c, item, schema, element, qualifier, language);
-            itemService.addMetadata(c, item, schema, element, qualifier, language,
-                                    values, authorities, confidences);
-            itemService.update(c, item);
-        }
     }
 
     /**
@@ -1016,111 +1374,421 @@ public class MetadataImport {
         }
     }
 
+    public void afterPropertiesSet() throws Exception {
+        setAuthorizedMetadataFields();
+    }
+
     /**
-     * Add an item metadata with a line from CSV, and optionally update the item
+     * Gets a copy of the given csv line with all entity target references resolved to UUID strings.
+     * Keys being iterated over represent metadatafields or special columns to be processed.
      *
-     * @param fromCSV The metadata from the CSV file
-     * @param md      The element to compare
-     * @param changes The changes object to populate
-     * @throws SQLException       when an SQL error has occurred (querying DSpace)
-     * @throws AuthorizeException If the user can't make the changes
+     * @param line the csv line to process.
+     * @return a copy, with all references resolved.
+     * @throws MetadataImportException if there is an error resolving any entity target reference.
      */
-    protected void add(String[] fromCSV, String md, BulkEditChange changes)
-        throws SQLException, AuthorizeException {
-        // Don't add owning collection or action
-        if (("collection".equals(md)) || ("action".equals(md))) {
-            return;
-        }
-
-        // Make a String array of the values
-        // First, strip of language if it is there
-        String language = null;
-        if (md.contains("[")) {
-            String[] bits = md.split("\\[");
-            language = bits[1].substring(0, bits[1].length() - 1);
-        }
-        AuthorityValue fromAuthority = authorityValueService.getAuthorityValueType(md);
-        if (md.indexOf(':') > 0) {
-            md = md.substring(md.indexOf(':') + 1);
-        }
-
-        String[] bits = md.split("\\.");
-        String schema = bits[0];
-        String element = bits[1];
-        // If there is a language on the element, strip if off
-        if (element.contains("[")) {
-            element = element.substring(0, element.indexOf('['));
-        }
-        String qualifier = null;
-        if (bits.length > 2) {
-            qualifier = bits[2];
-
-            // If there is a language, strip if off
-            if (qualifier.contains("[")) {
-                qualifier = qualifier.substring(0, qualifier.indexOf('['));
-            }
-        }
-
-        // Add all the values
-        for (String value : fromCSV) {
-            BulkEditMetadataValue dcv = getBulkEditValueFromCSV(language, schema, element, qualifier, value,
-                                                                fromAuthority);
-            if (fromAuthority != null) {
-                value = dcv.getValue() + csv.getAuthoritySeparator() + dcv.getAuthority() + csv
-                    .getAuthoritySeparator() + dcv.getConfidence();
-            }
-
-            // Add it
-            if ((value != null) && (!"".equals(value))) {
-                changes.registerAdd(dcv);
-            }
-        }
-    }
-
-    protected BulkEditMetadataValue getBulkEditValueFromCSV(String language, String schema, String element,
-                                                            String qualifier, String value,
-                                                            AuthorityValue fromAuthority) {
-        // Look to see if it should be removed
-        BulkEditMetadataValue dcv = new BulkEditMetadataValue();
-        dcv.setSchema(schema);
-        dcv.setElement(element);
-        dcv.setQualifier(qualifier);
-        dcv.setLanguage(language);
-        if (fromAuthority != null) {
-            if (value.indexOf(':') > 0) {
-                value = value.substring(0, value.indexOf(':'));
-            }
-
-            // look up the value and authority in solr
-            List<AuthorityValue> byValue = authorityValueService.findByValue(c, schema, element, qualifier, value);
-            AuthorityValue authorityValue = null;
-            if (byValue.isEmpty()) {
-                String toGenerate = fromAuthority.generateString() + value;
-                String field = schema + "_" + element + (StringUtils.isNotBlank(qualifier) ? "_" + qualifier : "");
-                authorityValue = authorityValueService.generate(c, toGenerate, value, field);
-                dcv.setAuthority(toGenerate);
+    public DSpaceCSVLine resolveEntityRefs(DSpaceCSVLine line) throws MetadataImportException {
+        DSpaceCSVLine newLine = new DSpaceCSVLine(line.getID());
+        UUID originId = evaluateOriginId(line.getID());
+        for (String key : line.keys()) {
+            // If a key represents a relation field attempt to resolve the target reference from the csvRefMap
+            if (key.split("\\.")[0].equalsIgnoreCase("relation")) {
+                if (line.get(key).size() > 0) {
+                    for (String val : line.get(key)) {
+                        // Attempt to resolve the relation target reference
+                        // These can be a UUID, metadata target reference or rowName target reference
+                        String uuid = resolveEntityRef(c, val).toString();
+                        newLine.add(key, uuid);
+                        //Entity refs have been resolved / placeholdered
+                        //Populate the EntityRelationMap
+                        populateEntityRelationMap(uuid, key, originId.toString());
+                    }
+                }
             } else {
-                authorityValue = byValue.get(0);
-                dcv.setAuthority(authorityValue.getId());
+                if (line.get(key).size() > 1) {
+                    for (String value : line.get(key)) {
+                        newLine.add(key, value);
+                    }
+                } else {
+                    if (line.get(key).size() > 0) {
+                        newLine.add(key, line.get(key).get(0));
+                    }
+                }
             }
-
-            dcv.setValue(authorityValue.getValue());
-            dcv.setConfidence(Choices.CF_ACCEPTED);
-        } else if (value == null || !value.contains(csv.getAuthoritySeparator())) {
-            simplyCopyValue(value, dcv);
-        } else {
-            String[] parts = value.split(csv.getEscapedAuthoritySeparator());
-            dcv.setValue(parts[0]);
-            dcv.setAuthority(parts[1]);
-            dcv.setConfidence((parts.length > 2 ? Integer.valueOf(parts[2]) : Choices.CF_ACCEPTED));
         }
-        return dcv;
+
+        return newLine;
     }
 
-    protected void simplyCopyValue(String value, BulkEditMetadataValue dcv) {
-        dcv.setValue(value);
-        dcv.setAuthority(null);
-        dcv.setConfidence(Choices.CF_UNSET);
+    /**
+     * Populate the entityRelationMap with all target references and it's asscoiated typeNames
+     * to their respective origins
+     *
+     * @param refUUID the target reference UUID for the relation
+     * @param relationField the field of the typeNames to relate from
+     */
+    private void populateEntityRelationMap(String refUUID, String relationField, String originId) {
+        HashMap<String, ArrayList<String>> typeNames = null;
+        if (entityRelationMap.get(refUUID) == null) {
+            typeNames = new HashMap<>();
+            ArrayList<String> originIds = new ArrayList<>();
+            originIds.add(originId);
+            typeNames.put(relationField, originIds);
+            entityRelationMap.put(refUUID, typeNames);
+        } else {
+            typeNames = entityRelationMap.get(refUUID);
+            if (typeNames.get(relationField) == null) {
+                ArrayList<String> originIds = new ArrayList<>();
+                originIds.add(originId);
+                typeNames.put(relationField, originIds);
+            } else {
+                ArrayList<String> originIds = typeNames.get(relationField);
+                originIds.add(originId);
+                typeNames.put(relationField, originIds);
+            }
+            entityRelationMap.put(refUUID, typeNames);
+        }
+    }
+
+    /**
+     * Populates the csvRefMap, csvRowMap, and entityTypeMap for the given csv line.
+     *
+     * The csvRefMap is an index that keeps track of which rows have a specific value for
+     * a specific metadata field or the special "rowName" column. This is used to help resolve indirect
+     * entity target references in the same CSV.
+     *
+     * The csvRowMap is a row number to UUID map, and contains an entry for every row that has
+     * been processed so far which has a known (minted) UUID for its item. This is used to help complete
+     * the resolution after the row number has been determined.
+     *
+     * @param line the csv line.
+     * @param uuid the uuid of the item, which may be null if it has not been minted yet.
+     */
+    private void populateRefAndRowMap(DSpaceCSVLine line, @Nullable UUID uuid) {
+        if (uuid != null) {
+            csvRowMap.put(rowCount, uuid);
+        } else {
+            csvRowMap.put(rowCount, new UUID(0, rowCount));
+        }
+        for (String key : line.keys()) {
+            if (key.contains(".") && !key.split("\\.")[0].equalsIgnoreCase("relation") ||
+                key.equalsIgnoreCase("rowName")) {
+                for (String value : line.get(key)) {
+                    String valueKey = key + ":" + value;
+                    Set<Integer> rowNums = csvRefMap.get(valueKey);
+                    if (rowNums == null) {
+                        rowNums = new HashSet<>();
+                        csvRefMap.put(valueKey, rowNums);
+                    }
+                    rowNums.add(rowCount);
+                }
+            }
+            //Populate entityTypeMap
+            if (key.equalsIgnoreCase("relationship.type") && line.get(key).size() > 0) {
+                if (uuid == null) {
+                    entityTypeMap.put(new UUID(0, rowCount), line.get(key).get(0));
+                } else {
+                    entityTypeMap.put(uuid, line.get(key).get(0));
+                }
+            }
+        }
+    }
+
+    /**
+     * Gets the UUID of the item indicated by the given target reference,
+     * which may be a direct UUID string, a row reference
+     * of the form rowName:VALUE, or a metadata value reference of the form schema.element[.qualifier]:VALUE.
+     *
+     * The reference may refer to a previously-processed item in the CSV or an item in the database.
+     *
+     * @param context the context to use.
+     * @param reference the target reference which may be a UUID, metadata reference, or rowName reference.
+     * @return the uuid.
+     * @throws MetadataImportException if the target reference is malformed or ambiguous (refers to multiple items).
+     */
+    private UUID resolveEntityRef(Context context, String reference) throws MetadataImportException {
+        // value reference
+        UUID uuid = null;
+        if (!reference.contains(":")) {
+            // assume it's a UUID
+            try {
+                return UUID.fromString(reference);
+            } catch (IllegalArgumentException e) {
+                throw new MetadataImportException("Error in CSV row " + rowCount + ":\n" +
+                                                      "Not a UUID or indirect entity reference: '" + reference + "'");
+            }
+        } else if (!reference.startsWith("rowName:")) { // Not a rowName ref; so it's a metadata value reference
+            MetadataValueService metadataValueService = ContentServiceFactory.getInstance().getMetadataValueService();
+            MetadataFieldService metadataFieldService =
+                ContentServiceFactory.getInstance().getMetadataFieldService();
+            int i = reference.indexOf(":");
+            String mfValue = reference.substring(i + 1);
+            String mf[] = reference.substring(0, i).split("\\.");
+            if (mf.length < 2) {
+                throw new MetadataImportException("Error in CSV row " + rowCount + ":\n" +
+                                                      "Bad metadata field in reference: '" + reference
+                                                      + "' (expected syntax is schema.element[.qualifier])");
+            }
+            String schema = mf[0];
+            String element = mf[1];
+            String qualifier = mf.length == 2 ? null : mf[2];
+            try {
+                MetadataField mfo = metadataFieldService.findByElement(context, schema, element, qualifier);
+                Iterator<MetadataValue> mdv = metadataValueService.findByFieldAndValue(context, mfo, mfValue);
+                if (mdv.hasNext()) {
+                    MetadataValue mdvVal = mdv.next();
+                    uuid = mdvVal.getDSpaceObject().getID();
+                    if (mdv.hasNext()) {
+                        throw new MetadataImportException("Error in CSV row " + rowCount + ":\n" +
+                                                              "Ambiguous reference; multiple matches in db: " + reference);
+                    }
+                }
+            } catch (SQLException e) {
+                throw new MetadataImportException("Error in CSV row " + rowCount + ":\n" +
+                                                      "Error looking up item by metadata reference: " + reference, e);
+            }
+        }
+        // Lookup UUIDs that may have already been processed into the csvRefMap
+        // See populateRefAndRowMap() for how the csvRefMap is populated
+        // See getMatchingCSVUUIDs() for how the reference param is sourced from the csvRefMap
+        Set<UUID> csvUUIDs = getMatchingCSVUUIDs(reference);
+        if (csvUUIDs.size() > 1) {
+            throw new MetadataImportException("Error in CSV row " + rowCount + ":\n" +
+                                                  "Ambiguous reference; multiple matches in csv: " + reference);
+        } else if (csvUUIDs.size() == 1) {
+            UUID csvUUID = csvUUIDs.iterator().next();
+            if (csvUUID.equals(uuid)) {
+                return uuid; // one match from csv and db (same item)
+            } else if (uuid != null) {
+                throw new MetadataImportException("Error in CSV row " + rowCount + ":\n" +
+                                                      "Ambiguous reference; multiple matches in db and csv: " + reference);
+            } else {
+                return csvUUID; // one match from csv
+            }
+        } else { // size == 0; the reference does not exist throw an error
+            if (uuid == null) {
+                throw new MetadataImportException("Error in CSV row " + rowCount + ":\n" +
+                                                      "No matches found for reference: " + reference +
+                                                      "\nKeep in mind you can only reference entries that " +
+                                                      "are listed before this one within the CSV.");
+            } else {
+                return uuid; // one match from db
+            }
+        }
+    }
+
+    /**
+     * Gets the set of matching lines as UUIDs that have already been processed given a metadata value.
+     *
+     * @param mdValueRef the metadataValue reference to search for.
+     * @return the set of matching lines as UUIDs.
+     */
+    private Set<UUID> getMatchingCSVUUIDs(String mdValueRef) {
+        Set<UUID> set = new HashSet<>();
+        if (csvRefMap.containsKey(mdValueRef)) {
+            for (Integer rowNum : csvRefMap.get(mdValueRef)) {
+                set.add(getUUIDForRow(rowNum));
+            }
+        }
+        return set;
+    }
+
+    /**
+     * Gets the UUID of the item of a given row in the CSV, if it has been minted.
+     * If the UUID has not yet been minted, gets a UUID representation of the row
+     * (a UUID whose numeric value equals the row number).
+     *
+     * @param rowNum the row number.
+     * @return the UUID of the item
+     */
+    private UUID getUUIDForRow(int rowNum) {
+        if (csvRowMap.containsKey(rowNum)) {
+            return csvRowMap.get(rowNum);
+        } else {
+            return new UUID(0, rowNum);
+        }
+    }
+
+    /**
+     * Return a UUID of the origin in process or a placeholder for the origin to be evaluated later
+     *
+     * @param originId UUID of the origin
+     * @return the UUID of the item or UUID placeholder
+     */
+    private UUID evaluateOriginId(@Nullable UUID originId) {
+        if (originId != null) {
+            return originId;
+        } else {
+            return new UUID(0, rowCount);
+        }
+    }
+
+    /**
+     * Validate every relation modification expressed in the CSV.
+     *
+     */
+    private void validateExpressedRelations() throws MetadataImportException {
+        for (String targetUUID : entityRelationMap.keySet()) {
+            String targetType = null;
+            try {
+                // Get the type of reference. Attempt lookup in processed map first before looking in archive.
+                if (entityTypeMap.get(UUID.fromString(targetUUID)) != null) {
+                    targetType = entityTypeService.findByEntityType(c, entityTypeMap.get(UUID.fromString(targetUUID)))
+                                                  .getLabel();
+                } else {
+                    // Target item may be archived; check there.
+                    // Add to errors if Realtionship.type cannot be derived
+                    Item targetItem = null;
+                    if (itemService.find(c, UUID.fromString(targetUUID)) != null) {
+                        targetItem = itemService.find(c, UUID.fromString(targetUUID));
+                        List<MetadataValue> relTypes = itemService.getMetadata(targetItem, "relationship",
+                                                                               "type", null, Item.ANY);
+                        String relTypeValue = null;
+                        if (relTypes.size() > 0) {
+                            relTypeValue = relTypes.get(0).getValue();
+                            targetType = entityTypeService.findByEntityType(c, relTypeValue).getLabel();
+                        } else {
+                            relationValidationErrors.add("Cannot resolve Entity type for target UUID: " +
+                                                             targetUUID);
+                        }
+                    } else {
+                        relationValidationErrors.add("Cannot resolve Entity type for target UUID: " +
+                                                         targetUUID);
+                    }
+                }
+                if (targetType == null) {
+                    continue;
+                }
+                // Get typeNames for each origin referer of this target.
+                for (String typeName : entityRelationMap.get(targetUUID).keySet()) {
+                    // Resolve Entity Type for each origin referer.
+                    for (String originRefererUUID : entityRelationMap.get(targetUUID).get(typeName)) {
+                        // Evaluate row number for origin referer.
+                        String originRow = "N/A";
+                        if (csvRowMap.containsValue(UUID.fromString(originRefererUUID))) {
+                            for (int key : csvRowMap.keySet()) {
+                                if (csvRowMap.get(key).toString().equalsIgnoreCase(originRefererUUID)) {
+                                    originRow = key + "";
+                                    break;
+                                }
+                            }
+                        }
+                        String originType = "";
+                        // Validate target type and origin type pairing with typeName or add to errors.
+                        // Attempt lookup in processed map first before looking in archive.
+                        if (entityTypeMap.get(UUID.fromString(originRefererUUID)) != null) {
+                            originType = entityTypeMap.get(UUID.fromString(originRefererUUID));
+                            validateTypesByTypeByTypeName(targetType, originType, typeName, originRow);
+                        } else {
+                            // Origin item may be archived; check there.
+                            // Add to errors if Realtionship.type cannot be derived.
+                            Item originItem = null;
+                            if (itemService.find(c, UUID.fromString(targetUUID)) != null) {
+                                originItem = itemService.find(c, UUID.fromString(originRefererUUID));
+                                List<MetadataValue> relTypes = itemService.getMetadata(originItem, "relationship",
+                                                                                       "type", null, Item.ANY);
+                                String relTypeValue = null;
+                                if (relTypes.size() > 0) {
+                                    relTypeValue = relTypes.get(0).getValue();
+                                    originType = entityTypeService.findByEntityType(c, relTypeValue).getLabel();
+                                    validateTypesByTypeByTypeName(targetType, originType, typeName, originRow);
+                                } else {
+                                    relationValidationErrors.add("Error on CSV row " + originRow + ":" + "\n" +
+                                                                     "Cannot resolve Entity type for reference: "
+                                                                     + originRefererUUID);
+                                }
+
+                            } else {
+                                relationValidationErrors.add("Error on CSV row " + originRow + ":" + "\n" +
+                                                                 "Cannot resolve Entity type for reference: "
+                                                                 + originRefererUUID + " in row: " + originRow);
+                            }
+                        }
+                    }
+                }
+
+            } catch (SQLException sqle) {
+                throw new MetadataImportException("Error interacting with database!", sqle);
+            }
+
+        } // If relationValidationErrors is empty all described relationships are valid.
+        if (!relationValidationErrors.isEmpty()) {
+            StringBuilder errors = new StringBuilder();
+            for (String error : relationValidationErrors) {
+                errors.append(error + "\n");
+            }
+            throw new MetadataImportException("Error validating relationships: \n" + errors);
+        }
+    }
+
+    /**
+     * Generates a list of potenital Relationship Types given a typeName and attempts to match the given
+     * targetType and originType to a Relationship Type in the list.
+     *
+     * @param targetType entity type of target.
+     * @param originType entity type of origin referer.
+     * @param typeName left or right typeName of the respective Relationship.
+     * @return the UUID of the item.
+     */
+    private void validateTypesByTypeByTypeName(String targetType, String originType, String typeName, String originRow)
+        throws MetadataImportException {
+        try {
+            RelationshipType foundRelationshipType = null;
+            List<RelationshipType> relationshipTypeList = relationshipTypeService
+                .findByLeftwardOrRightwardTypeName(c, typeName.split("\\.")[1]);
+            // Validate described relationship form the CSV.
+            foundRelationshipType = matchRelationshipType(relationshipTypeList, targetType, originType, typeName);
+            if (foundRelationshipType == null) {
+                relationValidationErrors.add("Error on CSV row " + originRow + ":" + "\n" +
+                                                 "No Relationship type found for:\n" +
+                                                 "Target type: " + targetType + "\n" +
+                                                 "Origin referer type: " + originType + "\n" +
+                                                 "with typeName: " + typeName + " for type: " + originType);
+            }
+        } catch (SQLException sqle) {
+            throw new MetadataImportException("Error interacting with database!", sqle);
+        }
+    }
+
+    /**
+     * Matches two Entity types to a Relationship Type from a set of Relationship Types.
+     *
+     * @param relTypes set of Relationship Types.
+     * @param targetType entity type of target.
+     * @param originType entity type of origin referer.
+     * @return null or matched Relationship Type.
+     */
+    private RelationshipType matchRelationshipType(List<RelationshipType> relTypes,
+                                                   String targetType, String originType, String originTypeName) {
+        RelationshipType foundRelationshipType = null;
+        if (originTypeName.split("\\.").length > 1) {
+            originTypeName = originTypeName.split("\\.")[1];
+        }
+        for (RelationshipType relationshipType : relTypes) {
+            // Is origin type leftward or righward
+            boolean isLeft = false;
+            if (relationshipType.getLeftType().getLabel().equalsIgnoreCase(originType)) {
+                isLeft = true;
+            }
+            if (isLeft) {
+                // Validate typeName reference
+                if (!relationshipType.getLeftwardType().equalsIgnoreCase(originTypeName)) {
+                    continue;
+                }
+                if (relationshipType.getLeftType().getLabel().equalsIgnoreCase(originType) &&
+                    relationshipType.getRightType().getLabel().equalsIgnoreCase(targetType)) {
+                    foundRelationshipType = relationshipType;
+                }
+            } else {
+                if (!relationshipType.getRightwardType().equalsIgnoreCase(originTypeName)) {
+                    continue;
+                }
+                if (relationshipType.getLeftType().getLabel().equalsIgnoreCase(targetType) &&
+                    relationshipType.getRightType().getLabel().equalsIgnoreCase(originType)) {
+                    foundRelationshipType = relationshipType;
+                }
+            }
+        }
+        return foundRelationshipType;
     }
 
     /**
@@ -1154,387 +1822,5 @@ public class MetadataImport {
 
         // Remove newlines as different operating systems sometimes use different formats
         return in.replaceAll("\r\n", "").replaceAll("\n", "").trim();
-    }
-
-    /**
-     * Print the help message
-     *
-     * @param options  The command line options the user gave
-     * @param exitCode the system exit code to use
-     */
-    private static void printHelp(Options options, int exitCode) {
-        // print the help message
-        HelpFormatter myhelp = new HelpFormatter();
-        myhelp.printHelp("MetatadataImport\n", options);
-        System.out.println("\nmetadataimport: MetadataImport -f filename");
-        System.exit(exitCode);
-    }
-
-    /**
-     * Display the changes that have been detected, or that have been made
-     *
-     * @param changes The changes detected
-     * @param changed Whether or not the changes have been made
-     * @return The number of items that have changed
-     */
-    private static int displayChanges(List<BulkEditChange> changes, boolean changed) {
-        // Display the changes
-        int changeCounter = 0;
-        for (BulkEditChange change : changes) {
-            // Get the changes
-            List<BulkEditMetadataValue> adds = change.getAdds();
-            List<BulkEditMetadataValue> removes = change.getRemoves();
-            List<Collection> newCollections = change.getNewMappedCollections();
-            List<Collection> oldCollections = change.getOldMappedCollections();
-            if ((adds.size() > 0) || (removes.size() > 0) ||
-                (newCollections.size() > 0) || (oldCollections.size() > 0) ||
-                (change.getNewOwningCollection() != null) || (change.getOldOwningCollection() != null) ||
-                (change.isDeleted()) || (change.isWithdrawn()) || (change.isReinstated())) {
-                // Show the item
-                Item i = change.getItem();
-
-                System.out.println("-----------------------------------------------------------");
-                if (!change.isNewItem()) {
-                    System.out.println("Changes for item: " + i.getID() + " (" + i.getHandle() + ")");
-                } else {
-                    System.out.print("New item: ");
-                    if (i != null) {
-                        if (i.getHandle() != null) {
-                            System.out.print(i.getID() + " (" + i.getHandle() + ")");
-                        } else {
-                            System.out.print(i.getID() + " (in workflow)");
-                        }
-                    }
-                    System.out.println();
-                }
-                changeCounter++;
-            }
-
-            // Show actions
-            if (change.isDeleted()) {
-                if (changed) {
-                    System.out.println(" - EXPUNGED!");
-                } else {
-                    System.out.println(" - EXPUNGE!");
-                }
-            }
-            if (change.isWithdrawn()) {
-                if (changed) {
-                    System.out.println(" - WITHDRAWN!");
-                } else {
-                    System.out.println(" - WITHDRAW!");
-                }
-            }
-            if (change.isReinstated()) {
-                if (changed) {
-                    System.out.println(" - REINSTATED!");
-                } else {
-                    System.out.println(" - REINSTATE!");
-                }
-            }
-
-            if (change.getNewOwningCollection() != null) {
-                Collection c = change.getNewOwningCollection();
-                if (c != null) {
-                    String cHandle = c.getHandle();
-                    String cName = c.getName();
-                    if (!changed) {
-                        System.out.print(" + New owning collection (" + cHandle + "): ");
-                    } else {
-                        System.out.print(" + New owning collection  (" + cHandle + "): ");
-                    }
-                    System.out.println(cName);
-                }
-
-                c = change.getOldOwningCollection();
-                if (c != null) {
-                    String cHandle = c.getHandle();
-                    String cName = c.getName();
-                    if (!changed) {
-                        System.out.print(" + Old owning collection (" + cHandle + "): ");
-                    } else {
-                        System.out.print(" + Old owning collection  (" + cHandle + "): ");
-                    }
-                    System.out.println(cName);
-                }
-            }
-
-            // Show new mapped collections
-            for (Collection c : newCollections) {
-                String cHandle = c.getHandle();
-                String cName = c.getName();
-                if (!changed) {
-                    System.out.print(" + Map to collection (" + cHandle + "): ");
-                } else {
-                    System.out.print(" + Mapped to collection  (" + cHandle + "): ");
-                }
-                System.out.println(cName);
-            }
-
-            // Show old mapped collections
-            for (Collection c : oldCollections) {
-                String cHandle = c.getHandle();
-                String cName = c.getName();
-                if (!changed) {
-                    System.out.print(" + Un-map from collection (" + cHandle + "): ");
-                } else {
-                    System.out.print(" + Un-mapped from collection  (" + cHandle + "): ");
-                }
-                System.out.println(cName);
-            }
-
-            // Show additions
-            for (BulkEditMetadataValue metadataValue : adds) {
-                String md = metadataValue.getSchema() + "." + metadataValue.getElement();
-                if (metadataValue.getQualifier() != null) {
-                    md += "." + metadataValue.getQualifier();
-                }
-                if (metadataValue.getLanguage() != null) {
-                    md += "[" + metadataValue.getLanguage() + "]";
-                }
-                if (!changed) {
-                    System.out.print(" + Add    (" + md + "): ");
-                } else {
-                    System.out.print(" + Added   (" + md + "): ");
-                }
-                System.out.print(metadataValue.getValue());
-                if (isAuthorityControlledField(md)) {
-                    System.out.print(", authority = " + metadataValue.getAuthority());
-                    System.out.print(", confidence = " + metadataValue.getConfidence());
-                }
-                System.out.println("");
-            }
-
-            // Show removals
-            for (BulkEditMetadataValue metadataValue : removes) {
-                String md = metadataValue.getSchema() + "." + metadataValue.getElement();
-                if (metadataValue.getQualifier() != null) {
-                    md += "." + metadataValue.getQualifier();
-                }
-                if (metadataValue.getLanguage() != null) {
-                    md += "[" + metadataValue.getLanguage() + "]";
-                }
-                if (!changed) {
-                    System.out.print(" - Remove (" + md + "): ");
-                } else {
-                    System.out.print(" - Removed (" + md + "): ");
-                }
-                System.out.print(metadataValue.getValue());
-                if (isAuthorityControlledField(md)) {
-                    System.out.print(", authority = " + metadataValue.getAuthority());
-                    System.out.print(", confidence = " + metadataValue.getConfidence());
-                }
-                System.out.println("");
-            }
-        }
-        return changeCounter;
-    }
-
-    /**
-     * is the field is defined as authority controlled
-     */
-    private static boolean isAuthorityControlledField(String md) {
-        String mdf = StringUtils.substringAfter(md, ":");
-        mdf = StringUtils.substringBefore(mdf, "[");
-        return authorityControlled.contains(mdf);
-    }
-
-    /**
-     * Set authority controlled fields
-     */
-    private static void setAuthorizedMetadataFields() {
-        authorityControlled = new HashSet<String>();
-        Enumeration propertyNames = ConfigurationManager.getProperties().propertyNames();
-        while (propertyNames.hasMoreElements()) {
-            String key = ((String) propertyNames.nextElement()).trim();
-            if (key.startsWith(AC_PREFIX)
-                && ConfigurationManager.getBooleanProperty(key, false)) {
-                authorityControlled.add(key.substring(AC_PREFIX.length()));
-            }
-        }
-    }
-
-    /**
-     * main method to run the metadata exporter
-     *
-     * @param argv the command line arguments given
-     */
-    public static void main(String[] argv) {
-        // Create an options object and populate it
-        CommandLineParser parser = new PosixParser();
-
-        Options options = new Options();
-
-        options.addOption("f", "file", true, "source file");
-        options.addOption("e", "email", true, "email address or user id of user (required if adding new items)");
-        options.addOption("s", "silent", false,
-                          "silent operation - doesn't request confirmation of changes USE WITH CAUTION");
-        options.addOption("w", "workflow", false, "workflow - when adding new items, use collection workflow");
-        options.addOption("n", "notify", false,
-                          "notify - when adding new items using a workflow, send notification emails");
-        options.addOption("t", "template", false,
-                          "template - when adding new items, use the collection template (if it exists)");
-        options.addOption("h", "help", false, "help");
-
-        // Parse the command line arguments
-        CommandLine line;
-        try {
-            line = parser.parse(options, argv);
-        } catch (ParseException pe) {
-            System.err.println("Error parsing command line arguments: " + pe.getMessage());
-            System.exit(1);
-            return;
-        }
-
-        if (line.hasOption('h')) {
-            printHelp(options, 0);
-        }
-
-        // Check a filename is given
-        if (!line.hasOption('f')) {
-            System.err.println("Required parameter -f missing!");
-            printHelp(options, 1);
-        }
-        String filename = line.getOptionValue('f');
-
-        // Option to apply template to new items
-        boolean useTemplate = false;
-        if (line.hasOption('t')) {
-            useTemplate = true;
-        }
-
-        // Options for workflows, and workflow notifications for new items
-        boolean useWorkflow = false;
-        boolean workflowNotify = false;
-        if (line.hasOption('w')) {
-            useWorkflow = true;
-            if (line.hasOption('n')) {
-                workflowNotify = true;
-            }
-        } else if (line.hasOption('n')) {
-            System.err.println("Invalid option 'n': (notify) can only be specified with the 'w' (workflow) option.");
-            System.exit(1);
-        }
-
-        // Create a context
-        Context c;
-        try {
-            c = new Context();
-            c.turnOffAuthorisationSystem();
-        } catch (Exception e) {
-            System.err.println("Unable to create a new DSpace Context: " + e.getMessage());
-            System.exit(1);
-            return;
-        }
-
-        // Find the EPerson, assign to context
-        try {
-            if (line.hasOption('e')) {
-                EPerson eperson;
-                String e = line.getOptionValue('e');
-                if (e.indexOf('@') != -1) {
-                    eperson = EPersonServiceFactory.getInstance().getEPersonService().findByEmail(c, e);
-                } else {
-                    eperson = EPersonServiceFactory.getInstance().getEPersonService().find(c, UUID.fromString(e));
-                }
-
-                if (eperson == null) {
-                    System.out.println("Error, eperson cannot be found: " + e);
-                    System.exit(1);
-                }
-                c.setCurrentUser(eperson);
-            }
-        } catch (Exception e) {
-            System.err.println("Unable to find DSpace user: " + e.getMessage());
-            System.exit(1);
-            return;
-        }
-
-        // Is this a silent run?
-        boolean change = false;
-
-        // Read lines from the CSV file
-        DSpaceCSV csv;
-        try {
-            csv = new DSpaceCSV(new File(filename), c);
-        } catch (MetadataImportInvalidHeadingException miihe) {
-            System.err.println(miihe.getMessage());
-            System.exit(1);
-            return;
-        } catch (Exception e) {
-            System.err.println("Error reading file: " + e.getMessage());
-            System.exit(1);
-            return;
-        }
-
-        // Perform the first import - just highlight differences
-        MetadataImport importer = new MetadataImport(c, csv);
-        List<BulkEditChange> changes;
-
-        if (!line.hasOption('s')) {
-            // See what has changed
-            try {
-                changes = importer.runImport(false, useWorkflow, workflowNotify, useTemplate);
-            } catch (MetadataImportException mie) {
-                System.err.println("Error: " + mie.getMessage());
-                System.exit(1);
-                return;
-            }
-
-            // Display the changes
-            int changeCounter = displayChanges(changes, false);
-
-            // If there were changes, ask if we should execute them
-            if (changeCounter > 0) {
-                try {
-                    // Ask the user if they want to make the changes
-                    System.out.println("\n" + changeCounter + " item(s) will be changed\n");
-                    System.out.print("Do you want to make these changes? [y/n] ");
-                    String yn = (new BufferedReader(new InputStreamReader(System.in))).readLine();
-                    if ("y".equalsIgnoreCase(yn)) {
-                        change = true;
-                    } else {
-                        System.out.println("No data has been changed.");
-                    }
-                } catch (IOException ioe) {
-                    System.err.println("Error: " + ioe.getMessage());
-                    System.err.println("No changes have been made");
-                    System.exit(1);
-                }
-            } else {
-                System.out.println("There were no changes detected");
-            }
-        } else {
-            change = true;
-        }
-
-        try {
-            // If required, make the change
-            if (change) {
-                try {
-                    // Make the changes
-                    changes = importer.runImport(true, useWorkflow, workflowNotify, useTemplate);
-                } catch (MetadataImportException mie) {
-                    System.err.println("Error: " + mie.getMessage());
-                    System.exit(1);
-                    return;
-                }
-
-                // Display the changes
-                displayChanges(changes, true);
-
-                // Commit the change to the DB
-//                c.commit();
-            }
-
-            // Finsh off and tidy up
-            c.restoreAuthSystemState();
-            c.complete();
-        } catch (Exception e) {
-            c.abort();
-            System.err.println("Error committing changes to database: " + e.getMessage());
-            System.err.println("Aborting most recent changes.");
-            System.exit(1);
-        }
     }
 }

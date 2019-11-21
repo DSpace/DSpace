@@ -7,9 +7,13 @@
  */
 package org.dspace.scripts.handler;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.SQLException;
 
 import org.apache.commons.cli.Options;
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.core.Context;
 
 /**
  * This is an interface meant to be implemented by any DSpaceRunnableHandler to specify specific execution methods
@@ -78,4 +82,9 @@ public interface DSpaceRunnableHandler {
      * @param name      The name of the script
      */
     public void printHelp(Options options, String name);
+
+    public InputStream getFileStream(Context context, String fileName) throws IOException, AuthorizeException;
+
+    public void writeFilestream(Context context, String fileName, InputStream inputStream, String type)
+        throws IOException;
 }
