@@ -16,10 +16,6 @@
         <url>http://www.dspace.org</url>
     </organization>
 
-    <prerequisites>
-        <maven>3.0</maven>
-    </prerequisites>
-
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>${project.build.sourceEncoding}</project.reporting.outputEncoding>
@@ -55,7 +51,8 @@
              (NOTE: individual POMs can override specific settings). -->
         <pluginManagement>
             <plugins>
-                <!-- Use to enforce a particular version of Java and ensure no conflicting dependencies -->
+                <!-- Use to enforce particular versions of Java and Maven,
+                     and to ensure no conflicting dependencies -->
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-enforcer-plugin</artifactId>
@@ -71,6 +68,9 @@
                                     <requireJavaVersion>
                                         <version>${java.version}</version>
                                     </requireJavaVersion>
+                                    <requireMavenVersion>
+                                        <version>[3.0.5,)</version>
+                                    </requireMavenVersion>
                                 </rules>
                             </configuration>
                         </execution>

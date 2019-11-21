@@ -22,6 +22,7 @@
   
  <!ELEMENT hint (#PCDATA) >
  <!ELEMENT required (#PCDATA)>
+ <!ELEMENT name-variants (#PCDATA)>
  <!ELEMENT regex (#PCDATA) >
 
  <!ELEMENT form-value-pairs (value-pairs)* >
@@ -59,5 +60,5 @@
 <!ELEMENT relationship-type (#PCDATA) >
 <!ELEMENT search-configuration (#PCDATA) >
 <!ELEMENT filter (#PCDATA) >
-<!ELEMENT relation-field (relationship-type, search-configuration, filter?, repeatable?, label, type-bind?, hint, linked-metadata-field?, required?, visibility?)>
+<!ELEMENT relation-field (relationship-type, search-configuration, filter?, repeatable?, name-variants?, label, type-bind?, hint, linked-metadata-field?, required?, visibility?)>
 <!ELEMENT linked-metadata-field (dc-schema, dc-element, dc-qualifier?, input-type)>

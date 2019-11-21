@@ -51,26 +51,26 @@ public interface RelationshipDAO extends GenericDAO<Relationship> {
     List<Relationship> findByItem(Context context, Item item, Integer limit, Integer offset) throws SQLException;
 
     /**
-     * This method returns the highest leftplace integer for all the relationships where this
-     * item is the leftitem so that we can set a proper leftplace attribute on the next relationship
+     * This method returns the next leftplace integer to use for a relationship with this item as the leftItem
+     *
      * @param context   The relevant DSpace context
      * @param item      The item to be matched on leftItem
-     * @return          The integer for the highest leftPlace value for all the relatonship objects
-     *                  that have the given item as leftItem
+     * @return          The next integer to be used for the leftplace of a relationship with the given item
+     *                  as a left item
      * @throws SQLException If something goes wrong
      */
-    int findLeftPlaceByLeftItem(Context context, Item item) throws SQLException;
+    int findNextLeftPlaceByLeftItem(Context context, Item item) throws SQLException;
 
     /**
-     * This method returns the highest rightplace integer for all the relationships where this
-     * item is the rightitem so that we can set a proper rightplace attribute on the next relationship
+     * This method returns the next rightplace integer to use for a relationship with this item as the rightItem
+     *
      * @param context   The relevant DSpace context
      * @param item      The item to be matched on rightItem
-     * @return          The integer for the highest rightPlace value for all the relatonship objects
-     *                  that have the given item as rightItem
+     * @return          The next integer to be used for the rightplace of a relationship with the given item
+     *                  as a right item
      * @throws SQLException If something goes wrong
      */
-    int findRightPlaceByRightItem(Context context, Item item) throws SQLException;
+    int findNextRightPlaceByRightItem(Context context, Item item) throws SQLException;
 
     /**
      * This method returns a list of Relationship objects for the given RelationshipType object.
@@ -113,7 +113,7 @@ public interface RelationshipDAO extends GenericDAO<Relationship> {
      * @throws SQLException If something goes wrong
      */
     List<Relationship> findByItemAndRelationshipType(Context context, Item item, RelationshipType relationshipType,
-                                              Integer limit, Integer offset) throws SQLException;
+                                                     Integer limit, Integer offset) throws SQLException;
 
     /**
      * This method returns a list of Relationship objects for the given RelationshipType object.
@@ -156,7 +156,6 @@ public interface RelationshipDAO extends GenericDAO<Relationship> {
      */
     List<Relationship> findByTypeName(Context context, String typeName, Integer limit, Integer offset)
             throws SQLException;
-
 
     /**
      * Count total number of relationships (rows in relationship table)
