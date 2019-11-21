@@ -105,7 +105,7 @@ public class CollectionItemtemplateController {
             throws SQLException, AuthorizeException {
 
         if (itemBody == null) {
-            throw new BadRequestException("The new item should be included as json in te body of this request");
+            throw new BadRequestException("The new item should be included as json in the body of this request");
         }
 
         Context context = ContextUtil.obtainContext(request);
