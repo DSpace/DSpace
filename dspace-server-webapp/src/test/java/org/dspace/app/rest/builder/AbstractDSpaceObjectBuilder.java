@@ -7,9 +7,11 @@
  */
 package org.dspace.app.rest.builder;
 
+import java.sql.SQLException;
 import java.util.Date;
 
 import org.apache.logging.log4j.Logger;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
@@ -216,7 +218,7 @@ public abstract class AbstractDSpaceObjectBuilder<T extends DSpaceObject>
         return (B) this;
     }
 
-    public abstract T build();
+    public abstract T build() throws SQLException, AuthorizeException;
 
     public void delete(T dso) throws Exception {
 

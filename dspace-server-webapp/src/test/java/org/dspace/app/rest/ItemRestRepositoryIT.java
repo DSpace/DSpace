@@ -317,11 +317,11 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                            Matchers.containsString("/api/core/items")))
         ;
 
-        getClient().perform(get("/api/core/items/" + publicItem1.getID() + "/bitstreams"))
+        getClient().perform(get("/api/core/items/" + publicItem1.getID() + "/bundles"))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$._links.self.href", Matchers
-                       .containsString("/api/core/items/" + publicItem1.getID() + "/bitstreams")))
+                       .containsString("/api/core/items/" + publicItem1.getID() + "/bundles")))
         ;
 
         getClient().perform(get("/api/core/items/" + publicItem1.getID() + "/owningCollection"))
@@ -1156,12 +1156,12 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient().perform(get("/api/core/items/" + publicItem.getID()))
                    .andExpect(status().isOk());
 
-        // Check publicItem bitstream creatino
-        getClient().perform(get("/api/core/items/" + publicItem.getID() + "/bitstreams"))
+        // Check publicItem bitstream creation (shuold be stored in bundle)
+        getClient().perform(get("/api/core/items/" + publicItem.getID() + "/bundles"))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$._links.self.href", Matchers
-                           .containsString("/api/core/items/" + publicItem.getID() + "/bitstreams")));
+                           .containsString("/api/core/items/" + publicItem.getID() + "/bundles")));
 
         String token = getAuthToken(admin.getEmail(), password);
 
