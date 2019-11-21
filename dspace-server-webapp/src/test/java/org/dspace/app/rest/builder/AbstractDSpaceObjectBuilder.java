@@ -65,6 +65,19 @@ public abstract class AbstractDSpaceObjectBuilder<T extends DSpaceObject>
         return (B) this;
     }
 
+    protected <B extends AbstractDSpaceObjectBuilder<T>> B addMetadataValue(final T dso, final String schema,
+                                                                            final String element,
+                                                                            final String qualifier,
+                                                                            final String language,
+                                                                            final String value) {
+        try {
+            getService().addMetadata(context, dso, schema, element, qualifier, language, value);
+        } catch (Exception e) {
+            return handleException(e);
+        }
+        return (B) this;
+    }
+
     protected <B extends AbstractDSpaceObjectBuilder<T>> B setMetadataSingleValue(final T dso, final String schema,
                                                                                   final String element,
                                                                                   final String qualifier,
