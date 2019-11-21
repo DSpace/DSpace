@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public class ItemRest extends DSpaceObjectRest {
     public static final String NAME = "item";
+    public static final String PLURAL_NAME = "items";
     public static final String CATEGORY = RestAddressableModel.CORE;
     private boolean inArchive = false;
     private boolean discoverable = false;

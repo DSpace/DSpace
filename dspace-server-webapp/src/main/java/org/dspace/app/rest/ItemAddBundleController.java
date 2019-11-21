@@ -20,6 +20,7 @@ import org.dspace.app.rest.converter.BundleConverter;
 import org.dspace.app.rest.converter.MetadataConverter;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.BundleRest;
+import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.hateoas.BundleResource;
 import org.dspace.app.rest.repository.ItemRestRepository;
 import org.dspace.app.rest.utils.ContextUtil;
@@ -58,7 +59,8 @@ import org.springframework.web.bind.annotation.RestController;
  * </pre>
  */
 @RestController
-@RequestMapping("/api/core/items" + REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID + "/bundles")
+@RequestMapping("/api/" + ItemRest.CATEGORY + "/" + ItemRest.PLURAL_NAME + REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID
+        + "/" + BundleRest.PLURAL_NAME)
 public class ItemAddBundleController {
 
     @Autowired
