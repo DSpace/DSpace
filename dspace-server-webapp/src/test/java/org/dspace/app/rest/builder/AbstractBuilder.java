@@ -7,11 +7,13 @@
  */
 package org.dspace.app.rest.builder;
 
+import java.sql.SQLException;
 import java.util.List;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.builder.util.AbstractBuilderCleanupUtil;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.authorize.service.ResourcePolicyService;
@@ -190,7 +192,7 @@ public abstract class AbstractBuilder<T, S> {
      */
     public abstract void cleanup() throws Exception;
 
-    public abstract T build();
+    public abstract T build() throws SQLException, AuthorizeException;
 
     public abstract void delete(T dso) throws Exception;
 
