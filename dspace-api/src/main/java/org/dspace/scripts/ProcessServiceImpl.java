@@ -7,6 +7,8 @@
  */
 package org.dspace.scripts;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -17,8 +19,14 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.content.Bitstream;
 import org.dspace.content.ProcessStatus;
 import org.dspace.content.dao.ProcessDAO;
+import org.dspace.content.service.BitstreamFormatService;
+import org.dspace.content.service.BitstreamService;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
@@ -34,6 +42,15 @@ public class ProcessServiceImpl implements ProcessService {
 
     @Autowired
     private ProcessDAO processDAO;
+
+    @Autowired
+    private BitstreamService bitstreamService;
+
+    @Autowired
+    private BitstreamFormatService bitstreamFormatService;
+
+    @Autowired
+    private AuthorizeService authorizeService;
 
     @Override
     public Process create(Context context, EPerson ePerson, String scriptName,
@@ -113,6 +130,21 @@ public class ProcessServiceImpl implements ProcessService {
     }
 
     @Override
+    public void appendFile(Context context, Process process, InputStream is, String type, String fileName)
+        throws IOException, SQLException, AuthorizeException {
+        Bitstream bitstream = bitstreamService.create(context, is);
+        bitstream.setName(context, fileName);
+        bitstreamService.setFormat(context, bitstream, bitstreamFormatService.guessFormat(context, bitstream));
+        bitstreamService.addMetadata(context, bitstream, "process", "type", null, null, type);
+        authorizeService.addPolicy(context, bitstream, Constants.READ, context.getCurrentUser());
+        authorizeService.addPolicy(context, bitstream, Constants.WRITE, context.getCurrentUser());
+        authorizeService.addPolicy(context, bitstream, Constants.DELETE, context.getCurrentUser());
+        bitstreamService.update(context, bitstream);
+        process.addBitstream(bitstream);
+        update(context, process);
+    }
+
+    @Override
     public void delete(Context context, Process process) throws SQLException {
         processDAO.delete(context, process);
         log.info(LogManager.getHeader(context, "process_delete", "Process with ID " + process.getID()
@@ -139,6 +171,33 @@ public class ProcessServiceImpl implements ProcessService {
         }
 
         return parameterList;
+    }
+
+    @Override
+    public Bitstream getBitstreamByName(Context context, Process process, String bitstreamName) {
+        for (Bitstream bitstream : getBitstreams(context, process, null)) {
+            if (StringUtils.equals(bitstream.getName(), bitstreamName)) {
+                return bitstream;
+            }
+        }
+
+        return null;
+    }
+
+    public List<Bitstream> getBitstreams(Context context, Process process, String type) {
+        List<Bitstream> allBitstreams = process.getBitstreams();
+
+        if (type == null) {
+            return allBitstreams;
+        } else {
+            List<Bitstream> filteredBitstreams = new ArrayList<>();
+            for (Bitstream bitstream : allBitstreams) {
+                if (StringUtils.equals(bitstreamService.getMetadata(bitstream, "process.type"), type)) {
+                    filteredBitstreams.add(bitstream);
+                }
+            }
+            return filteredBitstreams;
+        }
     }
 
     public int countTotal(Context context) throws SQLException {

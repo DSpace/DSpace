@@ -7,6 +7,8 @@
  */
 package org.dspace.app.rest.scripts.handler.impl;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.sql.SQLException;
@@ -16,8 +18,12 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.logging.log4j.Logger;
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.Bitstream;
 import org.dspace.content.ProcessStatus;
+import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.factory.ProcessServiceFactory;
+import org.dspace.content.service.BitstreamService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.scripts.DSpaceCommandLineParameter;
@@ -25,6 +31,8 @@ import org.dspace.scripts.DSpaceRunnable;
 import org.dspace.scripts.Process;
 import org.dspace.scripts.handler.DSpaceRunnableHandler;
 import org.dspace.scripts.service.ProcessService;
+import org.dspace.utils.DSpace;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 /**
  * The {@link DSpaceRunnableHandler} dealing with Scripts started from the REST api
@@ -34,6 +42,7 @@ public class RestDSpaceRunnableHandler implements DSpaceRunnableHandler {
         .getLogger(RestDSpaceRunnableHandler.class);
 
     private ProcessService processService = ProcessServiceFactory.getInstance().getProcessService();
+    private BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
 
     private Integer processId;
     private String scriptName;
@@ -176,6 +185,29 @@ public class RestDSpaceRunnableHandler implements DSpaceRunnableHandler {
         }
     }
 
+    @Override
+    public InputStream getFileStream(Context context, String fileName) throws IOException, AuthorizeException {
+        try {
+            Process process = processService.find(context, processId);
+            Bitstream bitstream = processService.getBitstreamByName(context, process, fileName);
+            return bitstreamService.retrieve(context, bitstream);
+        } catch (SQLException sqlException) {
+            log.error("SQL exception while attempting to find process", sqlException);
+        }
+        return null;
+    }
+
+    @Override
+    public void writeFilestream(Context context, String fileName, InputStream inputStream, String type)
+        throws IOException {
+        try {
+            Process process = processService.find(context, processId);
+            processService.appendFile(context, process, inputStream, type, fileName);
+        } catch (SQLException | AuthorizeException exception) {
+            log.error("Exception occurred while attempting to find process", exception);
+        }
+    }
+
     /**
      * This method will return the process created by this handler
      * @return The Process database object created by this handler
@@ -200,6 +232,9 @@ public class RestDSpaceRunnableHandler implements DSpaceRunnableHandler {
      * @param script    The script to be ran
      */
     public void schedule(DSpaceRunnable script) {
+        ThreadPoolTaskExecutor taskExecutor = new DSpace().getServiceManager()
+                                                          .getServiceByName("dspaceRunnableThreadExecutor",
+                                                                            ThreadPoolTaskExecutor.class);
         Context context = new Context();
         try {
             Process process = processService.find(context, processId);
@@ -213,6 +248,6 @@ public class RestDSpaceRunnableHandler implements DSpaceRunnableHandler {
                 context.abort();
             }
         }
-        script.run();
+        taskExecutor.execute(script);
     }
 }

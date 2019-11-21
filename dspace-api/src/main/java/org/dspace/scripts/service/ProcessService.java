@@ -7,9 +7,13 @@
  */
 package org.dspace.scripts.service;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.List;
 
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.Bitstream;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.scripts.DSpaceCommandLineParameter;
@@ -104,6 +108,9 @@ public interface ProcessService {
      */
     public void complete(Context context, Process process) throws SQLException;
 
+    public void appendFile(Context context, Process process, InputStream is, String type, String fileName)
+        throws IOException, SQLException, AuthorizeException;
+
     /**
      * This method will delete the given Process object from the database
      * @param context   The relevant DSpace context
@@ -127,6 +134,10 @@ public interface ProcessService {
      * @return The list of parsed parameters from the Process object
      */
     public List<DSpaceCommandLineParameter> getParameters(Process process);
+
+    public Bitstream getBitstreamByName(Context context, Process process, String bitstreamName);
+
+    public List<Bitstream> getBitstreams(Context context, Process process, String type);
 
     /**
      * Returns the total amount of Process objects in the dataase

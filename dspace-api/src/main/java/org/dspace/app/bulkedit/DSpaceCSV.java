@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Serializable;
@@ -27,7 +28,9 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.pdfbox.util.Charsets;
 import org.dspace.authority.AuthorityValue;
 import org.dspace.authority.factory.AuthorityServiceFactory;
 import org.dspace.authority.service.AuthorityValueService;
@@ -635,6 +638,14 @@ public class DSpaceCSV implements Serializable {
         }
         out.flush();
         out.close();
+    }
+
+    public InputStream getInputStream() {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (String csvLine : getCSVLinesAsStringArray()) {
+            stringBuilder.append(csvLine + "\n");
+        }
+        return IOUtils.toInputStream(stringBuilder.toString(), Charsets.UTF_8);
     }
 
     /**

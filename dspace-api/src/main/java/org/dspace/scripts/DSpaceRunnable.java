@@ -7,10 +7,14 @@
  */
 package org.dspace.scripts;
 
+import java.io.InputStream;
 import java.sql.SQLException;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.dspace.authorize.service.AuthorizeService;
@@ -71,6 +75,18 @@ public abstract class DSpaceRunnable implements Runnable {
 
     public Options getOptions() {
         return options;
+    }
+
+    public List<String> getFileNamesFromInputStreamOptions() {
+        List<String> fileNames = new LinkedList<>();
+
+        for (Option option : options.getOptions()) {
+            if (option.getType() == InputStream.class) {
+                fileNames.add(commandLine.getOptionValue(option.getOpt()));
+            }
+        }
+
+        return fileNames;
     }
 
     /**
