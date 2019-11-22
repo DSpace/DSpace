@@ -5,19 +5,28 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.content.factory.impl;
+package org.dspace.scripts.factory.impl;
 
-import org.dspace.content.factory.ProcessServiceFactory;
+import org.dspace.scripts.factory.ScriptServiceFactory;
 import org.dspace.scripts.service.ProcessService;
+import org.dspace.scripts.service.ScriptService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * The implementation for the {@link ProcessServiceFactory}
+ * The implementation for the {@link ScriptServiceFactory}
  */
-public class ProcessServiceFactoryImpl extends ProcessServiceFactory {
+public class ScriptServiceFactoryImpl extends ScriptServiceFactory {
+
+    @Autowired(required = true)
+    private ScriptService scriptService;
 
     @Autowired(required = true)
     private ProcessService processService;
+
+    @Override
+    public ScriptService getScriptService() {
+        return scriptService;
+    }
 
     @Override
     public ProcessService getProcessService() {
