@@ -646,9 +646,11 @@ public class OAIHarvester {
     		// NOTE: did not find, so we create (presumably, there will never be a case where an item already
     		// exists in a harvest collection but does not have an OAI_id)
     	{
-    		wi = workspaceItemService.create(ourContext, targetCollection, false);
-    		item = wi.getItem();
-
+            log.debug("Create new item: " + itemOaiID);
+            log.debug("Context: " + ourContext);
+            log.debug("TargetCollection: " + targetCollection);
+            wi = workspaceItemService.create(ourContext, targetCollection, false);
+            item = wi.getItem();
     		hi = harvestedItemService.create(ourContext, item, itemOaiID);
     		//item.setOaiID(itemOaiID);
 
@@ -663,8 +665,9 @@ public class OAIHarvester {
 
     		if (harvestRow.getHarvestType() == 3) {
     			ORExwalk.ingest(ourContext, item, oreREM, true);
+                log.debug("Crosswalk ingestion done on item: " + itemOaiID);
     		}
-
+            log.debug("Cleaning up for item: " + itemOaiID);
             // see if we can do something about the wonky metadata
             scrubMetadata(item);
 
