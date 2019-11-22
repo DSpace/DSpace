@@ -78,7 +78,7 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                    // check the first two rows
                    .andExpect(jsonPath("$.rows[0].fields", contains(
                         SubmissionFormFieldMatcher.matchFormFieldDefinition("name", "Author",
-                null, true, "Add an author", "dc.contributor.author"))))
+                null, true,"Add an author", "dc.contributor.author"))))
                    .andExpect(jsonPath("$.rows[1].fields", contains(
                         SubmissionFormFieldMatcher.matchFormFieldDefinition("onebox", "Title",
                                 "You must enter a main title for this item.", false,
@@ -90,9 +90,9 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                                         "You must enter at least the year.", false,
                                         "Please give the date", "col-sm-4",
                                         "dc.date.issued"),
-                                SubmissionFormFieldMatcher.matchFormFieldDefinition("onebox", "Publisher", null, false,
-                                        "Enter the name of", "col-sm-8",
-                                        "dc.publisher"))))
+                                SubmissionFormFieldMatcher.matchFormFieldDefinition("onebox", "Publisher",
+                                        null, false,"Enter the name of",
+                                        "col-sm-8","dc.publisher"))))
         ;
     }
 
@@ -114,9 +114,9 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                         // check the first two rows
                         .andExpect(jsonPath("$.rows[0].fields", contains(
                             SubmissionFormFieldMatcher.matchFormOpenRelationshipFieldDefinition("name",
-                        "Author", null, true, "Add an author",
+                        "Author", null, true,"Add an author",
                     "dc.contributor.author", "isAuthorOfPublication", null,
-            "personConfiguration"))))
+            "personConfiguration", true))))
         ;
     }
 
@@ -138,8 +138,8 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                         // check the first two rows
                         .andExpect(jsonPath("$.rows[0].fields", contains(
                             SubmissionFormFieldMatcher.matchFormClosedRelationshipFieldDefinition("Journal", null,
-                    false, "Select the journal related to this volume.", "isVolumeOfJournal",
-                        "creativework.publisher:somepublishername", "periodicalConfiguration"))))
+                    false,"Select the journal related to this volume.", "isVolumeOfJournal",
+                        "creativework.publisher:somepublishername", "periodicalConfiguration", false))))
         ;
     }
 }
