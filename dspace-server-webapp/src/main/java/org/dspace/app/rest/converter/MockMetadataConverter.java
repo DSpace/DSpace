@@ -17,7 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.model.MetadataRest;
 import org.dspace.app.rest.model.MetadataValueRest;
 import org.dspace.content.MetadataValue;
-import org.dspace.mock.MockMetadataValue;
+import org.dspace.mock.MetadataValueDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
@@ -26,10 +26,10 @@ import org.springframework.stereotype.Component;
  * Converter to translate between lists of domain {@link MetadataValue}s and {@link MetadataRest} representations.
  */
 @Component
-public class MockMetadataConverter implements Converter<List<MockMetadataValue>, MetadataRest> {
+public class MockMetadataConverter implements Converter<List<MetadataValueDTO>, MetadataRest> {
 
     @Autowired
-    private MockMetadataValueConverter valueConverter;
+    private MetadataValueDTOConverter valueConverter;
 
     /**
      * Gets a rest representation of the given list of domain metadata values.
@@ -38,10 +38,10 @@ public class MockMetadataConverter implements Converter<List<MockMetadataValue>,
      * @return the rest representation.
      */
     @Override
-    public MetadataRest convert(List<MockMetadataValue> metadataValueList) {
+    public MetadataRest convert(List<MetadataValueDTO> metadataValueList) {
         // Convert each value to a DTO while retaining place order in a map of key -> SortedSet
         Map<String, List<MetadataValueRest>> mapOfLists = new HashMap<>();
-        for (MockMetadataValue metadataValue : metadataValueList) {
+        for (MetadataValueDTO metadataValue : metadataValueList) {
             String key = metadataValue.getSchema() + "." + metadataValue.getElement();
             if (StringUtils.isNotBlank(metadataValue.getQualifier())) {
                 key += "." + metadataValue.getQualifier();

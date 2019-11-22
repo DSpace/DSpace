@@ -26,7 +26,7 @@ import org.dspace.app.sherpa.SHERPAPublisher;
 import org.dspace.app.sherpa.SHERPAResponse;
 import org.dspace.external.model.ExternalDataObject;
 import org.dspace.external.provider.ExternalDataProvider;
-import org.dspace.mock.MockMetadataValue;
+import org.dspace.mock.MetadataValueDTO;
 
 /**
  * This class is the implementation of the ExternalDataProvider interface that will deal with SherpaPublisher External
@@ -110,19 +110,19 @@ public class SherpaPublisherDataProvider implements ExternalDataProvider {
         externalDataObject.setSource(sourceIdentifier);
 
         //Text value == name
-        externalDataObject.addMetadata(new MockMetadataValue("dc", "title", null, null, sherpaPublisher.getName()));
+        externalDataObject.addMetadata(new MetadataValueDTO("dc", "title", null, null, sherpaPublisher.getName()));
         externalDataObject.setDisplayValue(sherpaPublisher.getName());
         externalDataObject.setValue(sherpaPublisher.getName());
         if (StringUtils.isNotBlank(sherpaPublisher.getId())) {
             externalDataObject.setId(sherpaPublisher.getId());
             externalDataObject
                 .addMetadata(
-                    new MockMetadataValue("dc", "identifier", "sherpaPublisher", null, sherpaPublisher.getId()));
+                    new MetadataValueDTO("dc", "identifier", "sherpaPublisher", null, sherpaPublisher.getId()));
         }
 
         //Text value == homeurl
         externalDataObject
-            .addMetadata(new MockMetadataValue("dc", "identifier", "other", null, sherpaPublisher.getHomeurl()));
+            .addMetadata(new MetadataValueDTO("dc", "identifier", "other", null, sherpaPublisher.getHomeurl()));
 
         return externalDataObject;
     }

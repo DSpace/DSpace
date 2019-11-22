@@ -19,7 +19,10 @@ import org.dspace.content.authority.Choices;
  *
  * @author kevinvandevelde at atmire.com
  */
-public class MockMetadataValue {
+
+
+//TODO COMMENTS
+public class MetadataValueDTO {
 
     private String schema;
     private String element;
@@ -29,7 +32,7 @@ public class MockMetadataValue {
     private String authority;
     private int confidence = Choices.CF_UNSET;
 
-    public MockMetadataValue(MetadataValue metadataValue) {
+    public MetadataValueDTO(MetadataValue metadataValue) {
         MetadataField metadataField = metadataValue.getMetadataField();
         MetadataSchema metadataSchema = metadataField.getMetadataSchema();
         schema = metadataSchema.getName();
@@ -41,7 +44,7 @@ public class MockMetadataValue {
         confidence = metadataValue.getConfidence();
     }
 
-    public MockMetadataValue() {
+    public MetadataValueDTO() {
     }
 
     /**
@@ -54,8 +57,8 @@ public class MockMetadataValue {
      * @param authority     The authority to be assigned to this MockMetadataValue object
      * @param confidence    The confidence to be assigned to this MockMetadataValue object
      */
-    public MockMetadataValue(String schema, String element, String qualifier, String language, String value,
-                             String authority, int confidence) {
+    public MetadataValueDTO(String schema, String element, String qualifier, String language, String value,
+                            String authority, int confidence) {
         this.schema = schema;
         this.element = element;
         this.qualifier = qualifier;
@@ -72,7 +75,7 @@ public class MockMetadataValue {
      * @param language      The language to be assigend to this MockMetadataValue object
      * @param value         The value to be assigned to this MockMetadataValue object
      */
-    public MockMetadataValue(String schema, String element, String qualifier, String language, String value) {
+    public MetadataValueDTO(String schema, String element, String qualifier, String language, String value) {
         this.schema = schema;
         this.element = element;
         this.qualifier = qualifier;

@@ -10,7 +10,7 @@ package org.dspace.external.model;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.dspace.mock.MockMetadataValue;
+import org.dspace.mock.MetadataValueDTO;
 
 /**
  * The representation model object for external data
@@ -32,7 +32,7 @@ public class ExternalDataObject {
     /**
      * The list of Metadata values. These our MockMetadataValues because they won't exist in the DB
      */
-    private List<MockMetadataValue> metadata = new LinkedList<>();
+    private List<MetadataValueDTO> metadata = new LinkedList<>();
     /**
      * The display value of the ExternalDataObject
      */
@@ -73,7 +73,7 @@ public class ExternalDataObject {
      * Generic getter for the Metadata
      * @return  The metadata
      */
-    public List<MockMetadataValue> getMetadata() {
+    public List<MetadataValueDTO> getMetadata() {
         return metadata;
     }
 
@@ -81,19 +81,19 @@ public class ExternalDataObject {
      * Generic setter for the Metadata
      * @param metadata  The metadata to be set
      */
-    public void setMetadata(List<MockMetadataValue> metadata) {
+    public void setMetadata(List<MetadataValueDTO> metadata) {
         this.metadata = metadata;
     }
 
     /**
      * This method will add a Metadata value to the list of metadata values
-     * @param mockMetadataValue The metadatavalue to be added
+     * @param metadataValueDTO The metadatavalue to be added
      */
-    public void addMetadata(MockMetadataValue mockMetadataValue) {
+    public void addMetadata(MetadataValueDTO metadataValueDTO) {
         if (metadata == null) {
             metadata = new LinkedList<>();
         }
-        metadata.add(mockMetadataValue);
+        metadata.add(metadataValueDTO);
     }
 
     /**
