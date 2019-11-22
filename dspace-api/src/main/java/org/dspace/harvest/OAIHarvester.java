@@ -537,8 +537,10 @@ public class OAIHarvester {
 			log.debug("Item " + handle + " was found locally. Using it to harvest " + itemOaiID + ".");
 
     		// FIXME: check for null pointer if for some odd reason we don't have a matching hi
+			log.debug("Context: " + ourContext);
+			log.debug("Context: " + item.getCollections().get(0));
     		hi = harvestedItemService.find(ourContext, item);
-
+			log.debug("HarvestedItem found. " + hi.getOaiID());
     		// Compare last-harvest on the item versus the last time the item was updated on the OAI provider side
 			// If ours is more recent, forgo this item, since it's probably a left-over from a previous harvesting attempt
 			Date OAIDatestamp = Utils.parseISO8601Date(header.getChildText("datestamp", OAI_NS));
@@ -576,7 +578,7 @@ public class OAIHarvester {
 			if (mdr == null) {
 				mdr = new DefaultMetadataRemover();
 			}
-
+			log.debug("clearing metadata on item: " + itemOaiID);
 			mdr.clearMetadata(ourContext, item);
 
     		if (descMD.size() == 1)
@@ -589,6 +591,7 @@ public class OAIHarvester {
             }
 			// Dspace may remove all metadatum -> in these cases the handle metadatum is lost unless the ingested metadadata somehow
 			// provides this data. This step enforces the rule that at least one metadatum field contains the full handle url
+			log.debug("make sure item has a handle: " + itemOaiID);
 			if (handleMetadatumBackup.getValue() != null)
 			{
 				itemService.addMetadata(ourContext, item, handleMetadatumBackup.getMetadataField().getMetadataSchema().getName(), handleMetadatumBackup.getMetadataField().getElement(),
@@ -617,6 +620,7 @@ public class OAIHarvester {
 				}
 
 				// now do the crosswalk
+				log.debug("Do the crosswalk on item: " + itemOaiID);
 				if (ORExwalk instanceof OAIConfigurableCrosswalk)
 				{
 					Properties props = new Properties();
@@ -626,8 +630,10 @@ public class OAIHarvester {
 
 				// once the xwalk is configured (or not), carry out the crosswalk
     			ORExwalk.ingest(ourContext, item, oreREM, true);
+				log.debug("Crosswalk ingestion done on item: " + itemOaiID);
     		}
 
+			log.debug("Cleaning up for item: " + itemOaiID);
             scrubMetadata(item);
 
             // remove duplicate metadata (BIBSYS)
