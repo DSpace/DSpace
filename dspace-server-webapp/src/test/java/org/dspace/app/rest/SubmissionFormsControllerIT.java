@@ -90,9 +90,9 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                                         "You must enter at least the year.", false,
                                         "Please give the date", "col-sm-4",
                                         "dc.date.issued"),
-                                SubmissionFormFieldMatcher.matchFormFieldDefinition("onebox", "Publisher", null, false,
-                                        "Enter the name of", "col-sm-8",
-                                        "dc.publisher"))))
+                                SubmissionFormFieldMatcher.matchFormFieldDefinition("onebox", "Publisher",
+                                        null, false,"Enter the name of",
+                                        "col-sm-8","dc.publisher"))))
         ;
     }
 
@@ -116,7 +116,7 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                             SubmissionFormFieldMatcher.matchFormOpenRelationshipFieldDefinition("lookup-name",
                         "Author", null, true, "Add an author",
                     "dc.contributor.author", "isAuthorOfPublication", null,
-            "personConfiguration"))))
+            "personConfiguration", true))))
         ;
     }
 
@@ -138,8 +138,8 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                         // check the first two rows
                         .andExpect(jsonPath("$.rows[0].fields", contains(
                             SubmissionFormFieldMatcher.matchFormClosedRelationshipFieldDefinition("Journal", null,
-                    false, "Select the journal related to this volume.", "isVolumeOfJournal",
-                        "creativework.publisher:somepublishername", "periodicalConfiguration"))))
+                    false,"Select the journal related to this volume.", "isVolumeOfJournal",
+                        "creativework.publisher:somepublishername", "periodicalConfiguration", false))))
         ;
     }
 }

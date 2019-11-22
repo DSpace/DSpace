@@ -90,6 +90,11 @@ public class DCInput {
     private boolean repeatable = false;
 
     /**
+     * should name-variants be used?
+     */
+    private boolean nameVariants = false;
+
+    /**
      * 'hint' text to display
      */
     private String hint = null;
@@ -183,6 +188,9 @@ public class DCInput {
         String repStr = fieldMap.get("repeatable");
         repeatable = "true".equalsIgnoreCase(repStr)
             || "yes".equalsIgnoreCase(repStr);
+        String nameVariantsString = fieldMap.get("name-variants");
+        nameVariants = (StringUtils.isNotBlank(nameVariantsString)) ?
+                nameVariantsString.equalsIgnoreCase("true") : false;
         label = fieldMap.get("label");
         inputType = fieldMap.get("input-type");
         // these types are list-controlled
@@ -267,6 +275,15 @@ public class DCInput {
      */
     public boolean getRepeatable() {
         return isRepeatable();
+    }
+
+    /**
+     * Get the nameVariants flag for this row
+     *
+     * @return the nameVariants flag
+     */
+    public boolean areNameVariantsAllowed() {
+        return nameVariants;
     }
 
     /**

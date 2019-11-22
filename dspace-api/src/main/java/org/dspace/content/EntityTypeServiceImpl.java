@@ -28,13 +28,20 @@ public class EntityTypeServiceImpl implements EntityTypeService {
     protected AuthorizeService authorizeService;
 
     @Override
-    public EntityType findByEntityType(Context context,String entityType) throws SQLException {
+    public EntityType findByEntityType(Context context, String entityType) throws SQLException {
         return entityTypeDAO.findByEntityType(context, entityType);
     }
 
     @Override
     public List<EntityType> findAll(Context context) throws SQLException {
-        return entityTypeDAO.findAll(context, EntityType.class);
+
+        return findAll(context, -1, -1);
+    }
+
+    @Override
+    public List<EntityType> findAll(Context context, Integer limit, Integer offset) throws SQLException {
+
+        return entityTypeDAO.findAll(context, EntityType.class, limit, offset);
     }
 
     @Override
