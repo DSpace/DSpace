@@ -60,6 +60,7 @@
                 <entry key="publicationIssue" value-ref="publicationIssue"/>
                 <entry key="publicationVolume" value-ref="publicationVolume"/>
                 <entry key="periodical" value-ref="periodical"/>
+                <entry key="project" value-ref="project"/>
             </map>
         </property>
         <property name="toIgnoreMetadataFields">
@@ -648,6 +649,66 @@
         <property name="spellCheckEnabled" value="true"/>
     </bean>
 
+    <bean id="project" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype">
+        <property name="id" value="project"/>
+        <property name="indexAlways" value="true"/>
+        <!--Which sidebar facets are to be displayed-->
+        <property name="sidebarFacets">
+            <list>
+                <ref bean="searchFilterSubject"/>
+            </list>
+        </property>
+        <!--The search filters which can be used on the discovery search page-->
+        <property name="searchFilters">
+            <list>
+                <ref bean="searchFilterSubject"/>
+                <ref bean="searchFilterIdentifier"/>
+            </list>
+        </property>
+        <!--The sort filters for the discovery search-->
+        <property name="searchSortConfiguration">
+            <bean class="org.dspace.discovery.configuration.DiscoverySortConfiguration">
+                <!--<property name="defaultSort" ref="sortDateIssued"/>-->
+                <!--DefaultSortOrder can either be desc or asc (desc is default)-->
+                <property name="defaultSortOrder" value="desc"/>
+                <property name="sortFields">
+                    <list>
+                        <ref bean="sortTitle"/>
+                    </list>
+                </property>
+            </bean>
+        </property>
+        <!--Any default filter queries, these filter queries will be used for all
+            queries done by discovery for this configuration -->
+        <property name="defaultFilterQueries">
+            <list>
+                <!--Only find items, communities and collections-->
+                <value>search.resourcetype:2 AND entityType_keyword:Project</value>
+            </list>
+        </property>
+        <!--Default result per page  -->
+        <property name="defaultRpp" value="10"/>
+        <property name="recentSubmissionConfiguration">
+            <bean class="org.dspace.discovery.configuration.DiscoveryRecentSubmissionsConfiguration">
+                <property name="metadataSortField" value="dc.date.accessioned"/>
+                <property name="type" value="date"/>
+                <property name="max" value="5"/>
+                <property name="useAsHomePage" value="false"/>
+            </bean>
+        </property>
+
+        <!-- When true a "did you mean" example will be displayed, value can be true or false -->
+        <property name="spellCheckEnabled" value="true"/>
+    </bean>
+
+
+
+
+
+
+
+
+
     <bean id="organization" class="org.dspace.discovery.configuration.DiscoveryConfiguration"
           scope="prototype">
         <property name="id" value="organization"/>
@@ -1148,6 +1209,15 @@
         <property name="metadataFields">
             <list>
                 <value>dc.type</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="searchFilterIdentifier" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
+        <property name="indexFieldName" value="itemidentifier" />
+        <property name="metadataFields">
+            <list>
+                <value>dc.identifier</value>
             </list>
         </property>
     </bean>
