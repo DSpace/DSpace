@@ -8,31 +8,26 @@
 
     <bean class="org.dspace.external.provider.impl.SherpaJournalDataProvider" init-method="init">
         <property name="sourceIdentifier" value="sherpaJournal"/>
-        <property name="url" value="http://www.sherpa.ac.uk/romeo/api29.php"/>
+        <property name="url" value="${sherpa.romeo.url}"/>
         <!-- please register for a free api access key to get many benefits -->
-        <property name="apiKey" value=""/>
+        <property name="apiKey" value="${sherpa.romeo.apiKey}"/>
 
     </bean>
     <bean class="org.dspace.external.provider.impl.SherpaPublisherDataProvider">
         <property name="sourceIdentifier" value="sherpaPublisher"/>
-        <property name="url" value="http://www.sherpa.ac.uk/romeo/api29.php"/>
+        <property name="url" value="${orcid.api.url}"/>
         <!-- please register for a free api access key to get many benefits -->
-        <property name="apiKey" value=""/>
+        <property name="apiKey" value="${sherpa.romeo.apiKey}"/>
 
     </bean>
     <bean class="org.dspace.external.provider.impl.OrcidV2AuthorDataProvider" init-method="init">
-        <constructor-arg value="https://pub.orcid.org/v2.1"/>
+        <constructor-arg value="${orcid.api.url}"/>
         <property name="sourceIdentifier" value="orcidV2"/>
-        <property name="orcidUrl" value="https://orcid.org/" />
-
-<!--        <property name="OAUTHUrl" value="https://api.orcid.org/oauth/token"/>-->
-        <!-- Fill in these properties if you want to use them -->
-<!--        <property name="clientId" value=""/>-->
-<!--        <property name="clientSecret" value=""/>-->
+        <property name="orcidUrl" value="${orcid.url}" />
     </bean>
 
     <bean class="org.dspace.external.provider.impl.LCNameDataProvider">
-        <property name="url" value="http://alcme.oclc.org/srw/search/lcnaf"/>
+        <property name="url" value="${lcname.url}"/>
         <property name="sourceIdentifier" value="lcname"/>
     </bean>
 </beans>

@@ -30,7 +30,7 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.content.DCPersonName;
 import org.dspace.external.model.ExternalDataObject;
 import org.dspace.external.provider.ExternalDataProvider;
-import org.dspace.mock.MockMetadataValue;
+import org.dspace.mock.MetadataValueDTO;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -316,17 +316,17 @@ public class LCNameDataProvider implements ExternalDataProvider {
                     String givenName = names.length > 1 ? names[1] : null;
                     if (StringUtils.isNotBlank(familyName)) {
                         externalDataObject
-                            .addMetadata(new MockMetadataValue("person", "familyName", null, null, familyName));
+                            .addMetadata(new MetadataValueDTO("person", "familyName", null, null, familyName));
                     }
                     if (StringUtils.isNotBlank(givenName)) {
                         externalDataObject
-                            .addMetadata(new MockMetadataValue("person", "givenName", null, null, givenName));
+                            .addMetadata(new MetadataValueDTO("person", "givenName", null, null, givenName));
                     }
                     if (StringUtils.isNotBlank(birthDate)) {
                         externalDataObject
-                            .addMetadata(new MockMetadataValue("person", "date", "birth", null, birthDate));
+                            .addMetadata(new MetadataValueDTO("person", "date", "birth", null, birthDate));
                     }
-                    externalDataObject.addMetadata(new MockMetadataValue("person", "identifier", "lccn", null, lccn));
+                    externalDataObject.addMetadata(new MetadataValueDTO("person", "identifier", "lccn", null, lccn));
                     result.add(externalDataObject);
                 } else {
                     log.warn("Got anomalous result, at least one of these null: lccn=" + lccn + ", name=" + name);

@@ -38,7 +38,7 @@ import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
-import org.dspace.mock.MockMetadataValue;
+import org.dspace.mock.MetadataValueDTO;
 import org.jdom.Element;
 import org.jdom.Namespace;
 
@@ -196,7 +196,7 @@ public class AIPTechMDCrosswalk implements IngestionCrosswalk, DisseminationCros
     public Element disseminateElement(Context context, DSpaceObject dso)
         throws CrosswalkException, IOException, SQLException,
         AuthorizeException {
-        List<MockMetadataValue> dc = new ArrayList<>();
+        List<MetadataValueDTO> dc = new ArrayList<>();
         if (dso.getType() == Constants.ITEM) {
             Item item = (Item) dso;
             EPerson is = item.getSubmitter();
@@ -283,8 +283,8 @@ public class AIPTechMDCrosswalk implements IngestionCrosswalk, DisseminationCros
         return XSLTDisseminationCrosswalk.createDIM(dso, dc);
     }
 
-    private static MockMetadataValue makeDC(String element, String qualifier, String value) {
-        MockMetadataValue dcv = new MockMetadataValue();
+    private static MetadataValueDTO makeDC(String element, String qualifier, String value) {
+        MetadataValueDTO dcv = new MetadataValueDTO();
         dcv.setSchema("dc");
         dcv.setLanguage(null);
         dcv.setElement(element);
