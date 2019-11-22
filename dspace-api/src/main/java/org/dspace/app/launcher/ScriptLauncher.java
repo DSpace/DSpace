@@ -85,10 +85,9 @@ public class ScriptLauncher {
         }
 
         // Look up command in the configuration, and execute.
-        Integer status;
 
         CommandLineDSpaceRunnableHandler commandLineDSpaceRunnableHandler = new CommandLineDSpaceRunnableHandler();
-        status = handleScript(args, commandConfigs, commandLineDSpaceRunnableHandler, kernelImpl);
+        int status = handleScript(args, commandConfigs, commandLineDSpaceRunnableHandler, kernelImpl);
 
         // Destroy the service kernel if it is still alive
         if (kernelImpl != null) {
