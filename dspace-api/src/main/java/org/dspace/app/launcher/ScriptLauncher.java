@@ -13,9 +13,16 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.TreeMap;
 
+import org.apache.commons.cli.ParseException;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
+import org.dspace.scripts.DSpaceRunnable;
+import org.dspace.scripts.handler.DSpaceRunnableHandler;
+import org.dspace.scripts.handler.impl.CommandLineDSpaceRunnableHandler;
 import org.dspace.servicemanager.DSpaceKernelImpl;
 import org.dspace.servicemanager.DSpaceKernelInit;
 import org.dspace.services.RequestService;
+import org.dspace.utils.DSpace;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
@@ -27,6 +34,9 @@ import org.jdom.input.SAXBuilder;
  * @author Mark Diggory
  */
 public class ScriptLauncher {
+
+    private static final Logger log = Logger.getLogger(ScriptLauncher.class);
+
     /**
      * The service manager kernel
      */
@@ -76,8 +86,10 @@ public class ScriptLauncher {
         }
 
         // Look up command in the configuration, and execute.
-        int status;
-        status = runOneCommand(commandConfigs, args);
+        Integer status;
+
+        CommandLineDSpaceRunnableHandler commandLineDSpaceRunnableHandler = new CommandLineDSpaceRunnableHandler();
+        status = handleScript(args, commandConfigs, commandLineDSpaceRunnableHandler, kernelImpl);
 
         // Destroy the service kernel if it is still alive
         if (kernelImpl != null) {
@@ -86,6 +98,39 @@ public class ScriptLauncher {
         }
 
         System.exit(status);
+
+    }
+
+    public static Integer handleScript(String[] args, Document commandConfigs,
+                                       DSpaceRunnableHandler dSpaceRunnableHandler,
+                                       DSpaceKernelImpl kernelImpl) {
+        Integer status;
+        status = runDSpaceScriptWithArgs(args, dSpaceRunnableHandler);
+        if (status == null) {
+            status = runOneCommand(commandConfigs, args, kernelImpl);
+        }
+        return status;
+    }
+
+    private static Integer runDSpaceScriptWithArgs(String[] args, DSpaceRunnableHandler dSpaceRunnableHandler) {
+        List<DSpaceRunnable> scripts = new DSpace().getServiceManager().getServicesByType(DSpaceRunnable.class);
+        String command = args[0];
+        for (DSpaceRunnable script : scripts) {
+            if (StringUtils.equalsIgnoreCase(script.getName(), command)) {
+                try {
+                    script.initialize(args, dSpaceRunnableHandler);
+                    script.run();
+                    return 0;
+                } catch (ParseException e) {
+                    script.printHelp();
+                    log.error(e.getMessage(), e);
+                    System.out.println(e.getMessage());
+                    e.printStackTrace();
+                    return 1;
+                }
+            }
+        }
+        return null;
     }
 
     protected static int runOneCommand(Document commandConfigs, String[] args) {
@@ -98,7 +143,7 @@ public class ScriptLauncher {
      * @param commandConfigs  Document
      * @param args the command line arguments given
      */
-    public static int runOneCommand(Document commandConfigs, String[] args, DSpaceKernelImpl kernelImpl) {
+    protected static int runOneCommand(Document commandConfigs, String[] args, DSpaceKernelImpl kernelImpl) {
         String request = args[0];
         Element root = commandConfigs.getRootElement();
         List<Element> commands = root.getChildren("command");
