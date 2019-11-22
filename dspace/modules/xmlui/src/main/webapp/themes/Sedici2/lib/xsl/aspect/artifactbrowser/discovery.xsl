@@ -494,7 +494,7 @@
 							<xsl:when test="dri:list[starts-with(@n,concat($handle, ':sedici.creator.')) and descendant::text()]">
 								<xsl:for-each select="dri:list[starts-with(@n,concat($handle, ':sedici.creator.'))]/dri:item">
 									<xsl:value-of select="."/>
-									<xsl:if test="count(following-sibling::node()) != 0">
+									<xsl:if test="(count(following::dri:list[starts-with(@n, concat($handle, ':sedici.creator.'))]) + count(following-sibling::node())) != 0">
 										<xsl:text>; </xsl:text>
 									</xsl:if>
 								</xsl:for-each>
