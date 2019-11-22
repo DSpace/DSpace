@@ -7,6 +7,9 @@
  */
 package org.dspace.scripts.service;
 
+import java.util.List;
+
+import org.dspace.core.Context;
 import org.dspace.scripts.DSpaceRunnable;
 
 /**
@@ -20,4 +23,11 @@ public interface ScriptService {
      * @return      The matching DSpaceRunnable script
      */
     DSpaceRunnable getScriptForName(String name);
+
+    /**
+     * This method will return a list of DSpaceRunnable objects for which the given Context is authorized to use them
+     * @param context   The relevant DSpace context
+     * @return          The list of accessible DSpaceRunnable scripts for this context
+     */
+    List<DSpaceRunnable> getDSpaceRunnables(Context context);
 }

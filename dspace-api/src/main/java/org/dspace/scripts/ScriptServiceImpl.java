@@ -8,8 +8,10 @@
 package org.dspace.scripts;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+import org.dspace.core.Context;
 import org.dspace.scripts.service.ScriptService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -27,5 +29,11 @@ public class ScriptServiceImpl implements ScriptService {
                               .filter(dSpaceRunnable -> StringUtils.equalsIgnoreCase(dSpaceRunnable.getName(), name))
                               .findFirst()
                               .orElse(null);
+    }
+
+    @Override
+    public List<DSpaceRunnable> getDSpaceRunnables(Context context) {
+        return dSpaceRunnables.stream().filter(
+            dSpaceRunnable -> dSpaceRunnable.isAllowedToExecute(context)).collect(Collectors.toList());
     }
 }
