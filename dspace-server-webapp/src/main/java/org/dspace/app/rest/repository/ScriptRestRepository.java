@@ -35,6 +35,7 @@ import org.dspace.core.Context;
 import org.dspace.scripts.DSpaceCommandLineParameter;
 import org.dspace.scripts.DSpaceRunnable;
 import org.dspace.scripts.service.ProcessService;
+import org.dspace.scripts.service.ScriptService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -50,9 +51,6 @@ public class ScriptRestRepository extends DSpaceRestRepository<ScriptRest, Strin
     private static final Logger log = LogManager.getLogger();
 
     @Autowired
-    private List<DSpaceRunnable> dspaceRunnables;
-
-    @Autowired
     private ScriptConverter scriptConverter;
 
     @Autowired
@@ -62,17 +60,21 @@ public class ScriptRestRepository extends DSpaceRestRepository<ScriptRest, Strin
     private ProcessConverter processConverter;
 
     @Autowired
+    private ScriptService scriptService;
+
+    @Autowired
     private DSpaceRunnableParameterConverter dSpaceRunnableParameterConverter;
+
 
     @Override
     public ScriptRest findOne(Context context, String name) {
-        for (DSpaceRunnable dSpaceRunnable : dspaceRunnables) {
-            if (StringUtils.equalsIgnoreCase(dSpaceRunnable.getName(), name)) {
-                if (dSpaceRunnable.isAllowedToExecute(context)) {
-                    return scriptConverter.fromModel(dSpaceRunnable);
-                } else {
-                    throw new AccessDeniedException("The current user was not authorized to access this script");
-                }
+
+        DSpaceRunnable dSpaceRunnable = scriptService.getScriptForName(name);
+        if (dSpaceRunnable != null) {
+            if (dSpaceRunnable.isAllowedToExecute(context)) {
+                return scriptConverter.fromModel(dSpaceRunnable);
+            } else {
+                throw new AccessDeniedException("The current user was not authorized to access this script");
             }
         }
         throw new DSpaceBadRequestException("The script with name: " + name + " could not be found");
@@ -80,9 +82,8 @@ public class ScriptRestRepository extends DSpaceRestRepository<ScriptRest, Strin
 
     @Override
     public Page<ScriptRest> findAll(Context context, Pageable pageable) {
-        return utils.getPage(dspaceRunnables.stream().filter(
-            dSpaceRunnable -> dSpaceRunnable.isAllowedToExecute(context)).collect(Collectors.toList()), pageable)
-                    .map(scriptConverter);
+        List<DSpaceRunnable> dSpaceRunnables = scriptService.getDSpaceRunnables(context);
+        return utils.getPage(dSpaceRunnables, pageable).map(scriptConverter);
     }
 
     @Override
@@ -108,7 +109,7 @@ public class ScriptRestRepository extends DSpaceRestRepository<ScriptRest, Strin
         String properties = requestService.getCurrentRequest().getServletRequest().getParameter("properties");
         List<DSpaceCommandLineParameter> dSpaceCommandLineParameters =
             processPropertiesToDSpaceCommandLineParameters(properties);
-        DSpaceRunnable scriptToExecute = getdSpaceRunnableForName(scriptName);
+        DSpaceRunnable scriptToExecute = scriptService.getScriptForName(scriptName);
         if (scriptToExecute == null) {
             throw new DSpaceBadRequestException("The script for name: " + scriptName + " wasn't found");
         }
@@ -143,17 +144,6 @@ public class ScriptRestRepository extends DSpaceRestRepository<ScriptRest, Strin
             parameterValueRestList.stream().map(x -> dSpaceRunnableParameterConverter.toModel(x))
                                   .collect(Collectors.toList()));
         return dSpaceCommandLineParameters;
-    }
-
-    private DSpaceRunnable getdSpaceRunnableForName(String scriptName) {
-        DSpaceRunnable scriptToExecute = null;
-        for (DSpaceRunnable script : dspaceRunnables) {
-            if (StringUtils.equalsIgnoreCase(script.getName(), scriptName)) {
-                scriptToExecute = script;
-                break;
-            }
-        }
-        return scriptToExecute;
     }
 
     private List<String> constructArgs(List<DSpaceCommandLineParameter> dSpaceCommandLineParameters) {
