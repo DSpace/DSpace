@@ -51,9 +51,6 @@ public class ScriptRestRepository extends DSpaceRestRepository<ScriptRest, Strin
     private static final Logger log = LogManager.getLogger();
 
     @Autowired
-    private List<DSpaceRunnable> dspaceRunnables;
-
-    @Autowired
     private ScriptConverter scriptConverter;
 
     @Autowired
@@ -73,7 +70,7 @@ public class ScriptRestRepository extends DSpaceRestRepository<ScriptRest, Strin
     public ScriptRest findOne(Context context, String name) {
 
         DSpaceRunnable dSpaceRunnable = scriptService.getScriptForName(name);
-        if (dspaceRunnables != null) {
+        if (dSpaceRunnable != null) {
             if (dSpaceRunnable.isAllowedToExecute(context)) {
                 return scriptConverter.fromModel(dSpaceRunnable);
             } else {
@@ -85,9 +82,8 @@ public class ScriptRestRepository extends DSpaceRestRepository<ScriptRest, Strin
 
     @Override
     public Page<ScriptRest> findAll(Context context, Pageable pageable) {
-        return utils.getPage(dspaceRunnables.stream().filter(
-            dSpaceRunnable -> dSpaceRunnable.isAllowedToExecute(context)).collect(Collectors.toList()), pageable)
-                    .map(scriptConverter);
+        List<DSpaceRunnable> dSpaceRunnables = scriptService.getDSpaceRunnables(context);
+        return utils.getPage(dSpaceRunnables, pageable).map(scriptConverter);
     }
 
     @Override
