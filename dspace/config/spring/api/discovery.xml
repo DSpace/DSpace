@@ -663,6 +663,9 @@
             <list>
                 <ref bean="searchFilterSubject"/>
                 <ref bean="searchFilterIdentifier"/>
+                <ref bean="searchFilterIsOrgUnitOfProjectRelation"/>
+                <ref bean="searchFilterIsPersonOfProjectRelation"/>
+                <ref bean="searchFilterIsPublicationOfProjectRelation"/>
             </list>
         </property>
         <!--The sort filters for the discovery search-->
@@ -1579,6 +1582,42 @@
                 <value>placeholder.placeholder.placeholder</value>
             </list>
         </property>
+    </bean>
+
+    <bean id="searchFilterIsOrgUnitOfProjectRelation" class="org.dspace.discovery.configuration.DiscoverySearchFilter">
+
+        <property name="indexFieldName" value="isOrgUnitOfProject"/>
+        <property name="metadataFields">
+            <list>
+                <value>relation.isOrgUnitOfProject</value>
+            </list>
+        </property>
+        <property name="isOpenByDefault" value="false"/>
+        <property name="pageSize" value="10"/>
+    </bean>
+
+    <bean id="searchFilterIsPersonOfProjectRelation" class="org.dspace.discovery.configuration.DiscoverySearchFilter">
+
+        <property name="indexFieldName" value="isPersonOfProject"/>
+        <property name="metadataFields">
+            <list>
+                <value>relation.isPersonOfProject</value>
+            </list>
+        </property>
+        <property name="isOpenByDefault" value="false"/>
+        <property name="pageSize" value="10"/>
+    </bean>
+
+    <bean id="searchFilterIsPublicationOfProjectRelation" class="org.dspace.discovery.configuration.DiscoverySearchFilter">
+
+        <property name="indexFieldName" value="isPublicationOfProject"/>
+        <property name="metadataFields">
+            <list>
+                <value>relation.isPublicationOfProject</value>
+            </list>
+        </property>
+        <property name="isOpenByDefault" value="false"/>
+        <property name="pageSize" value="10"/>
     </bean>
 
     <!--Sort properties-->
