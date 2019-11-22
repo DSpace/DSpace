@@ -538,7 +538,7 @@ public class OAIHarvester {
 
     		// FIXME: check for null pointer if for some odd reason we don't have a matching hi
 			log.debug("Context: " + ourContext);
-			log.debug("Context: " + item.getCollections().get(0));
+			log.debug("Collection: " + (item.getCollections().isEmpty() ? "ingen collection tilknyttet" : item.getCollections().get(0).getName()));
     		hi = harvestedItemService.find(ourContext, item);
 			log.debug("HarvestedItem found. " + hi.getOaiID());
     		// Compare last-harvest on the item versus the last time the item was updated on the OAI provider side
