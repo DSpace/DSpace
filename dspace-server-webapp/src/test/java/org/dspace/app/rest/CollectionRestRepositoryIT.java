@@ -27,6 +27,7 @@ import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.matcher.CollectionMatcher;
 import org.dspace.app.rest.matcher.MetadataMatcher;
+import org.dspace.app.rest.matcher.PageMatcher;
 import org.dspace.app.rest.model.CollectionRest;
 import org.dspace.app.rest.model.MetadataRest;
 import org.dspace.app.rest.model.MetadataValueRest;
@@ -855,5 +856,40 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                                          .contentType(contentType))
                             .andExpect(status().isBadRequest());
 
+    }
+
+
+    @Test
+    public void findAllCollectionsWithMultilanguageTitlesTest() throws Exception {
+
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Community child2 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community Two")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                                           .withNameForLanguage("Collection 1", "en")
+                                           .withNameForLanguage("Col 1", "fr")
+                                           .withNameForLanguage("Coll 1", "de")
+                                           .build();
+        Collection col2 = CollectionBuilder.createCollection(context, child2).withName("Collection 2").build();
+
+
+        getClient().perform(get("/api/core/collections"))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
+                       CollectionMatcher.matchCollectionEntry(col1.getName(), col1.getID(), col1.getHandle()),
+                       CollectionMatcher.matchCollectionEntry(col2.getName(), col2.getID(), col2.getHandle())
+                   )))
+                   .andExpect(jsonPath("$.page", PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 2)));
     }
 }
