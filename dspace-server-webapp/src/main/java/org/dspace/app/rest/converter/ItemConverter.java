@@ -7,16 +7,14 @@
  */
 package org.dspace.app.rest.converter;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.Logger;
-import org.dspace.app.rest.model.BitstreamRest;
+import org.dspace.app.rest.model.BundleRest;
 import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.MetadataValueList;
 import org.dspace.app.rest.projection.Projection;
-import org.dspace.content.Bitstream;
-import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
@@ -59,13 +57,11 @@ public class ItemConverter
         if (templateItemOf != null) {
             item.setTemplateItemOf(converter.toRest(templateItemOf, projection));
         }
-        List<BitstreamRest> bitstreams = new ArrayList<>();
-        for (Bundle bun : obj.getBundles()) {
-            for (Bitstream bit : bun.getBitstreams()) {
-                bitstreams.add(converter.toRest(bit, projection));
-            }
-        }
-        item.setBitstreams(bitstreams);
+
+        item.setBundles(obj.getBundles()
+                            .stream()
+                            .map(x -> (BundleRest) converter.toRest(x, projection))
+                            .collect(Collectors.toList()));
 
         List<MetadataValue> fullList = itemService.getMetadata(obj, Item.ANY, Item.ANY, Item.ANY, Item.ANY, true);
         MetadataValueList metadataValues = new MetadataValueList(fullList);

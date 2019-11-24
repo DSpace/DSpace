@@ -16,15 +16,20 @@ import java.util.List;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
+import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.model.BitstreamRest;
+import org.dspace.app.rest.model.BundleRest;
 import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.repository.patch.DSpaceObjectPatch;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Bitstream;
+import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.BundleService;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.core.Context;
@@ -47,6 +52,12 @@ import org.springframework.stereotype.Component;
 public class BitstreamRestRepository extends DSpaceObjectRestRepository<Bitstream, BitstreamRest> {
 
     private final BitstreamService bs;
+
+    @Autowired
+    BundleService bundleService;
+
+    @Autowired
+    AuthorizeService authorizeService;
 
     @Autowired
     private CollectionService collectionService;
@@ -163,5 +174,25 @@ public class BitstreamRestRepository extends DSpaceObjectRestRepository<Bitstrea
         }
         context.abort();
         return is;
+    }
+
+    /**
+     * Method that will move the bitsream corresponding to the uuid to the target bundle
+     *
+     * @param context      The context
+     * @param bitstream    The bitstream to be moved
+     * @param targetBundle The target bundle
+     * @return The target bundle with the bitstream attached
+     */
+    public BundleRest performBitstreamMove(Context context, Bitstream bitstream, Bundle targetBundle)
+            throws SQLException, IOException, AuthorizeException {
+
+        if (bitstream.getBundles().contains(targetBundle)) {
+            throw new DSpaceBadRequestException("The provided bitstream is already in the target bundle");
+        }
+
+        bundleService.moveBitstreamToBundle(context, targetBundle, bitstream);
+
+        return converter.toRest(targetBundle, utils.obtainProjection());
     }
 }

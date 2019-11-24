@@ -24,14 +24,17 @@ import org.dspace.app.rest.converter.MetadataConverter;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
+import org.dspace.app.rest.model.BundleRest;
 import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.repository.patch.ItemPatch;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.content.service.BundleService;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
@@ -63,6 +66,9 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
 
     @Autowired
     ItemPatch itemPatch;
+
+    @Autowired
+    BundleService bundleService;
 
     @Autowired
     WorkspaceItemService workspaceItemService;
@@ -121,7 +127,7 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
 
     @Override
     protected void updateDSpaceObject(Item item, ItemRest itemRest)
-            throws AuthorizeException, SQLException  {
+            throws AuthorizeException, SQLException {
         super.updateDSpaceObject(item, itemRest);
 
         Context context = obtainContext();
@@ -151,15 +157,15 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
             item = is.find(context, id);
             if (item == null) {
                 throw new ResourceNotFoundException(ItemRest.CATEGORY + "." + ItemRest.NAME +
-                                                        " with id: " + id + " not found");
+                                                            " with id: " + id + " not found");
             }
             if (is.isInProgressSubmission(context, item)) {
                 throw new UnprocessableEntityException("The item cannot be deleted. "
-                        + "It's part of a in-progress submission.");
+                                                               + "It's part of a in-progress submission.");
             }
             if (item.getTemplateItemOf() != null) {
                 throw new UnprocessableEntityException("The item cannot be deleted. "
-                        + "It's a template for a collection");
+                                                               + "It's a template for a collection");
             }
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
@@ -192,7 +198,7 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
         Collection collection = collectionService.find(context, owningCollectionUuid);
         if (collection == null) {
             throw new DSpaceBadRequestException("The given owningCollection parameter is invalid: "
-                                              + owningCollectionUuid);
+                                                        + owningCollectionUuid);
         }
         WorkspaceItem workspaceItem = workspaceItemService.create(context, collection, false);
         Item item = workspaceItem.getItem();
@@ -208,7 +214,7 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
     }
 
     @Override
-    @PreAuthorize("hasPermission(#id, 'ITEM', 'WRITE')")
+    @PreAuthorize("hasPermission(#uuid, 'ITEM', 'WRITE')")
     protected ItemRest put(Context context, HttpServletRequest request, String apiCategory, String model, UUID uuid,
                            JsonNode jsonNode)
             throws RepositoryMethodNotImplementedException, SQLException, AuthorizeException {
@@ -230,9 +236,34 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
             metadataConverter.setMetadata(context, item, itemRest.getMetadata());
         } else {
             throw new IllegalArgumentException("The UUID in the Json and the UUID in the url do not match: "
-                                                   + uuid + ", "
-                                                   + itemRest.getId());
+                                                       + uuid + ", "
+                                                       + itemRest.getId());
         }
         return converter.toRest(item, Projection.DEFAULT);
+    }
+
+    /**
+     * Method to add a bundle to an item
+     *
+     * @param context    The context
+     * @param item       The item to which the bundle has to be added
+     * @param bundleRest The bundleRest that needs to be added to the item
+     * @return The added bundle
+     */
+    public Bundle addBundleToItem(Context context, Item item, BundleRest bundleRest)
+            throws SQLException, AuthorizeException {
+        if (item.getBundles(bundleRest.getName()).size() > 0) {
+            throw new DSpaceBadRequestException("The bundle name already exists in the item");
+        }
+
+        Bundle bundle = bundleService.create(context, item, bundleRest.getName());
+
+        metadataConverter.setMetadata(context, bundle, bundleRest.getMetadata());
+        bundle.setName(context, bundleRest.getName());
+
+        context.commit();
+
+        return bundle;
+
     }
 }

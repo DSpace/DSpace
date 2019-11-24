@@ -28,6 +28,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 })
 public class ItemRest extends DSpaceObjectRest {
     public static final String NAME = "item";
+    public static final String PLURAL_NAME = "items";
     public static final String CATEGORY = RestAddressableModel.CORE;
     public static final String RELATIONSHIPS = "relationships";
     private boolean inArchive = false;
@@ -38,7 +39,8 @@ public class ItemRest extends DSpaceObjectRest {
     private CollectionRest owningCollection;
     @JsonIgnore
     private CollectionRest templateItemOf;
-    List<BitstreamRest> bitstreams;
+
+    List<BundleRest> bundles;
 
     @Override
     public String getCategory() {
@@ -99,13 +101,13 @@ public class ItemRest extends DSpaceObjectRest {
         this.templateItemOf = templateItemOf;
     }
 
-    @LinkRest(linkClass = BitstreamRest.class)
+    @LinkRest(linkClass = BundleRest.class)
     @JsonIgnore
-    public List<BitstreamRest> getBitstreams() {
-        return bitstreams;
+    public List<BundleRest> getBundles() {
+        return bundles;
     }
 
-    public void setBitstreams(List<BitstreamRest> bitstreams) {
-        this.bitstreams = bitstreams;
+    public void setBundles(List<BundleRest> bundles) {
+        this.bundles = bundles;
     }
 }

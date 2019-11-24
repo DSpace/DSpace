@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest;
 
+import static org.dspace.app.rest.utils.RegexUtils.REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID;
 import static org.dspace.core.Constants.COLLECTION;
 
 import java.io.IOException;
@@ -46,9 +47,7 @@ import org.springframework.web.bind.annotation.RestController;
  * This class will typically receive a UUID that resolves to an Item and it'll perform logic on its collections
  */
 @RestController
-@RequestMapping("/api/core/items/" +
-        "{uuid:[0-9a-fxA-FX]{8}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{12}}" +
-        "/mappedCollections")
+@RequestMapping("/api/core/items" + REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID + "/mappedCollections")
 public class MappedCollectionRestController {
 
     private static final Logger log = Logger.getLogger(MappedCollectionRestController.class);

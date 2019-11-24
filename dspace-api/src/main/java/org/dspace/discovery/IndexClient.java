@@ -13,11 +13,8 @@ import java.util.Iterator;
 import java.util.UUID;
 
 import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
-import org.apache.commons.cli.PosixParser;
-import org.apache.logging.log4j.Logger;
+import org.apache.commons.cli.ParseException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
@@ -26,103 +23,26 @@ import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.handle.factory.HandleServiceFactory;
-import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.scripts.DSpaceRunnable;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Class used to reindex dspace communities/collections/items into discovery
- *
- * @author Kevin Van de Velde (kevin at atmire dot com)
- * @author Mark Diggory (markd at atmire dot com)
- * @author Ben Bosman (ben at atmire dot com)
  */
-public class IndexClient {
+public class IndexClient extends DSpaceRunnable {
 
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(IndexClient.class);
+    private Context context;
 
-    /**
-     * Default constructor
-     */
-    private IndexClient() { }
+    @Autowired
+    private IndexingService indexer;
 
-    /**
-     * When invoked as a command-line tool, creates, updates, removes content
-     * from the whole index
-     *
-     * @param args the command-line arguments, none used
-     * @throws SQLException           An exception that provides information on a database access error or other errors.
-     * @throws IOException            A general class of exceptions produced by failed or interrupted I/O operations.
-     * @throws SearchServiceException if something went wrong with querying the solr server
-     */
-    public static void main(String[] args) throws SQLException, IOException, SearchServiceException {
+    private IndexClientOptions indexClientOptions;
 
-        Context context = new Context(Context.Mode.READ_ONLY);
-        context.turnOffAuthorisationSystem();
-
-        String usage = "org.dspace.discovery.IndexClient [-cbhf] | [-r <handle>] | [-i <handle>] or nothing to " +
-                "update/clean an existing index.";
-        Options options = new Options();
-        HelpFormatter formatter = new HelpFormatter();
-        CommandLine line = null;
-
-        options.addOption(OptionBuilder
-                              .withArgName("handle to remove")
-                              .hasArg(true)
-                              .withDescription(
-                                  "remove an Item, Collection or Community from index based on its handle")
-                              .create("r"));
-
-        options.addOption(OptionBuilder
-                              .withArgName("handle or uuid to add or update")
-                              .hasArg(true)
-                              .withDescription(
-                                  "add or update an Item, Collection or Community based on its handle or uuid")
-                              .create("i"));
-
-        options.addOption(OptionBuilder
-                              .isRequired(false)
-                              .withDescription(
-                                  "clean existing index removing any documents that no longer exist in the db")
-                              .create("c"));
-
-        options.addOption(OptionBuilder
-                              .isRequired(false)
-                              .withDescription(
-                                  "(re)build index, wiping out current one if it exists")
-                              .create("b"));
-
-        options.addOption(OptionBuilder
-                              .isRequired(false)
-                              .withDescription(
-                                  "Rebuild the spellchecker, can be combined with -b and -f.")
-                              .create("s"));
-
-        options.addOption(OptionBuilder
-                              .isRequired(false)
-                              .withDescription(
-                                  "if updating existing index, force each handle to be reindexed even if uptodate")
-                              .create("f"));
-
-        options.addOption(OptionBuilder
-                              .isRequired(false)
-                              .withDescription(
-                                  "print this help message")
-                              .create("h"));
-
-        options.addOption(OptionBuilder.isRequired(false).withDescription(
-            "optimize search core").create("o"));
-
-        try {
-            line = new PosixParser().parse(options, args);
-        } catch (Exception e) {
-            // automatically generate the help statement
-            formatter.printHelp(usage, e.getMessage(), options, "");
-            System.exit(1);
-        }
-
-        if (line.hasOption("h")) {
-            // automatically generate the help statement
-            formatter.printHelp(usage, options);
-            System.exit(1);
+    @Override
+    public void internalRun() throws Exception {
+        if (indexClientOptions == IndexClientOptions.HELP) {
+            printHelp();
+            return;
         }
 
         /** Acquire from dspace-services in future */
@@ -130,28 +50,29 @@ public class IndexClient {
          * new DSpace.getServiceManager().getServiceByName("org.dspace.discovery.SolrIndexer");
          */
 
-        IndexingService indexer = DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName(
-            IndexingService.class.getName(),
-            IndexingService.class
-        );
-
-        if (line.hasOption("r")) {
-            log.info("Removing " + line.getOptionValue("r") + " from Index");
-            indexer.unIndexContent(context, line.getOptionValue("r"));
-        } else if (line.hasOption("c")) {
-            log.info("Cleaning Index");
-            indexer.cleanIndex(line.hasOption("f"));
-        } else if (line.hasOption("b")) {
-            log.info("(Re)building index from scratch.");
+        if (indexClientOptions == IndexClientOptions.REMOVE) {
+            handler.logInfo("Removing " + commandLine.getOptionValue("r") + " from Index");
+            indexer.unIndexContent(context, commandLine.getOptionValue("r"));
+        } else if (indexClientOptions == IndexClientOptions.CLEAN) {
+            handler.logInfo("Cleaning Index");
+            indexer.cleanIndex(false);
+        } else if (indexClientOptions == IndexClientOptions.FORCECLEAN) {
+            handler.logInfo("Cleaning Index");
+            indexer.cleanIndex(true);
+        } else if (indexClientOptions == IndexClientOptions.BUILD ||
+            indexClientOptions == IndexClientOptions.BUILDANDSPELLCHECK) {
+            handler.logInfo("(Re)building index from scratch.");
             indexer.createIndex(context);
-            checkRebuildSpellCheck(line, indexer);
-        } else if (line.hasOption("o")) {
-            log.info("Optimizing search core.");
+            if (indexClientOptions == IndexClientOptions.BUILDANDSPELLCHECK) {
+                checkRebuildSpellCheck(commandLine, indexer);
+            }
+        } else if (indexClientOptions == IndexClientOptions.OPTIMIZE) {
+            handler.logInfo("Optimizing search core.");
             indexer.optimize();
-        } else if (line.hasOption('s')) {
-            checkRebuildSpellCheck(line, indexer);
-        } else if (line.hasOption('i')) {
-            final String param = line.getOptionValue('i');
+        } else if (indexClientOptions == IndexClientOptions.SPELLCHECK) {
+            checkRebuildSpellCheck(commandLine, indexer);
+        } else if (indexClientOptions == IndexClientOptions.INDEX) {
+            final String param = commandLine.getOptionValue('i');
             UUID uuid = null;
             try {
                 uuid = UUID.fromString(param);
@@ -171,24 +92,55 @@ public class IndexClient {
                 }
             } else {
                 dso = (IndexableObject) HandleServiceFactory.getInstance()
-                                .getHandleService().resolveToObject(context, param);
+                                                            .getHandleService().resolveToObject(context, param);
             }
             if (dso == null) {
                 throw new IllegalArgumentException("Cannot resolve " + param + " to a DSpace object");
             }
-            log.info("Indexing " + param + " force " + line.hasOption("f"));
+            handler.logInfo("Indexing " + param + " force " + commandLine.hasOption("f"));
             final long startTimeMillis = System.currentTimeMillis();
-            final long count = indexAll(indexer, ContentServiceFactory.getInstance().getItemService(), context, dso);
+            final long count = indexAll(indexer, ContentServiceFactory.getInstance().getItemService(), context,
+                                        dso);
             final long seconds = (System.currentTimeMillis() - startTimeMillis) / 1000;
-            log.info("Indexed " + count + " object" + (count > 1 ? "s" : "") + " in " + seconds + " seconds");
-        } else {
-            log.info("Updating and Cleaning Index");
-            indexer.cleanIndex(line.hasOption("f"));
-            indexer.updateIndex(context, line.hasOption("f"));
-            checkRebuildSpellCheck(line, indexer);
+            handler.logInfo("Indexed " + count + " object" + (count > 1 ? "s" : "") + " in " + seconds + " seconds");
+        } else if (indexClientOptions == IndexClientOptions.UPDATE ||
+            indexClientOptions == IndexClientOptions.UPDATEANDSPELLCHECK) {
+            handler.logInfo("Updating and Cleaning Index");
+            indexer.cleanIndex(false);
+            indexer.updateIndex(context, false);
+            if (indexClientOptions == IndexClientOptions.UPDATEANDSPELLCHECK) {
+                checkRebuildSpellCheck(commandLine, indexer);
+            }
+        } else if (indexClientOptions == IndexClientOptions.FORCEUPDATE ||
+            indexClientOptions == IndexClientOptions.FORCEUPDATEANDSPELLCHECK) {
+            handler.logInfo("Updating and Cleaning Index");
+            indexer.cleanIndex(true);
+            indexer.updateIndex(context, true);
+            if (indexClientOptions == IndexClientOptions.FORCEUPDATEANDSPELLCHECK) {
+                checkRebuildSpellCheck(commandLine, indexer);
+            }
         }
 
-        log.info("Done with indexing");
+        handler.logInfo("Done with indexing");
+    }
+
+    public void setup() throws ParseException {
+        try {
+            context = new Context(Context.Mode.READ_ONLY);
+            context.turnOffAuthorisationSystem();
+        } catch (Exception e) {
+            throw new ParseException("Unable to create a new DSpace Context: " + e.getMessage());
+        }
+
+        indexClientOptions = IndexClientOptions.getIndexClientOption(commandLine);
+    }
+
+    /**
+     * Constructor for this class. This will ensure that the Options are created and set appropriately.
+     */
+    private IndexClient() {
+        Options options = IndexClientOptions.constructOptions();
+        this.options = options;
     }
 
     /**
@@ -273,13 +225,12 @@ public class IndexClient {
      * @param line    the command line options
      * @param indexer the solr indexer
      * @throws SearchServiceException in case of a solr exception
-     * @throws java.io.IOException passed through
+     * @throws IOException passed through
      */
-    protected static void checkRebuildSpellCheck(CommandLine line, IndexingService indexer)
+    protected void checkRebuildSpellCheck(CommandLine line, IndexingService indexer)
         throws SearchServiceException, IOException {
-        if (line.hasOption("s")) {
-            log.info("Rebuilding spell checker.");
-            indexer.buildSpellCheck();
-        }
+        handler.logInfo("Rebuilding spell checker.");
+        indexer.buildSpellCheck();
     }
+
 }

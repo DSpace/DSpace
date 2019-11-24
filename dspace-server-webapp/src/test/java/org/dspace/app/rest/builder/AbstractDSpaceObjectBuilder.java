@@ -7,9 +7,11 @@
  */
 package org.dspace.app.rest.builder;
 
+import java.sql.SQLException;
 import java.util.Date;
 
 import org.apache.logging.log4j.Logger;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
@@ -59,6 +61,19 @@ public abstract class AbstractDSpaceObjectBuilder<T extends DSpaceObject>
                                                                             final String value) {
         try {
             getService().addMetadata(context, dso, schema, element, qualifier, Item.ANY, value);
+        } catch (Exception e) {
+            return handleException(e);
+        }
+        return (B) this;
+    }
+
+    protected <B extends AbstractDSpaceObjectBuilder<T>> B addMetadataValue(final T dso, final String schema,
+                                                                            final String element,
+                                                                            final String qualifier,
+                                                                            final String language,
+                                                                            final String value) {
+        try {
+            getService().addMetadata(context, dso, schema, element, qualifier, language, value);
         } catch (Exception e) {
             return handleException(e);
         }
@@ -216,7 +231,7 @@ public abstract class AbstractDSpaceObjectBuilder<T extends DSpaceObject>
         return (B) this;
     }
 
-    public abstract T build();
+    public abstract T build() throws SQLException, AuthorizeException;
 
     public void delete(T dso) throws Exception {
 
