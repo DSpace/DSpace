@@ -576,7 +576,7 @@
 			</xsl:call-template>		
 		</xsl:variable>
 				
-		<fundingReference xmlns="http://namespace.openaire.eu/schema/oaire/">
+		<oaire:fundingReference>
 			<xsl:if test="$funder_name">
 				<funderName>
 					<xsl:value-of select="$funder_name"/>
@@ -594,7 +594,7 @@
 				<awardNumber><xsl:value-of select="$awardNumber"/></awardNumber>
 			</xsl:if>
 			<!--awardTitle>Open Access Infrastructure for Research in Europe 2020</awardTitle-->
-		</fundingReference>
+		</oaire:fundingReference>
    </xsl:template>
    
    <!-- 
@@ -705,7 +705,7 @@
             <xsl:with-param name="value" select="$dc_type" />
          </xsl:call-template>
       </xsl:variable>
-      <resourceType xmlns="http://namespace.openaire.eu/schema/oaire/">
+      <oaire:resourceType>
          <xsl:choose>
             <xsl:when test="$lc_dc_type = 'annotation' or $dc_type = 'http://purl.org/coar/resource_type/c_1162'">
                <xsl:attribute name="uri">
@@ -1071,7 +1071,7 @@
                <xsl:text>other</xsl:text>
             </xsl:otherwise>
          </xsl:choose>
-      </resourceType>
+      </oaire:resourceType>
    </xsl:template>
    
    
@@ -1186,14 +1186,14 @@
    <!-- licenseCondition -->
    <!--xsl:template match="doc:element[@name='dc']/doc:element[@name='rights']/doc:element/doc:element">
       <xsl:variable name="dc_right" select="doc:field[@name='value']/text()" />
-      <licenseCondition xmlns="http://namespace.openaire.eu/schema/oaire/">
+      <oaire:licenseCondition>
          <xsl:value-of select="$dc_right" />
-      </licenseCondition>
+      </oaire:licenseCondition>
    </xsl:template-->
    <!-- licenseCondition << dc.rights.uri -->
    <xsl:template match="doc:element[@name='dc']/doc:element[@name='rights']/doc:element[@name='uri']/doc:element">
       <xsl:variable name="dc_right_uri" select="doc:field[@name='value']/text()" />
-      <licenseCondition xmlns="http://namespace.openaire.eu/schema/oaire/">
+      <oaire:licenseCondition>
          <xsl:choose>
             <xsl:when test="contains($dc_right_uri, 'creativecommons.org')">
 			   <xsl:attribute name="startDate">
@@ -1232,7 +1232,7 @@
                <xsl:value-of select="$dc_right_uri" />
             </xsl:otherwise>
          </xsl:choose>
-      </licenseCondition>
+      </oaire:licenseCondition>
    </xsl:template>
    
    
@@ -1269,7 +1269,7 @@
    <xsl:template match="doc:element[@name='bundles']/doc:element[@name='bundle']" mode="bundle">
 	   <xsl:if test="doc:field[@name='name' and text()='ORIGINAL']">
 		   <xsl:for-each select="doc:element[@name='bitstreams']/doc:element[@name='bitstream']">
-			  <file xmlns="http://namespace.openaire.eu/schema/oaire/">
+			  <oaire:file>
 				 <xsl:attribute name="accessRightsURI">				 
 					<xsl:call-template name="coarrights_attribute_uri">
 						<xsl:with-param name="value" select="../../../../doc:element[@name='dc']/doc:element[@name='rights']/doc:element/doc:field[@name='value']/text()" />
@@ -1298,7 +1298,7 @@
 					 </xsl:choose>
 				   </xsl:attribute>
 				 <xsl:value-of select="doc:field[@name='url']" />
-			  </file>
+			  </oaire:file>
 		   </xsl:for-each>
        </xsl:if>
 	</xsl:template>
@@ -1307,39 +1307,39 @@
    <xsl:template match="doc:element[@name='degois']" mode="oaire">
       <!-- citationTitle -->
       <xsl:for-each select="doc:element[@name='publication']/doc:element[@name='title']/doc:element/doc:field[@name='value']">
-         <citationTitle xmlns="http://namespace.openaire.eu/schema/oaire/">
+         <oaire:citationTitle>
             <xsl:value-of select="." />
-         </citationTitle>
+         </oaire:citationTitle>
       </xsl:for-each>
       <!-- citationVolume -->
       <xsl:for-each select="doc:element[@name='publication']/doc:element[@name='volume']/doc:element/doc:field[@name='value']">
-         <citationVolume xmlns="http://namespace.openaire.eu/schema/oaire/">
+         <oaire:citationVolume>
             <xsl:value-of select="." />
-         </citationVolume>
+         </oaire:citationVolume>
       </xsl:for-each>
       <!-- citationIssue -->
       <xsl:for-each select="doc:element[@name='publication']/doc:element[@name='issue']/doc:element/doc:field[@name='value']">
-         <citationIssue xmlns="http://namespace.openaire.eu/schema/oaire/">
+         <oaire:citationIssue>
             <xsl:value-of select="." />
-         </citationIssue>
+         </oaire:citationIssue>
       </xsl:for-each>
       <!-- citationStartPage -->
       <xsl:for-each select="doc:element[@name='publication']/doc:element[@name='firstPage']/doc:element/doc:field[@name='value']">
-         <citationStartPage xmlns="http://namespace.openaire.eu/schema/oaire/">
+         <oaire:citationStartPage>
             <xsl:value-of select="." />
-         </citationStartPage>
+         </oaire:citationStartPage>
       </xsl:for-each>
       <!-- citationEndPage -->
       <xsl:for-each select="doc:element[@name='publication']/doc:element[@name='lastPage']/doc:element/doc:field[@name='value']">
-         <citationEndPage xmlns="http://namespace.openaire.eu/schema/oaire/">
+         <oaire:citationEndPage>
             <xsl:value-of select="." />
-         </citationEndPage>
+         </oaire:citationEndPage>
       </xsl:for-each>
       <!-- citationConferencePlace -->
       <xsl:for-each select="doc:element[@name='publication']/doc:element[@name='location']/doc:element/doc:field[@name='value']">
-         <citationConferencePlace xmlns="http://namespace.openaire.eu/schema/oaire/">
+         <oaire:citationConferencePlace>
             <xsl:value-of select="." />
-         </citationConferencePlace>
+         </oaire:citationConferencePlace>
       </xsl:for-each>
    </xsl:template>
    
@@ -1347,51 +1347,51 @@
    <xsl:template match="doc:element[@name='oaire']" mode="oaire">
       <!-- citationTitle -->
       <xsl:for-each select="doc:element[@name='citationTitle']/doc:element/doc:field[@name='value']">
-         <citationTitle xmlns="http://namespace.openaire.eu/schema/oaire/">
+         <oaire:citationTitle>
             <xsl:value-of select="." />
-         </citationTitle>
+         </oaire:citationTitle>
       </xsl:for-each>
 	  <!-- citationEdition -->
       <xsl:for-each select="doc:element[@name='citationEdition']/doc:element/doc:field[@name='value']">
-         <citationEdition xmlns="http://namespace.openaire.eu/schema/oaire/">
+         <oaire:citationEdition>
             <xsl:value-of select="." />
-         </citationEdition>
+         </oaire:citationEdition>
       </xsl:for-each>	  
       <!-- citationVolume -->
       <xsl:for-each select="doc:element[@name='citationVolume']/doc:element/doc:field[@name='value']">
-         <citationVolume xmlns="http://namespace.openaire.eu/schema/oaire/">
+         <oaire:citationVolume>
             <xsl:value-of select="." />
-         </citationVolume>
+         </oaire:citationVolume>
       </xsl:for-each>
       <!-- citationIssue -->
       <xsl:for-each select="doc:element[@name='citationIssue']/doc:element/doc:field[@name='value']">
-         <citationIssue xmlns="http://namespace.openaire.eu/schema/oaire/">
+         <oaire:citationIssue>
             <xsl:value-of select="." />
-         </citationIssue>
+         </oaire:citationIssue>
       </xsl:for-each>
       <!-- citationStartPage -->
       <xsl:for-each select="doc:element[@name='citationStartPage']/doc:element/doc:field[@name='value']">
-         <citationStartPage xmlns="http://namespace.openaire.eu/schema/oaire/">
+         <oaire:citationStartPage>
             <xsl:value-of select="." />
-         </citationStartPage>
+         </oaire:citationStartPage>
       </xsl:for-each>
       <!-- citationEndPage -->
       <xsl:for-each select="doc:element[@name='citationEndPage']/doc:element/doc:field[@name='value']">
-         <citationEndPage xmlns="http://namespace.openaire.eu/schema/oaire/">
+         <oaire:citationEndPage>
             <xsl:value-of select="." />
-         </citationEndPage>
+         </oaire:citationEndPage>
       </xsl:for-each>
       <!-- citationConferencePlace -->
       <xsl:for-each select="doc:element[@name='citationConferencePlace']/doc:element/doc:field[@name='value']">
-         <citationConferencePlace xmlns="http://namespace.openaire.eu/schema/oaire/">
+         <oaire:citationConferencePlace>
             <xsl:value-of select="." />
-         </citationConferencePlace>
+         </oaire:citationConferencePlace>
       </xsl:for-each>
       <!-- citationConferenceDate -->
       <xsl:for-each select="doc:element[@name='citationConferenceDate']/doc:element/doc:field[@name='value']">
-         <citationConferenceDate xmlns="http://namespace.openaire.eu/schema/oaire/">
+         <oaire:citationConferenceDate>
             <xsl:value-of select="." />
-         </citationConferenceDate>
+         </oaire:citationConferenceDate>
       </xsl:for-each>
    </xsl:template>   
    
@@ -1574,6 +1574,7 @@
             <xsl:with-param name="version" select="$version" />
       </xsl:call-template>
    </xsl:template>
+   
    <!-- openaire.version -->
    <xsl:template match="doc:element[@name='oaire']/doc:element[@name='version']/doc:element" mode="openaire">
       <xsl:variable name="version" select="doc:field[@name='value']/text()" />
@@ -1591,7 +1592,7 @@
             <xsl:with-param name="value" select="$version" />
          </xsl:call-template>
       </xsl:variable>
-      <version xmlns="http://namespace.openaire.eu/schema/oaire/">		 
+      <oaire:version>
 		 <xsl:attribute name="uri">
 			 <xsl:choose>
 				<xsl:when test="$lc_version = concat($eu_prefix,'acceptedversion') or $version = 'http://purl.org/coar/version/c_ab4af688f83e57aa'  or $lc_version = 'am'">
@@ -1616,7 +1617,7 @@
 			 </xsl:choose>
 		 </xsl:attribute>
 		 <xsl:value-of select="$version" />
-      </version>
+      </oaire:version>
    </xsl:template>   
    
    <!-- xml:language -->
@@ -1634,9 +1635,9 @@
       </xsl:if>
    </xsl:template>
 
-   <!-- ------------------- -->
+   <!--  -->
    <!-- Auxiliary templates -->
-   <!-- ------------------- -->
+   <!--  -->
    <xsl:param name="smallcase" select="'abcdefghijklmnopqrstuvwxyzàèìòùáéíóúýâêîôûãñõäëïöüÿåæœçðø'" />
    <xsl:param name="uppercase" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZÀÈÌÒÙÁÉÍÓÚÝÂÊÎÔÛÃÑÕÄËÏÖÜŸÅÆŒÇÐØ'" />
    
