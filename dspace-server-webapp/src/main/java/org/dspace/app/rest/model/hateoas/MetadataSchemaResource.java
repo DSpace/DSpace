@@ -19,7 +19,7 @@ import org.dspace.app.rest.utils.Utils;
  */
 @RelNameDSpaceResource(MetadataSchemaRest.NAME)
 public class MetadataSchemaResource extends DSpaceResource<MetadataSchemaRest> {
-    public MetadataSchemaResource(MetadataSchemaRest ms, Utils utils, String... rels) {
-        super(ms, utils, rels);
+    public MetadataSchemaResource(MetadataSchemaRest ms, Utils utils) {
+        super(ms, utils);
     }
 }

@@ -41,14 +41,14 @@ public class AuthorityEntryHalLinkFactory extends HalLinkFactory<AuthorityEntryR
                         .findRel(null, null, AuthorityRest.CATEGORY,
                                  English.plural(AuthorityRest.NAME),
                                  entry.getAuthorityName() + "/" + AuthorityRest.ENTRY,
-                                 entry.getOtherInformation().get(AuthorityUtils.RESERVED_KEYMAP_PARENT), null, null,
-                                 null)).toUriComponentsBuilder();
+                                 entry.getOtherInformation().get(AuthorityUtils.RESERVED_KEYMAP_PARENT), null, null))
+                        .toUriComponentsBuilder();
 
                 list.add(buildLink(AuthorityUtils.RESERVED_KEYMAP_PARENT, uriComponentsBuilder.build().toString()));
             }
         }
         String selfLinkString = linkTo(
-            getMethodOn().findOne(entry.getCategory(), English.plural(entry.getType()), entry.getAuthorityName(), null))
+            getMethodOn().findOne(entry.getCategory(), English.plural(entry.getType()), entry.getAuthorityName()))
             .toUriComponentsBuilder().build().toString() + "/entryValues/" + entry.getId();
         list.add(buildLink(Link.REL_SELF, selfLinkString));
     }

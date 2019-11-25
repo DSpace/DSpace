@@ -115,6 +115,8 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                              .withTitle("Author1")
                              .withIssueDate("2017-10-17")
                              .withAuthor("Smith, Donald")
+                             .withPersonIdentifierLastName("Smith")
+                             .withPersonIdentifierFirstName("Donald")
                              .withRelationshipType("Person")
                              .build();
 
@@ -934,6 +936,12 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
 
         context.turnOffAuthorisationSystem();
 
+        Item publication1 = ItemBuilder.createItem(context, col3)
+                                       .withTitle("Publication1")
+                                       .withIssueDate("2015-01-01")
+                                       .withRelationshipType("Publication")
+                                       .build();
+
         Item author2 = ItemBuilder.createItem(context, col2)
                                   .withTitle("Author2")
                                   .withIssueDate("2016-02-13")
@@ -1143,6 +1151,12 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
 
 
         context.turnOffAuthorisationSystem();
+
+        Item publication1 = ItemBuilder.createItem(context, col3)
+                                       .withTitle("Publication1")
+                                       .withIssueDate("2015-01-01")
+                                       .withRelationshipType("Publication")
+                                       .build();
 
         Item author2 = ItemBuilder.createItem(context, col2)
                                   .withTitle("Author2")

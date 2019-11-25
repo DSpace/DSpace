@@ -18,9 +18,19 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
+@LinksRest(links = {
+    @LinkRest(
+            name = ItemRest.RELATIONSHIPS,
+            linkClass = RelationshipRest.class,
+            method = "getItemRelationships",
+            embedOptional = true
+    )
+})
 public class ItemRest extends DSpaceObjectRest {
     public static final String NAME = "item";
+    public static final String PLURAL_NAME = "items";
     public static final String CATEGORY = RestAddressableModel.CORE;
+    public static final String RELATIONSHIPS = "relationships";
     private boolean inArchive = false;
     private boolean discoverable = false;
     private boolean withdrawn = false;
@@ -29,9 +39,8 @@ public class ItemRest extends DSpaceObjectRest {
     private CollectionRest owningCollection;
     @JsonIgnore
     private CollectionRest templateItemOf;
-    List<BitstreamRest> bitstreams;
 
-    List<RelationshipRest> relationships;
+    List<BundleRest> bundles;
 
     @Override
     public String getCategory() {
@@ -92,23 +101,13 @@ public class ItemRest extends DSpaceObjectRest {
         this.templateItemOf = templateItemOf;
     }
 
-    @LinkRest(linkClass = BitstreamRest.class)
+    @LinkRest(linkClass = BundleRest.class)
     @JsonIgnore
-    public List<BitstreamRest> getBitstreams() {
-        return bitstreams;
+    public List<BundleRest> getBundles() {
+        return bundles;
     }
 
-    public void setBitstreams(List<BitstreamRest> bitstreams) {
-        this.bitstreams = bitstreams;
-    }
-
-    @LinkRest(linkClass = RelationshipRest.class)
-    @JsonIgnore
-    public List<RelationshipRest> getRelationships() {
-        return relationships;
-    }
-
-    public void setRelationships(List<RelationshipRest> relationships) {
-        this.relationships = relationships;
+    public void setBundles(List<BundleRest> bundles) {
+        this.bundles = bundles;
     }
 }
