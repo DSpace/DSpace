@@ -558,15 +558,20 @@ public class OAIHarvester {
 
             // Lets take a backup of the handle url in case we clear it in the following steps.
             // We need to store the metadatum as well for context
-			MetadataValue handleMetadatumBackup = Iterables.find(
-                    itemService.getMetadata(item, Item.ANY, Item.ANY, Item.ANY, Item.ANY),
-                    new Predicate<MetadataValue>()
-                    {
-						@Override
-						public boolean apply(@Nullable MetadataValue metadataValues) {
-							return metadataValues != null && metadataValues.getValue() != null && metadataValues.getValue().contains(handle);
-						}
-                    });
+			MetadataValue handleMetadatumBackup = null;
+			try {
+				handleMetadatumBackup = Iterables.find(
+						itemService.getMetadata(item, Item.ANY, Item.ANY, Item.ANY, Item.ANY),
+						new Predicate<MetadataValue>()
+						{
+							@Override
+							public boolean apply(@Nullable MetadataValue metadataValues) {
+								return metadataValues != null && metadataValues.getValue() != null && metadataValues.getValue().contains(handle);
+							}
+						});
+			} catch (Exception e) {
+				log.error("Unable to backup handle for item: " + itemOaiID);
+			}
 			if (handleMetadatumBackup != null) {
                 String backupHdl = handleMetadatumBackup.getValue();
                 log.debug("Took backup of handle: " + backupHdl);
@@ -596,7 +601,7 @@ public class OAIHarvester {
 			// Dspace may remove all metadatum -> in these cases the handle metadatum is lost unless the ingested metadadata somehow
 			// provides this data. This step enforces the rule that at least one metadatum field contains the full handle url
 			log.debug("make sure item has a handle: " + itemOaiID);
-			if (handleMetadatumBackup.getValue() != null)
+			if (handleMetadatumBackup != null && handleMetadatumBackup.getValue() != null)
 			{
 				itemService.addMetadata(ourContext, item, handleMetadatumBackup.getMetadataField().getMetadataSchema().getName(), handleMetadatumBackup.getMetadataField().getElement(),
 						handleMetadatumBackup.getMetadataField().getQualifier(), handleMetadatumBackup.getLanguage(), handleMetadatumBackup.getValue());
