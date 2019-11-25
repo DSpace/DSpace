@@ -27,5 +27,149 @@
             delimited by commas.
         </scope_note>
     </dc-type>
+    
+    <!-- OpenAIRE4 Guidelines -->
+    <!-- 6.2.2. Attribute relatedIdentifierType (M) -->
+    <!-- specific type required by OpenAIRE4 Guidelines -->
+    <dc-type>
+        <schema>creativework</schema>
+        <element>identifier</element>
+        <qualifier>ark</qualifier>
+        <scope_note>Archival Resource Key</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>creativework</schema>
+        <element>identifier</element>
+        <qualifier>arxiv</qualifier>
+        <scope_note>arXiv.org identifier</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>creativework</schema>
+        <element>identifier</element>
+        <qualifier>bibcode</qualifier>
+        <scope_note>Astrophysics Data System bibliographic codes; bibcodes can be resolved via 
+            http://adsabs.harvard.edu/abs/bibcode.
+        </scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>creativework</schema>
+        <element>identifier</element>
+        <qualifier>doi</qualifier>
+        <scope_note>Digital Object Identifier</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>creativework</schema>
+        <element>identifier</element>
+        <qualifier>ean13</qualifier>
+        <scope_note>European Article Number, now renamed International Article Number, but retaining 
+            the original acronym, is a 13-digit barcoding standard which is a superset of the original 
+            12-digit Universal Product Code (UPC) system.
+        </scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>creativework</schema>
+        <element>identifier</element>
+        <qualifier>eissn</qualifier>
+        <scope_note>International Standard Serial Number (electronic Version)</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>creativework</schema>
+        <element>identifier</element>
+        <qualifier>handle</qualifier>
+        <scope_note>Handle System Identifier</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>creativework</schema>
+        <element>identifier</element>
+        <qualifier>igsn</qualifier>
+        <scope_note>International Geo Sample Number; a 9-digit alphanumeric code that uniquely identifies 
+            samples from our natural environment and related sampling features.
+        </scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>creativework</schema>
+        <element>identifier</element>
+        <qualifier>istc</qualifier>
+        <scope_note>International Standard Text Code; a unique “number” assigned to a textual work. An 
+            ISTC consists of 16 numbers and/or letters.
+        </scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>creativework</schema>
+        <element>identifier</element>
+        <qualifier>lissn</qualifier>
+        <scope_note>The linking ISSN or ISSN-L enables collocation or linking among different media 
+            versions of a continuing resource.
+        </scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>creativework</schema>
+        <element>identifier</element>
+        <qualifier>lsid</qualifier>
+        <scope_note>Life Science Identifiers; a unique identifier for data in the Life Science domain. 
+            Format: urn:lsid:authority:namespace:identifier:revision
+        </scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>creativework</schema>
+        <element>identifier</element>
+        <qualifier>pissn</qualifier>
+        <scope_note>International Standard Serial Number (print version)</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>creativework</schema>
+        <element>identifier</element>
+        <qualifier>pmid</qualifier>
+        <scope_note>PubMed ID</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>creativework</schema>
+        <element>identifier</element>
+        <qualifier>purl</qualifier>
+        <scope_note>Persistent Uniform Resource Locator</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>creativework</schema>
+        <element>identifier</element>
+        <qualifier>upc</qualifier>
+        <scope_note>Universal Product Code is a barcode symbology used for tracking trade items in stores. 
+            Its most common form, the UPC-A, consists of 12 numerical digits.
+        </scope_note>
+    </dc-type>
+  
+    <dc-type>
+        <schema>creativework</schema>
+        <element>identifier</element>
+        <qualifier>url</qualifier>
+        <scope_note>Uniform Resource Locator</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>creativework</schema>
+        <element>identifier</element>
+        <qualifier>urn</qualifier>
+        <scope_note>Uniform Resource Name</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>creativework</schema>
+        <element>identifier</element>
+        <qualifier>wos</qualifier>
+        <scope_note>Web of Science accession number</scope_note>
+    </dc-type>
 
 </dspace-dc-types>

@@ -15,6 +15,11 @@
         <name>oaire</name>
         <namespace>http://namespace.openaire.eu/schema/oaire/</namespace>
     </dc-schema>
+    
+    <dc-schema>
+        <name>datacite</name>
+        <namespace>http://datacite.org/schema/kernel-4</namespace>
+    </dc-schema>
 	
     <dc-type>
         <schema>oaire</schema>
@@ -92,6 +97,23 @@
         <schema>oaire</schema>
         <element>citationConferenceDate</element>
         <scope_note>The date when the conference took place. This property is considered to be part of the bibliographic citation. Recommended best practice for encoding the date value is defined in a profile of ISO 8601 [W3CDTF] and follows the YYYY-MM-DD format.</scope_note>
-    </dc-type>	
+    </dc-type>
+
+    <!--
+      OpenAIRE4 Guidelines
+      21 - Geolocation -->	
+    <dc-type>
+        <schema>datacite</schema>
+        <element>geoLocation</element>
+        <scope_note>Spatial region or named place where the data was gathered or about which the data is focused.</scope_note>
+    </dc-type>
+        
+    <!-- specific type required by OpenAIRE4 Guidelines -->
+    <dc-type>
+        <schema>datacite</schema>
+        <element>subject</element>
+        <qualifier>fos</qualifier>
+        <scope_note>Fields of Science and Technology - OECD</scope_note>
+    </dc-type>
 
 </dspace-dc-types>

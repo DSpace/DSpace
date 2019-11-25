@@ -82,6 +82,53 @@
         <element>affiliation</element>
         <qualifier>name</qualifier>
         <scope_note>The organizational or institutional affiliation of the creator</scope_note>
-    </dc-type>	
+    </dc-type>
+    
+    <!-- OpenAIRE4 Guidelines -->
+    <!-- 2.2.2.1. Attribute nameType (R) -->
+    <!-- and 3.2.6. Subproperty nameIdentifier (R) -->
+    <!-- specific type required by OpenAIRE4 Guidelines -->  
+
+    <dc-type>
+        <schema>person</schema>
+        <element>identifier</element>
+        <qualifier>authorid</qualifier>
+        <scope_note>Scopus Author ID</scope_note>
+    </dc-type>
+  
+    <dc-type>
+        <schema>person</schema>
+        <element>identifier</element>
+        <qualifier>ciencia-id</qualifier>
+        <scope_note>Permanent individual means of identification and authentication for citizens carrying out scientific activity. - https://www.ciencia-id.pt/</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>person</schema>
+        <element>identifier</element>
+        <qualifier>gsid</qualifier>
+        <scope_note>Google Scholar ID</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>person</schema>
+        <element>identifier</element>
+        <qualifier>orcid</qualifier>
+        <scope_note>Open Researcher and Contributor ID</scope_note>
+    </dc-type>
+  
+    <dc-type>
+        <schema>person</schema>
+        <element>identifier</element>
+        <qualifier>rid</qualifier>
+        <scope_note>Web of Science ResearcherID</scope_note>
+    </dc-type>
+    
+    <dc-type>
+        <schema>person</schema>
+        <element>identifier</element>
+        <qualifier>isni</qualifier>
+        <scope_note>International Standard Name Identifier</scope_note>
+    </dc-type>
 
 </dspace-dc-types>
