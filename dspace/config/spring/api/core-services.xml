@@ -56,6 +56,9 @@
     <bean class="org.dspace.content.RelationshipTypeServiceImpl"/>
     <bean class="org.dspace.content.RelationshipMetadataServiceImpl"/>
 
+    <bean class="org.dspace.scripts.ProcessServiceImpl"/>
+    <bean class="org.dspace.scripts.ScriptServiceImpl"/>
+
     <bean class="org.dspace.content.authority.ChoiceAuthorityServiceImpl"/>
     <bean class="org.dspace.content.authority.MetadataAuthorityServiceImpl" lazy-init="true"/>
 
@@ -113,5 +116,7 @@
     <bean class="org.dspace.xmlworkflow.XmlWorkflowServiceImpl"/>
     <bean class="org.dspace.xmlworkflow.WorkflowRequirementsServiceImpl"/>
     <bean class="org.dspace.xmlworkflow.XmlWorkflowFactoryImpl"/>
+
+
 </beans>
 
