@@ -16,7 +16,7 @@ import org.dspace.app.rest.utils.Utils;
  */
 @RelNameDSpaceResource(ScriptRest.NAME)
 public class ScriptResource extends DSpaceResource<ScriptRest> {
-    public ScriptResource(ScriptRest data, Utils utils, String... rels) {
-        super(data, utils, rels);
+    public ScriptResource(ScriptRest data, Utils utils) {
+        super(data, utils);
     }
 }

@@ -56,7 +56,7 @@ public class AuthenticationStatusRest extends BaseObjectRest<Integer> {
         }
     }
 
-    @LinkRest(linkClass = EPersonRest.class, name = "eperson", optional = true)
+    @LinkRest(linkClass = EPersonRest.class, name = "eperson", linkOptional = true)
     @JsonIgnore
     public EPersonRest getEPersonRest() {
         return ePersonRest;

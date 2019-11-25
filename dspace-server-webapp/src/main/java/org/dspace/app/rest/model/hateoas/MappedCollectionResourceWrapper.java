@@ -14,7 +14,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.dspace.app.rest.model.CollectionRest;
 import org.dspace.app.rest.model.MappedCollectionRestWrapper;
 import org.dspace.app.rest.utils.Utils;
-import org.springframework.data.domain.Pageable;
 
 /**
  * This class will act as a HALResource object for the MappedCollectionRestWrapper data object and will transform
@@ -25,25 +24,15 @@ public class MappedCollectionResourceWrapper extends HALResource<MappedCollectio
     @JsonIgnore
     private List<CollectionResource> collectionResources = new LinkedList<>();
 
-    public MappedCollectionResourceWrapper(MappedCollectionRestWrapper content, Utils utils, Pageable pageable,
-                                            String... rels) {
+    public MappedCollectionResourceWrapper(MappedCollectionRestWrapper content, Utils utils) {
         super(content);
-        addEmbeds(content, utils, pageable);
+        addEmbeds(content, utils);
     }
 
-    private void addEmbeds(final MappedCollectionRestWrapper data, final Utils utils, Pageable pageable) {
-
+    private void addEmbeds(final MappedCollectionRestWrapper data, final Utils utils) {
         for (CollectionRest collectionRest : data.getMappedCollectionRestList()) {
-
             collectionResources.add(new CollectionResource(collectionRest, utils));
         }
-
-
         embedResource("mappedCollections", collectionResources);
-
-    }
-
-    public List<CollectionResource> getCollectionResources() {
-        return collectionResources;
     }
 }
