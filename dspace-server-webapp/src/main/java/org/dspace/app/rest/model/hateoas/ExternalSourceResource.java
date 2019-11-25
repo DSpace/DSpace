@@ -9,13 +9,14 @@ package org.dspace.app.rest.model.hateoas;
 
 import org.dspace.app.rest.model.ExternalSourceRest;
 import org.dspace.app.rest.model.hateoas.annotations.RelNameDSpaceResource;
+import org.dspace.app.rest.utils.Utils;
 
 /**
  * This class serves as the HAL Resource for the ExternalSourceRest object
  */
 @RelNameDSpaceResource(ExternalSourceRest.NAME)
-public class ExternalSourceResource extends HALResource<ExternalSourceRest> {
-    public ExternalSourceResource(ExternalSourceRest content) {
-        super(content);
+public class ExternalSourceResource extends DSpaceResource<ExternalSourceRest> {
+    public ExternalSourceResource(ExternalSourceRest externalSourceRest, Utils utils, String... rels) {
+        super(externalSourceRest, utils, rels);
     }
 }
