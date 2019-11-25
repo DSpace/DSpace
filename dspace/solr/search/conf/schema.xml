@@ -288,6 +288,7 @@
     <!-- used by the DSpace Discovery Solr Indexer to track the last time a document was indexed -->
     <field name="SolrIndexer.lastIndexed" type="date" indexed="true" stored="true" default="NOW" multiValued="false" omitNorms="true" />
     <field name="lastModified" type="date" indexed="true" stored="true" default="NOW" multiValued="false" omitNorms="true" />
+    <field name="lastModified_dt" type="date" indexed="true" stored="true" default="NOW" multiValued="false" omitNorms="true" docValues="true"/>
 
      <!-- Dynamic field used to store the relation metadata as a keywordFilter -->
      <dynamicField name="relation.*" type="keywordFilter" indexed="true" stored="true" omitNorms="true" multiValued="true"/>
@@ -357,6 +358,7 @@
         or to add multiple fields to the same field for easier/faster searching.  -->
 
  <copyField source="*" dest="search_text"/>
+ <copyField source="lastModified" dest="lastModified_dt"/>
  <copyField source="title" dest="itemauthoritylookup"/>
  <copyField source="title" dest="itemauthoritylookupexactmatch"/>
 

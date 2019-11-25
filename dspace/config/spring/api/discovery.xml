@@ -386,11 +386,12 @@
         <!--The sort filters for the discovery search-->
         <property name="searchSortConfiguration">
             <bean class="org.dspace.discovery.configuration.DiscoverySortConfiguration">
-                <!--<property name="defaultSort" ref="sortDateIssued"/>-->
+                <property name="defaultSort" ref="sortLastModified"/>
                 <!--DefaultSortOrder can either be desc or asc (desc is default)-->
                 <property name="defaultSortOrder" value="desc"/>
                 <property name="sortFields">
                     <list>
+                    	<ref bean="sortLastModified" />
                         <ref bean="sortTitle" />
                         <ref bean="sortDateIssued" />
                     </list>
@@ -463,11 +464,12 @@
         <!--The sort filters for the discovery search-->
         <property name="searchSortConfiguration">
             <bean class="org.dspace.discovery.configuration.DiscoverySortConfiguration">
-                <!--<property name="defaultSort" ref="sortDateIssued"/>-->
+                <property name="defaultSort" ref="sortLastModified"/>
                 <!--DefaultSortOrder can either be desc or asc (desc is default)-->
                 <property name="defaultSortOrder" value="desc"/>
                 <property name="sortFields">
                     <list>
+                        <ref bean="sortLastModified" />
                         <ref bean="sortTitle" />
                         <ref bean="sortDateIssued" />
                     </list>
@@ -1524,6 +1526,10 @@
         <property name="metadataField" value="dc.date.accessioned"/>
         <property name="type" value="date"/>
     </bean>
+    <bean id="sortLastModified" class="org.dspace.discovery.configuration.DiscoverySortFieldConfiguration">
+		<property name="metadataField" value="lastModified" />
+		<property name="type" value="date" />
+	</bean>
 
     <bean id="sortFamilyName" class="org.dspace.discovery.configuration.DiscoverySortFieldConfiguration">
         <property name="metadataField" value="person.familyName"/>
