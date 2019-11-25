@@ -554,9 +554,7 @@ public class OAIHarvester {
             // first, let's make sure that we're updating the right thing.  Allow the IngestionWorkflow
             // to give us a new item if necessary, and update the HarvestedItem if it wants
             item = ingestionWorkflow.preUpdate(ourContext, item, targetCollection, hi, descMD, oreREM);
-
-            //Optimize. Set owningInstitution manually. Avoids lookup for each iteration
-//            item.setBrageInstitution(owningInstitution);
+			log.debug("Item cleared");
 
             // Lets take a backup of the handle url in case we clear it in the following steps.
             // We need to store the metadatum as well for context
@@ -566,9 +564,10 @@ public class OAIHarvester {
                     {
 						@Override
 						public boolean apply(@Nullable MetadataValue metadataValues) {
-							return metadataValues != null && metadataValues.getValue().contains(handle);
+							return metadataValues != null && metadataValues.getValue() != null && metadataValues.getValue().contains(handle);
 						}
                     });
+			log.debug("Took backup of handle: " + handleMetadatumBackup == null ? null : handleMetadatumBackup.getValue());
 
             // allow a plugin to clear the metadata if one is configured
             String mdAuthority = harvestRow.getMetadataAuthorityType();
