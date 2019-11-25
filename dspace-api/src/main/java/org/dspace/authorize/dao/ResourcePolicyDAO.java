@@ -9,6 +9,7 @@ package org.dspace.authorize.dao;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.UUID;
 
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.content.DSpaceObject;
@@ -79,4 +80,34 @@ public interface ResourcePolicyDAO extends GenericDAO<ResourcePolicy> {
      */
     public List<ResourcePolicy> findByDSoAndActionExceptRpType(Context c, DSpaceObject o, int actionID,
             String rpType) throws SQLException;
+
+    public List<ResourcePolicy> findbyEPerson(Context c, EPerson ePerson, int offset, int limit) throws SQLException;
+
+    public int searchCountEPerson(Context context, EPerson eperson) throws SQLException;
+
+    public List<ResourcePolicy> searchByEPersonAndResourceUuid(Context context, EPerson ePerson, UUID resourceUuid, int offset, int limit) throws SQLException;
+
+    public int searchCountByResourceUuid(Context context, UUID resourceUuid, EPerson eperson) throws SQLException;
+
+    public List<ResourcePolicy> searchByResouceUuidAndActionId(Context context, UUID resourceUuid, int actionId, int offset, int limit) throws SQLException;
+
+    public int searchCountByResouceAndAction(Context context, UUID resourceUuid, int actionId) throws SQLException;
+
+    public List<ResourcePolicy> searchByResouceUuid(Context context, UUID resourceUuid, int offset, int limit) throws SQLException;
+
+    public int searchCountByResourceUuid(Context context, UUID resourceUuid) throws SQLException;
+
+    public List<ResourcePolicy> searchByGroup(Context context, Group group, int offset, int limit) throws SQLException;
+
+    public int searchCountResourcePolicyOfGroup(Context context, Group group) throws SQLException;
+
+    public List<ResourcePolicy> searchByGroupAndResourceUuid(Context context, Group group, UUID resourceUuid, int offset, int limit) throws SQLException;
+
+    public int searchCountByGroupAndResourceUuid(Context context, Group group, UUID resourceUuid) throws SQLException;    
+    
+    
+    
+    
+    
+    
 }

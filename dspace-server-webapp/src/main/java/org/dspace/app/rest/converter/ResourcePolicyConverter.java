@@ -25,6 +25,12 @@ public class ResourcePolicyConverter implements DSpaceConverter<ResourcePolicy, 
     @Autowired
     ResourcePolicyService resourcePolicyService;
 
+    @Autowired
+    EPersonConverter epersonConverter;
+
+    @Autowired
+    GroupConverter groupConverter;
+
     @Override
     public ResourcePolicyRest fromModel(ResourcePolicy obj) {
 
@@ -34,7 +40,7 @@ public class ResourcePolicyConverter implements DSpaceConverter<ResourcePolicy, 
 
         model.setName(obj.getRpName());
         model.setDescription(obj.getRpDescription());
-        model.setRpType(obj.getRpType());
+        model.setPolicyType(obj.getRpType());
 
         model.setAction(resourcePolicyService.getActionText(obj));
 
@@ -43,10 +49,12 @@ public class ResourcePolicyConverter implements DSpaceConverter<ResourcePolicy, 
 
         if (obj.getGroup() != null) {
             model.setGroupUUID(obj.getGroup().getID());
+            model.setGroup(groupConverter.convert(obj.getGroup()));
         }
 
         if (obj.getEPerson() != null) {
             model.setEpersonUUID(obj.getEPerson().getID());
+            model.setEperson(epersonConverter.convert(obj.getEPerson()));
         }
         return model;
     }
