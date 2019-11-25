@@ -184,7 +184,7 @@ public class ItemUtils {
      * @throws SQLException
      */
     private static Element createRelationshipsElement(Context context, Item item) throws SQLException {
-        Element relationships = create("relationships");
+        Element relationships = create("entities");
 
         List<Relationship> rels = relationshipService.findByItem(context, item);
 
@@ -194,7 +194,7 @@ public class ItemUtils {
             Item rightItem = rel.getRightItem();
             boolean isLeftItem = false;
 
-            Element relationship = create("relationship");
+            Element relationship = create("entity");
 
             Item relItem;
             //get the related item of the current item
@@ -208,7 +208,7 @@ public class ItemUtils {
             relationship.getField().add(createValue("virtualRelationId",
                     org.dspace.core.Constants.VIRTUAL_AUTHORITY_PREFIX + rel.getID()));
             relationship.getField().add(createValue("uuid", relItem.getID().toString()));
-            relationship.getField().add(createValue("name", isLeftItem ?
+            relationship.getField().add(createValue("relationName", isLeftItem ?
                     rel.getRightwardValue() : rel.getLeftwardValue() ));
 
             //just process each related item
