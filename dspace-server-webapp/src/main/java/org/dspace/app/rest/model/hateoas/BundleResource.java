@@ -19,8 +19,7 @@ import org.dspace.app.rest.utils.Utils;
  */
 @RelNameDSpaceResource(BundleRest.NAME)
 public class BundleResource extends DSpaceResource<BundleRest>  {
-
-    public BundleResource(BundleRest data, Utils utils, String... rels) {
-        super(data, utils, rels);
+    public BundleResource(BundleRest data, Utils utils) {
+        super(data, utils);
     }
 }

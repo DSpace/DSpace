@@ -16,12 +16,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.dspace.app.rest.converter.BundleConverter;
+import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.converter.MetadataConverter;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.BundleRest;
 import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.hateoas.BundleResource;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.repository.ItemRestRepository;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.rest.utils.Utils;
@@ -64,17 +65,16 @@ import org.springframework.web.bind.annotation.RestController;
 public class ItemAddBundleController {
 
     @Autowired
+    ConverterService converter;
+
+    @Autowired
     ItemService itemService;
 
     @Autowired
     ItemRestRepository itemRestRepository;
 
     @Autowired
-    BundleConverter converter;
-
-    @Autowired
     MetadataConverter metadataConverter;
-
 
     @Autowired
     Utils utils;
@@ -107,10 +107,8 @@ public class ItemAddBundleController {
         }
 
         Bundle bundle = itemRestRepository.addBundleToItem(context, item, bundleRest);
-
-        BundleResource bundleResource = new BundleResource(converter.convert(bundle), utils);
+        BundleResource bundleResource = converter.toResource(converter.toRest(bundle, Projection.DEFAULT));
         return ControllerUtils.toResponseEntity(HttpStatus.CREATED, null, bundleResource);
-
     }
 
 }

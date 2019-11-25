@@ -11,16 +11,12 @@ import java.sql.SQLException;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.dspace.app.rest.converter.processes.ProcessConverter;
 import org.dspace.app.rest.model.ProcessRest;
-import org.dspace.app.rest.model.hateoas.DSpaceResource;
-import org.dspace.app.rest.model.hateoas.ProcessResource;
 import org.dspace.core.Context;
 import org.dspace.scripts.Process;
 import org.dspace.scripts.service.ProcessService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
@@ -36,18 +32,6 @@ public class ProcessRestRepository extends DSpaceRestRepository<ProcessRest, Int
     @Autowired
     private ProcessService processService;
 
-    @Autowired
-    private ProcessConverter processConverter;
-
-    /**
-     * This method will return an integer describing the total amount of Process objects in the database
-     * @return The total amount of Process objects in the database
-     * @throws SQLException If something goes wrong
-     */
-    public int getTotalAmountOfProcesses() throws SQLException {
-        return processService.countTotal(obtainContext());
-    }
-
     @Override
     @PreAuthorize("hasPermission(#id, 'PROCESS', 'READ')")
     public ProcessRest findOne(Context context, Integer id) {
@@ -56,7 +40,7 @@ public class ProcessRestRepository extends DSpaceRestRepository<ProcessRest, Int
             if (process == null) {
                 return null;
             }
-            return processConverter.fromModel(process);
+            return converter.toRest(process, utils.obtainProjection());
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
@@ -66,24 +50,17 @@ public class ProcessRestRepository extends DSpaceRestRepository<ProcessRest, Int
     @Override
     @PreAuthorize("hasAuthority('ADMIN')")
     public Page<ProcessRest> findAll(Context context, Pageable pageable) {
-        List<Process> processes = null;
-        int total = 0;
         try {
-            total = getTotalAmountOfProcesses();
-            processes = processService.findAll(context, pageable.getPageSize(), pageable.getOffset());
+            int total = processService.countTotal(context);
+            List<Process> processes = processService.findAll(context, pageable.getPageSize(), pageable.getOffset());
+            return converter.toRestPage(processes, pageable, total, utils.obtainProjection(true));
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<ProcessRest> page = new PageImpl<>(processes, pageable, total).map(processConverter);
-
-        return page;
     }
 
+    @Override
     public Class<ProcessRest> getDomainClass() {
-        return null;
-    }
-
-    public DSpaceResource<ProcessRest> wrapResource(ProcessRest model, String... rels) {
-        return new ProcessResource(model, utils, rels);
+        return ProcessRest.class;
     }
 }
