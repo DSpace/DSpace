@@ -8,20 +8,29 @@
 package org.dspace.authorize.dao.impl;
 
 import java.sql.SQLException;
+
 import java.util.List;
+import java.util.UUID;
+
 import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Root;
+import javax.persistence.criteria.SetJoin;
 
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.ResourcePolicy_;
 import org.dspace.authorize.dao.ResourcePolicyDAO;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.DSpaceObject_;
 import org.dspace.core.AbstractHibernateDAO;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+
+import com.ibm.icu.lang.UCharacter.JoiningType;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the ResourcePolicy object.
@@ -109,31 +118,25 @@ public class ResourcePolicyDAOImpl extends AbstractHibernateDAO<ResourcePolicy> 
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, ResourcePolicy.class);
         Root<ResourcePolicy> resourcePolicyRoot = criteriaQuery.from(ResourcePolicy.class);
         criteriaQuery.select(resourcePolicyRoot);
-        criteriaQuery
-            .where(criteriaBuilder.and(criteriaBuilder.equal(resourcePolicyRoot.get(ResourcePolicy_.dSpaceObject), dso),
-                                       criteriaBuilder
-                                           .equal(resourcePolicyRoot.get(ResourcePolicy_.epersonGroup), group),
-                                       criteriaBuilder.equal(resourcePolicyRoot.get(ResourcePolicy_.actionId), action),
-                                       criteriaBuilder.notEqual(resourcePolicyRoot.get(ResourcePolicy_.id), notPolicyID)
-                   )
-        );
+        criteriaQuery.where(
+                criteriaBuilder.and(criteriaBuilder.equal(resourcePolicyRoot.get(ResourcePolicy_.dSpaceObject), dso),
+                        criteriaBuilder.equal(resourcePolicyRoot.get(ResourcePolicy_.epersonGroup), group),
+                        criteriaBuilder.equal(resourcePolicyRoot.get(ResourcePolicy_.actionId), action),
+                        criteriaBuilder.notEqual(resourcePolicyRoot.get(ResourcePolicy_.id), notPolicyID)));
         return list(context, criteriaQuery, false, ResourcePolicy.class, 1, -1);
     }
 
     public List<ResourcePolicy> findByEPersonGroupTypeIdAction(Context context, EPerson e, List<Group> groups,
-                                                               int action, int type_id) throws SQLException {
+            int action, int type_id) throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, ResourcePolicy.class);
         Root<ResourcePolicy> resourcePolicyRoot = criteriaQuery.from(ResourcePolicy.class);
         criteriaQuery.select(resourcePolicyRoot);
-        criteriaQuery.where(
-            criteriaBuilder.and(criteriaBuilder.equal(resourcePolicyRoot.get(ResourcePolicy_.resourceTypeId), type_id),
-                                criteriaBuilder.equal(resourcePolicyRoot.get(ResourcePolicy_.actionId), action),
-                                criteriaBuilder
-                                    .or(criteriaBuilder.equal(resourcePolicyRoot.get(ResourcePolicy_.eperson), e),
-                                        (resourcePolicyRoot.get(ResourcePolicy_.epersonGroup).in(groups)))
-            )
-        );
+        criteriaQuery.where(criteriaBuilder.and(
+                criteriaBuilder.equal(resourcePolicyRoot.get(ResourcePolicy_.resourceTypeId), type_id),
+                criteriaBuilder.equal(resourcePolicyRoot.get(ResourcePolicy_.actionId), action),
+                criteriaBuilder.or(criteriaBuilder.equal(resourcePolicyRoot.get(ResourcePolicy_.eperson), e),
+                        (resourcePolicyRoot.get(ResourcePolicy_.epersonGroup).in(groups)))));
         return list(context, criteriaQuery, false, ResourcePolicy.class, 1, -1);
     }
 
@@ -203,32 +206,151 @@ public class ResourcePolicyDAOImpl extends AbstractHibernateDAO<ResourcePolicy> 
 
     @Override
     public List<ResourcePolicy> findByDSoAndActionExceptRpType(Context context, DSpaceObject dso, int action,
-                                                               String rpType) throws SQLException {
+            String rpType) throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, ResourcePolicy.class);
 
         Root<ResourcePolicy> resourcePolicyRoot = criteriaQuery.from(ResourcePolicy.class);
         criteriaQuery.select(resourcePolicyRoot);
         if (rpType != null) {
-            criteriaQuery.where(
-                criteriaBuilder.and(criteriaBuilder.equal(resourcePolicyRoot.get(ResourcePolicy_.dSpaceObject), dso),
-                                    criteriaBuilder.equal(resourcePolicyRoot.get(ResourcePolicy_.actionId), action),
-                                    criteriaBuilder.or(
-                                            criteriaBuilder.notEqual(resourcePolicyRoot.get(ResourcePolicy_.rptype),
-                                                    rpType),
-                                            criteriaBuilder.isNull(resourcePolicyRoot.get(ResourcePolicy_.rptype))
-                                    )
-                )
-            );
+            criteriaQuery.where(criteriaBuilder.and(
+                    criteriaBuilder.equal(resourcePolicyRoot.get(ResourcePolicy_.dSpaceObject), dso),
+                    criteriaBuilder.equal(resourcePolicyRoot.get(ResourcePolicy_.actionId), action),
+                    criteriaBuilder.or(criteriaBuilder.notEqual(resourcePolicyRoot.get(ResourcePolicy_.rptype), rpType),
+                            criteriaBuilder.isNull(resourcePolicyRoot.get(ResourcePolicy_.rptype)))));
         } else {
-            criteriaQuery.where(
-                    criteriaBuilder.and(
-                            criteriaBuilder.equal(resourcePolicyRoot.get(ResourcePolicy_.dSpaceObject), dso),
-                            criteriaBuilder.equal(resourcePolicyRoot.get(ResourcePolicy_.actionId), action),
-                            criteriaBuilder.isNotNull(resourcePolicyRoot.get(ResourcePolicy_.rptype))
-                    )
-            );
+            criteriaQuery.where(criteriaBuilder.and(
+                    criteriaBuilder.equal(resourcePolicyRoot.get(ResourcePolicy_.dSpaceObject), dso),
+                    criteriaBuilder.equal(resourcePolicyRoot.get(ResourcePolicy_.actionId), action),
+                    criteriaBuilder.isNotNull(resourcePolicyRoot.get(ResourcePolicy_.rptype))));
         }
-        return list(context, criteriaQuery, false, ResourcePolicy.class, 1, -1);
+        return list(context, criteriaQuery, false, ResourcePolicy.class, 1, 1);
     }
+
+    @Override
+    public List<ResourcePolicy> findbyEPerson(Context context, EPerson ePerson, int offset, int limit)
+            throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, ResourcePolicy.class);
+        Root<ResourcePolicy> resourcePolicyRoot = criteriaQuery.from(ResourcePolicy.class);
+        criteriaQuery.select(resourcePolicyRoot);
+        criteriaQuery.where(criteriaBuilder.equal(resourcePolicyRoot.get(ResourcePolicy_.eperson), ePerson));
+        return list(context, criteriaQuery, false, ResourcePolicy.class, limit, offset);
+    }
+
+    @Override
+    public int searchCountEPerson(Context context, EPerson eperson) throws SQLException {
+        Query query = createQuery(context,
+                "SELECT count(*) FROM " + ResourcePolicy.class.getSimpleName() + " WHERE eperson_id = (:epersonUuid) ");
+        query.setParameter("epersonUuid", eperson.getID());
+        return count(query);
+    }
+
+    @Override
+    public List<ResourcePolicy> searchByEPersonAndResourceUuid(Context context, EPerson ePerson, UUID resourceUuid,
+            int offset, int limit) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, ResourcePolicy.class);
+        Root<ResourcePolicy> resourcePolicyRoot = criteriaQuery.from(ResourcePolicy.class);
+        Join<ResourcePolicy, DSpaceObject> join = resourcePolicyRoot.join(ResourcePolicy_.dSpaceObject);
+        criteriaQuery.where(
+                criteriaBuilder.and(criteriaBuilder.equal(resourcePolicyRoot.get(ResourcePolicy_.eperson), ePerson),
+                        criteriaBuilder.equal(join.get(DSpaceObject_.id), resourceUuid)));
+        return list(context, criteriaQuery, false, ResourcePolicy.class, limit, offset);
+    }
+   
+    @Override
+    public int searchCountByResourceUuid(Context context, UUID resourceUuid, EPerson eperson) throws SQLException {
+        Query query = createQuery(context, "SELECT count(*) FROM " + ResourcePolicy.class.getSimpleName()
+                + " WHERE eperson_id = (:epersonUuid) AND dspace_object = (:resourceUuid) ");
+        query.setParameter("resourceUuid", resourceUuid);
+        query.setParameter("epersonUuid", eperson.getID());
+        return count(query);
+    }
+
+    @Override
+    public List<ResourcePolicy> searchByResouceUuidAndActionId(Context context, UUID resourceUuid, int actionId, int offset,
+            int limit) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, ResourcePolicy.class);
+        Root<ResourcePolicy> resourcePolicyRoot = criteriaQuery.from(ResourcePolicy.class);
+        Join<ResourcePolicy, DSpaceObject> join = resourcePolicyRoot.join(ResourcePolicy_.dSpaceObject);
+        criteriaQuery.where(
+                criteriaBuilder.and(criteriaBuilder.equal(resourcePolicyRoot.get(ResourcePolicy_.actionId), actionId),
+                        criteriaBuilder.equal(join.get(DSpaceObject_.id), resourceUuid)));
+        return list(context, criteriaQuery, false, ResourcePolicy.class, limit, offset);
+    }
+
+    @Override
+    public int searchCountByResouceAndAction(Context context, UUID resourceUuid, int actionId) throws SQLException {
+        Query query = createQuery(context, "SELECT count(*) FROM " + ResourcePolicy.class.getSimpleName()
+                + " WHERE dspace_object = (:resourceUuid) AND action_id = (:actionId) ");
+        query.setParameter("resourceUuid", resourceUuid);
+        query.setParameter("actionId", actionId);
+        return count(query);
+    }
+
+    @Override
+    public List<ResourcePolicy> searchByResouceUuid(Context context, UUID resourceUuid, int offset, int limit)
+            throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, ResourcePolicy.class);
+        Root<ResourcePolicy> resourcePolicyRoot = criteriaQuery.from(ResourcePolicy.class);
+        Join<ResourcePolicy, DSpaceObject> join = resourcePolicyRoot.join(ResourcePolicy_.dSpaceObject);
+        criteriaBuilder.and(criteriaBuilder.equal(resourcePolicyRoot.get(ResourcePolicy_.dSpaceObject), resourceUuid),
+                criteriaBuilder.equal(join.get(DSpaceObject_.id), resourceUuid));
+        return list(context, criteriaQuery, false, ResourcePolicy.class, limit, offset);
+    }
+
+    @Override
+    public int searchCountByResourceUuid(Context context, UUID resourceUuid) throws SQLException {
+        Query query = createQuery(context, "SELECT count(*) FROM " + ResourcePolicy.class.getSimpleName()
+                + " WHERE dspace_object = (:resourceUuid) ");
+        query.setParameter("resourceUuid", resourceUuid);
+        return count(query);
+    }
+
+    @Override
+    public List<ResourcePolicy> searchByGroup(Context context, Group group, int offset, int limit) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, ResourcePolicy.class);
+        Root<ResourcePolicy> resourcePolicyRoot = criteriaQuery.from(ResourcePolicy.class);
+        criteriaQuery.select(resourcePolicyRoot);
+        criteriaQuery.where(criteriaBuilder.equal(resourcePolicyRoot.get(ResourcePolicy_.epersonGroup), group));
+        return list(context, criteriaQuery, false, ResourcePolicy.class, limit, offset);
+    }
+
+    @Override
+    public int searchCountResourcePolicyOfGroup(Context context, Group group) throws SQLException {
+        Query query = createQuery(context,
+                "SELECT count(*) FROM " + ResourcePolicy.class.getSimpleName() + " WHERE epersongroup_id = (:groupUuid) ");
+        query.setParameter("groupUuid", group.getID());
+        return count(query);
+    }
+
+    @Override
+    public List<ResourcePolicy> searchByGroupAndResourceUuid(Context context, Group group, UUID resourceUuid,
+            int offset, int limit) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, ResourcePolicy.class);
+        Root<ResourcePolicy> resourcePolicyRoot = criteriaQuery.from(ResourcePolicy.class);
+        Join<ResourcePolicy, DSpaceObject> join = resourcePolicyRoot.join(ResourcePolicy_.dSpaceObject);
+        criteriaQuery.where(
+                criteriaBuilder.and(criteriaBuilder.equal(resourcePolicyRoot.get(ResourcePolicy_.epersonGroup), group),
+                        criteriaBuilder.equal(join.get(DSpaceObject_.id), resourceUuid)));
+        return list(context, criteriaQuery, false, ResourcePolicy.class, limit, offset);
+    }
+
+    @Override
+    public int searchCountByGroupAndResourceUuid(Context context, Group group, UUID resourceUuid) throws SQLException {
+        Query query = createQuery(context, "SELECT count(*) FROM " + ResourcePolicy.class.getSimpleName()
+                + " WHERE dspace_object = (:resourceUuid) AND epersongroup_id = (:groupUuid) ");
+        query.setParameter("resourceUuid", resourceUuid);
+        query.setParameter("groupUuid", group.getID());
+        return count(query);
+    }
+    
+    
+    
+
 }

@@ -13,6 +13,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
@@ -313,4 +314,67 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService {
         throws SQLException {
         return resourcePolicyDAO.findByDSoAndActionExceptRpType(c, o, actionID, rpType);
     }
+
+    @Override
+    public List<ResourcePolicy> findByEPerson(Context context, EPerson ePerson, int offset, int limit) throws SQLException {
+        return resourcePolicyDAO.findbyEPerson(context,ePerson,offset,limit);
+    }
+
+    @Override
+    public int searchCountEPerson(Context context, EPerson eperson) throws SQLException {
+        return resourcePolicyDAO.searchCountEPerson(context, eperson);
+    }
+        
+    @Override
+    public List<ResourcePolicy> searchByEPersonAndResourceUuid(Context context, EPerson eperson, UUID resourceUuid,int offset, int limit) throws SQLException {
+        return resourcePolicyDAO.searchByEPersonAndResourceUuid(context, eperson, resourceUuid,offset,limit);
+    }
+        
+    @Override
+    public int searchCountResourcePolicies(Context context, UUID resourceUuid, EPerson eperson) throws SQLException {
+        return resourcePolicyDAO.searchCountByResourceUuid(context, resourceUuid, eperson);
+    }
+       
+    @Override
+    public List<ResourcePolicy> searchByResouceUuidAndActionId(Context context, UUID resourceUuid, int actionId, int offset, int limit) throws SQLException {
+        return resourcePolicyDAO.searchByResouceUuidAndActionId(context, resourceUuid, actionId, offset, limit);
+    }
+      
+    @Override
+    public int searchCountByResouceAndAction(Context context, UUID resourceUuid, int actionId) throws SQLException {
+        return resourcePolicyDAO.searchCountByResouceAndAction(context, resourceUuid, actionId);
+    }
+
+    @Override
+    public List<ResourcePolicy> searchByResouceUuid(Context context, UUID resourceUuid, int offset, int limit)
+            throws SQLException {
+        return resourcePolicyDAO.searchByResouceUuid(context, resourceUuid, offset, limit);
+    }
+
+    @Override
+    public int searchCountByResourceUuid(Context context, UUID resourceUuid) throws SQLException {
+        return resourcePolicyDAO.searchCountByResourceUuid(context, resourceUuid);
+    }
+
+    @Override
+    public List<ResourcePolicy> searchByGroup(Context context, Group group, int offset, int limit) throws SQLException {
+        return resourcePolicyDAO.searchByGroup(context, group, offset, limit);
+    }
+
+    @Override
+    public int searchCountResourcePolicyOfGroup(Context context, Group group) throws SQLException {
+        return resourcePolicyDAO.searchCountResourcePolicyOfGroup(context, group);
+    }
+
+    @Override
+    public List<ResourcePolicy> searchByGroupAndResourceUuid(Context context, Group group, UUID resourceUuid, int offset, int limit) throws SQLException {
+        return resourcePolicyDAO.searchByGroupAndResourceUuid(context, group, resourceUuid, offset, limit);
+    }
+
+    @Override
+    public int searchCountByGroupAndResourceUuid(Context context, Group group, UUID resourceUuid) throws SQLException {
+        return resourcePolicyDAO.searchCountByGroupAndResourceUuid(context, group, resourceUuid);
+    }
+
+
 }

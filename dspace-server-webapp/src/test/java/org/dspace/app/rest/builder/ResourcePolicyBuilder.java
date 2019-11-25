@@ -17,6 +17,7 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 import org.dspace.discovery.SearchServiceException;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
 
 public class ResourcePolicyBuilder extends AbstractBuilder<ResourcePolicy, ResourcePolicyService> {
 
@@ -91,6 +92,10 @@ public class ResourcePolicyBuilder extends AbstractBuilder<ResourcePolicy, Resou
         resourcePolicy.setEPerson(ePerson);
         return this;
     }
+    public ResourcePolicyBuilder withGroup(Group epersonGroup) throws SQLException {
+        resourcePolicy.setGroup(epersonGroup);
+        return this;
+    }
     public ResourcePolicyBuilder withAction(int action) throws SQLException {
         resourcePolicy.setAction(action);
         return this;
@@ -99,5 +104,10 @@ public class ResourcePolicyBuilder extends AbstractBuilder<ResourcePolicy, Resou
         resourcePolicy.setdSpaceObject(dspaceObject);
         return this;
     }
+    public ResourcePolicyBuilder withPolicyType(String policyType) {
+        resourcePolicy.setRpType(policyType);
+        return this;
+    }
+
 
 }
