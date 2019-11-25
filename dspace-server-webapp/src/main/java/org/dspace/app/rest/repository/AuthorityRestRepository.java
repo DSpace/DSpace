@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.dspace.app.rest.model.AuthorityRest;
-import org.dspace.app.rest.model.hateoas.AuthorityResource;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.utils.AuthorityUtils;
 import org.dspace.content.authority.ChoiceAuthority;
 import org.dspace.content.authority.service.ChoiceAuthorityService;
@@ -42,31 +42,25 @@ public class AuthorityRestRepository extends DSpaceRestRepository<AuthorityRest,
     @Override
     public AuthorityRest findOne(Context context, String name) {
         ChoiceAuthority source = cas.getChoiceAuthorityByAuthorityName(name);
-        AuthorityRest result = authorityUtils.convertAuthority(source, name);
-        return result;
+        return authorityUtils.convertAuthority(source, name, utils.obtainProjection());
     }
 
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
     @Override
     public Page<AuthorityRest> findAll(Context context, Pageable pageable) {
         Set<String> authoritiesName = cas.getChoiceAuthoritiesNames();
-        List<AuthorityRest> results = new ArrayList<AuthorityRest>();
+        List<AuthorityRest> results = new ArrayList<>();
+        Projection projection = utils.obtainProjection(true);
         for (String authorityName : authoritiesName) {
             ChoiceAuthority source = cas.getChoiceAuthorityByAuthorityName(authorityName);
-            AuthorityRest result = authorityUtils.convertAuthority(source, authorityName);
+            AuthorityRest result = authorityUtils.convertAuthority(source, authorityName, projection);
             results.add(result);
         }
-        return new PageImpl<AuthorityRest>(results, pageable, results.size());
+        return new PageImpl<>(results, pageable, results.size());
     }
 
     @Override
     public Class<AuthorityRest> getDomainClass() {
         return AuthorityRest.class;
     }
-
-    @Override
-    public AuthorityResource wrapResource(AuthorityRest model, String... rels) {
-        return new AuthorityResource(model, utils, rels);
-    }
-
 }

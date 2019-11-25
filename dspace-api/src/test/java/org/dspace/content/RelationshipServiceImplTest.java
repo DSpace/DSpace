@@ -114,11 +114,11 @@ public class RelationshipServiceImplTest {
         Item item = mock(Item.class);
 
         // Mock DAO to return mocked left place as 0
-        when(relationshipDAO.findLeftPlaceByLeftItem(context, item)).thenReturn(0);
+        when(relationshipDAO.findNextLeftPlaceByLeftItem(context, item)).thenReturn(0);
 
         // The left place reported from out mocked item should match the DAO's report of the left place
-        assertEquals("TestFindLeftPlaceByLeftItem 0", relationshipDAO.findLeftPlaceByLeftItem(context, item),
-                relationshipService.findLeftPlaceByLeftItem(context, item));
+        assertEquals("TestFindLeftPlaceByLeftItem 0", relationshipDAO.findNextLeftPlaceByLeftItem(context, item),
+                relationshipService.findNextLeftPlaceByLeftItem(context, item));
     }
 
     @Test
@@ -127,11 +127,11 @@ public class RelationshipServiceImplTest {
         Item item = mock(Item.class);
 
         // Mock lower level DAO to return mocked right place as 0
-        when(relationshipDAO.findRightPlaceByRightItem(context, item)).thenReturn(0);
+        when(relationshipDAO.findNextRightPlaceByRightItem(context, item)).thenReturn(0);
 
         // The right place reported from out mocked item should match the DAO's report of the right place
-        assertEquals("TestFindRightPlaceByRightItem 0", relationshipDAO.findRightPlaceByRightItem(context, item),
-                relationshipService.findRightPlaceByRightItem(context, item));
+        assertEquals("TestFindRightPlaceByRightItem 0", relationshipDAO.findNextRightPlaceByRightItem(context, item),
+                relationshipService.findNextRightPlaceByRightItem(context, item));
     }
 
     @Test

@@ -18,6 +18,7 @@ import org.dspace.app.rest.model.RestAddressableModel;
 import org.dspace.app.rest.model.SearchResultEntryRest;
 import org.dspace.app.rest.model.SearchResultsRest;
 import org.dspace.app.rest.parameter.SearchFilter;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.core.Context;
 import org.dspace.discovery.DiscoverResult;
 import org.dspace.discovery.IndexableObject;
@@ -45,15 +46,17 @@ public class DiscoverResultConverter {
     public SearchResultsRest convert(final Context context, final String query, final String dsoType,
                                      final String configurationName, final String scope,
                                      final List<SearchFilter> searchFilters, final Pageable page,
-                                     final DiscoverResult searchResult, final DiscoveryConfiguration configuration) {
+                                     final DiscoverResult searchResult, final DiscoveryConfiguration configuration,
+                                     final Projection projection) {
 
         SearchResultsRest resultsRest = new SearchResultsRest();
+        resultsRest.setProjection(projection);
 
         setRequestInformation(context, query, dsoType, configurationName, scope, searchFilters, page, resultsRest);
 
-        addSearchResults(searchResult, resultsRest);
+        addSearchResults(searchResult, resultsRest, projection);
 
-        addFacetValues(context, searchResult, resultsRest, configuration);
+        addFacetValues(context, searchResult, resultsRest, configuration, projection);
 
         resultsRest.setTotalNumberOfResults(searchResult.getTotalSearchResults());
 
@@ -61,16 +64,18 @@ public class DiscoverResultConverter {
     }
 
     private void addFacetValues(Context context, final DiscoverResult searchResult, final SearchResultsRest resultsRest,
-            final DiscoveryConfiguration configuration) {
-        facetConverter.addFacetValues(context, searchResult, resultsRest, configuration);
+            final DiscoveryConfiguration configuration, final Projection projection) {
+        facetConverter.addFacetValues(context, searchResult, resultsRest, configuration, projection);
     }
 
-    private void addSearchResults(final DiscoverResult searchResult, final SearchResultsRest resultsRest) {
+    private void addSearchResults(final DiscoverResult searchResult, final SearchResultsRest resultsRest,
+                                  final Projection projection) {
         for (IndexableObject dspaceObject : CollectionUtils.emptyIfNull(searchResult.getIndexableObjects())) {
             SearchResultEntryRest resultEntry = new SearchResultEntryRest();
+            resultEntry.setProjection(projection);
 
             //Convert the DSpace Object to its REST model
-            resultEntry.setIndexableObject(convertDSpaceObject(dspaceObject));
+            resultEntry.setIndexableObject(convertDSpaceObject(dspaceObject, projection));
 
             //Add hit highlighting for this DSO if present
             DiscoverResult.IndexableObjectHighlightResult highlightedResults = searchResult
@@ -86,10 +91,10 @@ public class DiscoverResultConverter {
         }
     }
 
-    private RestAddressableModel convertDSpaceObject(final IndexableObject dspaceObject) {
+    private RestAddressableModel convertDSpaceObject(final IndexableObject dspaceObject, final Projection projection) {
         for (IndexableObjectConverter<IndexableObject, RestAddressableModel> converter : converters) {
             if (converter.supportsModel(dspaceObject)) {
-                return converter.convert(dspaceObject);
+                return converter.convert(dspaceObject, projection);
             }
         }
         return null;
