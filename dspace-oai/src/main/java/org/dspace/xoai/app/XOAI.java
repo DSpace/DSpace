@@ -447,6 +447,12 @@ public class XOAI {
         for (String f : getFileFormats(item)) {
             doc.addField("metadata.dc.format.mimetype", f);
         }
+        
+        // Message output before processing - for debugging purposes
+        if (verbose) {
+            println(String.format("Item %s with handle %s is about to be indexed",
+                    item.getID().toString(), handle));
+        }        
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         XmlOutputContext xmlContext = XmlOutputContext.emptyContext(out, Second);

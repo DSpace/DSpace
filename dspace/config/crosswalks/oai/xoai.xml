@@ -20,6 +20,7 @@
             <Format ref="qdc"/>
             <Format ref="marc"/>
             <Format ref="uketd_dc"/>
+            <Format ref="oai_openaire"/>
             <!--<Format ref="junii2" />-->
             <Description>
                 This is the default context of the DSpace OAI-PMH data provider.
@@ -70,6 +71,7 @@
                 This contexts complies with OpenAIRE Guidelines for Literature Repositories v3.0.
             </Description>
         </Context>
+              
     </Contexts>
 
 
@@ -154,6 +156,15 @@
             <XSLT>metadataFormats/junii2.xsl</XSLT>
             <Namespace>http://irdb.nii.ac.jp/oai</Namespace>
             <SchemaLocation>http://irdb.nii.ac.jp/oai/junii2-3-1.xsd</SchemaLocation>
+        </Format>
+        <!-- Metadata format based on the OpenAIRE 4.0 guidelines
+             https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/use_of_oai_pmh.html 
+        -->
+        <Format id="oai_openaire">
+            <Prefix>oai_openaire</Prefix>
+            <XSLT>metadataFormats/oai_openaire.xsl</XSLT>
+            <Namespace>http://namespace.openaire.eu/schema/oaire/</Namespace>
+            <SchemaLocation>https://www.openaire.eu/schema/repo-lit/4.0/openaire.xsd</SchemaLocation>
         </Format>
     </Formats>
 
