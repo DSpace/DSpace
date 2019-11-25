@@ -89,7 +89,7 @@ public class AuthorityEntryLinkRepository extends AbstractDSpaceRestRepository
     @SearchRestMethod(name = "byParent")
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
     public Page<AuthorityEntryRest> findByParent(HttpServletRequest request, String name,
-                                          Pageable pageable, String projection) {
+                                          Pageable pageable, Projection projection) {
         Context context = obtainContext();
         String id = request.getParameter("id");
 
@@ -99,7 +99,7 @@ public class AuthorityEntryLinkRepository extends AbstractDSpaceRestRepository
                     context.getCurrentLocale().toString());
 
             for (Choice value : choices.values) {
-                results.add(authorityUtils.convertEntry(value, name));
+                results.add(authorityUtils.convertEntry(value, name, projection));
             }
         }
 
@@ -114,7 +114,7 @@ public class AuthorityEntryLinkRepository extends AbstractDSpaceRestRepository
 
     @SearchRestMethod(name = "top")
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
-    public Page<AuthorityEntryRest> findAllTop(String name, Pageable pageable, String projection) {
+    public Page<AuthorityEntryRest> findAllTop(String name, Pageable pageable, Projection projection) {
         Context context = obtainContext();
         List<AuthorityEntryRest> results = new ArrayList<AuthorityEntryRest>();
         if (authorityUtils.isHierarchical(name)) {
@@ -122,7 +122,7 @@ public class AuthorityEntryLinkRepository extends AbstractDSpaceRestRepository
                     context.getCurrentLocale().toString());
 
             for (Choice value : choices.values) {
-                results.add(authorityUtils.convertEntry(value, name));
+                results.add(authorityUtils.convertEntry(value, name, projection));
             }
         }
 

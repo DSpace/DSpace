@@ -789,11 +789,6 @@ public class RestResourceController implements InitializingBean {
         if (linkRest != null) {
             LinkRestRepository linkRepository = utils.getLinkResourceRepository(apiCategory, model, linkRest.name());
             Method linkMethod = utils.requireMethod(linkRepository.getClass(), linkRest.method());
-            try {
-                if (Page.class.isAssignableFrom(linkMethod.getReturnType())) {
-                    Page<? extends RestModel> pageResult = (Page<? extends RestAddressableModel>) linkMethod
-                            .invoke(linkRepository, request, uuid, page, utils.obtainProjection(true));
-
             if (linkMethod == null) {
                 // TODO custom exception
                 throw new RuntimeException(
@@ -802,7 +797,7 @@ public class RestResourceController implements InitializingBean {
                 try {
                     if (Page.class.isAssignableFrom(linkMethod.getReturnType())) {
                         Page<? extends RestModel> pageResult = (Page<? extends RestAddressableModel>) linkMethod
-                                .invoke(linkRepository, request, uuid, page, projection);
+                                .invoke(linkRepository, request, uuid, page, utils.obtainProjection(true));
 
                         Link link = null;
                         String querystring = request.getQueryString();
@@ -813,32 +808,25 @@ public class RestResourceController implements InitializingBean {
                             link = linkTo(this.getClass(), apiCategory, model).slash(uuid).slash(subpath).withSelfRel();
                         }
 
-                        Page<HALResource> halResources = pageResult.map(linkRepository::wrapResource);
-                        if (halResources.hasContent()) {
-                            halResources.forEach(linkService::addLinks);
-
-                            return assembler.toResource(halResources, link);
-                        } else {
+                        if (!pageResult.hasContent()) {
                             response.setStatus(HttpServletResponse.SC_NO_CONTENT);
                             return null;
                         }
-                    } else {
-                        link = linkTo(this.getClass(), apiCategory, model).slash(uuid).slash(subpath).withSelfRel();
-                    }
 
-                    Page<HALResource> halResources = pageResult.map(object -> converter.toResource(object));
-                    return assembler.toResource(halResources, link);
-                } else {
-                    RestModel object = (RestModel) linkMethod.invoke(linkRepository, request, uuid, page,
-                            utils.obtainProjection());
-                    Link link = linkTo(this.getClass(), apiCategory, model).slash(uuid).slash(subpath)
-                            .withSelfRel();
-                    HALResource tmpresult = converter.toResource(object);
-                    tmpresult.add(link);
-                    return tmpresult;
+                        Page<HALResource> halResources = pageResult.map(object -> converter.toResource(object));
+                        return assembler.toResource(halResources, link);
+                    } else {
+                        RestModel object = (RestModel) linkMethod.invoke(linkRepository, request, uuid, page,
+                                utils.obtainProjection());
+                        Link link = linkTo(this.getClass(), apiCategory, model).slash(uuid).slash(subpath)
+                                .withSelfRel();
+                        HALResource tmpresult = converter.toResource(object);
+                        tmpresult.add(link);
+                        return tmpresult;
+                    }
+                } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+                    throw new RuntimeException(e.getMessage(), e);
                 }
-            } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-                throw new RuntimeException(e.getMessage(), e);
             }
         }
         RestAddressableModel modelObject = repository.findOne(uuid);

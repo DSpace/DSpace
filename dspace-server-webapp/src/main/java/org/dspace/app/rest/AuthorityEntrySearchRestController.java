@@ -19,12 +19,14 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.link.HalLinkService;
 import org.dspace.app.rest.model.AuthorityRest;
 import org.dspace.app.rest.model.LinkRest;
 import org.dspace.app.rest.model.RestAddressableModel;
 import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.hateoas.HALResource;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.repository.DSpaceRestRepository;
 import org.dspace.app.rest.repository.LinkRestRepository;
 import org.dspace.app.rest.utils.RestRepositoryUtils;
@@ -66,6 +68,9 @@ public class AuthorityEntrySearchRestController {
         "(?!^[0-9a-fxA-FX]{8}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{12}$)[\\w+\\-]+$+}";
 
     @Autowired
+    ConverterService converter;
+   
+    @Autowired
     HalLinkService linkService;
 
     @Autowired
@@ -99,7 +104,7 @@ public class AuthorityEntrySearchRestController {
                                                                 PagedResourcesAssembler assembler,
                                                                 @RequestParam MultiValueMap<String,
                                                                 Object> parameters,
-                                                                @RequestParam(required = false) String projection)
+                                                                Projection projection)
         throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 
         PagedResources<? extends HALResource> result = null;
@@ -108,7 +113,7 @@ public class AuthorityEntrySearchRestController {
         Class<RestAddressableModel> domainClass = repository.getDomainClass();
         String searchMethodName = "top";
 
-        LinkRest linkRest = utils.getLinkRest(AuthorityRest.ENTRIES, domainClass);
+        LinkRest linkRest = utils.getClassLevelLinkRest(AuthorityRest.ENTRIES, domainClass);
 
         if (linkRest != null) {
             LinkRestRepository linkRepository = utils.getLinkResourceRepository(AuthorityRest.CATEGORY,
@@ -128,8 +133,7 @@ public class AuthorityEntrySearchRestController {
             Page<? extends RestModel> pageResult = (Page<? extends RestAddressableModel>) linkMethod
                     .invoke(linkRepository, id, pageable, projection);
 
-            Page<HALResource> halResources = pageResult.map(linkRepository::wrapResource);
-            halResources.forEach(linkService::addLinks);
+            Page<HALResource> halResources = pageResult.map(restObject -> converter.toResource(restObject));
 
             return assembler.toResource(halResources, link);
         } else {
@@ -148,7 +152,7 @@ public class AuthorityEntrySearchRestController {
                                                                   PagedResourcesAssembler assembler,
                                                                   @RequestParam MultiValueMap<String,
                                                                   Object> parameters,
-                                                                  @RequestParam(required = false) String projection)
+                                                                  Projection projection)
         throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 
         PagedResources<? extends HALResource> result = null;
@@ -157,7 +161,7 @@ public class AuthorityEntrySearchRestController {
         Class<RestAddressableModel> domainClass = repository.getDomainClass();
         String searchMethodName = "byParent";
 
-        LinkRest linkRest = utils.getLinkRest(AuthorityRest.ENTRIES, domainClass);
+        LinkRest linkRest = utils.getClassLevelLinkRest(AuthorityRest.ENTRIES, domainClass);
 
         if (linkRest != null) {
             LinkRestRepository linkRepository = utils.getLinkResourceRepository(AuthorityRest.CATEGORY,
@@ -178,8 +182,7 @@ public class AuthorityEntrySearchRestController {
             Page<? extends RestModel> pageResult = (Page<? extends RestAddressableModel>) linkMethod
                     .invoke(linkRepository, request, id, pageable, projection);
 
-            Page<HALResource> halResources = pageResult.map(linkRepository::wrapResource);
-            halResources.forEach(linkService::addLinks);
+            Page<HALResource> halResources = pageResult.map(restObject -> converter.toResource(restObject));
 
             return assembler.toResource(halResources, link);
         } else {
