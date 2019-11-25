@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.dspace.app.rest.converter.BitstreamConverter;
+import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.BundleRest;
@@ -25,7 +25,6 @@ import org.dspace.app.rest.model.hateoas.BitstreamResource;
 import org.dspace.app.rest.repository.BundleRestRepository;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.rest.utils.Utils;
-import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.service.BundleService;
 import org.dspace.core.Context;
@@ -72,10 +71,10 @@ public class BundleUploadBitstreamController {
     private BundleService bundleService;
 
     @Autowired
-    private BitstreamConverter bitstreamConverter;
+    private BundleRestRepository bundleRestRepository;
 
     @Autowired
-    private BundleRestRepository bundleRestRepository;
+    private ConverterService converter;
 
     /**
      * Method to upload a Bitstream to a Bundle with the given UUID in the URL. This will create a Bitstream with the
@@ -92,7 +91,6 @@ public class BundleUploadBitstreamController {
 
         Context context = ContextUtil.obtainContext(request);
         Bundle bundle = null;
-        Bitstream bitstream = null;
         try {
             bundle = bundleService.find(context, uuid);
         } catch (SQLException e) {
@@ -110,10 +108,10 @@ public class BundleUploadBitstreamController {
             throw new UnprocessableEntityException("The InputStream from the file couldn't be read", e);
         }
 
-        bitstream = bundleRestRepository.uploadBitstream(context, bundle, uploadfile.getOriginalFilename(),
-                                                         fileInputStream, properties);
+        BitstreamRest bitstreamRest = bundleRestRepository.uploadBitstream(
+                context, bundle, uploadfile.getOriginalFilename(), fileInputStream, properties);
+        BitstreamResource bitstreamResource = converter.toResource(bitstreamRest);
 
-        BitstreamResource bitstreamResource = new BitstreamResource(bitstreamConverter.fromModel(bitstream), utils);
         return ControllerUtils.toResponseEntity(HttpStatus.CREATED, null, bitstreamResource);
     }
 }

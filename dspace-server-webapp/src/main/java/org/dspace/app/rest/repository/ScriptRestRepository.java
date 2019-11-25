@@ -21,20 +21,17 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.converter.DSpaceRunnableParameterConverter;
-import org.dspace.app.rest.converter.ScriptConverter;
-import org.dspace.app.rest.converter.processes.ProcessConverter;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.model.ParameterValueRest;
 import org.dspace.app.rest.model.ProcessRest;
 import org.dspace.app.rest.model.ScriptRest;
-import org.dspace.app.rest.model.hateoas.DSpaceResource;
-import org.dspace.app.rest.model.hateoas.ScriptResource;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.scripts.handler.impl.RestDSpaceRunnableHandler;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.scripts.DSpaceCommandLineParameter;
 import org.dspace.scripts.DSpaceRunnable;
-import org.dspace.scripts.service.ProcessService;
+import org.dspace.scripts.service.ScriptService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -50,29 +47,20 @@ public class ScriptRestRepository extends DSpaceRestRepository<ScriptRest, Strin
     private static final Logger log = LogManager.getLogger();
 
     @Autowired
-    private List<DSpaceRunnable> dspaceRunnables;
-
-    @Autowired
-    private ScriptConverter scriptConverter;
-
-    @Autowired
-    private ProcessService processService;
-
-    @Autowired
-    private ProcessConverter processConverter;
+    private ScriptService scriptService;
 
     @Autowired
     private DSpaceRunnableParameterConverter dSpaceRunnableParameterConverter;
 
     @Override
     public ScriptRest findOne(Context context, String name) {
-        for (DSpaceRunnable dSpaceRunnable : dspaceRunnables) {
-            if (StringUtils.equalsIgnoreCase(dSpaceRunnable.getName(), name)) {
-                if (dSpaceRunnable.isAllowedToExecute(context)) {
-                    return scriptConverter.fromModel(dSpaceRunnable);
-                } else {
-                    throw new AccessDeniedException("The current user was not authorized to access this script");
-                }
+
+        DSpaceRunnable dSpaceRunnable = scriptService.getScriptForName(name);
+        if (dSpaceRunnable != null) {
+            if (dSpaceRunnable.isAllowedToExecute(context)) {
+                return converter.toRest(dSpaceRunnable, utils.obtainProjection());
+            } else {
+                throw new AccessDeniedException("The current user was not authorized to access this script");
             }
         }
         throw new DSpaceBadRequestException("The script with name: " + name + " could not be found");
@@ -80,19 +68,13 @@ public class ScriptRestRepository extends DSpaceRestRepository<ScriptRest, Strin
 
     @Override
     public Page<ScriptRest> findAll(Context context, Pageable pageable) {
-        return utils.getPage(dspaceRunnables.stream().filter(
-            dSpaceRunnable -> dSpaceRunnable.isAllowedToExecute(context)).collect(Collectors.toList()), pageable)
-                    .map(scriptConverter);
+        List<DSpaceRunnable> dSpaceRunnables = scriptService.getDSpaceRunnables(context);
+        return converter.toRestPage(utils.getPage(dSpaceRunnables, pageable), utils.obtainProjection(true));
     }
 
     @Override
     public Class<ScriptRest> getDomainClass() {
         return ScriptRest.class;
-    }
-
-    @Override
-    public DSpaceResource<ScriptRest> wrapResource(ScriptRest model, String... rels) {
-        return new ScriptResource(model, utils, rels);
     }
 
     /**
@@ -108,7 +90,7 @@ public class ScriptRestRepository extends DSpaceRestRepository<ScriptRest, Strin
         String properties = requestService.getCurrentRequest().getServletRequest().getParameter("properties");
         List<DSpaceCommandLineParameter> dSpaceCommandLineParameters =
             processPropertiesToDSpaceCommandLineParameters(properties);
-        DSpaceRunnable scriptToExecute = getdSpaceRunnableForName(scriptName);
+        DSpaceRunnable scriptToExecute = scriptService.getScriptForName(scriptName);
         if (scriptToExecute == null) {
             throw new DSpaceBadRequestException("The script for name: " + scriptName + " wasn't found");
         }
@@ -121,7 +103,7 @@ public class ScriptRestRepository extends DSpaceRestRepository<ScriptRest, Strin
         try {
             runDSpaceScript(scriptToExecute, restDSpaceRunnableHandler, args);
             context.complete();
-            return processConverter.fromModel(restDSpaceRunnableHandler.getProcess());
+            return converter.toRest(restDSpaceRunnableHandler.getProcess(), Projection.DEFAULT);
         } catch (SQLException e) {
             log.error("Failed to create a process with user: " + context.getCurrentUser() +
                           " scriptname: " + scriptName + " and parameters " + DSpaceCommandLineParameter
@@ -143,17 +125,6 @@ public class ScriptRestRepository extends DSpaceRestRepository<ScriptRest, Strin
             parameterValueRestList.stream().map(x -> dSpaceRunnableParameterConverter.toModel(x))
                                   .collect(Collectors.toList()));
         return dSpaceCommandLineParameters;
-    }
-
-    private DSpaceRunnable getdSpaceRunnableForName(String scriptName) {
-        DSpaceRunnable scriptToExecute = null;
-        for (DSpaceRunnable script : dspaceRunnables) {
-            if (StringUtils.equalsIgnoreCase(script.getName(), scriptName)) {
-                scriptToExecute = script;
-                break;
-            }
-        }
-        return scriptToExecute;
     }
 
     private List<String> constructArgs(List<DSpaceCommandLineParameter> dSpaceCommandLineParameters) {

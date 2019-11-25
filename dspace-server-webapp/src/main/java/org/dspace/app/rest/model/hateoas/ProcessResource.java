@@ -17,7 +17,7 @@ import org.dspace.scripts.Process;
  */
 @RelNameDSpaceResource(ProcessRest.NAME)
 public class ProcessResource extends DSpaceResource<ProcessRest> {
-    public ProcessResource(ProcessRest content, Utils utils, String[] rels) {
-        super(content, utils, rels);
+    public ProcessResource(ProcessRest content, Utils utils) {
+        super(content, utils);
     }
 }

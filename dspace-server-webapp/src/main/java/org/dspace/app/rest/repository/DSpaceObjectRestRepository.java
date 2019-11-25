@@ -10,11 +10,11 @@ package org.dspace.app.rest.repository;
 import java.sql.SQLException;
 import java.util.UUID;
 
-import org.dspace.app.rest.converter.DSpaceObjectConverter;
 import org.dspace.app.rest.converter.MetadataConverter;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.DSpaceObjectRest;
 import org.dspace.app.rest.model.patch.Patch;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.repository.patch.DSpaceObjectPatch;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
@@ -33,17 +33,14 @@ public abstract class DSpaceObjectRestRepository<M extends DSpaceObject, R exten
 
     final DSpaceObjectService<M> dsoService;
     final DSpaceObjectPatch<R> dsoPatch;
-    final DSpaceObjectConverter<M, R> dsoConverter;
 
     @Autowired
     MetadataConverter metadataConverter;
 
     DSpaceObjectRestRepository(DSpaceObjectService<M> dsoService,
-                               DSpaceObjectConverter<M, R> dsoConverter,
                                DSpaceObjectPatch<R> dsoPatch) {
         this.dsoService = dsoService;
         this.dsoPatch = dsoPatch;
-        this.dsoConverter = dsoConverter;
     }
 
     /**
@@ -78,7 +75,7 @@ public abstract class DSpaceObjectRestRepository<M extends DSpaceObject, R exten
      */
     protected void updateDSpaceObject(M dso, R dsoRest)
             throws AuthorizeException, SQLException {
-        R origDsoRest = dsoConverter.fromModel(dso);
+        R origDsoRest = converter.toRest(dso, Projection.DEFAULT);
         if (!origDsoRest.getMetadata().equals(dsoRest.getMetadata())) {
             metadataConverter.setMetadata(obtainContext(), dso, dsoRest.getMetadata());
         }

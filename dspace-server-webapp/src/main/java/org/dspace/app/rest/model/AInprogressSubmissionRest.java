@@ -35,10 +35,6 @@ public abstract class AInprogressSubmissionRest<T extends Serializable> extends 
     @JsonIgnore
     private EPersonRest submitter;
 
-    public AInprogressSubmissionRest() {
-        super();
-    }
-
     public Date getLastModified() {
         return lastModified;
     }

@@ -12,6 +12,7 @@ import java.util.List;
 
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.GroupRest;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.eperson.Group;
 import org.springframework.stereotype.Component;
 
@@ -27,22 +28,16 @@ public class GroupConverter extends DSpaceObjectConverter<Group, org.dspace.app.
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(GroupConverter.class);
 
     @Override
-    public GroupRest fromModel(Group obj) {
-        GroupRest epersongroup = super.fromModel(obj);
+    public GroupRest convert(Group obj, Projection projection) {
+        GroupRest epersongroup = super.convert(obj, projection);
         epersongroup.setPermanent(obj.isPermanent());
         List<GroupRest> groups = new ArrayList<GroupRest>();
         for (Group g : obj.getMemberGroups()) {
-            groups.add(convert(g));
+            groups.add(convert(g, projection));
         }
         epersongroup.setGroups(groups);
 
         return epersongroup;
-    }
-
-    @Override
-    public Group toModel(GroupRest obj) {
-        // TODO Auto-generated method stub
-        return null;
     }
 
     @Override
@@ -51,7 +46,7 @@ public class GroupConverter extends DSpaceObjectConverter<Group, org.dspace.app.
     }
 
     @Override
-    protected Class<Group> getModelClass() {
+    public Class<Group> getModelClass() {
         return Group.class;
     }
 
