@@ -5,23 +5,18 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.mock;
+package org.dspace.content;
 
-import org.dspace.content.MetadataField;
-import org.dspace.content.MetadataSchema;
-import org.dspace.content.MetadataValue;
 import org.dspace.content.authority.Choices;
 
 /**
- * Metadata Value is bound to a database, the dissemination crosswalk require mock metadata just need for desimanation
+ * Metadata Value is bound to a database, the dissemination crosswalk require a MetadataValueDTO
+ * just need for desimanation
  * This class provides a wrapper for this.
  * This class should only be used for the dissemniation metadata values that aren't to be written to the database
  *
  * @author kevinvandevelde at atmire.com
  */
-
-
-//TODO COMMENTS
 public class MetadataValueDTO {
 
     private String schema;
@@ -48,14 +43,14 @@ public class MetadataValueDTO {
     }
 
     /**
-     * Constructor for the MockMetadataValue class
-     * @param schema        The schema to be assigned to this MockMetadataValue object
-     * @param element       The element to be assigned to this MockMetadataValue object
-     * @param qualifier     The qualifier to be assigned to this MockMetadataValue object
-     * @param language      The language to be assigend to this MockMetadataValue object
-     * @param value         The value to be assigned to this MockMetadataValue object
-     * @param authority     The authority to be assigned to this MockMetadataValue object
-     * @param confidence    The confidence to be assigned to this MockMetadataValue object
+     * Constructor for the MetadataValueDTO class
+     * @param schema        The schema to be assigned to this MetadataValueDTO object
+     * @param element       The element to be assigned to this MetadataValueDTO object
+     * @param qualifier     The qualifier to be assigned to this MetadataValueDTO object
+     * @param language      The language to be assigend to this MetadataValueDTO object
+     * @param value         The value to be assigned to this MetadataValueDTO object
+     * @param authority     The authority to be assigned to this MetadataValueDTO object
+     * @param confidence    The confidence to be assigned to this MetadataValueDTO object
      */
     public MetadataValueDTO(String schema, String element, String qualifier, String language, String value,
                             String authority, int confidence) {
@@ -67,13 +62,14 @@ public class MetadataValueDTO {
         this.authority = authority;
         this.confidence = confidence;
     }
+
     /**
-     * Constructor for the MockMetadataValue class
-     * @param schema        The schema to be assigned to this MockMetadataValue object
-     * @param element       The element to be assigned to this MockMetadataValue object
-     * @param qualifier     The qualifier to be assigned to this MockMetadataValue object
-     * @param language      The language to be assigend to this MockMetadataValue object
-     * @param value         The value to be assigned to this MockMetadataValue object
+     * Constructor for the MetadataValueDTO class
+     * @param schema        The schema to be assigned to this MetadataValueDTO object
+     * @param element       The element to be assigned to this MetadataValueDTO object
+     * @param qualifier     The qualifier to be assigned to this MetadataValueDTO object
+     * @param language      The language to be assigend to this MetadataValueDTO object
+     * @param value         The value to be assigned to this MetadataValueDTO object
      */
     public MetadataValueDTO(String schema, String element, String qualifier, String language, String value) {
         this.schema = schema;

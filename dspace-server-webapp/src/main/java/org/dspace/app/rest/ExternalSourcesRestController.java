@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
  * on the calls it receives
  */
 @RestController
-@RequestMapping("/api/integration/externalsources/{authorityName}")
+@RequestMapping("/api/integration/externalsources/{externalSourceName}")
 public class ExternalSourcesRestController {
 
     @Autowired
@@ -41,11 +41,12 @@ public class ExternalSourcesRestController {
     HalLinkService linkService;
 
     /**
-     * This method will retrieve all the ExternalSourceEntries for the ExternalSource for the given AuthorityName param
+     * This method will retrieve all the ExternalSourceEntries for the ExternalSource for the given externalSourceName
+     * param
      *
      * curl -X GET http://<dspace.restUrl>/api/integration/externalsources/orcidV2/entries
      *
-     * @param authorityName The authorityName that defines which ExternalDataProvider is used
+     * @param externalSourceName The externalSourceName that defines which ExternalDataProvider is used
      * @param query         The query used in the lookup
      * @param parent        The parent used in the lookup
      * @param pageable      The pagination object
@@ -54,13 +55,13 @@ public class ExternalSourcesRestController {
      */
     @RequestMapping(method = RequestMethod.GET, value = "/entries")
     public PagedResources<ExternalSourceEntryResource> getExternalSourceEntries(
-        @PathVariable("authorityName") String authorityName,
+        @PathVariable("externalSourceName") String externalSourceName,
         @RequestParam(name = "query") String query,
         @RequestParam(name = "parent", required = false) String parent,
         Pageable pageable, PagedResourcesAssembler assembler) {
 
         Page<ExternalSourceEntryRest> externalSourceEntryRestPage = externalSourceRestRepository
-            .getExternalSourceEntries(authorityName, query, parent, pageable);
+            .getExternalSourceEntries(externalSourceName, query, parent, pageable);
         Page<ExternalSourceEntryResource> externalSourceEntryResources = externalSourceEntryRestPage
             .map(externalSourceEntryRest -> new ExternalSourceEntryResource(externalSourceEntryRest));
         externalSourceEntryResources.forEach(linkService::addLinks);
@@ -71,20 +72,21 @@ public class ExternalSourcesRestController {
 
     /**
      * This method will retrieve one ExternalSourceEntryResource based on the ExternalSource for the given
-     * AuthorityName and with the given entryId
+     * externalSourceName and with the given entryId
      *
      * curl -X GET http://<dspace.restUrl>/api/integration/externalsources/orcidV2/entries/0000-0000-0000-0000
      *
-     * @param authorityName The authorityName that defines which ExternalDataProvider is used
+     * @param externalSourceName The externalSourceName that defines which ExternalDataProvider is used
      * @param entryId       The entryId used for the lookup
      * @return              An ExternalSourceEntryResource that complies with the above params
      */
     @RequestMapping(method = RequestMethod.GET, value = "/entryValues/{entryId}")
-    public ExternalSourceEntryResource getExternalSourceEntryValue(@PathVariable("authorityName") String authorityName,
+    public ExternalSourceEntryResource getExternalSourceEntryValue(@PathVariable("externalSourceName") String
+                                                                           externalSourceName,
                                                                    @PathVariable("entryId") String entryId) {
 
         ExternalSourceEntryRest externalSourceEntryRest = externalSourceRestRepository
-            .getExternalSourceEntryValue(authorityName, entryId);
+            .getExternalSourceEntryValue(externalSourceName, entryId);
         ExternalSourceEntryResource externalSourceEntryResource = new ExternalSourceEntryResource(
             externalSourceEntryRest);
         linkService.addLinks(externalSourceEntryResource);

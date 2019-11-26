@@ -10,7 +10,7 @@ package org.dspace.external.model;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.dspace.mock.MetadataValueDTO;
+import org.dspace.content.MetadataValueDTO;
 
 /**
  * The representation model object for external data
@@ -30,7 +30,7 @@ public class ExternalDataObject {
      */
     private String source;
     /**
-     * The list of Metadata values. These our MockMetadataValues because they won't exist in the DB
+     * The list of Metadata values. These our MetadataValueDTO because they won't exist in the DB
      */
     private List<MetadataValueDTO> metadata = new LinkedList<>();
     /**
