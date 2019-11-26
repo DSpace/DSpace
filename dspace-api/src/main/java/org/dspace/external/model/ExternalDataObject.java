@@ -10,7 +10,7 @@ package org.dspace.external.model;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.dspace.content.MetadataValueDTO;
+import org.dspace.content.dto.MetadataValueDTO;
 
 /**
  * The representation model object for external data
