@@ -28,7 +28,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.DCPersonName;
-import org.dspace.content.MetadataValueDTO;
+import org.dspace.content.dto.MetadataValueDTO;
 import org.dspace.external.model.ExternalDataObject;
 import org.dspace.external.provider.ExternalDataProvider;
 import org.xml.sax.Attributes;

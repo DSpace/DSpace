@@ -25,7 +25,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.dspace.content.MetadataValueDTO;
+import org.dspace.content.dto.MetadataValueDTO;
 import org.dspace.external.OrcidRestConnector;
 import org.dspace.external.model.ExternalDataObject;
 import org.dspace.external.provider.ExternalDataProvider;
