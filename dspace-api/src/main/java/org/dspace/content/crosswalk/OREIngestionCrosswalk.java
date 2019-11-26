@@ -196,6 +196,7 @@ public class OREIngestionCrosswalk
 
             // ingest and update
             if (in != null) {
+                log.debug("targetBundle: " + targetBundle + " , item: " + item.getID());
                 Bitstream newBitstream = bitstreamService.create(context, targetBundle, in);
 
                 String bsName = resource.getAttributeValue("title");
