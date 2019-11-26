@@ -42,6 +42,24 @@ public class BitstreamMatcher {
         );
     }
 
+    public static Matcher<? super Object> matchBitstreamEntry(UUID uuid, long size, String name, String description) {
+        return allOf(
+                //Check ID and size
+                hasJsonPath("$.uuid", is(uuid.toString())),
+                hasJsonPath("$.sizeBytes", is((int) size)),
+                hasJsonPath("$.metadata", allOf(
+                        matchMetadata("dc.title", name),
+                        matchMetadata("dc.description", description)
+                )),
+                //Make sure we have a checksum
+                hasJsonPath("$.checkSum", matchChecksum()),
+                //Make sure we have a valid format
+                hasJsonPath("$._embedded.format", matchFormat()),
+                //Check links
+                matchBitstreamLinks(uuid)
+        );
+    }
+
     public static Matcher<? super Object> matchBitstreamEntry(UUID uuid, long size) {
         return allOf(
             //Check ID and size

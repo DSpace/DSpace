@@ -7,6 +7,10 @@
  */
 package org.dspace.content;
 
+import static org.dspace.core.Constants.ADD;
+import static org.dspace.core.Constants.REMOVE;
+import static org.dspace.core.Constants.WRITE;
+
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -266,6 +270,81 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
     @Override
     public List<ResourcePolicy> getBundlePolicies(Context context, Bundle bundle) throws SQLException {
         return authorizeService.getPolicies(context, bundle);
+    }
+
+    @Override
+    public void updateBitstreamOrder(Context context, Bundle bundle, int from, int to)
+            throws AuthorizeException, SQLException {
+        List<Bitstream> bitstreams = bundle.getBitstreams();
+        if (bitstreams.size() < 1 || from >= bitstreams.size() || to >= bitstreams.size() || from < 0 || to < 0) {
+            throw new IllegalArgumentException(
+                    "Invalid 'from' and 'to' arguments supplied for moving a bitstream within bundle " +
+                            bundle.getID() + ". from: " + from + "; to: " + to
+            );
+        }
+        List<UUID> bitstreamIds = new LinkedList<>();
+        for (Bitstream bitstream : bitstreams) {
+            bitstreamIds.add(bitstream.getID());
+        }
+        if (from < to) {
+            bitstreamIds.add(to + 1, bitstreamIds.get(from));
+            bitstreamIds.remove(from);
+        } else {
+            bitstreamIds.add(to, bitstreamIds.get(from));
+            bitstreamIds.remove(from + 1);
+        }
+        setOrder(context, bundle, bitstreamIds.toArray(new UUID[bitstreamIds.size()]));
+    }
+
+    @Override
+    public void moveBitstreamToBundle(Context context, Bundle targetBundle, Bitstream bitstream)
+            throws SQLException, AuthorizeException, IOException {
+        List<Bundle> bundles = new LinkedList<>();
+        bundles.addAll(bitstream.getBundles());
+
+        if (hasSufficientMovePermissions(context, bundles, targetBundle)) {
+            this.addBitstream(context, targetBundle, bitstream);
+            this.update(context, targetBundle);
+            for (Bundle bundle : bundles) {
+                this.removeBitstream(context, bundle, bitstream);
+                this.update(context, bundle);
+            }
+        }
+    }
+
+
+    /**
+     * Verifies if the context (user) has sufficient rights to the bundles in order to move a bitstream
+     *
+     * @param context      The context
+     * @param bundles      The current bundles in which the bitstream resides
+     * @param targetBundle The target bundle
+     * @return true when the context has sufficient rights
+     * @throws AuthorizeException When one of the necessary rights is not present
+     */
+    private boolean hasSufficientMovePermissions(final Context context, final List<Bundle> bundles,
+                                                 final Bundle targetBundle) throws SQLException, AuthorizeException {
+        for (Bundle bundle : bundles) {
+            if (!authorizeService.authorizeActionBoolean(context, bundle, WRITE) || !authorizeService
+                    .authorizeActionBoolean(context, bundle, REMOVE)) {
+                throw new AuthorizeException(
+                        "The current user does not have WRITE and REMOVE access to the current bundle: " + bundle
+                                .getID());
+            }
+        }
+        if (!authorizeService.authorizeActionBoolean(context, targetBundle, WRITE) || !authorizeService
+                .authorizeActionBoolean(context, targetBundle, ADD)) {
+            throw new AuthorizeException(
+                    "The current user does not have WRITE and ADD access to the target bundle: " + targetBundle
+                            .getID());
+        }
+        for (Item item : targetBundle.getItems()) {
+            if (!authorizeService.authorizeActionBoolean(context, item, WRITE)) {
+                throw new AuthorizeException(
+                        "The current user does not have WRITE access to the target bundle's item: " + item.getID());
+            }
+        }
+        return true;
     }
 
     @Override

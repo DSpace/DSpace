@@ -29,10 +29,10 @@ public class RelationshipHalLinkFactory extends HalLinkFactory<RelationshipResou
         throws Exception {
 
         list.add(buildLink("leftItem", getMethodOn()
-            .findOne(ItemRest.CATEGORY, English.plural(ItemRest.NAME), halResource.getContent().getLeftId(), null)));
+            .findOne(ItemRest.CATEGORY, English.plural(ItemRest.NAME), halResource.getContent().getLeftId())));
 
         list.add(buildLink("rightItem", getMethodOn()
-            .findOne(ItemRest.CATEGORY, English.plural(ItemRest.NAME), halResource.getContent().getRightId(), null)));
+            .findOne(ItemRest.CATEGORY, English.plural(ItemRest.NAME), halResource.getContent().getRightId())));
     }
 
     @Override

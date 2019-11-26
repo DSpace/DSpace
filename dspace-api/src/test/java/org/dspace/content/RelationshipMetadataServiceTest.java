@@ -354,4 +354,78 @@ public class RelationshipMetadataServiceTest extends AbstractUnitTest {
         assertThat(issueList.size(), equalTo(1));
         assertThat(issueList.get(0).getValue(), equalTo("2"));
     }
+
+    @Test
+    public void testGetNextRightPlace() throws Exception {
+        assertThat(relationshipService.findNextRightPlaceByRightItem(context, authorItem), equalTo(0));
+        context.turnOffAuthorisationSystem();
+
+        itemService.addMetadata(context, item, "relationship", "type", null, null, "Publication");
+        itemService.addMetadata(context, authorItem, "relationship", "type", null, null, "Author");
+        itemService.addMetadata(context, authorItem, "person", "familyName", null, null, "familyName");
+        itemService.addMetadata(context, authorItem, "person", "givenName", null, null, "firstName");
+        EntityType publicationEntityType = entityTypeService.create(context, "Publication");
+        EntityType authorEntityType = entityTypeService.create(context, "Author");
+        RelationshipType isAuthorOfPublication = relationshipTypeService
+            .create(context, publicationEntityType, authorEntityType, "isAuthorOfPublication", "isPublicationOfAuthor",
+                    null, null, null, null);
+        Relationship relationship = relationshipService.create(context, item, authorItem, isAuthorOfPublication, 0, 0);
+        context.restoreAuthSystemState();
+
+        assertThat(relationshipService.findNextRightPlaceByRightItem(context, authorItem), equalTo(1));
+
+        context.turnOffAuthorisationSystem();
+        Community community = communityService.create(null, context);
+
+        Collection col = collectionService.create(context, community);
+        WorkspaceItem is = workspaceItemService.create(context, col, false);
+        Item secondItem = installItemService.installItem(context, is);
+        itemService.addMetadata(context, secondItem, "relationship", "type", null, null, "Publication");
+        Relationship secondRelationship = relationshipService.create(context, secondItem, authorItem,
+                                                                     isAuthorOfPublication, 0, 0);
+        context.restoreAuthSystemState();
+
+        assertThat(relationshipService.findNextRightPlaceByRightItem(context, authorItem), equalTo(2));
+
+
+
+    }
+
+    @Test
+    public void testGetNextLeftPlace() throws Exception {
+        assertThat(relationshipService.findNextLeftPlaceByLeftItem(context, item), equalTo(0));
+        context.turnOffAuthorisationSystem();
+
+        itemService.addMetadata(context, item, "relationship", "type", null, null, "Publication");
+        itemService.addMetadata(context, authorItem, "relationship", "type", null, null, "Author");
+        itemService.addMetadata(context, authorItem, "person", "familyName", null, null, "familyName");
+        itemService.addMetadata(context, authorItem, "person", "givenName", null, null, "firstName");
+        EntityType publicationEntityType = entityTypeService.create(context, "Publication");
+        EntityType authorEntityType = entityTypeService.create(context, "Author");
+        RelationshipType isAuthorOfPublication = relationshipTypeService
+            .create(context, publicationEntityType, authorEntityType, "isAuthorOfPublication", "isPublicationOfAuthor",
+                    null, null, null, null);
+        Relationship relationship = relationshipService.create(context, item, authorItem, isAuthorOfPublication, 0, 0);
+        context.restoreAuthSystemState();
+
+        assertThat(relationshipService.findNextLeftPlaceByLeftItem(context, item), equalTo(1));
+
+        context.turnOffAuthorisationSystem();
+        Community community = communityService.create(null, context);
+
+        Collection col = collectionService.create(context, community);
+        WorkspaceItem is = workspaceItemService.create(context, col, false);
+        Item secondAuthor = installItemService.installItem(context, is);
+        itemService.addMetadata(context, secondAuthor, "relationship", "type", null, null, "Author");
+        itemService.addMetadata(context, secondAuthor, "person", "familyName", null, null, "familyName");
+        itemService.addMetadata(context, secondAuthor, "person", "givenName", null, null, "firstName");
+        Relationship secondRelationship = relationshipService.create(context, item, secondAuthor,
+                                                                     isAuthorOfPublication, 0, 0);
+        context.restoreAuthSystemState();
+
+        assertThat(relationshipService.findNextLeftPlaceByLeftItem(context, item), equalTo(2));
+
+
+
+    }
 }

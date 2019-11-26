@@ -24,7 +24,6 @@ public class RelationshipTypeResourceWrapper extends HALResource<RelationshipTyp
      * The constructor for the RelationshipTypeResourceWrapper
      * This will call the HALResource constructor and additionally add embeds to the resource
      * @param content           The RelationshipTypeRestWrapper object that contains the data
-     * @param utils             The Util object
      */
     public RelationshipTypeResourceWrapper(RelationshipTypeRestWrapper content, Utils utils) {
         super(content);

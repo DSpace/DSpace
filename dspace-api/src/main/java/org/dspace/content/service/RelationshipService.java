@@ -74,26 +74,26 @@ public interface RelationshipService extends DSpaceCRUDService<Relationship> {
     public Relationship create(Context context, Relationship relationship) throws SQLException, AuthorizeException;
 
     /**
-     * Retrieves the highest integer value for the leftplace property of a Relationship for all relationships
-     * that have the given item as a left item
+     * This method returns the next leftplace integer to use for a relationship with this item as the leftItem
+     *
      * @param context   The relevant DSpace context
      * @param item      The item that has to be the leftItem of a relationship for it to qualify
-     * @return          The integer value of the highest left place property of all relationships
-     *                  that have the given item as a leftitem property
+     * @return          The next integer to be used for the leftplace of a relationship with the given item
+     *                  as a left item
      * @throws SQLException If something goes wrong
      */
-    int findLeftPlaceByLeftItem(Context context, Item item) throws SQLException;
+    int findNextLeftPlaceByLeftItem(Context context, Item item) throws SQLException;
 
     /**
-     * Retrieves the highest integer value for the rightplace property of a Relationship for all relationships
-     * that have the given item as a right item
+     * This method returns the next rightplace integer to use for a relationship with this item as the rightItem
+     *
      * @param context   The relevant DSpace context
      * @param item      The item that has to be the rightitem of a relationship for it to qualify
-     * @return          The integer value of the highest right place property of all relationships
-     *                  that have the given item as a rightitem property
+     * @return          The next integer to be used for the rightplace of a relationship with the given item
+     *                  as a right item
      * @throws SQLException If something goes wrong
      */
-    int findRightPlaceByRightItem(Context context, Item item) throws SQLException;
+    int findNextRightPlaceByRightItem(Context context, Item item) throws SQLException;
 
     /**
      * This method returns a list of Relationships for which the leftItem or rightItem is equal to the given
@@ -147,10 +147,9 @@ public interface RelationshipService extends DSpaceCRUDService<Relationship> {
      * @param context           The relevant DSpace context
      * @param relationship      The Relationship object that will have it's place updated and that will be used
      *                          to retrieve the other relationships whose place might need to be updated
-     * @param isCreation        Is the relationship new or did it already exist
      * @throws SQLException     If something goes wrong
      */
-    public void updatePlaceInRelationship(Context context, Relationship relationship, boolean isCreation)
+    public void updatePlaceInRelationship(Context context, Relationship relationship)
             throws SQLException, AuthorizeException;
 
     /**
