@@ -704,14 +704,6 @@
         <property name="spellCheckEnabled" value="true"/>
     </bean>
 
-
-
-
-
-
-
-
-
     <bean id="organization" class="org.dspace.discovery.configuration.DiscoveryConfiguration"
           scope="prototype">
         <property name="id" value="organization"/>
