@@ -44,49 +44,50 @@ public class ExternalSourceRestRepository extends DSpaceRestRepository<ExternalS
 
     /**
      * This method will retrieve one ExternalSourceEntryResource based on the ExternalSource for the given
-     * AuthorityName and with the given entryId
-     * @param authorityName The authorityName that defines which ExternalDataProvider is used
+     * externalSourceName and with the given entryId
+     * @param externalSourceName The externalSourceName that defines which ExternalDataProvider is used
      * @param entryId       The entryId used for the lookup
      * @return              An ExternalSourceEntryRest object that complies with the above params
      */
-    public ExternalSourceEntryRest getExternalSourceEntryValue(String authorityName, String entryId) {
-        if (externalDataService.getExternalDataProvider(authorityName) == null) {
-            throw new ResourceNotFoundException("The externalSource for: " + authorityName + " couldn't be found");
+    public ExternalSourceEntryRest getExternalSourceEntryValue(String externalSourceName, String entryId) {
+        if (externalDataService.getExternalDataProvider(externalSourceName) == null) {
+            throw new ResourceNotFoundException("The externalSource for: " + externalSourceName + " couldn't be found");
         }
-        Optional<ExternalDataObject> externalDataObject = externalDataService.getExternalDataObject(authorityName,
+        Optional<ExternalDataObject> externalDataObject = externalDataService.getExternalDataObject(externalSourceName,
                                                                                                     entryId);
         ExternalDataObject dataObject = externalDataObject.orElseThrow(() -> new ResourceNotFoundException(
-            "Couldn't find an ExternalSource for source: " + authorityName + " and ID: " + entryId));
+            "Couldn't find an ExternalSource for source: " + externalSourceName + " and ID: " + entryId));
         return externalSourceEntryRestConverter.fromModel(dataObject);
 
     }
 
     /**
-     * This method will retrieve all the ExternalSourceEntries for the ExternalSource for the given AuthorityName param
-     * @param authorityName The authorityName that defines which ExternalDataProvider is used
+     * This method will retrieve all the ExternalSourceEntries for the ExternalSource for the given externalSourceName
+     * param
+     * @param externalSourceName The externalSourceName that defines which ExternalDataProvider is used
      * @param query         The query used in the lookup
      * @param parent        The parent used in the lookup
      * @param pageable      The pagination object
      * @return              A paginated list of ExternalSourceEntryResource objects that comply with the params
      */
-    public Page<ExternalSourceEntryRest> getExternalSourceEntries(String authorityName, String query, String parent,
+    public Page<ExternalSourceEntryRest> getExternalSourceEntries(String externalSourceName, String query, String parent,
                                                                   Pageable pageable) {
-        if (externalDataService.getExternalDataProvider(authorityName) == null) {
-            throw new ResourceNotFoundException("The externalSource for: " + authorityName + " couldn't be found");
+        if (externalDataService.getExternalDataProvider(externalSourceName) == null) {
+            throw new ResourceNotFoundException("The externalSource for: " + externalSourceName + " couldn't be found");
         }
         List<ExternalDataObject> externalDataObjects = externalDataService
-            .searchExternalDataObjects(authorityName, query, pageable.getOffset(), pageable.getPageSize());
-        int numberOfResults = externalDataService.getNumberOfResults(authorityName, query);
+            .searchExternalDataObjects(externalSourceName, query, pageable.getOffset(), pageable.getPageSize());
+        int numberOfResults = externalDataService.getNumberOfResults(externalSourceName, query);
         Page<ExternalSourceEntryRest> page = new PageImpl(externalDataObjects, pageable, numberOfResults)
                                                 .map(externalSourceEntryRestConverter);
         return page;
     }
 
     @Override
-    public ExternalSourceRest findOne(Context context, String authorityName) {
-        ExternalDataProvider externalDataProvider = externalDataService.getExternalDataProvider(authorityName);
+    public ExternalSourceRest findOne(Context context, String externalSourceName) {
+        ExternalDataProvider externalDataProvider = externalDataService.getExternalDataProvider(externalSourceName);
         if (externalDataProvider == null) {
-            throw new ResourceNotFoundException("ExternalDataProvider for: " + authorityName + " couldn't be found");
+            throw new ResourceNotFoundException("ExternalDataProvider for: " + externalSourceName + " couldn't be found");
         }
         return externalSourceRestConverter.fromModel(externalDataProvider);
     }

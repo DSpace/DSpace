@@ -17,7 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.model.MetadataRest;
 import org.dspace.app.rest.model.MetadataValueRest;
 import org.dspace.content.MetadataValue;
-import org.dspace.mock.MetadataValueDTO;
+import org.dspace.content.MetadataValueDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
@@ -26,7 +26,7 @@ import org.springframework.stereotype.Component;
  * Converter to translate between lists of domain {@link MetadataValue}s and {@link MetadataRest} representations.
  */
 @Component
-public class MockMetadataConverter implements Converter<List<MetadataValueDTO>, MetadataRest> {
+public class MetadataValueDTOListConverter implements Converter<List<MetadataValueDTO>, MetadataRest> {
 
     @Autowired
     private MetadataValueDTOConverter valueConverter;

@@ -29,7 +29,7 @@ import org.dspace.external.OrcidRestConnector;
 import org.dspace.external.model.ExternalDataObject;
 import org.dspace.external.provider.ExternalDataProvider;
 import org.dspace.external.provider.orcid.xml.XMLtoBio;
-import org.dspace.mock.MetadataValueDTO;
+import org.dspace.content.MetadataValueDTO;
 import org.json.JSONObject;
 import org.orcid.jaxb.model.common_v2.OrcidId;
 import org.orcid.jaxb.model.record_v2.Person;

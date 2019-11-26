@@ -30,7 +30,7 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.content.DCPersonName;
 import org.dspace.external.model.ExternalDataObject;
 import org.dspace.external.provider.ExternalDataProvider;
-import org.dspace.mock.MetadataValueDTO;
+import org.dspace.content.MetadataValueDTO;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;

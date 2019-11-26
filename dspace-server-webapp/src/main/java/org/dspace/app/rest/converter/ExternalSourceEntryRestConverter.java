@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component;
 public class ExternalSourceEntryRestConverter implements DSpaceConverter<ExternalDataObject, ExternalSourceEntryRest> {
 
     @Autowired
-    private MockMetadataConverter metadataConverter;
+    private MetadataValueDTOListConverter metadataConverter;
 
     @Override
     public ExternalSourceEntryRest fromModel(ExternalDataObject externalDataObject) {

@@ -26,7 +26,7 @@ import org.dspace.app.sherpa.SHERPAPublisher;
 import org.dspace.app.sherpa.SHERPAResponse;
 import org.dspace.external.model.ExternalDataObject;
 import org.dspace.external.provider.ExternalDataProvider;
-import org.dspace.mock.MetadataValueDTO;
+import org.dspace.content.MetadataValueDTO;
 
 /**
  * This class is the implementation of the ExternalDataProvider interface that will deal with SherpaPublisher External
