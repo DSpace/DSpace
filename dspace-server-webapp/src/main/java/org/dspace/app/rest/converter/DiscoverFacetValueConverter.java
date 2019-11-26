@@ -8,6 +8,7 @@
 package org.dspace.app.rest.converter;
 
 import org.dspace.app.rest.model.SearchFacetValueRest;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.discovery.DiscoverResult;
 import org.springframework.stereotype.Component;
 
@@ -17,8 +18,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class DiscoverFacetValueConverter {
 
-    public SearchFacetValueRest convert(final DiscoverResult.FacetResult value) {
+    public SearchFacetValueRest convert(final DiscoverResult.FacetResult value, final Projection projection) {
         SearchFacetValueRest valueRest = new SearchFacetValueRest();
+        valueRest.setProjection(projection);
         valueRest.setLabel(value.getDisplayedValue());
         valueRest.setFilterValue(value.getAsFilterQuery());
         valueRest.setFilterType(value.getFilterType());

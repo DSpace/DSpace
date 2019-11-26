@@ -61,7 +61,7 @@ public class RelationshipDAOImpl extends AbstractHibernateDAO<Relationship> impl
     }
 
     @Override
-    public int findLeftPlaceByLeftItem(Context context, Item item) throws SQLException {
+    public int findNextLeftPlaceByLeftItem(Context context, Item item) throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Relationship.class);
         Root<Relationship> relationshipRoot = criteriaQuery.from(Relationship.class);
@@ -70,25 +70,25 @@ public class RelationshipDAOImpl extends AbstractHibernateDAO<Relationship> impl
         List<Relationship> list = list(context, criteriaQuery, false, Relationship.class, -1, -1);
         list.sort((o1, o2) -> o2.getLeftPlace() - o1.getLeftPlace());
         if (!list.isEmpty()) {
-            return list.get(0).getLeftPlace();
+            return list.get(0).getLeftPlace() + 1;
         } else {
-            return 1;
+            return 0;
         }
     }
 
     @Override
-    public int findRightPlaceByRightItem(Context context, Item item) throws SQLException {
+    public int findNextRightPlaceByRightItem(Context context, Item item) throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Relationship.class);
         Root<Relationship> relationshipRoot = criteriaQuery.from(Relationship.class);
         criteriaQuery.select(relationshipRoot);
         criteriaQuery.where(criteriaBuilder.equal(relationshipRoot.get(Relationship_.rightItem), item));
         List<Relationship> list = list(context, criteriaQuery, false, Relationship.class, -1, -1);
-        list.sort((o1, o2) -> o2.getLeftPlace() - o1.getLeftPlace());
+        list.sort((o1, o2) -> o2.getRightPlace() - o1.getRightPlace());
         if (!list.isEmpty()) {
-            return list.get(0).getLeftPlace();
+            return list.get(0).getRightPlace() + 1;
         } else {
-            return 1;
+            return 0;
         }
     }
 

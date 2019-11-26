@@ -19,7 +19,7 @@ import org.dspace.app.rest.utils.Utils;
  */
 @RelNameDSpaceResource(EPersonRest.NAME)
 public class EPersonResource extends DSpaceResource<EPersonRest> {
-    public EPersonResource(EPersonRest eperson, Utils utils, String... rels) {
-        super(eperson, utils, rels);
+    public EPersonResource(EPersonRest eperson, Utils utils) {
+        super(eperson, utils);
     }
 }

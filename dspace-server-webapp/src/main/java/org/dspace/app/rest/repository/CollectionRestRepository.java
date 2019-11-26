@@ -9,7 +9,6 @@ package org.dspace.app.rest.repository;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import javax.servlet.ServletInputStream;
@@ -20,17 +19,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
-import org.dspace.app.rest.converter.BitstreamConverter;
-import org.dspace.app.rest.converter.CollectionConverter;
-import org.dspace.app.rest.converter.MetadataConverter;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.CollectionRest;
 import org.dspace.app.rest.model.CommunityRest;
-import org.dspace.app.rest.model.hateoas.CollectionResource;
 import org.dspace.app.rest.model.patch.Patch;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.repository.patch.DSpaceObjectPatch;
 import org.dspace.app.rest.utils.CollectionRestEqualityUtils;
 import org.dspace.authorize.AuthorizeException;
@@ -44,7 +40,6 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -67,15 +62,6 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
     CommunityService communityService;
 
     @Autowired
-    CollectionConverter converter;
-
-    @Autowired
-    BitstreamConverter bitstreamConverter;
-
-    @Autowired
-    MetadataConverter metadataConverter;
-
-    @Autowired
     CollectionRestEqualityUtils collectionRestEqualityUtils;
 
     @Autowired
@@ -84,9 +70,9 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
     @Autowired
     private BitstreamService bitstreamService;
 
-    public CollectionRestRepository(CollectionService dsoService,
-                                    CollectionConverter dsoConverter) {
-        super(dsoService, dsoConverter, new DSpaceObjectPatch<CollectionRest>() {});
+    public CollectionRestRepository(CollectionService dsoService) {
+        super(dsoService, new DSpaceObjectPatch<CollectionRest>() {});
+        this.cs = dsoService;
     }
 
     @Override
@@ -101,66 +87,47 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
         if (collection == null) {
             return null;
         }
-        return dsoConverter.fromModel(collection);
+        return converter.toRest(collection, utils.obtainProjection());
     }
 
     @Override
     public Page<CollectionRest> findAll(Context context, Pageable pageable) {
-        List<Collection> it = null;
-        List<Collection> collections = new ArrayList<Collection>();
-        int total = 0;
         try {
-            total = cs.countTotal(context);
-            it = cs.findAll(context, pageable.getPageSize(), pageable.getOffset());
-            for (Collection c : it) {
-                collections.add(c);
-            }
+            long total = cs.countTotal(context);
+            List<Collection> collections = cs.findAll(context, pageable.getPageSize(), pageable.getOffset());
+            return converter.toRestPage(collections, pageable, total, utils.obtainProjection(true));
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<CollectionRest> page = new PageImpl<Collection>(collections, pageable, total).map(dsoConverter);
-        return page;
     }
 
     @SearchRestMethod(name = "findAuthorizedByCommunity")
     public Page<CollectionRest> findAuthorizedByCommunity(
             @Parameter(value = "uuid", required = true) UUID communityUuid, Pageable pageable) {
-        Context context = obtainContext();
-        List<Collection> it = null;
-        List<Collection> collections = new ArrayList<Collection>();
         try {
+            Context context = obtainContext();
             Community com = communityService.find(context, communityUuid);
             if (com == null) {
                 throw new ResourceNotFoundException(
                         CommunityRest.CATEGORY + "." + CommunityRest.NAME + " with id: " + communityUuid
                         + " not found");
             }
-            it = cs.findAuthorized(context, com, Constants.ADD);
-            for (Collection c : it) {
-                collections.add(c);
-            }
+            List<Collection> collections = cs.findAuthorized(context, com, Constants.ADD);
+            return converter.toRestPage(utils.getPage(collections, pageable), utils.obtainProjection(true));
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<CollectionRest> page = utils.getPage(collections, pageable).map(dsoConverter);
-        return page;
     }
 
     @SearchRestMethod(name = "findAuthorized")
     public Page<CollectionRest> findAuthorized(Pageable pageable) {
-        Context context = obtainContext();
-        List<Collection> it = null;
-        List<Collection> collections = new ArrayList<Collection>();
         try {
-            it = cs.findAuthorizedOptimized(context, Constants.ADD);
-            for (Collection c : it) {
-                collections.add(c);
-            }
+            Context context = obtainContext();
+            List<Collection> collections = cs.findAuthorizedOptimized(context, Constants.ADD);
+            return converter.toRestPage(utils.getPage(collections, pageable), utils.obtainProjection(true));
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<CollectionRest> page = utils.getPage(collections, pageable).map(dsoConverter);
-        return page;
     }
 
     @Override
@@ -173,11 +140,6 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
     @Override
     public Class<CollectionRest> getDomainClass() {
         return CollectionRest.class;
-    }
-
-    @Override
-    public CollectionResource wrapResource(CollectionRest collection, String... rels) {
-        return new CollectionResource(collection, utils, rels);
     }
 
     @Override
@@ -217,7 +179,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
         } catch (SQLException e) {
             throw new RuntimeException("Unable to create new Collection under parent Community " + id, e);
         }
-        return converter.convert(collection);
+        return converter.toRest(collection, Projection.DEFAULT);
     }
 
 
@@ -236,7 +198,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
         if (collection == null) {
             throw new ResourceNotFoundException(apiCategory + "." + model + " with id: " + id + " not found");
         }
-        CollectionRest originalCollectionRest = converter.fromModel(collection);
+        CollectionRest originalCollectionRest = converter.toRest(collection, Projection.DEFAULT);
         if (collectionRestEqualityUtils.isCollectionRestEqualWithoutMetadata(originalCollectionRest, collectionRest)) {
             metadataConverter.setMetadata(context, collection, collectionRest.getMetadata());
         } else {
@@ -244,7 +206,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
                                                    + id + ", "
                                                    + collectionRest.getId());
         }
-        return converter.fromModel(collection);
+        return converter.toRest(collection, Projection.DEFAULT);
     }
     @Override
     @PreAuthorize("hasPermission(#id, 'COLLECTION', 'DELETE')")
@@ -289,6 +251,6 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
         Bitstream bitstream = cs.setLogo(context, collection, uploadfile.getInputStream());
         cs.update(context, collection);
         bitstreamService.update(context, bitstream);
-        return bitstreamConverter.fromModel(context.reloadEntity(bitstream));
+        return converter.toRest(context.reloadEntity(bitstream), Projection.DEFAULT);
     }
 }

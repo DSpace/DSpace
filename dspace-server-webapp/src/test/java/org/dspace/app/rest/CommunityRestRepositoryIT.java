@@ -30,16 +30,16 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
-import org.dspace.app.rest.converter.CommunityConverter;
+import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.matcher.CommunityMatcher;
 import org.dspace.app.rest.matcher.MetadataMatcher;
 import org.dspace.app.rest.matcher.PageMatcher;
 import org.dspace.app.rest.model.CommunityRest;
 import org.dspace.app.rest.model.MetadataRest;
 import org.dspace.app.rest.model.MetadataValueRest;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.app.rest.test.MetadataPatchSuite;
 import org.dspace.authorize.service.AuthorizeService;
@@ -62,7 +62,7 @@ import org.springframework.test.web.servlet.MvcResult;
 public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Autowired
-    CommunityConverter communityConverter;
+    ConverterService converter;
 
     @Autowired
     CommunityService communityService;
@@ -831,7 +831,7 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
 
         ObjectMapper mapper = new ObjectMapper();
 
-        CommunityRest communityRest = communityConverter.fromModel(parentCommunity);
+        CommunityRest communityRest = converter.toRest(parentCommunity, Projection.DEFAULT);
 
         communityRest.setMetadata(new MetadataRest()
                 .put("dc.title", new MetadataValueRest("Electronic theses and dissertations")));
@@ -1041,7 +1041,7 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
 
         ObjectMapper mapper = new ObjectMapper();
 
-        CommunityRest communityRest = communityConverter.fromModel(parentCommunity);
+        CommunityRest communityRest = converter.toRest(parentCommunity, Projection.DEFAULT);
 
         communityRest.setMetadata(new MetadataRest()
                 .put("dc.title", new MetadataValueRest("Electronic theses and dissertations")));

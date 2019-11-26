@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.dspace.app.rest.model.SearchConfigurationRest;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.configuration.DiscoverySearchFilter;
 import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
@@ -24,9 +25,13 @@ import org.springframework.stereotype.Component;
  * to the convert method.
  */
 @Component
-public class DiscoverConfigurationConverter {
-    public SearchConfigurationRest convert(DiscoveryConfiguration configuration) {
+public class DiscoverConfigurationConverter
+        implements DSpaceConverter<DiscoveryConfiguration, SearchConfigurationRest> {
+
+    @Override
+    public SearchConfigurationRest convert(DiscoveryConfiguration configuration, Projection projection) {
         SearchConfigurationRest searchConfigurationRest = new SearchConfigurationRest();
+        searchConfigurationRest.setProjection(projection);
         if (configuration != null) {
             addSearchFilters(searchConfigurationRest,
                              configuration.getSearchFilters(), configuration.getSidebarFacets());
@@ -34,6 +39,11 @@ public class DiscoverConfigurationConverter {
             setDefaultSortOption(configuration, searchConfigurationRest);
         }
         return searchConfigurationRest;
+    }
+
+    @Override
+    public Class<DiscoveryConfiguration> getModelClass() {
+        return DiscoveryConfiguration.class;
     }
 
     private void setDefaultSortOption(DiscoveryConfiguration configuration,
