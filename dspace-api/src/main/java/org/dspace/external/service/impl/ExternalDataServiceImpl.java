@@ -16,6 +16,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataValueDTO;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
@@ -24,7 +25,6 @@ import org.dspace.core.Context;
 import org.dspace.external.model.ExternalDataObject;
 import org.dspace.external.provider.ExternalDataProvider;
 import org.dspace.external.service.ExternalDataService;
-import org.dspace.mock.MockMetadataValue;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -102,11 +102,11 @@ public class ExternalDataServiceImpl implements ExternalDataService {
         }
         WorkspaceItem workspaceItem = workspaceItemService.create(context, collection, true);
         Item item = workspaceItem.getItem();
-        for (MockMetadataValue mockMetadataValue : externalDataObject.getMetadata()) {
-            itemService.addMetadata(context, item, mockMetadataValue.getSchema(), mockMetadataValue.getElement(),
-                                    mockMetadataValue.getQualifier(), mockMetadataValue.getLanguage(),
-                                    mockMetadataValue.getValue(), mockMetadataValue.getAuthority(),
-                                    mockMetadataValue.getConfidence());
+        for (MetadataValueDTO metadataValueDTO : externalDataObject.getMetadata()) {
+            itemService.addMetadata(context, item, metadataValueDTO.getSchema(), metadataValueDTO.getElement(),
+                                    metadataValueDTO.getQualifier(), metadataValueDTO.getLanguage(),
+                                    metadataValueDTO.getValue(), metadataValueDTO.getAuthority(),
+                                    metadataValueDTO.getConfidence());
         }
 
         return installItemService.installItem(context, workspaceItem);
