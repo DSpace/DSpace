@@ -146,7 +146,7 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
     public List<MetadataValue> getMetadataByMetadataString(T dso, String mdString) {
         StringTokenizer dcf = new StringTokenizer(mdString, ".");
 
-        String[] tokens = { "", "", "" };
+        String[] tokens = {"", "", ""};
         int i = 0;
         while (dcf.hasMoreTokens()) {
             tokens[i] = dcf.nextToken().trim();
@@ -250,8 +250,11 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
                 }
             }
             MetadataValue metadataValue = metadataValueService.create(context, dso, metadataField);
-            //Set place to list length
-            metadataValue.setPlace(this.getMetadata(dso, Item.ANY, Item.ANY, Item.ANY, Item.ANY).size());
+            //Set place to list length of all metadatavalues for the given schema.element.qualifier combination.
+            // Subtract one to adhere to the 0 as first element rule
+            metadataValue.setPlace(
+                this.getMetadata(dso, metadataField.getMetadataSchema().getName(), metadataField.getElement(),
+                                 metadataField.getQualifier(), Item.ANY).size() - 1);
 
             metadataValue.setLanguage(lang == null ? null : lang.trim());
 
@@ -533,7 +536,7 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
     protected String[] getMDValueByField(String field) {
         StringTokenizer dcf = new StringTokenizer(field, ".");
 
-        String[] tokens = { "", "", "" };
+        String[] tokens = {"", "", ""};
         int i = 0;
         while (dcf.hasMoreTokens()) {
             tokens[i] = dcf.nextToken().trim();
@@ -571,7 +574,7 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
                     if (compare == 0) {
                         if (o1 instanceof RelationshipMetadataValue) {
                             return 1;
-                        } else if (o2 instanceof  RelationshipMetadataValue) {
+                        } else if (o2 instanceof RelationshipMetadataValue) {
                             return -1;
                         }
                     }

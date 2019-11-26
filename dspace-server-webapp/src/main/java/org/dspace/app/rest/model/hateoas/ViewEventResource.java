@@ -13,7 +13,7 @@ import org.dspace.app.rest.utils.Utils;
 
 @RelNameDSpaceResource(ViewEventRest.NAME)
 public class ViewEventResource extends DSpaceResource<ViewEventRest> {
-    public ViewEventResource(ViewEventRest data, Utils utils, String... rels) {
-        super(data, utils, rels);
+    public ViewEventResource(ViewEventRest data, Utils utils) {
+        super(data, utils);
     }
 }
