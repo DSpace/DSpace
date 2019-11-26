@@ -96,7 +96,8 @@ public class ExternalSourceEntryUriListHandler implements UriListHandler<Item> {
     }
 
     @Override
-    public Item handle(Context context, HttpServletRequest request, List<String> uriList) {
+    public Item handle(Context context, HttpServletRequest request, List<String> uriList)
+        throws SQLException, AuthorizeException {
         ExternalDataObject dataObject = getExternalDataObjectFromUriList(uriList);
 
         String owningCollectionUuid = request.getParameter("owningCollection");
@@ -107,7 +108,7 @@ public class ExternalSourceEntryUriListHandler implements UriListHandler<Item> {
             item = externalDataService.createItemFromExternalDataObject(context, dataObject, collection);
         } catch (AuthorizeException | SQLException e) {
             log.error(e.getMessage(), e);
-            throw new RuntimeException(e);
+            throw e;
         }
         return item;
     }

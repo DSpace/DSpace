@@ -7,11 +7,13 @@
  */
 package org.dspace.app.rest.repository.handler.service;
 
+import java.sql.SQLException;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.repository.handler.UriListHandler;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -39,7 +41,8 @@ public class UriListHandlerService {
      * @param <T>       The class to be returned, same as the class parameter above
      * @return          The object that was handled through this method
      */
-    public <T> T handle(Context context, HttpServletRequest request, List<String> uriList, Class<T> clazz) {
+    public <T> T handle(Context context, HttpServletRequest request, List<String> uriList, Class<T> clazz)
+        throws SQLException, AuthorizeException {
 
         // Loop all the uriListHandlers
         for (UriListHandler uriListHandler : uriListHandlers) {

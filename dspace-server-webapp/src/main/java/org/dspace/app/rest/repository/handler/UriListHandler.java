@@ -7,9 +7,11 @@
  */
 package org.dspace.app.rest.repository.handler;
 
+import java.sql.SQLException;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 
 /**
@@ -45,6 +47,6 @@ public interface UriListHandler<T> {
      * @param uriList   The list of UriList Strings
      * @return          The object of class T that was handled
      */
-    T handle(Context context, HttpServletRequest request, List<String> uriList);
+    T handle(Context context, HttpServletRequest request, List<String> uriList) throws SQLException, AuthorizeException;
 
 }
