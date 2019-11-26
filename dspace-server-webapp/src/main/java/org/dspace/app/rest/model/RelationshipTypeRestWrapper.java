@@ -18,15 +18,13 @@ import org.dspace.app.rest.RelationshipTypeRestController;
  * RelationshipTypeRest objects
  * The other methods are generic getters and setters
  */
-public class RelationshipTypeRestWrapper implements RestAddressableModel {
+public class RelationshipTypeRestWrapper extends RestAddressableModel {
 
     @JsonIgnore
     private List<RelationshipTypeRest> relationshipTypeRestList;
 
     private String entityTypeLabel;
     private Integer entityTypeId;
-
-
 
     public List<RelationshipTypeRest> getRelationshipTypeRestList() {
         return relationshipTypeRestList;

@@ -10,7 +10,6 @@ package org.dspace.app.rest.model.hateoas;
 import org.dspace.app.rest.model.HarvestedCollectionRest;
 import org.dspace.app.rest.model.HarvesterMetadataRest;
 import org.dspace.app.rest.utils.Utils;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * HarvestedCollection Rest HAL Resource. The HAL Resource wraps the REST Resource
@@ -20,11 +19,11 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class HarvestedCollectionResource extends HALResource<HarvestedCollectionRest> {
 
-    @Autowired
     private Utils utils;
 
-    public HarvestedCollectionResource(HarvestedCollectionRest data) {
+    public HarvestedCollectionResource(HarvestedCollectionRest data, Utils utils) {
         super(data);
+        this.utils = utils;
         embedResource("harvestermetadata", data.getMetadataConfigs());
     }
 

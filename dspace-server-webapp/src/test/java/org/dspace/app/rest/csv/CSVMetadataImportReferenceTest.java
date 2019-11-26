@@ -86,9 +86,9 @@ public class CSVMetadataImportReferenceTest extends AbstractEntityIntegrationTes
             }
         }
         if (placeDirection.equalsIgnoreCase("left")) {
-            assertEquals(relationship.getLeftPlace(), placeCount);
+            assertEquals(placeCount, relationship.getLeftPlace());
         } else {
-            assertEquals(relationship.getRightPlace(), placeCount);
+            assertEquals(placeCount, relationship.getRightPlace());
         }
         assertEquals(expectedCount, foundCount);
     }
