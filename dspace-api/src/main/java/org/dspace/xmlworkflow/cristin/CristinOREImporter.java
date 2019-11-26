@@ -145,10 +145,10 @@ public class CristinOREImporter implements IngestionCrosswalk, OAIConfigurableCr
         }
         Document doc = new Document();
         doc.addContent(root.detach());
-
+        log.debug("Created new document for item " + item.getID());
         // now, ingest the bitstreams (if necessary - this method will decide based on the config)
         Bitstream metadataBitstream = this.ingestBitstreams(context, doc, item);
-
+        log.debug("Done ingesting bitstreams for item " + item.getID());
         //Iff metadata is provided
         if (metadataBitstream != null) {
             //update the metadata from the metadata bundle
@@ -246,6 +246,7 @@ public class CristinOREImporter implements IngestionCrosswalk, OAIConfigurableCr
 
             // 0 - we always ingest the metadata bitstream
             if (isMdBs) {
+                log.debug("0 - we always ingest the metadata bitstream");
                 this.backupAndRemove(context, item, metadataBitstreams);
                 metadataBitstream = fm.ingestBitstream(context, href, ib.getName(), ib.getMimetype(), targetBundle);
             }
@@ -257,24 +258,28 @@ public class CristinOREImporter implements IngestionCrosswalk, OAIConfigurableCr
 
             // 2 - if the bitstream already exists, but has changed, replace it
             else if (fm.bitstreamNameAlreadyExists(ib, originalBitstreams)) {
+                log.debug("2 - if the bitstream already exists, but has changed, replace it");
                 this.backupAndRemove(context, item, targetBundle, ib);
                 fm.ingestBitstream(context, href, ib.getName(), ib.getMimetype(), targetBundle);
             }
 
             // 3 - if the bitstream does not exist, create it
             else if (fm.isNewBitstream(ib, originalBitstreams)) {
+                log.debug("3 - if the bitstream does not exist, create it");
                 fm.ingestBitstream(context, href, ib.getName(), ib.getMimetype(), targetBundle);
             }
         }
 
         // 4 - if there is not a version of an existing bitstream in the incoming bitstreams, delete it
         for (Bitstream bs : originalBitstreams) {
+            log.debug("4 - if there is not a version of an existing bitstream in the incoming bitstreams, delete it");
             if (!fm.bitstreamIsIncoming(bs, incomingBitstreams)) {
                 this.backupAndRemove(context, item, bs);
             }
         }
 
         // 5 - ensure that the resulting order of the bitstreams is commensurate with the incoming bitstreams
+        log.debug("5 - ensure that the resulting order of the bitstreams is commensurate with the incoming bitstreams");
         fm.sequenceBitstreams(context, item, "ORIGINAL", incomingBitstreams);
 
         return metadataBitstream;
