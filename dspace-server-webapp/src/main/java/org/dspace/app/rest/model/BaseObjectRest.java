@@ -21,7 +21,7 @@ import org.springframework.hateoas.Identifiable;
  * @param <T> the class of the resource identifier
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
-public abstract class BaseObjectRest<T extends Serializable> implements Identifiable<T>, RestAddressableModel {
+public abstract class BaseObjectRest<T extends Serializable> extends RestAddressableModel implements Identifiable<T> {
 
     protected T id;
 

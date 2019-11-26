@@ -20,7 +20,7 @@ import org.dspace.app.rest.utils.Utils;
  */
 @RelNameDSpaceResource(SiteRest.NAME)
 public class SiteResource extends DSpaceResource<SiteRest> {
-    public SiteResource(SiteRest site, Utils utils, String... rels) {
-        super(site, utils, rels);
+    public SiteResource(SiteRest site, Utils utils) {
+        super(site, utils);
     }
 }

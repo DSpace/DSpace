@@ -66,10 +66,16 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
 
     @Override
     public List<T> findAll(Context context, Class<T> clazz) throws SQLException {
+
+        return findAll(context, clazz, -1, -1);
+    }
+
+    @Override
+    public List<T> findAll(Context context, Class<T> clazz, Integer limit, Integer offset) throws SQLException {
         CriteriaQuery criteriaQuery = getCriteriaQuery(getCriteriaBuilder(context), clazz);
         Root<T> root = criteriaQuery.from(clazz);
         criteriaQuery.select(root);
-        return executeCriteriaQuery(context, criteriaQuery, false, -1, -1);
+        return executeCriteriaQuery(context, criteriaQuery, false, limit, offset);
     }
 
     @Override

@@ -13,7 +13,6 @@ import org.springframework.stereotype.Component;
 @Component(StatisticsSupportRest.CATEGORY + "." + StatisticsSupportRest.NAME)
 public class StatisticsRestRepository extends AbstractDSpaceRestRepository {
 
-
     public StatisticsSupportRest getStatisticsSupport() {
         return new StatisticsSupportRest();
     }

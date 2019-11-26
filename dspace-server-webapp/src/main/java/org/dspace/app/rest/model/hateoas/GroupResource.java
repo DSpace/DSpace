@@ -19,7 +19,7 @@ import org.dspace.app.rest.utils.Utils;
  */
 @RelNameDSpaceResource(GroupRest.NAME)
 public class GroupResource extends DSpaceResource<GroupRest> {
-    public GroupResource(GroupRest group, Utils utils, String... rels) {
-        super(group, utils, rels);
+    public GroupResource(GroupRest group, Utils utils) {
+        super(group, utils);
     }
 }

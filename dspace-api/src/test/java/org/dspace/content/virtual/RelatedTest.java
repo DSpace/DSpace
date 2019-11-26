@@ -124,15 +124,15 @@ public class RelatedTest {
         Entity entity = mock(Entity.class);
         EntityType entityType = mock(EntityType.class);
         RelationshipType relationshipType = mock(RelationshipType.class);
-        related.setRelationshipTypeString("LeftLabel");
+        related.setRelationshipTypeString("LeftwardType");
         relationshipTypeList.add(relationshipType);
         relationshipList.add(relationship);
         related.setPlace(0);
 
         // Mock the state of objects utilized in getRelationsByLabel() to meet the success criteria of an invocation
         when(item.getID()).thenReturn(UUID.randomUUID());
-        when(relationshipType.getLeftLabel()).thenReturn("LeftLabel");
-        when(relationshipType.getRightLabel()).thenReturn("RightLabel");
+        when(relationshipType.getLeftwardType()).thenReturn("LeftwardType");
+        when(relationshipType.getRightwardType()).thenReturn("RightwardType");
         when(relationshipType.getLeftType()).thenReturn(entityType);
         when(relationshipType.getRightType()).thenReturn(entityType);
         when(entityService.getAllRelationshipTypes(context, entity)).thenReturn(relationshipTypeList);

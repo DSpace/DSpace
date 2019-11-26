@@ -120,6 +120,7 @@ public class Related implements VirtualMetadataConfiguration {
      * Generic setter for the useForPlace property
      * @param useForPlace   The boolean value that the useForPlace property will be set to
      */
+    @Override
     public void setUseForPlace(boolean useForPlace) {
         this.useForPlace = useForPlace;
     }
@@ -128,8 +129,17 @@ public class Related implements VirtualMetadataConfiguration {
      * Generic getter for the useForPlace property
      * @return  The useForPlace to be used by this bean
      */
+    @Override
     public boolean getUseForPlace() {
         return useForPlace;
+    }
+
+    @Override
+    public void setPopulateWithNameVariant(boolean populateWithNameVariant) { }
+
+    @Override
+    public boolean getPopulateWithNameVariant() {
+        return false;
     }
 
     /**
@@ -142,6 +152,7 @@ public class Related implements VirtualMetadataConfiguration {
      *                  Will return an empty list if no relationships are found
      * @throws SQLException If something goes wrong
      */
+    @Override
     public List<String> getValues(Context context, Item item) throws SQLException {
         Entity entity = entityService.findByItemId(context, item.getID());
         EntityType entityType = entityService.getType(context, entity);
@@ -149,8 +160,8 @@ public class Related implements VirtualMetadataConfiguration {
         List<RelationshipType> relationshipTypes = entityService.getAllRelationshipTypes(context, entity);
         List<RelationshipType> possibleRelationshipTypes = new LinkedList<>();
         for (RelationshipType relationshipType : relationshipTypes) {
-            if (StringUtils.equals(relationshipType.getLeftLabel(), relationshipTypeString) || StringUtils
-                .equals(relationshipType.getRightLabel(), relationshipTypeString)) {
+            if (StringUtils.equals(relationshipType.getLeftwardType(), relationshipTypeString) || StringUtils
+                .equals(relationshipType.getRightwardType(), relationshipTypeString)) {
                 possibleRelationshipTypes.add(relationshipType);
             }
         }
