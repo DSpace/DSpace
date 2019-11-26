@@ -23,7 +23,6 @@ import org.dspace.app.rest.exception.RESTAuthorizationException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.RestAddressableModel;
-import org.dspace.app.rest.model.hateoas.DSpaceResource;
 import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.authorize.AuthorizeException;
@@ -38,9 +37,8 @@ import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
- * This is the base class for any Rest Repository. It add a DSpaceContext to the
- * normal Spring Data Repository methods signature and assure that the
- * repository is able to wrap a DSpace Rest Object in a HAL Resource
+ * Base class for any Rest Repository. Adds a DSpaceContext to the
+ * normal Spring Data Repository methods signature.
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
@@ -248,17 +246,6 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
      * The REST model supported by the repository
      */
     public abstract Class<T> getDomainClass();
-
-    /**
-     * Wrap the REST model in a REST HAL Resource
-     *
-     * @param model
-     *            the rest model instance
-     * @param rels
-     *            the HAL links
-     * @return the REST Resource
-     */
-    public abstract DSpaceResource<T> wrapResource(T model, String... rels);
 
     /**
      * Create and return a new instance. Data are usually retrieved from the thread bound http request

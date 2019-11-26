@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest;
 
+import static org.dspace.app.rest.utils.RegexUtils.REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID;
 import static org.dspace.core.Constants.COLLECTION;
 
 import java.io.IOException;
@@ -18,7 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.dspace.app.rest.converter.CollectionConverter;
+import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.exception.MethodNotAllowedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.link.HalLinkService;
@@ -46,9 +47,7 @@ import org.springframework.web.bind.annotation.RestController;
  * This class will typically receive a UUID that resolves to an Item and it'll perform logic on its collections
  */
 @RestController
-@RequestMapping("/api/core/items/" +
-        "{uuid:[0-9a-fxA-FX]{8}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{12}}" +
-        "/mappedCollections")
+@RequestMapping("/api/core/items" + REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID + "/mappedCollections")
 public class MappedCollectionRestController {
 
     private static final Logger log = Logger.getLogger(MappedCollectionRestController.class);
@@ -57,7 +56,7 @@ public class MappedCollectionRestController {
     private ItemService itemService;
 
     @Autowired
-    private CollectionConverter collectionConverter;
+    private ConverterService converter;
 
     @Autowired
     private CollectionService collectionService;
@@ -100,18 +99,16 @@ public class MappedCollectionRestController {
         List<CollectionRest> mappingCollectionRest = new LinkedList<>();
         for (Collection collection : collections) {
             if (collection.getID() != owningCollectionUuid) {
-                mappingCollectionRest.add(collectionConverter.fromModel(collection));
+                mappingCollectionRest.add(converter.toRest(collection, utils.obtainProjection()));
             }
         }
 
         MappedCollectionRestWrapper mappingCollectionRestWrapper = new MappedCollectionRestWrapper();
+        mappingCollectionRestWrapper.setProjection(utils.obtainProjection());
         mappingCollectionRestWrapper.setMappedCollectionRestList(mappingCollectionRest);
         mappingCollectionRestWrapper.setItem(item);
-        MappedCollectionResourceWrapper mappingCollectionResourceWrapper = new MappedCollectionResourceWrapper(
-                mappingCollectionRestWrapper, utils, pageable);
-
-
-        halLinkService.addLinks(mappingCollectionResourceWrapper);
+        MappedCollectionResourceWrapper mappingCollectionResourceWrapper =
+                converter.toResource(mappingCollectionRestWrapper);
 
         return mappingCollectionResourceWrapper;
 
