@@ -21,7 +21,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.content.MetadataValueDTO;
+import org.dspace.content.dto.MetadataValueDTO;
 import org.dspace.content.Site;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.packager.DSpaceAIPIngester;

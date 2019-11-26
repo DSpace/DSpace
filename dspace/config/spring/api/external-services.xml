@@ -15,7 +15,7 @@
     </bean>
     <bean class="org.dspace.external.provider.impl.SherpaPublisherDataProvider">
         <property name="sourceIdentifier" value="sherpaPublisher"/>
-        <property name="url" value="${orcid.api.url}"/>
+        <property name="url" value="${sherpa.romeo.url}"/>
         <!-- please register for a free api access key to get many benefits -->
         <property name="apiKey" value="${sherpa.romeo.apiKey}"/>
 
