@@ -29,6 +29,7 @@ import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
+import org.dspace.content.MetadataValueDTO;
 import org.dspace.content.Site;
 import org.dspace.content.authority.Choices;
 import org.dspace.content.factory.ContentServiceFactory;
@@ -40,7 +41,6 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.handle.factory.HandleServiceFactory;
-import org.dspace.mock.MockMetadataValue;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;
@@ -308,13 +308,13 @@ public class XSLTDisseminationCrosswalk
      * @param dcvs list of metadata
      * @return element
      */
-    public static Element createDIM(DSpaceObject dso, List<MockMetadataValue> dcvs) {
+    public static Element createDIM(DSpaceObject dso, List<MetadataValueDTO> dcvs) {
         Element dim = new Element("dim", DIM_NS);
         String type = Constants.typeText[dso.getType()];
         dim.setAttribute("dspaceType", type);
 
         for (int i = 0; i < dcvs.size(); i++) {
-            MockMetadataValue dcv = dcvs.get(i);
+            MetadataValueDTO dcv = dcvs.get(i);
             Element field =
                 createField(dcv.getSchema(), dcv.getElement(), dcv.getQualifier(),
                             dcv.getLanguage(), dcv.getValue(), dcv.getAuthority(), dcv.getConfidence());
@@ -391,12 +391,12 @@ public class XSLTDisseminationCrosswalk
         }
     }
 
-    protected static List<MockMetadataValue> item2Metadata(Item item) {
+    protected static List<MetadataValueDTO> item2Metadata(Item item) {
         List<MetadataValue> dcvs = itemService.getMetadata(item, Item.ANY, Item.ANY, Item.ANY,
                                                            Item.ANY);
-        List<MockMetadataValue> result = new ArrayList<>();
+        List<MetadataValueDTO> result = new ArrayList<>();
         for (MetadataValue metadataValue : dcvs) {
-            result.add(new MockMetadataValue(metadataValue));
+            result.add(new MetadataValueDTO(metadataValue));
         }
 
         return result;

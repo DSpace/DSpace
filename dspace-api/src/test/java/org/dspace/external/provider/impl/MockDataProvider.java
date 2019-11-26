@@ -15,9 +15,9 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
+import org.dspace.content.MetadataValueDTO;
 import org.dspace.external.model.ExternalDataObject;
 import org.dspace.external.provider.ExternalDataProvider;
-import org.dspace.mock.MockMetadataValue;
 
 public class MockDataProvider implements ExternalDataProvider {
 
@@ -83,8 +83,8 @@ public class MockDataProvider implements ExternalDataProvider {
             externalDataObject.setId(id);
             externalDataObject.setValue(id);
             externalDataObject.setDisplayValue(id);
-            List<MockMetadataValue> list = new LinkedList<>();
-            list.add(new MockMetadataValue("dc", "contributor", "author", null, "Donald, Smith"));
+            List<MetadataValueDTO> list = new LinkedList<>();
+            list.add(new MetadataValueDTO("dc", "contributor", "author", null, "Donald, Smith"));
             externalDataObject.setMetadata(list);
 
             mockLookupMap.put(id, externalDataObject);
