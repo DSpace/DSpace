@@ -8,6 +8,7 @@
 package org.dspace.app.rest.converter;
 
 import org.dspace.app.rest.model.ExternalSourceRest;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.external.provider.ExternalDataProvider;
 import org.springframework.stereotype.Component;
 
@@ -17,17 +18,15 @@ import org.springframework.stereotype.Component;
 @Component
 public class ExternalSourceRestConverter implements DSpaceConverter<ExternalDataProvider, ExternalSourceRest> {
 
-    @Override
-    public ExternalSourceRest fromModel(ExternalDataProvider obj) {
+    public ExternalSourceRest convert(ExternalDataProvider modelObject, Projection projection) {
         ExternalSourceRest externalSourceRest = new ExternalSourceRest();
-        externalSourceRest.setId(obj.getSourceIdentifier());
-        externalSourceRest.setName(obj.getSourceIdentifier());
+        externalSourceRest.setId(modelObject.getSourceIdentifier());
+        externalSourceRest.setName(modelObject.getSourceIdentifier());
         externalSourceRest.setHierarchical(false);
         return externalSourceRest;
     }
 
-    @Override
-    public ExternalDataProvider toModel(ExternalSourceRest obj) {
-        return null;
+    public Class<ExternalDataProvider> getModelClass() {
+        return ExternalDataProvider.class;
     }
 }

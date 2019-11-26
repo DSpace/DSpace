@@ -8,6 +8,7 @@
 package org.dspace.app.rest.converter;
 
 import org.dspace.app.rest.model.ExternalSourceEntryRest;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.external.model.ExternalDataObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -21,20 +22,18 @@ public class ExternalSourceEntryRestConverter implements DSpaceConverter<Externa
     @Autowired
     private MetadataValueDTOListConverter metadataConverter;
 
-    @Override
-    public ExternalSourceEntryRest fromModel(ExternalDataObject externalDataObject) {
+    public ExternalSourceEntryRest convert(ExternalDataObject modelObject, Projection projection) {
         ExternalSourceEntryRest externalSourceEntryRest = new ExternalSourceEntryRest();
-        externalSourceEntryRest.setId(externalDataObject.getId());
-        externalSourceEntryRest.setExternalSource(externalDataObject.getSource());
-        externalSourceEntryRest.setDisplay(externalDataObject.getDisplayValue());
-        externalSourceEntryRest.setValue(externalDataObject.getValue());
-        externalSourceEntryRest.setExternalSource(externalDataObject.getSource());
-        externalSourceEntryRest.setMetadata(metadataConverter.convert(externalDataObject.getMetadata()));
+        externalSourceEntryRest.setId(modelObject.getId());
+        externalSourceEntryRest.setExternalSource(modelObject.getSource());
+        externalSourceEntryRest.setDisplay(modelObject.getDisplayValue());
+        externalSourceEntryRest.setValue(modelObject.getValue());
+        externalSourceEntryRest.setExternalSource(modelObject.getSource());
+        externalSourceEntryRest.setMetadata(metadataConverter.convert(modelObject.getMetadata()));
         return externalSourceEntryRest;
     }
 
-    @Override
-    public ExternalDataObject toModel(ExternalSourceEntryRest obj) {
-        return null;
+    public Class<ExternalDataObject> getModelClass() {
+        return ExternalDataObject.class;
     }
 }
