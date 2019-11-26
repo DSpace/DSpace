@@ -18,10 +18,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
-import org.dspace.app.rest.converter.BitstreamConverter;
-import org.dspace.app.rest.converter.CollectionConverter;
 import org.dspace.app.rest.converter.ItemConverter;
-import org.dspace.app.rest.converter.MetadataConverter;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
@@ -29,7 +26,6 @@ import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.CollectionRest;
 import org.dspace.app.rest.model.CommunityRest;
 import org.dspace.app.rest.model.ItemRest;
-import org.dspace.app.rest.model.hateoas.CollectionResource;
 import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.repository.patch.DSpaceObjectPatch;
@@ -288,7 +284,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
         cs.update(context, collection);
         itemService.update(context, templateItem);
 
-        return itemConverter.fromModel(templateItem);
+        return converter.toRest(templateItem, Projection.DEFAULT);
     }
 
     /**
@@ -306,6 +302,6 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
                             + collection.getID() + " not found");
         }
 
-        return itemConverter.fromModel(item);
+        return converter.toRest(item, Projection.DEFAULT);
     }
 }
