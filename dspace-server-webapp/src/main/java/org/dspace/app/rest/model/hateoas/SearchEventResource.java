@@ -13,7 +13,7 @@ import org.dspace.app.rest.utils.Utils;
 
 @RelNameDSpaceResource(SearchEventRest.NAME)
 public class SearchEventResource extends DSpaceResource<SearchEventRest> {
-    public SearchEventResource(SearchEventRest data, Utils utils, String... rels) {
-        super(data, utils, rels);
+    public SearchEventResource(SearchEventRest data, Utils utils) {
+        super(data, utils);
     }
 }

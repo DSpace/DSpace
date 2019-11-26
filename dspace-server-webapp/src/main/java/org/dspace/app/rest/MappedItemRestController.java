@@ -7,6 +7,8 @@
  */
 package org.dspace.app.rest;
 
+import static org.dspace.app.rest.utils.RegexUtils.REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID;
+
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -15,7 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.dspace.app.rest.converter.ItemConverter;
+import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.link.HalLinkService;
 import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.MappedItemRestWrapper;
@@ -40,8 +42,7 @@ import org.springframework.web.bind.annotation.RestController;
  * have the given collection as their owning collection
  */
 @RestController
-@RequestMapping("/api/core/collections/" +
-    "{uuid:[0-9a-fxA-FX]{8}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{12}}/mappedItems")
+@RequestMapping("/api/core/collections" + REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID + "/mappedItems")
 public class MappedItemRestController {
 
     private static final Logger log = Logger.getLogger(MappedItemRestController.class);
@@ -53,7 +54,7 @@ public class MappedItemRestController {
     private ItemService itemService;
 
     @Autowired
-    private ItemConverter itemConverter;
+    private ConverterService converter;
 
     @Autowired
     Utils utils;
@@ -67,12 +68,12 @@ public class MappedItemRestController {
      * returning only items that belong to a different collection but are mapped to the given one.
      * These Items are then encapsulated in a MappedItemResourceWrapper and returned
      *
-     * curl -X GET http://<dspace.restUrl>/api/core/collections/{uuid}/mappedItems
+     * curl -X GET http://<dspace.baseUrl>/api/core/collections/{uuid}/mappedItems
      *
      * Example:
      * <pre>
      * {@code
-     *      curl -X GET http://<dspace.restUrl>/api/core/collections/8b632938-77c2-487c-81f0-e804f63e68e6/mappedItems
+     *      curl -X GET http://<dspace.baseUrl>/api/core/collections/8b632938-77c2-487c-81f0-e804f63e68e6/mappedItems
      * }
      * </pre>
      *
@@ -95,11 +96,12 @@ public class MappedItemRestController {
         while (itemIterator.hasNext()) {
             Item item = itemIterator.next();
             if (item.getOwningCollection().getID() != uuid) {
-                mappedItemRestList.add(itemConverter.fromModel(item));
+                mappedItemRestList.add(converter.toRest(item, utils.obtainProjection()));
             }
         }
 
         MappedItemRestWrapper mappedItemRestWrapper = new MappedItemRestWrapper();
+        mappedItemRestWrapper.setProjection(utils.obtainProjection());
         mappedItemRestWrapper.setMappedItemRestList(mappedItemRestList);
         mappedItemRestWrapper.setCollectionUuid(uuid);
         MappedItemResourceWrapper mappedItemResourceWrapper =

@@ -33,14 +33,11 @@ dspace.dir=/dspace
 # DSpace host name - should match base URL.  Do not include port number
 dspace.hostname = localhost
 
-# DSpace base host URL.  Include port number etc.
-dspace.baseUrl = http://localhost:8080
+# DSpace server backend webapp URL.  Include port number etc.
+dspace.baseUrl = http://localhost:8080/server
 
-# Full link your end users will use to access DSpace. In most cases, this will be the baseurl followed by
-# the context path to the UI you are using.
-#
-# Alternatively, you can use a url redirect or deploy the web application under the servlet container root.
-#dspace.url = ${dspace.baseUrl}
+# Full link your end users will use to access DSpace. This is the URL of your angular UI
+dspace.url = http://localhost:3000
 
 # Name of the site
 dspace.name = DSpace at My University
@@ -53,11 +50,9 @@ dspace.name = DSpace at My University
 #default.language = en_US
 
 # Solr server/webapp.
-# DSpace uses Solr for all search/browse capability (and for usage statistics by default).
-# The included 'solr' webapp MUST be deployed to Tomcat for DSpace to function.
-# Usually it will be available via port 8080 and the 'solr' context path. But,
-# But, you may need to modify this if you are running DSpace on a custom port, etc.
-solr.server = http://localhost:8080/solr
+# DSpace uses Solr for all search/browse capability (and for usage statistics).
+# since DSpace 7, SOLR must be installed as a stand-alone service
+#solr.server = http://localhost:8983/solr
 
 ##########################
 # DATABASE CONFIGURATION #
