@@ -16,7 +16,7 @@ import org.dspace.app.rest.utils.Utils;
  */
 @RelNameDSpaceResource(ExternalSourceRest.NAME)
 public class ExternalSourceResource extends DSpaceResource<ExternalSourceRest> {
-    public ExternalSourceResource(ExternalSourceRest externalSourceRest, Utils utils, String... rels) {
-        super(externalSourceRest, utils, rels);
+    public ExternalSourceResource(ExternalSourceRest externalSourceRest, Utils utils) {
+        super(externalSourceRest, utils);
     }
 }

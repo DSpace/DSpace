@@ -15,9 +15,9 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
+import org.dspace.content.MetadataValueDTO;
 import org.dspace.external.model.ExternalDataObject;
 import org.dspace.external.provider.ExternalDataProvider;
-import org.dspace.content.MetadataValueDTO;
 
 public class MockDataProvider implements ExternalDataProvider {
 
