@@ -69,7 +69,7 @@ public class AuthorityEntrySearchRestController {
 
     @Autowired
     ConverterService converter;
-   
+
     @Autowired
     HalLinkService linkService;
 

@@ -583,6 +583,7 @@ public class DOIIdentifierProviderTest
         // we want the created DOI to be returned in the following format:
         // doi:10.<prefix>/<suffix>.
         String formated_doi = doiService.formatIdentifier(doi);
+        boolean t = doi.equals(formated_doi);
         assertTrue("DOI was not in the expected format!", doi.equals(formated_doi));
 
         DOI doiRow = doiService.findByDoi(context, doi.substring(DOI.SCHEME.length()));

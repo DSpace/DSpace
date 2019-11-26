@@ -49,23 +49,18 @@
    </form>      
    
    <form name="traditionalpageone">
-            <row>
-                <relation-field>
-                    <relationship-type>isAuthorOfPublication</relationship-type>
-                    <search-configuration>personConfiguration</search-configuration>
-                    <repeatable>true</repeatable>
-                    <name-variants>true</name-variants>
-                    <label>Author</label>
-                    <hint>Add an author</hint>
-                    <linked-metadata-field>
-                        <dc-schema>dc</dc-schema>
-                        <dc-element>contributor</dc-element>
-                        <dc-qualifier>author</dc-qualifier>
-                        <input-type>name</input-type>
-                    </linked-metadata-field>
-                    <required></required>
-                </relation-field>
-            </row>
+	 <row>
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>contributor</dc-element>
+         <dc-qualifier>author</dc-qualifier>
+         <repeatable>true</repeatable>
+         <label>Authors</label>
+         <input-type>name</input-type>
+         <hint>Enter the names of the authors of this item.</hint>
+         <required></required>
+       </field>
+     </row>
      <row>
        <field>
          <dc-schema>dc</dc-schema>
