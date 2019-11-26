@@ -11,43 +11,38 @@ import java.util.stream.Collectors;
 
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.BundleRest;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.content.Bundle;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class BundleConverter
-    extends DSpaceObjectConverter<org.dspace.content.Bundle, org.dspace.app.rest.model.BundleRest> {
+    extends DSpaceObjectConverter<Bundle, BundleRest> {
 
-    @Autowired
-    BitstreamConverter bitstreamConverter;
+    @Override
+    public BundleRest convert(Bundle bundle, Projection projection) {
+        BundleRest bundleRest = super.convert(bundle, projection);
 
+        bundleRest.setBitstreams(bundle.getBitstreams()
+                                .stream()
+                                .map(x -> (BitstreamRest) converter.toRest(x, projection))
+                                .collect(Collectors.toList()));
+
+        if (bundle.getPrimaryBitstream() != null) {
+            BitstreamRest primaryBitstreamRest = converter.toRest(bundle.getPrimaryBitstream(), projection);
+            bundleRest.setPrimaryBitstream(primaryBitstreamRest);
+        }
+
+        return bundleRest;
+    }
+
+    @Override
     protected BundleRest newInstance() {
         return new BundleRest();
     }
 
-    protected Class<Bundle> getModelClass() {
+    @Override
+    public Class<Bundle> getModelClass() {
         return Bundle.class;
     }
-
-    public BundleRest fromModel(Bundle obj) {
-        BundleRest bundle = (BundleRest) super.fromModel(obj);
-
-        bundle.setBitstreams(obj.getBitstreams()
-                                .stream()
-                                .map(x -> bitstreamConverter.fromModel(x))
-                                .collect(Collectors.toList()));
-
-        if (obj.getPrimaryBitstream() != null) {
-            BitstreamRest primaryBitstreamRest = bitstreamConverter.fromModel(obj.getPrimaryBitstream());
-            bundle.setPrimaryBitstream(primaryBitstreamRest);
-        }
-
-        return bundle;
-    }
-
-    public Bundle toModel(BundleRest obj) {
-        return null;
-    }
 }
-

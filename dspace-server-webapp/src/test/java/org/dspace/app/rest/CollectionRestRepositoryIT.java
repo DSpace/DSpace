@@ -24,13 +24,14 @@ import java.util.UUID;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
-import org.dspace.app.rest.converter.CollectionConverter;
+import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.matcher.CollectionMatcher;
 import org.dspace.app.rest.matcher.MetadataMatcher;
 import org.dspace.app.rest.matcher.PageMatcher;
 import org.dspace.app.rest.model.CollectionRest;
 import org.dspace.app.rest.model.MetadataRest;
 import org.dspace.app.rest.model.MetadataValueRest;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.app.rest.test.MetadataPatchSuite;
 import org.dspace.authorize.service.AuthorizeService;
@@ -46,7 +47,7 @@ import org.springframework.http.MediaType;
 public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Autowired
-    CollectionConverter collectionConverter;
+    ConverterService converter;
 
     @Autowired
     AuthorizeService authorizeService;
@@ -370,7 +371,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
 
         ObjectMapper mapper = new ObjectMapper();
 
-        CollectionRest collectionRest = collectionConverter.fromModel(col1);
+        CollectionRest collectionRest = converter.toRest(col1, Projection.DEFAULT);
 
         collectionRest.setMetadata(new MetadataRest()
                 .put("dc.title", new MetadataValueRest("Electronic theses and dissertations")));
@@ -731,7 +732,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         String token = getAuthToken(eperson.getEmail(), password);
         ObjectMapper mapper = new ObjectMapper();
 
-        CollectionRest collectionRest = collectionConverter.fromModel(col1);
+        CollectionRest collectionRest = converter.toRest(col1, Projection.DEFAULT);
 
         collectionRest.setMetadata(new MetadataRest()
                 .put("dc.title", new MetadataValueRest("Electronic theses and dissertations")));

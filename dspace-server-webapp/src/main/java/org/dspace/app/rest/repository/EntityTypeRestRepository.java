@@ -10,10 +10,7 @@ package org.dspace.app.rest.repository;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.dspace.app.rest.converter.EntityTypeConverter;
 import org.dspace.app.rest.model.EntityTypeRest;
-import org.dspace.app.rest.model.hateoas.DSpaceResource;
-import org.dspace.app.rest.model.hateoas.EntityTypeResource;
 import org.dspace.content.EntityType;
 import org.dspace.content.service.EntityTypeService;
 import org.dspace.core.Context;
@@ -32,37 +29,28 @@ public class EntityTypeRestRepository extends DSpaceRestRepository<EntityTypeRes
     @Autowired
     private EntityTypeService entityTypeService;
 
-    @Autowired
-    private EntityTypeConverter entityTypeConverter;
-
     public EntityTypeRest findOne(Context context, Integer integer) {
         try {
             EntityType entityType = entityTypeService.find(context, integer);
             if (entityType == null) {
                 throw new ResourceNotFoundException("The entityType for ID: " + integer + " could not be found");
             }
-            return entityTypeConverter.fromModel(entityType);
+            return converter.toRest(entityType, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
 
     public Page<EntityTypeRest> findAll(Context context, Pageable pageable) {
-        List<EntityType> entityTypeList = null;
         try {
-            entityTypeList = entityTypeService.findAll(context);
+            List<EntityType> entityTypes = entityTypeService.findAll(context);
+            return converter.toRestPage(utils.getPage(entityTypes, pageable), utils.obtainProjection(true));
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<EntityTypeRest> page = utils.getPage(entityTypeList, pageable).map(entityTypeConverter);
-        return page;
     }
 
     public Class<EntityTypeRest> getDomainClass() {
         return EntityTypeRest.class;
-    }
-
-    public DSpaceResource<EntityTypeRest> wrapResource(EntityTypeRest model, String... rels) {
-        return new EntityTypeResource(model, utils, rels);
     }
 }
