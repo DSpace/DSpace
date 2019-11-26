@@ -102,6 +102,23 @@ public class CollectionBuilder extends AbstractDSpaceObjectBuilder<Collection> {
         return this;
     }
 
+    /**
+     * Create an admin group for the collection with the specified members
+     *
+     * @param members epersons to add to the admin group
+     * @return this builder
+     * @throws SQLException
+     * @throws AuthorizeException
+     */
+    public CollectionBuilder withAdminGroup(EPerson... members) throws SQLException, AuthorizeException {
+        Group g = collectionService.createAdministrators(context, collection);
+        for (EPerson e : members) {
+            groupService.addMember(context, g, e);
+        }
+        groupService.update(context, g);
+        return this;
+    }
+
     @Override
     public Collection build() {
         try {
