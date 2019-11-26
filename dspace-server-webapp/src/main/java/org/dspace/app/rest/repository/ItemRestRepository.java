@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
+import org.dspace.app.rest.converter.JsonPatchConverter;
 import org.dspace.app.rest.converter.MetadataConverter;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
@@ -63,9 +64,6 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
 
     @Autowired
     MetadataConverter metadataConverter;
-
-    @Autowired
-    ItemPatch itemPatch;
 
     @Autowired
     BundleService bundleService;
@@ -265,5 +263,44 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
 
         return bundle;
 
+    }
+
+    /**
+     * Modify a template Item which is a template Item
+     * @param item          The Item to be modified
+     * @param jsonNode      The patch to be applied
+     * @return              The Item as it is after applying the patch
+     * @throws SQLException
+     * @throws AuthorizeException
+     */
+    public ItemRest patchTemplateItem(Item item, JsonNode jsonNode)
+        throws SQLException, AuthorizeException {
+
+        ObjectMapper mapper = new ObjectMapper();
+        JsonPatchConverter patchConverter = new JsonPatchConverter(mapper);
+        Patch patch = patchConverter.convert(jsonNode);
+
+        ItemRest patchedItemRest = dsoPatch.patch(converter.toRest(item, Projection.DEFAULT), patch.getOperations());
+        updateDSpaceObject(item, patchedItemRest);
+
+        return converter.toRest(item, Projection.DEFAULT);
+    }
+
+    /**
+     * Remove an Item which is a template for a Collection.
+     *
+     * Note: The caller is responsible for checking that this item is in fact a template item.
+     *
+     * @param context
+     * @param item          The item to be removed
+     * @throws SQLException
+     * @throws IOException
+     * @throws AuthorizeException
+     */
+    public void removeTemplateItem(Context context, Item item) throws SQLException, IOException, AuthorizeException {
+
+        Collection collection = item.getTemplateItemOf();
+        collectionService.removeTemplateItem(context, collection);
+        collectionService.update(context, collection);
     }
 }
