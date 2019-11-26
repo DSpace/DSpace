@@ -23,21 +23,17 @@ import javax.ws.rs.core.Response;
 import org.apache.catalina.connector.ClientAbortException;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.Logger;
-import org.dspace.app.rest.converter.BitstreamConverter;
-import org.dspace.app.rest.converter.DSpaceObjectConverter;
+import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
-import org.dspace.app.rest.link.HalLinkService;
 import org.dspace.app.rest.model.BitstreamRest;
-import org.dspace.app.rest.model.BundleRest;
 import org.dspace.app.rest.model.hateoas.BitstreamResource;
-import org.dspace.app.rest.repository.BitstreamRestRepository;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.rest.utils.MultipartFileSender;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
-import org.dspace.content.Bundle;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.core.Context;
@@ -87,12 +83,6 @@ public class BitstreamRestController {
     BitstreamFormatService bitstreamFormatService;
 
     @Autowired
-    BitstreamRestRepository bitstreamRestRepository;
-
-    @Autowired
-    DSpaceObjectConverter<Bundle, BundleRest> dsoConverter;
-
-    @Autowired
     private EventService eventService;
 
     @Autowired
@@ -102,13 +92,10 @@ public class BitstreamRestController {
     private ConfigurationService configurationService;
 
     @Autowired
-    BitstreamConverter converter;
+    ConverterService converter;
 
     @Autowired
     Utils utils;
-
-    @Autowired
-    HalLinkService halLinkService;
 
     @PreAuthorize("hasPermission(#uuid, 'BITSTREAM', 'READ')")
     @RequestMapping( method = {RequestMethod.GET, RequestMethod.HEAD}, value = "content")
@@ -253,7 +240,7 @@ public class BitstreamRestController {
 
         context.commit();
 
-        return (BitstreamResource) utils.getResourceRepository(BitstreamRest.CATEGORY, BitstreamRest.NAME)
-                .wrapResource(converter.fromModel(context.reloadEntity(bitstream)));
+        BitstreamRest bitstreamRest = converter.toRest(context.reloadEntity(bitstream), Projection.DEFAULT);
+        return converter.toResource(bitstreamRest);
     }
 }

@@ -28,6 +28,7 @@ import org.dspace.app.rest.matcher.PageMatcher;
 import org.dspace.app.rest.matcher.ProcessMatcher;
 import org.dspace.app.rest.matcher.ScriptMatcher;
 import org.dspace.app.rest.model.ParameterValueRest;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.content.ProcessStatus;
 import org.dspace.scripts.DSpaceCommandLineParameter;
@@ -180,9 +181,9 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
         parameters.add(new DSpaceCommandLineParameter("-z", "test"));
         parameters.add(new DSpaceCommandLineParameter("-q", null));
 
-        List<ParameterValueRest> list = parameters.stream().map(
-            dSpaceCommandLineParameter -> dSpaceRunnableParameterConverter.fromModel(dSpaceCommandLineParameter))
-                                                  .collect(Collectors.toList());
+        List<ParameterValueRest> list = parameters.stream()
+                .map(dSpaceCommandLineParameter -> dSpaceRunnableParameterConverter
+                        .convert(dSpaceCommandLineParameter, Projection.DEFAULT)).collect(Collectors.toList());
 
         String token = getAuthToken(admin.getEmail(), password);
 
@@ -212,9 +213,9 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
         parameters.add(new DSpaceCommandLineParameter("-r", "test"));
         parameters.add(new DSpaceCommandLineParameter("-i", null));
 
-        List<ParameterValueRest> list = parameters.stream().map(
-            dSpaceCommandLineParameter -> dSpaceRunnableParameterConverter.fromModel(dSpaceCommandLineParameter))
-                                                  .collect(Collectors.toList());
+        List<ParameterValueRest> list = parameters.stream()
+                .map(dSpaceCommandLineParameter -> dSpaceRunnableParameterConverter
+                        .convert(dSpaceCommandLineParameter, Projection.DEFAULT)).collect(Collectors.toList());
 
         String token = getAuthToken(admin.getEmail(), password);
         List<ProcessStatus> acceptableProcessStatuses = new LinkedList<>();

@@ -18,7 +18,7 @@ import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
 /**
  * This class' purpose is to create a container for the information used in the SearchFacetEntryResource
  */
-public class SearchFacetEntryRest implements RestAddressableModel {
+public class SearchFacetEntryRest extends RestAddressableModel {
 
     public static final String NAME = "discover";
     public static final String CATEGORY = RestModel.DISCOVER;

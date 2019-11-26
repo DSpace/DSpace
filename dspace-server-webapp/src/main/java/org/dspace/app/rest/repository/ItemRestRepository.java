@@ -20,7 +20,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-import org.dspace.app.rest.converter.ItemConverter;
 import org.dspace.app.rest.converter.JsonPatchConverter;
 import org.dspace.app.rest.converter.MetadataConverter;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
@@ -28,8 +27,8 @@ import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.BundleRest;
 import org.dspace.app.rest.model.ItemRest;
-import org.dspace.app.rest.model.hateoas.ItemResource;
 import org.dspace.app.rest.model.patch.Patch;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.repository.patch.ItemPatch;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bundle;
@@ -45,7 +44,6 @@ import org.dspace.core.Context;
 import org.dspace.util.UUIDUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -82,13 +80,8 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
     @Autowired
     InstallItemService installItemService;
 
-    @Autowired
-    private ItemConverter itemConverter;
-
-    public ItemRestRepository(ItemService dsoService,
-                              ItemConverter dsoConverter,
-                              ItemPatch dsoPatch) {
-        super(dsoService, dsoConverter, dsoPatch);
+    public ItemRestRepository(ItemService dsoService, ItemPatch dsoPatch) {
+        super(dsoService, dsoPatch);
         this.is = dsoService;
     }
 
@@ -104,27 +97,23 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
         if (item == null) {
             return null;
         }
-        return dsoConverter.fromModel(item);
+        return converter.toRest(item, utils.obtainProjection());
     }
 
     @Override
     @PreAuthorize("hasAuthority('ADMIN')")
     public Page<ItemRest> findAll(Context context, Pageable pageable) {
-        Iterator<Item> it = null;
-        List<Item> items = new ArrayList<Item>();
-        int total = 0;
         try {
-            total = is.countTotal(context);
-            it = is.findAll(context, pageable.getPageSize(), pageable.getOffset());
+            long total = is.countTotal(context);
+            Iterator<Item> it = is.findAll(context, pageable.getPageSize(), pageable.getOffset());
+            List<Item> items = new ArrayList<>();
             while (it.hasNext()) {
-                Item i = it.next();
-                items.add(i);
+                items.add(it.next());
             }
+            return converter.toRestPage(items, pageable, total, utils.obtainProjection(true));
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<ItemRest> page = new PageImpl<Item>(items, pageable, total).map(dsoConverter);
-        return page;
     }
 
     @Override
@@ -156,11 +145,6 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
     @Override
     public Class<ItemRest> getDomainClass() {
         return ItemRest.class;
-    }
-
-    @Override
-    public ItemResource wrapResource(ItemRest item, String... rels) {
-        return new ItemResource(item, utils, rels);
     }
 
     @Override
@@ -224,7 +208,7 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
 
         Item itemToReturn = installItemService.installItem(context, workspaceItem);
 
-        return dsoConverter.fromModel(itemToReturn);
+        return converter.toRest(itemToReturn, Projection.DEFAULT);
     }
 
     @Override
@@ -253,7 +237,7 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
                                                        + uuid + ", "
                                                        + itemRest.getId());
         }
-        return dsoConverter.fromModel(item);
+        return converter.toRest(item, Projection.DEFAULT);
     }
 
     /**
@@ -296,10 +280,10 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
         JsonPatchConverter patchConverter = new JsonPatchConverter(mapper);
         Patch patch = patchConverter.convert(jsonNode);
 
-        ItemRest patchedItemRest = dsoPatch.patch(itemConverter.fromModel(item), patch.getOperations());
+        ItemRest patchedItemRest = dsoPatch.patch(converter.toRest(item, Projection.DEFAULT), patch.getOperations());
         updateDSpaceObject(item, patchedItemRest);
 
-        return itemConverter.fromModel(item);
+        return converter.toRest(item, Projection.DEFAULT);
     }
 
     /**
