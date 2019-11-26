@@ -11,8 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.dspace.app.rest.model.AuthorityEntryRest;
 import org.dspace.app.rest.model.AuthorityRest;
-import org.dspace.app.rest.model.hateoas.AuthorityEntryResource;
-import org.dspace.app.rest.model.hateoas.HALResource;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.utils.AuthorityUtils;
 import org.dspace.content.authority.Choice;
 import org.dspace.content.authority.ChoiceAuthority;
@@ -20,6 +19,7 @@ import org.dspace.content.authority.service.ChoiceAuthorityService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
@@ -30,7 +30,7 @@ import org.springframework.stereotype.Component;
  */
 @Component(AuthorityRest.CATEGORY + "." + AuthorityRest.NAME + "." + AuthorityRest.ENTRY)
 public class AuthorityEntryValueLinkRepository extends AbstractDSpaceRestRepository
-    implements LinkRestRepository<AuthorityEntryRest> {
+    implements LinkRestRepository {
 
     @Autowired
     private ChoiceAuthorityService cas;
@@ -38,18 +38,16 @@ public class AuthorityEntryValueLinkRepository extends AbstractDSpaceRestReposit
     @Autowired
     private AuthorityUtils authorityUtils;
 
-    @Override
-    public HALResource wrapResource(AuthorityEntryRest model, String... rels) {
-        return new AuthorityEntryResource(model);
-    }
-
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
     public AuthorityEntryRest getResource(HttpServletRequest request, String name, String relId,
-                                          Pageable pageable, String projection) {
+                                          Pageable pageable, Projection projection) {
         Context context = obtainContext();
         ChoiceAuthority choiceAuthority = cas.getChoiceAuthorityByAuthorityName(name);
         Choice choice = choiceAuthority.getChoice(null, relId, context.getCurrentLocale().toString());
-        return authorityUtils.convertEntry(choice, name);
+        if (choice == null) {
+            throw new ResourceNotFoundException("The authority was not found");
+        }
+        return authorityUtils.convertEntry(choice, name, projection);
     }
 
 }

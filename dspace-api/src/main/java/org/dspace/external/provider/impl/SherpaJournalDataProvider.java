@@ -30,9 +30,9 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.sherpa.SHERPAJournal;
 import org.dspace.app.sherpa.SHERPAResponse;
+import org.dspace.content.MetadataValueDTO;
 import org.dspace.external.model.ExternalDataObject;
 import org.dspace.external.provider.ExternalDataProvider;
-import org.dspace.mock.MockMetadataValue;
 
 /**
  * This class is the implementation of the ExternalDataProvider interface that will deal with SherpaJournal External
@@ -105,7 +105,7 @@ public class SherpaJournalDataProvider implements ExternalDataProvider {
                 sherpaResponse = new SHERPAResponse("SHERPA/RoMEO returned no response");
             }
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            log.error("SHERPA/RoMEO query failed: ", e);
         }
 
         if (sherpaResponse == null) {
@@ -126,9 +126,9 @@ public class SherpaJournalDataProvider implements ExternalDataProvider {
         externalDataObject.setSource(sourceIdentifier);
         externalDataObject.setId(sherpaJournal.getTitle());
         externalDataObject
-            .addMetadata(new MockMetadataValue("dc", "title", null, null, sherpaJournal.getTitle()));
+            .addMetadata(new MetadataValueDTO("dc", "title", null, null, sherpaJournal.getTitle()));
         externalDataObject
-            .addMetadata(new MockMetadataValue("dc", "identifier", "issn", null, sherpaJournal.getIssn()));
+            .addMetadata(new MetadataValueDTO("dc", "identifier", "issn", null, sherpaJournal.getIssn()));
         externalDataObject.setValue(sherpaJournal.getTitle());
         externalDataObject.setDisplayValue(sherpaJournal.getTitle());
         return externalDataObject;

@@ -28,6 +28,7 @@ import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
+import org.dspace.content.MetadataValueDTO;
 import org.dspace.content.Site;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
@@ -39,7 +40,6 @@ import org.dspace.core.Context;
 import org.dspace.core.SelfNamedPlugin;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
-import org.dspace.mock.MockMetadataValue;
 import org.jdom.Attribute;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -328,7 +328,7 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
 
     private List<Element> disseminateListInternal(DSpaceObject dso, boolean addSchema)
         throws CrosswalkException, IOException, SQLException, AuthorizeException {
-        List<MockMetadataValue> dcvs = null;
+        List<MetadataValueDTO> dcvs = null;
         if (dso.getType() == Constants.ITEM) {
             dcvs = item2Metadata((Item) dso);
         } else if (dso.getType() == Constants.COLLECTION) {
@@ -345,7 +345,7 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
 
         List<Element> result = new ArrayList<Element>(dcvs.size());
 
-        for (MockMetadataValue dcv : dcvs) {
+        for (MetadataValueDTO dcv : dcvs) {
             String qdc = dcv.getSchema() + "." + dcv.getElement();
             if (dcv.getQualifier() != null) {
                 qdc += "." + dcv.getQualifier();
@@ -419,8 +419,8 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
      * @param site The site to derive metadata from
      * @return list of metadata
      */
-    protected List<MockMetadataValue> site2Metadata(Site site) {
-        List<MockMetadataValue> metadata = new ArrayList<>();
+    protected List<MetadataValueDTO> site2Metadata(Site site) {
+        List<MetadataValueDTO> metadata = new ArrayList<>();
 
         String identifier_uri = handleService.getCanonicalPrefix()
             + site.getHandle();
@@ -450,8 +450,8 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
      * @param community The community to derive metadata from
      * @return list of metadata
      */
-    protected List<MockMetadataValue> community2Metadata(Community community) {
-        List<MockMetadataValue> metadata = new ArrayList<>();
+    protected List<MetadataValueDTO> community2Metadata(Community community) {
+        List<MetadataValueDTO> metadata = new ArrayList<>();
 
         String description = communityService.getMetadata(community, "introductory_text");
         String description_abstract = communityService.getMetadata(community, "short_description");
@@ -493,8 +493,8 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
      * @param collection The collection to derive metadata from
      * @return list of metadata
      */
-    protected List<MockMetadataValue> collection2Metadata(Collection collection) {
-        List<MockMetadataValue> metadata = new ArrayList<>();
+    protected List<MetadataValueDTO> collection2Metadata(Collection collection) {
+        List<MetadataValueDTO> metadata = new ArrayList<>();
 
         String description = collectionService.getMetadata(collection, "introductory_text");
         String description_abstract = collectionService.getMetadata(collection, "short_description");
@@ -547,19 +547,19 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
      * @param item The item to derive metadata from
      * @return list of metadata
      */
-    protected List<MockMetadataValue> item2Metadata(Item item) {
+    protected List<MetadataValueDTO> item2Metadata(Item item) {
         List<MetadataValue> dcvs = itemService.getMetadata(item, Item.ANY, Item.ANY, Item.ANY,
                                                            Item.ANY);
-        List<MockMetadataValue> result = new ArrayList<>();
+        List<MetadataValueDTO> result = new ArrayList<>();
         for (MetadataValue metadataValue : dcvs) {
-            result.add(new MockMetadataValue(metadataValue));
+            result.add(new MetadataValueDTO(metadataValue));
         }
 
         return result;
     }
 
-    protected MockMetadataValue createDCValue(String element, String qualifier, String value) {
-        MockMetadataValue dcv = new MockMetadataValue();
+    protected MetadataValueDTO createDCValue(String element, String qualifier, String value) {
+        MetadataValueDTO dcv = new MetadataValueDTO();
         dcv.setSchema("dc");
         dcv.setElement(element);
         dcv.setQualifier(qualifier);

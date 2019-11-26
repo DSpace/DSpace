@@ -25,11 +25,11 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dspace.content.MetadataValueDTO;
 import org.dspace.external.OrcidRestConnector;
 import org.dspace.external.model.ExternalDataObject;
 import org.dspace.external.provider.ExternalDataProvider;
 import org.dspace.external.provider.orcid.xml.XMLtoBio;
-import org.dspace.mock.MockMetadataValue;
 import org.json.JSONObject;
 import org.orcid.jaxb.model.common_v2.OrcidId;
 import org.orcid.jaxb.model.record_v2.Person;
@@ -121,20 +121,20 @@ public class OrcidV2AuthorDataProvider implements ExternalDataProvider {
         String firstName = "";
         if (person.getName().getFamilyName() != null) {
             lastName = person.getName().getFamilyName().getValue();
-            externalDataObject.addMetadata(new MockMetadataValue("person", "familyName", null, null,
-                                                                 lastName));
+            externalDataObject.addMetadata(new MetadataValueDTO("person", "familyName", null, null,
+                                                                lastName));
         }
         if (person.getName().getGivenNames() != null) {
             firstName = person.getName().getGivenNames().getValue();
-            externalDataObject.addMetadata(new MockMetadataValue("person", "givenName", null, null,
-                                                                 firstName));
+            externalDataObject.addMetadata(new MetadataValueDTO("person", "givenName", null, null,
+                                                                firstName));
 
         }
         externalDataObject.setId(person.getName().getPath());
         externalDataObject
-            .addMetadata(new MockMetadataValue("dc", "identifier", "orcid", null, person.getName().getPath()));
+            .addMetadata(new MetadataValueDTO("dc", "identifier", "orcid", null, person.getName().getPath()));
         externalDataObject
-            .addMetadata(new MockMetadataValue("dc", "identifier", "uri", null, orcidUrl + person.getName().getPath()));
+            .addMetadata(new MetadataValueDTO("dc", "identifier", "uri", null, orcidUrl + person.getName().getPath()));
         if (!StringUtils.isBlank(lastName) && !StringUtils.isBlank(firstName)) {
             externalDataObject.setDisplayValue(lastName + ", " + firstName);
             externalDataObject.setValue(lastName + ", " + firstName);

@@ -30,7 +30,7 @@ public class MappedItemResourceWrapper extends HALResource<MappedItemRestWrapper
     private Integer totalElements;
 
     public MappedItemResourceWrapper(MappedItemRestWrapper content, Utils utils,
-                                      Integer totalElements, String... rels) {
+                                      Integer totalElements) {
         super(content);
         embed(utils);
         this.totalElements = totalElements;

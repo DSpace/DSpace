@@ -12,6 +12,7 @@ import java.util.List;
 
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.InProgressSubmission;
+import org.dspace.content.RelationshipMetadataService;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
@@ -111,6 +112,8 @@ public abstract class ContentServiceFactory {
      * @return the EntityService
      */
     public abstract EntityService getEntityService();
+
+    public abstract RelationshipMetadataService getRelationshipMetadataService();
 
     public InProgressSubmissionService getInProgressSubmissionService(InProgressSubmission inProgressSubmission) {
         if (inProgressSubmission instanceof WorkspaceItem) {

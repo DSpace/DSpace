@@ -24,12 +24,14 @@ import java.util.UUID;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
-import org.dspace.app.rest.converter.CollectionConverter;
+import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.matcher.CollectionMatcher;
 import org.dspace.app.rest.matcher.MetadataMatcher;
+import org.dspace.app.rest.matcher.PageMatcher;
 import org.dspace.app.rest.model.CollectionRest;
 import org.dspace.app.rest.model.MetadataRest;
 import org.dspace.app.rest.model.MetadataValueRest;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.app.rest.test.MetadataPatchSuite;
 import org.dspace.authorize.service.AuthorizeService;
@@ -45,7 +47,7 @@ import org.springframework.http.MediaType;
 public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Autowired
-    CollectionConverter collectionConverter;
+    ConverterService converter;
 
     @Autowired
     AuthorizeService authorizeService;
@@ -98,6 +100,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
         Collection col2 = CollectionBuilder.createCollection(context, child2).withName("Collection 2").build();
 
+        context.restoreAuthSystemState();
 
         getClient().perform(get("/api/core/collections")
                                 .param("size", "1"))
@@ -147,6 +150,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
         Collection col2 = CollectionBuilder.createCollection(context, child2).withName("Collection 2").build();
 
+        context.restoreAuthSystemState();
 
         getClient().perform(get("/api/core/collections/" + col1.getID()))
                    .andExpect(status().isOk())
@@ -179,6 +183,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
                                            .withLogo("TestingContentForLogo").build();
         Collection col2 = CollectionBuilder.createCollection(context, child2).withName("Collection 2").build();
+
+        context.restoreAuthSystemState();
 
         getClient().perform(get("/api/core/collections/" + col1.getID()))
                    .andExpect(status().isOk())
@@ -225,6 +231,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
         Collection col2 = CollectionBuilder.createCollection(context, child2).withName("Collection 2").build();
 
+        context.restoreAuthSystemState();
+
         getClient().perform(get("/api/core/collections/search/findAuthorized"))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
@@ -253,6 +261,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
         Collection col2 = CollectionBuilder.createCollection(context, child2).withName("Collection 2").build();
+
+        context.restoreAuthSystemState();
 
         getClient().perform(get("/api/core/collections/search/findAuthorizedByCommunity")
                                 .param("uuid", parentCommunity.getID().toString()))
@@ -294,6 +304,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
         Collection col2 = CollectionBuilder.createCollection(context, child2).withName("Collection 2").build();
 
+        context.restoreAuthSystemState();
 
         getClient().perform(get("/api/core/collections/" + UUID.randomUUID()))
                    .andExpect(status().isNotFound());
@@ -317,6 +328,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
         Collection col2 = CollectionBuilder.createCollection(context, child2).withName("Collection 2").build();
+
+        context.restoreAuthSystemState();
 
         getClient().perform(get("/api/core/collections/" + col1.getID()))
                    .andExpect(status().isOk())
@@ -358,10 +371,12 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
 
         ObjectMapper mapper = new ObjectMapper();
 
-        CollectionRest collectionRest = collectionConverter.fromModel(col1);
+        CollectionRest collectionRest = converter.toRest(col1, Projection.DEFAULT);
 
         collectionRest.setMetadata(new MetadataRest()
                 .put("dc.title", new MetadataValueRest("Electronic theses and dissertations")));
+
+        context.restoreAuthSystemState();
 
         getClient(token).perform(put("/api/core/collections/" + col1.getID().toString())
                                      .contentType(MediaType.APPLICATION_JSON)
@@ -408,6 +423,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
 
         String token = getAuthToken(admin.getEmail(), password);
 
+        context.restoreAuthSystemState();
+
         getClient(token).perform(get("/api/core/collections/" + col1.getID().toString()))
                         .andExpect(status().isOk())
                         .andExpect(content().contentType(contentType))
@@ -449,6 +466,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                                            .withName("Collection 1")
                                            .build();
 
+        context.restoreAuthSystemState();
+
         getClient().perform(get("/api/core/collections/" + col1.getID().toString()))
                         .andExpect(status().isOk())
                         .andExpect(content().contentType(contentType))
@@ -473,6 +492,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                                           .withName("Parent Community")
                                           .withLogo("ThisIsSomeDummyText")
                                           .build();
+        context.restoreAuthSystemState();
 
         ObjectMapper mapper = new ObjectMapper();
         CollectionRest collectionRest = new CollectionRest();
@@ -519,6 +539,111 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
 
     }
 
+    @Test
+    public void createTestByAuthorizedUser() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .withLogo("ThisIsSomeDummyText")
+                                          .build();
+
+        ObjectMapper mapper = new ObjectMapper();
+        CollectionRest collectionRest = new CollectionRest();
+        // We send a name but the created collection should set this to the title
+        collectionRest.setName("Collection");
+
+        collectionRest.setMetadata(new MetadataRest()
+            .put("dc.description",
+                new MetadataValueRest("<p>Some cool HTML code here</p>"))
+            .put("dc.description.abstract",
+                new MetadataValueRest("Sample top-level community created via the REST API"))
+            .put("dc.description.tableofcontents",
+                new MetadataValueRest("<p>HTML News</p>"))
+            .put("dc.rights",
+                new MetadataValueRest("Custom Copyright Text"))
+            .put("dc.title",
+                new MetadataValueRest("Title Text")));
+
+        // ADD authorization on parent community
+        context.setCurrentUser(eperson);
+        authorizeService.addPolicy(context, parentCommunity, Constants.ADD, eperson);
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+
+        getClient(authToken).perform(post("/api/core/collections")
+            .content(mapper.writeValueAsBytes(collectionRest))
+            .param("parent", parentCommunity.getID().toString())
+            .contentType(contentType))
+                            .andExpect(status().isCreated())
+                            .andExpect(content().contentType(contentType))
+                            .andExpect(jsonPath("$", Matchers.allOf(
+                                hasJsonPath("$.id", not(empty())),
+                                hasJsonPath("$.uuid", not(empty())),
+                                hasJsonPath("$.name", is("Title Text")),
+                                hasJsonPath("$.handle", not(empty())),
+                                hasJsonPath("$.type", is("collection")),
+                                hasJsonPath("$.metadata", Matchers.allOf(
+                                    MetadataMatcher.matchMetadata("dc.description",
+                                        "<p>Some cool HTML code here</p>"),
+                                    MetadataMatcher.matchMetadata("dc.description.abstract",
+                                        "Sample top-level community created via the REST API"),
+                                    MetadataMatcher.matchMetadata("dc.description.tableofcontents",
+                                        "<p>HTML News</p>"),
+                                    MetadataMatcher.matchMetadata("dc.rights",
+                                        "Custom Copyright Text"),
+                                    MetadataMatcher.matchMetadata("dc.title",
+                                        "Title Text")
+                                )))));
+
+    }
+
+    @Test
+    public void createTestByUnauthorizedUser() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .withLogo("ThisIsSomeDummyText")
+                                          .build();
+
+        ObjectMapper mapper = new ObjectMapper();
+        CollectionRest collectionRest = new CollectionRest();
+        // We send a name but the created collection should set this to the title
+        collectionRest.setName("Collection");
+
+        collectionRest.setMetadata(new MetadataRest()
+            .put("dc.description",
+                new MetadataValueRest("<p>Some cool HTML code here</p>"))
+            .put("dc.description.abstract",
+                new MetadataValueRest("Sample top-level community created via the REST API"))
+            .put("dc.description.tableofcontents",
+                new MetadataValueRest("<p>HTML News</p>"))
+            .put("dc.rights",
+                new MetadataValueRest("Custom Copyright Text"))
+            .put("dc.title",
+                new MetadataValueRest("Title Text")));
+
+        context.setCurrentUser(eperson);
+        context.restoreAuthSystemState();
+
+        // User doesn't have add permission on the collection.
+        String authToken = getAuthToken(eperson.getEmail(), password);
+
+        getClient(authToken).perform(post("/api/core/collections")
+            .content(mapper.writeValueAsBytes(collectionRest))
+            .param("parent", parentCommunity.getID().toString())
+            .contentType(contentType))
+                            .andExpect(status().isForbidden());
+
+    }
 
     @Test
     public void deleteCollectionEpersonWithDeleteRightsTest() throws Exception {
@@ -551,6 +676,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         authorizeService.addPolicy(context, col1, Constants.WRITE, eperson);
 
         String token = getAuthToken(eperson.getEmail(), password);
+
+        context.restoreAuthSystemState();
 
         getClient(token).perform(get("/api/core/collections/" + col1.getID().toString()))
                         .andExpect(status().isOk())
@@ -600,10 +727,12 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         context.setCurrentUser(eperson);
         authorizeService.addPolicy(context, col1, Constants.WRITE, eperson);
 
+        context.restoreAuthSystemState();
+
         String token = getAuthToken(eperson.getEmail(), password);
         ObjectMapper mapper = new ObjectMapper();
 
-        CollectionRest collectionRest = collectionConverter.fromModel(col1);
+        CollectionRest collectionRest = converter.toRest(col1, Projection.DEFAULT);
 
         collectionRest.setMetadata(new MetadataRest()
                 .put("dc.title", new MetadataValueRest("Electronic theses and dissertations")));
@@ -677,6 +806,9 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                                             new MetadataValueRest("Title Text")));
 
         String authToken = getAuthToken(admin.getEmail(), password);
+
+        context.restoreAuthSystemState();
+
         getClient(authToken).perform(post("/api/core/collections")
                                          .content(mapper.writeValueAsBytes(collectionRest))
                                          .param("parent", "123")
@@ -716,10 +848,48 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                                             new MetadataValueRest("Title Text")));
 
         String authToken = getAuthToken(admin.getEmail(), password);
+
+        context.restoreAuthSystemState();
+
         getClient(authToken).perform(post("/api/core/collections")
                                          .content(mapper.writeValueAsBytes(collectionRest))
                                          .contentType(contentType))
                             .andExpect(status().isBadRequest());
 
+    }
+
+
+    @Test
+    public void findAllCollectionsWithMultilanguageTitlesTest() throws Exception {
+
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Community child2 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community Two")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                                           .withNameForLanguage("Collection 1", "en")
+                                           .withNameForLanguage("Col 1", "fr")
+                                           .withNameForLanguage("Coll 1", "de")
+                                           .build();
+        Collection col2 = CollectionBuilder.createCollection(context, child2).withName("Collection 2").build();
+
+
+        getClient().perform(get("/api/core/collections"))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
+                       CollectionMatcher.matchCollectionEntry(col1.getName(), col1.getID(), col1.getHandle()),
+                       CollectionMatcher.matchCollectionEntry(col2.getName(), col2.getID(), col2.getHandle())
+                   )))
+                   .andExpect(jsonPath("$.page", PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 2)));
     }
 }

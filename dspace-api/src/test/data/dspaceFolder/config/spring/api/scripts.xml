@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+    <bean id="indexClient" class="org.dspace.discovery.IndexClient" scope="prototype">
+        <property name="name" value="index-discovery"/>
+        <property name="description" value="Update Discovery Solr Search Index"/>
+    </bean>
+
+    <bean id="MockScript" class="org.dspace.scripts.impl.MockDSpaceRunnableScript" scope="prototype">
+        <property name="name" value="mock-script" />
+        <property name="description" value="Mocking a script for testing purposes" />
+    </bean>
+</beans>
