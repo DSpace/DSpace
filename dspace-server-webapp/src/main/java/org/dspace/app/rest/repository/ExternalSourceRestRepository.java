@@ -11,8 +11,6 @@ import java.util.List;
 import java.util.Optional;
 
 import org.dspace.app.rest.converter.ConverterService;
-import org.dspace.app.rest.converter.ExternalSourceEntryRestConverter;
-import org.dspace.app.rest.converter.ExternalSourceRestConverter;
 import org.dspace.app.rest.model.ExternalSourceEntryRest;
 import org.dspace.app.rest.model.ExternalSourceRest;
 import org.dspace.app.rest.projection.Projection;
@@ -35,12 +33,6 @@ public class ExternalSourceRestRepository extends DSpaceRestRepository<ExternalS
 
     @Autowired
     private ExternalDataService externalDataService;
-
-    @Autowired
-    private ExternalSourceRestConverter externalSourceRestConverter;
-
-    @Autowired
-    private ExternalSourceEntryRestConverter externalSourceEntryRestConverter;
 
     @Autowired
     ConverterService converter;
