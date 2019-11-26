@@ -7,34 +7,14 @@
  */
 package org.dspace.content.crosswalk;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.ConnectException;
-import java.net.URL;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.sql.SQLException;
-import java.text.NumberFormat;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import org.apache.http.HttpEntity;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Bitstream;
-import org.dspace.content.BitstreamFormat;
-import org.dspace.content.Bundle;
-import org.dspace.content.DSpaceObject;
-import org.dspace.content.Item;
+import org.dspace.content.*;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
@@ -42,12 +22,14 @@ import org.dspace.content.service.BundleService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.jdom.Attribute;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.Namespace;
+import org.jdom.*;
 import org.jdom.xpath.XPath;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.SQLException;
+import java.text.NumberFormat;
+import java.util.*;
 
 /**
  * ORE ingestion crosswalk
@@ -59,7 +41,9 @@ import org.jdom.xpath.XPath;
  */
 public class OREIngestionCrosswalk
         implements IngestionCrosswalk {
-    /** log4j category */
+    /**
+     * log4j category
+     */
     private static Logger log = Logger.getLogger(OREDisseminationCrosswalk.class);
 
     /* Namespaces */
@@ -178,22 +162,21 @@ public class OREIngestionCrosswalk
             InputStream in = null;
             if (href != null) {
 //                try {
-                    // Make sure the url string escapes all the oddball characters
-                    //String processedURL = encodeForURL(href).replace("%20", "+");
+                // Make sure the url string escapes all the oddball characters
+                //String processedURL = encodeForURL(href).replace("%20", "+");
 
-					// Generate a requeset for the aggregated resource
-                CloseableHttpClient httpclient = HttpClients.createDefault();
-                HttpGet httpget = new HttpGet(href);
-                response = httpclient.execute(httpget);
+                // Generate a request for the aggregated resource
                 try {
-                        HttpEntity entity = response.getEntity();
-                        if (entity != null) {
-                            in = entity.getContent();
-//                                instream.close();
-                        }
-                    } catch (Exception ex) {
-                        log.error("The provided URI was invalid: " + href);
+                    CloseableHttpClient httpclient = HttpClients.createDefault();
+                    HttpGet httpget = new HttpGet(href);
+                    response = httpclient.execute(httpget);
+                    HttpEntity entity = response.getEntity();
+                    if (entity != null) {
+                        in = entity.getContent();
                     }
+                } catch (Exception ex) {
+                    log.error("The provided URI was invalid: " + href, ex);
+                }
 //                } catch (FileNotFoundException fe) {
 //                    log.error("The provided URI failed to return a resource: " + href);
 //                } catch (ConnectException fe) {
@@ -205,7 +188,7 @@ public class OREIngestionCrosswalk
 
             // ingest and update
             if (in != null) {
-                log.debug("targetBundle: " + targetBundle + " , item: " + item.getID());
+                log.debug("targetBundle: " + targetBundle.getName() + " , item: " + item.getID());
                 Bitstream newBitstream = bitstreamService.create(context, targetBundle, in);
 
                 String bsName = resource.getAttributeValue("title");
@@ -225,7 +208,7 @@ public class OREIngestionCrosswalk
             } else {
                 throw new CrosswalkException("Could not retrieve bitstream: " + entryId);
             }
-            response.close();
+//            response.close();
         }
         log.info("OREIngest for Item " + item.getID() + " took: " + (new Date().getTime() - timeStart.getTime()) + "ms.");
     }
@@ -233,6 +216,7 @@ public class OREIngestionCrosswalk
 
     /**
      * Helper method to escape all characters that are not part of the canon set
+     *
      * @param sourceString source unescaped string
      */
     private String encodeForURL(String sourceString) {
