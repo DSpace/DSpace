@@ -53,6 +53,7 @@ public class RelationshipMetadataServiceTest extends AbstractUnitTest {
     Item leftItem;
     Item rightItem;
     Relationship relationship;
+    RelationshipType isAuthorOfPublicationRelationshipType;
 
     /**
      * This method will be run before every test as per @Before. It will
@@ -111,12 +112,13 @@ public class RelationshipMetadataServiceTest extends AbstractUnitTest {
         itemService.addMetadata(context, rightItem, "person", "givenName", null, null, "firstName");
         EntityType publicationEntityType = entityTypeService.create(context, "Publication");
         EntityType authorEntityType = entityTypeService.create(context, "Author");
-        RelationshipType isAuthorOfPublication = relationshipTypeService
+        isAuthorOfPublicationRelationshipType = relationshipTypeService
                 .create(context, publicationEntityType, authorEntityType,
                         "isAuthorOfPublication", "isPublicationOfAuthor",
                         null, null, null, null);
 
-        relationship = relationshipService.create(context, leftItem, rightItem, isAuthorOfPublication, 0, 0);
+        relationship = relationshipService.create(context, leftItem, rightItem,
+            isAuthorOfPublicationRelationshipType, 0, 0);
         context.restoreAuthSystemState();
     }
 
@@ -445,5 +447,55 @@ public class RelationshipMetadataServiceTest extends AbstractUnitTest {
         List<MetadataValue> relationshipMetadataList = itemService
             .getMetadata(leftItem, MetadataSchemaEnum.RELATION.getName(), "isAuthorOfPublication", null, Item.ANY);
         assertThat(relationshipMetadataList.size(), equalTo(0));
+    }
+
+    @Test
+    public void testGetNextRightPlace() throws Exception {
+        assertThat(relationshipService.findNextRightPlaceByRightItem(context, rightItem), equalTo(0));
+        initPublicationAuthor();
+
+        assertThat(relationshipService.findNextRightPlaceByRightItem(context, rightItem), equalTo(1));
+
+        context.turnOffAuthorisationSystem();
+        Community community = communityService.create(null, context);
+
+        Collection col = collectionService.create(context, community);
+        WorkspaceItem is = workspaceItemService.create(context, col, false);
+        Item secondItem = installItemService.installItem(context, is);
+        itemService.addMetadata(context, secondItem, "relationship", "type", null, null, "Publication");
+        Relationship secondRelationship = relationshipService.create(context, secondItem, rightItem,
+                                                                     isAuthorOfPublicationRelationshipType, 0, 0);
+        context.restoreAuthSystemState();
+
+        assertThat(relationshipService.findNextRightPlaceByRightItem(context, rightItem), equalTo(2));
+
+
+
+    }
+
+    @Test
+    public void testGetNextLeftPlace() throws Exception {
+        assertThat(relationshipService.findNextLeftPlaceByLeftItem(context, leftItem), equalTo(0));
+        initPublicationAuthor();
+
+        assertThat(relationshipService.findNextLeftPlaceByLeftItem(context, leftItem), equalTo(1));
+
+        context.turnOffAuthorisationSystem();
+        Community community = communityService.create(null, context);
+
+        Collection col = collectionService.create(context, community);
+        WorkspaceItem is = workspaceItemService.create(context, col, false);
+        Item secondAuthor = installItemService.installItem(context, is);
+        itemService.addMetadata(context, secondAuthor, "relationship", "type", null, null, "Author");
+        itemService.addMetadata(context, secondAuthor, "person", "familyName", null, null, "familyName");
+        itemService.addMetadata(context, secondAuthor, "person", "givenName", null, null, "firstName");
+        Relationship secondRelationship = relationshipService.create(context, leftItem, secondAuthor,
+                                                                     isAuthorOfPublicationRelationshipType, 0, 0);
+        context.restoreAuthSystemState();
+
+        assertThat(relationshipService.findNextLeftPlaceByLeftItem(context, leftItem), equalTo(2));
+
+
+
     }
 }

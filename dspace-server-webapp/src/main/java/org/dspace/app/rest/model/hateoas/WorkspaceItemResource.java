@@ -19,7 +19,7 @@ import org.dspace.app.rest.utils.Utils;
  */
 @RelNameDSpaceResource(WorkspaceItemRest.NAME)
 public class WorkspaceItemResource extends DSpaceResource<WorkspaceItemRest> {
-    public WorkspaceItemResource(WorkspaceItemRest witem, Utils utils, String... rels) {
-        super(witem, utils, rels);
+    public WorkspaceItemResource(WorkspaceItemRest witem, Utils utils) {
+        super(witem, utils);
     }
 }

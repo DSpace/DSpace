@@ -23,6 +23,7 @@ public class SelectableRelationship {
     private String relationshipType;
     private String filter;
     private String searchConfiguration;
+    private String nameVariants;
 
     public void setRelationshipType(String relationshipType) {
         this.relationshipType = relationshipType;
@@ -46,5 +47,13 @@ public class SelectableRelationship {
 
     public String getSearchConfiguration() {
         return searchConfiguration;
+    }
+
+    public void setNameVariants(String nameVariants) {
+        this.nameVariants = nameVariants;
+    }
+
+    public String getNameVariants() {
+        return nameVariants;
     }
 }

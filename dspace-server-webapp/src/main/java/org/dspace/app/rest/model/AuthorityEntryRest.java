@@ -17,7 +17,7 @@ import org.dspace.app.rest.RestResourceController;
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
-public class AuthorityEntryRest implements RestAddressableModel {
+public class AuthorityEntryRest extends RestAddressableModel {
     public static final String NAME = "authorityEntry";
     private String id;
     private String display;
