@@ -5,15 +5,17 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.content;
+package org.dspace.content.dto;
 
+import org.dspace.content.MetadataField;
+import org.dspace.content.MetadataSchema;
+import org.dspace.content.MetadataValue;
 import org.dspace.content.authority.Choices;
 
 /**
- * Metadata Value is bound to a database, the dissemination crosswalk require a MetadataValueDTO
- * just need for desimanation
- * This class provides a wrapper for this.
- * This class should only be used for the dissemniation metadata values that aren't to be written to the database
+ * This class acts as Data transfer object in which we can store data like in a regular MetadataValue object, but this
+ * one isn't saved in the DB. This can freely be used to represent Metadata without it being saved in the database,
+ * this will typically be used when transferring data
  *
  * @author kevinvandevelde at atmire.com
  */

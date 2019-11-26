@@ -9,7 +9,7 @@ package org.dspace.app.rest.converter;
 
 import org.dspace.app.rest.model.MetadataValueRest;
 import org.dspace.content.MetadataValue;
-import org.dspace.content.MetadataValueDTO;
+import org.dspace.content.dto.MetadataValueDTO;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
