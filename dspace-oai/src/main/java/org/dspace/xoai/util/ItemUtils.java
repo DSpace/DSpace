@@ -45,16 +45,17 @@ import org.dspace.xoai.data.DSpaceItem;
 public class ItemUtils {
     private static final Logger log = LogManager.getLogger(ItemUtils.class);
 
-    private static final MetadataExposureService metadataExposureService = UtilServiceFactory.getInstance()
-            .getMetadataExposureService();
+    private static final MetadataExposureService metadataExposureService
+            = UtilServiceFactory.getInstance().getMetadataExposureService();
 
-    private static final ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+    private static final ItemService itemService
+            = ContentServiceFactory.getInstance().getItemService();
 
-    private static final RelationshipService relationshipService = ContentServiceFactory.getInstance()
-            .getRelationshipService();
+    private static final RelationshipService relationshipService
+            = ContentServiceFactory.getInstance().getRelationshipService();
 
-    private static final BitstreamService bitstreamService = ContentServiceFactory.getInstance()
-            .getBitstreamService();
+    private static final BitstreamService bitstreamService
+            = ContentServiceFactory.getInstance().getBitstreamService();
 
     /**
      * Default constructor
@@ -240,7 +241,7 @@ public class ItemUtils {
     }
 
     /**
-     * This method will add all sub-elements to the top element schema like: dc, or dcterms, ...
+     * This method will add all sub-elements to a top element, like: dc, or dcterms, ...
      * @param schema         Element argument passed by reference that will be changed
      * @param val            Metadatavalue that will be processed
      * @throws SQLException
@@ -295,6 +296,12 @@ public class ItemUtils {
         }
     }
 
+    /**
+     * Utility method to retrieve a structured XML in XOAI format 
+     * @param context
+     * @param item
+     * @return Structured XML Metadata in XOAI format
+     */
     public static Metadata retrieveMetadata(Context context, Item item) {
         Metadata metadata;
 
@@ -354,7 +361,7 @@ public class ItemUtils {
             log.warn(e.getMessage(), e);
         }
 
-        // Relationships
+        // Relationships info
         try {
             Element relationships = createRelationshipsElement(context, item);
             metadata.getElement().add(relationships);
