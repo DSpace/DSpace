@@ -92,7 +92,7 @@
     <dc-type>
         <schema>person</schema>
         <element>identifier</element>
-        <qualifier>authorid</qualifier>
+        <qualifier>scopus-author-id</qualifier>
         <scope_note>Scopus Author ID</scope_note>
     </dc-type>
   
