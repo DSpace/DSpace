@@ -268,12 +268,6 @@
     <qualifier>uri</qualifier>
     <scope_note>Uniform Resource Identifier</scope_note>
   </dc-type>
-  
-
-
-
-  
-
 
   <!-- Used by system: do not remove -->
   <dc-type>
@@ -549,7 +543,7 @@
     <qualifier>mesh</qualifier>
     <scope_note>MEdical Subject Headings</scope_note>
   </dc-type>
-  
+
   <dc-type>
 	<schema>dc</schema>
     <element>subject</element>
