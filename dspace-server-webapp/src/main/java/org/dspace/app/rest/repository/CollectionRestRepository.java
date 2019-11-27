@@ -16,7 +16,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
@@ -25,6 +24,7 @@ import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.CollectionRest;
 import org.dspace.app.rest.model.CommunityRest;
+import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.repository.patch.DSpaceObjectPatch;
@@ -33,9 +33,11 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.Item;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,9 +57,6 @@ import org.springframework.web.multipart.MultipartFile;
 @Component(CollectionRest.CATEGORY + "." + CollectionRest.NAME)
 public class CollectionRestRepository extends DSpaceObjectRestRepository<Collection, CollectionRest> {
 
-    private static final Logger log = org.apache.logging.log4j.LogManager
-            .getLogger(CollectionRestRepository.class);
-
     @Autowired
     CommunityService communityService;
 
@@ -70,9 +69,11 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
     @Autowired
     private BitstreamService bitstreamService;
 
+    @Autowired
+    private ItemService itemService;
+
     public CollectionRestRepository(CollectionService dsoService) {
         super(dsoService, new DSpaceObjectPatch<CollectionRest>() {});
-        this.cs = dsoService;
     }
 
     @Override
@@ -211,17 +212,12 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
     @Override
     @PreAuthorize("hasPermission(#id, 'COLLECTION', 'DELETE')")
     protected void delete(Context context, UUID id) throws AuthorizeException {
-        Collection collection = null;
         try {
-            collection = cs.find(context, id);
+            Collection collection = cs.find(context, id);
             if (collection == null) {
                 throw new ResourceNotFoundException(
                     CollectionRest.CATEGORY + "." + CollectionRest.NAME + " with id: " + id + " not found");
             }
-        } catch (SQLException e) {
-            throw new RuntimeException("Unable to find Collection with id = " + id, e);
-        }
-        try {
             cs.delete(context, collection);
         } catch (SQLException e) {
             throw new RuntimeException("Unable to delete Collection with id = " + id, e);
@@ -242,15 +238,66 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
      * @throws SQLException
      */
     public BitstreamRest setLogo(Context context, Collection collection, MultipartFile uploadfile)
-            throws IOException, AuthorizeException, SQLException {
+        throws IOException, AuthorizeException, SQLException {
 
         if (collection.getLogo() != null) {
             throw new UnprocessableEntityException(
-                    "The collection with the given uuid already has a logo: " + collection.getID());
+                "The collection with the given uuid already has a logo: " + collection.getID());
         }
         Bitstream bitstream = cs.setLogo(context, collection, uploadfile.getInputStream());
         cs.update(context, collection);
         bitstreamService.update(context, bitstream);
         return converter.toRest(context.reloadEntity(bitstream), Projection.DEFAULT);
+    }
+
+    /**
+     * This method creates a new Item to be used as a template in a Collection
+     *
+     * @param context
+     * @param collection    The collection for which to make the item
+     * @param inputItemRest The new item
+     * @return              The created item
+     * @throws SQLException
+     * @throws AuthorizeException
+     */
+    public ItemRest createTemplateItem(Context context, Collection collection, ItemRest inputItemRest)
+        throws SQLException, AuthorizeException {
+        if (collection.getTemplateItem() != null) {
+            throw new UnprocessableEntityException("Collection with ID " + collection.getID()
+                + " already contains a template item");
+        }
+
+        if (inputItemRest.getInArchive() || inputItemRest.getDiscoverable() || inputItemRest.getWithdrawn()) {
+            throw new UnprocessableEntityException(
+                    "The template item should not be archived, discoverable or withdrawn");
+        }
+
+        cs.createTemplateItem(context, collection);
+        Item templateItem = collection.getTemplateItem();
+        metadataConverter.setMetadata(context, templateItem, inputItemRest.getMetadata());
+        templateItem.setDiscoverable(false);
+
+        cs.update(context, collection);
+        itemService.update(context, templateItem);
+
+        return converter.toRest(templateItem, Projection.DEFAULT);
+    }
+
+    /**
+     * This method looks up the template Item associated with a Collection
+     *
+     * @param collection    The Collection for which to find the template
+     * @return              The template Item from the Collection
+     * @throws SQLException
+     */
+    public ItemRest getTemplateItem(Collection collection) throws SQLException {
+        Item item = collection.getTemplateItem();
+        if (item == null) {
+            throw new ResourceNotFoundException(
+                    "TemplateItem from " + CollectionRest.CATEGORY + "." + CollectionRest.NAME + " with id: "
+                            + collection.getID() + " not found");
+        }
+
+        return converter.toRest(item, Projection.DEFAULT);
     }
 }
