@@ -17,11 +17,13 @@
     <bean id="authenticateServiceFactory" class="org.dspace.authenticate.factory.AuthenticateServiceFactoryImpl"/>
 
     <bean id="authorityServiceFactory" class="org.dspace.authority.factory.AuthorityServiceFactoryImpl"/>
+    <bean id="externalServiceFactory" class="org.dspace.external.factory.ExternalServiceFactoryImpl"/>
     <bean id="contentAuthorityServiceFactory" class="org.dspace.content.authority.factory.ContentAuthorityServiceFactoryImpl"/>
 
     <bean id="authorizeServiceFactory" class="org.dspace.authorize.factory.AuthorizeServiceFactoryImpl"/>
     <bean id="checkerServiceFactory" class="org.dspace.checker.factory.CheckerServiceFactoryImpl"/>
     <bean id="contentServiceFactory" class="org.dspace.content.factory.ContentServiceFactoryImpl"/>
+    <bean id="scriptServiceFactory" class="org.dspace.scripts.factory.impl.ScriptServiceFactoryImpl"/>
     <bean id="coreServiceFactory" class="org.dspace.core.factory.CoreServiceFactoryImpl"/>
     <bean id="curateServiceFactory" class="org.dspace.curate.factory.CurateServiceFactoryImpl"/>
 

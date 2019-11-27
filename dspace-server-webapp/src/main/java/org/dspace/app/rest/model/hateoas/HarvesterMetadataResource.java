@@ -18,8 +18,8 @@ import org.dspace.app.rest.utils.Utils;
  */
 public class HarvesterMetadataResource extends DSpaceResource<HarvesterMetadataRest> {
 
-    public HarvesterMetadataResource(HarvesterMetadataRest data, Utils utils, String... rels) {
-        super(data, utils, rels);
+    public HarvesterMetadataResource(HarvesterMetadataRest data, Utils utils) {
+        super(data, utils);
 
     }
 }

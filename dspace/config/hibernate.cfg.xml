@@ -48,6 +48,8 @@
         <mapping class="org.dspace.content.RelationshipType"/>
         <mapping class="org.dspace.content.EntityType"/>
 
+        <mapping class="org.dspace.scripts.Process"/>
+
         <mapping class="org.dspace.content.MetadataField"/>
         <mapping class="org.dspace.content.MetadataSchema"/>
         <mapping class="org.dspace.content.MetadataValue"/>

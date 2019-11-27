@@ -49,6 +49,10 @@ public class ItemWithdrawReplaceOperation<R> extends PatchOperation<R> {
             // This is a request to withdraw the item.
             try {
                 if (withdraw) {
+                    if (item.getTemplateItemOf() != null) {
+                        throw new UnprocessableEntityException("A template item cannot be withdrawn.");
+                    }
+
                     // The item is currently not withdrawn and also not archived. Is this a possible situation?
                     if (!item.isWithdrawn() && !item.isArchived()) {
                         throw new UnprocessableEntityException("Cannot withdraw item when it is not in archive.");

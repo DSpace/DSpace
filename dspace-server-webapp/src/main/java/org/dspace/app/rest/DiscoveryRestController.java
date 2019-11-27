@@ -14,6 +14,7 @@ import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.link.HalLinkService;
 import org.dspace.app.rest.model.FacetConfigurationRest;
 import org.dspace.app.rest.model.FacetResultsRest;
@@ -61,6 +62,9 @@ public class DiscoveryRestController implements InitializingBean {
     @Autowired
     private HalLinkService halLinkService;
 
+    @Autowired
+    private ConverterService converter;
+
     @Override
     public void afterPropertiesSet() throws Exception {
         discoverableEndpointsService
@@ -74,8 +78,7 @@ public class DiscoveryRestController implements InitializingBean {
         throws Exception {
 
         SearchSupportRest searchSupportRest = discoveryRestRepository.getSearchSupport();
-        SearchSupportResource searchSupportResource = new SearchSupportResource(searchSupportRest);
-        halLinkService.addLinks(searchSupportResource);
+        SearchSupportResource searchSupportResource = converter.toResource(searchSupportRest);
         return searchSupportResource;
     }
 
@@ -91,9 +94,7 @@ public class DiscoveryRestController implements InitializingBean {
         SearchConfigurationRest searchConfigurationRest = discoveryRestRepository
             .getSearchConfiguration(dsoScope, configuration);
 
-        SearchConfigurationResource searchConfigurationResource = new SearchConfigurationResource(
-            searchConfigurationRest);
-        halLinkService.addLinks(searchConfigurationResource);
+        SearchConfigurationResource searchConfigurationResource = converter.toResource(searchConfigurationRest);
         return searchConfigurationResource;
     }
 
@@ -142,9 +143,8 @@ public class DiscoveryRestController implements InitializingBean {
         }
 
         //Get the Search results in JSON format
-        SearchResultsRest searchResultsRest = null;
-        searchResultsRest = discoveryRestRepository
-            .getSearchObjects(query, dsoType, dsoScope, configuration, searchFilters, page);
+        SearchResultsRest searchResultsRest = discoveryRestRepository
+            .getSearchObjects(query, dsoType, dsoScope, configuration, searchFilters, page, utils.obtainProjection());
 
         //Convert the Search JSON results to paginated HAL resources
         SearchResultsResource searchResultsResource = new SearchResultsResource(searchResultsRest, utils, page);
@@ -164,7 +164,7 @@ public class DiscoveryRestController implements InitializingBean {
 
         FacetConfigurationRest facetConfigurationRest = discoveryRestRepository
             .getFacetsConfiguration(dsoScope, configuration);
-        FacetConfigurationResource facetConfigurationResource = new FacetConfigurationResource(facetConfigurationRest);
+        FacetConfigurationResource facetConfigurationResource = converter.toResource(facetConfigurationRest);
 
         halLinkService.addLinks(facetConfigurationResource, pageable);
         return facetConfigurationResource;
@@ -192,7 +192,7 @@ public class DiscoveryRestController implements InitializingBean {
         FacetResultsRest facetResultsRest = discoveryRestRepository
             .getFacetObjects(facetName, prefix, query, dsoType, dsoScope, configuration, searchFilters, page);
 
-        FacetResultsResource facetResultsResource = new FacetResultsResource(facetResultsRest);
+        FacetResultsResource facetResultsResource = converter.toResource(facetResultsRest);
 
         halLinkService.addLinks(facetResultsResource, page);
         return facetResultsResource;

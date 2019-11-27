@@ -39,7 +39,7 @@ public class SubmissionSectionHalLinkFactory extends HalLinkFactory<SubmissionSe
             UriComponentsBuilder uriComponentsBuilder = linkTo(
                 getMethodOn(SubmissionFormRest.CATEGORY, SubmissionFormRest.NAME)
                     .findRel(null, null, SubmissionFormRest.CATEGORY, English.plural(SubmissionFormRest.NAME),
-                            sd.getId(), "", null, null, null))
+                            sd.getId(), "", null, null))
                 .toUriComponentsBuilder();
             String uribuilder = uriComponentsBuilder.build().toString();
             list.add(
@@ -49,7 +49,7 @@ public class SubmissionSectionHalLinkFactory extends HalLinkFactory<SubmissionSe
             UriComponentsBuilder uriComponentsBuilder = linkTo(
                 getMethodOn(RestResourceController.class, SubmissionUploadRest.CATEGORY, SubmissionUploadRest.NAME)
                     .findRel(null, null, SubmissionUploadRest.CATEGORY, English.plural(SubmissionUploadRest.NAME),
-                           sd.getId(), "", null, null, null))
+                           sd.getId(), "", null, null))
                 .toUriComponentsBuilder();
             String uribuilder = uriComponentsBuilder.build().toString();
             list.add(
