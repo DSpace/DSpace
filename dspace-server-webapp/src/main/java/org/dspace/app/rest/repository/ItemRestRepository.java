@@ -366,8 +366,6 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
         return bundle;
     }
 
-    }
-
     /**
      * Modify a template Item which is a template Item
      * @param item          The Item to be modified
@@ -405,6 +403,8 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
         Collection collection = item.getTemplateItemOf();
         collectionService.removeTemplateItem(context, collection);
         collectionService.update(context, collection);
+    }
+
     @Override
     protected ItemRest createAndReturn(Context context, List<String> stringList)
         throws AuthorizeException, SQLException, RepositoryMethodNotImplementedException {
