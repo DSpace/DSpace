@@ -44,6 +44,8 @@ public class RelationshipServiceImpl implements RelationshipService {
     protected RelationshipTypeService relationshipTypeService;
 
     @Autowired
+    private RelationshipMetadataService relationshipMetadataService;
+    @Autowired
     private VirtualMetadataPopulator virtualMetadataPopulator;
 
     @Override
@@ -60,6 +62,8 @@ public class RelationshipServiceImpl implements RelationshipService {
                                int leftPlace, int rightPlace) throws AuthorizeException, SQLException {
         return create(c, leftItem, rightItem, relationshipType, leftPlace, rightPlace, null, null);
     }
+
+
 
     @Override
     public Relationship create(Context c, Item leftItem, Item rightItem, RelationshipType relationshipType,
@@ -313,8 +317,21 @@ public class RelationshipServiceImpl implements RelationshipService {
 
     @Override
     public void delete(Context context, Relationship relationship) throws SQLException, AuthorizeException {
-        if (isRelationshipValidToDelete(context, relationship)) {
+        //TODO: retrieve default settings from configuration
+        delete(context, relationship, false, false);
+    }
+
+    @Override
+    public void delete(Context context, Relationship relationship, boolean copyToLeftItem, boolean copyToRightItem)
+        throws SQLException, AuthorizeException {
+        log.info(org.dspace.core.LogManager.getHeader(context, "delete_relationship",
+                                                      "relationship_id=" + relationship.getID() + "&" +
+                                                          "copyMetadataValuesToLeftItem=" + copyToLeftItem + "&" +
+                                                          "copyMetadataValuesToRightItem=" + copyToRightItem));
+        if (isRelationshipValidToDelete(context, relationship) &&
+            copyToItemPermissionCheck(context, relationship, copyToLeftItem, copyToRightItem)) {
             // To delete a relationship, a user must have WRITE permissions on one of the related Items
+            copyMetadataValues(context, relationship, copyToLeftItem, copyToRightItem);
             if (authorizeService.authorizeActionBoolean(context, relationship.getLeftItem(), Constants.WRITE) ||
                 authorizeService.authorizeActionBoolean(context, relationship.getRightItem(), Constants.WRITE)) {
                 relationshipDAO.delete(context, relationship);
@@ -327,6 +344,71 @@ public class RelationshipServiceImpl implements RelationshipService {
         } else {
             throw new IllegalArgumentException("The relationship given was not valid");
         }
+    }
+
+    /**
+     * Converts virtual metadata from RelationshipMetadataValue objects to actual item metadata.
+     *
+     * @param context           The relevant DSpace context
+     * @param relationship      The relationship containing the left and right items
+     * @param copyToLeftItem    The boolean indicating whether we want to write to left item or not
+     * @param copyToRightItem   The boolean indicating whether we want to write to right item or not
+     */
+    private void copyMetadataValues(Context context, Relationship relationship, boolean copyToLeftItem,
+                                    boolean copyToRightItem)
+        throws SQLException, AuthorizeException {
+        if (copyToLeftItem) {
+            String entityTypeString = relationshipMetadataService
+                .getEntityTypeStringFromMetadata(relationship.getLeftItem());
+            List<RelationshipMetadataValue> relationshipMetadataValues =
+                relationshipMetadataService.findRelationshipMetadataValueForItemRelationship(context,
+                    relationship.getLeftItem(), entityTypeString, relationship, true);
+            for (RelationshipMetadataValue relationshipMetadataValue : relationshipMetadataValues) {
+                itemService.addMetadata(context, relationship.getLeftItem(),
+                                        relationshipMetadataValue.getMetadataField(), null,
+                                        relationshipMetadataValue.getValue() );
+            }
+            itemService.update(context, relationship.getLeftItem());
+        }
+        if (copyToRightItem) {
+            String entityTypeString = relationshipMetadataService
+                .getEntityTypeStringFromMetadata(relationship.getRightItem());
+            List<RelationshipMetadataValue> relationshipMetadataValues =
+                relationshipMetadataService.findRelationshipMetadataValueForItemRelationship(context,
+                    relationship.getRightItem(), entityTypeString, relationship, true);
+            for (RelationshipMetadataValue relationshipMetadataValue : relationshipMetadataValues) {
+                itemService.addMetadata(context, relationship.getRightItem(),
+                                        relationshipMetadataValue.getMetadataField(), null,
+                                        relationshipMetadataValue.getValue() );
+            }
+            itemService.update(context, relationship.getRightItem());
+        }
+    }
+
+    /**
+     * This method will check if the current user has sufficient rights to write to the respective items if requested
+     * @param context           The relevant DSpace context
+     * @param relationship      The relationship containing the left and right items
+     * @param copyToLeftItem    The boolean indicating whether we want to write to left item or not
+     * @param copyToRightItem   The boolean indicating whether we want to write to right item or not
+     * @return                  A boolean indicating whether the permissions are okay for this request
+     * @throws AuthorizeException   If something goes wrong
+     * @throws SQLException         If something goes wrong
+     */
+    private boolean copyToItemPermissionCheck(Context context, Relationship relationship,
+                                              boolean copyToLeftItem, boolean copyToRightItem) throws SQLException {
+        boolean isPermissionCorrect = true;
+        if (copyToLeftItem) {
+            if (!authorizeService.authorizeActionBoolean(context, relationship.getLeftItem(), Constants.WRITE)) {
+                isPermissionCorrect = false;
+            }
+        }
+        if (copyToRightItem) {
+            if (!authorizeService.authorizeActionBoolean(context, relationship.getRightItem(), Constants.WRITE)) {
+                isPermissionCorrect = false;
+            }
+        }
+        return isPermissionCorrect;
     }
 
     private boolean isRelationshipValidToDelete(Context context, Relationship relationship) throws SQLException {
