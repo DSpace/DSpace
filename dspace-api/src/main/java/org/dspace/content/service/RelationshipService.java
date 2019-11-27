@@ -304,4 +304,15 @@ public interface RelationshipService extends DSpaceCRUDService<Relationship> {
      */
     int countByTypeName(Context context, String typeName)
             throws SQLException;
+
+    /**
+     * This method is used to delete a Relationship whilst given the possibility to copy the Virtual Metadata created
+     * by this relationship to the left and/or right item
+     * @param context           The relevant DSpace context
+     * @param relationship      The relationship to be deleted
+     * @param copyToLeftItem    A boolean indicating whether we should copy metadata to the left item or not
+     * @param copyToRightItem   A boolean indicating whether we should copy metadata to the right item or not
+     */
+    void delete(Context context, Relationship relationship, boolean copyToLeftItem, boolean copyToRightItem)
+        throws SQLException, AuthorizeException;
 }
