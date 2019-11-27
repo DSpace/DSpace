@@ -477,11 +477,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                     QueryResponse rsp = getSolr().query(query, SolrRequest.METHOD.POST);
                     SolrDocumentList docs = rsp.getResults();
 
-                    Iterator iter = docs.iterator();
-                    while (iter.hasNext()) {
-
-                        SolrDocument doc = (SolrDocument) iter.next();
-
+                    for (SolrDocument doc : docs) {
                         String handle = (String) doc.getFieldValue(HANDLE_FIELD);
 
                         DSpaceObject o = handleService.resolveToObject(context, handle);
