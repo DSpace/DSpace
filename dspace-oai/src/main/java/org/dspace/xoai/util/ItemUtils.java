@@ -297,7 +297,7 @@ public class ItemUtils {
     }
 
     /**
-     * Utility method to retrieve a structured XML in XOAI format 
+     * Utility method to retrieve a structured XML in XOAI format
      * @param context
      * @param item
      * @return Structured XML Metadata in XOAI format
