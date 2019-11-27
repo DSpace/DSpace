@@ -8,6 +8,7 @@
 package org.dspace.app.rest.repository.patch.factories.impl;
 
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
+import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
@@ -36,6 +37,11 @@ public class ItemDiscoverableReplaceOperation<R> extends PatchOperation<R> {
         Boolean discoverable = getBooleanOperationValue(operation.getValue());
         if (supports(object, operation)) {
             Item item = (Item) object;
+            if (discoverable) {
+                if (item.getTemplateItemOf() != null) {
+                    throw new UnprocessableEntityException("A template item cannot be discoverable.");
+                }
+            }
             item.setDiscoverable(discoverable);
             return object;
         } else {
