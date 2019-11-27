@@ -561,29 +561,40 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 // Query for all indexed Items, Collections and Communities,
                 // returning just their handle
                 query.setFields(HANDLE_FIELD, RESOURCE_UNIQUE_ID, RESOURCE_ID_FIELD, RESOURCE_TYPE_FIELD);
+                query.addSort(RESOURCE_UNIQUE_ID, SolrQuery.ORDER.asc);
                 query.setQuery(RESOURCE_TYPE_FIELD + ":" + type);
-                QueryResponse rsp = getSolr().query(query, SolrRequest.METHOD.POST);
-                SolrDocumentList docs = rsp.getResults();
 
-                Iterator iter = docs.iterator();
-                while (iter.hasNext()) {
+                // Get the total amount of results
+                QueryResponse totalResponse = getSolr().query(query);
+                long total = totalResponse.getResults().getNumFound();
 
-                    SolrDocument doc = (SolrDocument) iter.next();
+                int start = 0;
+                int batch = 100;
 
-                    String uniqueID = (String) doc.getFieldValue(RESOURCE_UNIQUE_ID);
+                query.setRows(batch);
+                while (start < total) {
+                    query.setStart(start);
+                    QueryResponse rsp = getSolr().query(query, SolrRequest.METHOD.POST);
+                    SolrDocumentList docs = rsp.getResults();
 
-                    IndexableObject o = findIndexableObject(context, doc);
+                    for (SolrDocument doc : docs) {
+                        String uniqueID = (String) doc.getFieldValue(RESOURCE_UNIQUE_ID);
 
-                    if (o == null) {
-                        log.info("Deleting: " + uniqueID);
-                        /*
-                         * Use IndexWriter to delete, its easier to manage
-                         * write.lock
-                         */
-                        unIndexContent(context, uniqueID);
-                    } else {
-                        log.debug("Keeping: " + o.getUniqueIndexID());
+                        IndexableObject o = findIndexableObject(context, doc);
+
+                        if (o == null) {
+                            log.info("Deleting: " + uniqueID);
+                            /*
+                             * Use IndexWriter to delete, its easier to manage
+                             * write.lock
+                             */
+                            unIndexContent(context, uniqueID);
+                        } else {
+                            log.debug("Keeping: " + o.getUniqueIndexID());
+                        }
                     }
+
+                    start += batch;
                 }
             }
         } catch (Exception e) {
