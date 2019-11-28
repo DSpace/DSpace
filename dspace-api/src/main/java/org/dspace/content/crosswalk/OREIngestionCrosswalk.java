@@ -228,6 +228,7 @@ public class OREIngestionCrosswalk
                 throw new CrosswalkException("Could not retrieve bitstream: " + entryId);
             }
 
+            in.close();
         }
         log.info("OREIngest for Item " + item.getID() + " took: " + (new Date().getTime() - timeStart.getTime()) + "ms.");
     }
