@@ -1286,6 +1286,8 @@
             </pair>
         </value-pairs>
 
+        <!-- OpenAIRE specific value pairs -->
+
         <value-pairs value-pairs-name="openaire_license_types" dc-term="license">
 
             <!-- Based on: http://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/latest/field_licensecondition.html#dc-rightslicensecondition -->
@@ -1653,9 +1655,6 @@
             </pair>
         </value-pairs>
 
-        <!-- default language order: (from dspace 1.2.1)
-             "en_US", "en", "es", "de", "fr", "it", "ja", "zh", "other", ""
-        -->
         <value-pairs value-pairs-name="common_iso_639-3_languages" dc-term="language_iso">
             <pair>
                 <displayed-value>N/A</displayed-value>
