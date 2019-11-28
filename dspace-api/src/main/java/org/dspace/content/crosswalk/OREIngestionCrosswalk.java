@@ -174,7 +174,7 @@ public class OREIngestionCrosswalk
             } else {
                 targetBundle = targetBundles.get(0);
             }
-            CloseableHttpResponse response;
+
             InputStream in = null;
             if (href != null) {
 //                try {
@@ -182,10 +182,10 @@ public class OREIngestionCrosswalk
                     //String processedURL = encodeForURL(href).replace("%20", "+");
 
 					// Generate a requeset for the aggregated resource
-                CloseableHttpClient httpclient = HttpClients.createDefault();
-                HttpGet httpget = new HttpGet(href);
-                response = httpclient.execute(httpget);
-                try {
+                    CloseableHttpClient httpclient = HttpClients.createDefault();
+                    HttpGet httpget = new HttpGet(href);
+                    CloseableHttpResponse response = httpclient.execute(httpget);
+                    try {
                         HttpEntity entity = response.getEntity();
                         if (entity != null) {
                             in = entity.getContent();
@@ -193,6 +193,8 @@ public class OREIngestionCrosswalk
                         }
                     } catch (Exception ex) {
                         log.error("The provided URI was invalid: " + href);
+                    } finally {
+                        response.close();
                     }
 //                } catch (FileNotFoundException fe) {
 //                    log.error("The provided URI failed to return a resource: " + href);
@@ -225,7 +227,7 @@ public class OREIngestionCrosswalk
             } else {
                 throw new CrosswalkException("Could not retrieve bitstream: " + entryId);
             }
-            response.close();
+
         }
         log.info("OREIngest for Item " + item.getID() + " took: " + (new Date().getTime() - timeStart.getTime()) + "ms.");
     }
