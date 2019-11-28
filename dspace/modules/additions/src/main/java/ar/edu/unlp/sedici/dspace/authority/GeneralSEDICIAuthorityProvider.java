@@ -75,7 +75,6 @@ public abstract class GeneralSEDICIAuthorityProvider extends SPARQLAuthorityProv
 			pqs.append("}\n");
 		}
 		else {
-			filter = normalizeTextForParserSPARQL10(filter);
 			getTextFilterQuery(pqs,filter);
 			pqs.append("}\n");
 			pqs.append("ORDER BY ASC(?label)\n");

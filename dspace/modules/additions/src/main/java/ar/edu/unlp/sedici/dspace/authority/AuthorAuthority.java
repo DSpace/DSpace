@@ -121,7 +121,6 @@ public class AuthorAuthority extends SPARQLAuthorityProvider {
 			+ "} \n"); // end link
 		pqs.append("	}\n"); 
 		if (!"".equals(text)) {
-			text = normalizeTextForParserSPARQL10(text);
 			String[] tokens = text.split(",");
 			if (tokens.length > 1 && tokens[0].trim().length() > 0 && tokens[1].trim().length() > 0) {
 				pqs.append("FILTER(REGEX(?name, ?text2, \"i\") && REGEX(?surname, ?text1, \"i\"))\n");
