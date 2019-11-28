@@ -357,8 +357,7 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
         JsonPatchConverter patchConverter = new JsonPatchConverter(mapper);
         Patch patch = patchConverter.convert(jsonNode);
 
-        ItemRest patchedItemRest = dsoPatch.patch(converter.toRest(item, Projection.DEFAULT), patch.getOperations());
-        updateDSpaceObject(item, patchedItemRest);
+        patchDSpaceObject(ItemRest.CATEGORY, ItemRest.NAME, item.getID(), patch);
 
         return converter.toRest(item, Projection.DEFAULT);
     }

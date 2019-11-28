@@ -47,7 +47,7 @@ public class DspaceObjectMetadataRemoveOperation<R extends DSpaceObject> extends
     @Override
     public R perform(Context context, R resource, Operation operation) throws SQLException {
         DSpaceObjectService dsoService = ContentServiceFactory.getInstance().getDSpaceObjectService(resource);
-        String indexInPath = metadataPatchUtils.getIndexFromPath(operation);
+        String indexInPath = metadataPatchUtils.getIndexFromPath(operation.getPath());
         MetadataField metadataField = metadataPatchUtils.getMetadataField(context, operation);
 
         remove(context, resource, dsoService, metadataField, indexInPath);

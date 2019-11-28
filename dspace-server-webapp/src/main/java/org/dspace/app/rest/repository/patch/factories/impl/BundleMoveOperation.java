@@ -10,14 +10,12 @@ package org.dspace.app.rest.repository.patch.factories.impl;
 import java.sql.SQLException;
 
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
-import org.dspace.app.rest.model.BundleRest;
+import org.dspace.app.rest.model.patch.MoveOperation;
 import org.dspace.app.rest.model.patch.Operation;
-import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bundle;
 import org.dspace.content.service.BundleService;
 import org.dspace.core.Context;
-import org.dspace.services.RequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -32,27 +30,31 @@ import org.springframework.stereotype.Component;
  * </code>
  */
 @Component
-public class BundleMoveOperation extends MovePatchOperation<BundleRest, Integer> {
+public class BundleMoveOperation extends PatchOperation<Bundle> {
 
     @Autowired
     BundleService bundleService;
 
     @Autowired
-    RequestService requestService;
+    DspaceObjectMetadataPatchUtils dspaceObjectMetadataPatchUtils;
+
+    private static final String OPERATION_PATH_BUNDLE_MOVE = "/_links/bitstreams/";
 
     /**
      * Executes the move patch operation.
      *
-     * @param resource  the rest model.
+     * @param bundle  the bundle in which we want to move files around.
      * @param operation the move patch operation.
      * @return the updated rest model.
      * @throws DSpaceBadRequestException
      */
     @Override
-    public BundleRest move(BundleRest resource, Operation operation) {
-        Context context = ContextUtil.obtainContext(requestService.getCurrentRequest().getServletRequest());
+    public Bundle perform(Context context, Bundle bundle, Operation operation) {
         try {
-            Bundle bundle = bundleService.findByIdOrLegacyId(context, resource.getId());
+            MoveOperation moveOperation = (MoveOperation) operation;
+            final int from = Integer.parseInt(dspaceObjectMetadataPatchUtils.getIndexFromPath(moveOperation.getFrom()));
+            final int to = Integer.parseInt(dspaceObjectMetadataPatchUtils.getIndexFromPath(moveOperation.getPath()));
+
             int totalAmount = bundle.getBitstreams().size();
 
             if (totalAmount < 1) {
@@ -78,29 +80,13 @@ public class BundleMoveOperation extends MovePatchOperation<BundleRest, Integer>
             throw new DSpaceBadRequestException(e.getMessage(), e);
         }
 
-        return resource;
+        return bundle;
     }
 
-    /**
-     * This method should return the typed array to be used in the
-     * LateObjectEvaluator evaluation of json arrays.
-     *
-     * @return
-     */
     @Override
-    protected Class<Integer[]> getArrayClassForEvaluation() {
-        return Integer[].class;
-    }
-
-    /**
-     * This method should return the object type to be used in the
-     * LateObjectEvaluator evaluation of json objects.
-     *
-     * @return
-     */
-    @Override
-    protected Class<Integer> getClassForEvaluation() {
-        return Integer.class;
+    public boolean supports(Object objectToMatch, Operation operation) {
+        return (objectToMatch instanceof Bundle && operation.getOp().trim().equalsIgnoreCase(OPERATION_MOVE)
+                && operation.getPath().trim().startsWith(OPERATION_PATH_BUNDLE_MOVE));
     }
 
     /**
