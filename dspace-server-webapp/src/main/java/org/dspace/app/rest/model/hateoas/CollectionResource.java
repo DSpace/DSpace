@@ -19,10 +19,11 @@ import org.dspace.app.rest.utils.Utils;
  */
 @RelNameDSpaceResource(CollectionRest.NAME)
 public class CollectionResource extends DSpaceResource<CollectionRest> {
-    public CollectionResource(CollectionRest collection, Utils utils, String... rels) {
-        super(collection, utils, rels);
+    public CollectionResource(CollectionRest collection, Utils utils) {
+        super(collection, utils);
         add(utils.linkToSubResource(collection, CollectionRest.LICENSE));
         add(utils.linkToSubResource(collection, CollectionRest.HARVEST));
         add(utils.linkToSubResource(collection, "mappedItems"));
+        add(utils.linkToSubResource(collection, "itemtemplate"));
     }
 }

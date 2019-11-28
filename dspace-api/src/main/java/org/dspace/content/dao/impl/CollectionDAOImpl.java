@@ -9,7 +9,6 @@ package org.dspace.content.dao.impl;
 
 import java.sql.SQLException;
 import java.util.AbstractMap;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -64,11 +63,20 @@ public class CollectionDAOImpl extends AbstractHibernateDSODAO<Collection> imple
     public List<Collection> findAll(Context context, MetadataField order, Integer limit, Integer offset)
         throws SQLException {
         StringBuilder query = new StringBuilder();
-        query.append("SELECT ").append(Collection.class.getSimpleName()).append(" FROM Collection as ")
-             .append(Collection.class.getSimpleName()).append(" ");
-        addMetadataLeftJoin(query, Collection.class.getSimpleName(), Arrays.asList(order));
-        addMetadataSortQuery(query, Arrays.asList(order), null);
 
+        // The query has to be rather complex because we want to sort the retrieval of Collections based on the title
+        // We'll join the Collections with the metadata fields on the sortfield specified in the parameters
+        // then we'll sort on this metadata field (this is usually the title). We're also making sure that the place
+        // is the lowest place in the metadata fields list so that we avoid the duplication bug
+        query.append("SELECT c" +
+                                " FROM Collection c" +
+                                " left join c.metadata title on title.metadataField = :sortField and" +
+                                " title.dSpaceObject = c.id and" +
+                                " title.place = (select min(internal.place) " +
+                                "from c.metadata internal " +
+                                "where internal.metadataField = :sortField and" +
+                                " internal.dSpaceObject = c.id)" +
+                                " ORDER BY LOWER(title.value)");
         Query hibernateQuery = createQuery(context, query.toString());
         if (offset != null) {
             hibernateQuery.setFirstResult(offset);
@@ -76,7 +84,7 @@ public class CollectionDAOImpl extends AbstractHibernateDSODAO<Collection> imple
         if (limit != null) {
             hibernateQuery.setMaxResults(limit);
         }
-        hibernateQuery.setParameter(order.toString(), order.getID());
+        hibernateQuery.setParameter("sortField", order);
         return list(hibernateQuery);
     }
 

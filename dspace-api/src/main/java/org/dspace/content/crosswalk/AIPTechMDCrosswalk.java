@@ -22,6 +22,7 @@ import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.Site;
+import org.dspace.content.dto.MetadataValueDTO;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.packager.DSpaceAIPIngester;
 import org.dspace.content.packager.METSManifest;
@@ -195,7 +196,7 @@ public class AIPTechMDCrosswalk implements IngestionCrosswalk, DisseminationCros
     public Element disseminateElement(Context context, DSpaceObject dso)
         throws CrosswalkException, IOException, SQLException,
         AuthorizeException {
-        List<MockMetadataValue> dc = new ArrayList<>();
+        List<MetadataValueDTO> dc = new ArrayList<>();
         if (dso.getType() == Constants.ITEM) {
             Item item = (Item) dso;
             EPerson is = item.getSubmitter();
@@ -282,8 +283,8 @@ public class AIPTechMDCrosswalk implements IngestionCrosswalk, DisseminationCros
         return XSLTDisseminationCrosswalk.createDIM(dso, dc);
     }
 
-    private static MockMetadataValue makeDC(String element, String qualifier, String value) {
-        MockMetadataValue dcv = new MockMetadataValue();
+    private static MetadataValueDTO makeDC(String element, String qualifier, String value) {
+        MetadataValueDTO dcv = new MetadataValueDTO();
         dcv.setSchema("dc");
         dcv.setLanguage(null);
         dcv.setElement(element);

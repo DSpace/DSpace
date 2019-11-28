@@ -16,7 +16,7 @@ import org.dspace.content.Item;
 /**
  * The REST object that will define a list of CollectionRest objects to be returned by the REST api
  */
-public class MappedCollectionRestWrapper implements RestAddressableModel {
+public class MappedCollectionRestWrapper extends RestAddressableModel {
 
     @JsonIgnore
     private List<CollectionRest> mappedCollectionRestList;

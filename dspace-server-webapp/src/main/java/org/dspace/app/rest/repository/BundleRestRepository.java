@@ -18,14 +18,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.dspace.app.rest.converter.BundleConverter;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.BundleRest;
-import org.dspace.app.rest.model.hateoas.BundleResource;
-import org.dspace.app.rest.model.hateoas.DSpaceResource;
 import org.dspace.app.rest.model.patch.Patch;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.repository.patch.BundlePatch;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
@@ -58,12 +56,8 @@ public class BundleRestRepository extends DSpaceObjectRestRepository<Bundle, Bun
 
     private static final Logger log = LogManager.getLogger();
 
-
     @Autowired
     private BundleService bundleService;
-
-    @Autowired
-    private BundlePatch bundlePatch;
 
     @Autowired
     private AuthorizeService authorizeService;
@@ -77,11 +71,8 @@ public class BundleRestRepository extends DSpaceObjectRestRepository<Bundle, Bun
     @Autowired
     private BitstreamFormatService bitstreamFormatService;
 
-
-    public BundleRestRepository(BundleService dsoService,
-                                BundleConverter dsoConverter,
-                                BundlePatch dsoPatch) {
-        super(dsoService, dsoConverter, dsoPatch);
+    public BundleRestRepository(BundleService dsoService, BundlePatch dsoPatch) {
+        super(dsoService, dsoPatch);
         this.bundleService = dsoService;
     }
 
@@ -96,7 +87,7 @@ public class BundleRestRepository extends DSpaceObjectRestRepository<Bundle, Bun
         if (bundle == null) {
             return null;
         }
-        return dsoConverter.fromModel(bundle);
+        return converter.toRest(bundle, utils.obtainProjection());
     }
 
     public Page<BundleRest> findAll(Context context, Pageable pageable) {
@@ -132,8 +123,8 @@ public class BundleRestRepository extends DSpaceObjectRestRepository<Bundle, Bun
      * @param properties      The properties to be assigned to the bitstream
      * @return The uploaded bitstream
      */
-    public Bitstream uploadBitstream(Context context, Bundle bundle, String fileName, InputStream fileInputStream,
-                                     String properties) {
+    public BitstreamRest uploadBitstream(Context context, Bundle bundle, String fileName, InputStream fileInputStream,
+                                         String properties) {
         Item item = null;
         Bitstream bitstream = null;
         try {
@@ -160,7 +151,7 @@ public class BundleRestRepository extends DSpaceObjectRestRepository<Bundle, Bun
             throw new RuntimeException(message, e);
         }
 
-        return bitstream;
+        return converter.toRest(bitstream, Projection.DEFAULT);
     }
 
     /**
@@ -211,10 +202,6 @@ public class BundleRestRepository extends DSpaceObjectRestRepository<Bundle, Bun
 
     public Class<BundleRest> getDomainClass() {
         return BundleRest.class;
-    }
-
-    public DSpaceResource<BundleRest> wrapResource(BundleRest model, String... rels) {
-        return new BundleResource(model, utils, rels);
     }
 
     /**

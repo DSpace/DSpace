@@ -27,8 +27,6 @@
         <resource.delimiter>@</resource.delimiter>
         <!-- Define our starting class for our Spring Boot Application -->
         <start-class>org.dspace.app.rest.Application</start-class>
-        <!-- Library for reading JSON documents: https://github.com/json-path/JsonPath -->
-        <json-path.version>2.4.0</json-path.version>
         <!-- Library for managing JSON Web Tokens (JWT): https://bitbucket.org/connect2id/nimbus-jose-jwt/wiki/Home -->
         <nimbus-jose-jwt.version>6.2</nimbus-jose-jwt.version>
     </properties>
@@ -149,6 +147,37 @@
 
         </profile>
     </profiles>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <configuration>
+                    <attachClasses>true</attachClasses>
+                    <!-- Filter the web.xml (needed for IDE compatibility/debugging) -->
+                    <filteringDeploymentDescriptors>true</filteringDeploymentDescriptors>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>prepare-package</phase>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <!-- Builds a *-tests.jar of all test classes -->
+                            <goal>test-jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
     <dependencyManagement>
         <dependencies>
@@ -299,7 +328,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
-            <version>${spring-boot.version}</version>
             <scope>test</scope>
             <exclusions>
                 <!-- Temporary exclusion to avoid dependency conflict with version of org.json:json used by dspace-api.
@@ -325,7 +353,6 @@
         <dependency>
             <groupId>com.jayway.jsonpath</groupId>
             <artifactId>json-path-assert</artifactId>
-            <version>${json-path.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency> <!-- Keep jmockit before junit -->
@@ -418,7 +445,6 @@
         <dependency>
             <groupId>org.apache.solr</groupId>
             <artifactId>solr-cell</artifactId>
-            <version>${solr.client.version}</version>
             <scope>test</scope>
             <exclusions>
                 <exclusion>
@@ -480,7 +506,6 @@
         <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-analyzers-icu</artifactId>
-            <version>${solr.client.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>

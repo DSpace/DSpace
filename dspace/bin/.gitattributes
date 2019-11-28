@@ -1,0 +1,9 @@
+# Ensure Unix files in this folder always keep Unix line endings
+dspace text eol=lf
+dspace-info.pl text eol=lf
+log-reporter text eol=lf
+make-handle-config text eol=lf
+start-handle-server text eol=lf
+
+# Ensure Windows files in this folder always keep Windows line endings
+*.bat text eol=crlf

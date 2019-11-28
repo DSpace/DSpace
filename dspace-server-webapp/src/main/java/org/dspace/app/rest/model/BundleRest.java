@@ -21,6 +21,7 @@ import org.dspace.content.Bitstream;
 
 public class BundleRest extends DSpaceObjectRest {
     public static final String NAME = "bundle";
+    public static final String PLURAL_NAME = "bundles";
     public static final String CATEGORY = RestAddressableModel.CORE;
 
     private BitstreamRest primaryBitstream;

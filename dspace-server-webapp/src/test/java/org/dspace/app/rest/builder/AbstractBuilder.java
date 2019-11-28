@@ -39,6 +39,8 @@ import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.eperson.service.RegistrationDataService;
+import org.dspace.scripts.factory.ScriptServiceFactory;
+import org.dspace.scripts.service.ProcessService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.versioning.factory.VersionServiceFactory;
 import org.dspace.versioning.service.VersionHistoryService;
@@ -53,6 +55,8 @@ import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
 /**
  * Abstract builder class that holds references to all available services
  *
+ * @param <T>   This param represents the Model object for the Builder
+ * @param <S>   This param represents the Service object for the builder
  * @author Jonas Van Goolen - (jonas@atmire.com)
  */
 public abstract class AbstractBuilder<T, S> {
@@ -84,6 +88,7 @@ public abstract class AbstractBuilder<T, S> {
     static RelationshipService relationshipService;
     static RelationshipTypeService relationshipTypeService;
     static EntityTypeService entityTypeService;
+    static ProcessService processService;
 
     protected Context context;
 
@@ -129,6 +134,7 @@ public abstract class AbstractBuilder<T, S> {
         relationshipService = ContentServiceFactory.getInstance().getRelationshipService();
         relationshipTypeService = ContentServiceFactory.getInstance().getRelationshipTypeService();
         entityTypeService = ContentServiceFactory.getInstance().getEntityTypeService();
+        processService = ScriptServiceFactory.getInstance().getProcessService();
 
         // Temporarily disabled
         claimedTaskService = XmlWorkflowServiceFactory.getInstance().getClaimedTaskService();
@@ -164,6 +170,8 @@ public abstract class AbstractBuilder<T, S> {
         relationshipService = null;
         relationshipTypeService = null;
         entityTypeService = null;
+        processService = null;
+
     }
 
     public static void cleanupObjects() throws Exception {

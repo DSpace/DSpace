@@ -1850,4 +1850,61 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                         .andExpect(status().isBadRequest());
     }
 
+    @Test
+    public void updateTestEPersonWithoutPermissionForbidden() throws Exception {
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        context.restoreAuthSystemState();
+
+        ObjectMapper mapper = new ObjectMapper();
+        ItemRest itemRest = new ItemRest();
+        itemRest.setName("Practices of research data curation in institutional repositories:" +
+                             " A qualitative view from repository staff");
+        itemRest.setInArchive(true);
+        itemRest.setDiscoverable(true);
+        itemRest.setWithdrawn(false);
+
+
+        String token = getAuthToken(admin.getEmail(), password);
+        MvcResult mvcResult = getClient(token).perform(post("/api/core/items?owningCollection=" +
+                                                                col1.getID().toString())
+                                                           .content(mapper.writeValueAsBytes(itemRest))
+                                                           .contentType(contentType))
+                                              .andExpect(status().isCreated())
+                                              .andReturn();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        Map<String,Object> map = mapper.readValue(content, Map.class);
+        String itemUuidString = String.valueOf(map.get("uuid"));
+        String itemHandleString = String.valueOf(map.get("handle"));
+
+        itemRest.setMetadata(new MetadataRest()
+                                 .put("dc.description", new MetadataValueRest("<p>Some cool HTML code here</p>"))
+                                 .put("dc.description.abstract",
+                                      new MetadataValueRest("Sample item created via the REST API"))
+                                 .put("dc.description.tableofcontents", new MetadataValueRest("<p>HTML News</p>"))
+                                 .put("dc.rights", new MetadataValueRest("New Custom Copyright Text"))
+                                 .put("dc.title", new MetadataValueRest("New title")));
+
+        itemRest.setUuid(itemUuidString);
+        itemRest.setHandle(itemHandleString);
+
+        token = getAuthToken(eperson.getEmail(), password);
+        getClient(token).perform(put("/api/core/items/" + itemUuidString)
+                                                 .content(mapper.writeValueAsBytes(itemRest))
+                                                 .contentType(contentType))
+                                    .andExpect(status().isForbidden());
+    }
+
+
 }
