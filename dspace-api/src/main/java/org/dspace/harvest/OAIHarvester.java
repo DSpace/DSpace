@@ -622,15 +622,13 @@ public class OAIHarvester {
 					if (bvs != null) {
 						bvs.versionBundles(ourContext, item);
 					} else {
-						synchronized(this) {
-							List<Bundle> allBundles = item.getBundles();
-							log.debug("start to remove " + allBundles.size() + " bundles");
-							for (Iterator<Bundle> iterator = allBundles.iterator(); iterator.hasNext(); ) {
-								Bundle b = iterator.next();
-								log.debug("removing bundle " + b.getName());
-								itemService.removeBundle(ourContext, item, b);
-								log.debug("done removing bundle " + b.getName() + " from item " + itemOaiID);
-							}
+						List<Bundle> allBundles = item.getBundles();
+						log.debug("start to remove " + allBundles.size() + " bundles");
+						for (Iterator<Bundle> iterator = allBundles.iterator(); iterator.hasNext(); ) {
+                            Bundle b = iterator.next();
+                            log.debug("removing bundle " + b.getName());
+                            itemService.removeBundle(ourContext, item, b);
+							log.debug("done removing bundle " + b.getName() + " from item " + itemOaiID);
 						}
 					}
 				}
