@@ -322,11 +322,11 @@
 	                <RightCondition>
 		                <Or>
 		                    <LeftCondition>
-		                    	<Not>
-		                    		<Condition>
-		                    			<Custom ref="relationshipTypeExistsCondition"/>
-		                    		</Condition>
-		                    	</Not>
+		                        <Not>
+		                            <Condition>
+		                                <Custom ref="relationshipTypeExistsCondition"/>
+		                            </Condition>
+		                        </Not>
 		                    </LeftCondition>
 		                    <RightCondition>
 		                    	<Custom ref="isPublicationEntityCondition"/>
