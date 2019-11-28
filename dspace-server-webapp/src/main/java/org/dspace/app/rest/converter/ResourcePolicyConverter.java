@@ -8,6 +8,7 @@
 package org.dspace.app.rest.converter;
 
 import org.dspace.app.rest.model.ResourcePolicyRest;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.ResourcePolicyService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,9 +33,10 @@ public class ResourcePolicyConverter implements DSpaceConverter<ResourcePolicy, 
     GroupConverter groupConverter;
 
     @Override
-    public ResourcePolicyRest fromModel(ResourcePolicy obj) {
+    public ResourcePolicyRest convert(ResourcePolicy obj, Projection projection) {
 
         ResourcePolicyRest model = new ResourcePolicyRest();
+        model.setProjection(projection);
 
         model.setId(obj.getID());
 
@@ -49,20 +51,19 @@ public class ResourcePolicyConverter implements DSpaceConverter<ResourcePolicy, 
 
         if (obj.getGroup() != null) {
             model.setGroupUUID(obj.getGroup().getID());
-            model.setGroup(groupConverter.convert(obj.getGroup()));
+            model.setGroup(groupConverter.convert(obj.getGroup(), projection));
         }
 
         if (obj.getEPerson() != null) {
             model.setEpersonUUID(obj.getEPerson().getID());
-            model.setEperson(epersonConverter.convert(obj.getEPerson()));
+            model.setEperson(epersonConverter.convert(obj.getEPerson(), projection));
         }
         return model;
     }
 
     @Override
-    public ResourcePolicy toModel(ResourcePolicyRest obj) {
-        // TODO Auto-generated method stub
-        return null;
+    public Class<ResourcePolicy> getModelClass() {
+        return ResourcePolicy.class;
     }
 
 }

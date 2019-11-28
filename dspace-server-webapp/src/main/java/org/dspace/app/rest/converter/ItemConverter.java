@@ -7,29 +7,19 @@
  */
 package org.dspace.app.rest.converter;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
-import javax.servlet.http.HttpServletRequest;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.Logger;
-import org.dspace.app.rest.model.BitstreamRest;
+import org.dspace.app.rest.model.BundleRest;
 import org.dspace.app.rest.model.ItemRest;
-import org.dspace.app.rest.model.RelationshipRest;
-import org.dspace.app.rest.utils.ContextUtil;
-import org.dspace.content.Bitstream;
-import org.dspace.content.Bundle;
+import org.dspace.app.rest.model.MetadataValueList;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
-import org.dspace.content.Relationship;
 import org.dspace.content.service.ItemService;
-import org.dspace.content.service.RelationshipService;
-import org.dspace.core.Context;
 import org.dspace.discovery.IndexableObject;
-import org.dspace.services.RequestService;
-import org.dspace.services.model.Request;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -41,91 +31,43 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class ItemConverter
-    extends DSpaceObjectConverter<org.dspace.content.Item, org.dspace.app.rest.model.ItemRest>
+    extends DSpaceObjectConverter<Item, ItemRest>
     implements IndexableObjectConverter<Item, ItemRest> {
 
-    @Autowired(required = true)
-    private CollectionConverter collectionConverter;
-    @Autowired(required = true)
-    private BitstreamConverter bitstreamConverter;
     @Autowired
-    private RequestService requestService;
-    @Autowired
-    private RelationshipService relationshipService;
-    @Autowired
-    private RelationshipConverter relationshipConverter;
+    private ConverterService converter;
+
     @Autowired
     private ItemService itemService;
-    @Autowired
-    private MetadataConverter metadataConverter;
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(ItemConverter.class);
 
     @Override
-    public ItemRest fromModel(org.dspace.content.Item obj) {
-        ItemRest item = super.fromModel(obj);
+    public ItemRest convert(Item obj, Projection projection) {
+        ItemRest item = super.convert(obj, projection);
         item.setInArchive(obj.isArchived());
         item.setDiscoverable(obj.isDiscoverable());
         item.setWithdrawn(obj.isWithdrawn());
         item.setLastModified(obj.getLastModified());
-        try {
-            Collection c = obj.getOwningCollection();
-            if (c != null) {
-                item.setOwningCollection(collectionConverter.fromModel(c));
-            }
-        } catch (Exception e) {
-            log.error("Error setting owning collection for item" + item.getHandle(), e);
+        Collection owningCollection = obj.getOwningCollection();
+        if (owningCollection != null) {
+            item.setOwningCollection(converter.toRest(owningCollection, projection));
         }
-        try {
-            Collection c = obj.getTemplateItemOf();
-            if (c != null) {
-                item.setTemplateItemOf(collectionConverter.fromModel(c));
-            }
-        } catch (Exception e) {
-            log.error("Error setting template item of for item " + item.getHandle(), e);
+        Collection templateItemOf = obj.getTemplateItemOf();
+        if (templateItemOf != null) {
+            item.setTemplateItemOf(converter.toRest(templateItemOf, projection));
         }
-        List<BitstreamRest> bitstreams = new ArrayList<BitstreamRest>();
-        for (Bundle bun : obj.getBundles()) {
-            for (Bitstream bit : bun.getBitstreams()) {
-                BitstreamRest bitrest = bitstreamConverter.fromModel(bit);
-                bitstreams.add(bitrest);
-            }
-        }
-        item.setBitstreams(bitstreams);
-        List<Relationship> relationships = new LinkedList<>();
-        try {
-            Context context;
-            Request currentRequest = requestService.getCurrentRequest();
-            if (currentRequest != null) {
-                HttpServletRequest request = currentRequest.getHttpServletRequest();
-                context = ContextUtil.obtainContext(request);
-            } else {
-                context = new Context();
-            }
-            relationships = relationshipService.findByItem(context, obj);
-        } catch (SQLException e) {
-            log.error("Error retrieving relationships for item " + item.getHandle(), e);
-        }
-        List<RelationshipRest> relationshipRestList = new LinkedList<>();
-        for (Relationship relationship : relationships) {
-            RelationshipRest relationshipRest = relationshipConverter.fromModel(relationship);
-            relationshipRestList.add(relationshipRest);
-        }
-        item.setRelationships(relationshipRestList);
 
-        List<MetadataValue> fullList = new LinkedList<>();
-        fullList = itemService.getMetadata(obj, Item.ANY, Item.ANY, Item.ANY, Item.ANY, true);
+        item.setBundles(obj.getBundles()
+                            .stream()
+                            .map(x -> (BundleRest) converter.toRest(x, projection))
+                            .collect(Collectors.toList()));
 
-        item.setMetadata(metadataConverter.convert(fullList));
-
+        List<MetadataValue> fullList = itemService.getMetadata(obj, Item.ANY, Item.ANY, Item.ANY, Item.ANY, true);
+        MetadataValueList metadataValues = new MetadataValueList(fullList);
+        item.setMetadata(converter.toRest(metadataValues, projection));
 
         return item;
-    }
-
-    @Override
-    public org.dspace.content.Item toModel(ItemRest obj) {
-        // TODO Auto-generated method stub
-        return null;
     }
 
     @Override
@@ -134,7 +76,7 @@ public class ItemConverter
     }
 
     @Override
-    protected Class<Item> getModelClass() {
+    public Class<Item> getModelClass() {
         return Item.class;
     }
 

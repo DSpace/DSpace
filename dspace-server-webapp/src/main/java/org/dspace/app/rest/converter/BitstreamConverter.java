@@ -10,9 +10,9 @@ package org.dspace.app.rest.converter;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.dspace.app.rest.model.BitstreamFormatRest;
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.CheckSumRest;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,19 +25,14 @@ import org.springframework.stereotype.Component;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @Component
-public class BitstreamConverter
-    extends DSpaceObjectConverter<org.dspace.content.Bitstream, org.dspace.app.rest.model.BitstreamRest> {
-    @Autowired(required = true)
-    BitstreamFormatConverter bfConverter;
+public class BitstreamConverter extends DSpaceObjectConverter<Bitstream, BitstreamRest> {
+
+    @Autowired
+    ConverterService converter;
 
     @Override
-    public org.dspace.content.Bitstream toModel(org.dspace.app.rest.model.BitstreamRest obj) {
-        return super.toModel(obj);
-    }
-
-    @Override
-    public BitstreamRest fromModel(org.dspace.content.Bitstream obj) {
-        BitstreamRest b = super.fromModel(obj);
+    public BitstreamRest convert(org.dspace.content.Bitstream obj, Projection projection) {
+        BitstreamRest b = super.convert(obj, projection);
         b.setSequenceId(obj.getSequenceID());
         List<Bundle> bundles = null;
         try {
@@ -53,14 +48,11 @@ public class BitstreamConverter
         checksum.setCheckSumAlgorithm(obj.getChecksumAlgorithm());
         checksum.setValue(obj.getChecksum());
         b.setCheckSum(checksum);
-        BitstreamFormatRest format = null;
         try {
-            format = bfConverter.fromModel(obj.getFormat(null));
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            b.setFormat(converter.toRest(obj.getFormat(null), projection));
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
-        b.setFormat(format);
         b.setSizeBytes(obj.getSizeBytes());
         return b;
     }
@@ -71,7 +63,7 @@ public class BitstreamConverter
     }
 
     @Override
-    protected Class<Bitstream> getModelClass() {
+    public Class<Bitstream> getModelClass() {
         return Bitstream.class;
     }
 }

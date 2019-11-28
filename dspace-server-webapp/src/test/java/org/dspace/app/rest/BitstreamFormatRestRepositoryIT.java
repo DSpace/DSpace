@@ -27,9 +27,10 @@ import java.util.concurrent.atomic.AtomicReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.app.rest.builder.BitstreamFormatBuilder;
 import org.dspace.app.rest.builder.EPersonBuilder;
-import org.dspace.app.rest.converter.BitstreamFormatConverter;
+import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.matcher.BitstreamFormatMatcher;
 import org.dspace.app.rest.model.BitstreamFormatRest;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.service.BitstreamFormatService;
@@ -49,7 +50,7 @@ import org.springframework.test.web.servlet.MvcResult;
 public class BitstreamFormatRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Autowired
-    BitstreamFormatConverter converter;
+    ConverterService converter;
 
     @Autowired
     BitstreamFormatService bitstreamFormatService;
@@ -279,7 +280,7 @@ public class BitstreamFormatRestRepositoryIT extends AbstractControllerIntegrati
                 .build();
         context.restoreAuthSystemState();
 
-        BitstreamFormatRest bitstreamFormatRest = converter.fromModel(bitstreamFormat);
+        BitstreamFormatRest bitstreamFormatRest = converter.toRest(bitstreamFormat, Projection.DEFAULT);
         String token = getAuthToken(admin.getEmail(), password);
         //Update it
         bitstreamFormatRest.setShortDescription("Test short UPDATED");
@@ -311,7 +312,7 @@ public class BitstreamFormatRestRepositoryIT extends AbstractControllerIntegrati
                 .build();
         context.restoreAuthSystemState();
 
-        BitstreamFormatRest bitstreamFormatRest = converter.fromModel(bitstreamFormat);
+        BitstreamFormatRest bitstreamFormatRest = converter.toRest(bitstreamFormat, Projection.DEFAULT);
         String token = getAuthToken(admin.getEmail(), password);
         //Update it
         bitstreamFormatRest.setShortDescription("Test short UPDATED");
@@ -349,7 +350,7 @@ public class BitstreamFormatRestRepositoryIT extends AbstractControllerIntegrati
 
         int nonExistentBitstreamFormatID = 404404404;
 
-        BitstreamFormatRest bitstreamFormatRest = converter.fromModel(bitstreamFormat);
+        BitstreamFormatRest bitstreamFormatRest = converter.toRest(bitstreamFormat, Projection.DEFAULT);
         String token = getAuthToken(admin.getEmail(), password);
         //Update it with non existent ID in URL and in JSON
         bitstreamFormatRest.setShortDescription("Test short UPDATED");
@@ -386,7 +387,7 @@ public class BitstreamFormatRestRepositoryIT extends AbstractControllerIntegrati
 
         int nonExistentBitstreamFormatID = 404404404;
 
-        BitstreamFormatRest bitstreamFormatRest = converter.fromModel(bitstreamFormat);
+        BitstreamFormatRest bitstreamFormatRest = converter.toRest(bitstreamFormat, Projection.DEFAULT);
         String token = getAuthToken(admin.getEmail(), password);
         //Update it with non existent ID in URL
         bitstreamFormatRest.setShortDescription("Test short UPDATED");
@@ -422,7 +423,7 @@ public class BitstreamFormatRestRepositoryIT extends AbstractControllerIntegrati
 
         int nonExistentBitstreamFormatID = 404404404;
 
-        BitstreamFormatRest bitstreamFormatRest = converter.fromModel(bitstreamFormat);
+        BitstreamFormatRest bitstreamFormatRest = converter.toRest(bitstreamFormat, Projection.DEFAULT);
         String token = getAuthToken(admin.getEmail(), password);
         //Update it with non existent ID in JSON, but valid in URL
         bitstreamFormatRest.setShortDescription("Test short UPDATED");
@@ -460,7 +461,7 @@ public class BitstreamFormatRestRepositoryIT extends AbstractControllerIntegrati
                 .build();
         context.restoreAuthSystemState();
 
-        BitstreamFormatRest bitstreamFormatRest = converter.fromModel(bitstreamFormat1);
+        BitstreamFormatRest bitstreamFormatRest = converter.toRest(bitstreamFormat1, Projection.DEFAULT);
         String token = getAuthToken(admin.getEmail(), password);
         //Update but id in body is not same id as in URL
         bitstreamFormatRest.setShortDescription("Test short UPDATED");
@@ -493,7 +494,7 @@ public class BitstreamFormatRestRepositoryIT extends AbstractControllerIntegrati
                                                                 .build();
         context.restoreAuthSystemState();
 
-        BitstreamFormatRest bitstreamFormatRest = converter.fromModel(bitstreamFormat);
+        BitstreamFormatRest bitstreamFormatRest = converter.toRest(bitstreamFormat, Projection.DEFAULT);
 
         //Try to update bitstreamFormat without auth token
         bitstreamFormatRest.setShortDescription("Test short UPDATED");
@@ -529,7 +530,7 @@ public class BitstreamFormatRestRepositoryIT extends AbstractControllerIntegrati
                 .build();
         context.restoreAuthSystemState();
 
-        BitstreamFormatRest bitstreamFormatRest = converter.fromModel(bitstreamFormat);
+        BitstreamFormatRest bitstreamFormatRest = converter.toRest(bitstreamFormat, Projection.DEFAULT);
         String token = getAuthToken(user.getEmail(), password);
 
         //Try to update bitstreamFormat without non-admin auth token
