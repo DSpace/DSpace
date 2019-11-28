@@ -22,12 +22,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
@@ -177,30 +174,22 @@ public class OREIngestionCrosswalk
 
             InputStream in = null;
             if (href != null) {
-//                try {
+                try {
                     // Make sure the url string escapes all the oddball characters
                     //String processedURL = encodeForURL(href).replace("%20", "+");
 
 					// Generate a requeset for the aggregated resource
-                    CloseableHttpClient httpclient = HttpClients.createDefault();
-                    HttpGet httpget = new HttpGet(href);
-                    CloseableHttpResponse response = httpclient.execute(httpget);
-                    try {
-                        HttpEntity entity = response.getEntity();
-                        if (entity != null) {
-                            in = entity.getContent();
-//                                instream.close();
-                        }
-                    } catch (Exception ex) {
-                        log.error("The provided URI was invalid: " + href);
-                    } finally {
-                        response.close();
-                    }
-//                } catch (FileNotFoundException fe) {
-//                    log.error("The provided URI failed to return a resource: " + href);
-//                } catch (ConnectException fe) {
-//                    log.error("The provided URI was invalid: " + href);
-//                }
+                    OkHttpClient client = new OkHttpClient();
+                    Request request = new Request.Builder()
+                            .url(href)
+                            .build();
+                    Response response = client.newCall(request).execute();
+                    in = response.body().byteStream();
+                } catch (FileNotFoundException fe) {
+                    log.error("The provided URI failed to return a resource: " + href);
+                } catch (ConnectException fe) {
+                    log.error("The provided URI was invalid: " + href);
+                }
             } else {
                 throw new CrosswalkException("Entry did not contain link to resource: " + entryId);
             }
@@ -228,7 +217,6 @@ public class OREIngestionCrosswalk
                 throw new CrosswalkException("Could not retrieve bitstream: " + entryId);
             }
 
-            in.close();
         }
         log.info("OREIngest for Item " + item.getID() + " took: " + (new Date().getTime() - timeStart.getTime()) + "ms.");
     }
