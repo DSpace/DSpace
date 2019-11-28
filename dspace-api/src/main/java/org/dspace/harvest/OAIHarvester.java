@@ -545,7 +545,7 @@ public class OAIHarvester {
 			// If ours is more recent, forgo this item, since it's probably a left-over from a previous harvesting attempt
 			Date OAIDatestamp = Utils.parseISO8601Date(header.getChildText("datestamp", OAI_NS));
 			Date itemLastHarvest = hi.getHarvestDate();
-			if (itemLastHarvest != null && OAIDatestamp != null && OAIDatestamp.before(itemLastHarvest)) {
+			if (itemLastHarvest != null && OAIDatestamp.before(itemLastHarvest)) {
 				log.info("Item " + handle + " was harvested more recently than the last update time reported by the OAI server; skipping.");
 				return;
 			}
