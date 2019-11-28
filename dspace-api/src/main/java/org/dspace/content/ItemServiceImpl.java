@@ -332,7 +332,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         context.addEvent(new Event(Event.REMOVE, Constants.ITEM, item.getID(),
                 Constants.BUNDLE, bundle.getID(), bundle.getName(), getIdentifiers(context, item)));
 
-         bundleService.delete(context, bundle);
+            bundleService.delete(context, bundle);
     }
 
     @Override

@@ -441,23 +441,21 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
         context.addEvent(new Event(Event.DELETE, Constants.BUNDLE, bundle.getID(),
                 bundle.getName(), getIdentifiers(context, bundle)));
 
-        log.debug("start removing bitstreams");
         // Remove bitstreams
         List<Bitstream> bitstreams = bundle.getBitstreams();
         bundle.clearBitstreams();
         for (Bitstream bitstream : bitstreams) {
             removeBitstream(context, bundle, bitstream);
         }
-        log.debug("done removing bitstreams");
+        
         List<Item> items = new LinkedList<>(bundle.getItems());
         bundle.getItems().clear();
         for (Item item : items) {
-            log.debug("removing bundle from item: " + item.getID());
             item.removeBundle(bundle);
         }
+
         // Remove ourself
         bundleDAO.delete(context, bundle);
-        log.debug("done removing bundle");
     }
 
     @Override
