@@ -628,7 +628,6 @@ public class OAIHarvester {
                             Bundle b = iterator.next();
                             log.debug("removing bundle " + b.getName());
                             itemService.removeBundle(ourContext, item, b);
-							log.debug("done removing bundle " + b.getName() + " from item " + itemOaiID);
 						}
 					}
 				}
