@@ -8,6 +8,7 @@
 package org.dspace.app.rest.converter;
 
 import org.dspace.app.rest.model.WorkspaceItemRest;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.util.SubmissionConfigReaderException;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.discovery.IndexableObject;
@@ -28,16 +29,20 @@ public class WorkspaceItemConverter
     }
 
     @Override
-    public WorkspaceItemRest fromModel(org.dspace.content.WorkspaceItem obj) {
+    public WorkspaceItemRest convert(org.dspace.content.WorkspaceItem obj, Projection projection) {
         WorkspaceItemRest witem = new WorkspaceItemRest();
-
-        fillFromModel(obj, witem);
+        witem.setProjection(projection);
+        fillFromModel(obj, witem, projection);
         return witem;
     }
 
-    @Override
     public org.dspace.content.WorkspaceItem toModel(WorkspaceItemRest obj) {
         return null;
+    }
+
+    @Override
+    public Class<WorkspaceItem> getModelClass() {
+        return WorkspaceItem.class;
     }
 
     @Override

@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.CollectionRest;
 import org.dspace.app.rest.model.ResourcePolicyRest;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.AuthorizeService;
@@ -44,35 +45,28 @@ public class CollectionConverter
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(CollectionConverter.class);
 
     @Autowired
-    private BitstreamConverter bitstreamConverter;
+    private ConverterService converter;
     @Autowired
     private CollectionService collectionService;
     @Autowired
     private RequestService requestService;
     @Autowired
     private AuthorizeService authorizeService;
-    @Autowired
-    private ResourcePolicyConverter resourcePolicyConverter;
 
     @Override
-    public org.dspace.content.Collection toModel(org.dspace.app.rest.model.CollectionRest obj) {
-        return (org.dspace.content.Collection) super.toModel(obj);
-    }
-
-    @Override
-    public CollectionRest fromModel(org.dspace.content.Collection obj) {
-        CollectionRest col = (CollectionRest) super.fromModel(obj);
+    public CollectionRest convert(org.dspace.content.Collection obj, Projection projection) {
+        CollectionRest col = super.convert(obj, projection);
         Bitstream logo = obj.getLogo();
         if (logo != null) {
-            col.setLogo(bitstreamConverter.convert(logo));
+            col.setLogo(converter.toRest(logo, projection));
         }
 
-        col.setDefaultAccessConditions(getDefaultBitstreamPoliciesForCollection(obj.getID()));
+        col.setDefaultAccessConditions(getDefaultBitstreamPoliciesForCollection(obj.getID(), projection));
 
         return col;
     }
 
-    private List<ResourcePolicyRest> getDefaultBitstreamPoliciesForCollection(UUID uuid) {
+    private List<ResourcePolicyRest> getDefaultBitstreamPoliciesForCollection(UUID uuid, Projection projection) {
 
         Context context = null;
         Request currentRequest = requestService.getCurrentRequest();
@@ -95,7 +89,7 @@ public class CollectionConverter
         List<ResourcePolicyRest> results = new ArrayList<ResourcePolicyRest>();
 
         for (ResourcePolicy pp : defaultCollectionPolicies) {
-            ResourcePolicyRest accessCondition = resourcePolicyConverter.convert(pp);
+            ResourcePolicyRest accessCondition = converter.toRest(pp, projection);
             if (accessCondition != null) {
                 results.add(accessCondition);
             }
@@ -109,7 +103,7 @@ public class CollectionConverter
     }
 
     @Override
-    protected Class<org.dspace.content.Collection> getModelClass() {
+    public Class<org.dspace.content.Collection> getModelClass() {
         return org.dspace.content.Collection.class;
     }
 

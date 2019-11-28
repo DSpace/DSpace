@@ -23,6 +23,7 @@ import org.dspace.app.rest.model.SearchConfigurationRest;
 import org.dspace.app.rest.model.SearchResultsRest;
 import org.dspace.app.rest.model.SearchSupportRest;
 import org.dspace.app.rest.parameter.SearchFilter;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.utils.DiscoverQueryBuilder;
 import org.dspace.app.rest.utils.ScopeResolver;
 import org.dspace.core.Context;
@@ -85,12 +86,13 @@ public class DiscoveryRestRepository extends AbstractDSpaceRestRepository {
         DiscoveryConfiguration discoveryConfiguration = searchConfigurationService
             .getDiscoveryConfigurationByNameOrDso(configuration, scopeObject);
 
-        return discoverConfigurationConverter.convert(discoveryConfiguration);
+        return discoverConfigurationConverter.convert(discoveryConfiguration, utils.obtainProjection());
     }
 
     public SearchResultsRest getSearchObjects(final String query, final String dsoType, final String dsoScope,
                                               final String configuration,
-                                              final List<SearchFilter> searchFilters, final Pageable page) {
+                                              final List<SearchFilter> searchFilters, final Pageable page,
+                                              final Projection projection) {
         Context context = obtainContext();
         IndexableObject scopeObject = scopeResolver.resolveScope(context, dsoScope);
         DiscoveryConfiguration discoveryConfiguration = searchConfigurationService
@@ -111,7 +113,7 @@ public class DiscoveryRestRepository extends AbstractDSpaceRestRepository {
 
         return discoverResultConverter
             .convert(context, query, dsoType, configuration, dsoScope, searchFilters, page, searchResult,
-                     discoveryConfiguration);
+                     discoveryConfiguration, projection);
     }
 
     public FacetConfigurationRest getFacetsConfiguration(final String dsoScope, final String configuration) {
@@ -150,7 +152,8 @@ public class DiscoveryRestRepository extends AbstractDSpaceRestRepository {
         }
 
         FacetResultsRest facetResultsRest = discoverFacetResultsConverter.convert(context, facetName, prefix, query,
-                dsoType, dsoScope, searchFilters, searchResult, discoveryConfiguration, page);
+                dsoType, dsoScope, searchFilters, searchResult, discoveryConfiguration, page,
+                utils.obtainProjection());
         return facetResultsRest;
     }
 
@@ -176,7 +179,8 @@ public class DiscoveryRestRepository extends AbstractDSpaceRestRepository {
         }
 
         SearchResultsRest searchResultsRest = discoverFacetsConverter.convert(context, query, dsoType,
-                configuration, dsoScope, searchFilters, page, discoveryConfiguration, searchResult);
+                configuration, dsoScope, searchFilters, page, discoveryConfiguration, searchResult,
+                utils.obtainProjection());
 
         return searchResultsRest;
 

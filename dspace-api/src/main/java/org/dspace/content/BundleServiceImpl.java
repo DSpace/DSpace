@@ -273,7 +273,7 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
     }
 
     @Override
-    public void moveBitstream(Context context, Bundle bundle, int from, int to)
+    public void updateBitstreamOrder(Context context, Bundle bundle, int from, int to)
             throws AuthorizeException, SQLException {
         List<Bitstream> bitstreams = bundle.getBitstreams();
         if (bitstreams.size() < 1 || from >= bitstreams.size() || to >= bitstreams.size() || from < 0 || to < 0) {
