@@ -567,12 +567,7 @@ public class OAIHarvester {
 							return metadataValues != null && metadataValues.getValue() != null && metadataValues.getValue().contains(handle);
 						}
                     });
-			if (handleMetadatumBackup != null) {
-                String backupHdl = handleMetadatumBackup.getValue();
-                log.debug("Took backup of handle: " + backupHdl);
-            } else {
-                log.debug("No handle found to backup");
-            }
+			log.debug("Took backup of handle: " + handleMetadatumBackup == null ? null : handleMetadatumBackup.getValue());
 
             // allow a plugin to clear the metadata if one is configured
             String mdAuthority = harvestRow.getMetadataAuthorityType();
