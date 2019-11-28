@@ -608,7 +608,7 @@ public class OAIHarvester {
 			}
     		// Import the actual bitstreams
     		if (harvestRow.getHarvestType() == 3) {
-    			log.info("Running ORE ingest on: " + itemOaiID + "; new handle: " + handle);
+    			log.info("Running ORE ingest on: " + handle);
 
 				boolean updateBitstreams = ingestionWorkflow.updateBitstreams(ourContext, item, hi);
 				if (updateBitstreams) {
@@ -621,9 +621,9 @@ public class OAIHarvester {
 					if (bvs != null) {
 						bvs.versionBundles(ourContext, item);
 					} else {
-						List<Bundle> allBundles = item.getBundles();
-						for (Iterator<Bundle> iterator = allBundles.iterator(); iterator.hasNext(); ) {
-							itemService.removeBundle(ourContext, item, iterator.next());
+						Iterator<Bundle> allBundles = item.getBundles().iterator();
+						while (allBundles.hasNext()) {
+							itemService.removeBundle(ourContext, item, allBundles.next());
 						}
 					}
 				}
