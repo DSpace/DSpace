@@ -916,7 +916,7 @@
                     <dc-qualifier>condition</dc-qualifier>
                     <repeatable>false</repeatable>
                     <label>License</label>
-                    <input-type value-pairs-name="openaire_licenses">dropdown</input-type>
+                    <input-type value-pairs-name="openaire_license_types">dropdown</input-type>
                     <hint>Select the license of the resource.</hint>
                     <required></required>
                 </field>
@@ -947,7 +947,7 @@
             </row>
         </form>
 
-        <form name="openaire-people">
+        <form name="openaire-person">
             <row>
                 <field>
                     <dc-schema>person</dc-schema>
