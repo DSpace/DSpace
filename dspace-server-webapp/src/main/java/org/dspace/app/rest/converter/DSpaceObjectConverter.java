@@ -7,6 +7,8 @@
  */
 package org.dspace.app.rest.converter;
 
+import org.dspace.app.rest.model.MetadataValueList;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.content.DSpaceObject;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -21,32 +23,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 public abstract class DSpaceObjectConverter<M extends DSpaceObject, R extends org.dspace.app.rest.model
     .DSpaceObjectRest> implements DSpaceConverter<M, R> {
 
-    @Autowired(required = true)
-    private MetadataConverter metadataConverter;
+    @Autowired
+    ConverterService converter;
 
     @Override
-    public R fromModel(M obj) {
+    public R convert(M obj, Projection projection) {
         R resource = newInstance();
+        resource.setProjection(projection);
         resource.setHandle(obj.getHandle());
         if (obj.getID() != null) {
             resource.setUuid(obj.getID().toString());
         }
         resource.setName(obj.getName());
-        resource.setMetadata(metadataConverter.convert(obj.getMetadata()));
+        MetadataValueList metadataValues = new MetadataValueList(obj.getMetadata());
+        resource.setMetadata(converter.toRest(metadataValues, projection));
         return resource;
     }
 
-    @Override
-    public M toModel(R obj) {
-        return null;
-    }
-
-    public boolean supportsModel(DSpaceObject object) {
-        return object != null && object.getClass().equals(getModelClass());
-    }
-
     protected abstract R newInstance();
-
-    protected abstract Class<M> getModelClass();
-
 }

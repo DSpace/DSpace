@@ -8,17 +8,29 @@
 package org.dspace.app.rest.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.dspace.app.rest.projection.Projection;
 
 /**
  * A directly addressable REST resource
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
-public interface RestAddressableModel extends RestModel {
+public abstract class RestAddressableModel implements RestModel {
+
+    private Projection projection = Projection.DEFAULT;
 
     @JsonIgnore
-    public String getCategory();
+    public abstract String getCategory();
 
     @JsonIgnore
-    public Class getController();
+    public abstract Class getController();
+
+    @JsonIgnore
+    public Projection getProjection() {
+        return projection;
+    }
+
+    public void setProjection(Projection projection) {
+        this.projection = projection;
+    }
 }

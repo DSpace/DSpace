@@ -19,7 +19,7 @@ import org.dspace.app.rest.utils.Utils;
  */
 @RelNameDSpaceResource(BitstreamFormatRest.NAME)
 public class BitstreamFormatResource extends DSpaceResource<BitstreamFormatRest> {
-    public BitstreamFormatResource(BitstreamFormatRest bf, Utils utils, String... rels) {
-        super(bf, utils, rels);
+    public BitstreamFormatResource(BitstreamFormatRest bf, Utils utils) {
+        super(bf, utils);
     }
 }

@@ -13,10 +13,8 @@ import java.util.UUID;
 
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
-import org.dspace.app.rest.converter.ResourcePolicyConverter;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.model.ResourcePolicyRest;
-import org.dspace.app.rest.model.hateoas.ResourcePolicyResource;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.ResourcePolicyService;
@@ -28,7 +26,6 @@ import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
@@ -44,9 +41,6 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
 
     @Autowired
     ResourcePolicyService resourcePolicyService;
-
-    @Autowired
-    ResourcePolicyConverter resourcePolicyConverter;
 
     @Autowired
     Utils utils;
@@ -69,7 +63,7 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
         if (source == null) {
             return null;
         }
-        return resourcePolicyConverter.convert(source);
+        return converter.toRest(source, utils.obtainProjection());
     }
 
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
@@ -81,11 +75,6 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
     @Override
     public Class<ResourcePolicyRest> getDomainClass() {
         return ResourcePolicyRest.class;
-    }
-
-    @Override
-    public ResourcePolicyResource wrapResource(ResourcePolicyRest model, String... rels) {
-        return new ResourcePolicyResource(model, utils, rels);
     }
 
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
@@ -110,9 +99,9 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<ResourcePolicyRest> page = new PageImpl<ResourcePolicy>(resourcePolisies, pageable, total)
-                .map(resourcePolicyConverter);
-        return page;
+ //    Page<ResourcePolicyRest> page = new PageImpl<ResourcePolicy>(resourcePolisies, pageable, total)
+//              .map(resourcePolicyConverter);
+        return converter.toRestPage(resourcePolisies, pageable, total, utils.obtainProjection(true));
     }
 
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
@@ -140,9 +129,9 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<ResourcePolicyRest> page = new PageImpl<ResourcePolicy>(resourcePolisies, pageable, total)
-                .map(resourcePolicyConverter);
-        return page;
+   //     Page<ResourcePolicyRest> page = new PageImpl<ResourcePolicy>(resourcePolisies, pageable, total)
+  //              .map(resourcePolicyConverter);
+        return converter.toRestPage(resourcePolisies, pageable, total, utils.obtainProjection(true));
     }
 
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
@@ -171,8 +160,8 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<ResourcePolicyRest> page = new PageImpl<ResourcePolicy>(resourcePolisies, pageable, total)
-                .map(resourcePolicyConverter);
-        return page;
+//        Page<ResourcePolicyRest> page = new PageImpl<ResourcePolicy>(resourcePolisies, pageable, total)
+//                .map(resourcePolicyConverter);
+        return converter.toRestPage(resourcePolisies, pageable, total, utils.obtainProjection(true));
     }
 }
