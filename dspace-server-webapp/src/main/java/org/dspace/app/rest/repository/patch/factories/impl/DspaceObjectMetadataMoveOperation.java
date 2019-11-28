@@ -44,9 +44,8 @@ public class DspaceObjectMetadataMoveOperation<R extends DSpaceObject> extends P
     public R perform(Context context, R resource, Operation operation) throws SQLException {
         DSpaceObjectService dsoService = ContentServiceFactory.getInstance().getDSpaceObjectService(resource);
         MetadataField metadataField = metadataPatchUtils.getMetadataField(context, operation);
-        String indexInPath = metadataPatchUtils.getIndexFromPath(operation);
-        String[] partsFromMove = ((MoveOperation) operation).getFrom().split("/");
-        String indexToMoveFrom = (partsFromMove.length > 3) ? partsFromMove[3] : null;
+        String indexInPath = metadataPatchUtils.getIndexFromPath(operation.getPath());
+        String indexToMoveFrom = metadataPatchUtils.getIndexFromPath(((MoveOperation) operation).getFrom());
 
         move(context, resource, dsoService, metadataField, indexInPath, indexToMoveFrom);
         return resource;

@@ -53,8 +53,6 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
     private static final Logger log = org.apache.logging.log4j.LogManager
             .getLogger(CommunityRestRepository.class);
 
-    private final CommunityService cs;
-
     @Autowired
     BitstreamService bitstreamService;
 
@@ -63,9 +61,6 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
 
     @Autowired
     private CommunityService cs;
-
-    @Autowired
-    private BitstreamService bitstreamService;
 
     public CommunityRestRepository(CommunityService dsoService) {
         super(dsoService);

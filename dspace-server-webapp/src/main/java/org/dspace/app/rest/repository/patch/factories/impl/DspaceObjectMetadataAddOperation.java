@@ -42,7 +42,7 @@ public class DspaceObjectMetadataAddOperation<R extends DSpaceObject> extends Pa
         DSpaceObjectService dsoService = ContentServiceFactory.getInstance().getDSpaceObjectService(resource);
         MetadataValueRest metadataValueToAdd = metadataPatchUtils.extractMetadataValueFromOperation(operation);
         MetadataField metadataField = metadataPatchUtils.getMetadataField(context, operation);
-        String indexInPath = metadataPatchUtils.getIndexFromPath(operation);
+        String indexInPath = metadataPatchUtils.getIndexFromPath(operation.getPath());
 
         add(context, resource, dsoService, metadataField, metadataValueToAdd, indexInPath);
         return resource;

@@ -143,11 +143,11 @@ public final class DspaceObjectMetadataPatchUtils {
 
     /**
      * Retrieved the index from the path of the patch operation, if one can be found
-     * @param operation     The operation of the patch
+     * @param path          The string from the operation
      * @return              The index in the path if there is one (path ex: /metadata/dc.title/1 (1 being the index))
      */
-    protected String getIndexFromPath(Operation operation) {
-        String[] partsOfPath = operation.getPath().split("/");
+    protected String getIndexFromPath(String path) {
+        String[] partsOfPath = path.split("/");
         // Index of md being patched
         String indexInPath = (partsOfPath.length > 3) ? partsOfPath[3] : null;
         return indexInPath;
