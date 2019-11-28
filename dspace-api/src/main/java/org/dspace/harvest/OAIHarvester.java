@@ -621,13 +621,14 @@ public class OAIHarvester {
 					if (bvs != null) {
 						bvs.versionBundles(ourContext, item);
 					} else {
-						Iterator<Bundle> allBundles = item.getBundles().iterator();
-						while (allBundles.hasNext()) {
-							itemService.removeBundle(ourContext, item, allBundles.next());
+						List<Bundle> allBundles = item.getBundles();
+						for (Bundle bundle : allBundles) {
+							itemService.removeBundle(ourContext, item, bundle);
 						}
 					}
 				}
 
+				// now do the crosswalk
 				log.debug("Do the crosswalk on item: " + itemOaiID);
 				if (ORExwalk instanceof OAIConfigurableCrosswalk)
 				{
