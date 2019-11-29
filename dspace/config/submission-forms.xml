@@ -586,7 +586,7 @@
 
         <!-- OpenAIRE specific forms -->
 
-        <form name="OpenAIREPublicationPageoneForm">
+        <form name="openAIREPublicationPageoneForm">
             <row>
                 <field>
                     <dc-schema>dc</dc-schema>
@@ -614,7 +614,7 @@
             <row>
                 <relation-field>
                     <relationship-type>isAuthorOfPublication</relationship-type>
-                    <search-configuration>personConfiguration</search-configuration>
+                    <search-configuration>openAIRECreatorConfiguration</search-configuration>
                     <repeatable>true</repeatable>
                     <label>Author</label>
                     <hint>Add an author</hint>
@@ -838,7 +838,7 @@
             </row>
         </form>
 
-        <form name="OpenAIREPublicationPagetwoForm">
+        <form name="openAIREPublicationPagetwoForm">
             <row>
                 <field>
                     <dc-schema>dc</dc-schema>
@@ -947,7 +947,7 @@
             </row>
         </form>
 
-        <form name="OpenAIREPersonForm">
+        <form name="openAIREPersonForm">
             <row>
                 <field>
                     <dc-schema>person</dc-schema>
@@ -1011,7 +1011,7 @@
             </row>
         </form>
 
-        <form name="OpenAIREProjectForm">
+        <form name="openAIREProjectForm">
             <row>
                 <field>
                     <dc-schema>dc</dc-schema>
@@ -1065,7 +1065,7 @@
             </row>
         </form>
 
-        <form name="OpenAIREOrganizationForm">
+        <form name="openAIREOrganizationForm">
             <row>
                 <field>
                     <dc-schema>organization</dc-schema>
