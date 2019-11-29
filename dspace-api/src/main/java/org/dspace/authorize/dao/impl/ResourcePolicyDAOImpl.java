@@ -17,7 +17,6 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Root;
-import javax.persistence.criteria.SetJoin;
 
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.ResourcePolicy_;
@@ -25,12 +24,9 @@ import org.dspace.authorize.dao.ResourcePolicyDAO;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.DSpaceObject_;
 import org.dspace.core.AbstractHibernateDAO;
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
-
-import com.ibm.icu.lang.UCharacter.JoiningType;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the ResourcePolicy object.
@@ -258,7 +254,7 @@ public class ResourcePolicyDAOImpl extends AbstractHibernateDAO<ResourcePolicy> 
                         criteriaBuilder.equal(join.get(DSpaceObject_.id), resourceUuid)));
         return list(context, criteriaQuery, false, ResourcePolicy.class, limit, offset);
     }
-   
+
     @Override
     public int searchCountByResourceUuid(Context context, UUID resourceUuid, EPerson eperson) throws SQLException {
         Query query = createQuery(context, "SELECT count(*) FROM " + ResourcePolicy.class.getSimpleName()
@@ -269,8 +265,8 @@ public class ResourcePolicyDAOImpl extends AbstractHibernateDAO<ResourcePolicy> 
     }
 
     @Override
-    public List<ResourcePolicy> searchByResouceUuidAndActionId(Context context, UUID resourceUuid, int actionId, int offset,
-            int limit) throws SQLException {
+    public List<ResourcePolicy> searchByResouceUuidAndActionId(Context context, UUID resourceUuid, int actionId,
+            int offset, int limit) throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, ResourcePolicy.class);
         Root<ResourcePolicy> resourcePolicyRoot = criteriaQuery.from(ResourcePolicy.class);
@@ -322,8 +318,8 @@ public class ResourcePolicyDAOImpl extends AbstractHibernateDAO<ResourcePolicy> 
 
     @Override
     public int searchCountResourcePolicyOfGroup(Context context, Group group) throws SQLException {
-        Query query = createQuery(context,
-                "SELECT count(*) FROM " + ResourcePolicy.class.getSimpleName() + " WHERE epersongroup_id = (:groupUuid) ");
+        Query query = createQuery(context, "SELECT count(*) " + "FROM " + ResourcePolicy.class.getSimpleName()
+                + " WHERE epersongroup_id = (:groupUuid) ");
         query.setParameter("groupUuid", group.getID());
         return count(query);
     }
@@ -349,8 +345,4 @@ public class ResourcePolicyDAOImpl extends AbstractHibernateDAO<ResourcePolicy> 
         query.setParameter("groupUuid", group.getID());
         return count(query);
     }
-    
-    
-    
-
 }
