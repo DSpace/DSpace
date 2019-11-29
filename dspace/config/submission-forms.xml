@@ -586,7 +586,7 @@
 
         <!-- OpenAIRE specific forms -->
 
-        <form name="openaire-publication-pageone">
+        <form name="OpenAIREPublicationPageoneForm">
             <row>
                 <field>
                     <dc-schema>dc</dc-schema>
@@ -838,7 +838,7 @@
             </row>
         </form>
 
-        <form name="openaire-publication-pagetwo">
+        <form name="OpenAIREPublicationPagetwoForm">
             <row>
                 <field>
                     <dc-schema>dc</dc-schema>
@@ -947,7 +947,7 @@
             </row>
         </form>
 
-        <form name="openaire-person">
+        <form name="OpenAIREPersonForm">
             <row>
                 <field>
                     <dc-schema>person</dc-schema>
@@ -1011,7 +1011,7 @@
             </row>
         </form>
 
-        <form name="openaire-project">
+        <form name="OpenAIREProjectForm">
             <row>
                 <field>
                     <dc-schema>dc</dc-schema>
@@ -1065,7 +1065,7 @@
             </row>
         </form>
 
-        <form name="openaire-organization">
+        <form name="OpenAIREOrganizationForm">
             <row>
                 <field>
                     <dc-schema>organization</dc-schema>
