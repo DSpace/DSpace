@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.rest.repository.patch.factories.impl;
+package org.dspace.app.rest.repository.patch.operation;
 
 import java.sql.SQLException;
 import java.util.Arrays;
