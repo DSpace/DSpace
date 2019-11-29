@@ -47,8 +47,7 @@ public class ClaimedTaskConverter
     }
 
     @Override
-    public boolean supportsModel(IndexableObject object) {
-        return object instanceof ClaimedTask;
+    public boolean supportsModel(IndexableObject idxo) {
+        return idxo.getIndexedObject() instanceof ClaimedTask;
     }
-
 }
