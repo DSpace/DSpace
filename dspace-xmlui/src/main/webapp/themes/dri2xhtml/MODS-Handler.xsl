@@ -23,7 +23,7 @@
     xmlns:dcterms="http://purl.org/dc/terms/"
     xmlns:dim="http://www.dspace.org/xmlns/dspace/dim" 
     xmlns:xlink="http://www.w3.org/TR/xlink/"
-    xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="3.0"
     xmlns="http://www.w3.org/1999/xhtml"
     exclude-result-prefixes="i18n dri mets mods dc dcterms dim xlink xsl">
     

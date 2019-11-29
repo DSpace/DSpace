@@ -14,7 +14,7 @@ The purpose of this xml is the following
     These elements that have been translated need to go back to text so we can pass them along to the jason xslt
 -->
 
-<xsl:stylesheet	xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+<xsl:stylesheet	xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="3.0">
 
     <xsl:template match="@*|node()|text()|comment()|processing-instruction()">
         <xsl:copy>

@@ -22,7 +22,7 @@
     xmlns:dc="http://purl.org/dc/elements/1.1/"
     xmlns:dim="http://www.dspace.org/xmlns/dspace/dim" 
     xmlns:xlink="http://www.w3.org/TR/xlink/"
-    xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="3.0">
     
     <xsl:import href="dri2xhtml/structural.xsl"/>
     <xsl:import href="dri2xhtml/DIM-Handler.xsl"/>
