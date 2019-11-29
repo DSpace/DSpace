@@ -106,28 +106,29 @@
             <scope visibilityOutside="read-only">submission</scope>
         </step>
 
-        <step id="OpenAIREProjectForm" mandatory="true">
+        <!-- OpenAIRE submission steps/forms -->
+        <step id="openAIREProjectForm" mandatory="true">
             <heading>submit.progressbar.describe.stepone</heading>
             <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
             <type>submission-form</type>
         </step>
 
-        <step id="OpenAIREPersonForm" mandatory="true">
+        <step id="openAIREPersonForm" mandatory="true">
             <heading>submit.progressbar.describe.stepone</heading>
             <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
             <type>submission-form</type>
         </step>
-        <step id="OpenAIREOrganizationForm" mandatory="true">
+        <step id="openAIREOrganizationForm" mandatory="true">
             <heading>submit.progressbar.describe.stepone</heading>
             <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
             <type>submission-form</type>
         </step>
-        <step id="OpenAIREPublicationPageoneForm" mandatory="true">
+        <step id="openAIREPublicationPageoneForm" mandatory="true">
             <heading>submit.progressbar.describe.stepone</heading>
             <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
             <type>submission-form</type>
         </step>
-        <step id="OpenAIREPublicationPagetwoForm" mandatory="true">
+        <step id="openAIREPublicationPagetwoForm" mandatory="true">
             <heading>submit.progressbar.describe.stepone</heading>
             <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
             <type>submission-form</type>
@@ -248,13 +249,13 @@
             <step id="license"/>
         </submission-process>
 
-        <!-- OpenAIRE compliant forms -->
-        <submission-process name="OpenAIREPublicationSubmission">
+        <!-- OpenAIRE submission processes -->
+        <submission-process name="openAIREPublicationSubmission">
             <step id="collection"/>
 
             <!--Step will be to Describe the item. -->
-            <step id="OpenAIREPublicationPageoneForm"/>
-            <step id="OpenAIREPublicationPagetwoForm"/>
+            <step id="openAIREPublicationPageoneForm"/>
+            <step id="openAIREPublicationPagetwoForm"/>
 
             <!--Step will be to Upload the item -->
             <!-- step id="upload-with-embargo"/-->
@@ -263,17 +264,17 @@
             <!--Step will be to Sign off on the License -->
             <step id="license"/>
         </submission-process>
-        <submission-process name="OpenAIREPersonSubmission">
+        <submission-process name="openAIREPersonSubmission">
             <step id="collection"/>
-            <step id="OpenAIREPersonForm"/>
+            <step id="openAIREPersonForm"/>
         </submission-process>
-        <submission-process name="OpenAIREProjectSubmission">
+        <submission-process name="openAIREProjectSubmission">
             <step id="collection"/>
-            <step id="OpenAIREProjectForm"/>
+            <step id="openAIREProjectForm"/>
         </submission-process>
-        <submission-process name="OpenAIREOrganizationSubmission">
+        <submission-process name="openAIREOrganizationSubmission">
             <step id="collection"/>
-            <step id="OpenAIREOrganizationForm"/>
+            <step id="openAIREOrganizationForm"/>
         </submission-process>
     </submission-definitions>
 
