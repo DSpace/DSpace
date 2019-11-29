@@ -5,12 +5,12 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.rest.repository.patch.factories.impl;
+package org.dspace.app.rest.repository.patch.operation;
 
 import java.sql.SQLException;
 
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
-import org.dspace.app.rest.model.MetadataValueRest;
+import org.dspace.app.rest.model.patch.MoveOperation;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.MetadataField;
@@ -21,18 +21,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- Class for PATCH ADD operations on Dspace Objects' metadata
+ * Class for PATCH MOVE operations on Dspace Objects' metadata
  * Usage: (can be done on other dso than Item also):
- * - ADD metadata (with schema.identifier.qualifier) value of a dso (here: Item) to end of list of md
+ * - MOVE metadata (with schema.identifier.qualifier) value of a dso (here: Item)
+ * from given index in from to given index in path
  * <code>
  * curl -X PATCH http://${dspace.url}/api/core/items/<:id-item> -H "
- * Content-Type: application/json" -d '[{ "op": "add", "path": "
- * /metadata/schema.identifier.qualifier(/0|-)}", "value": "metadataValue"]'
+ * Content-Type: application/json" -d '[{ "op": "move",
+ * "from": "/metadata/schema.identifier.qualifier/indexToCopyFrom"
+ * "path": "/metadata/schema.identifier.qualifier/indexToCopyTo"}]'
  * </code>
+ *
  * @author Maria Verdonck (Atmire) on 18/11/2019
  */
 @Component
-public class DspaceObjectMetadataAddOperation<R extends DSpaceObject> extends PatchOperation<R> {
+public class DspaceObjectMetadataMoveOperation<R extends DSpaceObject> extends PatchOperation<R> {
 
     @Autowired
     DspaceObjectMetadataPatchUtils metadataPatchUtils;
@@ -40,38 +43,34 @@ public class DspaceObjectMetadataAddOperation<R extends DSpaceObject> extends Pa
     @Override
     public R perform(Context context, R resource, Operation operation) throws SQLException {
         DSpaceObjectService dsoService = ContentServiceFactory.getInstance().getDSpaceObjectService(resource);
-        MetadataValueRest metadataValueToAdd = metadataPatchUtils.extractMetadataValueFromOperation(operation);
         MetadataField metadataField = metadataPatchUtils.getMetadataField(context, operation);
         String indexInPath = metadataPatchUtils.getIndexFromPath(operation.getPath());
+        String indexToMoveFrom = metadataPatchUtils.getIndexFromPath(((MoveOperation) operation).getFrom());
 
-        add(context, resource, dsoService, metadataField, metadataValueToAdd, indexInPath);
+        move(context, resource, dsoService, metadataField, indexInPath, indexToMoveFrom);
         return resource;
     }
 
     /**
-     * Adds metadata to the dso (appending if index is 0 or left out, prepending if -)
+     * Moves metadata of the dso from indexFrom to indexTo
      *
      * @param context       context patch is being performed in
      * @param dso           dso being patched
      * @param dsoService    service doing the patch in db
      * @param metadataField md field being patched
-     * @param metadataValue value of md element
-     * @param index         determines whether we're prepending (-) or appending (0) md value
+     * @param indexFrom     index we're moving metadata from
+     * @param indexTo       index we're moving metadata to
      */
-    private void add(Context context, DSpaceObject dso, DSpaceObjectService dsoService, MetadataField metadataField,
-                     MetadataValueRest metadataValue, String index) {
+    private void move(Context context, DSpaceObject dso,
+                      DSpaceObjectService dsoService, MetadataField metadataField, String indexFrom, String indexTo) {
         metadataPatchUtils.checkMetadataFieldNotNull(metadataField);
-        int indexInt = 0;
-        if (index != null && index.equals("-")) {
-            indexInt = -1;
-        }
         try {
-            dsoService.addAndShiftRightMetadata(context, dso, metadataField.getMetadataSchema().getName(),
-                    metadataField.getElement(), metadataField.getQualifier(), metadataValue.getLanguage(),
-                    metadataValue.getValue(), metadataValue.getAuthority(), metadataValue.getConfidence(), indexInt);
+            dsoService.moveMetadata(context, dso, metadataField.getMetadataSchema().getName(),
+                    metadataField.getElement(), metadataField.getQualifier(), Integer.parseInt(indexFrom),
+                    Integer.parseInt(indexTo));
         } catch (SQLException e) {
-            throw new DSpaceBadRequestException("SQLException in DspaceObjectMetadataAddOperation.add trying to add " +
-                    "metadata to dso.", e);
+            throw new DSpaceBadRequestException("SQLException in DspaceObjectMetadataMoveOperation.move trying to " +
+                    "move metadata in dso.", e);
         }
     }
 
@@ -79,7 +78,7 @@ public class DspaceObjectMetadataAddOperation<R extends DSpaceObject> extends Pa
     public boolean supports(Object objectToMatch, Operation operation) {
         return ((operation.getPath().startsWith(metadataPatchUtils.METADATA_PATH)
                 || operation.getPath().equals(metadataPatchUtils.METADATA_PATH))
-                && operation.getOp().trim().equalsIgnoreCase(OPERATION_ADD)
+                && operation.getOp().trim().equalsIgnoreCase(OPERATION_MOVE)
                 && objectToMatch instanceof DSpaceObject);
     }
 }

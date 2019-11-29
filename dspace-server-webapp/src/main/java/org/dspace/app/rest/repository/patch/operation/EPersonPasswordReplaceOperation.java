@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.rest.repository.patch.factories.impl;
+package org.dspace.app.rest.repository.patch.operation;
 
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.model.patch.Operation;
