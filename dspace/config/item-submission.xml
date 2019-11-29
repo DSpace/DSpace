@@ -106,36 +106,63 @@
             <scope visibilityOutside="read-only">submission</scope>
         </step>
 
-		<!-- Step Upload Item with Embargo Features to enable this step, please 
-			make sure to comment-out the previous step "UploadStep" <step id="upload-with-embargo"> 
-			<heading>submit.progressbar.upload</heading> <processing-class>org.dspace.submit.step.UploadWithEmbargoStep</processing-class> 
-			<type>uploadWithEmbargo</type> </step> -->
+        <step id="OpenAIREProjectForm" mandatory="true">
+            <heading>submit.progressbar.describe.stepone</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+        </step>
+
+        <step id="OpenAIREPersonForm" mandatory="true">
+            <heading>submit.progressbar.describe.stepone</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+        </step>
+        <step id="OpenAIREOrganizationForm" mandatory="true">
+            <heading>submit.progressbar.describe.stepone</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+        </step>
+        <step id="OpenAIREPublicationPageoneForm" mandatory="true">
+            <heading>submit.progressbar.describe.stepone</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+        </step>
+        <step id="OpenAIREPublicationPagetwoForm" mandatory="true">
+            <heading>submit.progressbar.describe.stepone</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+        </step>
+
+        <!-- Step Upload Item with Embargo Features to enable this step, please 
+            make sure to comment-out the previous step "UploadStep" <step id="upload-with-embargo"> 
+            <heading>submit.progressbar.upload</heading> <processing-class>org.dspace.submit.step.UploadWithEmbargoStep</processing-class> 
+            <type>uploadWithEmbargo</type> </step> -->
 
 
-		<!--Step will be to select a Creative Commons License -->
-		<!-- Uncomment this step to allow the user to select a Creative Commons 
-			license -->
-		<!-- <step id="creative-commons"> <heading>submit.progressbar.CClicense</heading> 
-			<processing-class>org.dspace.submit.step.CCLicenseStep</processing-class> 
-			<type>cclicense</type> </step> -->
+        <!--Step will be to select a Creative Commons License -->
+        <!-- Uncomment this step to allow the user to select a Creative Commons 
+            license -->
+        <!-- <step id="creative-commons"> <heading>submit.progressbar.CClicense</heading> 
+            <processing-class>org.dspace.submit.step.CCLicenseStep</processing-class> 
+	       <type>cclicense</type> </step> -->
 
-		<!--Step will be to Check for potential duplicate -->
-		<!-- <step id="detect-duplicate"> <heading>submit.progressbar.detect.duplicate</heading> 
-			<processing-class>org.dspace.submit.step.DetectPotentialDuplicate</processing-class> 
-			<type>duplicate</type> </step> -->
+        <!--Step will be to Check for potential duplicate -->
+        <!-- <step id="detect-duplicate"> <heading>submit.progressbar.detect.duplicate</heading> 
+            <processing-class>org.dspace.submit.step.DetectPotentialDuplicate</processing-class> 
+            <type>duplicate</type> </step> -->
 
-		<!--Step will be to Verify/Review everything -->
-		<!-- <step id="verify"> <heading>submit.progressbar.verify</heading> <processing-class>org.dspace.submit.step.VerifyStep</processing-class> 
-			<type>verify</type> </step> -->
+        <!--Step will be to Verify/Review everything -->
+        <!-- <step id="verify"> <heading>submit.progressbar.verify</heading> <processing-class>org.dspace.submit.step.VerifyStep</processing-class> 
+            <type>verify</type> </step> -->
 
-		<!-- Fake Steps to test parsing of all options -->
-		<!-- <step mandatory="false"> <heading>fake.submission.readonly</heading> 
-			<processing-class>org.dspace.submit.step.SampleStep</processing-class> <type>sample</type> 
-			<scope visibility="read-only">submission</scope> </step> <step mandatory="false"> 
-			<heading>fake.workflow.readonly</heading> <processing-class>org.dspace.submit.step.SampleStep</processing-class> 
-			<type>sample</type> <scope visibility="read-only">workflow</scope> </step> -->
+        <!-- Fake Steps to test parsing of all options -->
+        <!-- <step mandatory="false"> <heading>fake.submission.readonly</heading> 
+            <processing-class>org.dspace.submit.step.SampleStep</processing-class> <type>sample</type> 
+            <scope visibility="read-only">submission</scope> </step> <step mandatory="false"> 
+            <heading>fake.workflow.readonly</heading> <processing-class>org.dspace.submit.step.SampleStep</processing-class> 
+            <type>sample</type> <scope visibility="read-only">workflow</scope> </step> -->
 
-		<!-- This is the Sample Step which utilizes the JSPSampleStep class -->
+        <!-- This is the Sample Step which utilizes the JSPSampleStep class -->
         <step id="sample">
             <heading>Sample</heading>
             <processing-class>org.dspace.submit.step.SampleStep</processing-class>
@@ -143,43 +170,43 @@
         </step>
     </step-definitions>
 
-	<!-- The submission-definitions map lays out the detailed definition of -->
-	<!-- all the Item Submission Processes (and the ordering of their steps). -->
-	<!-- Each separate "submission-process" has a unique name as an attribute, -->
-	<!-- which matches one of the names in the process-map. One named -->
-	<!-- "submit-process" has the name "traditional"; as this name suggests, -->
-	<!-- it is the default item submission process, which gets used when -->
-	<!-- the specified collection has no correspondingly named submit-process. -->
-	<!-- -->
-	<!-- Each submit-process contains an ordered set of steps; each step -->
-	<!-- defines one "step" occurring during the process of submitting an -->
-	<!-- item. A step MUST be referenced by 'id' (it must -->
-	<!-- be defined in <step-definitions> above). -->
-	<!-- -->
-	<!-- -->
+    <!-- The submission-definitions map lays out the detailed definition of -->
+    <!-- all the Item Submission Processes (and the ordering of their steps). -->
+    <!-- Each separate "submission-process" has a unique name as an attribute, -->
+    <!-- which matches one of the names in the process-map. One named -->
+    <!-- "submit-process" has the name "traditional"; as this name suggests, -->
+    <!-- it is the default item submission process, which gets used when -->
+    <!-- the specified collection has no correspondingly named submit-process. -->
+    <!-- -->
+    <!-- Each submit-process contains an ordered set of steps; each step -->
+    <!-- defines one "step" occurring during the process of submitting an -->
+    <!-- item. A step MUST be referenced by 'id' (it must -->
+    <!-- be defined in <step-definitions> above). -->
+    <!-- -->
+    <!-- -->
     <submission-definitions>
 
-		<!--This "traditional" process defines the DEFAULT item submission process -->
+        <!--This "traditional" process defines the DEFAULT item submission process -->
         <submission-process name="traditional">
 
-			<!--Uncommment to display the SAMPLE step as your first step -->
-			<!--<step id="sample"/> -->
+            <!--Uncommment to display the SAMPLE step as your first step -->
+            <!--<step id="sample"/> -->
 
             <step id="collection"/>
-			
-			<!--Step will be to Describe the item. -->
+
+            <!--Step will be to Describe the item. -->
             <step id="traditionalpageone"/>
             <step id="traditionalpagetwo"/>
 
-			<!--Step will be to Upload the item -->
+            <!--Step will be to Upload the item -->
             <step id="upload"/>
-			<!-- <step id="upload-with-embargo"/> -->
-			<!-- <step id="detect-duplicate"/> -->
+            <!-- <step id="upload-with-embargo"/> -->
+            <!-- <step id="detect-duplicate"/> -->
 
-			<!--Step will be to Sign off on the License -->
+            <!--Step will be to Sign off on the License -->
             <step id="license"/>
-			<!-- <step id="creative-commons"/> -->
-			<!-- <step id="verify"/> -->
+            <!-- <step id="creative-commons"/> -->
+            <!-- <step id="verify"/> -->
         </submission-process>
 
         <submission-process name="People">
@@ -222,30 +249,31 @@
         </submission-process>
 
         <!-- OpenAIRE compliant forms -->
-        <submission-process name="OpenAIRE_Publication">
+        <submission-process name="OpenAIREPublicationSubmission">
             <step id="collection"/>
-            
+
             <!--Step will be to Describe the item. -->
-            <step id="openaire-publication-pageone"/>
-            <step id="openaire-publication-pagetwo"/>
+            <step id="OpenAIREPublicationPageoneForm"/>
+            <step id="OpenAIREPublicationPagetwoForm"/>
 
             <!--Step will be to Upload the item -->
-            <step id="upload-with-embargo"/>
+            <!-- step id="upload-with-embargo"/-->
+            <step id="upload"/>
 
             <!--Step will be to Sign off on the License -->
             <step id="license"/>
         </submission-process>
-        <submission-process name="OpenAIRE_Person">
+        <submission-process name="OpenAIREPersonSubmission">
             <step id="collection"/>
-            <step id="openaire-person"/>
+            <step id="OpenAIREPersonForm"/>
         </submission-process>
-        <submission-process name="OpenAIRE_Project">
+        <submission-process name="OpenAIREProjectSubmission">
             <step id="collection"/>
-            <step id="openaire-project"/>
+            <step id="OpenAIREProjectForm"/>
         </submission-process>
-        <submission-process name="OpenAIRE_Organization">
+        <submission-process name="OpenAIREOrganizationSubmission">
             <step id="collection"/>
-            <step id="openaire-organization"/>
+            <step id="OpenAIREOrganizationForm"/>
         </submission-process>
     </submission-definitions>
 
