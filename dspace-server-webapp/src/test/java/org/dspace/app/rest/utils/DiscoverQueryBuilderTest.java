@@ -20,12 +20,12 @@ import static org.mockito.Mockito.when;
 
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.parameter.SearchFilter;
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.discovery.DiscoverFacetField;
 import org.dspace.discovery.DiscoverFilterQuery;
@@ -42,6 +42,8 @@ import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
 import org.dspace.discovery.configuration.DiscoverySortConfiguration;
 import org.dspace.discovery.configuration.DiscoverySortFieldConfiguration;
 import org.dspace.discovery.configuration.HierarchicalSidebarFacetConfiguration;
+import org.dspace.discovery.indexobject.IndexableItem;
+import org.dspace.discovery.indexobject.factory.IndexFactory;
 import org.dspace.services.ConfigurationService;
 import org.junit.Before;
 import org.junit.Test;
@@ -74,6 +76,9 @@ public class DiscoverQueryBuilderTest {
     @Mock
     private IndexableObject scope;
 
+    @Mock
+    private IndexFactory indexFactory;
+
     private DiscoveryConfiguration discoveryConfiguration;
     private String query;
     private SearchFilter searchFilter;
@@ -81,6 +86,10 @@ public class DiscoverQueryBuilderTest {
 
     @Before
     public void setUp() throws Exception {
+        queryBuilder.setIndexableFactories(Collections.singletonList(indexFactory));
+
+        when(indexFactory.getType()).thenReturn(IndexableItem.TYPE);
+
         when(configurationService.getIntProperty(eq("rest.search.max.results"), anyInt())).thenReturn(100);
 
         when(searchService.escapeQueryChars(any(String.class))).then(invocation -> invocation.getArguments()[0]);
@@ -165,7 +174,7 @@ public class DiscoverQueryBuilderTest {
 
         assertThat(discoverQuery.getFilterQueries(), containsInAnyOrder("archived:true", "subject:\"Java\""));
         assertThat(discoverQuery.getQuery(), is(query));
-        assertThat(discoverQuery.getDSpaceObjectFilter(), is(Constants.ITEM));
+        assertThat(discoverQuery.getDSpaceObjectFilter(), is(IndexableItem.TYPE));
         assertThat(discoverQuery.getSortField(), is("dc.title_sort"));
         assertThat(discoverQuery.getSortOrder(), is(DiscoverQuery.SORT_ORDER.asc));
         assertThat(discoverQuery.getMaxResults(), is(10));
@@ -191,7 +200,7 @@ public class DiscoverQueryBuilderTest {
 
         assertThat(discoverQuery.getFilterQueries(), containsInAnyOrder("archived:true"));
         assertThat(discoverQuery.getQuery(), isEmptyOrNullString());
-        assertThat(discoverQuery.getDSpaceObjectFilter(), is(-1));
+        assertThat(discoverQuery.getDSpaceObjectFilter(), isEmptyOrNullString());
         //Note this should actually be "dc.date.accessioned_dt"  but remember that our searchService is just a stupid
         // mock
         assertThat(discoverQuery.getSortField(), is("dc.date.accessioned_sort"));
@@ -221,7 +230,7 @@ public class DiscoverQueryBuilderTest {
 
         assertThat(discoverQuery.getFilterQueries(), containsInAnyOrder("archived:true"));
         assertThat(discoverQuery.getQuery(), isEmptyOrNullString());
-        assertThat(discoverQuery.getDSpaceObjectFilter(), is(-1));
+        assertThat(discoverQuery.getDSpaceObjectFilter(), is(isEmptyOrNullString()));
         //Note this should actually be "dc.date.accessioned_dt"  but remember that our searchService is just a stupid
         // mock
         assertThat(discoverQuery.getSortField(), is("score_sort"));
@@ -281,7 +290,7 @@ public class DiscoverQueryBuilderTest {
 
         assertThat(discoverQuery.getFilterQueries(), containsInAnyOrder("archived:true", "subject:\"Java\""));
         assertThat(discoverQuery.getQuery(), is(query));
-        assertThat(discoverQuery.getDSpaceObjectFilter(), is(Constants.ITEM));
+        assertThat(discoverQuery.getDSpaceObjectFilter(), is(IndexableItem.TYPE));
         assertThat(discoverQuery.getSortField(), isEmptyOrNullString());
         assertThat(discoverQuery.getMaxResults(), is(0));
         assertThat(discoverQuery.getStart(), is(0));

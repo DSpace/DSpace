@@ -47,4 +47,6 @@
     <!--Configurable workflow services -->
     <bean id="workflowServiceFactory" class="org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactoryImpl"/>
 
+    <bean id="indexObjectFactoryFactory" class="org.dspace.discovery.indexobject.factory.IndexObjectFactoryFactoryImpl"/>
+
 </beans>

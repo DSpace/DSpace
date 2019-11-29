@@ -20,7 +20,7 @@
            http://www.springframework.org/schema/context/spring-context-3.0.xsd
            http://www.springframework.org/schema/util
            http://www.springframework.org/schema/util/spring-util-3.0.xsd"
-    default-autowire-candidates="*Service,*DAO,javax.sql.DataSource">
+    default-autowire-candidates="*Service,*DAO,javax.sql.DataSource,*Plugin" default-lazy-init="true">
 
     <context:annotation-config /> <!-- allows us to use spring annotations in beans -->
 
@@ -31,7 +31,7 @@
     <alias name="solrServiceResourceIndexPlugin" alias="org.dspace.discovery.SolrServiceResourceRestrictionPlugin"/>
 
     <!-- Additional indexing plugin make filtering by has content in original bundle (like pdf's, images) posible via SOLR -->
-    <bean id="hasContentInOriginalBundle" class="org.dspace.discovery.SolrServiceContentInOriginalBundleFilterPlugin"/>
+    <bean id="hasContentInOriginalBundlePlugin" class="org.dspace.discovery.SolrServiceContentInOriginalBundleFilterPlugin"/>
 
     <!-- Additional indexing plugin enables searching by filenames and by file descriptions for files in ORIGINAL bundle -->
     <bean id="solrServiceFileInfoPlugin" class="org.dspace.discovery.SolrServiceFileInfoPlugin"/>
@@ -157,7 +157,7 @@
         <property name="defaultFilterQueries">
             <list>
                 <!--Only find items, communities and collections-->
-                <value>search.resourcetype:2 OR search.resourcetype:3 OR search.resourcetype:4</value>
+                <value>search.resourcetype:Item OR search.resourcetype:Collection OR search.resourcetype:Community</value>
             </list>
         </property>
         <!--The configuration for the recent submissions-->
@@ -298,7 +298,7 @@
         <property name="defaultFilterQueries">
             <list>
                 <!--Only find items, communities and collections-->
-                <value>search.resourcetype:2 OR search.resourcetype:3 OR search.resourcetype:4</value>
+                <value>search.resourcetype:Item OR search.resourcetype:Collection OR search.resourcetype:Community</value>
             </list>
         </property>
         <!-- Limit recent submissions on homepage to only 5 (default is 20) -->
@@ -403,7 +403,7 @@
         <property name="defaultFilterQueries">
             <list>
                 <!--Only find items, workspace and accepted for workflow -->
-                <value>search.resourcetype:2 OR search.resourcetype:[8 TO 9]</value>
+                <value>search.resourcetype:Item OR search.resourcetype:WorkspaceItem OR search.resourcetype:XmlWorkflowItem</value>
             </list>
         </property>
         <!--Default result per page  -->
@@ -480,7 +480,7 @@
         <property name="defaultFilterQueries">
             <list>
                 <!--Only find PoolTask and ClaimedTask -->
-                <value>search.resourcetype:[10 TO 11]</value>
+                <value>search.resourcetype:PoolTask OR search.resourcetype:ClaimedTask</value>
             </list>
         </property>
         <!--Default result per page  -->
@@ -568,7 +568,7 @@
         <property name="defaultFilterQueries">
             <list>
                 <!--Only find items, communities and collections-->
-                <value>search.resourcetype:2 AND entityType_keyword:Publication</value>
+                <value>search.resourcetype:Item AND entityType_keyword:Publication</value>
             </list>
         </property>
         <!--The configuration for the recent submissions-->
@@ -631,7 +631,7 @@
         <property name="defaultFilterQueries">
             <list>
                 <!--Only find items, communities and collections-->
-                <value>search.resourcetype:2 AND entityType_keyword:Person</value>
+                <value>search.resourcetype:Item AND entityType_keyword:Person</value>
             </list>
         </property>
         <!--Default result per page  -->
@@ -750,7 +750,7 @@
         <property name="defaultFilterQueries">
             <list>
                 <!--Only find items, communities and collections-->
-                <value>search.resourcetype:2 AND entityType_keyword:OrgUnit</value>
+                <value>search.resourcetype:Item AND entityType_keyword:OrgUnit</value>
             </list>
         </property>
         <!--The configuration for the recent submissions-->
@@ -811,7 +811,7 @@
         <property name="defaultFilterQueries">
             <list>
                 <!--Only find items, communities and collections-->
-                <value>search.resourcetype:2 AND entityType_keyword:JournalIssue</value>
+                <value>search.resourcetype:Item AND entityType_keyword:JournalIssue</value>
             </list>
         </property>
         <!--The configuration for the recent submissions-->
@@ -871,7 +871,7 @@
         <property name="defaultFilterQueries">
             <list>
                 <!--Only find items, communities and collections-->
-                <value>search.resourcetype:2 AND entityType_keyword:JournalVolume</value>
+                <value>search.resourcetype:Item AND entityType_keyword:JournalVolume</value>
             </list>
         </property>
         <!--The configuration for the recent submissions-->
@@ -931,7 +931,7 @@
         <property name="defaultFilterQueries">
             <list>
                 <!--Only find items, communities and collections-->
-                <value>search.resourcetype:2 AND entityType_keyword:Journal</value>
+                <value>search.resourcetype:Item AND entityType_keyword:Journal</value>
             </list>
         </property>
         <!--The configuration for the recent submissions-->

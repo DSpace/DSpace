@@ -14,7 +14,7 @@ import org.dspace.app.rest.RestResourceController;
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
-public class WorkflowItemRest extends AInprogressSubmissionRest<Integer> {
+public class WorkflowItemRest extends AInprogressSubmissionRest {
     public static final String NAME = "workflowitem";
     public static final String CATEGORY = RestAddressableModel.WORKFLOW;
 

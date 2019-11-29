@@ -23,6 +23,7 @@ import org.dspace.discovery.DiscoverResult.FacetResult;
 import org.dspace.discovery.SearchService;
 import org.dspace.discovery.SearchServiceException;
 import org.dspace.discovery.configuration.DiscoveryConfigurationParameters;
+import org.dspace.discovery.indexobject.IndexableItem;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
@@ -122,7 +123,7 @@ public class ItemCountDAOSolr implements ItemCountDAO {
         query.addFacetField(new DiscoverFacetField("location.coll",
                                                    DiscoveryConfigurationParameters.TYPE_STANDARD, -1,
                                                    DiscoveryConfigurationParameters.SORT.COUNT));
-        query.addFilterQueries("search.resourcetype:2");    // count only items
+        query.addFilterQueries("search.resourcetype:" + IndexableItem.TYPE);    // count only items
         query.addFilterQueries("NOT(discoverable:false)");  // only discoverable
         query.setMaxResults(0);
 

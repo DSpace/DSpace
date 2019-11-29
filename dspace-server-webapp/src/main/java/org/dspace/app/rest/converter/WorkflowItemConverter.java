@@ -23,7 +23,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class WorkflowItemConverter
-    extends AInprogressItemConverter<XmlWorkflowItem, org.dspace.app.rest.model.WorkflowItemRest, Integer> {
+    extends AInprogressItemConverter<XmlWorkflowItem, org.dspace.app.rest.model.WorkflowItemRest> {
 
     public WorkflowItemConverter() throws SubmissionConfigReaderException {
         super();
@@ -44,6 +44,6 @@ public class WorkflowItemConverter
 
     @Override
     public boolean supportsModel(IndexableObject object) {
-        return object instanceof XmlWorkflowItem;
+        return object.getIndexedObject() instanceof XmlWorkflowItem;
     }
 }

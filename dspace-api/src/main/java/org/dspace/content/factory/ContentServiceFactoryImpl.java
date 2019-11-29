@@ -20,7 +20,6 @@ import org.dspace.content.service.DSpaceObjectLegacySupportService;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.content.service.EntityService;
 import org.dspace.content.service.EntityTypeService;
-import org.dspace.content.service.IndexableObjectService;
 import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataFieldService;
@@ -31,7 +30,6 @@ import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.content.service.SiteService;
 import org.dspace.content.service.SupervisedItemService;
 import org.dspace.content.service.WorkspaceItemService;
-import org.dspace.utils.DSpace;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -84,11 +82,6 @@ public class ContentServiceFactoryImpl extends ContentServiceFactory {
     private EntityTypeService entityTypeService;
     @Autowired(required = true)
     private EntityService entityService;
-
-    @Override
-    public List<IndexableObjectService> getIndexableObjectServices() {
-        return new DSpace().getServiceManager().getServicesByType(IndexableObjectService.class);
-    }
 
     @Override
     public List<DSpaceObjectService<? extends DSpaceObject>> getDSpaceObjectServices() {
