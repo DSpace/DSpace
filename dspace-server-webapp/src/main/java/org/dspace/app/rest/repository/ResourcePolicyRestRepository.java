@@ -99,8 +99,6 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
- //    Page<ResourcePolicyRest> page = new PageImpl<ResourcePolicy>(resourcePolisies, pageable, total)
-//              .map(resourcePolicyConverter);
         return converter.toRestPage(resourcePolisies, pageable, total, utils.obtainProjection(true));
     }
 
@@ -129,8 +127,6 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-   //     Page<ResourcePolicyRest> page = new PageImpl<ResourcePolicy>(resourcePolisies, pageable, total)
-  //              .map(resourcePolicyConverter);
         return converter.toRestPage(resourcePolisies, pageable, total, utils.obtainProjection(true));
     }
 
@@ -160,8 +156,6 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-//        Page<ResourcePolicyRest> page = new PageImpl<ResourcePolicy>(resourcePolisies, pageable, total)
-//                .map(resourcePolicyConverter);
         return converter.toRestPage(resourcePolisies, pageable, total, utils.obtainProjection(true));
     }
 }

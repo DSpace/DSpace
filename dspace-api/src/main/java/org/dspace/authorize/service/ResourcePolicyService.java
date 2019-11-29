@@ -96,18 +96,21 @@ public interface ResourcePolicyService extends DSpaceCRUDService<ResourcePolicy>
             throws SQLException;
 
     public List<ResourcePolicy> findByEPerson(Context c, EPerson ePerson, int offset, int limit) throws SQLException;
-    
+
     public int searchCountEPerson(Context context, EPerson eperson) throws SQLException;
 
-    public List<ResourcePolicy> searchByEPersonAndResourceUuid(Context context, EPerson ePerson, UUID resourceUuid,int offset, int limit) throws SQLException;
-        
+    public List<ResourcePolicy> searchByEPersonAndResourceUuid(Context context, EPerson ePerson, UUID resourceUuid,
+            int offset, int limit) throws SQLException;
+
     public int searchCountResourcePolicies(Context context, UUID resourceUuid, EPerson eperson) throws SQLException;
-    
-    public List<ResourcePolicy> searchByResouceUuidAndActionId(Context context, UUID resourceUuid, int actionId, int offset, int limit) throws SQLException;
-    
+
+    public List<ResourcePolicy> searchByResouceUuidAndActionId(Context context, UUID resourceUuid, int actionId,
+            int offset, int limit) throws SQLException;
+
     public int searchCountByResouceAndAction(Context context, UUID resourceUuid, int actionId) throws SQLException;
 
-    public List<ResourcePolicy> searchByResouceUuid(Context context, UUID resourceUuid, int offset, int limit) throws SQLException;
+    public List<ResourcePolicy> searchByResouceUuid(Context context, UUID resourceUuid, int offset, int limit)
+            throws SQLException;
 
     public int searchCountByResourceUuid(Context context, UUID resourceUuid) throws SQLException;
 
@@ -115,18 +118,9 @@ public interface ResourcePolicyService extends DSpaceCRUDService<ResourcePolicy>
 
     public int searchCountResourcePolicyOfGroup(Context context, Group group) throws SQLException;
 
-    public List<ResourcePolicy> searchByGroupAndResourceUuid(Context context, Group group, UUID resourceUuid, int offset, int limit) throws SQLException;
+    public List<ResourcePolicy> searchByGroupAndResourceUuid(Context context, Group group, UUID resourceUuid,
+            int offset, int limit) throws SQLException;
 
     public int searchCountByGroupAndResourceUuid(Context context, Group group, UUID resourceUuid) throws SQLException;
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
 
 }
