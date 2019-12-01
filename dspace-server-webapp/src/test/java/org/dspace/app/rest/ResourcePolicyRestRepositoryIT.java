@@ -117,6 +117,34 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         .andExpect(status().isNotFound());
     }
 
+    @Test
+    public void findOneForbiddenTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson eperson1 = EPersonBuilder.createEPerson(context)
+                .withEmail("eperson1@mail.com")
+                .withPassword("qwerty01")
+                .build();
+
+        EPerson eperson2 = EPersonBuilder.createEPerson(context)
+                .withEmail("eperson2@mail.com")
+                .withPassword("qwerty02")
+                .build();
+
+        Community community = CommunityBuilder.createCommunity(context).withName("My community").build();
+        Collection collection = CollectionBuilder.createCollection(context, community)
+                                .withName("My collection").build();
+
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+                .withDspaceObject(collection).withAction(Constants.WRITE).withPolicyType(ResourcePolicy.TYPE_SUBMISSION)
+                .withUser(eperson1).build();
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(eperson2.getEmail(), "qwerty02");
+        getClient(authToken).perform(get("/api/authz/resourcepolicies/" + resourcePolicy.getID()))
+                .andExpect(status().isForbidden());
+    }
+
 
     @Test
     public void searchOneResoucesPolicyByEpersonUuidTest() throws Exception {
@@ -257,6 +285,42 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         .andExpect(jsonPath("$.page.totalElements", is(0)));
     }
 
+    @Test
+    public void searchResoucesPolicyByEPersonUuidForbiddenTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson eperson1 = EPersonBuilder.createEPerson(context)
+                .withEmail("eperson1@mail.com")
+                .withPassword("qwerty01")
+                .build();
+
+        EPerson eperson2 = EPersonBuilder.createEPerson(context)
+                .withEmail("eperson2@mail.com")
+                .withPassword("qwerty02")
+                .build();
+
+        Community community = CommunityBuilder.createCommunity(context).withName("My community").build();
+
+        Community community2 = CommunityBuilder.createCommunity(context).withName("My 2 community").build();
+
+        ResourcePolicy resourcePolicyOfEPerson1 = ResourcePolicyBuilder.createResourcePolicy(context)
+                .withDspaceObject(community).withAction(Constants.WRITE)
+                .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
+                .withUser(eperson1).build();
+
+        ResourcePolicy resourcePolicyOfEPerson2 = ResourcePolicyBuilder.createResourcePolicy(context)
+                .withDspaceObject(community2).withAction(Constants.ADD)
+                .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
+                .withUser(eperson2).build();
+
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(eperson1.getEmail(), "qwerty01");
+        getClient(authToken).perform(get("/api/authz/resourcepolicies/search/eperson")
+                .param("uuid", eperson1.getID().toString())
+                .param("resource", community2.getID().toString()))
+                .andExpect(status().isForbidden());
+    }
 
   @Test
   public void searchResourcePoliciesOfOneResourceWithoutActionTest() throws Exception {
@@ -419,6 +483,45 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
       .andExpect(jsonPath("$.page.totalElements", is(0)));
   }
 
+  @Test
+  public void searchResoucesPoliciesByResourceUuidForbiddenTest() throws Exception {
+      context.turnOffAuthorisationSystem();
+
+      EPerson eperson1 = EPersonBuilder.createEPerson(context)
+              .withEmail("eperson1@mail.com")
+              .withPassword("qwerty01")
+              .build();
+
+      EPerson eperson2 = EPersonBuilder.createEPerson(context)
+              .withEmail("eperson2@mail.com")
+              .withPassword("qwerty02")
+              .build();
+
+      Community community = CommunityBuilder.createCommunity(context).withName("My community").build();
+
+      Community community2 = CommunityBuilder.createCommunity(context).withName("My 2 community").build();
+
+      ResourcePolicy resourcePolicyOfEPerson1 = ResourcePolicyBuilder.createResourcePolicy(context)
+              .withDspaceObject(community)
+              .withAction(Constants.REMOVE)
+              .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
+              .withUser(eperson1).build();
+
+      ResourcePolicy resourcePolicyOfEPerson2 = ResourcePolicyBuilder.createResourcePolicy(context)
+              .withDspaceObject(community2)
+              .withAction(Constants.ADD)
+              .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
+              .withUser(eperson2).build();
+
+      context.restoreAuthSystemState();
+
+      String authToken = getAuthToken(eperson1.getEmail(), "qwerty01");
+      getClient(authToken).perform(get("/api/authz/resourcepolicies/search/eperson")
+              .param("uuid", eperson1.getID().toString())
+              .param("resource", community2.getID().toString()))
+              .andExpect(status().isForbidden());
+  }
+
     @Test
     public void searchResourcePolicyByGroupUuidTest() throws Exception {
         context.turnOffAuthorisationSystem();
@@ -575,4 +678,43 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         .andExpect(jsonPath("$.page.totalElements", is(0)));
     }
 
+    @Test
+    public void searchResoucesPolicyByGroupUuidForbiddenTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Group group1 = GroupBuilder.createGroup(context).withName("My group").build();
+
+        EPerson eperson1 = EPersonBuilder.createEPerson(context)
+                .withEmail("eperson1@mail.com")
+                .withPassword("qwerty01")
+                .withGroupMembership(group1)
+                .build();
+
+        EPerson eperson2 = EPersonBuilder.createEPerson(context)
+                .withEmail("eperson2@mail.com")
+                .withPassword("qwerty02")
+                .build();
+
+        Community community = CommunityBuilder.createCommunity(context).withName("My community").build();
+
+        Community community2 = CommunityBuilder.createCommunity(context).withName("My 2 community").build();
+
+        ResourcePolicy resourcePolicyOfGroup1 = ResourcePolicyBuilder.createResourcePolicy(context)
+                .withDspaceObject(community).withAction(Constants.WRITE)
+                .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
+                .withGroup(group1).build();
+
+        ResourcePolicy secondresourcePolicyOfGroup1 = ResourcePolicyBuilder.createResourcePolicy(context)
+                .withDspaceObject(community2).withAction(Constants.ADD)
+                .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
+                .withGroup(group1).build();
+
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(eperson2.getEmail(), "qwerty02");
+        getClient(authToken).perform(get("/api/authz/resourcepolicies/search/group")
+                .param("uuid", group1.getID().toString())
+                .param("resource", community2.getID().toString()))
+                .andExpect(status().isForbidden());
+    }
 }
