@@ -19,7 +19,7 @@
     xmlns:xalan="http://xml.apache.org/xalan"
     xmlns:encoder="xalan://java.net.URLEncoder"
     xmlns:stringescapeutils="org.apache.commons.lang3.StringEscapeUtils"
-    xmlns:util="org.dspace.app.xmlui.utils.XSLUtils"
+    xmlns:util="http://www.dspace.org/xmlns/dspace"
     exclude-result-prefixes="xalan encoder i18n dri mets dim  xlink xsl util stringescapeutils">
 
     <xsl:output indent="yes"/>
@@ -280,8 +280,8 @@
                         </xsl:when>
                         <xsl:when test="dri:list[@n=(concat($handle, ':dc.description.abstract'))]/dri:item">
                         <div class="abstract">
-                                <!--<xsl:value-of select="util:shortenString(dri:list[@n=(concat($handle, ':dc.description.abstract'))]/dri:item[1], 220, 10)"/>-->
-                            <xsl:value-of select="dri:list[@n=(concat($handle, ':dc.description.abstract'))]/dri:item[1]"/>
+                                <xsl:value-of select="util:shortenString(dri:list[@n=(concat($handle, ':dc.description.abstract'))]/dri:item[1], 220, 10)"/>
+                            <!--<xsl:value-of select="dri:list[@n=(concat($handle, ':dc.description.abstract'))]/dri:item[1]"/>-->
                         </div>
                     </xsl:when>
                     </xsl:choose>

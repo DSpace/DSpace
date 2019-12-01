@@ -67,13 +67,13 @@
        <xsl:for-each select=".//dim:field[@element = 'identifier']">
             <xsl:text>rft_id=</xsl:text>
             <!--<xsl:value-of select="encoder:encode(string(.))"/>-->
-           <xsl:value-of select="string(.)"/>
+           <xsl:value-of select="encode-for-uri(string(.))"/>
             <xsl:text>&amp;</xsl:text>
         </xsl:for-each>
         <xsl:text>rfr_id=info%3Asid%2Fdspace.org%3Arepository&amp;</xsl:text>
         <xsl:for-each select=".//dim:field[@element != 'description' and @mdschema !='dc' and @qualifier != 'provenance']">
             <!--<xsl:value-of select="concat('rft.', @element,'=',encoder:encode(string(.))) "/>-->
-            <xsl:value-of select="concat('rft.', @element,'=',string(.)) "/>
+            <xsl:value-of select="concat('rft.', @element,'=',encode-for-uri(string(.))) "/>
             <xsl:if test="position()!=last()">
                 <xsl:text>&amp;</xsl:text>
             </xsl:if>

@@ -27,6 +27,7 @@
 	xmlns:xhtml="http://www.w3.org/1999/xhtml"
 	xmlns:mods="http://www.loc.gov/mods/v3"
 	xmlns:dc="http://purl.org/dc/elements/1.1/"
+    xmlns:util="http://www.dspace.org/xmlns/dspace"
 	xmlns="http://www.w3.org/1999/xhtml"
 	exclude-result-prefixes="i18n dri mets xlink xsl dim xhtml mods dc">
 
@@ -154,5 +155,85 @@
         <xsl:text> </xsl:text>
         <xsl:value-of select="substring-after(.,' ')"/>
     </xsl:template>
+
+    <!-- Cuts off the string at the space nearest to the targetLength if there is one within
+     * maxDeviation chars from the targetLength, or at the targetLength if no such space is
+     * found
+     -->
+
+    <xsl:function name="util:shortenString">
+        <xsl:param name="string"/>
+        <xsl:param name="targetLength"/>
+        <xsl:param name="maxDeviation"/>
+
+        <xsl:choose>
+            <xsl:when test="string-length($string) &lt;= $targetLength + $maxDeviation">
+                <xsl:value-of select="$string"/>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:value-of select="concat(util:cutString($string, $targetLength, $maxDeviation), ' ...')"/>
+            </xsl:otherwise>
+        </xsl:choose>
+
+    </xsl:function>
+
+    <xsl:function name="util:cutString">
+        <xsl:param name="string"/>
+        <xsl:param name="targetLength"/>
+        <xsl:param name="maxDeviation"/>
+
+        <xsl:variable name="targetDeviation" select="substring($string,$targetLength - $maxDeviation, $maxDeviation*2)"/>
+
+        <xsl:choose>
+            <!-- There is no space so return at targetLength -->
+            <xsl:when test="not(contains($targetDeviation, ' '))">
+                <xsl:value-of select="substring($string, 0, $targetLength)"/>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:variable name="firstHalf" select="substring($targetDeviation, 0, $maxDeviation)"/>
+                <xsl:variable name="secondHalf" select="substring($targetDeviation, $maxDeviation)"/>
+
+                <xsl:choose>
+                    <!-- Both first half and second half have space -->
+                    <xsl:when test="contains($firstHalf, ' ') and contains($secondHalf, ' ')">
+                        <xsl:variable name="firstHalfIndex" select="$maxDeviation - number(util:indexOfSpace($firstHalf)[count(util:indexOfSpace($firstHalf))])"/>
+
+                        <xsl:choose>
+                            <!-- If distance to space in first half is shorter then return cut off at first half -->
+                            <xsl:when test="$firstHalfIndex &lt; number(util:indexOfSpace($secondHalf)[1]) - 1">
+                                <xsl:value-of select="substring($string, 0, $targetLength - $firstHalfIndex)"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:value-of select="substring($string, 0, $targetLength + number(util:indexOfSpace($secondHalf)[1]) - 1)"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+
+                    </xsl:when>
+                    <xsl:when test="contains($firstHalf, ' ')">
+                        <xsl:variable name="firstHalfIndex" select="$maxDeviation - number(util:indexOfSpace($firstHalf)[count(util:indexOfSpace($firstHalf))])"/>
+                        <xsl:value-of select="substring($string, 0, $targetLength - $firstHalfIndex)"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:value-of select="substring($string, 0, $targetLength + number(util:indexOfSpace($secondHalf)[1]) - 1)"/>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:function>
+
+    <xsl:function name="util:indexOfSpace">
+        <xsl:param name="string"/>
+
+        <xsl:analyze-string select="$string" regex=".">
+            <xsl:matching-substring>
+                <xsl:choose>
+                    <xsl:when test="not(compare(., ' '))">
+                        <xsl:value-of select="position()"/>
+                    </xsl:when>
+                </xsl:choose>
+            </xsl:matching-substring>
+        </xsl:analyze-string>
+    </xsl:function>
+
 
 </xsl:stylesheet>
