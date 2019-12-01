@@ -280,7 +280,8 @@
                         </xsl:when>
                         <xsl:when test="dri:list[@n=(concat($handle, ':dc.description.abstract'))]/dri:item">
                         <div class="abstract">
-                                <xsl:value-of select="util:shortenString(dri:list[@n=(concat($handle, ':dc.description.abstract'))]/dri:item[1], 220, 10)"/>
+                                <!--<xsl:value-of select="util:shortenString(dri:list[@n=(concat($handle, ':dc.description.abstract'))]/dri:item[1], 220, 10)"/>-->
+                            <xsl:value-of select="dri:list[@n=(concat($handle, ':dc.description.abstract'))]/dri:item[1]"/>
                         </div>
                     </xsl:when>
                     </xsl:choose>
@@ -387,7 +388,7 @@
 
     <xsl:template match="dri:table[@id='aspect.discovery.SimpleSearch.table.discovery-filters']/dri:row">
         <script type="text/javascript">
-            <xsl:text>
+            <!--<xsl:text>
                 if (!window.DSpace) {
                     window.DSpace = {};
                 }
@@ -402,7 +403,7 @@
                     relational_operator: '</xsl:text><xsl:value-of select="stringescapeutils:escapeEcmaScript(dri:cell/dri:field[starts-with(@n, 'filter_relational_operator')]/dri:value/@option)"/><xsl:text>',
                     query: '</xsl:text><xsl:value-of select="stringescapeutils:escapeEcmaScript(dri:cell/dri:field[@rend = 'discovery-filter-input']/dri:value)"/><xsl:text>',
                 });
-            </xsl:text>
+            </xsl:text>-->
         </script>
     </xsl:template>
 

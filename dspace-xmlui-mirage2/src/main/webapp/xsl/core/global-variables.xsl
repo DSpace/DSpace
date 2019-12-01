@@ -39,11 +39,11 @@
 
     <xsl:variable name="theme-path" select="concat($context-path,'/themes/',$pagemeta/dri:metadata[@element='theme'][@qualifier='path'])"/>
 
-    <xsl:variable name="isModal" select="dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='framing'][@qualifier='modal']/text()='true'"/>
+    <xsl:variable name="isModal" select="$pagemeta/dri:metadata[@element='framing'][@qualifier='modal']/text()='true'"/>
 
     <!--the max thumbnail height & width from dspace.cfg, needed for item view and item list pages-->
-    <xsl:variable name="thumbnail.maxheight" select="confman:getIntProperty('thumbnail.maxheight', 80)"/>
-    <xsl:variable name="thumbnail.maxwidth" select="confman:getIntProperty('thumbnail.maxwidth', 80)"/>
+    <xsl:variable name="thumbnail.maxheight" select="80"/> <!--confman:getIntProperty('thumbnail.maxheight', 80)"/>-->
+    <xsl:variable name="thumbnail.maxwidth" select="80"/> <!--confman:getIntProperty('thumbnail.maxwidth', 80)"/>-->
     <!-- item details url -->
     <xsl:variable name="ds_item_view_toggle_url" select="//dri:p[contains(@rend , 'item-view-toggle') and
         (preceding-sibling::dri:referenceSet[@type = 'summaryView'] or following-sibling::dri:referenceSet[@type = 'summaryView'])]/dri:xref/@target"/>

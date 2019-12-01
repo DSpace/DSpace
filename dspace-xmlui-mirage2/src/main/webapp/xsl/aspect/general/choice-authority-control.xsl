@@ -95,6 +95,7 @@
 
     <xsl:template name="addLookupButtonAuthor">
         <xsl:param name="isName" select="'missing value'"/>
+        <xsl:param name="confIndicator" select="''"/>
         <button type="button" name="{concat('lookup_',@n)}" class="ds-button-field ds-add-button btn btn-default ">
             <xsl:attribute name="onClick">
                 <xsl:text>javascript:AuthorLookup('</xsl:text>

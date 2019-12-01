@@ -55,7 +55,7 @@
             </xsl:choose>
         </xsl:variable>
 
-        <xsl:variable name="emphasis" select="confman:getProperty('xmlui.theme.mirage.item-list.emphasis')"/>
+        <xsl:variable name="emphasis" select="file"/> <!--confman:getProperty('xmlui.theme.mirage.item-list.emphasis')"/>-->
         <xsl:choose>
             <xsl:when test="'file' = $emphasis">
 
@@ -168,7 +168,8 @@
             <xsl:if test="dim:field[@element = 'description' and @qualifier='abstract']">
                 <xsl:variable name="abstract" select="dim:field[@element = 'description' and @qualifier='abstract']/node()"/>
                 <div class="artifact-abstract">
-                    <xsl:value-of select="util:shortenString($abstract, 220, 10)"/>
+                    <!--<xsl:value-of select="util:shortenString($abstract, 220, 10)"/>-->
+                    <xsl:value-of select="$abstract"/>
                 </div>
             </xsl:if>
         </div>

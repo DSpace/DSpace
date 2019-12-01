@@ -24,6 +24,7 @@
                 xmlns:dri="http://di.tamu.edu/DRI/1.0/"
                 xmlns:mets="http://www.loc.gov/METS/"
                 xmlns:xlink="http://www.w3.org/TR/xlink/"
+                xmlns:xs="http://www.w3.org/2001/XMLSchema"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="3.0"
                 xmlns:dim="http://www.dspace.org/xmlns/dspace/dim"
                 xmlns:xhtml="http://www.w3.org/1999/xhtml"
@@ -32,13 +33,14 @@
                 xmlns:confman="org.dspace.core.ConfigurationManager"
                 exclude-result-prefixes="i18n dri mets xlink xsl dim xhtml mods dc confman">
 
-    <xsl:output method="xml" encoding="UTF-8" indent="yes"/>
+    <xsl:output method="xhtml" encoding="UTF-8" indent="yes"/>
 
     <!--
         Requested Page URI. Some functions may alter behavior of processing depending if URI matches a pattern.
         Specifically, adding a static page will need to override the DRI, to directly add content.
     -->
     <xsl:variable name="request-uri" select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='URI']"/>
+    <xsl:variable name="properties" select="unparsed-text('/dspace/config/local.cfg')" as="xs:string"/>
 
     <!--
         The starting point of any XSL processing is matching the root element. In DRI the root element is document,
@@ -62,14 +64,14 @@
         <xsl:choose>
             <xsl:when test="not($isModal)">
 
-
-            <xsl:text disable-output-escaping='yes'>&lt;!DOCTYPE html&gt;
-            </xsl:text>
-            <xsl:text disable-output-escaping="yes">&lt;!--[if lt IE 7]&gt; &lt;html class=&quot;no-js lt-ie9 lt-ie8 lt-ie7&quot; lang=&quot;en&quot;&gt; &lt;![endif]--&gt;
-            &lt;!--[if IE 7]&gt;    &lt;html class=&quot;no-js lt-ie9 lt-ie8&quot; lang=&quot;en&quot;&gt; &lt;![endif]--&gt;
-            &lt;!--[if IE 8]&gt;    &lt;html class=&quot;no-js lt-ie9&quot; lang=&quot;en&quot;&gt; &lt;![endif]--&gt;
-            &lt;!--[if gt IE 8]&gt;&lt;!--&gt; &lt;html class=&quot;no-js&quot; lang=&quot;en&quot;&gt; &lt;!--&lt;![endif]--&gt;
-            </xsl:text>
+            <!--<xsl:text disable-output-escaping='yes'>&lt;!DOCTYPE html&gt;
+            </xsl:text>-->
+                <html>
+                <xsl:comment>[if lt IE 7]&gt; &lt;html class=&quot;no-js lt-ie9 lt-ie8 lt-ie7&quot; lang=&quot;en&quot;&gt; &lt;![endif]--&gt;
+                    &lt;!--[if IE 7]&gt;    &lt;html class=&quot;no-js lt-ie9 lt-ie8&quot; lang=&quot;en&quot;&gt; &lt;![endif]--&gt;
+                    &lt;!--[if IE 8]&gt;    &lt;html class=&quot;no-js lt-ie9&quot; lang=&quot;en&quot;&gt; &lt;![endif]--&gt;
+                    &lt;!--[if gt IE 8]&gt;&lt;!--&gt; &lt;html class=&quot;no-js&quot; lang=&quot;en&quot;&gt; &lt;!--&lt;![endif]
+                </xsl:comment>
 
                 <!-- First of all, build the HTML head element -->
 
@@ -129,7 +131,8 @@
                     <!-- Javascript at the bottom for fast page loading -->
                     <xsl:call-template name="addJavascript"/>
                 </body>
-                <xsl:text disable-output-escaping="yes">&lt;/html&gt;</xsl:text>
+                </html>
+                <!--<xsl:text disable-output-escaping="yes">&lt;/html&gt;</xsl:text>-->
 
             </xsl:when>
             <xsl:otherwise>
@@ -267,10 +270,10 @@
                 }
             </script>
 
-            <xsl:text disable-output-escaping="yes">&lt;!--[if lt IE 9]&gt;
-                &lt;script src="</xsl:text><xsl:value-of select="concat($theme-path, 'vendor/html5shiv/dist/html5shiv.js')"/><xsl:text disable-output-escaping="yes">"&gt;&#160;&lt;/script&gt;
-                &lt;script src="</xsl:text><xsl:value-of select="concat($theme-path, 'vendor/respond/dest/respond.min.js')"/><xsl:text disable-output-escaping="yes">"&gt;&#160;&lt;/script&gt;
-                &lt;![endif]--&gt;</xsl:text>
+            <xsl:comment>[if lt IE 9]&gt;
+                &lt;script src="<xsl:value-of select="concat($theme-path, 'vendor/html5shiv/dist/html5shiv.js')"/>"&gt;&#160;&lt;/script&gt;
+                &lt;script src="<xsl:value-of select="concat($theme-path, 'vendor/respond/dest/respond.min.js')"/>"&gt;&#160;&lt;/script&gt;
+                &lt;![endif]</xsl:comment>
 
             <!-- Modernizr enables HTML5 elements & feature detects -->
             <script src="{concat($theme-path, 'vendor/modernizr/modernizr.js')}">&#160;</script>
@@ -293,8 +296,22 @@
 
             <!-- Head metadata in item pages -->
             <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='xhtml_head_item']">
-                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='xhtml_head_item']"
-                              disable-output-escaping="yes"/>
+                <!--<xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='xhtml_head_item']"
+                              disable-output-escaping="yes"/>-->
+                <xsl:analyze-string select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='xhtml_head_item']"
+                                    regex="&lt;([a-z]*)(.*?)/&gt;">
+                    <xsl:matching-substring>
+                        <xsl:element name="{regex-group(1)}">
+                            <xsl:analyze-string select="regex-group(2)" regex='\s([a-z]*)="(.*?)"'>
+                                <xsl:matching-substring>
+                                    <xsl:attribute name="{regex-group(1)}">
+                                        <xsl:value-of select="regex-group(2)"/>
+                                    </xsl:attribute>
+                                </xsl:matching-substring>
+                            </xsl:analyze-string>
+                        </xsl:element>
+                    </xsl:matching-substring>
+                </xsl:analyze-string>
             </xsl:if>
 
             <!-- Add all Google Scholar Metadata values -->
@@ -302,8 +319,10 @@
                 <meta name="{@element}" content="{.}"></meta>
             </xsl:for-each>
 
+            <!-- https://stackoverflow.com/questions/33392114/saxon-he-integrated-extension-functions-how-and-where -->
+
             <!-- Add MathJAX JS library to render scientific formulas-->
-            <xsl:if test="confman:getProperty('webui.browse.render-scientific-formulas') = 'true'">
+            <!--<xsl:if test="confman:getProperty('webui.browse.render-scientific-formulas') = 'true'">
                 <script type="text/x-mathjax-config">
                     MathJax.Hub.Config({
                       tex2jax: {
@@ -317,7 +336,7 @@
                     });
                 </script>
                 <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">&#160;</script>
-            </xsl:if>
+            </xsl:if>-->
 
         </head>
     </xsl:template>
@@ -541,20 +560,21 @@
                 <i class="glyphicon glyphicon-home" aria-hidden="true"/>&#160;
             </xsl:if>
             <!-- Determine whether we are dealing with a link or plain text trail link -->
+            <a>
             <xsl:choose>
                 <xsl:when test="./@target">
-                    <a>
+
                         <xsl:attribute name="href">
                             <xsl:value-of select="./@target"/>
                         </xsl:attribute>
                         <xsl:apply-templates />
-                    </a>
                 </xsl:when>
                 <xsl:otherwise>
                     <xsl:attribute name="class">active</xsl:attribute>
                     <xsl:apply-templates />
                 </xsl:otherwise>
             </xsl:choose>
+            </a>
         </li>
     </xsl:template>
 

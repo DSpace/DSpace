@@ -65,7 +65,6 @@
                                 </input>
                                 <span class="input-group-btn">
                                     <button class="ds-button-field btn btn-primary" title="xmlui.general.go" i18n:attr="title">
-                                        <span class="glyphicon glyphicon-search" aria-hidden="true"/>
                                         <xsl:attribute name="onclick">
                                                     <xsl:text>
                                                         var radio = document.getElementById(&quot;ds-search-form-scope-container&quot;);
@@ -85,6 +84,7 @@
                                                         }
                                                     </xsl:text>
                                         </xsl:attribute>
+                                        <span class="glyphicon glyphicon-search" aria-hidden="true"/>
                                     </button>
                                 </span>
                             </div>
