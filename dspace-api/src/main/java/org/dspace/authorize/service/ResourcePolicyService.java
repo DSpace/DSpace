@@ -123,4 +123,6 @@ public interface ResourcePolicyService extends DSpaceCRUDService<ResourcePolicy>
 
     public int searchCountByGroupAndResourceUuid(Context context, Group group, UUID resourceUuid) throws SQLException;
 
+    public boolean isMyResourcePolicy(Context context, EPerson eperson, Integer id) throws SQLException;
+
 }
