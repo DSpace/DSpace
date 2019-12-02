@@ -16,6 +16,8 @@ import java.util.List;
 import com.lyncode.xoai.dataprovider.xml.xoai.Element;
 import com.lyncode.xoai.dataprovider.xml.xoai.Metadata;
 import com.lyncode.xoai.util.Base64Utils;
+
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.factory.UtilServiceFactory;
@@ -23,10 +25,14 @@ import org.dspace.app.util.service.MetadataExposureService;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.authority.Choices;
+import org.dspace.content.authority.factory.ContentAuthorityServiceFactory;
+import org.dspace.content.authority.service.ChoiceAuthorityService;
+import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.ItemService;
@@ -34,6 +40,8 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.Utils;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
 import org.dspace.xoai.data.DSpaceItem;
 
 /**
@@ -51,6 +59,18 @@ public class ItemUtils {
 
     private static final BitstreamService bitstreamService
         = ContentServiceFactory.getInstance().getBitstreamService();
+
+    private static final MetadataAuthorityService mam = ContentAuthorityServiceFactory
+            .getInstance().getMetadataAuthorityService();
+
+    private static final ChoiceAuthorityService choicheAuthManager = ContentAuthorityServiceFactory
+            .getInstance().getChoiceAuthorityService();
+
+    private static final HandleService handleService = HandleServiceFactory
+            .getInstance().getHandleService();
+
+    public static Integer MAX_DEEP = 2;
+    public static String AUTHORITY = "authority";
 
     /**
      * Default constructor
@@ -81,7 +101,96 @@ public class ItemUtils {
         return e;
     }
 
-    public static Metadata retrieveMetadata(Context context, Item item) {
+    /***
+     * Write metadata into a Element structure.
+     * 
+     * @param schema The reference schema
+     * @param val The metadata value
+     * @return
+     */
+    private static Element writeMetadata(Element  schema,MetadataValue val) {
+        return writeMetadata(schema, val, false);
+    }
+
+    /***
+     * Write metadata into a Element structure.
+     * 
+     * @param schema The reference schema
+     * @param val The metadata value
+     * @param forceEmptyQualifier Set to true to create a qualifier element
+     *              with value "none" when qualifier is empty. Otherwise the qualifier element is not created.
+     * @return
+     */
+    private static Element writeMetadata(Element schema, MetadataValue val, boolean forceEmptyQualifier) {
+
+        Element valueElem = null;
+        valueElem = schema;
+
+        // Has element.. with XOAI one could have only schema and value
+        if (val.getElement() != null && !val.getElement().equals("")) {
+            Element element = getElement(schema.getElement(), val.getElement());
+            if (element == null) {
+                element = create(val.getElement());
+                schema.getElement().add(element);
+            }
+            valueElem = element;
+
+            // Qualified element?
+            if (val.getQualifier() != null && !val.getQualifier().equals("")) {
+                Element qualifier = getElement(element.getElement(), val.getQualifier());
+                if (qualifier == null) {
+                    qualifier = create(val.getQualifier());
+                    element.getElement().add(qualifier);
+                }
+                valueElem = qualifier;
+            } else if (forceEmptyQualifier) {
+                Element qualifier = getElement(element.getElement(), "none");
+                // if (qualifier == null)
+                {
+                    qualifier = create("none");
+                    element.getElement().add(qualifier);
+                }
+                valueElem = qualifier;
+            }
+        }
+
+        // Language?
+        if (val.getLanguage() != null && !val.getLanguage().equals("")) {
+            Element language = getElement(valueElem.getElement(), val.getLanguage());
+            // remove single language
+            // if (language == null)
+            {
+                language = create(val.getLanguage());
+                valueElem.getElement().add(language);
+            }
+            valueElem = language;
+        } else {
+            Element language = getElement(valueElem.getElement(), "none");
+            // remove single language
+            // if (language == null)
+            {
+                language = create("none");
+                valueElem.getElement().add(language);
+            }
+            valueElem = language;
+        }
+
+        valueElem.getField().add(createValue("value", val.getValue()));
+        if (val.getAuthority() != null) {
+            valueElem.getField().add(createValue("authority", val.getAuthority()));
+            if (val.getConfidence() != Choices.CF_NOVALUE) {
+                valueElem.getField().add(createValue("confidence", val.getConfidence() + ""));
+            }
+        }
+        return valueElem;
+
+    }
+
+    public static Metadata retrieveMetadata (Context context, Item item) {
+        return retrieveMetadata(context, item, false, 0);
+    }
+
+    public static Metadata retrieveMetadata(Context context, Item item, boolean skipAutority, int deep) {
         Metadata metadata;
 
         // read all metadata into Metadata Object
@@ -102,63 +211,59 @@ public class ItemUtils {
                 throw new RuntimeException(se);
             }
 
-            Element valueElem = null;
-            Element schema = getElement(metadata.getElement(), field.getMetadataSchema().getName());
+            // mapping metadata in index only
+            Element schema = getElement(metadata.getElement(), val.getSchema());
+
             if (schema == null) {
-                schema = create(field.getMetadataSchema().getName());
+                schema = create(val.getSchema());
                 metadata.getElement().add(schema);
             }
-            valueElem = schema;
-
-            // Has element.. with XOAI one could have only schema and value
-            if (field.getElement() != null && !field.getElement().equals("")) {
-                Element element = getElement(schema.getElement(),
-                                             field.getElement());
-                if (element == null) {
-                    element = create(field.getElement());
-                    schema.getElement().add(element);
+            Element element = writeMetadata(schema, val);
+            // backward compatibility
+            {
+                // metadata.getElement().add(element);
+                Element elementCopy = create(element.getName());
+                for (Element.Field f : element.getField()) {
+                    elementCopy.getField().add(f);
                 }
-                valueElem = element;
+                metadata.getElement().add(elementCopy);
+            }
 
-                // Qualified element?
-                if (field.getQualifier() != null && !field.getQualifier().equals("")) {
-                    Element qualifier = getElement(element.getElement(),
-                                                   field.getQualifier());
-                    if (qualifier == null) {
-                        qualifier = create(field.getQualifier());
-                        element.getElement().add(qualifier);
+            if (!skipAutority && StringUtils.isNotBlank(val.getAuthority())) {
+                String m = Utils.standardize(val.getSchema(), val.getElement(), val.getQualifier(), ".");
+                // compute deep
+                int authorityDeep = ConfigurationManager.getIntProperty("oai", "oai.authority." + m + ".deep");
+                if (authorityDeep <= 0) {
+                    authorityDeep = ConfigurationManager.getIntProperty("oai", "oai.authority.deep");
+
+                    if (authorityDeep <= 0) {
+                        authorityDeep = MAX_DEEP;
                     }
-                    valueElem = qualifier;
                 }
-            }
 
-            // Language?
-            if (val.getLanguage() != null && !val.getLanguage().equals("")) {
-                Element language = getElement(valueElem.getElement(),
-                                              val.getLanguage());
-                if (language == null) {
-                    language = create(val.getLanguage());
-                    valueElem.getElement().add(language);
-                }
-                valueElem = language;
-            } else {
-                Element language = getElement(valueElem.getElement(),
-                                              "none");
-                if (language == null) {
-                    language = create("none");
-                    valueElem.getElement().add(language);
-                }
-                valueElem = language;
-            }
+                // add metadata of related objects, using authority to get it
+                boolean metadataAuth = mam.isAuthorityControlled(val.getMetadataField());
+                if (metadataAuth && (deep < authorityDeep)) {
+                    try {
+                        DSpaceObject dso = handleService.resolveToObject(context, val.getAuthority());
 
-            valueElem.getField().add(createValue("value", val.getValue()));
-            if (val.getAuthority() != null) {
-                valueElem.getField().add(createValue("authority", val.getAuthority()));
-                if (val.getConfidence() != Choices.CF_NOVALUE) {
-                    valueElem.getField().add(createValue("confidence", val.getConfidence() + ""));
+                        if (dso != null && dso instanceof Item) {
+                            Metadata itemMetadata = retrieveMetadata(context, (Item) dso, skipAutority, deep + 1);
+                            if (itemMetadata != null && !itemMetadata.getElement().isEmpty()) {
+                                Element root = create(AUTHORITY);
+                                element.getElement().add(root);
+                                for (Element crisElement : itemMetadata.getElement()) {
+                                    root.getElement().add(crisElement);
+                                }
+                            }
+                        }
+                    } catch (Exception e) {
+                        log.error("Error during retrieving choices plugin for field " + m + ". " + e.getMessage(), e);
+                    }
                 }
             }
         }
+
         // Done! Metadata has been read!
         // Now adding bitstream info
         Element bundles = create("bundles");
