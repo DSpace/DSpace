@@ -25,6 +25,7 @@
                         <map:generator name="exception" src="org.apache.cocoon.generation.ExceptionGenerator"/>
                         <map:generator name="AJAXMenuGenerator"
                              src="org.dspace.app.xmlui.cocoon.AJAXMenuGenerator"/>
+                        <map:generator name="RequestGenerator" src="org.apache.cocoon.generation.RequestGenerator"/>
                 </map:generators>
                 <map:serializers default="xml">
                         <map:serializer logger="sitemap.serializer.xml" mime-type="text/xml; charset=utf-8" name="xml"
@@ -212,6 +213,7 @@
                         <map:action name="PropertyFileReader" src="org.dspace.app.xmlui.cocoon.PropertyFileReader" />
                         <map:action name="DspacePropertyAction" src="ar.edu.unlp.sedici.xmlui.actions.DpsacePropertyAction" />
                         <map:action name="ExceptionAction" src="ar.edu.unlp.sedici.aspect.redirect.ExceptionAction" />
+                        <map:action name="ClearCacheAction" src="org.apache.cocoon.acting.ClearCacheAction"/>
                 </map:actions>
                 <map:pipes default="caching">
                         <map:pipe name="noncaching" src="org.apache.cocoon.components.pipeline.impl.NonCachingProcessingPipeline">
@@ -702,6 +704,22 @@
                   </map:match>
                 </map:pipeline>
                 
+                <map:pipeline>
+                    <!-- clear cache pipeline -->
+                    <map:match pattern="clear-cache">
+                        <map:select type="simple">
+                            <map:parameter name="value" value="{request:method}"/>
+                            <map:when test="POST">
+                                <map:match type="request" pattern="cache-clearance">
+                                    <map:act type="ClearCacheAction"/>
+                                    <map:generate type="RequestGenerator"/>
+                                    <map:serialize type="xml"/>
+                                </map:match>
+                            </map:when>
+                        </map:select>
+                    </map:match>
+                </map:pipeline>
+
                 <map:pipeline>
                         <!--<map:match pattern="**">-->
                         <map:mount check-reload="no" src="themes/themes.xmap" uri-prefix=""/>
