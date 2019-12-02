@@ -122,7 +122,7 @@ public class ExternalSourceEntryUriListHandler implements UriListHandler<Item> {
      */
     private ExternalDataObject getExternalDataObjectFromUriList(List<String> uriList) {
         String inputString = uriList.get(0);
-        Pattern pattern = Pattern.compile("api\\/integration\\/externalsources\\/(.*)\\/entryValues\\/(.*)}");
+        Pattern pattern = Pattern.compile("api\\/integration\\/externalsources\\/(.*)\\/entryValues\\/(.*)");
         Matcher matcher = pattern.matcher(inputString);
 
         matcher.find();
