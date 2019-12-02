@@ -51,8 +51,9 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
     @Autowired
     private GroupService groupService;
 
-    @PreAuthorize("hasAuthority('AUTHENTICATED')")
+
     @Override
+    @PreAuthorize("hasPermission(#id, 'resourcepolicy', 'READ')")
     public ResourcePolicyRest findOne(Context context, Integer id) {
         ResourcePolicy source = null;
         try {

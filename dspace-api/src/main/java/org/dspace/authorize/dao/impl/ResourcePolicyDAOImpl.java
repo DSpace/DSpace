@@ -345,4 +345,14 @@ public class ResourcePolicyDAOImpl extends AbstractHibernateDAO<ResourcePolicy> 
         query.setParameter("groupUuid", group.getID());
         return count(query);
     }
+
+    @Override
+    public ResourcePolicy findOneById(Context context, Integer id) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, ResourcePolicy.class);
+        Root<ResourcePolicy> resourcePolicyRoot = criteriaQuery.from(ResourcePolicy.class);
+        criteriaQuery.select(resourcePolicyRoot);
+        criteriaQuery.where(criteriaBuilder.equal(resourcePolicyRoot.get(ResourcePolicy_.id), id));
+        return singleResult(context, criteriaQuery);
+    }
 }

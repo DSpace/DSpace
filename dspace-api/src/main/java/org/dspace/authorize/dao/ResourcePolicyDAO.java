@@ -109,4 +109,7 @@ public interface ResourcePolicyDAO extends GenericDAO<ResourcePolicy> {
 
     public int searchCountByGroupAndResourceUuid(Context context, Group group, UUID resourceUuid) throws SQLException;
 
+    public ResourcePolicy findOneById(Context context, Integer id) throws SQLException;
+
+
 }
