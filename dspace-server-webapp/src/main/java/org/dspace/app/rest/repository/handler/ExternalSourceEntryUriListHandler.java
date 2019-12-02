@@ -69,7 +69,7 @@ public class ExternalSourceEntryUriListHandler implements UriListHandler<Item> {
 
     @Override
     public boolean validate(Context context, HttpServletRequest request, List<String> uriList,
-                            Class clazz) {
+                            Class clazz) throws AuthorizeException {
         if (uriList.size() > 1) {
             return false;
         }
@@ -86,7 +86,7 @@ public class ExternalSourceEntryUriListHandler implements UriListHandler<Item> {
                 return false;
             }
             if (!authorizeService.isAdmin(context)) {
-                return false;
+                throw new AuthorizeException("Only admins are allowed to create items using external data");
             }
         } catch (SQLException e) {
             log.error(e.getMessage(), e);
