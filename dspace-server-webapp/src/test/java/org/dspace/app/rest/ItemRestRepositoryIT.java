@@ -2042,4 +2042,51 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                                   "mock/entryValues/azeazezaezeaz")).andExpect(status().is(404));
 
     }
+
+    @Test
+    public void createItemFromExternalSourcesForbidden() throws Exception {
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(eperson.getEmail(), password);
+        getClient(token).perform(post("/api/core/items?owningCollection=" + col1.getID().toString())
+                                    .contentType(org.springframework.http.MediaType.parseMediaType(
+                                        org.springframework.data.rest.webmvc.RestMediaTypes.TEXT_URI_LIST_VALUE))
+                                    .content("https://localhost:8080/server/api/integration/externalsources/" +
+                                        "mock/entryValues/one")).andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void createItemFromExternalSourcesUnauthorized() throws Exception {
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        context.restoreAuthSystemState();
+
+        getClient().perform(post("/api/core/items?owningCollection=" + col1.getID().toString())
+                                     .contentType(org.springframework.http.MediaType.parseMediaType(
+                                         org.springframework.data.rest.webmvc.RestMediaTypes.TEXT_URI_LIST_VALUE))
+                                     .content("https://localhost:8080/server/api/integration/externalsources/" +
+                                                  "mock/entryValues/one")).andExpect(status().isUnauthorized());
+    }
 }

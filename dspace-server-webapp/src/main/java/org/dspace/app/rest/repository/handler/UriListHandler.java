@@ -38,7 +38,8 @@ public interface UriListHandler<T> {
      * @param clazz     The class to be returned by the handle method
      * @return          A boolean indicating whether all this input is valid for the implementing UriListHandler
      */
-    boolean validate(Context context, HttpServletRequest request, List<String> uriList, Class clazz);
+    boolean validate(Context context, HttpServletRequest request, List<String> uriList, Class clazz)
+        throws AuthorizeException;
 
     /**
      * This method will perform the actual handle logic
