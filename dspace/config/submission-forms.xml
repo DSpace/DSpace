@@ -51,7 +51,7 @@
             <row>
                 <relation-field>
                     <relationship-type>isAuthorOfPublication</relationship-type>
-                    <search-configuration>personConfiguration</search-configuration>
+                    <search-configuration>person</search-configuration>
                     <repeatable>true</repeatable>
                     <label>Author</label>
                     <hint>Add an author</hint>
@@ -490,7 +490,7 @@
             <row>
                 <relation-field>
                     <relationship-type>isVolumeOfJournal</relationship-type>
-                    <search-configuration>periodicalConfiguration</search-configuration>
+                    <search-configuration>periodical</search-configuration>
                     <filter>creativework.publisher:somepublishername</filter>
                     <label>Journal</label>
                     <hint>Select the journal related to this volume.</hint>
@@ -782,8 +782,6 @@
                     <hint>Enter the start page number.</hint>
                     <required></required>
                 </field>
-            </row>
-            <row>
                 <field>
                     <dc-schema>oaire</dc-schema>
                     <dc-element>citation</dc-element>
@@ -820,8 +818,6 @@
                         select "Not Applicable (or Unknown)".</hint>
                     <required></required>
                 </field>
-            </row>
-            <row>
                 <field>
                     <dc-schema>dc</dc-schema>
                     <dc-element>language</dc-element>
@@ -886,7 +882,7 @@
             <row>
                 <relation-field>
                     <relationship-type>isProjectOfPublication</relationship-type>
-                    <search-configuration>projectConfiguration</search-configuration>
+                    <search-configuration>project</search-configuration>
                     <repeatable>true</repeatable>
                     <label>Funding</label>
                     <hint>Add a related Funding</hint>
@@ -928,7 +924,7 @@
                     <dc-qualifier></dc-qualifier>
                     <repeatable>false</repeatable>
                     <label>Coverage</label>
-                    <input-type>textarea</input-type>
+                    <input-type>onebox</input-type>
                     <hint>Enter the coverage of the item, like a period, jurisdiction, etc.</hint>
                     <required></required>
                 </field>
@@ -956,8 +952,6 @@
                     <input-type>onebox</input-type>
                     <hint>Enter the last name of the person</hint>
                 </field>
-            </row>
-            <row>
                 <field>
                     <dc-schema>person</dc-schema>
                     <dc-element>givenName</dc-element>
@@ -969,10 +963,10 @@
             <row>
                 <field>
                     <dc-schema>dc</dc-schema>
-                    <dc-element>Title</dc-element>
-                    <label>Name</label>
+                    <dc-element>title</dc-element>
+                    <label>Author preferred name</label>
                     <input-type>onebox</input-type>
-                    <hint>Enter the name of the person</hint>
+                    <hint>Enter the preferred name of this person regarding the authorship</hint>
                 </field>
             </row>
             <row>
@@ -980,6 +974,7 @@
                     <dc-schema>person</dc-schema>
                     <dc-element>affiliation</dc-element>
                     <dc-qualifier>name</dc-qualifier>
+                    <repeatable>true</repeatable>
                     <label>Affiliation Name</label>
                     <input-type>onebox</input-type>
                     <hint>Enter the first name of the person</hint>
@@ -989,6 +984,7 @@
                 <field>
                     <dc-schema>person</dc-schema>
                     <dc-element>email</dc-element>
+                    <repeatable>true</repeatable>
                     <label>Email</label>
                     <input-type>onebox</input-type>
                     <hint>Enter the email of the person</hint>
@@ -1016,7 +1012,7 @@
                 <field>
                     <dc-schema>dc</dc-schema>
                     <dc-element>title</dc-element>
-                    <label>Name</label>
+                    <label>Project name</label>
                     <input-type>onebox</input-type>
                     <hint>Enter the name of the project</hint>
                 </field>
@@ -1026,31 +1022,15 @@
                     <dc-schema>dc</dc-schema>
                     <dc-element>identifier</dc-element>
                     <dc-qualifier>uri</dc-qualifier>
-                    <label>Project page</label>
+                    <label>Project web page</label>
                     <input-type>onebox</input-type>
                     <hint>Enter the URL of the project webpage</hint>
                 </field>
             </row>
             <row>
-                <field>
-                    <dc-schema>dc</dc-schema>
-                    <dc-element>identifier</dc-element>
-                    <label>Award number</label>
-                    <input-type>onebox</input-type>
-                    <hint>Enter the identifier of the project</hint>
-                </field>            
-                <field>
-                    <dc-schema>oaire</dc-schema>
-                    <dc-element>fundingStream</dc-element>
-                    <label>Name of the funding stream</label>
-                    <input-type>textarea</input-type>
-                    <hint>Enter the name of the funding stream of the project</hint>
-                </field>
-            </row>
-            <row>
                 <relation-field>
                     <relationship-type>isFundingAgencyOfProject</relationship-type>
-                    <search-configuration>fundingAgencyConfiguration</search-configuration>
+                    <search-configuration>openAIREfundingAgencyConfiguration</search-configuration>
                     <repeatable>false</repeatable>
                     <label>Funding Agency</label>
                     <hint>Add a Funding Agency</hint>
@@ -1063,6 +1043,22 @@
                     <required>One funding agency is required</required>
                 </relation-field>
             </row>
+            <row>
+                <field>
+                    <dc-schema>oaire</dc-schema>
+                    <dc-element>fundingStream</dc-element>
+                    <label>Name of the Funding Stream</label>
+                    <input-type>onebox</input-type>
+                    <hint>Enter the name of the funding stream of the project</hint>
+                </field>            
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>identifier</dc-element>
+                    <label>Award number</label>
+                    <input-type>onebox</input-type>
+                    <hint>Enter the identifier of the project</hint>
+                </field>            
+            </row>
         </form>
 
         <form name="openAIREOrganizationForm">
@@ -1070,7 +1066,7 @@
                 <field>
                     <dc-schema>organization</dc-schema>
                     <dc-element>legalName</dc-element>
-                    <label>Name</label>
+                    <label>Organization name</label>
                     <input-type>onebox</input-type>
                     <hint>Enter the name of the orgunit or organization</hint>
                 </field>
@@ -1087,6 +1083,16 @@
                     <hint>If the organization has any identifiers or codes associated with
                         it, please enter the types and the actual numbers or codes.
                     </hint>
+                    <required></required>
+                </field>
+            </row>
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>type</dc-element>
+                    <label>Organization type</label>
+                    <input-type value-pairs-name="openaire_organization_types">dropdown</input-type>
+                    <hint>Choose the attributes of the Organization</hint>
                     <required></required>
                 </field>
             </row>
@@ -1768,6 +1774,17 @@
             <pair>
                 <displayed-value>Other</displayed-value>
                 <stored-value></stored-value>
+            </pair>
+        </value-pairs>
+
+        <value-pairs value-pairs-name="openaire_organization_types" dc-term="type">
+            <pair>
+                <displayed-value>N/A</displayed-value>
+                <stored-value></stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Is a Funding Organization</displayed-value>
+                <stored-value>FundingOrganization</stored-value>
             </pair>
         </value-pairs>
 
