@@ -1030,7 +1030,7 @@
             <row>
                 <relation-field>
                     <relationship-type>isFundingAgencyOfProject</relationship-type>
-                    <search-configuration>openAIREfundingAgencyConfiguration</search-configuration>
+                    <search-configuration>openAIREFundingAgencyConfiguration</search-configuration>
                     <repeatable>false</repeatable>
                     <label>Funding Agency</label>
                     <hint>Add a Funding Agency</hint>
