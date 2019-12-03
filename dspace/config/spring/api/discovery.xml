@@ -1044,6 +1044,7 @@
                 <ref bean="searchFilterIsPersonOfOrgUnitRelation"/>
                 <ref bean="searchFilterIsProjectOfOrgUnitRelation"/>
                 <ref bean="searchFilterIsPublicationOfOrgUnitRelation"/>
+                <ref bean="searchFilterIsProjectOfFundingAgencyRelation"/>
             </list>
         </property>
         <!--The sort filters for the discovery search-->
@@ -1733,6 +1734,50 @@
         <property name="metadataFields">
             <list>
                 <value>relation.isPublicationOfProject</value>
+            </list>
+        </property>
+        <property name="isOpenByDefault" value="false"/>
+        <property name="pageSize" value="10"/>
+    </bean>
+
+    <bean id="searchFilterIsContributorOfPublicationRelation" class="org.dspace.discovery.configuration.DiscoverySearchFilter">
+        <property name="indexFieldName" value="isContributorOfPublication"/>
+        <property name="metadataFields">
+            <list>
+                <value>relation.isContributorOfPublication</value>
+            </list>
+        </property>
+        <property name="isOpenByDefault" value="false"/>
+        <property name="pageSize" value="10"/>
+    </bean>
+
+    <bean id="searchFilterIsPublicationOfContributorRelation" class="org.dspace.discovery.configuration.DiscoverySearchFilter">
+        <property name="indexFieldName" value="isPublicationOfContributor"/>
+        <property name="metadataFields">
+            <list>
+                <value>relation.isPublicationOfContributor</value>
+            </list>
+        </property>
+        <property name="isOpenByDefault" value="false"/>
+        <property name="pageSize" value="10"/>
+    </bean>
+
+    <bean id="searchFilterIsFundingAgencyOfProjectRelation" class="org.dspace.discovery.configuration.DiscoverySearchFilter">
+        <property name="indexFieldName" value="isFundingAgencyOfProject"/>
+        <property name="metadataFields">
+            <list>
+                <value>relation.isFundingAgencyOfProject</value>
+            </list>
+        </property>
+        <property name="isOpenByDefault" value="false"/>
+        <property name="pageSize" value="10"/>
+    </bean>
+
+    <bean id="searchFilterIsProjectOfFundingAgencyRelation" class="org.dspace.discovery.configuration.DiscoverySearchFilter">
+        <property name="indexFieldName" value="isProjectOfFundingAgency"/>
+        <property name="metadataFields">
+            <list>
+                <value>relation.isProjectOfFundingAgency</value>
             </list>
         </property>
         <property name="isOpenByDefault" value="false"/>
