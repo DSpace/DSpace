@@ -52,11 +52,11 @@ public class InitializeEntities {
     private RelationshipService relationshipService;
     private EntityTypeService entityTypeService;
 
+
     private InitializeEntities() {
         relationshipTypeService = ContentServiceFactory.getInstance().getRelationshipTypeService();
         relationshipService = ContentServiceFactory.getInstance().getRelationshipService();
         entityTypeService = ContentServiceFactory.getInstance().getEntityTypeService();
-
     }
 
     /**
