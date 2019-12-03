@@ -1012,8 +1012,7 @@
         <property name="defaultFilterQueries">
             <list>
                 <!--Only find items, and orgunits or persons-->
-                <value>search.resourcetype:2 AND entityType_keyword:OrgUnit</value>
-                <value>search.resourcetype:2 AND entityType_keyword:Person</value>
+                <value>search.resourcetype:2 AND (entityType_keyword:OrgUnit OR entityType_keyword:Person)</value>
             </list>
         </property>
 
