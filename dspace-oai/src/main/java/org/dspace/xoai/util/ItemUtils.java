@@ -177,70 +177,6 @@ public class ItemUtils {
     }
 
     /**
-     * This method will create a top Element &lt;relationships&gt; and all subsequent
-     * &lt;relationship&gt; related for an item
-     * @param context
-     * @param item
-     * @return
-     * @throws SQLException
-     */
-    private static Element createRelationshipsElement(Context context, Item item) throws SQLException {
-        Element relationships = create("entities");
-
-        List<Relationship> rels = relationshipService.findByItem(context, item);
-
-        // To build a list of all related Items
-        for (Relationship rel : rels) {
-            Item leftItem = rel.getLeftItem();
-            Item rightItem = rel.getRightItem();
-            boolean isLeftItem = false;
-
-            Element relationship = create("entity");
-
-            Item relItem;
-            //get the related item of the current item
-            if (leftItem.getID() != item.getID()) {
-                relItem = leftItem;
-                isLeftItem = true;
-            } else {
-                relItem = rightItem;
-            }
-
-            relationship.getField().add(createValue("virtualRelationId",
-                    org.dspace.core.Constants.VIRTUAL_AUTHORITY_PREFIX + rel.getID()));
-            relationship.getField().add(createValue("uuid", relItem.getID().toString()));
-            relationship.getField().add(createValue("relationName", isLeftItem ?
-                    rel.getRightwardValue() : rel.getLeftwardValue() ));
-
-            //just process each related item
-            List<MetadataValue> vals = itemService.getMetadata(relItem, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
-            for (MetadataValue val : vals) {
-                MetadataField field = val.getMetadataField();
-                try {
-                    // Don't expose fields that are hidden by configuration
-                    if (metadataExposureService.isHidden(context, field.getMetadataSchema().getName(),
-                            field.getElement(), field.getQualifier())) {
-                        continue;
-                    }
-
-                    Element schema = getElement(relationship.getElement(), field.getMetadataSchema().getName());
-                    if (schema == null) {
-                        schema = create(field.getMetadataSchema().getName());
-                        relationship.getElement().add(schema);
-                    }
-
-                    fillSchemaElement(schema, val);
-                } catch (SQLException se) {
-                    throw new RuntimeException(se);
-                }
-            }
-            relationships.getElement().add(relationship);
-
-        }
-        return relationships;
-    }
-
-    /**
      * This method will add all sub-elements to a top element, like: dc, or dcterms, ...
      * @param schema         Element argument passed by reference that will be changed
      * @param val            Metadatavalue that will be processed
@@ -358,14 +294,6 @@ public class ItemUtils {
             Element license = createLicenseElement(context, item);
             metadata.getElement().add(license);
         } catch (AuthorizeException | IOException | SQLException e) {
-            log.warn(e.getMessage(), e);
-        }
-
-        // Relationships info
-        try {
-            Element relationships = createRelationshipsElement(context, item);
-            metadata.getElement().add(relationships);
-        } catch (SQLException e) {
             log.warn(e.getMessage(), e);
         }
 
