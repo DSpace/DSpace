@@ -21,6 +21,10 @@
                 <entry key="isVolumeOfJournal" value-ref="isVolumeOfJournalMap"/>
                 <entry key="isIssueOfJournalVolume" value-ref="isIssueOfJournalVolumeMap"/>
                 <entry key="isJournalIssueOfPublication" value-ref="isJournalIssueOfPublicationMap"/>
+                <!-- relations based on OpenAIRE guidelines -->
+                <entry key="isContributorOfPublication" value-ref="isAuthorOfPublicationMap"/>
+                <entry key="isProjectOfPublication" value-ref="isProjectOfPublicationMap"/>
+                <entry key="isFundingAgencyOfProject" value-ref="isOrgUnitOfProjectMap"/>
             </map>
         </property>
     </bean>
@@ -219,6 +223,20 @@
             <value>, </value>
         </property>
     </bean>
+    
+    <!-- Config like this will tell our VirtualMetadataPopulator to include the virtual metadata field
+     'dc.contributor.other' on the appropriate item with the values defined in the value-ref.
+      This value-ref should be a bean of type VirtualMetadataConfiguration -->
+    <util:map id="isProjectOfPublicationMap">
+        <entry key="dc.relation" value-ref="publicationProject_name"/>
+    </util:map>
+    <bean class="org.dspace.content.virtual.Collected" id="publicationProject_name">
+        <property name="fields">
+            <util:list>
+                <value>dc.title</value>
+            </util:list>
+        </property>
+    </bean>    
 
     <!-- This Related bean defines a relationship type that will be used on a publication.
         The publication will receive 1 virtual metadata value namely the creativeworkseries.issn to which it belongs
