@@ -249,7 +249,7 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
             }
 
             if (jsonNode.hasNonNull("leftPlace")) {
-                relationship.setRightPlace(relationshipRest.getLeftPlace());
+                relationship.setLeftPlace(relationshipRest.getLeftPlace());
             }
 
             relationshipService.update(context, relationship);
