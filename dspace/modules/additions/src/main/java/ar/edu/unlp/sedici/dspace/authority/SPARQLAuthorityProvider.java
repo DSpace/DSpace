@@ -53,11 +53,7 @@ public abstract class SPARQLAuthorityProvider implements ChoiceAuthority {
 
 	@Override
 	public Choices getMatches(String field, String text, int collection, int start, int limit, String locale) {
-		if (text == null)
-			text = "";
-		else 
-			text = text.replaceAll("(?i)[^a-z\\s0-9\\(\\)\\,\\.]", "");
-
+		text = normalizeTextForParserSPARQL10(text);
 		ParameterizedSparqlString query = this.getSparqlSearch(
 				field, text, locale, false);
 		Choice[] choices = this.evalSparql(query, start, limit);
@@ -147,12 +143,17 @@ public abstract class SPARQLAuthorityProvider implements ChoiceAuthority {
 	}
 
 	protected String normalizeTextForParserSPARQL10(String text) {
-		text = text.replaceAll("(?i)[^a-z\\s0-9\\(\\)\\,\\.]", "");
-		if (text.indexOf("(") >= 0) {
-			text = text.replace("(", "\\\\(");
+		if (text == null) {
+			text = "";			
 		}
-		if (text.indexOf(")") >= 0) {
-			text = text.replace(")", "\\\\)");
+		else {
+			text = text.replaceAll("(?i)[^a-z\\s0-9\\(\\)\\,\\.]", "");
+			if (text.indexOf("(") >= 0) {
+				text = text.replace("(", "\\\\(");
+			}
+			if (text.indexOf(")") >= 0) {
+				text = text.replace(")", "\\\\)");
+			}			
 		}
 		return text;
 	}
