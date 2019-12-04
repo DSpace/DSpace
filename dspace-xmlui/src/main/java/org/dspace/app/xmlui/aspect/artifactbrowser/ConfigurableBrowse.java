@@ -499,6 +499,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
         Map<String, String> queryParams = new HashMap<String, String>();
 
         queryParams.putAll(params.getCommonParameters());
+        queryParams.putAll(params.getControlParameters());
 
         Division controls = div.addInteractiveDivision("browse-controls", BROWSE_URL_BASE,
                 Division.METHOD_POST, "browse controls");
