@@ -89,6 +89,11 @@ public class AbstractEntityIntegrationTest extends AbstractControllerIntegration
                                                               null, 1,
                                                               1).build();
 
+        RelationshipTypeBuilder.createRelationshipTypeBuilder(context, journalIssue, journalVolume,
+                                                                "isJournalVolumeOfIssue", "isIssueOfJournalVolume",
+                                                                null, null, null,
+                                                                null).build();
+
         RelationshipTypeBuilder.createRelationshipTypeBuilder(context, publication, orgUnit, "isAuthorOfPublication",
                                                               "isPublicationOfAuthor", 0, null, 0,
                                                               null).build();

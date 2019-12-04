@@ -12,6 +12,7 @@ import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.converter.HarvestedCollectionConverter;
 import org.dspace.app.rest.link.HalLinkService;
 import org.dspace.app.rest.model.HarvestedCollectionRest;
@@ -49,6 +50,9 @@ public class CollectionHarvestSettingsController {
     CollectionService collectionService;
 
     @Autowired
+    ConverterService converter;
+
+    @Autowired
     HarvestedCollectionService harvestedCollectionService;
 
     @Autowired
@@ -80,9 +84,7 @@ public class CollectionHarvestSettingsController {
         }
 
         HarvestedCollectionRest harvestedCollectionRest = harvestedCollectionRestRepository.findOne(collection);
-        HarvestedCollectionResource resource = new HarvestedCollectionResource(harvestedCollectionRest);
-
-        halLinkService.addLinks(resource);
+        HarvestedCollectionResource resource = converter.toResource(harvestedCollectionRest);
 
         return resource;
     }
@@ -114,8 +116,7 @@ public class CollectionHarvestSettingsController {
 
         // Return a harvestedCollectionResource only if a new harvestedCollection was created
         if (harvestedCollectionRest != null) {
-            harvestedCollectionResource = new HarvestedCollectionResource(harvestedCollectionRest);
-            halLinkService.addLinks(harvestedCollectionResource);
+            harvestedCollectionResource = converter.toResource(harvestedCollectionRest);
         }
 
         context.commit();

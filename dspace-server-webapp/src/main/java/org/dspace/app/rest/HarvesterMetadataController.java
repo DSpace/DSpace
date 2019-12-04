@@ -12,12 +12,12 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.link.HalLinkService;
 import org.dspace.app.rest.model.HarvesterMetadataRest;
 import org.dspace.app.rest.model.hateoas.HarvesterMetadataResource;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.harvest.OAIHarvester;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -38,6 +38,9 @@ public class HarvesterMetadataController {
     @Autowired
     private HalLinkService halLinkService;
 
+    @Autowired
+    private ConverterService converter;
+
     /**
      * GET endpoint that returns all available metadata formats
      * @param request   The request object
@@ -46,15 +49,14 @@ public class HarvesterMetadataController {
      */
     @RequestMapping(method = RequestMethod.GET)
     public HarvesterMetadataResource get(HttpServletRequest request,
-                                     HttpServletResponse response) {
+                                         HttpServletResponse response) {
         List<Map<String,String>> configs = OAIHarvester.getAvailableMetadataFormats();
 
         HarvesterMetadataRest data = new HarvesterMetadataRest();
+        data.setProjection(utils.obtainProjection());
         data.setConfigs(configs);
 
-        HarvesterMetadataResource resource = new HarvesterMetadataResource(data, utils);
-        halLinkService.addLinks(resource);
-
+        HarvesterMetadataResource resource = converter.toResource(data);
         return resource;
     }
 
