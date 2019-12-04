@@ -3705,7 +3705,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                        PageMatcher.pageEntry(0, 20)
                    )))
                    //The search results should be an empty list.
-                             .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
+                             .andExpect(jsonPath("$._embedded.searchResult._embedded.objects",
+                                 Matchers.containsInAnyOrder(
                                  SearchResultMatcher.matchOnItemName("item", "items", "Private Test item 2"),
                                  SearchResultMatcher.matchOnItemName("item", "items", "Withdrawn Test 2")
                              )))
