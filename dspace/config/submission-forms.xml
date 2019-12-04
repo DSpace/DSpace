@@ -950,14 +950,14 @@
                     <dc-element>familyName</dc-element>
                     <label>Last name</label>
                     <input-type>onebox</input-type>
-                    <hint>Enter the last name of the person</hint>
+                    <hint>Enter surname or last name of the person</hint>
                 </field>
                 <field>
                     <dc-schema>person</dc-schema>
                     <dc-element>givenName</dc-element>
                     <label>First name</label>
                     <input-type>onebox</input-type>
-                    <hint>Enter the first name of the person</hint>
+                    <hint>Enter personal or first name of the person</hint>
                 </field>
             </row>
             <row>
@@ -977,7 +977,7 @@
                     <repeatable>true</repeatable>
                     <label>Affiliation Name</label>
                     <input-type>onebox</input-type>
-                    <hint>Enter the first name of the person</hint>
+                    <hint>Enter the organizational or institutional affiliation of this person</hint>
                 </field>
             </row>
             <row>
