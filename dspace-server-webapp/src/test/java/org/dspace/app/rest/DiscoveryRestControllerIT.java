@@ -3597,7 +3597,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
         Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
-        //2. Two public items that are readable by Anonymous with different subjects and one private item
+        //2. One public item, one private, one withdrawn.
         Item publicItem1 = ItemBuilder.createItem(context, col1)
                                       .withTitle("Test")
                                       .withIssueDate("2010-10-17")
@@ -3624,10 +3624,10 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
 
         String query = "Test";
         //** WHEN **
-        //An anonymous user browses this endpoint to find the the withdrawn or private objects in the system
+        //A non-admin user browses this endpoint to find the withdrawn or private objects in the system
         //With a query stating 'Test'
         getClient().perform(get("/api/discover/search/objects")
-            .param("configuration", "showUnDiscoverableItems")
+            .param("configuration", "undiscoverable")
             .param("query", query))
                    //** THEN **
                    //The status has to be 200 OK
@@ -3662,7 +3662,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
         Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
-        //2. Two public items that are readable by Anonymous with different subjects and one private item
+        //2. One public item, one private, one withdrawn.
         Item publicItem1 = ItemBuilder.createItem(context, col1)
                                       .withTitle("Test")
                                       .withIssueDate("2010-10-17")
@@ -3690,10 +3690,10 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         String query = "Test";
         String adminToken = getAuthToken(admin.getEmail(), password);
         //** WHEN **
-        //A system admin user browses this endpoint to find the withdrawn or private objects in the system
-        //With a query stating 'Test'
+        // A system admin user browses this endpoint to find the withdrawn or private objects in the system
+        // With a query stating 'Test'
         getClient(adminToken).perform(get("/api/discover/search/objects")
-            .param("configuration", "showUnDiscoverableItems")
+            .param("configuration", "undiscoverable")
             .param("query", query))
                    //** THEN **
                    //The status has to be 200 OK
