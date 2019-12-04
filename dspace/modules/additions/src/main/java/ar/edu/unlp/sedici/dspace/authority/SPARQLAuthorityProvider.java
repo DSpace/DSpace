@@ -147,7 +147,7 @@ public abstract class SPARQLAuthorityProvider implements ChoiceAuthority {
 			text = "";			
 		}
 		else {
-			text = text.replaceAll("(?i)[^a-z\\s0-9\\(\\)\\,\\.]", "");
+			text = text.replaceAll("(?i)[^a-z\\s0-9\\(\\)\\,\\.\\:\\/À-ž]", "");
 			if (text.indexOf("(") >= 0) {
 				text = text.replace("(", "\\\\(");
 			}
