@@ -143,8 +143,6 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
         //Verify if we have received valid parameters
         try {
             getUserParams();
-        } catch (ResourceNotFoundException e) {
-            throw new BadRequestException("Invalid parameters");
         } catch (SQLException e) {
             throw new RuntimeException(e);
         } catch (UIException e) {
