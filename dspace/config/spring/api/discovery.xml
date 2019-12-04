@@ -964,6 +964,7 @@
             <list>
                 <ref bean="searchFilterOrganizationAddressCountry"/>
                 <ref bean="searchFilterJobtitle"/>
+                <ref bean="searchFilterEntityType"/>
             </list>
         </property>
         <!--The search filters which can be used on the discovery search page-->
@@ -1024,7 +1025,7 @@
 
     <bean id="openAIREFundingAgency" class="org.dspace.discovery.configuration.DiscoveryConfiguration"
           scope="prototype">
-        <property name="id" value="openAIREfundingAgency"/>
+        <property name="id" value="fundingAgency"/>
         <property name="indexAlways" value="true"/>
         <!--Which sidebar facets are to be displayed-->
         <property name="sidebarFacets">
