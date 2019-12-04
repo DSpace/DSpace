@@ -782,8 +782,8 @@ public class DCInputsReader {
     public String getInputFormNameByCollectionAndField(Collection collection, String field)
         throws DCInputsReaderException {
         ArrayList<List<DCInputSet>> arrayInputSets = new ArrayList<List<DCInputSet>>();
-        arrayInputSets.add(getInputsByCollectionHandle(collection.getHandle()));
         arrayInputSets.add(getInputsGroupByCollectionHandle(collection.getHandle()));
+        arrayInputSets.add(getInputsByCollectionHandle(collection.getHandle()));
         arrayInputSets.add(getInputsUploadByCollectionHandle(collection.getHandle()));
 
         for (List<DCInputSet> inputSets: arrayInputSets) {
