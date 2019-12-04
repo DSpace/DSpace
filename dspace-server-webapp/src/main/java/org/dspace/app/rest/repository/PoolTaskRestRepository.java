@@ -11,18 +11,15 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
-
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
-import org.dspace.app.rest.converter.PoolTaskConverter;
 import org.dspace.app.rest.exception.RESTAuthorizationException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.PoolTaskRest;
-import org.dspace.app.rest.model.hateoas.PoolTaskResource;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.service.ItemService;
@@ -67,9 +64,6 @@ public class PoolTaskRestRepository extends DSpaceRestRepository<PoolTaskRest, I
     PoolTaskService poolTaskService;
 
     @Autowired
-    PoolTaskConverter converter;
-
-    @Autowired
     XmlWorkflowService workflowService;
 
     @Autowired
@@ -90,12 +84,11 @@ public class PoolTaskRestRepository extends DSpaceRestRepository<PoolTaskRest, I
         if (task == null) {
             return null;
         }
-        return converter.fromModel(task);
+        return converter.toRest(task, utils.obtainProjection());
     }
 
     @SearchRestMethod(name = "findByUser")
     public Page<PoolTaskRest> findByUser(@Parameter(value = "uuid") UUID userID, Pageable pageable) {
-        List<PoolTask> tasks = null;
         try {
             Context context = obtainContext();
             //FIXME this should be secured with annotation but they are currently ignored by search methods
@@ -107,7 +100,8 @@ public class PoolTaskRestRepository extends DSpaceRestRepository<PoolTaskRest, I
             }
             if (authorizeService.isAdmin(context) || userID.equals(currentUser.getID())) {
                 EPerson ep = epersonService.find(context, userID);
-                tasks = poolTaskService.findByEperson(context, ep);
+                List<PoolTask> tasks = poolTaskService.findByEperson(context, ep);
+                return converter.toRestPage(utils.getPage(tasks, pageable), utils.obtainProjection(true));
             } else {
                 throw new RESTAuthorizationException("Only administrators can search for pool tasks of other users");
             }
@@ -116,18 +110,11 @@ public class PoolTaskRestRepository extends DSpaceRestRepository<PoolTaskRest, I
         } catch (SQLException | IOException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<PoolTaskRest> page = utils.getPage(tasks, pageable).map(converter);
-        return page;
     }
 
     @Override
     public Class<PoolTaskRest> getDomainClass() {
         return PoolTaskRest.class;
-    }
-
-    @Override
-    public PoolTaskResource wrapResource(PoolTaskRest task, String... rels) {
-        return new PoolTaskResource(task, utils, rels);
     }
 
     @Override

@@ -474,7 +474,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
     }
 
     @Test
-    public void deleteUnauthorized() throws Exception {
+    public void deleteForbidden() throws Exception {
 
         //We turn off the authorization system in order to create the structure as defined below
         context.turnOffAuthorisationSystem();
@@ -521,7 +521,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
     }
 
     @Test
-    public void deleteForbidden() throws Exception {
+    public void deleteUnauthorized() throws Exception {
 
         //We turn off the authorization system in order to create the structure as defined below
         context.turnOffAuthorisationSystem();
@@ -581,13 +581,72 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
 
         String token = getAuthToken(admin.getEmail(), password);
 
-        // 422 error when trying to DELETE parentCommunity logo
+        // trying to DELETE parentCommunity logo should work
         getClient(token).perform(delete("/api/core/bitstreams/" + parentCommunity.getLogo().getID()))
-                   .andExpect(status().is(422));
+                   .andExpect(status().is(204));
 
-        // 422 error when trying to DELETE collection logo
+        // trying to DELETE collection logo should work
         getClient(token).perform(delete("/api/core/bitstreams/" + col.getLogo().getID()))
-                   .andExpect(status().is(422));
+                   .andExpect(status().is(204));
+    }
+
+    @Test
+    public void deleteMissing() throws Exception {
+        String token = getAuthToken(admin.getEmail(), password);
+
+        // Delete
+        getClient(token).perform(delete("/api/core/bitstreams/1c11f3f1-ba1f-4f36-908a-3f1ea9a557eb"))
+                .andExpect(status().isNotFound());
+
+        // Verify 404 after failed delete
+        getClient(token).perform(delete("/api/core/bitstreams/1c11f3f1-ba1f-4f36-908a-3f1ea9a557eb"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void deleteDeleted() throws Exception {
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        //2. One public items that is readable by Anonymous
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                .withTitle("Test")
+                .withIssueDate("2010-10-17")
+                .withAuthor("Smith, Donald")
+                .withSubject("ExtraEntry")
+                .build();
+
+        String bitstreamContent = "ThisIsSomeDummyText";
+        //Add a bitstream to an item
+        Bitstream bitstream = null;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream = BitstreamBuilder.
+                    createBitstream(context, publicItem1, is)
+                    .withName("Bitstream")
+                    .withDescription("Description")
+                    .withMimeType("text/plain")
+                    .build();
+        }
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        // Delete
+        getClient(token).perform(delete("/api/core/bitstreams/" + bitstream.getID()))
+                .andExpect(status().is(204));
+
+        // Verify 404 when trying to delete a non-existing bitstream
+        getClient(token).perform(delete("/api/core/bitstreams/" + bitstream.getID()))
+                .andExpect(status().isNotFound());
     }
 
     @Test

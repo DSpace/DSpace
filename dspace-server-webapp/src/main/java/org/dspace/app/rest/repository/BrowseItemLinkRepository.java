@@ -11,14 +11,12 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
-import org.dspace.app.rest.converter.ItemConverter;
 import org.dspace.app.rest.model.BrowseIndexRest;
 import org.dspace.app.rest.model.ItemRest;
-import org.dspace.app.rest.model.hateoas.ItemResource;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.utils.ScopeResolver;
 import org.dspace.browse.BrowseEngine;
 import org.dspace.browse.BrowseException;
@@ -32,7 +30,6 @@ import org.dspace.sort.SortException;
 import org.dspace.sort.SortOption;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -47,18 +44,13 @@ import org.springframework.stereotype.Component;
  */
 @Component(BrowseIndexRest.CATEGORY + "." + BrowseIndexRest.NAME + "." + BrowseIndexRest.ITEMS)
 public class BrowseItemLinkRepository extends AbstractDSpaceRestRepository
-    implements LinkRestRepository<ItemRest> {
-    @Autowired
-    ItemConverter converter;
-
-    @Autowired
-    ItemRestRepository itemRestRepository;
+    implements LinkRestRepository {
 
     @Autowired
     ScopeResolver scopeResolver;
 
     public Page<ItemRest> listBrowseItems(HttpServletRequest request, String browseName, Pageable pageable,
-                                          String projection)
+                                          Projection projection)
         throws BrowseException, SQLException {
         //FIXME these should be bind automatically and available as method arguments
         String scope = null;
@@ -156,13 +148,8 @@ public class BrowseItemLinkRepository extends AbstractDSpaceRestRepository
         for (IndexableObject bb : binfo.getBrowseItemResults()) {
             tmpResult.add((Item) bb);
         }
-        Page<ItemRest> page = new PageImpl<Item>(tmpResult, pageResultInfo, binfo.getTotal()).map(converter);
-        return page;
-    }
 
-    @Override
-    public ItemResource wrapResource(ItemRest item, String... rels) {
-        return itemRestRepository.wrapResource(item, rels);
+        return converter.toRestPage(tmpResult, pageResultInfo, binfo.getTotal(), projection);
     }
 
     @Override

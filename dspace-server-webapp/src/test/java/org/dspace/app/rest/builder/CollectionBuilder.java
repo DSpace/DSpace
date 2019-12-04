@@ -55,6 +55,10 @@ public class CollectionBuilder extends AbstractDSpaceObjectBuilder<Collection> {
         return setMetadataSingleValue(collection, MetadataSchemaEnum.DC.getName(), "title", null, name);
     }
 
+    public CollectionBuilder withNameForLanguage(final String name, final String language) {
+        return addMetadataValue(collection, MetadataSchemaEnum.DC.getName(), "title", null, language, name);
+    }
+
     public CollectionBuilder withLogo(final String content) throws AuthorizeException, IOException, SQLException {
 
         InputStream is = IOUtils.toInputStream(content, CharEncoding.UTF_8);
@@ -91,6 +95,23 @@ public class CollectionBuilder extends AbstractDSpaceObjectBuilder<Collection> {
 
     public CollectionBuilder withWorkflowGroup(int step, EPerson... members) throws SQLException, AuthorizeException {
         Group g = collectionService.createWorkflowGroup(context, collection, step);
+        for (EPerson e : members) {
+            groupService.addMember(context, g, e);
+        }
+        groupService.update(context, g);
+        return this;
+    }
+
+    /**
+     * Create an admin group for the collection with the specified members
+     *
+     * @param members epersons to add to the admin group
+     * @return this builder
+     * @throws SQLException
+     * @throws AuthorizeException
+     */
+    public CollectionBuilder withAdminGroup(EPerson... members) throws SQLException, AuthorizeException {
+        Group g = collectionService.createAdministrators(context, collection);
         for (EPerson e : members) {
             groupService.addMember(context, g, e);
         }

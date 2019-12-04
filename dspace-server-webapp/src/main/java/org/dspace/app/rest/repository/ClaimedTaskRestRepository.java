@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
-
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 
@@ -19,13 +18,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
-import org.dspace.app.rest.converter.ClaimedTaskConverter;
 import org.dspace.app.rest.exception.RESTAuthorizationException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.ClaimedTaskRest;
 import org.dspace.app.rest.model.PoolTaskRest;
-import org.dspace.app.rest.model.hateoas.ClaimedTaskResource;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.service.ItemService;
@@ -72,9 +69,6 @@ public class ClaimedTaskRestRepository extends DSpaceRestRepository<ClaimedTaskR
     ClaimedTaskService claimedTaskService;
 
     @Autowired
-    ClaimedTaskConverter converter;
-
-    @Autowired
     XmlWorkflowService workflowService;
 
     @Autowired
@@ -95,14 +89,13 @@ public class ClaimedTaskRestRepository extends DSpaceRestRepository<ClaimedTaskR
         if (task == null) {
             return null;
         }
-        return converter.fromModel(task);
+        return converter.toRest(task, utils.obtainProjection());
     }
 
     @SearchRestMethod(name = "findByUser")
     public Page<ClaimedTaskRest> findByUser(@Parameter(value = "uuid", required = true) UUID userID,
             Pageable pageable) {
         //FIXME this should be secured with annotation but they are currently ignored by search methods
-        List<ClaimedTask> tasks = null;
         try {
             Context context = obtainContext();
             EPerson currentUser = context.getCurrentUser();
@@ -113,25 +106,19 @@ public class ClaimedTaskRestRepository extends DSpaceRestRepository<ClaimedTaskR
             }
             if (authorizeService.isAdmin(context) || userID.equals(currentUser.getID())) {
                 EPerson ep = epersonService.find(context, userID);
-                tasks = claimedTaskService.findByEperson(context, ep);
+                List<ClaimedTask> tasks = claimedTaskService.findByEperson(context, ep);
+                return converter.toRestPage(utils.getPage(tasks, pageable), utils.obtainProjection(true));
             } else {
                 throw new RESTAuthorizationException("Only administrators can search for claimed tasks of other users");
             }
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<ClaimedTaskRest> page = utils.getPage(tasks, pageable).map(converter);
-        return page;
     }
 
     @Override
     public Class<ClaimedTaskRest> getDomainClass() {
         return ClaimedTaskRest.class;
-    }
-
-    @Override
-    public ClaimedTaskResource wrapResource(ClaimedTaskRest task, String... rels) {
-        return new ClaimedTaskResource(task, utils, rels);
     }
 
     @Override
