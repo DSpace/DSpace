@@ -28,14 +28,22 @@ public class SolrServicePrivateItemPlugin implements SolrServiceSearchPlugin {
     @Autowired(required = true)
     protected AuthorizeService authorizeService;
 
+
+    @Autowired(required = true)
+    protected SearchService searchService;
+
     @Override
     public void additionalSearchParameters(Context context, DiscoverQuery discoveryQuery, SolrQuery solrQuery) {
         try {
-            if (!authorizeService.isAdmin(context)) {
+            // Prevents access if user has no administrative rights on the community or collection.
+            // NOTE: the resource restriction plugin adds location filters for community and collection admins.
+            if ( !authorizeService.isAdmin(context) && !authorizeService.isCommunityAdmin(context)
+                && !authorizeService.isCollectionAdmin(context)) {
                 solrQuery.addFilterQuery("NOT(discoverable:false)");
             }
-        } catch (SQLException e) {
-            log.error(LogManager.getHeader(context, "Error while adding non-administrator filters to query", ""), e);
+        } catch (SQLException ex) {
+            log.error(LogManager.getHeader(context, "Error looking up authorization rights of current user",
+                ""), ex);
         }
     }
 }
