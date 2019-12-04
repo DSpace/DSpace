@@ -230,7 +230,7 @@ public class SolrBrowseDAO implements BrowseDAO {
                 query.addFilterQueries(searcher.createLocationQueryForAdministrableItems(context));
             }
         } catch (SQLException ex) {
-            log.error(ex);
+            log.error("Error looking up authorization rights of current user", ex);
         }
     }
 
