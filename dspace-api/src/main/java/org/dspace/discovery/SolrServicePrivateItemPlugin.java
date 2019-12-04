@@ -18,9 +18,12 @@ import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class SolrServiceUnDiscoverableItemsPlugin implements SolrServiceSearchPlugin {
+/**
+ * This plugin prevents discovery of private items by non-administrators.
+ */
+public class SolrServicePrivateItemPlugin implements SolrServiceSearchPlugin {
 
-    private static final Logger log = getLogger(SolrServiceUnDiscoverableItemsPlugin.class.getSimpleName());
+    private static final Logger log = getLogger(SolrServicePrivateItemPlugin.class.getSimpleName());
 
     @Autowired(required = true)
     protected AuthorizeService authorizeService;
@@ -29,11 +32,10 @@ public class SolrServiceUnDiscoverableItemsPlugin implements SolrServiceSearchPl
     public void additionalSearchParameters(Context context, DiscoverQuery discoveryQuery, SolrQuery solrQuery) {
         try {
             if (!authorizeService.isAdmin(context)) {
-                solrQuery.addFilterQuery("NOT(withdrawn:true");
                 solrQuery.addFilterQuery("NOT(discoverable:false)");
             }
         } catch (SQLException e) {
-            log.error(LogManager.getHeader(context, "Error while adding non-administrator filter to query", ""), e);
+            log.error(LogManager.getHeader(context, "Error while adding non-administrator filters to query", ""), e);
         }
     }
 }

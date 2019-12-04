@@ -27,6 +27,7 @@
     <bean id="solrServiceResourceIndexPlugin" class="org.dspace.discovery.SolrServiceResourceRestrictionPlugin" scope="prototype"/>
     <bean id="SolrServiceSpellIndexingPlugin" class="org.dspace.discovery.SolrServiceSpellIndexingPlugin" scope="prototype"/>
     <bean id="solrServiceMetadataBrowseIndexingPlugin" class="org.dspace.discovery.SolrServiceMetadataBrowseIndexingPlugin" scope="prototype"/>
+    <bean id="solrServicePrivateItemPlugin" class="org.dspace.discovery.SolrServicePrivateItemPlugin" scope="prototype"/>
 
     <alias name="solrServiceResourceIndexPlugin" alias="org.dspace.discovery.SolrServiceResourceRestrictionPlugin"/>
 
@@ -157,6 +158,8 @@
             <list>
                 <!--Only find items, communities and collections-->
                 <value>search.resourcetype:2 OR search.resourcetype:3 OR search.resourcetype:4</value>
+                <value>NOT(withdrawn:true)</value>
+                <value>NOT(discoverable:false)</value>
             </list>
         </property>
         <!--The configuration for the recent submissions-->
@@ -244,7 +247,7 @@
         <property name="spellCheckEnabled" value="true"/>
     </bean>
 
-    <!--The default configuration settings for discovery-->
+    <!--The configuration settings for discovery of withdrawn and indiscoverable items (admin only)-->
     <bean id="unDiscoverableItemsConfiguration" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype">
         <!--Which sidebar facets are to be displayed-->
         <property name="sidebarFacets">
@@ -295,8 +298,9 @@
             queries done by discovery for this configuration -->
         <property name="defaultFilterQueries">
             <list>
-                <!--Only find items, communities and collections-->
+                <!--Only find items-->
                 <value>search.resourcetype:2</value>
+                <!-- Only find withdrawn or undiscoverable-->
                 <value>withdrawn:true OR discoverable:false</value>
             </list>
         </property>
@@ -545,6 +549,8 @@
             <list>
                 <!--Only find items, workspace and accepted for workflow -->
                 <value>search.resourcetype:2 OR search.resourcetype:[8 TO 9]</value>
+                <value>NOT(withdrawn:true)</value>
+                <value>NOT(discoverable:false)</value>
             </list>
         </property>
         <!--Default result per page  -->
@@ -622,6 +628,8 @@
             <list>
                 <!--Only find PoolTask and ClaimedTask -->
                 <value>search.resourcetype:[10 TO 11]</value>
+                <value>NOT(withdrawn:true)</value>
+                <value>NOT(discoverable:false)</value>
             </list>
         </property>
         <!--Default result per page  -->
@@ -775,6 +783,8 @@
             <list>
                 <!--Only find items, communities and collections-->
                 <value>search.resourcetype:2 AND entityType_keyword:Person</value>
+                <value>NOT(withdrawn:true)</value>
+                <value>NOT(discoverable:false)</value>
             </list>
         </property>
         <!--Default result per page  -->
