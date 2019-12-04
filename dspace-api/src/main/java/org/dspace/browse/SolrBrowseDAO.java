@@ -169,9 +169,6 @@ public class SolrBrowseDAO implements BrowseDAO {
 
     private DiscoverResult sResponse = null;
 
-    private boolean itemsWithdrawn = false;
-    private boolean itemsDiscoverable = true;
-
     private boolean showFrequencies;
 
     private DiscoverResult getSolrResponse() throws BrowseException {
@@ -217,8 +214,7 @@ public class SolrBrowseDAO implements BrowseDAO {
                 }
             }
             try {
-                sResponse = searcher.search(context, query, itemsWithdrawn
-                    || !itemsDiscoverable);
+                sResponse = searcher.search(context, query);
             } catch (SearchServiceException e) {
                 throw new BrowseException(e);
             }
@@ -227,21 +223,14 @@ public class SolrBrowseDAO implements BrowseDAO {
     }
 
     private void addStatusFilter(DiscoverQuery query) {
-        if (itemsWithdrawn) {
-            query.addFilterQueries("withdrawn:true");
-        } else if (!itemsDiscoverable) {
-            query.addFilterQueries("discoverable:false");
-            // TODO
-
-            try {
-                if (!authorizeService.isAdmin(context)
-                    && (authorizeService.isCommunityAdmin(context)
-                    || authorizeService.isCollectionAdmin(context))) {
-                    query.addFilterQueries(searcher.createLocationQueryForAdministrableItems(context));
-                }
-            } catch (SQLException ex) {
-                log.error(ex);
+        try {
+            if (!authorizeService.isAdmin(context)
+                && (authorizeService.isCommunityAdmin(context)
+                || authorizeService.isCollectionAdmin(context))) {
+                query.addFilterQueries(searcher.createLocationQueryForAdministrableItems(context));
             }
+        } catch (SQLException ex) {
+            log.error(ex);
         }
     }
 
@@ -363,10 +352,9 @@ public class SolrBrowseDAO implements BrowseDAO {
             query.setQuery("bi_" + column + "_sort" + ": {\"" + value + "\" TO *]");
             query.addFilterQueries("-(bi_" + column + "_sort" + ":" + value + "*)");
         }
-        boolean includeUnDiscoverable = itemsWithdrawn || !itemsDiscoverable;
         DiscoverResult resp = null;
         try {
-            resp = searcher.search(context, query, includeUnDiscoverable);
+            resp = searcher.search(context, query);
         } catch (SearchServiceException e) {
             throw new BrowseException(e);
         }
@@ -693,11 +681,6 @@ public class SolrBrowseDAO implements BrowseDAO {
      */
     @Override
     public void setTable(String table) {
-        if (table.equals(BrowseIndex.getWithdrawnBrowseIndex().getTableName())) {
-            itemsWithdrawn = true;
-        } else if (table.equals(BrowseIndex.getPrivateBrowseIndex().getTableName())) {
-            itemsDiscoverable = false;
-        }
         facetField = table;
     }
 

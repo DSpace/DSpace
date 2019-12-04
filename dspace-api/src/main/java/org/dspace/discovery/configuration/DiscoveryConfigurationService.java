@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.discovery.IndexableObject;
 import org.dspace.services.factory.DSpaceServicesFactory;
@@ -70,15 +69,7 @@ public class DiscoveryConfigurationService {
 
     public DiscoveryConfiguration getDiscoveryConfigurationByNameOrDso(final String configurationName,
                                                                        final IndexableObject dso) {
-
-        if (dso instanceof Community && configurationName.contentEquals("showUnDiscoverableItems")) {
-            // Use community-level configuration if it is defined. If not, fall back to configuration name.
-            if (getMap().containsKey(configurationName + "." + ((Community) dso).getHandle())) {
-                return getMap().get(configurationName +  "." + ((Community) dso).getHandle());
-            } else {
-                return getMap().get(configurationName);
-            }
-        } else if (StringUtils.isNotBlank(configurationName) && getMap().containsKey(configurationName)) {
+        if (StringUtils.isNotBlank(configurationName) && getMap().containsKey(configurationName)) {
             return getMap().get(configurationName);
         } else {
             return getDiscoveryConfiguration(dso);
