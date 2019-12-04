@@ -54,7 +54,7 @@
                <!-- Used to show filters and results on MyDSpace -->
                 <entry key="workspace" value-ref="workspaceConfiguration" />
                 <entry key="workflow" value-ref="workflowConfiguration" />
-                <entry key="undiscoverable" value-ref="unDiscoverableItemsConfiguration" />
+                <entry key="undiscoverable" value-ref="unDiscoverableItems" />
                 <entry key="publication" value-ref="publication"/>
                 <entry key="person" value-ref="person"/>
                 <entry key="organization" value-ref="organization"/>
@@ -247,7 +247,7 @@
     </bean>
 
     <!--The configuration settings for discovery of withdrawn and indiscoverable items (admin only)-->
-    <bean id="unDiscoverableItemsConfiguration" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype">
+    <bean id="unDiscoverableItems" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype">
         <!--Which sidebar facets are to be displayed-->
         <property name="sidebarFacets">
             <list>
