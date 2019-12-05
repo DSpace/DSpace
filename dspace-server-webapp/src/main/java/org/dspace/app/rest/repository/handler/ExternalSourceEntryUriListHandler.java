@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.rest.model.ExternalSourceRest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Collection;
@@ -59,7 +60,7 @@ public class ExternalSourceEntryUriListHandler implements UriListHandler<Item> {
             return false;
         }
         for (String string : uriList) {
-            if (!(StringUtils.contains(string, "api/integration/externalsources") &&
+            if (!(StringUtils.contains(string, ExternalSourceRest.CATEGORY + "/" + ExternalSourceRest.PLURAL_NAME) &&
                 StringUtils.contains(string, "entryValues"))) {
                 return false;
             }
@@ -81,6 +82,9 @@ public class ExternalSourceEntryUriListHandler implements UriListHandler<Item> {
             return false;
         }
         try {
+            if (!authorizeService.isAdmin(context)) {
+                throw new AuthorizeException("Only admins are allowed to create items using external data");
+            }
             Collection collection = collectionService.find(context, UUID.fromString(owningCollectionString));
             if (collection == null) {
                 return false;
@@ -89,7 +93,8 @@ public class ExternalSourceEntryUriListHandler implements UriListHandler<Item> {
                 throw new AuthorizeException("Only admins are allowed to create items using external data");
             }
         } catch (SQLException e) {
-            log.error(e.getMessage(), e);
+            log.error("Search for owningCollection with UUID:" + owningCollectionString + " resulted in an error",
+                      e);
             return false;
         }
         return true;
@@ -107,7 +112,8 @@ public class ExternalSourceEntryUriListHandler implements UriListHandler<Item> {
             collection = collectionService.find(context, UUID.fromString(owningCollectionUuid));
             item = externalDataService.createItemFromExternalDataObject(context, dataObject, collection);
         } catch (AuthorizeException | SQLException e) {
-            log.error(e.getMessage(), e);
+            log.error("An error occured when trying to create item in collection with uuid: " + owningCollectionUuid,
+                      e);
             throw e;
         }
         return item;
