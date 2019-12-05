@@ -174,6 +174,6 @@ public interface RelationshipTypeService extends DSpaceCRUDService<RelationshipT
     RelationshipType create(Context context, EntityType leftEntityType, EntityType rightEntityType,
                             String leftwardType, String rightwardType, Integer leftCardinalityMinInteger,
                             Integer leftCardinalityMaxInteger, Integer rightCardinalityMinInteger,
-                            Integer rightCardinalityMaxInteger, Boolean copyLeft, Boolean copyRight)
+                            Integer rightCardinalityMaxInteger, Boolean copyToLeft, Boolean copyToRight)
         throws SQLException, AuthorizeException;
 }

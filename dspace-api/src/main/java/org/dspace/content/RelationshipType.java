@@ -105,14 +105,14 @@ public class RelationshipType implements ReloadableEntity<Integer> {
     /**
      * The boolean indicating whether the metadata should be copied on left item or not
      */
-    @Column(name = "copy_left", nullable = false)
-    private boolean copyLeft;
+    @Column(name = "copy_to_left", nullable = false)
+    private boolean copyToLeft;
 
     /**
      * The boolean indicating whether the metadata should be copied on right item or not
      */
-    @Column(name = "copy_right", nullable = false)
-    private boolean copyRight;
+    @Column(name = "copy_to_right", nullable = false)
+    private boolean copyToRight;
     /**
      * Protected constructor, create object using:
      * {@link org.dspace.content.service.RelationshipTypeService#create(Context)} }
@@ -256,35 +256,35 @@ public class RelationshipType implements ReloadableEntity<Integer> {
     }
 
     /**
-     * Generic getter for the copyLeft
-     * @return the copyLeft value of this RelationshipType
+     * Generic getter for the copyToLeft
+     * @return the copyToLeft value of this RelationshipType
      */
-    public boolean isCopyLeft() {
-        return copyLeft;
+    public boolean isCopyToLeft() {
+        return copyToLeft;
     }
 
     /**
-     * Generic setter for the copyLeft
-     * @param copyLeft   The copyLeft to be set on this RelationshipType
+     * Generic setter for the copyToLeft
+     * @param copyToLeft   The copyToLeft to be set on this RelationshipType
      */
-    public void setCopyLeft(boolean copyLeft) {
-        this.copyLeft = copyLeft;
+    public void setCopyToLeft(boolean copyToLeft) {
+        this.copyToLeft = copyToLeft;
     }
 
     /**
-     * Generic getter for the copyRight
-     * @return the copyRight value of this RelationshipType
+     * Generic getter for the copyToRight
+     * @return the copyToRight value of this RelationshipType
      */
-    public boolean isCopyRight() {
-        return copyRight;
+    public boolean isCopyToRight() {
+        return copyToRight;
     }
 
     /**
-     * Generic setter for the copyRight
-     * @param copyRight   The copyRight to be set on this RelationshipType
+     * Generic setter for the copyToRight
+     * @param copyToRight   The copyToRight to be set on this RelationshipType
      */
-    public void setCopyRight(boolean copyRight) {
-        this.copyRight = copyRight;
+    public void setCopyToRight(boolean copyToRight) {
+        this.copyToRight = copyToRight;
     }
 
     /**
