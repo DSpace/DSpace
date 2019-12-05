@@ -89,9 +89,6 @@ public class ExternalSourceEntryUriListHandler implements UriListHandler<Item> {
             if (collection == null) {
                 return false;
             }
-            if (!authorizeService.isAdmin(context)) {
-                throw new AuthorizeException("Only admins are allowed to create items using external data");
-            }
         } catch (SQLException e) {
             log.error("Search for owningCollection with UUID:" + owningCollectionString + " resulted in an error",
                       e);
