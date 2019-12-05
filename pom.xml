@@ -19,13 +19,17 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>${project.build.sourceEncoding}</project.reporting.outputEncoding>
-        <java.version>1.8</java.version>
+        <java.version>11</java.version>
         <pdfbox-version>2.0.15</pdfbox-version>
         <poi-version>3.17</poi-version>
         <postgresql.driver.version>42.2.1</postgresql.driver.version>
         <!-- PIN Jena to 2.x until both RDF and SWORDv2 can be updated to Jena 3. Requires package renaming, see
              https://jena.apache.org/documentation/migrate_jena2_jena3.html -->
         <jena.version>2.13.0</jena.version>
+        <jaxb-api.version>2.3.1</jaxb-api.version>
+        <jaxb-runtime.version>2.3.1</jaxb-runtime.version>
+        <javax-annotation.version>1.3.2</javax-annotation.version>
+        <jmockit.version>1.48</jmockit.version>
         <log4j.version>2.6.2</log4j.version>
         <slf4j.version>1.7.22</slf4j.version>
         <!-- NOTE: when updating jackson.version, also sync jackson-databind dependency below -->
@@ -91,29 +95,10 @@
                 <!-- Used to compile all Java classes -->
                 <plugin>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.5.1</version>
+                    <version>3.8.1</version>
                     <configuration>
-                      <!-- Turn on http://errorprone.info -->
-                      <compilerId>javac-with-errorprone</compilerId>
-                      <forceJavacCompilerUse>true</forceJavacCompilerUse>
-                      <source>${java.version}</source>
-                      <target>${java.version}</target>
+                        <release>${java.version}</release>
                     </configuration>
-                    <!-- Extra dependencies for http://errorprone.info -->
-                    <dependencies>
-                      <dependency>
-                        <groupId>org.codehaus.plexus</groupId>
-                        <artifactId>plexus-compiler-javac-errorprone</artifactId>
-                        <version>2.8.2</version>
-                      </dependency>
-                      <!-- Override plexus-compiler-javac-errorprone's dependency on
-                           Error Prone with the latest version -->
-                      <dependency>
-                        <groupId>com.google.errorprone</groupId>
-                        <artifactId>error_prone_core</artifactId>
-                        <version>2.1.1</version>
-                      </dependency>
-                    </dependencies>
                 </plugin>
                 <!-- Used to package all DSpace JARs -->
                 <plugin>
@@ -323,7 +308,7 @@
                 <plugin>
                     <groupId>org.jacoco</groupId>
                     <artifactId>jacoco-maven-plugin</artifactId>
-                    <version>0.7.9</version>
+                    <version>0.8.2</version>
                 </plugin>
                 <plugin>
                     <groupId>org.eluder.coveralls</groupId>
@@ -464,7 +449,7 @@
                 </property>
             </activation>
             <properties>
-                <test.argLine>-Xmx1024m</test.argLine>
+                <test.argLine>-Xmx1024m -Djdk.attach.allowAttachSelf -javaagent:${settings.localRepository}/org/jmockit/jmockit/${jmockit.version}/jmockit-${jmockit.version}.jar</test.argLine>
             </properties>
         </profile>
 
@@ -1494,7 +1479,8 @@
             <dependency> <!-- Keep jmockit before junit -->
                 <groupId>org.jmockit</groupId>
                 <artifactId>jmockit</artifactId>
-                <version>1.21</version>
+                <!-- <version>1.21</version> -->
+                <version>${jmockit.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
@@ -1633,6 +1619,22 @@
                 <groupId>xom</groupId>
                 <artifactId>xom</artifactId>
                 <version>1.2.5</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.xml.bind</groupId>
+                <artifactId>jaxb-api</artifactId>
+                <version>${jaxb-api.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.glassfish.jaxb</groupId>
+                <artifactId>jaxb-runtime</artifactId>
+                <version>${jaxb-runtime.version}</version>
+                <scope>runtime</scope>
+            </dependency>
+            <dependency>
+                <groupId>javax.annotation</groupId>
+                <artifactId>javax.annotation-api</artifactId>
+                <version>${javax-annotation.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
