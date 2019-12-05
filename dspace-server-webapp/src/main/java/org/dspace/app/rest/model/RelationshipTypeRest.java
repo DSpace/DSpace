@@ -22,8 +22,8 @@ public class RelationshipTypeRest extends BaseObjectRest<Integer> {
 
     private String leftwardType;
     private String rightwardType;
-    private boolean copyLeft;
-    private boolean copyRight;
+    private boolean copyToLeft;
+    private boolean copyToRight;
     private Integer leftMinCardinality;
     private Integer leftMaxCardinality;
     private Integer rightMinCardinality;
@@ -60,35 +60,35 @@ public class RelationshipTypeRest extends BaseObjectRest<Integer> {
     }
 
     /**
-     * Generic getter for the copyLeft
-     * @return the copyLeft value of this RelationshipTypeRest
+     * Generic getter for the copyToLeft
+     * @return the copyToLeft value of this RelationshipTypeRest
      */
-    public boolean isCopyLeft() {
-        return copyLeft;
+    public boolean isCopyToLeft() {
+        return copyToLeft;
     }
 
     /**
-     * Generic setter for the copyLeft
-     * @param copyLeft   The copyLeft to be set on this RelationshipTypeRest
+     * Generic setter for the copyToLeft
+     * @param copyToLeft   The copyToLeft to be set on this RelationshipTypeRest
      */
-    public void setCopyLeft(boolean copyLeft) {
-        this.copyLeft = copyLeft;
+    public void setCopyToLeft(boolean copyToLeft) {
+        this.copyToLeft = copyToLeft;
     }
 
     /**
-     * Generic getter for the copyRight
-     * @return the copyRight value of this RelationshipTypeRest
+     * Generic getter for the copyToRight
+     * @return the copyToRight value of this RelationshipTypeRest
      */
-    public boolean isCopyRight() {
-        return copyRight;
+    public boolean isCopyToRight() {
+        return copyToRight;
     }
 
     /**
-     * Generic setter for the copyRight
-     * @param copyRight   The copyRight to be set on this RelationshipTypeRest
+     * Generic setter for the copyToRight
+     * @param copyToRight   The copyToRight to be set on this RelationshipTypeRest
      */
-    public void setCopyRight(boolean copyRight) {
-        this.copyRight = copyRight;
+    public void setCopyToRight(boolean copyToRight) {
+        this.copyToRight = copyToRight;
     }
 
     public Integer getLeftMinCardinality() {

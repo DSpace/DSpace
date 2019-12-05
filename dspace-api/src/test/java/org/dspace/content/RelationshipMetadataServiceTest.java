@@ -126,7 +126,7 @@ public class RelationshipMetadataServiceTest extends AbstractUnitTest {
      * Common function to convert leftItem to a publication item, convert rightItem to an author item,
      * and relating them to each other stored in the relationship field
      */
-    private void initPublicationAuthorWithCopyParams(boolean copyLeft, boolean copyRight)
+    private void initPublicationAuthorWithCopyParams(boolean copyToLeft, boolean copyToRight)
         throws SQLException, AuthorizeException {
         context.turnOffAuthorisationSystem();
         itemService.addMetadata(context, leftItem, "relationship", "type", null, null, "Publication");
@@ -138,7 +138,7 @@ public class RelationshipMetadataServiceTest extends AbstractUnitTest {
         RelationshipType isAuthorOfPublication = relationshipTypeService
             .create(context, publicationEntityType, authorEntityType,
                     "isAuthorOfPublication", "isPublicationOfAuthor",
-                    null, null, null, null, copyLeft, copyRight);
+                    null, null, null, null, copyToLeft, copyToRight);
 
         relationship = relationshipService.create(context, leftItem, rightItem, isAuthorOfPublication, 0, 0);
         context.restoreAuthSystemState();
