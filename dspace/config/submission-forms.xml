@@ -616,6 +616,7 @@
                     <relationship-type>isAuthorOfPublication</relationship-type>
                     <search-configuration>openAIRECreatorConfiguration</search-configuration>
                     <repeatable>true</repeatable>
+                    <name-variants>true</name-variants>
                     <label>Author</label>
                     <hint>Add an author</hint>
                     <linked-metadata-field>
@@ -884,6 +885,7 @@
                     <relationship-type>isProjectOfPublication</relationship-type>
                     <search-configuration>project</search-configuration>
                     <repeatable>true</repeatable>
+                    <name-variants>false</name-variants>
                     <label>Funding</label>
                     <hint>Add a related Funding</hint>
                     <linked-metadata-field>
@@ -1032,6 +1034,7 @@
                     <relationship-type>isFundingAgencyOfProject</relationship-type>
                     <search-configuration>openAIREFundingAgencyConfiguration</search-configuration>
                     <repeatable>false</repeatable>
+                    <name-variants>false</name-variants>
                     <label>Funding Agency</label>
                     <hint>Add a Funding Agency</hint>
                     <linked-metadata-field>
@@ -1755,6 +1758,10 @@
             <pair>
                 <displayed-value>ISNI - International Standard Name Identifier</displayed-value>
                 <stored-value>isni</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Other</displayed-value>
+                <stored-value></stored-value>
             </pair>
         </value-pairs>
 
