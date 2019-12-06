@@ -163,16 +163,6 @@
     </xsl:template>
     
     <xsl:template match="dri:div[@id='aspect.artifactbrowser.ConfigurableBrowse.div.browse-controls']">
-    	<!-- preparamos el queryString base a partir de los hiddens -->
-    	<xsl:variable name="queryString">
-    		<xsl:for-each select="dri:p[@n='hidden-fields']/dri:field">
-    			<xsl:value-of select="@n"/>
-    			<xsl:text>=</xsl:text>
-    			<xsl:value-of select="dri:value[@type='raw']"/>
-    			<xsl:text>&amp;</xsl:text>
-    		</xsl:for-each>
-    	</xsl:variable>
-    	
     	<div>
     		<xsl:attribute name="class">
     			<xsl:text>search-controls-box </xsl:text>
@@ -180,18 +170,32 @@
     		</xsl:attribute>
 	    	<!-- generamos los links de control -->
 	    	<xsl:call-template name="browseResultControls">
-	    		<xsl:with-param name="queryString" select="$queryString"/>
 	    		<xsl:with-param name="element" select="dri:p/dri:field[@n='rpp']"/>
 	    	</xsl:call-template>
-	    	<!-- Oculto el criterio de ordenación (asc o desc) de la lista de resultados si se ha seleccionado un término del BROWSE-->
-	    	<xsl:if test="count(../dri:div[@n='browse-by-author-results' or @n='browse-by-subject-results']/dri:referenceSet/dri:reference) = 0">
-		    	<xsl:call-template name="browseResultControls">
-		    		<xsl:with-param name="queryString" select="$queryString"/>
-		    		<xsl:with-param name="element" select="dri:p/dri:field[@n='order']"/>
-		    	</xsl:call-template>
-		    </xsl:if>
+   	        <xsl:call-template name="browseResultControls">
+                <xsl:with-param name="element" select="dri:p/dri:field[@n='sort_by']"/>
+            </xsl:call-template>
+	    	<xsl:call-template name="browseResultControls">
+	    		<xsl:with-param name="element" select="dri:p/dri:field[@n='order']"/>
+	    	</xsl:call-template>
     	</div>
     	
+    </xsl:template>
+
+    <!-- Generar un queryString a partir de los hidden-fields en los browse result controls.  -->
+    <xsl:template name="getBrowseResultControlsParams">
+        <!-- utilizar este parámetro para excluir -->
+        <xsl:param name="controlToExclude" select="''"/>
+        
+        <!-- preparamos el queryString base a partir de los hiddens -->
+        <xsl:for-each select="dri:p[@n='hidden-fields']/dri:field">
+            <xsl:if test="$controlToExclude != @n">
+	            <xsl:value-of select="@n"/>
+	            <xsl:text>=</xsl:text>
+	            <xsl:value-of select="dri:value[@type='raw']"/>
+	            <xsl:text>&amp;</xsl:text>
+            </xsl:if>
+        </xsl:for-each>
     </xsl:template>
 
 	<!-- Template para mostrar filtros de ordenamiento en Discovery -->
@@ -243,10 +247,14 @@
 	
 	<!-- Template para mostrar filtros de ordenamiento en Browse -->
 	<xsl:template name="browseResultControls">
-		<xsl:param name="queryString"/>
 		<xsl:param name="element"/>
 		
 		<xsl:variable name="controlName" select="$element/@n"/>
+		<xsl:variable name="queryString">
+            <xsl:call-template name="getBrowseResultControlsParams">
+                <xsl:with-param name="controlToExclude" select="$controlName"/>
+            </xsl:call-template>
+		</xsl:variable>
 		
 		<!-- incluimos los valores de los otros controles -->
     	<xsl:variable name="otherSearchControls">
