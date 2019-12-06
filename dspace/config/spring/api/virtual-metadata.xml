@@ -44,6 +44,19 @@
           This value-ref should be a bean of type VirtualMetadataConfiguration -->
     <util:map id="isAuthorOfPublicationMap">
         <entry key="dc.contributor.author" value-ref="publicationAuthor_author"/>
+        <entry key="person.givenName" value-ref="publicationAuthor_givenName"/>
+        <entry key="person.familyName" value-ref="publicationAuthor_familyName"/>
+        <entry key="person.affiliation.name" value-ref="publicationAuthor_affiliation"/>
+        <entry key="person.identifier" value-ref="publicationAuthor_author"/>
+        <entry key="person.identifier.scopus-author-id" value-ref="publicationAuthor_author"/>
+        <entry key="person.identifier.ciencia-id" value-ref="publicationAuthor_author"/>
+        <entry key="person.identifier.gsid" value-ref="publicationAuthor_author"/>
+        <entry key="person.identifier.gsid" value-ref="publicationAuthor_author"/>
+        <entry key="person.identifier.orcid" value-ref="publicationAuthor_author"/>
+        <entry key="person.identifier.rid" value-ref="publicationAuthor_author"/>
+        <entry key="person.identifier.isni" value-ref="publicationAuthor_author"/>
+        <entry key="organization.name" value-ref="publicationAuthor_author"/>
+        <entry key="organization.identifier" value-ref="publicationAuthor_author"/>
     </util:map>
     <!--
          If the related item has:
@@ -64,6 +77,27 @@
         </property>
         <property name="useForPlace" value="true"/>
         <property name="populateWithNameVariant" value="true"/>
+    </bean>
+    <bean class="org.dspace.content.virtual.Collected" id="publicationAuthor_givenName">
+        <property name="fields">
+            <util:list>
+                <value>person.givenName</value>
+            </util:list>
+        </property>
+    </bean>
+    <bean class="org.dspace.content.virtual.Collected" id="publicationAuthor_familyName">
+        <property name="fields">
+            <util:list>
+                <value>person.familyName</value>
+            </util:list>
+        </property>
+    </bean>
+    <bean class="org.dspace.content.virtual.Collected" id="publicationAuthor_affiliation">
+        <property name="fields">
+            <util:list>
+                <value>person.affiliation.name</value>
+            </util:list>
+        </property>
     </bean>
 
     <!-- Config like this will tell our VirtualMetadataPopulator to include the virtual metadata field
