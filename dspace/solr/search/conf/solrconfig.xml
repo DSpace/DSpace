@@ -845,7 +845,7 @@
        <int name="rows">10</int>
        <str name="df">search_text</str>
        <str name="q.alt">*:*</str>
-       <str name="q.op">OR</str>
+       <str name="q.op">AND</str>
        <str name="defType">edismax</str>
        <float name="tie">0.01</float>
 		<str name="qf">
@@ -899,7 +899,7 @@
 		   *,score
 		</str>
 		<str name="mm">
-		   1&lt;75%
+        3&lt;-25% 5&lt;-40% 8&lt;4
 		</str>
 		<int name="ps">100</int>
      </lst>
