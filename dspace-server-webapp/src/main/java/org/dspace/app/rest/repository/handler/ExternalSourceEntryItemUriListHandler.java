@@ -23,21 +23,16 @@ import org.dspace.app.rest.model.ExternalSourceRest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Collection;
-import org.dspace.content.Item;
+import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.CollectionService;
 import org.dspace.core.Context;
 import org.dspace.external.model.ExternalDataObject;
 import org.dspace.external.service.ExternalDataService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
-import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-/**
- * This class will handle ExternalSourceEntryUriList and it'll create Item objects based on them
- */
-@Component
-public class ExternalSourceEntryUriListHandler implements UriListHandler<Item> {
+public abstract class ExternalSourceEntryItemUriListHandler<T> implements UriListHandler<T> {
 
     private List<RequestMethod> allowedRequestMethods = new LinkedList<>(Arrays.asList(RequestMethod.POST));
 
@@ -51,11 +46,9 @@ public class ExternalSourceEntryUriListHandler implements UriListHandler<Item> {
     private CollectionService collectionService;
 
     private static final Logger log = org.apache.logging.log4j.LogManager
-        .getLogger(ExternalSourceEntryUriListHandler.class);
+        .getLogger(ExternalSourceEntryItemUriListHandler.class);
 
-
-    @Override
-    public boolean supports(List<String> uriList, String method) {
+    public boolean supports(List<String> uriList, String method, Class clazz) {
         if (!allowedRequestMethods.contains(RequestMethod.valueOf(method))) {
             return false;
         }
@@ -68,13 +61,9 @@ public class ExternalSourceEntryUriListHandler implements UriListHandler<Item> {
         return true;
     }
 
-    @Override
-    public boolean validate(Context context, HttpServletRequest request, List<String> uriList,
-                            Class clazz) throws AuthorizeException {
+    public boolean validate(Context context, HttpServletRequest request, List<String> uriList)
+        throws AuthorizeException {
         if (uriList.size() > 1) {
-            return false;
-        }
-        if (clazz != Item.class) {
             return false;
         }
         String owningCollectionString = request.getParameter("owningCollection");
@@ -82,9 +71,6 @@ public class ExternalSourceEntryUriListHandler implements UriListHandler<Item> {
             return false;
         }
         try {
-            if (!authorizeService.isAdmin(context)) {
-                throw new AuthorizeException("Only admins are allowed to create items using external data");
-            }
             Collection collection = collectionService.find(context, UUID.fromString(owningCollectionString));
             if (collection == null) {
                 return false;
@@ -97,23 +83,19 @@ public class ExternalSourceEntryUriListHandler implements UriListHandler<Item> {
         return true;
     }
 
-    @Override
-    public Item handle(Context context, HttpServletRequest request, List<String> uriList)
+    public WorkspaceItem createWorkspaceItem(Context context, HttpServletRequest request, List<String> uriList)
         throws SQLException, AuthorizeException {
         ExternalDataObject dataObject = getExternalDataObjectFromUriList(uriList);
 
         String owningCollectionUuid = request.getParameter("owningCollection");
-        Collection collection = null;
-        Item item = null;
         try {
-            collection = collectionService.find(context, UUID.fromString(owningCollectionUuid));
-            item = externalDataService.createItemFromExternalDataObject(context, dataObject, collection);
+            Collection collection = collectionService.find(context, UUID.fromString(owningCollectionUuid));
+            return externalDataService.createWorkspaceItemFromExternalDataObject(context, dataObject, collection);
         } catch (AuthorizeException | SQLException e) {
             log.error("An error occured when trying to create item in collection with uuid: " + owningCollectionUuid,
                       e);
             throw e;
         }
-        return item;
     }
 
     /**
@@ -137,6 +119,5 @@ public class ExternalSourceEntryUriListHandler implements UriListHandler<Item> {
         return externalDataObject.orElseThrow(() -> new ResourceNotFoundException(
             "Couldn't find an ExternalSource for source: " + externalSourceIdentifer + " and ID: " + id));
     }
-
 
 }

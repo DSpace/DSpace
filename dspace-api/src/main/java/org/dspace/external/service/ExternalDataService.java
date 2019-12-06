@@ -13,7 +13,7 @@ import java.util.Optional;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
-import org.dspace.content.Item;
+import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Context;
 import org.dspace.external.model.ExternalDataObject;
 import org.dspace.external.provider.ExternalDataProvider;
@@ -75,6 +75,7 @@ public interface ExternalDataService {
      * @throws AuthorizeException   If something goes wrong
      * @throws SQLException         If something goes wrong
      */
-    Item createItemFromExternalDataObject(Context context, ExternalDataObject externalDataObject, Collection collection)
+    WorkspaceItem createWorkspaceItemFromExternalDataObject(Context context, ExternalDataObject externalDataObject,
+                                                            Collection collection)
         throws AuthorizeException, SQLException;
 }
