@@ -1906,5 +1906,187 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                     .andExpect(status().isForbidden());
     }
 
+    @Test
+    public void createItemFromExternalSources() throws Exception {
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
 
+        context.restoreAuthSystemState();
+
+        ObjectMapper mapper = new ObjectMapper();
+        String token = getAuthToken(admin.getEmail(), password);
+        MvcResult mvcResult = getClient(token).perform(post("/api/core/items?owningCollection="
+                                                                + col1.getID().toString())
+                                     .contentType(org.springframework.http.MediaType.parseMediaType(
+                                         org.springframework.data.rest.webmvc.RestMediaTypes.TEXT_URI_LIST_VALUE))
+                                     .content("https://localhost:8080/server/api/integration/externalsources/" +
+                                                  "mock/entryValues/one")).andExpect(status().isCreated()).andReturn();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        Map<String,Object> map = mapper.readValue(content, Map.class);
+        String itemUuidString = String.valueOf(map.get("uuid"));
+        String itemHandleString = String.valueOf(map.get("handle"));
+
+        getClient(token).perform(get("/api/core/items/" + itemUuidString))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$", Matchers.allOf(
+                            hasJsonPath("$.id", is(itemUuidString)),
+                            hasJsonPath("$.uuid", is(itemUuidString)),
+                            hasJsonPath("$.handle", is(itemHandleString)),
+                            hasJsonPath("$.type", is("item")),
+                            hasJsonPath("$.metadata", Matchers.allOf(
+                                MetadataMatcher.matchMetadata("dc.contributor.author", "Donald, Smith")
+                            )))));
+    }
+
+    @Test
+    public void createItemFromExternalSourcesNoOwningCollectionUuidBadRequest() throws Exception {
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(post("/api/core/items")
+                                   .contentType(org.springframework.http.MediaType.parseMediaType(
+                                       org.springframework.data.rest.webmvc.RestMediaTypes.TEXT_URI_LIST_VALUE))
+                                   .content("https://localhost:8080/server/api/integration/externalsources/" +
+                                        "mock/entryValues/one")).andExpect(status().isBadRequest()).andReturn();
+    }
+
+    @Test
+    public void createItemFromExternalSourcesRandomOwningCollectionUuidBadRequest() throws Exception {
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(post("/api/core/items?owningCollection=" + UUID.randomUUID())
+                                     .contentType(org.springframework.http.MediaType.parseMediaType(
+                                         org.springframework.data.rest.webmvc.RestMediaTypes.TEXT_URI_LIST_VALUE))
+                                     .content("https://localhost:8080/server/api/integration/externalsources/" +
+                                          "mock/entryValues/one")).andExpect(status().isBadRequest()).andReturn();
+    }
+
+    @Test
+    public void createItemFromExternalSourcesWrongUriList() throws Exception {
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        context.restoreAuthSystemState();
+
+        ObjectMapper mapper = new ObjectMapper();
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(post("/api/core/items?owningCollection=" + col1.getID().toString())
+                                    .contentType(org.springframework.http.MediaType.parseMediaType(
+                                        org.springframework.data.rest.webmvc.RestMediaTypes.TEXT_URI_LIST_VALUE))
+                                    .content("https://localhost:8080/server/mock/mock/mock/" +
+                                        "mock/entryValues/one")).andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void createItemFromExternalSourcesWrongSourceBadRequest() throws Exception {
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(post("/api/core/items?owningCollection=" + col1.getID().toString())
+                                    .contentType(org.springframework.http.MediaType.parseMediaType(
+                                        org.springframework.data.rest.webmvc.RestMediaTypes.TEXT_URI_LIST_VALUE))
+                                    .content("https://localhost:8080/server/api/integration/externalsources/" +
+                                        "mockWrongSource/entryValues/one")).andExpect(status().isBadRequest());
+
+    }
+
+    @Test
+    public void createItemFromExternalSourcesWrongIdResourceNotFound() throws Exception {
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(post("/api/core/items?owningCollection=" + col1.getID().toString())
+                                     .contentType(org.springframework.http.MediaType.parseMediaType(
+                                         org.springframework.data.rest.webmvc.RestMediaTypes.TEXT_URI_LIST_VALUE))
+                                     .content("https://localhost:8080/server/api/integration/externalsources/" +
+                                                  "mock/entryValues/azeazezaezeaz")).andExpect(status().is(404));
+
+    }
+
+    @Test
+    public void createItemFromExternalSourcesForbidden() throws Exception {
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(eperson.getEmail(), password);
+        getClient(token).perform(post("/api/core/items?owningCollection=" + col1.getID().toString())
+                                    .contentType(org.springframework.http.MediaType.parseMediaType(
+                                        org.springframework.data.rest.webmvc.RestMediaTypes.TEXT_URI_LIST_VALUE))
+                                    .content("https://localhost:8080/server/api/integration/externalsources/" +
+                                        "mock/entryValues/one")).andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void createItemFromExternalSourcesUnauthorized() throws Exception {
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        context.restoreAuthSystemState();
+
+        getClient().perform(post("/api/core/items?owningCollection=" + col1.getID().toString())
+                                     .contentType(org.springframework.http.MediaType.parseMediaType(
+                                         org.springframework.data.rest.webmvc.RestMediaTypes.TEXT_URI_LIST_VALUE))
+                                     .content("https://localhost:8080/server/api/integration/externalsources/" +
+                                                  "mock/entryValues/one")).andExpect(status().isUnauthorized());
+    }
 }
