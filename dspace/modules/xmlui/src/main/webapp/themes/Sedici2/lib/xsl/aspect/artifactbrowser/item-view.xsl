@@ -694,7 +694,18 @@
 				<b><i18n:text>sedici.items.handle.utilizacion_URI</i18n:text></b>
 				<xsl:for-each select="dim:field[(@mdschema='dc' and @element='identifier' and @qualifier='uri') or (@mdschema='sedici' and @element='identifier' and @qualifier='other' and java:ar.edu.unlp.sedici.dspace.utils.Utils.isDoi(text()))]">
 					<li>
-						<a target="_blank"><xsl:attribute name="href"><xsl:value-of select="." /></xsl:attribute><xsl:value-of select="." /></a>
+						<a target="_blank">
+							<xsl:choose>
+								<xsl:when test="@mdschema='sedici' and @element='identifier' and @qualifier='other' and java:ar.edu.unlp.sedici.dspace.utils.Utils.isDoi(text())">
+									<!-- Si es doi, hay que mostrarlo como https://doi.org/10.XXXX/XXXX -->
+									<xsl:variable select="concat('https://doi.org/', substring(text(), string-length(substring-before(text(), '10.')) + 1))" name="doi"/>
+									<xsl:attribute name="href"><xsl:value-of select="$doi" /></xsl:attribute><xsl:value-of select="$doi" />
+								</xsl:when>
+								<xsl:otherwise>
+									<xsl:attribute name="href"><xsl:value-of select="." /></xsl:attribute><xsl:value-of select="." />
+								</xsl:otherwise>
+							</xsl:choose>
+						</a>
 					</li>
 				</xsl:for-each>
 			</div>
