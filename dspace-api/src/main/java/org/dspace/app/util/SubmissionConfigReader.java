@@ -147,6 +147,8 @@ public class SubmissionConfigReader {
             factory.setValidating(false);
             factory.setIgnoringComments(true);
             factory.setIgnoringElementContentWhitespace(true);
+            factory.setNamespaceAware(true);
+            factory.setXIncludeAware(true);
 
             DocumentBuilder db = factory.newDocumentBuilder();
             Document doc = db.parse(uri);
