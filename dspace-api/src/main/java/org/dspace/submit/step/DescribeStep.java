@@ -172,6 +172,12 @@ public class DescribeStep extends AbstractProcessingStep
             {
                 continue;
             }
+
+            // Omit fields not visible based on user's group
+            if (!inputs[i].isVisibleOnGroup(context)) {
+                continue;
+            }
+
 	        if (inputs[i].getInputType().equals("qualdrop_value"))
 	        {
 		        @SuppressWarnings("unchecked") // This cast is correct
