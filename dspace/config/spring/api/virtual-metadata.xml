@@ -59,6 +59,7 @@
             <value>, </value>
         </property>
         <property name="useForPlace" value="true"/>
+        <property name="populateWithNameVariant" value="true"/>
     </bean>
 
     <!-- Config like this will tell our VirtualMetadataPopulator to include the virtual metadata field
@@ -76,7 +77,7 @@
     </bean>
 
     <util:map id="isPersonOfProjectMap">
-        <entry key="project.contributor.author" value-ref="projectPerson_author"/>
+        <entry key="dc.contributor.author" value-ref="projectPerson_author"/>
     </util:map>
     <!--
      If the related item has:
@@ -97,7 +98,7 @@
     </bean>
 
     <util:map id="isOrgUnitOfProjectMap">
-        <entry key="project.contributor.other" value-ref="projectOrgUnit_other"/>
+        <entry key="dc.contributor.other" value-ref="projectOrgUnit_other"/>
     </util:map>
     <!-- This Collected bean wil create a list of project.contributor.other virtual metadata fields that hold
          the value of organization.legalName, each of them in a separate metadatavalue

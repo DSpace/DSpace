@@ -10,6 +10,7 @@ package org.dspace.app.rest.model;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.dspace.app.rest.RestResourceController;
 
 /**
@@ -30,7 +31,11 @@ public class RelationshipRest extends BaseObjectRest<Integer> {
     private RelationshipTypeRest relationshipType;
     private int leftPlace;
     private int rightPlace;
+    private String leftwardValue;
+    private String rightwardValue;
 
+    @Override
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     public String getType() {
         return NAME;
     }
@@ -91,5 +96,21 @@ public class RelationshipRest extends BaseObjectRest<Integer> {
 
     public void setRelationshipTypeId(int relationshipTypeId) {
         this.relationshipTypeId = relationshipTypeId;
+    }
+
+    public String getRightwardValue() {
+        return rightwardValue;
+    }
+
+    public void setRightwardValue(String rightwardValue) {
+        this.rightwardValue = rightwardValue;
+    }
+
+    public String getLeftwardValue() {
+        return leftwardValue;
+    }
+
+    public void setLeftwardValue(String leftwardValue) {
+        this.leftwardValue = leftwardValue;
     }
 }

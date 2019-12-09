@@ -10,16 +10,13 @@ package org.dspace.app.rest.repository;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Iterator;
-import java.util.function.Consumer;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.converter.BrowseEntryConverter;
-import org.dspace.app.rest.converter.BrowseIndexConverter;
 import org.dspace.app.rest.model.BrowseEntryRest;
 import org.dspace.app.rest.model.BrowseIndexRest;
-import org.dspace.app.rest.model.hateoas.BrowseEntryResource;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.utils.ScopeResolver;
 import org.dspace.browse.BrowseEngine;
 import org.dspace.browse.BrowseException;
@@ -45,19 +42,17 @@ import org.springframework.stereotype.Component;
  */
 @Component(BrowseIndexRest.CATEGORY + "." + BrowseIndexRest.NAME + "." + BrowseIndexRest.ENTRIES)
 public class BrowseEntryLinkRepository extends AbstractDSpaceRestRepository
-    implements LinkRestRepository<BrowseEntryRest> {
-    @Autowired
-    BrowseEntryConverter converter;
+    implements LinkRestRepository {
 
     @Autowired
-    BrowseIndexConverter bixConverter;
+    BrowseEntryConverter browseEntryConverter;
 
     @Autowired
     ScopeResolver scopeResolver;
 
     // FIXME It will be nice to drive arguments binding by annotation as in normal spring controller methods
     public Page<BrowseEntryRest> listBrowseEntries(HttpServletRequest request, String browseName,
-                                                   Pageable pageable, String projection)
+                                                   Pageable pageable, Projection projection)
         throws BrowseException, SQLException {
         // FIXME this should be bind automatically and available as method
         // argument
@@ -122,20 +117,11 @@ public class BrowseEntryLinkRepository extends AbstractDSpaceRestRepository
         BrowseInfo binfo = be.browse(bs);
         Pageable pageResultInfo = new PageRequest((binfo.getStart() - 1) / binfo.getResultsPerPage(),
                                                   binfo.getResultsPerPage());
-        Page<BrowseEntryRest> page = new PageImpl<String[]>(Arrays.asList(binfo.getStringResults()), pageResultInfo,
-                                                            binfo.getTotal()).map(converter);
-        page.forEach(new Consumer<BrowseEntryRest>() {
-            @Override
-            public void accept(BrowseEntryRest t) {
-                t.setBrowseIndex(bixConverter.convert(bi));
-            }
-        });
+        Page<BrowseEntryRest> page = new PageImpl<>(Arrays.asList(binfo.getStringResults()), pageResultInfo,
+                                                            binfo.getTotal()).map(browseEntryConverter);
+        BrowseIndexRest biRest = converter.toRest(bi, projection);
+        page.forEach(t -> t.setBrowseIndex(biRest));
         return page;
-    }
-
-    @Override
-    public BrowseEntryResource wrapResource(BrowseEntryRest entry, String... rels) {
-        return new BrowseEntryResource(entry);
     }
 
     @Override

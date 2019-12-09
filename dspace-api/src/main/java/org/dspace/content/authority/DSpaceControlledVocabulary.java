@@ -241,7 +241,7 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Choic
         } catch (XPathExpressionException e) {
             log.warn(e.getMessage(), e);
         }
-        return new Choice("", "", "");
+        return null;
     }
 
     private void readNode(String[] authorities, String[] values, String[] labels, String[] parent, String[] notes,

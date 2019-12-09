@@ -12,21 +12,19 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
-import org.dspace.app.rest.converter.WorkflowItemConverter;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.RESTAuthorizationException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.ErrorRest;
 import org.dspace.app.rest.model.WorkflowItemRest;
-import org.dspace.app.rest.model.hateoas.WorkflowItemResource;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.Patch;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.submit.AbstractRestProcessingStep;
 import org.dspace.app.rest.submit.SubmissionService;
 import org.dspace.app.rest.submit.UploadableStep;
@@ -48,7 +46,6 @@ import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -70,27 +67,29 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
 
     @Autowired
     XmlWorkflowItemService wis;
+
     @Autowired
     ItemService itemService;
+
     @Autowired
     BitstreamService bitstreamService;
+
     @Autowired
     BitstreamFormatService bitstreamFormatService;
+
     @Autowired
     ConfigurationService configurationService;
 
     @Autowired
-    WorkflowItemConverter converter;
-
-    @Autowired
     SubmissionService submissionService;
+
     @Autowired
     EPersonServiceImpl epersonService;
 
     @Autowired
     WorkflowService<XmlWorkflowItem> wfs;
 
-    private SubmissionConfigReader submissionConfigReader;
+    private final SubmissionConfigReader submissionConfigReader;
 
     public WorkflowItemRestRepository() throws SubmissionConfigReaderException {
         submissionConfigReader = new SubmissionConfigReader();
@@ -108,39 +107,34 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
         if (witem == null) {
             return null;
         }
-        return converter.fromModel(witem);
+        return converter.toRest(witem, utils.obtainProjection());
     }
 
     @Override
     @PreAuthorize("hasAuthority('ADMIN')")
     public Page<WorkflowItemRest> findAll(Context context, Pageable pageable) {
-        List<XmlWorkflowItem> witems = null;
-        int total = 0;
         try {
-            total = wis.countAll(context);
-            witems = wis.findAll(context, pageable.getPageNumber(), pageable.getPageSize());
+            long total = wis.countAll(context);
+            List<XmlWorkflowItem> witems = wis.findAll(context, pageable.getPageNumber(), pageable.getPageSize());
+            return converter.toRestPage(witems, pageable, total, utils.obtainProjection(true));
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<WorkflowItemRest> page = new PageImpl<XmlWorkflowItem>(witems, pageable, total).map(converter);
-        return page;
     }
 
     @SearchRestMethod(name = "findBySubmitter")
     @PreAuthorize("hasAuthority('ADMIN')")
     public Page<WorkflowItemRest> findBySubmitter(@Parameter(value = "uuid") UUID submitterID, Pageable pageable) {
-        List<XmlWorkflowItem> witems = null;
-        int total = 0;
         try {
             Context context = obtainContext();
             EPerson ep = epersonService.find(context, submitterID);
-            witems = wis.findBySubmitter(context, ep, pageable.getPageNumber(), pageable.getPageSize());
-            total = wis.countBySubmitter(context, ep);
+            long total = wis.countBySubmitter(context, ep);
+            List<XmlWorkflowItem> witems = wis.findBySubmitter(context, ep, pageable.getPageNumber(),
+                    pageable.getPageSize());
+            return converter.toRestPage(witems, pageable, total, utils.obtainProjection(true));
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<WorkflowItemRest> page = new PageImpl<XmlWorkflowItem>(witems, pageable, total).map(converter);
-        return page;
     }
 
     @Override
@@ -163,17 +157,12 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
         if (source.getItem().isArchived()) {
             return null;
         }
-        return converter.convert(source);
+        return converter.toRest(source, Projection.DEFAULT);
     }
 
     @Override
     public Class<WorkflowItemRest> getDomainClass() {
         return WorkflowItemRest.class;
-    }
-
-    @Override
-    public WorkflowItemResource wrapResource(WorkflowItemRest witem, String... rels) {
-        return new WorkflowItemResource(witem, utils, rels);
     }
 
     @Override
@@ -215,7 +204,7 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
             }
 
         }
-        wsi = converter.convert(source);
+        wsi = converter.toRest(source, Projection.DEFAULT);
 
         if (!errors.isEmpty()) {
             wsi.getErrors().addAll(errors);

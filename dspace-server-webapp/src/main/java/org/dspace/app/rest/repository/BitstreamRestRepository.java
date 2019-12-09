@@ -16,15 +16,22 @@ import java.util.List;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
-import org.dspace.app.rest.converter.BitstreamConverter;
-import org.dspace.app.rest.exception.UnprocessableEntityException;
+import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.model.BitstreamRest;
-import org.dspace.app.rest.model.hateoas.BitstreamResource;
+import org.dspace.app.rest.model.BundleRest;
 import org.dspace.app.rest.model.patch.Patch;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.repository.patch.DSpaceObjectPatch;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Bitstream;
+import org.dspace.content.Bundle;
+import org.dspace.content.Collection;
+import org.dspace.content.Community;
 import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.BundleService;
+import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.CommunityService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -47,9 +54,20 @@ public class BitstreamRestRepository extends DSpaceObjectRestRepository<Bitstrea
     private final BitstreamService bs;
 
     @Autowired
-    public BitstreamRestRepository(BitstreamService dsoService,
-                                   BitstreamConverter dsoConverter) {
-        super(dsoService, dsoConverter, new DSpaceObjectPatch<BitstreamRest>() { });
+    BundleService bundleService;
+
+    @Autowired
+    AuthorizeService authorizeService;
+
+    @Autowired
+    private CollectionService collectionService;
+
+    @Autowired
+    private CommunityService communityService;
+
+    @Autowired
+    public BitstreamRestRepository(BitstreamService dsoService) {
+        super(dsoService, new DSpaceObjectPatch<BitstreamRest>() { });
         this.bs = dsoService;
     }
 
@@ -72,7 +90,7 @@ public class BitstreamRestRepository extends DSpaceObjectRestRepository<Bitstrea
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        return dsoConverter.fromModel(bit);
+        return converter.toRest(bit, utils.obtainProjection());
     }
 
     @Override
@@ -90,7 +108,9 @@ public class BitstreamRestRepository extends DSpaceObjectRestRepository<Bitstrea
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<BitstreamRest> page = new PageImpl<Bitstream>(bit, pageable, total).map(dsoConverter);
+        Projection projection = utils.obtainProjection(true);
+        Page<BitstreamRest> page = new PageImpl<>(bit, pageable, total)
+                .map((bitstream) -> converter.toRest(bitstream, projection));
         return page;
     }
 
@@ -107,19 +127,25 @@ public class BitstreamRestRepository extends DSpaceObjectRestRepository<Bitstrea
     }
 
     @Override
-    public BitstreamResource wrapResource(BitstreamRest bs, String... rels) {
-        return new BitstreamResource(bs, utils, rels);
-    }
-
-    @Override
     protected void delete(Context context, UUID id) throws AuthorizeException {
         Bitstream bit = null;
         try {
             bit = bs.find(context, id);
-            if (bit.getCommunity() != null | bit.getCollection() != null) {
-                throw new UnprocessableEntityException("The bitstream cannot be deleted it is a logo");
+            if (bit == null) {
+                throw new ResourceNotFoundException("The bitstream with uuid " + id + " could not be found");
             }
-        } catch (SQLException e) {
+            if (bit.isDeleted()) {
+                throw new ResourceNotFoundException("The bitstream with uuid " + id + " was already deleted");
+            }
+            Community community = bit.getCommunity();
+            if (community != null) {
+                communityService.setLogo(context, community, null);
+            }
+            Collection collection = bit.getCollection();
+            if (collection != null) {
+                collectionService.setLogo(context, collection, null);
+            }
+        } catch (SQLException | IOException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
         try {
@@ -148,5 +174,25 @@ public class BitstreamRestRepository extends DSpaceObjectRestRepository<Bitstrea
         }
         context.abort();
         return is;
+    }
+
+    /**
+     * Method that will move the bitsream corresponding to the uuid to the target bundle
+     *
+     * @param context      The context
+     * @param bitstream    The bitstream to be moved
+     * @param targetBundle The target bundle
+     * @return The target bundle with the bitstream attached
+     */
+    public BundleRest performBitstreamMove(Context context, Bitstream bitstream, Bundle targetBundle)
+            throws SQLException, IOException, AuthorizeException {
+
+        if (bitstream.getBundles().contains(targetBundle)) {
+            throw new DSpaceBadRequestException("The provided bitstream is already in the target bundle");
+        }
+
+        bundleService.moveBitstreamToBundle(context, targetBundle, bitstream);
+
+        return converter.toRest(targetBundle, utils.obtainProjection());
     }
 }

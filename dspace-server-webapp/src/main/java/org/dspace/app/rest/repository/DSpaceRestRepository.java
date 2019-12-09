@@ -13,6 +13,7 @@ import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -23,7 +24,6 @@ import org.dspace.app.rest.exception.RESTAuthorizationException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.RestAddressableModel;
-import org.dspace.app.rest.model.hateoas.DSpaceResource;
 import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.authorize.AuthorizeException;
@@ -38,9 +38,8 @@ import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
- * This is the base class for any Rest Repository. It add a DSpaceContext to the
- * normal Spring Data Repository methods signature and assure that the
- * repository is able to wrap a DSpace Rest Object in a HAL Resource
+ * Base class for any Rest Repository. Adds a DSpaceContext to the
+ * normal Spring Data Repository methods signature.
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
@@ -239,7 +238,7 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
     }
 
     /**
-     * Method to implement to support scroll of entity instances from the collection resource endpoin
+     * Method to implement to support scroll of entity instances from the collection resource endpoint
      *
      * @param context
      *            the dspace context
@@ -255,15 +254,44 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
     public abstract Class<T> getDomainClass();
 
     /**
-     * Wrap the REST model in a REST HAL Resource
+     * Create and return a new instance. Data are usually retrieved from the thread bound http request
      *
-     * @param model
-     *            the rest model instance
-     * @param rels
-     *            the HAL links
-     * @return the REST Resource
+     * @return the created REST object
      */
-    public abstract DSpaceResource<T> wrapResource(T model, String... rels);
+    public T createAndReturn() {
+        Context context = null;
+        try {
+            context = obtainContext();
+            T entity = thisRepository.createAndReturn(context);
+            context.commit();
+            return entity;
+        } catch (AuthorizeException e) {
+            throw new RESTAuthorizationException(e);
+        } catch (SQLException ex) {
+            throw new RuntimeException(ex.getMessage(), ex);
+        }
+    }
+
+    /**
+     * Create and return a new instance after adding to the parent. Data are usually retrieved from
+     * the thread bound http request.
+     *
+     * @param uuid the id of the parent object
+     * @return the created REST object
+     */
+    public T createAndReturn(UUID uuid) {
+        Context context = null;
+        try {
+            context = obtainContext();
+            T entity = thisRepository.createAndReturn(context, uuid);
+            context.commit();
+            return entity;
+        } catch (AuthorizeException e) {
+            throw new RESTAuthorizationException(e);
+        } catch (SQLException ex) {
+            throw new RuntimeException(ex.getMessage(), ex);
+        }
+    }
 
     /**
      * Create and return a new instance. Data is recovered from the thread bound HTTP request and the list
@@ -287,22 +315,22 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
     }
 
     /**
-     * Create and return a new instance. Data are usually retrieved from the thread bound http request
+     * Method to implement to support the creation of a new instance. Usually require to retrieve the http request from
+     * the thread bound attribute
      *
+     * @param context
+     *            the dspace context
+     * @param uuid
+     *            The uuid of the parent object retrieved from the query param.
      * @return the created REST object
+     * @throws AuthorizeException
+     * @throws SQLException
+     * @throws RepositoryMethodNotImplementedException
+     *             returned by the default implementation when the operation is not supported for the entity
      */
-    public T createAndReturn() {
-        Context context = null;
-        try {
-            context = obtainContext();
-            T entity = thisRepository.createAndReturn(context);
-            context.commit();
-            return entity;
-        } catch (AuthorizeException e) {
-            throw new RESTAuthorizationException(e);
-        } catch (SQLException ex) {
-            throw new RuntimeException(ex.getMessage(), ex);
-        }
+    protected T createAndReturn(Context context, UUID uuid)
+        throws AuthorizeException, SQLException, RepositoryMethodNotImplementedException {
+        throw new RepositoryMethodNotImplementedException("No implementation found; Method not allowed!", "");
     }
 
     /**

@@ -10,6 +10,7 @@ package org.dspace.content.factory;
 import java.util.List;
 
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.RelationshipMetadataService;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.BundleService;
@@ -77,6 +78,8 @@ public class ContentServiceFactoryImpl extends ContentServiceFactory {
     private RelationshipService relationshipService;
     @Autowired(required = true)
     private RelationshipTypeService relationshipTypeService;
+    @Autowired(required = true)
+    private RelationshipMetadataService relationshipMetadataService;
     @Autowired(required = true)
     private EntityTypeService entityTypeService;
     @Autowired(required = true)
@@ -182,4 +185,8 @@ public class ContentServiceFactoryImpl extends ContentServiceFactory {
         return entityService;
     }
 
+    @Override
+    public RelationshipMetadataService getRelationshipMetadataService() {
+        return relationshipMetadataService;
+    }
 }

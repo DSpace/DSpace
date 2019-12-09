@@ -25,6 +25,7 @@ import org.dspace.app.rest.builder.ItemBuilder;
 import org.dspace.app.rest.builder.MetadataFieldBuilder;
 import org.dspace.app.rest.builder.MetadataSchemaBuilder;
 import org.dspace.app.rest.builder.PoolTaskBuilder;
+import org.dspace.app.rest.builder.ProcessBuilder;
 import org.dspace.app.rest.builder.RelationshipBuilder;
 import org.dspace.app.rest.builder.RelationshipTypeBuilder;
 import org.dspace.app.rest.builder.SiteBuilder;
@@ -61,6 +62,7 @@ public class AbstractBuilderCleanupUtil {
         map.put(MetadataFieldBuilder.class.getName(), new LinkedList<>());
         map.put(MetadataSchemaBuilder.class.getName(), new LinkedList<>());
         map.put(SiteBuilder.class.getName(), new LinkedList<>());
+        map.put(ProcessBuilder.class.getName(), new LinkedList<>());
 
     }
 

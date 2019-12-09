@@ -20,8 +20,8 @@ public class RelationshipTypeRest extends BaseObjectRest<Integer> {
     public static final String NAME = "relationshiptype";
     public static final String CATEGORY = "core";
 
-    private String leftLabel;
-    private String rightLabel;
+    private String leftwardType;
+    private String rightwardType;
     private Integer leftMinCardinality;
     private Integer leftMaxCardinality;
     private Integer rightMinCardinality;
@@ -41,20 +41,20 @@ public class RelationshipTypeRest extends BaseObjectRest<Integer> {
         return RestResourceController.class;
     }
 
-    public String getLeftLabel() {
-        return leftLabel;
+    public String getLeftwardType() {
+        return leftwardType;
     }
 
-    public void setLeftLabel(String leftLabel) {
-        this.leftLabel = leftLabel;
+    public void setLeftwardType(String leftwardType) {
+        this.leftwardType = leftwardType;
     }
 
-    public String getRightLabel() {
-        return rightLabel;
+    public String getRightwardType() {
+        return rightwardType;
     }
 
-    public void setRightLabel(String rightLabel) {
-        this.rightLabel = rightLabel;
+    public void setRightwardType(String rightwardType) {
+        this.rightwardType = rightwardType;
     }
 
     public Integer getLeftMinCardinality() {

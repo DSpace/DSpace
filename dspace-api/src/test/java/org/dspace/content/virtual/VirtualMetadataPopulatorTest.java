@@ -62,15 +62,15 @@ public class VirtualMetadataPopulatorTest {
         HashMap<String, VirtualMetadataConfiguration> mapExt = new HashMap<>();
         VirtualMetadataConfiguration virtualMetadataConfiguration = mock(VirtualMetadataConfiguration.class);
         mapExt.put("hashKey", virtualMetadataConfiguration);
-        map.put("LeftLabel", mapExt);
-        map.put("NotRightLabel", mapExt);
+        map.put("LeftwardType", mapExt);
+        map.put("NotRightwardType", mapExt);
         virtualMetadataPopulator.setMap(map);
 
         // Mock the state of objects utilized in isUseForPlaceTrueForRelationshipType()
         // to meet the success criteria of an invocation
         when(virtualMetadataConfiguration.getUseForPlace()).thenReturn(true);
-        when(relationshipType.getLeftLabel()).thenReturn("LeftLabel");
-        when(relationshipType.getRightLabel()).thenReturn("RightLabel");
+        when(relationshipType.getLeftwardType()).thenReturn("LeftwardType");
+        when(relationshipType.getRightwardType()).thenReturn("RightwardType");
 
         // Assert that the useForPlace for our mocked relationshipType is false
         assertEquals("TestGetFields 0", false,

@@ -19,6 +19,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public class CommunityRest extends DSpaceObjectRest {
     public static final String NAME = "community";
+    public static final String PLURAL_NAME = "communities";
     public static final String CATEGORY = RestAddressableModel.CORE;
 
     @JsonIgnore

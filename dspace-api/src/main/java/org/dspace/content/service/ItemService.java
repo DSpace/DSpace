@@ -24,10 +24,8 @@ import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataValue;
-import org.dspace.content.RelationshipMetadataValue;
 import org.dspace.content.Thumbnail;
 import org.dspace.content.WorkspaceItem;
-import org.dspace.content.virtual.VirtualMetadataPopulator;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
@@ -40,7 +38,7 @@ import org.dspace.eperson.Group;
  * @author kevinvandevelde at atmire.com
  */
 public interface ItemService
-        extends DSpaceObjectService<Item>, DSpaceObjectLegacySupportService<Item>, IndexableObjectService<Item, UUID> {
+    extends DSpaceObjectService<Item>, DSpaceObjectLegacySupportService<Item>, IndexableObjectService<Item, UUID> {
 
     public Thumbnail getThumbnail(Context context, Item item, boolean requireOriginal) throws SQLException;
 
@@ -205,7 +203,7 @@ public interface ItemService
      * @throws SQLException if database error
      */
     public Iterator<Item> findInArchiveOrWithdrawnNonDiscoverableModifiedSince(Context context, Date since)
-            throws SQLException;
+        throws SQLException;
 
     /**
      * Get all the items (including private and withdrawn) in this collection. The order is indeterminate.
@@ -676,19 +674,6 @@ public interface ItemService
      * @throws SQLException if database error
      */
     boolean isInProgressSubmission(Context context, Item item) throws SQLException;
-
-    /**
-     * This method retrieves a list of MetadataValue objects that get constructed from processing
-     * the given Item's Relationships through the config given to the {@link VirtualMetadataPopulator}
-     * @param item  The Item that will be processed through it's Relationships
-     * @param enableVirtualMetadata This parameter will determine whether the list of Relationship metadata
-     *                              should be populated with metadata that is being generated through the
-     *                              VirtualMetadataPopulator functionality or not
-     * @return      The list of MetadataValue objects constructed through the Relationships
-     */
-    public List<RelationshipMetadataValue> getRelationshipMetadata(Item item, boolean enableVirtualMetadata);
-
-
 
     /**
      * Get metadata for the DSpace Object in a chosen schema.
