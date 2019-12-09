@@ -78,7 +78,7 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
         return ResourcePolicyRest.class;
     }
 
-    @PreAuthorize("hasAuthority('AUTHENTICATED')")
+    @PreAuthorize("hasPermission(#resourceUuid, 'dspaceObject', 'ADMIN')")
     @SearchRestMethod(name = "resource")
     public Page<ResourcePolicyRest> resource(@Parameter(value = "uuid", required = true) UUID resourceUuid,
                                       @Parameter(value = "action", required = false) String action, Pageable pageable) {
@@ -103,7 +103,7 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
         return converter.toRestPage(resourcePolisies, pageable, total, utils.obtainProjection(true));
     }
 
-    @PreAuthorize("hasAuthority('AUTHENTICATED')")
+    @PreAuthorize("hasPermission(#epersonUuid, 'EPERSON', 'READ')")
     @SearchRestMethod(name = "eperson")
     public Page<ResourcePolicyRest> eperson(@Parameter(value = "uuid", required = true) UUID epersonUuid,
                                 @Parameter(value = "resource", required = false) UUID resourceUuid, Pageable pageable) {
@@ -131,7 +131,7 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
         return converter.toRestPage(resourcePolisies, pageable, total, utils.obtainProjection(true));
     }
 
-    @PreAuthorize("hasAuthority('AUTHENTICATED')")
+    @PreAuthorize("hasPermission(#groupUuid, 'GROUP', 'READ')")
     @SearchRestMethod(name = "group")
     public Page<ResourcePolicyRest> group(@Parameter(value = "uuid", required = true) UUID groupUuid,
                                 @Parameter(value = "resource", required = false) UUID resourceUuid, Pageable pageable) {
