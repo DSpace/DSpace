@@ -9,7 +9,7 @@
         <property name="configLocation" value="file:${dspace.dir}/config/hibernate.cfg.xml"/>
         <!-- Use the dataSource defined in the bean below. This is necessary so that Flyway can initialize
              our database using the dataSource *prior* to Hibernate taking over -->
-        <property name="dataSource" ref="dspaceDataSource" />
+        <property name="dataSource" ref="dataSource" />
         <!-- Specify some additional Hibernate settings via dynamic properties. As noted below,
         these values will be dynamically loaded from DSpace's ConfigurationService. -->
         <!-- All other Hibernate settings are specified via the hibernate.cfg.xml referenced above. -->
