@@ -7,6 +7,9 @@
  */
 package org.dspace.app.rest;
 
+import static org.dspace.app.rest.utils.RegexUtils.REGEX_REQUESTMAPPING_IDENTIFIER_AS_DIGIT;
+import static org.dspace.app.rest.utils.RegexUtils.REGEX_REQUESTMAPPING_IDENTIFIER_AS_STRING_VERSION_STRONG;
+import static org.dspace.app.rest.utils.RegexUtils.REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
@@ -20,17 +23,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.atteo.evo.inflector.English;
+import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.converter.JsonPatchConverter;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.PaginationException;
@@ -52,6 +54,7 @@ import org.dspace.app.rest.repository.LinkRestRepository;
 import org.dspace.app.rest.utils.RestRepositoryUtils;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.util.UUIDUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -64,7 +67,6 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedResources;
-import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.ResourceSupport;
 import org.springframework.hateoas.Resources;
 import org.springframework.hateoas.UriTemplate;
@@ -72,6 +74,7 @@ import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -95,24 +98,6 @@ import org.springframework.web.multipart.MultipartFile;
 @SuppressWarnings("rawtypes")
 public class RestResourceController implements InitializingBean {
 
-    /**
-     * Regular expression in the request mapping to accept UUID as identifier
-     */
-    private static final String REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID =
-        "/{uuid:[0-9a-fxA-FX]{8}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{12}}";
-
-    /**
-     * Regular expression in the request mapping to accept a string as identifier but not the other kind of
-     * identifier (digits or uuid)
-     */
-    private static final String REGEX_REQUESTMAPPING_IDENTIFIER_AS_STRING_VERSION_STRONG = "/{id:^(?!^\\d+$)" +
-        "(?!^[0-9a-fxA-FX]{8}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{12}$)[\\w+\\-]+$+}";
-
-    /**
-     * Regular expression in the request mapping to accept number as identifier
-     */
-    private static final String REGEX_REQUESTMAPPING_IDENTIFIER_AS_DIGIT = "/{id:\\d+}";
-
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(RestResourceController.class);
 
     @Autowired
@@ -129,6 +114,9 @@ public class RestResourceController implements InitializingBean {
 
     @Autowired
     HalLinkService linkService;
+
+    @Autowired
+    ConverterService converter;
 
     @Override
     public void afterPropertiesSet() {
@@ -152,22 +140,20 @@ public class RestResourceController implements InitializingBean {
      *
      * Note that the regular expression in the request mapping accept a number as identifier;
      *
-     * Please see {@link RestResourceController#findOne(String, String, String, String)} for findOne with string as
+     * Please see {@link RestResourceController#findOne(String, String, String)} for findOne with string as
      * identifier
-     * and see {@link RestResourceController#findOne(String, String, UUID, String)} for uuid as identifier
+     * and see {@link RestResourceController#findOne(String, String, UUID)} for uuid as identifier
      *
      * @param apiCategory
      * @param model
      * @param id
-     * @param projection
      * @return
      */
     @RequestMapping(method = RequestMethod.GET, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_DIGIT)
     @SuppressWarnings("unchecked")
     public DSpaceResource<RestAddressableModel> findOne(@PathVariable String apiCategory, @PathVariable String model,
-                                                        @PathVariable Integer id,
-                                                        @RequestParam(required = false) String projection) {
-        return findOneInternal(apiCategory, model, id, projection);
+                                                        @PathVariable Integer id) {
+        return findOneInternal(apiCategory, model, id);
     }
 
     /**
@@ -186,22 +172,20 @@ public class RestResourceController implements InitializingBean {
      * </pre>
      *
      *
-     * Please see {@link RestResourceController#findOne(String, String, Integer, String)} for findOne with number as
+     * Please see {@link RestResourceController#findOne(String, String, Integer)} for findOne with number as
      * identifier
-     * and see {@link RestResourceController#findOne(String, String, UUID, String)} for uuid as identifier
+     * and see {@link RestResourceController#findOne(String, String, UUID)} for uuid as identifier
      *
      * @param apiCategory
      * @param model
      * @param id
-     * @param projection
      * @return
      */
     @RequestMapping(method = RequestMethod.GET, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_STRING_VERSION_STRONG)
     @SuppressWarnings("unchecked")
     public DSpaceResource<RestAddressableModel> findOne(@PathVariable String apiCategory, @PathVariable String model,
-                                                        @PathVariable String id,
-                                                        @RequestParam(required = false) String projection) {
-        return findOneInternal(apiCategory, model, id, projection);
+                                                        @PathVariable String id) {
+        return findOneInternal(apiCategory, model, id);
     }
 
     /**
@@ -209,22 +193,20 @@ public class RestResourceController implements InitializingBean {
      *
      * Note that the regular expression in the request mapping accept a UUID as identifier;
      *
-     * Please see {@link RestResourceController#findOne(String, String, Integer, String)} for findOne with number as
+     * Please see {@link RestResourceController#findOne(String, String, Integer)} for findOne with number as
      * identifier
-     * and see {@link RestResourceController#findOne(String, String, String, String)} for string as identifier
+     * and see {@link RestResourceController#findOne(String, String, String)} for string as identifier
      *
      * @param apiCategory
      * @param model
      * @param uuid
-     * @param projection
      * @return
      */
     @RequestMapping(method = RequestMethod.GET, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID)
     @SuppressWarnings("unchecked")
     public DSpaceResource<RestAddressableModel> findOne(@PathVariable String apiCategory, @PathVariable String model,
-                                                        @PathVariable UUID uuid,
-                                                        @RequestParam(required = false) String projection) {
-        return findOneInternal(apiCategory, model, uuid, projection);
+                                                        @PathVariable UUID uuid) {
+        return findOneInternal(apiCategory, model, uuid);
     }
 
     /**
@@ -233,13 +215,10 @@ public class RestResourceController implements InitializingBean {
      * @param apiCategory
      * @param model
      * @param id
-     * @param projection
      * @return
      */
     private <ID extends Serializable> DSpaceResource<RestAddressableModel> findOneInternal(String apiCategory,
-                                                                                           String model, ID id,
-                                                                                           String projection) {
-        checkModelPluralForm(apiCategory, model);
+                                                                                           String model, ID id) {
         DSpaceRestRepository<RestAddressableModel, ID> repository = utils.getResourceRepository(apiCategory, model);
         Optional<RestAddressableModel> modelObject = Optional.empty();
         try {
@@ -250,9 +229,7 @@ public class RestResourceController implements InitializingBean {
         if (!modelObject.isPresent()) {
             throw new ResourceNotFoundException(apiCategory + "." + model + " with id: " + id + " not found");
         }
-        DSpaceResource result = repository.wrapResource(modelObject.get());
-        linkService.addLinks(result);
-        return result;
+        return converter.toResource(modelObject);
     }
 
     /**
@@ -267,7 +244,6 @@ public class RestResourceController implements InitializingBean {
      * @param rel
      * @param page
      * @param assembler
-     * @param projection
      * @return
      */
     @RequestMapping(method = RequestMethod.GET, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_DIGIT + "/{rel}")
@@ -275,9 +251,8 @@ public class RestResourceController implements InitializingBean {
                                    @PathVariable String apiCategory,
                                    @PathVariable String model, @PathVariable Integer id, @PathVariable String rel,
                                    Pageable page,
-                                   PagedResourcesAssembler assembler,
-                                   @RequestParam(required = false) String projection) {
-        return findRelInternal(request, response, apiCategory, model, id, rel, page, assembler, projection);
+                                   PagedResourcesAssembler assembler) {
+        return findRelInternal(request, response, apiCategory, model, id, rel, page, assembler);
     }
 
     /**
@@ -293,7 +268,6 @@ public class RestResourceController implements InitializingBean {
      * @param rel
      * @param page
      * @param assembler
-     * @param projection
      * @return
      */
     @RequestMapping(method = RequestMethod.GET, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_STRING_VERSION_STRONG +
@@ -302,9 +276,8 @@ public class RestResourceController implements InitializingBean {
                                    @PathVariable String apiCategory,
                                    @PathVariable String model, @PathVariable String id, @PathVariable String rel,
                                    Pageable page,
-                                   PagedResourcesAssembler assembler,
-                                   @RequestParam(required = false) String projection) {
-        return findRelInternal(request, response, apiCategory, model, id, rel, page, assembler, projection);
+                                   PagedResourcesAssembler assembler) {
+        return findRelInternal(request, response, apiCategory, model, id, rel, page, assembler);
     }
 
     /**
@@ -319,7 +292,6 @@ public class RestResourceController implements InitializingBean {
      * @param rel
      * @param page
      * @param assembler
-     * @param projection
      * @return
      */
     @RequestMapping(method = RequestMethod.GET, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID + "/{rel}")
@@ -327,9 +299,8 @@ public class RestResourceController implements InitializingBean {
                                    @PathVariable String apiCategory,
                                    @PathVariable String model, @PathVariable UUID uuid, @PathVariable String rel,
                                    Pageable page,
-                                   PagedResourcesAssembler assembler,
-                                   @RequestParam(required = false) String projection) {
-        return findRelInternal(request, response, apiCategory, model, uuid, rel, page, assembler, projection);
+                                   PagedResourcesAssembler assembler) {
+        return findRelInternal(request, response, apiCategory, model, uuid, rel, page, assembler);
     }
 
     /**
@@ -362,18 +333,16 @@ public class RestResourceController implements InitializingBean {
      * @param relid
      * @param page
      * @param assembler
-     * @param projection
      * @return
      */
     @RequestMapping(method = RequestMethod.GET, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_STRING_VERSION_STRONG +
-        "/{rel}/{relid:[\\w+\\-]+}")
+        "/{rel}/{relid}")
     public ResourceSupport findRel(HttpServletRequest request, HttpServletResponse response,
                                    @PathVariable String apiCategory,
                                    @PathVariable String model, @PathVariable String id, @PathVariable String rel,
                                    @PathVariable String relid,
-                                   Pageable page, PagedResourcesAssembler assembler,
-                                   @RequestParam(required = false) String projection) {
-        return findRelEntryInternal(request, response, apiCategory, model, id, rel, relid, page, assembler, projection);
+                                   Pageable page, PagedResourcesAssembler assembler) throws Throwable {
+        return findRelEntryInternal(request, response, apiCategory, model, id, rel, relid, page, assembler);
     }
 
 
@@ -392,14 +361,17 @@ public class RestResourceController implements InitializingBean {
      * @param request       The relevant request
      * @param apiCategory   The apiCategory to be used
      * @param model         The model to be used
+     * @param parent        Optional parent identifier
      * @return              The relevant ResponseEntity for this request
      * @throws HttpRequestMethodNotSupportedException   If something goes wrong
      */
     @RequestMapping(method = RequestMethod.POST, consumes = {"application/json", "application/hal+json"})
-    public ResponseEntity<ResourceSupport> post(HttpServletRequest request, @PathVariable String apiCategory,
-                                                @PathVariable String model)
+    public ResponseEntity<ResourceSupport> post(HttpServletRequest request,
+                                                @PathVariable String apiCategory,
+                                                @PathVariable String model,
+                                                @RequestParam(required = false) String parent)
         throws HttpRequestMethodNotSupportedException {
-        return postJsonInternal(request, apiCategory, model);
+        return postJsonInternal(request, apiCategory, model, parent);
     }
 
     /**
@@ -434,21 +406,28 @@ public class RestResourceController implements InitializingBean {
      * @param request       The relevant request
      * @param apiCategory   The apiCategory to be used
      * @param model         The model to be used
+     * @param parent        The parent object id (optional)
      * @return              The relevant ResponseEntity for this request
      * @throws HttpRequestMethodNotSupportedException   If something goes wrong
      */
     public <ID extends Serializable> ResponseEntity<ResourceSupport> postJsonInternal(HttpServletRequest request,
                                                                                   String apiCategory,
-                                                                                  String model)
+                                                                                  String model, String parent)
         throws HttpRequestMethodNotSupportedException {
         checkModelPluralForm(apiCategory, model);
         DSpaceRestRepository<RestAddressableModel, ID> repository = utils.getResourceRepository(apiCategory, model);
-        RestAddressableModel modelObject = repository.createAndReturn();
+
+        RestAddressableModel modelObject;
+        if (parent != null) {
+            UUID parentUuid = UUIDUtils.fromString(parent);
+            modelObject = repository.createAndReturn(parentUuid);
+        } else {
+            modelObject = repository.createAndReturn();
+        }
         if (modelObject == null) {
             return ControllerUtils.toEmptyResponse(HttpStatus.CREATED);
         }
-        DSpaceResource result = repository.wrapResource(modelObject);
-        linkService.addLinks(result);
+        DSpaceResource result = converter.toResource(modelObject);
         //TODO manage HTTPHeader
         return ControllerUtils.toResponseEntity(HttpStatus.CREATED, new HttpHeaders(), result);
     }
@@ -480,8 +459,7 @@ public class RestResourceController implements InitializingBean {
         if (modelObject == null) {
             return ControllerUtils.toEmptyResponse(HttpStatus.CREATED);
         }
-        DSpaceResource result = repository.wrapResource(modelObject);
-        linkService.addLinks(result);
+        DSpaceResource result = converter.toResource(modelObject);
         //TODO manage HTTPHeader
         return ControllerUtils.toResponseEntity(HttpStatus.CREATED, new HttpHeaders(), result);
     }
@@ -519,8 +497,7 @@ public class RestResourceController implements InitializingBean {
         }
 
         if (modelObject != null) {
-            DSpaceResource result = repository.wrapResource(modelObject);
-            linkService.addLinks(result);
+            DSpaceResource result = converter.toResource(modelObject);
             return ControllerUtils.toResponseEntity(HttpStatus.CREATED, new HttpHeaders(), result);
         } else {
             return ControllerUtils.toEmptyResponse(HttpStatus.NO_CONTENT);
@@ -611,8 +588,7 @@ public class RestResourceController implements InitializingBean {
             log.error(e.getMessage(), e);
             return ControllerUtils.toEmptyResponse(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        DSpaceResource result = repository.wrapResource(modelObject);
-        linkService.addLinks(result);
+        DSpaceResource result = converter.toResource(modelObject);
         return ControllerUtils.toResponseEntity(HttpStatus.CREATED, new HttpHeaders(), result);
     }
 
@@ -649,8 +625,7 @@ public class RestResourceController implements InitializingBean {
 
         List<DSpaceResource> resources = new ArrayList<>();
         for (T modelObject : content) {
-            DSpaceResource result = repository.wrapResource(modelObject);
-            linkService.addLinks(result);
+            DSpaceResource result = converter.toResource(modelObject);
             resources.add(result);
         }
         return ControllerUtils.toResponseEntity(HttpStatus.OK, new HttpHeaders(), Resources.wrap(resources));
@@ -729,8 +704,7 @@ public class RestResourceController implements InitializingBean {
             log.error(e.getMessage(), e);
             throw e;
         }
-        DSpaceResource result = repository.wrapResource(modelObject);
-        linkService.addLinks(result);
+        DSpaceResource result = converter.toResource(modelObject);
         //TODO manage HTTPHeader
         return ControllerUtils.toResponseEntity(HttpStatus.OK, new HttpHeaders(), result);
 
@@ -747,7 +721,6 @@ public class RestResourceController implements InitializingBean {
      * @param relid
      * @param page
      * @param assembler
-     * @param projection
      * @return
      */
     private <ID extends Serializable> ResourceSupport findRelEntryInternal(HttpServletRequest request,
@@ -755,28 +728,37 @@ public class RestResourceController implements InitializingBean {
                                                                            String apiCategory, String model,
                                                                            String id, String rel, String relid,
                                                                            Pageable page,
-                                                                           PagedResourcesAssembler assembler,
-                                                                           String projection) {
+                                                                           PagedResourcesAssembler assembler)
+            throws Throwable {
         checkModelPluralForm(apiCategory, model);
         DSpaceRestRepository<RestAddressableModel, ID> repository = utils.getResourceRepository(apiCategory, model);
         Class<RestAddressableModel> domainClass = repository.getDomainClass();
 
-        LinkRest linkRest = utils.getLinkRest(rel, domainClass);
+        LinkRest linkRest = utils.getClassLevelLinkRest(rel, domainClass);
         if (linkRest != null) {
             LinkRestRepository linkRepository = utils.getLinkResourceRepository(apiCategory, model, linkRest.name());
-            Method linkMethod = repositoryUtils.getLinkMethod("getResource", linkRepository);
-
+            Method linkMethod = utils.requireMethod(linkRepository.getClass(), "getResource");
             try {
-                Object object = linkMethod.invoke(linkRepository, request, id, relid, page, projection);
-                Link link = linkTo(this.getClass(), apiCategory, English.plural(model)).slash(id)
-                                                                                       .slash(rel).withSelfRel();
+                Object object = linkMethod.invoke(linkRepository, request, id, relid, page, utils.obtainProjection());
+                Link link = linkTo(this.getClass(), apiCategory, model).slash(id).slash(rel).slash(relid).withSelfRel();
+
                 List result = new ArrayList();
                 result.add(object);
                 PageImpl<RestAddressableModel> pageResult = new PageImpl(result, page, 1);
-                Page<HALResource> halResources = pageResult.map(linkRepository::wrapResource);
-                halResources.forEach(linkService::addLinks);
+                Page<HALResource> halResources = pageResult.map(restObject -> converter.toResource(restObject));
                 return assembler.toResource(halResources, link);
-            } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+            } catch (InvocationTargetException e) {
+                // This catch has been made to resolve the issue that caused AuthorizeDenied exceptions for the methods
+                // on the repository defined by the @PreAuthorize etc annotation to be absorbed by the reflection's
+                // InvocationTargetException and thrown as a RunTimeException when it was actually an AccessDenied
+                // Exception and it should be returned/shown as one
+                if (e.getTargetException() instanceof AccessDeniedException ||
+                    e.getTargetException() instanceof ResourceNotFoundException) {
+                    throw e.getTargetException();
+                } else {
+                    throw new RuntimeException(e.getMessage(), e);
+                }
+            } catch (IllegalAccessException | IllegalArgumentException e) {
                 throw new RuntimeException(e.getMessage(), e);
             }
         }
@@ -790,63 +772,52 @@ public class RestResourceController implements InitializingBean {
      * @param apiCategory
      * @param model
      * @param uuid
-     * @param rel
      * @param page
      * @param assembler
-     * @param projection
      * @return
      */
     private <ID extends Serializable> ResourceSupport findRelInternal(HttpServletRequest request,
                                                                       HttpServletResponse response, String apiCategory,
                                                                       String model, ID uuid, String subpath,
-                                                                      Pageable page, PagedResourcesAssembler assembler,
-                                                                      String projection) {
+                                                                      Pageable page,
+                                                                      PagedResourcesAssembler assembler) {
         checkModelPluralForm(apiCategory, model);
         DSpaceRestRepository<RestAddressableModel, ID> repository = utils.getResourceRepository(apiCategory, model);
         Class<RestAddressableModel> domainClass = repository.getDomainClass();
 
-        LinkRest linkRest = utils.getLinkRest(subpath, domainClass);
+        LinkRest linkRest = utils.getClassLevelLinkRest(subpath, domainClass);
         PagedResources<? extends HALResource> result;
 
         if (linkRest != null) {
             LinkRestRepository linkRepository = utils.getLinkResourceRepository(apiCategory, model, linkRest.name());
-            Method linkMethod = repositoryUtils.getLinkMethod(linkRest.method(), linkRepository);
+            Method linkMethod = utils.requireMethod(linkRepository.getClass(), linkRest.method());
+            try {
+                if (Page.class.isAssignableFrom(linkMethod.getReturnType())) {
+                    Page<? extends RestModel> pageResult = (Page<? extends RestAddressableModel>) linkMethod
+                            .invoke(linkRepository, request, uuid, page, utils.obtainProjection(true));
 
-            if (linkMethod == null) {
-                // TODO custom exception
-                throw new RuntimeException(
-                        "Method for relation " + subpath + " not found: " + linkRest.name() + ":" + linkRest.method());
-            } else {
-                try {
-                    if (Page.class.isAssignableFrom(linkMethod.getReturnType())) {
-                        Page<? extends RestModel> pageResult = (Page<? extends RestAddressableModel>) linkMethod
-                                .invoke(linkRepository, request, uuid, page, projection);
-
-                        Link link = null;
-                        String querystring = request.getQueryString();
-                        if (querystring != null && querystring.length() > 0) {
-                            link = linkTo(this.getClass(), apiCategory, model).slash(uuid)
-                                .slash(subpath + '?' + querystring).withSelfRel();
-                        } else {
-                            link = linkTo(this.getClass(), apiCategory, model).slash(uuid).slash(subpath).withSelfRel();
-                        }
-
-                        Page<HALResource> halResources = pageResult.map(linkRepository::wrapResource);
-                        halResources.forEach(linkService::addLinks);
-
-                        return assembler.toResource(halResources, link);
+                    Link link = null;
+                    String querystring = request.getQueryString();
+                    if (querystring != null && querystring.length() > 0) {
+                        link = linkTo(this.getClass(), apiCategory, model).slash(uuid)
+                            .slash(subpath + '?' + querystring).withSelfRel();
                     } else {
-                        RestModel object = (RestModel) linkMethod.invoke(linkRepository, request, uuid, page,
-                                projection);
-                        Link link = linkTo(this.getClass(), apiCategory, model).slash(uuid).slash(subpath)
-                                .withSelfRel();
-                        HALResource tmpresult = linkRepository.wrapResource(object);
-                        tmpresult.add(link);
-                        return tmpresult;
+                        link = linkTo(this.getClass(), apiCategory, model).slash(uuid).slash(subpath).withSelfRel();
                     }
-                } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-                    throw new RuntimeException(e.getMessage(), e);
+
+                    Page<HALResource> halResources = pageResult.map(object -> converter.toResource(object));
+                    return assembler.toResource(halResources, link);
+                } else {
+                    RestModel object = (RestModel) linkMethod.invoke(linkRepository, request, uuid, page,
+                            utils.obtainProjection());
+                    Link link = linkTo(this.getClass(), apiCategory, model).slash(uuid).slash(subpath)
+                            .withSelfRel();
+                    HALResource tmpresult = converter.toResource(object);
+                    tmpresult.add(link);
+                    return tmpresult;
                 }
+            } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+                throw new RuntimeException(e.getMessage(), e);
             }
         }
         RestAddressableModel modelObject = repository.findById(uuid).orElse(null);
@@ -855,8 +826,7 @@ public class RestResourceController implements InitializingBean {
             throw new ResourceNotFoundException(apiCategory + "." + model + " with id: " + uuid + " not found");
         }
 
-        DSpaceResource resource = repository.wrapResource(modelObject, subpath);
-        linkService.addLinks(resource);
+        DSpaceResource resource = converter.toResource(modelObject);
 
         String rel = null;
 
@@ -897,16 +867,7 @@ public class RestResourceController implements InitializingBean {
                 .getResourceRepository(fullList.get(0).getCategory(), fullList.get(0).getType());
             PageImpl<RestAddressableModel> pageResult = new PageImpl(fullList.subList(start, end), page,
                                                                      fullList.size());
-            result = assembler.toResource(pageResult.map(resourceRepository::wrapResource));
-
-            for (Resource subObj : result) {
-                if (subObj.getContent() instanceof HALResource) {
-                    linkService.addLinks((HALResource) subObj.getContent());
-                }
-            }
-            return result;
-
-
+            return assembler.toResource(pageResult.map(converter::toResource));
         } else {
             if (resource.getEmbeddedResources().get(rel) == null) {
                 response.setStatus(HttpServletResponse.SC_NO_CONTENT);
@@ -923,7 +884,6 @@ public class RestResourceController implements InitializingBean {
      * @param model
      * @param page
      * @param assembler
-     * @param projection
      * @return
      */
     @RequestMapping(method = RequestMethod.GET)
@@ -932,25 +892,16 @@ public class RestResourceController implements InitializingBean {
                                                                                       @PathVariable String model,
                                                                                       Pageable page,
                                                                                       PagedResourcesAssembler assembler,
-                                                                                      @RequestParam(required = false)
-                                                                                              String projection,
                                                                                       HttpServletResponse response) {
 
         DSpaceRestRepository<T, ?> repository = utils.getResourceRepository(apiCategory, model);
-
-        RestResourceController restResourceController = methodOn(this.getClass(), apiCategory, model);
-
-        PagedResources<DSpaceResource<RestAddressableModel>> all = restResourceController
-                .findAll(apiCategory, model, page, assembler, projection, response);
-
-        ControllerLinkBuilder controllerLinkBuilder = linkTo(all);
-
-        Link link = controllerLinkBuilder.withSelfRel();
+        Link link = linkTo(methodOn(this.getClass(), apiCategory, model).findAll(apiCategory, model,
+                                                                                 page, assembler, response))
+            .withSelfRel();
 
         Page<DSpaceResource<T>> resources;
         try {
-            resources = repository.findAll(page).map(repository::wrapResource);
-            resources.forEach(linkService::addLinks);
+            resources = repository.findAll(page).map(converter::toResource);
         } catch (PaginationException pe) {
             resources = new PageImpl<>(new ArrayList<>(), page, pe.getTotal());
         }
@@ -1027,18 +978,15 @@ public class RestResourceController implements InitializingBean {
             if (searchResult == null) {
                 resources = new PageImpl(new ArrayList(), pageable, 0);
             } else {
-                resources = ((Page<T>) searchResult).map(repository::wrapResource);
+                resources = ((Page<T>) searchResult).map(converter::toResource);
             }
-            resources.forEach(linkService::addLinks);
             result = assembler.toResource(resources, link);
         } else {
             if (searchResult == null) {
                 response.setStatus(HttpServletResponse.SC_NO_CONTENT);
                 return null;
             }
-            DSpaceResource<T> dsResource = repository.wrapResource((T) searchResult);
-            linkService.addLinks(dsResource);
-            result = dsResource;
+            return converter.toResource((T) searchResult);
         }
         return result;
     }
@@ -1090,12 +1038,12 @@ public class RestResourceController implements InitializingBean {
     /**
      * Execute a PUT request for an entity with id of type UUID;
      *
-     * curl -X PUT http://<dspace.restUrl>/api/{apiCategory}/{model}/{uuid}
+     * curl -X PUT http://<dspace.baseUrl>/api/{apiCategory}/{model}/{uuid}
      *
      * Example:
      * <pre>
      * {@code
-     *      curl -X PUT http://<dspace.restUrl>/api/core/collection/8b632938-77c2-487c-81f0-e804f63e68e6
+     *      curl -X PUT http://<dspace.baseUrl>/api/core/collection/8b632938-77c2-487c-81f0-e804f63e68e6
      * }
      * </pre>
      *
@@ -1187,9 +1135,7 @@ public class RestResourceController implements InitializingBean {
         if (modelObject == null) {
             throw new ResourceNotFoundException(apiCategory + "." + model + " with id: " + id + " not found");
         }
-        DSpaceResource result = repository.wrapResource(modelObject);
-        linkService.addLinks(result);
-        return result;
+        return converter.toResource(modelObject);
 
     }
     /**
@@ -1212,9 +1158,6 @@ public class RestResourceController implements InitializingBean {
         if (modelObject == null) {
             throw new ResourceNotFoundException(apiCategory + "." + model + " with id: " + id + " not found");
         }
-        DSpaceResource result = repository.wrapResource(modelObject);
-        linkService.addLinks(result);
-        return result;
-
+        return converter.toResource(modelObject);
     }
 }

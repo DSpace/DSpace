@@ -16,8 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.model.AuthorityEntryRest;
 import org.dspace.app.rest.model.AuthorityRest;
-import org.dspace.app.rest.model.hateoas.AuthorityEntryResource;
-import org.dspace.app.rest.model.hateoas.HALResource;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.utils.AuthorityUtils;
 import org.dspace.content.Collection;
 import org.dspace.content.authority.Choice;
@@ -39,7 +38,7 @@ import org.springframework.stereotype.Component;
  */
 @Component(AuthorityRest.CATEGORY + "." + AuthorityRest.NAME + "." + AuthorityRest.ENTRIES)
 public class AuthorityEntryLinkRepository extends AbstractDSpaceRestRepository
-    implements LinkRestRepository<AuthorityEntryRest> {
+    implements LinkRestRepository {
 
     @Autowired
     private ChoiceAuthorityService cas;
@@ -50,14 +49,9 @@ public class AuthorityEntryLinkRepository extends AbstractDSpaceRestRepository
     @Autowired
     private AuthorityUtils authorityUtils;
 
-    @Override
-    public HALResource wrapResource(AuthorityEntryRest model, String... rels) {
-        return new AuthorityEntryResource(model);
-    }
-
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
     public Page<AuthorityEntryRest> query(HttpServletRequest request, String name,
-                                          Pageable pageable, String projection) {
+                                          Pageable pageable, Projection projection) {
         Context context = obtainContext();
         String query = request.getParameter("query");
         String metadata = request.getParameter("metadata");
@@ -70,7 +64,7 @@ public class AuthorityEntryLinkRepository extends AbstractDSpaceRestRepository
                 throw new RuntimeException(e);
             }
         }
-        List<AuthorityEntryRest> results = new ArrayList<AuthorityEntryRest>();
+        List<AuthorityEntryRest> results = new ArrayList<>();
         if (StringUtils.isNotBlank(metadata)) {
             String[] tokens = org.dspace.core.Utils.tokenize(metadata);
             String fieldKey = org.dspace.core.Utils.standardize(tokens[0], tokens[1], tokens[2], "_");
@@ -78,10 +72,10 @@ public class AuthorityEntryLinkRepository extends AbstractDSpaceRestRepository
                     pageable.getPageSize(),
                                              context.getCurrentLocale().toString());
             for (Choice value : choices.values) {
-                results.add(authorityUtils.convertEntry(value, name));
+                results.add(authorityUtils.convertEntry(value, name, projection));
             }
         }
-        return new PageImpl<AuthorityEntryRest>(results, pageable, results.size());
+        return new PageImpl<>(results, pageable, results.size());
     }
 
 }

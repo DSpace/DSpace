@@ -84,4 +84,19 @@ public class RelationshipBuilder extends AbstractBuilder<Relationship, Relations
 
         return this;
     }
+
+    public RelationshipBuilder withLeftwardValue(String leftwardValue) throws SQLException {
+        relationship.setLeftwardValue(leftwardValue);
+        return this;
+    }
+
+    public RelationshipBuilder withRightwardValue(String rightwardValue) throws SQLException {
+        relationship.setRightwardValue(rightwardValue);
+        return this;
+    }
+
+    public RelationshipBuilder withLeftPlace(int leftPlace) {
+        relationship.setLeftPlace(leftPlace);
+        return this;
+    }
 }

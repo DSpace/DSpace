@@ -10,6 +10,7 @@ package org.dspace.app.rest;
 import java.util.Arrays;
 import java.util.UUID;
 
+import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.link.HalLinkService;
 import org.dspace.app.rest.model.RestAddressableModel;
@@ -49,6 +50,9 @@ public class StatisticsRestController implements InitializingBean {
     private HalLinkService halLinkService;
 
     @Autowired
+    private ConverterService converter;
+
+    @Autowired
     private StatisticsRestRepository statisticsRestRepository;
 
     @Autowired
@@ -66,12 +70,10 @@ public class StatisticsRestController implements InitializingBean {
 
     @RequestMapping(method = RequestMethod.GET)
     public StatisticsSupportResource getStatisticsSupport() throws Exception {
-
         StatisticsSupportRest statisticsSupportRest = statisticsRestRepository.getStatisticsSupport();
-        StatisticsSupportResource statisticsSupportResource = new StatisticsSupportResource(statisticsSupportRest);
-        halLinkService.addLinks(statisticsSupportResource);
-        return statisticsSupportResource;
+        return converter.toResource(statisticsSupportRest);
     }
+
     @RequestMapping(method = RequestMethod.GET, value = "/viewevents/{uuid}")
     public PagedResources<ViewEventResource> getViewEvent(@PathVariable(name = "uuid") UUID uuid) throws Exception {
         throw new RepositoryMethodNotImplementedException("No implementation found; Method not allowed!", "");
@@ -94,13 +96,13 @@ public class StatisticsRestController implements InitializingBean {
 
     @RequestMapping(method = RequestMethod.POST, value = "/viewevents")
     public ResponseEntity<ResourceSupport> postViewEvent() throws Exception {
-        ViewEventResource result = new ViewEventResource(viewEventRestRepository.createViewEvent(), utils);
+        ViewEventResource result = converter.toResource(viewEventRestRepository.createViewEvent());
         return ControllerUtils.toResponseEntity(HttpStatus.CREATED, new HttpHeaders(), result);
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "/searchevents")
     public ResponseEntity<ResourceSupport> postSearchEvent() throws Exception {
-        SearchEventResource result =  new SearchEventResource(searchEventRestRepository.createSearchEvent(), utils);
+        SearchEventResource result = converter.toResource(searchEventRestRepository.createSearchEvent());
         return ControllerUtils.toResponseEntity(HttpStatus.CREATED, new HttpHeaders(), result);
     }
 

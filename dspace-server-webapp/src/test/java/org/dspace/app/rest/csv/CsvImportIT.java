@@ -131,7 +131,7 @@ public class CsvImportIT extends AbstractEntityIntegrationTest {
     private void assertArticleRelationships(Item article, Item itemB, Item itemC, Item itemF) throws SQLException {
         List<Relationship> relationshipsForArticle = relationshipService
             .findByItemAndRelationshipType(context, article, relationshipTypeService
-                .findbyTypesAndLabels(context, entityTypeService.findByEntityType(context, "Publication"),
+                .findbyTypesAndTypeName(context, entityTypeService.findByEntityType(context, "Publication"),
                                       entityTypeService.findByEntityType(context, "Person"), "isAuthorOfPublication",
                                       "isPublicationOfAuthor"));
         assertThat(relationshipsForArticle.size(), is(3));

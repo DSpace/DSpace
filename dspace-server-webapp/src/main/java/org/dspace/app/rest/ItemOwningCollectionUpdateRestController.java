@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest;
 
+import static org.dspace.app.rest.utils.RegexUtils.REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID;
 import static org.dspace.core.Constants.COLLECTION;
 
 import java.io.IOException;
@@ -16,10 +17,11 @@ import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.dspace.app.rest.converter.CollectionConverter;
+import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.CollectionRest;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.authorize.AuthorizeException;
@@ -41,13 +43,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * This controller will handle all the incoming calls on the api/code/items/{itemUuid}/owningCollection endpoint
- * where the itemUuid corresponds to the item of which you want to edit the owning collection.
+ * This controller will handle all the incoming calls on the api/code/items/{uuid}/owningCollection endpoint
+ * where the uuid corresponds to the item of which you want to edit the owning collection.
  */
 @RestController
-@RequestMapping("/api/core/items/" +
-        "{itemUuid:[0-9a-fxA-FX]{8}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{12" +
-        "}}/owningCollection")
+@RequestMapping("/api/core/items" + REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID + "/owningCollection")
 public class ItemOwningCollectionUpdateRestController {
 
     @Autowired
@@ -60,7 +60,7 @@ public class ItemOwningCollectionUpdateRestController {
     AuthorizeService authorizeService;
 
     @Autowired
-    CollectionConverter converter;
+    ConverterService converter;
 
     @Autowired
     Utils utils;
@@ -69,7 +69,7 @@ public class ItemOwningCollectionUpdateRestController {
      * This method will update the owning collection of the item that correspond to the provided item uuid, effectively
      * moving the item to the new collection.
      *
-     * @param itemUuid The UUID of the item that will be moved
+     * @param uuid The UUID of the item that will be moved
      * @param response The response object
      * @param request  The request object
      * @return The wrapped resource containing the new owning collection or null when the item was not moved
@@ -78,9 +78,9 @@ public class ItemOwningCollectionUpdateRestController {
      * @throws AuthorizeException If the user is not authorized to perform the move action
      */
     @RequestMapping(method = RequestMethod.PUT, consumes = {"text/uri-list"})
-    @PreAuthorize("hasPermission(#itemUuid, 'ITEM','WRITE')")
+    @PreAuthorize("hasPermission(#uuid, 'ITEM','WRITE')")
     @PostAuthorize("returnObject != null")
-    public CollectionRest move(@PathVariable UUID itemUuid, HttpServletResponse response,
+    public CollectionRest move(@PathVariable UUID uuid, HttpServletResponse response,
                                HttpServletRequest request)
             throws SQLException, IOException, AuthorizeException {
         Context context = ContextUtil.obtainContext(request);
@@ -92,12 +92,12 @@ public class ItemOwningCollectionUpdateRestController {
                                                            "or the data cannot be resolved to a collection.");
         }
 
-        Collection targetCollection = performItemMove(context, itemUuid, (Collection) dsoList.get(0));
+        Collection targetCollection = performItemMove(context, uuid, (Collection) dsoList.get(0));
 
         if (targetCollection == null) {
             return null;
         }
-        return converter.fromModel(targetCollection);
+        return converter.toRest(targetCollection, Projection.DEFAULT);
 
     }
 
