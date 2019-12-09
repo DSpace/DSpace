@@ -20,7 +20,7 @@
             <Format ref="qdc"/>
             <Format ref="marc"/>
             <Format ref="uketd_dc"/>
-            <Format ref="oai_openaire"/>
+            <Format ref="oaiopenaire"/>
             <!--<Format ref="junii2" />-->
             <Description>
                 This is the default context of the DSpace OAI-PMH data provider.
@@ -71,7 +71,28 @@
                 This contexts complies with OpenAIRE Guidelines for Literature Repositories v3.0.
             </Description>
         </Context>
-              
+
+        <!--
+            OpenAIRE Guidelines 4.0:
+
+            - https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/
+
+            There is a limitation over the embargoedEndDate parameter:
+
+            - Predefined DSpace fields don't allow to set this up with a default.
+         -->
+        <Context baseurl="openaire4" name="OpenAIRE 4 Context">
+            <!-- Date format, field prefixes, etc are ensured by the transformer -->
+            <!--Transformer ref="openaire4Transformer"/-->
+            <!-- OpenAIRE filter -->
+            <Filter ref="defaultFilter"/>
+            <!-- Metadata Formats -->
+            <Format ref="oaiopenaire"/>
+            <Description>
+                This contexts complies with OpenAIRE Guidelines for Literature Repositories v4.0.
+            </Description>
+        </Context>
+
     </Contexts>
 
 
@@ -160,7 +181,7 @@
         <!-- Metadata format based on the OpenAIRE 4.0 guidelines
              https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/use_of_oai_pmh.html 
         -->
-        <Format id="oai_openaire">
+        <Format id="oaiopenaire">
             <Prefix>oai_openaire</Prefix>
             <XSLT>metadataFormats/oai_openaire.xsl</XSLT>
             <Namespace>http://namespace.openaire.eu/schema/oaire/</Namespace>
@@ -174,6 +195,9 @@
         </Transformer>
         <Transformer id="openaireTransformer">
             <XSLT>transformers/openaire.xsl</XSLT>
+        </Transformer>
+        <Transformer id="openaire4Transformer">
+            <XSLT>transformers/openaire4.xsl</XSLT>
         </Transformer>
     </Transformers>
 
@@ -284,6 +308,46 @@
             </Definition>
         </Filter>
 
+        <!-- OpenAIRE 4 filter for records returned by OAI-PMH.
+             By default, return an Item record:
+                * If it is publicly accessible
+                * * OR it has been withdrawn (in order to display a tombstone record).
+                * AND doesn't have a relationship.type field
+                * * OR the relationship.type is a Publication
+                * limiting the results only to Publications as expected
+             This filter is used by the context ([oai]/openaire4).
+        -->
+        <Filter id="openAire4Filter">
+            <Definition>
+                <And>            
+                	<LeftCondition>
+		                <Or>
+		                    <LeftCondition>
+		                        <Custom ref="itemAccessCondition"/>
+		                    </LeftCondition>
+		                    <RightCondition>
+		                        <Custom ref="itemWithdrawnCondition"/>
+		                    </RightCondition>
+		                </Or>
+	                </LeftCondition>
+	                <RightCondition>
+		                <Or>
+		                    <LeftCondition>
+		                        <Not>
+		                            <Condition>
+		                                <Custom ref="relationshipTypeExistsCondition"/>
+		                            </Condition>
+		                        </Not>
+		                    </LeftCondition>
+		                    <RightCondition>
+		                    	<Custom ref="isPublicationEntityCondition"/>
+		                    </RightCondition>
+		                </Or>
+	                </RightCondition>
+                </And>
+            </Definition>
+        </Filter>
+
         <!-- UKETD Filter for records returned by OAI-PMH.
              By default, return an Item record:
                 * If it is a "thesis"
@@ -300,9 +364,9 @@
         <!-- Default filter for records returned by OAI-PMH. 
              By default, return an Item record:
                 * If it is publicly accessible
-                * OR it has been withdrawn (in order to display a tombstone record).
+                * * OR it has been withdrawn (in order to display a tombstone record).
                 * AND doesn't have a relationship.type field
-                * OR the relationship.type is a Publication
+                * * OR the relationship.type is a Publication
                 * limiting the results only to Publications as expected
              This filter is used by the default context ([oai]/request).
         -->
