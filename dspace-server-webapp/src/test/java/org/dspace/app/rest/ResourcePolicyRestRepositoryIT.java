@@ -386,7 +386,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
         String authToken = getAuthToken(eperson1.getEmail(), "qwerty01");
         getClient(authToken).perform(get("/api/authz/resourcepolicies/search/eperson")
-                .param("uuid", eperson1.getID().toString())
+                .param("uuid", eperson2.getID().toString())
                 .param("resource", community2.getID().toString()))
                 .andExpect(status().isForbidden());
     }
@@ -410,7 +410,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
         ResourcePolicy firstResourcePolicyOfEPerson1 = ResourcePolicyBuilder.createResourcePolicy(context)
                 .withDspaceObject(community)
-                .withAction(Constants.WRITE)
+                .withAction(Constants.ADMIN)
                 .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
                 .withUser(eperson1).build();
 
@@ -443,7 +443,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
   }
 
   @Test
-  public void searchResourcePoliciesOfOneResourceWithActionTest() throws Exception {
+  public void searchResourcePoliciesOfOneResourceIsOwnerTest() throws Exception {
       context.turnOffAuthorisationSystem();
 
         EPerson eperson1 = EPersonBuilder.createEPerson(context)
@@ -463,13 +463,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
         ResourcePolicy firstResourcePolicyOfEPerson1 = ResourcePolicyBuilder.createResourcePolicy(context)
                 .withDspaceObject(collection)
-                .withAction(Constants.WRITE)
-                .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
-                .withUser(eperson1).build();
-
-        ResourcePolicy secondResourcePolicyOfEPerson1 = ResourcePolicyBuilder.createResourcePolicy(context)
-                .withDspaceObject(collection)
-                .withAction(Constants.ADD)
+                .withAction(Constants.ADMIN)
                 .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
                 .withUser(eperson1).build();
 
@@ -487,13 +481,18 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
                 .param("action", "ADD"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$._embedded.resourcepolicies",Matchers.containsInAnyOrder(
-                        ResoucePolicyMatcher.matchResourcePolicy(secondResourcePolicyOfEPerson1),
+                .andExpect(jsonPath("$._embedded.resourcepolicies",Matchers.contains(
                         ResoucePolicyMatcher.matchResourcePolicy(firstResourcePolicyOfEPerson2)
                         )))
                 .andExpect(jsonPath("$._links.self.href",
                         Matchers.containsString("api/authz/resourcepolicies/search/resource")))
-                .andExpect(jsonPath("$.page.totalElements", is(2)));
+                .andExpect(jsonPath("$.page.totalElements", is(1)));
+
+      String authToken2 = getAuthToken(eperson2.getEmail(), "qwerty02");
+      getClient(authToken2).perform(get("/api/authz/resourcepolicies/search/resource")
+                .param("uuid", collection.getID().toString())
+                .param("action", "ADD"))
+                .andExpect(status().isForbidden());
   }
 
   /**
@@ -552,6 +551,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
       .andExpect(jsonPath("$.page.totalElements", is(0)));
   }
 
+
   @Test
   public void searchResoucesPoliciesByResourceUuidForbiddenTest() throws Exception {
       context.turnOffAuthorisationSystem();
@@ -591,6 +591,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
               .andExpect(status().isForbidden());
   }
 
+
     @Test
     public void searchResourcePolicyByGroupUuidTest() throws Exception {
         context.turnOffAuthorisationSystem();
@@ -600,12 +601,6 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         EPerson eperson1 = EPersonBuilder.createEPerson(context)
                 .withEmail("eperson1@mail.com")
                 .withPassword("qwerty01")
-                .withGroupMembership(group1)
-                .build();
-
-        EPerson eperson2 = EPersonBuilder.createEPerson(context)
-                .withEmail("eperson2@mail.com")
-                .withPassword("qwerty02")
                 .withGroupMembership(group1)
                 .build();
 
@@ -624,11 +619,11 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
         ResourcePolicy secondResourcePolicyOfGroup1 = ResourcePolicyBuilder.createResourcePolicy(context)
                 .withDspaceObject(community)
-                .withAction(Constants.REMOVE)
+                .withAction(Constants.READ)
                 .withGroup(group1).build();
 
         ResourcePolicy collectionResourcePolicyOfGroup1 = ResourcePolicyBuilder.createResourcePolicy(context)
-                .withDspaceObject(community)
+                .withDspaceObject(collection)
                 .withAction(Constants.WRITE)
                 .withGroup(group1).build();
 

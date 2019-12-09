@@ -21,10 +21,9 @@ import org.apache.log4j.Logger;
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.model.DSpaceObjectRest;
 import org.dspace.app.rest.utils.ContextUtil;
+import org.dspace.app.rest.utils.DSpaceObjectUtils;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.content.DSpaceObject;
-import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.Context;
 import org.dspace.discovery.SearchServiceException;
 import org.springframework.beans.factory.InitializingBean;
@@ -55,7 +54,7 @@ public class UUIDLookupRestController implements InitializingBean {
     public static final String PARAM = "uuid";
 
     @Autowired
-    private ContentServiceFactory contentServiceFactory;
+    private DSpaceObjectUtils dspaceObjectUtil;
 
     @Autowired
     private Utils utils;
@@ -91,17 +90,14 @@ public class UUIDLookupRestController implements InitializingBean {
         Context context = null;
         try {
             context = ContextUtil.obtainContext(request);
-            for (DSpaceObjectService<? extends DSpaceObject> dSpaceObjectService : contentServiceFactory
-                    .getDSpaceObjectServices()) {
-                DSpaceObject dso = dSpaceObjectService.find(context, uuid);
-                if (dso != null) {
-                    DSpaceObjectRest dsor = converter.toRest(dso, utils.obtainProjection());
-                    URI link = linkTo(dsor.getController(), dsor.getCategory(), dsor.getTypePlural())
-                            .slash(dsor.getId()).toUri();
-                    response.setStatus(HttpServletResponse.SC_FOUND);
-                    response.sendRedirect(link.toString());
-                    return;
-                }
+            DSpaceObject dso = dspaceObjectUtil.findDSpaceObject(context, uuid);
+            if (dso != null) {
+                DSpaceObjectRest dsor = converter.toRest(dso, utils.obtainProjection());
+                URI link = linkTo(dsor.getController(), dsor.getCategory(), dsor.getTypePlural()).slash(dsor.getId())
+                        .toUri();
+                response.setStatus(HttpServletResponse.SC_FOUND);
+                response.sendRedirect(link.toString());
+                return;
             }
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
         } finally {
