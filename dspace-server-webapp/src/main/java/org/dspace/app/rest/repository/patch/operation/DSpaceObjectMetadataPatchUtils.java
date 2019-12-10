@@ -29,7 +29,7 @@ import org.springframework.stereotype.Component;
  * @author Maria Verdonck (Atmire) on 18/11/2019
  */
 @Component
-public final class DspaceObjectMetadataPatchUtils {
+public final class DSpaceObjectMetadataPatchUtils {
 
     private ObjectMapper objectMapper = new ObjectMapper();
 
@@ -41,7 +41,7 @@ public final class DspaceObjectMetadataPatchUtils {
      */
     protected static final String METADATA_PATH = "/metadata";
 
-    private DspaceObjectMetadataPatchUtils() {
+    private DSpaceObjectMetadataPatchUtils() {
     }
 
     /**
@@ -149,8 +149,7 @@ public final class DspaceObjectMetadataPatchUtils {
     protected String getIndexFromPath(String path) {
         String[] partsOfPath = path.split("/");
         // Index of md being patched
-        String indexInPath = (partsOfPath.length > 3) ? partsOfPath[3] : null;
-        return indexInPath;
+        return (partsOfPath.length > 3) ? partsOfPath[3] : null;
     }
 
     protected void checkMetadataFieldNotNull(MetadataField metadataField) {

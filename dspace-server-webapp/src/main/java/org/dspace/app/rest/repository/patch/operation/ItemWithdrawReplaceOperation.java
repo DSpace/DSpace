@@ -21,7 +21,7 @@ import org.dspace.core.Context;
 import org.springframework.stereotype.Component;
 
 /**
- * This is the implementation for Item resource patches.
+ * This is the implementation for Item 'withdrawn' patches.
  * <p>
  * Example: <code>
  * curl -X PATCH http://${dspace.url}/api/core/items/<:id-item> -H "

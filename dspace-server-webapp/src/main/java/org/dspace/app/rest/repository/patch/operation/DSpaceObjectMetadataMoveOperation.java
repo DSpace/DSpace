@@ -35,10 +35,10 @@ import org.springframework.stereotype.Component;
  * @author Maria Verdonck (Atmire) on 18/11/2019
  */
 @Component
-public class DspaceObjectMetadataMoveOperation<R extends DSpaceObject> extends PatchOperation<R> {
+public class DSpaceObjectMetadataMoveOperation<R extends DSpaceObject> extends PatchOperation<R> {
 
     @Autowired
-    DspaceObjectMetadataPatchUtils metadataPatchUtils;
+    DSpaceObjectMetadataPatchUtils metadataPatchUtils;
 
     @Override
     public R perform(Context context, R resource, Operation operation) throws SQLException {

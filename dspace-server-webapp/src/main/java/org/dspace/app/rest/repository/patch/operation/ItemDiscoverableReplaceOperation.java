@@ -15,7 +15,7 @@ import org.dspace.core.Context;
 import org.springframework.stereotype.Component;
 
 /**
- * This is the implementation for Item resource patches.
+ * This is the implementation for Item 'discoverable' patches.
  *
  * Example: <code>
  * curl -X PATCH http://${dspace.url}/api/core/items/<:id-item> -H "
@@ -37,10 +37,8 @@ public class ItemDiscoverableReplaceOperation<R> extends PatchOperation<R> {
         Boolean discoverable = getBooleanOperationValue(operation.getValue());
         if (supports(object, operation)) {
             Item item = (Item) object;
-            if (discoverable) {
-                if (item.getTemplateItemOf() != null) {
-                    throw new UnprocessableEntityException("A template item cannot be discoverable.");
-                }
+            if (discoverable && item.getTemplateItemOf() != null) {
+                throw new UnprocessableEntityException("A template item cannot be discoverable.");
             }
             item.setDiscoverable(discoverable);
             return object;

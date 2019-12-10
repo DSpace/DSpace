@@ -91,7 +91,6 @@ public class MetadataFieldServiceImpl implements MetadataFieldService {
         return metadataFieldDAO.findByElement(context, metadataSchema, element, qualifier);
     }
 
-
     @Override
     public MetadataField findByElement(Context context, String metadataSchemaName, String element, String qualifier)
         throws SQLException {
@@ -107,8 +106,7 @@ public class MetadataFieldServiceImpl implements MetadataFieldService {
         if (schema == null || element == null) {
             return null;
         } else {
-            MetadataSchema metadataSchema = metadataSchemaService.find(context, schema);
-            return this.findByElement(context, metadataSchema, element, qualifier);
+            return this.findByElement(context, schema, element, qualifier);
         }
     }
 

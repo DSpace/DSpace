@@ -37,7 +37,6 @@ import org.springframework.stereotype.Component;
 public class EPersonRestPermissionEvaluatorPlugin extends RestObjectPermissionEvaluatorPlugin {
 
     private static final Logger log = LoggerFactory.getLogger(EPersonRestPermissionEvaluatorPlugin.class);
-    public static final String OPERATION_PASSWORD_CHANGE = "/password";
 
     @Autowired
     AuthorizeService authorizeService;

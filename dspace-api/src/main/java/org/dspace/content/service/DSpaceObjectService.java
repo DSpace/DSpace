@@ -182,7 +182,7 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
 
     /**
      * Add metadata fields. These are appended to existing values.
-     * Use <code>clearDC</code> to remove values. The ordering of values
+     * Use <code>clearMetadata</code> to remove values. The ordering of values
      * passed in is maintained.
      * <p>
      * If metadata authority control is available, try to get authority
@@ -207,7 +207,7 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
 
     /**
      * Add metadata fields. These are appended to existing values.
-     * Use <code>clearDC</code> to remove values. The ordering of values
+     * Use <code>clearMetadata</code> to remove values. The ordering of values
      * passed in is maintained.
      *
      * @param context     DSpace context
@@ -231,7 +231,7 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
 
     /**
      * Add metadata fields. These are appended to existing values.
-     * Use <code>clearDC</code> to remove values. The ordering of values
+     * Use <code>clearMetadata</code> to remove values. The ordering of values
      * passed in is maintained.
      *
      * @param context       DSpace context
@@ -272,7 +272,7 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
 
     /**
      * Add a single metadata field. This is appended to existing
-     * values. Use <code>clearDC</code> to remove values.
+     * values. Use <code>clearMetadata</code> to remove values.
      *
      * @param context   DSpace context
      * @param dso       DSpaceObject
@@ -292,7 +292,7 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
 
     /**
      * Add a single metadata field. This is appended to existing
-     * values. Use <code>clearDC</code> to remove values.
+     * values. Use <code>clearMetadata</code> to remove values.
      *
      * @param context    DSpace context
      * @param dso        DSpaceObject
@@ -314,10 +314,10 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
 
     /**
      * Clear metadata values. As with <code>getDC</code> above,
-     * passing in <code>null</code> only matches fields where the qualifier or
+     * passing in <code>null</code> only matches fields where the qualifier orr
      * language is actually <code>null</code>.<code>Item.ANY</code> will
      * match any element, qualifier or language, including <code>null</code>.
-     * Thus, <code>dspaceobject.clearDC(Item.ANY, Item.ANY, Item.ANY)</code> will
+     * Thus, <code>dspaceobject.clearMetadata(Item.ANY, Item.ANY, Item.ANY)</code> will
      * remove all Dublin Core metadata associated with an DSpaceObject.
      *
      * @param context   DSpace context
@@ -372,7 +372,7 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
 
     /**
      * Add a single metadata field. Whether it's appended or prepended depends on index parameter.
-     * Use <code>clearDC</code> to remove values.
+     * Use <code>clearMetadata</code> to remove values.
      *
      * @param context    DSpace context
      * @param dso        DSpaceObject
