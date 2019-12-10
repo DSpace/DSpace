@@ -41,9 +41,18 @@
 
     <xsl:variable name="isModal" select="$pagemeta/dri:metadata[@element='framing'][@qualifier='modal']/text()='true'"/>
 
+    <!--<xsl:variable name="METSRIGHTS-enabled" select="$pagemeta/dri:metadata[@element='METSRIGHTS-enabled'][not(@qualifier)] = 'true'"/>
+
+    <xsl:variable name="render-scientific-formulas" select="$pagemeta/dri:metadata[@element='browse'][@qualifier='render-scientific-formulas'] = 'true'"/>
+
+    <xsl:variable name="item-list-emphasis" select="$pagemeta/dri:metadata[@element='item-list'][@qualifier='emphasis']"/>
+
+    <xsl:variable name="item-view-label-1" select="$pagemeta/dri:metadata[@element='item-view'][@qualifier='label-1']"/>
+    <xsl:variable name="item-view-label-2" select="$pagemeta/dri:metadata[@element='item-view'][@qualifier='label-2']"/>-->
+
     <!--the max thumbnail height & width from dspace.cfg, needed for item view and item list pages-->
-    <xsl:variable name="thumbnail.maxheight" select="80"/> <!--confman:getIntProperty('thumbnail.maxheight', 80)"/>-->
-    <xsl:variable name="thumbnail.maxwidth" select="80"/> <!--confman:getIntProperty('thumbnail.maxwidth', 80)"/>-->
+    <xsl:variable name="thumbnail.maxheight" select="$pagemeta/dri:metadata[@element='thumbnail'][@qualifier='maxheight']"/>
+    <xsl:variable name="thumbnail.maxwidth" select="$pagemeta/dri:metadata[@element='thumbnail'][@qualifier='maxwidth']"/>
     <!-- item details url -->
     <xsl:variable name="ds_item_view_toggle_url" select="//dri:p[contains(@rend , 'item-view-toggle') and
         (preceding-sibling::dri:referenceSet[@type = 'summaryView'] or following-sibling::dri:referenceSet[@type = 'summaryView'])]/dri:xref/@target"/>

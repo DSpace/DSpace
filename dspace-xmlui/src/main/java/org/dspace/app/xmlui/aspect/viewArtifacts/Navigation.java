@@ -25,6 +25,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.core.I18nUtil;
 import org.xml.sax.SAXException;
@@ -111,13 +112,32 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
         pageMeta.addMetadata("request","serverName").addContent(request.getServerName());
         pageMeta.addMetadata("request","URI").addContent(request.getSitemapURI());
 
+        // Metadata added to accommodate Saxon-HE XSLT processor that doesn't play easily with Java classes
+        // Start
+
+        ConfigurationService cs = DSpaceServicesFactory.getInstance().getConfigurationService();
+
+        pageMeta.addMetadata("thumbnail", "maxheight").addContent(cs.getIntProperty("thumbnail.maxheight", 80));
+        pageMeta.addMetadata("thumbnail", "maxwidth").addContent(cs.getIntProperty("thumbnail.maxwidth", 80));
+
+        pageMeta.addMetadata("item-list", "emphasis").addContent(cs.getProperty("xmlui.theme.mirage.item-list.emphasis", "metadata"));
+
+        pageMeta.addMetadata("item-view","label-1").addContent(cs.getProperty("mirage2.item-view.bitstream.href.label.1"));
+        pageMeta.addMetadata("item-view","label-2").addContent(cs.getProperty("mirage2.item-view.bitstream.href.label.2"));
+
+        pageMeta.addMetadata("browse", "render-scientific-formulas").addContent(cs.getProperty("webui.browse.render-scientific-formulas", "false"));
+
+        pageMeta.addMetadata("METSRIGHTS-enabled").addContent((cs.getProperty("plugin.named.org.dspace.content.crosswalk.DisseminationCrosswalk").contains("METSRIGHTS")) ? "true": "false");
+
+        // End
+
         String dspaceVersion = Util.getSourceVersion();
         if (dspaceVersion != null)
         {
             pageMeta.addMetadata("dspace","version").addContent(dspaceVersion);
         }
 
-        String analyticsKey = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("xmlui.google.analytics.key");
+        String analyticsKey = cs.getProperty("xmlui.google.analytics.key");
         if (analyticsKey != null && analyticsKey.length() > 0)
         {
                 analyticsKey = analyticsKey.trim();
@@ -125,10 +145,10 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
         }
 
         // add metadata for OpenSearch auto-discovery links if enabled
-        if (DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("websvc.opensearch.autolink"))
+        if (cs.getBooleanProperty("websvc.opensearch.autolink"))
         {
-            pageMeta.addMetadata("opensearch", "shortName").addContent( DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("websvc.opensearch.shortname") );
-            pageMeta.addMetadata("opensearch", "autolink").addContent( "open-search/description.xml" );
+            pageMeta.addMetadata("opensearch", "shortName").addContent(cs.getProperty("websvc.opensearch.shortname"));
+            pageMeta.addMetadata("opensearch", "autolink").addContent( "open-search/description.xml");
         }
 
         pageMeta.addMetadata("page","contactURL").addContent(contextPath + "/contact");

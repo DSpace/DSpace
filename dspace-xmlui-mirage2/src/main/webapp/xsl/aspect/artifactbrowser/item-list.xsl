@@ -55,7 +55,7 @@
             </xsl:choose>
         </xsl:variable>
 
-        <xsl:variable name="emphasis" select="file"/> <!--confman:getProperty('xmlui.theme.mirage.item-list.emphasis')"/>-->
+        <xsl:variable name="emphasis" select="$pagemeta/dri:metadata[@element='item-list'][@qualifier='emphasis']"/>
         <xsl:choose>
             <xsl:when test="'file' = $emphasis">
 

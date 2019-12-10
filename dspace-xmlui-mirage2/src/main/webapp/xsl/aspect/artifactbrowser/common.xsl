@@ -126,7 +126,7 @@
     <xsl:template match="dri:referenceSet[@id='aspect.artifactbrowser.ItemViewer.referenceSet.collection-viewer']/dri:reference" mode="summaryView">
         <!-- simplified check to verify whether access rights are available in METS -->
         <!--<xsl:variable name='METSRIGHTS-enabled' select="contains(confman:getProperty('plugin.named.org.dspace.content.crosswalk.DisseminationCrosswalk'), 'METSRIGHTS')" />-->
-        <xsl:variable name="METSRIGHTS-enabled" select="false()"/>
+        <xsl:variable name="METSRIGHTS-enabled" select="$pagemeta/dri:metadata[@element='METSRIGHTS-enabled'][not(@qualifier)] = 'true'"/>
         <xsl:variable name="externalMetadataURL">
             <xsl:text>cocoon:/</xsl:text>
             <xsl:value-of select="@url"/>
@@ -248,7 +248,7 @@
     <xsl:template match="dri:reference" mode="summaryView">
         <!-- simplified check to verify whether access rights are available in METS -->
         <!--<xsl:variable name='METSRIGHTS-enabled' select="contains(confman:getProperty('plugin.named.org.dspace.content.crosswalk.DisseminationCrosswalk'), 'METSRIGHTS')" />-->
-        <xsl:variable name="METSRIGHTS-enabled" select="false()"/>
+        <xsl:variable name="METSRIGHTS-enabled" select="$pagemeta/dri:metadata[@element='METSRIGHTS-enabled'][not(@qualifier)] = 'true'"/>
         <xsl:variable name="externalMetadataURL">
             <xsl:text>cocoon:/</xsl:text>
             <xsl:value-of select="@url"/>

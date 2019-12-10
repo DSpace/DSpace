@@ -33,14 +33,13 @@
                 xmlns:confman="org.dspace.core.ConfigurationManager"
                 exclude-result-prefixes="i18n dri mets xlink xsl dim xhtml mods dc confman">
 
-    <xsl:output method="xhtml" encoding="UTF-8" indent="yes"/>
+    <xsl:output method="xml" encoding="UTF-8" indent="yes"/>
 
     <!--
         Requested Page URI. Some functions may alter behavior of processing depending if URI matches a pattern.
         Specifically, adding a static page will need to override the DRI, to directly add content.
     -->
     <xsl:variable name="request-uri" select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='URI']"/>
-    <xsl:variable name="properties" select="unparsed-text('/dspace/config/local.cfg')" as="xs:string"/>
 
     <!--
         The starting point of any XSL processing is matching the root element. In DRI the root element is document,
@@ -322,7 +321,7 @@
             <!-- https://stackoverflow.com/questions/33392114/saxon-he-integrated-extension-functions-how-and-where -->
 
             <!-- Add MathJAX JS library to render scientific formulas-->
-            <!--<xsl:if test="confman:getProperty('webui.browse.render-scientific-formulas') = 'true'">
+            <xsl:if test="$pagemeta/dri:metadata[@element='browse'][@qualifier='render-scientific-formulas'] = 'true'">
                 <script type="text/x-mathjax-config">
                     MathJax.Hub.Config({
                       tex2jax: {
@@ -336,7 +335,7 @@
                     });
                 </script>
                 <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">&#160;</script>
-            </xsl:if>-->
+            </xsl:if>
 
         </head>
     </xsl:template>
