@@ -8,12 +8,8 @@
 package org.dspace.app.bulkedit;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -621,24 +617,6 @@ public class DSpaceCSV implements Serializable {
         }
 
         return csvLines;
-    }
-
-    /**
-     * Save the CSV file to the given filename
-     *
-     * @param filename The filename to save the CSV file to
-     * @throws IOException Thrown if an error occurs when writing the file
-     */
-    public final void save(String filename) throws IOException {
-        // Save the file
-        BufferedWriter out = new BufferedWriter(
-            new OutputStreamWriter(
-                new FileOutputStream(filename), "UTF-8"));
-        for (String csvLine : getCSVLinesAsStringArray()) {
-            out.write(csvLine + "\n");
-        }
-        out.flush();
-        out.close();
     }
 
     public InputStream getInputStream() {

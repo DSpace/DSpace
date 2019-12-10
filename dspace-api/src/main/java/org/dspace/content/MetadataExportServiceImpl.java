@@ -13,28 +13,27 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.google.common.collect.Iterators;
-import org.apache.logging.log4j.Logger;
 import org.dspace.app.bulkedit.DSpaceCSV;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataExportService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.scripts.handler.DSpaceRunnableHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class MetadataExportServiceImpl implements MetadataExportService {
 
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(MetadataExportServiceImpl.class);
-
     @Autowired
     private ItemService itemService;
 
-    public DSpaceCSV handleExport(Context context, boolean exportAllItems, boolean exportAllMetadata, String handle)
-        throws Exception {
+    @Override
+    public DSpaceCSV handleExport(Context context, boolean exportAllItems, boolean exportAllMetadata, String handle,
+                                  DSpaceRunnableHandler handler) throws Exception {
         Iterator<Item> toExport = null;
 
         if (!exportAllItems) {
-            log.info("Exporting whole repository WARNING: May take some time!");
+            handler.logInfo("Exporting whole repository WARNING: May take some time!");
             toExport = itemService.findAll(context);
         } else {
             DSpaceObject dso = HandleServiceFactory.getInstance().getHandleService().resolveToObject(context, handle);
@@ -44,16 +43,16 @@ public class MetadataExportServiceImpl implements MetadataExportService {
             }
 
             if (dso.getType() == Constants.ITEM) {
-                log.info("Exporting item '" + dso.getName() + "' (" + handle + ")");
+                handler.logInfo("Exporting item '" + dso.getName() + "' (" + handle + ")");
                 List<Item> item = new ArrayList<>();
                 item.add((Item) dso);
                 toExport = item.iterator();
             } else if (dso.getType() == Constants.COLLECTION) {
-                log.info("Exporting collection '" + dso.getName() + "' (" + handle + ")");
+                handler.logInfo("Exporting collection '" + dso.getName() + "' (" + handle + ")");
                 Collection collection = (Collection) dso;
                 toExport = itemService.findByCollection(context, collection);
             } else if (dso.getType() == Constants.COMMUNITY) {
-                log.info("Exporting community '" + dso.getName() + "' (" + handle + ")");
+                handler.logInfo("Exporting community '" + dso.getName() + "' (" + handle + ")");
                 toExport = buildFromCommunity(context, (Community) dso);
             } else {
                 throw new IllegalArgumentException("Error identifying '" + handle + "'");
@@ -64,11 +63,7 @@ public class MetadataExportServiceImpl implements MetadataExportService {
         return csv;
     }
 
-    /**
-     * Run the export
-     *
-     * @return the exported CSV lines
-     */
+    @Override
     public DSpaceCSV export(Context context, Iterator<Item> toExport, boolean exportAll) throws Exception {
         Context.Mode originalMode = context.getCurrentMode();
         context.setMode(Context.Mode.READ_ONLY);
@@ -86,6 +81,7 @@ public class MetadataExportServiceImpl implements MetadataExportService {
         return csv;
     }
 
+    @Override
     public DSpaceCSV export(Context context, Community community, boolean exportAll) throws Exception {
         return export(context, buildFromCommunity(context, community), exportAll);
     }

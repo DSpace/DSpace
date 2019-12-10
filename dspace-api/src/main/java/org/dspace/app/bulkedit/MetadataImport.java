@@ -21,7 +21,6 @@ import java.util.Set;
 import java.util.UUID;
 import javax.annotation.Nullable;
 
-import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.lang3.StringUtils;
@@ -59,6 +58,7 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.handle.service.HandleService;
 import org.dspace.scripts.DSpaceRunnable;
+import org.dspace.scripts.handler.DSpaceRunnableHandler;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowService;
 import org.dspace.workflow.factory.WorkflowServiceFactory;
@@ -219,7 +219,7 @@ public class MetadataImport extends DSpaceRunnable implements InitializingBean {
                 try {
                     // Ask the user if they want to make the changes
                     handler.logInfo("\n" + changeCounter + " item(s) will be changed\n");
-                    change = handler.getUserValidation();
+                    change = determineChange(handler);
 
                 } catch (IOException ioe) {
                     throw new IOException("Error: " + ioe.getMessage() + ", No changes have been made", ioe);
@@ -254,6 +254,10 @@ public class MetadataImport extends DSpaceRunnable implements InitializingBean {
                 "Error committing changes to database: " + e.getMessage() + ", aborting most recent changes", e);
         }
 
+    }
+
+    protected boolean determineChange(DSpaceRunnableHandler handler) throws IOException {
+        return true;
     }
 
     public void setup() throws ParseException {
@@ -322,7 +326,7 @@ public class MetadataImport extends DSpaceRunnable implements InitializingBean {
         change = false;
     }
 
-    private MetadataImport() {
+    public MetadataImport() {
         Options options = constructOptions();
         this.options = options;
     }
@@ -1228,20 +1232,6 @@ public class MetadataImport extends DSpaceRunnable implements InitializingBean {
 
         // Remove newlines as different operating systems sometimes use different formats
         return in.replaceAll("\r\n", "").replaceAll("\n", "").trim();
-    }
-
-    /**
-     * Print the help message
-     *
-     * @param options  The command line options the user gave
-     * @param exitCode the system exit code to use
-     */
-    private static void printHelp(Options options, int exitCode) {
-        // print the help message
-        HelpFormatter myhelp = new HelpFormatter();
-        myhelp.printHelp("MetatadataImport\n", options);
-        System.out.println("\nmetadataimport: MetadataImport -f filename");
-        System.exit(exitCode);
     }
 
     /**
