@@ -825,7 +825,7 @@
                     <dc-qualifier>iso</dc-qualifier>
                     <repeatable>false</repeatable>
                     <label>Language</label>
-                    <input-type value-pairs-name="common_iso_639-3_languages">dropdown</input-type>
+                    <input-type value-pairs-name="common_iso_languages">dropdown</input-type>
                     <hint>Select the language of the main content of the item. If the language does not appear in the
                         list, please select 'Other'. If the content does not really have a language (for example, if it
                         is a dataset or an image) please select 'N/A'.
@@ -1290,6 +1290,14 @@
                 <stored-value>tr</stored-value>
             </pair>
             <pair>
+                <displayed-value>Portuguese</displayed-value>
+                <stored-value>pt</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Turkish</displayed-value>
+                <stored-value>tr</stored-value>
+            </pair>
+            <pair>
                 <displayed-value>(Other)</displayed-value>
                 <stored-value>other</stored-value>
             </pair>
@@ -1661,57 +1669,6 @@
             <pair>
                 <displayed-value>Not Applicable (or Unknown)</displayed-value>
                 <stored-value>http://purl.org/coar/version/c_be7fb7dd8ff6fe43</stored-value>
-            </pair>
-        </value-pairs>
-
-        <value-pairs value-pairs-name="common_iso_639-3_languages" dc-term="language_iso">
-            <pair>
-                <displayed-value>N/A</displayed-value>
-                <stored-value></stored-value>
-            </pair>
-            <pair><!-- two versions of english ?? -->
-                <displayed-value>English (United States)</displayed-value>
-                <stored-value>eng</stored-value>
-            </pair>
-            <pair>
-                <displayed-value>English</displayed-value>
-                <stored-value>eng</stored-value>
-            </pair>
-            <pair>
-                <displayed-value>Spanish</displayed-value>
-                <stored-value>spa</stored-value>
-            </pair>
-            <pair>
-                <displayed-value>German</displayed-value>
-                <stored-value>deu</stored-value>
-            </pair>
-            <pair>
-                <displayed-value>French</displayed-value>
-                <stored-value>fra</stored-value>
-            </pair>
-            <pair>
-                <displayed-value>Italian</displayed-value>
-                <stored-value>ita</stored-value>
-            </pair>
-            <pair>
-                <displayed-value>Japanese</displayed-value>
-                <stored-value>jpn</stored-value>
-            </pair>
-            <pair>
-                <displayed-value>Chinese</displayed-value>
-                <stored-value>zho</stored-value>
-            </pair>
-            <pair>
-                <displayed-value>Portuguese</displayed-value>
-                <stored-value>por</stored-value>
-            </pair>
-            <pair>
-                <displayed-value>Turkish</displayed-value>
-                <stored-value>tur</stored-value>
-            </pair>
-            <pair>
-                <displayed-value>(Other)</displayed-value>
-                <stored-value>other</stored-value>
             </pair>
         </value-pairs>
 
