@@ -262,9 +262,6 @@ public class RelationshipServiceImplTest {
                 .thenReturn(leftTypelist);
         when(relationshipService.findByItemAndRelationshipType(context, rightItem, testRel, false))
                 .thenReturn(rightTypelist);
-        when(itemService.getMetadata(leftItem, "relationship", "type", null, Item.ANY)).thenReturn(metsList);
-        when(itemService.getMetadata(rightItem, "relationship", "type", null, Item.ANY)).thenReturn(metsList);
-        when(relationshipDAO.create(any(), any())).thenReturn(relationship);
         when(relationshipService.find(context,0)).thenReturn(relationship);
 
         // Invoke delete()

@@ -132,7 +132,6 @@ public class RelatedTest {
         // Mock the state of objects utilized in getRelationsByLabel() to meet the success criteria of an invocation
         when(item.getID()).thenReturn(UUID.randomUUID());
         when(relationshipType.getLeftwardType()).thenReturn("LeftwardType");
-        when(relationshipType.getRightwardType()).thenReturn("RightwardType");
         when(relationshipType.getLeftType()).thenReturn(entityType);
         when(entityService.getAllRelationshipTypes(context, entity)).thenReturn(relationshipTypeList);
         when(entityService.findByItemId(context, item.getID())).thenReturn(entity);

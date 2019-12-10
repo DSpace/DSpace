@@ -112,7 +112,8 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
     public Page<EPersonRest> findAll(Context context, Pageable pageable) {
         try {
             long total = es.countTotal(context);
-            List<EPerson> epersons = es.findAll(context, EPerson.EMAIL, pageable.getPageSize(), Math.toIntExact(pageable.getOffset()));
+            List<EPerson> epersons = es.findAll(context, EPerson.EMAIL, pageable.getPageSize(),
+                    Math.toIntExact(pageable.getOffset()));
             return converter.toRestPage(epersons, pageable, total, utils.obtainProjection(true));
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
