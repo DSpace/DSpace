@@ -211,6 +211,18 @@
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <version>${spring-boot.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-tomcat</artifactId>
+            <scope>provided</scope>
+            <version>${spring-boot.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-rest</artifactId>
             <version>${spring-boot.version}</version>
         </dependency>
@@ -273,6 +285,11 @@
             <artifactId>dspace-api</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-services</artifactId>
+        </dependency>
+
         <!-- DSpace modules to deploy (this modules are all optional, but add features/endpoints to webapp) -->
         <!-- You may choose to comment out any of these modules if you do not want/need its features -->
         <dependency>
@@ -292,6 +309,14 @@
             <artifactId>dspace-swordv2</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-collections4</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
+        </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
