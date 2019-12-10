@@ -52,7 +52,7 @@
             <row>
                 <relation-field>
                     <relationship-type>isAuthorOfPublication</relationship-type>
-                    <search-configuration>personConfiguration</search-configuration>
+                    <search-configuration>person</search-configuration>
                     <repeatable>true</repeatable>
                     <name-variants>true</name-variants>
                     <label>Author</label>
