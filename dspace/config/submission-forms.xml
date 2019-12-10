@@ -200,6 +200,7 @@
                 <relation-field>
                     <relationship-type>isOrgUnitOfPublication</relationship-type>
                     <search-configuration>organization</search-configuration>
+                    <repeatable>true</repeatable>
                     <label>Organization</label>
                     <hint>Select the Organizational Unit related to this publication.</hint>
                 </relation-field>
