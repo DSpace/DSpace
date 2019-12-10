@@ -63,8 +63,8 @@
                 <entry key="project" value-ref="project"/>
                 <!-- OpenAIRE4 guidelines - search for a creator that can be a Person
                      or an OrgUnit -->
-                <entry key="openAIRECreatorConfiguration" value-ref="openAIREAuthor"/>
-                <!-- OpenAIRE4 guidelines - search for an OrgUnit -->
+                <entry key="openAIRECreatorConfiguration" value-ref="personOrOrganization"/>
+                <!-- OpenAIRE4 guidelines - search for an OrgUnit that have a specific dc.type=FundingOrganization -->
                 <entry key="openAIREFundingAgencyConfiguration" value-ref="openAIREFundingAgency"/>
             </map>
         </property>
@@ -955,9 +955,9 @@
         <property name="spellCheckEnabled" value="true"/>
     </bean>
 
-    <bean id="openAIREAuthor" class="org.dspace.discovery.configuration.DiscoveryConfiguration"
+    <bean id="personOrOrganization" class="org.dspace.discovery.configuration.DiscoveryConfiguration"
           scope="prototype">
-        <property name="id" value="author"/>
+        <property name="id" value="personOrOrganization"/>
         <property name="indexAlways" value="true"/>
         <!--Which sidebar facets are to be displayed-->
         <property name="sidebarFacets">
@@ -1069,7 +1069,7 @@
             queries done by discovery for this configuration -->
         <property name="defaultFilterQueries">
             <list>
-                <!--Only find items, communities and collections-->
+                <!--Only find items that have a entityType=OrgUnit and a dc.type=FundingOrganization -->
                 <value>search.resourcetype:2 AND entityType_keyword:OrgUnit AND dc.type:FundingOrganization</value>
             </list>
         </property>
