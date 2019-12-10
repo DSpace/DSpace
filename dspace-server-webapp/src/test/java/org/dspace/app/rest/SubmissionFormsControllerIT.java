@@ -139,7 +139,7 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                         .andExpect(jsonPath("$.rows[0].fields", contains(
                             SubmissionFormFieldMatcher.matchFormClosedRelationshipFieldDefinition("Journal", null,
                     false,"Select the journal related to this volume.", "isVolumeOfJournal",
-                        "creativework.publisher:somepublishername", "periodicalConfiguration", false))))
+                        "creativework.publisher:somepublishername", "periodical", false))))
         ;
     }
 }

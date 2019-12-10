@@ -189,6 +189,22 @@
 
         <form name="traditionalpagetwo">
             <row>
+                <relation-field>
+                    <relationship-type>isJournalIssueOfPublication</relationship-type>
+                    <search-configuration>publicationIssue</search-configuration>
+                    <label>Journal Issue</label>
+                    <hint>Select the journal issue related to this publication.</hint>
+                </relation-field>
+            </row>
+            <row>
+                <relation-field>
+                    <relationship-type>isOrgUnitOfPublication</relationship-type>
+                    <search-configuration>organization</search-configuration>
+                    <label>Organization</label>
+                    <hint>Select the Organizational Unit related to this publication.</hint>
+                </relation-field>
+            </row>
+            <row>
                 <field>
                     <dc-schema>dc</dc-schema>
                     <dc-element>subject</dc-element>
@@ -305,6 +321,14 @@
                     <input-type>onebox</input-type>
                     <hint>Enter the job title of the person</hint>
                 </field>
+            </row>
+            <row>
+                <relation-field>
+                    <relationship-type>isOrgUnitOfPerson</relationship-type>
+                    <search-configuration>organization</search-configuration>
+                    <label>Organization</label>
+                    <hint>Select the Organizational Unit this is part of.</hint>
+                </relation-field>
             </row>
         </form>
 
@@ -491,7 +515,7 @@
             <row>
                 <relation-field>
                     <relationship-type>isVolumeOfJournal</relationship-type>
-                    <search-configuration>periodicalConfiguration</search-configuration>
+                    <search-configuration>periodical</search-configuration>
                     <filter>creativework.publisher:somepublishername</filter>
                     <label>Journal</label>
                     <hint>Select the journal related to this volume.</hint>
