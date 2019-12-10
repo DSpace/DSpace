@@ -106,34 +106,6 @@
             <scope visibilityOutside="read-only">submission</scope>
         </step>
 
-        <!-- OpenAIRE submission steps/forms -->
-        <step id="openAIREProjectForm" mandatory="true">
-            <heading>submit.progressbar.describe.stepone</heading>
-            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
-            <type>submission-form</type>
-        </step>
-
-        <step id="openAIREPersonForm" mandatory="true">
-            <heading>submit.progressbar.describe.stepone</heading>
-            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
-            <type>submission-form</type>
-        </step>
-        <step id="openAIREOrganizationForm" mandatory="true">
-            <heading>submit.progressbar.describe.stepone</heading>
-            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
-            <type>submission-form</type>
-        </step>
-        <step id="openAIREPublicationPageoneForm" mandatory="true">
-            <heading>submit.progressbar.describe.stepone</heading>
-            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
-            <type>submission-form</type>
-        </step>
-        <step id="openAIREPublicationPagetwoForm" mandatory="true">
-            <heading>submit.progressbar.describe.stepone</heading>
-            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
-            <type>submission-form</type>
-        </step>
-
         <!-- Step Upload Item with Embargo Features to enable this step, please 
             make sure to comment-out the previous step "UploadStep" <step id="upload-with-embargo"> 
             <heading>submit.progressbar.upload</heading> <processing-class>org.dspace.submit.step.UploadWithEmbargoStep</processing-class> 
@@ -162,6 +134,33 @@
             <scope visibility="read-only">submission</scope> </step> <step mandatory="false"> 
             <heading>fake.workflow.readonly</heading> <processing-class>org.dspace.submit.step.SampleStep</processing-class> 
             <type>sample</type> <scope visibility="read-only">workflow</scope> </step> -->
+
+        <!-- OpenAIRE submission steps/forms -->
+        <step id="openAIREProjectForm" mandatory="true">
+            <heading>submit.progressbar.describe.stepone</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+        </step>
+        <step id="openAIREPersonForm" mandatory="true">
+            <heading>submit.progressbar.describe.stepone</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+        </step>
+        <step id="openAIREOrganizationForm" mandatory="true">
+            <heading>submit.progressbar.describe.stepone</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+        </step>
+        <step id="openAIREPublicationPageoneForm" mandatory="true">
+            <heading>submit.progressbar.describe.stepone</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+        </step>
+        <step id="openAIREPublicationPagetwoForm" mandatory="true">
+            <heading>submit.progressbar.describe.stepone</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+        </step>
 
         <!-- This is the Sample Step which utilizes the JSPSampleStep class -->
         <step id="sample">
