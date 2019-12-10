@@ -116,7 +116,7 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                             SubmissionFormFieldMatcher.matchFormOpenRelationshipFieldDefinition("name",
                         "Author", null, true,"Add an author",
                     "dc.contributor.author", "isAuthorOfPublication", null,
-            "personConfiguration", true))))
+            "person", true))))
         ;
     }
 
