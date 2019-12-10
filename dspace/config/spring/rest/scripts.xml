@@ -6,4 +6,8 @@
         <property name="corePoolSize" value="5"/>
     </bean>
 
+    <bean id="MetadataImport" class="org.dspace.app.bulkedit.MetadataImport" scope="prototype">
+        <property name="name" value="metadata-import" />
+        <property name="description" value="Import metadata after batch editing" />
+    </bean>
 </beans>

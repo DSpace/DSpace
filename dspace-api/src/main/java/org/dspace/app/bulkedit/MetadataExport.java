@@ -21,7 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class MetadataExport extends DSpaceRunnable {
 
-    private Context c = null;
+    private Context context = null;
     private boolean help = false;
     private String filename = null;
     private String handle = null;
@@ -31,43 +31,46 @@ public class MetadataExport extends DSpaceRunnable {
     @Autowired
     private MetadataExportService metadataExportService;
 
-    protected Context context;
-
     private MetadataExport() {
-        Options options = constructOptions();
-        this.options = options;
+        this.options = constructOptions();
     }
 
     private Options constructOptions() {
         Options options = new Options();
 
         options.addOption("i", "id", true, "ID or handle of thing to export (item, collection, or community)");
+        options.getOption("i").setType(String.class);
         options.addOption("f", "file", true, "destination where you want file written");
+        options.getOption("f").setType(String.class);
         options.getOption("f").setRequired(true);
         options.addOption("a", "all", false,
                           "include all metadata fields that are not normally changed (e.g. provenance)");
+        options.getOption("a").setType(boolean.class);
         options.addOption("h", "help", false, "help");
+        options.getOption("h").setType(boolean.class);
+
 
         return options;
     }
 
     public void internalRun() throws Exception {
         if (help) {
-            handler.logInfo("\nfull export: metadataexport -f filename");
-            handler.logInfo("partial export: metadataexport -i handle -f filename");
+            handler.logInfo("\nfull export: metadata-export -f filename");
+            handler.logInfo("partial export: metadata-export -i handle -f filename");
             printHelp();
             return;
         }
 
-        DSpaceCSV dSpaceCSV = metadataExportService.handleExport(c, exportAllItems, exportAllMetadata, handle);
-        handler.writeFilestream(c, filename, dSpaceCSV.getInputStream(), "exportCSV");
-        c.restoreAuthSystemState();
-        c.complete();
+        DSpaceCSV dSpaceCSV = metadataExportService.handleExport(context, exportAllItems, exportAllMetadata, handle,
+                                                                 handler);
+        handler.writeFilestream(context, filename, dSpaceCSV.getInputStream(), "exportCSV");
+        context.restoreAuthSystemState();
+        context.complete();
     }
 
     public void setup() throws ParseException {
-        c = new Context();
-        c.turnOffAuthorisationSystem();
+        context = new Context();
+        context.turnOffAuthorisationSystem();
 
         if (commandLine.hasOption('h')) {
             help = true;

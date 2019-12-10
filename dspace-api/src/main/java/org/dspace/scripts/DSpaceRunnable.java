@@ -77,6 +77,11 @@ public abstract class DSpaceRunnable implements Runnable {
         return options;
     }
 
+    /**
+     * This method will traverse all the options and it'll grab options defined as an InputStream type to then save
+     * the filename specified by that option in a list of Strings that'll be returned in the end
+     * @return  The list of Strings representing filenames from the options given to the script
+     */
     public List<String> getFileNamesFromInputStreamOptions() {
         List<String> fileNames = new LinkedList<>();
 

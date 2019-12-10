@@ -135,8 +135,24 @@ public interface ProcessService {
      */
     public List<DSpaceCommandLineParameter> getParameters(Process process);
 
+    /**
+     * This method will return the Bitstream that matches the given name for the given Process
+     * @param context           The relevant DSpace context
+     * @param process           The process that should hold the requested Bitstream
+     * @param bitstreamName     The name of the requested Bitstream
+     * @return                  The Bitstream from the given Process that matches the given bitstream name
+     */
     public Bitstream getBitstreamByName(Context context, Process process, String bitstreamName);
 
+    /**
+     * This method will return all the Bitstreams for a given process if the type is defined as null. If type is
+     * different than null, the bitstreams with metadata process.type equal to the given type from that process
+     * are returned
+     * @param context   The relevant DSpace context
+     * @param process   The process that holds the Bitstreams to be searched in
+     * @param type      The type that the Bitstream must have
+     * @return          The list of Bitstreams of the given type for the given Process
+     */
     public List<Bitstream> getBitstreams(Context context, Process process, String type);
 
     /**
