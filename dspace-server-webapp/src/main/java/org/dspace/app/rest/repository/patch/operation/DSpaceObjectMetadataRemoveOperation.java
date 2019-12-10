@@ -39,10 +39,10 @@ import org.springframework.stereotype.Component;
  * @author Maria Verdonck (Atmire) on 18/11/2019
  */
 @Component
-public class DspaceObjectMetadataRemoveOperation<R extends DSpaceObject> extends PatchOperation<R> {
+public class DSpaceObjectMetadataRemoveOperation<R extends DSpaceObject> extends PatchOperation<R> {
 
     @Autowired
-    DspaceObjectMetadataPatchUtils metadataPatchUtils;
+    DSpaceObjectMetadataPatchUtils metadataPatchUtils;
 
     @Override
     public R perform(Context context, R resource, Operation operation) throws SQLException {
@@ -88,7 +88,7 @@ public class DspaceObjectMetadataRemoveOperation<R extends DSpaceObject> extends
                 }
             }
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("This index (" + index + ") is not valid nr", e);
+            throw new IllegalArgumentException("This index (" + index + ") is not valid number.", e);
         } catch (ArrayIndexOutOfBoundsException e) {
             throw new UnprocessableEntityException("There is no metadata of this type at that index");
         } catch (SQLException e) {

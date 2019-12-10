@@ -36,7 +36,7 @@ public class BundleMoveOperation extends PatchOperation<Bundle> {
     BundleService bundleService;
 
     @Autowired
-    DspaceObjectMetadataPatchUtils dspaceObjectMetadataPatchUtils;
+    DSpaceObjectMetadataPatchUtils dspaceObjectMetadataPatchUtils;
 
     private static final String OPERATION_PATH_BUNDLE_MOVE = "/_links/bitstreams/";
 

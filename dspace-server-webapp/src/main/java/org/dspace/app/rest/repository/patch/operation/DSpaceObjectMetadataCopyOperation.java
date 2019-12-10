@@ -39,10 +39,10 @@ import org.springframework.stereotype.Component;
  * @author Maria Verdonck (Atmire) on 18/11/2019
  */
 @Component
-public class DspaceObjectMetadataCopyOperation<R extends DSpaceObject> extends PatchOperation<R> {
+public class DSpaceObjectMetadataCopyOperation<R extends DSpaceObject> extends PatchOperation<R> {
 
     @Autowired
-    DspaceObjectMetadataPatchUtils metadataPatchUtils;
+    DSpaceObjectMetadataPatchUtils metadataPatchUtils;
 
     @Override
     public R perform(Context context, R resource, Operation operation) throws SQLException {
@@ -85,7 +85,7 @@ public class DspaceObjectMetadataCopyOperation<R extends DSpaceObject> extends P
                 throw new UnprocessableEntityException("There is no metadata of this type at that index");
             }
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("This index (" + indexToCopyFrom + ") is not valid nr", e);
+            throw new IllegalArgumentException("This index (" + indexToCopyFrom + ") is not valid number.", e);
         } catch (SQLException e) {
             throw new DSpaceBadRequestException("SQLException in DspaceObjectMetadataCopyOperation.copy trying to " +
                     "add metadata to dso.", e);

@@ -37,10 +37,10 @@ import org.springframework.stereotype.Component;
  * @author Maria Verdonck (Atmire) on 18/11/2019
  */
 @Component
-public class DspaceObjectMetadataReplaceOperation<R extends DSpaceObject> extends PatchOperation<R> {
+public class DSpaceObjectMetadataReplaceOperation<R extends DSpaceObject> extends PatchOperation<R> {
 
     @Autowired
-    DspaceObjectMetadataPatchUtils metadataPatchUtils;
+    DSpaceObjectMetadataPatchUtils metadataPatchUtils;
 
     @Override
     public R perform(Context context, R resource, Operation operation) throws SQLException {
@@ -166,7 +166,7 @@ public class DspaceObjectMetadataReplaceOperation<R extends DSpaceObject> extend
                 throw new UnprocessableEntityException("There is no metadata of this type at that index");
             }
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("This index (" + index + ") is not valid nr", e);
+            throw new IllegalArgumentException("This index (" + index + ") is not valid number.", e);
         }
     }
 

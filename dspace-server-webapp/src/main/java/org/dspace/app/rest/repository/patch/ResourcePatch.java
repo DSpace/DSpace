@@ -46,7 +46,7 @@ public class ResourcePatch<M extends DSpaceObject> {
 
     /**
      * Checks with all possible patch operations whether they support this operation
-     *      (based on instanceof restModel and operation.path
+     *      (based on instanceof dso and operation.path)
      * @param context       Context of patch operation
      * @param dso           the dso resource to patch
      * @param operation     the patch operation
