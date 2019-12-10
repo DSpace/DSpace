@@ -136,12 +136,14 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         Community community2 = CommunityBuilder.createCommunity(context).withName("My community_2").build();
 
         ResourcePolicy resourcePolicyOfEPerson1 = ResourcePolicyBuilder.createResourcePolicy(context)
-                .withDspaceObject(community).withAction(Constants.ADD).withPolicyType(ResourcePolicy.TYPE_CUSTOM)
+                .withDspaceObject(community)
+                .withAction(Constants.ADD)
                 .withUser(eperson1).build();
 
         ResourcePolicy resourcePolicyOfEPerson2 = ResourcePolicyBuilder.createResourcePolicy(context)
-                .withDspaceObject(community2).withAction(Constants.REMOVE)
-                .withPolicyType(ResourcePolicy.TYPE_CUSTOM).withUser(eperson2).build();
+                .withDspaceObject(community2)
+                .withAction(Constants.REMOVE)
+                .withUser(eperson2).build();
 
         context.restoreAuthSystemState();
 
@@ -172,16 +174,19 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
                 .build();
 
         ResourcePolicy resourcePolicyOfCommunity = ResourcePolicyBuilder.createResourcePolicy(context)
-                .withDspaceObject(community).withAction(Constants.READ).withPolicyType(ResourcePolicy.TYPE_CUSTOM)
+                .withDspaceObject(community)
+                .withAction(Constants.READ)
                 .withUser(eperson1).build();
 
         ResourcePolicy secondResourcePolicyOfCommunity = ResourcePolicyBuilder.createResourcePolicy(context)
-                .withDspaceObject(community).withAction(Constants.REMOVE).withPolicyType(ResourcePolicy.TYPE_CUSTOM)
+                .withDspaceObject(community)
+                .withAction(Constants.REMOVE)
                 .withUser(eperson1).build();
 
         ResourcePolicy resourcePolicyOfCollection = ResourcePolicyBuilder.createResourcePolicy(context)
-                .withDspaceObject(collection).withAction(Constants.REMOVE)
-                .withPolicyType(ResourcePolicy.TYPE_SUBMISSION).withUser(eperson1).build();
+                .withDspaceObject(collection)
+                .withAction(Constants.REMOVE)
+                .withUser(eperson1).build();
 
         context.restoreAuthSystemState();
 
@@ -235,7 +240,6 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
                 .withDspaceObject(community)
                 .withAction(Constants.READ)
-                .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
                 .withUser(eperson1).build();
 
         context.restoreAuthSystemState();
@@ -278,7 +282,6 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         ResourcePolicy firstResourcePolicyOfEPerson1 = ResourcePolicyBuilder.createResourcePolicy(context)
                 .withDspaceObject(community)
                 .withAction(Constants.WRITE)
-                .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
                 .withUser(eperson1).build();
 
         ResourcePolicy firstResourcePolicyOfEPerson2 = ResourcePolicyBuilder.createResourcePolicy(context)
@@ -331,19 +334,16 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         ResourcePolicy firstResourcePolicyOfEPerson1 = ResourcePolicyBuilder.createResourcePolicy(context)
                 .withDspaceObject(collection)
                 .withAction(Constants.WRITE)
-                .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
                 .withUser(eperson1).build();
 
         ResourcePolicy secondResourcePolicyOfEPerson1 = ResourcePolicyBuilder.createResourcePolicy(context)
                 .withDspaceObject(collection)
                 .withAction(Constants.ADD)
-                .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
                 .withUser(eperson1).build();
 
         ResourcePolicy firstResourcePolicyOfEPerson2 = ResourcePolicyBuilder.createResourcePolicy(context)
                 .withDspaceObject(collection)
                 .withAction(Constants.ADD)
-                .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
                 .withUser(eperson2).build();
 
       context.restoreAuthSystemState();
@@ -398,7 +398,6 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
       ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
               .withDspaceObject(community)
               .withAction(Constants.READ)
-              .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
               .withUser(eperson1).build();
 
       context.restoreAuthSystemState();

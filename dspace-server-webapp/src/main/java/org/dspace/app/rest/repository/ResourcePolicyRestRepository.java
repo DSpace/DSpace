@@ -88,13 +88,13 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
             Context context = obtainContext();
             if (action != null) {
                 int actionId = Constants.getActionID(action);
-                resourcePolisies = resourcePolicyService.searchByResouceUuidAndActionId(context, resourceUuid, actionId,
+                resourcePolisies = resourcePolicyService.findByResouceUuidAndActionId(context, resourceUuid, actionId,
                         pageable.getOffset(), pageable.getOffset() + pageable.getPageSize());
-                total = resourcePolicyService.searchCountByResouceAndAction(context, resourceUuid, actionId);
+                total = resourcePolicyService.countByResouceUuidAndActionId(context, resourceUuid, actionId);
             } else {
-                resourcePolisies = resourcePolicyService.searchByResouceUuid(context, resourceUuid,
+                resourcePolisies = resourcePolicyService.findByResouceUuid(context, resourceUuid,
                         pageable.getOffset(), pageable.getOffset() + pageable.getPageSize());
-                total = resourcePolicyService.searchCountByResourceUuid(context, resourceUuid);
+                total = resourcePolicyService.countByResourceUuid(context, resourceUuid);
             }
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
@@ -116,13 +116,14 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
                 return null;
             }
             if (resourceUuid != null) {
-                resourcePolisies = resourcePolicyService.searchByEPersonAndResourceUuid(context, eperson, resourceUuid,
+                resourcePolisies = resourcePolicyService.findByEPersonAndResourceUuid(context, eperson, resourceUuid,
                                    pageable.getOffset(), pageable.getOffset() + pageable.getPageSize());
-                total = resourcePolicyService.searchCountResourcePolicies(context, resourceUuid, eperson);
+                total = resourcePolicyService.countResourcePoliciesByEPersonAndResourceUuid(context,
+                        resourceUuid, eperson);
             } else {
                 resourcePolisies = resourcePolicyService.findByEPerson(context, eperson, pageable.getOffset(),
                         pageable.getOffset() + pageable.getPageSize());
-                total = resourcePolicyService.searchCountEPerson(context, eperson);
+                total = resourcePolicyService.countByEPerson(context, eperson);
             }
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
@@ -144,13 +145,13 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
                 return null;
             }
             if (resourceUuid != null) {
-                resourcePolisies = resourcePolicyService.searchByGroupAndResourceUuid(context, group, resourceUuid,
+                resourcePolisies = resourcePolicyService.findByGroupAndResourceUuid(context, group, resourceUuid,
                         pageable.getOffset(), pageable.getOffset() + pageable.getPageSize());
-                total = resourcePolicyService.searchCountByGroupAndResourceUuid(context, group, resourceUuid);
+                total = resourcePolicyService.countByGroupAndResourceUuid(context, group, resourceUuid);
             } else {
-                resourcePolisies = resourcePolicyService.searchByGroup(context, group, pageable.getOffset(),
+                resourcePolisies = resourcePolicyService.findByGroup(context, group, pageable.getOffset(),
                         pageable.getOffset() + pageable.getPageSize());
-                total = resourcePolicyService.searchCountResourcePolicyOfGroup(context, group);
+                total = resourcePolicyService.countResourcePolicyByGroup(context, group);
             }
 
         } catch (SQLException e) {
