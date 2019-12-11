@@ -30,7 +30,7 @@ public class RelationshipTypeResourceWrapperHalLinkFactory
     protected void addLinks(RelationshipTypeResourceWrapper halResource, Pageable pageable, LinkedList<Link> list)
         throws Exception {
         list.add(buildLink(Link.REL_SELF, getMethodOn()
-            .retrieve(halResource.getContent().getEntityTypeId(), null, null)));
+            .retrieve(halResource.getContent().getEntityTypeId(), null, null, null, null)));
     }
 
     @Override

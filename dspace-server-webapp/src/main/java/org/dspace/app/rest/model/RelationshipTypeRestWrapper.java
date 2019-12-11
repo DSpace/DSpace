@@ -10,6 +10,7 @@ package org.dspace.app.rest.model;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.dspace.app.rest.RelationshipTypeRestController;
 
 /**
@@ -23,7 +24,9 @@ public class RelationshipTypeRestWrapper extends RestAddressableModel {
     @JsonIgnore
     private List<RelationshipTypeRest> relationshipTypeRestList;
 
+    @JsonIgnore
     private String entityTypeLabel;
+    @JsonIgnore
     private Integer entityTypeId;
 
     public List<RelationshipTypeRest> getRelationshipTypeRestList() {
@@ -43,6 +46,7 @@ public class RelationshipTypeRestWrapper extends RestAddressableModel {
         return RelationshipTypeRestController.class;
     }
 
+    @JsonIgnore
     public String getType() {
         return "relationshiptype";
     }
