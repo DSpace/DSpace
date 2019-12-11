@@ -20,6 +20,7 @@ import org.dspace.content.service.BitstreamService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 /**
@@ -32,7 +33,7 @@ public class BitstreamFormatLinkRepository extends AbstractDSpaceRestRepository
     @Autowired
     BitstreamService bitstreamService;
 
-    //@PreAuthorize("hasPermission(#bitstreamId, 'BITSTREAM', 'READ')")
+    @PreAuthorize("hasPermission(#bitstreamId, 'BITSTREAM', 'READ')")
     public BitstreamFormatRest getFormat(@Nullable HttpServletRequest request,
                                          UUID bitstreamId,
                                          @Nullable Pageable optionalPageable,

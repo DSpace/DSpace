@@ -20,6 +20,7 @@ import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 /**
@@ -32,7 +33,7 @@ public class ItemTemplateItemOfLinkRepository extends AbstractDSpaceRestReposito
     @Autowired
     ItemService itemService;
 
-    //@PreAuthorize("hasPermission(#itemId, 'ITEM', 'READ')")
+    @PreAuthorize("hasPermission(#itemId, 'ITEM', 'READ')")
     public CollectionRest getTemplateItemOf(@Nullable HttpServletRequest request,
                                             UUID itemId,
                                             @Nullable Pageable optionalPageable,

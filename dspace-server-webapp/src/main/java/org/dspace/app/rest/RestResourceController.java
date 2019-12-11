@@ -819,8 +819,14 @@ public class RestResourceController implements InitializingBean {
                         return tmpresult;
                     }
                 }
-            } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-                throw new RuntimeException(e.getMessage(), e);
+            } catch (InvocationTargetException e) {
+                if (e.getTargetException() instanceof RuntimeException) {
+                    throw (RuntimeException) e.getTargetException();
+                } else {
+                    throw new RuntimeException(e);
+                }
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
             }
         }
         RestAddressableModel modelObject = repository.findById(uuid).orElse(null);
