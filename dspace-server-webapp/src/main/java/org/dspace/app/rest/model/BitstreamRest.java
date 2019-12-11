@@ -15,17 +15,23 @@ import com.fasterxml.jackson.annotation.JsonProperty.Access;
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
+@LinksRest(links = {
+        @LinkRest(
+                name = BitstreamRest.FORMAT,
+                linkClass = BitstreamFormatRest.class,
+                method = "getFormat",
+                embedOptional = true
+        )
+})
 public class BitstreamRest extends DSpaceObjectRest {
     public static final String PLURAL_NAME = "bitstreams";
     public static final String NAME = "bitstream";
     public static final String CATEGORY = RestAddressableModel.CORE;
+
+    public static final String FORMAT = "format";
+
     private String bundleName;
 
-    // avoid to serialize this object inline as we want a full resource embedded
-    // TODO extends this annotation to provide information about lazy loading
-    // and projection behavior
-    @JsonProperty(access = Access.WRITE_ONLY)
-    private BitstreamFormatRest format;
     private Long sizeBytes;
     private CheckSumRest checkSum;
     // sequenceId is READ_ONLY because it is assigned by the ItemService (as it must be unique within an Item)
@@ -38,14 +44,6 @@ public class BitstreamRest extends DSpaceObjectRest {
 
     public void setBundleName(String bundleName) {
         this.bundleName = bundleName;
-    }
-
-    public BitstreamFormatRest getFormat() {
-        return format;
-    }
-
-    public void setFormat(BitstreamFormatRest format) {
-        this.format = format;
     }
 
     public Long getSizeBytes() {
