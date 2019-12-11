@@ -149,12 +149,19 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
         Context context = obtainContext();
         if (itemRest.getWithdrawn() != item.isWithdrawn()) {
             if (itemRest.getWithdrawn()) {
+                if (item.getTemplateItemOf() != null) {
+                    throw new UnprocessableEntityException("A template item cannot be withdrawn.");
+                }
                 itemService.withdraw(context, item);
             } else {
                 itemService.reinstate(context, item);
             }
         }
+
         if (itemRest.getDiscoverable() != item.isDiscoverable()) {
+            if (itemRest.getDiscoverable() && item.getTemplateItemOf() != null) {
+                throw new UnprocessableEntityException("A template item cannot be discoverable.");
+            }
             item.setDiscoverable(itemRest.getDiscoverable());
             itemService.update(context, item);
         }

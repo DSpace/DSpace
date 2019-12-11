@@ -809,11 +809,15 @@ public class RestResourceController implements InitializingBean {
                 } else {
                     RestModel object = (RestModel) linkMethod.invoke(linkRepository, request, uuid, page,
                             utils.obtainProjection());
-                    Link link = linkTo(this.getClass(), apiCategory, model).slash(uuid).slash(subpath)
-                            .withSelfRel();
-                    HALResource tmpresult = converter.toResource(object);
-                    tmpresult.add(link);
-                    return tmpresult;
+                    if (object == null) {
+                        throw new ResourceNotFoundException(subpath + " undefined for " + model + "/" + uuid);
+                    } else {
+                        Link link = linkTo(this.getClass(), apiCategory, model).slash(uuid).slash(subpath)
+                                .withSelfRel();
+                        HALResource tmpresult = converter.toResource(object);
+                        tmpresult.add(link);
+                        return tmpresult;
+                    }
                 }
             } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
                 throw new RuntimeException(e.getMessage(), e);

@@ -9,7 +9,6 @@ package org.dspace.app.rest.repository.patch.factories.impl;
 
 import org.apache.log4j.Logger;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
-import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.patch.Operation;
 import org.springframework.stereotype.Component;
@@ -30,17 +29,10 @@ public class ItemDiscoverableReplaceOperation extends ReplacePatchOperation<Item
 
     private static final Logger log = Logger.getLogger(ItemDiscoverableReplaceOperation.class);
 
-
     @Override
     public ItemRest replace(ItemRest item, Operation operation) {
 
-        Boolean discoverable = getBooleanOperationValue(operation.getValue());
-        if (discoverable) {
-            if (item.getTemplateItemOf() != null) {
-                throw new UnprocessableEntityException("A template item cannot be discoverable.");
-            }
-        }
-        item.setDiscoverable(discoverable);
+        item.setDiscoverable(getBooleanOperationValue(operation.getValue()));
         return item;
 
     }
