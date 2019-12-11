@@ -20,6 +20,7 @@ import org.dspace.content.service.BundleService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 /**
@@ -32,7 +33,7 @@ public class BundlePrimaryBitstreamLinkRepository extends AbstractDSpaceRestRepo
     @Autowired
     BundleService bundleService;
 
-    //@PreAuthorize("hasPermission(#bundleId, 'BUNDLE', 'READ')")
+    @PreAuthorize("hasPermission(#bundleId, 'BUNDLE', 'READ')")
     public BitstreamRest getPrimaryBitstream(@Nullable HttpServletRequest request,
                                              UUID bundleId,
                                              @Nullable Pageable optionalPageable,

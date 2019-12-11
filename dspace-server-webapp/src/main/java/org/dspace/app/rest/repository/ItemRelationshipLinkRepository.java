@@ -25,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 /**
@@ -40,7 +41,7 @@ public class ItemRelationshipLinkRepository extends AbstractDSpaceRestRepository
     @Autowired
     ItemService itemService;
 
-    //@PreAuthorize("hasPermission(#itemId, 'ITEM', 'READ')")
+    @PreAuthorize("hasPermission(#itemId, 'ITEM', 'READ')")
     public Page<RelationshipRest> getRelationships(@Nullable HttpServletRequest request,
                                                    UUID itemId,
                                                    @Nullable Pageable optionalPageable,
