@@ -8,7 +8,6 @@
 package org.dspace.app.rest;
 
 import java.sql.SQLException;
-import java.util.LinkedList;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -16,10 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.link.HalLinkService;
 import org.dspace.app.rest.model.RelationshipTypeRest;
-import org.dspace.app.rest.model.RelationshipTypeRestWrapper;
 import org.dspace.app.rest.model.hateoas.RelationshipTypeResource;
-import org.dspace.app.rest.model.hateoas.RelationshipTypeResourceWrapper;
-import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.content.EntityType;
@@ -69,7 +65,7 @@ public class RelationshipTypeRestController {
      * @param id        The ID of the EntityType objects that we'll use to retrieve the RelationshipTypes
      * @param response  The response object
      * @param request   The request object
-     * @return          The wrapped resource containing the list of RelationshipType objects as defined above
+     * @return The wrapped resource containing the list of RelationshipType objects as defined above
      * @throws SQLException If something goes wrong
      */
     @RequestMapping(method = RequestMethod.GET)
@@ -82,9 +78,11 @@ public class RelationshipTypeRestController {
         EntityType entityType = entityTypeService.find(context, id);
         List<RelationshipType> list = relationshipTypeService.findByEntityType(context, entityType, -1, -1);
 
-        Page<RelationshipTypeRest> relationshipTypeRestPage = converter.toRestPage(list, pageable, list.size(),  utils.obtainProjection(true));
+        Page<RelationshipTypeRest> relationshipTypeRestPage = converter
+            .toRestPage(list, pageable, list.size(), utils.obtainProjection(true));
 
-        Page<RelationshipTypeResource> relationshipTypeResources = relationshipTypeRestPage.map(relationshipTypeRest -> new RelationshipTypeResource(relationshipTypeRest, utils));
+        Page<RelationshipTypeResource> relationshipTypeResources = relationshipTypeRestPage
+            .map(relationshipTypeRest -> new RelationshipTypeResource(relationshipTypeRest, utils));
         relationshipTypeResources.forEach(halLinkService::addLinks);
         PagedResources<RelationshipTypeResource> result = assembler.toResource(relationshipTypeResources);
         return result;
