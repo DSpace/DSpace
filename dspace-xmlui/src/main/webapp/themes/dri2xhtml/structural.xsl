@@ -24,7 +24,7 @@
         xmlns:mods="http://www.loc.gov/mods/v3"
         xmlns:dc="http://purl.org/dc/elements/1.1/"
         xmlns="http://www.w3.org/1999/xhtml"
-        xmlns:confman="org.dspace.core.ConfigurationManager"
+        xmlns:confman="https://dspace.org/api/confman"
         exclude-result-prefixes="mets xlink xsl dim xhtml mods dc confman">
     
     <xsl:output indent="yes"/>

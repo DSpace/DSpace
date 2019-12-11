@@ -31,10 +31,9 @@
     xmlns:xalan="http://xml.apache.org/xalan"
     xmlns:encoder="xalan://java.net.URLEncoder"
     xmlns:util="http://www.dspace.org/xmlns/dspace"
-    xmlns:jstring="java.lang.String"
     xmlns:rights="http://cosimo.stanford.edu/sdr/metsrights/"
-    xmlns:confman="org.dspace.core.ConfigurationManager"
-    exclude-result-prefixes="xalan encoder i18n dri mets dim xlink xsl util jstring rights confman">
+    xmlns:confman="https://dspace.org/api/confman"
+    exclude-result-prefixes="xalan encoder i18n dri mets dim xlink xsl util rights confman">
 
     <xsl:output indent="yes"/>
 
@@ -531,7 +530,7 @@
     </xsl:template>
 
     <xsl:template name="display-rights">
-        <xsl:variable name="file_id" select="jstring:replaceAll(jstring:replaceAll(string(@ADMID), '_METSRIGHTS', ''), 'rightsMD_', '')"/>
+        <xsl:variable name="file_id" select="replace(replace(string(@ADMID), '_METSRIGHTS', ''), 'rightsMD_', '')"/>
         <xsl:variable name="rights_declaration" select="../../../mets:amdSec/mets:rightsMD[@ID = concat('rightsMD_', $file_id, '_METSRIGHTS')]/mets:mdWrap/mets:xmlData/rights:RightsDeclarationMD"/>
         <xsl:variable name="rights_context" select="$rights_declaration/rights:Context"/>
         <xsl:variable name="users">

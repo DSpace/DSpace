@@ -28,7 +28,7 @@
     xmlns:xhtml="http://www.w3.org/1999/xhtml"
     xmlns:mods="http://www.loc.gov/mods/v3"
     xmlns:dc="http://purl.org/dc/elements/1.1/"
-    xmlns:confman="org.dspace.core.ConfigurationManager"
+    xmlns:confman="https://dspace.org/api/confman"
     xmlns="http://www.w3.org/1999/xhtml"
     exclude-result-prefixes="i18n dri mets xlink xsl dim xhtml mods dc confman">
 
