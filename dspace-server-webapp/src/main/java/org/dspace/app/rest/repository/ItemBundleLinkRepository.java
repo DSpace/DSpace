@@ -8,18 +8,16 @@
 package org.dspace.app.rest.repository;
 
 import java.sql.SQLException;
-import java.util.List;
 import java.util.UUID;
 import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletRequest;
 
+import org.dspace.app.rest.model.BundleRest;
 import org.dspace.app.rest.model.ItemRest;
-import org.dspace.app.rest.model.RelationshipRest;
 import org.dspace.app.rest.projection.Projection;
+import org.dspace.content.Bundle;
 import org.dspace.content.Item;
-import org.dspace.content.Relationship;
 import org.dspace.content.service.ItemService;
-import org.dspace.content.service.RelationshipService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -28,23 +26,20 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 /**
- * Link repository for "relationships" subresource of an individual item.
+ * Link repository for "bundles" subresource of an individual item.
  */
-@Component(ItemRest.CATEGORY + "." + ItemRest.NAME + "." + ItemRest.RELATIONSHIPS)
-public class ItemRelationshipLinkRepository extends AbstractDSpaceRestRepository
+@Component(ItemRest.CATEGORY + "." + ItemRest.NAME + "." + ItemRest.BUNDLES)
+public class ItemBundleLinkRepository extends AbstractDSpaceRestRepository
         implements LinkRestRepository {
-
-    @Autowired
-    RelationshipService relationshipService;
 
     @Autowired
     ItemService itemService;
 
     //@PreAuthorize("hasPermission(#itemId, 'ITEM', 'READ')")
-    public Page<RelationshipRest> getRelationships(@Nullable HttpServletRequest request,
-                                                   UUID itemId,
-                                                   @Nullable Pageable optionalPageable,
-                                                   Projection projection) {
+    public Page<BundleRest> getBundles(@Nullable HttpServletRequest request,
+                                       UUID itemId,
+                                       @Nullable Pageable optionalPageable,
+                                       Projection projection) {
         try {
             Context context = obtainContext();
             Item item = itemService.find(context, itemId);
@@ -52,11 +47,8 @@ public class ItemRelationshipLinkRepository extends AbstractDSpaceRestRepository
                 return null;
             }
             Pageable pageable = optionalPageable != null ? optionalPageable : new PageRequest(0, 20);
-            Integer limit = pageable == null ? null : pageable.getPageSize();
-            Integer offset = pageable == null ? null : Math.toIntExact(pageable.getOffset());
-            int total = relationshipService.countByItem(context, item);
-            List<Relationship> relationships = relationshipService.findByItem(context, item, limit, offset);
-            return converter.toRestPage(relationships, pageable, total, projection);
+            Page<Bundle> bundlePage = utils.getPage(item.getBundles(), pageable);
+            return converter.toRestPage(bundlePage, projection);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
