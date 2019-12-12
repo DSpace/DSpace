@@ -105,7 +105,9 @@
 
     <xsl:template match="dim:dim" mode="itemSummaryView-DIM">
         <div class="item-summary-view-metadata">
-            <xsl:call-template name="itemSummaryView-DIM-title"/>
+            <xsl:call-template name="itemSummaryView-DIM-title">
+                <xsl:with-param name="allowtitle" select="true"/>
+            </xsl:call-template>
             <div class="row">
                 <div class="col-sm-4">
                     <div class="row">
@@ -118,9 +120,7 @@
                     </div>
                     <xsl:call-template name="itemSummaryView-DIM-date"/>
                     <xsl:call-template name="itemSummaryView-DIM-authors"/>
-                    <xsl:if test="$ds_item_view_toggle_url != ''">
-                        <xsl:call-template name="itemSummaryView-show-full"/>
-                    </xsl:if>
+                    <xsl:call-template name="itemSummaryView-show-full"/>
                 </div>
                 <div class="col-sm-8">
                     <xsl:call-template name="itemSummaryView-DIM-abstract"/>
@@ -132,37 +132,42 @@
     </xsl:template>
 
     <xsl:template name="itemSummaryView-DIM-title">
-        <xsl:choose>
-            <xsl:when test="count(dim:field[@element='title'][not(@qualifier)]) &gt; 1">
-                <h2 class="page-header first-page-header">
-                    <xsl:value-of select="dim:field[@element='title'][not(@qualifier)][1]/node()"/>
-                </h2>
-                <div class="simple-item-view-other">
-                    <p class="lead">
-                        <xsl:for-each select="dim:field[@element='title'][not(@qualifier)]">
-                            <xsl:if test="not(position() = 1)">
-                                <xsl:value-of select="./node()"/>
-                                <xsl:if test="count(following-sibling::dim:field[@element='title'][not(@qualifier)]) != 0">
-                                    <xsl:text>; </xsl:text>
-                                    <br/>
+        <!-- This parameter is passed from within this XSL to prevent it being automatically rendered from
+                the DRI head element. -->
+        <xsl:param name="allowtitle"/>
+        <xsl:if test="$allowtitle = 'true'">
+            <xsl:choose>
+                <xsl:when test="count(dim:field[@element='title'][not(@qualifier)]) &gt; 1">
+                    <h2 class="page-header first-page-header">
+                        <xsl:value-of select="dim:field[@element='title'][not(@qualifier)][1]/node()"/>
+                    </h2>
+                    <div class="simple-item-view-other">
+                        <p class="lead">
+                            <xsl:for-each select="dim:field[@element='title'][not(@qualifier)]">
+                                <xsl:if test="not(position() = 1)">
+                                    <xsl:value-of select="./node()"/>
+                                    <xsl:if test="count(following-sibling::dim:field[@element='title'][not(@qualifier)]) != 0">
+                                        <xsl:text>; </xsl:text>
+                                        <br/>
+                                    </xsl:if>
                                 </xsl:if>
-                            </xsl:if>
 
-                        </xsl:for-each>
-                    </p>
-                </div>
-            </xsl:when>
-            <xsl:when test="count(dim:field[@element='title'][not(@qualifier)]) = 1">
-                <h2 class="page-header first-page-header">
-                    <xsl:value-of select="dim:field[@element='title'][not(@qualifier)][1]/node()"/>
-                </h2>
-            </xsl:when>
-            <xsl:otherwise>
-                <h2 class="page-header first-page-header">
-                    <i18n:text>xmlui.dri2xhtml.METS-1.0.no-title</i18n:text>
-                </h2>
-            </xsl:otherwise>
-        </xsl:choose>
+                            </xsl:for-each>
+                        </p>
+                    </div>
+                </xsl:when>
+                <xsl:when test="count(dim:field[@element='title'][not(@qualifier)]) = 1">
+                    <h2 class="page-header first-page-header">
+                        <xsl:value-of select="dim:field[@element='title'][not(@qualifier)][1]/node()"/>
+                    </h2>
+                </xsl:when>
+                <xsl:otherwise>
+                    <h2 class="page-header first-page-header">
+                        <i18n:text>xmlui.dri2xhtml.METS-1.0.no-title</i18n:text>
+                    </h2>
+                </xsl:otherwise>
+            </xsl:choose>
+        </xsl:if>
     </xsl:template>
 
     <xsl:template name="itemSummaryView-DIM-thumbnail">
@@ -312,7 +317,7 @@
                 <i18n:text>xmlui.mirage2.itemSummaryView.MetaData</i18n:text>
             </h5>
             <a>
-                <xsl:attribute name="href"><xsl:value-of select="$ds_item_view_toggle_url"/></xsl:attribute>
+                <xsl:attribute name="href"><xsl:value-of select="'?show=full'"/></xsl:attribute>
                 <i18n:text>xmlui.ArtifactBrowser.ItemViewer.show_full</i18n:text>
             </a>
         </div>
@@ -454,7 +459,9 @@
     </xsl:template>
 
     <xsl:template match="dim:dim" mode="itemDetailView-DIM">
-        <xsl:call-template name="itemSummaryView-DIM-title"/>
+        <xsl:call-template name="itemSummaryView-DIM-title">
+                <xsl:with-param name="allowtitle" select="true"/>
+        </xsl:call-template>
         <div class="ds-table-responsive">
             <table class="ds-includeSet-table detailtable table table-striped table-hover">
                 <xsl:apply-templates mode="itemDetailView-DIM"/>
@@ -491,15 +498,6 @@
             </td>
                 <td><xsl:value-of select="./@language"/></td>
             </tr>
-    </xsl:template>
-
-    <!-- don't render the item-view-toggle automatically in the summary view, only when it gets called -->
-    <xsl:template match="dri:p[contains(@rend , 'item-view-toggle') and
-        (preceding-sibling::dri:referenceSet[@type = 'summaryView'] or following-sibling::dri:referenceSet[@type = 'summaryView'])]">
-    </xsl:template>
-
-    <!-- don't render the head on the item view page -->
-    <xsl:template match="dri:div[@n='item-view']/dri:head" priority="5">
     </xsl:template>
 
    <xsl:template match="mets:fileGrp[@USE='CONTENT']">
