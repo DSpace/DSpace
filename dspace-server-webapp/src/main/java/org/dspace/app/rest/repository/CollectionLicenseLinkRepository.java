@@ -7,7 +7,9 @@
  */
 package org.dspace.app.rest.repository;
 
+import java.sql.SQLException;
 import java.util.UUID;
+import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
@@ -24,12 +26,12 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 /**
- * Controller for exposition of license
+ * Link repository for "license" subresource of an individual collection.
  *
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
 @Component(CollectionRest.CATEGORY + "." + CollectionRest.NAME + "." + CollectionRest.LICENSE)
-public class LicenseRestLinkRepository extends AbstractDSpaceRestRepository
+public class CollectionLicenseLinkRepository extends AbstractDSpaceRestRepository
     implements LinkRestRepository {
 
     @Autowired
@@ -39,22 +41,28 @@ public class LicenseRestLinkRepository extends AbstractDSpaceRestRepository
     LicenseService licenseService;
 
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
-    public LicenseRest getLicenseCollection(HttpServletRequest request, UUID uuid, Pageable pageable,
-                                            Projection projection)
-        throws Exception {
-        Context context = obtainContext();
-        Collection collection = collectionService.find(context, uuid);
-
-        LicenseRest licenseRest = new LicenseRest();
-        String text = collection.getLicenseCollection();
-        if (StringUtils.isNotBlank(text)) {
-            licenseRest.setCustom(true);
-            licenseRest.setText(text);
-        } else {
-            licenseRest.setText(licenseService.getDefaultSubmissionLicense());
+    public LicenseRest getCollectionLicense(@Nullable HttpServletRequest request,
+                                            UUID collectionId,
+                                            @Nullable Pageable pageable,
+                                            Projection projection) {
+        try {
+            Context context = obtainContext();
+            Collection collection = collectionService.find(context, collectionId);
+            if (collection == null) {
+                return null;
+            }
+            LicenseRest licenseRest = new LicenseRest();
+            String text = collection.getLicenseCollection();
+            if (StringUtils.isNotBlank(text)) {
+                licenseRest.setCustom(true);
+                licenseRest.setText(text);
+            } else {
+                licenseRest.setText(licenseService.getDefaultSubmissionLicense());
+            }
+            return licenseRest;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
-
-        return licenseRest;
     }
 
     @Override
