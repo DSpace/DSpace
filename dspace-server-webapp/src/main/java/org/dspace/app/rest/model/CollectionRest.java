@@ -21,7 +21,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
     @LinkRest(
             name = CollectionRest.LICENSE,
             linkClass = LicenseRest.class,
-            method = "getLicenseCollection",
+            method = "getCollectionLicense",
             embedOptional = true,
             linkOptional = true
     )
