@@ -23,7 +23,6 @@ import org.dspace.content.service.RelationshipService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
@@ -52,11 +51,10 @@ public class ItemRelationshipLinkRepository extends AbstractDSpaceRestRepository
             if (item == null) {
                 return null;
             }
-            Pageable pageable = optionalPageable != null ? optionalPageable : new PageRequest(0, 20);
-            Integer limit = pageable == null ? null : pageable.getPageSize();
-            Integer offset = pageable == null ? null : Math.toIntExact(pageable.getOffset());
             int total = relationshipService.countByItem(context, item);
-            List<Relationship> relationships = relationshipService.findByItem(context, item, limit, offset);
+            Pageable pageable = utils.getPageable(optionalPageable);
+            List<Relationship> relationships = relationshipService.findByItem(context, item,
+                    pageable.getPageSize(), Math.toIntExact(pageable.getOffset()));
             return converter.toRestPage(relationships, pageable, total, projection);
         } catch (SQLException e) {
             throw new RuntimeException(e);

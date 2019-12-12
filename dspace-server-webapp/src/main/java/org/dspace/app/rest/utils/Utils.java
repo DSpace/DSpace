@@ -110,7 +110,8 @@ public class Utils {
     /** Cache to support fast lookups of LinkRest method annotation information. */
     private Map<Method, Optional<LinkRest>> linkAnnotationForMethod = new HashMap<>();
 
-    public <T> Page<T> getPage(List<T> fullContents, Pageable pageable) {
+    public <T> Page<T> getPage(List<T> fullContents, @Nullable Pageable optionalPageable) {
+        Pageable pageable = getPageable(optionalPageable);
         int total = fullContents.size();
         List<T> pageContent = null;
         if (pageable.getOffset() > total) {
@@ -124,6 +125,10 @@ public class Utils {
             }
             return new PageImpl<T>(pageContent, pageable, total);
         }
+    }
+
+    public Pageable getPageable(@Nullable Pageable optionalPageable) {
+        return optionalPageable != null ? optionalPageable : new PageRequest(0, 20);
     }
 
     public Link linkToSingleResource(DSpaceResource r, String rel) {

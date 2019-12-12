@@ -21,7 +21,6 @@ import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
@@ -47,8 +46,7 @@ public class ItemBundleLinkRepository extends AbstractDSpaceRestRepository
             if (item == null) {
                 return null;
             }
-            Pageable pageable = optionalPageable != null ? optionalPageable : new PageRequest(0, 20);
-            Page<Bundle> bundlePage = utils.getPage(item.getBundles(), pageable);
+            Page<Bundle> bundlePage = utils.getPage(item.getBundles(), optionalPageable);
             return converter.toRestPage(bundlePage, projection);
         } catch (SQLException e) {
             throw new RuntimeException(e);
