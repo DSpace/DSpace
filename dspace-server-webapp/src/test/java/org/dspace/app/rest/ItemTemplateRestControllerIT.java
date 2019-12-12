@@ -191,8 +191,9 @@ public class ItemTemplateRestControllerIT extends AbstractControllerIntegrationT
                     MetadataMatcher.matchMetadata("dc.description",
                         "dc description content"),
                     MetadataMatcher.matchMetadata("dc.description.abstract",
-                        "dc description abstract content")
-                )))));
+                        "dc description abstract content"))),
+                hasJsonPath("$._links.mappedCollections")
+            )));
     }
 
     @Test
@@ -213,8 +214,9 @@ public class ItemTemplateRestControllerIT extends AbstractControllerIntegrationT
                     MetadataMatcher.matchMetadata("dc.description",
                         "dc description content"),
                     MetadataMatcher.matchMetadata("dc.description.abstract",
-                        "dc description abstract content")
-                )))));
+                        "dc description abstract content"))),
+                hasJsonPath("$._links.mappedCollections")
+            )));
     }
 
     @Test
