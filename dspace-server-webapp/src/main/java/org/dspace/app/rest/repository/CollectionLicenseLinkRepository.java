@@ -41,10 +41,10 @@ public class CollectionLicenseLinkRepository extends AbstractDSpaceRestRepositor
     LicenseService licenseService;
 
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
-    public LicenseRest getCollectionLicense(@Nullable HttpServletRequest request,
-                                            UUID collectionId,
-                                            @Nullable Pageable pageable,
-                                            Projection projection) {
+    public LicenseRest getLicense(@Nullable HttpServletRequest request,
+                                  UUID collectionId,
+                                  @Nullable Pageable pageable,
+                                  Projection projection) {
         try {
             Context context = obtainContext();
             Collection collection = collectionService.find(context, collectionId);
