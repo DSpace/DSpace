@@ -176,7 +176,7 @@ public class ItemUtils {
     }
 
     /**
-     * This method will add all sub-elements to a top element, like: dc, or dcterms, ...
+     * This method will add all sub-elements to a top element, like: dc, or dcterms, ...     * 
      * @param schema         Element argument passed by reference that will be changed
      * @param val            Metadatavalue that will be processed
      * @throws SQLException
@@ -284,6 +284,7 @@ public class ItemUtils {
 
         // Repository Info
         Element repository = create("repository");
+        repository.getField().add(createValue("url", ConfigurationManager.getProperty("dspace.baseUrl")));
         repository.getField().add(createValue("name", ConfigurationManager.getProperty("dspace.name")));
         repository.getField().add(createValue("mail", ConfigurationManager.getProperty("mail.admin")));
         metadata.getElement().add(repository);
