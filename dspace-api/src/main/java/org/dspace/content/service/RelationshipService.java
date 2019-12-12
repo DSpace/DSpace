@@ -74,6 +74,19 @@ public interface RelationshipService extends DSpaceCRUDService<Relationship> {
     public Relationship create(Context context, Relationship relationship) throws SQLException, AuthorizeException;
 
     /**
+     * This method creates a relationship object in the database equal to the given relationship param
+     * if this is a valid relationship
+     * @param context               The relevant DSpace context
+     * @param relationship          The relationship that will be created in the database if it is valid
+     * @param forceBypassValidation A boolean indicating whether we should force by-pass validation
+     * @return                      The created relationship with updated place variables
+     * @throws SQLException         If something goes wrong
+     * @throws AuthorizeException   If something goes wrong with authorizations
+     */
+    public Relationship create(Context context, Relationship relationship, boolean forceBypassValidation)
+            throws SQLException, AuthorizeException;
+
+    /**
      * This method returns the next leftplace integer to use for a relationship with this item as the leftItem
      *
      * @param context   The relevant DSpace context
@@ -109,6 +122,20 @@ public interface RelationshipService extends DSpaceCRUDService<Relationship> {
                                                             RelationshipType relationshipType)
         throws SQLException;
 
+    /**
+     * This method returns a list of Relationships for which the leftItem or rightItem is equal to the given
+     * Item object and for which the RelationshipType object is equal to the relationshipType property
+     * @param context           The relevant DSpace context
+     * @param item              The Item object to be matched on the leftItem or rightItem for the relationship
+     * @param relationshipType  The RelationshipType object that will be used to check the Relationship on
+     * @param isLeft             Is the item left or right
+     * @return  The list of Relationship objects that have the given Item object as leftItem or rightItem and
+     *          for which the relationshipType property is equal to the given RelationshipType
+     * @throws SQLException If something goes wrong
+     */
+    public List<Relationship> findByItemAndRelationshipType(Context context, Item item,
+                                                            RelationshipType relationshipType, boolean isLeft)
+            throws SQLException;
     /**
      * This method returns a list of Relationships for which the leftItem or rightItem is equal to the given
      * Item object and for which the RelationshipType object is equal to the relationshipType property
@@ -228,6 +255,20 @@ public interface RelationshipService extends DSpaceCRUDService<Relationship> {
         throws AuthorizeException, SQLException;
 
     /**
+     * This method is used to construct a Relationship object by-passing validation
+     * @param c                     The relevant DSpace context
+     * @param leftItem              The leftItem Item object for the relationship
+     * @param rightItem             The rightItem Item object for the relationship
+     * @param relationshipType      The RelationshipType object for the relationship
+     * @param forceBypassValidation A boolean indicating whether we should force by-pass validation
+     * @return                      The created Relationship object with the given properties
+     * @throws AuthorizeException   If something goes wrong
+     * @throws SQLException         If something goes wrong
+     */
+    Relationship create(Context c, Item leftItem, Item rightItem, RelationshipType relationshipType,
+            boolean forceBypassValidation) throws AuthorizeException, SQLException;
+
+    /**
      * This method returns a list of Relationship objects for the given typeName
      * @param context           The relevant DSpace context
      * @param typeName          The leftward or rightward typeName of the relationship type
@@ -308,6 +349,16 @@ public interface RelationshipService extends DSpaceCRUDService<Relationship> {
     /**
      * This method is used to delete a Relationship whilst given the possibility to copy the Virtual Metadata created
      * by this relationship to the left and/or right item
+     * @param context               The relevant DSpace context
+     * @param relationship          The relationship to be deleted
+     * @param forceBypassValidation A boolean indicating whether we should force by-pass validation
+     */
+    void delete(Context context, Relationship relationship, boolean bypassValidation)
+            throws SQLException, AuthorizeException;
+
+    /**
+     * This method is used to delete a Relationship whilst given the possibility to copy the Virtual Metadata created
+     * by this relationship to the left and/or right item
      * @param context           The relevant DSpace context
      * @param relationship      The relationship to be deleted
      * @param copyToLeftItem    A boolean indicating whether we should copy metadata to the left item or not
@@ -315,4 +366,17 @@ public interface RelationshipService extends DSpaceCRUDService<Relationship> {
      */
     void delete(Context context, Relationship relationship, boolean copyToLeftItem, boolean copyToRightItem)
         throws SQLException, AuthorizeException;
+
+    /**
+     * This method is used to delete a Relationship whilst given the possibility to copy the Virtual Metadata created
+     * by this relationship to the left and/or right item
+     * @param context               The relevant DSpace context
+     * @param relationship          The relationship to be deleted
+     * @param copyToLeftItem        A boolean indicating whether we should copy metadata to the left item or not
+     * @param copyToRightItem       A boolean indicating whether we should copy metadata to the right item or not
+     * @param forceBypassValidation A boolean indicating whether we should force by-pass validation
+     */
+    void delete(Context context, Relationship relationship, boolean copyToLeftItem, boolean copyToRightItem,
+            boolean bypassValidation) throws SQLException, AuthorizeException;
+
 }

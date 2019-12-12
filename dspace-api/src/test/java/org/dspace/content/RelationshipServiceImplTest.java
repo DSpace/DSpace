@@ -225,7 +225,10 @@ public class RelationshipServiceImplTest {
         // and RelationshipType
         assertEquals("TestCreate 2", relationship, relationshipService.create(context, leftItem, rightItem,
                 testRel,0,0));
-
+        // The reported Relationship should match our defined relationship, given left/right item
+        // RelationshipType and bypassValidation
+        assertEquals("TestCreate 3", relationship, relationshipService.create(context, leftItem, rightItem,
+                testRel, true));
         context.restoreAuthSystemState();
     }
 

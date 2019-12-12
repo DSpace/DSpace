@@ -69,6 +69,24 @@ public class RelationshipServiceImpl implements RelationshipService {
     public Relationship create(Context c, Item leftItem, Item rightItem, RelationshipType relationshipType,
                                int leftPlace, int rightPlace, String leftwardValue, String rightwardValue)
             throws AuthorizeException, SQLException {
+        Relationship relationship = createRelationshipObject(c, leftItem, rightItem, relationshipType,
+                leftPlace, rightPlace, leftwardValue, rightwardValue);
+        return create(c, relationship);
+    }
+
+    @Override
+    public Relationship create(Context c, Item leftItem, Item rightItem, RelationshipType relationshipType,
+                               boolean bypassValidation)
+            throws AuthorizeException, SQLException {
+        Relationship relationship = createRelationshipObject(c, leftItem, rightItem, relationshipType,
+                0, 0, null, null);
+        return create(c, relationship, bypassValidation);
+    }
+
+    private Relationship createRelationshipObject(Context c, Item leftItem, Item rightItem,
+            RelationshipType relationshipType, int leftPlace, int rightPlace, String leftwardValue,
+            String rightwardValue)
+        throws AuthorizeException, SQLException {
         Relationship relationship = new Relationship();
         relationship.setLeftItem(leftItem);
         relationship.setRightItem(rightItem);
@@ -77,27 +95,41 @@ public class RelationshipServiceImpl implements RelationshipService {
         relationship.setRightPlace(rightPlace);
         relationship.setLeftwardValue(leftwardValue);
         relationship.setRightwardValue(rightwardValue);
-        return create(c, relationship);
+        return relationship;
     }
 
     @Override
     public Relationship create(Context context, Relationship relationship) throws SQLException, AuthorizeException {
         if (isRelationshipValidToCreate(context, relationship)) {
-            if (authorizeService.authorizeActionBoolean(context, relationship.getLeftItem(), Constants.WRITE) ||
-                authorizeService.authorizeActionBoolean(context, relationship.getRightItem(), Constants.WRITE)) {
-                // This order of execution should be handled in the creation (create, updateplace, update relationship)
-                // for a proper place allocation
-                Relationship relationshipToReturn = relationshipDAO.create(context, relationship);
-                updatePlaceInRelationship(context, relationshipToReturn);
-                update(context, relationshipToReturn);
-                return relationshipToReturn;
-            } else {
-                throw new AuthorizeException(
-                    "You do not have write rights on this relationship's items");
-            }
-
+            return createRelationshipDAO(context, relationship);
         } else {
             throw new IllegalArgumentException("The relationship given was not valid");
+        }
+    }
+
+    @Override
+    public Relationship create(Context context, Relationship relationship, boolean bypassValidation)
+            throws SQLException, AuthorizeException {
+        if (isRelationshipValidToCreate(context, relationship) || bypassValidation) {
+            return createRelationshipDAO(context, relationship);
+        } else {
+            throw new IllegalArgumentException("The relationship given was not valid");
+        }
+    }
+
+    private Relationship createRelationshipDAO(Context context, Relationship relationship)
+        throws AuthorizeException, SQLException {
+        if (authorizeService.authorizeActionBoolean(context, relationship.getLeftItem(), Constants.WRITE) ||
+            authorizeService.authorizeActionBoolean(context, relationship.getRightItem(), Constants.WRITE)) {
+            // This order of execution should be handled in the creation (create, updateplace, update relationship)
+            // for a proper place allocation
+            Relationship relationshipToReturn = relationshipDAO.create(context, relationship);
+            updatePlaceInRelationship(context, relationshipToReturn);
+            update(context, relationshipToReturn);
+            return relationshipToReturn;
+        } else {
+            throw new AuthorizeException(
+                "You do not have write rights on this relationship's items");
         }
     }
 
@@ -322,6 +354,13 @@ public class RelationshipServiceImpl implements RelationshipService {
     }
 
     @Override
+    public void delete(Context context, Relationship relationship, boolean bypassValidation)
+            throws SQLException, AuthorizeException {
+        //TODO: retrieve default settings from configuration
+        delete(context, relationship, false, false, bypassValidation);
+    }
+
+    @Override
     public void delete(Context context, Relationship relationship, boolean copyToLeftItem, boolean copyToRightItem)
         throws SQLException, AuthorizeException {
         log.info(org.dspace.core.LogManager.getHeader(context, "delete_relationship",
@@ -330,19 +369,41 @@ public class RelationshipServiceImpl implements RelationshipService {
                                                           "copyMetadataValuesToRightItem=" + copyToRightItem));
         if (isRelationshipValidToDelete(context, relationship) &&
             copyToItemPermissionCheck(context, relationship, copyToLeftItem, copyToRightItem)) {
-            // To delete a relationship, a user must have WRITE permissions on one of the related Items
-            copyMetadataValues(context, relationship, copyToLeftItem, copyToRightItem);
-            if (authorizeService.authorizeActionBoolean(context, relationship.getLeftItem(), Constants.WRITE) ||
-                authorizeService.authorizeActionBoolean(context, relationship.getRightItem(), Constants.WRITE)) {
-                relationshipDAO.delete(context, relationship);
-                updatePlaceInRelationship(context, relationship);
-            } else {
-                throw new AuthorizeException(
-                    "You do not have write rights on this relationship's items");
-            }
+            deleteRelationship(context, relationship, copyToLeftItem, copyToRightItem);
 
         } else {
             throw new IllegalArgumentException("The relationship given was not valid");
+        }
+    }
+
+    @Override
+    public void delete(Context context, Relationship relationship, boolean copyToLeftItem, boolean copyToRightItem,
+            boolean bypassValidation) throws SQLException, AuthorizeException {
+        log.info(org.dspace.core.LogManager.getHeader(context, "delete_relationship",
+                                                      "relationship_id=" + relationship.getID() + "&" +
+                                                          "copyMetadataValuesToLeftItem=" + copyToLeftItem + "&" +
+                                                          "copyMetadataValuesToRightItem=" + copyToRightItem));
+        if ((isRelationshipValidToDelete(context, relationship) &&
+            copyToItemPermissionCheck(context, relationship, copyToLeftItem, copyToRightItem)) || bypassValidation) {
+            deleteRelationship(context, relationship, copyToLeftItem, copyToRightItem);
+
+        } else {
+            throw new IllegalArgumentException("The relationship given was not valid");
+        }
+    }
+
+    private void deleteRelationship(Context context, Relationship relationship, boolean copyToLeftItem,
+            boolean copyToRightItem) throws SQLException, AuthorizeException {
+
+        // To delete a relationship, a user must have WRITE permissions on one of the related Items
+        copyMetadataValues(context, relationship, copyToLeftItem, copyToRightItem);
+        if (authorizeService.authorizeActionBoolean(context, relationship.getLeftItem(), Constants.WRITE) ||
+            authorizeService.authorizeActionBoolean(context, relationship.getRightItem(), Constants.WRITE)) {
+            relationshipDAO.delete(context, relationship);
+            updatePlaceInRelationship(context, relationship);
+        } else {
+            throw new AuthorizeException(
+                "You do not have write rights on this relationship's items");
         }
     }
 
