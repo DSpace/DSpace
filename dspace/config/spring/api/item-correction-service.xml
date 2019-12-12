@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+
+    <!-- Submission correction Service Application. Autowired at this time. -->
+    <bean id="org.dspace.versioning.ItemCorrectionService"
+          class="org.dspace.versioning.ItemCorrectionService"
+          scope="singleton">
+       <property name="correctionRelationshipName" value="isCorrectionOfItem" />
+    </bean>
+
+    <!-- Correction Item Provider, defines behavior for replicating
+         Item, Metadata, Budles and Bitstreams. Autowired at this time. -->
+    <bean class="org.dspace.versioning.ItemCorrectionProvider">
+        <property name="ignoredMetadataFields" >
+            <set>
+		<value>dc.date.accessioned</value>
+		<value>dc.date.available</value>
+            </set>
+        </property>
+        
+    </bean>
+           
+</beans>
