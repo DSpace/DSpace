@@ -212,8 +212,9 @@
 				<xsl:when test="$language='it'">
 					ita
 				</xsl:when>
+				<!-- Si no es un lenguaje que soportemos, lo seteo como 'Sin determinar' ('Undetermined') -->
 				<xsl:otherwise>
-					<xsl:value-of select="$language"/>
+					und
 				</xsl:otherwise>
 			</xsl:choose>
 		</xsl:variable>

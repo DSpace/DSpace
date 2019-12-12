@@ -119,8 +119,8 @@
 	</xsl:template>
 	
 <!-- dc:date - ISO 8601 compliant-->
-<!-- Removing other dc.date.* - Para reducir ambigüedad, se dejan sólo las fechas de publicación y de exposición (sólo Tesis)-->
-	<xsl:template match="/doc:metadata/doc:element[@name='dc']/doc:element[@name='date']/doc:element[@name!='issued']" />
+<!-- Removing other dc.date.* - Para reducir ambigüedad, se dejan sólo las fechas de publicación, creación y de exposición (sólo Tesis)-->
+	<xsl:template match="/doc:metadata/doc:element[@name='dc']/doc:element[@name='date']/doc:element[@name!='issued' or @name!='created']" />
 	
  	<!-- Formatting sedici.date.exposure -->
 	<xsl:template match="/doc:metadata/doc:element[@name='sedici']/doc:element[@name='date']/doc:element[@name='exposure']/doc:element/doc:field/text()">
@@ -138,6 +138,22 @@
 					<doc:field name="value">
 						<xsl:call-template name="formatdate">
 							<xsl:with-param name="datestr" select="doc:element/doc:field/text()	" />
+						</xsl:call-template>
+					</doc:field>
+				</doc:element>
+			</doc:element>
+		</xsl:if>
+	</xsl:template>
+
+	<!--  Formatting dc.date.created -->
+	<!-- Sólo procesamos y mostramos el dc.date.created si es que NO EXISTE el dc.date.issued. -->
+	<xsl:template match="/doc:metadata/doc:element[@name='dc']/doc:element[@name='date']/doc:element[@name='created']">
+		<xsl:if test="not(../../../doc:element[@name='dc']/doc:element[@name='date']/doc:element[@name='issued'])">
+			<doc:element name="created">
+				<doc:element name="es">
+					<doc:field name="value">
+						<xsl:call-template name="formatdate">
+							<xsl:with-param name="datestr" select="doc:element/doc:field/text()"/>
 						</xsl:call-template>
 					</doc:field>
 				</doc:element>
