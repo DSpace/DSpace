@@ -308,46 +308,6 @@
             </Definition>
         </Filter>
 
-        <!-- OpenAIRE 4 filter for records returned by OAI-PMH.
-             By default, return an Item record:
-                * If it is publicly accessible
-                * * OR it has been withdrawn (in order to display a tombstone record).
-                * AND doesn't have a relationship.type field
-                * * OR the relationship.type is a Publication
-                * limiting the results only to Publications as expected
-             This filter is used by the context ([oai]/openaire4).
-        -->
-        <Filter id="openAire4Filter">
-            <Definition>
-                <And>            
-                	<LeftCondition>
-		                <Or>
-		                    <LeftCondition>
-		                        <Custom ref="itemAccessCondition"/>
-		                    </LeftCondition>
-		                    <RightCondition>
-		                        <Custom ref="itemWithdrawnCondition"/>
-		                    </RightCondition>
-		                </Or>
-	                </LeftCondition>
-	                <RightCondition>
-		                <Or>
-		                    <LeftCondition>
-		                        <Not>
-		                            <Condition>
-		                                <Custom ref="relationshipTypeExistsCondition"/>
-		                            </Condition>
-		                        </Not>
-		                    </LeftCondition>
-		                    <RightCondition>
-		                    	<Custom ref="isPublicationEntityCondition"/>
-		                    </RightCondition>
-		                </Or>
-	                </RightCondition>
-                </And>
-            </Definition>
-        </Filter>
-
         <!-- UKETD Filter for records returned by OAI-PMH.
              By default, return an Item record:
                 * If it is a "thesis"
