@@ -183,7 +183,7 @@ public class WorkspaceItem
         return item;
     }
 
-    void setItem(Item item) {
+    public void setItem(Item item) {
         this.item = item;
     }
 
@@ -192,7 +192,7 @@ public class WorkspaceItem
         return collection;
     }
 
-    void setCollection(Collection collection) {
+    public void setCollection(Collection collection) {
         this.collection = collection;
     }
 
