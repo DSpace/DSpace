@@ -21,7 +21,6 @@ import javax.xml.transform.TransformerException;
 import org.apache.logging.log4j.Logger;
 import org.apache.xpath.XPathAPI;
 import org.dspace.content.Collection;
-import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
@@ -91,7 +90,8 @@ public class XmlWorkflowFactoryImpl implements XmlWorkflowFactory {
      * @throws WorkflowConfigurationException If no corresponding mapping or default can be found or error trying to
      *                                        to resolve to one
      */
-    private Workflow getWorkflowById(HashMap<String, Workflow> cache, String id, String xpathId) throws WorkflowConfigurationException {
+    private Workflow getWorkflowById(HashMap<String, Workflow> cache, String id, String xpathId)
+            throws WorkflowConfigurationException {
         //Initialize our cache if we have none
         if (cache == null) {
             cache = new HashMap<>();
@@ -166,7 +166,8 @@ public class XmlWorkflowFactoryImpl implements XmlWorkflowFactory {
                 Node mainNode = input.getFirstChild();
                 NodeList allWorkflowNodes = XPathAPI.selectNodeList(mainNode, "//workflow-map/name-map");
                 for (int i = 0; i < allWorkflowNodes.getLength(); i++) {
-                    String workflowID = allWorkflowNodes.item(i).getAttributes().getNamedItem("workflow").getTextContent();
+                    String workflowID =
+                            allWorkflowNodes.item(i).getAttributes().getNamedItem("workflow").getTextContent();
                     Node workflowNode = XPathAPI.selectSingleNode(mainNode, "//workflow[@id='" + workflowID + "']");
                     Workflow wf = new Workflow(workflowID, getRoles(workflowNode));
                     Step step = createFirstStep(wf, workflowNode);
@@ -184,8 +185,9 @@ public class XmlWorkflowFactoryImpl implements XmlWorkflowFactory {
     /**
      * Return a list of collections handles that are mapped to the given workflow in the workflow configuration.
      * Makes use of a cache so it only retrieves the workflowName->List<collectionHandle> if it's not cached
-     * @param workflowName  Name of workflow we want the collections of that are mapped to is
-     * @return              List of collection handles mapped to the requested workflow
+     *
+     * @param workflowName Name of workflow we want the collections of that are mapped to is
+     * @return List of collection handles mapped to the requested workflow
      * @throws WorkflowConfigurationException
      */
     @Override
@@ -205,7 +207,8 @@ public class XmlWorkflowFactoryImpl implements XmlWorkflowFactory {
                         "[@workflow='" + workflowName + "']");
                 List<String> collectionsHandlesMappedToThisWorkflow = new ArrayList<>();
                 for (int i = 0; i < allWorkflowNodes.getLength(); i++) {
-                    String collectionHandle = allWorkflowNodes.item(i).getAttributes().getNamedItem("collection").getTextContent();
+                    String collectionHandle =
+                            allWorkflowNodes.item(i).getAttributes().getNamedItem("collection").getTextContent();
                     collectionsHandlesMappedToThisWorkflow.add(collectionHandle);
                 }
                 workflowNameToCollectionHandlesCache.put(workflowName, collectionsHandlesMappedToThisWorkflow);
@@ -257,9 +260,8 @@ public class XmlWorkflowFactoryImpl implements XmlWorkflowFactory {
             }
             return outcomes;
         } catch (Exception e) {
-            log.error(
-                    "Outcome configuration error for step: " + stepNode.getAttributes().getNamedItem("id").getTextContent(),
-                    e);
+            log.error("Outcome configuration error for step: " +
+                    stepNode.getAttributes().getNamedItem("id").getTextContent(), e);
             throw new WorkflowConfigurationException(
                     "Outcome configuration error for step: " + stepNode.getAttributes().getNamedItem("id")
                             .getTextContent());
@@ -288,8 +290,8 @@ public class XmlWorkflowFactoryImpl implements XmlWorkflowFactory {
             File xmlFile = new File(path);
             Document input = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(xmlFile);
             Node mainNode = input.getFirstChild();
-            Node stepNode = XPathAPI
-                    .selectSingleNode(mainNode, "//workflow[@id='" + workflow.getID() + "']/step[@id='" + stepID + "']");
+            Node stepNode = XPathAPI.selectSingleNode(mainNode, "//workflow[@id='" + workflow.getID()
+                    + "']/step[@id='" + stepID + "']");
 
             if (stepNode == null) {
                 throw new WorkflowConfigurationException("Step does not exist for workflow: " + workflow.getID());
