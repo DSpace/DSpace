@@ -8,7 +8,6 @@
 package org.dspace.app.rest.repository;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import javax.annotation.Nullable;
@@ -16,19 +15,15 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.CollectionRest;
-import org.dspace.app.rest.model.ResourcePolicyRest;
 import org.dspace.app.rest.projection.Projection;
-import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Collection;
 import org.dspace.content.service.CollectionService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.services.model.Request;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
@@ -59,8 +54,7 @@ public class CollectionDefaultAccessConditionLinkRepository extends AbstractDSpa
             }
             List<ResourcePolicy> policies = authorizeService.getPoliciesActionFilter(context, collection,
                     Constants.DEFAULT_BITSTREAM_READ);
-            Pageable pageable = optionalPageable != null ? optionalPageable : new PageRequest(0, 20);
-            return converter.toRestPage(utils.getPage(policies, pageable), projection);
+            return converter.toRestPage(utils.getPage(policies, optionalPageable), projection);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
