@@ -795,6 +795,11 @@ public class RestResourceController implements InitializingBean {
                     Page<? extends RestModel> pageResult = (Page<? extends RestAddressableModel>) linkMethod
                             .invoke(linkRepository, request, uuid, page, utils.obtainProjection());
 
+                    if (pageResult == null) {
+                        response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+                        return null;
+                    }
+
                     Link link = null;
                     String querystring = request.getQueryString();
                     if (querystring != null && querystring.length() > 0) {
@@ -810,7 +815,8 @@ public class RestResourceController implements InitializingBean {
                     RestModel object = (RestModel) linkMethod.invoke(linkRepository, request, uuid, page,
                             utils.obtainProjection());
                     if (object == null) {
-                        throw new ResourceNotFoundException(subpath + " undefined for " + model + "/" + uuid);
+                        response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+                        return null;
                     } else {
                         Link link = linkTo(this.getClass(), apiCategory, model).slash(uuid).slash(subpath)
                                 .withSelfRel();
