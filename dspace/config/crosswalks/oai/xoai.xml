@@ -594,8 +594,6 @@
 	    			<string>Capitulo de libro</string>
 		    		<string>Objeto de conferencia</string>
 			    	<string>Resumen</string>
-				    <string>Edicion de revista</string>
-    				<string>Boletin</string>
     				<string>Conjunto de datos</string>
     			</list>
 			</Configuration>
