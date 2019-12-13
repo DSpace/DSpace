@@ -16,6 +16,11 @@ import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Context;
 import org.springframework.stereotype.Component;
 
+/**
+ * This class extends the {@link ExternalSourceEntryItemUriListHandler} abstract class and implements it specifically
+ * for the WorkspaceItem objects. It'll add extra checks and validations based on a WorkspaceItem and call the super
+ * functions.
+ */
 @Component
 public class ExternalSourceEntryWorkspaceItemUriListHandler
     extends ExternalSourceEntryItemUriListHandler<WorkspaceItem> {
@@ -41,6 +46,7 @@ public class ExternalSourceEntryWorkspaceItemUriListHandler
         return true;
     }
 
+    @Override
     public WorkspaceItem handle(Context context, HttpServletRequest request, List<String> uriList)
         throws SQLException, AuthorizeException {
         return super.createWorkspaceItem(context, request, uriList);

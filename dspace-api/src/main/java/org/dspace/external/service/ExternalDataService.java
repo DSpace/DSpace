@@ -66,8 +66,7 @@ public interface ExternalDataService {
     public int getNumberOfResults(String source, String query);
 
     /**
-     * This method will create an Item in the given Collection based on the given ExternalDataObject.
-     * Note that this Item will be Archived
+     * This method will create a WorkspaceItem in the given Collection based on the given ExternalDataObject.
      * @param context               The relevant DSpace context
      * @param externalDataObject    The relevant ExternalDataObject to be used
      * @param collection            The Collection in which the item will be present
