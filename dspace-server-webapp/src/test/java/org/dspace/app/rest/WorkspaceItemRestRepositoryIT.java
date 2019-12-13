@@ -1630,14 +1630,6 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         ;
     }
 
-
-
-
-
-
-
-
-
     @Test
     public void createWorkspaceItemFromExternalSources() throws Exception {
         //We turn off the authorization system in order to create the structure as defined below

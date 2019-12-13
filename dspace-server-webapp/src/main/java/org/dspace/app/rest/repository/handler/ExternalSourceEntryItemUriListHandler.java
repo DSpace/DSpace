@@ -21,7 +21,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.ExternalSourceRest;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Collection;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.CollectionService;
@@ -32,12 +31,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+/**
+ * This provides an abstract class for the Item and WorkspaceItemUriListHandlers to extend and provide shared logic
+ * to reduce code duplication
+ * @param <T>   The type of Object we're dealing with
+ */
 public abstract class ExternalSourceEntryItemUriListHandler<T> implements UriListHandler<T> {
 
     private List<RequestMethod> allowedRequestMethods = new LinkedList<>(Arrays.asList(RequestMethod.POST));
-
-    @Autowired
-    private AuthorizeService authorizeService;
 
     @Autowired
     private ExternalDataService externalDataService;
@@ -48,6 +49,7 @@ public abstract class ExternalSourceEntryItemUriListHandler<T> implements UriLis
     private static final Logger log = org.apache.logging.log4j.LogManager
         .getLogger(ExternalSourceEntryItemUriListHandler.class);
 
+    @Override
     public boolean supports(List<String> uriList, String method, Class clazz) {
         if (!allowedRequestMethods.contains(RequestMethod.valueOf(method))) {
             return false;
@@ -61,6 +63,7 @@ public abstract class ExternalSourceEntryItemUriListHandler<T> implements UriLis
         return true;
     }
 
+    @Override
     public boolean validate(Context context, HttpServletRequest request, List<String> uriList)
         throws AuthorizeException {
         if (uriList.size() > 1) {
@@ -83,6 +86,17 @@ public abstract class ExternalSourceEntryItemUriListHandler<T> implements UriLis
         return true;
     }
 
+    /**
+     * This method will create a WorkspaceItem made from the ExternalDataObject that will be created from the given
+     * uriList. The Collection for the WorkspaceItem will be retrieved through the request.
+     *
+     * @param context   The relevant DSpace context
+     * @param request   The relevant Request
+     * @param uriList   The uriList that contains the data for the ExternalDataObject
+     * @return          A WorkspaceItem created from the given information
+     * @throws SQLException         If something goes wrong
+     * @throws AuthorizeException   If something goes wrong
+     */
     public WorkspaceItem createWorkspaceItem(Context context, HttpServletRequest request, List<String> uriList)
         throws SQLException, AuthorizeException {
         ExternalDataObject dataObject = getExternalDataObjectFromUriList(uriList);

@@ -8,8 +8,6 @@
 package org.dspace.app.rest.repository.handler;
 
 import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
@@ -18,30 +16,20 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
-import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.InstallItemService;
 import org.dspace.core.Context;
-import org.dspace.external.service.ExternalDataService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
- * This class will handle ExternalSourceEntryUriList and it'll create Item objects based on them
+ * This class will handle ExternalSourceEntryUriList and it'll create Item objects based on them.
+ * This will create Archived items and thus only Admin users can use it
  */
 @Component
 public class ExternalSourceEntryArchivedItemUriListHandler extends ExternalSourceEntryItemUriListHandler<Item> {
 
-    private List<RequestMethod> allowedRequestMethods = new LinkedList<>(Arrays.asList(RequestMethod.POST));
-
     @Autowired
     private AuthorizeService authorizeService;
-
-    @Autowired
-    private ExternalDataService externalDataService;
-
-    @Autowired
-    private CollectionService collectionService;
 
     @Autowired
     private InstallItemService installItemService;
