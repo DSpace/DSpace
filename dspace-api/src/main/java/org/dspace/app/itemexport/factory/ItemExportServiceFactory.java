@@ -11,7 +11,8 @@ import org.dspace.app.itemexport.service.ItemExportService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
- * Abstract factory to get services for the itemexport package, use ItemExportServiceFactory.getInstance() to retrieve an implementation
+ * Abstract factory to get services for the itemexport package, use ItemExportServiceFactory.getInstance() to
+ * retrieve an implementation
  *
  * @author kevinvandevelde at atmire.com
  */
@@ -19,7 +20,8 @@ public abstract class ItemExportServiceFactory {
 
     public abstract ItemExportService getItemExportService();
 
-    public static ItemExportServiceFactory getInstance(){
-        return DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName("itemExportServiceFactory", ItemExportServiceFactory.class);
+    public static ItemExportServiceFactory getInstance() {
+        return DSpaceServicesFactory.getInstance().getServiceManager()
+                                    .getServiceByName("itemExportServiceFactory", ItemExportServiceFactory.class);
     }
 }

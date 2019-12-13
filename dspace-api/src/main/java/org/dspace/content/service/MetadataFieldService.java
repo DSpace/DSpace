@@ -7,19 +7,20 @@
  */
 package org.dspace.content.service;
 
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.List;
+
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
 import org.dspace.content.NonUniqueMetadataException;
 import org.dspace.core.Context;
 
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.List;
-
 /**
  * Service interface class for the MetadataField object.
- * The implementation of this class is responsible for all business logic calls for the MetadataField object and is autowired by spring
+ * The implementation of this class is responsible for all business logic calls for the MetadataField object and is
+ * autowired by spring
  *
  * @author kevinvandevelde at atmire.com
  */
@@ -28,28 +29,27 @@ public interface MetadataFieldService {
     /**
      * Creates a new metadata field.
      *
-     * @param context
-     *            DSpace context object
+     * @param context        DSpace context object
      * @param metadataSchema schema
-     * @param scopeNote scope note
-     * @param element element
-     * @param qualifier qualifier
+     * @param scopeNote      scope note
+     * @param element        element
+     * @param qualifier      qualifier
      * @return new MetadataField
-     * @throws AuthorizeException if authorization error
-     * @throws SQLException if database error
-     * @throws NonUniqueMetadataException if an existing field with an identical element and qualifier is already present
+     * @throws AuthorizeException         if authorization error
+     * @throws SQLException               if database error
+     * @throws NonUniqueMetadataException if an existing field with an identical element and qualifier is already
+     *                                    present
      */
-    public MetadataField create(Context context, MetadataSchema metadataSchema, String element, String qualifier, String scopeNote)
-            throws AuthorizeException, SQLException, NonUniqueMetadataException;
+    public MetadataField create(Context context, MetadataSchema metadataSchema, String element, String qualifier,
+                                String scopeNote)
+        throws AuthorizeException, SQLException, NonUniqueMetadataException;
 
     /**
      * Find the field corresponding to the given numeric ID.  The ID is
      * a database key internal to DSpace.
      *
-     * @param context
-     *            context, in case we need to read it in from DB
-     * @param id
-     *            the metadata field ID
+     * @param context context, in case we need to read it in from DB
+     * @param id      the metadata field ID
      * @return the metadata field object
      * @throws SQLException if database error
      */
@@ -58,22 +58,23 @@ public interface MetadataFieldService {
     /**
      * Retrieves the metadata field from the database.
      *
-     * @param context dspace context
+     * @param context        dspace context
      * @param metadataSchema schema
-     * @param element element name
-     * @param qualifier qualifier (may be ANY or null)
+     * @param element        element name
+     * @param qualifier      qualifier (may be ANY or null)
      * @return recalled metadata field
      * @throws SQLException if database error
      */
     public MetadataField findByElement(Context context, MetadataSchema metadataSchema, String element, String qualifier)
-            throws SQLException;
+        throws SQLException;
 
     public MetadataField findByElement(Context context, String metadataSchemaName, String element, String qualifier)
-            throws SQLException;
+        throws SQLException;
 
-    public List<MetadataField> findFieldsByElementNameUnqualified(Context context, String metadataSchema, String element) 
-    		throws SQLException;
-    
+    public List<MetadataField> findFieldsByElementNameUnqualified(Context context, String metadataSchema,
+                                                                  String element)
+        throws SQLException;
+
     /**
      * Retrieve all metadata field types from the registry
      *
@@ -86,34 +87,35 @@ public interface MetadataFieldService {
     /**
      * Return all metadata fields that are found in a given schema.
      *
-     * @param context dspace context
+     * @param context        dspace context
      * @param metadataSchema the metadata schema for which we want all our metadata fields
      * @return array of metadata fields
      * @throws SQLException if database error
      */
     public List<MetadataField> findAllInSchema(Context context, MetadataSchema metadataSchema)
-            throws SQLException;
+        throws SQLException;
 
 
     /**
      * Update the metadata field in the database.
      *
-     * @param context dspace context
+     * @param context       dspace context
      * @param metadataField metadata field
-     * @throws SQLException if database error
-     * @throws AuthorizeException if authorization error
-     * @throws NonUniqueMetadataException if an existing field with an identical element and qualifier is already present
-     * @throws IOException if IO error
+     * @throws SQLException               if database error
+     * @throws AuthorizeException         if authorization error
+     * @throws NonUniqueMetadataException if an existing field with an identical element and qualifier is already
+     *                                    present
+     * @throws IOException                if IO error
      */
     public void update(Context context, MetadataField metadataField)
-            throws SQLException, AuthorizeException, NonUniqueMetadataException, IOException;
+        throws SQLException, AuthorizeException, NonUniqueMetadataException, IOException;
 
     /**
      * Delete the metadata field.
      *
-     * @param context dspace context
+     * @param context       dspace context
      * @param metadataField metadata field
-     * @throws SQLException if database error
+     * @throws SQLException       if database error
      * @throws AuthorizeException if authorization error
      */
     public void delete(Context context, MetadataField metadataField) throws SQLException, AuthorizeException;

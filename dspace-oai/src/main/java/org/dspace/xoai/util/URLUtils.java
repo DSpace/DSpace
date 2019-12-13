@@ -7,28 +7,29 @@
  */
 package org.dspace.xoai.util;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
-import org.dspace.app.util.Util;
-import org.dspace.core.Constants;
 import java.io.UnsupportedEncodingException;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.dspace.app.util.Util;
+import org.dspace.core.Constants;
+
 /**
- * 
  * @author Lyncode Development Team (dspace at lyncode dot com)
  */
-public class URLUtils
-{
+public class URLUtils {
     private static Logger log = LogManager.getLogger(URLUtils.class);
 
-    public static String encode (String value) {
-        try
-        {
-        	return Util.encodeBitstreamName(value, Constants.DEFAULT_ENCODING);
+    /**
+     * Default constructor
+     */
+    private URLUtils() { }
 
-        }
-        catch (UnsupportedEncodingException e)
-        {
+    public static String encode(String value) {
+        try {
+            return Util.encodeBitstreamName(value, Constants.DEFAULT_ENCODING);
+
+        } catch (UnsupportedEncodingException e) {
             log.warn(e.getMessage(), e);
             return value;
         }

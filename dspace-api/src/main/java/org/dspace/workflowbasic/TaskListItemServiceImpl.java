@@ -7,14 +7,14 @@
  */
 package org.dspace.workflowbasic;
 
+import java.sql.SQLException;
+import java.util.List;
+
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.workflowbasic.dao.TaskListItemDAO;
 import org.dspace.workflowbasic.service.TaskListItemService;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.sql.SQLException;
-import java.util.List;
 
 /**
  * Service implementation for the TaskListItem object.
@@ -28,8 +28,7 @@ public class TaskListItemServiceImpl implements TaskListItemService {
     @Autowired(required = true)
     protected TaskListItemDAO taskListItemDAO;
 
-    protected TaskListItemServiceImpl()
-    {
+    protected TaskListItemServiceImpl() {
 
     }
 

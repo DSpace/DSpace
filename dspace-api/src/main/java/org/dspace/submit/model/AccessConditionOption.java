@@ -9,79 +9,78 @@ package org.dspace.submit.model;
 
 /**
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
- *
  */
 public class AccessConditionOption {
 
-	private String name;
-	
-	private String groupName;
-	
-	private String selectGroupName;
-	
-	private Boolean hasStartDate;
-	
-	private Boolean hasEndDate;
-	
-	private String startDateLimit;
-	
-	private String endDateLimit;
+    private String name;
 
-	public String getName() {
-		return name;
-	}
+    private String groupName;
 
-	public void setName(String type) {
-		this.name = type;
-	}
+    private String selectGroupName;
 
-	public String getGroupName() {
-		return groupName;
-	}
+    private Boolean hasStartDate;
 
-	public void setGroupName(String groupName) {
-		this.groupName = groupName;
-	}
+    private Boolean hasEndDate;
 
-	public Boolean getHasStartDate() {
-		return hasStartDate;
-	}
+    private String startDateLimit;
 
-	public void setHasStartDate(Boolean hasStartDate) {
-		this.hasStartDate = hasStartDate;
-	}
+    private String endDateLimit;
 
-	public Boolean getHasEndDate() {
-		return hasEndDate;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public void setHasEndDate(Boolean hasEndDate) {
-		this.hasEndDate = hasEndDate;
-	}
+    public void setName(String type) {
+        this.name = type;
+    }
 
-	public String getStartDateLimit() {
-		return startDateLimit;
-	}
+    public String getGroupName() {
+        return groupName;
+    }
 
-	public void setStartDateLimit(String startDateLimit) {
-		this.startDateLimit = startDateLimit;
-	}
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
+    }
 
-	public String getEndDateLimit() {
-		return endDateLimit;
-	}
+    public Boolean getHasStartDate() {
+        return hasStartDate;
+    }
 
-	public void setEndDateLimit(String endDateLimit) {
-		this.endDateLimit = endDateLimit;
-	}
+    public void setHasStartDate(Boolean hasStartDate) {
+        this.hasStartDate = hasStartDate;
+    }
 
-	public String getSelectGroupName() {
-		return selectGroupName;
-	}
+    public Boolean getHasEndDate() {
+        return hasEndDate;
+    }
 
-	public void setSelectGroupName(String selectGroupName) {
-		this.selectGroupName = selectGroupName;
-	}
+    public void setHasEndDate(Boolean hasEndDate) {
+        this.hasEndDate = hasEndDate;
+    }
+
+    public String getStartDateLimit() {
+        return startDateLimit;
+    }
+
+    public void setStartDateLimit(String startDateLimit) {
+        this.startDateLimit = startDateLimit;
+    }
+
+    public String getEndDateLimit() {
+        return endDateLimit;
+    }
+
+    public void setEndDateLimit(String endDateLimit) {
+        this.endDateLimit = endDateLimit;
+    }
+
+    public String getSelectGroupName() {
+        return selectGroupName;
+    }
+
+    public void setSelectGroupName(String selectGroupName) {
+        this.selectGroupName = selectGroupName;
+    }
 
 
 }

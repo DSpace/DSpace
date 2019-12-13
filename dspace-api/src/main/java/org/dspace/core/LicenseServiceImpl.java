@@ -28,85 +28,70 @@ import org.slf4j.LoggerFactory;
  *
  * @author mhwood
  */
-public class LicenseServiceImpl implements LicenseService
-{
+public class LicenseServiceImpl implements LicenseService {
     private final Logger log = LoggerFactory.getLogger(LicenseServiceImpl.class);
 
-    /** The default license */
+    /**
+     * The default license
+     */
     protected String license;
 
-    protected LicenseServiceImpl()
-    {
+    protected LicenseServiceImpl() {
 
     }
 
     @Override
     public void writeLicenseFile(String licenseFile,
-            String newLicense)
-    {
-        try
-        {
+                                 String newLicense) {
+        try {
             FileOutputStream fos = new FileOutputStream(licenseFile);
             OutputStreamWriter osr = new OutputStreamWriter(fos, "UTF-8");
             PrintWriter out = new PrintWriter(osr);
             out.print(newLicense);
             out.close();
-        } catch (IOException e)
-        {
+        } catch (IOException e) {
             log.warn("license_write: " + e.getLocalizedMessage());
         }
         license = newLicense;
     }
 
     @Override
-    public String getLicenseText(String licenseFile)
-    {
+    public String getLicenseText(String licenseFile) {
         InputStream is = null;
         InputStreamReader ir = null;
         BufferedReader br = null;
-        try
-        {
+        try {
             is = new FileInputStream(licenseFile);
             ir = new InputStreamReader(is, "UTF-8");
             br = new BufferedReader(ir);
             String lineIn;
             license = "";
-            while ((lineIn = br.readLine()) != null)
-            {
+            while ((lineIn = br.readLine()) != null) {
                 license = license + lineIn + '\n';
             }
-        } catch (IOException e)
-        {
+        } catch (IOException e) {
             log.error("Can't load configuration", e);
             throw new IllegalStateException("Failed to read default license.", e);
-        } finally
-        {
-            if (br != null)
-            {
-                try
-                {
+        } finally {
+            if (br != null) {
+                try {
                     br.close();
-                } catch (IOException ioe)
-                {
+                } catch (IOException ioe) {
+                    // ignore
                 }
             }
-            if (ir != null)
-            {
-                try
-                {
+            if (ir != null) {
+                try {
                     ir.close();
-                }
-                catch (IOException ioe)
-                {
+                } catch (IOException ioe) {
+                    // ignore
                 }
             }
-            if (is != null)
-            {
-                try
-                {
+            if (is != null) {
+                try {
                     is.close();
-                } catch (IOException ioe)
-                {
+                } catch (IOException ioe) {
+                    // ignore
                 }
             }
         }
@@ -119,10 +104,8 @@ public class LicenseServiceImpl implements LicenseService
      * @return the default license
      */
     @Override
-    public String getDefaultSubmissionLicense()
-    {
-        if (null == license)
-        {
+    public String getDefaultSubmissionLicense() {
+        if (null == license) {
             init();
         }
         return license;
@@ -131,16 +114,15 @@ public class LicenseServiceImpl implements LicenseService
     /**
      * Load in the default license.
      */
-    protected void init()
-    {
-        File licenseFile = new File(DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.dir")
+    protected void init() {
+        File licenseFile = new File(
+            DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.dir")
                 + File.separator + "config" + File.separator + "default.license");
 
-        FileInputStream  fir = null;
+        FileInputStream fir = null;
         InputStreamReader ir = null;
         BufferedReader br = null;
-        try
-        {
+        try {
 
             fir = new FileInputStream(licenseFile);
             ir = new InputStreamReader(fir, "UTF-8");
@@ -148,55 +130,41 @@ public class LicenseServiceImpl implements LicenseService
             String lineIn;
             license = "";
 
-            while ((lineIn = br.readLine()) != null)
-            {
+            while ((lineIn = br.readLine()) != null) {
                 license = license + lineIn + '\n';
             }
 
             br.close();
 
-        }
-        catch (IOException e)
-        {
-            log.error("Can't load license: " + licenseFile.toString() , e);
+        } catch (IOException e) {
+            log.error("Can't load license: " + licenseFile.toString(), e);
 
             // FIXME: Maybe something more graceful here, but with the
             // configuration we can't do anything
             throw new IllegalStateException("Cannot load license: "
-                    + licenseFile.toString(),e);
-        }
-        finally
-        {
-            if (br != null)
-            {
-                try
-                {
+                                                + licenseFile.toString(), e);
+        } finally {
+            if (br != null) {
+                try {
                     br.close();
-                }
-                catch (IOException ioe)
-                {
+                } catch (IOException ioe) {
+                    // ignore
                 }
             }
 
-            if (ir != null)
-            {
-                try
-                {
+            if (ir != null) {
+                try {
                     ir.close();
-                }
-                catch (IOException ioe)
-                {
+                } catch (IOException ioe) {
+                    // ignore
                 }
             }
 
-            if (fir != null)
-            {
-                try
-                {
+            if (fir != null) {
+                try {
                     fir.close();
-                }
-                catch (IOException ioe)
-                {
+                } catch (IOException ioe) {
+                    // ignore
                 }
             }
         }

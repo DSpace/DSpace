@@ -7,14 +7,14 @@
  */
 package org.dspace.xmlworkflow.factory;
 
+import java.io.IOException;
+import java.sql.SQLException;
+
 import org.dspace.content.Collection;
 import org.dspace.xmlworkflow.WorkflowConfigurationException;
 import org.dspace.xmlworkflow.state.Step;
 import org.dspace.xmlworkflow.state.Workflow;
 import org.dspace.xmlworkflow.state.actions.WorkflowActionConfig;
-
-import java.io.IOException;
-import java.sql.SQLException;
 
 /**
  * The xmlworkflowfactory is responsible for parsing the
@@ -27,6 +27,8 @@ import java.sql.SQLException;
  * @author Mark Diggory (markd at atmire dot com)
  */
 public interface XmlWorkflowFactory {
+
+    public final String LEGACY_WORKFLOW_NAME = "default";
 
     public Workflow getWorkflow(Collection collection) throws IOException, WorkflowConfigurationException, SQLException;
 

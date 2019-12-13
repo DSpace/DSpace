@@ -7,29 +7,28 @@
  */
 package org.dspace.content.authority;
 
-import org.dspace.authority.AuthoritySearchService;
-import org.dspace.authority.AuthorityValue;
-import org.dspace.authority.factory.AuthorityServiceFactory;
-import org.dspace.authority.rest.RestSource;
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.common.SolrDocument;
-import org.apache.solr.common.SolrDocumentList;
-import org.apache.solr.common.params.CommonParams;
-import org.dspace.authority.service.AuthorityValueService;
-import org.dspace.content.Collection;
-import org.dspace.core.ConfigurationManager;
-import org.dspace.services.factory.DSpaceServicesFactory;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.Logger;
+import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.common.SolrDocument;
+import org.apache.solr.common.SolrDocumentList;
+import org.apache.solr.common.params.CommonParams;
+import org.dspace.authority.AuthoritySearchService;
+import org.dspace.authority.AuthorityValue;
+import org.dspace.authority.SolrAuthorityInterface;
+import org.dspace.authority.factory.AuthorityServiceFactory;
+import org.dspace.authority.service.AuthorityValueService;
+import org.dspace.content.Collection;
+import org.dspace.core.ConfigurationManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
+
 /**
- *
  * @author Antoine Snyers (antoine at atmire.com)
  * @author Kevin Van de Velde (kevin at atmire dot com)
  * @author Ben Bosman (ben at atmire dot com)
@@ -37,14 +36,21 @@ import java.util.Map;
  */
 public class SolrAuthority implements ChoiceAuthority {
 
-    private static final Logger log = Logger.getLogger(SolrAuthority.class);
-    protected RestSource source = DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName("AuthoritySource", RestSource.class);
-    protected boolean externalResults = false;
-    protected final AuthorityValueService authorityValueService = AuthorityServiceFactory.getInstance().getAuthorityValueService();
+    protected SolrAuthorityInterface source =
+        DSpaceServicesFactory.getInstance().getServiceManager()
+                             .getServiceByName("AuthoritySource", SolrAuthorityInterface.class);
 
-    public Choices getMatches(String field, String text, Collection collection, int start, int limit, String locale, boolean bestMatch) {
-        if(limit == 0)
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(SolrAuthority.class);
+
+    protected boolean externalResults = false;
+    protected final AuthorityValueService authorityValueService = AuthorityServiceFactory.getInstance()
+                                                                                         .getAuthorityValueService();
+
+    public Choices getMatches(String field, String text, Collection collection, int start, int limit, String locale,
+                              boolean bestMatch) {
+        if (limit == 0) {
             limit = 10;
+        }
 
         SolrQuery queryArgs = new SolrQuery();
         if (text == null || text.trim().equals("")) {
@@ -74,7 +80,7 @@ public class SolrAuthority implements ChoiceAuthority {
         queryArgs.set(CommonParams.START, start);
         //We add one to our facet limit so that we know if there are more matches
         int maxNumberOfSolrResults = limit + 1;
-        if(externalResults){
+        if (externalResults) {
             maxNumberOfSolrResults = ConfigurationManager.getIntProperty("xmlui.lookup.select.size", 12);
         }
         queryArgs.set(CommonParams.ROWS, maxNumberOfSolrResults);
@@ -83,9 +89,9 @@ public class SolrAuthority implements ChoiceAuthority {
         String localSortField = "";
         if (StringUtils.isNotBlank(locale)) {
             localSortField = sortField + "_" + locale;
-            queryArgs.setSortField(localSortField, SolrQuery.ORDER.asc);
+            queryArgs.addSort(localSortField, SolrQuery.ORDER.asc);
         } else {
-            queryArgs.setSortField(sortField, SolrQuery.ORDER.asc);
+            queryArgs.addSort(sortField, SolrQuery.ORDER.asc);
         }
 
         Choices result;
@@ -94,13 +100,14 @@ public class SolrAuthority implements ChoiceAuthority {
             boolean hasMore = false;
             QueryResponse searchResponse = getSearchService().search(queryArgs);
             SolrDocumentList authDocs = searchResponse.getResults();
-            ArrayList<Choice> choices = new ArrayList<Choice>();
+            ArrayList<Choice> choices = new ArrayList<>();
             if (authDocs != null) {
                 max = (int) searchResponse.getResults().getNumFound();
                 int maxDocs = authDocs.size();
-                if (limit < maxDocs)
+                if (limit < maxDocs) {
                     maxDocs = limit;
-                List<AuthorityValue> alreadyPresent = new ArrayList<AuthorityValue>();
+                }
+                List<AuthorityValue> alreadyPresent = new ArrayList<>();
                 for (int i = 0; i < maxDocs; i++) {
                     SolrDocument solrDocument = authDocs.get(i);
                     if (solrDocument != null) {
@@ -115,7 +122,8 @@ public class SolrAuthority implements ChoiceAuthority {
 
                 if (externalResults && StringUtils.isNotBlank(text)) {
                     int sizeFromSolr = alreadyPresent.size();
-                    int maxExternalResults = limit <= 10 ? Math.max(limit - sizeFromSolr, 2) : Math.max(limit - 10 - sizeFromSolr, 2) + limit - 10;
+                    int maxExternalResults = limit <= 10 ? Math.max(limit - sizeFromSolr, 2) : Math
+                        .max(limit - 10 - sizeFromSolr, 2) + limit - 10;
                     addExternalResults(text, choices, alreadyPresent, maxExternalResults);
                 }
 
@@ -126,14 +134,16 @@ public class SolrAuthority implements ChoiceAuthority {
 
 
             int confidence;
-            if (choices.size() == 0)
+            if (choices.size() == 0) {
                 confidence = Choices.CF_NOTFOUND;
-            else if (choices.size() == 1)
+            } else if (choices.size() == 1) {
                 confidence = Choices.CF_UNCERTAIN;
-            else
+            } else {
                 confidence = Choices.CF_AMBIGUOUS;
+            }
 
-            result = new Choices(choices.toArray(new Choice[choices.size()]), start, hasMore ? max : choices.size() + start, confidence, hasMore);
+            result = new Choices(choices.toArray(new Choice[choices.size()]), start,
+                                 hasMore ? max : choices.size() + start, confidence, hasMore);
         } catch (Exception e) {
             log.error("Error while retrieving authority values {field: " + field + ", prefix:" + text + "}", e);
             result = new Choices(true);
@@ -142,10 +152,12 @@ public class SolrAuthority implements ChoiceAuthority {
         return result;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
-    protected void addExternalResults(String text, ArrayList<Choice> choices, List<AuthorityValue> alreadyPresent, int max) {
-        if(source != null){
+    protected void addExternalResults(String text, ArrayList<Choice> choices, List<AuthorityValue> alreadyPresent,
+                                      int max) {
+        if (source != null) {
             try {
-                List<AuthorityValue> values = source.queryAuthorities(text, max * 2); // max*2 because results get filtered
+                List<AuthorityValue> values = source
+                    .queryAuthorities(text, max * 2); // max*2 because results get filtered
 
                 // filtering loop
                 Iterator<AuthorityValue> iterator = values.iterator();
@@ -176,7 +188,8 @@ public class SolrAuthority implements ChoiceAuthority {
     }
 
     private String toQuery(String searchField, String text) {
-        return searchField + ":\"" + text.toLowerCase().replaceAll(":", "\\:") + "*\" or " + searchField + ":\"" + text.toLowerCase().replaceAll(":", "\\:")+"\"";
+        return searchField + ":(" + text.toLowerCase().replaceAll(":", "\\:") + "*) or " + searchField + ":(" + text
+            .toLowerCase().replaceAll(":", "\\:") + ")";
     }
 
     @Override
@@ -187,7 +200,7 @@ public class SolrAuthority implements ChoiceAuthority {
     @Override
     public Choices getBestMatch(String field, String text, Collection collection, String locale) {
         Choices matches = getMatches(field, text, collection, 0, 1, locale, false);
-        if (matches.values.length !=0 && !matches.values[0].value.equalsIgnoreCase(text)) {
+        if (matches.values.length != 0 && !matches.values[0].value.equalsIgnoreCase(text)) {
             matches = new Choices(false);
         }
         return matches;
@@ -213,35 +226,41 @@ public class SolrAuthority implements ChoiceAuthority {
                 }
                 if (label != null) {
                     if (log.isDebugEnabled()) {
-                        log.debug("returning label " + label + " for key " + key + " using locale " + locale + " and fieldvalue " + "value_" + locale);
+                        log.debug(
+                            "returning label " + label + " for key " + key + " using locale " + locale + " and " +
+                                "fieldvalue " + "value_" + locale);
                     }
                     return label;
                 }
                 try {
                     label = (String) docs.get(0).getFieldValue("value");
                 } catch (Exception e) {
-                    log.error("couldn't get field value for key " + key,e);
+                    log.error("couldn't get field value for key " + key, e);
                 }
                 if (label != null) {
                     if (log.isDebugEnabled()) {
-                        log.debug("returning label " + label + " for key " + key + " using locale " + locale + " and fieldvalue " + "value");
+                        log.debug(
+                            "returning label " + label + " for key " + key + " using locale " + locale + " and " +
+                                "fieldvalue " + "value");
                     }
                     return label;
                 }
                 try {
                     label = (String) docs.get(0).getFieldValue("value_en");
                 } catch (Exception e) {
-                    log.error("couldn't get field value for key " + key,e);
+                    log.error("couldn't get field value for key " + key, e);
                 }
                 if (label != null) {
                     if (log.isDebugEnabled()) {
-                        log.debug("returning label " + label + " for key " + key + " using locale " + locale + " and fieldvalue " + "value_en");
+                        log.debug(
+                            "returning label " + label + " for key " + key + " using locale " + locale + " and " +
+                                "fieldvalue " + "value_en");
                     }
                     return label;
                 }
             }
         } catch (Exception e) {
-            log.error("error occurred while trying to get label for key " + key,e);
+            log.error("error occurred while trying to get label for key " + key, e);
         }
 
         return key;

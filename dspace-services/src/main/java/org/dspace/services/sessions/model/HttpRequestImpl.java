@@ -16,7 +16,7 @@ import org.dspace.services.model.Request;
 
 public final class HttpRequestImpl extends AbstractRequestImpl implements Request {
 
-    private transient ServletRequest  servletRequest  = null;
+    private transient ServletRequest servletRequest = null;
     private transient ServletResponse servletResponse = null;
 
     public HttpRequestImpl(ServletRequest request, ServletResponse response) {
@@ -34,7 +34,7 @@ public final class HttpRequestImpl extends AbstractRequestImpl implements Reques
 
     public HttpServletRequest getHttpServletRequest() {
         if (servletRequest instanceof HttpServletRequest) {
-            return (HttpServletRequest)servletRequest;
+            return (HttpServletRequest) servletRequest;
         }
 
         return null;
@@ -46,7 +46,7 @@ public final class HttpRequestImpl extends AbstractRequestImpl implements Reques
 
     public HttpServletResponse getHttpServletResponse() {
         if (servletResponse instanceof HttpServletResponse) {
-            return (HttpServletResponse)servletResponse;
+            return (HttpServletResponse) servletResponse;
         }
 
         return null;

@@ -9,25 +9,26 @@
 
 -->
 <beans xmlns="http://www.springframework.org/schema/beans"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:context="http://www.springframework.org/schema/context"
-    xsi:schemaLocation="http://www.springframework.org/schema/beans
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
            http://www.springframework.org/schema/beans/spring-beans.xsd
            http://www.springframework.org/schema/context
            http://www.springframework.org/schema/context/spring-context.xsd"
-    default-autowire-candidates="*Service,*DAO,javax.sql.DataSource">
+       default-autowire-candidates="*Service,*DAO,javax.sql.DataSource">
 
-    <context:annotation-config /> <!-- allows us to use spring annotations in beans -->
+    <context:annotation-config/> <!-- allows us to use spring annotations in beans -->
 
     <bean class="org.dspace.app.sherpa.SHERPAService" id="org.dspace.app.sherpa.SHERPAService">
-        <property name="maxNumberOfTries" value="3" />
-        <property name="sleepBetweenTimeouts" value="2000" />
-        <property name="timeout" value="5000" />
-            </bean>
+        <property name="maxNumberOfTries" value="3"/>
+        <property name="sleepBetweenTimeouts" value="2000"/>
+        <property name="timeout" value="5000"/>
+    </bean>
 
-	
-	<bean class="org.dspace.app.sherpa.submit.SHERPASubmitService" id="org.dspace.app.sherpa.submit.SHERPASubmitService">
-		<property name="sherpaService" ref="org.dspace.app.sherpa.SHERPAService" />
-		<property name="configuration" ref="org.dspace.app.sherpa.submit.SHERPASubmitConfigurationService" />
-	</bean>
+
+    <bean class="org.dspace.app.sherpa.submit.SHERPASubmitService"
+          id="org.dspace.app.sherpa.submit.SHERPASubmitService">
+        <property name="sherpaService" ref="org.dspace.app.sherpa.SHERPAService"/>
+        <property name="configuration" ref="org.dspace.app.sherpa.submit.SHERPASubmitConfigurationService"/>
+    </bean>
 </beans>

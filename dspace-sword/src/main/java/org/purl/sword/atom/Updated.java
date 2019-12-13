@@ -7,30 +7,27 @@
  */
 package org.purl.sword.atom;
 
-import org.purl.sword.base.*;
+import org.purl.sword.base.BasicStringContentElement;
+import org.purl.sword.base.Namespaces;
+import org.purl.sword.base.XmlName;
 
 /**
- *
  * @author Neil Taylor (nst@aber.ac.uk)
  */
-public class Updated extends BasicStringContentElement
-{
+public class Updated extends BasicStringContentElement {
     private static final XmlName XML_NAME =
-            new XmlName(Namespaces.PREFIX_ATOM, "updated", Namespaces.NS_ATOM);
+        new XmlName(Namespaces.PREFIX_ATOM, "updated", Namespaces.NS_ATOM);
 
-    public Updated()
-    {
+    public Updated() {
         super(XML_NAME);
     }
 
-    public Updated(String uri)
-    {
+    public Updated(String uri) {
         this();
         setContent(uri);
     }
 
-    public static XmlName elementName()
-    {
-        return XML_NAME; 
+    public static XmlName elementName() {
+        return XML_NAME;
     }
 }

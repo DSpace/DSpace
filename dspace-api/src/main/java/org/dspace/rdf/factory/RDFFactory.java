@@ -15,18 +15,17 @@ import org.dspace.utils.DSpace;
 
 /**
  * Abstract factory to get services for the rdf package, use RDFFactory.getInstance() to retrieve an implementation.
+ *
  * @author Pascal-Nicolas Becker (p dot becker at tu hyphen berlin dot de)
  */
-public abstract class RDFFactory
-{
+public abstract class RDFFactory {
     public abstract RDFStorage getRDFStorage();
 
     public abstract URIGenerator getURIGenerator();
 
     public abstract RDFConverter getRDFConverter();
 
-    public static RDFFactory getInstance()
-    {
+    public static RDFFactory getInstance() {
         return new DSpace().getServiceManager().getServiceByName("rdfFactory", RDFFactory.class);
     }
 }

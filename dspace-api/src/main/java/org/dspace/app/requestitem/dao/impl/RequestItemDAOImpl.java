@@ -7,14 +7,16 @@
  */
 package org.dspace.app.requestitem.dao.impl;
 
-import org.dspace.app.requestitem.RequestItem;
-import org.dspace.app.requestitem.dao.RequestItemDAO;
-import org.dspace.core.Context;
-import org.dspace.core.AbstractHibernateDAO;
-import org.hibernate.Criteria;
-import org.hibernate.criterion.Restrictions;
-
 import java.sql.SQLException;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
+
+import org.dspace.app.requestitem.RequestItem;
+import org.dspace.app.requestitem.RequestItem_;
+import org.dspace.app.requestitem.dao.RequestItemDAO;
+import org.dspace.core.AbstractHibernateDAO;
+import org.dspace.core.Context;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the RequestItem object.
@@ -23,18 +25,19 @@ import java.sql.SQLException;
  *
  * @author kevinvandevelde at atmire.com
  */
-public class RequestItemDAOImpl extends AbstractHibernateDAO<RequestItem> implements RequestItemDAO
-{
-    protected RequestItemDAOImpl()
-    {
+public class RequestItemDAOImpl extends AbstractHibernateDAO<RequestItem> implements RequestItemDAO {
+    protected RequestItemDAOImpl() {
         super();
     }
 
     @Override
     public RequestItem findByToken(Context context, String token) throws SQLException {
-        Criteria criteria = createCriteria(context, RequestItem.class);
-        criteria.add(Restrictions.eq("token", token));
-        return uniqueResult(criteria);
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, RequestItem.class);
+        Root<RequestItem> requestItemRoot = criteriaQuery.from(RequestItem.class);
+        criteriaQuery.select(requestItemRoot);
+        criteriaQuery.where(criteriaBuilder.equal(requestItemRoot.get(RequestItem_.token), token));
+        return uniqueResult(context, criteriaQuery, false, RequestItem.class, -1, -1);
     }
 
 

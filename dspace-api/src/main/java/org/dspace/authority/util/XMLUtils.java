@@ -7,7 +7,17 @@
  */
 package org.dspace.authority.util;
 
-import org.apache.log4j.Logger;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Iterator;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.xpath.XPathExpressionException;
+
+import org.apache.logging.log4j.Logger;
 import org.apache.xpath.XPathAPI;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -15,18 +25,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.xpath.XPathExpressionException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Iterator;
-
 /**
- *
  * @author Antoine Snyers (antoine at atmire.com)
  * @author Kevin Van de Velde (kevin at atmire dot com)
  * @author Ben Bosman (ben at atmire dot com)
@@ -37,10 +36,15 @@ public class XMLUtils {
     /**
      * log4j logger
      */
-    private static Logger log = Logger.getLogger(XMLUtils.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(XMLUtils.class);
 
     /**
-     * @param xml The starting context (a Node or a Document, for example).
+     * Default constructor
+     */
+    private XMLUtils() { }
+
+    /**
+     * @param xml             The starting context (a Node or a Document, for example).
      * @param singleNodeXPath xpath
      * @return node.getTextContent() on the node that matches singleNodeXPath
      * null if nothing matches the NodeListXPath
@@ -57,7 +61,7 @@ public class XMLUtils {
     }
 
     /**
-     * @param xml The starting context (a Node or a Document, for example).
+     * @param xml           The starting context (a Node or a Document, for example).
      * @param NodeListXPath xpath
      * @return A Node matches the NodeListXPath
      * null if nothing matches the NodeListXPath
@@ -74,7 +78,7 @@ public class XMLUtils {
     }
 
     /**
-     * @param xml The starting context (a Node or a Document, for example).
+     * @param xml           The starting context (a Node or a Document, for example).
      * @param NodeListXPath xpath
      * @return A NodeList containing the nodes that match the NodeListXPath
      * null if nothing matches the NodeListXPath
@@ -99,6 +103,7 @@ public class XMLUtils {
      * that are element nodes:
      * node.getNodeType() == Node.ELEMENT_NODE
      * node instanceof Element
+     *
      * @param nodeList NodeList
      * @return iterator over nodes
      */

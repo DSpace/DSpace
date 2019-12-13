@@ -7,14 +7,15 @@
  */
 package org.dspace.checker.factory;
 
-import org.dspace.checker.service.SimpleReporterService;
 import org.dspace.checker.service.ChecksumHistoryService;
 import org.dspace.checker.service.ChecksumResultService;
 import org.dspace.checker.service.MostRecentChecksumService;
+import org.dspace.checker.service.SimpleReporterService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Factory implementation to get services for the checker package, use CheckerServiceFactory.getInstance() to retrieve an implementation
+ * Factory implementation to get services for the checker package, use CheckerServiceFactory.getInstance() to
+ * retrieve an implementation
  *
  * @author kevinvandevelde at atmire.com
  */

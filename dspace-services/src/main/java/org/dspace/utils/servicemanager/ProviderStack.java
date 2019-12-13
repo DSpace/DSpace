@@ -19,12 +19,12 @@ import org.dspace.kernel.mixins.OrderedService;
 
 
 /**
- * This class stores a list of providers in a specific order 
- * (determined by insertion order and the {@link OrderedService} 
+ * This class stores a list of providers in a specific order
+ * (determined by insertion order and the {@link OrderedService}
  * settings).
  * <p>
  * Should be thread safe.
- * 
+ *
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
 public final class ProviderStack<T> {
@@ -34,7 +34,7 @@ public final class ProviderStack<T> {
     /**
      * Default empty constructor.
      * <p>
-     * This is mostly only useful if you are planning to add new 
+     * This is mostly only useful if you are planning to add new
      * providers later.  You should probably use the other contructors.
      */
     public ProviderStack() {
@@ -42,17 +42,17 @@ public final class ProviderStack<T> {
     }
 
     /**
-     * Construct a provider holder with all currently known providers of 
+     * Construct a provider holder with all currently known providers of
      * the given type.
      *
      * @param serviceManager the system service manager
-     * @param providerType the interface type of the providers we care about
+     * @param providerType   the interface type of the providers we care about
      */
     public ProviderStack(ServiceManager serviceManager, Class<T> providerType) {
         providers = Collections.synchronizedList(new ArrayList<ProviderHolder<T>>());
         List<T> foundProviders = serviceManager.getServicesByType(providerType);
         // filter out the NotProviders first
-        for (Iterator<T> iterator = foundProviders.iterator(); iterator.hasNext();) {
+        for (Iterator<T> iterator = foundProviders.iterator(); iterator.hasNext(); ) {
             T t = iterator.next();
             if (t instanceof NotProvider) {
                 iterator.remove();
@@ -60,7 +60,7 @@ public final class ProviderStack<T> {
         }
         Collections.sort(foundProviders, new OrderedServiceComparator());
         for (T t : foundProviders) {
-            providers.add( new ProviderHolder<T>(t) );
+            providers.add(new ProviderHolder<T>(t));
         }
     }
 
@@ -81,7 +81,7 @@ public final class ProviderStack<T> {
                 continue; // skip all the NotProviders
             }
             if (t instanceof OrderedService) {
-                tList.add( t );
+                tList.add(t);
             }
         }
         // sort the ordered ones
@@ -89,16 +89,16 @@ public final class ProviderStack<T> {
         // now add in the rest in the order given
         for (int i = 0; i < currentProviders.length; i++) {
             T t = currentProviders[i];
-            if (! (t instanceof OrderedService)) {
+            if (!(t instanceof OrderedService)) {
                 if (t instanceof NotProvider) {
                     continue; // skip all the NotProviders
                 }
-                tList.add( t );
+                tList.add(t);
             }
         }
         // now put these into holders
         for (T t : tList) {
-            providers.add( new ProviderHolder<T>(t) );
+            providers.add(new ProviderHolder<T>(t));
         }
         tList.clear();
     }
@@ -107,7 +107,7 @@ public final class ProviderStack<T> {
      * Add a provider to the stack of providers.
      * This will be placed at the bottom if the order is less than or
      * equal to 0 or this provider is not ordered.
-     * 
+     *
      * @param provider the provider to add to the stack
      * @return the position in the stack that this provider was added
      */
@@ -119,13 +119,14 @@ public final class ProviderStack<T> {
         refresh();
         int providerOrder = 0;
         if (provider instanceof NotProvider) {
-            throw new IllegalArgumentException("Cannot place anything that implements NotProvider into the provider stack, failure for: " + provider);
+            throw new IllegalArgumentException(
+                "Cannot place anything that implements NotProvider into the provider stack, failure for: " + provider);
         }
         if (provider instanceof OrderedService) {
-            providerOrder = ((OrderedService)provider).getOrder();
+            providerOrder = ((OrderedService) provider).getOrder();
         }
         // place at the bottom of the stack
-        providers.add( new ProviderHolder<T>(provider) );
+        providers.add(new ProviderHolder<T>(provider));
         if (providerOrder > 0) {
             // re-sort the providers
             Collections.sort(this.providers, new ProviderStackComparator());
@@ -134,8 +135,9 @@ public final class ProviderStack<T> {
     }
 
     /**
-     * Remove a provider based on the position in the stack (starting at 
+     * Remove a provider based on the position in the stack (starting at
      * 0 and ending at size-1).
+     *
      * @param position the position to remove the provider from
      * @return true if the provider position was found and removed OR false if not found
      */
@@ -153,6 +155,7 @@ public final class ProviderStack<T> {
 
     /**
      * Remove a provider by the object equality.
+     *
      * @param provider the provider to remove from the stack
      * @return true if the provider was found and removed OR false if not found
      */
@@ -162,7 +165,7 @@ public final class ProviderStack<T> {
         }
         boolean removed = false;
         refresh();
-        for (Iterator<ProviderHolder<T>> iterator = providers.iterator(); iterator.hasNext();) {
+        for (Iterator<ProviderHolder<T>> iterator = providers.iterator(); iterator.hasNext(); ) {
             ProviderHolder<T> holder = iterator.next();
             T p = holder.getProvider();
             if (p == null) {
@@ -182,6 +185,7 @@ public final class ProviderStack<T> {
      * <p>
      * WARNING: this should not be held onto; it should be only used for
      * iteration and then discarded.
+     *
      * @return a read-only list of all providers in the stack in the correct order, highest priority first
      */
     public List<T> getProviders() {
@@ -191,6 +195,7 @@ public final class ProviderStack<T> {
 
     /**
      * This allows access to the provider holders.
+     *
      * @return a read only list of the provider holders in the correct order
      */
     public List<ProviderHolder<T>> getProviderHolders() {
@@ -203,28 +208,31 @@ public final class ProviderStack<T> {
      * used more than once (i.e. only iterate over this completely once:
      * stopping and continuing later is likely to produce failures).
      * <p>
-     * NOTE: This will attempt to iterate over all the valid providers 
+     * NOTE: This will attempt to iterate over all the valid providers
      * in the stack, but if the provider has been garbage collected
-     * during the iteration then a {@link NoSuchElementException} will 
-     * be thrown if the provider was the last one in the stack and 
+     * during the iteration then a {@link NoSuchElementException} will
+     * be thrown if the provider was the last one in the stack and
      * next() is called.  You should probably handle the exception by
      * assuming this indicates all items were iterated over.
+     *
      * @return an iterator over all the providers in the stack in order of priority
      */
     public Iterator<T> getIterator() {
         return new Iterator<T>() {
             protected ListIterator<ProviderHolder<T>> it = null;
+
             public synchronized boolean hasNext() {
                 if (it == null) {
                     it = providers.listIterator();
                 }
                 return it.hasNext();
             }
+
             public synchronized T next() {
                 if (it == null) {
                     it = providers.listIterator();
                 }
-                /* get the next provider if it is not null, otherwise keep going until we find a non-null one 
+                /* get the next provider if it is not null, otherwise keep going until we find a non-null one
                  * or just return null if there are none left
                  */
                 T t = null;
@@ -240,6 +248,7 @@ public final class ProviderStack<T> {
                 }
                 return t;
             }
+
             public void remove() {
                 it.remove();
             }
@@ -247,7 +256,7 @@ public final class ProviderStack<T> {
     }
 
     /**
-     * Get a provider based on the position in the stack (starting at 0 
+     * Get a provider based on the position in the stack (starting at 0
      * and ending at size-1).
      *
      * @param position the position to check for the provider
@@ -263,7 +272,7 @@ public final class ProviderStack<T> {
     }
 
     /**
-     * Get the provider holder from the position in the stack if there 
+     * Get the provider holder from the position in the stack if there
      * is one.
      *
      * @param position the position to check for the provider
@@ -282,7 +291,7 @@ public final class ProviderStack<T> {
     }
 
     /**
-     * Check the number of current providers which are available in this 
+     * Check the number of current providers which are available in this
      * stack.
      *
      * @return the total number of viable providers
@@ -300,13 +309,14 @@ public final class ProviderStack<T> {
     }
 
     /**
-     * Check to make sure all providers are refreshed and any that are 
+     * Check to make sure all providers are refreshed and any that are
      * no longer valid are flushed out of the list.
+     *
      * @return list of valid providers
      */
     protected List<T> refresh() {
         ArrayList<T> l = new ArrayList<T>();
-        for (Iterator<ProviderHolder<T>> iterator = providers.iterator(); iterator.hasNext();) {
+        for (Iterator<ProviderHolder<T>> iterator = providers.iterator(); iterator.hasNext(); ) {
             ProviderHolder<T> holder = iterator.next();
             T provider = holder.getProvider();
             if (provider == null) {

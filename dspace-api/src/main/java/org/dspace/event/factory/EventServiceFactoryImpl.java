@@ -11,7 +11,8 @@ import org.dspace.event.service.EventService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Factory implementation to get services for the event package, use EventServiceFactory.getInstance() to retrieve an implementation
+ * Factory implementation to get services for the event package, use EventServiceFactory.getInstance() to retrieve an
+ * implementation
  *
  * @author kevinvandevelde at atmire.com
  */

@@ -8,17 +8,18 @@
 package org.dspace.browse;
 
 import java.sql.SQLException;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
-import org.dspace.sort.SortOption;
 import org.dspace.sort.OrderFormat;
+import org.dspace.sort.SortOption;
 
 /**
  * This class does most of the actual grunt work of preparing a browse
@@ -28,23 +29,31 @@ import org.dspace.sort.OrderFormat;
  * the results of the requested browse
  *
  * @author Richard Jones
- *
  */
-public class BrowseEngine
-{
-    /** the logger for this class */
-    private static final Logger log = Logger.getLogger(BrowseEngine.class);
+public class BrowseEngine {
+    /**
+     * the logger for this class
+     */
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(BrowseEngine.class);
 
-    /** the browse scope which is the basis for our browse */
+    /**
+     * the browse scope which is the basis for our browse
+     */
     private BrowserScope scope;
 
-    /** the DSpace context */
+    /**
+     * the DSpace context
+     */
     private final Context context;
 
-    /** The Data Access Object for the browse tables */
+    /**
+     * The Data Access Object for the browse tables
+     */
     private final BrowseDAO dao;
 
-    /** The Browse Index associated with the Browse Scope */
+    /**
+     * The Browse Index associated with the Browse Scope
+     */
     private BrowseIndex browseIndex;
 
     /**
@@ -52,12 +61,11 @@ public class BrowseEngine
      * Context object.  This will automatically assign a Data Access Object
      * for the Browse Engine, based on the brand of the provided DBMS.
      *
-     * @param context       the DSpace context
+     * @param context the DSpace context
      * @throws BrowseException if browse error
      */
     public BrowseEngine(Context context)
-        throws BrowseException
-    {
+        throws BrowseException {
         // set the context
         this.context = context;
 
@@ -71,13 +79,12 @@ public class BrowseEngine
      * total number of results, the range, and information to construct
      * previous and next links on any web page
      *
-     * @param bs    the scope of the browse
-     * @return      the results of the browse
+     * @param bs the scope of the browse
+     * @return the results of the browse
      * @throws BrowseException if browse error
      */
     public BrowseInfo browse(BrowserScope bs)
-        throws BrowseException
-    {
+        throws BrowseException {
         log.debug(LogManager.getHeader(context, "browse", ""));
 
         // first, load the browse scope into the object
@@ -88,14 +95,11 @@ public class BrowseEngine
         browseIndex = scope.getBrowseIndex();
 
         // now make the decision as to how to browse
-        if (browseIndex.isMetadataIndex() && !scope.isSecondLevel())
-        {
+        if (browseIndex.isMetadataIndex() && !scope.isSecondLevel()) {
             // this is a single value browse type that has not gone to
             // the second level (i.e. authors, not items by a given author)
             return browseByValue(scope);
-        }
-        else
-        {
+        } else {
             // this is the full browse type or a browse that has gone to
             // the second level
             return browseByItem(scope);
@@ -109,13 +113,12 @@ public class BrowseEngine
      * not currently support focus or values.  This method is used, for example,
      * to generate the Recently Submitted Items results.
      *
-     * @param bs    the scope of the browse
-     * @return      the results of the browse
+     * @param bs the scope of the browse
+     * @return the results of the browse
      * @throws BrowseException if browse error
      */
     public BrowseInfo browseMini(BrowserScope bs)
-        throws BrowseException
-    {
+        throws BrowseException {
         log.info(LogManager.getHeader(context, "browse_mini", ""));
 
         // load the scope into the object
@@ -133,17 +136,13 @@ public class BrowseEngine
 
         // define a clause for the WHERE clause which will allow us to constrain
         // our browse to a specified community or collection
-        if (scope.inCollection() || scope.inCommunity())
-        {
-            if (scope.inCollection())
-            {
+        if (scope.inCollection() || scope.inCommunity()) {
+            if (scope.inCollection()) {
                 Collection col = (Collection) scope.getBrowseContainer();
                 dao.setContainerTable("collection2item");
                 dao.setContainerIDField("collection_id");
                 dao.setContainerID(col.getID());
-            }
-            else if (scope.inCommunity())
-            {
+            } else if (scope.inCommunity()) {
                 Community com = (Community) scope.getBrowseContainer();
                 dao.setContainerTable("communities2item");
                 dao.setContainerIDField("community_id");
@@ -156,8 +155,7 @@ public class BrowseEngine
 
         // assemble the ORDER BY clause
         String orderBy = browseIndex.getSortField(scope.isSecondLevel());
-        if (scope.getSortBy() > 0)
-        {
+        if (scope.getSortBy() > 0) {
             orderBy = "sort_" + Integer.toString(scope.getSortBy());
         }
         dao.setOrderField(orderBy);
@@ -178,8 +176,7 @@ public class BrowseEngine
         browseInfo.setAscending(scope.isAscending());
 
         // tell the browse info what the container for the browse was
-        if (scope.inCollection() || scope.inCommunity())
-        {
+        if (scope.inCollection() || scope.inCommunity()) {
             browseInfo.setBrowseContainer(scope.getBrowseContainer());
         }
 
@@ -195,16 +192,14 @@ public class BrowseEngine
      * BrowseInfo object which contains full BrowseItem objects as its result
      * set.
      *
-     * @param bs        the scope of the browse
-     * @return          the results of the browse
+     * @param bs the scope of the browse
+     * @return the results of the browse
      * @throws BrowseException if browse error
      */
     private BrowseInfo browseByItem(BrowserScope bs)
-        throws BrowseException
-    {
+        throws BrowseException {
         log.info(LogManager.getHeader(context, "browse_by_item", ""));
-        try
-        {
+        try {
             // get the table name that we are going to be getting our data from
             dao.setTable(browseIndex.getTableName());
 
@@ -213,27 +208,23 @@ public class BrowseEngine
 
             // assemble the value clause
             String rawValue = null;
-            if (scope.hasFilterValue() && scope.isSecondLevel())
-            {
+            if (scope.hasFilterValue() && scope.isSecondLevel()) {
                 String value = scope.getFilterValue();
                 rawValue = value;
 
                 // make sure the incoming value is normalised
                 value = OrderFormat.makeSortString(value, scope.getFilterValueLang(),
-                            scope.getBrowseIndex().getDataType());
+                                                   scope.getBrowseIndex().getDataType());
 
                 dao.setAuthorityValue(scope.getAuthorityValue());
 
                 // set the values in the Browse Query
-                if (scope.isSecondLevel())
-                {
+                if (scope.isSecondLevel()) {
                     dao.setFilterValueField("value");
-                    dao.setFilterValue(rawValue);    
-                }
-                else
-                {
-	                dao.setFilterValueField("sort_value");
-	                dao.setFilterValue(value);
+                    dao.setFilterValue(rawValue);
+                } else {
+                    dao.setFilterValueField("sort_value");
+                    dao.setFilterValue(value);
                 }
                 dao.setFilterValuePartial(scope.getFilterValuePartial());
 
@@ -244,17 +235,13 @@ public class BrowseEngine
 
             // define a clause for the WHERE clause which will allow us to constrain
             // our browse to a specified community or collection
-            if (scope.inCollection() || scope.inCommunity())
-            {
-                if (scope.inCollection())
-                {
+            if (scope.inCollection() || scope.inCommunity()) {
+                if (scope.inCollection()) {
                     Collection col = (Collection) scope.getBrowseContainer();
                     dao.setContainerTable("collection2item");
                     dao.setContainerIDField("collection_id");
                     dao.setContainerID(col.getID());
-                }
-                else if (scope.inCommunity())
-                {
+                } else if (scope.inCommunity()) {
                     Community com = (Community) scope.getBrowseContainer();
                     dao.setContainerTable("communities2item");
                     dao.setContainerIDField("community_id");
@@ -267,16 +254,14 @@ public class BrowseEngine
 
             // assemble the ORDER BY clause
             String orderBy = browseIndex.getSortField(scope.isSecondLevel());
-            if (scope.getSortBy() > 0)
-            {
+            if (scope.getSortBy() > 0) {
                 orderBy = "sort_" + Integer.toString(scope.getSortBy());
             }
             dao.setOrderField(orderBy);
 
             int offset = scope.getOffset();
             String rawFocusValue = null;
-            if (offset < 1 && (scope.hasJumpToItem() || scope.hasJumpToValue() || scope.hasStartsWith()))
-            {
+            if (offset < 1 && (scope.hasJumpToItem() || scope.hasJumpToValue() || scope.hasStartsWith())) {
                 // We need to convert these to an offset for the actual browse query.
                 // First, get a value that we can look up in the ordering field
                 rawFocusValue = getJumpToValue();
@@ -299,20 +284,17 @@ public class BrowseEngine
             List<Item> results = null;
 
             // Does this browse have any contents?
-            if (total > 0)
-            {
+            if (total > 0) {
                 // now run the query
                 results = dao.doQuery();
 
                 // now, if we don't have any results, we are at the end of the browse.  This will
                 // be because a starts_with value has been supplied for which we don't have
                 // any items.
-                if (results.size() == 0)
-                {
+                if (results.size() == 0) {
                     // In this case, we will calculate a new offset for the last page of results
                     offset = total - scope.getResultsPerPage();
-                    if (offset < 0)
-                    {
+                    if (offset < 0) {
                         offset = 0;
                     }
 
@@ -320,9 +302,7 @@ public class BrowseEngine
                     dao.setOffset(offset);
                     results = dao.doQuery();
                 }
-            }
-            else
-            {
+            } else {
                 // No records, so make an empty list
                 results = new ArrayList<>();
             }
@@ -331,13 +311,11 @@ public class BrowseEngine
 //            BrowseInfo browseInfo = new BrowseInfo(results, position, total, offset);
             BrowseInfo browseInfo = new BrowseInfo(results, offset, total, offset);
 
-            if (offset + scope.getResultsPerPage() < total)
-            {
+            if (offset + scope.getResultsPerPage() < total) {
                 browseInfo.setNextOffset(offset + scope.getResultsPerPage());
             }
 
-            if (offset - scope.getResultsPerPage() > -1)
-            {
+            if (offset - scope.getResultsPerPage() > -1) {
                 browseInfo.setPrevOffset(offset - scope.getResultsPerPage());
             }
 
@@ -362,8 +340,7 @@ public class BrowseEngine
             // set the focus value if there is one
             browseInfo.setFocus(rawFocusValue);
 
-            if (scope.hasJumpToItem())
-            {
+            if (scope.hasJumpToItem()) {
                 browseInfo.setFocusItem(scope.getJumpToItem());
             }
 
@@ -371,8 +348,7 @@ public class BrowseEngine
             browseInfo.setStartsWith(scope.hasStartsWith());
 
             // tell the browse info what the container for the browse was
-            if (scope.inCollection() || scope.inCommunity())
-            {
+            if (scope.inCollection() || scope.inCommunity()) {
                 browseInfo.setBrowseContainer(scope.getBrowseContainer());
             }
 
@@ -381,9 +357,7 @@ public class BrowseEngine
             browseInfo.setEtAl(scope.getEtAl());
 
             return browseInfo;
-        }
-        catch (SQLException e)
-        {
+        } catch (SQLException e) {
             log.error("caught exception: ", e);
             throw new BrowseException(e);
         }
@@ -394,21 +368,20 @@ public class BrowseEngine
      * produces a BrowseInfo object that contains Strings as the results of
      * the browse
      *
-     * @param bs        the scope of the browse
-     * @return          the results of the browse
+     * @param bs the scope of the browse
+     * @return the results of the browse
      * @throws BrowseException if browse error
      */
     private BrowseInfo browseByValue(BrowserScope bs)
-        throws BrowseException
-    {
+        throws BrowseException {
         log.info(LogManager.getHeader(context, "browse_by_value", "focus=" + bs.getJumpToValue()));
 
-        try
-        {
+        try {
             // get the table name that we are going to be getting our data from
             // this is the distinct table constrained to either community or collection
             dao.setTable(browseIndex.getDistinctTableName());
 
+            dao.setStartsWith(StringUtils.lowerCase(scope.getStartsWith()));
             // remind the DAO that this is a distinct value browse, so it knows what sort
             // of query to build
             dao.setDistinct(true);
@@ -418,29 +391,26 @@ public class BrowseEngine
 
             // inform dao about the display frequencies flag
             dao.setEnableBrowseFrequencies(browseIndex.isDisplayFrequencies());
-            
+
             // if we want to display frequencies, we need to pass the map table
-            if (browseIndex.isDisplayFrequencies()){
-            	dao.setFilterMappingTables(null, browseIndex.getMapTableName());
+            if (browseIndex.isDisplayFrequencies()) {
+                dao.setFilterMappingTables(null, browseIndex.getMapTableName());
             }
-            
+
             // set our constraints on community or collection
-            if (scope.inCollection() || scope.inCommunity())
-            {
-            	// Scoped browsing of distinct metadata requires the mapping
+            if (scope.inCollection() || scope.inCommunity()) {
+                // Scoped browsing of distinct metadata requires the mapping
                 // table to be specified.
-            	if (!browseIndex.isDisplayFrequencies())
-            		dao.setFilterMappingTables(null, browseIndex.getMapTableName());
-                
-                if (scope.inCollection())
-                {
+                if (!browseIndex.isDisplayFrequencies()) {
+                    dao.setFilterMappingTables(null, browseIndex.getMapTableName());
+                }
+
+                if (scope.inCollection()) {
                     Collection col = (Collection) scope.getBrowseContainer();
                     dao.setContainerTable("collection2item");
                     dao.setContainerIDField("collection_id");
                     dao.setContainerID(col.getID());
-                }
-                else if (scope.inCommunity())
-                {
+                } else if (scope.inCommunity()) {
                     Community com = (Community) scope.getBrowseContainer();
                     dao.setContainerTable("communities2item");
                     dao.setContainerIDField("community_id");
@@ -461,17 +431,8 @@ public class BrowseEngine
             dao.setJumpToField("sort_value");
             int offset = scope.getOffset();
             String rawFocusValue = null;
-            if (offset < 1 && scope.hasJumpToValue() || scope.hasStartsWith())
-            {
-                String focusValue = getJumpToValue();
-
-                // store the value to tell the Browse Info object which value we are browsing on
-                rawFocusValue = focusValue;
-
-                // make sure the incoming value is normalised
-                focusValue = normalizeJumpToValue(focusValue);
-
-                offset = getOffsetForDistinctValue(focusValue);
+            if (offset < 1 && scope.hasJumpToValue() || scope.hasStartsWith()) {
+                rawFocusValue = getJumpToValue();
             }
 
 
@@ -483,20 +444,17 @@ public class BrowseEngine
             List<String[]> results = null;
 
             // Does this browse have any contents?
-            if (total > 0)
-            {
+            if (total > 0) {
                 // now run the query
                 results = dao.doValueQuery();
 
                 // now, if we don't have any results, we are at the end of the browse.  This will
                 // be because a starts_with value has been supplied for which we don't have
                 // any items.
-                if (results.size() == 0)
-                {
+                if (results.size() == 0) {
                     // In this case, we will calculate a new offset for the last page of results
                     offset = total - scope.getResultsPerPage();
-                    if (offset < 0)
-                    {
+                    if (offset < 0) {
                         offset = 0;
                     }
 
@@ -504,9 +462,7 @@ public class BrowseEngine
                     dao.setOffset(offset);
                     results = dao.doValueQuery();
                 }
-            }
-            else
-            {
+            } else {
                 // No records, so make an empty list
                 results = new ArrayList<String[]>();
             }
@@ -514,13 +470,11 @@ public class BrowseEngine
             // construct the BrowseInfo object to pass back
             BrowseInfo browseInfo = new BrowseInfo(results, offset, total, offset);
 
-            if (offset + scope.getResultsPerPage() < total)
-            {
+            if (offset + scope.getResultsPerPage() < total) {
                 browseInfo.setNextOffset(offset + scope.getResultsPerPage());
             }
 
-            if (offset - scope.getResultsPerPage() > -1)
-            {
+            if (offset - scope.getResultsPerPage() > -1) {
                 browseInfo.setPrevOffset(offset - scope.getResultsPerPage());
             }
 
@@ -543,17 +497,14 @@ public class BrowseEngine
             browseInfo.setStartsWith(scope.hasStartsWith());
 
             // tell the browse info what the container for the browse was
-            if (scope.inCollection() || scope.inCommunity())
-            {
+            if (scope.inCollection() || scope.inCommunity()) {
                 browseInfo.setBrowseContainer(scope.getBrowseContainer());
             }
 
             browseInfo.setResultsPerPage(scope.getResultsPerPage());
 
             return browseInfo;
-        }
-        catch (SQLException e)
-        {
+        } catch (SQLException e) {
             log.error("caught exception: ", e);
             throw new BrowseException(e);
         }
@@ -562,24 +513,21 @@ public class BrowseEngine
     /**
      * Return the focus value.
      *
-     * @return  the focus value to use
+     * @return the focus value to use
      * @throws BrowseException if browse error
      */
     private String getJumpToValue()
-        throws BrowseException
-    {
+        throws BrowseException {
         log.debug(LogManager.getHeader(context, "get_focus_value", ""));
 
         // if the focus is by value, just return it
-        if (scope.hasJumpToValue())
-        {
+        if (scope.hasJumpToValue()) {
             log.debug(LogManager.getHeader(context, "get_focus_value_return", "return=" + scope.getJumpToValue()));
             return scope.getJumpToValue();
         }
 
         // if the focus is to start with, then we need to return the value of the starts with
-        if (scope.hasStartsWith())
-        {
+        if (scope.hasStartsWith()) {
             log.debug(LogManager.getHeader(context, "get_focus_value_return", "return=" + scope.getStartsWith()));
             return scope.getStartsWith();
         }
@@ -600,17 +548,14 @@ public class BrowseEngine
         // to do comparisons in other columns.  The use of the focus value needs to be consistent
         // across the browse
         SortOption so = scope.getSortOption();
-        if (so == null || so.getNumber() == 0)
-        {
-            if (browseIndex.getSortOption() != null)
-            {
+        if (so == null || so.getNumber() == 0) {
+            if (browseIndex.getSortOption() != null) {
                 so = browseIndex.getSortOption();
             }
         }
 
         String col = "sort_1";
-        if (so.getNumber() > 0)
-        {
+        if (so.getNumber() > 0) {
             col = "sort_" + Integer.toString(so.getNumber());
         }
 
@@ -629,29 +574,25 @@ public class BrowseEngine
      * Convert the value into an offset into the table for this browse
      *
      * @param value value
-     * @return  the focus value to use
+     * @return the focus value to use
      * @throws BrowseException if browse error
      */
     private int getOffsetForValue(String value)
-        throws BrowseException
-    {
+        throws BrowseException {
         // we need to make sure that we select from the correct column.  If the sort option
         // is the 0th option then we use sort_value, but if it is one of the others we have
         // to select from that column instead.  Otherwise, we end up missing the focus value
         // to do comparisons in other columns.  The use of the focus value needs to be consistent
         // across the browse
         SortOption so = scope.getSortOption();
-        if (so == null || so.getNumber() == 0)
-        {
-            if (browseIndex.getSortOption() != null)
-            {
+        if (so == null || so.getNumber() == 0) {
+            if (browseIndex.getSortOption() != null) {
                 so = browseIndex.getSortOption();
             }
         }
 
         String col = "sort_1";
-        if (so.getNumber() > 0)
-        {
+        if (so.getNumber() > 0) {
             col = "sort_" + Integer.toString(so.getNumber());
         }
 
@@ -665,14 +606,12 @@ public class BrowseEngine
      * Convert the value into an offset into the table for this browse
      *
      * @param value value
-     * @return  the focus value to use
+     * @return the focus value to use
      * @throws BrowseException if browse error
      */
     private int getOffsetForDistinctValue(String value)
-        throws BrowseException
-    {
-        if (!browseIndex.isMetadataIndex())
-        {
+        throws BrowseException {
+        if (!browseIndex.isMetadataIndex()) {
             throw new IllegalArgumentException("getOffsetForDistinctValue called when not a metadata index");
         }
 
@@ -687,20 +626,17 @@ public class BrowseEngine
      * return the focus value that is passed in.
      *
      * @param value a focus value to normalize
-     * @return  the normalized focus value
+     * @return the normalized focus value
      * @throws BrowseException if browse error
      */
     private String normalizeJumpToValue(String value)
-        throws BrowseException
-    {
+        throws BrowseException {
         // If the scope has a focus value (focus by value)
-        if (scope.hasJumpToValue())
-        {
+        if (scope.hasJumpToValue()) {
             // Normalize it based on the specified language as appropriate for this index
-            return OrderFormat.makeSortString(scope.getJumpToValue(), scope.getJumpToValueLang(), scope.getBrowseIndex().getDataType());
-        }
-        else if (scope.hasStartsWith())
-        {
+            return OrderFormat.makeSortString(scope.getJumpToValue(), scope.getJumpToValueLang(),
+                                              scope.getBrowseIndex().getDataType());
+        } else if (scope.hasStartsWith()) {
             // Scope has a starts with, so normalize that instead
             return OrderFormat.makeSortString(scope.getStartsWith(), null, scope.getBrowseIndex().getDataType());
         }
@@ -716,12 +652,11 @@ public class BrowseEngine
      * calling getTotalResults(false)
      *
      * @return total
-     * @throws SQLException if database error
+     * @throws SQLException    if database error
      * @throws BrowseException if browse error
      */
     private int getTotalResults()
-        throws SQLException, BrowseException
-    {
+        throws SQLException, BrowseException {
         return getTotalResults(false);
     }
 
@@ -729,21 +664,20 @@ public class BrowseEngine
      * Get the total number of results.  The argument determines whether this is a distinct
      * browse or not as this has an impact on how results are counted
      *
-     * @param distinct  is this a distinct browse or not
-     * @return          the total number of results available in this type of browse
-     * @throws SQLException if database error
+     * @param distinct is this a distinct browse or not
+     * @return the total number of results available in this type of browse
+     * @throws SQLException    if database error
      * @throws BrowseException if browse error
      */
     private int getTotalResults(boolean distinct)
-        throws SQLException, BrowseException
-    {
+        throws SQLException, BrowseException {
         log.debug(LogManager.getHeader(context, "get_total_results", "distinct=" + distinct));
 
         // tell the browse query whether we are distinct
         dao.setDistinct(distinct);
 
         // ensure that the select is set to "*"
-        String[] select = { "*" };
+        String[] select = {"*"};
         dao.setCountValues(select);
 
         // FIXME: it would be nice to have a good way of doing this in the DAO
@@ -760,7 +694,7 @@ public class BrowseEngine
         dao.setOrderField(null);
         dao.setLimit(-1);
         dao.setOffset(-1);
-        
+
         // perform the query and get the result
         int count = dao.doCountQuery();
 

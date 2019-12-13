@@ -7,6 +7,12 @@
  */
 package org.dspace.services.session;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import org.dspace.services.CachingService;
 import org.dspace.services.model.Cache;
 import org.dspace.services.model.CacheConfig;
@@ -17,18 +23,16 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
-
 
 /**
  * Testing the request and session services
- * 
+ *
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
 public class StatelessRequestServiceImplTest extends DSpaceAbstractKernelTest {
 
     private StatelessRequestServiceImpl statelessRequestService;
-    private CachingService cachingService; 
+    private CachingService cachingService;
 
     @Before
     public void before() {
@@ -64,11 +68,12 @@ public class StatelessRequestServiceImplTest extends DSpaceAbstractKernelTest {
         assertNotNull(requestId);
 
         statelessRequestService.endRequest(null);
-        assertNull( getRequestCache() );
+        assertNull(getRequestCache());
     }
 
     /**
-     * Test method for {@link org.dspace.services.sessions.StatelessRequestServiceImpl#registerRequestInterceptor(org.dspace.services.model.RequestInterceptor)}.
+     * Test method for
+     * {@link org.dspace.services.sessions.StatelessRequestServiceImpl#registerRequestInterceptor(org.dspace.services.model.RequestInterceptor)}.
      */
     @Test
     public void testRegisterRequestListener() {
@@ -79,25 +84,25 @@ public class StatelessRequestServiceImplTest extends DSpaceAbstractKernelTest {
 
         String requestId = statelessRequestService.startRequest();
         assertEquals(1, mri.hits);
-        assertTrue( mri.state.startsWith("start") );
-        assertTrue( mri.state.contains(requestId));
+        assertTrue(mri.state.startsWith("start"));
+        assertTrue(mri.state.contains(requestId));
 
         statelessRequestService.endRequest(null);
         assertEquals(2, mri.hits);
-        assertTrue( mri.state.startsWith("end") );
-        assertTrue( mri.state.contains("success"));
-        assertTrue( mri.state.contains(requestId));
+        assertTrue(mri.state.startsWith("end"));
+        assertTrue(mri.state.contains("success"));
+        assertTrue(mri.state.contains(requestId));
 
         requestId = statelessRequestService.startRequest();
         assertEquals(3, mri.hits);
-        assertTrue( mri.state.startsWith("start") );
-        assertTrue( mri.state.contains(requestId));
+        assertTrue(mri.state.startsWith("start"));
+        assertTrue(mri.state.contains(requestId));
 
-        statelessRequestService.endRequest( new RuntimeException("Oh Noes!") );
+        statelessRequestService.endRequest(new RuntimeException("Oh Noes!"));
         assertEquals(4, mri.hits);
-        assertTrue( mri.state.startsWith("end") );
-        assertTrue( mri.state.contains("fail"));
-        assertTrue( mri.state.contains(requestId));
+        assertTrue(mri.state.startsWith("end"));
+        assertTrue(mri.state.contains("fail"));
+        assertTrue(mri.state.contains(requestId));
 
         try {
             statelessRequestService.registerRequestInterceptor(null);
@@ -136,7 +141,7 @@ public class StatelessRequestServiceImplTest extends DSpaceAbstractKernelTest {
         assertNull(requestId); // no request yet
     }
 
-    
+
     /**
      * @return the request storage cache
      */

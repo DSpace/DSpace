@@ -81,6 +81,9 @@
          <includes>
             <include>*:jar:*</include>
          </includes>
+        <excludes>
+            <exclude>org.glassfish.hk2.external:bean-validator:jar:*</exclude>
+        </excludes>
          <outputDirectory>lib</outputDirectory>
          <useProjectArtifact>false</useProjectArtifact>
       </dependencySet>
@@ -95,7 +98,7 @@
          <includes>
             <include>org.dspace.modules:*:jar:*</include>
          </includes>
-         <binaries>
+        <binaries>
             <includeDependencies>true</includeDependencies>
             <outputDirectory>lib</outputDirectory>
             <unpack>false</unpack>
@@ -105,6 +108,9 @@
                   <includes>
                      <include>*:jar:*</include>
                   </includes>
+                  <excludes>
+                      <exclude>org.glassfish.hk2.external:bean-validator:jar:*</exclude>
+                  </excludes>
                </dependencySet>
             </dependencySets>
          </binaries>

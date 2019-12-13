@@ -24,16 +24,11 @@ public class WorkflowActionConfig {
     private Step step;
     private boolean requiresUI;
 
-
-    private ActionInterface actionUI;
-
-
-
-    public WorkflowActionConfig(String id){
+    public WorkflowActionConfig(String id) {
         this.id = id;
     }
 
-    public void setProcessingAction(Action processingAction){
+    public void setProcessingAction(Action processingAction) {
         this.processingAction = processingAction;
         processingAction.setParent(this);
 
@@ -56,7 +51,6 @@ public class WorkflowActionConfig {
     }
 
 
-
     public void setStep(Step step) {
         this.step = step;
     }
@@ -65,11 +59,4 @@ public class WorkflowActionConfig {
         return step;
     }
 
-    public ActionInterface getActionUI() {
-        return actionUI;
-    }
-
-    public void setActionUI(ActionInterface actionUI) {
-        this.actionUI = actionUI;
-    }
 }

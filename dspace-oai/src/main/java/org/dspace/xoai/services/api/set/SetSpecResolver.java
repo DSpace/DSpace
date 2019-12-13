@@ -14,7 +14,9 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.xoai.exceptions.InvalidSetSpecException;
 
 public interface SetSpecResolver {
-    String toSetSpec (Community community) throws InvalidSetSpecException;
-    String toSetSpec (Collection collection) throws InvalidSetSpecException;
-    DSpaceObject fromSetSpec (String setSpec) throws InvalidSetSpecException;
+    String toSetSpec(Community community) throws InvalidSetSpecException;
+
+    String toSetSpec(Collection collection) throws InvalidSetSpecException;
+
+    DSpaceObject fromSetSpec(String setSpec) throws InvalidSetSpecException;
 }

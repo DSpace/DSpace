@@ -30,11 +30,11 @@ import org.dspace.content.packager.PackageParameters;
  * @see org.dspace.content.packager.PackageDisseminator
  * @see org.dspace.content.packager.PackageParameters
  */
-public abstract class AbstractPackagerWrappingCrosswalk 
-{
-    // Crosswalk's PackageParameters, which can be used when calling/initializing a Packager during ingestion/dissemination
+public abstract class AbstractPackagerWrappingCrosswalk {
+    // Crosswalk's PackageParameters, which can be used when calling/initializing a Packager during
+    // ingestion/dissemination
     private PackageParameters packageParameters = null;
-    
+
     // Crosswalk's Ingestion License, which can be used when calling a Packager during ingestion
     private String ingestionLicense = null;
 
@@ -52,8 +52,7 @@ public abstract class AbstractPackagerWrappingCrosswalk
      *
      * @param pparams PackageParameters to make available to the Crosswalk
      */
-    public void setPackagingParameters(PackageParameters pparams)
-    {
+    public void setPackagingParameters(PackageParameters pparams) {
         this.packageParameters = pparams;
     }
 
@@ -71,36 +70,33 @@ public abstract class AbstractPackagerWrappingCrosswalk
      *
      * @return PackageParameters previously made available to the Crosswalk or null
      */
-    public PackageParameters getPackagingParameters()
-    {
+    public PackageParameters getPackagingParameters() {
         return this.packageParameters;
     }
-    
-    
+
+
     /**
      * Set custom ingestion license for this Crosswalk.
      * <p>
      * This license can be used by the crosswalk when calling a PackageIngester
-     * 
+     *
      * @param license the full text of the ingestion license
      * @see org.dspace.content.packager.PackageIngester
      */
-    public void setIngestionLicense(String license)
-    {
+    public void setIngestionLicense(String license) {
         this.ingestionLicense = license;
     }
-    
+
     /**
      * Get custom ingestion license for this Crosswalk.
      * <p>
      * This license can be used by the crosswalk when calling a PackageIngester
-     * 
+     *
      * @return the full text of the ingestion license as a String
      * @see org.dspace.content.packager.PackageIngester
      */
-    public String getIngestionLicense()
-    {
+    public String getIngestionLicense() {
         return this.ingestionLicense;
     }
-    
+
 }

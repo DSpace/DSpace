@@ -9,12 +9,10 @@ package org.dspace.app.sherpa;
 
 /**
  * POJO representation for a SHERPA journal
- * 
+ *
  * @author Andrea Bollini
- * 
  */
-public class SHERPAJournal
-{
+public class SHERPAJournal {
     private String title;
 
     private String issn;
@@ -24,8 +22,7 @@ public class SHERPAJournal
     private String romeopub;
 
     public SHERPAJournal(String title, String issn, String zetopub,
-            String romeopub)
-    {
+                         String romeopub) {
         super();
         this.title = title;
         this.issn = issn;
@@ -33,23 +30,19 @@ public class SHERPAJournal
         this.romeopub = romeopub;
     }
 
-    public String getTitle()
-    {
+    public String getTitle() {
         return title;
     }
 
-    public String getIssn()
-    {
+    public String getIssn() {
         return issn;
     }
 
-    public String getZetopub()
-    {
+    public String getZetopub() {
         return zetopub;
     }
 
-    public String getRomeopub()
-    {
+    public String getRomeopub() {
         return romeopub;
     }
 

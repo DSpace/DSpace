@@ -7,19 +7,17 @@
  */
 package org.dspace.submit.lookup;
 
-import gr.ekt.bte.core.DataLoader;
-import gr.ekt.bte.core.Record;
-import gr.ekt.bte.core.TransformationEngine;
-import gr.ekt.bte.dataloader.FileDataLoader;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.log4j.Logger;
+import gr.ekt.bte.core.DataLoader;
+import gr.ekt.bte.core.Record;
+import gr.ekt.bte.core.TransformationEngine;
+import gr.ekt.bte.dataloader.FileDataLoader;
+import org.apache.logging.log4j.Logger;
 import org.dspace.submit.util.SubmissionLookupDTO;
 
 /**
@@ -28,8 +26,7 @@ import org.dspace.submit.util.SubmissionLookupDTO;
  * @author Luigi Andrea Pascarelli
  * @author Panagiotis Koutsourakis
  */
-public class SubmissionLookupService
-{
+public class SubmissionLookupService {
     public static final String CFG_MODULE = "submission-lookup";
 
     public static final String SL_NAMESPACE_PREFIX = "http://www.dspace.org/sl/";
@@ -38,7 +35,7 @@ public class SubmissionLookupService
 
     public static final String PROVIDER_NAME_FIELD = "provider_name_field";
 
-    private static Logger log = Logger.getLogger(SubmissionLookupService.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(SubmissionLookupService.class);
 
     public static final String SEPARATOR_VALUE = "#######";
 
@@ -55,61 +52,50 @@ public class SubmissionLookupService
     protected TransformationEngine phase1TransformationEngine;
 
     protected TransformationEngine phase2TransformationEngine;
-    
+
     protected List<String> detailFields = null;
 
     public void setPhase2TransformationEngine(
-            TransformationEngine phase2TransformationEngine)
-    {
+        TransformationEngine phase2TransformationEngine) {
         this.phase2TransformationEngine = phase2TransformationEngine;
     }
 
     public void setPhase1TransformationEngine(
-            TransformationEngine phase1TransformationEngine)
-    {
+        TransformationEngine phase1TransformationEngine) {
         this.phase1TransformationEngine = phase1TransformationEngine;
 
         MultipleSubmissionLookupDataLoader dataLoader = (MultipleSubmissionLookupDataLoader) phase1TransformationEngine
-                .getDataLoader();
+            .getDataLoader();
 
         this.idents2provs = new HashMap<String, List<String>>();
         this.searchProviders = new ArrayList<String>();
         this.fileProviders = new ArrayList<String>();
 
-        if (providers == null)
-        {
+        if (providers == null) {
             this.providers = new ArrayList<DataLoader>();
 
-            for (String providerName : dataLoader.getProvidersMap().keySet())
-            {
+            for (String providerName : dataLoader.getProvidersMap().keySet()) {
                 DataLoader p = dataLoader.getProvidersMap().get(providerName);
 
                 this.providers.add(p);
 
                 // Do not do that for file providers
-                if (p instanceof FileDataLoader)
-                {
+                if (p instanceof FileDataLoader) {
                     this.fileProviders.add(providerName);
-                }
-                else if (p instanceof NetworkSubmissionLookupDataLoader)
-                {
+                } else if (p instanceof NetworkSubmissionLookupDataLoader) {
 
                     NetworkSubmissionLookupDataLoader p2 = (NetworkSubmissionLookupDataLoader) p;
 
                     p2.setProviderName(providerName);
 
-                    if (p2.isSearchProvider())
-                    {
+                    if (p2.isSearchProvider()) {
                         searchProviders.add(providerName);
                     }
                     List<String> suppIdentifiers = p2.getSupportedIdentifiers();
-                    if (suppIdentifiers != null)
-                    {
-                        for (String ident : suppIdentifiers)
-                        {
+                    if (suppIdentifiers != null) {
+                        for (String ident : suppIdentifiers) {
                             List<String> tmp = idents2provs.get(ident);
-                            if (tmp == null)
-                            {
+                            if (tmp == null) {
                                 tmp = new ArrayList<String>();
                                 idents2provs.put(ident, tmp);
                             }
@@ -121,33 +107,26 @@ public class SubmissionLookupService
         }
     }
 
-    public TransformationEngine getPhase1TransformationEngine()
-    {
+    public TransformationEngine getPhase1TransformationEngine() {
         return phase1TransformationEngine;
     }
 
-    public TransformationEngine getPhase2TransformationEngine()
-    {
+    public TransformationEngine getPhase2TransformationEngine() {
         return phase2TransformationEngine;
     }
 
-    public List<String> getIdentifiers()
-    {
+    public List<String> getIdentifiers() {
 
         List<String> allSupportedIdentifiers = new ArrayList<String>();
         MultipleSubmissionLookupDataLoader dataLoader = (MultipleSubmissionLookupDataLoader) phase1TransformationEngine
-                .getDataLoader();
-        for (String providerName : dataLoader.getProvidersMap().keySet())
-        {
+            .getDataLoader();
+        for (String providerName : dataLoader.getProvidersMap().keySet()) {
             DataLoader provider = dataLoader.getProvidersMap()
-                    .get(providerName);
-            if (provider instanceof SubmissionLookupDataLoader)
-            {
+                                            .get(providerName);
+            if (provider instanceof SubmissionLookupDataLoader) {
                 for (String identifier : ((SubmissionLookupDataLoader) provider)
-                        .getSupportedIdentifiers())
-                {
-                    if (!allSupportedIdentifiers.contains(identifier))
-                    {
+                    .getSupportedIdentifiers()) {
+                    if (!allSupportedIdentifiers.contains(identifier)) {
                         allSupportedIdentifiers.add(identifier);
                     }
                 }
@@ -157,69 +136,59 @@ public class SubmissionLookupService
         return allSupportedIdentifiers;
     }
 
-    public Map<String, List<String>> getProvidersIdentifiersMap()
-    {
+    public Map<String, List<String>> getProvidersIdentifiersMap() {
         return idents2provs;
     }
 
     public SubmissionLookupDTO getSubmissionLookupDTO(
-            HttpServletRequest request, String uuidSubmission)
-    {
+        HttpServletRequest request, String uuidSubmission) {
         SubmissionLookupDTO dto = (SubmissionLookupDTO) request.getSession()
-                .getAttribute("submission_lookup_" + uuidSubmission);
-        if (dto == null)
-        {
+                                                               .getAttribute("submission_lookup_" + uuidSubmission);
+        if (dto == null) {
             dto = new SubmissionLookupDTO();
             storeDTOs(request, uuidSubmission, dto);
         }
         return dto;
     }
 
-    public void invalidateDTOs(HttpServletRequest request, String uuidSubmission)
-    {
+    public void invalidateDTOs(HttpServletRequest request, String uuidSubmission) {
         request.getSession().removeAttribute(
-                "submission_lookup_" + uuidSubmission);
+            "submission_lookup_" + uuidSubmission);
     }
 
     public void storeDTOs(HttpServletRequest request, String uuidSubmission,
-            SubmissionLookupDTO dto)
-    {
+                          SubmissionLookupDTO dto) {
         request.getSession().setAttribute(
-                "submission_lookup_" + uuidSubmission, dto);
+            "submission_lookup_" + uuidSubmission, dto);
     }
 
-    public List<String> getSearchProviders()
-    {
+    public List<String> getSearchProviders() {
         return searchProviders;
     }
 
-    public List<DataLoader> getProviders()
-    {
+    public List<DataLoader> getProviders() {
         return providers;
     }
 
-    public static String getProviderName(Record rec)
-    {
+    public static String getProviderName(Record rec) {
         return SubmissionLookupUtils.getFirstValue(rec,
-                SubmissionLookupService.PROVIDER_NAME_FIELD);
+                                                   SubmissionLookupService.PROVIDER_NAME_FIELD);
     }
 
-    public static String getType(Record rec)
-    {
+    public static String getType(Record rec) {
         return SubmissionLookupUtils.getFirstValue(rec,
-                SubmissionLookupDataLoader.TYPE);
+                                                   SubmissionLookupDataLoader.TYPE);
     }
 
-    public List<String> getFileProviders()
-    {
+    public List<String> getFileProviders() {
         return this.fileProviders;
     }
 
-	public List<String> getDetailFields() {
-		return detailFields;
-	}
+    public List<String> getDetailFields() {
+        return detailFields;
+    }
 
-	public void setDetailFields(List<String> detailFields) {
-		this.detailFields = detailFields;
-	}
+    public void setDetailFields(List<String> detailFields) {
+        this.detailFields = detailFields;
+    }
 }

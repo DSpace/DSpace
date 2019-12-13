@@ -8,7 +8,11 @@
 
 package org.dspace.authority.indexer;
 
-import org.apache.log4j.Logger;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
+
+import org.apache.logging.log4j.Logger;
 import org.dspace.authority.factory.AuthorityServiceFactory;
 import org.dspace.authority.service.AuthorityService;
 import org.dspace.content.DSpaceObject;
@@ -18,10 +22,6 @@ import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.event.Consumer;
 import org.dspace.event.Event;
-
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
 
 /**
  * Consumer that takes care of the indexing of authority controlled metadata fields for installed/updated items
@@ -33,12 +33,16 @@ import java.util.UUID;
  */
 public class AuthorityConsumer implements Consumer {
 
-    private final Logger log = Logger.getLogger(AuthorityConsumer.class);
+    private final Logger log = org.apache.logging.log4j.LogManager.getLogger(AuthorityConsumer.class);
 
-    /** A set of all item IDs installed which need their authority updated **/
+    /**
+     * A set of all item IDs installed which need their authority updated
+     **/
     protected Set<UUID> itemsToUpdateAuthority = null;
 
-    /** A set of item IDs who's metadata needs to be reindexed **/
+    /**
+     * A set of item IDs who's metadata needs to be reindexed
+     **/
     protected Set<UUID> itemsToReindex = null;
 
     protected ItemService itemService;
@@ -54,20 +58,21 @@ public class AuthorityConsumer implements Consumer {
 
     @Override
     public void consume(Context ctx, Event event) throws Exception {
-        if(itemsToUpdateAuthority == null){
+        if (itemsToUpdateAuthority == null) {
             itemsToUpdateAuthority = new HashSet<>();
             itemsToReindex = new HashSet<>();
         }
 
         DSpaceObject dso = event.getSubject(ctx);
-        if(dso instanceof Item){
+        if (dso instanceof Item) {
             Item item = (Item) dso;
-            if(item.isArchived()){
-                if(!itemsToReindex.contains(item.getID()))
+            if (item.isArchived()) {
+                if (!itemsToReindex.contains(item.getID())) {
                     itemsToReindex.add(item.getID());
+                }
             }
 
-            if(("ARCHIVED: " + true).equals(event.getDetail())){
+            if (("ARCHIVED: " + true).equals(event.getDetail())) {
                 itemsToUpdateAuthority.add(item.getID());
             }
 
@@ -76,10 +81,11 @@ public class AuthorityConsumer implements Consumer {
 
     @Override
     public void end(Context ctx) throws Exception {
-        if(itemsToUpdateAuthority == null)
+        if (itemsToUpdateAuthority == null) {
             return;
+        }
 
-        try{
+        try {
             ctx.turnOffAuthorisationSystem();
             for (UUID id : itemsToUpdateAuthority) {
                 Item item = itemService.find(ctx, id);
@@ -91,7 +97,7 @@ public class AuthorityConsumer implements Consumer {
                 authorityService.indexItem(ctx, item);
 
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             log.error("Error while consuming the authority consumer", e);
 
         } finally {

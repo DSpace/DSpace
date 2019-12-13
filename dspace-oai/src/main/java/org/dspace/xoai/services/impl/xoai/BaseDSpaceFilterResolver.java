@@ -7,23 +7,30 @@
  */
 package org.dspace.xoai.services.impl.xoai;
 
+import static com.lyncode.xoai.dataprovider.filter.Scope.MetadataFormat;
+
 import com.lyncode.xoai.dataprovider.data.Filter;
 import com.lyncode.xoai.dataprovider.filter.Scope;
-import com.lyncode.xoai.dataprovider.filter.conditions.*;
+import com.lyncode.xoai.dataprovider.filter.conditions.AndCondition;
+import com.lyncode.xoai.dataprovider.filter.conditions.Condition;
+import com.lyncode.xoai.dataprovider.filter.conditions.CustomCondition;
+import com.lyncode.xoai.dataprovider.filter.conditions.NotCondition;
+import com.lyncode.xoai.dataprovider.filter.conditions.OrCondition;
 import com.lyncode.xoai.dataprovider.xml.xoaiconfig.parameters.ParameterMap;
-import org.apache.log4j.Logger;
-import org.dspace.xoai.filter.*;
+import org.apache.logging.log4j.Logger;
+import org.dspace.xoai.filter.AndFilter;
+import org.dspace.xoai.filter.DSpaceFilter;
+import org.dspace.xoai.filter.NotFilter;
+import org.dspace.xoai.filter.OrFilter;
 import org.dspace.xoai.filter.results.SolrFilterResult;
+import org.dspace.xoai.services.api.FieldResolver;
 import org.dspace.xoai.services.api.context.ContextService;
 import org.dspace.xoai.services.api.context.ContextServiceException;
-import org.dspace.xoai.services.api.FieldResolver;
 import org.dspace.xoai.services.api.xoai.DSpaceFilterResolver;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import static com.lyncode.xoai.dataprovider.filter.Scope.MetadataFormat;
-
 public class BaseDSpaceFilterResolver implements DSpaceFilterResolver {
-    private static final Logger LOGGER = Logger.getLogger(BaseDSpaceFilterResolver.class);
+    private static final Logger LOGGER = org.apache.logging.log4j.LogManager.getLogger(BaseDSpaceFilterResolver.class);
 
     @Autowired
     FieldResolver fieldResolver;
@@ -31,11 +38,14 @@ public class BaseDSpaceFilterResolver implements DSpaceFilterResolver {
     @Autowired
     ContextService contextService;
 
-    public DSpaceFilter getFilter (Condition condition) {
-        if (condition instanceof AndCondition) return (DSpaceFilter) getFilter((AndCondition) condition);
-        else if (condition instanceof OrCondition) return (DSpaceFilter) getFilter((OrCondition) condition);
-        else if (condition instanceof NotCondition) return (DSpaceFilter) getFilter((NotCondition) condition);
-        else if (condition instanceof CustomCondition) {
+    public DSpaceFilter getFilter(Condition condition) {
+        if (condition instanceof AndCondition) {
+            return (DSpaceFilter) getFilter((AndCondition) condition);
+        } else if (condition instanceof OrCondition) {
+            return (DSpaceFilter) getFilter((OrCondition) condition);
+        } else if (condition instanceof NotCondition) {
+            return (DSpaceFilter) getFilter((NotCondition) condition);
+        } else if (condition instanceof CustomCondition) {
             CustomCondition customCondition = (CustomCondition) condition;
             return (DSpaceFilter) customCondition.getFilter();
         } else {
@@ -47,13 +57,13 @@ public class BaseDSpaceFilterResolver implements DSpaceFilterResolver {
     public String buildSolrQuery(Scope scope, Condition condition) {
         DSpaceFilter filter = getFilter(condition);
         SolrFilterResult result = filter.buildSolrQuery();
-        if (result.hasResult())
-        {
-            if (scope == MetadataFormat)
+        if (result.hasResult()) {
+            if (scope == MetadataFormat) {
                 return "(item.deleted:true OR ("
-                        + result.getQuery() + "))";
-            else
+                    + result.getQuery() + "))";
+            } else {
                 return "(" + result.getQuery() + ")";
+            }
         }
         return "true";
     }
@@ -61,22 +71,18 @@ public class BaseDSpaceFilterResolver implements DSpaceFilterResolver {
     @Override
     public Filter getFilter(Class<? extends Filter> filterClass, ParameterMap configuration) {
         Filter result = null;
-        try
-        {
+        try {
             result = filterClass.newInstance();
-            if (result instanceof DSpaceFilter)
-            {
+            if (result instanceof DSpaceFilter) {
                 // add the DSpace filter specific objects
                 ((DSpaceFilter) result).setConfiguration(configuration);
                 ((DSpaceFilter) result).setContext(contextService.getContext());
                 ((DSpaceFilter) result).setFieldResolver(fieldResolver);
             }
-        }
-        catch (InstantiationException | IllegalAccessException
-                | ContextServiceException e)
-        {
+        } catch (InstantiationException | IllegalAccessException
+            | ContextServiceException e) {
             LOGGER.error("Filter " + filterClass.getName()
-                    + " could not be instantiated", e);
+                             + " could not be instantiated", e);
         }
         return result;
     }

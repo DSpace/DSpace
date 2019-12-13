@@ -7,11 +7,11 @@
  */
 package org.dspace.usage;
 
+import java.util.List;
+import javax.servlet.http.HttpServletRequest;
+
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
-
-import javax.servlet.http.HttpServletRequest;
-import java.util.List;
 
 /**
  * Extends the standard usage event to contain search information
@@ -21,66 +21,196 @@ import java.util.List;
  * @author Ben Bosman (ben at atmire dot com)
  * @author Mark Diggory (markd at atmire dot com)
  */
-public class UsageSearchEvent extends UsageEvent{
+public class UsageSearchEvent extends UsageEvent {
 
-    private List<String> queries;
+    private String query;
+    private String dsoType;
     private DSpaceObject scope;
+    private String configuration;
+    private List<AppliedFilter> appliedFilters;
+    private Sort sort;
+    private Page page;
 
-    /** Optional search parameters **/
-    private int rpp;
-    private String sortBy;
-    private String sortOrder;
-    private int page;
-
-
-    public UsageSearchEvent(Action action, HttpServletRequest request, Context context, DSpaceObject object, List<String> queries, DSpaceObject scope) {
+    public UsageSearchEvent(Action action, HttpServletRequest request,
+                                Context context,
+                                DSpaceObject object) {
         super(action, request, context, object);
-
-        this.queries = queries;
-        this.scope = scope;
-        this.rpp = -1;
-        this.sortBy = null;
-        this.sortOrder = null;
-        this.page = -1;
     }
 
-    public List<String> getQueries() {
-        return queries;
+    public void setDsoType(String dsoType) {
+        this.dsoType = dsoType;
+    }
+
+    public String getDsoType() {
+        return dsoType;
+    }
+
+    public void setScope(DSpaceObject scope) {
+        this.scope = scope;
     }
 
     public DSpaceObject getScope() {
         return scope;
     }
 
-    public int getRpp() {
-        return rpp;
+    public void setConfiguration(String configuration) {
+        this.configuration = configuration;
     }
 
-    public void setRpp(int rpp) {
-        this.rpp = rpp;
+    public String getConfiguration() {
+        return configuration;
     }
 
-    public String getSortBy() {
-        return sortBy;
+    public List<AppliedFilter> getAppliedFilters() {
+        return appliedFilters;
     }
 
-    public void setSortBy(String sortBy) {
-        this.sortBy = sortBy;
+    public void setAppliedFilters(List<AppliedFilter> appliedFilters) {
+        this.appliedFilters = appliedFilters;
     }
 
-    public String getSortOrder() {
-        return sortOrder;
+    public Sort getSort() {
+        return sort;
     }
 
-    public void setSortOrder(String sortOrder) {
-        this.sortOrder = sortOrder;
+    public void setSort(Sort sort) {
+        this.sort = sort;
     }
 
-    public int getPage() {
+    public Page getPage() {
         return page;
     }
 
-    public void setPage(int page) {
+    public void setPage(Page page) {
         this.page = page;
+    }
+
+    public String getQuery() {
+        return query;
+    }
+
+    public void setQuery(String query) {
+        this.query = query;
+    }
+
+    public static class Page {
+
+        private int size;
+        private int totalElements;
+        private int totalPages;
+        private int number;
+
+        public Page(int size, int totalElements, int totalPages, int number) {
+            this.size = size;
+            this.totalElements = totalElements;
+            this.totalPages = totalPages;
+            this.number = number;
+        }
+
+        public int getSize() {
+            return size;
+        }
+
+        public void setSize(int size) {
+            this.size = size;
+        }
+
+        public int getTotalElements() {
+            return totalElements;
+        }
+
+        public void setTotalElements(int totalElements) {
+            this.totalElements = totalElements;
+        }
+
+        public int getTotalPages() {
+            return totalPages;
+        }
+
+        public void setTotalPages(int totalPages) {
+            this.totalPages = totalPages;
+        }
+
+        public int getNumber() {
+            return number;
+        }
+
+        public void setNumber(int number) {
+            this.number = number;
+        }
+    }
+
+    public static class Sort {
+
+        private String by;
+        private String order;
+
+        public Sort(String by, String order) {
+            this.by = by;
+            this.order = order;
+        }
+
+        public String getBy() {
+            return by;
+        }
+
+        public void setBy(String by) {
+            this.by = by;
+        }
+
+        public String getOrder() {
+            return order;
+        }
+
+        public void setOrder(String order) {
+            this.order = order;
+        }
+    }
+
+    public static class AppliedFilter {
+
+        private String filter;
+        private String operator;
+        private String value;
+        private String label;
+
+        public AppliedFilter(String filter, String operator, String value, String label) {
+            this.filter = filter;
+            this.operator = operator;
+            this.value = value;
+            this.label = label;
+        }
+
+        public String getFilter() {
+            return filter;
+        }
+
+        public void setFilter(String filter) {
+            this.filter = filter;
+        }
+
+        public String getOperator() {
+            return operator;
+        }
+
+        public void setOperator(String operator) {
+            this.operator = operator;
+        }
+
+        public String getValue() {
+            return value;
+        }
+
+        public void setValue(String value) {
+            this.value = value;
+        }
+
+        public String getLabel() {
+            return label;
+        }
+
+        public void setLabel(String label) {
+            this.label = label;
+        }
     }
 }

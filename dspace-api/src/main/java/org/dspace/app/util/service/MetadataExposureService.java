@@ -7,9 +7,9 @@
  */
 package org.dspace.app.util.service;
 
-import org.dspace.core.Context;
-
 import java.sql.SQLException;
+
+import org.dspace.core.Context;
 
 /**
  * Static utility class to manage configuration for exposure (hiding) of
@@ -29,20 +29,20 @@ import java.sql.SQLException;
  * scalable.
  *
  * Algorithm is as follows:
- *  1. If a Context is provided and it has a user who is Administrator,
- *     always grant access (return false).
- *  2. Return true if field is on the hidden list, false otherwise.
+ * 1. If a Context is provided and it has a user who is Administrator,
+ * always grant access (return false).
+ * 2. Return true if field is on the hidden list, false otherwise.
  *
  * The internal maps are populated from DSpace Configuration at the first
  * call, in case the properties are not available in the static context.
  *
  * Configuration Properties:
- *  ## hide a single metadata field
- *  #metadata.hide.SCHEMA.ELEMENT[.QUALIFIER] = true
- *  # example: dc.type
- *  metadata.hide.dc.type = true
- *  # example: dc.description.provenance
- *  metadata.hide.dc.description.provenance = true
+ * ## hide a single metadata field
+ * #metadata.hide.SCHEMA.ELEMENT[.QUALIFIER] = true
+ * # example: dc.type
+ * metadata.hide.dc.type = true
+ * # example: dc.description.provenance
+ * metadata.hide.dc.description.provenance = true
  *
  * @author Larry Stone
  * @version $Revision: 3734 $
@@ -50,16 +50,16 @@ import java.sql.SQLException;
 public interface MetadataExposureService {
 
     /**
-     * Returns whether the given metadata field should be exposed (visible). The metadata field is in the DSpace's DC notation: schema.element.qualifier
+     * Returns whether the given metadata field should be exposed (visible). The metadata field is in the DSpace's DC
+     * notation: schema.element.qualifier
      *
-     * @param context DSpace context
-     * @param schema metadata field schema (namespace), e.g. "dc"
-     * @param element metadata field element
+     * @param context   DSpace context
+     * @param schema    metadata field schema (namespace), e.g. "dc"
+     * @param element   metadata field element
      * @param qualifier metadata field qualifier
-     *
      * @return true (hidden) or false (exposed)
      * @throws SQLException if database error
      */
     public boolean isHidden(Context context, String schema, String element, String qualifier)
-            throws SQLException;
+        throws SQLException;
 }

@@ -7,14 +7,15 @@
  */
 package org.dspace.test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
-import org.dspace.test.DSpaceAbstractRequestTest;
 import org.junit.Test;
 
 /**
  * A simple class to test that the abstract request test case works
- * 
+ *
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
 public class TestAbstractDSpaceRequestTest extends DSpaceAbstractRequestTest {
@@ -27,7 +28,7 @@ public class TestAbstractDSpaceRequestTest extends DSpaceAbstractRequestTest {
         assertTrue(kernel.isRunning());
         assertNotNull(getRequestService());
         assertNotNull(getRequestId());
-        assertNotNull( getRequestService().getCurrentRequestId() );
+        assertNotNull(getRequestService().getCurrentRequestId());
         assertEquals(getRequestId(), getRequestService().getCurrentRequestId());
     }
 }

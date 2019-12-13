@@ -8,69 +8,58 @@
 package org.purl.sword.base;
 
 import java.util.Properties;
+
 import nu.xom.Element;
 
 /**
- *
  * @author Neil Taylor (nst@aber.ac.uk)
  */
-public class BasicBooleanContentElement extends BasicContentElement
-{
+public class BasicBooleanContentElement extends BasicContentElement {
     private boolean content;
 
     private boolean isSet;
 
-    public BasicBooleanContentElement(String prefix, String localName, String namespaceUri)
-    {
+    public BasicBooleanContentElement(String prefix, String localName, String namespaceUri) {
         super(prefix, localName, namespaceUri);
     }
 
-    public BasicBooleanContentElement(XmlName name)
-    {
+    public BasicBooleanContentElement(XmlName name) {
         super(name);
     }
 
-    public boolean getContent()
-    {
+    public boolean getContent() {
         return content;
     }
 
-    public void setContent(boolean value)
-    {
-        isSet = true; 
-        content = value; 
+    public void setContent(boolean value) {
+        isSet = true;
+        content = value;
     }
 
-    public boolean isSet()
-    {
+    public boolean isSet() {
         return isSet;
     }
 
-    protected void marshallContent(Element element)
-    {
-       element.appendChild(Boolean.toString(content));
+    protected void marshallContent(Element element) {
+        element.appendChild(Boolean.toString(content));
     }
 
     protected void unmarshallContent(Element element)
-    throws UnmarshallException
-    {
-       setContent(unmarshallBoolean(element));
+        throws UnmarshallException {
+        setContent(unmarshallBoolean(element));
     }
 
-    protected SwordValidationInfo validateContent(Properties validationContext)
-    {
+    protected SwordValidationInfo validateContent(Properties validationContext) {
         SwordValidationInfo result = null;
-        if ( ! isSet )
-        {
+        if (!isSet) {
             result = new SwordValidationInfo(xmlName,
-                SwordValidationInfo.MISSING_CONTENT,
-                SwordValidationInfoType.WARNING);
+                                             SwordValidationInfo.MISSING_CONTENT,
+                                             SwordValidationInfoType.WARNING);
         }
-        return result; 
+        return result;
     }
 
-    protected String getContentAsString()
-    {
+    protected String getContentAsString() {
         return Boolean.toString(content);
     }
 

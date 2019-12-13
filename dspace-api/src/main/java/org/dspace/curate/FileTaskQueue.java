@@ -19,19 +19,18 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
 
 /**
  * FileTaskQueue provides a TaskQueue implementation based on flat files
- * for the queues and semaphores. 
+ * for the queues and semaphores.
  *
  * @author richardrodgers
  */
-public class FileTaskQueue implements TaskQueue
-{
-    private static Logger log = Logger.getLogger(TaskQueue.class);   
+public class FileTaskQueue implements TaskQueue {
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(TaskQueue.class);
     // base directory for curation task queues
     protected String tqDir;
 
@@ -40,21 +39,18 @@ public class FileTaskQueue implements TaskQueue
     // list of queues owned by reader
     protected List<Integer> readList = new ArrayList<Integer>();
 
-    public FileTaskQueue()
-    {
+    public FileTaskQueue() {
         tqDir = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("curate.taskqueue.dir");
     }
-    
+
     @Override
-    public String[] queueNames()
-    {
+    public String[] queueNames() {
         return new File(tqDir).list();
     }
-    
+
     @Override
     public synchronized void enqueue(String queueName, TaskQueueEntry entry)
-           throws IOException
-    {
+        throws IOException {
         Set entrySet = new HashSet<TaskQueueEntry>();
         entrySet.add(entry);
         enqueue(queueName, entrySet);
@@ -62,42 +58,33 @@ public class FileTaskQueue implements TaskQueue
 
     @Override
     public synchronized void enqueue(String queueName, Set<TaskQueueEntry> entrySet)
-           throws IOException
-    {
+        throws IOException {
         // don't block or fail - iterate until an unlocked queue found/created
         int queueIdx = 0;
         File qDir = ensureQueue(queueName);
-        while (true)
-        {
+        while (true) {
             File lock = new File(qDir, "lock" + Integer.toString(queueIdx));
 
             // Check for lock, and create one if it doesn't exist.
             // If the lock file already exists, this will return false
-            if (lock.createNewFile())
-            {
+            if (lock.createNewFile()) {
                 // append set contents to queue
                 BufferedWriter writer = null;
-                try
-                {
+                try {
                     File queue = new File(qDir, "queue" + Integer.toString(queueIdx));
                     writer = new BufferedWriter(new FileWriter(queue, true));
                     Iterator<TaskQueueEntry> iter = entrySet.iterator();
-                    while (iter.hasNext())
-                    {
+                    while (iter.hasNext()) {
                         writer.write(iter.next().toString());
                         writer.newLine();
                     }
-                }
-                finally
-                {
-                    if (writer != null)
-                    {
+                } finally {
+                    if (writer != null) {
                         writer.close();
                     }
                 }
                 // remove lock
-                if (!lock.delete())
-                {
+                if (!lock.delete()) {
                     log.error("Unable to remove lock: " + lock.getName());
                 }
                 break;
@@ -108,18 +95,15 @@ public class FileTaskQueue implements TaskQueue
 
     @Override
     public synchronized Set<TaskQueueEntry> dequeue(String queueName, long ticket)
-           throws IOException
-    {
+        throws IOException {
         Set<TaskQueueEntry> entrySet = new HashSet<TaskQueueEntry>();
-        if (readTicket == -1L)
-        {
+        if (readTicket == -1L) {
             // hold the ticket & copy all Ids available, locking queues
             // stop when no more queues or one found locked
             File qDir = ensureQueue(queueName);
             readTicket = ticket;
             int queueIdx = 0;
-            while (true)
-            {
+            while (true) {
                 File queue = new File(qDir, "queue" + Integer.toString(queueIdx));
                 File lock = new File(qDir, "lock" + Integer.toString(queueIdx));
 
@@ -128,30 +112,22 @@ public class FileTaskQueue implements TaskQueue
                 if (queue.exists() && lock.createNewFile()) {
                     // read contents from file
                     BufferedReader reader = null;
-                    try
-                    {
+                    try {
                         reader = new BufferedReader(new FileReader(queue));
                         String entryStr = null;
-                        while ((entryStr = reader.readLine()) != null)
-                        {
+                        while ((entryStr = reader.readLine()) != null) {
                             entryStr = entryStr.trim();
-                            if (entryStr.length() > 0)
-                            {
+                            if (entryStr.length() > 0) {
                                 entrySet.add(new TaskQueueEntry(entryStr));
                             }
                         }
-                    }
-                    finally
-                    {
-                        if (reader != null)
-                        {
-                            reader.close();    
+                    } finally {
+                        if (reader != null) {
+                            reader.close();
                         }
                     }
                     readList.add(queueIdx);
-                }
-                else
-                {
+                } else {
                     break;
                 }
                 queueIdx++;
@@ -159,42 +135,34 @@ public class FileTaskQueue implements TaskQueue
         }
         return entrySet;
     }
-    
+
     @Override
-    public synchronized void release(String queueName, long ticket, boolean remove)
-    {
-        if (ticket == readTicket)
-        {
+    public synchronized void release(String queueName, long ticket, boolean remove) {
+        if (ticket == readTicket) {
             readTicket = -1L;
             File qDir = ensureQueue(queueName);
             // remove locks & queues (if flag true)
-            for (Integer queueIdx : readList)
-            {
+            for (Integer queueIdx : readList) {
                 File lock = new File(qDir, "lock" + Integer.toString(queueIdx));
-                if (remove)
-                {
+                if (remove) {
                     File queue = new File(qDir, "queue" + Integer.toString(queueIdx));
-                    if (!queue.delete())
-                    {
+                    if (!queue.delete()) {
                         log.error("Unable to delete queue file: " + queue.getName());
                     }
                 }
 
-                if (!lock.delete())
-                {
+                if (!lock.delete()) {
                     log.error("Unable to delete lock file: " + lock.getName());
                 }
             }
             readList.clear();
         }
     }
-    
-    protected File ensureQueue(String queueName)
-    {
+
+    protected File ensureQueue(String queueName) {
         // create directory structures as needed
         File baseDir = new File(tqDir, queueName);
-        if (!baseDir.exists() && !baseDir.mkdirs())
-        {
+        if (!baseDir.exists() && !baseDir.mkdirs()) {
             throw new IllegalStateException("Unable to create directories");
         }
 

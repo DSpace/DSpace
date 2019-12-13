@@ -7,11 +7,12 @@
  */
 package org.dspace.submit.step;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 
-public class UploadWithEmbargoStep extends UploadStep
-{
-    /** log4j logger */
-    private static Logger log = Logger.getLogger(UploadWithEmbargoStep.class);
+public class UploadWithEmbargoStep extends UploadStep {
+    /**
+     * log4j logger
+     */
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(UploadWithEmbargoStep.class);
 
 }

@@ -17,21 +17,24 @@ import org.springframework.stereotype.Service;
 
 /**
  * This bean is a simple example of a bean which is annotated as a spring bean and should be found when the AC starts up
- * 
+ *
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
 @Service
 public class SampleAnnotationBean implements InitializedService, ShutdownService {
 
     public int initCounter = 0;
+
     public void init() {
         initCounter++;
     }
+
     public void shutdown() {
         initCounter++;
     }
 
     private ServiceExample serviceExample;
+
     @Autowired
     @Required
     public void setServiceExample(ServiceExample serviceExample) {
@@ -39,6 +42,7 @@ public class SampleAnnotationBean implements InitializedService, ShutdownService
     }
 
     private ConcreteExample concreteExample;
+
     @Autowired
     @Required
     public void setConcreteExample(ConcreteExample concreteExample) {
@@ -58,6 +62,7 @@ public class SampleAnnotationBean implements InitializedService, ShutdownService
     }
 
     private String value = null;
+
     public void setSampleValue(String value) {
         this.value = value;
     }

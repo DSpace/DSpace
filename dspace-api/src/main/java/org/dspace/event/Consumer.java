@@ -16,11 +16,10 @@ import org.dspace.core.Context;
  * consume() calls between the start and end of the event stream, if they are
  * invoked asynchronously, once in a long time period, rather than synchronously
  * after every Context.commit().
- * 
+ *
  * @version $Revision$
  */
-public interface Consumer
-{
+public interface Consumer {
     /**
      * Initialize - allocate any resources required to operate. This may include
      * initializing any pooled JMS resources. Called ONCE when created by the
@@ -36,11 +35,9 @@ public interface Consumer
      * it from the consumer. This behavior is based on the dispatcher/consumer
      * configuration. Should include logic to initialize any resources required
      * for a batch of events.
-     * 
-     * @param ctx
-     *            the execution context object
-     * @param event
-     *            the content event
+     *
+     * @param ctx   the execution context object
+     * @param event the content event
      * @throws Exception if error
      */
     public void consume(Context ctx, Event event) throws Exception;
@@ -48,9 +45,8 @@ public interface Consumer
     /**
      * Signal that there are no more events queued in this event stream and
      * event processing for the preceding consume calls should be finished up.
-     * 
-     * @param ctx
-     *            the execution context object
+     *
+     * @param ctx the execution context object
      * @throws Exception if error
      */
     public void end(Context ctx) throws Exception;
@@ -58,9 +54,8 @@ public interface Consumer
     /**
      * Finish - free any allocated resources. Called when consumer (via it's
      * parent dispatcher) is going to be destroyed by the dispatcher pool.
-     * 
-     * @param ctx
-     *            the execution context object
+     *
+     * @param ctx the execution context object
      * @throws Exception if error
      */
     public void finish(Context ctx) throws Exception;

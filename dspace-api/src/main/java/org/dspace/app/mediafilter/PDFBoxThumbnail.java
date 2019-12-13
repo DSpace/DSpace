@@ -7,17 +7,15 @@
  */
 package org.dspace.app.mediafilter;
 
-import java.awt.image.*;
+import java.awt.image.BufferedImage;
 import java.io.InputStream;
-
 import javax.imageio.ImageIO;
 
+import org.apache.logging.log4j.Logger;
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.encryption.InvalidPasswordException;
 import org.apache.pdfbox.rendering.PDFRenderer;
-
 import org.dspace.content.Item;
-
-import org.dspace.app.mediafilter.JPEGFilter;
 
 /**
  * Create JPEG thumbnails from PDF cover page using PDFBox.
@@ -29,21 +27,19 @@ import org.dspace.app.mediafilter.JPEGFilter;
  * @author Ivan Masár helix84@centrum.sk
  * @author Jason Sherman jsherman@usao.edu
  */
-public class PDFBoxThumbnail extends MediaFilter implements SelfRegisterInputFormats
-{
+public class PDFBoxThumbnail extends MediaFilter implements SelfRegisterInputFormats {
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(PDFBoxThumbnail.class);
+
     @Override
-    public String getFilteredName(String oldFilename)
-    {
+    public String getFilteredName(String oldFilename) {
         return oldFilename + ".jpg";
     }
 
     /**
      * @return String bundle name
-     *  
      */
     @Override
-    public String getBundleName()
-    {
+    public String getBundleName() {
         return "THUMBNAIL";
     }
 
@@ -51,8 +47,7 @@ public class PDFBoxThumbnail extends MediaFilter implements SelfRegisterInputFor
      * @return String bitstreamformat
      */
     @Override
-    public String getFormatString()
-    {
+    public String getFormatString() {
         return "JPEG";
     }
 
@@ -60,48 +55,49 @@ public class PDFBoxThumbnail extends MediaFilter implements SelfRegisterInputFor
      * @return String description
      */
     @Override
-    public String getDescription()
-    {
+    public String getDescription() {
         return "Generated Thumbnail";
     }
 
     /**
      * @param currentItem item
-     * @param source source input stream
-     * @param verbose verbose mode
-     * 
+     * @param source      source input stream
+     * @param verbose     verbose mode
      * @return InputStream the resulting input stream
      * @throws Exception if error
      */
     @Override
     public InputStream getDestinationStream(Item currentItem, InputStream source, boolean verbose)
-            throws Exception
-    {
-        PDDocument doc = PDDocument.load(source);
-        PDFRenderer renderer = new PDFRenderer(doc);
-        BufferedImage buf = renderer.renderImage(0);
-//        ImageIO.write(buf, "PNG", new File("custom-render.png"));
-        doc.close();
+        throws Exception {
+        BufferedImage buf;
 
+        // Render the page image.
+        try ( PDDocument doc = PDDocument.load(source); ) {
+            PDFRenderer renderer = new PDFRenderer(doc);
+            buf = renderer.renderImage(0);
+        } catch (InvalidPasswordException ex) {
+            log.error("PDF is encrypted. Cannot create thumbnail (item: {})",
+                () -> currentItem.getHandle());
+            return null;
+        }
+
+        // Generate thumbnail derivative and return as IO stream.
         JPEGFilter jpegFilter = new JPEGFilter();
         return jpegFilter.getThumb(currentItem, buf, verbose);
     }
 
     @Override
-    public String[] getInputMIMETypes()
-    {
+    public String[] getInputMIMETypes() {
         return ImageIO.getReaderMIMETypes();
     }
 
     @Override
-    public String[] getInputDescriptions()
-    {
+    public String[] getInputDescriptions() {
         return null;
     }
 
     @Override
-    public String[] getInputExtensions()
-    {
+    public String[] getInputExtensions() {
         // Temporarily disabled as JDK 1.6 only
         // return ImageIO.getReaderFileSuffixes();
         return null;

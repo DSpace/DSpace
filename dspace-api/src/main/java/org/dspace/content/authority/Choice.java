@@ -17,25 +17,28 @@ import java.util.Map;
  * @author Larry Stone
  * @see Choices
  */
-public class Choice
-{
-    /** Authority key for this value */
+public class Choice {
+    /**
+     * Authority key for this value
+     */
     public String authority = null;
 
-    /**  Label to display for this value (e.g. to present in UI menu) */
+    /**
+     * Label to display for this value (e.g. to present in UI menu)
+     */
     public String label = null;
 
-    /**  The canonical text value to insert into MetadataValue's text field */
+    /**
+     * The canonical text value to insert into MetadataValue's text field
+     */
     public String value = null;
 
     public Map<String, String> extras = new HashMap<String, String>();
 
-    public Choice()
-    {
+    public Choice() {
     }
 
-    public Choice(String authority, String value, String label)
-    {
+    public Choice(String authority, String value, String label) {
         this.authority = authority;
         this.value = value;
         this.label = label;

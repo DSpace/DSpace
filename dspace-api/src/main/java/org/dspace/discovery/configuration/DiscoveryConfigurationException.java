@@ -14,7 +14,7 @@ package org.dspace.discovery.configuration;
  * @author Ben Bosman (ben at atmire dot com)
  * @author Mark Diggory (markd at atmire dot com)
  */
-public class DiscoveryConfigurationException extends Exception{
+public class DiscoveryConfigurationException extends Exception {
 
     public DiscoveryConfigurationException() {
     }

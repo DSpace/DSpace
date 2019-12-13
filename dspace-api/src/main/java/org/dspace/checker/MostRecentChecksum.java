@@ -7,13 +7,21 @@
  */
 package org.dspace.checker;
 
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.dspace.content.Bitstream;
-
-import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.persistence.Transient;
+
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.dspace.content.Bitstream;
 
 /**
  * Database entity representation of the most_recent_checksum table
@@ -21,35 +29,34 @@ import java.util.Date;
  * @author kevinvandevelde at atmire.com
  */
 @Entity
-@Table(name="most_recent_checksum")
-public class MostRecentChecksum implements Serializable
-{
+@Table(name = "most_recent_checksum")
+public class MostRecentChecksum implements Serializable {
     @Id
     @OneToOne
-    @JoinColumn(name="bitstream_id", nullable = false)
+    @JoinColumn(name = "bitstream_id", nullable = false)
     private Bitstream bitstream;
 
-    @Column(name= "to_be_processed", nullable = false)
+    @Column(name = "to_be_processed", nullable = false)
     private boolean toBeProcessed;
 
-    @Column(name= "expected_checksum", nullable = false)
+    @Column(name = "expected_checksum", nullable = false)
     private String expectedChecksum;
 
-    @Column(name= "current_checksum", nullable = false)
+    @Column(name = "current_checksum", nullable = false)
     private String currentChecksum;
 
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name= "last_process_start_date", nullable = false)
+    @Column(name = "last_process_start_date", nullable = false)
     private Date processStartDate;
 
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name= "last_process_end_date", nullable = false)
+    @Column(name = "last_process_end_date", nullable = false)
     private Date processEndDate;
 
-    @Column(name= "checksum_algorithm", nullable = false)
+    @Column(name = "checksum_algorithm", nullable = false)
     private String checksumAlgorithm;
 
-    @Column(name= "matched_prev_checksum", nullable = false)
+    @Column(name = "matched_prev_checksum", nullable = false)
     private boolean matchedPrevChecksum;
 
     @Transient
@@ -59,15 +66,14 @@ public class MostRecentChecksum implements Serializable
     private boolean bitstreamFound;
 
     @OneToOne
-    @JoinColumn(name= "result", referencedColumnName = "result_code")
+    @JoinColumn(name = "result", referencedColumnName = "result_code")
     private ChecksumResult checksumResult;
 
     /**
      * Protected constructor, create handled by the
      * {@link org.dspace.checker.service.MostRecentChecksumService}
      */
-    protected MostRecentChecksum()
-    {
+    protected MostRecentChecksum() {
     }
 
     public Bitstream getBitstream() {
@@ -160,41 +166,45 @@ public class MostRecentChecksum implements Serializable
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
+        if (this == o) {
+            return true;
+        }
 
-        if (o == null || getClass() != o.getClass()) return false;
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         MostRecentChecksum that = (MostRecentChecksum) o;
 
         return new EqualsBuilder()
-                .append(toBeProcessed, that.toBeProcessed)
-                .append(matchedPrevChecksum, that.matchedPrevChecksum)
-                .append(infoFound, that.infoFound)
-                .append(bitstreamFound, that.bitstreamFound)
-                .append(bitstream, that.bitstream)
-                .append(expectedChecksum, that.expectedChecksum)
-                .append(currentChecksum, that.currentChecksum)
-                .append(processStartDate, that.processStartDate)
-                .append(processEndDate, that.processEndDate)
-                .append(checksumAlgorithm, that.checksumAlgorithm)
-                .append(checksumResult, that.checksumResult)
-                .isEquals();
+            .append(toBeProcessed, that.toBeProcessed)
+            .append(matchedPrevChecksum, that.matchedPrevChecksum)
+            .append(infoFound, that.infoFound)
+            .append(bitstreamFound, that.bitstreamFound)
+            .append(bitstream, that.bitstream)
+            .append(expectedChecksum, that.expectedChecksum)
+            .append(currentChecksum, that.currentChecksum)
+            .append(processStartDate, that.processStartDate)
+            .append(processEndDate, that.processEndDate)
+            .append(checksumAlgorithm, that.checksumAlgorithm)
+            .append(checksumResult, that.checksumResult)
+            .isEquals();
     }
 
     @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 37)
-                .append(bitstream)
-                .append(toBeProcessed)
-                .append(expectedChecksum)
-                .append(currentChecksum)
-                .append(processStartDate)
-                .append(processEndDate)
-                .append(checksumAlgorithm)
-                .append(matchedPrevChecksum)
-                .append(infoFound)
-                .append(bitstreamFound)
-                .append(checksumResult)
-                .toHashCode();
+            .append(bitstream)
+            .append(toBeProcessed)
+            .append(expectedChecksum)
+            .append(currentChecksum)
+            .append(processStartDate)
+            .append(processEndDate)
+            .append(checksumAlgorithm)
+            .append(matchedPrevChecksum)
+            .append(infoFound)
+            .append(bitstreamFound)
+            .append(checksumResult)
+            .toHashCode();
     }
 }

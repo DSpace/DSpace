@@ -9,7 +9,6 @@ package org.dspace.services.sessions.model;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;

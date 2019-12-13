@@ -9,11 +9,11 @@ package org.dspace.xoai.services.impl.xoai;
 
 import com.lyncode.xoai.dataprovider.services.api.ItemRepository;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.dspace.xoai.services.api.CollectionsService;
+import org.dspace.xoai.services.api.HandleResolver;
 import org.dspace.xoai.services.api.config.ConfigurationService;
 import org.dspace.xoai.services.api.context.ContextService;
 import org.dspace.xoai.services.api.context.ContextServiceException;
-import org.dspace.xoai.services.api.CollectionsService;
-import org.dspace.xoai.services.api.HandleResolver;
 import org.dspace.xoai.services.api.solr.SolrQueryResolver;
 import org.dspace.xoai.services.api.solr.SolrServerResolver;
 import org.dspace.xoai.services.api.xoai.ItemRepositoryResolver;
@@ -41,10 +41,10 @@ public class DSpaceItemRepositoryResolver implements ItemRepositoryResolver {
         if (itemRepository == null) {
             try {
                 itemRepository = new DSpaceItemSolrRepository(
-                        solrServerResolver.getServer(),
-                        collectionsService,
-                        handleResolver,
-                        solrQueryResolver);
+                    solrServerResolver.getServer(),
+                    collectionsService,
+                    handleResolver,
+                    solrQueryResolver);
             } catch (SolrServerException e) {
                 throw new ContextServiceException(e.getMessage(), e);
             }

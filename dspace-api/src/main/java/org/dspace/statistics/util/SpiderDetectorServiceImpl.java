@@ -7,21 +7,25 @@
  */
 package org.dspace.statistics.util;
 
-import org.apache.commons.configuration.ConversionException;
-import org.apache.commons.lang.StringUtils;
-import org.dspace.services.ConfigurationService;
-import org.dspace.services.factory.DSpaceServicesFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.commons.configuration2.ex.ConversionException;
+import org.apache.commons.lang3.StringUtils;
+import org.dspace.service.ClientInfoService;
+import org.dspace.services.ConfigurationService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * SpiderDetectorServiceImpl is used to find IP's that are spiders...
@@ -37,17 +41,16 @@ public class SpiderDetectorServiceImpl implements SpiderDetectorService {
 
     private static final Logger log = LoggerFactory.getLogger(SpiderDetectorServiceImpl.class);
 
-    private Boolean useProxies;
-
     private Boolean useCaseInsensitiveMatching;
 
     private final List<Pattern> agents
-            = Collections.synchronizedList(new ArrayList<Pattern>());
+        = Collections.synchronizedList(new ArrayList<Pattern>());
 
     private final List<Pattern> domains
-            = Collections.synchronizedList(new ArrayList<Pattern>());
+        = Collections.synchronizedList(new ArrayList<Pattern>());
 
     private ConfigurationService configurationService;
+    private ClientInfoService clientInfoService;
 
     /**
      * Sparse HashTable structure to hold IP address ranges.
@@ -55,8 +58,9 @@ public class SpiderDetectorServiceImpl implements SpiderDetectorService {
     private IPTable table = null;
 
     @Autowired(required = true)
-    public SpiderDetectorServiceImpl(ConfigurationService configurationService) {
+    public SpiderDetectorServiceImpl(ConfigurationService configurationService, ClientInfoService clientInfoService) {
         this.configurationService = configurationService;
+        this.clientInfoService = clientInfoService;
     }
 
     public IPTable getTable() {
@@ -72,20 +76,19 @@ public class SpiderDetectorServiceImpl implements SpiderDetectorService {
      * @param clientIP address of the client.
      * @param proxyIPs comma-list of X-Forwarded-For addresses, or null.
      * @param hostname domain name of host, or null.
-     * @param agent User-Agent header value, or null.
+     * @param agent    User-Agent header value, or null.
      * @return true if the client matches any spider characteristics list.
      */
     public boolean isSpider(String clientIP, String proxyIPs, String hostname, String agent) {
         // See if any agent patterns match
-        if (null != agent)
-        {
-            synchronized(agents)
-            {
-                if (agents.isEmpty())
+        if (null != agent) {
+            synchronized (agents) {
+                if (agents.isEmpty()) {
                     loadPatterns("agents", agents);
+                }
             }
 
-            if(isUseCaseInsensitiveMatching()) {
+            if (isUseCaseInsensitiveMatching()) {
                 agent = StringUtils.lowerCase(agent);
                 hostname = StringUtils.lowerCase(hostname);
             }
@@ -102,32 +105,29 @@ public class SpiderDetectorServiceImpl implements SpiderDetectorService {
         }
 
         // No.  See if any IP addresses match
-        if (isUseProxies() && proxyIPs != null) {
+        if (clientInfoService.isUseProxiesEnabled() && proxyIPs != null) {
             /* This header is a comma delimited list */
             for (String xfip : proxyIPs.split(",")) {
-                if (isSpider(xfip))
-                {
+                if (isSpider(xfip)) {
                     return true;
                 }
             }
         }
 
-        if (isSpider(clientIP))
+        if (isSpider(clientIP)) {
             return true;
+        }
 
         // No.  See if any DNS names match
-        if (null != hostname)
-        {
-            synchronized(domains)
-            {
-                if (domains.isEmpty())
+        if (null != hostname) {
+            synchronized (domains) {
+                if (domains.isEmpty()) {
                     loadPatterns("domains", domains);
+                }
             }
-            for (Pattern candidate : domains)
-            {
+            for (Pattern candidate : domains) {
                 // prevent matcher() invocation from a null Pattern object
-                if (null != candidate && candidate.matcher(hostname).find())
-                {
+                if (null != candidate && candidate.matcher(hostname).find()) {
                     return true;
                 }
             }
@@ -145,18 +145,15 @@ public class SpiderDetectorServiceImpl implements SpiderDetectorService {
      * @throws IOException could not happen since we check the file be4 we use it
      */
     public Set<String> readPatterns(File patternFile)
-            throws IOException
-    {
+        throws IOException {
         Set<String> patterns = new HashSet<>();
 
-        if (!patternFile.exists() || !patternFile.isFile())
-        {
+        if (!patternFile.exists() || !patternFile.isFile()) {
             return patterns;
         }
 
         //Read our file & get all them patterns.
-        try (BufferedReader in = new BufferedReader(new FileReader(patternFile)))
-        {
+        try (BufferedReader in = new BufferedReader(new FileReader(patternFile))) {
             String line;
             while ((line = in.readLine()) != null) {
                 if (!line.startsWith("#")) {
@@ -177,34 +174,29 @@ public class SpiderDetectorServiceImpl implements SpiderDetectorService {
     /**
      * Load agent name patterns from all files in a single subdirectory of config/spiders.
      *
-     * @param directory simple directory name (e.g. "agents").
-     *      "${dspace.dir}/config/spiders" will be prepended to yield the path to
-     *      the directory of pattern files.
+     * @param directory   simple directory name (e.g. "agents").
+     *                    "${dspace.dir}/config/spiders" will be prepended to yield the path to
+     *                    the directory of pattern files.
      * @param patternList patterns read from the files in {@code directory} will
-     *      be added to this List.
+     *                    be added to this List.
      */
-    private void loadPatterns(String directory, List<Pattern> patternList)
-    {
+    private void loadPatterns(String directory, List<Pattern> patternList) {
         String dspaceHome = configurationService.getProperty("dspace.dir");
         File spidersDir = new File(dspaceHome, "config/spiders");
         File patternsDir = new File(spidersDir, directory);
-        if (patternsDir.exists() && patternsDir.isDirectory())
-        {
-            for (File file : patternsDir.listFiles())
-            {
+        if (patternsDir.exists() && patternsDir.isDirectory()) {
+            for (File file : patternsDir.listFiles()) {
                 Set<String> patterns;
-                try
-                {
+                try {
                     patterns = readPatterns(file);
-                } catch (IOException ex)
-                {
+                } catch (IOException ex) {
                     log.error("Patterns not read from {}:  {}",
-                            file.getPath(), ex.getMessage());
+                              file.getPath(), ex.getMessage());
                     continue;
                 }
                 //If case insensitive matching is enabled, lowercase the patterns so they can be lowercase matched
                 for (String pattern : patterns) {
-                    if(isUseCaseInsensitiveMatching()) {
+                    if (isUseCaseInsensitiveMatching()) {
                         pattern = StringUtils.lowerCase(pattern);
                     }
                     patternList.add(Pattern.compile(pattern));
@@ -213,9 +205,7 @@ public class SpiderDetectorServiceImpl implements SpiderDetectorService {
 
                 log.info("Loaded pattern file:  {}", file.getPath());
             }
-        }
-        else
-        {
+        } else {
             log.info("No patterns loaded from {}", patternsDir.getPath());
         }
     }
@@ -228,9 +218,9 @@ public class SpiderDetectorServiceImpl implements SpiderDetectorService {
      */
     public boolean isSpider(HttpServletRequest request) {
         return isSpider(request.getRemoteAddr(),
-                request.getHeader("X-Forwarded-For"),
-                request.getRemoteHost(),
-                request.getHeader("User-Agent"));
+                        request.getHeader("X-Forwarded-For"),
+                        request.getRemoteHost(),
+                        request.getHeader("User-Agent"));
     }
 
     /**
@@ -270,12 +260,10 @@ public class SpiderDetectorServiceImpl implements SpiderDetectorService {
 
                 if (spidersDir.exists() && spidersDir.isDirectory()) {
                     for (File file : spidersDir.listFiles()) {
-                        if (file.isFile())
-                        {
+                        if (file.isFile()) {
                             for (String ip : readPatterns(file)) {
                                 log.debug("Loading {}", ip);
-                                if (!Character.isDigit(ip.charAt(0)))
-                                {
+                                if (!Character.isDigit(ip.charAt(0))) {
                                     try {
                                         ip = DnsLookup.forward(ip);
                                         log.debug("Resolved to {}", ip);
@@ -292,8 +280,7 @@ public class SpiderDetectorServiceImpl implements SpiderDetectorService {
                 } else {
                     log.info("No spider file loaded");
                 }
-            }
-            catch (IOException | IPTable.IPFormatException e) {
+            } catch (IOException | IPTable.IPFormatException e) {
                 log.error("Error Loading Spiders:" + e.getMessage(), e);
             }
 
@@ -303,12 +290,14 @@ public class SpiderDetectorServiceImpl implements SpiderDetectorService {
 
     /**
      * checks if case insensitive matching is enabled
+     *
      * @return true if it's enabled, false if not
      */
     private boolean isUseCaseInsensitiveMatching() {
         if (useCaseInsensitiveMatching == null) {
             try {
-                useCaseInsensitiveMatching = configurationService.getBooleanProperty("usage-statistics.bots.case-insensitive");
+                useCaseInsensitiveMatching = configurationService
+                    .getBooleanProperty("usage-statistics.bots.case-insensitive");
             } catch (ConversionException e) {
                 useCaseInsensitiveMatching = false;
                 log.warn("Please use a boolean value for usage-statistics.bots.case-insensitive");
@@ -316,14 +305,6 @@ public class SpiderDetectorServiceImpl implements SpiderDetectorService {
         }
 
         return useCaseInsensitiveMatching;
-    }
-
-    private boolean isUseProxies() {
-        if(useProxies == null) {
-            useProxies = configurationService.getBooleanProperty("useProxies");
-        }
-
-        return useProxies;
     }
 
 }

@@ -8,23 +8,24 @@
 
 package org.dspace.importer.external.service.components;
 
-import org.apache.log4j.Logger;
-import org.dspace.importer.external.exception.MetadataSourceException;
-import org.dspace.importer.external.exception.SourceExceptionHandler;
-
-import javax.annotation.Resource;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.locks.ReentrantLock;
+import javax.annotation.Resource;
+
+import org.apache.logging.log4j.Logger;
+import org.dspace.importer.external.exception.MetadataSourceException;
+import org.dspace.importer.external.exception.SourceExceptionHandler;
 
 /**
  * This class contains primitives to handle request timeouts and to retry requests.
  * This is achieved by classifying exceptions as fatal or as non fatal/retryable.
  * Evidently only subclasses can make the proper determination of what is retryable and what isn't.
  * This is useful in case the service employs throttling and to deal with general network issues.
+ *
  * @author Roeland Dillen (roeland at atmire dot com)
  * @author Antoine Snyers (antoine at atmire dot com)
  */
@@ -51,7 +52,7 @@ public abstract class AbstractRemoteMetadataSource {
     }
 
     /**
-     *  initialize the exceptionHandlersMap with an empty {@link java.util.LinkedHashMap}
+     * initialize the exceptionHandlersMap with an empty {@link java.util.LinkedHashMap}
      */
     protected void initExceptionHandlers() {
         exceptionHandlersMap = new LinkedHashMap<>();
@@ -71,8 +72,7 @@ public abstract class AbstractRemoteMetadataSource {
     /**
      * Set the warning message used for logging
      *
-     * @param warning
-     *     warning message
+     * @param warning warning message
      */
     public void setWarning(String warning) {
         this.warning = warning;
@@ -86,6 +86,7 @@ public abstract class AbstractRemoteMetadataSource {
     public int getRetry() {
         return retry;
     }
+
     /**
      * Return the number of max retries that can be undertaken before separate functionality kicks in
      *
@@ -98,10 +99,9 @@ public abstract class AbstractRemoteMetadataSource {
     /**
      * Set the number of maximum retries before throwing on the exception
      *
-     * @param maxRetry
-     *     maximum number of retries
+     * @param maxRetry maximum number of retries
      */
-    @Resource(name="maxRetry")
+    @Resource(name = "maxRetry")
     public void setMaxRetry(int maxRetry) {
         this.maxRetry = maxRetry;
     }
@@ -136,7 +136,7 @@ public abstract class AbstractRemoteMetadataSource {
     /**
      * log4j logger
      */
-    private static Logger log = Logger.getLogger(AbstractRemoteMetadataSource.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(AbstractRemoteMetadataSource.class);
 
     /**
      * Command pattern implementation. the callable.call method will be retried
@@ -147,7 +147,8 @@ public abstract class AbstractRemoteMetadataSource {
      *                 the public methods of this class.
      * @param <T>      return type. Generics for type safety.
      * @return The result of the call
-     * @throws org.dspace.importer.external.exception.MetadataSourceException if something unrecoverable happens (e.g. network failures)
+     * @throws org.dspace.importer.external.exception.MetadataSourceException if something unrecoverable happens (e.g
+     *                                                                        . network failures)
      */
     protected <T> T retry(Callable<T> callable) throws MetadataSourceException {
 
@@ -185,7 +186,7 @@ public abstract class AbstractRemoteMetadataSource {
                 lock.unlock();
             }
 
-            try{
+            try {
                 Thread.sleep(1000L);
             } catch (InterruptedException e) {
                 throwSourceException(retry, e, operationId);
@@ -196,10 +197,11 @@ public abstract class AbstractRemoteMetadataSource {
     }
 
     /**
-     * Handles a given exception or throws on a {@link org.dspace.importer.external.exception.MetadataSourceException} if no ExceptionHandler is set
+     * Handles a given exception or throws on a
+     * {@link org.dspace.importer.external.exception.MetadataSourceException} if no ExceptionHandler is set
      *
-     * @param retry The number of retries before the exception was thrown on
-     * @param exception The exception to handle
+     * @param retry       The number of retries before the exception was thrown on
+     * @param exception   The exception to handle
      * @param operationId The id of the operation that threw the exception
      * @throws MetadataSourceException if no ExceptionHandler is configured for the given exception
      */
@@ -218,7 +220,8 @@ public abstract class AbstractRemoteMetadataSource {
     /**
      * Retrieve a list of SourceExceptionHandler objects that have an instanceof the exception configured to them.
      *
-     * @param exception The exception to base the retrieval of {@link org.dspace.importer.external.exception.SourceExceptionHandler} on
+     * @param exception The exception to base the retrieval of
+     *                  {@link org.dspace.importer.external.exception.SourceExceptionHandler} on
      * @return a list of {@link org.dspace.importer.external.exception.SourceExceptionHandler} objects
      */
     protected List<SourceExceptionHandler> getExceptionHandler(Exception exception) {
@@ -233,14 +236,15 @@ public abstract class AbstractRemoteMetadataSource {
     /**
      * Throw a {@link MetadataSourceException}
      *
-     * @param retry The number of retries before the exception was thrown on
-     * @param exception The exception to throw
+     * @param retry       The number of retries before the exception was thrown on
+     * @param exception   The exception to throw
      * @param operationId The id of the operation that threw the exception
      * @throws MetadataSourceException if no ExceptionHandler is configured for the given exception
      */
-    protected void throwSourceException(int retry, Exception exception, String operationId) throws MetadataSourceException {
+    protected void throwSourceException(int retry, Exception exception, String operationId)
+        throws MetadataSourceException {
         throwSourceExceptionHook();
-        log.error("Source exception " + exception.getMessage(),exception);
+        log.error("Source exception " + exception.getMessage(), exception);
         throw new MetadataSourceException("At retry of operation " + operationId + " " + retry, exception);
     }
 

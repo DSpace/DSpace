@@ -7,40 +7,34 @@
  */
 package org.dspace.xoai.services.impl;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
-
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 /**
- * 
  * @author Lyncode Development Team (dspace at lyncode dot com)
  */
-public class MetadataFieldCache
-{
+public class MetadataFieldCache {
     private static Logger log = LogManager
-            .getLogger(MetadataFieldCache.class);
+        .getLogger(MetadataFieldCache.class);
 
     private Map<String, Integer> fields;
 
-    public MetadataFieldCache()
-    {
+    public MetadataFieldCache() {
         fields = new HashMap<String, Integer>();
     }
 
-    public boolean hasField(String field)
-    {
+    public boolean hasField(String field) {
         return fields.containsKey(field);
     }
 
-    public int getField(String field)
-    {
+    public int getField(String field) {
         return fields.get(field).intValue();
     }
 
-    public void add(String field, int id)
-    {
+    public void add(String field, int id) {
         fields.put(field, new Integer(id));
     }
 }

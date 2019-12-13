@@ -6,7 +6,9 @@
  * http://www.dspace.org/license/
  */
 /**
- * Service components that are aggregated/used in the {@link org.dspace.importer.external.service.AbstractImportMetadataSourceService} and {@link org.dspace.importer.external.service.ImportService}
+ * Service components that are aggregated/used in the
+ * {@link org.dspace.importer.external.service.AbstractImportMetadataSourceService} and
+ * {@link org.dspace.importer.external.service.ImportService}
  * @author Roeland Dillen (roeland at atmire dot com)
  */
 package org.dspace.importer.external.service.components;

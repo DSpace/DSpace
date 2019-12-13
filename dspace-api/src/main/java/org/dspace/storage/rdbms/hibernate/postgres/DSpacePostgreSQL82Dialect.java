@@ -16,15 +16,16 @@ import org.hibernate.type.descriptor.sql.LongVarcharTypeDescriptor;
 import org.hibernate.type.descriptor.sql.SqlTypeDescriptor;
 
 /**
- * UUID's are not supported by default in hibernate due to differences in the database in order to fix this a custom sql dialect is needed.
+ * UUID's are not supported by default in hibernate due to differences in the database in order to fix this a custom
+ * sql dialect is needed.
  * Source: https://forum.hibernate.org/viewtopic.php?f=1&amp;t=1014157
  *
  * @author kevinvandevelde at atmire.com
  */
-public class DSpacePostgreSQL82Dialect extends PostgreSQL82Dialect
-{
+public class DSpacePostgreSQL82Dialect extends PostgreSQL82Dialect {
     @Override
-    public void contributeTypes(final org.hibernate.boot.model.TypeContributions typeContributions, final ServiceRegistry serviceRegistry) {
+    public void contributeTypes(final org.hibernate.boot.model.TypeContributions typeContributions,
+                                final ServiceRegistry serviceRegistry) {
         super.contributeTypes(typeContributions, serviceRegistry);
         typeContributions.contributeType(new InternalPostgresUUIDType());
     }

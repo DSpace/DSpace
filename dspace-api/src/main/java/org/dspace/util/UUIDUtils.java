@@ -7,21 +7,26 @@
  */
 package org.dspace.util;
 
-import org.apache.commons.lang3.StringUtils;
-
 import java.util.UUID;
+
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Utility class to read UUIDs
  */
 public class UUIDUtils {
 
+    /**
+     * Default constructor
+     */
+    private UUIDUtils() { }
+
     public static UUID fromString(final String identifier) {
         UUID output = null;
-        if(StringUtils.isNotBlank(identifier)) {
+        if (StringUtils.isNotBlank(identifier)) {
             try {
                 output = UUID.fromString(identifier.trim());
-            } catch(IllegalArgumentException e) {
+            } catch (IllegalArgumentException e) {
                 output = null;
             }
         }

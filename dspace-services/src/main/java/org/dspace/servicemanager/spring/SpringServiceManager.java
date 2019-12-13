@@ -7,6 +7,15 @@
  */
 package org.dspace.servicemanager.spring;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
 import org.dspace.kernel.config.SpringLoader;
 import org.dspace.servicemanager.DSpaceServiceManager;
 import org.dspace.servicemanager.ServiceManagerSystem;
@@ -19,8 +28,6 @@ import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-
-import java.util.*;
 
 /**
  * This is the Spring implementation of the service manager.
@@ -40,6 +47,7 @@ public final class SpringServiceManager implements ServiceManagerSystem {
     public ClassPathXmlApplicationContext getApplicationContext() {
         return applicationContext;
     }
+
     /**
      * @return the current spring bean factory OR null if there is not one
      */
@@ -55,17 +63,19 @@ public final class SpringServiceManager implements ServiceManagerSystem {
     private boolean testMode = false;
     private boolean developmentMode = false;
     private String[] configPaths = null;
+
     /**
      * For TESTING:
      * Allows adding extra spring config paths.
      *
-     * @param parent parent ServiceManagerSystem
+     * @param parent               parent ServiceManagerSystem
      * @param configurationService current DSpace configuration service
-     * @param testMode if true then do not load the core beans
-     * @param developmentMode if true then services loaded on demand only
-     * @param configPaths additional spring config paths within this classloader
+     * @param testMode             if true then do not load the core beans
+     * @param developmentMode      if true then services loaded on demand only
+     * @param configPaths          additional spring config paths within this classloader
      */
-    public SpringServiceManager(ServiceManagerSystem parent, DSpaceConfigurationService configurationService, boolean testMode, boolean developmentMode, String... configPaths) {
+    public SpringServiceManager(ServiceManagerSystem parent, DSpaceConfigurationService configurationService,
+                                boolean testMode, boolean developmentMode, String... configPaths) {
         if (parent == null) {
             throw new IllegalArgumentException("parent SMS cannot be null");
         }
@@ -89,7 +99,7 @@ public final class SpringServiceManager implements ServiceManagerSystem {
         T bean = null;
         // handle special case to return the core AC
         if (ApplicationContext.class.getName().equals(name)
-                && ApplicationContext.class.isAssignableFrom(type)) {
+            && ApplicationContext.class.isAssignableFrom(type)) {
             bean = (T) getApplicationContext();
         } else {
             if (name != null) {
@@ -98,7 +108,10 @@ public final class SpringServiceManager implements ServiceManagerSystem {
                     bean = (T) applicationContext.getBean(name, type);
                 } catch (BeansException e) {
                     // no luck, try the fall back option
-                    log.info("Unable to locate bean by name or id=" + name + ". Will try to look up bean by type next. BeansException: " + e.getMessage());
+                    log.info(
+                        "Unable to locate bean by name or id=" + name + ". Will try to look up bean by type next. " +
+                            "BeansException: " + e
+                            .getMessage());
                     bean = null;
                 }
             } else {
@@ -107,21 +120,20 @@ public final class SpringServiceManager implements ServiceManagerSystem {
                     bean = (T) applicationContext.getBean(type.getName(), type);
                 } catch (BeansException e) {
                     // no luck, try the fall back option
-                    log.info("Unable to locate bean by name or id=" + type.getName() + ". Will try to look up bean by type next. BeansException: " + e.getMessage());
+                    log.info("Unable to locate bean by name or id=" + type
+                        .getName() + ". Will try to look up bean by type next. BeansException: " + e.getMessage());
                     bean = null;
                 }
             }
             // if still no luck then try by type only
             if (name == null
-                    && bean == null) {
+                && bean == null) {
                 try {
                     Map<String, T> map = applicationContext.getBeansOfType(type);
                     if (map.size() == 1) {
                         // only return the bean if there is exactly one
                         bean = (T) map.values().iterator().next();
-                    }
-                    else
-                    {
+                    } else {
                         log.error("Multiple beans of type " + type.getName() + " found. Only one was expected!");
                     }
                 } catch (BeansException e) {
@@ -141,9 +153,9 @@ public final class SpringServiceManager implements ServiceManagerSystem {
         Map<String, T> beans;
         try {
             beans = applicationContext.getBeansOfType(type, true, true);
-            l.addAll( (Collection<? extends T>) beans.values() );
+            l.addAll((Collection<? extends T>) beans.values());
         } catch (BeansException e) {
-            throw new RuntimeException("Failed to get beans of type ("+type+"): " + e.getMessage(), e);
+            throw new RuntimeException("Failed to get beans of type (" + type + "): " + e.getMessage(), e);
         }
         return l;
     }
@@ -179,7 +191,8 @@ public final class SpringServiceManager implements ServiceManagerSystem {
         applicationContext.setAllowCircularReferences(true);
         //applicationContext.registerShutdownHook(); // this interferes with the kernel shutdown hook
         // add the config interceptors (partially done in the xml)
-        applicationContext.addBeanFactoryPostProcessor( new DSpaceBeanFactoryPostProcessor(parent, configurationService, testMode) );
+        applicationContext
+            .addBeanFactoryPostProcessor(new DSpaceBeanFactoryPostProcessor(parent, configurationService, testMode));
         applicationContext.refresh();
         if (developmentMode) {
             log.warn("Spring Service Manager is running in developmentMode, services will be loaded on demand only");
@@ -189,10 +202,12 @@ public final class SpringServiceManager implements ServiceManagerSystem {
             applicationContext.getBeanFactory().freezeConfiguration();
         }
         long totalTime = System.currentTimeMillis() - startTime;
-        log.info("Spring Service Manager started up in "+totalTime+" ms with "+applicationContext.getBeanDefinitionCount()+" services...");
+        log.info("Spring Service Manager started up in " + totalTime + " ms with " + applicationContext
+            .getBeanDefinitionCount() + " services...");
     }
 
-    public static String[] getSpringPaths(boolean testMode, String[] configPaths, DSpaceConfigurationService configurationService) {
+    public static String[] getSpringPaths(boolean testMode, String[] configPaths,
+                                          DSpaceConfigurationService configurationService) {
         List<String> pathList = new LinkedList<>();
         pathList.add(configPath);
         pathList.add(addonResourcePath);
@@ -205,23 +220,26 @@ public final class SpringServiceManager implements ServiceManagerSystem {
         if (configPaths != null) {
             pathList.addAll(Arrays.asList(configPaths));
         }
-        if(testMode){
+        if (testMode) {
             log.warn("TEST Spring Service Manager running in test mode, no dspace home spring files will be loaded");
         } else {
             //Retrieve all our spring file locations depending on the deployed module
             String[] springLoaderClassNames = configurationService.getArrayProperty("spring.springloader.modules");
-            if(springLoaderClassNames != null){
-                for(String springLoaderClassName : springLoaderClassNames){
+            if (springLoaderClassNames != null) {
+                for (String springLoaderClassName : springLoaderClassNames) {
                     try {
-                        Class<SpringLoader> springLoaderClass = (Class<SpringLoader>) Class.forName(springLoaderClassName.trim());
-                        String[] resourcePaths = springLoaderClass.getConstructor().newInstance().getResourcePaths(configurationService);
-                        if(resourcePaths != null){
+                        Class<SpringLoader> springLoaderClass = (Class<SpringLoader>) Class
+                            .forName(springLoaderClassName.trim());
+                        String[] resourcePaths = springLoaderClass.getConstructor().newInstance()
+                                                                  .getResourcePaths(configurationService);
+                        if (resourcePaths != null) {
                             pathList.addAll(Arrays.asList(resourcePaths));
                         }
                     } catch (ClassNotFoundException e) {
                         //Ignore this exception, if we get one this just means that this module isn't loaded
                     } catch (Exception e) {
-                        log.error("Error while retrieving spring resource paths for module: " + springLoaderClassName, e);
+                        log.error("Error while retrieving spring resource paths for module: " + springLoaderClassName,
+                                  e);
                     }
                 }
             }
@@ -237,10 +255,12 @@ public final class SpringServiceManager implements ServiceManagerSystem {
         }
         T service;
         try {
-            service = (T) applicationContext.getBeanFactory().autowire(type, AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, true);
+            service = (T) applicationContext.getBeanFactory()
+                                            .autowire(type, AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, true);
             registerBean(name, service);
         } catch (BeansException e) {
-            throw new IllegalArgumentException("Invalid service class ("+type+") with name ("+name+") registration: " + e.getMessage(), e);
+            throw new IllegalArgumentException(
+                "Invalid service class (" + type + ") with name (" + name + ") registration: " + e.getMessage(), e);
         }
         return service;
     }
@@ -253,7 +273,8 @@ public final class SpringServiceManager implements ServiceManagerSystem {
         try {
             applicationContext.getBeanFactory().autowireBean(service);
         } catch (BeansException e) {
-            throw new IllegalArgumentException("Invalid service ("+service+") with name ("+name+") registration: " + e.getMessage(), e);
+            throw new IllegalArgumentException(
+                "Invalid service (" + service + ") with name (" + name + ") registration: " + e.getMessage(), e);
         }
         registerBean(name, service);
     }
@@ -267,10 +288,10 @@ public final class SpringServiceManager implements ServiceManagerSystem {
     }
 
     /**
-     * This handles the common part of the 2 types of service 
+     * This handles the common part of the 2 types of service
      * registrations.
      *
-     * @param name name of bean
+     * @param name    name of bean
      * @param service service object
      */
     private void registerBean(String name, Object service) {
@@ -278,7 +299,8 @@ public final class SpringServiceManager implements ServiceManagerSystem {
             applicationContext.getBeanFactory().initializeBean(service, name);
             applicationContext.getBeanFactory().registerSingleton(name, service);
         } catch (BeansException e) {
-            throw new IllegalArgumentException("Invalid service ("+service+") with name ("+name+") registration: " + e.getMessage(), e);
+            throw new IllegalArgumentException(
+                "Invalid service (" + service + ") with name (" + name + ") registration: " + e.getMessage(), e);
         }
     }
 

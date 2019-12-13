@@ -10,48 +10,47 @@ package org.dspace.license;
 
 /**
  * @author wbossons
- *
  */
 public class CCLicense {
 
-	private String licenseName;
-	private String licenseId;
-	private int order = 0;
+    private String licenseName;
+    private String licenseId;
+    private int order = 0;
 
-	public CCLicense() {
-		super();
-	}
+    public CCLicense() {
+        super();
+    }
 
-	public CCLicense(String licenseId, String licenseName, int order) {
-		super();
-		this.licenseId 		= licenseId;
-		this.licenseName = licenseName;
-		this.order 			= order;
-	}
+    public CCLicense(String licenseId, String licenseName, int order) {
+        super();
+        this.licenseId = licenseId;
+        this.licenseName = licenseName;
+        this.order = order;
+    }
 
-	public String getLicenseName() {
-		return licenseName;
-	}
+    public String getLicenseName() {
+        return licenseName;
+    }
 
-	public void setLicenseName(String licenseName) {
-		this.licenseName = licenseName;
-	}
+    public void setLicenseName(String licenseName) {
+        this.licenseName = licenseName;
+    }
 
-	public String getLicenseId() {
-		return licenseId;
-	}
+    public String getLicenseId() {
+        return licenseId;
+    }
 
-	public void setLicenseId(String licenseId) {
-		this.licenseId = licenseId;
-	}
+    public void setLicenseId(String licenseId) {
+        this.licenseId = licenseId;
+    }
 
-	public int getOrder() {
-		return this.order;
-	}
+    public int getOrder() {
+        return this.order;
+    }
 
-	public void setOrder(int order) {
-		this.order = order;
-	}
+    public void setOrder(int order) {
+        this.order = order;
+    }
 
 
 }

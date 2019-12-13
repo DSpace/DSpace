@@ -17,7 +17,7 @@ public class DSpaceConfigurationService implements ConfigurationService {
     }
 
     @Override
-    public String getProperty(String module, String key)  {
+    public String getProperty(String module, String key) {
         return ConfigurationManager.getProperty(module, key);
     }
 

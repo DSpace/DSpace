@@ -10,7 +10,7 @@ package org.dspace.kernel;
 /**
  * Beans that have a lifecycle and can be controlled via their lifecycle implement this interface.
  * Based on the Sakai K2 lifecycle interface -AZ
- * 
+ *
  * @param <T> the type of object managed by this lifecycle.
  */
 public interface CommonLifecycle<T> {
@@ -29,6 +29,7 @@ public interface CommonLifecycle<T> {
 
     /**
      * Gets a reference to the bean that is being managed inside this lifecycle.
+     *
      * @return the managed object
      */
     public T getManagedBean();

@@ -9,29 +9,23 @@ package org.dspace.xoai.exceptions;
 
 
 /**
- * 
  * @author Lyncode Development Team (dspace at lyncode dot com)
  */
 @SuppressWarnings("serial")
-public class CompilingException extends Exception
-{
+public class CompilingException extends Exception {
 
-    public CompilingException()
-    {
+    public CompilingException() {
     }
 
-    public CompilingException(String arg0)
-    {
+    public CompilingException(String arg0) {
         super(arg0);
     }
 
-    public CompilingException(Throwable arg0)
-    {
+    public CompilingException(Throwable arg0) {
         super(arg0);
     }
 
-    public CompilingException(String arg0, Throwable arg1)
-    {
+    public CompilingException(String arg0, Throwable arg1) {
         super(arg0, arg1);
     }
 

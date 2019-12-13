@@ -19,27 +19,24 @@ import org.dspace.core.Context;
  * inception of the Item page (in HandleServlet). Classes that
  * implement the process method and appear in the configuration will be run
  * before the at the start of preparing the item home page has any chance
- * to continue its execution. <b>Note that the plugin is executed also before 
+ * to continue its execution. <b>Note that the plugin is executed also before
  * than the READ permission on the item is checked</b>
- * 
+ *
  * @author Andrea Bollini
- * 
  */
-public interface ItemHomeProcessor
-{
-	/**
-	 * execute the process
-	 * 
-	 * @param context       the DSpace context
-	 * @param request	    the HTTP request
-	 * @param response	    the HTTP response
-	 * @param item         	the item object whose home page we are on
-	 * 
-	 * @throws PluginException	any particular problem with the plugin execution
-	 * @throws AuthorizeException	Authorisation errors during plugin execution
-	 */
-	void process(Context context, HttpServletRequest request,
-    		HttpServletResponse response, Item item)
-		throws PluginException, AuthorizeException;
-	
+public interface ItemHomeProcessor {
+    /**
+     * execute the process
+     *
+     * @param context  the DSpace context
+     * @param request  the HTTP request
+     * @param response the HTTP response
+     * @param item     the item object whose home page we are on
+     * @throws PluginException    any particular problem with the plugin execution
+     * @throws AuthorizeException Authorisation errors during plugin execution
+     */
+    void process(Context context, HttpServletRequest request,
+                 HttpServletResponse response, Item item)
+        throws PluginException, AuthorizeException;
+
 }

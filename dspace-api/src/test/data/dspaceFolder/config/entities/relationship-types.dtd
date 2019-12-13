@@ -1,0 +1,15 @@
+<!-- Build relationships from XML -->
+
+
+<!ELEMENT relationships (type)*>
+<!ELEMENT type (leftType|rightType|leftwardType|rightwardType|leftCardinality|rightCardinality|copyToLeft|copyToRight)*>
+<!ELEMENT leftType (#PCDATA)>
+<!ELEMENT rightType (#PCDATA)>
+<!ELEMENT leftwardType (#PCDATA)>
+<!ELEMENT rightwardType (#PCDATA)>
+<!ELEMENT copyToLeft (#PCDATA)>
+<!ELEMENT copyToRight (#PCDATA)>
+<!ELEMENT leftCardinality (min|max)*>
+<!ELEMENT min (#PCDATA)>
+<!ELEMENT rightCardinality (min|max)*>
+<!ELEMENT max (#PCDATA)>

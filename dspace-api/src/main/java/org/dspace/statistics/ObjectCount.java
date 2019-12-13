@@ -9,7 +9,7 @@ package org.dspace.statistics;
 
 /**
  * Data structure for returning results from statistics searches.
- * 
+ *
  * @author mdiggory at atmire.com
  * @author ben at atmire.com
  * @author kevinvandevelde at atmire.com
@@ -18,7 +18,7 @@ public class ObjectCount {
     private long count;
     private String value;
 
-    public ObjectCount(){
+    public ObjectCount() {
     }
 
     public long getCount() {

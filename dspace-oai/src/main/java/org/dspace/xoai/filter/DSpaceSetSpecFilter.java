@@ -8,8 +8,8 @@
 package org.dspace.xoai.filter;
 
 import com.lyncode.xoai.dataprovider.core.ReferenceSet;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.util.ClientUtils;
 import org.dspace.xoai.data.DSpaceItem;
 import org.dspace.xoai.filter.results.SolrFilterResult;
@@ -18,57 +18,45 @@ import org.dspace.xoai.services.api.HandleResolver;
 
 
 /**
- *
  * @author Lyncode Development Team (dspace at lyncode dot com)
  */
-public class DSpaceSetSpecFilter extends DSpaceFilter
-{
+public class DSpaceSetSpecFilter extends DSpaceFilter {
     private static final Logger log = LogManager.getLogger(DSpaceSetSpecFilter.class);
 
     private final String setSpec;
     private final HandleResolver handleResolver;
     private final CollectionsService collectionsService;
 
-    public DSpaceSetSpecFilter(CollectionsService collectionsService, HandleResolver handleResolver, String spec)
-    {
+    public DSpaceSetSpecFilter(CollectionsService collectionsService, HandleResolver handleResolver, String spec) {
         this.collectionsService = collectionsService;
         this.handleResolver = handleResolver;
         this.setSpec = spec;
     }
 
     @Override
-    public boolean isShown(DSpaceItem item)
-    {
-        for (ReferenceSet s : item.getSets())
-            if (s.getSetSpec().equals(setSpec))
+    public boolean isShown(DSpaceItem item) {
+        for (ReferenceSet s : item.getSets()) {
+            if (s.getSetSpec().equals(setSpec)) {
                 return true;
+            }
+        }
         return false;
     }
 
     @Override
-    public SolrFilterResult buildSolrQuery()
-    {
-        if (setSpec.startsWith("col_"))
-        {
-            try
-            {
+    public SolrFilterResult buildSolrQuery() {
+        if (setSpec.startsWith("col_")) {
+            try {
                 return new SolrFilterResult("item.collections:"
-                        + ClientUtils.escapeQueryChars(setSpec));
-            }
-            catch (Exception ex)
-            {
+                                                + ClientUtils.escapeQueryChars(setSpec));
+            } catch (Exception ex) {
                 log.error(ex.getMessage(), ex);
             }
-        }
-        else if (setSpec.startsWith("com_"))
-        {
-            try
-            {
+        } else if (setSpec.startsWith("com_")) {
+            try {
                 return new SolrFilterResult("item.communities:"
-                        + ClientUtils.escapeQueryChars(setSpec));
-            }
-            catch (Exception e)
-            {
+                                                + ClientUtils.escapeQueryChars(setSpec));
+            } catch (Exception e) {
                 log.error(e.getMessage(), e);
             }
         }

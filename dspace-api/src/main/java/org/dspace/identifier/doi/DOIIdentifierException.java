@@ -10,7 +10,6 @@ package org.dspace.identifier.doi;
 import org.dspace.identifier.IdentifierException;
 
 /**
- *
  * @author Pascal-Nicolas Becker (p dot becker at tu hyphen berlin dot de)
  */
 public class DOIIdentifierException extends IdentifierException {
@@ -45,7 +44,7 @@ public class DOIIdentifierException extends IdentifierException {
      */
     public static final int BAD_REQUEST = 5;
     /**
-     * Some registration agencies request that a DOI gets reserved before it can 
+     * Some registration agencies request that a DOI gets reserved before it can
      * be registered. This error code signals that a unreserved DOI should be
      * registered and that the registration agency denied it.
      */
@@ -55,7 +54,7 @@ public class DOIIdentifierException extends IdentifierException {
      */
     public static final int AUTHENTICATION_ERROR = 7;
     /**
-     * A internal error occurred either in the registration agency or in the 
+     * A internal error occurred either in the registration agency or in the
      * DOIConnector.
      */
     public static final int INTERNAL_ERROR = 8;
@@ -81,7 +80,7 @@ public class DOIIdentifierException extends IdentifierException {
      * You tried to reserve or register a DOI that is marked as DELETED.
      */
     public static final int DOI_IS_DELETED = 13;
-    
+
     private int code;
 
     // FOR DEBUGGING
@@ -157,18 +156,15 @@ public class DOIIdentifierException extends IdentifierException {
         super(cause);
         this.code = code;
     }
-    
-    public int getCode()
-    {
+
+    public int getCode() {
         return this.code;
     }
 
     @Override
-    public String getMessage()
-    {
+    public String getMessage() {
         String message = super.getMessage();
-        if ((message == null || message.isEmpty()) && code != CODE_NOT_SET)
-        {
+        if ((message == null || message.isEmpty()) && code != CODE_NOT_SET) {
             return codeToString(code);
         }
         return message;

@@ -7,7 +7,6 @@
  */
 package org.dspace.workflow;
 
-
 import org.dspace.content.InProgressSubmission;
 import org.dspace.core.ReloadableEntity;
 
@@ -16,6 +15,6 @@ import org.dspace.core.ReloadableEntity;
  *
  * @author kevinvandevelde at atmire.com
  */
-public interface WorkflowItem extends InProgressSubmission, ReloadableEntity<Integer> {
-
+public interface WorkflowItem extends InProgressSubmission<Integer>, ReloadableEntity<Integer> {
+    public int getState();
 }

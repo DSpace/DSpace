@@ -7,8 +7,11 @@
  */
 package org.dspace.servicemanager;
 
-import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.HashMap;
 import java.util.List;
@@ -27,7 +30,7 @@ import org.junit.Test;
 
 /**
  * testing the main dspace service manager
- * 
+ *
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
 public class DSpaceServiceManagerTest {
@@ -81,7 +84,8 @@ public class DSpaceServiceManagerTest {
     }
 
     /**
-     * Test method for {@link org.dspace.servicemanager.DSpaceServiceManager#registerService(java.lang.String, java.lang.Object)}.
+     * Test method for
+     * {@link org.dspace.servicemanager.DSpaceServiceManager#registerService(java.lang.String, java.lang.Object)}.
      */
     @Test
     public void testRegisterService() {
@@ -94,7 +98,7 @@ public class DSpaceServiceManagerTest {
         assertEquals("AZ", service);
 
         try {
-            dsm.registerService("fakey", (Object)null);
+            dsm.registerService("fakey", (Object) null);
             fail("should have thrown exception");
         } catch (IllegalArgumentException e) {
             assertNotNull(e.getMessage());
@@ -102,7 +106,8 @@ public class DSpaceServiceManagerTest {
     }
 
     /**
-     * Test method for {@link org.dspace.servicemanager.DSpaceServiceManager#registerServiceClass(java.lang.String, java.lang.Class)}.
+     * Test method for
+     * {@link org.dspace.servicemanager.DSpaceServiceManager#registerServiceClass(java.lang.String, java.lang.Class)}.
      */
     @Test
     public void testRegisterServiceClass() {
@@ -119,7 +124,7 @@ public class DSpaceServiceManagerTest {
 
 
         try {
-            dsm.registerService("fakey", (Class<?>)null);
+            dsm.registerService("fakey", (Class<?>) null);
             fail("should have thrown exception");
         } catch (IllegalArgumentException e) {
             assertNotNull(e.getMessage());
@@ -143,7 +148,8 @@ public class DSpaceServiceManagerTest {
     }
 
     /**
-     * Test method for {@link org.dspace.servicemanager.DSpaceServiceManager#getServiceByName(java.lang.String, java.lang.Class)}.
+     * Test method for
+     * {@link org.dspace.servicemanager.DSpaceServiceManager#getServiceByName(java.lang.String, java.lang.Class)}.
      */
     @Test
     public void testGetServiceByName() {
@@ -155,7 +161,8 @@ public class DSpaceServiceManagerTest {
         assertEquals("azeckoski", concrete.getName());
         concrete = null;
 
-        SampleAnnotationBean sab = dsm.getServiceByName(SampleAnnotationBean.class.getName(), SampleAnnotationBean.class);
+        SampleAnnotationBean sab = dsm
+            .getServiceByName(SampleAnnotationBean.class.getName(), SampleAnnotationBean.class);
         assertNotNull(sab);
         assertEquals(null, sab.getSampleValue());
         sab = null;
@@ -171,7 +178,8 @@ public class DSpaceServiceManagerTest {
         concrete = null;
 
         // initialize a SampleAnnotationBean
-        SampleAnnotationBean sab = dsm.getServiceByName(SampleAnnotationBean.class.getName(), SampleAnnotationBean.class);
+        SampleAnnotationBean sab = dsm
+            .getServiceByName(SampleAnnotationBean.class.getName(), SampleAnnotationBean.class);
         assertNotNull(sab);
         // Based on the configuration for "sampleValue" in the init() method above,
         // a value should be pre-set!
@@ -259,11 +267,12 @@ public class DSpaceServiceManagerTest {
     public void testInitAndShutdown() {
         dsm.startup();
 
-        SampleAnnotationBean sab = dsm.getServiceByName(SampleAnnotationBean.class.getName(), SampleAnnotationBean.class);
+        SampleAnnotationBean sab = dsm
+            .getServiceByName(SampleAnnotationBean.class.getName(), SampleAnnotationBean.class);
         assertNotNull(sab);
         assertEquals(1, sab.initCounter);
         sab = null;
-        
+
         TestService ts = new TestService();
         assertEquals(0, ts.value);
         dsm.registerService(TestService.class.getName(), ts);
@@ -299,7 +308,7 @@ public class DSpaceServiceManagerTest {
         dsm.unregisterService(serviceName);
         assertEquals("shutdown", service.getSomething());
         assertEquals(3, service.getTriggers());
-        
+
         service = null;
         properties = null;
     }
@@ -307,9 +316,11 @@ public class DSpaceServiceManagerTest {
     public static class TestService implements InitializedService, ShutdownService {
 
         public int value = 0;
+
         public void init() {
             value++;
         }
+
         public void shutdown() {
             value++;
         }

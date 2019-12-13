@@ -14,11 +14,10 @@ import java.lang.annotation.RetentionPolicy;
 /**
  * Annotation type for CurationTasks. A task is mutative if it
  * alters (transforms, mutates) it's target object.
- * 
+ *
  * @author richardrodgers
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Mutative
-{
+public @interface Mutative {
 }

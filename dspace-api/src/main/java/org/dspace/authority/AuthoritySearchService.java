@@ -7,15 +7,15 @@
  */
 package org.dspace.authority;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.util.List;
+
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
 
-import java.net.MalformedURLException;
-import java.util.List;
-
 /**
- *
  * @author Antoine Snyers (antoine at atmire.com)
  * @author Kevin Van de Velde (kevin at atmire dot com)
  * @author Ben Bosman (ben at atmire dot com)
@@ -23,7 +23,8 @@ import java.util.List;
  */
 public interface AuthoritySearchService {
 
-    public QueryResponse search(SolrQuery query) throws SolrServerException, MalformedURLException;
+    public QueryResponse search(SolrQuery query)
+            throws SolrServerException, MalformedURLException, IOException;
 
     public List<String> getAllIndexedMetadataFields() throws Exception;
 

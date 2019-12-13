@@ -7,16 +7,17 @@
  */
 package org.dspace.importer.external.metadatamapping.contributor;
 
-import org.dspace.importer.external.metadatamapping.MetadataFieldConfig;
-import org.dspace.importer.external.metadatamapping.MetadataFieldMapping;
-import org.dspace.importer.external.metadatamapping.MetadatumDTO;
-
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.dspace.importer.external.metadatamapping.MetadataFieldConfig;
+import org.dspace.importer.external.metadatamapping.MetadataFieldMapping;
+import org.dspace.importer.external.metadatamapping.MetadatumDTO;
+
 /**
  * Wrapper class used to accommodate for the possibility of correlations between multiple MetadatumContributor objects
+ *
  * @author Philip Vissenaekens (philip at atmire dot com)
  */
 public class CombinedMetadatumContributor<T> implements MetadataContributor<T> {
@@ -26,7 +27,7 @@ public class CombinedMetadatumContributor<T> implements MetadataContributor<T> {
 
     private String separator;
 
-    private MetadataFieldMapping<T,MetadataContributor<T>> metadataFieldMapping;
+    private MetadataFieldMapping<T, MetadataContributor<T>> metadataFieldMapping;
 
     /**
      * Initialize an empty CombinedMetadatumContributor object
@@ -35,13 +36,13 @@ public class CombinedMetadatumContributor<T> implements MetadataContributor<T> {
     }
 
     /**
-     *
-     *
-     * @param field {@link org.dspace.importer.external.metadatamapping.MetadataFieldConfig} used in mapping
+     * @param field                 {@link org.dspace.importer.external.metadatamapping.MetadataFieldConfig} used in
+     *                              mapping
      * @param metadatumContributors A list of MetadataContributor
-     * @param separator A separator used to differentiate between different values
+     * @param separator             A separator used to differentiate between different values
      */
-    public CombinedMetadatumContributor(MetadataFieldConfig field, List<MetadataContributor> metadatumContributors, String separator) {
+    public CombinedMetadatumContributor(MetadataFieldConfig field, List<MetadataContributor> metadatumContributors,
+                                        String separator) {
         this.field = field;
         this.metadatumContributors = (LinkedList<MetadataContributor>) metadatumContributors;
         this.separator = separator;
@@ -71,7 +72,7 @@ public class CombinedMetadatumContributor<T> implements MetadataContributor<T> {
      */
     @Override
     public Collection<MetadatumDTO> contributeMetadata(T t) {
-        List<MetadatumDTO> values=new LinkedList<>();
+        List<MetadatumDTO> values = new LinkedList<>();
 
         LinkedList<LinkedList<MetadatumDTO>> metadatumLists = new LinkedList<>();
 
@@ -80,7 +81,7 @@ public class CombinedMetadatumContributor<T> implements MetadataContributor<T> {
             metadatumLists.add(metadatums);
         }
 
-        for (int i = 0; i<metadatumLists.getFirst().size();i++) {
+        for (int i = 0; i < metadatumLists.getFirst().size(); i++) {
 
             StringBuilder value = new StringBuilder();
 
@@ -145,8 +146,7 @@ public class CombinedMetadatumContributor<T> implements MetadataContributor<T> {
     /**
      * Set the separator used to differentiate between distinct values
      *
-     * @param separator
-     *     separator used to differentiate between distinct values
+     * @param separator separator used to differentiate between distinct values
      */
     public void setSeparator(String separator) {
         this.separator = separator;

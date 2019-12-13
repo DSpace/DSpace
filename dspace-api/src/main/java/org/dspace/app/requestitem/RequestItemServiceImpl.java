@@ -7,7 +7,10 @@
  */
 package org.dspace.app.requestitem;
 
-import org.apache.log4j.Logger;
+import java.sql.SQLException;
+import java.util.Date;
+
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.requestitem.dao.RequestItemDAO;
 import org.dspace.app.requestitem.service.RequestItemService;
 import org.dspace.content.Bitstream;
@@ -15,9 +18,6 @@ import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.core.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.sql.SQLException;
-import java.util.Date;
 
 /**
  * Service implementation for the RequestItem object.
@@ -28,18 +28,18 @@ import java.util.Date;
  */
 public class RequestItemServiceImpl implements RequestItemService {
 
-    private final Logger log = Logger.getLogger(RequestItemServiceImpl.class);
+    private final Logger log = org.apache.logging.log4j.LogManager.getLogger(RequestItemServiceImpl.class);
 
     @Autowired(required = true)
     protected RequestItemDAO requestItemDAO;
 
-    protected RequestItemServiceImpl()
-    {
+    protected RequestItemServiceImpl() {
 
     }
 
     @Override
-    public String createRequest(Context context, Bitstream bitstream, Item item, boolean allFiles, String reqEmail, String reqName, String reqMessage) throws SQLException {
+    public String createRequest(Context context, Bitstream bitstream, Item item, boolean allFiles, String reqEmail,
+                                String reqName, String reqMessage) throws SQLException {
         RequestItem requestItem = requestItemDAO.create(context, new RequestItem());
 
         requestItem.setToken(Utils.generateHexKey());
@@ -53,10 +53,9 @@ public class RequestItemServiceImpl implements RequestItemService {
 
         requestItemDAO.save(context, requestItem);
 
-        if (log.isDebugEnabled())
-        {
+        if (log.isDebugEnabled()) {
             log.debug("Created requestitem_token " + requestItem.getID()
-                    + " with token " + requestItem.getToken() +  "\"");
+                          + " with token " + requestItem.getToken() + "\"");
         }
         return requestItem.getToken();
     }

@@ -16,7 +16,10 @@ import java.util.UUID;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.authorize.service.ResourcePolicyService;
-import org.dspace.content.*;
+import org.dspace.content.Bitstream;
+import org.dspace.content.Bundle;
+import org.dspace.content.Collection;
+import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.ItemService;
@@ -33,13 +36,20 @@ import org.dspace.eperson.service.GroupService;
  * @author dstuve
  * @version $Revision$
  */
-public class PolicySet
-{
-    private static final AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
-    private static final ResourcePolicyService resourcePolicyService = AuthorizeServiceFactory.getInstance().getResourcePolicyService();
+public class PolicySet {
+    private static final AuthorizeService authorizeService =
+        AuthorizeServiceFactory.getInstance().getAuthorizeService();
+    private static final ResourcePolicyService resourcePolicyService =
+        AuthorizeServiceFactory.getInstance().getResourcePolicyService();
     private static final ItemService itemService = ContentServiceFactory.getInstance().getItemService();
-    private static final CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
+    private static final CollectionService collectionService =
+        ContentServiceFactory.getInstance().getCollectionService();
     private static final GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
+
+    /**
+     * Default constructor
+     */
+    private PolicySet() { }
 
     /**
      * Command line interface to setPolicies - run to see arguments
@@ -47,12 +57,10 @@ public class PolicySet
      * @param argv the command line arguments given
      * @throws Exception if error
      */
-    public static void main(String[] argv) throws Exception
-    {
-        if (argv.length < 6)
-        {
+    public static void main(String[] argv) throws Exception {
+        if (argv.length < 6) {
             System.out
-                    .println("Args: containerType containerID contentType actionID groupID command [filter]");
+                .println("Args: containerType containerID contentType actionID groupID command [filter]");
             System.out.println("container=COLLECTION command = ADD|REPLACE");
 
             return;
@@ -67,13 +75,11 @@ public class PolicySet
         boolean isReplace = false;
         String command = argv[5];
         String filter = null;
-        if ( argv.length == 7 )
-        {
+        if (argv.length == 7) {
             filter = argv[6];
         }
 
-        if (command.equals("REPLACE"))
-        {
+        if (command.equals("REPLACE")) {
             isReplace = true;
         }
 
@@ -86,7 +92,7 @@ public class PolicySet
         // carnage begins here
         //////////////////////
         setPoliciesFilter(c, containertype, containerID, contenttype, actionID,
-                groupID, isReplace, false, filter);
+                          groupID, isReplace, false, filter);
 
         c.complete();
         System.exit(0);
@@ -96,176 +102,129 @@ public class PolicySet
      * Useful policy wildcard tool. Can set entire collections' contents'
      * policies
      *
-     * @param c
-     *            current context
-     * @param containerType
-     *            type, Constants.ITEM or Constants.COLLECTION
-     * @param containerID
-     *            ID of container (DB primary key)
-     * @param contentType
-     *            type (BUNDLE, ITEM, or BITSTREAM)
-     * @param actionID
-     *            action ID
-     * @param groupID
-     *            group ID (database key)
-     * @param isReplace
-     *            if <code>true</code>, existing policies are removed first,
-     *            otherwise add to existing policies
-     * @param clearOnly
-     *            if <code>true</code>, just delete policies for matching
-     *            objects
-     * @throws SQLException if database error
-     *             if database problem
+     * @param c             current context
+     * @param containerType type, Constants.ITEM or Constants.COLLECTION
+     * @param containerID   ID of container (DB primary key)
+     * @param contentType   type (BUNDLE, ITEM, or BITSTREAM)
+     * @param actionID      action ID
+     * @param groupID       group ID (database key)
+     * @param isReplace     if <code>true</code>, existing policies are removed first,
+     *                      otherwise add to existing policies
+     * @param clearOnly     if <code>true</code>, just delete policies for matching
+     *                      objects
+     * @throws SQLException       if database error
+     *                            if database problem
      * @throws AuthorizeException if authorization error
-     *             if current user is not authorized to change these policies
+     *                            if current user is not authorized to change these policies
      */
     public static void setPolicies(Context c, int containerType,
                                    UUID containerID, int contentType, int actionID, UUID groupID,
                                    boolean isReplace, boolean clearOnly) throws SQLException,
-            AuthorizeException
-    {
-        setPoliciesFilter(c, containerType,containerID, contentType, actionID, groupID, isReplace, clearOnly, null, null, null, null, null);
+        AuthorizeException {
+        setPoliciesFilter(c, containerType, containerID, contentType, actionID, groupID, isReplace, clearOnly, null,
+                          null, null, null, null);
     }
 
 
     /**
-     *
-     * @param c
-     *            current context
-     * @param containerType
-     *            type, Constants.ITEM or Constants.COLLECTION
-     * @param containerID
-     *            ID of container (DB primary key)
-     * @param contentType
-     *            ID of container (DB primary key)
-     * @param actionID
-     *            action ID (e.g. Constants.READ)
-     * @param groupID
-     *            group ID (database key)
-     * @param isReplace
-     *            if <code>true</code>, existing policies are removed first,
-     *            otherwise add to existing policies
-     * @param clearOnly
-     *            if non-null, only process bitstreams whose names contain filter
-     * @param name
-     *            policy name
-     * @param description
-     *            policy descrption
-     * @param startDate
-     *            policy start date
-     * @param endDate
-     *            policy end date
-     * @throws SQLException if database error
+     * @param c             current context
+     * @param containerType type, Constants.ITEM or Constants.COLLECTION
+     * @param containerID   ID of container (DB primary key)
+     * @param contentType   ID of container (DB primary key)
+     * @param actionID      action ID (e.g. Constants.READ)
+     * @param groupID       group ID (database key)
+     * @param isReplace     if <code>true</code>, existing policies are removed first,
+     *                      otherwise add to existing policies
+     * @param clearOnly     if non-null, only process bitstreams whose names contain filter
+     * @param name          policy name
+     * @param description   policy descrption
+     * @param startDate     policy start date
+     * @param endDate       policy end date
+     * @throws SQLException       if database error
      * @throws AuthorizeException if authorization error
      */
     public static void setPolicies(Context c, int containerType,
                                    UUID containerID, int contentType, int actionID, UUID groupID,
                                    boolean isReplace, boolean clearOnly,
-                                   String name, String description, Date startDate, Date endDate) throws SQLException, AuthorizeException
-    {
+                                   String name, String description, Date startDate, Date endDate)
+        throws SQLException, AuthorizeException {
         setPoliciesFilter(c, containerType, containerID, contentType,
-                actionID, groupID, isReplace, clearOnly, null, name, description, startDate, endDate);
+                          actionID, groupID, isReplace, clearOnly, null, name, description, startDate, endDate);
     }
 
     /**
      * Useful policy wildcard tool. Can set entire collections' contents'
      * policies
      *
-     * @param c
-     *            current context
-     * @param containerType
-     *            type, Constants.ITEM or Constants.COLLECTION
-     * @param containerID
-     *            ID of container (DB primary key)
-     * @param contentType
-     *            type (BUNDLE, ITEM, or BITSTREAM)
-     * @param actionID
-     *            action ID (e.g. Constants.READ)
-     * @param groupID
-     *            group ID (database key)
-     * @param isReplace
-     *            if <code>true</code>, existing policies are removed first,
-     *            otherwise add to existing policies
-     * @param clearOnly
-     *            if <code>true</code>, just delete policies for matching
-     *            objects
-     * @param filter
-     *            if non-null, only process bitstreams whose names contain filter
-     * @throws SQLException if database error
-     *             if database problem
+     * @param c             current context
+     * @param containerType type, Constants.ITEM or Constants.COLLECTION
+     * @param containerID   ID of container (DB primary key)
+     * @param contentType   type (BUNDLE, ITEM, or BITSTREAM)
+     * @param actionID      action ID (e.g. Constants.READ)
+     * @param groupID       group ID (database key)
+     * @param isReplace     if <code>true</code>, existing policies are removed first,
+     *                      otherwise add to existing policies
+     * @param clearOnly     if <code>true</code>, just delete policies for matching
+     *                      objects
+     * @param filter        if non-null, only process bitstreams whose names contain filter
+     * @throws SQLException       if database error
+     *                            if database problem
      * @throws AuthorizeException if authorization error
-     *             if current user is not authorized to change these policies
+     *                            if current user is not authorized to change these policies
      */
     public static void setPoliciesFilter(Context c, int containerType,
                                          UUID containerID, int contentType, int actionID, UUID groupID,
-                                         boolean isReplace, boolean clearOnly, String filter) throws SQLException,AuthorizeException
-    {
-        setPoliciesFilter(c, containerType,containerID, contentType, actionID, groupID, isReplace, clearOnly, filter, null, null, null, null);
+                                         boolean isReplace, boolean clearOnly, String filter)
+        throws SQLException, AuthorizeException {
+        setPoliciesFilter(c, containerType, containerID, contentType, actionID, groupID, isReplace, clearOnly, filter,
+                          null, null, null, null);
     }
 
     /**
      * Useful policy wildcard tool. Can set entire collections' contents'
      * policies
      *
-     * @param c
-     *            current context
-     * @param containerType
-     *            type, Constants.ITEM or Constants.COLLECTION
-     * @param containerID
-     *            ID of container (DB primary key)
-     * @param contentType
-     *            type (BUNDLE, ITEM, or BITSTREAM)
-     * @param actionID
-     *            action ID
-     * @param groupID
-     *            group ID (database key)
-     * @param isReplace
-     *            if <code>true</code>, existing policies are removed first,
-     *            otherwise add to existing policies
-     * @param clearOnly
-     *            if <code>true</code>, just delete policies for matching
-     *            objects
-     * @param filter
-     *            if non-null, only process bitstreams whose names contain filter
-     * @param name
-     *            policy name
-     * @param description
-     *            policy description
-     * @param startDate
-     *            policy start date
-     * @param endDate
-     *            policy end date
-     * @throws SQLException if database error
-     *             if database problem
+     * @param c             current context
+     * @param containerType type, Constants.ITEM or Constants.COLLECTION
+     * @param containerID   ID of container (DB primary key)
+     * @param contentType   type (BUNDLE, ITEM, or BITSTREAM)
+     * @param actionID      action ID
+     * @param groupID       group ID (database key)
+     * @param isReplace     if <code>true</code>, existing policies are removed first,
+     *                      otherwise add to existing policies
+     * @param clearOnly     if <code>true</code>, just delete policies for matching
+     *                      objects
+     * @param filter        if non-null, only process bitstreams whose names contain filter
+     * @param name          policy name
+     * @param description   policy description
+     * @param startDate     policy start date
+     * @param endDate       policy end date
+     * @throws SQLException       if database error
+     *                            if database problem
      * @throws AuthorizeException if authorization error
-     *             if current user is not authorized to change these policies
+     *                            if current user is not authorized to change these policies
      */
     public static void setPoliciesFilter(Context c, int containerType,
                                          UUID containerID, int contentType, int actionID, UUID groupID,
                                          boolean isReplace, boolean clearOnly, String filter,
-                                         String name, String description, Date startDate, Date endDate) throws SQLException, AuthorizeException
-    {
-        if (containerType == Constants.COLLECTION)
-        {
+                                         String name, String description, Date startDate, Date endDate)
+        throws SQLException, AuthorizeException {
+        if (containerType == Constants.COLLECTION) {
             Collection collection = collectionService.find(c, containerID);
             Group group = groupService.find(c, groupID);
 
             Iterator<Item> i = itemService.findAllByCollection(c, collection);
-            if (contentType == Constants.ITEM)
-            {
+            if (contentType == Constants.ITEM) {
                 // build list of all items in a collection
-                while (i.hasNext())
-                {
+                while (i.hasNext()) {
                     Item myitem = i.next();
 
                     // is this a replace? delete policies first
-                    if (isReplace || clearOnly)
-                    {
+                    if (isReplace || clearOnly) {
                         authorizeService.removeAllPolicies(c, myitem);
                     }
 
-                    if (!clearOnly)
-                    {
+                    if (!clearOnly) {
 
                         // before create a new policy check if an identical policy is already in place
                         if (!authorizeService.isAnIdenticalPolicyAlreadyInPlace(c, myitem, group, actionID, -1)) {
@@ -285,13 +244,10 @@ public class PolicySet
                         }
                     }
                 }
-            }
-            else if (contentType == Constants.BUNDLE)
-            {
+            } else if (contentType == Constants.BUNDLE) {
                 // build list of all items in a collection
                 // build list of all bundles in those items
-                while (i.hasNext())
-                {
+                while (i.hasNext()) {
                     Item myitem = i.next();
 
                     List<Bundle> bundles = myitem.getBundles();
@@ -322,13 +278,10 @@ public class PolicySet
                         }
                     }
                 }
-            }
-            else if (contentType == Constants.BITSTREAM)
-            {
+            } else if (contentType == Constants.BITSTREAM) {
                 // build list of all bitstreams in a collection
                 // iterate over items, bundles, get bitstreams
-                while (i.hasNext())
-                {
+                while (i.hasNext()) {
                     Item myitem = i.next();
                     System.out.println("Item " + myitem.getID());
 
@@ -341,7 +294,7 @@ public class PolicySet
 
                         for (Bitstream bitstream : bitstreams) {
                             if (filter == null ||
-                                    bitstream.getName().indexOf(filter) != -1) {
+                                bitstream.getName().indexOf(filter) != -1) {
                                 // is this a replace? delete policies first
                                 if (isReplace || clearOnly) {
                                     authorizeService.removeAllPolicies(c, bitstream);
@@ -349,7 +302,8 @@ public class PolicySet
 
                                 if (!clearOnly) {
                                     // before create a new policy check if an identical policy is already in place
-                                    if (!authorizeService.isAnIdenticalPolicyAlreadyInPlace(c, bitstream, group, actionID, -1)) {
+                                    if (!authorizeService
+                                        .isAnIdenticalPolicyAlreadyInPlace(c, bitstream, group, actionID, -1)) {
                                         // now add the policy
                                         ResourcePolicy rp = resourcePolicyService.create(c);
 

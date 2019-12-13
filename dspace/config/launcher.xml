@@ -139,13 +139,6 @@
         </step>
     </command>
     <command>
-        <name>index-discovery</name>
-        <description>Update Discovery Solr Search Index</description>
-        <step>
-            <class>org.dspace.discovery.IndexClient</class>
-        </step>
-    </command>
-    <command>
         <name>itemupdate</name>
         <description>Item update tool for altering metadata and bitstream content in items</description>
         <step>
@@ -240,6 +233,13 @@
             <class>org.dspace.util.SolrImportExport</class>
 	    <argument>-a</argument>
 	    <argument>reindex</argument>
+        </step>
+    </command>
+    <command>
+        <name>solr-upgrade-statistics-6x</name>
+        <description>Upgrade statistics (integer to UUID) to DSpace 6.x (or above) compatibility</description>
+        <step passuserargs="true">
+            <class>org.dspace.util.SolrUpgradePre6xStatistics</class>
         </step>
     </command>
     <command>
@@ -364,6 +364,13 @@
         <description>Display the version of DSpace and other troubleshooting information</description>
         <step>
             <class>org.dspace.app.util.Version</class>
+        </step>
+    </command>
+    <command>
+        <name>initialize-entities</name>
+        <description>Initialize the entities with a provided xml</description>
+        <step>
+            <class>org.dspace.app.util.InitializeEntities</class>
         </step>
     </command>
 </commands>

@@ -8,16 +8,25 @@
 package org.dspace.content;
 
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.OrderColumn;
+import javax.persistence.Table;
+import javax.persistence.Transient;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BundleService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.hibernate.proxy.HibernateProxyHelper;
-
-import javax.persistence.*;
 
 /**
  * Class representing bundles of bitstreams stored in the DSpace system
@@ -26,15 +35,14 @@ import javax.persistence.*;
  * is no metadata associated with bundles - they are simple containers. Thus,
  * the <code>update</code> method doesn't do much yet. Creating, adding or
  * removing bitstreams has instant effect in the database.
- * 
+ *
  * @author Robert Tansley
  * @version $Revision$
  */
 @Entity
-@Table(name="bundle")
-public class Bundle extends DSpaceObject implements DSpaceObjectLegacySupport
-{
-    @Column(name="bundle_id", insertable = false, updatable = false)
+@Table(name = "bundle")
+public class Bundle extends DSpaceObject implements DSpaceObjectLegacySupport {
+    @Column(name = "bundle_id", insertable = false, updatable = false)
     private Integer legacyId;
 
     @OneToOne
@@ -43,18 +51,18 @@ public class Bundle extends DSpaceObject implements DSpaceObjectLegacySupport
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
-            name="bundle2bitstream",
-            joinColumns={@JoinColumn(name="bundle_id") },
-            inverseJoinColumns={@JoinColumn(name="bitstream_id") }
+        name = "bundle2bitstream",
+        joinColumns = {@JoinColumn(name = "bundle_id")},
+        inverseJoinColumns = {@JoinColumn(name = "bitstream_id")}
     )
-    @OrderColumn(name="bitstream_order")
+    @OrderColumn(name = "bitstream_order")
     private final List<Bitstream> bitstreams = new ArrayList<>();
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
-            name = "item2bundle",
-            joinColumns = {@JoinColumn(name = "bundle_id", referencedColumnName = "uuid") },
-            inverseJoinColumns = {@JoinColumn(name = "item_id", referencedColumnName = "uuid") }
+        name = "item2bundle",
+        joinColumns = {@JoinColumn(name = "bundle_id", referencedColumnName = "uuid")},
+        inverseJoinColumns = {@JoinColumn(name = "item_id", referencedColumnName = "uuid")}
     )
     private final List<Item> items = new ArrayList<>();
 
@@ -64,10 +72,8 @@ public class Bundle extends DSpaceObject implements DSpaceObjectLegacySupport
     /**
      * Protected constructor, create object using:
      * {@link org.dspace.content.service.BundleService#create(Context, Item, String)}
-     *
      */
-    protected Bundle()
-    {
+    protected Bundle() {
     }
 
     @Override
@@ -77,47 +83,42 @@ public class Bundle extends DSpaceObject implements DSpaceObjectLegacySupport
 
     /**
      * Get the name of the bundle
-     * 
+     *
      * @return name of the bundle (ORIGINAL, TEXT, THUMBNAIL) or NULL if not set
      */
     @Override
-    public String getName()
-    {
-        return getBundleService().getMetadataFirstValue(this, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY);
+    public String getName() {
+        return getBundleService().getMetadataFirstValue(this, MetadataSchemaEnum.DC.getName(), "title", null, Item.ANY);
     }
 
     /**
      * Set the name of the bundle
-     * 
+     *
      * @param context context
-     * @param name
-     *            string name of the bundle (ORIGINAL, TEXT, THUMBNAIL) are the
-     *            values currently used
+     * @param name    string name of the bundle (ORIGINAL, TEXT, THUMBNAIL) are the
+     *                values currently used
      * @throws SQLException if database error
      */
-    public void setName(Context context, String name) throws SQLException
-    {
-        getBundleService().setMetadataSingleValue(context, this, MetadataSchema.DC_SCHEMA, "title", null, null, name);
+    public void setName(Context context, String name) throws SQLException {
+        getBundleService().setMetadataSingleValue(context, this, MetadataSchemaEnum.DC.getName(),
+                                                  "title", null, null, name);
     }
 
     /**
      * Get the primary bitstream ID of the bundle
-     * 
+     *
      * @return primary bitstream ID or -1 if not set
      */
-    public Bitstream getPrimaryBitstream()
-    {
+    public Bitstream getPrimaryBitstream() {
         return primaryBitstream;
     }
 
     /**
      * Set the primary bitstream ID of the bundle
-     * 
-     * @param bitstream
-     *            primary bitstream (e.g. index html file)
+     *
+     * @param bitstream primary bitstream (e.g. index html file)
      */
-    public void setPrimaryBitstreamID(Bitstream bitstream)
-    {
+    public void setPrimaryBitstreamID(Bitstream bitstream) {
         primaryBitstream = bitstream;
         setModified();
     }
@@ -125,16 +126,15 @@ public class Bundle extends DSpaceObject implements DSpaceObjectLegacySupport
     /**
      * Unset the primary bitstream ID of the bundle
      */
-    public void unsetPrimaryBitstreamID()
-    {
-    	primaryBitstream = null;
+    public void unsetPrimaryBitstreamID() {
+        primaryBitstream = null;
     }
-    
+
     /**
      * Get a copy of the bitstream list of this bundle
      * Note that this is a copy and if you wish to manipulate the bistream list, you should use
      * {@ref Bundle.addBitstream}, {@ref Bundle.removeBitstream} or {@ref Bundle.clearBitstreams}
-     * 
+     *
      * @return the bitstreams
      */
     public List<Bitstream> getBitstreams() {
@@ -144,9 +144,10 @@ public class Bundle extends DSpaceObject implements DSpaceObjectLegacySupport
 
     /**
      * Add a new bitstream to this bundle.
+     *
      * @param bitstream
      */
-    void addBitstream(Bitstream bitstream){
+    void addBitstream(Bitstream bitstream) {
         bitstreams.add(bitstream);
     }
 
@@ -159,6 +160,7 @@ public class Bundle extends DSpaceObject implements DSpaceObjectLegacySupport
 
     /**
      * Remove the given bitstream from this bundles bitstream list
+     *
      * @param bitstream The bitstream to remove
      */
     public void removeBitstream(Bitstream bitstream) {
@@ -167,7 +169,7 @@ public class Bundle extends DSpaceObject implements DSpaceObjectLegacySupport
 
     /**
      * Get the items this bundle appears in
-     * 
+     *
      * @return array of <code>Item</code> s this bundle appears in
      */
     public List<Item> getItems() {
@@ -189,30 +191,25 @@ public class Bundle extends DSpaceObject implements DSpaceObjectLegacySupport
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null)
-        {
+        if (obj == null) {
             return false;
         }
         Class<?> objClass = HibernateProxyHelper.getClassWithoutInitializingProxy(obj);
-        if (this.getClass() != objClass)
-        {
+        if (this.getClass() != objClass) {
             return false;
         }
         final Bundle other = (Bundle) obj;
-        if (this.getType() != other.getType())
-        {
+        if (this.getType() != other.getType()) {
             return false;
         }
-        if(!this.getID().equals(other.getID()))
-        {
+        if (!this.getID().equals(other.getID())) {
             return false;
         }
         return true;
     }
 
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         int hash = 5;
         hash += 71 * hash + getType();
         hash += 71 * hash + getID().hashCode();
@@ -222,18 +219,16 @@ public class Bundle extends DSpaceObject implements DSpaceObjectLegacySupport
 
     /**
      * return type found in Constants
+     *
      * @return bundle type
      */
     @Override
-    public int getType()
-    {
+    public int getType() {
         return Constants.BUNDLE;
     }
 
-    private BundleService getBundleService()
-    {
-        if(bundleService == null)
-        {
+    private BundleService getBundleService() {
+        if (bundleService == null) {
             bundleService = ContentServiceFactory.getInstance().getBundleService();
         }
         return bundleService;

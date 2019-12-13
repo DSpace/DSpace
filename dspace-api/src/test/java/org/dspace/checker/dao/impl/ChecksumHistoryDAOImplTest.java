@@ -7,12 +7,16 @@
  */
 package org.dspace.checker.dao.impl;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import javax.persistence.Query;
+
 import org.dspace.AbstractUnitTest;
 import org.dspace.checker.ChecksumResultCode;
 import org.dspace.content.Bitstream;
@@ -20,46 +24,36 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.core.CoreHelpers;
 import org.dspace.core.HibernateDBConnection;
-import org.hibernate.Query;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
-
 /**
- *
  * @author mwood
  */
 public class ChecksumHistoryDAOImplTest
-        extends AbstractUnitTest
-{
-    public ChecksumHistoryDAOImplTest()
-    {
+    extends AbstractUnitTest {
+    public ChecksumHistoryDAOImplTest() {
     }
 
     @BeforeClass
     public static void setUpClass()
-            throws SQLException, ClassNotFoundException
-    {
+        throws SQLException, ClassNotFoundException {
     }
 
     @AfterClass
-    public static void tearDownClass()
-    {
+    public static void tearDownClass() {
     }
 
     @Before
-    public void setUp()
-    {
+    public void setUp() {
     }
 
     @After
     public void tearDown()
-            throws SQLException
-    {
+        throws SQLException {
     }
 
     /**
@@ -67,8 +61,7 @@ public class ChecksumHistoryDAOImplTest
      */
     @Test
     public void testDeleteByDateAndCode()
-            throws Exception
-    {
+        throws Exception {
         System.out.println("deleteByDateAndCode");
 
         GregorianCalendar cal = new GregorianCalendar();
@@ -77,10 +70,10 @@ public class ChecksumHistoryDAOImplTest
 
         // Create two older rows
         HibernateDBConnection dbc = (HibernateDBConnection) CoreHelpers.getDBConnection(context);
-        Query qry = dbc.getSession().createSQLQuery(
-                "INSERT INTO checksum_history"
-                        + "(check_id, process_end_date, result, bitstream_id)"
-                        + " VALUES (:id, :date, :result, :bitstream)");
+        Query qry = dbc.getSession().createNativeQuery(
+            "INSERT INTO checksum_history"
+                + "(check_id, process_end_date, result, bitstream_id)"
+                + " VALUES (:id, :date, :result, :bitstream)");
         int checkId = 0;
 
         // Row with matching result code
@@ -94,9 +87,9 @@ public class ChecksumHistoryDAOImplTest
         cal.add(Calendar.DATE, -1);
         Date matchDate = cal.getTime();
         checkId++;
-        qry.setInteger("id", checkId);
-        qry.setDate("date", matchDate);
-        qry.setString("result", ChecksumResultCode.CHECKSUM_MATCH.name());
+        qry.setParameter("id", checkId);
+        qry.setParameter("date", matchDate);
+        qry.setParameter("result", ChecksumResultCode.CHECKSUM_MATCH.name());
         qry.setParameter("bitstream", bs.getID()); // FIXME identifier not being set???
         qry.executeUpdate();
 
@@ -104,9 +97,9 @@ public class ChecksumHistoryDAOImplTest
         cal.add(Calendar.DATE, -1);
         Date noMatchDate = cal.getTime();
         checkId++;
-        qry.setInteger("id", checkId);
-        qry.setDate("date", noMatchDate);
-        qry.setString("result", ChecksumResultCode.CHECKSUM_NO_MATCH.name());
+        qry.setParameter("id", checkId);
+        qry.setParameter("date", noMatchDate);
+        qry.setParameter("result", ChecksumResultCode.CHECKSUM_NO_MATCH.name());
         qry.setParameter("bitstream", bs.getID()); // FIXME identifier not being set???
         qry.executeUpdate();
 
@@ -114,9 +107,9 @@ public class ChecksumHistoryDAOImplTest
         cal.add(Calendar.DATE, +3);
         Date futureDate = cal.getTime();
         checkId++;
-        qry.setInteger("id", checkId);
-        qry.setDate("date", new java.sql.Date(futureDate.getTime()));
-        qry.setString("result", ChecksumResultCode.CHECKSUM_MATCH.name());
+        qry.setParameter("id", checkId);
+        qry.setParameter("date", new java.sql.Date(futureDate.getTime()));
+        qry.setParameter("result", ChecksumResultCode.CHECKSUM_MATCH.name());
         qry.setParameter("bitstream", bs.getID()); // FIXME identifier not being set???
         qry.executeUpdate();
 
@@ -124,27 +117,27 @@ public class ChecksumHistoryDAOImplTest
         ChecksumHistoryDAOImpl instance = new ChecksumHistoryDAOImpl();
         int expResult = 1;
         int result = instance.deleteByDateAndCode(context, retentionDate,
-                resultCode);
+                                                  resultCode);
         assertEquals(expResult, result);
 
         // See if matching old row is gone.
         qry = dbc.getSession().createQuery(
-                "SELECT COUNT(*) FROM ChecksumHistory WHERE process_end_date = :date");
+            "SELECT COUNT(*) FROM ChecksumHistory WHERE process_end_date = :date");
         long count;
 
-        qry.setDate("date", matchDate);
-        count = (Long) qry.uniqueResult();
-        assertEquals("Should find no row at matchDate", count, 0);
+        qry.setParameter("date", matchDate);
+        count = (Long) qry.getSingleResult();
+        assertEquals("Should find no row at matchDate", 0, count);
 
         // See if nonmatching old row is still present.
-        qry.setDate("date", noMatchDate);
-        count = (Long) qry.uniqueResult();
-        assertEquals("Should find one row at noMatchDate", count, 1);
+        qry.setParameter("date", noMatchDate);
+        count = (Long) qry.getSingleResult();
+        assertEquals("Should find one row at noMatchDate", 1, count);
 
         // See if new row is still present.
-        qry.setDate("date", futureDate);
-        count = (Long) qry.uniqueResult();
-        assertEquals("Should find one row at futureDate", count, 1);
+        qry.setParameter("date", futureDate);
+        count = (Long) qry.getSingleResult();
+        assertEquals("Should find one row at futureDate", 1, count);
     }
 
     /**

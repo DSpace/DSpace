@@ -7,12 +7,12 @@
  */
 package org.dspace.authority;
 
-import org.apache.log4j.Logger;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.logging.log4j.Logger;
 
 /**
  * This class contains a list of active authority types.
@@ -32,12 +32,11 @@ public class AuthorityTypes {
     /**
      * log4j logger
      */
-    private static Logger log = Logger.getLogger(AuthorityTypes.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(AuthorityTypes.class);
 
     protected List<AuthorityValue> types = new ArrayList<AuthorityValue>();
 
     protected Map<String, AuthorityValue> fieldDefaults = new HashMap<String, AuthorityValue>();
-
 
 
     public List<AuthorityValue> getTypes() {

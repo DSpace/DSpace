@@ -17,12 +17,13 @@ import org.springframework.beans.factory.config.DestructionAwareBeanPostProcesso
 /**
  * This processes beans as they are loaded into the system by spring.
  * Allows us to handle the init method and also push config options.
- * 
+ *
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
 public final class DSpaceBeanPostProcessor implements BeanPostProcessor, DestructionAwareBeanPostProcessor {
 
     private DSpaceConfigurationService configurationService;
+
     @Autowired
     public DSpaceBeanPostProcessor(DSpaceConfigurationService configurationService) {
         if (configurationService == null) {
@@ -32,11 +33,12 @@ public final class DSpaceBeanPostProcessor implements BeanPostProcessor, Destruc
     }
 
     /* (non-Javadoc)
-     * @see org.springframework.beans.factory.config.BeanPostProcessor#postProcessBeforeInitialization(java.lang.Object, java.lang.String)
+     * @see org.springframework.beans.factory.config.BeanPostProcessor#postProcessBeforeInitialization(java.lang
+     * .Object, java.lang.String)
      */
     @Override
     public Object postProcessBeforeInitialization(Object bean, String beanName)
-            throws BeansException {
+        throws BeansException {
         // Before initializing the service, first configure it based on any related settings in the configurationService
         // NOTE: configs related to this bean MUST be prefixed with the bean's name (e.g. [beanName].setting = value)
         DSpaceServiceManager.configureService(beanName, bean, configurationService);
@@ -44,25 +46,27 @@ public final class DSpaceBeanPostProcessor implements BeanPostProcessor, Destruc
     }
 
     /* (non-Javadoc)
-     * @see org.springframework.beans.factory.config.BeanPostProcessor#postProcessAfterInitialization(java.lang.Object, java.lang.String)
+     * @see org.springframework.beans.factory.config.BeanPostProcessor#postProcessAfterInitialization(java.lang
+     * .Object, java.lang.String)
      */
     @Override
     public Object postProcessAfterInitialization(Object bean, String beanName)
-            throws BeansException {
+        throws BeansException {
         DSpaceServiceManager.initService(bean);
         return bean;
     }
 
     /* (non-Javadoc)
-     * @see org.springframework.beans.factory.config.DestructionAwareBeanPostProcessor#postProcessBeforeDestruction(java.lang.Object, java.lang.String)
+     * @see org.springframework.beans.factory.config.DestructionAwareBeanPostProcessor#postProcessBeforeDestruction
+     * (java.lang.Object, java.lang.String)
      */
     @Override
     public void postProcessBeforeDestruction(Object bean, String beanName) throws BeansException {
         DSpaceServiceManager.shutdownService(bean);
     }
 
-//    @Override
+    //    @Override
     public boolean requiresDestruction(Object arg0) {
-    	return false;
+        return false;
     }
 }
