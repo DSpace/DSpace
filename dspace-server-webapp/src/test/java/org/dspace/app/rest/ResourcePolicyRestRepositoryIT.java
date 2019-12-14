@@ -6,15 +6,19 @@
  * http://www.dspace.org/license/
  */
 package org.dspace.app.rest;
-
+import static com.jayway.jsonpath.JsonPath.read;
+import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.Matchers.is;
-
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
@@ -22,9 +26,11 @@ import org.dspace.app.rest.builder.EPersonBuilder;
 import org.dspace.app.rest.builder.GroupBuilder;
 import org.dspace.app.rest.builder.ResourcePolicyBuilder;
 import org.dspace.app.rest.matcher.ResoucePolicyMatcher;
+import org.dspace.app.rest.model.ResourcePolicyRest;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.core.Constants;
@@ -45,6 +51,9 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
     @Autowired
     AuthorizeService authorizeService;
+
+    @Autowired
+    ResourcePolicyService resourcePolicyService;
 
     @Test
     public void findAllTest() throws Exception {
@@ -586,7 +595,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
       String authToken = getAuthToken(eperson1.getEmail(), "qwerty01");
       getClient(authToken).perform(get("/api/authz/resourcepolicies/search/eperson")
-              .param("uuid", eperson1.getID().toString())
+              .param("uuid", eperson2.getID().toString())
               .param("resource", community2.getID().toString()))
               .andExpect(status().isForbidden());
   }
@@ -780,5 +789,58 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
                 .param("uuid", group1.getID().toString())
                 .param("resource", community2.getID().toString()))
                 .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void createWithEPersonTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        AtomicReference<Integer> idRef = new AtomicReference<Integer>();
+        try {
+            Community community = CommunityBuilder.createCommunity(context)
+                    .withName("My commynity")
+                    .build();
+
+            EPerson eperson1 = EPersonBuilder.createEPerson(context)
+                    .withEmail("eperson1@mail.com")
+                    .withPassword("qwerty01")
+                    .build();
+
+            context.restoreAuthSystemState();
+
+            ObjectMapper mapper = new ObjectMapper();
+            ResourcePolicyRest resourcePolicyRest = new ResourcePolicyRest();
+
+            resourcePolicyRest.setPolicyType(ResourcePolicy.TYPE_SUBMISSION);
+            resourcePolicyRest.setAction(Constants.actionText[Constants.READ]);
+
+            String authToken = getAuthToken(admin.getEmail(), password);
+            getClient(authToken)
+                    .perform(post("/api/authz/resourcepolicies")
+                            .content(mapper.writeValueAsBytes(resourcePolicyRest))
+                            .param("resource", community.getID().toString())
+                            .param("eperson", eperson1.getID().toString())
+                            .contentType(contentType))
+                    .andExpect(status().isCreated())
+                    .andExpect(content().contentType(contentType))
+                    .andExpect(jsonPath("$",Matchers.allOf(
+                            hasJsonPath("$.name", is(resourcePolicyRest.getName())),
+                            hasJsonPath("$.description", is(resourcePolicyRest.getDescription())),
+                            hasJsonPath("$.policyType", is(resourcePolicyRest.getPolicyType())),
+                            hasJsonPath("$.action", is(resourcePolicyRest.getAction())),
+                            hasJsonPath("$.startDate", is(resourcePolicyRest.getStartDate())),
+                            hasJsonPath("$.endDate", is(resourcePolicyRest.getEndDate())),
+                            hasJsonPath("$.type", is(resourcePolicyRest.getType())))))
+                    .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
+
+            String authToken1 = getAuthToken(eperson1.getEmail(), "qwerty01");
+            getClient(authToken1).perform(get("/api/authz/resourcepolicies/" + idRef.get()))
+                    .andExpect(status().isOk())
+                    .andExpect(content().contentType(contentType))
+                    .andExpect(jsonPath("$._links.self.href",
+                            Matchers.containsString("/api/authz/resourcepolicies/" + idRef.get())));
+        } finally {
+            ResourcePolicyBuilder.delete(idRef.get());
+        }
     }
 }
