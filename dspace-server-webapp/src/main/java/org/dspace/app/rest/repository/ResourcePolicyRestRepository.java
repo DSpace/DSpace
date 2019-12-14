@@ -7,17 +7,27 @@
  */
 package org.dspace.app.rest.repository;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
+import javax.servlet.http.HttpServletRequest;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
+import org.dspace.app.rest.exception.MissingParameterException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
+import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.ResourcePolicyRest;
+import org.dspace.app.rest.projection.Projection;
+import org.dspace.app.rest.utils.DSpaceObjectUtils;
 import org.dspace.app.rest.utils.Utils;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.ResourcePolicyService;
+import org.dspace.content.DSpaceObject;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
@@ -51,6 +61,8 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
     @Autowired
     private GroupService groupService;
 
+    @Autowired
+    DSpaceObjectUtils dspaceObjectUtils;
 
     @Override
     @PreAuthorize("hasPermission(#id, 'resourcepolicy', 'READ')")
@@ -158,5 +170,79 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
             throw new RuntimeException(e.getMessage(), e);
         }
         return converter.toRestPage(resourcePolisies, pageable, total, utils.obtainProjection(true));
+    }
+}
+
+    @Override
+    protected ResourcePolicyRest createAndReturn(Context context) throws AuthorizeException {
+
+        String resourceUuidStr = getRequestService().getCurrentRequest().getServletRequest().getParameter("resource");
+        String epersonUuidStr = getRequestService().getCurrentRequest().getServletRequest().getParameter("eperson");
+        String groupUuidStr = getRequestService().getCurrentRequest().getServletRequest().getParameter("group");
+
+
+        if (resourceUuidStr == null) {
+            throw new MissingParameterException(" Missing parameter! ");
+        }
+        if ((epersonUuidStr == null && groupUuidStr == null) || (epersonUuidStr != null && groupUuidStr != null)) {
+            throw new MissingParameterException(" Only one parameter! ");
+        }
+
+        HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
+        ObjectMapper mapper = new ObjectMapper();
+        ResourcePolicyRest resourcePolicyRest = null;
+        ResourcePolicy resoursePolicy = null;
+
+        UUID resourceUuid = UUID.fromString(resourceUuidStr);
+
+        try {
+            resourcePolicyRest = mapper.readValue(req.getInputStream(), ResourcePolicyRest.class);
+        } catch (IOException excIO) {
+            throw new UnprocessableEntityException("error parsing the body ..." + excIO.getMessage());
+        }
+
+        try {
+            DSpaceObject dspaceObject = dspaceObjectUtils.findDSpaceObject(context, resourceUuid);
+            if (dspaceObject == null) {
+                throw new UnprocessableEntityException("DSpaceObject with this uuid: " + resourceUuid + " not found");
+            }
+            resoursePolicy = resourcePolicyService.create(context);
+            resoursePolicy.setdSpaceObject(dspaceObject);
+            resoursePolicy.setRpName(resourcePolicyRest.getName());
+            resoursePolicy.setRpDescription(resourcePolicyRest.getDescription());
+            resoursePolicy.setAction(Constants.getActionID(resourcePolicyRest.getAction()));
+            resoursePolicy.setStartDate(resourcePolicyRest.getStartDate());
+            resoursePolicy.setEndDate(resourcePolicyRest.getEndDate());
+        } catch (SQLException excSQL) {
+            throw new RuntimeException(excSQL.getMessage(), excSQL);
+        }
+
+        if (epersonUuidStr != null) {
+            try {
+                UUID epersonUuid = UUID.fromString(epersonUuidStr);
+                EPerson ePerson = epersonService.find(context, epersonUuid);
+                if (ePerson == null) {
+                    throw new UnprocessableEntityException("EPerson with this uuid: " + epersonUuid + " not found");
+                }
+                resoursePolicy.setEPerson(ePerson);
+                resourcePolicyService.update(context, resoursePolicy);
+            } catch (SQLException excSQL) {
+                throw new RuntimeException(excSQL.getMessage(), excSQL);
+            }
+            return converter.toRest(resoursePolicy, Projection.DEFAULT);
+        } else {
+            try {
+                UUID groupUuid = UUID.fromString(groupUuidStr);
+                Group group = groupService.find(context, groupUuid);
+                if (group == null) {
+                    throw new UnprocessableEntityException("Group with this uuid: " + groupUuid + " not found");
+                }
+                resoursePolicy.setGroup(group);
+                resourcePolicyService.update(context, resoursePolicy);
+            } catch (SQLException excSQL) {
+                throw new RuntimeException(excSQL.getMessage(), excSQL);
+            }
+            return converter.toRest(resoursePolicy, Projection.DEFAULT);
+        }
     }
 }
