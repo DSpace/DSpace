@@ -13,6 +13,7 @@ import org.springframework.web.servlet.ModelAndView;
 import org.ssu.entity.FacultyEntity;
 import org.ssu.entity.jooq.Faculty;
 import org.ssu.entity.response.ItemDepositorResponse;
+import org.ssu.entity.response.ItemResponse;
 import org.ssu.service.EpersonService;
 import org.ssu.service.ReportService;
 
@@ -25,6 +26,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Controller
 public class ReportController {
@@ -33,6 +35,7 @@ public class ReportController {
 
     @Resource
     private ReportService reportService;
+    private DateTimeFormatter format = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 
     @RequestMapping("/report")
     public ModelAndView homepage(ModelAndView model) {
@@ -61,10 +64,50 @@ public class ReportController {
     @ResponseBody
     public String getPersonList(@RequestParam("from") String from, @RequestParam("to") String to, HttpServletRequest request) throws SQLException, IOException {
         Context context = UIUtil.obtainContext(request);
-        DateTimeFormatter format = DateTimeFormatter.ofPattern("dd.MM.yyyy");
         LocalDate fromDate = LocalDate.parse(from, format);
         LocalDate toDate = LocalDate.parse(to, format);
         return new ObjectMapper().writeValueAsString(reportService.getUsersSubmissionCountBetweenDates(context, fromDate, toDate));
     }
 
+    @RequestMapping(value = "/report/itemUploadingReport", method = RequestMethod.GET)
+    public ModelAndView getUploadingStatisticsByDepositor(@RequestParam(value = "from", defaultValue = "01.01.2010") String from,
+                                                          @RequestParam(value = "to", defaultValue = "01.01.2100") String to,
+                                                          @RequestParam("faculty") Optional<String> faculty,
+                                                          @RequestParam("chair") Optional<String> chair,
+                                                          @RequestParam("person") Optional<String> person,
+                                                          HttpServletRequest request,
+                                                          ModelAndView model) throws SQLException, IOException {
+        Context context = UIUtil.obtainContext(request);
+        List<ItemResponse> itemsInSpeciality = new ArrayList<>();
+        LocalDate fromDate = LocalDate.parse(from, format);
+        LocalDate toDate = LocalDate.parse(to, format);
+
+
+        if(faculty.isPresent())
+            itemsInSpeciality = reportService.getUploadedItemsByFacultyName(context, faculty.get(), fromDate, toDate);
+
+        if(chair.isPresent())
+            itemsInSpeciality = reportService.getUploadedItemsByChairName(context, chair.get(), fromDate, toDate);
+
+        if(person.isPresent()) {
+            String name = person.get();
+            String email = name;
+            if(name.contains("(")) {
+                email = name.substring(name.indexOf('(') + 1, name.indexOf(')'));
+            }
+            itemsInSpeciality = reportService.getUploadedItemsByPersonEmail(context, email, fromDate, toDate);
+        }
+
+
+        List<String> itemLinks = itemsInSpeciality
+                .stream()
+                .sorted(Comparator.comparing(ItemResponse::getTitle))
+                .map(item -> String.format("<a href = \"%s\">%s</a>", item.getHandle(), item.getTitle()))
+                .collect(Collectors.toList());
+
+        model.setViewName("detailed-report");
+        model.addObject("data", itemLinks);
+        model.addObject("deposittor", Stream.of(request.getParameter("depositor").split("//")).reduce((a, b) -> b).orElse("--"));
+        return model;
+    }
 }

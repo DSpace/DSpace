@@ -12,6 +12,7 @@ import org.ssu.entity.EssuirEperson;
 import org.ssu.entity.response.DepositorDivision;
 import org.ssu.entity.response.DepositorSimpleUnit;
 import org.ssu.entity.response.ItemDepositorResponse;
+import org.ssu.entity.response.ItemResponse;
 
 import javax.annotation.Resource;
 import java.io.IOException;
@@ -61,45 +62,39 @@ public class ReportService {
                 .collect(Collectors.toList());
     }
 
-    public List<ItemDepositorResponse> getUsersSubmissionCountBetweenDates(Context context, LocalDate from, LocalDate to) throws SQLException, IOException {
+    private Seq<Item> getItemsBetweenDates(Context context, LocalDate from, LocalDate to) throws SQLException, IOException {
         Map<UUID, LocalDate> allDatesAvailable = essuirItemService.getAllDatesAvailable(context);
-        List<Pair<EssuirEperson, Long>> submissionsByEperson = Seq.seq(Lists.newArrayList(essuirItemService.findAll(context)))
-                .filter(submission -> isDateInRange.test(allDatesAvailable.getOrDefault(submission.getID(), LocalDate.MIN), Pair.of(from, to)))
+        return Seq.seq(Lists.newArrayList(essuirItemService.findAll(context)))
+                .filter(submission -> isDateInRange.test(allDatesAvailable.getOrDefault(submission.getID(), LocalDate.MIN), Pair.of(from, to)));
+    }
+    public List<ItemDepositorResponse> getUsersSubmissionCountBetweenDates(Context context, LocalDate from, LocalDate to) throws SQLException, IOException {
+        List<Pair<EssuirEperson, Long>> submissionsByEperson = getItemsBetweenDates(context, from, to)
                 .grouped(Item::getSubmitter, Collectors.counting())
                 .map(submission -> Pair.of(epersonService.extendEpersonInformation(submission.v1), submission.v2))
                 .toList();
         return collectStatistics(submissionsByEperson);
     }
 
-//    public List<Item> getUploadedItemsByFacultyName(String faculty, LocalDate from, LocalDate to) {
-//        List<Item> items = databaseService.fetchItemsInArchive();
-//
-//        return items
-//                .stream()
-//                .filter(item -> isDateInRange.test(item.getDateAvailable(), Pair.of(from, to)))
-//                .filter(item -> faculty.equals(item.getSubmitter().getChairEntity().getFacultyEntityName()))
-//                .collect(Collectors.toList());
-//    }
-//
-//    public List<Item> getUploadedItemsByChairName(String chair, LocalDate from, LocalDate to) {
-//        List<Item> items = databaseService.fetchItemsInArchive();
-//
-//        return items
-//                .stream()
-//                .filter(item -> isDateInRange.test(item.getDateAvailable(), Pair.of(from, to)))
-//                .filter(item -> chair.equals(item.getSubmitter().getChairEntity().getChairName()))
-//                .collect(Collectors.toList());
-//    }
-//
-//    public List<Item> getUploadedItemsByPersonEmail(String person, LocalDate from, LocalDate to) {
-//        List<Item> items = databaseService.fetchItemsInArchive();
-//
-//        return items
-//                .stream()
-//                .filter(item -> isDateInRange.test(item.getDateAvailable(), Pair.of(from, to)))
-//                .filter(item -> person.equals(item.getSubmitter().getEmail()))
-//                .collect(Collectors.toList());
-//    }
+    public List<ItemResponse> getUploadedItemsByFacultyName(Context context, String faculty, LocalDate from, LocalDate to) throws SQLException, IOException {
+        return getItemsBetweenDates(context, from, to)
+                .filter(item -> faculty.equals(epersonService.extendEpersonInformation(item.getSubmitter()).getChairEntity().getFacultyEntityName()))
+                .map(item -> new ItemResponse.Builder().withTitle(item.getName()).withHandle(item.getHandle()).build())
+                .collect(Collectors.toList());
+    }
+
+    public List<ItemResponse> getUploadedItemsByChairName(Context context, String chair, LocalDate from, LocalDate to) throws SQLException, IOException {
+        return getItemsBetweenDates(context, from, to)
+                .filter(item -> chair.equals(epersonService.extendEpersonInformation(item.getSubmitter()).getChairEntity().getName()))
+                .map(item -> new ItemResponse.Builder().withTitle(item.getName()).withHandle(item.getHandle()).build())
+                .collect(Collectors.toList());
+    }
+
+    public List<ItemResponse> getUploadedItemsByPersonEmail(Context context, String person, LocalDate from, LocalDate to) throws SQLException, IOException {
+        return getItemsBetweenDates(context, from, to)
+                .filter(item -> person.equals(item.getSubmitter().getEmail()))
+                .map(item -> new ItemResponse.Builder().withTitle(item.getName()).withHandle(item.getHandle()).build())
+                .collect(Collectors.toList());
+    }
 //
 //    public List<Item> getItemsInSpeciality(String pattern, LocalDate from, LocalDate to) {
 //        return specialityReportFetcher.getItemsInSpeciality(pattern, from, to);

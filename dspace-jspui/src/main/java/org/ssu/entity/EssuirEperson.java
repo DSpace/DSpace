@@ -26,7 +26,7 @@ public class EssuirEperson implements DepositorSimpleUnit {
 
     @Override
     public String getName() {
-        return getLastName() + " " + getFirstName();
+        return String.format("%s %s(%s)", getLastName(), getFirstName(), getEmail());
     }
 
     public String getLastName() {
