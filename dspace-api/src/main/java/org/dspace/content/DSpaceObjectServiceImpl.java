@@ -10,8 +10,10 @@ package org.dspace.content;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -27,6 +29,7 @@ import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.MetadataValueService;
+import org.dspace.content.service.RelationshipService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.handle.service.HandleService;
@@ -60,6 +63,8 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
     protected MetadataFieldService metadataFieldService;
     @Autowired(required = true)
     protected MetadataAuthorityService metadataAuthorityService;
+    @Autowired(required = true)
+    protected RelationshipService relationshipService;
 
     public DSpaceObjectServiceImpl() {
 
@@ -67,7 +72,7 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
 
     @Override
     public String getName(T dso) {
-        String value = getMetadataFirstValue(dso, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY);
+        String value = getMetadataFirstValue(dso, MetadataSchemaEnum.DC.getName(), "title", null, Item.ANY);
         return value == null ? "" : value;
     }
 
@@ -141,7 +146,7 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
     public List<MetadataValue> getMetadataByMetadataString(T dso, String mdString) {
         StringTokenizer dcf = new StringTokenizer(mdString, ".");
 
-        String[] tokens = { "", "", "" };
+        String[] tokens = {"", "", ""};
         int i = 0;
         while (dcf.hasMoreTokens()) {
             tokens[i] = dcf.nextToken().trim();
@@ -235,12 +240,22 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
         throws SQLException {
         boolean authorityControlled = metadataAuthorityService.isAuthorityControlled(metadataField);
         boolean authorityRequired = metadataAuthorityService.isAuthorityRequired(metadataField);
-
         // We will not verify that they are valid entries in the registry
         // until update() is called.
         for (int i = 0; i < values.size(); i++) {
 
+            if (authorities != null && authorities.size() >= i) {
+                if (StringUtils.startsWith(authorities.get(i), Constants.VIRTUAL_AUTHORITY_PREFIX)) {
+                    continue;
+                }
+            }
             MetadataValue metadataValue = metadataValueService.create(context, dso, metadataField);
+            //Set place to list length of all metadatavalues for the given schema.element.qualifier combination.
+            // Subtract one to adhere to the 0 as first element rule
+            metadataValue.setPlace(
+                this.getMetadata(dso, metadataField.getMetadataSchema().getName(), metadataField.getElement(),
+                                 metadataField.getQualifier(), Item.ANY).size() - 1);
+
             metadataValue.setLanguage(lang == null ? null : lang.trim());
 
             // Logic to set Authority and Confidence:
@@ -521,7 +536,7 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
     protected String[] getMDValueByField(String field) {
         StringTokenizer dcf = new StringTokenizer(field, ".");
 
-        String[] tokens = { "", "", "" };
+        String[] tokens = {"", "", ""};
         int i = 0;
         while (dcf.hasMoreTokens()) {
             tokens[i] = dcf.nextToken().trim();
@@ -543,11 +558,50 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
              */
             // A map created to store the latest place for each metadata field
             Map<MetadataField, Integer> fieldToLastPlace = new HashMap<>();
-            List<MetadataValue> metadataValues = dso.getMetadata();
+            List<MetadataValue> metadataValues = new LinkedList<>();
+            if (dso.getType() == Constants.ITEM) {
+                metadataValues = getMetadata(dso, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
+            } else {
+                metadataValues = dso.getMetadata();
+            }
+            //This inline sort function will sort the MetadataValues based on their place in ascending order
+            //If two places are the same then the MetadataValue instance will be placed before the
+            //RelationshipMetadataValue instance.
+            //This is done to ensure that the order is correct.
+            metadataValues.sort(new Comparator<MetadataValue>() {
+                public int compare(MetadataValue o1, MetadataValue o2) {
+                    int compare = o1.getPlace() - o2.getPlace();
+                    if (compare == 0) {
+                        if (o1 instanceof RelationshipMetadataValue) {
+                            return 1;
+                        } else if (o2 instanceof RelationshipMetadataValue) {
+                            return -1;
+                        }
+                    }
+                    return compare;
+                }
+            });
             for (MetadataValue metadataValue : metadataValues) {
                 //Retrieve & store the place for each metadata value
-                int mvPlace = getMetadataValuePlace(fieldToLastPlace, metadataValue);
-                metadataValue.setPlace(mvPlace);
+                if (StringUtils.startsWith(metadataValue.getAuthority(), Constants.VIRTUAL_AUTHORITY_PREFIX) &&
+                    ((RelationshipMetadataValue) metadataValue).isUseForPlace()) {
+                    int mvPlace = getMetadataValuePlace(fieldToLastPlace, metadataValue);
+                    metadataValue.setPlace(mvPlace);
+                    String authority = metadataValue.getAuthority();
+                    String relationshipId = StringUtils.split(authority, "::")[1];
+                    Relationship relationship = relationshipService.find(context, Integer.parseInt(relationshipId));
+                    if (relationship.getLeftItem() == (Item) dso) {
+                        relationship.setLeftPlace(mvPlace);
+                    } else {
+                        relationship.setRightPlace(mvPlace);
+                    }
+                    relationshipService.update(context, relationship);
+
+                } else if (!StringUtils.startsWith(metadataValue.getAuthority(),
+                                                   Constants.VIRTUAL_AUTHORITY_PREFIX)) {
+                    int mvPlace = getMetadataValuePlace(fieldToLastPlace, metadataValue);
+                    metadataValue.setPlace(mvPlace);
+                }
             }
         }
     }
@@ -557,7 +611,7 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
      *
      * @param fieldToLastPlace the map containing the latest place of each metadata field
      * @param metadataValue    the metadata value that needs to get a place
-     * @return The new place for the metadata valu
+     * @return The new place for the metadata value
      */
     protected int getMetadataValuePlace(Map<MetadataField, Integer> fieldToLastPlace, MetadataValue metadataValue) {
         MetadataField metadataField = metadataValue.getMetadataField();
@@ -573,23 +627,23 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
     protected String[] getMDValueByLegacyField(String field) {
         switch (field) {
             case "introductory_text":
-                return new String[] {MetadataSchema.DC_SCHEMA, "description", null};
+                return new String[] {MetadataSchemaEnum.DC.getName(), "description", null};
             case "short_description":
-                return new String[] {MetadataSchema.DC_SCHEMA, "description", "abstract"};
+                return new String[] {MetadataSchemaEnum.DC.getName(), "description", "abstract"};
             case "side_bar_text":
-                return new String[] {MetadataSchema.DC_SCHEMA, "description", "tableofcontents"};
+                return new String[] {MetadataSchemaEnum.DC.getName(), "description", "tableofcontents"};
             case "copyright_text":
-                return new String[] {MetadataSchema.DC_SCHEMA, "rights", null};
+                return new String[] {MetadataSchemaEnum.DC.getName(), "rights", null};
             case "name":
-                return new String[] {MetadataSchema.DC_SCHEMA, "title", null};
+                return new String[] {MetadataSchemaEnum.DC.getName(), "title", null};
             case "provenance_description":
-                return new String[] {MetadataSchema.DC_SCHEMA, "provenance", null};
+                return new String[] {MetadataSchemaEnum.DC.getName(), "provenance", null};
             case "license":
-                return new String[] {MetadataSchema.DC_SCHEMA, "rights", "license"};
+                return new String[] {MetadataSchemaEnum.DC.getName(), "rights", "license"};
             case "user_format_description":
-                return new String[] {MetadataSchema.DC_SCHEMA, "format", null};
+                return new String[] {MetadataSchemaEnum.DC.getName(), "format", null};
             case "source":
-                return new String[] {MetadataSchema.DC_SCHEMA, "source", null};
+                return new String[] {MetadataSchemaEnum.DC.getName(), "source", null};
             case "firstname":
                 return new String[] {"eperson", "firstname", null};
             case "lastname":

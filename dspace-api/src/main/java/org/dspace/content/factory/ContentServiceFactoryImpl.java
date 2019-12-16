@@ -10,6 +10,7 @@ package org.dspace.content.factory;
 import java.util.List;
 
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.RelationshipMetadataService;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.BundleService;
@@ -17,12 +18,16 @@ import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.DSpaceObjectLegacySupportService;
 import org.dspace.content.service.DSpaceObjectService;
+import org.dspace.content.service.EntityService;
+import org.dspace.content.service.EntityTypeService;
 import org.dspace.content.service.IndexableObjectService;
 import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.MetadataSchemaService;
 import org.dspace.content.service.MetadataValueService;
+import org.dspace.content.service.RelationshipService;
+import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.content.service.SiteService;
 import org.dspace.content.service.SupervisedItemService;
 import org.dspace.content.service.WorkspaceItemService;
@@ -68,6 +73,17 @@ public class ContentServiceFactoryImpl extends ContentServiceFactory {
     private SupervisedItemService supervisedItemService;
     @Autowired(required = true)
     private SiteService siteService;
+
+    @Autowired(required = true)
+    private RelationshipService relationshipService;
+    @Autowired(required = true)
+    private RelationshipTypeService relationshipTypeService;
+    @Autowired(required = true)
+    private RelationshipMetadataService relationshipMetadataService;
+    @Autowired(required = true)
+    private EntityTypeService entityTypeService;
+    @Autowired(required = true)
+    private EntityService entityService;
 
     @Override
     public List<IndexableObjectService> getIndexableObjectServices() {
@@ -149,4 +165,28 @@ public class ContentServiceFactoryImpl extends ContentServiceFactory {
         return siteService;
     }
 
+    @Override
+    public RelationshipTypeService getRelationshipTypeService() {
+        return relationshipTypeService;
+    }
+
+    @Override
+    public RelationshipService getRelationshipService() {
+        return relationshipService;
+    }
+
+    @Override
+    public EntityTypeService getEntityTypeService() {
+        return entityTypeService;
+    }
+
+    @Override
+    public EntityService getEntityService() {
+        return entityService;
+    }
+
+    @Override
+    public RelationshipMetadataService getRelationshipMetadataService() {
+        return relationshipMetadataService;
+    }
 }

@@ -273,6 +273,9 @@
     <field name="SolrIndexer.lastIndexed" type="date" indexed="true" stored="true" default="NOW" multiValued="false" omitNorms="true" />
     <field name="lastModified" type="date" indexed="true" stored="true" default="NOW" multiValued="false" omitNorms="true" />
 
+     <!-- Dynamic field used to store the relation metadata as a keywordFilter -->
+     <dynamicField name="relation.*" type="keywordFilter" indexed="true" stored="true" omitNorms="true" multiValued="true"/>
+
  	<!--Dynamic field used to store metadata for projection-->
     <dynamicField name="*_stored" type="dspaceMetadataProjection" indexed="false" stored="true" multiValued="true"/>
 
@@ -318,7 +321,6 @@
     <dynamicField name="*_tl"  type="long"    indexed="true" stored="true" docValues="true"/>
     <dynamicField name="*_tf"  type="float"   indexed="true" stored="true" docValues="true"/>
     <dynamicField name="*_td"  type="double"  indexed="true" stored="true" docValues="true"/>
-    <dynamicField name="*_tdt" type="date"    indexed="true" stored="true" docValues="true"/>
 
     <dynamicField name="*_pi"  type="pint"    indexed="true" stored="true"/>
 

@@ -139,13 +139,6 @@
         </step>
     </command>
     <command>
-        <name>index-discovery</name>
-        <description>Update Discovery Solr Search Index</description>
-        <step>
-            <class>org.dspace.discovery.IndexClient</class>
-        </step>
-    </command>
-    <command>
         <name>itemupdate</name>
         <description>Item update tool for altering metadata and bitstream content in items</description>
         <step>
@@ -371,6 +364,13 @@
         <description>Display the version of DSpace and other troubleshooting information</description>
         <step>
             <class>org.dspace.app.util.Version</class>
+        </step>
+    </command>
+    <command>
+        <name>initialize-entities</name>
+        <description>Initialize the entities with a provided xml</description>
+        <step>
+            <class>org.dspace.app.util.InitializeEntities</class>
         </step>
     </command>
 </commands>
