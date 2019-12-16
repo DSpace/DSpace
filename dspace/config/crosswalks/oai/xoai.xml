@@ -320,7 +320,7 @@
             </Definition>
         </Filter>
 
-        <!-- OpenAIRE4 filter for records returned by OAI-PMH. 
+        <!-- OpenAIRE4 filter for records returned by OAI-PMH.
              By default, return an Item record:
                 * If it is publicly accessible
                 * * OR it has been withdrawn (in order to display a tombstone record).
@@ -360,7 +360,7 @@
             </Definition>
         </Filter>
 
-        <!-- Default filter for records returned by OAI-PMH. 
+        <!-- Default filter for records returned by OAI-PMH.
              By default, return an Item record:
                 * If it is publicly accessible
                 * * OR it has been withdrawn (in order to display a tombstone record).
@@ -493,7 +493,7 @@
                 <string name="value">info:eu-repo/grantAgreement/</string>
             </Configuration>
         </CustomCondition>
-                
+
         <!-- This condition determines if an Item has a "relationship.type" -->
         <CustomCondition id="relationshipTypeExistsCondition">
             <Class>org.dspace.xoai.filter.DSpaceMetadataExistsFilter</Class>
@@ -501,7 +501,7 @@
                 <string name="field">relationship.type</string>
             </Configuration>
         </CustomCondition>
-        
+
         <!-- This condition determines if an Item has a "relationship.type" field
              specifying one of the valid DRIVER document types. -->
         <CustomCondition id="isPublicationEntityCondition">
