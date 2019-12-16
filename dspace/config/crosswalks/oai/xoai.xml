@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration indented="false" maxListIdentifiersSize="100" maxListRecordsSize="100"
-               maxListSetsSize="100" stylesheet="static/style.xsl"
-               xmlns="http://www.lyncode.com/XOAIConfiguration">
+    maxListSetsSize="100" stylesheet="static/style.xsl" xmlns="http://www.lyncode.com/XOAIConfiguration">
 
     <Contexts>
         <Context baseurl="request" name="Default Context">
@@ -85,7 +84,7 @@
             <!-- Date format, field prefixes, etc are ensured by the transformer -->
             <!--Transformer ref="openaire4Transformer"/-->
             <!-- OpenAIRE filter -->
-            <Filter ref="defaultFilter"/>
+            <Filter ref="openAIRE4Filter"/>
             <!-- Metadata Formats -->
             <Format ref="oaiopenaire"/>
             <Description>
@@ -321,6 +320,46 @@
             </Definition>
         </Filter>
 
+        <!-- OpenAIRE4 filter for records returned by OAI-PMH. 
+             By default, return an Item record:
+                * If it is publicly accessible
+                * * OR it has been withdrawn (in order to display a tombstone record).
+                * AND doesn't have a relationship.type field
+                * * OR the relationship.type is a Publication
+                * limiting the results only to Publications as expected
+             This filter is used by the default context ([oai]/request).
+        -->
+        <Filter id="openAIRE4Filter">
+            <Definition>
+                <And>
+                    <LeftCondition>
+                        <Or>
+                            <LeftCondition>
+                                <Custom ref="itemAccessCondition"/>
+                            </LeftCondition>
+                            <RightCondition>
+                                <Custom ref="itemWithdrawnCondition"/>
+                            </RightCondition>
+                        </Or>
+                    </LeftCondition>
+                    <RightCondition>
+                        <Or>
+                            <LeftCondition>
+                                <Not>
+                                    <Condition>
+                                        <Custom ref="relationshipTypeExistsCondition"/>
+                                    </Condition>
+                                </Not>
+                            </LeftCondition>
+                            <RightCondition>
+                                <Custom ref="isPublicationEntityCondition"/>
+                            </RightCondition>
+                        </Or>
+                    </RightCondition>
+                </And>
+            </Definition>
+        </Filter>
+
         <!-- Default filter for records returned by OAI-PMH. 
              By default, return an Item record:
                 * If it is publicly accessible
@@ -332,31 +371,31 @@
         -->
         <Filter id="defaultFilter">
             <Definition>
-                <And>            
-                	<LeftCondition>
-		                <Or>
-		                    <LeftCondition>
-		                        <Custom ref="itemAccessCondition"/>
-		                    </LeftCondition>
-		                    <RightCondition>
-		                        <Custom ref="itemWithdrawnCondition"/>
-		                    </RightCondition>
-		                </Or>
-	                </LeftCondition>
-	                <RightCondition>
-		                <Or>
-		                    <LeftCondition>
-		                        <Not>
-		                            <Condition>
-		                                <Custom ref="relationshipTypeExistsCondition"/>
-		                            </Condition>
-		                        </Not>
-		                    </LeftCondition>
-		                    <RightCondition>
-		                    	<Custom ref="isPublicationEntityCondition"/>
-		                    </RightCondition>
-		                </Or>
-	                </RightCondition>
+                <And>
+                    <LeftCondition>
+                        <Or>
+                            <LeftCondition>
+                                <Custom ref="itemAccessCondition"/>
+                            </LeftCondition>
+                            <RightCondition>
+                                <Custom ref="itemWithdrawnCondition"/>
+                            </RightCondition>
+                        </Or>
+                    </LeftCondition>
+                    <RightCondition>
+                        <Or>
+                            <LeftCondition>
+                                <Not>
+                                    <Condition>
+                                        <Custom ref="relationshipTypeExistsCondition"/>
+                                    </Condition>
+                                </Not>
+                            </LeftCondition>
+                            <RightCondition>
+                                <Custom ref="isPublicationEntityCondition"/>
+                            </RightCondition>
+                        </Or>
+                    </RightCondition>
                 </And>
             </Definition>
         </Filter>
@@ -476,8 +515,8 @@
                     <!-- and other alternative names for publications types -->
                 </list>
             </Configuration>
-        </CustomCondition>        
-        
+        </CustomCondition>
+
     </Filters>
 
     <Sets>
