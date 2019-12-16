@@ -26,6 +26,7 @@ import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.WorkspaceItemConverter;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
+import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.ErrorRest;
 import org.dspace.app.rest.model.WorkspaceItemRest;
 import org.dspace.app.rest.model.patch.Operation;
@@ -60,6 +61,8 @@ import org.dspace.submit.lookup.SubmissionItemDataLoader;
 import org.dspace.submit.lookup.SubmissionLookupOutputGenerator;
 import org.dspace.submit.lookup.SubmissionLookupService;
 import org.dspace.submit.util.ItemSubmissionLookupDTO;
+import org.dspace.util.UUIDUtils;
+import org.dspace.versioning.ItemCorrectionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -93,6 +96,9 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
 
     @Autowired
     ConfigurationService configurationService;
+
+    @Autowired
+    ItemCorrectionService itemCorrectionService;
 
     @Autowired
     WorkspaceItemConverter workspaceItemConverter;
@@ -159,7 +165,32 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
 
     @Override
     protected WorkspaceItemRest createAndReturn(Context context) throws SQLException, AuthorizeException {
-        WorkspaceItem source = submissionService.createWorkspaceItem(context, getRequestService().getCurrentRequest());
+        WorkspaceItem source;
+        String itemUUID = getRequestService().getCurrentRequest().getHttpServletRequest().getParameter("item");
+        String relationship = getRequestService().getCurrentRequest().getHttpServletRequest()
+                .getParameter("relationship");
+
+        if ((StringUtils.isNotBlank(itemUUID) && StringUtils.isNotBlank(relationship))
+                || StringUtils.isNotBlank(relationship)) {
+            try {
+                source = itemCorrectionService.createWorkspaceItemAndRelationshipByItem(context,
+                        getRequestService().getCurrentRequest(), UUIDUtils.fromString(itemUUID), relationship);
+            } catch (Exception e) {
+                throw new UnprocessableEntityException(e.getMessage());
+            }
+        } else if (StringUtils.isNotBlank(itemUUID)) {
+            try {
+                source = itemCorrectionService.createWorkspaceItemByItem(context,
+                        getRequestService().getCurrentRequest(), UUIDUtils.fromString(itemUUID));
+            } catch (Exception e) {
+                throw new UnprocessableEntityException(e.getMessage());
+            }
+        } else if (StringUtils.isNotBlank(relationship)) {
+            throw new UnprocessableEntityException("Cannot create a relationship without a given item");
+        } else {
+            source = submissionService.createWorkspaceItem(context, getRequestService().getCurrentRequest());
+        }
+
         return converter.toRest(source, Projection.DEFAULT);
     }
 
