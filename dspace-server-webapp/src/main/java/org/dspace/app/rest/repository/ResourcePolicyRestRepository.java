@@ -8,6 +8,7 @@
 package org.dspace.app.rest.repository;
 
 import java.io.IOException;
+
 import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
@@ -63,6 +64,7 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
 
     @Autowired
     DSpaceObjectUtils dspaceObjectUtils;
+
 
     @Override
     @PreAuthorize("hasPermission(#id, 'resourcepolicy', 'READ')")
@@ -171,7 +173,6 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
         }
         return converter.toRestPage(resourcePolisies, pageable, total, utils.obtainProjection(true));
     }
-}
 
     @Override
     protected ResourcePolicyRest createAndReturn(Context context) throws AuthorizeException {
@@ -182,23 +183,23 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
 
 
         if (resourceUuidStr == null) {
-            throw new MissingParameterException(" Missing parameter! ");
+            throw new MissingParameterException("Missing resource (uuid) parameter");
         }
         if ((epersonUuidStr == null && groupUuidStr == null) || (epersonUuidStr != null && groupUuidStr != null)) {
-            throw new MissingParameterException(" Only one parameter! ");
+            throw new MissingParameterException("Both eperson than group parameters supploed, only one allowed");
         }
 
         HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
         ObjectMapper mapper = new ObjectMapper();
         ResourcePolicyRest resourcePolicyRest = null;
-        ResourcePolicy resoursePolicy = null;
+        ResourcePolicy resourcePolicy = null;
 
         UUID resourceUuid = UUID.fromString(resourceUuidStr);
 
         try {
             resourcePolicyRest = mapper.readValue(req.getInputStream(), ResourcePolicyRest.class);
-        } catch (IOException excIO) {
-            throw new UnprocessableEntityException("error parsing the body ..." + excIO.getMessage());
+        } catch (IOException exIO) {
+            throw new UnprocessableEntityException("error parsing the body " + exIO.getMessage(), exIO);
         }
 
         try {
@@ -206,13 +207,14 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
             if (dspaceObject == null) {
                 throw new UnprocessableEntityException("DSpaceObject with this uuid: " + resourceUuid + " not found");
             }
-            resoursePolicy = resourcePolicyService.create(context);
-            resoursePolicy.setdSpaceObject(dspaceObject);
-            resoursePolicy.setRpName(resourcePolicyRest.getName());
-            resoursePolicy.setRpDescription(resourcePolicyRest.getDescription());
-            resoursePolicy.setAction(Constants.getActionID(resourcePolicyRest.getAction()));
-            resoursePolicy.setStartDate(resourcePolicyRest.getStartDate());
-            resoursePolicy.setEndDate(resourcePolicyRest.getEndDate());
+            resourcePolicy = resourcePolicyService.create(context);
+            resourcePolicy.setRpType(resourcePolicyRest.getPolicyType());
+            resourcePolicy.setdSpaceObject(dspaceObject);
+            resourcePolicy.setRpName(resourcePolicyRest.getName());
+            resourcePolicy.setRpDescription(resourcePolicyRest.getDescription());
+            resourcePolicy.setAction(Constants.getActionID(resourcePolicyRest.getAction()));
+            resourcePolicy.setStartDate(resourcePolicyRest.getStartDate());
+            resourcePolicy.setEndDate(resourcePolicyRest.getEndDate());
         } catch (SQLException excSQL) {
             throw new RuntimeException(excSQL.getMessage(), excSQL);
         }
@@ -222,27 +224,27 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
                 UUID epersonUuid = UUID.fromString(epersonUuidStr);
                 EPerson ePerson = epersonService.find(context, epersonUuid);
                 if (ePerson == null) {
-                    throw new UnprocessableEntityException("EPerson with this uuid: " + epersonUuid + " not found");
+                    throw new UnprocessableEntityException("EPerson with uuid: " + epersonUuid + " not found");
                 }
-                resoursePolicy.setEPerson(ePerson);
-                resourcePolicyService.update(context, resoursePolicy);
+                resourcePolicy.setEPerson(ePerson);
+                resourcePolicyService.update(context, resourcePolicy);
             } catch (SQLException excSQL) {
                 throw new RuntimeException(excSQL.getMessage(), excSQL);
             }
-            return converter.toRest(resoursePolicy, Projection.DEFAULT);
+            return converter.toRest(resourcePolicy, Projection.DEFAULT);
         } else {
             try {
                 UUID groupUuid = UUID.fromString(groupUuidStr);
                 Group group = groupService.find(context, groupUuid);
                 if (group == null) {
-                    throw new UnprocessableEntityException("Group with this uuid: " + groupUuid + " not found");
+                    throw new UnprocessableEntityException("Group with uuid: " + groupUuid + " not found");
                 }
-                resoursePolicy.setGroup(group);
-                resourcePolicyService.update(context, resoursePolicy);
+                resourcePolicy.setGroup(group);
+                resourcePolicyService.update(context, resourcePolicy);
             } catch (SQLException excSQL) {
                 throw new RuntimeException(excSQL.getMessage(), excSQL);
             }
-            return converter.toRest(resoursePolicy, Projection.DEFAULT);
+            return converter.toRest(resourcePolicy, Projection.DEFAULT);
         }
     }
 }

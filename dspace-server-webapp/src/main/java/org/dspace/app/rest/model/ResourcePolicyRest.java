@@ -13,6 +13,7 @@ import java.util.UUID;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.dspace.app.rest.RestResourceController;
 
 /**
@@ -70,8 +71,8 @@ public class ResourcePolicyRest extends BaseObjectRest<Integer> {
         this.endDate = endDate;
     }
 
-
     @Override
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     public String getType() {
         return NAME;
     }
