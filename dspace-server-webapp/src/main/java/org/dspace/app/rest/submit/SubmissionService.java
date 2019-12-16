@@ -92,7 +92,7 @@ public class SubmissionService {
     public WorkspaceItem createWorkspaceItem(Context context, Request request) throws SQLException, AuthorizeException {
         WorkspaceItem wsi = null;
         Collection collection = null;
-        String collectionUUID = request.getHttpServletRequest().getParameter("collection");
+        String collectionUUID = request.getHttpServletRequest().getParameter("owningCollection");
 
         if (StringUtils.isBlank(collectionUUID)) {
             collectionUUID = configurationService.getProperty("submission.default.collection");
