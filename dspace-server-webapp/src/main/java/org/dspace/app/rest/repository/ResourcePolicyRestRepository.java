@@ -38,6 +38,7 @@ import org.dspace.eperson.service.GroupService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
@@ -245,6 +246,21 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
                 throw new RuntimeException(excSQL.getMessage(), excSQL);
             }
             return converter.toRest(resourcePolicy, Projection.DEFAULT);
+        }
+    }
+
+    @Override
+    protected void delete(Context context, Integer id) throws AuthorizeException {
+        ResourcePolicy resourcePolicy = null;
+        try {
+            resourcePolicy = resourcePolicyService.find(context, id);
+            if (resourcePolicy == null) {
+                throw new ResourceNotFoundException(
+                        ResourcePolicyRest.CATEGORY + "." + ResourcePolicyRest.NAME + " with id: " + id + " not found");
+            }
+            resourcePolicyService.delete(context, resourcePolicy);
+        } catch (SQLException e) {
+            throw new RuntimeException("Unable to delete ResourcePolicy with id = " + id, e);
         }
     }
 }
