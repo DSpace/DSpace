@@ -351,9 +351,13 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
                 throw new ResourceNotFoundException("The request DSO with id: " + dsoId + " was not found");
             }
             for (RelationshipType relationshipType : relationshipTypeList) {
+                boolean isLeft = false;
+                if (relationshipType.getLeftwardType().equalsIgnoreCase(label)) {
+                    isLeft = true;
+                }
                 total += relationshipService.countByItemAndRelationshipType(context, item, relationshipType);
                 relationships.addAll(relationshipService.findByItemAndRelationshipType(context, item, relationshipType,
-                        pageable.getPageSize(), pageable.getOffset()));
+                        isLeft, pageable.getPageSize(), pageable.getOffset()));
             }
         } else {
             for (RelationshipType relationshipType : relationshipTypeList) {
