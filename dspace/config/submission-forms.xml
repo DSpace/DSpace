@@ -614,7 +614,7 @@
             <row>
                 <relation-field>
                     <relationship-type>isAuthorOfPublication</relationship-type>
-                    <search-configuration>openAIRECreatorConfiguration</search-configuration>
+                    <search-configuration>openAIRECreator</search-configuration>
                     <repeatable>true</repeatable>
                     <name-variants>true</name-variants>
                     <label>Author</label>
@@ -664,7 +664,7 @@
                 <field>
                     <dc-schema>dc</dc-schema>
                     <dc-element>relation</dc-element>
-                    <dc-qualifier>HasVersion</dc-qualifier>
+                    <dc-qualifier>hasversion</dc-qualifier>
                     <repeatable>false</repeatable>
                     <label>Editor Version</label>
                     <input-type>onebox</input-type>
@@ -675,8 +675,8 @@
             <row>
                 <field>
                     <dc-schema>dc</dc-schema>
-                    <dc-element>relation</dc-element>
-                    <dc-qualifier>References</dc-qualifier>
+                    <dc-element>dcterms</dc-element>
+                    <dc-qualifier>references</dc-qualifier>
                     <repeatable>false</repeatable>
                     <label>Related Dataset</label>
                     <input-type>onebox</input-type>
@@ -1032,7 +1032,7 @@
             <row>
                 <relation-field>
                     <relationship-type>isFundingAgencyOfProject</relationship-type>
-                    <search-configuration>openAIREFundingAgencyConfiguration</search-configuration>
+                    <search-configuration>openAIREFundingAgency</search-configuration>
                     <repeatable>false</repeatable>
                     <name-variants>false</name-variants>
                     <label>Funding Agency</label>

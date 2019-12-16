@@ -63,9 +63,9 @@
                 <entry key="project" value-ref="project"/>
                 <!-- OpenAIRE4 guidelines - search for a creator that can be a Person
                      or an OrgUnit -->
-                <entry key="openAIRECreatorConfiguration" value-ref="personOrOrganization"/>
+                <entry key="openAIRECreator" value-ref="personOrOrganization"/>
                 <!-- OpenAIRE4 guidelines - search for an OrgUnit that have a specific dc.type=FundingOrganization -->
-                <entry key="openAIREFundingAgencyConfiguration" value-ref="openAIREFundingAgency"/>
+                <entry key="openAIREFundingAgency" value-ref="openAIREFundingAgency"/>
             </map>
         </property>
         <property name="toIgnoreMetadataFields">
