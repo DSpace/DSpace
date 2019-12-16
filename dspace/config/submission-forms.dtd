@@ -5,7 +5,7 @@
 
  <!ELEMENT form-definitions (form)+ >
  <!ELEMENT form (row)+ >
- <!ELEMENT row (field)+ >
+ <!ELEMENT row (field|relation-field)+ >
  <!ATTLIST form name NMTOKEN #REQUIRED>
  
  <!ELEMENT field (dc-schema, dc-element, dc-qualifier?, language?, repeatable?, label, style?, type-bind?, input-type, hint, required?, regex?, vocabulary?, visibility?, readonly?) >
@@ -22,6 +22,7 @@
   
  <!ELEMENT hint (#PCDATA) >
  <!ELEMENT required (#PCDATA)>
+ <!ELEMENT name-variants (#PCDATA)>
  <!ELEMENT regex (#PCDATA) >
 
  <!ELEMENT form-value-pairs (value-pairs)* >
@@ -55,3 +56,9 @@
  <!ATTLIST language value-pairs-name CDATA  #IMPLIED>  
 
  <!ELEMENT readonly (#PCDATA) >
+
+<!ELEMENT relationship-type (#PCDATA) >
+<!ELEMENT search-configuration (#PCDATA) >
+<!ELEMENT filter (#PCDATA) >
+<!ELEMENT relation-field (relationship-type, search-configuration, filter?, repeatable?, name-variants?, label, type-bind?, hint, linked-metadata-field?, required?, visibility?)>
+<!ELEMENT linked-metadata-field (dc-schema, dc-element, dc-qualifier?, input-type)>

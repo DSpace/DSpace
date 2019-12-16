@@ -34,8 +34,6 @@ import java.util.TimeZone;
 import java.util.UUID;
 import java.util.Vector;
 
-import com.google.common.collect.ImmutableList;
-
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.collections4.Transformer;
@@ -107,6 +105,7 @@ import org.dspace.handle.service.HandleService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.storage.rdbms.DatabaseUtils;
 import org.dspace.util.MultiFormatDateParser;
+import org.dspace.util.SolrUtils;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.xmlworkflow.WorkflowConfigurationException;
 import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
@@ -473,7 +472,8 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             switch (type) {
                 case Constants.ITEM:
                     Iterator<Item> items = itemService.findAllUnfiltered(context);
-                    for (Item item : ImmutableList.copyOf(items)) {
+                    while (items.hasNext()) {
+                        Item item = items.next();
                         indexContent(context, item, force);
                         //To prevent memory issues, discard an object from the cache after processing
                         context.uncacheEntity(item);
@@ -529,7 +529,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             try {
                 getSolr().deleteByQuery(
                     "search.resourcetype:[" + Constants.ITEM + " TO " + Constants.COMMUNITY + "]" +
-                    " AND " +
+                    " OR " +
                     "search.resourcetype:[" + Constants.WORKSPACEITEM + " TO " + Constants.CLAIMEDTASK + "]");
             } catch (Exception e) {
                 throw new SearchServiceException(e.getMessage(), e);
@@ -560,7 +560,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 SolrQuery query = new SolrQuery();
                 // Query for all indexed Items, Collections and Communities,
                 // returning just their handle
-                query.setFields(HANDLE_FIELD);
+                query.setFields(HANDLE_FIELD, RESOURCE_UNIQUE_ID, RESOURCE_ID_FIELD, RESOURCE_TYPE_FIELD);
                 query.setQuery(RESOURCE_TYPE_FIELD + ":" + type);
                 QueryResponse rsp = getSolr().query(query, SolrRequest.METHOD.POST);
                 SolrDocumentList docs = rsp.getResults();
@@ -1056,7 +1056,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         doc.addField("archived", item.isArchived());
         doc.addField("withdrawn", item.isWithdrawn());
         doc.addField("discoverable", item.isDiscoverable());
-        doc.addField("lastModified", item.getLastModified());
+        doc.addField("lastModified", SolrUtils.getDateFormatter().format(item.getLastModified()));
 
         EPerson submitter = item.getSubmitter();
         if (submitter != null) {
@@ -1477,7 +1477,8 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                     if (type.equals(DiscoveryConfigurationParameters.TYPE_DATE)) {
                         Date date = MultiFormatDateParser.parse(value);
                         if (date != null) {
-                            doc.addField(field + "_dt", date);
+                            String stringDate = SolrUtils.getDateFormatter().format(date);
+                            doc.addField(field + "_dt", stringDate);
                         } else {
                             log.warn("Error while indexing sort date field, item: " + item
                                 .getHandle() + " metadata field: " + field + " date value: " + date);
@@ -1742,7 +1743,8 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                                         List<String> locations) {
         // want to be able to check when last updated
         // (not tokenized, but it is indexed)
-        doc.addField(LAST_INDEXED_FIELD, new Date());
+        doc.addField(LAST_INDEXED_FIELD,
+                SolrUtils.getDateFormatter().format(new Date()));
 
         // New fields to weaken the dependence on handles, and allow for faster
         // list display
@@ -2208,10 +2210,14 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     /**
      * Find the indexable object by type and UUID
      *
-     * @param context The relevant DSpace Context.
-     * @param doc     the solr document
+     * @param context
+     *            The relevant DSpace Context.
+     * @param doc
+     *            the solr document, the following fields MUST be present RESOURCE_TYPE_FIELD, RESOURCE_ID_FIELD and
+     *            HANDLE_FIELD
      * @return an IndexableObject
-     * @throws SQLException An exception that provides information on a database access error or other errors.
+     * @throws SQLException
+     *             An exception that provides information on a database access error or other errors.
      */
     protected IndexableObject findIndexableObject(Context context, SolrDocument doc) throws SQLException {
         Integer type = (Integer) doc.getFirstValue(RESOURCE_TYPE_FIELD);

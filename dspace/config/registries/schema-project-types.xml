@@ -1,0 +1,43 @@
+<dspace-dc-types>
+
+    <dspace-header>
+        <title>Project Types</title>
+    </dspace-header>
+
+    <dc-schema>
+        <name>project</name>
+        <namespace>https://schema.org/Project</namespace>
+    </dc-schema>
+
+    <!-- Project (https://schema.org/Project) has no own fields
+     ‘Project’ is still in ‘Pending’ https://pending.schema.org/
+     NO EQUIVALENT FOUND:
+        - project.identifier.status > NOT FOUND
+        - project.identifier.startdate > NOT FOUND
+        - project.identifier.expectedcompletion > NOT FOUND
+    -->
+	
+	<!--
+	  OpenAIRE4 Guidelines
+      4.2.2. Subproperty funderName (M)
+      Name of the funding provider (occurrence: 1). Mandatory if FundingReference is used. -->
+    <dc-type>
+        <schema>project</schema>
+        <element>funder</element>
+        <qualifier>name</qualifier>
+        <scope_note>Name of the funding provider.</scope_note>
+    </dc-type>
+	
+	<!--
+	  OpenAIRE4 Guidelines
+      4.2.3. Subproperty funderIdentifier (R)
+      Unique identifier of the funding entity (occurrence: 0-1). 
+    -->
+	<dc-type>
+        <schema>project</schema>
+        <element>funder</element>
+        <qualifier>identifier</qualifier>
+        <scope_note>Unique identifier of the funding entity.</scope_note>
+    </dc-type>
+
+</dspace-dc-types>

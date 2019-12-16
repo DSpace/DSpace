@@ -27,6 +27,7 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.authority.AuthorityValue;
 import org.dspace.authority.factory.AuthorityServiceFactory;
 import org.dspace.authority.service.AuthorityValueService;
@@ -34,6 +35,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
+import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.authority.Choices;
 import org.dspace.content.factory.ContentServiceFactory;
@@ -168,6 +170,9 @@ public class DSpaceCSV implements Serializable {
                 if ("collection".equals(element)) {
                     // Store the heading
                     headings.add(element);
+                }   else if ("rowName".equals(element)) {
+                    // Store the heading
+                    headings.add(element);
                 } else if ("action".equals(element)) { // Store the action
                     // Store the heading
                     headings.add(element);
@@ -198,20 +203,24 @@ public class DSpaceCSV implements Serializable {
                     }
 
                     // Check that the scheme exists
-                    MetadataSchema foundSchema = metadataSchemaService.find(c, metadataSchema);
-                    if (foundSchema == null) {
-                        throw new MetadataImportInvalidHeadingException(clean[0],
-                                                                        MetadataImportInvalidHeadingException.SCHEMA,
-                                                                        columnCounter);
-                    }
+                    if (!StringUtils.equals(metadataSchema, MetadataSchemaEnum.RELATION.getName())) {
+                        MetadataSchema foundSchema = metadataSchemaService.find(c, metadataSchema);
+                        if (foundSchema == null) {
+                            throw new MetadataImportInvalidHeadingException(clean[0],
+                                                                            MetadataImportInvalidHeadingException
+                                                                                .SCHEMA,
+                                                                            columnCounter);
+                        }
 
-                    // Check that the metadata element exists in the schema
-                    MetadataField foundField = metadataFieldService
-                        .findByElement(c, foundSchema, metadataElement, metadataQualifier);
-                    if (foundField == null) {
-                        throw new MetadataImportInvalidHeadingException(clean[0],
-                                                                        MetadataImportInvalidHeadingException.ELEMENT,
-                                                                        columnCounter);
+                        // Check that the metadata element exists in the schema
+                        MetadataField foundField = metadataFieldService
+                            .findByElement(c, foundSchema, metadataElement, metadataQualifier);
+                        if (foundField == null) {
+                            throw new MetadataImportInvalidHeadingException(clean[0],
+                                                                            MetadataImportInvalidHeadingException
+                                                                                .ELEMENT,
+                                                                            columnCounter);
+                        }
                     }
 
                     // Store the heading

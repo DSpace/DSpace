@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd" default-lazy-init="true">
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:util="http://www.springframework.org/schema/util"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd"
+    default-lazy-init="true">
 
 
     <!-- ******************** -->
@@ -49,6 +50,14 @@
     <bean class="org.dspace.content.SiteServiceImpl"/>
     <bean class="org.dspace.content.SupervisedItemServiceImpl"/>
     <bean class="org.dspace.content.WorkspaceItemServiceImpl"/>
+    <bean class="org.dspace.content.RelationshipServiceImpl"/>
+    <bean class="org.dspace.content.EntityTypeServiceImpl"/>
+    <bean class="org.dspace.content.EntityServiceImpl"/>
+    <bean class="org.dspace.content.RelationshipTypeServiceImpl"/>
+    <bean class="org.dspace.content.RelationshipMetadataServiceImpl"/>
+
+    <bean class="org.dspace.scripts.ProcessServiceImpl"/>
+    <bean class="org.dspace.scripts.ScriptServiceImpl"/>
 
     <bean class="org.dspace.content.authority.ChoiceAuthorityServiceImpl"/>
     <bean class="org.dspace.content.authority.MetadataAuthorityServiceImpl" lazy-init="true"/>
@@ -107,4 +116,6 @@
     <bean class="org.dspace.xmlworkflow.XmlWorkflowServiceImpl"/>
     <bean class="org.dspace.xmlworkflow.WorkflowRequirementsServiceImpl"/>
 
+
 </beans>
+

@@ -63,6 +63,29 @@ public interface ItemDAO extends DSpaceObjectLegacySupportDAO<Item> {
     public Iterator<Item> findArchivedByCollection(Context context, Collection collection, Integer limit,
                                                    Integer offset) throws SQLException;
 
+    /**
+     * Returns all the Items in an iterator that are archived and for which the given Collection is part of the Item's
+     * Collections but it is not the owning collection
+     * @param context       The relevant DSpace context
+     * @param collection    The collection to check on
+     * @param limit         The limit for the query
+     * @param offset        The offset for the query
+     * @return              An iterator containing the items for which the constraints hold true
+     * @throws SQLException If something goes wrong
+     */
+    public Iterator<Item> findArchivedByCollectionExcludingOwning(Context context, Collection collection, Integer limit,
+                                                                  Integer offset) throws SQLException;
+
+    /**
+     * Counts all the items that are archived and for which the given Collection is part of the Item's Collections
+     * but it is not the owning Collection
+     * @param context       The relevant DSpace context
+     * @param collection    The collection to check on
+     * @return              The total amount of items that fit the constraints
+     * @throws SQLException If something goes wrong
+     */
+    public int countArchivedByCollectionExcludingOwning(Context context, Collection collection) throws SQLException;
+
     public Iterator<Item> findAllByCollection(Context context, Collection collection) throws SQLException;
 
     public Iterator<Item> findAllByCollection(Context context, Collection collection, Integer limit, Integer offset)

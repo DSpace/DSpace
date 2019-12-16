@@ -89,11 +89,11 @@ public interface SolrLoggerService {
      * @throws SolrServerException Exception from the Solr server to the solrj Java client.
      */
     public void removeIndex(String query)
-            throws IOException, SolrServerException;
+        throws IOException, SolrServerException;
 
     public Map<String, List<String>> queryField(String query,
                                                 List oldFieldVals, String field)
-            throws IOException;
+        throws IOException;
 
     public void markRobotsByIP();
 
@@ -117,7 +117,7 @@ public interface SolrLoggerService {
         throws SolrServerException, IOException;
 
     public void query(String query, int max)
-            throws SolrServerException, IOException;
+        throws SolrServerException, IOException;
 
     /**
      * Query used to get values grouped by the given facet field.
@@ -137,7 +137,7 @@ public interface SolrLoggerService {
     public ObjectCount[] queryFacetField(String query,
                                          String filterQuery, String facetField, int max, boolean showTotal,
                                          List<String> facetQueries)
-            throws SolrServerException, IOException;
+        throws SolrServerException, IOException;
 
     /**
      * Query used to get values grouped by the date.
@@ -161,19 +161,19 @@ public interface SolrLoggerService {
     public ObjectCount[] queryFacetDate(String query,
                                         String filterQuery, int max, String dateType, String dateStart,
                                         String dateEnd, boolean showTotal, Context context)
-            throws SolrServerException, IOException;
+        throws SolrServerException, IOException;
 
     public Map<String, Integer> queryFacetQuery(String query,
                                                 String filterQuery, List<String> facetQueries)
-            throws SolrServerException, IOException;
+        throws SolrServerException, IOException;
 
     public ObjectCount queryTotal(String query, String filterQuery)
-            throws SolrServerException, IOException;
+        throws SolrServerException, IOException;
 
     public QueryResponse query(String query, String filterQuery,
                                String facetField, int rows, int max, String dateType, String dateStart,
                                String dateEnd, List<String> facetQueries, String sort, boolean ascending)
-            throws SolrServerException, IOException;
+        throws SolrServerException, IOException;
 
     /**
      * Returns in a filterQuery string all the ip addresses that should be ignored
