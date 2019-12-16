@@ -26,6 +26,7 @@ import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.WorkspaceItemConverter;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
+import org.dspace.app.rest.exception.RESTAuthorizationException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.ErrorRest;
 import org.dspace.app.rest.model.WorkspaceItemRest;
@@ -175,6 +176,8 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
             try {
                 source = itemCorrectionService.createWorkspaceItemAndRelationshipByItem(context,
                         getRequestService().getCurrentRequest(), UUIDUtils.fromString(itemUUID), relationship);
+            } catch (AuthorizeException e) {
+                throw new RESTAuthorizationException(e);
             } catch (Exception e) {
                 throw new UnprocessableEntityException(e.getMessage());
             }
