@@ -9,6 +9,7 @@ package org.dspace.app.rest;
 import static com.jayway.jsonpath.JsonPath.read;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.Matchers.is;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -842,5 +843,35 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         } finally {
             ResourcePolicyBuilder.delete(idRef.get());
         }
+    }
+
+    @Test
+    public void deleteOne() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson eperson1 = EPersonBuilder.createEPerson(context)
+                .withEmail("eperson1@mail.com")
+                .withPassword("qwerty01")
+                .build();
+
+        Community community = CommunityBuilder.createCommunity(context)
+                .withName("My community")
+                .build();
+
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+                .withDspaceObject(community)
+                .withUser(eperson1)
+                .withAction(Constants.ADMIN)
+                .build();
+
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(delete("/api/authz/resourcepolicies/" + resourcePolicy.getID()))
+                        .andExpect(status().is(204));
+
+        // Verify 404 after delete
+        getClient(token).perform(get("/api/authz/resourcepolicies/" + resourcePolicy.getID()))
+                        .andExpect(status().isNotFound());
     }
 }
