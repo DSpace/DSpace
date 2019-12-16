@@ -20,7 +20,7 @@
 
     <!-- Modifying and normalizing dc.language -->
     <xsl:template
-        match="/doc:metadata/doc:element[@name='dc']/doc:element[@name='language']/doc:element/doc:field/text()">
+        match="/doc:metadata/doc:element[@name='dc']/doc:element[@name='language']/doc:element[@name='iso']/doc:element/doc:field/text()">
 
         <xsl:variable name="lc_value">
             <xsl:call-template name="lowercase">
@@ -58,7 +58,9 @@
             <xsl:when test="$lc_value = 'tr'">
                 <xsl:text>tur</xsl:text>
             </xsl:when>
-            <xsl:otherwise/>
+            <xsl:otherwise>
+                <xsl:value-of select="."/>
+            </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
         
@@ -69,7 +71,7 @@
     <!-- Replacing -->
     <xsl:template
         match="/doc:metadata/doc:element[@name='dc']/doc:element[@name='rights']/doc:element/doc:field/text()">
-
+        <xsl:variable name="value" select="."/>
         <xsl:variable name="lc_value">
             <xsl:call-template name="lowercase">
                 <xsl:with-param name="value" select="."/>
