@@ -25,7 +25,6 @@ import org.dspace.handle.service.HandleService;
 import org.dspace.xmlworkflow.WorkflowConfigurationException;
 import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
 import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
-import org.dspace.xmlworkflow.state.Workflow;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -66,7 +65,7 @@ public class WorkflowDefinitionController {
     public List<CollectionRest> get(HttpServletRequest request, HttpServletResponse response,
                                     @PathVariable String workflowName) throws SQLException {
         try {
-            if (this.workflowByThisNameExists(workflowName)) {
+            if (xmlWorkflowFactory.workflowByThisNameExists(workflowName)) {
                 List<String> collectionsHandlesMappedToWorkflow
                         = xmlWorkflowFactory.getCollectionHandlesMappedToWorklow(workflowName);
                 List<CollectionRest> collectionResourcesFromHandles = new ArrayList<>();
@@ -85,21 +84,5 @@ public class WorkflowDefinitionController {
             // TODO ? Better exception?
             throw new RuntimeException(e.getMessage(), e);
         }
-    }
-
-    /**
-     * Check to see if there is a workflow configured by the given name
-     * @param workflowName  Name of a possible configured workflow
-     * @return  True if there is a workflow configured by this name, false otherwise
-     * @throws WorkflowConfigurationException
-     */
-    private boolean workflowByThisNameExists(String workflowName) throws WorkflowConfigurationException {
-        List<Workflow> allConfiguredWorkflows = xmlWorkflowFactory.getAllConfiguredWorkflows();
-        for (Workflow workflow: allConfiguredWorkflows) {
-            if (workflow.getID().equalsIgnoreCase(workflowName)) {
-                return true;
-            }
-        }
-        return false;
     }
 }

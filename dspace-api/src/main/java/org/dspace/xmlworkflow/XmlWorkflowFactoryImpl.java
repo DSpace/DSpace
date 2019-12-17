@@ -106,30 +106,25 @@ public class XmlWorkflowFactoryImpl implements XmlWorkflowFactory {
                 Node mainNode = input.getFirstChild();
                 Node workflowMap = XPathAPI.selectSingleNode(mainNode,
                         "//workflow-map/name-map[@" + xpathId + "='" + id + "']");
-                if (workflowMap == null) {
+                if (workflowMap == null && xpathId != "workflow") {
                     // No workflowId found by this id in cache, so retrieve & use the default workflow
                     if (cache.get("default") == null) {
-                        String workflowID = XPathAPI
-                                .selectSingleNode(mainNode, "//workflow-map/name-map[@" + xpathId + "='default']")
-                                .getAttributes().getNamedItem("workflow").getTextContent();
-                        if (workflowID == null) {
-                            throw new WorkflowConfigurationException(
-                                    "No workflow mapping is present for " + xpathId + ":" + id);
-                        }
-                        Node workflowNode = XPathAPI.selectSingleNode(mainNode, "//workflow[@id='" + workflowID + "']");
-                        Workflow wf = new Workflow(workflowID, getRoles(workflowNode));
-                        Step step = createFirstStep(wf, workflowNode);
-                        wf.setFirstStep(step);
-                        cache.put("default", wf);
-                        cache.put(id, wf);
-                        return wf;
+                        Workflow defaultWorkflow = this.getDefaultWorkflow();
+                        cache.put("default", defaultWorkflow);
+                        cache.put(id, defaultWorkflow);
+                        return defaultWorkflow;
                     } else {
                         return cache.get("default");
                     }
 
                 } else {
                     // We have a workflowID so retrieve it & resolve it to a workflow, also store it in our cache
-                    String workflowID = workflowMap.getAttributes().getNamedItem("workflow").getTextContent();
+                    String workflowID = "";
+                    if (xpathId.equalsIgnoreCase("workflow")) {
+                        workflowID = id;
+                    } else {
+                        workflowID = workflowMap.getAttributes().getNamedItem("workflow").getTextContent();
+                    }
 
                     Node workflowNode = XPathAPI.selectSingleNode(mainNode, "//workflow[@id='" + workflowID + "']");
                     Workflow wf = new Workflow(workflowID, getRoles(workflowNode));
@@ -145,6 +140,41 @@ public class XmlWorkflowFactoryImpl implements XmlWorkflowFactory {
             }
         } else {
             return cache.get(id);
+        }
+    }
+
+    /**
+     * Gets the default workflow, i.e. the workflow that is mapped to collection=default in workflow.xml
+     */
+    public Workflow getDefaultWorkflow() throws WorkflowConfigurationException {
+        //Initialize our cache if we have none
+        if (collectionHandleToWorkflowCache == null) {
+            collectionHandleToWorkflowCache = new HashMap<>();
+        }
+
+        //attempt to retrieve default workflow
+        if (collectionHandleToWorkflowCache.get("default") == null) {
+            try {
+                File xmlFile = new File(path);
+                Document input = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(xmlFile);
+                Node mainNode = input.getFirstChild();
+                String workflowID = XPathAPI
+                        .selectSingleNode(mainNode, "//workflow-map/name-map[@collection='default']")
+                        .getAttributes().getNamedItem("workflow").getTextContent();
+                if (workflowID == null) {
+                    throw new WorkflowConfigurationException("No default workflow mapping is present");
+                }
+                Node workflowNode = XPathAPI.selectSingleNode(mainNode, "//workflow[@id='" + workflowID + "']");
+                Workflow wf = new Workflow(workflowID, getRoles(workflowNode));
+                Step step = createFirstStep(wf, workflowNode);
+                wf.setFirstStep(step);
+                return wf;
+            } catch (Exception e) {
+                log.error("Error while retrieve default workflow", e);
+                throw new WorkflowConfigurationException("Error while retrieve default workflow");
+            }
+        } else {
+            return collectionHandleToWorkflowCache.get("default");
         }
     }
 
@@ -223,6 +253,42 @@ public class XmlWorkflowFactoryImpl implements XmlWorkflowFactory {
         } else {
             return new ArrayList<>();
         }
+    }
+
+    /**
+     * Check to see if there is a workflow configured by the given name
+     *
+     * @param workflowName Name of a possible configured workflow
+     * @return True if there is a workflow configured by this name, false otherwise
+     * @throws WorkflowConfigurationException
+     */
+    @Override
+    public boolean workflowByThisNameExists(String workflowName) throws WorkflowConfigurationException {
+        List<Workflow> allConfiguredWorkflows = this.getAllConfiguredWorkflows();
+        for (Workflow workflow : allConfiguredWorkflows) {
+            if (workflow.getID().equalsIgnoreCase(workflowName)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Check to see if the given workflowName is the workflow configured to be default for collections
+     * @param workflowName  Name of workflow to check if default
+     * @return  True if given workflowName is the workflow mapped to default for collections, otherwise false
+     * @throws WorkflowConfigurationException
+     */
+    public boolean isDefaultWorkflow(String workflowName) throws WorkflowConfigurationException {
+        try {
+            Workflow defaultWorkflow = this.getDefaultWorkflow();
+            return (defaultWorkflow.getID().equalsIgnoreCase(workflowName));
+        } catch (Exception e) {
+            log.error("Error while trying to check if " + workflowName + " is the default workflow");
+            throw new WorkflowConfigurationException("Error while trying to check if " + workflowName
+                    + " is the default workflow");
+        }
+
     }
 
     protected Step createFirstStep(Workflow workflow, Node workflowNode)
