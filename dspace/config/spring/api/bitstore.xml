@@ -7,14 +7,23 @@
         <property name="incoming" value="0"/>
         <property name="stores">
             <map>
-                <entry key="0" value-ref="localStore"/>
+                <!--<entry key="0" value-ref="localStore"/>-->
                 <!--<entry key="1" value-ref="s3Store"/>-->
+                <!--Note, the key must be 0 for the BitStore used in all the tests-->
+                <entry key="0" value-ref="hadoopStore"/>
             </map>
         </property>
     </bean>
 
     <bean name="localStore" class="org.dspace.storage.bitstore.DSBitStoreService" scope="singleton">
         <property name="baseDir" value="${assetstore.dir}"/>
+    </bean>
+
+    <bean name="hadoopStore" class="org.dspace.storage.bitstore.HadoopBitStoreService" scope="singleton">
+        <!--The base dir for asset storing-->
+        <property name="baseDir" value="${assetstore.dir}"/>
+        <!--The file system path for the hadoop filesystem. Connect to a hdfs cluster with a path like "hdfs://namenode:8020" and to a local file with a path like "file:///"-->
+        <property name="defaultFS" value="file:///"/>
     </bean>
 
     <bean name="s3Store" class="org.dspace.storage.bitstore.S3BitStoreService" scope="singleton">
