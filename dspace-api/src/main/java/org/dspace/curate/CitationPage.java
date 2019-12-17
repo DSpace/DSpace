@@ -110,8 +110,9 @@ public class CitationPage extends AbstractCurationTask {
             try {
             	
                 dBundle = bundleService.create(Curator.curationContext(), item ,CitationPage.DISPLAY_BUNDLE_NAME);
-                
-                clonePolicies(Curator.curationContext(), original, dBundle);
+                // don't inherit now otherwise they will be copied over the moved bitstreams
+                resourcePolicyService.removeAllPolicies(Curator.curationContext(), dBundle);
+                //clonePolicies(Curator.curationContext(), original, dBundle);
                 		
             } catch (AuthorizeException e) {
                 log.error("User not authroized to create bundle on item \""
@@ -142,6 +143,7 @@ public class CitationPage extends AbstractCurationTask {
             try {
                 pBundle = bundleService.create(Curator.curationContext(), item, CitationPage.PRESERVATION_BUNDLE_NAME);
                 // don't inherit now otherwise they will be copied over the moved bitstreams
+                resourcePolicyService.removeAllPolicies(Curator.curationContext(), pBundle);
                 //clonePolicies(Curator.curationContext(), original, pBundle);
             } catch (AuthorizeException e) {
                 log.error("User not authroized to create bundle on item \""
@@ -172,8 +174,9 @@ public class CitationPage extends AbstractCurationTask {
                         //Add the cited document to the approiate bundle
                         this.addCitedPageToItem(citedDocument, bundle, pBundle,
                                 dBundle, item, bitstream);
-                        // now set the policies of the preservation bundle
+                        // now set the policies of the preservation and display bundle
                         clonePolicies(Curator.curationContext(), original, pBundle);
+                        clonePolicies(Curator.curationContext(), original, dBundle);
                     } catch (Exception e) {
                         //Could be many things, but nothing that should be
                         //expected.
