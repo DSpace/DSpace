@@ -42,6 +42,16 @@
             <!-- datacite:relatedIdentifier -->
             <xsl:apply-templates
                 select="doc:metadata/doc:element[@name='dc']/doc:element[@name='identifier']" mode="datacite"/>
+            <!-- datacite:dates and embargo -->
+            <xsl:apply-templates
+                select="doc:metadata/doc:element[@name='dc']/doc:element[@name='date']" mode="datacite"/>
+            <!-- dc:language -->
+            <xsl:apply-templates
+                select="doc:metadata/doc:element[@name='dc']/doc:element[@name='language']/doc:element[@name='iso']"
+                mode="dc"/>
+            <!-- dc:publisher -->
+            <xsl:apply-templates
+                select="doc:metadata/doc:element[@name='dc']/doc:element[@name='publisher']" mode="dc"/>
             <!-- oaire:resourceType -->
             <xsl:apply-templates
                 select="doc:metadata/doc:element[@name='dc']/doc:element[@name='type']" mode="oaire"/>
@@ -59,13 +69,9 @@
             <!-- datacite:rights -->
             <xsl:apply-templates
                 select="doc:metadata/doc:element[@name='dc']/doc:element[@name='rights']" mode="datacite"/>
-            <!-- datacite:dates and embargo -->
+            <!-- datacite:subject -->
             <xsl:apply-templates
-                select="doc:metadata/doc:element[@name='dc']/doc:element[@name='date']" mode="datacite"/>
-            <!-- dc:language -->
-            <xsl:apply-templates
-                select="doc:metadata/doc:element[@name='dc']/doc:element[@name='language']/doc:element[@name='iso']"
-                mode="dc"/>
+                select="doc:metadata/doc:element[@name='dc']/doc:element[@name='subject']" mode="datacite"/>
             <!-- datacite:size -->
             <xsl:apply-templates
                 select="doc:metadata/doc:element[@name='bundles']/doc:element[@name='bundle']" mode="datacite"/>
@@ -500,21 +506,42 @@
 
    <!-- datacite:rights -->
    <!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/field_accessrights.html -->
-   <xsl:template match="doc:element[@name='dc']/doc:element[@name='rights']/doc:element" mode="datacite">
-      <xsl:variable name="rightsURI">
-         <xsl:call-template name="resolveRightsURI">
-            <xsl:with-param name="field" select="doc:field[@name='value']/text()" />
-         </xsl:call-template>
-      </xsl:variable>
-      <datacite:rights>
-         <xsl:if test="$rightsURI">
-            <xsl:attribute name="rightsURI">
-                <xsl:value-of select="$rightsURI" />
+    <xsl:template match="doc:element[@name='dc']/doc:element[@name='rights']/doc:element" mode="datacite">
+        <xsl:variable name="rightsURI">
+            <xsl:call-template name="resolveRightsURI">
+                <xsl:with-param name="field" select="doc:field[@name='value']/text()"/>
+            </xsl:call-template>
+        </xsl:variable>
+        <datacite:rights>
+            <xsl:if test="$rightsURI">
+                <xsl:attribute name="rightsURI">
+                <xsl:value-of select="$rightsURI"/>
             </xsl:attribute>
-         </xsl:if>
-         <xsl:value-of select="doc:field[@name='value']/text()" />
-      </datacite:rights>
-   </xsl:template>
+            </xsl:if>
+            <xsl:value-of select="doc:field[@name='value']/text()"/>
+        </datacite:rights>
+    </xsl:template>
+
+
+   <!-- datacite:subjects -->
+   <!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/field_subject.html -->
+    <xsl:template match="doc:element[@name='dc']/doc:element[@name='subject']" mode="datacite">
+        <datacite:subjects>
+            <xsl:for-each select="./doc:element">
+                <xsl:apply-templates select="." mode="datacite"/>
+            </xsl:for-each>
+        </datacite:subjects>
+    </xsl:template>
+
+   <!-- datacite:subject -->
+    <xsl:template match="doc:element[@name='dc']/doc:element[@name='subject']/doc:element" mode="datacite">
+        <xsl:for-each select="./doc:field[@name='value']">
+            <datacite:subject>
+                <xsl:value-of select="./text()"/>
+            </datacite:subject>
+        </xsl:for-each>
+    </xsl:template>
+
 
     <!-- datacite.dates -->
     <!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/field_embargoenddate.html -->
@@ -576,6 +603,15 @@
         <dc:language>
             <xsl:value-of select="./doc:element/doc:field[@name='value']"/>
         </dc:language>
+    </xsl:template>
+
+
+    <!-- dc:publisher -->
+    <!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/field_publisher.html -->
+    <xsl:template match="doc:element[@name='dc']/doc:element[@name='publisher']" mode="dc">
+        <dc:publisher>
+            <xsl:value-of select="./doc:element/doc:field[@name='value']"/>
+        </dc:publisher>
     </xsl:template>
 
 
@@ -939,9 +975,10 @@
    
     <!-- get the coar access rights globally -->
     <xsl:template name="getRightsURI">
-         <xsl:call-template name="resolveRightsURI">
-            <xsl:with-param name="field" select="//doc:element[@name='dc']/doc:element[@name='rights']/doc:element/doc:field[@name='value']/text()" />
-         </xsl:call-template>
+        <xsl:call-template name="resolveRightsURI">
+            <xsl:with-param name="field"
+                select="//doc:element[@name='dc']/doc:element[@name='rights']/doc:element/doc:field[@name='value']/text()"/>
+        </xsl:call-template>
     </xsl:template>
 
    <!-- get the issued date globally -->
@@ -1201,7 +1238,9 @@
             <xsl:when test="$lc_dc_type = 'software'">
                 <xsl:text>software</xsl:text>
             </xsl:when>
-            <xsl:otherwise>other research product</xsl:otherwise>
+            <xsl:otherwise>
+                other research product
+            </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
 
@@ -1403,19 +1442,19 @@
         </xsl:variable>
         <xsl:choose>
             <xsl:when test="$lc_value = 'open access'">
-               <xsl:text>http://purl.org/coar/access_right/c_abf2</xsl:text>
+                <xsl:text>http://purl.org/coar/access_right/c_abf2</xsl:text>
             </xsl:when>
             <xsl:when test="$lc_value = 'embargoed access'">
-               <xsl:text>http://purl.org/coar/access_right/c_f1cf</xsl:text>
+                <xsl:text>http://purl.org/coar/access_right/c_f1cf</xsl:text>
             </xsl:when>
             <xsl:when test="$lc_value = 'restricted access'">
-               <xsl:text>http://purl.org/coar/access_right/c_16ec</xsl:text>
+                <xsl:text>http://purl.org/coar/access_right/c_16ec</xsl:text>
             </xsl:when>
             <xsl:when test="$lc_value = 'metadata only access'">
-               <xsl:text>http://purl.org/coar/access_right/c_14cb</xsl:text>
+                <xsl:text>http://purl.org/coar/access_right/c_14cb</xsl:text>
             </xsl:when>
             <xsl:otherwise/>
-        </xsl:choose>   
+        </xsl:choose>
     </xsl:template>
 
    <!-- xml:language -->
