@@ -141,7 +141,8 @@ public class CitationPage extends AbstractCurationTask {
         } else {
             try {
                 pBundle = bundleService.create(Curator.curationContext(), item, CitationPage.PRESERVATION_BUNDLE_NAME);
-                clonePolicies(Curator.curationContext(), original, pBundle);
+                // don't inherit now otherwise they will be copied over the moved bitstreams
+                //clonePolicies(Curator.curationContext(), original, pBundle);
             } catch (AuthorizeException e) {
                 log.error("User not authroized to create bundle on item \""
                         + item.getName() + "\": " + e.getMessage());
@@ -171,7 +172,8 @@ public class CitationPage extends AbstractCurationTask {
                         //Add the cited document to the approiate bundle
                         this.addCitedPageToItem(citedDocument, bundle, pBundle,
                                 dBundle, item, bitstream);
-
+                        // now set the policies of the preservation bundle
+                        clonePolicies(Curator.curationContext(), original, pBundle);
                     } catch (Exception e) {
                         //Could be many things, but nothing that should be
                         //expected.
