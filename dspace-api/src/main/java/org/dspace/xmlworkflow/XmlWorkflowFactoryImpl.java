@@ -164,10 +164,10 @@ public class XmlWorkflowFactoryImpl implements XmlWorkflowFactory {
                 File xmlFile = new File(path);
                 Document input = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(xmlFile);
                 Node mainNode = input.getFirstChild();
-                NodeList allWorkflowNodes = XPathAPI.selectNodeList(mainNode, "//workflow-map/name-map");
+                NodeList allWorkflowNodes = XPathAPI.selectNodeList(mainNode, "//workflow");
                 for (int i = 0; i < allWorkflowNodes.getLength(); i++) {
                     String workflowID =
-                            allWorkflowNodes.item(i).getAttributes().getNamedItem("workflow").getTextContent();
+                            allWorkflowNodes.item(i).getAttributes().getNamedItem("id").getTextContent();
                     Node workflowNode = XPathAPI.selectSingleNode(mainNode, "//workflow[@id='" + workflowID + "']");
                     Workflow wf = new Workflow(workflowID, getRoles(workflowNode));
                     Step step = createFirstStep(wf, workflowNode);
@@ -218,7 +218,11 @@ public class XmlWorkflowFactoryImpl implements XmlWorkflowFactory {
                         "Error while getting collections mapped to this workflow: " + workflowName);
             }
         }
-        return workflowNameToCollectionHandlesCache.get(workflowName);
+        if (workflowNameToCollectionHandlesCache.get(workflowName) != null) {
+            return workflowNameToCollectionHandlesCache.get(workflowName);
+        } else {
+            return new ArrayList<>();
+        }
     }
 
     protected Step createFirstStep(Workflow workflow, Node workflowNode)

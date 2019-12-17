@@ -2,8 +2,8 @@
 <wf-config>
     <workflow-map>
         <name-map collection="default" workflow="default"/>
-        <name-map collection="123456789/4" workflow="selectSingleReviewer"/>
-        <name-map collection="123456789/5" workflow="scoreReview"/>
+        <!--<name-map collection="123456789/4" workflow="selectSingleReviewer"/>-->
+        <!--<name-map collection="123456789/5" workflow="scoreReview"/>-->
     </workflow-map>
 
     <!--Standard workflow step-->

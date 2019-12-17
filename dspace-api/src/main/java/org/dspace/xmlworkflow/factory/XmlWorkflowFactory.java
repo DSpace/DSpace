@@ -8,7 +8,6 @@
 package org.dspace.xmlworkflow.factory;
 
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.List;
 
 import org.dspace.content.Collection;
@@ -32,7 +31,7 @@ public interface XmlWorkflowFactory {
 
     public final String LEGACY_WORKFLOW_NAME = "default";
 
-    public Workflow getWorkflow(Collection collection) throws IOException, WorkflowConfigurationException, SQLException;
+    public Workflow getWorkflow(Collection collection) throws WorkflowConfigurationException;
 
     public Workflow getWorkflowByName(String workflowName) throws WorkflowConfigurationException;
 
