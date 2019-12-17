@@ -614,7 +614,7 @@
             <row>
                 <relation-field>
                     <relationship-type>isAuthorOfPublication</relationship-type>
-                    <search-configuration>openAIRECreator</search-configuration>
+                    <search-configuration>personOrOrganization</search-configuration>
                     <repeatable>true</repeatable>
                     <name-variants>true</name-variants>
                     <label>Author</label>
