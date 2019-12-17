@@ -26,11 +26,13 @@ import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.WorkspaceItemConverter;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
+import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.model.ErrorRest;
 import org.dspace.app.rest.model.WorkspaceItemRest;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.projection.Projection;
+import org.dspace.app.rest.repository.handler.service.UriListHandlerService;
 import org.dspace.app.rest.submit.AbstractRestProcessingStep;
 import org.dspace.app.rest.submit.SubmissionService;
 import org.dspace.app.rest.submit.UploadableStep;
@@ -108,6 +110,9 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
 
     @Autowired
     CollectionService collectionService;
+
+    @Autowired
+    private UriListHandlerService uriListHandlerService;
 
     private SubmissionConfigReader submissionConfigReader;
 
@@ -480,5 +485,15 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
         }
         return results;
     }
+
+    @Override
+    protected WorkspaceItemRest createAndReturn(Context context, List<String> stringList)
+        throws AuthorizeException, SQLException, RepositoryMethodNotImplementedException {
+
+        HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
+        WorkspaceItem workspaceItem = uriListHandlerService.handle(context, req, stringList, WorkspaceItem.class);
+        return converter.toRest(workspaceItem, Projection.DEFAULT);
+    }
+
 
 }
