@@ -20,6 +20,7 @@ import org.dspace.content.service.CommunityService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
@@ -41,7 +42,10 @@ public class CommunityLogoLinkRepository extends AbstractDSpaceRestRepository
         try {
             Context context = obtainContext();
             Community community = communityService.find(context, communityId);
-            if (community == null || community.getLogo() == null) {
+            if (community == null) {
+                throw new ResourceNotFoundException("No such community: " + communityId);
+            }
+            if (community.getLogo() == null) {
                 return null;
             }
             return converter.toRest(community.getLogo(), projection);

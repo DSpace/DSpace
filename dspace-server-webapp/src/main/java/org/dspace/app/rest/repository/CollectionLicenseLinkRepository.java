@@ -22,6 +22,7 @@ import org.dspace.core.Context;
 import org.dspace.core.service.LicenseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
@@ -49,7 +50,7 @@ public class CollectionLicenseLinkRepository extends AbstractDSpaceRestRepositor
             Context context = obtainContext();
             Collection collection = collectionService.find(context, collectionId);
             if (collection == null) {
-                return null;
+                throw new ResourceNotFoundException("No such collection: " + collectionId);
             }
             LicenseRest licenseRest = new LicenseRest();
             String text = collection.getLicenseCollection();

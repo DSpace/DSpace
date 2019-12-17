@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
@@ -49,7 +50,7 @@ public class BundleBitstreamLinkRepository extends AbstractDSpaceRestRepository
             Context context = obtainContext();
             Bundle bundle = bundleService.find(context, bundleId);
             if (bundle == null) {
-                return null;
+                throw new ResourceNotFoundException("No such bundle: " + bundleId);
             }
             Pageable pageable = optionalPageable != null ? optionalPageable : new PageRequest(0, 20);
             Page<Bitstream> page = utils.getPage(bundle.getBitstreams(), pageable);
