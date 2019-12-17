@@ -20,6 +20,7 @@ import org.dspace.content.service.BitstreamService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
@@ -41,7 +42,10 @@ public class BitstreamFormatLinkRepository extends AbstractDSpaceRestRepository
         try {
             Context context = obtainContext();
             Bitstream bitstream = bitstreamService.find(context, bitstreamId);
-            if (bitstream == null || bitstream.getFormat(context) == null) {
+            if (bitstream == null) {
+                throw new ResourceNotFoundException("No such bitstream: " + bitstreamId);
+            }
+            if (bitstream.getFormat(context) == null) {
                 return null;
             }
             return converter.toRest(bitstream.getFormat(context), projection);

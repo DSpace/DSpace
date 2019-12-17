@@ -24,6 +24,7 @@ import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
@@ -49,7 +50,7 @@ public class ItemRelationshipLinkRepository extends AbstractDSpaceRestRepository
             Context context = obtainContext();
             Item item = itemService.find(context, itemId);
             if (item == null) {
-                return null;
+                throw new ResourceNotFoundException("No such item: " + itemId);
             }
             int total = relationshipService.countByItem(context, item);
             Pageable pageable = utils.getPageable(optionalPageable);

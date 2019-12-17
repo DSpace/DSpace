@@ -20,6 +20,7 @@ import org.dspace.content.service.BundleService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
@@ -41,7 +42,10 @@ public class BundlePrimaryBitstreamLinkRepository extends AbstractDSpaceRestRepo
         try {
             Context context = obtainContext();
             Bundle bundle = bundleService.find(context, bundleId);
-            if (bundle == null || bundle.getPrimaryBitstream() == null) {
+            if (bundle == null) {
+                throw new ResourceNotFoundException("No such bundle: " + bundleId);
+            }
+            if (bundle.getPrimaryBitstream() == null) {
                 return null;
             }
             return converter.toRest(bundle.getPrimaryBitstream(), projection);
