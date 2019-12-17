@@ -61,6 +61,10 @@
                 <entry key="publicationVolume" value-ref="publicationVolume"/>
                 <entry key="periodical" value-ref="periodical"/>
                 <entry key="project" value-ref="project"/>
+                <!-- search for an entity that can be a Person or an OrgUnit -->
+                <entry key="personOrOrganization" value-ref="personOrOrganization"/>
+                <!-- OpenAIRE4 guidelines - search for an OrgUnit that have a specific dc.type=FundingOrganization -->
+                <entry key="openAIREFundingAgency" value-ref="openAIREFundingAgency"/>
             </map>
         </property>
         <property name="toIgnoreMetadataFields">
@@ -950,6 +954,130 @@
         <property name="spellCheckEnabled" value="true"/>
     </bean>
 
+    <bean id="personOrOrganization" class="org.dspace.discovery.configuration.DiscoveryConfiguration"
+          scope="prototype">
+        <property name="id" value="personOrOrganization"/>
+        <property name="indexAlways" value="true"/>
+        <!--Which sidebar facets are to be displayed-->
+        <property name="sidebarFacets">
+            <list>
+                <ref bean="searchFilterOrganizationAddressCountry"/>
+                <ref bean="searchFilterJobtitle"/>
+                <ref bean="searchFilterEntityType"/>
+            </list>
+        </property>
+        <!--The search filters which can be used on the discovery search page-->
+        <property name="searchFilters">
+            <list>
+                <ref bean="searchFilterEntityType"/>
+                <ref bean="searchFilterOrganizationLegalName"/>
+                <ref bean="searchFilterOrganizationAddressCountry"/>
+                <ref bean="searchFilterOrganizationAddressLocality"/>
+                <ref bean="searchFilterOrganizationFoundingDate"/>
+                <ref bean="searchFilterFamilyName"/>
+                <ref bean="searchFilterGivenName"/>
+                <ref bean="searchFilterJobtitle"/>
+                <ref bean="searchFilterIsPersonOfOrgUnitRelation"/>
+                <ref bean="searchFilterIsProjectOfOrgUnitRelation"/>
+                <ref bean="searchFilterIsPublicationOfOrgUnitRelation"/>
+                <ref bean="searchFilterIsOrgUnitOfPersonRelation"/>
+                <ref bean="searchFilterIsProjectOfPersonRelation"/>
+                <ref bean="searchFilterIsPublicationOfAuthorRelation"/>
+            </list>
+        </property>
+        <!--The sort filters for the discovery search-->
+        <property name="searchSortConfiguration">
+            <bean class="org.dspace.discovery.configuration.DiscoverySortConfiguration">
+                <property name="defaultSort" ref="sortEntityType"/>
+                <!--DefaultSortOrder can either be desc or asc (desc is default)-->
+                <property name="defaultSortOrder" value="desc"/>
+                <property name="sortFields">
+                    <list>
+                        <ref bean="sortEntityType"/>
+                        <ref bean="sortOrganizationLegalName"/>
+                        <ref bean="sortOrganizationAddressCountry"/>
+                        <ref bean="sortOrganizationAddressLocality"/>
+                        <ref bean="sortOrganizationFoundingDate"/>
+                        <ref bean="sortDateAccessioned"/>
+                        <ref bean="sortFamilyName"/>
+                        <ref bean="sortGivenName"/>
+                        <ref bean="sortBirthDate"/>
+                        <ref bean="sortDateAccessioned"/>
+                    </list>
+                </property>
+            </bean>
+        </property>
+        <!--Any default filter queries, these filter queries will be used for all
+            queries done by discovery for this configuration -->
+        <property name="defaultFilterQueries">
+            <list>
+                <!--Only find items, and orgunits or persons-->
+                <value>search.resourcetype:2 AND (entityType_keyword:OrgUnit OR entityType_keyword:Person)</value>
+            </list>
+        </property>
+
+        <!--Default result per page  -->
+        <property name="defaultRpp" value="10"/>
+        <!-- When true a "did you mean" example will be displayed, value can be true or false -->
+        <property name="spellCheckEnabled" value="true"/>
+    </bean>
+
+    <bean id="openAIREFundingAgency" class="org.dspace.discovery.configuration.DiscoveryConfiguration"
+          scope="prototype">
+        <property name="id" value="fundingAgency"/>
+        <property name="indexAlways" value="true"/>
+        <!--Which sidebar facets are to be displayed-->
+        <property name="sidebarFacets">
+            <list>
+                <ref bean="searchFilterOrganizationAddressCountry"/>
+                <ref bean="searchFilterOrganizationAddressLocality"/>
+                <ref bean="searchFilterOrganizationFoundingDate"/>
+            </list>
+        </property>
+        <!--The search filters which can be used on the discovery search page-->
+        <property name="searchFilters">
+            <list>
+                <ref bean="searchFilterOrganizationLegalName"/>
+                <ref bean="searchFilterOrganizationAddressCountry"/>
+                <ref bean="searchFilterOrganizationAddressLocality"/>
+                <ref bean="searchFilterOrganizationFoundingDate"/>
+                <ref bean="searchFilterIsPersonOfOrgUnitRelation"/>
+                <ref bean="searchFilterIsProjectOfOrgUnitRelation"/>
+                <ref bean="searchFilterIsPublicationOfOrgUnitRelation"/>
+                <ref bean="searchFilterIsProjectOfFundingAgencyRelation"/>
+            </list>
+        </property>
+        <!--The sort filters for the discovery search-->
+        <property name="searchSortConfiguration">
+            <bean class="org.dspace.discovery.configuration.DiscoverySortConfiguration">
+                <!--<property name="defaultSort" ref="sortDateIssued"/>-->
+                <!--DefaultSortOrder can either be desc or asc (desc is default)-->
+                <property name="defaultSortOrder" value="desc"/>
+                <property name="sortFields">
+                    <list>
+                        <ref bean="sortOrganizationLegalName"/>
+                        <ref bean="sortOrganizationAddressCountry"/>
+                        <ref bean="sortOrganizationAddressLocality"/>
+                        <ref bean="sortOrganizationFoundingDate"/>
+                        <ref bean="sortDateAccessioned"/>
+                    </list>
+                </property>
+            </bean>
+        </property>
+        <!--Any default filter queries, these filter queries will be used for all
+            queries done by discovery for this configuration -->
+        <property name="defaultFilterQueries">
+            <list>
+                <!--Only find items that have a entityType=OrgUnit and a dc.type=FundingOrganization -->
+                <value>search.resourcetype:2 AND entityType_keyword:OrgUnit AND dc.type:FundingOrganization</value>
+            </list>
+        </property>
+        <!--Default result per page  -->
+        <property name="defaultRpp" value="10"/>
+        <!-- When true a "did you mean" example will be displayed, value can be true or false -->
+        <property name="spellCheckEnabled" value="true"/>
+    </bean>
+
 
     <!--TagCloud configuration bean for homepage discovery configuration-->
     <bean id="homepageTagCloudFacetConfiguration" class="org.dspace.discovery.configuration.TagCloudFacetConfiguration">
@@ -1612,6 +1740,50 @@
         <property name="pageSize" value="10"/>
     </bean>
 
+    <bean id="searchFilterIsContributorOfPublicationRelation" class="org.dspace.discovery.configuration.DiscoverySearchFilter">
+        <property name="indexFieldName" value="isContributorOfPublication"/>
+        <property name="metadataFields">
+            <list>
+                <value>relation.isContributorOfPublication</value>
+            </list>
+        </property>
+        <property name="isOpenByDefault" value="false"/>
+        <property name="pageSize" value="10"/>
+    </bean>
+
+    <bean id="searchFilterIsPublicationOfContributorRelation" class="org.dspace.discovery.configuration.DiscoverySearchFilter">
+        <property name="indexFieldName" value="isPublicationOfContributor"/>
+        <property name="metadataFields">
+            <list>
+                <value>relation.isPublicationOfContributor</value>
+            </list>
+        </property>
+        <property name="isOpenByDefault" value="false"/>
+        <property name="pageSize" value="10"/>
+    </bean>
+
+    <bean id="searchFilterIsFundingAgencyOfProjectRelation" class="org.dspace.discovery.configuration.DiscoverySearchFilter">
+        <property name="indexFieldName" value="isFundingAgencyOfProject"/>
+        <property name="metadataFields">
+            <list>
+                <value>relation.isFundingAgencyOfProject</value>
+            </list>
+        </property>
+        <property name="isOpenByDefault" value="false"/>
+        <property name="pageSize" value="10"/>
+    </bean>
+
+    <bean id="searchFilterIsProjectOfFundingAgencyRelation" class="org.dspace.discovery.configuration.DiscoverySearchFilter">
+        <property name="indexFieldName" value="isProjectOfFundingAgency"/>
+        <property name="metadataFields">
+            <list>
+                <value>relation.isProjectOfFundingAgency</value>
+            </list>
+        </property>
+        <property name="isOpenByDefault" value="false"/>
+        <property name="pageSize" value="10"/>
+    </bean>
+
     <!--Sort properties-->
     <bean id="sortTitle" class="org.dspace.discovery.configuration.DiscoverySortFieldConfiguration">
         <property name="metadataField" value="dc.title"/>
@@ -1662,6 +1834,10 @@
 
     <bean id="sortPublicationVolumeNumber" class="org.dspace.discovery.configuration.DiscoverySortFieldConfiguration">
         <property name="metadataField" value="publicationvolume.volumeNumber"/>
+    </bean>
+
+    <bean id="sortEntityType" class="org.dspace.discovery.configuration.DiscoverySortFieldConfiguration">
+        <property name="metadataField" value="relationship.type"/>
     </bean>
 
 </beans>
