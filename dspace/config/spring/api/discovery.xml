@@ -61,9 +61,8 @@
                 <entry key="publicationVolume" value-ref="publicationVolume"/>
                 <entry key="periodical" value-ref="periodical"/>
                 <entry key="project" value-ref="project"/>
+                <!-- search for an entity that can be a Person or an OrgUnit -->
                 <entry key="personOrOrganization" value-ref="personOrOrganization"/>
-                <!-- OpenAIRE4 guidelines - search for a creator that can be a Person
-                     or an OrgUnit -->
                 <!-- OpenAIRE4 guidelines - search for an OrgUnit that have a specific dc.type=FundingOrganization -->
                 <entry key="openAIREFundingAgency" value-ref="openAIREFundingAgency"/>
             </map>
