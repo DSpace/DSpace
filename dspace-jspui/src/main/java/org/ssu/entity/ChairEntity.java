@@ -21,7 +21,7 @@ public class ChairEntity implements DepositorDivision {
 
     @Column(name = "chair_name")
     @JsonProperty("name")
-    private String chairName;
+    private String chairName = "";
 
     @OneToOne
     @JoinColumn(name = "faculty_id")

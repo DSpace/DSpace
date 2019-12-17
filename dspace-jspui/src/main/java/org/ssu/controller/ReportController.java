@@ -60,6 +60,12 @@ public class ReportController {
         return model;
     }
 
+    @RequestMapping(value = "/report/speciality", method = RequestMethod.GET)
+    public ModelAndView getSpecialityStatistics(ModelAndView model, HttpServletRequest request, HttpServletResponse response) {
+        model.setViewName("report-speciality");
+        return model;
+    }
+
     @RequestMapping(value = "/report/person", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
     @ResponseBody
     public String getPersonList(@RequestParam("from") String from, @RequestParam("to") String to, HttpServletRequest request) throws SQLException, IOException {
@@ -67,6 +73,16 @@ public class ReportController {
         LocalDate fromDate = LocalDate.parse(from, format);
         LocalDate toDate = LocalDate.parse(to, format);
         return new ObjectMapper().writeValueAsString(reportService.getUsersSubmissionCountBetweenDates(context, fromDate, toDate));
+    }
+
+    @RequestMapping(value = "/report/speciality-data", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
+    @ResponseBody
+    public String getSpecialityStatisticsData(@RequestParam("from") String from, @RequestParam("to") String to, HttpServletRequest request) throws IOException, SQLException {
+        Context context = UIUtil.obtainContext(request);
+        DateTimeFormatter format = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+        LocalDate fromDate = LocalDate.parse(from, format);
+        LocalDate toDate = LocalDate.parse(to, format);
+        return new ObjectMapper().writeValueAsString(reportService.getSpecialitySubmissionCountBetweenDates(context, fromDate, toDate));
     }
 
     @RequestMapping(value = "/report/itemUploadingReport", method = RequestMethod.GET)

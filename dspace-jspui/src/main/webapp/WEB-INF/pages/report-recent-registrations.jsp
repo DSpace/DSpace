@@ -44,7 +44,7 @@
                 <td class="evenRowOddCol">${user.lastName} ${user.firstName}</td>
                 <td class="evenRowOddCol">${user.email}</td>
                 <td class="evenRowOddCol">${user.chairEntity.facultyEntity.name}</td>
-                <td class="evenRowOddCol">${user.chairEntity.chairName}</td>
+                <td class="evenRowOddCol">${user.chairEntity.name}</td>
             </tr>
 
         </c:forEach>

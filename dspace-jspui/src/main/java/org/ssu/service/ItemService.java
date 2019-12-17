@@ -161,4 +161,8 @@ public class ItemService {
                 .build();
     }
 
+    public Map<UUID, String> fetchMastersAndBachelorsPapers() {
+        return metadatavalueRepository.selectMetadataByFieldId(133);
+    }
+
 }

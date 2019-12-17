@@ -6,11 +6,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.hp.hpl.jena.sparql.function.library.print;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.ssu.entity.response.DepositorSimpleUnit;
 
 import javax.persistence.*;
 
 @Entity
-public class Speciality {
+public class Speciality  implements DepositorSimpleUnit {
     @Id
     @Column(name = "id")
     @JsonProperty("id")

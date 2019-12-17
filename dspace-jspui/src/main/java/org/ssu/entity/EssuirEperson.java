@@ -8,7 +8,7 @@ import javax.persistence.Column;
 public class EssuirEperson implements DepositorSimpleUnit {
     private EPerson ePerson;
     private String position;
-    private ChairEntity chairEntity;
+    private ChairEntity chairEntity = new ChairEntity();
 
     private EssuirEperson(Builder builder) {
         ePerson = builder.ePerson;

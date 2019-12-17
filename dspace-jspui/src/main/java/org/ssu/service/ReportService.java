@@ -9,6 +9,7 @@ import org.jooq.lambda.Seq;
 import org.springframework.stereotype.Service;
 import org.ssu.entity.ChairEntity;
 import org.ssu.entity.EssuirEperson;
+import org.ssu.entity.jooq.Faculty;
 import org.ssu.entity.response.DepositorDivision;
 import org.ssu.entity.response.DepositorSimpleUnit;
 import org.ssu.entity.response.ItemDepositorResponse;
@@ -33,6 +34,8 @@ public class ReportService {
     private ItemService essuirItemService;
     @Resource
     private EpersonService epersonService;
+    @Resource
+    private SpecialityReportFetcher specialityReportFetcher;
 
     private BiPredicate<LocalDate, Pair<LocalDate, LocalDate>> isDateInRange = (date, range) -> date.isAfter(range.getLeft().minusDays(1)) && date.isBefore(range.getRight().plusDays(1));
 
@@ -104,7 +107,7 @@ public class ReportService {
 //        return specialityReportFetcher.getBachelorsWithoutSpeciality();
 //    }
 //
-//    public List<Faculty> getSpecialitySubmissionCountBetweenDates(LocalDate from, LocalDate to) {
-//        return collectStatistics(specialityReportFetcher.getSpecialitySubmissionCountBetweenDates(from, to));
-//    }
+    public List<ItemDepositorResponse> getSpecialitySubmissionCountBetweenDates(Context context, LocalDate from, LocalDate to) throws IOException, SQLException {
+        return collectStatistics(specialityReportFetcher.getSpecialitySubmissionCountBetweenDates(context, from, to));
+    }
 }
