@@ -13,7 +13,10 @@
 
  -->
 <xsl:stylesheet version="1.0"
-	xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:doc="http://www.lyncode.com/xoai" xmlns:dc="http://purl.org/dc/doc:elements/1.1/" >
+	xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+	xmlns:doc="http://www.lyncode.com/xoai"
+	xmlns:dc="http://purl.org/dc/doc:elements/1.1/"
+	xmlns:java="http://xml.apache.org/xalan/java">
 	<xsl:output indent="yes" method="xml" omit-xml-declaration="yes" />
 
 	<xsl:include href="driver-commons.xsl"/>
@@ -24,11 +27,6 @@
 				  	
 	  	<xsl:variable name="context" select="'snrd'"/>
 		
-		<xsl:call-template name="sedici-identifier">
-			<xsl:with-param name="handle" select="doc:element[@name='others']/doc:field[@name='handle']/text()"/>
-			<xsl:with-param name="context-name" select="$context"/>
-		</xsl:call-template>
-			
 	  		<xsl:variable name="subtype" select="doc:element[@name='sedici']/doc:element[@name='subtype']/doc:element/doc:field/text()"/>
 			<xsl:call-template name="driver-type">
 				<xsl:with-param name="subtype" select="$subtype"/>
@@ -60,6 +58,27 @@
 					<xsl:with-param name="type"><xsl:value-of select="../../@name"/></xsl:with-param>
 					<xsl:with-param name="value"><xsl:value-of select="./text()"/></xsl:with-param>
 				</xsl:call-template>
+			</xsl:for-each>
+
+			<!-- Ver "Idenficadores alternativos" en SNRD v.2015 -->
+			<!--  sedici.identifier.other -->
+			<xsl:for-each select="doc:element[@name='sedici']/doc:element[@name='identifier']/doc:element[@name='other']/doc:element/doc:field">
+				<xsl:choose>
+					<xsl:when test="java:ar.edu.unlp.sedici.dspace.utils.Utils.isDoi(./text())">
+						<xsl:variable name="doiStartIndex"
+							select="string-length(substring-before(./text(),'10.'))+1" />
+						<xsl:call-template name="printAlternativeIdentifier">
+							<xsl:with-param name="type">doi</xsl:with-param>
+							<xsl:with-param name="value"><xsl:value-of select="substring(./text(),$doiStartIndex)" /></xsl:with-param>
+						</xsl:call-template>
+					</xsl:when>
+					<xsl:when test="contains(./text(),'hdl.handle.net')">
+						<xsl:call-template name="printAlternativeIdentifier">
+							<xsl:with-param name="type">hdl</xsl:with-param>
+							<xsl:with-param name="value"><xsl:value-of select="substring-after(./text(),'http://hdl.handle.net/')"/></xsl:with-param>
+						</xsl:call-template>
+					</xsl:when>
+				</xsl:choose>
 			</xsl:for-each>
 			
 			<xsl:apply-templates select="@*|node()" />
