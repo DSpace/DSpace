@@ -3,6 +3,7 @@ package org.ssu.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.app.webui.util.UIUtil;
+import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -123,7 +124,32 @@ public class ReportController {
 
         model.setViewName("detailed-report");
         model.addObject("data", itemLinks);
-        model.addObject("deposittor", Stream.of(request.getParameter("depositor").split("//")).reduce((a, b) -> b).orElse("--"));
+        model.addObject("depositor", Stream.of(request.getParameter("depositor").split("//")).reduce((a, b) -> b).orElse("--"));
+        return model;
+    }
+
+    @RequestMapping(value = "/report/detailedReport", method = RequestMethod.GET)
+    public ModelAndView getDetailedReportForDepositor(@RequestParam(value = "from", defaultValue = "01.01.2010") String from, @RequestParam(value = "to", defaultValue = "01.01.2100") String to,@RequestParam("depositor") String depositor, ModelAndView model, HttpServletRequest request) throws SQLException, IOException {
+        Context context = UIUtil.obtainContext(request);
+        List<Item> itemsInSpeciality;
+        LocalDate fromDate = LocalDate.parse(from, format);
+        LocalDate toDate = LocalDate.parse(to, format);
+        if(depositor.equals("-")) {
+            itemsInSpeciality = reportService.getBacheoursWithoutSpeciality(context);
+        } else {
+            itemsInSpeciality = reportService.getItemsInSpeciality(context, depositor, fromDate, toDate);
+        }
+
+        List<String> itemLinks = itemsInSpeciality
+                .stream()
+                .filter(item -> Objects.nonNull(item.getName()))
+                .sorted(Comparator.comparing(Item::getName))
+                .map(item -> String.format("<a href = \"/handle/%s\">%s</a>", item.getHandle(), item.getName()))
+                .collect(Collectors.toList());
+
+        model.setViewName("detailed-report");
+
+        model.addObject("data", itemLinks);
         return model;
     }
 }

@@ -72,7 +72,7 @@
                             if(parent) {
                                 pname = parent.name + "//";
                             }
-                            return common.treetable(obj, common, value, config) + " <a href = \"/statistics/detailedReport?from=" + $('#beginDate').val() + "&to=" + $('#endDate').val() +"&depositor=" + pname + obj.name + "\">" + obj.name + "</a>";
+                            return common.treetable(obj, common, value, config) + " <a href = \"/report/detailedReport?from=" + $('#beginDate').val() + "&to=" + $('#endDate').val() +"&depositor=" + pname + obj.name + "\">" + obj.name + "</a>";
                         }
                     },
                     {id: "count", header: "<%= LocaleSupport.getLocalizedMessage(pageContext, "report.submissions-count") %>", width: 200, sort: "int"}
@@ -135,5 +135,5 @@
 
     </script>
     <br/>
-    <div class="text-center"><h4><a href = "/statistics/detailedReport?depositor=-">Роботи, для яких не вказана спеціальність та/або дата представлення</a></h4></div>
+    <div class="text-center"><h4><a href = "/report/detailedReport?depositor=-">Роботи, для яких не вказана спеціальність та/або дата представлення</a></h4></div>
 </dspace:layout>

@@ -98,15 +98,15 @@ public class ReportService {
                 .map(item -> new ItemResponse.Builder().withTitle(item.getName()).withHandle(item.getHandle()).build())
                 .collect(Collectors.toList());
     }
-//
-//    public List<Item> getItemsInSpeciality(String pattern, LocalDate from, LocalDate to) {
-//        return specialityReportFetcher.getItemsInSpeciality(pattern, from, to);
-//    }
-//
-//    public List<Item> getBacheoursWithoutSpeciality() {
-//        return specialityReportFetcher.getBachelorsWithoutSpeciality();
-//    }
-//
+
+    public List<Item> getItemsInSpeciality(Context context, String pattern, LocalDate from, LocalDate to) throws IOException, SQLException {
+        return specialityReportFetcher.getItemsInSpeciality(context, pattern, from, to);
+    }
+
+    public List<Item> getBacheoursWithoutSpeciality(Context context) {
+        return specialityReportFetcher.getBachelorsWithoutSpeciality(context);
+    }
+
     public List<ItemDepositorResponse> getSpecialitySubmissionCountBetweenDates(Context context, LocalDate from, LocalDate to) throws IOException, SQLException {
         return collectStatistics(specialityReportFetcher.getSpecialitySubmissionCountBetweenDates(context, from, to));
     }

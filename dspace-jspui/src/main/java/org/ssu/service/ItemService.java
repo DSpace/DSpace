@@ -1,5 +1,8 @@
 package org.ssu.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Lists;
 import org.dspace.content.*;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.MetadataFieldService;
@@ -23,21 +26,17 @@ import java.util.stream.Collectors;
 
 @Service
 public class ItemService {
-    @Resource
-    private AuthorsService authorsService;
-
-    @Resource
-    private EssuirStatistics essuirStatistics;
-
-    @Resource
-    private TypeLocalization typeLocalization;
-
-    @Resource
-    private MetadatavalueRepository metadatavalueRepository;
-
     transient private final org.dspace.content.service.ItemService itemService = ContentServiceFactory.getInstance().getItemService();
     transient private final MetadataFieldService metadataFieldService = ContentServiceFactory.getInstance().getMetadataFieldService();
     transient private final MetadataValueService metadataValueService = ContentServiceFactory.getInstance().getMetadataValueService();
+    @Resource
+    private AuthorsService authorsService;
+    @Resource
+    private EssuirStatistics essuirStatistics;
+    @Resource
+    private TypeLocalization typeLocalization;
+    @Resource
+    private MetadatavalueRepository metadatavalueRepository;
 
     public Iterator<Item> findAll(Context context) throws SQLException {
         return itemService.findAll(context);
@@ -68,6 +67,25 @@ public class ItemService {
                 .map(MetadataValue::getValue)
                 .findFirst()
                 .orElse("");
+    }
+
+    public String getSpecialityForItem(Item item) {
+        String speciality = itemService.getMetadata(item, MetadataSchema.DC_SCHEMA, "speciality", "id", Item.ANY)
+                .stream()
+                .map(MetadataValue::getValue)
+                .findFirst()
+                .orElse("");
+
+        try {
+            ArrayList<JsonNode> jsonNodes = Lists.newArrayList(new ObjectMapper().readTree(speciality).elements());
+            if(jsonNodes.size() < 3) return "";
+            return jsonNodes.stream()
+                    .map(it -> it.get("name").asText())
+                    .collect(Collectors.joining("//"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return "";
     }
 
     public String getURIForItem(Item item) {
@@ -165,4 +183,7 @@ public class ItemService {
         return metadatavalueRepository.selectMetadataByFieldId(133);
     }
 
+    public Map<UUID, String> fetchItemType() {
+        return metadatavalueRepository.selectMetadataByFieldId(66);
+    }
 }

@@ -47,6 +47,21 @@ public class MetadatavalueRepository {
                 .fetchOne(METADATAVALUE.value);
     }
 
+    private String getItemMetadataByFieldId(UUID uuid, int fieldTypeId) {
+        return dsl.select(METADATAVALUE.value)
+                .from(HANDLE)
+                .where(METADATAVALUE.metadataFieldId.eq(fieldTypeId).and(METADATAVALUE.dspaceObjectId.eq(uuid)))
+                .fetchOne(METADATAVALUE.value);
+    }
+
+    public String getItemTitleByDspaceObjectId(UUID uuid) {
+        return getItemMetadataByFieldId(uuid, METADATAVALUE_TITLE_FIELD_ID);
+    }
+
+    public String getItemLinkByDspaceObjectId(UUID uuid) {
+        return getItemMetadataByFieldId(uuid, METADATAVALUE_LINK_FIELD_ID);
+    }
+
     public String getItemTitleByItemId(int itemId) {
         return getItemMetadataByFieldId(itemId, METADATAVALUE_TITLE_FIELD_ID);
     }
