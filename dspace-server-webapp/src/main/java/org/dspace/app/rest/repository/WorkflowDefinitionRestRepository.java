@@ -41,9 +41,13 @@ public class WorkflowDefinitionRestRepository extends DSpaceRestRepository<Workf
     private CollectionService collectionService;
 
     @Override
-    public WorkflowDefinitionRest findOne(Context context, String s) {
+    public WorkflowDefinitionRest findOne(Context context, String workflowName) {
         try {
-            return converter.toRest(xmlWorkflowFactory.getWorkflowByName(s), utils.obtainProjection());
+            if (xmlWorkflowFactory.workflowByThisNameExists(workflowName)) {
+                return converter.toRest(xmlWorkflowFactory.getWorkflowByName(workflowName), utils.obtainProjection());
+            } else {
+                throw new ResourceNotFoundException("No workflow with name " + workflowName + " is configured");
+            }
         } catch (WorkflowConfigurationException e) {
             // TODO ? Better exception?
             throw new RuntimeException(e.getMessage(), e);
@@ -54,7 +58,7 @@ public class WorkflowDefinitionRestRepository extends DSpaceRestRepository<Workf
     public Page<WorkflowDefinitionRest> findAll(Context context, Pageable pageable) {
         try {
             List<Workflow> workflows = xmlWorkflowFactory.getAllConfiguredWorkflows();
-            return converter.toRestPage(workflows, pageable, workflows.size(), utils.obtainProjection(true));
+            return converter.toRestPage(workflows, pageable, workflows.size(), utils.obtainProjection());
         } catch (WorkflowConfigurationException e) {
             // TODO ? Better exception?
             throw new RuntimeException(e.getMessage(), e);

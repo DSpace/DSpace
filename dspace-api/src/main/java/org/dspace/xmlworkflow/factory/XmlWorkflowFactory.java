@@ -37,6 +37,12 @@ public interface XmlWorkflowFactory {
 
     public List<Workflow> getAllConfiguredWorkflows() throws WorkflowConfigurationException;
 
+    public boolean workflowByThisNameExists(String workflowName) throws WorkflowConfigurationException;
+
+    public boolean isDefaultWorkflow(String workflowName) throws WorkflowConfigurationException;
+
+    public Workflow getDefaultWorkflow() throws WorkflowConfigurationException;
+
     public List<String> getCollectionHandlesMappedToWorklow(String workflowName) throws WorkflowConfigurationException;
 
     public Step createStep(Workflow workflow, String stepID) throws WorkflowConfigurationException, IOException;
