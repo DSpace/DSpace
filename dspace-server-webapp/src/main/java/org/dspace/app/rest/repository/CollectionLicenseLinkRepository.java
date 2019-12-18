@@ -41,7 +41,7 @@ public class CollectionLicenseLinkRepository extends AbstractDSpaceRestRepositor
     @Autowired
     LicenseService licenseService;
 
-    @PreAuthorize("hasAuthority('AUTHENTICATED')")
+    @PreAuthorize("hasPermission(#collectionId, 'COLLECTION', 'READ')")
     public LicenseRest getLicense(@Nullable HttpServletRequest request,
                                   UUID collectionId,
                                   @Nullable Pageable pageable,
