@@ -87,6 +87,7 @@
 
 
    <!-- datacite.titles -->
+   <!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/field_title.html -->
     <xsl:template match="doc:element[@name='dc']/doc:element[@name='title']" mode="datacite">
         <datacite:titles>
             <xsl:apply-templates select="." mode="title"/>
@@ -298,24 +299,28 @@
         </datacite:nameIdentifier>
     </xsl:template>
 
+    <!-- This template creates the sub-element <datacite:givenName> from a Person built entity -->
     <xsl:template match="doc:field[starts-with(@name,'person.givenName')]" mode="entity_author">
         <datacite:givenName>
             <xsl:value-of select="./text()"/>
         </datacite:givenName>
     </xsl:template>
 
+    <!-- This template creates the sub-element <datacite:familyName> from a Person built entity -->
     <xsl:template match="doc:field[starts-with(@name,'person.familyName')]" mode="entity_author">
         <datacite:familyName>
             <xsl:value-of select="./text()"/>
         </datacite:familyName>
     </xsl:template>
 
+    <!-- This template creates the sub-element <datacite:affiliation> from a Person built entity -->
     <xsl:template match="doc:field[starts-with(@name,'person.affiliation.name')]" mode="entity_author">
         <datacite:affiliation>
             <xsl:value-of select="./text()"/>
         </datacite:affiliation>
     </xsl:template>
 
+    <!-- This template creates the sub-element <datacite:nameIdentifier> from a Person built entity -->
     <xsl:template match="doc:field[starts-with(@name,'person.identifier.*')]" mode="entity_author">
         <!-- TODO resolve the scheme based on the value -->
         <datacite:nameIdentifier nameIdentifierScheme="" schemeURI="">
@@ -323,12 +328,14 @@
         </datacite:nameIdentifier>
     </xsl:template>
 
+    <!-- This template creates the sub-element <datacite:nameIdentifier> of type ORCID from a Person built entity -->
     <xsl:template match="doc:field[starts-with(@name,'person.identifier.orcid')]" mode="entity_author">
         <datacite:nameIdentifier nameIdentifierScheme="ORCID" schemeURI="http://orcid.org">
             <xsl:value-of select="./text()"/>
         </datacite:nameIdentifier>
     </xsl:template>
 
+    <!-- This template creates the sub-element <datacite:nameIdentifier> of type Scopus Author ID from a Person built entity -->
     <xsl:template match="doc:field[starts-with(@name,'person.identifier.scopus-author-id')]"
         mode="entity_author">
         <datacite:nameIdentifier nameIdentifierScheme="Scopus Author ID"
@@ -337,6 +344,7 @@
         </datacite:nameIdentifier>
     </xsl:template>
 
+    <!-- This template creates the sub-element <datacite:nameIdentifier> of type Ciencia ID from a Person built entity -->
     <xsl:template match="doc:field[starts-with(@name,'person.identifier.ciencia-id')]" mode="entity_author">
         <datacite:nameIdentifier nameIdentifierScheme="Ciência ID"
             schemeURI="https://www.ciencia-id.pt">
@@ -344,6 +352,7 @@
         </datacite:nameIdentifier>
     </xsl:template>
 
+    <!-- This template creates the sub-element <datacite:nameIdentifier> of type Researcher ID from a Person built entity -->
     <xsl:template match="doc:field[starts-with(@name,'person.identifier.rid')]" mode="entity_author">
         <datacite:nameIdentifier nameIdentifierScheme="Researcher ID"
             schemeURI="https://www.researcherid.com">
@@ -351,6 +360,7 @@
         </datacite:nameIdentifier>
     </xsl:template>
 
+    <!-- This template creates the sub-element <datacite:nameIdentifier> of type Google Scholar ID from a Person built entity -->
     <xsl:template match="doc:field[starts-with(@name,'person.identifier.gsid')]" mode="entity_author">
         <datacite:nameIdentifier nameIdentifierScheme="Google Scholar ID"
             schemeURI="https://scholar.google.com">
@@ -358,12 +368,14 @@
         </datacite:nameIdentifier>
     </xsl:template>
 
+    <!-- This template creates the sub-element <datacite:nameIdentifier> of type ISNI from a Person built entity -->
     <xsl:template match="doc:field[starts-with(@name,'person.identifier.isni')]" mode="entity_author">
         <datacite:nameIdentifier nameIdentifierScheme="ISNI" schemeURI="http://www.isni.org">
             <xsl:value-of select="./text()"/>
         </datacite:nameIdentifier>
     </xsl:template>
 
+    <!-- This template creates the sub-element <datacite:nameIdentifier> for an organization from a built entity -->
     <xsl:template match="doc:field[starts-with(@name,'organization.identifier.*')]" mode="entity_author">
         <!-- TODO resolve the scheme based on the value -->
         <datacite:nameIdentifier nameIdentifierScheme="" schemeURI="">
@@ -371,6 +383,7 @@
         </datacite:nameIdentifier>
     </xsl:template>
 
+    <!-- This template creates the sub-element <datacite:nameIdentifier> of type ISNI for an organization from a built entity -->
     <xsl:template match="doc:field[starts-with(@name,'organization.identifier.isni')]" mode="entity_author">
         <datacite:nameIdentifier nameIdentifierScheme="ISNI" schemeURI="http://www.isni.org">
             <xsl:value-of select="./text()"/>
@@ -408,18 +421,21 @@
         </oaire:fundingReference>
     </xsl:template>
 
+    <!-- This template creates the sub-element <oaire:awardTitle> from a Funded Project built entity -->
     <xsl:template match="doc:field[starts-with(@name,'dc.relation')]" mode="entity_funding">
         <oaire:awardTitle>
             <xsl:value-of select="./text()"/>
         </oaire:awardTitle>
     </xsl:template>
 
+    <!-- This template creates the sub-element <oaire:funderName> from a Funded Project built entity -->
     <xsl:template match="doc:field[starts-with(@name,'project.funder.name')]" mode="entity_funding">
         <oaire:funderName>
             <xsl:value-of select="./text()"/>
         </oaire:funderName>
     </xsl:template>
 
+    <!-- This template creates the sub-element <oaire:funderIdentifier> from a Funded Project built entity -->
     <xsl:template match="doc:field[starts-with(@name,'project.funder.identifier')]" mode="entity_funding">
         <!-- TODO: recognize the type ISNI / GRID / Crossref Funder -->
         <oaire:funderIdentifier funderIdentifierType="Crossref Funder ID">
@@ -427,12 +443,14 @@
         </oaire:funderIdentifier>
     </xsl:template>
 
+    <!-- This template creates the sub-element <oaire:fundingStream> from a Funded Project built entity -->
     <xsl:template match="doc:field[starts-with(@name,'oaire.fundingStream')]" mode="entity_funding">
         <oaire:fundingStream>
             <xsl:value-of select="./text()"/>
         </oaire:fundingStream>
     </xsl:template>
 
+    <!-- This template creates the sub-element <oaire:awardNumber> from a Funded Project built entity -->
     <xsl:template match="doc:field[starts-with(@name,'oaire.awardNumber')]" mode="entity_funding">
         <!-- TODO: get the awarduri from doc:field@name='oaire.awardURI -->
         <oaire:awardNumber>
@@ -444,6 +462,7 @@
         </oaire:awardNumber>
     </xsl:template>
 
+    <!-- This template creates the property awardURI from a Funded Project built entity -->
     <xsl:template match="doc:field[starts-with(@name,'oaire.awardURI')]" mode="entity_funding_param">
         <xsl:value-of select="./text()"/>
     </xsl:template>
@@ -699,6 +718,8 @@
         </xsl:if>
     </xsl:template>
 
+    <!-- oaire:file -->
+    <!-- processing of each bitstream entry -->
     <xsl:template match="doc:element[@name='bitstreams']/doc:element[@name='bitstream']" mode="oaire">
         <oaire:file>
             <xsl:attribute name="accessRightsURI">
@@ -812,6 +833,7 @@
    <!-- Auxiliary templates - get types -->
    <!--  -->
 
+    <!-- This template will retrieve the type of a title element (like: alternative) based on the element name -->
     <xsl:template name="getTitleType">
         <xsl:param name="elementName"/>
         <xsl:variable name="lc_title_type">
@@ -835,6 +857,7 @@
         </xsl:choose>
     </xsl:template>
 
+    <!-- This template will retrieve the type of a contributor based on the element name -->
     <xsl:template name="getContributorType">
         <xsl:param name="elementName"/>
         <xsl:variable name="lc_contributor_type">
@@ -855,6 +878,7 @@
         </xsl:choose>
     </xsl:template>
 
+    <!-- This template will retrieve the type of a date based on the element name -->
     <xsl:template name="getDateType">
         <xsl:param name="elementName"/>
         <xsl:variable name="lc_dc_date_type">
@@ -887,6 +911,11 @@
         </xsl:choose>
     </xsl:template>
 
+    <!-- This template will retrieve the identifier type based on the element name -->
+    <!-- 
+        there are some special cases like DOI or HANDLE which the type is also
+        inferred from the value itself
+      -->
     <xsl:template name="getRelatedIdentifierType">
         <xsl:param name="element"/>
         <xsl:variable name="lc_identifier_type">
@@ -999,7 +1028,7 @@
     <!-- 
         this template will verify if a field name with "authority"
         is present and if it start with "virtual::"
-        if it occurs, than we are in a presence of an related entity 
+        if it occurs, than we are in a presence of a related entity 
      -->
     <xsl:template name="isRelatedEntity">
         <xsl:param name="element"/>
@@ -1019,7 +1048,13 @@
         this template will try to look for all "virtual::"
         and rebuild an "Entity" based on all virtual fields 
         in the source data.
-        This will retrieve something like 
+        This will retrieve something like:
+        <element name="virtual::226">
+           <field name="dc.contributor.author.none">Doe, John</field>
+           <field name="person.givenName.none">John</field>
+           <field name="person.familyName.none">Doe</field>
+           <field name="relation.isAuthorOfPublication.none">3f685bbd-07d9-403e-9de2-b8f0fabe27a7</field>
+        </element>
      -->
     <xsl:template name="buildEntityNode">
         <xsl:param name="element"/>
@@ -1051,9 +1086,9 @@
     </xsl:template>
    
    <!-- 
-    This template will recursively create the field name based on parent node names
-    to be something like this:
-    person.familyName.*
+        This template will recursively create the field name based on parent node names
+        to be something like this:
+        person.familyName.*
     -->
     <xsl:template name="buildEntityFieldName">
         <xsl:param name="element"/>
@@ -1209,6 +1244,11 @@
         </xsl:choose>
     </xsl:template>
 
+    <!--
+        This template will return the general type of the resource
+        based on a valued text like 'article'
+        https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/field_publicationtype.html#attribute-resourcetypegeneral-m 
+     -->
     <xsl:template name="resolveResourceTypeGeneral">
         <xsl:param name="field"/>
         <xsl:variable name="lc_dc_type">
@@ -1244,6 +1284,12 @@
         </xsl:choose>
     </xsl:template>
 
+    <!--
+        This template will return the COAR Resource Type Vocabulary URI
+        like http://purl.org/coar/resource_type/c_6501
+        based on a valued text like 'article'
+        https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/field_publicationtype.html#attribute-uri-m
+     -->
     <xsl:template name="resolveResourceTypeURI">
         <xsl:param name="field"/>
         <xsl:variable name="lc_dc_type">
@@ -1433,6 +1479,12 @@
         </xsl:choose>
     </xsl:template>
 
+    <!--
+        This template will return the COAR Access Right Vocabulary URI
+        like http://purl.org/coar/access_right/c_abf2
+        based on a value text like 'open access'
+        https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/field_accessrights.html#definition-and-usage-instruction
+     -->
     <xsl:template name="resolveRightsURI">
         <xsl:param name="field"/>
         <xsl:variable name="lc_value">
@@ -1458,6 +1510,7 @@
     </xsl:template>
 
    <!-- xml:language -->
+   <!-- this template will add a xml:lang parameter with the defined language of an element -->
     <xsl:template name="xmlLanguage">
         <xsl:param name="name"/>
         <xsl:variable name="lc_name">
