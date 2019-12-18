@@ -9,8 +9,12 @@
             <xsl:apply-templates select="@*|node()"/>
         </xsl:copy>
     </xsl:template>
- 
-    <!-- Formatting dc.date.issued -->
+
+    <!-- 
+        Formatting dc.date.issued
+        based on what OpenAIRE4 specifies for issued dates 
+        https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/field_publicationdate.html
+    -->
     <xsl:template
         match="/doc:metadata/doc:element[@name='dc']/doc:element[@name='date']/doc:element[@name='issued']/doc:element/doc:field/text()">
         <xsl:call-template name="formatdate">
@@ -18,7 +22,10 @@
         </xsl:call-template>
     </xsl:template>
 
-    <!-- Modifying and normalizing dc.language -->
+    <!-- 
+        Modifying and normalizing dc.language
+        to ISO 639-3 (from ISO 639-1) for each language available at the submission form
+     -->
     <xsl:template
         match="/doc:metadata/doc:element[@name='dc']/doc:element[@name='language']/doc:element[@name='iso']/doc:element/doc:field/text()">
 
@@ -63,12 +70,18 @@
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
-        
+
     <!-- Modifying dc.rights -->
     <!-- Removing unwanted -->
     <xsl:template
         match="/doc:metadata/doc:element[@name='dc']/doc:element[@name='rights']/doc:element/doc:element"/>
-    <!-- Replacing -->
+
+    <!-- 
+        Normalizing dc.rights according to COAR Controlled Vocabulary for
+        Access Rights (Version 1.0) (http://vocabularies.coar-repositories.org/documentation/access_rights/)
+        available at
+        https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/field_accessrights.html#definition-and-usage-instruction
+    -->
     <xsl:template
         match="/doc:metadata/doc:element[@name='dc']/doc:element[@name='rights']/doc:element/doc:field/text()">
         <xsl:variable name="value" select="."/>
@@ -100,7 +113,11 @@
         </xsl:choose>
     </xsl:template>
 
-    <!-- Modifying and normalizing dc.type -->
+    <!-- Modifying and normalizing dc.type according to COAR Controlled Vocabulary for Resource Type 
+        Genres (Version 2.0) (http://vocabularies.coar-repositories.org/documentation/resource_types/)
+        available at 
+        https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/field_publicationtype.html#attribute-uri-m
+    -->
     <xsl:template
         match="/doc:metadata/doc:element[@name='dc']/doc:element[@name='type']/doc:element/doc:field/text()">
         <xsl:variable name="dc_type" select="."/>
@@ -332,7 +349,12 @@
     <!-- AUXILIARY TEMPLATES -->
 
 
-    <!-- Date format -->
+    <!--  
+        Date format
+        This template is discarding the " 16:53:24.556" part from a date and time 
+        like "2019-04-30 16:53:24.556" to support the YYYY-MM-DD format of 
+        ISO 8601 [W3CDTF]
+    -->
     <xsl:template name="formatdate">
         <xsl:param name="datestr"/>
         <xsl:variable name="sub">
