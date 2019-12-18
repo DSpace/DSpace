@@ -7,19 +7,9 @@
  */
 package org.dspace.app.rest.converter;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.EPersonRest;
-import org.dspace.app.rest.model.GroupRest;
 import org.dspace.app.rest.projection.Projection;
-import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
-import org.dspace.eperson.Group;
-import org.dspace.eperson.service.GroupService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -31,14 +21,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class EPersonConverter extends DSpaceObjectConverter<EPerson, org.dspace.app.rest.model.EPersonRest> {
 
-    @Autowired
-    private ConverterService converter;
-
-    @Autowired
-    private GroupService groupService;
-
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(EPersonConverter.class);
-
     @Override
     public EPersonRest convert(EPerson obj, Projection projection) {
         EPersonRest eperson = super.convert(obj, projection);
@@ -49,19 +31,6 @@ public class EPersonConverter extends DSpaceObjectConverter<EPerson, org.dspace.
         eperson.setSelfRegistered(obj.getSelfRegistered());
         eperson.setEmail(obj.getEmail());
 
-        return eperson;
-    }
-
-    public EPersonRest fromModelWithGroups(Context context, EPerson ePerson, Projection projection)
-            throws SQLException {
-        EPersonRest eperson = convert(ePerson, projection);
-
-        List<GroupRest> groups = new ArrayList<>();
-        for (Group g : groupService.allMemberGroups(context, ePerson)) {
-            groups.add(converter.toRest(g, projection));
-        }
-
-        eperson.setGroups(groups);
         return eperson;
     }
 
