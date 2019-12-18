@@ -81,7 +81,7 @@
          -->
         <Context baseurl="openaire4" name="OpenAIRE 4 Context">
             <!-- Date format, field prefixes, etc are ensured by the transformer -->
-            <!--Transformer ref="openaire4Transformer"/-->
+            <Transformer ref="openaire4Transformer"/>
             <!-- OpenAIRE filter -->
             <Filter ref="openAIRE4Filter"/>
             <!-- Metadata Formats -->
