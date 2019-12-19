@@ -7,6 +7,7 @@
  */
 package org.dspace.external.provider.metadata.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -23,8 +24,8 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class MetadataSuggestionProviderServiceImpl implements MetadataSuggestionProviderService {
 
-    @Autowired
-    private List<MetadataSuggestionProvider> metadataSuggestionProviders;
+    @Autowired(required = false)
+    private List<MetadataSuggestionProvider> metadataSuggestionProviders = new ArrayList<>();
 
     @Override
     public List<MetadataSuggestionProvider> getMetadataSuggestionProviders(InProgressSubmission inProgressSubmission) {
@@ -35,26 +36,32 @@ public class MetadataSuggestionProviderServiceImpl implements MetadataSuggestion
     }
 
     @Override
-    public MetadataSuggestionProvider getMetadataSuggestionProvider(String id) {
+    public Optional<MetadataSuggestionProvider> getMetadataSuggestionProvider(String id) {
 
         for (MetadataSuggestionProvider metadataSuggestionProvider : metadataSuggestionProviders) {
             if (StringUtils.equals(metadataSuggestionProvider.getId(), id)) {
-                return metadataSuggestionProvider;
+                return Optional.of(metadataSuggestionProvider);
             }
         }
-        return null;
+        return Optional.empty();
     }
 
     @Override
-    public MetadataItemSuggestions getMetadataItemSuggestions(String suggestionName, String entryId,
-                                           InProgressSubmission inProgressSubmission) {
-        MetadataSuggestionProvider metadataSuggestionProvider = getMetadataSuggestionProvider(suggestionName);
-        if (metadataSuggestionProvider != null) {
-            Optional<ExternalDataObject> externalDataObjectOptional = metadataSuggestionProvider.getExternalDataProvider().getExternalDataObject(entryId);
-            ExternalDataObject externalDataObject = externalDataObjectOptional.orElseThrow(() -> new IllegalArgumentException("Couldn't construct an externalDataObject for the given EntryId: " + entryId + " and suggestionName: " + suggestionName));
-            return new MetadataItemSuggestions(externalDataObject, inProgressSubmission);
+    public Optional<MetadataItemSuggestions> getMetadataItemSuggestions(String suggestionName, String entryId,
+                                                                        InProgressSubmission inProgressSubmission) {
+        Optional<MetadataSuggestionProvider> metadataSuggestionProviderOptional = getMetadataSuggestionProvider(
+            suggestionName);
+        if (metadataSuggestionProviderOptional.isPresent()) {
+            MetadataSuggestionProvider metadataSuggestionProvider = metadataSuggestionProviderOptional.get();
+            Optional<ExternalDataObject> externalDataObjectOptional = metadataSuggestionProvider
+                .getExternalDataProvider().getExternalDataObject(entryId);
+            ExternalDataObject externalDataObject = externalDataObjectOptional
+                .orElseThrow(() -> new IllegalArgumentException("Couldn't construct an externalDataObject for the " +
+                                                                    "given EntryId: " + entryId + " and " +
+                                                                    "suggestionName: " + suggestionName));
+            return Optional.of(new MetadataItemSuggestions(externalDataObject, inProgressSubmission));
         }
 
-        return null;
+        return Optional.empty();
     }
 }

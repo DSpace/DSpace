@@ -32,7 +32,8 @@ public class MetadataSuggestionEntryConverter implements
         metadataSuggestionEntryRest.setDisplay(obj.getExternalDataObject().getDisplayValue());
         metadataSuggestionEntryRest.setId(obj.getExternalDataObject().getId());
         metadataSuggestionEntryRest.setValue(obj.getExternalDataObject().getValue());
-        metadataSuggestionEntryRest.setMetadataRest(metadataConverter.convert(obj.getExternalDataObject().getMetadata()));
+        metadataSuggestionEntryRest
+            .setMetadataRest(metadataConverter.convert(obj.getExternalDataObject().getMetadata()));
         metadataSuggestionEntryRest.setMetadataSuggestion(obj.getExternalDataObject().getSource());
         metadataSuggestionEntryRest.setMetadataChangeRest(metadataChangeConverter.convert(obj.getMetadataChanges()));
         return metadataSuggestionEntryRest;

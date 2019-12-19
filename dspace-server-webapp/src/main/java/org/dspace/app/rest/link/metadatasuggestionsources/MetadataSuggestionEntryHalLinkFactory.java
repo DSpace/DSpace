@@ -28,8 +28,12 @@ public class MetadataSuggestionEntryHalLinkFactory
         throws Exception {
 
 
-        list.add(buildLink(Link.REL_SELF, getMethodOn().getMetadataSuggestionEntry(halResource.getContent().getMetadataSuggestion(), halResource.getContent().getId(), null, null, null, null)));
-        list.add(buildLink("changes",  getMethodOn().getMetadataSuggestionEntryChanges(halResource.getContent().getMetadataSuggestion(), halResource.getContent().getId(), null, null, null, null)));
+        list.add(buildLink(Link.REL_SELF, getMethodOn()
+            .getMetadataSuggestionEntry(halResource.getContent().getMetadataSuggestion(),
+                                        halResource.getContent().getId(), null, null, null, null)));
+        list.add(buildLink("changes", getMethodOn()
+            .getMetadataSuggestionEntryChanges(halResource.getContent().getMetadataSuggestion(),
+                                               halResource.getContent().getId(), null, null, null, null)));
 
     }
 

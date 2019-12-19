@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.link.HalLinkService;
 import org.dspace.app.rest.model.MetadataSuggestionEntryRest;
@@ -62,6 +63,9 @@ public class MetadataSuggestionsRestController {
         @RequestParam(name = "workflowitem", required = false) Integer workflowItemId,
         HttpServletResponse response, HttpServletRequest request) {
 
+        if (workflowItemId == null && workspaceItemId == null) {
+            throw new DSpaceBadRequestException("You need to provide either a workflowitem ID or a workspaceitem ID");
+        }
         Context context = ContextUtil.obtainContext(request);
         InProgressSubmission inProgressSubmission = metadataSuggestionsRestRepository
             .resolveInProgressSubmission(workspaceItemId, workflowItemId, context);

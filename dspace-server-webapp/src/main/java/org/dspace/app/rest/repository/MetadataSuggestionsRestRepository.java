@@ -10,7 +10,6 @@ package org.dspace.app.rest.repository;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
@@ -22,21 +21,17 @@ import org.dspace.app.rest.model.MetadataSuggestionEntryRest;
 import org.dspace.app.rest.model.MetadataSuggestionsSourceRest;
 import org.dspace.app.rest.model.hateoas.DSpaceResource;
 import org.dspace.app.rest.model.hateoas.MetadataSuggestionsSourceResource;
-import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Context;
-import org.dspace.external.model.ExternalDataObject;
 import org.dspace.external.provider.metadata.MetadataSuggestionProvider;
 import org.dspace.external.provider.metadata.service.MetadataSuggestionProviderService;
 import org.dspace.external.provider.metadata.service.impl.MetadataItemSuggestions;
-import org.dspace.services.RequestService;
 import org.dspace.workflow.WorkflowItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
-import org.springframework.hateoas.PagedResources;
 import org.springframework.stereotype.Component;
 
 /**
@@ -66,10 +61,11 @@ public class MetadataSuggestionsRestRepository extends DSpaceRestRepository<Meta
      * This method will create a page of MetadataSuggestionsSources that adheres to the given parameters
      * @param pageable              The pageable object for this request
      * @param inProgressSubmission  The InProgressionSubmission object for this call
-     * @return                      A page containing MetadataSuggestionsSources
+     * @return A page containing MetadataSuggestionsSources
      */
     public Page<MetadataSuggestionsSourceRest> getAllMetadataSuggestionSources(Pageable pageable,
-        InProgressSubmission inProgressSubmission) {
+                                                                               InProgressSubmission
+                                                                                   inProgressSubmission) {
 
         if (inProgressSubmission == null) {
             throw new DSpaceBadRequestException("A valid workflowItem or workspaceItem needs to be passed along in" +
@@ -90,20 +86,28 @@ public class MetadataSuggestionsRestRepository extends DSpaceRestRepository<Meta
      * @param inProgressSubmission  The InProgressSubmission to be used
      * @return
      */
-    public MetadataSuggestionEntryRest getMetadataSuggestionEntry(String suggestionName, String entryId, InProgressSubmission inProgressSubmission) {
-        //TODO Save Workspaceitem/workflowitemid in rest object so we can use it in the linkfactory
-        MetadataItemSuggestions metadataItemSuggestions = metadataSuggestionProviderService.getMetadataItemSuggestions(suggestionName, entryId, inProgressSubmission);
-        return metadataSuggestionEntryConverter.fromModel(metadataItemSuggestions);
+    public MetadataSuggestionEntryRest getMetadataSuggestionEntry(String suggestionName, String entryId,
+                                                                  InProgressSubmission inProgressSubmission) {
+        Optional<MetadataItemSuggestions> metadataItemSuggestionsOptional = metadataSuggestionProviderService
+            .getMetadataItemSuggestions(suggestionName, entryId, inProgressSubmission);
+        if (metadataItemSuggestionsOptional.isPresent()) {
+            return metadataSuggestionEntryConverter.fromModel(metadataItemSuggestionsOptional.get());
+        } else {
+            throw new ResourceNotFoundException(
+                "MetadataSuggestionEntry for suggestionName: " + suggestionName + " and entryId: " + entryId + " for " +
+                    "the given inProgressSubmission could not be found");
+        }
     }
 
     @Override
     public MetadataSuggestionsSourceRest findOne(Context context, String id) {
-        MetadataSuggestionProvider metadataSuggestionProvider = metadataSuggestionProviderService
+        Optional<MetadataSuggestionProvider> metadataSuggestionProviderOptional = metadataSuggestionProviderService
             .getMetadataSuggestionProvider(id);
-        if (metadataSuggestionProvider == null) {
+        if (metadataSuggestionProviderOptional.isPresent()) {
+            return metadataSuggestionsSourceRestConverter.fromModel(metadataSuggestionProviderOptional.get());
+        } else {
             throw new ResourceNotFoundException("MetadataSuggestionProvider for: " + id + " couldn't be found");
         }
-        return metadataSuggestionsSourceRestConverter.fromModel(metadataSuggestionProvider);
     }
 
     @Override

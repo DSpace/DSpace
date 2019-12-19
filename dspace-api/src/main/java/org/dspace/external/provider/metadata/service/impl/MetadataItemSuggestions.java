@@ -18,7 +18,8 @@ import org.dspace.external.model.ExternalDataObject;
 import org.dspace.mock.MockMetadataValue;
 
 /**
- *  This class will take an {@link ExternalDataObject} and an {@link InProgressSubmission} and calculate the changes that the
+ *  This class will take an {@link ExternalDataObject} and an {@link InProgressSubmission} and calculate the changes
+ *  that the
  *  ExternalDataObject suggests
  */
 public class MetadataItemSuggestions {
@@ -27,7 +28,8 @@ public class MetadataItemSuggestions {
     private InProgressSubmission inProgressSubmission;
     private List<MetadataChange> metadataChanges;
 
-    protected MetadataItemSuggestions(ExternalDataObject externalDataObject, InProgressSubmission inProgressSubmission) {
+    protected MetadataItemSuggestions(ExternalDataObject externalDataObject,
+                                      InProgressSubmission inProgressSubmission) {
         this.externalDataObject = externalDataObject;
         this.inProgressSubmission = inProgressSubmission;
     }
@@ -66,15 +68,17 @@ public class MetadataItemSuggestions {
     private void constructMetadataChanges() {
         metadataChanges = new LinkedList<>();
         Map<String, List<String>> inProgressSubmissionMetadataMap = new HashMap<String, List<String>>();
-        List<MockMetadataValue> mockMetadataFromInProgressSubmission = inProgressSubmission.getItem().getMetadata().stream().map(metadataValue -> new MockMetadataValue(metadataValue)).collect(
-            Collectors.toList());
+        List<MockMetadataValue> mockMetadataFromInProgressSubmission = inProgressSubmission.getItem().getMetadata()
+               .stream().map(metadataValue -> new MockMetadataValue(metadataValue)).collect(Collectors.toList());
         mockMetadataFromInProgressSubmission.stream().forEach(mockMetadataValue -> {
-            inProgressSubmissionMetadataMap.computeIfAbsent(mockMetadataValue.getKey(), k -> new LinkedList<>()).add(mockMetadataValue.getValue());
+            inProgressSubmissionMetadataMap.computeIfAbsent(mockMetadataValue.getKey(), k -> new LinkedList<>())
+                                           .add(mockMetadataValue.getValue());
         });
 
         for (MockMetadataValue mockMetadataValue : externalDataObject.getMetadata()) {
             if (!inProgressSubmissionMetadataMap.containsKey(mockMetadataValue.getKey())) {
-                metadataChanges.add(new MetadataChange("add", mockMetadataValue.getKey(), mockMetadataValue.getValue()));
+                metadataChanges
+                    .add(new MetadataChange("add", mockMetadataValue.getKey(), mockMetadataValue.getValue()));
             }
         }
     }

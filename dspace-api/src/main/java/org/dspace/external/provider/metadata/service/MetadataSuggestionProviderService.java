@@ -8,6 +8,7 @@
 package org.dspace.external.provider.metadata.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.dspace.content.InProgressSubmission;
 import org.dspace.external.provider.metadata.MetadataSuggestionProvider;
@@ -30,7 +31,7 @@ public interface MetadataSuggestionProviderService {
      * @param id    The id of the MetadataSuggestionProvider that is to be returned
      * @return The MetadataSuggestionProvider that has the given id as its actual id
      */
-    MetadataSuggestionProvider getMetadataSuggestionProvider(String id);
+    Optional<MetadataSuggestionProvider> getMetadataSuggestionProvider(String id);
 
     /**
      * This method will return a {@link MetadataItemSuggestions} object based on the given parameters
@@ -39,6 +40,6 @@ public interface MetadataSuggestionProviderService {
      * @param inProgressSubmission  The InProgressSubmission for this suggestion
      * @return                      The MetadataItemSuggestion
      */
-    MetadataItemSuggestions getMetadataItemSuggestions(String suggestionName, String entryId,
-                                                       InProgressSubmission inProgressSubmission);
+    Optional<MetadataItemSuggestions> getMetadataItemSuggestions(String suggestionName, String entryId,
+                                                                 InProgressSubmission inProgressSubmission);
 }
