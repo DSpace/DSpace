@@ -32,7 +32,6 @@ import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.eperson.Group;
 import org.hamcrest.Matchers;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
@@ -43,7 +42,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
  * @author Frederic Van Reet (frederic dot vanreet at atmire dot com)
  * @author Tom Desair (tom dot desair at atmire dot com)
  */
-@Ignore
 public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTest {
 
     @Test

@@ -40,12 +40,10 @@ import org.dspace.content.Community;
 import org.dspace.core.Constants;
 import org.dspace.eperson.EPerson;
 import org.hamcrest.Matchers;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 
-@Ignore
 public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Autowired
