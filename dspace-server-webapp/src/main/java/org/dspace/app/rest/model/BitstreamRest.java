@@ -17,6 +17,12 @@ import com.fasterxml.jackson.annotation.JsonProperty.Access;
  */
 @LinksRest(links = {
         @LinkRest(
+                name = BitstreamRest.BUNDLE,
+                linkClass = BundleRest.class,
+                method = "getBundle",
+                embedOptional = true
+        ),
+        @LinkRest(
                 name = BitstreamRest.FORMAT,
                 linkClass = BitstreamFormatRest.class,
                 method = "getFormat",
@@ -28,6 +34,7 @@ public class BitstreamRest extends DSpaceObjectRest {
     public static final String NAME = "bitstream";
     public static final String CATEGORY = RestAddressableModel.CORE;
 
+    public static final String BUNDLE = "bundle";
     public static final String FORMAT = "format";
 
     private String bundleName;
