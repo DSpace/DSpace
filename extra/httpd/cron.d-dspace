@@ -78,6 +78,9 @@ DSPACE=/var/dspace
 #Backup en AIP una vez por semana
 #5 22 * *       dspace  sun date && $DSPACE/bin/dspace packager -d -a -t AIP -e alira@sedici.unlp.edu.ar -u -i 10915/0 $DSPACE/backups/aip/aip-site.zip && date
 
+#Limpieza de la cache de cocoon cada 8 horas a partir de las 7am
+0 7/8 * * * dspace curl --silent --output /dev/null --show-error --fail --data "cache-clearance" http://sedici.unlp.edu.ar/clear-cache
+
 # ########## STATS ######################
 0 1 * * *       dspace  $DSPACE/bin/dspace stat-general
 0 1 * * *       dspace  $DSPACE/bin/dspace stat-monthly
