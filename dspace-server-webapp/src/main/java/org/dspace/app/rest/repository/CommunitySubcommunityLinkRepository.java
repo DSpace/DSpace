@@ -52,4 +52,9 @@ public class CommunitySubcommunityLinkRepository extends AbstractDSpaceRestRepos
             throw new RuntimeException(e);
         }
     }
+
+    @Override
+    public boolean isEmbeddableRelation(Object data, String name) {
+        return false;
+    }
 }
