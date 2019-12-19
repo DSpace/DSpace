@@ -284,7 +284,7 @@ public class XmlWorkflowFactoryImpl implements XmlWorkflowFactory {
             Workflow defaultWorkflow = this.getDefaultWorkflow();
             return (defaultWorkflow.getID().equalsIgnoreCase(workflowName));
         } catch (Exception e) {
-            log.error("Error while trying to check if " + workflowName + " is the default workflow");
+            log.error("Error while trying to check if " + workflowName + " is the default workflow", e);
             throw new WorkflowConfigurationException("Error while trying to check if " + workflowName
                     + " is the default workflow");
         }

@@ -35,7 +35,7 @@ public class WorkflowDefinitionConverter implements DSpaceConverter<Workflow, Wo
         try {
             restModel.setIsDefault(xmlWorkflowFactory.isDefaultWorkflow(modelObject.getID()));
         } catch (WorkflowConfigurationException e) {
-            log.error("Error while trying to check if " + modelObject.getID() + " is the default workflow");
+            log.error("Error while trying to check if " + modelObject.getID() + " is the default workflow", e);
         }
         return restModel;
     }
