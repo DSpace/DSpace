@@ -90,7 +90,7 @@ public class HandleController {
         if(authorizeService.authorizeActionBoolean(dspaceContext, dSpaceObject, Constants.READ)) {
             Community parentCommunity = null;
             boolean includeCurrentCommunityInResult = false;
-            if (dSpaceObject.getType() == Constants.ITEM) {
+            if (dSpaceObject.getType() == Constants.ITEM && authorizeService.authorizeActionBoolean(dspaceContext, ((Item)dSpaceObject).getOwningCollection(), Constants.READ)) {
                 Item item = (Item) dSpaceObject;
                 request.setAttribute("dspace.collection", item.getOwningCollection());
                 parentCommunity = item.getOwningCollection().getCommunities().get(0);
@@ -108,14 +108,17 @@ public class HandleController {
                 includeCurrentCommunityInResult = true;
                 result = displayCollection(request, response, model, (Collection)dSpaceObject, locale);
             }
-            request.setAttribute("dspace.community", parentCommunity);
-            request.setAttribute("dspace.communities", getCommunityParents(dspaceContext, parentCommunity, includeCurrentCommunityInResult));
-        } else {
-            request.setAttribute("dspace.original.url", "/handle/123456789/" + itemId);
-            Authenticate.startAuthentication(dspaceContext, request, response);
-            result = new ModelAndView();
-            result.setViewName("home");
+            if(parentCommunity != null) {
+                request.setAttribute("dspace.community", parentCommunity);
+                request.setAttribute("dspace.communities", getCommunityParents(dspaceContext, parentCommunity, includeCurrentCommunityInResult));
+                return result;
+            }
         }
+
+        request.setAttribute("dspace.original.url", "/handle/123456789/" + itemId);
+        Authenticate.startAuthentication(dspaceContext, request, response);
+        result = new ModelAndView();
+        result.setViewName("home");
 
         return result;
     }
