@@ -9,7 +9,7 @@ package org.dspace.external.provider.impl.metadatamapping.contributors;
 
 import java.util.Collection;
 
-import org.dspace.mock.MockMetadataValue;
+import org.dspace.content.dto.MetadataValueDTO;
 
 /**
  * @author Roeland Dillen (roeland at atmire dot com)
@@ -23,5 +23,5 @@ public interface MetadataContributor<RecordType> {
      * @param t The recordType object to retrieve metadata from
      * @return A collection of MetadatumDTO objects, retrieve from the recordtype
      */
-    public Collection<MockMetadataValue> contributeMetadata(RecordType t);
+    public Collection<MetadataValueDTO> contributeMetadata(RecordType t);
 }

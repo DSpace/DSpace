@@ -8,6 +8,7 @@
 package org.dspace.app.rest.converter;
 
 import org.dspace.app.rest.model.MetadataSuggestionEntryRest;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.external.provider.metadata.service.impl.MetadataItemSuggestions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -21,26 +22,24 @@ public class MetadataSuggestionEntryConverter implements
                                               DSpaceConverter<MetadataItemSuggestions, MetadataSuggestionEntryRest> {
 
     @Autowired
-    private MockMetadataConverter metadataConverter;
-
-    @Autowired
     private MetadataChangeConverter metadataChangeConverter;
 
-    @Override
-    public MetadataSuggestionEntryRest fromModel(MetadataItemSuggestions obj) {
+    @Autowired
+    private ConverterService converter;
+
+    public MetadataSuggestionEntryRest convert(MetadataItemSuggestions obj, Projection projection) {
         MetadataSuggestionEntryRest metadataSuggestionEntryRest = new MetadataSuggestionEntryRest();
         metadataSuggestionEntryRest.setDisplay(obj.getExternalDataObject().getDisplayValue());
         metadataSuggestionEntryRest.setId(obj.getExternalDataObject().getId());
         metadataSuggestionEntryRest.setValue(obj.getExternalDataObject().getValue());
         metadataSuggestionEntryRest
-            .setMetadataRest(metadataConverter.convert(obj.getExternalDataObject().getMetadata()));
+            .setMetadataRest(converter.toRest(obj.getExternalDataObject().getMetadata(), Projection.DEFAULT));
         metadataSuggestionEntryRest.setMetadataSuggestion(obj.getExternalDataObject().getSource());
         metadataSuggestionEntryRest.setMetadataChangeRest(metadataChangeConverter.convert(obj.getMetadataChanges()));
         return metadataSuggestionEntryRest;
     }
 
-    @Override
-    public MetadataItemSuggestions toModel(MetadataSuggestionEntryRest obj) {
-        return null;
+    public Class<MetadataItemSuggestions> getModelClass() {
+        return MetadataItemSuggestions.class;
     }
 }

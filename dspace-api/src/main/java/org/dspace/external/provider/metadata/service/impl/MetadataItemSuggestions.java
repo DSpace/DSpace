@@ -14,8 +14,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.dspace.content.InProgressSubmission;
+import org.dspace.content.dto.MetadataValueDTO;
 import org.dspace.external.model.ExternalDataObject;
-import org.dspace.mock.MockMetadataValue;
 
 /**
  *  This class will take an {@link ExternalDataObject} and an {@link InProgressSubmission} and calculate the changes
@@ -68,14 +68,14 @@ public class MetadataItemSuggestions {
     private void constructMetadataChanges() {
         metadataChanges = new LinkedList<>();
         Map<String, List<String>> inProgressSubmissionMetadataMap = new HashMap<String, List<String>>();
-        List<MockMetadataValue> mockMetadataFromInProgressSubmission = inProgressSubmission.getItem().getMetadata()
-               .stream().map(metadataValue -> new MockMetadataValue(metadataValue)).collect(Collectors.toList());
+        List<MetadataValueDTO> mockMetadataFromInProgressSubmission = inProgressSubmission.getItem().getMetadata()
+            .stream().map(metadataValue -> new MetadataValueDTO(metadataValue)).collect(Collectors.toList());
         mockMetadataFromInProgressSubmission.stream().forEach(mockMetadataValue -> {
             inProgressSubmissionMetadataMap.computeIfAbsent(mockMetadataValue.getKey(), k -> new LinkedList<>())
                                            .add(mockMetadataValue.getValue());
         });
 
-        for (MockMetadataValue mockMetadataValue : externalDataObject.getMetadata()) {
+        for (MetadataValueDTO mockMetadataValue : externalDataObject.getMetadata()) {
             if (!inProgressSubmissionMetadataMap.containsKey(mockMetadataValue.getKey())) {
                 metadataChanges
                     .add(new MetadataChange("add", mockMetadataValue.getKey(), mockMetadataValue.getValue()));

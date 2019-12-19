@@ -11,9 +11,9 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.dspace.content.dto.MetadataValueDTO;
 import org.dspace.external.provider.impl.pubmed.metadatamapping.utils.MetadatumContributorUtils;
 import org.dspace.mock.MockMetadataField;
-import org.dspace.mock.MockMetadataValue;
 
 /**
  * Wrapper class used to accommodate for the possibility of correlations between multiple MetadatumContributor objects
@@ -57,13 +57,13 @@ public class CombinedMetadatumContributor<T> implements MetadataContributor<T> {
      * @return a collection of metadata composed by each MetadataContributor
      */
     @Override
-    public Collection<MockMetadataValue> contributeMetadata(T t) {
-        List<MockMetadataValue> values = new LinkedList<>();
+    public Collection<MetadataValueDTO> contributeMetadata(T t) {
+        List<MetadataValueDTO> values = new LinkedList<>();
 
-        LinkedList<LinkedList<MockMetadataValue>> metadatumLists = new LinkedList<>();
+        LinkedList<LinkedList<MetadataValueDTO>> metadatumLists = new LinkedList<>();
 
         for (MetadataContributor metadatumContributor : metadatumContributors) {
-            LinkedList<MockMetadataValue> metadatums = (LinkedList<MockMetadataValue>) metadatumContributor
+            LinkedList<MetadataValueDTO> metadatums = (LinkedList<MetadataValueDTO>) metadatumContributor
                 .contributeMetadata(t);
             metadatumLists.add(metadatums);
         }
@@ -72,7 +72,7 @@ public class CombinedMetadatumContributor<T> implements MetadataContributor<T> {
 
             StringBuilder value = new StringBuilder();
 
-            for (LinkedList<MockMetadataValue> metadatums : metadatumLists) {
+            for (LinkedList<MetadataValueDTO> metadatums : metadatumLists) {
                 value.append(metadatums.get(i).getValue());
 
                 if (!metadatums.equals(metadatumLists.getLast())) {

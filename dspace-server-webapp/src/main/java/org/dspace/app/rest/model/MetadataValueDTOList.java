@@ -14,21 +14,22 @@ import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.converter.MetadataConverter;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.content.MetadataValue;
+import org.dspace.content.dto.MetadataValueDTO;
 
 /**
  * Type-safe wrapper for a list of {@link MetadataValue}s for use with {@link MetadataConverter},
  * so it can be invoked properly via calls to {@link ConverterService#toRest(Object, Projection)}.
  */
-public class MetadataValueList extends AbstractList<MetadataValue> {
+public class MetadataValueDTOList extends AbstractList<MetadataValueDTO> {
 
-    private final List<MetadataValue> list;
+    private final List<MetadataValueDTO> list;
 
-    public MetadataValueList(List<MetadataValue> list) {
+    public MetadataValueDTOList(List<MetadataValueDTO> list) {
         this.list = list;
     }
 
     @Override
-    public MetadataValue get(int index) {
+    public MetadataValueDTO get(int index) {
         return list.get(index);
     }
 

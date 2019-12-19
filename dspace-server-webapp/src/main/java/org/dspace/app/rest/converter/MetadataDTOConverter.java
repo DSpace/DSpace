@@ -17,13 +17,14 @@ import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import org.dspace.app.rest.model.MetadataRest;
-import org.dspace.app.rest.model.MetadataValueList;
+import org.dspace.app.rest.model.MetadataValueDTOList;
 import org.dspace.app.rest.model.MetadataValueRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
+import org.dspace.content.dto.MetadataValueDTO;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.Context;
@@ -34,7 +35,7 @@ import org.springframework.stereotype.Component;
  * Converter to translate between lists of domain {@link MetadataValue}s and {@link MetadataRest} representations.
  */
 @Component
-public class MetadataConverter implements DSpaceConverter<MetadataValueList, MetadataRest> {
+public class MetadataDTOConverter implements DSpaceConverter<MetadataValueDTOList, MetadataRest> {
 
     @Autowired
     private ContentServiceFactory contentServiceFactory;
@@ -43,12 +44,12 @@ public class MetadataConverter implements DSpaceConverter<MetadataValueList, Met
     private ConverterService converter;
 
     @Override
-    public MetadataRest convert(MetadataValueList metadataValues,
+    public MetadataRest convert(MetadataValueDTOList metadataValues,
                                 Projection projection) {
         // Convert each value to a DTO while retaining place order in a map of key -> SortedSet
         Map<String, SortedSet<MetadataValueRest>> mapOfSortedSets = new HashMap<>();
-        for (MetadataValue metadataValue : metadataValues) {
-            String key = metadataValue.getMetadataField().toString('.');
+        for (MetadataValueDTO metadataValue : metadataValues) {
+            String key = metadataValue.getKey();
             SortedSet<MetadataValueRest> set = mapOfSortedSets.get(key);
             if (set == null) {
                 set = new TreeSet<>(Comparator.comparingInt(MetadataValueRest::getPlace));
@@ -69,8 +70,8 @@ public class MetadataConverter implements DSpaceConverter<MetadataValueList, Met
     }
 
     @Override
-    public Class<MetadataValueList> getModelClass() {
-        return MetadataValueList.class;
+    public Class<MetadataValueDTOList> getModelClass() {
+        return MetadataValueDTOList.class;
     }
 
     /**
@@ -83,17 +84,17 @@ public class MetadataConverter implements DSpaceConverter<MetadataValueList, Met
      * @throws AuthorizeException if an authorization error occurs.
      */
     public void setMetadata(Context context, DSpaceObject dso, MetadataRest metadataRest)
-            throws SQLException, AuthorizeException {
+        throws SQLException, AuthorizeException {
         DSpaceObjectService dsoService = contentServiceFactory.getDSpaceObjectService(dso);
         dsoService.clearMetadata(context, dso, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
-        for (Map.Entry<String, List<MetadataValueRest>> entry: metadataRest.getMap().entrySet()) {
+        for (Map.Entry<String, List<MetadataValueRest>> entry : metadataRest.getMap().entrySet()) {
             String[] seq = entry.getKey().split("\\.");
             String schema = seq[0];
             String element = seq[1];
             String qualifier = seq.length == 3 ? seq[2] : null;
-            for (MetadataValueRest mvr: entry.getValue()) {
+            for (MetadataValueRest mvr : entry.getValue()) {
                 dsoService.addMetadata(context, dso, schema, element, qualifier, mvr.getLanguage(),
-                        mvr.getValue(), mvr.getAuthority(), mvr.getConfidence());
+                                       mvr.getValue(), mvr.getAuthority(), mvr.getConfidence());
             }
         }
         dsoService.update(context, dso);

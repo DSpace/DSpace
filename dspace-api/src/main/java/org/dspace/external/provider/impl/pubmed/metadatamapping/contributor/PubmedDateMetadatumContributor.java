@@ -17,10 +17,10 @@ import java.util.List;
 
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.DCDate;
+import org.dspace.content.dto.MetadataValueDTO;
 import org.dspace.external.provider.impl.metadatamapping.contributors.MetadataContributor;
 import org.dspace.external.provider.impl.pubmed.metadatamapping.utils.MetadatumContributorUtils;
 import org.dspace.mock.MockMetadataField;
-import org.dspace.mock.MockMetadataValue;
 import org.springframework.beans.factory.annotation.Required;
 
 /**
@@ -82,14 +82,14 @@ public class PubmedDateMetadatumContributor<T> implements MetadataContributor<T>
      * @return a collection of import records. Only the identifier of the found records may be put in the record.
      */
     @Override
-    public Collection<MockMetadataValue> contributeMetadata(T t) {
-        List<MockMetadataValue> values = new LinkedList<>();
+    public Collection<MetadataValueDTO> contributeMetadata(T t) {
+        List<MetadataValueDTO> values = new LinkedList<>();
 
 
         try {
-            LinkedList<MockMetadataValue> yearList = (LinkedList<MockMetadataValue>) year.contributeMetadata(t);
-            LinkedList<MockMetadataValue> monthList = (LinkedList<MockMetadataValue>) month.contributeMetadata(t);
-            LinkedList<MockMetadataValue> dayList = (LinkedList<MockMetadataValue>) day.contributeMetadata(t);
+            LinkedList<MetadataValueDTO> yearList = (LinkedList<MetadataValueDTO>) year.contributeMetadata(t);
+            LinkedList<MetadataValueDTO> monthList = (LinkedList<MetadataValueDTO>) month.contributeMetadata(t);
+            LinkedList<MetadataValueDTO> dayList = (LinkedList<MetadataValueDTO>) day.contributeMetadata(t);
 
             for (int i = 0; i < yearList.size(); i++) {
                 DCDate dcDate = null;

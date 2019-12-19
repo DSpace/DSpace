@@ -15,9 +15,9 @@ import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMText;
 import org.apache.axiom.om.xpath.AXIOMXPath;
+import org.dspace.content.dto.MetadataValueDTO;
 import org.dspace.external.provider.impl.pubmed.metadatamapping.utils.MetadatumContributorUtils;
 import org.dspace.mock.MockMetadataField;
-import org.dspace.mock.MockMetadataValue;
 import org.jaxen.JaxenException;
 import org.springframework.beans.factory.annotation.Required;
 
@@ -92,8 +92,8 @@ public class SimpleXpathMetadatumContributor implements MetadataContributor<OMEl
      * @return a collection of import records. Only the identifier of the found records may be put in the record.
      */
     @Override
-    public Collection<MockMetadataValue> contributeMetadata(OMElement t) {
-        List<MockMetadataValue> values = new LinkedList<>();
+    public Collection<MetadataValueDTO> contributeMetadata(OMElement t) {
+        List<MetadataValueDTO> values = new LinkedList<>();
         try {
             AXIOMXPath xpath = new AXIOMXPath(query);
             List<Object> nodes = xpath.selectNodes(t);

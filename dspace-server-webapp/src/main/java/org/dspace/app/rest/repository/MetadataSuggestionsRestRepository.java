@@ -21,6 +21,7 @@ import org.dspace.app.rest.model.MetadataSuggestionEntryRest;
 import org.dspace.app.rest.model.MetadataSuggestionsSourceRest;
 import org.dspace.app.rest.model.hateoas.DSpaceResource;
 import org.dspace.app.rest.model.hateoas.MetadataSuggestionsSourceResource;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Context;
@@ -73,10 +74,9 @@ public class MetadataSuggestionsRestRepository extends DSpaceRestRepository<Meta
         }
         List<MetadataSuggestionProvider> metadataSuggestionProviders = metadataSuggestionProviderService
             .getMetadataSuggestionProviders(inProgressSubmission);
-        Page<MetadataSuggestionsSourceRest> page = utils.getPage(metadataSuggestionProviders, pageable)
-                                                        .map(metadataSuggestionsSourceRestConverter);
 
-        return page;
+        return converter
+            .toRestPage(metadataSuggestionProviders, pageable, metadataSuggestionProviders.size(), Projection.DEFAULT);
     }
 
     /**
@@ -91,7 +91,7 @@ public class MetadataSuggestionsRestRepository extends DSpaceRestRepository<Meta
         Optional<MetadataItemSuggestions> metadataItemSuggestionsOptional = metadataSuggestionProviderService
             .getMetadataItemSuggestions(suggestionName, entryId, inProgressSubmission);
         if (metadataItemSuggestionsOptional.isPresent()) {
-            return metadataSuggestionEntryConverter.fromModel(metadataItemSuggestionsOptional.get());
+            return converter.toRest(metadataItemSuggestionsOptional.get(), Projection.DEFAULT);
         } else {
             throw new ResourceNotFoundException(
                 "MetadataSuggestionEntry for suggestionName: " + suggestionName + " and entryId: " + entryId + " for " +
@@ -104,7 +104,7 @@ public class MetadataSuggestionsRestRepository extends DSpaceRestRepository<Meta
         Optional<MetadataSuggestionProvider> metadataSuggestionProviderOptional = metadataSuggestionProviderService
             .getMetadataSuggestionProvider(id);
         if (metadataSuggestionProviderOptional.isPresent()) {
-            return metadataSuggestionsSourceRestConverter.fromModel(metadataSuggestionProviderOptional.get());
+            return converter.toRest(metadataSuggestionProviderOptional.get(), Projection.DEFAULT);
         } else {
             throw new ResourceNotFoundException("MetadataSuggestionProvider for: " + id + " couldn't be found");
         }

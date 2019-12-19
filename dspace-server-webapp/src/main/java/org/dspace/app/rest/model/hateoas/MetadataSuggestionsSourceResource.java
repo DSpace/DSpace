@@ -19,7 +19,7 @@ public class MetadataSuggestionsSourceResource extends DSpaceResource<MetadataSu
 
     public MetadataSuggestionsSourceResource(MetadataSuggestionsSourceRest data, Utils utils,
                                              String... rels) {
-        super(data, utils, rels);
+        super(data, utils);
     }
 
 }
