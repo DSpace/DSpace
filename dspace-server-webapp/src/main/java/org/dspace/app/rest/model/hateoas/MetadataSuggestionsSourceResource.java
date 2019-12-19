@@ -9,13 +9,17 @@ package org.dspace.app.rest.model.hateoas;
 
 import org.dspace.app.rest.model.MetadataSuggestionsSourceRest;
 import org.dspace.app.rest.model.hateoas.annotations.RelNameDSpaceResource;
+import org.dspace.app.rest.utils.Utils;
 
 /**
  * The Resource object for {@link MetadataSuggestionsSourceRest} object
  */
 @RelNameDSpaceResource(MetadataSuggestionsSourceRest.NAME)
-public class MetadataSuggestionsSourceResource extends HALResource<MetadataSuggestionsSourceRest> {
-    public MetadataSuggestionsSourceResource(MetadataSuggestionsSourceRest content) {
-        super(content);
+public class MetadataSuggestionsSourceResource extends DSpaceResource<MetadataSuggestionsSourceRest> {
+
+    public MetadataSuggestionsSourceResource(MetadataSuggestionsSourceRest data, Utils utils,
+                                             String... rels) {
+        super(data, utils, rels);
     }
+
 }

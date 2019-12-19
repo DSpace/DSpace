@@ -9,14 +9,15 @@ package org.dspace.app.rest.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.dspace.app.rest.MetadataSuggestionsRestController;
+import org.dspace.app.rest.RestResourceController;
 
 /**
  * REST representation of the {@link org.dspace.external.provider.metadata.MetadataSuggestionProvider}
  */
 public class MetadataSuggestionsSourceRest extends BaseObjectRest<String> {
 
-    public static final String NAME = "metadataSuggestion";
-    public static final String PLURAL_NAME = "metadataSuggestions";
+    public static final String NAME = "metadatasuggestion";
+    public static final String PLURAL_NAME = "metadatasuggestions";
     public static final String CATEGORY = RestAddressableModel.INTEGRATION;
 
     @Override
@@ -26,7 +27,7 @@ public class MetadataSuggestionsSourceRest extends BaseObjectRest<String> {
 
     @Override
     public Class getController() {
-        return MetadataSuggestionsRestController.class;
+        return RestResourceController.class;
     }
 
     @Override
@@ -47,7 +48,7 @@ public class MetadataSuggestionsSourceRest extends BaseObjectRest<String> {
      */
     @JsonProperty("query-based")
     private boolean queryBased;
-    /**
+    /**k
      * A boolean indicating whether this MetadataSuggestionsSouceRest object is file based or not
      */
     @JsonProperty("file-based")

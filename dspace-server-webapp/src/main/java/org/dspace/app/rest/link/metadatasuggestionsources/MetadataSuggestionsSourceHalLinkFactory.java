@@ -26,7 +26,7 @@ public class MetadataSuggestionsSourceHalLinkFactory
     @Override
     protected void addLinks(MetadataSuggestionsSourceResource halResource, Pageable pageable, LinkedList<Link> list)
         throws Exception {
-        list.add(buildLink(Link.REL_SELF, getMethodOn().getMetadataSuggestion(halResource.getContent().getId())));
+//        list.add(buildLink(Link.REL_SELF, getMethodOn().getMetadataSuggestion(halResource.getContent().getId())));
 
         //TODO Uncomment when method is created
 //        list.add(buildLink("entries", getMethodOn()
