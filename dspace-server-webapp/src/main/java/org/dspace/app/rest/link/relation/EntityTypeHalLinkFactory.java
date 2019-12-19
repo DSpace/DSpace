@@ -27,7 +27,8 @@ import org.springframework.stereotype.Component;
 public class EntityTypeHalLinkFactory extends HalLinkFactory<EntityTypeResource, RelationshipTypeRestController> {
     @Override
     protected void addLinks(EntityTypeResource halResource, Pageable pageable, LinkedList<Link> list) throws Exception {
-        list.add(buildLink("relationshiptypes", getMethodOn().retrieve(halResource.getContent().getId(), null, null)));
+        list.add(buildLink("relationshiptypes", getMethodOn().retrieve(
+                halResource.getContent().getId(), null, null)));
     }
 
     @Override

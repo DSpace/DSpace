@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * This class converts the restUrl and constructs a RootRest instance to return
+ * This class read the core configuration properties and constructs a RootRest instance to return
  */
 @Component
 public class RootConverter {
@@ -25,7 +25,7 @@ public class RootConverter {
         RootRest rootRest = new RootRest();
         rootRest.setDspaceName(configurationService.getProperty("dspace.name"));
         rootRest.setDspaceURL(configurationService.getProperty("dspace.url"));
-        rootRest.setDspaceRest(configurationService.getProperty("dspace.restUrl"));
+        rootRest.setDspaceRest(configurationService.getProperty("dspace.baseUrl"));
         return rootRest;
     }
 }

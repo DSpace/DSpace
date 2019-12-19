@@ -165,7 +165,7 @@ public class SHERPAResponse {
                 }
             }
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            log.error("Error parsing SHERPA API Response", e);
         }
     }
 

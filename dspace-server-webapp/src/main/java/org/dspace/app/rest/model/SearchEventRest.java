@@ -29,19 +29,6 @@ public class SearchEventRest extends BaseObjectRest<UUID> {
     private SearchResultsRest.Sorting sort;
     private PageRest page;
 
-    public SearchEventRest(String query, UUID scope, String configuration,
-                           List<SearchResultsRest.AppliedFilter> appliedFilters,
-                           SearchResultsRest.Sorting sort) {
-        this.query = query;
-        this.scope = scope;
-        this.configuration = configuration;
-        this.appliedFilters = appliedFilters;
-        this.sort = sort;
-    }
-
-    public SearchEventRest() {
-    }
-
     public String getCategory() {
         return CATEGORY;
     }

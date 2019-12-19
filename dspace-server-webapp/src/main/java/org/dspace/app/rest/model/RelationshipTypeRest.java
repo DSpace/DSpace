@@ -20,8 +20,10 @@ public class RelationshipTypeRest extends BaseObjectRest<Integer> {
     public static final String NAME = "relationshiptype";
     public static final String CATEGORY = "core";
 
-    private String leftLabel;
-    private String rightLabel;
+    private String leftwardType;
+    private String rightwardType;
+    private boolean copyToLeft;
+    private boolean copyToRight;
     private Integer leftMinCardinality;
     private Integer leftMaxCardinality;
     private Integer rightMinCardinality;
@@ -41,20 +43,52 @@ public class RelationshipTypeRest extends BaseObjectRest<Integer> {
         return RestResourceController.class;
     }
 
-    public String getLeftLabel() {
-        return leftLabel;
+    public String getLeftwardType() {
+        return leftwardType;
     }
 
-    public void setLeftLabel(String leftLabel) {
-        this.leftLabel = leftLabel;
+    public void setLeftwardType(String leftwardType) {
+        this.leftwardType = leftwardType;
     }
 
-    public String getRightLabel() {
-        return rightLabel;
+    public String getRightwardType() {
+        return rightwardType;
     }
 
-    public void setRightLabel(String rightLabel) {
-        this.rightLabel = rightLabel;
+    public void setRightwardType(String rightwardType) {
+        this.rightwardType = rightwardType;
+    }
+
+    /**
+     * Generic getter for the copyToLeft
+     * @return the copyToLeft value of this RelationshipTypeRest
+     */
+    public boolean isCopyToLeft() {
+        return copyToLeft;
+    }
+
+    /**
+     * Generic setter for the copyToLeft
+     * @param copyToLeft   The copyToLeft to be set on this RelationshipTypeRest
+     */
+    public void setCopyToLeft(boolean copyToLeft) {
+        this.copyToLeft = copyToLeft;
+    }
+
+    /**
+     * Generic getter for the copyToRight
+     * @return the copyToRight value of this RelationshipTypeRest
+     */
+    public boolean isCopyToRight() {
+        return copyToRight;
+    }
+
+    /**
+     * Generic setter for the copyToRight
+     * @param copyToRight   The copyToRight to be set on this RelationshipTypeRest
+     */
+    public void setCopyToRight(boolean copyToRight) {
+        this.copyToRight = copyToRight;
     }
 
     public Integer getLeftMinCardinality() {

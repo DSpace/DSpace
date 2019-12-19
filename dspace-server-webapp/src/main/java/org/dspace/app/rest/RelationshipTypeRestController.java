@@ -13,11 +13,12 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.dspace.app.rest.converter.RelationshipTypeConverter;
+import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.link.HalLinkService;
 import org.dspace.app.rest.model.RelationshipTypeRest;
 import org.dspace.app.rest.model.RelationshipTypeRestWrapper;
 import org.dspace.app.rest.model.hateoas.RelationshipTypeResourceWrapper;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.content.EntityType;
@@ -48,7 +49,7 @@ public class RelationshipTypeRestController {
     private EntityTypeService entityTypeService;
 
     @Autowired
-    private RelationshipTypeConverter relationshipTypeConverter;
+    private ConverterService converter;
 
     @Autowired
     private Utils utils;
@@ -67,27 +68,28 @@ public class RelationshipTypeRestController {
      * @throws SQLException If something goes wrong
      */
     @RequestMapping(method = RequestMethod.GET)
-    public RelationshipTypeResourceWrapper retrieve(@PathVariable Integer id, HttpServletResponse response,
+    public RelationshipTypeResourceWrapper retrieve(@PathVariable Integer id,
+                                                    HttpServletResponse response,
                                                     HttpServletRequest request) throws SQLException {
         Context context = ContextUtil.obtainContext(request);
         EntityType entityType = entityTypeService.find(context, id);
-        List<RelationshipType> list = relationshipTypeService.findByEntityType(context, entityType);
+        List<RelationshipType> list = relationshipTypeService.findByEntityType(context, entityType, -1, -1);
 
         List<RelationshipTypeRest> relationshipTypeRests = new LinkedList<>();
 
+        Projection projection = utils.obtainProjection();
         for (RelationshipType relationshipType : list) {
-            relationshipTypeRests.add(relationshipTypeConverter.fromModel(relationshipType));
+            relationshipTypeRests.add(converter.toRest(relationshipType, projection));
         }
 
-
         RelationshipTypeRestWrapper relationshipTypeRestWrapper = new RelationshipTypeRestWrapper();
+        relationshipTypeRestWrapper.setProjection(projection);
         relationshipTypeRestWrapper.setEntityTypeId(id);
         relationshipTypeRestWrapper.setEntityTypeLabel(entityType.getLabel());
         relationshipTypeRestWrapper.setRelationshipTypeRestList(relationshipTypeRests);
 
-        RelationshipTypeResourceWrapper relationshipTypeResourceWrapper = new RelationshipTypeResourceWrapper(
-            relationshipTypeRestWrapper, utils);
-        halLinkService.addLinks(relationshipTypeResourceWrapper);
+        RelationshipTypeResourceWrapper relationshipTypeResourceWrapper =
+                converter.toResource(relationshipTypeRestWrapper);
         return relationshipTypeResourceWrapper;
     }
 }

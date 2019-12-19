@@ -128,9 +128,23 @@ public class InitializeEntities {
 
                     String leftType =  eElement.getElementsByTagName("leftType").item(0).getTextContent();
                     String rightType = eElement.getElementsByTagName("rightType").item(0).getTextContent();
-                    String leftLabel = eElement.getElementsByTagName("leftLabel").item(0).getTextContent();
-                    String rightLabel = eElement.getElementsByTagName("rightLabel").item(0).getTextContent();
+                    String leftwardType = eElement.getElementsByTagName("leftwardType").item(0).getTextContent();
+                    String rightwardType = eElement.getElementsByTagName("rightwardType").item(0).getTextContent();
+                    Node copyToLeftNode = eElement.getElementsByTagName("copyToLeft").item(0);
+                    Boolean copyToLeft;
+                    if (copyToLeftNode == null) {
+                        copyToLeft = false;
+                    } else {
+                        copyToLeft = Boolean.valueOf(copyToLeftNode.getTextContent());
 
+                    }
+                    Node copyToRightNode = eElement.getElementsByTagName("copyToRight").item(0);
+                    Boolean copyToRight;
+                    if (copyToRightNode == null) {
+                        copyToRight = false;
+                    } else {
+                        copyToRight = Boolean.valueOf(copyToRightNode.getTextContent());
+                    }
 
                     NodeList leftCardinalityList = eElement.getElementsByTagName("leftCardinality");
                     NodeList rightCardinalityList = eElement.getElementsByTagName("rightCardinality");
@@ -154,9 +168,9 @@ public class InitializeEntities {
                         rightCardinalityMax = getString(rightCardinalityMax,(Element) node, "max");
 
                     }
-                    populateRelationshipType(context, leftType, rightType, leftLabel, rightLabel,
+                    populateRelationshipType(context, leftType, rightType, leftwardType, rightwardType,
                                              leftCardinalityMin, leftCardinalityMax,
-                                             rightCardinalityMin, rightCardinalityMax);
+                                             rightCardinalityMin, rightCardinalityMax, copyToLeft, copyToRight);
 
 
                 }
@@ -173,9 +187,10 @@ public class InitializeEntities {
         return leftCardinalityMin;
     }
 
-    private void populateRelationshipType(Context context, String leftType, String rightType, String leftLabel,
-                                          String rightLabel, String leftCardinalityMin, String leftCardinalityMax,
-                                          String rightCardinalityMin, String rightCardinalityMax)
+    private void populateRelationshipType(Context context, String leftType, String rightType, String leftwardType,
+                                          String rightwardType, String leftCardinalityMin, String leftCardinalityMax,
+                                          String rightCardinalityMin, String rightCardinalityMax,
+                                          Boolean copyToLeft, Boolean copyToRight)
         throws SQLException, AuthorizeException {
 
         EntityType leftEntityType = entityTypeService.findByEntityType(context,leftType);
@@ -211,12 +226,15 @@ public class InitializeEntities {
             rightCardinalityMaxInteger = null;
         }
         RelationshipType relationshipType = relationshipTypeService
-            .findbyTypesAndLabels(context, leftEntityType, rightEntityType, leftLabel, rightLabel);
+            .findbyTypesAndTypeName(context, leftEntityType, rightEntityType, leftwardType, rightwardType);
         if (relationshipType == null) {
-            relationshipTypeService.create(context, leftEntityType, rightEntityType, leftLabel, rightLabel,
+            relationshipTypeService.create(context, leftEntityType, rightEntityType, leftwardType, rightwardType,
                                            leftCardinalityMinInteger, leftCardinalityMaxInteger,
-                                           rightCardinalityMinInteger, rightCardinalityMaxInteger);
+                                           rightCardinalityMinInteger, rightCardinalityMaxInteger,
+                                           copyToLeft, copyToRight);
         } else {
+            relationshipType.setCopyToLeft(copyToLeft);
+            relationshipType.setCopyToRight(copyToRight);
             relationshipType.setLeftMinCardinality(leftCardinalityMinInteger);
             relationshipType.setLeftMaxCardinality(leftCardinalityMaxInteger);
             relationshipType.setRightMinCardinality(rightCardinalityMinInteger);

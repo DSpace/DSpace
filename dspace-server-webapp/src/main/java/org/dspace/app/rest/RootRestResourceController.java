@@ -9,8 +9,8 @@ package org.dspace.app.rest;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.link.HalLinkService;
-import org.dspace.app.rest.model.RootRest;
 import org.dspace.app.rest.model.hateoas.RootResource;
 import org.dspace.app.rest.repository.RootRestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,13 +39,11 @@ public class RootRestResourceController {
     @Autowired
     RootRestRepository rootRestRepository;
 
+    @Autowired
+    ConverterService converter;
+
     @RequestMapping(method = RequestMethod.GET)
     public RootResource listDefinedEndpoint(HttpServletRequest request) {
-
-        RootRest rootRest = rootRestRepository.getRoot();
-        RootResource rootResource = new RootResource(rootRest);
-        halLinkService.addLinks(rootResource);
-
-        return rootResource;
+        return converter.toResource(rootRestRepository.getRoot());
     }
 }

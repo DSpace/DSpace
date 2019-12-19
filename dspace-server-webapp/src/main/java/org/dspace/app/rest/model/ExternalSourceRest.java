@@ -7,7 +7,7 @@
  */
 package org.dspace.app.rest.model;
 
-import org.dspace.app.rest.ExternalSourcesRestController;
+import org.dspace.app.rest.RestResourceController;
 
 /**
  * This class serves as a REST representation for an External Source
@@ -25,7 +25,7 @@ public class ExternalSourceRest extends BaseObjectRest<String> {
 
     @Override
     public Class getController() {
-        return ExternalSourcesRestController.class;
+        return RestResourceController.class;
     }
 
     @Override
