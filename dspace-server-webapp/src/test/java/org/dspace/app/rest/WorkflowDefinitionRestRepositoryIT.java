@@ -19,6 +19,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.List;
 import java.util.UUID;
 
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.model.WorkflowDefinitionRest;
@@ -84,16 +85,18 @@ public class WorkflowDefinitionRestRepositoryIT extends AbstractControllerIntegr
                 firstNonDefaultWorkflowName = workflow.getID();
             }
         }
-        //When we call this facets endpoint
-        getClient().perform(get(WORKFLOW_DEFINITIONS_ENDPOINT + "/" + firstNonDefaultWorkflowName))
-                //We expect a 200 OK status
-                .andExpect(status().isOk())
-                //There needs to be a self link to this endpoint
-                .andExpect(jsonPath("$._links.self.href", containsString(WORKFLOW_DEFINITIONS_ENDPOINT)))
-                // its name is name of non-default workflow
-                .andExpect(jsonPath("$.name", equalToIgnoringCase(firstNonDefaultWorkflowName)))
-                // is not default
-                .andExpect(jsonPath("$.isDefault", is(false)));
+        if (StringUtils.isNotBlank(firstNonDefaultWorkflowName)) {
+            //When we call this facets endpoint
+            getClient().perform(get(WORKFLOW_DEFINITIONS_ENDPOINT + "/" + firstNonDefaultWorkflowName))
+                    //We expect a 200 OK status
+                    .andExpect(status().isOk())
+                    //There needs to be a self link to this endpoint
+                    .andExpect(jsonPath("$._links.self.href", containsString(WORKFLOW_DEFINITIONS_ENDPOINT)))
+                    // its name is name of non-default workflow
+                    .andExpect(jsonPath("$.name", equalToIgnoringCase(firstNonDefaultWorkflowName)))
+                    // is not default
+                    .andExpect(jsonPath("$.isDefault", is(false)));
+        }
     }
 
     @Test
@@ -190,25 +193,26 @@ public class WorkflowDefinitionRestRepositoryIT extends AbstractControllerIntegr
             }
         }
 
-        List<String> handlesOfMappedCollections
-                = xmlWorkflowFactory.getCollectionHandlesMappedToWorklow(firstNonDefaultWorkflowName);
-
-        //When we call this facets endpoint
-        if (handlesOfMappedCollections.size() > 0) {
-            //returns array of collection jsons that are mapped to given workflow
-            MvcResult result = getClient().perform(get(WORKFLOW_DEFINITIONS_ENDPOINT + "/"
-                    + firstNonDefaultWorkflowName + "/collections")).andReturn();
-            String response = result.getResponse().getContentAsString();
-            JSONArray collectionsResult = new JSONArray(response);
-            assertEquals(collectionsResult.length(), handlesOfMappedCollections.size());
-        } else {
-            //no collections mapped to this workflow
-            getClient().perform(get(WORKFLOW_DEFINITIONS_ENDPOINT + "/"
-                    + firstNonDefaultWorkflowName + "/collections"))
-                    //We expect a 200 OK status
-                    .andExpect(status().isOk())
-                    //results in empty list
-                    .andExpect(jsonPath("$", empty()));
+        if (StringUtils.isNotBlank(firstNonDefaultWorkflowName)) {
+            List<String> handlesOfMappedCollections
+                    = xmlWorkflowFactory.getCollectionHandlesMappedToWorklow(firstNonDefaultWorkflowName);
+            //When we call this facets endpoint
+            if (handlesOfMappedCollections.size() > 0) {
+                //returns array of collection jsons that are mapped to given workflow
+                MvcResult result = getClient().perform(get(WORKFLOW_DEFINITIONS_ENDPOINT + "/"
+                        + firstNonDefaultWorkflowName + "/collections")).andReturn();
+                String response = result.getResponse().getContentAsString();
+                JSONArray collectionsResult = new JSONArray(response);
+                assertEquals(collectionsResult.length(), handlesOfMappedCollections.size());
+            } else {
+                //no collections mapped to this workflow
+                getClient().perform(get(WORKFLOW_DEFINITIONS_ENDPOINT + "/"
+                        + firstNonDefaultWorkflowName + "/collections"))
+                        //We expect a 200 OK status
+                        .andExpect(status().isOk())
+                        //results in empty list
+                        .andExpect(jsonPath("$", empty()));
+            }
         }
     }
 
