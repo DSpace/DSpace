@@ -2521,7 +2521,7 @@
     <message key="xmlui.Discovery.SimpleSearch.filter_head">Filtros</message>
     <message key="xmlui.Discovery.SimpleSearch.filter_help">Utilize filtros para refinar o resultado de busca.</message>
     <message key="xmlui.Discovery.SimpleSearch.filter_add">Adicionar</message>
-    <message key="xmlui.Discovery.SimpleSearch.filter_apply">Atualizar filtros
+    <message key="xmlui.Discovery.SimpleSearch.filter_apply">Atualizar filtros</message>
 
     <message key="xmlui.Discovery.SimpleSearch.filter.contains">Contém</message>
     <message key="xmlui.Discovery.SimpleSearch.filter.equals">Igual</message>
@@ -2680,7 +2680,7 @@
     <message key="xmlui.XMLWorkflow.scoreReview.scoreReviewStep">Pontuação de avaliação</message>
 
     <message key="xmlui.discovery.ocultar_filtros">Ocultar Filtros</message>
-    <message key="xmlui.discovery.ver_filtros">Ver filtros</message></message>
+    <message key="xmlui.discovery.ver_filtros">Ver filtros</message>
 	
 	<message key="sedici.home.buscar_material.title">Material de pesquisa</message>
 	<message key="sedici.home.buscar_material.info_pre">Pesquise entre mais de </message>
