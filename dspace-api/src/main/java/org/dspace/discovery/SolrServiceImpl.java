@@ -1855,21 +1855,10 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     }
 
     //========== SearchService implementation
-    @Override
-    public DiscoverResult search(Context context, DiscoverQuery query) throws SearchServiceException {
-        return search(context, query, false);
-    }
 
     @Override
-    public DiscoverResult search(Context context, IndexableObject dso,
-                                 DiscoverQuery query)
+    public DiscoverResult search(Context context, IndexableObject dso, DiscoverQuery discoveryQuery)
         throws SearchServiceException {
-        return search(context, dso, query, false);
-    }
-
-    @Override
-    public DiscoverResult search(Context context, IndexableObject dso, DiscoverQuery discoveryQuery,
-                                 boolean includeUnDiscoverable) throws SearchServiceException {
         if (dso != null) {
             if (dso instanceof Community) {
                 discoveryQuery.addFilterQueries("location:m" + dso.getID());
@@ -1879,19 +1868,19 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 discoveryQuery.addFilterQueries(HANDLE_FIELD + ":" + ((Item) dso).getHandle());
             }
         }
-        return search(context, discoveryQuery, includeUnDiscoverable);
+        return search(context, discoveryQuery);
 
     }
 
 
     @Override
-    public DiscoverResult search(Context context, DiscoverQuery discoveryQuery, boolean includeUnDiscoverable)
+    public DiscoverResult search(Context context, DiscoverQuery discoveryQuery )
         throws SearchServiceException {
         try {
             if (getSolr() == null) {
                 return new DiscoverResult();
             }
-            SolrQuery solrQuery = resolveToSolrQuery(context, discoveryQuery, includeUnDiscoverable);
+            SolrQuery solrQuery = resolveToSolrQuery(context, discoveryQuery);
 
 
             QueryResponse queryResponse = getSolr().query(solrQuery, SolrRequest.METHOD.POST);
@@ -1902,8 +1891,8 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         }
     }
 
-    protected SolrQuery resolveToSolrQuery(Context context, DiscoverQuery discoveryQuery,
-                                           boolean includeUnDiscoverable) throws SearchServiceException {
+    protected SolrQuery resolveToSolrQuery(Context context, DiscoverQuery discoveryQuery)
+        throws SearchServiceException {
         SolrQuery solrQuery = new SolrQuery();
 
         String query = "*:*";
@@ -1927,11 +1916,6 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             solrQuery.setParam(SpellingParams.SPELLCHECK_Q, query);
             solrQuery.setParam(SpellingParams.SPELLCHECK_COLLATE, Boolean.TRUE);
             solrQuery.setParam("spellcheck", Boolean.TRUE);
-        }
-
-        if (!includeUnDiscoverable) {
-            solrQuery.addFilterQuery("NOT(withdrawn:true)");
-            solrQuery.addFilterQuery("NOT(discoverable:false)");
         }
 
         for (int i = 0; i < discoveryQuery.getFilterQueries().size(); i++) {
@@ -2401,8 +2385,8 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
         } catch (Exception e) {
             log.error(
-                LogManager.getHeader(context, "Error while retrieving related items", "Handle: " + item.getHandle()),
-                e);
+                LogManager.getHeader(context, "Error while retrieving related items", "Handle: "
+                    + item.getHandle()), e);
         }
         return results;
     }
