@@ -2,6 +2,9 @@
 <!DOCTYPE relationships SYSTEM "relationship-types.dtd">
 
 <relationships>
+
+	<!-- Sample relationship types setup used for the entities development
+	 This file can be imported using the initialize-entities launcher -->
     <type>
         <leftType>Publication</leftType>
         <rightType>Person</rightType>
