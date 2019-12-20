@@ -22,7 +22,6 @@ import org.dspace.content.Collection;
 import org.dspace.core.Context;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
-import org.dspace.xmlworkflow.WorkflowConfigurationException;
 import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
 import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,25 +63,20 @@ public class WorkflowDefinitionController {
     @GetMapping("{workflowName}/collections")
     public List<CollectionRest> get(HttpServletRequest request, HttpServletResponse response,
                                     @PathVariable String workflowName) throws SQLException {
-        try {
-            if (xmlWorkflowFactory.workflowByThisNameExists(workflowName)) {
-                List<String> collectionsHandlesMappedToWorkflow
-                        = xmlWorkflowFactory.getCollectionHandlesMappedToWorklow(workflowName);
-                List<CollectionRest> collectionResourcesFromHandles = new ArrayList<>();
-                for (String handle : collectionsHandlesMappedToWorkflow) {
-                    Context context = ContextUtil.obtainContext(request);
-                    Collection collection = (Collection) handleService.resolveToObject(context, handle);
-                    if (collection != null) {
-                        collectionResourcesFromHandles.add(converter.toRest(collection, utils.obtainProjection()));
-                    }
+        if (xmlWorkflowFactory.workflowByThisNameExists(workflowName)) {
+            List<String> collectionsHandlesMappedToWorkflow
+                    = xmlWorkflowFactory.getCollectionHandlesMappedToWorklow(workflowName);
+            List<CollectionRest> collectionResourcesFromHandles = new ArrayList<>();
+            for (String handle : collectionsHandlesMappedToWorkflow) {
+                Context context = ContextUtil.obtainContext(request);
+                Collection collection = (Collection) handleService.resolveToObject(context, handle);
+                if (collection != null) {
+                    collectionResourcesFromHandles.add(converter.toRest(collection, utils.obtainProjection()));
                 }
-                return collectionResourcesFromHandles;
-            } else {
-                throw new ResourceNotFoundException("No workflow with name " + workflowName + " is configured");
             }
-        } catch (WorkflowConfigurationException e) {
-            // TODO ? Better exception?
-            throw new RuntimeException(e.getMessage(), e);
+            return collectionResourcesFromHandles;
+        } else {
+            throw new ResourceNotFoundException("No workflow with name " + workflowName + " is configured");
         }
     }
 }

@@ -7,14 +7,11 @@
  */
 package org.dspace.xmlworkflow.factory;
 
-import java.io.IOException;
 import java.util.List;
 
 import org.dspace.content.Collection;
 import org.dspace.xmlworkflow.WorkflowConfigurationException;
-import org.dspace.xmlworkflow.state.Step;
 import org.dspace.xmlworkflow.state.Workflow;
-import org.dspace.xmlworkflow.state.actions.WorkflowActionConfig;
 
 /**
  * The xmlworkflowfactory is responsible for parsing the
@@ -31,21 +28,58 @@ public interface XmlWorkflowFactory {
 
     public final String LEGACY_WORKFLOW_NAME = "default";
 
+    /**
+     * Retrieve the workflow configuration for a single collection
+     *
+     * @param collection the collection for which we want our workflow
+     * @return the workflow configuration
+     * @throws WorkflowConfigurationException occurs if there is a configuration error in the workflow
+     */
     public Workflow getWorkflow(Collection collection) throws WorkflowConfigurationException;
 
+    /**
+     * Retrieves the workflow configuration by name
+     *
+     * @param workflowName the name for which we want our workflow
+     * @return the workflow configuration
+     * @throws WorkflowConfigurationException occurs if there is no workflow configured by that name
+     */
     public Workflow getWorkflowByName(String workflowName) throws WorkflowConfigurationException;
 
-    public List<Workflow> getAllConfiguredWorkflows() throws WorkflowConfigurationException;
+    /**
+     * Creates a list of all configured workflows, or returns the cache of this if it was already created
+     *
+     * @return List of all configured workflows
+     */
+    public List<Workflow> getAllConfiguredWorkflows();
 
-    public boolean workflowByThisNameExists(String workflowName) throws WorkflowConfigurationException;
+    /**
+     * Check to see if there is a workflow configured by the given name
+     *
+     * @param workflowName Name of a possible configured workflow
+     * @return True if there is a workflow configured by this name, false otherwise
+     * @throws WorkflowConfigurationException occurs if there is no workflow configured by that name
+     */
+    public boolean workflowByThisNameExists(String workflowName);
 
+    /**
+     * Check to see if the given workflowName is the workflow configured to be default for collections
+     * @param workflowName  Name of workflow to check if default
+     * @return  True if given workflowName is the workflow mapped to default for collections, otherwise false
+     */
     public boolean isDefaultWorkflow(String workflowName) throws WorkflowConfigurationException;
 
-    public Workflow getDefaultWorkflow() throws WorkflowConfigurationException;
+    /**
+     * Gets the default workflow, i.e. the workflow that is mapped to collection=default in workflow.xml
+     */
+    public Workflow getDefaultWorkflow();
 
-    public List<String> getCollectionHandlesMappedToWorklow(String workflowName) throws WorkflowConfigurationException;
-
-    public Step createStep(Workflow workflow, String stepID) throws WorkflowConfigurationException, IOException;
-
-    public WorkflowActionConfig createWorkflowActionConfig(String actionID);
+    /**
+     * Return a list of collections handles that are mapped to the given workflow in the workflow configuration.
+     * Makes use of a cache so it only retrieves the workflowName->List<collectionHandle> if it's not cached
+     *
+     * @param workflowName Name of workflow we want the collections of that are mapped to is
+     * @return List of collection handles mapped to the requested workflow
+     */
+    public List<String> getCollectionHandlesMappedToWorklow(String workflowName);
 }

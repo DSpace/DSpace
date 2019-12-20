@@ -42,27 +42,21 @@ public class WorkflowDefinitionRestRepository extends DSpaceRestRepository<Workf
 
     @Override
     public WorkflowDefinitionRest findOne(Context context, String workflowName) {
-        try {
-            if (xmlWorkflowFactory.workflowByThisNameExists(workflowName)) {
+        if (xmlWorkflowFactory.workflowByThisNameExists(workflowName)) {
+            try {
                 return converter.toRest(xmlWorkflowFactory.getWorkflowByName(workflowName), utils.obtainProjection());
-            } else {
+            } catch (WorkflowConfigurationException e) {
                 throw new ResourceNotFoundException("No workflow with name " + workflowName + " is configured");
             }
-        } catch (WorkflowConfigurationException e) {
-            // TODO ? Better exception?
-            throw new RuntimeException(e.getMessage(), e);
+        } else {
+            throw new ResourceNotFoundException("No workflow with name " + workflowName + " is configured");
         }
     }
 
     @Override
     public Page<WorkflowDefinitionRest> findAll(Context context, Pageable pageable) {
-        try {
-            List<Workflow> workflows = xmlWorkflowFactory.getAllConfiguredWorkflows();
-            return converter.toRestPage(workflows, pageable, workflows.size(), utils.obtainProjection());
-        } catch (WorkflowConfigurationException e) {
-            // TODO ? Better exception?
-            throw new RuntimeException(e.getMessage(), e);
-        }
+        List<Workflow> workflows = xmlWorkflowFactory.getAllConfiguredWorkflows();
+        return converter.toRestPage(workflows, pageable, workflows.size(), utils.obtainProjection());
     }
     /**
      * GET endpoint that returns the workflow definition that applies to a specific collection eventually fallback
@@ -73,17 +67,17 @@ public class WorkflowDefinitionRestRepository extends DSpaceRestRepository<Workf
      */
     @SearchRestMethod(name = "findByCollection")
     public WorkflowDefinitionRest findByCollection(@Parameter(value = "uuid") UUID collectionId) throws SQLException {
-        try {
-            Context context = obtainContext();
-            Collection collectionFromUuid = collectionService.find(context, collectionId);
-            if (collectionFromUuid != null) {
+        Context context = obtainContext();
+        Collection collectionFromUuid = collectionService.find(context, collectionId);
+        if (collectionFromUuid != null) {
+            try {
                 return converter.toRest(xmlWorkflowFactory.getWorkflow(collectionFromUuid), utils.obtainProjection());
-            } else {
-                throw new ResourceNotFoundException("Collection with id " + collectionId + " not found");
+            } catch (WorkflowConfigurationException e) {
+                throw new ResourceNotFoundException("No workflow for this collection fault and " +
+                        "no defaultWorkflow found");
             }
-        } catch (WorkflowConfigurationException e) {
-            // TODO ? Better exception?
-            throw new RuntimeException(e.getMessage(), e);
+        } else {
+            throw new ResourceNotFoundException("Collection with id " + collectionId + " not found");
         }
     }
 
