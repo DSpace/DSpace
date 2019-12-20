@@ -196,7 +196,7 @@ public class EntityServiceImplTest  {
 
         // Mock the state of objects utilized in getLeftRelationshipTypes()
         // to meet the success criteria of the invocation
-        when(itemService.getMetadata(any(), any(), any(), any(), any())).thenReturn(metsList);
+        when(itemService.getMetadata(item, "relationship", "type", null, Item.ANY, false)).thenReturn(metsList);
         when(entity.getItem()).thenReturn(item);
         when(entityService.getType(context, entity)).thenReturn(entityType);
         when(entityTypeService.findByEntityType(any(), any())).thenReturn(entityType);
@@ -225,7 +225,7 @@ public class EntityServiceImplTest  {
 
         // Mock the state of objects utilized in getRightRelationshipTypes()
         // to meet the success criteria of the invocation
-        when(itemService.getMetadata(any(), any(), any(), any(), any())).thenReturn(metsList);
+        when(itemService.getMetadata(item, "relationship", "type", null, Item.ANY, false)).thenReturn(metsList);
         when(entity.getItem()).thenReturn(item);
         when(entityService.getType(context, entity)).thenReturn(entityType);
         when(entityTypeService.findByEntityType(any(), any())).thenReturn(entityType);
