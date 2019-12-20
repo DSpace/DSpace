@@ -170,7 +170,6 @@ public class EntityServiceImplTest  {
         when(metadataValue.getValue()).thenReturn("testType");
         when(entity.getItem()).thenReturn(item);
         when(itemService.getMetadata(item, "relationship", "type", null, Item.ANY)).thenReturn(list);
-        when(entityService.getType(context, entity)).thenReturn(leftType); // Mock
         when(relationshipTypeService.findByEntityType(context, entityService.getType(context, entity), -1, -1))
                 .thenReturn(relationshipTypeList);
 
