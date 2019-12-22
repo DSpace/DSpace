@@ -50,7 +50,7 @@ RUN ant init_installation update_configs update_code update_webapps
 FROM tomcat:8-jre8
 ENV DSPACE_INSTALL=/dspace
 COPY --from=ant_build /dspace $DSPACE_INSTALL
-EXPOSE 8080 8009
+EXPOSE 8080 8009 8000
 
 ENV JAVA_OPTS=-Xmx2000m
 
