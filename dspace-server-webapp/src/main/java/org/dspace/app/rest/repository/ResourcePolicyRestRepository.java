@@ -176,6 +176,7 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
     }
 
     @Override
+    @PreAuthorize("hasAuthority('ADMIN')")
     protected ResourcePolicyRest createAndReturn(Context context) throws AuthorizeException {
 
         String resourceUuidStr = getRequestService().getCurrentRequest().getServletRequest().getParameter("resource");
@@ -250,6 +251,7 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
     }
 
     @Override
+    @PreAuthorize("hasAuthority('ADMIN')")
     protected void delete(Context context, Integer id) throws AuthorizeException {
         ResourcePolicy resourcePolicy = null;
         try {
