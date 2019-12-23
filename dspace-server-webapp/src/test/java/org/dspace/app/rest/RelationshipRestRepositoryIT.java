@@ -38,6 +38,7 @@ import org.dspace.app.rest.builder.ItemBuilder;
 import org.dspace.app.rest.builder.RelationshipBuilder;
 import org.dspace.app.rest.matcher.PageMatcher;
 import org.dspace.app.rest.matcher.RelationshipMatcher;
+import org.dspace.app.rest.model.RelationshipRest;
 import org.dspace.app.rest.test.AbstractEntityIntegrationTest;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Collection;
@@ -85,6 +86,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
     private Item author3;
 
     private Item orgUnit1;
+    private Item orgUnit2;
     private Item project1;
 
     private Item publication1;
@@ -155,6 +157,13 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                               .withIssueDate("2015-01-01")
                               .withRelationshipType("OrgUnit")
                               .build();
+
+        orgUnit2 = ItemBuilder.createItem(context, col3)
+                .withTitle("OrgUnit2")
+                .withAuthor("Testy, TEst")
+                .withIssueDate("2015-01-01")
+                .withRelationshipType("OrgUnit")
+                .build();
 
         project1 = ItemBuilder.createItem(context, col3)
                               .withTitle("Project1")
@@ -2160,6 +2169,9 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         Relationship relationship1 = RelationshipBuilder
             .createRelationshipBuilder(context, author1, orgUnit1, isOrgUnitOfPersonRelationshipType).build();
 
+        Relationship relationshipOrgunitExtra = RelationshipBuilder
+                .createRelationshipBuilder(context, author1, orgUnit2, isOrgUnitOfPersonRelationshipType).build();
+
         // We're creating a Relationship of type isOrgUnitOfPerson between a different author and the same orgunit
         Relationship relationshipAuthorExtra = RelationshipBuilder
             .createRelationshipBuilder(context, author2, orgUnit1, isOrgUnitOfPersonRelationshipType).build();
@@ -2185,10 +2197,16 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
 
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.page",
-                                       is(PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 1))))
+                                       is(PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 2))))
                    .andExpect(jsonPath("$._embedded.relationships", hasItem(
                        RelationshipMatcher.matchRelationship(relationship1)
-                   )))
+                   ))) //check ordering
+                   .andExpect(jsonPath("$._embedded.relationships[0]._links.rightItem.href",
+                       containsString(orgUnit1.getID().toString())
+                   ))
+                   .andExpect(jsonPath("$._embedded.relationships[1]._links.rightItem.href",
+                       containsString(orgUnit2.getID().toString())
+                   ))
         ;
 
         // Perform a GET request to the searchByLabel endpoint, asking for Relationships of type isOrgUnitOfPerson
@@ -2200,10 +2218,11 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
 
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.page",
-                                       is(PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 2))))
+                                       is(PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 3))))
                    .andExpect(jsonPath("$._embedded.relationships", containsInAnyOrder(
                        RelationshipMatcher.matchRelationship(relationship1),
-                       RelationshipMatcher.matchRelationship(relationshipAuthorExtra)
+                       RelationshipMatcher.matchRelationship(relationshipAuthorExtra),
+                       RelationshipMatcher.matchRelationship(relationshipOrgunitExtra)
                    )))
         ;
     }
@@ -2433,6 +2452,53 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                        matchMetadata("dc.contributor.author", "Maybe, Maybe"),
                        matchMetadata("dc.contributor.author", "Testy, TEst"),
                        matchMetadata("dc.title", "Publication1"))));
+    }
+
+    @Test
+    public void putRelationshipWithJson() throws Exception {
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        MvcResult mvcResult = getClient(token).perform(post("/api/core/relationships")
+                                                           .param("relationshipType",
+                                                                  isAuthorOfPublicationRelationshipType.getID()
+                                                                                                       .toString())
+                                                           .contentType(MediaType.parseMediaType
+                                                               (org.springframework.data.rest.webmvc.RestMediaTypes
+                                                                    .TEXT_URI_LIST_VALUE))
+                                                           .content(
+                                                               "https://localhost:8080/server/api/core/items/" + publication1
+                                                                   .getID() + "\n" +
+                                                                   "https://localhost:8080/server/api/core/items/" + author1
+                                                                   .getID()))
+                                              .andExpect(status().isCreated())
+                                              .andReturn();
+
+        ObjectMapper mapper = new ObjectMapper();
+        String content = mvcResult.getResponse().getContentAsString();
+        Map<String, Object> map = mapper.readValue(content, Map.class);
+        String id = String.valueOf(map.get("id"));
+
+
+        RelationshipRest relationshipRest = new RelationshipRest();
+        relationshipRest.setLeftPlace(0);
+        relationshipRest.setRightPlace(1);
+        relationshipRest.setLeftwardValue(null);
+        relationshipRest.setRightwardValue(null);
+        //Modify the left item in the relationship publication > publication 2
+        MvcResult mvcResult2 = getClient(token).perform(put("/api/core/relationships/" + id)
+                                                            .contentType(contentType)
+                                                            .content(mapper.writeValueAsBytes(relationshipRest)))
+                                               .andExpect(status().isOk())
+                                               .andReturn();
+
+        //verify left item change and other not changed
+        getClient(token).perform(get("/api/core/relationships/" + id))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.leftPlace", is(0)))
+                        .andExpect(jsonPath("$.rightPlace", is(1)));
+
+
     }
 
 

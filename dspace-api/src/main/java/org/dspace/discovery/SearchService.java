@@ -51,29 +51,6 @@ public interface SearchService {
     DiscoverResult search(Context context, IndexableObject dso, DiscoverQuery query)
         throws SearchServiceException;
 
-    /**
-     * @param context          DSpace Context object.
-     * @param query            the discovery query object.
-     * @param includeWithdrawn use <code>true</code> to include in the results also withdrawn
-     *                         items that match the query.
-     * @return discovery search result object
-     * @throws SearchServiceException if search error
-     */
-    DiscoverResult search(Context context, DiscoverQuery query,
-                          boolean includeWithdrawn) throws SearchServiceException;
-
-    /**
-     * @param context          DSpace Context object
-     * @param dso              a DSpace Object to use as scope of the search (only results
-     *                         within this object)
-     * @param query            the discovery query object
-     * @param includeWithdrawn use <code>true</code> to include in the results also withdrawn
-     *                         items that match the query
-     * @return discovery search result object
-     * @throws SearchServiceException if search error
-     */
-    DiscoverResult search(Context context, IndexableObject dso, DiscoverQuery query, boolean includeWithdrawn)
-        throws SearchServiceException;
 
     List<IndexableObject> search(Context context, String query, String orderfield, boolean ascending, int offset,
             int max, String... filterquery);
