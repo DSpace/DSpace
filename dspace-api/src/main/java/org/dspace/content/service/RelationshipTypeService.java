@@ -135,6 +135,7 @@ public interface RelationshipTypeService extends DSpaceCRUDService<RelationshipT
     List<RelationshipType> findByEntityType(Context context, EntityType entityType, boolean isLeft,
                                             Integer limit, Integer offset)
             throws SQLException;
+
     /**
      * This method will support the creation of a RelationshipType object with the given parameters
      * @param context                       The relevant DSpace context
@@ -154,5 +155,25 @@ public interface RelationshipTypeService extends DSpaceCRUDService<RelationshipT
                             String leftwardType, String rightwardType, Integer leftCardinalityMinInteger,
                             Integer leftCardinalityMaxInteger, Integer rightCardinalityMinInteger,
                             Integer rightCardinalityMaxInteger)
+        throws SQLException, AuthorizeException;
+    /**
+     * This method will support the creation of a RelationshipType object with the given parameters
+     * @param context                       The relevant DSpace context
+     * @param leftEntityType                The leftEntityType EntityType object for this relationshipType
+     * @param rightEntityType               The rightEntityType EntityType object for this relationshipType
+     * @param leftwardType                  The leftwardType String object for this relationshipType
+     * @param rightwardType                 The rightwardType String object for this relationshipType
+     * @param leftCardinalityMinInteger     The leftCardinalityMinInteger Integer object for this relationshipType
+     * @param leftCardinalityMaxInteger     The leftCardinalityMaxInteger Integer object for this relationshipType
+     * @param rightCardinalityMinInteger    The rightCardinalityMinInteger Integer object for this relationshipType
+     * @param rightCardinalityMaxInteger    The rightCardinalityMaxInteger Integer object for this relationshipType
+     * @return                              The created RelationshipType object for these properties
+     * @throws SQLException                 If something goes wrong
+     * @throws AuthorizeException           If something goes wrong
+     */
+    RelationshipType create(Context context, EntityType leftEntityType, EntityType rightEntityType,
+                            String leftwardType, String rightwardType, Integer leftCardinalityMinInteger,
+                            Integer leftCardinalityMaxInteger, Integer rightCardinalityMinInteger,
+                            Integer rightCardinalityMaxInteger, Boolean copyToLeft, Boolean copyToRight)
         throws SQLException, AuthorizeException;
 }

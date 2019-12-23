@@ -30,6 +30,7 @@ import org.dspace.app.rest.model.BundleRest;
 import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.projection.Projection;
+import org.dspace.app.rest.repository.handler.service.UriListHandlerService;
 import org.dspace.app.rest.repository.patch.ItemPatch;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bundle;
@@ -93,6 +94,10 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
     @Autowired
     RelationshipTypeService relationshipTypeService;
 
+    @Autowired
+    private UriListHandlerService uriListHandlerService;
+
+
     public ItemRestRepository(ItemService dsoService, ItemPatch dsoPatch) {
         super(dsoService, dsoPatch);
     }
@@ -137,7 +142,7 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
 
     @Override
     protected void updateDSpaceObject(Item item, ItemRest itemRest)
-            throws AuthorizeException, SQLException {
+        throws AuthorizeException, SQLException {
         super.updateDSpaceObject(item, itemRest);
 
         Context context = obtainContext();
@@ -175,11 +180,11 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
             }
             if (itemService.isInProgressSubmission(context, item)) {
                 throw new UnprocessableEntityException("The item cannot be deleted. "
-                                                               + "It's part of a in-progress submission.");
+                                                           + "It's part of a in-progress submission.");
             }
             if (item.getTemplateItemOf() != null) {
                 throw new UnprocessableEntityException("The item cannot be deleted. "
-                                                               + "It's a template for a collection");
+                                                           + "It's a template for a collection");
             }
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
@@ -293,7 +298,7 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
         Collection collection = collectionService.find(context, owningCollectionUuid);
         if (collection == null) {
             throw new DSpaceBadRequestException("The given owningCollection parameter is invalid: "
-                                                        + owningCollectionUuid);
+                                                    + owningCollectionUuid);
         }
         WorkspaceItem workspaceItem = workspaceItemService.create(context, collection, false);
         Item item = workspaceItem.getItem();
@@ -312,7 +317,7 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
     @PreAuthorize("hasPermission(#uuid, 'ITEM', 'WRITE')")
     protected ItemRest put(Context context, HttpServletRequest request, String apiCategory, String model, UUID uuid,
                            JsonNode jsonNode)
-            throws RepositoryMethodNotImplementedException, SQLException, AuthorizeException {
+        throws RepositoryMethodNotImplementedException, SQLException, AuthorizeException {
         HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
         ObjectMapper mapper = new ObjectMapper();
         ItemRest itemRest = null;
@@ -359,7 +364,6 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
         context.commit();
 
         return bundle;
-
     }
 
     /**
@@ -399,5 +403,14 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
         Collection collection = item.getTemplateItemOf();
         collectionService.removeTemplateItem(context, collection);
         collectionService.update(context, collection);
+    }
+
+    @Override
+    protected ItemRest createAndReturn(Context context, List<String> stringList)
+        throws AuthorizeException, SQLException, RepositoryMethodNotImplementedException {
+
+        HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
+        Item item = uriListHandlerService.handle(context, req, stringList, Item.class);
+        return converter.toRest(item, Projection.DEFAULT);
     }
 }
