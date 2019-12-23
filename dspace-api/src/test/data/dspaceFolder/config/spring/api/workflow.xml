@@ -10,7 +10,7 @@
                 <entry key="defaultWorkflow"
                        value-ref="defaultWorkflow"/>
                 <entry key="123456789/4" value-ref="selectSingleReviewer"/>
-                <!--                <entry key="123456789/5" value-ref="scoreReview"/>-->
+<!--                <entry key="123456789/5" value-ref="scoreReview"/>-->
             </util:map>
         </property>
     </bean>
