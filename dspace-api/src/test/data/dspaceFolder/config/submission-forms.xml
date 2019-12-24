@@ -52,7 +52,7 @@
             <row>
                 <relation-field>
                     <relationship-type>isAuthorOfPublication</relationship-type>
-                    <search-configuration>personConfiguration</search-configuration>
+                    <search-configuration>person</search-configuration>
                     <repeatable>true</repeatable>
                     <name-variants>true</name-variants>
                     <label>Author</label>
@@ -238,7 +238,7 @@ it, please enter the types and the actual numbers or codes.</hint>
      <row>
        <relation-field>
          <relationship-type>isVolumeOfJournal</relationship-type>
-         <search-configuration>periodicalConfiguration</search-configuration>
+         <search-configuration>periodical</search-configuration>
          <filter>creativework.publisher:somepublishername</filter>
          <label>Journal</label>
          <hint>Select the journal related to this volume.</hint>

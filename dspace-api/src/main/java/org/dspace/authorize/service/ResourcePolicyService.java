@@ -67,61 +67,171 @@ public interface ResourcePolicyService extends DSpaceCRUDService<ResourcePolicy>
     public void removePolicies(Context c, DSpaceObject o, String type) throws SQLException, AuthorizeException;
 
     public void removeDsoGroupPolicies(Context context, DSpaceObject dso, Group group)
-            throws SQLException, AuthorizeException;
+        throws SQLException, AuthorizeException;
 
     public void removeDsoEPersonPolicies(Context context, DSpaceObject dso, EPerson ePerson)
-            throws SQLException, AuthorizeException;
+        throws SQLException, AuthorizeException;
 
     public void removeGroupPolicies(Context c, Group group) throws SQLException;
 
     public void removeDsoAndTypeNotEqualsToPolicies(Context c, DSpaceObject o, String type)
-            throws SQLException, AuthorizeException;
+        throws SQLException, AuthorizeException;
 
     /**
      * Return a list of policies for an object that match the action except the record labeled with the rpType
      *
-     * @param c
-     *            context
-     * @param o
-     *            DSpaceObject policies relate to
-     * @param actionID
-     *            action (defined in class Constants)
-     * @param rpType
-     *            the resource policy type
+     * @param c        context
+     * @param o        DSpaceObject policies relate to
+     * @param actionID action (defined in class Constants)
+     * @param rpType   the resource policy type
      * @return list of resource policies
-     * @throws SQLException
-     *             if there's a database problem
+     * @throws SQLException if there's a database problem
      */
     public List<ResourcePolicy> findExceptRpType(Context c, DSpaceObject o, int actionID, String rpType)
             throws SQLException;
 
-    public List<ResourcePolicy> findByEPerson(Context c, EPerson ePerson, int offset, int limit) throws SQLException;
+    /**
+     * Return a paginated list of policies that belong to an EPerson
+     * 
+     * @param context       DSpace context object
+     * @param ePerson       ePerson whose policies want to find
+     * @param offset        the position of the first result to return
+     * @param limit         paging limit
+     * @throws SQLException if database error
+     */
+    public List<ResourcePolicy> findByEPerson(Context context, EPerson ePerson, int offset, int limit)
+        throws SQLException;
 
-    public int searchCountEPerson(Context context, EPerson eperson) throws SQLException;
+    /**
+     * Count all the resource policies of the ePerson
+     * 
+     * @param context        DSpace context object
+     * @param ePerson        ePerson whose policies want to count
+     * @return               total resource policies of the ePerson
+     * @throws SQLException  if database error
+     */
+    public int countByEPerson(Context context, EPerson ePerson) throws SQLException;
 
-    public List<ResourcePolicy> searchByEPersonAndResourceUuid(Context context, EPerson ePerson, UUID resourceUuid,
-            int offset, int limit) throws SQLException;
+    /**
+     * Return a paginated list of policies related to a resourceUuid belong to an ePerson
+     * 
+     * @param context        DSpace context object
+     * @param ePerson        ePerson whose policies want to find
+     * @param resourceUuid   the uuid of an DSpace resource
+     * @param offset         the position of the first result to return
+     * @param limit          paging limit
+     * @return               list of resource policies
+     * @throws SQLException  if database error
+     */
+    public List<ResourcePolicy> findByEPersonAndResourceUuid(Context context, EPerson ePerson, UUID resourceUuid,
+        int offset, int limit) throws SQLException;
 
-    public int searchCountResourcePolicies(Context context, UUID resourceUuid, EPerson eperson) throws SQLException;
+    /**
+     * Count all the policies related to a resourceUuid belong to an ePerson
+     * 
+     * @param context        DSpace context object
+     * @param resourceUuid   the uuid of an DSpace resource
+     * @param ePerson        ePerson whose policies want to find
+     * @return               total policies
+     * @throws SQLException  if database error
+     */
+    public int countResourcePoliciesByEPersonAndResourceUuid(Context context, UUID resourceUuid, EPerson ePerson)
+        throws SQLException;
 
-    public List<ResourcePolicy> searchByResouceUuidAndActionId(Context context, UUID resourceUuid, int actionId,
-            int offset, int limit) throws SQLException;
+    /**
+     * Return a paginated list of policies related to a DSpace resource filter by actionId
+     * 
+     * @param context        DSpace context object
+     * @param resourceUuid   the uuid of an DSpace resource
+     * @param actionId       id relative to action as READ, WRITE, DELITE etc.
+     * @param offset         the position of the first result to return
+     * @param limit          paging limit
+     * @return               list of resource policies
+     * @throws SQLException  if database error
+     */
+    public List<ResourcePolicy> findByResouceUuidAndActionId(Context context, UUID resourceUuid, int actionId,
+        int offset, int limit) throws SQLException;
 
-    public int searchCountByResouceAndAction(Context context, UUID resourceUuid, int actionId) throws SQLException;
+    /**
+     * Count all the policies related to a resourceUuid and actionId
+     * 
+     * @param context        DSpace context object
+     * @param resourceUuid   the uuid of an DSpace resource
+     * @param actionId       id relative to action as READ, WRITE, DELITE etc.
+     * @return               total policies
+     * @throws SQLException  if database error
+     */
+    public int countByResouceUuidAndActionId(Context context, UUID resourceUuid, int actionId) throws SQLException;
 
-    public List<ResourcePolicy> searchByResouceUuid(Context context, UUID resourceUuid, int offset, int limit)
-            throws SQLException;
+    /**
+     * Return a paginated list of policies related to a DSpace resource
+     * 
+     * @param context        DSpace context object
+     * @param resourceUuid   the uuid of an DSpace resource
+     * @param offset         the position of the first result to return
+     * @param limit          paging limit
+     * @return               list of resource policies
+     * @throws SQLException  if database error
+     */
+    public List<ResourcePolicy> findByResouceUuid(Context context, UUID resourceUuid, int offset, int limit)
+        throws SQLException;
 
-    public int searchCountByResourceUuid(Context context, UUID resourceUuid) throws SQLException;
+    /**
+     * Count all the policies by resourceUuid
+     * 
+     * @param context        DSpace context object
+     * @param resourceUuid   the uuid of an DSpace resource
+     * @return               total policies
+     * @throws SQLException  if database error
+     */
+    public int countByResourceUuid(Context context, UUID resourceUuid) throws SQLException;
 
-    public List<ResourcePolicy> searchByGroup(Context context, Group group, int offset, int limit) throws SQLException;
+    /**
+     * Return a paginated list of policies related to a group
+     * 
+     * @param context        DSpace context object
+     * @param group          DSpace group
+     * @param offset         the position of the first result to return
+     * @param limit          paging limit
+     * @return               list of resource policies
+     * @throws SQLException  if database error
+     */
+    public List<ResourcePolicy> findByGroup(Context context, Group group, int offset, int limit) throws SQLException;
 
-    public int searchCountResourcePolicyOfGroup(Context context, Group group) throws SQLException;
+    /**
+     * Count all the resource policies of the group
+     * 
+     * @param context        DSpace context object
+     * @param group          DSpace group
+     * @return               total policies
+     * @throws SQLException  if database error
+     */
+    public int countResourcePolicyByGroup(Context context, Group group) throws SQLException;
 
-    public List<ResourcePolicy> searchByGroupAndResourceUuid(Context context, Group group, UUID resourceUuid,
-            int offset, int limit) throws SQLException;
+    /**
+     * Return a paginated list of policies related to a group and related to a resourceUuid
+     * 
+     * @param context        DSpace context object
+     * @param group          DSpace group
+     * @param resourceUuid   the uuid of an DSpace resource
+     * @param offset         the position of the first result to return
+     * @param limit          paging limit
+     * @return               list of resource policies
+     * @throws SQLException  if database error
+     */
+    public List<ResourcePolicy> findByGroupAndResourceUuid(Context context, Group group, UUID resourceUuid,
+        int offset, int limit) throws SQLException;
 
-    public int searchCountByGroupAndResourceUuid(Context context, Group group, UUID resourceUuid) throws SQLException;
+    /**
+     * Count all the resource policies of the group and of the resourceUuid
+     * 
+     * @param context        DSpace context object
+     * @param group          DSpace group
+     * @param resourceUuid   the uuid of an DSpace resource
+     * @return               total policies
+     * @throws SQLException  if database error
+     */
+    public int countByGroupAndResourceUuid(Context context, Group group, UUID resourceUuid) throws SQLException;
 
     public boolean isMyResourcePolicy(Context context, EPerson eperson, Integer id) throws SQLException;
 
