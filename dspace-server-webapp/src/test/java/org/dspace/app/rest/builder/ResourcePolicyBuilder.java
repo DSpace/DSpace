@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest.builder;
 
+import java.io.IOException;
 import java.sql.SQLException;
 
 import org.apache.log4j.Logger;
@@ -72,6 +73,22 @@ public class ResourcePolicyBuilder extends AbstractBuilder<ResourcePolicy, Resou
         indexingService.commit();
     }
 
+    public static void delete(Integer id)
+            throws SQLException, IOException, SearchServiceException {
+        try (Context c = new Context()) {
+            c.turnOffAuthorisationSystem();
+            ResourcePolicy rp = resourcePolicyService.find(c, id);
+            if (rp != null) {
+                try {
+                    resourcePolicyService.delete(c, rp);
+                } catch (AuthorizeException e) {
+                    throw new RuntimeException(e.getMessage(), e);
+                }
+            }
+            c.complete();
+        }
+        indexingService.commit();
+    }
 
     public static ResourcePolicyBuilder createResourcePolicy(Context context)
             throws SQLException, AuthorizeException {

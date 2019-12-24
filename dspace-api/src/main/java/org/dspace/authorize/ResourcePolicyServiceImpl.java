@@ -26,6 +26,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.eperson.service.GroupService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -46,6 +47,9 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService {
 
     @Autowired(required = true)
     protected ResourcePolicyDAO resourcePolicyDAO;
+
+    @Autowired
+    private GroupService groupService;
 
     protected ResourcePolicyServiceImpl() {
     }
@@ -379,5 +383,20 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService {
     @Override
     public int countByGroupAndResourceUuid(Context context, Group group, UUID resourceUuid) throws SQLException {
         return resourcePolicyDAO.countByGroupAndResourceUuid(context, group, resourceUuid);
+    }
+
+    @Override
+    public boolean isMyResourcePolicy(Context context, EPerson eperson, Integer id) throws SQLException {
+        boolean isMy = false;
+
+        ResourcePolicy resourcePolicy = resourcePolicyDAO.findOneById(context, id);
+        Group group = resourcePolicy.getGroup();
+
+        if (resourcePolicy.getEPerson() != null && resourcePolicy.getEPerson().getID() == eperson.getID()) {
+            isMy = true;
+        } else if (group != null && groupService.isMember(context, eperson, group)) {
+            isMy = true;
+        }
+        return isMy;
     }
 }
