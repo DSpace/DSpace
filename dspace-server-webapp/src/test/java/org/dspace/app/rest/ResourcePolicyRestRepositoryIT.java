@@ -6,15 +6,20 @@
  * http://www.dspace.org/license/
  */
 package org.dspace.app.rest;
-
+import static com.jayway.jsonpath.JsonPath.read;
+import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.Matchers.is;
-
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
@@ -22,9 +27,11 @@ import org.dspace.app.rest.builder.EPersonBuilder;
 import org.dspace.app.rest.builder.GroupBuilder;
 import org.dspace.app.rest.builder.ResourcePolicyBuilder;
 import org.dspace.app.rest.matcher.ResoucePolicyMatcher;
+import org.dspace.app.rest.model.ResourcePolicyRest;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.core.Constants;
@@ -45,6 +52,9 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
     @Autowired
     AuthorizeService authorizeService;
+
+    @Autowired
+    ResourcePolicyService resourcePolicyService;
 
     @Test
     public void findAllTest() throws Exception {
@@ -126,6 +136,103 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         .andExpect(status().isNotFound());
     }
 
+    @Test
+    public void findOneForbiddenTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson eperson1 = EPersonBuilder.createEPerson(context)
+                .withEmail("eperson1@mail.com")
+                .withPassword("qwerty01")
+                .build();
+
+        EPerson eperson2 = EPersonBuilder.createEPerson(context)
+                .withEmail("eperson2@mail.com")
+                .withPassword("qwerty02")
+                .build();
+
+        Community community = CommunityBuilder.createCommunity(context).withName("My community").build();
+        Collection collection = CollectionBuilder.createCollection(context, community)
+                                .withName("My collection").build();
+
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+                .withDspaceObject(collection)
+                .withAction(Constants.WRITE)
+                .withUser(eperson1).build();
+
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(eperson2.getEmail(), "qwerty02");
+        getClient(authToken).perform(get("/api/authz/resourcepolicies/" + resourcePolicy.getID()))
+                .andExpect(status().isForbidden());
+
+        String authToken1 = getAuthToken(eperson1.getEmail(), "qwerty01");
+        getClient(authToken1).perform(get("/api/authz/resourcepolicies/" + resourcePolicy.getID()))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void findOneAccessGrantToAdminTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson eperson1 = EPersonBuilder.createEPerson(context)
+                .withEmail("eperson1@mail.com")
+                .withPassword("qwerty01")
+                .build();
+
+        Community community = CommunityBuilder.createCommunity(context).withName("My community").build();
+
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+                .withDspaceObject(community)
+                .withAction(Constants.WRITE)
+                .withUser(eperson1).build();
+
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+        getClient(authToken).perform(get("/api/authz/resourcepolicies/" + resourcePolicy.getID()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", is(
+                        ResoucePolicyMatcher.matchResourcePolicy(resourcePolicy))));
+    }
+
+    @Test
+    public void findOneAccessGrantToSameUserTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Group group1 = GroupBuilder.createGroup(context).withName("My group").build();
+
+        EPerson eperson1 = EPersonBuilder.createEPerson(context)
+                .withEmail("eperson1@mail.com")
+                .withPassword("qwerty01")
+                .withGroupMembership(group1)
+                .build();
+
+        EPerson eperson2 = EPersonBuilder.createEPerson(context)
+                .withEmail("eperson2@mail.com")
+                .withPassword("qwerty02")
+                .build();
+
+        Community community = CommunityBuilder.createCommunity(context).withName("My community").build();
+        Collection collection = CollectionBuilder.createCollection(context, community)
+                                .withName("My collection").build();
+
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+                .withDspaceObject(collection)
+                .withAction(Constants.ADD)
+                .withGroup(group1)
+                .build();
+
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(eperson1.getEmail(), "qwerty01");
+        getClient(authToken).perform(get("/api/authz/resourcepolicies/" + resourcePolicy.getID()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", is(ResoucePolicyMatcher.matchResourcePolicy(resourcePolicy))));
+
+        String authTokenEperson2 = getAuthToken(eperson2.getEmail(), "qwerty02");
+        getClient(authTokenEperson2).perform(get("/api/authz/resourcepolicies/" + resourcePolicy.getID()))
+                .andExpect(status().isForbidden());
+    }
 
     @Test
     public void findOneResoucesPolicyByEpersonUuidTest() throws Exception {
@@ -270,6 +377,42 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         .andExpect(jsonPath("$.page.totalElements", is(0)));
     }
 
+    @Test
+    public void searchResoucesPolicyByEPersonUuidForbiddenTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson eperson1 = EPersonBuilder.createEPerson(context)
+                .withEmail("eperson1@mail.com")
+                .withPassword("qwerty01")
+                .build();
+
+        EPerson eperson2 = EPersonBuilder.createEPerson(context)
+                .withEmail("eperson2@mail.com")
+                .withPassword("qwerty02")
+                .build();
+
+        Community community = CommunityBuilder.createCommunity(context).withName("My community").build();
+
+        Community community2 = CommunityBuilder.createCommunity(context).withName("My 2 community").build();
+
+        ResourcePolicy resourcePolicyOfEPerson1 = ResourcePolicyBuilder.createResourcePolicy(context)
+                .withDspaceObject(community).withAction(Constants.WRITE)
+                .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
+                .withUser(eperson1).build();
+
+        ResourcePolicy resourcePolicyOfEPerson2 = ResourcePolicyBuilder.createResourcePolicy(context)
+                .withDspaceObject(community2).withAction(Constants.ADD)
+                .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
+                .withUser(eperson2).build();
+
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(eperson1.getEmail(), "qwerty01");
+        getClient(authToken).perform(get("/api/authz/resourcepolicies/search/eperson")
+                .param("uuid", eperson2.getID().toString())
+                .param("resource", community2.getID().toString()))
+                .andExpect(status().isForbidden());
+    }
 
   @Test
   public void findResourcePoliciesOfOneResourceWithoutActionTest() throws Exception {
@@ -363,13 +506,18 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
                 .param("action", "ADD"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$._embedded.resourcepolicies",Matchers.containsInAnyOrder(
-                        ResoucePolicyMatcher.matchResourcePolicy(secondResourcePolicyOfEPerson1),
+                .andExpect(jsonPath("$._embedded.resourcepolicies",Matchers.contains(
                         ResoucePolicyMatcher.matchResourcePolicy(firstResourcePolicyOfEPerson2)
                         )))
                 .andExpect(jsonPath("$._links.self.href",
                         Matchers.containsString("api/authz/resourcepolicies/search/resource")))
-                .andExpect(jsonPath("$.page.totalElements", is(2)));
+                .andExpect(jsonPath("$.page.totalElements", is(1)));
+
+      String authToken2 = getAuthToken(eperson2.getEmail(), "qwerty02");
+      getClient(authToken2).perform(get("/api/authz/resourcepolicies/search/resource")
+                .param("uuid", collection.getID().toString())
+                .param("action", "ADD"))
+                .andExpect(status().isForbidden());
   }
 
   /**
@@ -427,6 +575,47 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
       .andExpect(jsonPath("$.page.totalElements", is(0)));
   }
 
+
+  @Test
+  public void searchResoucesPoliciesByResourceUuidForbiddenTest() throws Exception {
+      context.turnOffAuthorisationSystem();
+
+      EPerson eperson1 = EPersonBuilder.createEPerson(context)
+              .withEmail("eperson1@mail.com")
+              .withPassword("qwerty01")
+              .build();
+
+      EPerson eperson2 = EPersonBuilder.createEPerson(context)
+              .withEmail("eperson2@mail.com")
+              .withPassword("qwerty02")
+              .build();
+
+      Community community = CommunityBuilder.createCommunity(context).withName("My community").build();
+
+      Community community2 = CommunityBuilder.createCommunity(context).withName("My 2 community").build();
+
+      ResourcePolicy resourcePolicyOfEPerson1 = ResourcePolicyBuilder.createResourcePolicy(context)
+              .withDspaceObject(community)
+              .withAction(Constants.REMOVE)
+              .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
+              .withUser(eperson1).build();
+
+      ResourcePolicy resourcePolicyOfEPerson2 = ResourcePolicyBuilder.createResourcePolicy(context)
+              .withDspaceObject(community2)
+              .withAction(Constants.ADD)
+              .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
+              .withUser(eperson2).build();
+
+      context.restoreAuthSystemState();
+
+      String authToken = getAuthToken(eperson1.getEmail(), "qwerty01");
+      getClient(authToken).perform(get("/api/authz/resourcepolicies/search/eperson")
+              .param("uuid", eperson2.getID().toString())
+              .param("resource", community2.getID().toString()))
+              .andExpect(status().isForbidden());
+  }
+
+
     @Test
     public void findResourcePolicyByGroupUuidTest() throws Exception {
         context.turnOffAuthorisationSystem();
@@ -436,12 +625,6 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         EPerson eperson1 = EPersonBuilder.createEPerson(context)
                 .withEmail("eperson1@mail.com")
                 .withPassword("qwerty01")
-                .withGroupMembership(group1)
-                .build();
-
-        EPerson eperson2 = EPersonBuilder.createEPerson(context)
-                .withEmail("eperson2@mail.com")
-                .withPassword("qwerty02")
                 .withGroupMembership(group1)
                 .build();
 
@@ -460,11 +643,11 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
         ResourcePolicy secondResourcePolicyOfGroup1 = ResourcePolicyBuilder.createResourcePolicy(context)
                 .withDspaceObject(community)
-                .withAction(Constants.REMOVE)
+                .withAction(Constants.READ)
                 .withGroup(group1).build();
 
         ResourcePolicy collectionResourcePolicyOfGroup1 = ResourcePolicyBuilder.createResourcePolicy(context)
-                .withDspaceObject(community)
+                .withDspaceObject(collection)
                 .withAction(Constants.WRITE)
                 .withGroup(group1).build();
 
@@ -583,4 +766,126 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         .andExpect(jsonPath("$.page.totalElements", is(0)));
     }
 
+    @Test
+    public void searchResoucesPolicyByGroupUuidForbiddenTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Group group1 = GroupBuilder.createGroup(context).withName("My group").build();
+
+        EPerson eperson1 = EPersonBuilder.createEPerson(context)
+                .withEmail("eperson1@mail.com")
+                .withPassword("qwerty01")
+                .withGroupMembership(group1)
+                .build();
+
+        EPerson eperson2 = EPersonBuilder.createEPerson(context)
+                .withEmail("eperson2@mail.com")
+                .withPassword("qwerty02")
+                .build();
+
+        Community community = CommunityBuilder.createCommunity(context).withName("My community").build();
+
+        Community community2 = CommunityBuilder.createCommunity(context).withName("My 2 community").build();
+
+        ResourcePolicy resourcePolicyOfGroup1 = ResourcePolicyBuilder.createResourcePolicy(context)
+                .withDspaceObject(community).withAction(Constants.WRITE)
+                .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
+                .withGroup(group1).build();
+
+        ResourcePolicy secondresourcePolicyOfGroup1 = ResourcePolicyBuilder.createResourcePolicy(context)
+                .withDspaceObject(community2).withAction(Constants.ADD)
+                .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
+                .withGroup(group1).build();
+
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(eperson2.getEmail(), "qwerty02");
+        getClient(authToken).perform(get("/api/authz/resourcepolicies/search/group")
+                .param("uuid", group1.getID().toString())
+                .param("resource", community2.getID().toString()))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void createWithEPersonTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        AtomicReference<Integer> idRef = new AtomicReference<Integer>();
+        try {
+            Community community = CommunityBuilder.createCommunity(context)
+                    .withName("My commynity")
+                    .build();
+
+            EPerson eperson1 = EPersonBuilder.createEPerson(context)
+                    .withEmail("eperson1@mail.com")
+                    .withPassword("qwerty01")
+                    .build();
+
+            context.restoreAuthSystemState();
+
+            ObjectMapper mapper = new ObjectMapper();
+            ResourcePolicyRest resourcePolicyRest = new ResourcePolicyRest();
+
+            resourcePolicyRest.setPolicyType(ResourcePolicy.TYPE_SUBMISSION);
+            resourcePolicyRest.setAction(Constants.actionText[Constants.READ]);
+
+            String authToken = getAuthToken(admin.getEmail(), password);
+            getClient(authToken)
+                    .perform(post("/api/authz/resourcepolicies")
+                            .content(mapper.writeValueAsBytes(resourcePolicyRest))
+                            .param("resource", community.getID().toString())
+                            .param("eperson", eperson1.getID().toString())
+                            .contentType(contentType))
+                    .andExpect(status().isCreated())
+                    .andExpect(content().contentType(contentType))
+                    .andExpect(jsonPath("$",Matchers.allOf(
+                            hasJsonPath("$.name", is(resourcePolicyRest.getName())),
+                            hasJsonPath("$.description", is(resourcePolicyRest.getDescription())),
+                            hasJsonPath("$.policyType", is(resourcePolicyRest.getPolicyType())),
+                            hasJsonPath("$.action", is(resourcePolicyRest.getAction())),
+                            hasJsonPath("$.startDate", is(resourcePolicyRest.getStartDate())),
+                            hasJsonPath("$.endDate", is(resourcePolicyRest.getEndDate())),
+                            hasJsonPath("$.type", is(resourcePolicyRest.getType())))))
+                    .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
+
+            String authToken1 = getAuthToken(eperson1.getEmail(), "qwerty01");
+            getClient(authToken1).perform(get("/api/authz/resourcepolicies/" + idRef.get()))
+                    .andExpect(status().isOk())
+                    .andExpect(content().contentType(contentType))
+                    .andExpect(jsonPath("$._links.self.href",
+                            Matchers.containsString("/api/authz/resourcepolicies/" + idRef.get())));
+        } finally {
+            ResourcePolicyBuilder.delete(idRef.get());
+        }
+    }
+
+    @Test
+    public void deleteOne() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson eperson1 = EPersonBuilder.createEPerson(context)
+                .withEmail("eperson1@mail.com")
+                .withPassword("qwerty01")
+                .build();
+
+        Community community = CommunityBuilder.createCommunity(context)
+                .withName("My community")
+                .build();
+
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+                .withDspaceObject(community)
+                .withUser(eperson1)
+                .withAction(Constants.ADMIN)
+                .build();
+
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(delete("/api/authz/resourcepolicies/" + resourcePolicy.getID()))
+                        .andExpect(status().is(204));
+
+        // Verify 404 after delete
+        getClient(token).perform(get("/api/authz/resourcepolicies/" + resourcePolicy.getID()))
+                        .andExpect(status().isNotFound());
+    }
 }
