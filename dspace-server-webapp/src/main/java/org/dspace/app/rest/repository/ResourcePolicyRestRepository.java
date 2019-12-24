@@ -8,10 +8,10 @@
 package org.dspace.app.rest.repository;
 
 import java.io.IOException;
-
 import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
+
 import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -22,9 +22,13 @@ import org.dspace.app.rest.exception.MissingParameterException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.ResourcePolicyRest;
+import org.dspace.app.rest.model.patch.Operation;
+import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.projection.Projection;
+import org.dspace.app.rest.repository.patch.factories.ResourcePolicyOperationFactory;
 import org.dspace.app.rest.utils.DSpaceObjectUtils;
 import org.dspace.app.rest.utils.Utils;
+import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.ResourcePolicyService;
@@ -42,7 +46,6 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
-
 /**
  * Controller for exposition of default access condition
  *
@@ -53,6 +56,9 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
 
     @Autowired
     ResourcePolicyService resourcePolicyService;
+
+    @Autowired
+    ResourcePolicyOperationFactory resourcePolicyOperationPatchFactory;
 
     @Autowired
     Utils utils;
@@ -104,13 +110,13 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
             Context context = obtainContext();
             if (action != null) {
                 int actionId = Constants.getActionID(action);
-                resourcePolisies = resourcePolicyService.searchByResouceUuidAndActionId(context, resourceUuid, actionId,
+                resourcePolisies = resourcePolicyService.findByResouceUuidAndActionId(context, resourceUuid, actionId,
                         pageable.getOffset(), pageable.getOffset() + pageable.getPageSize());
-                total = resourcePolicyService.searchCountByResouceAndAction(context, resourceUuid, actionId);
+                total = resourcePolicyService.countByResouceUuidAndActionId(context, resourceUuid, actionId);
             } else {
-                resourcePolisies = resourcePolicyService.searchByResouceUuid(context, resourceUuid,
+                resourcePolisies = resourcePolicyService.findByResouceUuid(context, resourceUuid,
                         pageable.getOffset(), pageable.getOffset() + pageable.getPageSize());
-                total = resourcePolicyService.searchCountByResourceUuid(context, resourceUuid);
+                total = resourcePolicyService.countByResourceUuid(context, resourceUuid);
             }
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
@@ -132,13 +138,14 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
                 return null;
             }
             if (resourceUuid != null) {
-                resourcePolisies = resourcePolicyService.searchByEPersonAndResourceUuid(context, eperson, resourceUuid,
+                resourcePolisies = resourcePolicyService.findByEPersonAndResourceUuid(context, eperson, resourceUuid,
                                    pageable.getOffset(), pageable.getOffset() + pageable.getPageSize());
-                total = resourcePolicyService.searchCountResourcePolicies(context, resourceUuid, eperson);
+                total = resourcePolicyService.countResourcePoliciesByEPersonAndResourceUuid(context,
+                        resourceUuid, eperson);
             } else {
                 resourcePolisies = resourcePolicyService.findByEPerson(context, eperson, pageable.getOffset(),
                         pageable.getOffset() + pageable.getPageSize());
-                total = resourcePolicyService.searchCountEPerson(context, eperson);
+                total = resourcePolicyService.countByEPerson(context, eperson);
             }
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
@@ -160,13 +167,13 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
                 return null;
             }
             if (resourceUuid != null) {
-                resourcePolisies = resourcePolicyService.searchByGroupAndResourceUuid(context, group, resourceUuid,
+                resourcePolisies = resourcePolicyService.findByGroupAndResourceUuid(context, group, resourceUuid,
                         pageable.getOffset(), pageable.getOffset() + pageable.getPageSize());
-                total = resourcePolicyService.searchCountByGroupAndResourceUuid(context, group, resourceUuid);
+                total = resourcePolicyService.countByGroupAndResourceUuid(context, group, resourceUuid);
             } else {
-                resourcePolisies = resourcePolicyService.searchByGroup(context, group, pageable.getOffset(),
+                resourcePolisies = resourcePolicyService.findByGroup(context, group, pageable.getOffset(),
                         pageable.getOffset() + pageable.getPageSize());
-                total = resourcePolicyService.searchCountResourcePolicyOfGroup(context, group);
+                total = resourcePolicyService.countResourcePolicyByGroup(context, group);
             }
 
         } catch (SQLException e) {
@@ -263,6 +270,28 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
             resourcePolicyService.delete(context, resourcePolicy);
         } catch (SQLException e) {
             throw new RuntimeException("Unable to delete ResourcePolicy with id = " + id, e);
+        }
+    }
+
+    @Override
+    protected void patch(Context context, HttpServletRequest request, String apiCategory, String model, Integer id,
+            Patch patch)
+            throws RepositoryMethodNotImplementedException, SQLException, AuthorizeException, DCInputsReaderException {
+        ResourcePolicyRest rest = findOne(id);
+        for (Operation op : patch.getOperations()) {
+            rest = resourcePolicyOperationPatchFactory.getOperationForPath(op.getPath()).perform(rest, op);
+        }
+
+        ResourcePolicy resourcePolicy = null;
+        try {
+            resourcePolicy = resourcePolicyService.find(context, id);
+            resourcePolicy.setStartDate(rest.getStartDate());
+            resourcePolicy.setEndDate(rest.getEndDate());
+            resourcePolicy.setRpDescription(rest.getDescription());
+            resourcePolicy.setRpName(rest.getName());
+            resourcePolicyService.update(context, resourcePolicy);
+        } catch (SQLException e) {
+            throw new RuntimeException("Unable to patch ResourcePolicy with id = " + id, e);
         }
     }
 }

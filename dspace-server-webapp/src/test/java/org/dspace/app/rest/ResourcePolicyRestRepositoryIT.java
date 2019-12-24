@@ -88,14 +88,23 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
     public void findOneTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
+        EPerson eperson1 = EPersonBuilder.createEPerson(context)
+                .withEmail("eperson1@mail.com")
+                .withPassword("qwerty01")
+                .build();
+
         Community community = CommunityBuilder.createCommunity(context).withName("My community").build();
 
-        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context).withDspaceObject(community)
-                .withAction(Constants.READ).withPolicyType(ResourcePolicy.TYPE_CUSTOM).withUser(admin).build();
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+                .withDspaceObject(community)
+                .withAction(Constants.READ)
+                .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
+                .withUser(eperson1)
+                .build();
 
         context.restoreAuthSystemState();
 
-        String authToken = getAuthToken(admin.getEmail(), password);
+        String authToken = getAuthToken(eperson1.getEmail(), "qwerty01");
         getClient(authToken).perform(get("/api/authz/resourcepolicies/" + resourcePolicy.getID()))
                 .andExpect(status().isOk()).andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$", is(
@@ -227,7 +236,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
     }
 
     @Test
-    public void searchOneResoucesPolicyByEpersonUuidTest() throws Exception {
+    public void findOneResoucesPolicyByEpersonUuidTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
         EPerson eperson1 = EPersonBuilder.createEPerson(context)
@@ -244,12 +253,14 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         Community community2 = CommunityBuilder.createCommunity(context).withName("My community_2").build();
 
         ResourcePolicy resourcePolicyOfEPerson1 = ResourcePolicyBuilder.createResourcePolicy(context)
-                .withDspaceObject(community).withAction(Constants.ADD).withPolicyType(ResourcePolicy.TYPE_CUSTOM)
+                .withDspaceObject(community)
+                .withAction(Constants.ADD)
                 .withUser(eperson1).build();
 
         ResourcePolicy resourcePolicyOfEPerson2 = ResourcePolicyBuilder.createResourcePolicy(context)
-                .withDspaceObject(community2).withAction(Constants.REMOVE)
-                .withPolicyType(ResourcePolicy.TYPE_CUSTOM).withUser(eperson2).build();
+                .withDspaceObject(community2)
+                .withAction(Constants.REMOVE)
+                .withUser(eperson2).build();
 
         context.restoreAuthSystemState();
 
@@ -269,7 +280,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
 
     @Test
-    public void searchResoucesPolicyByEpersonUuidAndResourceUuidTest() throws Exception {
+    public void findResoucesPolicyByEpersonUuidAndResourceUuidTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
         EPerson eperson1 = EPersonBuilder.createEPerson(context).withEmail("myemail@mail.com").withPassword("qwerty01")
@@ -280,16 +291,19 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
                 .build();
 
         ResourcePolicy resourcePolicyOfCommunity = ResourcePolicyBuilder.createResourcePolicy(context)
-                .withDspaceObject(community).withAction(Constants.READ).withPolicyType(ResourcePolicy.TYPE_CUSTOM)
+                .withDspaceObject(community)
+                .withAction(Constants.READ)
                 .withUser(eperson1).build();
 
         ResourcePolicy secondResourcePolicyOfCommunity = ResourcePolicyBuilder.createResourcePolicy(context)
-                .withDspaceObject(community).withAction(Constants.REMOVE).withPolicyType(ResourcePolicy.TYPE_CUSTOM)
+                .withDspaceObject(community)
+                .withAction(Constants.REMOVE)
                 .withUser(eperson1).build();
 
         ResourcePolicy resourcePolicyOfCollection = ResourcePolicyBuilder.createResourcePolicy(context)
-                .withDspaceObject(collection).withAction(Constants.REMOVE)
-                .withPolicyType(ResourcePolicy.TYPE_SUBMISSION).withUser(eperson1).build();
+                .withDspaceObject(collection)
+                .withAction(Constants.REMOVE)
+                .withUser(eperson1).build();
 
         context.restoreAuthSystemState();
 
@@ -317,7 +331,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
      * @throws Exception
      */
     @Test
-    public void searchResoucesPolicyEPersonWithoutParametersBadRequestTest() throws Exception {
+    public void findResoucesPolicyEPersonWithoutParametersBadRequestTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
         EPerson eperson1 = EPersonBuilder.createEPerson(context).withEmail("myemail@mail.com").withPassword("qwerty01")
@@ -330,7 +344,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
     }
 
     @Test
-    public void searchResoucesPolicyByEPersonUuidUnAuthenticatedTest() throws Exception {
+    public void findResoucesPolicyByEPersonUuidUnAuthenticatedTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
         EPerson eperson1 = EPersonBuilder.createEPerson(context)
@@ -343,7 +357,6 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
                 .withDspaceObject(community)
                 .withAction(Constants.READ)
-                .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
                 .withUser(eperson1).build();
 
         context.restoreAuthSystemState();
@@ -356,7 +369,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
     }
 
     @Test
-    public void searchEPersonNotFoundTest() throws Exception {
+    public void findEPersonNotFoundTest() throws Exception {
 
         String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken).perform(get("/api/authz/resourcepolicies/search/eperson")
@@ -403,7 +416,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
     }
 
   @Test
-  public void searchResourcePoliciesOfOneResourceWithoutActionTest() throws Exception {
+  public void findResourcePoliciesOfOneResourceWithoutActionTest() throws Exception {
       context.turnOffAuthorisationSystem();
 
         EPerson eperson1 = EPersonBuilder.createEPerson(context)
@@ -421,8 +434,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
         ResourcePolicy firstResourcePolicyOfEPerson1 = ResourcePolicyBuilder.createResourcePolicy(context)
                 .withDspaceObject(community)
-                .withAction(Constants.ADMIN)
-                .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
+                .withAction(Constants.WRITE)
                 .withUser(eperson1).build();
 
         ResourcePolicy firstResourcePolicyOfEPerson2 = ResourcePolicyBuilder.createResourcePolicy(context)
@@ -454,7 +466,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
   }
 
   @Test
-  public void searchResourcePoliciesOfOneResourceIsOwnerTest() throws Exception {
+  public void findResourcePoliciesOfOneResourceWithActionTest() throws Exception {
       context.turnOffAuthorisationSystem();
 
         EPerson eperson1 = EPersonBuilder.createEPerson(context)
@@ -474,14 +486,17 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
         ResourcePolicy firstResourcePolicyOfEPerson1 = ResourcePolicyBuilder.createResourcePolicy(context)
                 .withDspaceObject(collection)
-                .withAction(Constants.ADMIN)
-                .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
+                .withAction(Constants.WRITE)
+                .withUser(eperson1).build();
+
+        ResourcePolicy secondResourcePolicyOfEPerson1 = ResourcePolicyBuilder.createResourcePolicy(context)
+                .withDspaceObject(collection)
+                .withAction(Constants.ADD)
                 .withUser(eperson1).build();
 
         ResourcePolicy firstResourcePolicyOfEPerson2 = ResourcePolicyBuilder.createResourcePolicy(context)
                 .withDspaceObject(collection)
                 .withAction(Constants.ADD)
-                .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
                 .withUser(eperson2).build();
 
       context.restoreAuthSystemState();
@@ -512,7 +527,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
    * @throws Exception
    */
   @Test
-  public void searchResoucesPoliciesOfResourceWithoutParametersBadRequestTest() throws Exception {
+  public void findResoucesPoliciesOfResourceWithoutParametersBadRequestTest() throws Exception {
       context.turnOffAuthorisationSystem();
 
       EPerson eperson1 = EPersonBuilder.createEPerson(context)
@@ -528,7 +543,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
   }
 
   @Test
-  public void searchResoucesPoliciesByResourceUuidUnAuthenticatedTest() throws Exception {
+  public void findResoucesPoliciesByResourceUuidUnAuthenticatedTest() throws Exception {
       context.turnOffAuthorisationSystem();
 
       EPerson eperson1 = EPersonBuilder.createEPerson(context)
@@ -541,7 +556,6 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
       ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
               .withDspaceObject(community)
               .withAction(Constants.READ)
-              .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
               .withUser(eperson1).build();
 
       context.restoreAuthSystemState();
@@ -553,7 +567,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
   }
 
   @Test
-  public void searchResourceNotFoundTest() throws Exception {
+  public void findResourceNotFoundTest() throws Exception {
 
       String authToken = getAuthToken(admin.getEmail(), password);
       getClient(authToken).perform(get("/api/authz/resourcepolicies/search/resource")
@@ -604,7 +618,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
 
     @Test
-    public void searchResourcePolicyByGroupUuidTest() throws Exception {
+    public void findResourcePolicyByGroupUuidTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
         Group group1 = GroupBuilder.createGroup(context).withName("My group").build();
@@ -656,7 +670,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
     }
 
     @Test
-    public void searchResourcePolicyByGroupUuidAndResourceUuidTest() throws Exception {
+    public void findResourcePolicyByGroupUuidAndResourceUuidTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
         Group group1 = GroupBuilder.createGroup(context).withName("My group").build();
@@ -702,7 +716,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
      * @throws Exception
      */
     @Test
-    public void searchResoucesPoliciesByGroupWithoutParametersBadRequestTest() throws Exception {
+    public void findResoucesPoliciesByGroupWithoutParametersBadRequestTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
         EPerson eperson1 = EPersonBuilder.createEPerson(context)
@@ -718,7 +732,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
     }
 
     @Test
-    public void searchResoucesPoliciesByGroupUuidUnAuthenticatedTest() throws Exception {
+    public void findResoucesPoliciesByGroupUuidUnAuthenticatedTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
         Group group1 = GroupBuilder.createGroup(context).withName("My group").build();
@@ -744,7 +758,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
     }
 
     @Test
-    public void searchGroupNotFoundTest() throws Exception {
+    public void findGroupNotFoundTest() throws Exception {
 
         String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken).perform(get("/api/authz/resourcepolicies/search/group")
