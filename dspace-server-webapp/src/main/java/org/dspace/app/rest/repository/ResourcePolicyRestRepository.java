@@ -8,10 +8,10 @@
 package org.dspace.app.rest.repository;
 
 import java.io.IOException;
-
 import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
+
 import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -22,9 +22,13 @@ import org.dspace.app.rest.exception.MissingParameterException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.ResourcePolicyRest;
+import org.dspace.app.rest.model.patch.Operation;
+import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.projection.Projection;
+import org.dspace.app.rest.repository.patch.factories.ResourcePolicyOperationFactory;
 import org.dspace.app.rest.utils.DSpaceObjectUtils;
 import org.dspace.app.rest.utils.Utils;
+import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.ResourcePolicyService;
@@ -42,7 +46,6 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
-
 /**
  * Controller for exposition of default access condition
  *
@@ -53,6 +56,9 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
 
     @Autowired
     ResourcePolicyService resourcePolicyService;
+
+    @Autowired
+    ResourcePolicyOperationFactory resourcePolicyOperationPatchFactory;
 
     @Autowired
     Utils utils;
@@ -262,6 +268,28 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
             resourcePolicyService.delete(context, resourcePolicy);
         } catch (SQLException e) {
             throw new RuntimeException("Unable to delete ResourcePolicy with id = " + id, e);
+        }
+    }
+
+    @Override
+    protected void patch(Context context, HttpServletRequest request, String apiCategory, String model, Integer id,
+            Patch patch)
+            throws RepositoryMethodNotImplementedException, SQLException, AuthorizeException, DCInputsReaderException {
+        ResourcePolicyRest rest = findOne(id);
+        for (Operation op : patch.getOperations()) {
+            rest = resourcePolicyOperationPatchFactory.getOperationForPath(op.getPath()).perform(rest, op);
+        }
+
+        ResourcePolicy resourcePolicy = null;
+        try {
+            resourcePolicy = resourcePolicyService.find(context, id);
+            resourcePolicy.setStartDate(rest.getStartDate());
+            resourcePolicy.setEndDate(rest.getEndDate());
+            resourcePolicy.setRpDescription(rest.getDescription());
+            resourcePolicy.setRpName(rest.getName());
+            resourcePolicyService.update(context, resourcePolicy);
+        } catch (SQLException e) {
+            throw new RuntimeException("Unable to patch ResourcePolicy with id = " + id, e);
         }
     }
 }
