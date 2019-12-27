@@ -79,4 +79,4 @@ DSPACE=/var/dspace/install
 # 20 4 * * *	dspace	vacuumdb --analyze dspace > /dev/null 2>&1
 
 #Limpieza de la cache de cocoon cada 8 horas a partir de las 7am
-0 7/8 * * * dspace curl --silent --output /dev/null --show-error --fail --data "cache-clearance" http://sedici.unlp.edu.ar/clear-cache
+30 */8 * * * dspace curl --silent --output /dev/null --show-error --fail --data "cache-clearance" http://sedici.unlp.edu.ar/clear-cache
