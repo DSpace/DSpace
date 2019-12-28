@@ -25,11 +25,15 @@ import org.dspace.content.Collection;
 import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.core.Utils;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 /**
  * Submission form generator for DSpace. Reads and parses the installation
@@ -55,6 +59,10 @@ import org.xml.sax.SAXException;
  */
 
 public class DCInputsReader {
+    /** Logging sink */
+    private static final Logger LOG
+            = LoggerFactory.getLogger(DCInputsReader.class);
+
     /**
      * The ID of the default collection. Will never be the ID of a named
      * collection
@@ -131,6 +139,11 @@ public class DCInputsReader {
             factory.setXIncludeAware(true);
 
             DocumentBuilder db = factory.newDocumentBuilder();
+            if (!db.isXIncludeAware()) {
+                throw new IllegalStateException("XInclude could not be enabled.");
+            }
+            db.setErrorHandler(new DCInputsErrorHandler());
+
             Document doc = db.parse(uri);
             doNodes(doc);
             checkValues();
@@ -708,4 +721,27 @@ public class DCInputsReader {
         throw new DCInputsReaderException("No field configuration found!");
     }
 
+    /**
+     * Report XML parsing errors.
+     */
+    private class DCInputsErrorHandler
+            implements ErrorHandler {
+        @Override
+        public void warning(SAXParseException saxpe)
+                throws SAXException {
+            LOG.warn(saxpe.getMessage(), saxpe);
+        }
+
+        @Override
+        public void error(SAXParseException saxpe)
+                throws SAXException {
+            LOG.error(saxpe.getMessage(), saxpe);
+        }
+
+        @Override
+        public void fatalError(SAXParseException saxpe)
+                throws SAXException {
+            LOG.error("Fatal:  {}", saxpe.getMessage(), saxpe);
+        }
+    }
 }
