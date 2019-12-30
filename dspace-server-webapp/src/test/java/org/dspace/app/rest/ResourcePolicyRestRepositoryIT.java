@@ -7,18 +7,26 @@
  */
 package org.dspace.app.rest;
 import static com.jayway.jsonpath.JsonPath.read;
+
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.util.Random;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
+
+import javax.ws.rs.core.MediaType;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -29,6 +37,8 @@ import org.dspace.app.rest.builder.GroupBuilder;
 import org.dspace.app.rest.builder.ResourcePolicyBuilder;
 import org.dspace.app.rest.matcher.ResoucePolicyMatcher;
 import org.dspace.app.rest.model.ResourcePolicyRest;
+import org.dspace.app.rest.model.patch.Operation;
+import org.dspace.app.rest.model.patch.ReplaceOperation;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.AuthorizeService;
@@ -379,7 +389,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
     }
 
     @Test
-    public void searchResoucesPolicyByEPersonUuidForbiddenTest() throws Exception {
+    public void findResoucesPolicyByEPersonUuidForbiddenTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
         EPerson eperson1 = EPersonBuilder.createEPerson(context)
@@ -434,7 +444,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
         ResourcePolicy firstResourcePolicyOfEPerson1 = ResourcePolicyBuilder.createResourcePolicy(context)
                 .withDspaceObject(community)
-                .withAction(Constants.WRITE)
+                .withAction(Constants.ADMIN)
                 .withUser(eperson1).build();
 
         ResourcePolicy firstResourcePolicyOfEPerson2 = ResourcePolicyBuilder.createResourcePolicy(context)
@@ -485,13 +495,8 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
 
         ResourcePolicy firstResourcePolicyOfEPerson1 = ResourcePolicyBuilder.createResourcePolicy(context)
-                .withDspaceObject(collection)
-                .withAction(Constants.WRITE)
-                .withUser(eperson1).build();
-
-        ResourcePolicy secondResourcePolicyOfEPerson1 = ResourcePolicyBuilder.createResourcePolicy(context)
-                .withDspaceObject(collection)
-                .withAction(Constants.ADD)
+                .withDspaceObject(community)
+                .withAction(Constants.ADMIN)
                 .withUser(eperson1).build();
 
         ResourcePolicy firstResourcePolicyOfEPerson2 = ResourcePolicyBuilder.createResourcePolicy(context)
@@ -503,12 +508,12 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
       String authToken = getAuthToken(eperson1.getEmail(), "qwerty01");
       getClient(authToken).perform(get("/api/authz/resourcepolicies/search/resource")
-                .param("uuid", collection.getID().toString())
-                .param("action", "ADD"))
+                .param("uuid", community.getID().toString())
+                .param("action", "ADMIN"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$._embedded.resourcepolicies",Matchers.contains(
-                        ResoucePolicyMatcher.matchResourcePolicy(firstResourcePolicyOfEPerson2)
+                        ResoucePolicyMatcher.matchResourcePolicy(firstResourcePolicyOfEPerson1)
                         )))
                 .andExpect(jsonPath("$._links.self.href",
                         Matchers.containsString("api/authz/resourcepolicies/search/resource")))
@@ -578,7 +583,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
 
   @Test
-  public void searchResoucesPoliciesByResourceUuidForbiddenTest() throws Exception {
+  public void findResoucesPoliciesByResourceUuidForbiddenTest() throws Exception {
       context.turnOffAuthorisationSystem();
 
       EPerson eperson1 = EPersonBuilder.createEPerson(context)
@@ -768,7 +773,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
     }
 
     @Test
-    public void searchResoucesPolicyByGroupUuidForbiddenTest() throws Exception {
+    public void findResoucesPolicyByGroupUuidForbiddenTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
         Group group1 = GroupBuilder.createGroup(context).withName("My group").build();
@@ -1003,7 +1008,182 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
     @Test
     public void deliteOneNotFoundTest() throws Exception {
         String authToken = getAuthToken(admin.getEmail(), password);
-        getClient(authToken).perform(delete("/api/authz/resourcepolicies/" + new Random().nextInt(1000)))
+        getClient(authToken).perform(delete("/api/authz/resourcepolicies/" + Integer.MAX_VALUE))
                  .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void patchReplaceStartDataTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Community community = CommunityBuilder.createCommunity(context)
+                .withName("My Community")
+                .build();
+
+        EPerson eperson1 = EPersonBuilder.createEPerson(context)
+                .withEmail("eperson1@mail.com")
+                .withPassword("qwerty01")
+                .build();
+
+
+        Calendar calendar = Calendar.getInstance();
+
+        calendar.set(Calendar.YEAR, 2019);
+        calendar.set(Calendar.MONTH, 9);
+        calendar.set(Calendar.DATE, 31);
+
+        Date data = calendar.getTime();
+
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+                .withAction(Constants.READ)
+                .withDspaceObject(community)
+                .withUser(eperson1)
+                .withStartDate(data)
+                .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
+                .build();
+
+        context.restoreAuthSystemState();
+
+        Calendar calendar2 = Calendar.getInstance();
+        SimpleDateFormat formatDate = new SimpleDateFormat("yyyy-MM-dd");
+
+        calendar2.set(Calendar.YEAR, 2020);
+        calendar2.set(Calendar.MONTH, 0);
+        calendar2.set(Calendar.DATE, 1);
+
+        Date newData = calendar2.getTime();
+
+        List<Operation> ops = new ArrayList<Operation>();
+        ReplaceOperation replaceOperation = new ReplaceOperation("/startDate", formatDate.format(newData));
+        ops.add(replaceOperation);
+        String patchBody = getPatchContent(ops);
+
+        String authToken = getAuthToken(admin.getEmail(),password);
+        getClient(authToken).perform(patch("/api/authz/resourcepolicies/" + resourcePolicy.getID())
+                            .content(patchBody)
+                            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                            .andExpect(status().isOk());
+    }
+
+    @Test
+    public void patchReplaceStartDataUnAuthenticatedTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Community community = CommunityBuilder.createCommunity(context)
+                .withName("My Community")
+                .build();
+
+        Calendar calendar = Calendar.getInstance();
+
+        calendar.set(Calendar.YEAR, 2010);
+        calendar.set(Calendar.MONTH, 5);
+        calendar.set(Calendar.DATE, 15);
+
+        Date data = calendar.getTime();
+
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+                .withAction(Constants.WRITE)
+                .withDspaceObject(community)
+                .withStartDate(data)
+                .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
+                .build();
+
+        context.restoreAuthSystemState();
+
+        Calendar calendar2 = Calendar.getInstance();
+        SimpleDateFormat formatDate = new SimpleDateFormat("yyyy-MM-dd");
+
+        calendar2.set(Calendar.YEAR, 2021);
+        calendar2.set(Calendar.MONTH, 2);
+        calendar2.set(Calendar.DATE, 21);
+
+        Date newData = calendar2.getTime();
+
+        List<Operation> ops = new ArrayList<Operation>();
+        ReplaceOperation replaceOperation = new ReplaceOperation("/startDate", formatDate.format(newData));
+        ops.add(replaceOperation);
+        String patchBody = getPatchContent(ops);
+
+        getClient().perform(patch("/api/authz/resourcepolicies/" + resourcePolicy.getID())
+                   .content(patchBody)
+                   .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                   .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void patchReplaceStartDataForbiddenTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Community community = CommunityBuilder.createCommunity(context)
+                .withName("My Community")
+                .build();
+
+        EPerson eperson1 = EPersonBuilder.createEPerson(context)
+                .withEmail("eperson1@mail.com")
+                .withPassword("qwerty01")
+                .build();
+
+
+        Calendar calendar = Calendar.getInstance();
+
+        calendar.set(Calendar.YEAR, 2019);
+        calendar.set(Calendar.MONTH, 9);
+        calendar.set(Calendar.DATE, 31);
+
+        Date data = calendar.getTime();
+
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+                .withAction(Constants.READ)
+                .withDspaceObject(community)
+                .withUser(eperson1)
+                .withStartDate(data)
+                .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
+                .build();
+
+        context.restoreAuthSystemState();
+
+        Calendar calendar2 = Calendar.getInstance();
+        SimpleDateFormat formatDate = new SimpleDateFormat("yyyy-MM-dd");
+
+        calendar2.set(Calendar.YEAR, 2020);
+        calendar2.set(Calendar.MONTH, 0);
+        calendar2.set(Calendar.DATE, 1);
+
+        Date newData = calendar2.getTime();
+
+        List<Operation> ops = new ArrayList<Operation>();
+        ReplaceOperation replaceOperation = new ReplaceOperation("/startDate", formatDate.format(newData));
+        ops.add(replaceOperation);
+        String patchBody = getPatchContent(ops);
+
+        String authToken = getAuthToken(eperson1.getEmail(),"qwerty01");
+        getClient(authToken).perform(patch("/api/authz/resourcepolicies/" + resourcePolicy.getID())
+                            .content(patchBody)
+                            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                            .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void patchReplaceStartDataNotFoundTest() throws Exception {
+
+        Calendar calendar2 = Calendar.getInstance();
+        SimpleDateFormat formatDate = new SimpleDateFormat("yyyy-MM-dd");
+
+        calendar2.set(Calendar.YEAR, 2020);
+        calendar2.set(Calendar.MONTH, 0);
+        calendar2.set(Calendar.DATE, 1);
+
+        Date newData = calendar2.getTime();
+
+        List<Operation> ops = new ArrayList<Operation>();
+        ReplaceOperation replaceOperation = new ReplaceOperation("/startDate", formatDate.format(newData));
+        ops.add(replaceOperation);
+        String patchBody = getPatchContent(ops);
+
+        String authToken = getAuthToken(admin.getEmail(),password);
+        getClient(authToken).perform(patch("/api/authz/resourcepolicies/" + Integer.MAX_VALUE)
+                            .content(patchBody)
+                            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                            .andExpect(status().isNotFound());
     }
 }

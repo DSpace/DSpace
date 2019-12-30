@@ -8,6 +8,7 @@
 package org.dspace.app.rest.repository;
 
 import java.io.IOException;
+
 import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
@@ -274,10 +275,15 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
     }
 
     @Override
+    @PreAuthorize("hasAuthority('ADMIN')")
     protected void patch(Context context, HttpServletRequest request, String apiCategory, String model, Integer id,
             Patch patch)
             throws RepositoryMethodNotImplementedException, SQLException, AuthorizeException, DCInputsReaderException {
         ResourcePolicyRest rest = findOne(id);
+        if (rest == null) {
+            throw new ResourceNotFoundException(
+                    ResourcePolicyRest.CATEGORY + "." + ResourcePolicyRest.NAME + " with id: " + id + " not found");
+        }
         for (Operation op : patch.getOperations()) {
             rest = resourcePolicyOperationPatchFactory.getOperationForPath(op.getPath()).perform(rest, op);
         }
