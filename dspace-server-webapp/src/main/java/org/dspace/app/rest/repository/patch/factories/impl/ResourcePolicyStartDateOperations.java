@@ -7,6 +7,8 @@
  */
 package org.dspace.app.rest.repository.patch.factories.impl;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
@@ -29,9 +31,17 @@ import org.springframework.stereotype.Component;
 public class ResourcePolicyStartDateOperations extends ReplacePatchOperation<ResourcePolicyRest, Date>
         implements ResourcePatchOperation<ResourcePolicyRest> {
 
+    final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+
     @Override
     ResourcePolicyRest replace(ResourcePolicyRest resourcePolicy, Operation operation) {
-        resourcePolicy.setStartDate((Date) operation.getValue());
+        String dateS = (String) operation.getValue();
+        try {
+            Date date = simpleDateFormat.parse(dateS);
+            resourcePolicy.setStartDate(date);
+        } catch (ParseException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
         return resourcePolicy;
     }
 

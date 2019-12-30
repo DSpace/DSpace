@@ -8,7 +8,9 @@
 package org.dspace.app.rest.builder;
 
 import java.io.IOException;
+
 import java.sql.SQLException;
+import java.util.Date;
 
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
@@ -109,22 +111,29 @@ public class ResourcePolicyBuilder extends AbstractBuilder<ResourcePolicy, Resou
         resourcePolicy.setEPerson(ePerson);
         return this;
     }
+
     public ResourcePolicyBuilder withGroup(Group epersonGroup) throws SQLException {
         resourcePolicy.setGroup(epersonGroup);
         return this;
     }
+
     public ResourcePolicyBuilder withAction(int action) throws SQLException {
         resourcePolicy.setAction(action);
         return this;
     }
+
     public ResourcePolicyBuilder withDspaceObject(DSpaceObject dspaceObject) throws SQLException {
         resourcePolicy.setdSpaceObject(dspaceObject);
         return this;
     }
+
     public ResourcePolicyBuilder withPolicyType(String policyType) {
         resourcePolicy.setRpType(policyType);
         return this;
     }
 
-
+    public ResourcePolicyBuilder withStartDate(Date data) throws SQLException {
+        resourcePolicy.setStartDate(data);
+        return this;
+    }
 }
