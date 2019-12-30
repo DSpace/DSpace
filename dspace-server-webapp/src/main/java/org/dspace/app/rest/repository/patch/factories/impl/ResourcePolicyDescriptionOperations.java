@@ -29,7 +29,7 @@ public class ResourcePolicyDescriptionOperations extends ReplacePatchOperation<R
 
     @Override
     ResourcePolicyRest replace(ResourcePolicyRest resourcePolicy, Operation operation) {
-        resourcePolicy.setName((String) operation.getValue());
+        resourcePolicy.setDescription((String) operation.getValue());
         return resourcePolicy;
     }
 

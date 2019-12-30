@@ -9,7 +9,7 @@ package org.dspace.app.rest.repository.patch.factories;
 
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.model.ResourcePolicyRest;
-import org.dspace.app.rest.repository.patch.factories.impl.PatchOperation;
+import org.dspace.app.rest.repository.patch.factories.impl.ResourcePatchOperation;
 import org.dspace.app.rest.repository.patch.factories.impl.ResourcePolicyDescriptionOperations;
 import org.dspace.app.rest.repository.patch.factories.impl.ResourcePolicyEndDateOperations;
 import org.dspace.app.rest.repository.patch.factories.impl.ResourcePolicyNameOperations;
@@ -49,7 +49,7 @@ public class ResourcePolicyOperationFactory {
      * @return the patch operation implementation
      * @throws DSpaceBadRequestException
      */
-    public PatchOperation<ResourcePolicyRest, ?> getOperationForPath(String path) {
+    public ResourcePatchOperation<ResourcePolicyRest> getOperationForPath(String path) {
 
         switch (path) {
             case OPERATION_PATH_STARTDATE:
