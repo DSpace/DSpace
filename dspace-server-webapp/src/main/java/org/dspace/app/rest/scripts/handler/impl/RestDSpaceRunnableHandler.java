@@ -17,12 +17,12 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.ProcessStatus;
-import org.dspace.content.factory.ProcessServiceFactory;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.scripts.DSpaceCommandLineParameter;
 import org.dspace.scripts.DSpaceRunnable;
 import org.dspace.scripts.Process;
+import org.dspace.scripts.factory.ScriptServiceFactory;
 import org.dspace.scripts.handler.DSpaceRunnableHandler;
 import org.dspace.scripts.service.ProcessService;
 
@@ -33,7 +33,7 @@ public class RestDSpaceRunnableHandler implements DSpaceRunnableHandler {
     private static final Logger log = org.apache.logging.log4j.LogManager
         .getLogger(RestDSpaceRunnableHandler.class);
 
-    private ProcessService processService = ProcessServiceFactory.getInstance().getProcessService();
+    private ProcessService processService = ScriptServiceFactory.getInstance().getProcessService();
 
     private Integer processId;
     private String scriptName;

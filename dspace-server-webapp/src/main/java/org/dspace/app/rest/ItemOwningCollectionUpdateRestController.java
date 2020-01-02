@@ -17,10 +17,11 @@ import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.dspace.app.rest.converter.CollectionConverter;
+import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.CollectionRest;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.authorize.AuthorizeException;
@@ -59,7 +60,7 @@ public class ItemOwningCollectionUpdateRestController {
     AuthorizeService authorizeService;
 
     @Autowired
-    CollectionConverter converter;
+    ConverterService converter;
 
     @Autowired
     Utils utils;
@@ -96,7 +97,7 @@ public class ItemOwningCollectionUpdateRestController {
         if (targetCollection == null) {
             return null;
         }
-        return converter.fromModel(targetCollection);
+        return converter.toRest(targetCollection, Projection.DEFAULT);
 
     }
 

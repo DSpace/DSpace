@@ -18,8 +18,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @LinksRest(links = {
-    @LinkRest(name = CollectionRest.LICENSE, linkClass = LicenseRest.class, method = "getLicenseCollection", optional
-        = true)
+    @LinkRest(
+            name = CollectionRest.LICENSE,
+            linkClass = LicenseRest.class,
+            method = "getLicenseCollection",
+            embedOptional = true,
+            linkOptional = true
+    )
 })
 public class CollectionRest extends DSpaceObjectRest {
     public static final String NAME = "collection";

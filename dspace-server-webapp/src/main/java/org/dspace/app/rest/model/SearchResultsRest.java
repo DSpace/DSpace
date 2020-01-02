@@ -11,7 +11,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
@@ -28,7 +27,6 @@ public class SearchResultsRest extends DiscoveryResultsRest {
 
     @JsonIgnore
     List<SearchFacetEntryRest> facets;
-
 
     public List<SearchResultEntryRest> getSearchResults() {
         return searchResults;

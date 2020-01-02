@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest.repository;
 
+import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.core.Context;
@@ -25,6 +26,9 @@ public abstract class AbstractDSpaceRestRepository {
 
     @Autowired
     protected Utils utils;
+
+    @Autowired
+    protected ConverterService converter;
 
     protected RequestService requestService = new DSpace().getRequestService();
 

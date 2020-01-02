@@ -44,8 +44,7 @@ public class RelationshipMetadataServiceImpl implements RelationshipMetadataServ
         Context context = new Context();
         List<RelationshipMetadataValue> fullMetadataValueList = new LinkedList<>();
         try {
-            List<MetadataValue> list = item.getMetadata();
-            String entityType = getEntityTypeStringFromMetadata(list);
+            String entityType = getEntityTypeStringFromMetadata(item);
             if (StringUtils.isNotBlank(entityType)) {
                 List<Relationship> relationships = relationshipService.findByItem(context, item);
                 for (Relationship relationship : relationships) {
@@ -61,7 +60,8 @@ public class RelationshipMetadataServiceImpl implements RelationshipMetadataServ
         return fullMetadataValueList;
     }
 
-    private String getEntityTypeStringFromMetadata(List<MetadataValue> list) {
+    public String getEntityTypeStringFromMetadata(Item item) {
+        List<MetadataValue> list = item.getMetadata();
         for (MetadataValue mdv : list) {
             if (StringUtils.equals(mdv.getMetadataField().getMetadataSchema().getName(),
                 "relationship")
@@ -74,22 +74,8 @@ public class RelationshipMetadataServiceImpl implements RelationshipMetadataServ
         return null;
     }
 
-    /**
-     * This method processes one Relationship of an Item and will return a list of RelationshipMetadataValue objects
-     * that are generated for this specific relationship for the item through the config in VirtualMetadataPopulator
-     *
-     * It returns a combination of the output of the findVirtualMetadataFromConfiguration method and
-     *
-     * @param context               The context
-     * @param item                  The item whose virtual metadata is requested
-     * @param entityType            The entity type of the given item
-     * @param relationship          The relationship whose virtual metadata is requested
-     * @param enableVirtualMetadata Determines whether the VirtualMetadataPopulator should be used.
-     *                              If false, only the relation."relationname" metadata is populated
-     *                              If true, fields from the spring config virtual metadata is included as well
-     * @return                      The list of virtual metadata values
-     */
-    private List<RelationshipMetadataValue> findRelationshipMetadataValueForItemRelationship(
+    @Override
+    public List<RelationshipMetadataValue> findRelationshipMetadataValueForItemRelationship(
             Context context, Item item, String entityType, Relationship relationship, boolean enableVirtualMetadata)
         throws SQLException {
         List<RelationshipMetadataValue> resultingMetadataValueList = new LinkedList<>();
@@ -254,7 +240,6 @@ public class RelationshipMetadataServiceImpl implements RelationshipMetadataServ
             return null;
         }
         metadataValue.setMetadataField(metadataField);
-        metadataValue.setLanguage(Item.ANY);
         return metadataValue;
     }
 

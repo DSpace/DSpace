@@ -14,6 +14,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
+import javax.annotation.Nullable;
+
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
@@ -462,7 +464,9 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
         return bitstreamDAO.getNotReferencedBitstreams(context);
     }
 
-    public Long getLastModified(Bitstream bitstream) {
+    @Nullable
+    @Override
+    public Long getLastModified(Bitstream bitstream) throws IOException {
         return bitstreamStorageService.getLastModified(bitstream);
     }
 }

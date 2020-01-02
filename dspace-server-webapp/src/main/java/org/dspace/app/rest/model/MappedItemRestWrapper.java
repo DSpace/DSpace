@@ -16,7 +16,7 @@ import org.dspace.app.rest.MappedItemRestController;
 /**
  * The REST object that will define a list of ItemRest objects to be returned by the REST api
  */
-public class MappedItemRestWrapper implements RestAddressableModel {
+public class MappedItemRestWrapper extends RestAddressableModel {
 
     @JsonIgnore
     private List<ItemRest> mappedItemRestList;
