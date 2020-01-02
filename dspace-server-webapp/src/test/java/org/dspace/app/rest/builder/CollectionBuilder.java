@@ -42,7 +42,9 @@ public class CollectionBuilder extends AbstractDSpaceObjectBuilder<Collection> {
         return builder.create(parent);
     }
 
-    public static CollectionBuilder createCollection(final Context context, final Community parent, final String handle) {
+    public static CollectionBuilder createCollection(final Context context,
+                                                     final Community parent,
+                                                     final String handle) {
         CollectionBuilder builder = new CollectionBuilder(context);
         return builder.create(parent, handle);
     }
@@ -63,8 +65,7 @@ public class CollectionBuilder extends AbstractDSpaceObjectBuilder<Collection> {
                     this.collection = collection;
                 }
             }
-            Collection collection = this.collectionService.create(context, parent, handle);
-            this.collection = collectionService.create(context, parent, handle);
+            this.collection = this.collectionService.create(context, parent, handle);
         } catch (Exception e) {
             return handleException(e);
         }
