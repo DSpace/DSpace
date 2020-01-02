@@ -8,6 +8,7 @@
 package org.dspace.app.rest.converter;
 
 import org.dspace.app.rest.model.MetadataSuggestionEntryRest;
+import org.dspace.app.rest.model.MetadataValueDTOList;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.external.provider.metadata.service.impl.MetadataItemSuggestions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,8 +33,9 @@ public class MetadataSuggestionEntryConverter implements
         metadataSuggestionEntryRest.setDisplay(obj.getExternalDataObject().getDisplayValue());
         metadataSuggestionEntryRest.setId(obj.getExternalDataObject().getId());
         metadataSuggestionEntryRest.setValue(obj.getExternalDataObject().getValue());
+        MetadataValueDTOList metadataValueDTOList = new MetadataValueDTOList(obj.getExternalDataObject().getMetadata());
         metadataSuggestionEntryRest
-            .setMetadataRest(converter.toRest(obj.getExternalDataObject().getMetadata(), Projection.DEFAULT));
+            .setMetadataRest(converter.toRest(metadataValueDTOList, Projection.DEFAULT));
         metadataSuggestionEntryRest.setMetadataSuggestion(obj.getExternalDataObject().getSource());
         metadataSuggestionEntryRest.setMetadataChangeRest(metadataChangeConverter.convert(obj.getMetadataChanges()));
         return metadataSuggestionEntryRest;

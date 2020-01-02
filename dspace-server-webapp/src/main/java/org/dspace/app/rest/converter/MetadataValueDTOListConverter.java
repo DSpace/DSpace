@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.model.MetadataRest;
 import org.dspace.app.rest.model.MetadataValueRest;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.dto.MetadataValueDTO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,7 +52,7 @@ public class MetadataValueDTOListConverter implements Converter<List<MetadataVal
                 list = new LinkedList();
                 mapOfLists.put(key, list);
             }
-            list.add(valueConverter.convert(metadataValue));
+            list.add(valueConverter.convert(metadataValue, Projection.DEFAULT));
         }
 
         MetadataRest metadataRest = new MetadataRest();
