@@ -66,7 +66,7 @@ public class XmlWorkflowFactoryTest extends AbstractUnitTest {
             //we have to create a new community in the database
             context.turnOffAuthorisationSystem();
             this.owningCommunity = communityService.create(null, context);
-            this.mappedCollection = this.collectionService.create(context, owningCommunity, "123456789/4");
+            this.mappedCollection = this.collectionService.create(context, owningCommunity, "123456789/99");
             this.nonMappedCollection = this.collectionService.create(context, owningCommunity, "123456789/999");
             //we need to commit the changes so we don't block the table for testing
             context.restoreAuthSystemState();
