@@ -7,10 +7,8 @@
  */
 package org.dspace.app.rest.converter;
 
-import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.WorkflowDefinitionRest;
 import org.dspace.app.rest.projection.Projection;
-import org.dspace.xmlworkflow.WorkflowConfigurationException;
 import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
 import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
 import org.dspace.xmlworkflow.state.Workflow;
@@ -24,19 +22,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class WorkflowDefinitionConverter implements DSpaceConverter<Workflow, WorkflowDefinitionRest> {
 
-    private Logger log = org.apache.logging.log4j.LogManager.getLogger(WorkflowDefinitionConverter.class);
-
     protected XmlWorkflowFactory xmlWorkflowFactory = XmlWorkflowServiceFactory.getInstance().getWorkflowFactory();
 
     @Override
     public WorkflowDefinitionRest convert(Workflow modelObject, Projection projection) {
         WorkflowDefinitionRest restModel = new WorkflowDefinitionRest();
         restModel.setName(modelObject.getID());
-        try {
-            restModel.setIsDefault(xmlWorkflowFactory.isDefaultWorkflow(modelObject.getID()));
-        } catch (WorkflowConfigurationException e) {
-            log.error("Error while trying to check if " + modelObject.getID() + " is the default workflow", e);
-        }
+        restModel.setIsDefault(xmlWorkflowFactory.isDefaultWorkflow(modelObject.getID()));
         return restModel;
     }
 
