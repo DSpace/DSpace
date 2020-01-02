@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
@@ -101,16 +102,14 @@ public class XmlWorkflowFactoryImpl implements XmlWorkflowFactory {
 
 
     @Override
-    public boolean isDefaultWorkflow(String workflowName) throws WorkflowConfigurationException {
-        try {
+    public boolean isDefaultWorkflow(String workflowName) {
+        if (StringUtils.isNotBlank(workflowName)) {
             Workflow defaultWorkflow = this.getDefaultWorkflow();
-            return (defaultWorkflow.getID().equals(workflowName));
-        } catch (Exception e) {
-            log.error("Error while trying to check if " + workflowName + " is the default workflow", e);
-            throw new WorkflowConfigurationException("Error while trying to check if " + workflowName
-                    + " is the default workflow");
+            if (defaultWorkflow != null && StringUtils.isNotBlank(defaultWorkflow.getID())) {
+                return (defaultWorkflow.getID().equals(workflowName));
+            }
         }
-
+        return false;
     }
 
 }

@@ -67,7 +67,7 @@ public interface XmlWorkflowFactory {
      * @param workflowName  Name of workflow to check if default
      * @return  True if given workflowName is the workflow mapped to default for collections, otherwise false
      */
-    public boolean isDefaultWorkflow(String workflowName) throws WorkflowConfigurationException;
+    public boolean isDefaultWorkflow(String workflowName);
 
     /**
      * Gets the default workflow, i.e. the workflow that is mapped to collection=default in workflow.xml

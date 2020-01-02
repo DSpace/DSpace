@@ -32,7 +32,6 @@ import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
 import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
 import org.dspace.xmlworkflow.state.Workflow;
 import org.json.JSONArray;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -171,10 +170,6 @@ public class WorkflowDefinitionRestRepositoryIT extends AbstractControllerIntegr
                 .andExpect(jsonPath("$", empty()));
     }
 
-    // This test fails when running with all the others because the handle creation does not get reset as expected,
-    // since the com-subcom-collections created here have a handle much above the expected 1-5
-    // When running the test class separately the problem doesn't occur.
-    @Ignore
     @Test
     public void getCollectionsOfWorkflowByName_NonDefaultWorkflow() throws Exception {
         //We turn off the authorization system in order to create the structure as defined below
@@ -187,9 +182,8 @@ public class WorkflowDefinitionRestRepositoryIT extends AbstractControllerIntegr
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                 .withName("Sub Community")
                 .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
-        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
-        Collection col3 = CollectionBuilder.createCollection(context, child1).withName("Collection 3").build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1, "123456789/4").withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1, "123456789/5").withName("Collection 1").build();
         // until handle 123456789/5 used in example in workflow.xml (if uncommented)
         context.restoreAuthSystemState();
 
