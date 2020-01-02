@@ -9,12 +9,11 @@ package org.dspace.app.rest;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.dspace.app.rest.link.HalLinkService;
+import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.model.ProcessRest;
 import org.dspace.app.rest.model.ScriptRest;
 import org.dspace.app.rest.model.hateoas.ProcessResource;
 import org.dspace.app.rest.repository.ScriptRestRepository;
-import org.dspace.app.rest.utils.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ControllerUtils;
 import org.springframework.hateoas.ResourceSupport;
@@ -36,13 +35,10 @@ public class ScriptProcessesController {
     private static final Logger log = LogManager.getLogger();
 
     @Autowired
+    private ConverterService converter;
+
+    @Autowired
     private ScriptRestRepository scriptRestRepository;
-
-    @Autowired
-    private HalLinkService halLinkService;
-
-    @Autowired
-    private Utils utils;
 
     /**
      * This method can be called by sending a POST request to the system/scripts/{name}/processes endpoint
@@ -59,8 +55,7 @@ public class ScriptProcessesController {
             log.trace("Starting Process for Script with name: " + scriptName);
         }
         ProcessRest processRest = scriptRestRepository.startProcess(scriptName);
-        ProcessResource processResource = new ProcessResource(processRest, utils, null);
-        halLinkService.addLinks(processResource);
+        ProcessResource processResource = converter.toResource(processRest);
         return ControllerUtils.toResponseEntity(HttpStatus.ACCEPTED, null, processResource);
     }
 

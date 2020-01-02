@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.model.ScopeEnum;
 import org.dspace.app.rest.model.SubmissionFormFieldRest;
@@ -22,6 +21,7 @@ import org.dspace.app.rest.model.SubmissionVisibilityRest;
 import org.dspace.app.rest.model.VisibilityEnum;
 import org.dspace.app.rest.model.submit.SelectableMetadata;
 import org.dspace.app.rest.model.submit.SelectableRelationship;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.repository.SubmissionFormRestRepository;
 import org.dspace.app.rest.utils.AuthorityUtils;
 import org.dspace.app.util.DCInput;
@@ -51,8 +51,9 @@ public class SubmissionFormConverter implements DSpaceConverter<DCInputSet, Subm
     private SubmissionFormRestRepository submissionFormRestRepository;
 
     @Override
-    public SubmissionFormRest fromModel(DCInputSet obj) {
+    public SubmissionFormRest convert(DCInputSet obj, Projection projection) {
         SubmissionFormRest sd = new SubmissionFormRest();
+        sd.setProjection(projection);
         sd.setName(obj.getFormName());
         DCInput[][] step = obj.getFields();
         List<SubmissionFormRowRest> rows = getPage(step, obj.getFormName());
@@ -203,7 +204,7 @@ public class SubmissionFormConverter implements DSpaceConverter<DCInputSet, Subm
     }
 
     @Override
-    public DCInputSet toModel(SubmissionFormRest obj) {
-        throw new NotImplementedException("Method not implemented");
+    public Class<DCInputSet> getModelClass() {
+        return DCInputSet.class;
     }
 }
