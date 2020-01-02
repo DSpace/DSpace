@@ -7,8 +7,8 @@
  */
 package org.dspace.xmlworkflow.state;
 
-import static junit.framework.TestCase.assertNull;
 import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertNull;
 
 import java.util.List;
 
