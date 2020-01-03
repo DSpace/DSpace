@@ -1533,12 +1533,4 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
             .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject'][5].value", is("Final Subject")))
         ;
     }
-
-    @Override
-    public void destroy() throws Exception {
-        //reinstate file upload mandatory
-        configurationService.setProperty("webui.submit.upload.required", null);
-
-        super.destroy();
-    }
 }
