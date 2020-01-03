@@ -54,7 +54,8 @@ public class UploadConfiguration {
     public Boolean isRequired() {
         if (required == null) {
             //defaults to true
-            required = configurationService.getBooleanProperty("webui.submit.upload.required", true);
+            //don't store a local copy of the configuration property
+            return configurationService.getBooleanProperty("webui.submit.upload.required", true);
         }
         return required;
     }
