@@ -19,8 +19,8 @@ import org.dspace.discovery.indexobject.IndexableInProgressSubmission;
  *
  * @author Kevin Van de Velde (kevin at atmire dot com)
  */
-public interface InprogressSubmissionIndexFactory<T extends IndexableInProgressSubmission>
-        extends IndexFactory<T> {
+public interface InprogressSubmissionIndexFactory<T extends IndexableInProgressSubmission, S>
+        extends IndexFactory<T, S> {
 
     /**
      * Store common fields between workspace / workflow items in the solr document

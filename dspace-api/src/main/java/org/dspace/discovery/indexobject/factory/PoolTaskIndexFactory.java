@@ -8,11 +8,12 @@
 package org.dspace.discovery.indexobject.factory;
 
 import org.dspace.discovery.indexobject.IndexablePoolTask;
+import org.dspace.xmlworkflow.storedcomponents.PoolTask;
 
 /**
  * Factory interface for indexing/retrieving Pooltask objects in the search core
  *
  * @author Kevin Van de Velde (kevin at atmire dot com)
  */
-public interface PoolTaskIndexFactory extends IndexFactory<IndexablePoolTask> {
+public interface PoolTaskIndexFactory extends IndexFactory<IndexablePoolTask, PoolTask> {
 }

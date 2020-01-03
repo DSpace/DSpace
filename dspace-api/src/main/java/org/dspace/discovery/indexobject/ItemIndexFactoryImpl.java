@@ -10,6 +10,7 @@ package org.dspace.discovery.indexobject;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -33,12 +34,15 @@ import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
 import org.dspace.content.MetadataValue;
+import org.dspace.content.WorkspaceItem;
 import org.dspace.content.authority.Choices;
 import org.dspace.content.authority.service.ChoiceAuthorityService;
 import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.dspace.content.service.ItemService;
+import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Context;
 import org.dspace.discovery.FullTextContentStreams;
+import org.dspace.discovery.IndexableObject;
 import org.dspace.discovery.SearchUtils;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.configuration.DiscoveryConfigurationParameters;
@@ -52,18 +56,22 @@ import org.dspace.discovery.configuration.DiscoverySortConfiguration;
 import org.dspace.discovery.configuration.DiscoverySortFieldConfiguration;
 import org.dspace.discovery.configuration.HierarchicalSidebarFacetConfiguration;
 import org.dspace.discovery.indexobject.factory.ItemIndexFactory;
+import org.dspace.discovery.indexobject.factory.WorkflowItemIndexFactory;
+import org.dspace.discovery.indexobject.factory.WorkspaceItemIndexFactory;
 import org.dspace.eperson.EPerson;
 import org.dspace.handle.service.HandleService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.util.MultiFormatDateParser;
 import org.dspace.util.SolrUtils;
+import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
+import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Factory implementation for indexing/retrieving items in the search core
  * @author Kevin Van de Velde (kevin at atmire dot com)
  */
-public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<IndexableItem>
+public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<IndexableItem, Item>
         implements ItemIndexFactory {
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(ItemIndexFactoryImpl.class);
@@ -79,6 +87,14 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
     protected ChoiceAuthorityService choiceAuthorityService;
     @Autowired
     protected MetadataAuthorityService metadataAuthorityService;
+    @Autowired
+    protected WorkspaceItemService workspaceItemService;
+    @Autowired
+    protected XmlWorkflowItemService xmlWorkflowItemService;
+    @Autowired
+    protected WorkflowItemIndexFactory workflowItemIndexFactory;
+    @Autowired
+    protected WorkspaceItemIndexFactory workspaceItemIndexFactory;
 
 
     @Override
@@ -113,6 +129,7 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
     @Override
     public SolrInputDocument buildDocument(Context context, IndexableItem indexableItem)
             throws SQLException, IOException {
+        // Add the ID's, types and call the SolrServiceIndexPlugins
         SolrInputDocument doc = super.buildDocument(context, indexableItem);
 
         final Item item = indexableItem.getIndexedObject();
@@ -128,6 +145,7 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
                     submitter.getFullName());
         }
 
+        // Add the item metadata
         List<DiscoveryConfiguration> discoveryConfigurations = SearchUtils.getAllDiscoveryConfigurations(item);
         addDiscoveryFields(doc, context, indexableItem.getIndexedObject(), discoveryConfigurations);
 
@@ -674,6 +692,34 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
     public void delete(String indexableObjectIdentifier) throws IOException, SolrServerException {
         super.delete(indexableObjectIdentifier);
         deleteInProgressData(indexableObjectIdentifier);
+    }
+
+    @Override
+    public boolean supports(Object object) {
+        return object instanceof Item;
+    }
+
+    @Override
+    public List getIndexableObjects(Context context, Item object) throws SQLException {
+        List<IndexableObject> results = new ArrayList<>();
+        if (object.isArchived() || object.isWithdrawn()) {
+            // We only want to index an item as an item if it is not in workflow
+            results.addAll(Arrays.asList(new IndexableItem(object)));
+        } else {
+            // Check if we have a workflow / workspace item
+            final WorkspaceItem workspaceItem = workspaceItemService.findByItem(context, object);
+            if (workspaceItem != null) {
+                results.addAll(workspaceItemIndexFactory.getIndexableObjects(context, workspaceItem));
+            } else {
+                // Check if we a workflow item
+                final XmlWorkflowItem xmlWorkflowItem = xmlWorkflowItemService.findByItem(context, object);
+                if (xmlWorkflowItem != null) {
+                    results.addAll(workflowItemIndexFactory.getIndexableObjects(context, xmlWorkflowItem));
+                }
+            }
+        }
+
+        return results;
     }
 
     @Override

@@ -26,8 +26,8 @@ import org.springframework.beans.factory.annotation.Autowired;
  * Factory implementation for indexing/retrieving InProgressSubmissions in the search core
  * @author Kevin Van de Velde (kevin at atmire dot com)
  */
-public abstract class InprogressSubmissionIndexFactoryImpl<T extends IndexableInProgressSubmission>
-        extends IndexFactoryImpl<T> implements InprogressSubmissionIndexFactory<T> {
+public abstract class InprogressSubmissionIndexFactoryImpl<T extends IndexableInProgressSubmission, S>
+        extends IndexFactoryImpl<T, S> implements InprogressSubmissionIndexFactory<T, S> {
 
     @Autowired
     protected CollectionIndexFactory indexableCollectionService;
@@ -37,7 +37,9 @@ public abstract class InprogressSubmissionIndexFactoryImpl<T extends IndexableIn
 
     @Override
     public SolrInputDocument buildDocument(Context context, T indexableObject) throws SQLException, IOException {
+        // Add the ID's, types and call the SolrServiceIndexPlugins
         SolrInputDocument doc = super.buildDocument(context, indexableObject);
+        // Add submitter, locations and modification time
         storeInprogressItemFields(context, doc, indexableObject.getIndexedObject());
         return doc;
     }

@@ -9,6 +9,7 @@ package org.dspace.discovery.indexobject;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
@@ -28,7 +29,8 @@ import org.springframework.beans.factory.annotation.Autowired;
  * Factory implementation for indexing/retrieving workspace items in the search core
  * @author Kevin Van de Velde (kevin at atmire dot com)
  */
-public class WorkspaceItemIndexFactoryImpl extends InprogressSubmissionIndexFactoryImpl<IndexableWorkspaceItem>
+public class WorkspaceItemIndexFactoryImpl
+        extends InprogressSubmissionIndexFactoryImpl<IndexableWorkspaceItem, WorkspaceItem>
         implements WorkspaceItemIndexFactory {
 
     @Autowired
@@ -59,8 +61,10 @@ public class WorkspaceItemIndexFactoryImpl extends InprogressSubmissionIndexFact
     @Override
     public SolrInputDocument buildDocument(Context context, IndexableWorkspaceItem indexableObject)
             throws SQLException, IOException {
+        // Add the ID's, types and call the SolrServiceIndexPlugins
         final SolrInputDocument doc = super.buildDocument(context, indexableObject);
 
+        // Add the object type
         String acvalue = DSpaceServicesFactory.getInstance().getConfigurationService()
                 .getProperty("discovery.facet.namedtype.workspace");
         if (StringUtils.isBlank(acvalue)) {
@@ -69,11 +73,22 @@ public class WorkspaceItemIndexFactoryImpl extends InprogressSubmissionIndexFact
         addNamedResourceTypeIndex(doc, acvalue);
         final WorkspaceItem inProgressSubmission = indexableObject.getIndexedObject();
 
+        // Add the item metadata as configured
         List<DiscoveryConfiguration> discoveryConfigurations = SearchUtils
                 .getAllDiscoveryConfigurations(inProgressSubmission);
         indexableItemService.addDiscoveryFields(doc, context, inProgressSubmission.getItem(), discoveryConfigurations);
 
         return doc;
+    }
+
+    @Override
+    public boolean supports(Object object) {
+        return object instanceof WorkspaceItem;
+    }
+
+    @Override
+    public List getIndexableObjects(Context context, WorkspaceItem object) {
+        return Arrays.asList(new IndexableWorkspaceItem(object));
     }
 
     @Override

@@ -21,11 +21,12 @@ import org.dspace.discovery.indexobject.factory.DSpaceObjectIndexFactory;
  * Factory implementation for indexing/retrieving DSpaceObjects in the search core
  * @author Kevin Van de Velde (kevin at atmire dot com)
  */
-public abstract class DSpaceObjectIndexFactoryImpl<T extends IndexableDSpaceObject>
-        extends IndexFactoryImpl<T> implements DSpaceObjectIndexFactory<T> {
+public abstract class DSpaceObjectIndexFactoryImpl<T extends IndexableDSpaceObject, S>
+        extends IndexFactoryImpl<T, S> implements DSpaceObjectIndexFactory<T, S> {
 
     @Override
     public SolrInputDocument buildDocument(Context context, T indexableObject) throws SQLException, IOException {
+        // Add the ID's, types and call the SolrServiceIndexPlugins
         SolrInputDocument doc = super.buildDocument(context, indexableObject);
         final DSpaceObject dso = indexableObject.getIndexedObject();
 

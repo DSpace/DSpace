@@ -309,15 +309,22 @@ public class SolrServiceImpl implements SearchService, IndexingService {
      */
     @Override
     public void updateIndex(Context context, boolean force) {
+        updateIndex(context, force, null);
+    }
+
+    @Override
+    public void updateIndex(Context context, boolean force, String type) {
         try {
             final List<IndexFactory> indexableObjectServices = indexObjectServiceFactory.
-                    getIndexFactories();
+                getIndexFactories();
             for (IndexFactory indexableObjectService : indexableObjectServices) {
-                final Iterator<IndexableObject> indexableObjects = indexableObjectService.findAll(context);
-                while (indexableObjects.hasNext()) {
-                    final IndexableObject indexableObject = indexableObjects.next();
-                    indexContent(context, indexableObject, force);
-                    context.uncacheEntity(indexableObject.getIndexedObject());
+                if (type == null || StringUtils.equals(indexableObjectService.getType(), type)) {
+                    final Iterator<IndexableObject> indexableObjects = indexableObjectService.findAll(context);
+                    while (indexableObjects.hasNext()) {
+                        final IndexableObject indexableObject = indexableObjects.next();
+                        indexContent(context, indexableObject, force);
+                        context.uncacheEntity(indexableObject.getIndexedObject());
+                    }
                 }
             }
             if (solrSearchCore.getSolr() != null) {

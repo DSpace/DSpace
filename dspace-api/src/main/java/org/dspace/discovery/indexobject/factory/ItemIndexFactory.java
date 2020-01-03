@@ -22,7 +22,7 @@ import org.dspace.discovery.indexobject.IndexableItem;
  *
  * @author Kevin Van de Velde (kevin at atmire dot com)
  */
-public interface ItemIndexFactory extends DSpaceObjectIndexFactory<IndexableItem> {
+public interface ItemIndexFactory extends DSpaceObjectIndexFactory<IndexableItem, Item> {
 
     /**
      * Store item fields in the solr document

@@ -8,11 +8,12 @@
 package org.dspace.discovery.indexobject.factory;
 
 import org.dspace.discovery.indexobject.IndexableClaimedTask;
+import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
 
 /**
  * Factory interface for indexing/retrieving claimed tasks in the search core
  *
  * @author Kevin Van de Velde (kevin at atmire dot com)
  */
-public interface ClaimedTaskIndexFactory extends IndexFactory<IndexableClaimedTask> {
+public interface ClaimedTaskIndexFactory extends IndexFactory<IndexableClaimedTask, ClaimedTask> {
 }

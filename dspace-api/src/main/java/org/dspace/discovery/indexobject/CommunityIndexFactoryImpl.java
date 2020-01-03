@@ -10,6 +10,7 @@ package org.dspace.discovery.indexobject;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
@@ -30,7 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * Factory implementation for indexing/retrieving communities in the search core
  * @author Kevin Van de Velde (kevin at atmire dot com)
  */
-public class CommunityIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<IndexableCommunity>
+public class CommunityIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<IndexableCommunity, Community>
         implements CommunityIndexFactory {
 
     @Autowired(required = true)
@@ -62,9 +63,11 @@ public class CommunityIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Inde
     @Override
     public SolrInputDocument buildDocument(Context context, IndexableCommunity indexableObject)
             throws SQLException, IOException {
+        // Add the ID's, types and call the SolrServiceIndexPlugins
         SolrInputDocument doc = super.buildDocument(context, indexableObject);
         final Community community = indexableObject.getIndexedObject();
 
+        // Retrieve configuration
         DiscoveryConfiguration discoveryConfiguration = SearchUtils.getDiscoveryConfiguration(community);
         DiscoveryHitHighlightingConfiguration highlightingConfiguration = discoveryConfiguration
             .getHitHighlightingConfiguration();
@@ -76,7 +79,7 @@ public class CommunityIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Inde
             }
         }
 
-        // and populate it
+        // Add community metadata
         String description = communityService.getMetadata(community, "introductory_text");
         String description_abstract = communityService.getMetadata(community, "short_description");
         String description_table = communityService.getMetadata(community, "side_bar_text");
@@ -93,6 +96,16 @@ public class CommunityIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Inde
         addContainerMetadataField(doc, highlightedMetadataFields, toIgnoreMetadataFields, "dc.rights", rights);
         addContainerMetadataField(doc, highlightedMetadataFields, toIgnoreMetadataFields, "dc.title", title);
         return doc;
+    }
+
+    @Override
+    public boolean supports(Object object) {
+        return object instanceof Community;
+    }
+
+    @Override
+    public List getIndexableObjects(Context context, Community object) {
+        return Arrays.asList(new IndexableCommunity(object));
     }
 
     @Override

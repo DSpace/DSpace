@@ -10,6 +10,7 @@ package org.dspace.discovery.indexobject;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
@@ -34,7 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * Factory implementation for indexing/retrieving collections in the search core
  * @author Kevin Van de Velde (kevin at atmire dot com)
  */
-public class CollectionIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<IndexableCollection>
+public class CollectionIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<IndexableCollection, Collection>
         implements CollectionIndexFactory {
 
     @Autowired
@@ -76,11 +77,12 @@ public class CollectionIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Ind
     @Override
     public SolrInputDocument buildDocument(Context context, IndexableCollection indexableCollection)
             throws IOException, SQLException {
-        // Create Lucene Document
+        // Create Lucene Document and add the ID's, types and call the SolrServiceIndexPlugins
         SolrInputDocument doc = super.buildDocument(context, indexableCollection);
 
         final Collection collection = indexableCollection.getIndexedObject();
 
+        // Retrieve configuration
         DiscoveryConfiguration discoveryConfiguration = SearchUtils.getDiscoveryConfiguration(collection);
         DiscoveryHitHighlightingConfiguration highlightingConfiguration = discoveryConfiguration
             .getHitHighlightingConfiguration();
@@ -93,7 +95,7 @@ public class CollectionIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Ind
         }
 
 
-        // and populate it
+        // Add collection metadata
         String description = collectionService.getMetadata(collection, "introductory_text");
         String description_abstract = collectionService.getMetadata(collection, "short_description");
         String description_table = collectionService.getMetadata(collection, "side_bar_text");
@@ -116,6 +118,16 @@ public class CollectionIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Ind
         addContainerMetadataField(doc, highlightedMetadataFields, toIgnoreMetadataFields, "dc.title", title);
 
         return doc;
+    }
+
+    @Override
+    public boolean supports(Object object) {
+        return object instanceof Collection;
+    }
+
+    @Override
+    public List getIndexableObjects(Context context, Collection object) {
+        return Arrays.asList(new IndexableCollection(object));
     }
 
     @Override

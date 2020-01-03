@@ -7,6 +7,7 @@
  */
 package org.dspace.discovery.indexobject.factory;
 
+import org.dspace.content.Community;
 import org.dspace.discovery.indexobject.IndexableCommunity;
 
 /**
@@ -14,5 +15,5 @@ import org.dspace.discovery.indexobject.IndexableCommunity;
  *
  * @author Kevin Van de Velde (kevin at atmire dot com)
  */
-public interface CommunityIndexFactory extends DSpaceObjectIndexFactory<IndexableCommunity> {
+public interface CommunityIndexFactory extends DSpaceObjectIndexFactory<IndexableCommunity, Community> {
 }

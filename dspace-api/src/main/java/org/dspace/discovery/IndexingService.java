@@ -51,6 +51,8 @@ public interface IndexingService {
 
     void updateIndex(Context context, boolean force);
 
+    void updateIndex(Context context, boolean force, String type);
+
     void cleanIndex(boolean force) throws IOException,
         SQLException, SearchServiceException;
 

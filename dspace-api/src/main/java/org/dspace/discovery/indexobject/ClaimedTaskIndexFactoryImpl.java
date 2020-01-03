@@ -9,7 +9,9 @@ package org.dspace.discovery.indexobject;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
@@ -26,7 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * Factory implementation for indexing/retrieving claimed tasks in the search core
  * @author Kevin Van de Velde (kevin at atmire dot com)
  */
-public class ClaimedTaskIndexFactoryImpl extends IndexFactoryImpl<IndexableClaimedTask>
+public class ClaimedTaskIndexFactoryImpl extends IndexFactoryImpl<IndexableClaimedTask, ClaimedTask>
         implements ClaimedTaskIndexFactory {
 
     @Autowired
@@ -58,8 +60,10 @@ public class ClaimedTaskIndexFactoryImpl extends IndexFactoryImpl<IndexableClaim
     @Override
     public SolrInputDocument buildDocument(Context context, IndexableClaimedTask indexableObject)
             throws SQLException, IOException {
+        // Add the ID's, types and call the SolrServiceIndexPlugins
         final SolrInputDocument doc = super.buildDocument(context, indexableObject);
         final ClaimedTask claimedTask = indexableObject.getIndexedObject();
+        // Add submitter, locations and modification time
         indexableWorkflowItemService.storeInprogressItemFields(context, doc, claimedTask.getWorkflowItem());
 
         addFacetIndex(doc, "action", claimedTask.getActionID(), claimedTask.getActionID());
@@ -75,6 +79,16 @@ public class ClaimedTaskIndexFactoryImpl extends IndexFactoryImpl<IndexableClaim
         addNamedResourceTypeIndex(doc, acvalue);
 
         return doc;
+    }
+
+    @Override
+    public boolean supports(Object object) {
+        return object instanceof ClaimedTask;
+    }
+
+    @Override
+    public List getIndexableObjects(Context context, ClaimedTask object) {
+        return Arrays.asList(new IndexableClaimedTask(object));
     }
 
     @Override

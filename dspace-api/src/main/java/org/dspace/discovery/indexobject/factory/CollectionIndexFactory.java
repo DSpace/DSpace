@@ -19,7 +19,7 @@ import org.dspace.discovery.indexobject.IndexableCollection;
  *
  * @author Kevin Van de Velde (kevin at atmire dot com)
  */
-public interface CollectionIndexFactory extends DSpaceObjectIndexFactory<IndexableCollection> {
+public interface CollectionIndexFactory extends DSpaceObjectIndexFactory<IndexableCollection, Collection> {
 
     /**
      * Return a list of the identifiers of the owning communities from the provided collection prepended by "m"
