@@ -182,7 +182,7 @@ public class WorkflowDefinitionRestRepositoryIT extends AbstractControllerIntegr
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                 .withName("Sub Community")
                 .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1, "123456789/99")
+        Collection col1 = CollectionBuilder.createCollection(context, child1, "123456789/workflow-test-1")
                 .withName("Collection 1")
                 .build();
         // until handle 123456789/5 used in example in workflow.xml (if uncommented)
