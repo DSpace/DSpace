@@ -52,8 +52,6 @@ import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.eperson.EPerson;
 import org.dspace.services.ConfigurationService;
-import org.dspace.submit.model.UploadConfiguration;
-import org.dspace.submit.model.UploadConfigurationService;
 import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.hamcrest.Matchers;
@@ -72,8 +70,6 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
     @Autowired
     private ConfigurationService configurationService;
 
-    @Autowired
-    private UploadConfigurationService uploadConfigurationService;
 
     @Before
     @Override
@@ -83,13 +79,6 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
 
         //disable file upload mandatory
         configurationService.setProperty("webui.submit.upload.required", false);
-
-        //reset config
-        for (String key : uploadConfigurationService.getMap().keySet()) {
-            UploadConfiguration uploadConfig = uploadConfigurationService.getMap().get(key);
-            uploadConfig.setRequired(null);
-        }
-
     }
 
     @Test
