@@ -7,6 +7,7 @@
  */
 package org.dspace.discovery.indexobject.factory;
 
+import org.dspace.content.WorkspaceItem;
 import org.dspace.discovery.indexobject.IndexableWorkspaceItem;
 
 /**
@@ -14,5 +15,6 @@ import org.dspace.discovery.indexobject.IndexableWorkspaceItem;
  *
  * @author Kevin Van de Velde (kevin at atmire dot com)
  */
-public interface WorkspaceItemIndexFactory extends InprogressSubmissionIndexFactory<IndexableWorkspaceItem> {
+public interface WorkspaceItemIndexFactory
+        extends InprogressSubmissionIndexFactory<IndexableWorkspaceItem, WorkspaceItem> {
 }

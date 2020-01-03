@@ -35,7 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * Basis factory interface implementation for indexing/retrieving any IndexableObject in the search core
  * @author Kevin Van de Velde (kevin at atmire dot com)
  */
-public abstract class IndexFactoryImpl<T extends IndexableObject> implements IndexFactory<T> {
+public abstract class IndexFactoryImpl<T extends IndexableObject, S> implements IndexFactory<T, S> {
 
     @Autowired
     protected List<SolrServiceIndexPlugin> solrServiceIndexPlugins;
@@ -190,4 +190,7 @@ public abstract class IndexFactoryImpl<T extends IndexableObject> implements Ind
     public void deleteAll() throws IOException, SolrServerException {
         solrSearchCore.getSolr().deleteByQuery(SearchUtils.RESOURCE_TYPE_FIELD + ":" + getType());
     }
+
+    @Override
+    public abstract List getIndexableObjects(Context context, S object) throws SQLException;
 }

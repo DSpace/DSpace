@@ -9,7 +9,9 @@ package org.dspace.discovery.indexobject;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
@@ -26,7 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * Factory implementation for indexing/retrieving pooled tasks in the search core
  * @author Kevin Van de Velde (kevin at atmire dot com)
  */
-public class PoolTaskIndexFactoryImpl extends IndexFactoryImpl<IndexablePoolTask>
+public class PoolTaskIndexFactoryImpl extends IndexFactoryImpl<IndexablePoolTask, PoolTask>
         implements PoolTaskIndexFactory {
 
     @Autowired
@@ -59,8 +61,10 @@ public class PoolTaskIndexFactoryImpl extends IndexFactoryImpl<IndexablePoolTask
     @Override
     public SolrInputDocument buildDocument(Context context, IndexablePoolTask indexableObject)
             throws SQLException, IOException {
+        // Add the ID's, types and call the SolrServiceIndexPlugins
         final SolrInputDocument doc = super.buildDocument(context, indexableObject);
         final PoolTask poolTask = indexableObject.getIndexedObject();
+        // Add submitter, locations and modification time
         indexableWorkflowItemService.storeInprogressItemFields(context, doc, poolTask.getWorkflowItem());
 
         addFacetIndex(doc, "action", poolTask.getActionID(), poolTask.getActionID());
@@ -80,6 +84,16 @@ public class PoolTaskIndexFactoryImpl extends IndexFactoryImpl<IndexablePoolTask
         addNamedResourceTypeIndex(doc, acvalue);
 
         return doc;
+    }
+
+    @Override
+    public boolean supports(Object object) {
+        return object instanceof PoolTask;
+    }
+
+    @Override
+    public List getIndexableObjects(Context context, PoolTask object) {
+        return Arrays.asList(new IndexablePoolTask(object));
     }
 
     @Override

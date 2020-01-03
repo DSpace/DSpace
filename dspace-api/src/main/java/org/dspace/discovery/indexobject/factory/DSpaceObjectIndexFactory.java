@@ -19,7 +19,7 @@ import org.dspace.discovery.indexobject.IndexableDSpaceObject;
  *
  * @author Kevin Van de Velde (kevin at atmire dot com)
  */
-public interface DSpaceObjectIndexFactory<T extends IndexableDSpaceObject> extends IndexFactory<T> {
+public interface DSpaceObjectIndexFactory<T extends IndexableDSpaceObject, S> extends IndexFactory<T, S> {
 
 
     /**

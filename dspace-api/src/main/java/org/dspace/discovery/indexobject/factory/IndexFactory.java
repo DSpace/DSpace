@@ -10,6 +10,7 @@ package org.dspace.discovery.indexobject.factory;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Optional;
 
 import org.apache.solr.client.solrj.SolrServerException;
@@ -22,7 +23,7 @@ import org.dspace.discovery.IndexableObject;
  *
  * @author Kevin Van de Velde (kevin at atmire dot com)
  */
-public interface IndexFactory<T extends IndexableObject> {
+public interface IndexFactory<T extends IndexableObject, S> {
 
     /**
      * Retrieve all instances of a certain indexable object type
@@ -88,4 +89,20 @@ public interface IndexFactory<T extends IndexableObject> {
      * @throws SQLException If database error
      */
     Optional<T> findIndexableObject(Context context, String id) throws SQLException;
+
+    /**
+     * Determine whether the class can handle the object
+     * @param object        The object which should be handle
+     * @return              True if the class can handle the given object. False if it doesn't.
+     */
+    boolean supports(Object object);
+
+    /**
+     * Retrieve all the indexable objects for the provided object
+     * @param context       DSpace context object
+     * @param object        The object we want to retrieve our indexable objects for
+     * @return              A list of indexable objects
+     * @throws SQLException If database error
+     */
+    List getIndexableObjects(Context context, S object) throws SQLException;
 }
