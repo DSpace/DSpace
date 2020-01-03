@@ -23,6 +23,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
+import org.dspace.app.rest.matcher.EPersonMatcher;
+import org.dspace.app.rest.matcher.WorkflowDefinitionMatcher;
 import org.dspace.app.rest.model.WorkflowDefinitionRest;
 import org.dspace.app.rest.repository.WorkflowDefinitionRestRepository;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
@@ -31,6 +33,7 @@ import org.dspace.content.Community;
 import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
 import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
 import org.dspace.xmlworkflow.state.Workflow;
+import org.hamcrest.Matchers;
 import org.json.JSONArray;
 import org.junit.Test;
 import org.springframework.test.web.servlet.MvcResult;
@@ -61,6 +64,59 @@ public class WorkflowDefinitionRestRepositoryIT extends AbstractControllerIntegr
                 .andExpect(jsonPath("$.page.totalElements", is(allConfiguredWorkflows.size())))
                 //There needs to be a self link to this endpoint
                 .andExpect(jsonPath("$._links.self.href", containsString(WORKFLOW_DEFINITIONS_ENDPOINT)));
+    }
+
+    @Test
+    public void getAllWorkflowDefinitionsEndpoint_Pagination_Size1() throws Exception {
+        List<Workflow> allConfiguredWorkflows = xmlWorkflowFactory.getAllConfiguredWorkflows();
+        //When we call this facets endpoint
+        getClient().perform(get(WORKFLOW_DEFINITIONS_ENDPOINT)
+                .param("size", "1"))
+                //We expect a 200 OK status
+                .andExpect(status().isOk())
+                //Number of total workflows is equals to number of configured workflows
+                .andExpect(jsonPath("$.page.totalElements", is(allConfiguredWorkflows.size())))
+                //Page size is 1
+                .andExpect(jsonPath("$.page.size", is(1)))
+                //Page nr is 1
+                .andExpect(jsonPath("$.page.number", is(0)))
+                //Contains only the first configured workflow
+                .andExpect(jsonPath("$._embedded.workflowDefinitionResources", Matchers.contains(
+                        WorkflowDefinitionMatcher.matchWorkflowDefinitionEntry(allConfiguredWorkflows.get(0))
+                )))
+                //Doesn't contain the other workflows
+                .andExpect(jsonPath("$._embedded.workflowDefinitionResources", Matchers.not(
+                        Matchers.contains(
+                                WorkflowDefinitionMatcher.matchWorkflowDefinitionEntry(allConfiguredWorkflows.get(1))
+                        )
+                )));
+    }
+
+    @Test
+    public void getAllWorkflowDefinitionsEndpoint_Pagination_Size1_Page1() throws Exception {
+        List<Workflow> allConfiguredWorkflows = xmlWorkflowFactory.getAllConfiguredWorkflows();
+        //When we call this facets endpoint
+        getClient().perform(get(WORKFLOW_DEFINITIONS_ENDPOINT)
+                .param("size", "1")
+                .param("page", "1"))
+                //We expect a 200 OK status
+                .andExpect(status().isOk())
+                //Number of total workflows is equals to number of configured workflows
+                .andExpect(jsonPath("$.page.totalElements", is(allConfiguredWorkflows.size())))
+                //Page size is 1
+                .andExpect(jsonPath("$.page.size", is(1)))
+                //Page nr is 2
+                .andExpect(jsonPath("$.page.number", is(1)))
+                //Contains only the second configured workflow
+                .andExpect(jsonPath("$._embedded.workflowDefinitionResources", Matchers.contains(
+                        WorkflowDefinitionMatcher.matchWorkflowDefinitionEntry(allConfiguredWorkflows.get(1))
+                )))
+                //Doesn't contain 1st configured workflow
+                .andExpect(jsonPath("$._embedded.workflowDefinitionResources", Matchers.not(
+                        Matchers.contains(
+                                WorkflowDefinitionMatcher.matchWorkflowDefinitionEntry(allConfiguredWorkflows.get(0))
+                        )
+                )));
     }
 
     @Test
