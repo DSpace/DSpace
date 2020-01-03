@@ -79,13 +79,9 @@ Common usage:
         <format property="build.date" pattern="yyyyMMdd-HHmmss" />
     </tstamp>
 
-    <!-- Default location of GeoLite2 City database to download. This may be overridden, if URL path changes. -->
-    <property name="geolite" value="http://geolite.maxmind.com/download/geoip/database/GeoLite2-City.tar.gz" />
-
     <!-- Default location of lucene-core JAR to download (for update_solr_indexes). This may be overridden, if URL path changes. -->
     <!-- NOTE: this URL should have the version of the JAR replaced with "[version]" -->
     <property name="lucene-core" value="http://search.maven.org/remotecontent?filepath=org/apache/lucene/lucene-core/[version]/lucene-core-[version].jar" />
-
 
     <!-- ============================================================= -->
     <!-- The DSpace class path for executing installation targets      -->
@@ -108,7 +104,7 @@ Common usage:
     <taskdef resource="net/sf/antcontrib/antlib.xml" classpathref="class.path"/>
 
     <!-- ============================================================= -->
-    <!-- Print some useful help text                                  -->
+    <!-- Print some useful help text.                                  -->
     <!-- ============================================================= -->
     <target name="help">
 
@@ -121,7 +117,6 @@ Common usage:
         <echo message="update          --> Update ${dspace.dir} config, etc, lib and web applications without " />
         <echo message="                    touching your data" />
     	<echo message="update_configs  --> Update your configs directory with new configuration files"/>
-    	<echo message="update_geolite  --> Dowload and install GeoCity database into ${dspace.dir}/config" />
         <echo message="update_code     --> Update compiled code (bin, lib, and etc directories)" />
         <echo message="update_webapps  --> Update web applications" />
         <echo message="update_solr_indexes --> Checks if any Solr indexes need upgrading (to latest Solr), and if so, upgrades them." />
@@ -152,7 +147,7 @@ Common usage:
 
 
     <!-- ============================================================= -->
-    <!-- clean out backup directories                  -->
+    <!-- clean out backup directories                                  -->
     <!-- ============================================================= -->
     <target name="clean_backups">
         <delete includeemptydirs="true">
@@ -179,10 +174,11 @@ Common usage:
     <!-- ============================================================= -->
     <!-- Update the config dir, only adds files, if a file is altered  -->
     <!-- in the target directory, the new file is suffixed wth *.new   -->
-    <!-- and should be hand updated afterward                .          -->
+    <!-- and should be hand updated afterward.                         -->
     <!-- ============================================================= -->
-    <target name="update_configs" depends="overwrite_configs,overwrite_solr_configs" description="Updates the Configuration Directory">
-    	<antcall target="init_geolite" />
+    <target name="update_configs"
+            depends="overwrite_configs,overwrite_solr_configs"
+            description="Updates the Configuration Directory">
     </target>
 
     <target name="overwrite_configs" description="Overwrites a configuration directory." if="${overwrite}" depends="copy_configs_keep">
@@ -860,8 +856,6 @@ Common usage:
 
         <antcall target="copy_webapps" />
 
-    	<antcall target="init_geolite" />
-
         <echo>
 ====================================================================
  The DSpace code has been installed.
@@ -889,63 +883,6 @@ Common usage:
 ====================================================================
         </echo>
 
-    </target>
-
-	<!-- installs GeoCity resolution database -->
-    <target name="update_geolite">
-        <echo>Downloading: ${geolite}</echo>
-        <trycatch property="geolite.error">
-            <try>
-                <get src="${geolite}"
-                     dest="${dspace.dir}/config/GeoLite2-City.tar.gz"
-                     verbose="true"/>
-                <untar src="${dspace.dir}/config/GeoLite2-City.tar.gz"
-                       dest="${dspace.dir}/config/"
-                       compression='gzip'>
-                    <patternset>
-                        <include name='**/GeoLite2-City.mmdb'/>
-                    </patternset>
-                    <mapper type='flatten'/>
-                </untar>
-                <delete file="${dspace.dir}/config/GeoLite2-City.tar.gz"/>
-            </try>
-            <catch>
-                <echo>
-====================================================================
-WARNING : FAILED TO DOWNLOAD GEOLITE DATABASE FILE
-          (Used for DSpace Solr Usage Statistics)
-
-Underlying Error: ${geolite.error}
-
-In order to use DSpace Solr Usage Statistics, you will need to
-manually re-run:
-
-ant update_geolite
-
-OR
-
-You may manually install this file by following these steps:
-(1) Download the latest database archive from ${geolite}
-(2) Unpack it.'
-(3) Copy the file 'GeoLite2-City.mmdb' to '${usage-statistics.dbfile}'.
-
-====================================================================
-                </echo>
-            </catch>
-        </trycatch>
-
-    </target>
-
-    <target name="check_geolite">
-        <condition property="need.geolite">
-            <not>
-                <available file="${usage-statistics.dbfile}" />
-            </not>
-        </condition>
-    </target>
-
-    <target name="init_geolite" depends="check_geolite" if="need.geolite">
-        <antcall target="update_geolite" />
     </target>
 
     <!-- Check if any Solr indexes need updating to the version of Solr/Lucene we are using. -->
