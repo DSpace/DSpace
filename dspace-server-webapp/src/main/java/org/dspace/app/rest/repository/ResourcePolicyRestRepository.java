@@ -275,7 +275,7 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
     }
 
     @Override
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasPermission(#id, 'resourcePolicyPatch', 'ADMIN')")
     protected void patch(Context context, HttpServletRequest request, String apiCategory, String model, Integer id,
             Patch patch)
             throws RepositoryMethodNotImplementedException, SQLException, AuthorizeException, DCInputsReaderException {
