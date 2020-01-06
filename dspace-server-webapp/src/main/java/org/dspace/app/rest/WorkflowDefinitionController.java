@@ -25,6 +25,8 @@ import org.dspace.handle.service.HandleService;
 import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
 import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -61,20 +63,25 @@ public class WorkflowDefinitionController {
      * @throws SQLException if db error
      */
     @GetMapping("{workflowName}/collections")
-    public List<CollectionRest> get(HttpServletRequest request, HttpServletResponse response,
-                                    @PathVariable String workflowName) throws SQLException {
+    public Page<CollectionRest> get(HttpServletRequest request, HttpServletResponse response,
+                                    @PathVariable String workflowName, Pageable pageable) throws SQLException {
         if (xmlWorkflowFactory.workflowByThisNameExists(workflowName)) {
-            List<String> collectionsHandlesMappedToWorkflow
-                    = xmlWorkflowFactory.getCollectionHandlesMappedToWorklow(workflowName);
-            List<CollectionRest> collectionResourcesFromHandles = new ArrayList<>();
+            Context context = ContextUtil.obtainContext(request);
+            List<String> collectionsHandlesMappedToWorkflow;
+            if (xmlWorkflowFactory.isDefaultWorkflow(workflowName)) {
+                collectionsHandlesMappedToWorkflow = xmlWorkflowFactory.getAllNonMappedCollectionsHandles(context);
+            } else {
+                collectionsHandlesMappedToWorkflow
+                        = xmlWorkflowFactory.getCollectionHandlesMappedToWorklow(workflowName);
+            }
+            List<Collection> collectionsFromHandles = new ArrayList<>();
             for (String handle : collectionsHandlesMappedToWorkflow) {
-                Context context = ContextUtil.obtainContext(request);
                 Collection collection = (Collection) handleService.resolveToObject(context, handle);
                 if (collection != null) {
-                    collectionResourcesFromHandles.add(converter.toRest(collection, utils.obtainProjection()));
+                    collectionsFromHandles.add(collection);
                 }
             }
-            return collectionResourcesFromHandles;
+            return converter.toRestPage(utils.getPage(collectionsFromHandles, pageable), utils.obtainProjection(true));
         } else {
             throw new ResourceNotFoundException("No workflow with name " + workflowName + " is configured");
         }

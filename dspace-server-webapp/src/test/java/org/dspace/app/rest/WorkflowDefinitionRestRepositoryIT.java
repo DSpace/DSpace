@@ -7,7 +7,6 @@
  */
 package org.dspace.app.rest;
 
-import static junit.framework.TestCase.assertEquals;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalToIgnoringCase;
@@ -20,23 +19,21 @@ import java.util.List;
 import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
-import org.dspace.app.rest.matcher.EPersonMatcher;
 import org.dspace.app.rest.matcher.WorkflowDefinitionMatcher;
 import org.dspace.app.rest.model.WorkflowDefinitionRest;
 import org.dspace.app.rest.repository.WorkflowDefinitionRestRepository;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
 import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
 import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
 import org.dspace.xmlworkflow.state.Workflow;
 import org.hamcrest.Matchers;
-import org.json.JSONArray;
 import org.junit.Test;
-import org.springframework.test.web.servlet.MvcResult;
 
 /**
  * Integration tests for the {@link WorkflowDefinitionRestRepository} and {@link WorkflowDefinitionController} controlled endpoints
@@ -45,10 +42,8 @@ import org.springframework.test.web.servlet.MvcResult;
  */
 public class WorkflowDefinitionRestRepositoryIT extends AbstractControllerIntegrationTest {
 
-    private static final Logger log
-            = org.apache.logging.log4j.LogManager.getLogger(WorkflowDefinitionRestRepositoryIT.class);
-
     private XmlWorkflowFactory xmlWorkflowFactory = XmlWorkflowServiceFactory.getInstance().getWorkflowFactory();
+    private HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
 
     private static final String WORKFLOW_DEFINITIONS_ENDPOINT
             = "/api/" + WorkflowDefinitionRest.CATEGORY + "/" + WorkflowDefinitionRest.NAME_PLURAL;
@@ -215,15 +210,65 @@ public class WorkflowDefinitionRestRepositoryIT extends AbstractControllerIntegr
     }
 
     @Test
-    public void getCollectionsOfWorkflowByName_DefaultWorkflow_EmptyList() throws Exception {
+    public void getCollectionsOfWorkflowByName_DefaultWorkflow_AllNonMappedCollections() throws Exception {
         Workflow defaultWorkflow = xmlWorkflowFactory.getDefaultWorkflow();
+        List<String> allNonMappedCollections = xmlWorkflowFactory.getAllNonMappedCollectionsHandles(context);
 
         //When we call this facets endpoint
         getClient().perform(get(WORKFLOW_DEFINITIONS_ENDPOINT + "/" + defaultWorkflow.getID()
                 + "/collections"))
                 //We expect a 200 OK status
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", empty()));
+                //Number of total workflows is equals to number of non-mapped collections
+                .andExpect(jsonPath("$.totalElements", is(allNonMappedCollections.size())));
+    }
+
+    @Test
+    public void getCollectionsOfWorkflowByName_DefaultWorkflow_AllNonMappedCollections_Paginated_Size1()
+            throws Exception {
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                .withName("Collection 1")
+                .build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1, "123456789/non-mapped-collection")
+                .withName("Collection 2")
+                .build();
+        context.restoreAuthSystemState();
+
+        Workflow defaultWorkflow = xmlWorkflowFactory.getDefaultWorkflow();
+        List<String> allNonMappedCollections = xmlWorkflowFactory.getAllNonMappedCollectionsHandles(context);
+
+        if (allNonMappedCollections.size() > 0) {
+            Collection firstNonMappedCollection =
+                    (Collection) handleService.resolveToObject(context, allNonMappedCollections.get(0));
+
+            //When we call this facets endpoint
+            getClient().perform(get(WORKFLOW_DEFINITIONS_ENDPOINT + "/" + defaultWorkflow.getID()
+                    + "/collections")
+                    .param("size", "1"))
+                    //We expect a 200 OK status
+                    .andExpect(status().isOk())
+                    //Number of total workflows is equals to number of configured workflows
+                    .andExpect(jsonPath("$.totalElements", is(allNonMappedCollections.size())))
+                    //Page size is 1
+                    .andExpect(jsonPath("$.size", is(1)))
+                    //Page nr is 1
+                    .andExpect(jsonPath("$.number", is(0)))
+                    //Contains only the first non-mapped collection
+                    .andExpect(jsonPath("$.content", Matchers.contains(
+                            WorkflowDefinitionMatcher.matchCollectionEntry(firstNonMappedCollection.getName(),
+                                    firstNonMappedCollection.getID(), firstNonMappedCollection.getHandle())
+                    )));
+        }
     }
 
     @Test
@@ -259,11 +304,25 @@ public class WorkflowDefinitionRestRepositoryIT extends AbstractControllerIntegr
             //When we call this facets endpoint
             if (handlesOfMappedCollections.size() > 0) {
                 //returns array of collection jsons that are mapped to given workflow
-                MvcResult result = getClient().perform(get(WORKFLOW_DEFINITIONS_ENDPOINT + "/"
-                        + firstNonDefaultWorkflowName + "/collections")).andReturn();
-                String response = result.getResponse().getContentAsString();
-                JSONArray collectionsResult = new JSONArray(response);
-                assertEquals(collectionsResult.length(), handlesOfMappedCollections.size());
+                //When we call this facets endpoint
+                Collection firstMappedCollection =
+                        (Collection) handleService.resolveToObject(context, handlesOfMappedCollections.get(0));
+                getClient().perform(get(WORKFLOW_DEFINITIONS_ENDPOINT + "/" + firstNonDefaultWorkflowName
+                        + "/collections")
+                        .param("size", "1"))
+                        //We expect a 200 OK status
+                        .andExpect(status().isOk())
+                        //Number of total workflows is equals to number of configured workflows
+                        .andExpect(jsonPath("$.totalElements", is(handlesOfMappedCollections.size())))
+                        //Page size is 1
+                        .andExpect(jsonPath("$.size", is(1)))
+                        //Page nr is 1
+                        .andExpect(jsonPath("$.number", is(0)))
+                        //Contains only the first mapped collection
+                        .andExpect(jsonPath("$.content", Matchers.contains(
+                                WorkflowDefinitionMatcher.matchCollectionEntry(firstMappedCollection.getName(),
+                                        firstMappedCollection.getID(), firstMappedCollection.getHandle())
+                        )));
             } else {
                 //no collections mapped to this workflow
                 getClient().perform(get(WORKFLOW_DEFINITIONS_ENDPOINT + "/"
@@ -271,7 +330,7 @@ public class WorkflowDefinitionRestRepositoryIT extends AbstractControllerIntegr
                         //We expect a 200 OK status
                         .andExpect(status().isOk())
                         //results in empty list
-                        .andExpect(jsonPath("$", empty()));
+                        .andExpect(jsonPath("$.content", empty()));
             }
         }
     }

@@ -10,6 +10,7 @@ package org.dspace.xmlworkflow.factory;
 import java.util.List;
 
 import org.dspace.content.Collection;
+import org.dspace.core.Context;
 import org.dspace.xmlworkflow.WorkflowConfigurationException;
 import org.dspace.xmlworkflow.state.Workflow;
 
@@ -64,8 +65,9 @@ public interface XmlWorkflowFactory {
 
     /**
      * Check to see if the given workflowName is the workflow configured to be default for collections
-     * @param workflowName  Name of workflow to check if default
-     * @return  True if given workflowName is the workflow mapped to default for collections, otherwise false
+     *
+     * @param workflowName Name of workflow to check if default
+     * @return True if given workflowName is the workflow mapped to default for collections, otherwise false
      */
     public boolean isDefaultWorkflow(String workflowName);
 
@@ -82,4 +84,12 @@ public interface XmlWorkflowFactory {
      * @return List of collection handles mapped to the requested workflow
      */
     public List<String> getCollectionHandlesMappedToWorklow(String workflowName);
+
+    /**
+     * Returns list of collection handles that are not mapped to any configured workflow, and thus use the default
+     * workflow
+     *
+     * @return List of collection handles not mapped to any workflow
+     */
+    public List<String> getAllNonMappedCollectionsHandles(Context context);
 }
