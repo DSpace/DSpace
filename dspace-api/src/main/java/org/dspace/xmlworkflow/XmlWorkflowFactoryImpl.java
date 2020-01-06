@@ -7,6 +7,7 @@
  */
 package org.dspace.xmlworkflow;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -14,8 +15,11 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.Collection;
+import org.dspace.content.service.CollectionService;
+import org.dspace.core.Context;
 import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
 import org.dspace.xmlworkflow.state.Workflow;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Required;
 
 /**
@@ -36,6 +40,9 @@ public class XmlWorkflowFactoryImpl implements XmlWorkflowFactory {
     private Logger log = org.apache.logging.log4j.LogManager.getLogger(XmlWorkflowFactoryImpl.class);
 
     private Map<String, Workflow> workflowMapping;
+
+    @Autowired(required = true)
+    protected CollectionService collectionService;
 
     @Override
     public Workflow getWorkflow(Collection collection) throws WorkflowConfigurationException {
@@ -88,6 +95,22 @@ public class XmlWorkflowFactoryImpl implements XmlWorkflowFactory {
             }
         }
         return collectionsMapped;
+    }
+
+    @Override
+    public List<String> getAllNonMappedCollectionsHandles(Context context) {
+        List<String> nonMappedCollectionHandles = new ArrayList<>();
+        try {
+            for (Collection collection: this.collectionService.findAll(context)) {
+                if (workflowMapping.get(collection.getHandle()) == null) {
+                    nonMappedCollectionHandles.add(collection.getHandle());
+                }
+            }
+        } catch (SQLException e) {
+            log.error("SQLException in XmlWorkflowFactoryImpl.getAllNonMappedCollectionsHandles trying to " +
+                    "retrieve all collections");
+        }
+        return nonMappedCollectionHandles;
     }
 
     @Override

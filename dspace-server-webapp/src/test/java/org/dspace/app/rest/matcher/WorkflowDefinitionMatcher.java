@@ -16,7 +16,11 @@ import org.dspace.app.rest.model.WorkflowDefinitionRest;
 import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
 import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
 import org.dspace.xmlworkflow.state.Workflow;
+
 import org.hamcrest.Matcher;
+import org.hamcrest.Matchers;
+
+import java.util.UUID;
 
 /**
  * @author Maria Verdonck (Atmire) on 03/01/2020
@@ -44,6 +48,18 @@ public class WorkflowDefinitionMatcher {
                 hasJsonPath("$.name", is(workflowName)),
                 hasJsonPath("$.isDefault", is(xmlWorkflowFactory.isDefaultWorkflow(workflowName))),
                 hasJsonPath("$._links.self.href", containsString(WORKFLOW_DEFINITIONS_ENDPOINT + workflowName))
+        );
+    }
+
+    public static Matcher<? super Object> matchCollectionEntry(String name, UUID uuid, String handle) {
+        return allOf(
+                hasJsonPath("$.uuid", is(uuid.toString())),
+                hasJsonPath("$.name", is(name)),
+                hasJsonPath("$.handle", is(handle)),
+                hasJsonPath("$.type", is("collection")),
+                hasJsonPath("$.metadata", Matchers.allOf(
+                        MetadataMatcher.matchMetadata("dc.title", name)
+                ))
         );
     }
 }
