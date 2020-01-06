@@ -695,6 +695,11 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         log.info(LogManager.getHeader(context, "delete_item", "item_id="
             + item.getID()));
 
+        // Remove relationships
+        for (Relationship relationship : relationshipService.findByItem(context, item)) {
+            relationshipService.delete(context, relationship, false, false);
+        }
+
         // Remove bundles
         removeAllBundles(context, item);
 

@@ -19,6 +19,12 @@ import org.apache.log4j.Logger;
 import org.dspace.scripts.DSpaceRunnable;
 import org.dspace.scripts.handler.DSpaceRunnableHandler;
 import org.dspace.scripts.handler.impl.CommandLineDSpaceRunnableHandler;
+import org.apache.commons.cli.ParseException;
+import org.apache.log4j.Logger;
+import org.dspace.scripts.DSpaceRunnable;
+import org.dspace.scripts.factory.ScriptServiceFactory;
+import org.dspace.scripts.handler.DSpaceRunnableHandler;
+import org.dspace.scripts.handler.impl.CommandLineDSpaceRunnableHandler;
 import org.dspace.servicemanager.DSpaceKernelImpl;
 import org.dspace.servicemanager.DSpaceKernelInit;
 import org.dspace.services.RequestService;
@@ -87,10 +93,9 @@ public class ScriptLauncher {
         }
 
         // Look up command in the configuration, and execute.
-        Integer status;
 
         CommandLineDSpaceRunnableHandler commandLineDSpaceRunnableHandler = new CommandLineDSpaceRunnableHandler();
-        status = handleScript(args, commandConfigs, commandLineDSpaceRunnableHandler, kernelImpl);
+        int status = handleScript(args, commandConfigs, commandLineDSpaceRunnableHandler, kernelImpl);
 
         // Destroy the service kernel if it is still alive
         if (kernelImpl != null) {
@@ -102,39 +107,47 @@ public class ScriptLauncher {
 
     }
 
-    public static Integer handleScript(String[] args, Document commandConfigs,
+    /**
+     * This method will take the arguments from a commandline input and it'll find the script that the first argument
+     * refers to and it'll execute this script.
+     * It can return a 1 or a 0 depending on whether the script failed or passed respectively
+     * @param args                  The arguments for the script and the script as first one in the array
+     * @param commandConfigs        The Document
+     * @param dSpaceRunnableHandler The DSpaceRunnableHandler for this execution
+     * @param kernelImpl            The relevant DSpaceKernelImpl
+     * @return                      A 1 or 0 depending on whether the script failed or passed respectively
+     */
+    public static int handleScript(String[] args, Document commandConfigs,
                                        DSpaceRunnableHandler dSpaceRunnableHandler,
                                        DSpaceKernelImpl kernelImpl) {
-        Integer status;
-        status = runDSpaceScriptWithArgs(args, dSpaceRunnableHandler);
-        if (status == null) {
+        int status;
+        DSpaceRunnable script = ScriptServiceFactory.getInstance().getScriptService().getScriptForName(args[0]);
+        if (script != null) {
+            status = executeScript(args, dSpaceRunnableHandler, script);
+        } else {
             status = runOneCommand(commandConfigs, args, kernelImpl);
         }
         return status;
     }
 
-    //TODO Duplicate needed code in the REST API
-    private static Integer runDSpaceScriptWithArgs(String[] args, DSpaceRunnableHandler dSpaceRunnableHandler) {
-        List<DSpaceRunnable> scripts = new DSpace().getServiceManager().getServicesByType(DSpaceRunnable.class);
-        String command = args[0];
-        for (DSpaceRunnable script : scripts) {
-            if (StringUtils.equalsIgnoreCase(script.getName(), command)) {
-                try {
-                    script.initialize(args, dSpaceRunnableHandler);
-                    script.run();
-                    return 0;
-                } catch (ParseException e) {
-                    //TODO Persistence error on next line
-//                    dSpaceRunnableHandler.handleException(new Context(), e);
-                    script.printHelp();
-                    log.error(e.getMessage(), e);
-                    System.out.println(e.getMessage());
-                    e.printStackTrace();
-                    return 1;
-                }
-            }
+    /**
+     * This method will simply execute the script
+     * @param args                  The arguments of the script with the script name as first place in the array
+     * @param dSpaceRunnableHandler The relevant DSpaceRunnableHandler
+     * @param script                The script to be executed
+     * @return                      A 1 or 0 depending on whether the script failed or passed respectively
+     */
+    private static int executeScript(String[] args, DSpaceRunnableHandler dSpaceRunnableHandler,
+                                     DSpaceRunnable script) {
+        try {
+            script.initialize(args, dSpaceRunnableHandler);
+            script.run();
+            return 0;
+        } catch (ParseException e) {
+            script.printHelp();
+            e.printStackTrace();
+            return 1;
         }
-        return null;
     }
 
     protected static int runOneCommand(Document commandConfigs, String[] args) {

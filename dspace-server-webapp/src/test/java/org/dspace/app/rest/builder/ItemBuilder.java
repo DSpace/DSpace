@@ -84,6 +84,14 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return addMetadataValue(item, "relationship", "type", null, relationshipType);
     }
 
+    public ItemBuilder withPublicationIssueNumber(final String issueNumber) {
+        return addMetadataValue(item, "publicationissue", "issueNumber", null, issueNumber);
+    }
+
+    public ItemBuilder withPublicationVolumeNumber(final String volumeNumber) {
+        return addMetadataValue(item, "publicationvolume", "volumeNumber", null, volumeNumber);
+    }
+
     public ItemBuilder makeUnDiscoverable() {
         item.setDiscoverable(false);
         return this;

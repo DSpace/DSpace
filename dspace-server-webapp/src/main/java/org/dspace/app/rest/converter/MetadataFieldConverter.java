@@ -8,6 +8,8 @@
 package org.dspace.app.rest.converter;
 
 import org.dspace.app.rest.model.MetadataFieldRest;
+import org.dspace.app.rest.projection.Projection;
+import org.dspace.content.MetadataField;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -18,24 +20,24 @@ import org.springframework.stereotype.Component;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @Component
-public class MetadataFieldConverter implements DSpaceConverter<org.dspace.content.MetadataField, MetadataFieldRest> {
-    @Autowired(required = true)
-    private MetadataSchemaConverter metadataSchemaConverter;
+public class MetadataFieldConverter implements DSpaceConverter<MetadataField, MetadataFieldRest> {
+    @Autowired
+    private ConverterService converter;
 
     @Override
-    public MetadataFieldRest fromModel(org.dspace.content.MetadataField obj) {
+    public MetadataFieldRest convert(MetadataField obj, Projection projection) {
         MetadataFieldRest field = new MetadataFieldRest();
+        field.setProjection(projection);
         field.setId(obj.getID());
         field.setElement(obj.getElement());
         field.setQualifier(obj.getQualifier());
         field.setScopeNote(obj.getScopeNote());
-        field.setSchema(metadataSchemaConverter.convert(obj.getMetadataSchema()));
+        field.setSchema(converter.toRest(obj.getMetadataSchema(), projection));
         return field;
     }
 
     @Override
-    public org.dspace.content.MetadataField toModel(MetadataFieldRest obj) {
-        // TODO Auto-generated method stub
-        return null;
+    public Class<MetadataField> getModelClass() {
+        return MetadataField.class;
     }
 }

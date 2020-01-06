@@ -22,5 +22,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface LinksRest {
-    LinkRest[] links();
+    LinkRest[] links() default {};
 }
