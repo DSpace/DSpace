@@ -7,6 +7,8 @@
  */
 package org.dspace.xmlworkflow.state.actions;
 
+import java.util.List;
+
 import org.dspace.xmlworkflow.state.Step;
 
 /**
@@ -57,6 +59,10 @@ public class WorkflowActionConfig {
 
     public Step getStep() {
         return step;
+    }
+
+    public List<String> getOptions() {
+        return this.processingAction.getOptions();
     }
 
 }
