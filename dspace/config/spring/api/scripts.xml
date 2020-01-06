@@ -9,7 +9,7 @@
         <property name="description" value="Update Discovery Solr Search Index"/>
     </bean>
 
-    <bean id="MetadataImportCLI" class="org.dspace.app.bulkedit.MetadataImportCLI" scope="prototype">
+    <bean id="MetadataImport" class="org.dspace.app.bulkedit.MetadataImportCLI" scope="prototype">
         <property name="name" value="metadata-import" />
         <property name="description" value="Import metadata after batch editing" />
     </bean>
