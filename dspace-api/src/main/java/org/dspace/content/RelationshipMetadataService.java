@@ -7,9 +7,11 @@
  */
 package org.dspace.content;
 
+import java.sql.SQLException;
 import java.util.List;
 
 import org.dspace.content.virtual.VirtualMetadataPopulator;
+import org.dspace.core.Context;
 
 /**
  * Interface used for the {@link RelationshipMetadataServiceImpl}
@@ -27,4 +29,34 @@ public interface RelationshipMetadataService {
      * @return      The list of MetadataValue objects constructed through the Relationships
      */
     public List<RelationshipMetadataValue> getRelationshipMetadata(Item item, boolean enableVirtualMetadata);
+
+    /**
+     * Retrieves the list of RelationshipMetadataValue objects specific to only one Relationship of the item.
+     *
+     * This method processes one Relationship of an Item and will return a list of RelationshipMetadataValue objects
+     * that are generated for this specific relationship for the item through the config in VirtualMetadataPopulator
+     *
+     * It returns a combination of the output of the findVirtualMetadataFromConfiguration method and
+     * the getRelationMetadataFromOtherItem method.
+     *
+     * @param context               The context
+     * @param item                  The item whose virtual metadata is requested
+     * @param entityType            The entity type of the given item
+     * @param relationship          The relationship whose virtual metadata is requested
+     * @param enableVirtualMetadata Determines whether the VirtualMetadataPopulator should be used.
+     *                              If false, only the relation."relationname" metadata is populated
+     *                              If true, fields from the spring config virtual metadata is included as well
+     * @return                      The list of virtual metadata values
+     */
+    public List<RelationshipMetadataValue> findRelationshipMetadataValueForItemRelationship(
+        Context context, Item item, String entityType, Relationship relationship, boolean enableVirtualMetadata)
+        throws SQLException;
+
+    /**
+     * This method will retrieve the EntityType String from an item
+     * @param item  The Item for which the entityType String will be returned
+     * @return      A String value indicating the entityType
+     */
+    public String getEntityTypeStringFromMetadata(Item item);
+
 }

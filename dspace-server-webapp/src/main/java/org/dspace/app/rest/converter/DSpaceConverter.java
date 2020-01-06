@@ -7,15 +7,11 @@
  */
 package org.dspace.app.rest.converter;
 
-import org.springframework.core.convert.converter.Converter;
+import org.dspace.app.rest.projection.Projection;
 
-public interface DSpaceConverter<M, R> extends Converter<M, R> {
-    @Override
-    public default R convert(M source) {
-        return fromModel(source);
-    }
+public interface DSpaceConverter<M, R> {
 
-    public abstract R fromModel(M obj);
+    R convert(M modelObject, Projection projection);
 
-    public abstract M toModel(R obj);
+    Class<M> getModelClass();
 }

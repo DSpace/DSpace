@@ -8,6 +8,7 @@
 package org.dspace.app.rest.converter;
 
 import org.dspace.app.rest.model.ParameterValueRest;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.scripts.DSpaceCommandLineParameter;
 import org.springframework.stereotype.Component;
 
@@ -20,7 +21,7 @@ public class DSpaceRunnableParameterConverter
     implements DSpaceConverter<DSpaceCommandLineParameter, ParameterValueRest> {
 
     @Override
-    public ParameterValueRest fromModel(DSpaceCommandLineParameter dSpaceCommandLineParameter) {
+    public ParameterValueRest convert(DSpaceCommandLineParameter dSpaceCommandLineParameter, Projection projection) {
         ParameterValueRest parameterValueRest = new ParameterValueRest();
         parameterValueRest.setName(dSpaceCommandLineParameter.getName());
         parameterValueRest.setValue(dSpaceCommandLineParameter.getValue());
@@ -28,6 +29,10 @@ public class DSpaceRunnableParameterConverter
     }
 
     @Override
+    public Class<DSpaceCommandLineParameter> getModelClass() {
+        return DSpaceCommandLineParameter.class;
+    }
+
     public DSpaceCommandLineParameter toModel(ParameterValueRest parameterValueRest) {
         return new DSpaceCommandLineParameter(parameterValueRest.getName(), parameterValueRest.getValue());
     }

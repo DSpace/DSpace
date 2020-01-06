@@ -19,7 +19,7 @@ import org.dspace.app.rest.utils.Utils;
  */
 @RelNameDSpaceResource(PoolTaskRest.NAME)
 public class PoolTaskResource extends DSpaceResource<PoolTaskRest> {
-    public PoolTaskResource(PoolTaskRest witem, Utils utils, String... rels) {
-        super(witem, utils, rels);
+    public PoolTaskResource(PoolTaskRest witem, Utils utils) {
+        super(witem, utils);
     }
 }

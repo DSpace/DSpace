@@ -10,10 +10,7 @@ package org.dspace.app.rest.repository;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.dspace.app.rest.converter.RelationshipTypeConverter;
 import org.dspace.app.rest.model.RelationshipTypeRest;
-import org.dspace.app.rest.model.hateoas.DSpaceResource;
-import org.dspace.app.rest.model.hateoas.RelationshipTypeResource;
 import org.dspace.content.RelationshipType;
 import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.core.Context;
@@ -31,33 +28,27 @@ public class RelationshipTypeRestRepository extends DSpaceRestRepository<Relatio
     @Autowired
     private RelationshipTypeService relationshipTypeService;
 
-    @Autowired
-    private RelationshipTypeConverter relationshipTypeConverter;
-
+    @Override
     public RelationshipTypeRest findOne(Context context, Integer integer) {
         try {
-            return relationshipTypeConverter.fromModel(relationshipTypeService.find(context, integer));
+            return converter.toRest(relationshipTypeService.find(context, integer), utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
 
+    @Override
     public Page<RelationshipTypeRest> findAll(Context context, Pageable pageable) {
-        List<RelationshipType> relationshipTypeList = null;
         try {
-            relationshipTypeList = relationshipTypeService.findAll(context);
+            List<RelationshipType> relationshipTypes = relationshipTypeService.findAll(context);
+            return converter.toRestPage(utils.getPage(relationshipTypes, pageable), utils.obtainProjection(true));
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<RelationshipTypeRest> page = utils.getPage(relationshipTypeList, pageable).map(relationshipTypeConverter);
-        return page;
     }
 
+    @Override
     public Class<RelationshipTypeRest> getDomainClass() {
         return RelationshipTypeRest.class;
-    }
-
-    public DSpaceResource<RelationshipTypeRest> wrapResource(RelationshipTypeRest model, String... rels) {
-        return new RelationshipTypeResource(model, utils, rels);
     }
 }

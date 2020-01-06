@@ -42,7 +42,7 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
      * log4j category
      */
     private static final Logger log = LogManager
-            .getLogger(AbstractIntegrationTestWithDatabase.class);
+        .getLogger(AbstractIntegrationTestWithDatabase.class);
 
     /**
      * Context mock object to use in the tests.
@@ -180,8 +180,9 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
 
             // Clear the search core.
             MockSolrServiceImpl searchService = DSpaceServicesFactory.getInstance()
-                    .getServiceManager()
-                    .getServiceByName(SearchService.class.getName(), MockSolrServiceImpl.class);
+                                                                     .getServiceManager()
+                                                                     .getServiceByName(SearchService.class.getName(),
+                                                                                       MockSolrServiceImpl.class);
             searchService.reset();
 
             // Reload our ConfigurationService (to reset configs to defaults again)
