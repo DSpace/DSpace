@@ -14,12 +14,6 @@ import java.util.List;
 import java.util.TreeMap;
 
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
-import org.dspace.scripts.DSpaceRunnable;
-import org.dspace.scripts.handler.DSpaceRunnableHandler;
-import org.dspace.scripts.handler.impl.CommandLineDSpaceRunnableHandler;
-import org.apache.commons.cli.ParseException;
 import org.apache.log4j.Logger;
 import org.dspace.scripts.DSpaceRunnable;
 import org.dspace.scripts.factory.ScriptServiceFactory;
@@ -28,7 +22,6 @@ import org.dspace.scripts.handler.impl.CommandLineDSpaceRunnableHandler;
 import org.dspace.servicemanager.DSpaceKernelImpl;
 import org.dspace.servicemanager.DSpaceKernelInit;
 import org.dspace.services.RequestService;
-import org.dspace.utils.DSpace;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
@@ -115,11 +108,11 @@ public class ScriptLauncher {
      * @param commandConfigs        The Document
      * @param dSpaceRunnableHandler The DSpaceRunnableHandler for this execution
      * @param kernelImpl            The relevant DSpaceKernelImpl
-     * @return                      A 1 or 0 depending on whether the script failed or passed respectively
+     * @return A 1 or 0 depending on whether the script failed or passed respectively
      */
     public static int handleScript(String[] args, Document commandConfigs,
-                                       DSpaceRunnableHandler dSpaceRunnableHandler,
-                                       DSpaceKernelImpl kernelImpl) {
+                                   DSpaceRunnableHandler dSpaceRunnableHandler,
+                                   DSpaceKernelImpl kernelImpl) {
         int status;
         DSpaceRunnable script = ScriptServiceFactory.getInstance().getScriptService().getScriptForName(args[0]);
         if (script != null) {
@@ -135,7 +128,7 @@ public class ScriptLauncher {
      * @param args                  The arguments of the script with the script name as first place in the array
      * @param dSpaceRunnableHandler The relevant DSpaceRunnableHandler
      * @param script                The script to be executed
-     * @return                      A 1 or 0 depending on whether the script failed or passed respectively
+     * @return A 1 or 0 depending on whether the script failed or passed respectively
      */
     private static int executeScript(String[] args, DSpaceRunnableHandler dSpaceRunnableHandler,
                                      DSpaceRunnable script) {
