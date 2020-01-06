@@ -7,8 +7,8 @@
  */
 package org.dspace.xmlworkflow.state.actions.processingaction;
 
-import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
@@ -18,7 +18,6 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.service.EPersonService;
-import org.dspace.workflow.WorkflowException;
 import org.dspace.xmlworkflow.state.Step;
 import org.dspace.xmlworkflow.state.actions.ActionResult;
 import org.dspace.xmlworkflow.storedcomponents.WorkflowItemRole;
@@ -42,31 +41,34 @@ public class SelectReviewerAction extends ProcessingAction {
 
     public static final int RESULTS_PER_PAGE = 5;
 
+    private static final String SUBMIT_CANCEL = "submit_cancel";
+    private static final String SUBMIT_SEARCH = "submit_search";
+    private static final String SUBMIT_SELECT_REVIEWER = "submit_select_reviewer_";
+
     private String roleId;
 
     @Autowired(required = true)
-    protected EPersonService ePersonService;
+    private EPersonService ePersonService;
 
     @Autowired(required = true)
-    protected WorkflowItemRoleService workflowItemRoleService;
+    private WorkflowItemRoleService workflowItemRoleService;
 
     @Override
-    public void activate(Context c, XmlWorkflowItem wf)
-        throws SQLException, IOException, AuthorizeException, WorkflowException {
+    public void activate(Context c, XmlWorkflowItem wf) {
 
     }
 
     @Override
     public ActionResult execute(Context c, XmlWorkflowItem wfi, Step step, HttpServletRequest request)
-        throws SQLException, AuthorizeException, IOException, WorkflowException {
-        String submitButton = Util.getSubmitButton(request, "submit_cancel");
+            throws SQLException, AuthorizeException {
+        String submitButton = Util.getSubmitButton(request, SUBMIT_CANCEL);
 
         //Check if our user has pressed cancel
-        if (submitButton.equals("submit_cancel")) {
+        if (submitButton.equals(SUBMIT_CANCEL)) {
             //Send us back to the submissions page
             return new ActionResult(ActionResult.TYPE.TYPE_CANCEL);
 
-        } else if (submitButton.equals("submit_search")) {
+        } else if (submitButton.equals(SUBMIT_SEARCH)) {
             //Perform the search
             String query = request.getParameter("query");
             int page = Util.getIntParameter(request, "result-page");
@@ -83,7 +85,7 @@ public class SelectReviewerAction extends ProcessingAction {
             request.setAttribute("result-page", page);
             request.setAttribute("page", SEARCH_RESULTS_PAGE);
             return new ActionResult(ActionResult.TYPE.TYPE_PAGE, SEARCH_RESULTS_PAGE);
-        } else if (submitButton.startsWith("submit_select_reviewer_")) {
+        } else if (submitButton.startsWith(SUBMIT_SELECT_REVIEWER)) {
             //Retrieve the identifier of the eperson which will do the reviewing
             UUID reviewerId = UUID.fromString(submitButton.substring(submitButton.lastIndexOf("_") + 1));
             EPerson reviewer = ePersonService.find(c, reviewerId);
@@ -98,6 +100,15 @@ public class SelectReviewerAction extends ProcessingAction {
 
         //There are only 2 active buttons on this page, so if anything else happens just return an error
         return new ActionResult(ActionResult.TYPE.TYPE_ERROR);
+    }
+
+    @Override
+    public List<String> getOptions() {
+        List<String> options = new ArrayList<>();
+        options.add(SUBMIT_CANCEL);
+        options.add(SUBMIT_SEARCH);
+        options.add(SUBMIT_SELECT_REVIEWER);
+        return options;
     }
 
     public String getRoleId() {

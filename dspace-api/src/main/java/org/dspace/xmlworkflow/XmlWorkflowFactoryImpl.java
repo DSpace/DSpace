@@ -17,8 +17,10 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.service.CollectionService;
 import org.dspace.core.Context;
+import org.dspace.utils.DSpace;
 import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
 import org.dspace.xmlworkflow.state.Workflow;
+import org.dspace.xmlworkflow.state.actions.WorkflowActionConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Required;
 
@@ -101,7 +103,7 @@ public class XmlWorkflowFactoryImpl implements XmlWorkflowFactory {
     public List<String> getAllNonMappedCollectionsHandles(Context context) {
         List<String> nonMappedCollectionHandles = new ArrayList<>();
         try {
-            for (Collection collection: this.collectionService.findAll(context)) {
+            for (Collection collection : this.collectionService.findAll(context)) {
                 if (workflowMapping.get(collection.getHandle()) == null) {
                     nonMappedCollectionHandles.add(collection.getHandle());
                 }
@@ -133,6 +135,16 @@ public class XmlWorkflowFactoryImpl implements XmlWorkflowFactory {
             }
         }
         return false;
+    }
+
+    @Override
+    public WorkflowActionConfig getActionByName(String workflowActionName) {
+        WorkflowActionConfig actionConfig
+                = new DSpace().getServiceManager().getServiceByName(workflowActionName, WorkflowActionConfig.class);
+        if (actionConfig != null) {
+            return actionConfig;
+        }
+        return null;
     }
 
 }

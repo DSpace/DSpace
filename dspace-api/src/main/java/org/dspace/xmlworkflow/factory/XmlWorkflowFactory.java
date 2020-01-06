@@ -13,6 +13,7 @@ import org.dspace.content.Collection;
 import org.dspace.core.Context;
 import org.dspace.xmlworkflow.WorkflowConfigurationException;
 import org.dspace.xmlworkflow.state.Workflow;
+import org.dspace.xmlworkflow.state.actions.WorkflowActionConfig;
 
 /**
  * The xmlworkflowfactory is responsible for parsing the
@@ -92,4 +93,11 @@ public interface XmlWorkflowFactory {
      * @return List of collection handles not mapped to any workflow
      */
     public List<String> getAllNonMappedCollectionsHandles(Context context);
+
+    /**
+     * Retrieve a WorkflowActionConfig object based on its name, should correspond with bean id in workflow-actions.xml
+     * @param workflowActionName    Name of workflow action we want to retrieve
+     * @return  WorkflowActionConfig object corresponding to the given workflowActionName
+     */
+    public WorkflowActionConfig getActionByName(String workflowActionName);
 }

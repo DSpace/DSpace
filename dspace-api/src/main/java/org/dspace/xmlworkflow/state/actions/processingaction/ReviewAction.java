@@ -9,6 +9,8 @@ package org.dspace.xmlworkflow.state.actions.processingaction;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -34,6 +36,8 @@ public class ReviewAction extends ProcessingAction {
     public static final int MAIN_PAGE = 0;
     public static final int REJECT_PAGE = 1;
 
+    private static final String SUBMIT_APPROVE = "submit_approve";
+    private static final String SUBMIT_REJECT = "submit_reject";
 
     @Override
     public void activate(Context c, XmlWorkflowItem wfItem) {
@@ -43,15 +47,23 @@ public class ReviewAction extends ProcessingAction {
     @Override
     public ActionResult execute(Context c, XmlWorkflowItem wfi, Step step, HttpServletRequest request)
         throws SQLException, AuthorizeException, IOException {
-        if (request.getParameter("submit_approve") != null) {
+        if (request.getParameter(SUBMIT_APPROVE) != null) {
             return processAccept(c, wfi, step, request);
         } else {
-            if (request.getParameter("submit_reject") != null) {
+            if (request.getParameter(SUBMIT_REJECT) != null) {
                 return processRejectPage(c, wfi, step, request);
             }
         }
 
         return new ActionResult(ActionResult.TYPE.TYPE_CANCEL);
+    }
+
+    @Override
+    public List<String> getOptions() {
+        List<String> options = new ArrayList<>();
+        options.add(SUBMIT_APPROVE);
+        options.add(SUBMIT_REJECT);
+        return options;
     }
 
     public ActionResult processAccept(Context c, XmlWorkflowItem wfi, Step step, HttpServletRequest request)
