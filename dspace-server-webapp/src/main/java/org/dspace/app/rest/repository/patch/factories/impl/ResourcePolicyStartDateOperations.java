@@ -151,7 +151,7 @@ public class ResourcePolicyStartDateOperations implements ResourcePatchOperation
         String dateS = (String) operation.getValue();
         try {
             Date date = simpleDateFormat.parse(dateS);
-            if (resource.getEndDate() != null && resource.getEndDate().after(date)) {
+            if (resource.getEndDate() != null && resource.getEndDate().before(date)) {
                 throw new DSpaceBadRequestException("Attempting to set an invalid startDate greater than the endDate.");
             }
         } catch (ParseException e) {
