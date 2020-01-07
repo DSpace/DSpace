@@ -114,6 +114,9 @@ public class Utils {
     public <T> Page<T> getPage(List<T> fullContents, Pageable pageable) {
         int total = fullContents.size();
         List<T> pageContent = null;
+        if (pageable == null) {
+            pageable = new PageRequest(0, EMBEDDED_PAGE_SIZE);
+        }
         if (pageable.getOffset() > total) {
             throw new PaginationException(total);
         } else {
