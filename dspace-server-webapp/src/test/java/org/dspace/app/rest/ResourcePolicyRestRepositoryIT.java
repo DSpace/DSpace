@@ -10,6 +10,7 @@ import static com.jayway.jsonpath.JsonPath.read;
 
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
@@ -34,10 +35,13 @@ import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.builder.EPersonBuilder;
 import org.dspace.app.rest.builder.GroupBuilder;
+import org.dspace.app.rest.builder.ItemBuilder;
 import org.dspace.app.rest.builder.ResourcePolicyBuilder;
 import org.dspace.app.rest.matcher.ResoucePolicyMatcher;
 import org.dspace.app.rest.model.ResourcePolicyRest;
+import org.dspace.app.rest.model.patch.AddOperation;
 import org.dspace.app.rest.model.patch.Operation;
+import org.dspace.app.rest.model.patch.RemoveOperation;
 import org.dspace.app.rest.model.patch.ReplaceOperation;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.authorize.ResourcePolicy;
@@ -45,6 +49,7 @@ import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.Item;
 import org.dspace.core.Constants;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
@@ -1016,15 +1021,20 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
     public void patchReplaceStartDataTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
-        Community community = CommunityBuilder.createCommunity(context)
-                .withName("My Community")
-                .build();
-
         EPerson eperson1 = EPersonBuilder.createEPerson(context)
                 .withEmail("eperson1@mail.com")
                 .withPassword("qwerty01")
                 .build();
 
+        Community community = CommunityBuilder.createCommunity(context).build();
+
+        Collection collection = CollectionBuilder.createCollection(context, community)
+                .withAdminGroup(eperson1)
+                .build();
+
+        Item publicItem1 = ItemBuilder.createItem(context, collection)
+                .withTitle("Public item")
+                .build();
 
         Calendar calendar = Calendar.getInstance();
 
@@ -1036,7 +1046,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
         ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
                 .withAction(Constants.READ)
-                .withDspaceObject(community)
+                .withDspaceObject(publicItem1)
                 .withUser(eperson1)
                 .withStartDate(data)
                 .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
@@ -1044,34 +1054,230 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
         context.restoreAuthSystemState();
 
-        Calendar calendar2 = Calendar.getInstance();
+        Calendar newCalendar = Calendar.getInstance();
         SimpleDateFormat formatDate = new SimpleDateFormat("yyyy-MM-dd");
 
-        calendar2.set(Calendar.YEAR, 2020);
-        calendar2.set(Calendar.MONTH, 0);
-        calendar2.set(Calendar.DATE, 1);
+        newCalendar.set(Calendar.YEAR, 2020);
+        newCalendar.set(Calendar.MONTH, 0);
+        newCalendar.set(Calendar.DATE, 1);
 
-        Date newData = calendar2.getTime();
+        Date newDate = newCalendar.getTime();
 
         List<Operation> ops = new ArrayList<Operation>();
-        ReplaceOperation replaceOperation = new ReplaceOperation("/startDate", formatDate.format(newData));
+        ReplaceOperation replaceOperation = new ReplaceOperation("/startDate", formatDate.format(newDate));
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
 
-        String authToken = getAuthToken(admin.getEmail(),password);
+        String authToken = getAuthToken(eperson1.getEmail(),"qwerty01");
         getClient(authToken).perform(patch("/api/authz/resourcepolicies/" + resourcePolicy.getID())
                             .content(patchBody)
                             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
-                            .andExpect(status().isOk());
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$",Matchers.allOf(
+                                    hasJsonPath("$.name", is(resourcePolicy.getRpName())),
+                                    hasJsonPath("$.description", is(resourcePolicy.getRpDescription())),
+                                    hasJsonPath("$.action", is(Constants.actionText[resourcePolicy.getAction()])),
+                                    hasJsonPath("$.startDate", is(formatDate.format(newDate))),
+                                    hasJsonPath("$.endDate", is(resourcePolicy.getEndDate())))));
+
+        getClient(authToken).perform(get("/api/authz/resourcepolicies/" + resourcePolicy.getID()))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$",Matchers.allOf(
+                                    hasJsonPath("$.action", is(Constants.actionText[resourcePolicy.getAction()])),
+                                    hasJsonPath("$.startDate", is(formatDate.format(newDate))))));
+    }
+
+    @Test
+    public void patchAddStartDataTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson eperson1 = EPersonBuilder.createEPerson(context)
+                .withEmail("eperson1@mail.com")
+                .withPassword("qwerty01")
+                .build();
+
+        Community community = CommunityBuilder.createCommunity(context).build();
+
+        Collection collection = CollectionBuilder.createCollection(context, community)
+                .withAdminGroup(eperson1)
+                .build();
+
+        Item publicItem1 = ItemBuilder.createItem(context, collection)
+                .withTitle("Public item")
+                .build();
+
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+                .withAction(Constants.READ)
+                .withDspaceObject(publicItem1)
+                .withUser(eperson1)
+                .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
+                .build();
+
+        context.restoreAuthSystemState();
+
+        Calendar newCalendar = Calendar.getInstance();
+        SimpleDateFormat formatDate = new SimpleDateFormat("yyyy-MM-dd");
+
+        newCalendar.set(Calendar.YEAR, 2019);
+        newCalendar.set(Calendar.MONTH, 9);
+        newCalendar.set(Calendar.DATE, 31);
+
+        Date newDate = newCalendar.getTime();
+
+        List<Operation> ops = new ArrayList<Operation>();
+        AddOperation addOperation = new AddOperation("/startDate", formatDate.format(newDate));
+        ops.add(addOperation);
+        String patchBody = getPatchContent(ops);
+
+        String authToken = getAuthToken(eperson1.getEmail(),"qwerty01");
+        getClient(authToken).perform(patch("/api/authz/resourcepolicies/" + resourcePolicy.getID())
+                            .content(patchBody)
+                            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$",Matchers.allOf(
+                                    hasJsonPath("$.name", is(resourcePolicy.getRpName())),
+                                    hasJsonPath("$.description", is(resourcePolicy.getRpDescription())),
+                                    hasJsonPath("$.action", is(Constants.actionText[resourcePolicy.getAction()])),
+                                    hasJsonPath("$.startDate", is(formatDate.format(newDate))),
+                                    hasJsonPath("$.endDate", is(resourcePolicy.getEndDate())))));
+
+        getClient(authToken).perform(get("/api/authz/resourcepolicies/" + resourcePolicy.getID()))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$",Matchers.allOf(
+                                    hasJsonPath("$.action", is(Constants.actionText[resourcePolicy.getAction()])),
+                                    hasJsonPath("$.startDate", is(formatDate.format(newDate))))));
+    }
+
+    @Test
+    public void patchRemoveStartDataTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson eperson1 = EPersonBuilder.createEPerson(context)
+                .withEmail("eperson1@mail.com")
+                .withPassword("qwerty01")
+                .build();
+
+        Community community = CommunityBuilder.createCommunity(context).build();
+
+        Collection collection = CollectionBuilder.createCollection(context, community)
+                .withAdminGroup(eperson1)
+                .build();
+
+        Item publicItem1 = ItemBuilder.createItem(context, collection)
+                .withTitle("Public item")
+                .build();
+
+        Calendar calendar = Calendar.getInstance();
+
+        calendar.set(Calendar.YEAR, 2019);
+        calendar.set(Calendar.MONTH, 9);
+        calendar.set(Calendar.DATE, 31);
+
+        Date data = calendar.getTime();
+
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+                .withAction(Constants.READ)
+                .withDspaceObject(publicItem1)
+                .withUser(eperson1)
+                .withStartDate(data)
+                .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
+                .build();
+
+        context.restoreAuthSystemState();
+
+        List<Operation> ops = new ArrayList<Operation>();
+        RemoveOperation removeOperation = new RemoveOperation("/startDate");
+        ops.add(removeOperation);
+        String patchBody = getPatchContent(ops);
+
+        String authToken = getAuthToken(eperson1.getEmail(),"qwerty01");
+        getClient(authToken).perform(patch("/api/authz/resourcepolicies/" + resourcePolicy.getID())
+                            .content(patchBody)
+                            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$",Matchers.allOf(
+                                    hasJsonPath("$.name", is(resourcePolicy.getRpName())),
+                                    hasJsonPath("$.description", is(resourcePolicy.getRpDescription())),
+                                    hasJsonPath("$.action", is(Constants.actionText[resourcePolicy.getAction()])),
+                                    hasJsonPath("$.startDate",nullValue()),
+                                    hasJsonPath("$.endDate", is(resourcePolicy.getEndDate())))));
+
+        getClient(authToken).perform(get("/api/authz/resourcepolicies/" + resourcePolicy.getID()))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$",Matchers.allOf(
+                                    hasJsonPath("$.action", is(Constants.actionText[resourcePolicy.getAction()])),
+                                    hasJsonPath("$.startDate", nullValue()))));
+    }
+
+    @Test
+    public void patchReplaceStartDateBadRequastTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson eperson1 = EPersonBuilder.createEPerson(context)
+                .withEmail("eperson1@mail.com")
+                .withPassword("qwerty01")
+                .build();
+
+        Community community = CommunityBuilder.createCommunity(context).build();
+
+        Collection collection = CollectionBuilder.createCollection(context, community)
+                .withAdminGroup(eperson1)
+                .build();
+
+        Item publicItem1 = ItemBuilder.createItem(context, collection)
+                .withTitle("Public item")
+                .build();
+
+        Calendar calendar = Calendar.getInstance();
+
+        calendar.set(Calendar.YEAR, 2019);
+        calendar.set(Calendar.MONTH, 9);
+        calendar.set(Calendar.DATE, 31);
+
+        Date date = calendar.getTime();
+
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+                .withAction(Constants.READ)
+                .withDspaceObject(publicItem1)
+                .withUser(eperson1)
+                .withStartDate(date)
+                .withDescription("my description")
+                .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
+                .build();
+
+        context.restoreAuthSystemState();
+
+        String wrongStartDate = "";
+        SimpleDateFormat formatDate = new SimpleDateFormat("yyyy-MM-dd");
+
+        List<Operation> ops = new ArrayList<Operation>();
+        ReplaceOperation replaceOperation = new ReplaceOperation("/startDate", wrongStartDate);
+        ops.add(replaceOperation);
+        String patchBody = getPatchContent(ops);
+
+        String authToken = getAuthToken(eperson1.getEmail(),"qwerty01");
+        getClient(authToken).perform(patch("/api/authz/resourcepolicies/" + resourcePolicy.getID())
+                            .content(patchBody)
+                            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                            .andExpect(status().isBadRequest());
+
+        getClient(authToken).perform(get("/api/authz/resourcepolicies/" + resourcePolicy.getID()))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$",Matchers.allOf(
+                                    hasJsonPath("$.action", is(Constants.actionText[resourcePolicy.getAction()])),
+                                    hasJsonPath("$.startDate", is(formatDate.format(date))),
+                                    hasJsonPath("$.description", is(resourcePolicy.getRpDescription())))));
     }
 
     @Test
     public void patchReplaceStartDataUnAuthenticatedTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
-        Community community = CommunityBuilder.createCommunity(context)
-                .withName("My Community")
-                .build();
+        Community community = CommunityBuilder.createCommunity(context).build();
+
+        Collection collection = CollectionBuilder.createCollection(context, community).build();
+
+        Item item = ItemBuilder.createItem(context, collection).build();
 
         Calendar calendar = Calendar.getInstance();
 
@@ -1083,7 +1289,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
         ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
                 .withAction(Constants.WRITE)
-                .withDspaceObject(community)
+                .withDspaceObject(item)
                 .withStartDate(data)
                 .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
                 .build();
@@ -1097,10 +1303,10 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         calendar2.set(Calendar.MONTH, 2);
         calendar2.set(Calendar.DATE, 21);
 
-        Date newData = calendar2.getTime();
+        Date newDate = calendar2.getTime();
 
         List<Operation> ops = new ArrayList<Operation>();
-        ReplaceOperation replaceOperation = new ReplaceOperation("/startDate", formatDate.format(newData));
+        ReplaceOperation replaceOperation = new ReplaceOperation("/startDate", formatDate.format(newDate));
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
 
@@ -1114,15 +1320,18 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
     public void patchReplaceStartDataForbiddenTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
-        Community community = CommunityBuilder.createCommunity(context)
-                .withName("My Community")
-                .build();
-
         EPerson eperson1 = EPersonBuilder.createEPerson(context)
                 .withEmail("eperson1@mail.com")
                 .withPassword("qwerty01")
                 .build();
 
+        Community community = CommunityBuilder.createCommunity(context).build();
+
+        Collection collection = CollectionBuilder.createCollection(context, community).build();
+
+        Item item = ItemBuilder.createItem(context, collection)
+                .withTitle("Public item")
+                .build();
 
         Calendar calendar = Calendar.getInstance();
 
@@ -1134,7 +1343,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
         ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
                 .withAction(Constants.READ)
-                .withDspaceObject(community)
+                .withDspaceObject(item)
                 .withUser(eperson1)
                 .withStartDate(data)
                 .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
@@ -1165,6 +1374,14 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
     @Test
     public void patchReplaceStartDataNotFoundTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson eperson1 = EPersonBuilder.createEPerson(context)
+                .withEmail("eperson1@mail.com")
+                .withPassword("qwerty01")
+                .build();
+
+        context.restoreAuthSystemState();
 
         Calendar calendar2 = Calendar.getInstance();
         SimpleDateFormat formatDate = new SimpleDateFormat("yyyy-MM-dd");
@@ -1180,10 +1397,235 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
 
-        String authToken = getAuthToken(admin.getEmail(),password);
+        String authToken = getAuthToken(eperson1.getEmail(),"qwerty01");
         getClient(authToken).perform(patch("/api/authz/resourcepolicies/" + Integer.MAX_VALUE)
                             .content(patchBody)
                             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                             .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void patchReplaceEndDateBeforeStartDataTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson eperson1 = EPersonBuilder.createEPerson(context)
+                .withEmail("eperson1@mail.com")
+                .withPassword("qwerty01")
+                .build();
+
+        Community community = CommunityBuilder.createCommunity(context).build();
+
+        Collection collection = CollectionBuilder.createCollection(context, community)
+                .withAdminGroup(eperson1)
+                .build();
+
+        Item publicItem1 = ItemBuilder.createItem(context, collection)
+                .withTitle("Public item")
+                .build();
+
+        Calendar calendarStartDate = Calendar.getInstance();
+
+        calendarStartDate.set(Calendar.YEAR, 2019);
+        calendarStartDate.set(Calendar.MONTH, 10);
+        calendarStartDate.set(Calendar.DATE, 21);
+
+        Date startDate = calendarStartDate.getTime();
+
+        Calendar calendarEndDate = Calendar.getInstance();
+
+        calendarEndDate.set(Calendar.YEAR, 2020);
+        calendarEndDate.set(Calendar.MONTH, 10);
+        calendarEndDate.set(Calendar.DATE, 21);
+
+        Date endDate = calendarEndDate.getTime();
+
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+                .withAction(Constants.READ)
+                .withDspaceObject(publicItem1)
+                .withUser(eperson1)
+                .withStartDate(startDate)
+                .withEndDate(endDate)
+                .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
+                .build();
+
+        context.restoreAuthSystemState();
+
+        Calendar newEndDateCalendar = Calendar.getInstance();
+        SimpleDateFormat formatDate = new SimpleDateFormat("yyyy-MM-dd");
+
+        newEndDateCalendar.set(Calendar.YEAR, 2018);
+        newEndDateCalendar.set(Calendar.MONTH, 10);
+        newEndDateCalendar.set(Calendar.DATE, 21);
+
+        Date newEndDate = newEndDateCalendar.getTime();
+
+        List<Operation> ops = new ArrayList<Operation>();
+        ReplaceOperation replaceOperation = new ReplaceOperation("/endDate", formatDate.format(newEndDate));
+        ops.add(replaceOperation);
+        String patchBody = getPatchContent(ops);
+
+        String authToken = getAuthToken(eperson1.getEmail(),"qwerty01");
+        getClient(authToken).perform(patch("/api/authz/resourcepolicies/" + resourcePolicy.getID())
+                            .content(patchBody)
+                            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                            .andExpect(status().isBadRequest());
+
+        getClient(authToken).perform(get("/api/authz/resourcepolicies/" + resourcePolicy.getID()))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$",Matchers.allOf(
+                                    hasJsonPath("$.action", is(Constants.actionText[resourcePolicy.getAction()])),
+                                    hasJsonPath("$.startDate", is(formatDate.format(startDate))),
+                                    hasJsonPath("$.endDate", is(formatDate.format(endDate))))));
+    }
+
+    @Test
+    public void patchReplaceDescriptionTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson eperson1 = EPersonBuilder.createEPerson(context)
+                .withEmail("eperson1@mail.com")
+                .withPassword("qwerty01")
+                .build();
+
+        Community community = CommunityBuilder.createCommunity(context).build();
+
+        Collection collection = CollectionBuilder.createCollection(context, community)
+                .withAdminGroup(eperson1)
+                .build();
+
+        Item publicItem1 = ItemBuilder.createItem(context, collection)
+                .withTitle("Public item")
+                .build();
+
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+                .withAction(Constants.READ)
+                .withDspaceObject(publicItem1)
+                .withUser(eperson1)
+                .withDescription("my description")
+                .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
+                .build();
+
+        context.restoreAuthSystemState();
+
+        String newDescription = "New Description";
+        List<Operation> ops = new ArrayList<Operation>();
+        ReplaceOperation replaceOperation = new ReplaceOperation("/description", newDescription);
+        ops.add(replaceOperation);
+        String patchBody = getPatchContent(ops);
+
+        String authToken = getAuthToken(eperson1.getEmail(),"qwerty01");
+        getClient(authToken).perform(patch("/api/authz/resourcepolicies/" + resourcePolicy.getID())
+                            .content(patchBody)
+                            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$",Matchers.allOf(
+                                    hasJsonPath("$.name", is(resourcePolicy.getRpName())),
+                                    hasJsonPath("$.description", is(newDescription)),
+                                    hasJsonPath("$.action", is(Constants.actionText[resourcePolicy.getAction()])))));
+
+        getClient(authToken).perform(get("/api/authz/resourcepolicies/" + resourcePolicy.getID()))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$",Matchers.allOf(
+                                    hasJsonPath("$.action", is(Constants.actionText[resourcePolicy.getAction()])),
+                                    hasJsonPath("$.description", is(newDescription)))));
+    }
+
+    @Test
+    public void patchReplaceDescriptionBadRequastTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson eperson1 = EPersonBuilder.createEPerson(context)
+                .withEmail("eperson1@mail.com")
+                .withPassword("qwerty01")
+                .build();
+
+        Community community = CommunityBuilder.createCommunity(context).build();
+
+        Collection collection = CollectionBuilder.createCollection(context, community)
+                .withAdminGroup(eperson1)
+                .build();
+
+        Item publicItem1 = ItemBuilder.createItem(context, collection)
+                .withTitle("Public item")
+                .build();
+
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+                .withAction(Constants.READ)
+                .withDspaceObject(publicItem1)
+                .withUser(eperson1)
+                .withDescription("my description")
+                .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
+                .build();
+
+        context.restoreAuthSystemState();
+
+        String newDescription = "";
+        List<Operation> ops = new ArrayList<Operation>();
+        ReplaceOperation replaceOperation = new ReplaceOperation("/description", newDescription);
+        ops.add(replaceOperation);
+        String patchBody = getPatchContent(ops);
+
+        String authToken = getAuthToken(eperson1.getEmail(),"qwerty01");
+        getClient(authToken).perform(patch("/api/authz/resourcepolicies/" + resourcePolicy.getID())
+                            .content(patchBody)
+                            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                            .andExpect(status().isBadRequest());
+
+        getClient(authToken).perform(get("/api/authz/resourcepolicies/" + resourcePolicy.getID()))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$",Matchers.allOf(
+                                    hasJsonPath("$.action", is(Constants.actionText[resourcePolicy.getAction()])),
+                                    hasJsonPath("$.description", is(resourcePolicy.getRpDescription())))));
+    }
+
+    @Test
+    public void patchReplaceNameTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson eperson1 = EPersonBuilder.createEPerson(context)
+                .withEmail("eperson1@mail.com")
+                .withPassword("qwerty01")
+                .build();
+
+        Community community = CommunityBuilder.createCommunity(context).build();
+
+        Collection collection = CollectionBuilder.createCollection(context, community)
+                .withAdminGroup(eperson1)
+                .build();
+
+        Item myItem = ItemBuilder.createItem(context, collection)
+                .withTitle("Public item")
+                .build();
+
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+                .withAction(Constants.READ)
+                .withDspaceObject(myItem)
+                .withUser(eperson1)
+                .withName("My name")
+                .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
+                .build();
+
+        context.restoreAuthSystemState();
+
+        String newName = "New Name";
+        List<Operation> ops = new ArrayList<Operation>();
+        ReplaceOperation replaceOperation = new ReplaceOperation("/name", newName);
+        ops.add(replaceOperation);
+        String patchBody = getPatchContent(ops);
+
+        String authToken = getAuthToken(eperson1.getEmail(),"qwerty01");
+        getClient(authToken).perform(patch("/api/authz/resourcepolicies/" + resourcePolicy.getID())
+                            .content(patchBody)
+                            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$",Matchers.allOf(
+                                    hasJsonPath("$.name", is(newName)),
+                                    hasJsonPath("$.action", is(Constants.actionText[resourcePolicy.getAction()])))));
+
+        getClient(authToken).perform(get("/api/authz/resourcepolicies/" + resourcePolicy.getID()))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$",Matchers.allOf(
+                                    hasJsonPath("$.action", is(Constants.actionText[resourcePolicy.getAction()])),
+                                    hasJsonPath("$.name", is(newName)))));
     }
 }
