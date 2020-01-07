@@ -136,4 +136,19 @@ public class ResourcePolicyBuilder extends AbstractBuilder<ResourcePolicy, Resou
         resourcePolicy.setStartDate(data);
         return this;
     }
+
+    public ResourcePolicyBuilder withEndDate(Date data) throws SQLException {
+        resourcePolicy.setEndDate(data);
+        return this;
+    }
+
+    public ResourcePolicyBuilder withDescription(String description) throws SQLException {
+        resourcePolicy.setRpDescription(description);
+        return this;
+    }
+
+    public ResourcePolicyBuilder withName(String name) throws SQLException {
+        resourcePolicy.setRpName(name);
+        return this;
+    }
 }
