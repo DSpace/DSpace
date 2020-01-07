@@ -50,4 +50,8 @@ public class AuthorityEntryValueLinkRepository extends AbstractDSpaceRestReposit
         return authorityUtils.convertEntry(choice, name, projection);
     }
 
+    @Override
+    public boolean isEmbeddableRelation(Object data, String name) {
+        return false;
+    }
 }

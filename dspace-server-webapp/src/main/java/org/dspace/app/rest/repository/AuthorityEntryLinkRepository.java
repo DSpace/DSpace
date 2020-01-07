@@ -135,4 +135,8 @@ public class AuthorityEntryLinkRepository extends AbstractDSpaceRestRepository
         return resources;
     }
 
+    @Override
+    public boolean isEmbeddableRelation(Object data, String name) {
+        return false;
+    }
 }
