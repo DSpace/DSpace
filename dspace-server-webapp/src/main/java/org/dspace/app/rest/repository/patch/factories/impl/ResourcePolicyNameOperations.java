@@ -13,41 +13,95 @@ import org.dspace.app.rest.model.patch.Operation;
 import org.springframework.stereotype.Component;
 
 /**
- * Implementation for ResourcePolicy description patches.
+ * Implementation for ResourcePolicy name patches.
  *
  * Example: <code>
  * curl -X PATCH http://${dspace.url}/api/authz/resourcepolicies/<:id-resourcepolicy> -H "
  * Content-Type: application/json" -d '[{ "op": "replace", "path": "
- * /description", "value": "New Description"]'
+ * /name", "value": "New Name"]'
  * </code>
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @Component
-public class ResourcePolicyNameOperations extends ReplacePatchOperation<ResourcePolicyRest, String>
-        implements ResourcePatchOperation<ResourcePolicyRest> {
+public class ResourcePolicyNameOperations implements ResourcePatchOperation<ResourcePolicyRest> {
 
     @Override
-    ResourcePolicyRest replace(ResourcePolicyRest resourcePolicy, Operation operation) {
-        resourcePolicy.setName((String) operation.getValue());
-        return resourcePolicy;
-    }
-
-
-    @Override
-    void checkModelForExistingValue(ResourcePolicyRest resource, Operation operation) {
-        if (resource.getDescription() == null) {
-            throw new DSpaceBadRequestException("Attempting to replace a non-existent value.");
+    public ResourcePolicyRest perform(ResourcePolicyRest resource, Operation operation)
+            throws DSpaceBadRequestException {
+        switch (operation.getOp()) {
+            case "replace":
+                checkOperationValue(operation.getValue());
+                checkModelForExistingValue(resource, operation);
+                return replace(resource, operation);
+            case "add":
+                checkOperationValue(operation.getValue());
+                checkModelForNotExistingValue(resource, operation);
+                return add(resource, operation);
+            case "remove":
+                checkModelForExistingValue(resource, operation);
+                return delete(resource, operation);
+            default:
+                throw new DSpaceBadRequestException("Unsupported operation " + operation.getOp());
         }
     }
 
-    @Override
-    protected Class<String[]> getArrayClassForEvaluation() {
-        return String[].class;
+    public ResourcePolicyRest replace(ResourcePolicyRest resourcePolicy, Operation operation) {
+        String newName = (String) operation.getValue();
+        resourcePolicy.setName(newName);
+        return resourcePolicy;
     }
 
-    @Override
-    protected Class<String> getClassForEvaluation() {
-        return String.class;
+    public ResourcePolicyRest add(ResourcePolicyRest resourcePolicy, Operation operation) {
+        String name = (String) operation.getValue();
+        resourcePolicy.setName(name);
+        return resourcePolicy;
+    }
+
+    public ResourcePolicyRest delete(ResourcePolicyRest resourcePolicy, Operation operation) {
+        resourcePolicy.setName(null);
+        return resourcePolicy;
+    }
+
+    /**
+     * Throws PatchBadRequestException for missing operation value.
+     *
+     * @param value
+     *            the value to test
+     */
+    void checkOperationValue(Object value) {
+        if (value == null || value.equals("")) {
+            throw new DSpaceBadRequestException("No value provided for the operation.");
+        }
+    }
+
+    /**
+     * Throws PatchBadRequestException for missing value in the /name path.
+     *
+     * @param resource
+     *            the resource to update
+     * @param operation
+     *            the operation to apply
+     * 
+     */
+    void checkModelForExistingValue(ResourcePolicyRest resource, Operation operation) {
+        if (resource.getName() == null) {
+            throw new DSpaceBadRequestException("Attempting to " + operation.getOp() + " a non-existent value.");
+        }
+    }
+
+    /**
+     * Throws PatchBadRequestException if a value is already set in the /name path.
+     *
+     * @param resource
+     *            the resource to update
+     * @param operation
+     *            the operation to apply
+     * 
+     */
+    void checkModelForNotExistingValue(ResourcePolicyRest resource, Operation operation) {
+        if (resource.getName() != null) {
+            throw new DSpaceBadRequestException("Attempting to add a value to an already existing path.");
+        }
     }
 }
