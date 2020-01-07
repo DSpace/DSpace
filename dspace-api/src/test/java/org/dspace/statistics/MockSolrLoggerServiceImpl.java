@@ -10,9 +10,7 @@ package org.dspace.statistics;
 import java.io.File;
 
 import com.maxmind.geoip2.DatabaseReader;
-import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Mock service that uses an embedded SOLR server for the statistics core.
@@ -20,9 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class MockSolrLoggerServiceImpl
         extends SolrLoggerServiceImpl
         implements InitializingBean {
-
-    @Autowired(required = true)
-    private ConfigurationService configurationService;
 
     public MockSolrLoggerServiceImpl() {
     }
@@ -34,9 +29,8 @@ public class MockSolrLoggerServiceImpl
 
         new FakeDatabaseReader(); // Activate fake
         new FakeDatabaseReader.Builder(); // Activate fake
-        String locationDbPath = configurationService.getProperty("usage-statistics.dbfile");
-        File locationDb = new File(locationDbPath);
-        locationDb.createNewFile();
+        File locationDb = File.createTempFile("GeoIP", ".db");
+        locationDb.deleteOnExit();
         locationService = new DatabaseReader.Builder(locationDb).build();
     }
 
