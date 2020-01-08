@@ -103,8 +103,7 @@ public class AuthorityEntrySearchRestController {
                                                                 Pageable pageable, Sort sort,
                                                                 PagedResourcesAssembler assembler,
                                                                 @RequestParam MultiValueMap<String,
-                                                                Object> parameters,
-                                                                Projection projection)
+                                                                Object> parameters)
         throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 
         PagedResources<? extends HALResource> result = null;
@@ -131,7 +130,7 @@ public class AuthorityEntrySearchRestController {
             }
 
             Page<? extends RestModel> pageResult = (Page<? extends RestAddressableModel>) linkMethod
-                    .invoke(linkRepository, id, pageable, projection);
+                    .invoke(linkRepository, id, pageable, utils.obtainProjection(true));
 
             Page<HALResource> halResources = pageResult.map(restObject -> converter.toResource(restObject));
 
@@ -151,8 +150,7 @@ public class AuthorityEntrySearchRestController {
                                                                   Pageable pageable, Sort sort,
                                                                   PagedResourcesAssembler assembler,
                                                                   @RequestParam MultiValueMap<String,
-                                                                  Object> parameters,
-                                                                  Projection projection)
+                                                                  Object> parameters)
         throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 
         PagedResources<? extends HALResource> result = null;
@@ -180,7 +178,7 @@ public class AuthorityEntrySearchRestController {
             }
 
             Page<? extends RestModel> pageResult = (Page<? extends RestAddressableModel>) linkMethod
-                    .invoke(linkRepository, request, id, pageable, projection);
+                    .invoke(linkRepository, request, id, pageable, utils.obtainProjection(true));
 
             Page<HALResource> halResources = pageResult.map(restObject -> converter.toResource(restObject));
 
