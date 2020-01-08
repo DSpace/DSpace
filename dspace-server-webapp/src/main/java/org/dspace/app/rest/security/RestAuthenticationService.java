@@ -32,7 +32,8 @@ public interface RestAuthenticationService {
 
     boolean hasAuthenticationData(HttpServletRequest request);
 
-    void invalidateAuthenticationData(HttpServletRequest request, HttpServletResponse response, Context context) throws Exception;
+    void invalidateAuthenticationData(HttpServletRequest request, HttpServletResponse response, Context context)
+            throws Exception;
 
     AuthenticationService getAuthenticationService();
 

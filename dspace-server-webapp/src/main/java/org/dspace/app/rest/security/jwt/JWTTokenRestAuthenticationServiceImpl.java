@@ -162,13 +162,13 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
         String authCookie = getAuthorizationCookie(request);
         if (StringUtils.isNotBlank(authHeader)) {
             tokenValue = authHeader.replace(AUTHORIZATION_TYPE, "").trim();
-        } else if (StringUtils.isNotBlank(authCookie)){
+        } else if (StringUtils.isNotBlank(authCookie)) {
             tokenValue = authCookie;
         }
 
         return tokenValue;
     }
-    
+
     private String getAuthorizationCookie(HttpServletRequest request) {
         String authCookie = "";
         Cookie[] cookies = request.getCookies();
