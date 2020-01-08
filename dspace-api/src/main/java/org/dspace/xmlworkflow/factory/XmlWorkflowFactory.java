@@ -16,9 +16,12 @@ import org.dspace.xmlworkflow.state.Workflow;
 import org.dspace.xmlworkflow.state.actions.WorkflowActionConfig;
 
 /**
- * The xmlworkflowfactory is responsible for parsing the
- * workflow xml file and is used to retrieve the workflow for
- * a certain collection
+ * The workflowfactory is responsible for parsing the workflow xml file and is used to retrieve info about the workflow:
+ * - the workflow for a certain collection
+ * - collections mapped to a certain workflow
+ * - collections not mapped to any workflow
+ * - configured workflows and the default workflow
+ * - workflow action by name
  *
  * @author Bram De Schouwer (bram.deschouwer at dot com)
  * @author Kevin Van de Velde (kevin at atmire dot com)
@@ -27,8 +30,6 @@ import org.dspace.xmlworkflow.state.actions.WorkflowActionConfig;
  * @author Maria Verdonck (Atmire) on 11/12/2019
  */
 public interface XmlWorkflowFactory {
-
-    public final String LEGACY_WORKFLOW_NAME = "default";
 
     /**
      * Retrieve the workflow configuration for a single collection
@@ -60,7 +61,6 @@ public interface XmlWorkflowFactory {
      *
      * @param workflowName Name of a possible configured workflow
      * @return True if there is a workflow configured by this name, false otherwise
-     * @throws WorkflowConfigurationException occurs if there is no workflow configured by that name
      */
     public boolean workflowByThisNameExists(String workflowName);
 
@@ -78,26 +78,27 @@ public interface XmlWorkflowFactory {
     public Workflow getDefaultWorkflow();
 
     /**
-     * Return a list of collections handles that are mapped to the given workflow in the workflow configuration.
-     * Makes use of a cache so it only retrieves the workflowName->List<collectionHandle> if it's not cached
+     * Return a list of collections that are mapped to the given workflow in the workflow configuration.
+     * * Makes use of a cache so it only retrieves the workflowName->List<collectionHandle> if it's not cached
      *
+     * @param context      Dspace context
      * @param workflowName Name of workflow we want the collections of that are mapped to is
-     * @return List of collection handles mapped to the requested workflow
+     * @return List of collections mapped to the requested workflow
      */
-    public List<String> getCollectionHandlesMappedToWorklow(String workflowName);
+    public List<Collection> getCollectionHandlesMappedToWorklow(Context context, String workflowName);
 
     /**
-     * Returns list of collection handles that are not mapped to any configured workflow, and thus use the default
-     * workflow
+     * Returns list of collections that are not mapped to any configured workflow, and thus use the default workflow
      *
-     * @return List of collection handles not mapped to any workflow
+     * @return List of collections not mapped to any workflow
      */
-    public List<String> getAllNonMappedCollectionsHandles(Context context);
+    public List<Collection> getAllNonMappedCollectionsHandles(Context context);
 
     /**
      * Retrieve a WorkflowActionConfig object based on its name, should correspond with bean id in workflow-actions.xml
-     * @param workflowActionName    Name of workflow action we want to retrieve
-     * @return  WorkflowActionConfig object corresponding to the given workflowActionName
+     *
+     * @param workflowActionName Name of workflow action we want to retrieve
+     * @return WorkflowActionConfig object corresponding to the given workflowActionName
      */
     public WorkflowActionConfig getActionByName(String workflowActionName);
 }

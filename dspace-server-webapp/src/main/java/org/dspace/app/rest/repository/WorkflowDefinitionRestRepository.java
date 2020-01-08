@@ -19,7 +19,6 @@ import org.dspace.content.service.CollectionService;
 import org.dspace.core.Context;
 import org.dspace.xmlworkflow.WorkflowConfigurationException;
 import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
-import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
 import org.dspace.xmlworkflow.state.Workflow;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -35,7 +34,8 @@ import org.springframework.stereotype.Component;
 @Component(WorkflowDefinitionRest.CATEGORY + "." + WorkflowDefinitionRest.NAME)
 public class WorkflowDefinitionRestRepository extends DSpaceRestRepository<WorkflowDefinitionRest, String> {
 
-    protected XmlWorkflowFactory xmlWorkflowFactory = XmlWorkflowServiceFactory.getInstance().getWorkflowFactory();
+    @Autowired
+    protected XmlWorkflowFactory xmlWorkflowFactory;
 
     @Autowired
     private CollectionService collectionService;
@@ -63,7 +63,7 @@ public class WorkflowDefinitionRestRepository extends DSpaceRestRepository<Workf
      * GET endpoint that returns the workflow definition that applies to a specific collection eventually fallback
      * to the default configuration.
      *
-     * @param collectionId     Uuid of the collection
+     * @param collectionId Uuid of the collection
      * @return the workflow definition for this collection
      */
     @SearchRestMethod(name = "findByCollection")

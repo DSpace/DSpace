@@ -34,7 +34,8 @@ public class WorkflowActionRestRepository extends DSpaceRestRepository<WorkflowA
         if (actionConfig != null) {
             return converter.toRest(actionConfig, utils.obtainProjection(true));
         } else {
-            throw new ResourceNotFoundException("No workflow action with name " + workflowActionName + " is configured");
+            throw new ResourceNotFoundException("No workflow action with name " + workflowActionName
+                    + " is configured");
         }
     }
 
