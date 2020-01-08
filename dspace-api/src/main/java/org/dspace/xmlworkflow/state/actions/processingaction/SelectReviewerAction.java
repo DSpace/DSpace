@@ -36,7 +36,6 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class SelectReviewerAction extends ProcessingAction {
 
-    public static final int MAIN_PAGE = 0;
     public static final int SEARCH_RESULTS_PAGE = 1;
 
     public static final int RESULTS_PER_PAGE = 5;
@@ -105,7 +104,6 @@ public class SelectReviewerAction extends ProcessingAction {
     @Override
     public List<String> getOptions() {
         List<String> options = new ArrayList<>();
-        options.add(SUBMIT_CANCEL);
         options.add(SUBMIT_SEARCH);
         options.add(SUBMIT_SELECT_REVIEWER);
         return options;
