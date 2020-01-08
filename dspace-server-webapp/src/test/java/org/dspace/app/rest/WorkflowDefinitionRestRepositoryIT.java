@@ -212,7 +212,7 @@ public class WorkflowDefinitionRestRepositoryIT extends AbstractControllerIntegr
     @Test
     public void getCollectionsOfWorkflowByName_DefaultWorkflow_AllNonMappedCollections() throws Exception {
         Workflow defaultWorkflow = xmlWorkflowFactory.getDefaultWorkflow();
-        List<String> allNonMappedCollections = xmlWorkflowFactory.getAllNonMappedCollectionsHandles(context);
+        List<Collection> allNonMappedCollections = xmlWorkflowFactory.getAllNonMappedCollectionsHandles(context);
 
         //When we call this facets endpoint
         getClient().perform(get(WORKFLOW_DEFINITIONS_ENDPOINT + "/" + defaultWorkflow.getID()
@@ -245,11 +245,10 @@ public class WorkflowDefinitionRestRepositoryIT extends AbstractControllerIntegr
         context.restoreAuthSystemState();
 
         Workflow defaultWorkflow = xmlWorkflowFactory.getDefaultWorkflow();
-        List<String> allNonMappedCollections = xmlWorkflowFactory.getAllNonMappedCollectionsHandles(context);
+        List<Collection> allNonMappedCollections = xmlWorkflowFactory.getAllNonMappedCollectionsHandles(context);
 
         if (allNonMappedCollections.size() > 0) {
-            Collection firstNonMappedCollection =
-                    (Collection) handleService.resolveToObject(context, allNonMappedCollections.get(0));
+            Collection firstNonMappedCollection = allNonMappedCollections.get(0);
 
             //When we call this facets endpoint
             getClient().perform(get(WORKFLOW_DEFINITIONS_ENDPOINT + "/" + defaultWorkflow.getID()
@@ -299,21 +298,20 @@ public class WorkflowDefinitionRestRepositoryIT extends AbstractControllerIntegr
         }
 
         if (StringUtils.isNotBlank(firstNonDefaultWorkflowName)) {
-            List<String> handlesOfMappedCollections
-                    = xmlWorkflowFactory.getCollectionHandlesMappedToWorklow(firstNonDefaultWorkflowName);
+            List<Collection> mappedCollections
+                    = xmlWorkflowFactory.getCollectionHandlesMappedToWorklow(context, firstNonDefaultWorkflowName);
             //When we call this facets endpoint
-            if (handlesOfMappedCollections.size() > 0) {
+            if (mappedCollections.size() > 0) {
                 //returns array of collection jsons that are mapped to given workflow
                 //When we call this facets endpoint
-                Collection firstMappedCollection =
-                        (Collection) handleService.resolveToObject(context, handlesOfMappedCollections.get(0));
+                Collection firstMappedCollection = mappedCollections.get(0);
                 getClient().perform(get(WORKFLOW_DEFINITIONS_ENDPOINT + "/" + firstNonDefaultWorkflowName
                         + "/collections")
                         .param("size", "1"))
                         //We expect a 200 OK status
                         .andExpect(status().isOk())
                         //Number of total workflows is equals to number of configured workflows
-                        .andExpect(jsonPath("$.totalElements", is(handlesOfMappedCollections.size())))
+                        .andExpect(jsonPath("$.totalElements", is(mappedCollections.size())))
                         //Page size is 1
                         .andExpect(jsonPath("$.size", is(1)))
                         //Page nr is 1

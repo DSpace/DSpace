@@ -7,11 +7,8 @@
  */
 package org.dspace.app.rest;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.model.CollectionRest;
@@ -20,10 +17,7 @@ import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.content.Collection;
 import org.dspace.core.Context;
-import org.dspace.handle.factory.HandleServiceFactory;
-import org.dspace.handle.service.HandleService;
 import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
-import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -42,8 +36,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/" + WorkflowDefinitionRest.CATEGORY + "/" + WorkflowDefinitionRest.NAME_PLURAL)
 public class WorkflowDefinitionController {
 
-    protected XmlWorkflowFactory xmlWorkflowFactory = XmlWorkflowServiceFactory.getInstance().getWorkflowFactory();
-    protected HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
+    @Autowired
+    protected XmlWorkflowFactory xmlWorkflowFactory;
 
     @Autowired
     protected ConverterService converter;
@@ -57,31 +51,22 @@ public class WorkflowDefinitionController {
      * but this collection is not included in the list returned by this method.
      *
      * @param request      The request object
-     * @param response     The response object
      * @param workflowName Name of workflow we want the collections of that are mapped to is
      * @return List of collections mapped to the requested workflow
-     * @throws SQLException if db error
      */
     @GetMapping("{workflowName}/collections")
-    public Page<CollectionRest> get(HttpServletRequest request, HttpServletResponse response,
-                                    @PathVariable String workflowName, Pageable pageable) throws SQLException {
+    public Page<CollectionRest> get(HttpServletRequest request, @PathVariable String workflowName, Pageable pageable) {
         if (xmlWorkflowFactory.workflowByThisNameExists(workflowName)) {
             Context context = ContextUtil.obtainContext(request);
-            List<String> collectionsHandlesMappedToWorkflow;
+            List<Collection> collectionsMappedToWorkflow;
             if (xmlWorkflowFactory.isDefaultWorkflow(workflowName)) {
-                collectionsHandlesMappedToWorkflow = xmlWorkflowFactory.getAllNonMappedCollectionsHandles(context);
+                collectionsMappedToWorkflow = xmlWorkflowFactory.getAllNonMappedCollectionsHandles(context);
             } else {
-                collectionsHandlesMappedToWorkflow
-                        = xmlWorkflowFactory.getCollectionHandlesMappedToWorklow(workflowName);
+                collectionsMappedToWorkflow
+                        = xmlWorkflowFactory.getCollectionHandlesMappedToWorklow(context, workflowName);
             }
-            List<Collection> collectionsFromHandles = new ArrayList<>();
-            for (String handle : collectionsHandlesMappedToWorkflow) {
-                Collection collection = (Collection) handleService.resolveToObject(context, handle);
-                if (collection != null) {
-                    collectionsFromHandles.add(collection);
-                }
-            }
-            return converter.toRestPage(utils.getPage(collectionsFromHandles, pageable), utils.obtainProjection(true));
+            return converter.toRestPage(utils.getPage(collectionsMappedToWorkflow, pageable),
+                    utils.obtainProjection(true));
         } else {
             throw new ResourceNotFoundException("No workflow with name " + workflowName + " is configured");
         }

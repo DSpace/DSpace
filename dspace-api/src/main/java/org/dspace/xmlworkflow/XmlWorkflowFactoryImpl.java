@@ -17,6 +17,7 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.service.CollectionService;
 import org.dspace.core.Context;
+import org.dspace.handle.service.HandleService;
 import org.dspace.utils.DSpace;
 import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
 import org.dspace.xmlworkflow.state.Workflow;
@@ -25,9 +26,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Required;
 
 /**
- * The workflowfactory is responsible for parsing the
- * workflow xml file and is used to retrieve the workflow for
- * a certain collection
+ * The workflowfactory is responsible for parsing the workflow xml file and is used to retrieve info about the workflow:
+ * - the workflow for a certain collection
+ * - collections mapped to a certain workflow
+ * - collections not mapped to any workflow
+ * - configured workflows and the default workflow
+ * - workflow action by name
  *
  * @author Bram De Schouwer (bram.deschouwer at dot com)
  * @author Kevin Van de Velde (kevin at atmire dot com)
@@ -45,6 +49,9 @@ public class XmlWorkflowFactoryImpl implements XmlWorkflowFactory {
 
     @Autowired(required = true)
     protected CollectionService collectionService;
+
+    @Autowired(required = true)
+    protected HandleService handleService;
 
     @Override
     public Workflow getWorkflow(Collection collection) throws WorkflowConfigurationException {
@@ -89,30 +96,38 @@ public class XmlWorkflowFactoryImpl implements XmlWorkflowFactory {
     }
 
     @Override
-    public List<String> getCollectionHandlesMappedToWorklow(String workflowName) {
-        List<String> collectionsMapped = new ArrayList<>();
+    public List<Collection> getCollectionHandlesMappedToWorklow(Context context, String workflowName) {
+        List<Collection> collectionsMapped = new ArrayList<>();
         for (String handle : this.workflowMapping.keySet()) {
             if (this.workflowMapping.get(handle).getID().equals(workflowName)) {
-                collectionsMapped.add(handle);
+                try {
+                    Collection collection = (Collection) handleService.resolveToObject(context, handle);
+                    if (collection != null) {
+                        collectionsMapped.add(collection);
+                    }
+                } catch (SQLException e) {
+                    log.error("SQLException in XmlWorkflowFactoryImpl.getCollectionHandlesMappedToWorklow trying to " +
+                            "retrieve collection with handle: " + handle, e);
+                }
             }
         }
         return collectionsMapped;
     }
 
     @Override
-    public List<String> getAllNonMappedCollectionsHandles(Context context) {
-        List<String> nonMappedCollectionHandles = new ArrayList<>();
+    public List<Collection> getAllNonMappedCollectionsHandles(Context context) {
+        List<Collection> nonMappedCollections = new ArrayList<>();
         try {
             for (Collection collection : this.collectionService.findAll(context)) {
                 if (workflowMapping.get(collection.getHandle()) == null) {
-                    nonMappedCollectionHandles.add(collection.getHandle());
+                    nonMappedCollections.add(collection);
                 }
             }
         } catch (SQLException e) {
             log.error("SQLException in XmlWorkflowFactoryImpl.getAllNonMappedCollectionsHandles trying to " +
-                    "retrieve all collections");
+                    "retrieve all collections", e);
         }
-        return nonMappedCollectionHandles;
+        return nonMappedCollections;
     }
 
     @Override
@@ -141,10 +156,7 @@ public class XmlWorkflowFactoryImpl implements XmlWorkflowFactory {
     public WorkflowActionConfig getActionByName(String workflowActionName) {
         WorkflowActionConfig actionConfig
                 = new DSpace().getServiceManager().getServiceByName(workflowActionName, WorkflowActionConfig.class);
-        if (actionConfig != null) {
-            return actionConfig;
-        }
-        return null;
+        return actionConfig;
     }
 
 }

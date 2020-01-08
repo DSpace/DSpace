@@ -14,13 +14,13 @@ import static org.hamcrest.Matchers.is;
 
 import java.util.UUID;
 
-import org.hamcrest.Matcher;
-import org.hamcrest.Matchers;
-
 import org.dspace.app.rest.model.WorkflowDefinitionRest;
 import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
 import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
 import org.dspace.xmlworkflow.state.Workflow;
+
+import org.hamcrest.Matcher;
+import org.hamcrest.Matchers;
 
 /**
  * @author Maria Verdonck (Atmire) on 03/01/2020
