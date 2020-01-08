@@ -19,6 +19,7 @@ import org.dspace.content.Item;
  * @author Stuart Lewis
  */
 public class BulkEditChange {
+
     /**
      * The item these changes relate to
      */

@@ -119,7 +119,7 @@ public class DiscoverQueryBuilder implements InitializingBean {
 
     private void configurePaginationForFacets(Pageable page, DiscoverQuery queryArgs) {
         if (page != null) {
-            queryArgs.setFacetOffset(page.getOffset());
+            queryArgs.setFacetOffset(Math.toIntExact(page.getOffset()));
         }
     }
 
@@ -262,7 +262,7 @@ public class DiscoverQueryBuilder implements InitializingBean {
     private void configurePagination(Pageable page, DiscoverQuery queryArgs) {
         if (page != null) {
             queryArgs.setMaxResults(Math.min(pageSizeLimit, page.getPageSize()));
-            queryArgs.setStart(page.getOffset());
+            queryArgs.setStart(Math.toIntExact(page.getOffset()));
         } else {
             queryArgs.setMaxResults(pageSizeLimit);
             queryArgs.setStart(0);

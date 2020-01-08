@@ -170,7 +170,7 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
                                    MultipartFile file) throws Exception {
 
         Context context = obtainContext();
-        WorkflowItemRest wsi = findOne(id);
+        WorkflowItemRest wsi = findOne(context, id);
         XmlWorkflowItem source = wis.find(context, id);
         List<ErrorRest> errors = new ArrayList<ErrorRest>();
         SubmissionConfig submissionConfig =
@@ -218,7 +218,7 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
     public void patch(Context context, HttpServletRequest request, String apiCategory, String model, Integer id,
                       Patch patch) throws SQLException, AuthorizeException {
         List<Operation> operations = patch.getOperations();
-        WorkflowItemRest wsi = findOne(id);
+        WorkflowItemRest wsi = findOne(context, id);
         XmlWorkflowItem source = wis.find(context, id);
         for (Operation op : operations) {
             //the value in the position 0 is a null value
