@@ -70,7 +70,8 @@ public class ExternalSourceRestRepository extends DSpaceRestRepository<ExternalS
             throw new ResourceNotFoundException("The externalSource for: " + externalSourceName + " couldn't be found");
         }
         List<ExternalDataObject> externalDataObjects = externalDataService
-            .searchExternalDataObjects(externalSourceName, query, pageable.getOffset(), pageable.getPageSize());
+            .searchExternalDataObjects(externalSourceName, query, Math.toIntExact(pageable.getOffset()),
+                    pageable.getPageSize());
         int numberOfResults = externalDataService.getNumberOfResults(externalSourceName, query);
         return converter.toRestPage(externalDataObjects, pageable, numberOfResults,
                                     utils.obtainProjection(true));
