@@ -109,7 +109,8 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                                                       restAuthenticationService),
                              LogoutFilter.class)
 
-            //Add a filter before our shibboleth endpoints to do the authentication based on the data in the HTTP request
+            //Add a filter before our shibboleth endpoints to do the authentication based on the data in the
+            // HTTP request
             .addFilterBefore(new ShibbolethAuthenticationFilter("/api/authn/shibboleth", authenticationManager(),
                                                       restAuthenticationService),
                              LogoutFilter.class)

@@ -12,7 +12,6 @@ import java.util.Arrays;
 
 import javax.servlet.http.HttpServletResponse;
 
-
 import org.dspace.app.rest.model.AuthnRest;
 import org.dspace.core.ConfigurationManager;
 import org.slf4j.Logger;
@@ -20,7 +19,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Link;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
