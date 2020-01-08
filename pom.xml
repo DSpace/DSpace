@@ -12,7 +12,7 @@
     <url>https://github.com/dspace/DSpace</url>
 
     <organization>
-        <name>DuraSpace</name>
+        <name>LYRASIS</name>
         <url>http://www.dspace.org</url>
     </organization>
 
@@ -29,7 +29,7 @@
         <log4j.version>2.11.2</log4j.version>
         <slf4j.version>1.7.25</slf4j.version>
         <!-- NOTE: when updating jackson.version, also sync jackson-databind dependency below -->
-        <jackson.version>2.9.9</jackson.version>
+        <jackson.version>2.10.2</jackson.version>
         <jersey.version>2.28</jersey.version>
         <hibernate.version>5.3.11.Final</hibernate.version>
         <hibernate-validator.version>6.0.17.Final</hibernate-validator.version>
@@ -1007,7 +1007,7 @@
             <dependency>
                 <groupId>org.apache.zookeeper</groupId>
                 <artifactId>zookeeper</artifactId>
-                <version>3.4.11</version>
+                <version>3.4.14</version>
             </dependency>
 
             <!-- solr-cell and axiom-api disagree on versions -->
