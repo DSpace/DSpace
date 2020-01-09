@@ -87,7 +87,7 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
 
     @Override
     public EPerson getAuthenticatedEPerson(HttpServletRequest request, Context context) {
-        String token = getToken(request, true);
+        String token = getToken(request, false);
         try {
             EPerson ePerson = jwtTokenHandler.parseEPersonFromToken(token, request, context);
             return ePerson;
