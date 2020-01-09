@@ -30,7 +30,7 @@ public class StatelessLoginFilter extends AbstractAuthenticationProcessingFilter
 
     private AuthenticationManager authenticationManager;
 
-    private RestAuthenticationService restAuthenticationService;
+    protected RestAuthenticationService restAuthenticationService;
 
     @Override
     public void afterPropertiesSet() {
@@ -63,7 +63,7 @@ public class StatelessLoginFilter extends AbstractAuthenticationProcessingFilter
                                             Authentication auth) throws IOException, ServletException {
 
         DSpaceAuthentication dSpaceAuthentication = (DSpaceAuthentication) auth;
-        restAuthenticationService.addAuthenticationDataForUser(req, res, dSpaceAuthentication);
+        restAuthenticationService.addAuthenticationDataForUser(req, res, dSpaceAuthentication, false);
     }
 
     @Override
