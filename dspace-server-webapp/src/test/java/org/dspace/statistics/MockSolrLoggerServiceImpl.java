@@ -8,6 +8,7 @@
 package org.dspace.statistics;
 
 import java.io.File;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -18,12 +19,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.DSpaceObject;
 import org.dspace.eperson.EPerson;
-import org.dspace.services.ConfigurationService;
 import org.dspace.solr.MockSolrServer;
 import org.dspace.usage.UsageWorkflowEvent;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -43,9 +42,6 @@ public class MockSolrLoggerServiceImpl
     private static final Logger log = LogManager.getLogger();
 
     private MockSolrServer mockSolrServer;
-
-    @Autowired(required = true)
-    private ConfigurationService configurationService;
 
     public MockSolrLoggerServiceImpl() {
     }
@@ -112,11 +108,10 @@ public class MockSolrLoggerServiceImpl
         try {
             new FakeDatabaseReader(); // Activate fake
             new FakeDatabaseReader.Builder(); // Activate fake
-            String locationDbPath = configurationService.getProperty("usage-statistics.dbfile");
-            File locationDb = new File(locationDbPath);
-            locationDb.createNewFile();
+            File locationDb = File.createTempFile("GeoIP", ".mmdb");
+            locationDb.deleteOnExit();
             locationService = new DatabaseReader.Builder(locationDb).build();
-        } catch (Exception e) {
+        } catch (IOException e) {
             log.error("Unable to load FakeDatabaseReader", e);
         }
     }
