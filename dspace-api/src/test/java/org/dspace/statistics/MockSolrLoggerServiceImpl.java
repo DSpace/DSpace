@@ -14,6 +14,11 @@ import org.springframework.beans.factory.InitializingBean;
 
 /**
  * Mock service that uses an embedded SOLR server for the statistics core.
+ * <p>
+ * <strong>NOTE:</strong>  this class is overridden by one <em>of the same name</em>
+ * defined in dspace-server-webapp and declared as a bean there.
+ * See {@code config/spring/api/Z-mock-services.xml}.  Some kind of classpath
+ * magic makes this work.
  */
 public class MockSolrLoggerServiceImpl
         extends SolrLoggerServiceImpl
