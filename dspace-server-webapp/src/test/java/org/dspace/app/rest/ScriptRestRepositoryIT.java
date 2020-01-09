@@ -86,28 +86,28 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         getClient(token).perform(get("/api/system/scripts").param("size", "1"))
                         .andExpect(status().isOk())
-                        .andExpect(jsonPath("$._embedded.scripts", hasItem(
+                        .andExpect(jsonPath("$._embedded.scripts", Matchers.not(Matchers.hasItem(
                             ScriptMatcher.matchScript(dSpaceRunnableList.get(0).getName(),
                                                       dSpaceRunnableList.get(0).getDescription())
-                        )))
-                        .andExpect(jsonPath("$._embedded.scripts", Matchers.not(hasItem(
+                        ))))
+                        .andExpect(jsonPath("$._embedded.scripts", hasItem(
                             ScriptMatcher.matchScript(dSpaceRunnableList.get(1).getName(),
                                                       dSpaceRunnableList.get(1).getDescription())
-                        ))))
+                        )))
                         .andExpect(jsonPath("$.page",
                                             is(PageMatcher.pageEntry(0, 1))));
 
 
         getClient(token).perform(get("/api/system/scripts").param("size", "1").param("page", "1"))
                         .andExpect(status().isOk())
-                        .andExpect(jsonPath("$._embedded.scripts", Matchers.not(hasItem(
+                        .andExpect(jsonPath("$._embedded.scripts", hasItem(
                             ScriptMatcher.matchScript(dSpaceRunnableList.get(0).getName(),
                                                       dSpaceRunnableList.get(0).getDescription())
-                        ))))
-                        .andExpect(jsonPath("$._embedded.scripts", hasItem(
+                        )))
+                        .andExpect(jsonPath("$._embedded.scripts", Matchers.not(hasItem(
                             ScriptMatcher.matchScript(dSpaceRunnableList.get(1).getName(),
                                                       dSpaceRunnableList.get(1).getDescription())
-                        )))
+                        ))))
                         .andExpect(jsonPath("$.page",
                                             is(PageMatcher.pageEntry(1, 1))));
     }

@@ -20,6 +20,7 @@ import org.apache.commons.cli.ParseException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Context;
 import org.dspace.scripts.handler.DSpaceRunnableHandler;
+import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Required;
 
@@ -28,7 +29,7 @@ import org.springframework.beans.factory.annotation.Required;
  * it provides the basic variables to be hold by the script as well as the means to initialize, parse and run the script
  * Every DSpaceRunnable that is implemented in this way should be defined in the scripts.xml config file as a bean
  */
-public abstract class DSpaceRunnable implements Runnable {
+public abstract class DSpaceRunnable implements Runnable, BeanNameAware {
 
     /**
      * The name of the script
@@ -54,15 +55,6 @@ public abstract class DSpaceRunnable implements Runnable {
 
     @Autowired
     private AuthorizeService authorizeService;
-
-    public String getName() {
-        return name;
-    }
-
-    @Required
-    public void setName(String name) {
-        this.name = name;
-    }
 
     public String getDescription() {
         return description;
@@ -173,5 +165,17 @@ public abstract class DSpaceRunnable implements Runnable {
             handler.logError("Error occured when trying to verify permissions for script: " + name);
         }
         return false;
+    }
+
+    public void setBeanName(String beanName) {
+        this.name = beanName;
+    }
+
+    /**
+     * Generic getter for the name
+     * @return the name value of this DSpaceRunnable
+     */
+    public String getName() {
+        return name;
     }
 }

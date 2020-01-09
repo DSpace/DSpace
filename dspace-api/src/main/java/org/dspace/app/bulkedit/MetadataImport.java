@@ -59,6 +59,7 @@ import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.handle.service.HandleService;
 import org.dspace.scripts.DSpaceRunnable;
 import org.dspace.scripts.handler.DSpaceRunnableHandler;
+import org.dspace.workflow.WorkflowException;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowService;
 import org.dspace.workflow.factory.WorkflowServiceFactory;
@@ -374,274 +375,270 @@ public class MetadataImport extends DSpaceRunnable implements InitializingBean {
     public List<BulkEditChange> runImport(boolean change,
                                           boolean useWorkflow,
                                           boolean workflowNotify,
-                                          boolean useTemplate) throws MetadataImportException {
+                                          boolean useTemplate)
+        throws MetadataImportException, SQLException, AuthorizeException, WorkflowException, IOException {
         // Store the changes
         ArrayList<BulkEditChange> changes = new ArrayList<BulkEditChange>();
 
         // Make the changes
-        try {
-            Context.Mode originalMode = c.getCurrentMode();
-            c.setMode(Context.Mode.BATCH_EDIT);
+        Context.Mode originalMode = c.getCurrentMode();
+        c.setMode(Context.Mode.BATCH_EDIT);
 
-            // Process each change
-            rowCount = 1;
-            for (DSpaceCSVLine line : toImport) {
-                // Resolve target references to other items
-                populateRefAndRowMap(line, line.getID());
-                line = resolveEntityRefs(line);
-                // Get the DSpace item to compare with
-                UUID id = line.getID();
+        // Process each change
+        rowCount = 1;
+        for (DSpaceCSVLine line : toImport) {
+            // Resolve target references to other items
+            populateRefAndRowMap(line, line.getID());
+            line = resolveEntityRefs(line);
+            // Get the DSpace item to compare with
+            UUID id = line.getID();
 
-                // Is there an action column?
-                if (csv.hasActions() && (!"".equals(line.getAction())) && (id == null)) {
-                    throw new MetadataImportException("'action' not allowed for new items!");
-                }
-
-                WorkspaceItem wsItem = null;
-                WorkflowItem wfItem = null;
-                Item item = null;
-
-                // Is this an existing item?
-                if (id != null) {
-                    // Get the item
-                    item = itemService.find(c, id);
-                    if (item == null) {
-                        throw new MetadataImportException("Unknown item ID " + id);
-                    }
-
-                    // Record changes
-                    BulkEditChange whatHasChanged = new BulkEditChange(item);
-
-                    // Has it moved collection?
-                    List<String> collections = line.get("collection");
-                    if (collections != null) {
-                        // Sanity check we're not orphaning it
-                        if (collections.size() == 0) {
-                            throw new MetadataImportException("Missing collection from item " + item.getHandle());
-                        }
-                        List<Collection> actualCollections = item.getCollections();
-                        compare(item, collections, actualCollections, whatHasChanged, change);
-                    }
-
-                    // Iterate through each metadata element in the csv line
-                    for (String md : line.keys()) {
-                        // Get the values we already have
-                        if (!"id".equals(md)) {
-                            // Get the values from the CSV
-                            String[] fromCSV = line.get(md).toArray(new String[line.get(md).size()]);
-                            // Remove authority unless the md is not authority controlled
-                            if (!isAuthorityControlledField(md)) {
-                                for (int i = 0; i < fromCSV.length; i++) {
-                                    int pos = fromCSV[i].indexOf(csv.getAuthoritySeparator());
-                                    if (pos > -1) {
-                                        fromCSV[i] = fromCSV[i].substring(0, pos);
-                                    }
-                                }
-                            }
-                            // Compare
-                            compareAndUpdate(item, fromCSV, change, md, whatHasChanged, line);
-                        }
-                    }
-
-                    if (csv.hasActions()) {
-                        // Perform the action
-                        String action = line.getAction();
-                        if ("".equals(action)) {
-                            // Do nothing
-                        } else if ("expunge".equals(action)) {
-                            // Does the configuration allow deletes?
-                            if (!ConfigurationManager.getBooleanProperty("bulkedit", "allowexpunge", false)) {
-                                throw new MetadataImportException("'expunge' action denied by configuration");
-                            }
-
-                            // Remove the item
-
-                            if (change) {
-                                itemService.delete(c, item);
-                            }
-
-                            whatHasChanged.setDeleted();
-                        } else if ("withdraw".equals(action)) {
-                            // Withdraw the item
-                            if (!item.isWithdrawn()) {
-                                if (change) {
-                                    itemService.withdraw(c, item);
-                                }
-                                whatHasChanged.setWithdrawn();
-                            }
-                        } else if ("reinstate".equals(action)) {
-                            // Reinstate the item
-                            if (item.isWithdrawn()) {
-                                if (change) {
-                                    itemService.reinstate(c, item);
-                                }
-                                whatHasChanged.setReinstated();
-                            }
-                        } else {
-                            // Unknown action!
-                            throw new MetadataImportException("Unknown action: " + action);
-                        }
-                    }
-
-                    // Only record if changes have been made
-                    if (whatHasChanged.hasChanges()) {
-                        changes.add(whatHasChanged);
-                    }
-                } else {
-                    // This is marked as a new item, so no need to compare
-
-                    // First check a user is set, otherwise this can't happen
-                    if (c.getCurrentUser() == null) {
-                        throw new MetadataImportException(
-                            "When adding new items, a user must be specified with the -e option");
-                    }
-
-                    // Iterate through each metadata element in the csv line
-                    BulkEditChange whatHasChanged = new BulkEditChange();
-                    for (String md : line.keys()) {
-                        // Get the values we already have
-                        if (!"id".equals(md) && !"rowName".equals(md)) {
-                            // Get the values from the CSV
-                            String[] fromCSV = line.get(md).toArray(new String[line.get(md).size()]);
-
-                            // Remove authority unless the md is not authority controlled
-                            if (!isAuthorityControlledField(md)) {
-                                for (int i = 0; i < fromCSV.length; i++) {
-                                    int pos = fromCSV[i].indexOf(csv.getAuthoritySeparator());
-                                    if (pos > -1) {
-                                        fromCSV[i] = fromCSV[i].substring(0, pos);
-                                    }
-                                }
-                            }
-
-                            // Add all the values from the CSV line
-                            add(fromCSV, md, whatHasChanged);
-                        }
-                    }
-
-                    // Check it has an owning collection
-                    List<String> collections = line.get("collection");
-                    if (collections == null) {
-                        throw new MetadataImportException(
-                            "New items must have a 'collection' assigned in the form of a handle");
-                    }
-
-                    // Check collections are really collections
-                    ArrayList<Collection> check = new ArrayList<Collection>();
-                    Collection collection;
-                    for (String handle : collections) {
-                        try {
-                            // Resolve the handle to the collection
-                            collection = (Collection) handleService.resolveToObject(c, handle);
-
-                            // Check it resolved OK
-                            if (collection == null) {
-                                throw new MetadataImportException(
-                                    "'" + handle + "' is not a Collection! You must specify a valid collection for " +
-                                        "new items");
-                            }
-
-                            // Check for duplicate
-                            if (check.contains(collection)) {
-                                throw new MetadataImportException(
-                                    "Duplicate collection assignment detected in new item! " + handle);
-                            } else {
-                                check.add(collection);
-                            }
-                        } catch (Exception ex) {
-                            throw new MetadataImportException(
-                                "'" + handle + "' is not a Collection! You must specify a valid collection for new " +
-                                    "items",
-                                ex);
-                        }
-                    }
-
-                    // Record the addition to collections
-                    boolean first = true;
-                    for (String handle : collections) {
-                        Collection extra = (Collection) handleService.resolveToObject(c, handle);
-                        if (first) {
-                            whatHasChanged.setOwningCollection(extra);
-                        } else {
-                            whatHasChanged.registerNewMappedCollection(extra);
-                        }
-                        first = false;
-                    }
-
-                    // Create the new item?
-                    if (change) {
-                        // Create the item
-                        String collectionHandle = line.get("collection").get(0);
-                        collection = (Collection) handleService.resolveToObject(c, collectionHandle);
-                        wsItem = workspaceItemService.create(c, collection, useTemplate);
-                        item = wsItem.getItem();
-
-                        // Add the metadata to the item
-                        for (BulkEditMetadataValue dcv : whatHasChanged.getAdds()) {
-                            if (!StringUtils.equals(dcv.getSchema(), MetadataSchemaEnum.RELATION.getName())) {
-                                itemService.addMetadata(c, item, dcv.getSchema(),
-                                                        dcv.getElement(),
-                                                        dcv.getQualifier(),
-                                                        dcv.getLanguage(),
-                                                        dcv.getValue(),
-                                                        dcv.getAuthority(),
-                                                        dcv.getConfidence());
-                            }
-                        }
-                        //Add relations after all metadata has been processed
-                        for (BulkEditMetadataValue dcv : whatHasChanged.getAdds()) {
-                            if (StringUtils.equals(dcv.getSchema(), MetadataSchemaEnum.RELATION.getName())) {
-                                addRelationship(c, item, dcv.getElement(), dcv.getValue());
-                            }
-                        }
-
-
-                        // Should the workflow be used?
-                        if (useWorkflow) {
-                            WorkflowService workflowService = WorkflowServiceFactory.getInstance().getWorkflowService();
-                            if (workflowNotify) {
-                                wfItem = workflowService.start(c, wsItem);
-                            } else {
-                                wfItem = workflowService.startWithoutNotify(c, wsItem);
-                            }
-                        } else {
-                            // Install the item
-                            installItemService.installItem(c, wsItem);
-                        }
-
-                        // Add to extra collections
-                        if (line.get("collection").size() > 0) {
-                            for (int i = 1; i < collections.size(); i++) {
-                                String handle = collections.get(i);
-                                Collection extra = (Collection) handleService.resolveToObject(c, handle);
-                                collectionService.addItem(c, extra, item);
-                            }
-                        }
-
-                        whatHasChanged.setItem(item);
-                    }
-
-                    // Record the changes
-                    changes.add(whatHasChanged);
-                }
-
-                if (change) {
-                    //only clear cache if changes have been made.
-                    c.uncacheEntity(wsItem);
-                    c.uncacheEntity(wfItem);
-                    c.uncacheEntity(item);
-                }
-                populateRefAndRowMap(line, item == null ? null : item.getID());
-                // keep track of current rows processed
-                rowCount++;
+            // Is there an action column?
+            if (csv.hasActions() && (!"".equals(line.getAction())) && (id == null)) {
+                throw new MetadataImportException("'action' not allowed for new items!");
             }
 
-            c.setMode(originalMode);
-        } catch (MetadataImportException mie) {
-            throw mie;
-        } catch (Exception e) {
-            e.printStackTrace();
+            WorkspaceItem wsItem = null;
+            WorkflowItem wfItem = null;
+            Item item = null;
+
+            // Is this an existing item?
+            if (id != null) {
+                // Get the item
+                item = itemService.find(c, id);
+                if (item == null) {
+                    throw new MetadataImportException("Unknown item ID " + id);
+                }
+
+                // Record changes
+                BulkEditChange whatHasChanged = new BulkEditChange(item);
+
+                // Has it moved collection?
+                List<String> collections = line.get("collection");
+                if (collections != null) {
+                    // Sanity check we're not orphaning it
+                    if (collections.size() == 0) {
+                        throw new MetadataImportException("Missing collection from item " + item.getHandle());
+                    }
+                    List<Collection> actualCollections = item.getCollections();
+                    compare(item, collections, actualCollections, whatHasChanged, change);
+                }
+
+                // Iterate through each metadata element in the csv line
+                for (String md : line.keys()) {
+                    // Get the values we already have
+                    if (!"id".equals(md)) {
+                        // Get the values from the CSV
+                        String[] fromCSV = line.get(md).toArray(new String[line.get(md).size()]);
+                        // Remove authority unless the md is not authority controlled
+                        if (!isAuthorityControlledField(md)) {
+                            for (int i = 0; i < fromCSV.length; i++) {
+                                int pos = fromCSV[i].indexOf(csv.getAuthoritySeparator());
+                                if (pos > -1) {
+                                    fromCSV[i] = fromCSV[i].substring(0, pos);
+                                }
+                            }
+                        }
+                        // Compare
+                        compareAndUpdate(item, fromCSV, change, md, whatHasChanged, line);
+                    }
+                }
+
+                if (csv.hasActions()) {
+                    // Perform the action
+                    String action = line.getAction();
+                    if ("".equals(action)) {
+                        // Do nothing
+                    } else if ("expunge".equals(action)) {
+                        // Does the configuration allow deletes?
+                        if (!ConfigurationManager.getBooleanProperty("bulkedit", "allowexpunge", false)) {
+                            throw new MetadataImportException("'expunge' action denied by configuration");
+                        }
+
+                        // Remove the item
+
+                        if (change) {
+                            itemService.delete(c, item);
+                        }
+
+                        whatHasChanged.setDeleted();
+                    } else if ("withdraw".equals(action)) {
+                        // Withdraw the item
+                        if (!item.isWithdrawn()) {
+                            if (change) {
+                                itemService.withdraw(c, item);
+                            }
+                            whatHasChanged.setWithdrawn();
+                        }
+                    } else if ("reinstate".equals(action)) {
+                        // Reinstate the item
+                        if (item.isWithdrawn()) {
+                            if (change) {
+                                itemService.reinstate(c, item);
+                            }
+                            whatHasChanged.setReinstated();
+                        }
+                    } else {
+                        // Unknown action!
+                        throw new MetadataImportException("Unknown action: " + action);
+                    }
+                }
+
+                // Only record if changes have been made
+                if (whatHasChanged.hasChanges()) {
+                    changes.add(whatHasChanged);
+                }
+            } else {
+                // This is marked as a new item, so no need to compare
+
+                // First check a user is set, otherwise this can't happen
+                if (c.getCurrentUser() == null) {
+                    throw new MetadataImportException(
+                        "When adding new items, a user must be specified with the -e option");
+                }
+
+                // Iterate through each metadata element in the csv line
+                BulkEditChange whatHasChanged = new BulkEditChange();
+                for (String md : line.keys()) {
+                    // Get the values we already have
+                    if (!"id".equals(md) && !"rowName".equals(md)) {
+                        // Get the values from the CSV
+                        String[] fromCSV = line.get(md).toArray(new String[line.get(md).size()]);
+
+                        // Remove authority unless the md is not authority controlled
+                        if (!isAuthorityControlledField(md)) {
+                            for (int i = 0; i < fromCSV.length; i++) {
+                                int pos = fromCSV[i].indexOf(csv.getAuthoritySeparator());
+                                if (pos > -1) {
+                                    fromCSV[i] = fromCSV[i].substring(0, pos);
+                                }
+                            }
+                        }
+
+                        // Add all the values from the CSV line
+                        add(fromCSV, md, whatHasChanged);
+                    }
+                }
+
+                // Check it has an owning collection
+                List<String> collections = line.get("collection");
+                if (collections == null) {
+                    throw new MetadataImportException(
+                        "New items must have a 'collection' assigned in the form of a handle");
+                }
+
+                // Check collections are really collections
+                ArrayList<Collection> check = new ArrayList<Collection>();
+                Collection collection;
+                for (String handle : collections) {
+                    try {
+                        // Resolve the handle to the collection
+                        collection = (Collection) handleService.resolveToObject(c, handle);
+
+                        // Check it resolved OK
+                        if (collection == null) {
+                            throw new MetadataImportException(
+                                "'" + handle + "' is not a Collection! You must specify a valid collection for " +
+                                    "new items");
+                        }
+
+                        // Check for duplicate
+                        if (check.contains(collection)) {
+                            throw new MetadataImportException(
+                                "Duplicate collection assignment detected in new item! " + handle);
+                        } else {
+                            check.add(collection);
+                        }
+                    } catch (Exception ex) {
+                        throw new MetadataImportException(
+                            "'" + handle + "' is not a Collection! You must specify a valid collection for new " +
+                                "items",
+                            ex);
+                    }
+                }
+
+                // Record the addition to collections
+                boolean first = true;
+                for (String handle : collections) {
+                    Collection extra = (Collection) handleService.resolveToObject(c, handle);
+                    if (first) {
+                        whatHasChanged.setOwningCollection(extra);
+                    } else {
+                        whatHasChanged.registerNewMappedCollection(extra);
+                    }
+                    first = false;
+                }
+
+                // Create the new item?
+                if (change) {
+                    // Create the item
+                    String collectionHandle = line.get("collection").get(0);
+                    collection = (Collection) handleService.resolveToObject(c, collectionHandle);
+                    wsItem = workspaceItemService.create(c, collection, useTemplate);
+                    item = wsItem.getItem();
+
+                    // Add the metadata to the item
+                    for (BulkEditMetadataValue dcv : whatHasChanged.getAdds()) {
+                        if (!StringUtils.equals(dcv.getSchema(), MetadataSchemaEnum.RELATION.getName())) {
+                            itemService.addMetadata(c, item, dcv.getSchema(),
+                                                    dcv.getElement(),
+                                                    dcv.getQualifier(),
+                                                    dcv.getLanguage(),
+                                                    dcv.getValue(),
+                                                    dcv.getAuthority(),
+                                                    dcv.getConfidence());
+                        }
+                    }
+                    //Add relations after all metadata has been processed
+                    for (BulkEditMetadataValue dcv : whatHasChanged.getAdds()) {
+                        if (StringUtils.equals(dcv.getSchema(), MetadataSchemaEnum.RELATION.getName())) {
+                            addRelationship(c, item, dcv.getElement(), dcv.getValue());
+                        }
+                    }
+
+
+                    // Should the workflow be used?
+                    if (useWorkflow) {
+                        WorkflowService workflowService = WorkflowServiceFactory.getInstance().getWorkflowService();
+                        if (workflowNotify) {
+                            wfItem = workflowService.start(c, wsItem);
+                        } else {
+                            wfItem = workflowService.startWithoutNotify(c, wsItem);
+                        }
+                    } else {
+                        // Install the item
+                        installItemService.installItem(c, wsItem);
+                    }
+
+                    // Add to extra collections
+                    if (line.get("collection").size() > 0) {
+                        for (int i = 1; i < collections.size(); i++) {
+                            String handle = collections.get(i);
+                            Collection extra = (Collection) handleService.resolveToObject(c, handle);
+                            collectionService.addItem(c, extra, item);
+                        }
+                    }
+
+                    whatHasChanged.setItem(item);
+                }
+
+                // Record the changes
+                changes.add(whatHasChanged);
+            }
+
+            if (change) {
+                //only clear cache if changes have been made.
+                c.uncacheEntity(wsItem);
+                c.uncacheEntity(wfItem);
+                c.uncacheEntity(item);
+            }
+            populateRefAndRowMap(line, item == null ? null : item.getID());
+            // keep track of current rows processed
+            rowCount++;
         }
+
+        c.setMode(originalMode);
+
 
         // Return the changes
         if (!change) {
