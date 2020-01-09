@@ -30,7 +30,7 @@ public class WorkflowActionMatcher {
 
     public static Matcher<? super Object> matchWorkflowActionEntry(WorkflowActionConfig workflowAction) {
         return allOf(
-                hasJsonPath("$.name", is(workflowAction.getId())),
+                hasJsonPath("$.id", is(workflowAction.getId())),
                 hasJsonPath("$.options", is(workflowAction.getOptions())),
                 hasJsonPath("$._links.self.href", containsString(WORKFLOW_ACTIONS_ENDPOINT + workflowAction.getId()))
         );
