@@ -119,6 +119,14 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
     }
 
     @Override
+    public void invalidateAuthenticationCookie(HttpServletResponse response) {
+        Cookie cookie = new Cookie(AUTHORIZATION_COOKIE, "");
+        cookie.setHttpOnly(true);
+        cookie.setMaxAge(0);
+        response.addCookie(cookie);
+    }
+
+    @Override
     public AuthenticationService getAuthenticationService() {
         return authenticationService;
     }
