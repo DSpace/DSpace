@@ -11,8 +11,8 @@ import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.model.WorkflowActionRest;
 import org.dspace.core.Context;
 import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
-import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
 import org.dspace.xmlworkflow.state.actions.WorkflowActionConfig;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
@@ -26,7 +26,8 @@ import org.springframework.stereotype.Component;
 @Component(WorkflowActionRest.CATEGORY + "." + WorkflowActionRest.NAME)
 public class WorkflowActionRestRepository extends DSpaceRestRepository<WorkflowActionRest, String> {
 
-    protected XmlWorkflowFactory xmlWorkflowFactory = XmlWorkflowServiceFactory.getInstance().getWorkflowFactory();
+    @Autowired
+    protected XmlWorkflowFactory xmlWorkflowFactory;
 
     @Override
     public WorkflowActionRest findOne(Context context, String workflowActionName) {

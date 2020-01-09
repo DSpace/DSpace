@@ -9,7 +9,6 @@ package org.dspace.app.rest.model;
 
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.dspace.app.rest.RestResourceController;
 
 /**
@@ -23,7 +22,6 @@ public class WorkflowActionRest extends BaseObjectRest<String> {
     public static final String NAME = "workflowaction";
     public static final String NAME_PLURAL = "workflowactions";
 
-    private String name;
     private List<String> options;
 
     @Override
@@ -41,21 +39,6 @@ public class WorkflowActionRest extends BaseObjectRest<String> {
         return NAME;
     }
 
-    @Override
-    @JsonIgnore
-    public String getId() {
-        return name;
-    }
-
-    /**
-     * Generic getter for the name
-     *
-     * @return the name value of thisWorkflowActionRest
-     */
-    public String getName() {
-        return name;
-    }
-
     /**
      * Generic getter for the options
      *
@@ -63,15 +46,6 @@ public class WorkflowActionRest extends BaseObjectRest<String> {
      */
     public List<String> getOptions() {
         return options;
-    }
-
-    /**
-     * Generic setter for the name
-     *
-     * @param name The name to be set on this WorkflowActionRest
-     */
-    public void setName(String name) {
-        this.name = name;
     }
 
     /**

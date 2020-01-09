@@ -27,8 +27,6 @@ import org.dspace.app.rest.repository.WorkflowDefinitionRestRepository;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
-import org.dspace.handle.factory.HandleServiceFactory;
-import org.dspace.handle.service.HandleService;
 import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
 import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
 import org.dspace.xmlworkflow.state.Workflow;
@@ -43,7 +41,6 @@ import org.junit.Test;
 public class WorkflowDefinitionRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     private XmlWorkflowFactory xmlWorkflowFactory = XmlWorkflowServiceFactory.getInstance().getWorkflowFactory();
-    private HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
 
     private static final String WORKFLOW_DEFINITIONS_ENDPOINT
             = "/api/" + WorkflowDefinitionRest.CATEGORY + "/" + WorkflowDefinitionRest.NAME_PLURAL;

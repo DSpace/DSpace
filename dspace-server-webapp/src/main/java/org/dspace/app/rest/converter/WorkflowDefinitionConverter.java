@@ -10,8 +10,8 @@ package org.dspace.app.rest.converter;
 import org.dspace.app.rest.model.WorkflowDefinitionRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
-import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
 import org.dspace.xmlworkflow.state.Workflow;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -22,7 +22,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class WorkflowDefinitionConverter implements DSpaceConverter<Workflow, WorkflowDefinitionRest> {
 
-    protected XmlWorkflowFactory xmlWorkflowFactory = XmlWorkflowServiceFactory.getInstance().getWorkflowFactory();
+    @Autowired
+    protected XmlWorkflowFactory xmlWorkflowFactory;
 
     @Override
     public WorkflowDefinitionRest convert(Workflow modelObject, Projection projection) {
