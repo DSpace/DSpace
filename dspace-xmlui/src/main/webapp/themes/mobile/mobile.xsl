@@ -28,14 +28,13 @@
 	xmlns:mods="http://www.loc.gov/mods/v3"
 	xmlns:dc="http://purl.org/dc/elements/1.1/"
     xmlns="http://www.w3.org/1999/xhtml"
-    xmlns:confman="org.dspace.core.ConfigurationManager"
-	exclude-result-prefixes="i18n dri mets xlink xsl dim xhtml mods dc confman">    
+	exclude-result-prefixes="i18n dri mets xlink xsl dim xhtml mods dc">
     <xsl:import href="../dri2xhtml.xsl"/>
     <xsl:output indent="yes"/>
 
     <!-- mobile variable -->
-    <xsl:variable name="mobile-url" select="confman:getProperty('dspace.mobileUrl')"/>
-    <xsl:variable name="dspace-url" select="confman:getProperty('dspace.url')"/>
+    <xsl:variable name="mobile-url" select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='mobileUrl'][not(@qualifier)]"/>
+    <xsl:variable name="dspace-url" select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='url'][not(@qualifier)]"/>
     <xsl:variable name="page-url" select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='URI']"/>
 
      <!--

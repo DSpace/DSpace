@@ -27,8 +27,7 @@
 	xmlns:mods="http://www.loc.gov/mods/v3"
 	xmlns:dc="http://purl.org/dc/elements/1.1/"
 	xmlns="http://www.w3.org/1999/xhtml"
-    xmlns:confman="org.dspace.core.ConfigurationManager"
-	exclude-result-prefixes="i18n dri mets xlink xsl dim xhtml mods dc confman">
+	exclude-result-prefixes="i18n dri mets xlink xsl dim xhtml mods dc">
 
     <xsl:output indent="yes"/>
 
@@ -44,63 +43,54 @@
 
     <!-- render linked resources using the http:// or https:// scheme depending on dspace.baseUrl -->
     <xsl:variable name="scheme" select="$pagemeta/dri:metadata[@element='scheme'][not(@qualifier)]"/>
-       <!-- <xsl:choose>
-            <xsl:when test="starts-with(confman:getProperty('dspace.baseUrl'), 'https://')">
-                <xsl:text>https://</xsl:text>
-            </xsl:when>
-            <xsl:otherwise>
-                <xsl:text>http://</xsl:text>
-            </xsl:otherwise>
-        </xsl:choose>
-    </xsl:variable>-->
 
     <!-- item metadata reference -->
     <xsl:variable name='identifier_doi'
-                  select='//dri:meta/dri:pageMeta/dri:metadata[@element="identifier" and @qualifier="doi"]'/>
+                  select='$pagemeta/dri:metadata[@element="identifier" and @qualifier="doi"]'/>
     <xsl:variable name='identifier_handle'
-                  select='//dri:meta/dri:pageMeta/dri:metadata[@element="identifier" and @qualifier="handle"]'/>
+                  select='$pagemeta/dri:metadata[@element="identifier" and @qualifier="handle"]'/>
 
     <!-- altmetric -->
 
     <xsl:variable name='altmetric.enabled'
-                  select='//dri:meta/dri:pageMeta/dri:metadata[@element="altmetric" and @qualifier="enabled"]'/>
+                  select='$pagemeta/dri:metadata[@element="altmetric" and @qualifier="enabled"]'/>
 
     <!--<xsl:if test="not(contains($altmetric.enabled), 'false')">-->
         <xsl:variable name='altmetric.badgeType'
-                      select='//dri:meta/dri:pageMeta/dri:metadata[@element="altmetric" and @qualifier="badgeType"]'/>
+                      select='$pagemeta/dri:metadata[@element="altmetric" and @qualifier="badgeType"]'/>
         <xsl:variable name='altmetric.popover'
-                      select='//dri:meta/dri:pageMeta/dri:metadata[@element="altmetric" and @qualifier="popover"]'/>
+                      select='$pagemeta/dri:metadata[@element="altmetric" and @qualifier="popover"]'/>
         <xsl:variable name='altmetric.details'
-                      select='//dri:meta/dri:pageMeta/dri:metadata[@element="altmetric" and @qualifier="details"]'/>
+                      select='$pagemeta/dri:metadata[@element="altmetric" and @qualifier="details"]'/>
         <xsl:variable name='altmetric.noScore'
-                      select='//dri:meta/dri:pageMeta/dri:metadata[@element="altmetric" and @qualifier="noScore"]'/>
+                      select='$pagemeta/dri:metadata[@element="altmetric" and @qualifier="noScore"]'/>
         <xsl:variable name='altmetric.hideNoMentions'
-                      select='//dri:meta/dri:pageMeta/dri:metadata[@element="altmetric" and @qualifier="hideNoMentions"]'/>
+                      select='$pagemeta/dri:metadata[@element="altmetric" and @qualifier="hideNoMentions"]'/>
         <xsl:variable name='altmetric.linkTarget'
-                      select='//dri:meta/dri:pageMeta/dri:metadata[@element="altmetric" and @qualifier="linkTarget"]'/>
+                      select='$pagemeta/dri:metadata[@element="altmetric" and @qualifier="linkTarget"]'/>
 
     <!--</xsl:if>-->
 
     <!-- plumx -->
 
     <xsl:variable name='plumx.enabled'
-                  select='//dri:meta/dri:pageMeta/dri:metadata[@element="plumx" and @qualifier="enabled"]'/>
+                  select='$pagemeta/dri:metadata[@element="plumx" and @qualifier="enabled"]'/>
 
     <!--<xsl:if test="not(contains($plumx.enabled), 'false')">-->
         <xsl:variable name='plumx.widget-type'
-                      select='//dri:meta/dri:pageMeta/dri:metadata[@element="plumx" and @qualifier="widget-type"]'/>
+                      select='$pagemeta/dri:metadata[@element="plumx" and @qualifier="widget-type"]'/>
         <xsl:variable name='plumx.data-popup'
-                      select='//dri:meta/dri:pageMeta/dri:metadata[@element="plumx" and @qualifier="data-popup"]'/>
+                      select='$pagemeta/dri:metadata[@element="plumx" and @qualifier="data-popup"]'/>
         <xsl:variable name='plumx.data-hide-when-empty'
-                      select='//dri:meta/dri:pageMeta/dri:metadata[@element="plumx" and @qualifier="data-hide-when-empty"]'/>
+                      select='$pagemeta/dri:metadata[@element="plumx" and @qualifier="data-hide-when-empty"]'/>
         <xsl:variable name='plumx.data-hide-print'
-                      select='//dri:meta/dri:pageMeta/dri:metadata[@element="plumx" and @qualifier="data-hide-print"]'/>
+                      select='$pagemeta/dri:metadata[@element="plumx" and @qualifier="data-hide-print"]'/>
         <xsl:variable name='plumx.data-orientation'
-                      select='//dri:meta/dri:pageMeta/dri:metadata[@element="plumx" and @qualifier="data-orientation"]'/>
+                      select='$pagemeta/dri:metadata[@element="plumx" and @qualifier="data-orientation"]'/>
         <xsl:variable name='plumx.data-width'
-                      select='//dri:meta/dri:pageMeta/dri:metadata[@element="plumx" and @qualifier="data-width"]'/>
+                      select='$pagemeta/dri:metadata[@element="plumx" and @qualifier="data-width"]'/>
         <xsl:variable name='plumx.data-border'
-                      select='//dri:meta/dri:pageMeta/dri:metadata[@element="plumx" and @qualifier="data-border"]'/>
+                      select='$pagemeta/dri:metadata[@element="plumx" and @qualifier="data-border"]'/>
 
     <!--</xsl:if>-->
 

@@ -243,8 +243,22 @@
 
             <!-- Head metadata in item pages -->
             <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='xhtml_head_item']">
-                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='xhtml_head_item']"
-                              disable-output-escaping="yes"/>
+                <!-- The head metadata is passed as one long string. This regular expression untangles the
+                string and puts them back together as an element with attributes and values.  -->
+                <xsl:analyze-string select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='xhtml_head_item']"
+                                    regex="&lt;([a-z]*)(.*?)/&gt;">
+                    <xsl:matching-substring>
+                        <xsl:element name="{regex-group(1)}">
+                            <xsl:analyze-string select="regex-group(2)" regex='\s([a-z]*)="(.*?)"'>
+                                <xsl:matching-substring>
+                                    <xsl:attribute name="{regex-group(1)}">
+                                        <xsl:value-of select="regex-group(2)"/>
+                                    </xsl:attribute>
+                                </xsl:matching-substring>
+                            </xsl:analyze-string>
+                        </xsl:element>
+                    </xsl:matching-substring>
+                </xsl:analyze-string>
             </xsl:if>
 
             <!-- Add all Google Scholar Metadata values -->

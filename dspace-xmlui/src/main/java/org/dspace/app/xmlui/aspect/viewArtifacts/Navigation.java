@@ -112,10 +112,18 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
         pageMeta.addMetadata("request","serverName").addContent(request.getServerName());
         pageMeta.addMetadata("request","URI").addContent(request.getSitemapURI());
 
-        // Metadata for Mirage2 added to accommodate Saxon-HE XSLT processor that doesn't play easily with Java classes
+        ConfigurationService cs = DSpaceServicesFactory.getInstance().getConfigurationService();
+
+        // Metadata for Mobile theme added to accommodate Saxon-HE XSLT processor that doesn't play easily with Java classes
         // Start
 
-        ConfigurationService cs = DSpaceServicesFactory.getInstance().getConfigurationService();
+        pageMeta.addMetadata("mobileUrl").addContent(cs.getProperty("dspace.mobileUrl"));
+        pageMeta.addMetadata("url").addContent(cs.getProperty("dspace.url"));
+
+        // End
+
+        // Metadata for Mirage2 added to accommodate Saxon-HE XSLT processor that doesn't play easily with Java classes
+        // Start
 
         pageMeta.addMetadata("thumbnail", "maxheight").addContent(cs.getIntProperty("thumbnail.maxheight", 80));
         pageMeta.addMetadata("thumbnail", "maxwidth").addContent(cs.getIntProperty("thumbnail.maxwidth", 80));

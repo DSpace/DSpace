@@ -30,8 +30,7 @@
                 xmlns:xhtml="http://www.w3.org/1999/xhtml"
                 xmlns:mods="http://www.loc.gov/mods/v3"
                 xmlns:dc="http://purl.org/dc/elements/1.1/"
-                xmlns:confman="org.dspace.core.ConfigurationManager"
-                exclude-result-prefixes="i18n dri mets xlink xsl dim xhtml mods dc confman">
+                exclude-result-prefixes="i18n dri mets xlink xsl dim xhtml mods dc">
 
     <xsl:output method="xml" encoding="UTF-8" indent="yes"/>
 
@@ -63,15 +62,10 @@
         <xsl:choose>
             <xsl:when test="not($isModal)">
 
-            <!--<xsl:text disable-output-escaping='yes'>&lt;!DOCTYPE html&gt;
-            </xsl:text>-->
-                <!--<html>-->
-
                 <xsl:comment>[if lt IE 7]&gt; &lt;html class=&quot;no-js lt-ie9 lt-ie8 lt-ie7&quot; lang=&quot;en&quot;&gt; &lt;![endif]</xsl:comment>
                 <xsl:comment>[if IE 7]&gt;    &lt;html class=&quot;no-js lt-ie9 lt-ie8&quot; lang=&quot;en&quot;&gt; &lt;![endif]</xsl:comment>
                 <xsl:comment>[if IE 8]&gt;    &lt;html class=&quot;no-js lt-ie9&quot; lang=&quot;en&quot;&gt; &lt;![endif]</xsl:comment>
                 <xsl:comment>[if gt IE 8]&gt;&lt;!</xsl:comment> <html class="no-js" lang="en"> <xsl:comment>&lt;![endif]</xsl:comment>
-
 
                 <!-- First of all, build the HTML head element -->
 
@@ -132,7 +126,6 @@
                     <xsl:call-template name="addJavascript"/>
                 </body>
                 </html>
-                <!--<xsl:text disable-output-escaping="yes">&lt;/html&gt;</xsl:text>-->
 
             </xsl:when>
             <xsl:otherwise>
@@ -296,8 +289,8 @@
 
             <!-- Head metadata in item pages -->
             <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='xhtml_head_item']">
-                <!--<xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='xhtml_head_item']"
-                              disable-output-escaping="yes"/>-->
+                <!-- The head metadata is passed as one long string. This regular expression untangles the
+                     string and puts them back together as an element with attributes and values.  -->
                 <xsl:analyze-string select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='xhtml_head_item']"
                                     regex="&lt;([a-z]*)(.*?)/&gt;">
                     <xsl:matching-substring>

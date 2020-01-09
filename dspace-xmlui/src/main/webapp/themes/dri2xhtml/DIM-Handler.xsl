@@ -415,6 +415,8 @@
     <xsl:template match="dim:dim" mode="itemSummaryView-DIM">
         <table class="ds-includeSet-table">
          <xsl:call-template name="itemSummaryView-DIM-fields">
+             <!--<xsl:with-param name="clause" select=""/>
+             <xsl:with-param name="phase" select=""/>-->
          </xsl:call-template>
         </table>
         <!--  Generate COinS  -->
@@ -429,7 +431,7 @@
     <!-- render each field on a row, alternating phase between odd and even -->
     <!-- recursion needed since not every row appears for each Item. -->
     <xsl:template name="itemSummaryView-DIM-fields">
-      <xsl:param name="clause" select="'1'"/>
+      <xsl:param name="clause" select="1"/>
       <xsl:param name="phase" select="'even'"/>
       <xsl:variable name="otherPhase">
             <xsl:choose>

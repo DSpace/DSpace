@@ -31,14 +31,12 @@
     xmlns:oreatom="http://www.openarchives.org/ore/atom/"
     xmlns="http://www.w3.org/1999/xhtml"
     xmlns:xalan="http://xml.apache.org/xalan"
-    xmlns:encoder="xalan://java.net.URLEncoder"
     xmlns:util="http://www.dspace.org/xmlns/dspace"
-    xmlns:confman="org.dspace.core.ConfigurationManager"
-    exclude-result-prefixes="xalan encoder i18n dri mets dim xlink xsl util confman">
+    exclude-result-prefixes="xalan i18n dri mets dim xlink xsl util">
 
     <xsl:output indent="yes"/>
 
-    <!--these templates are modfied to support the 2 different item list views that
+    <!--these templates are modified to support the 2 different item list views that
     can be configured with the property 'xmlui.theme.mirage.item-list.emphasis' in dspace.cfg-->
 
     <xsl:template name="itemSummaryList-DIM">
