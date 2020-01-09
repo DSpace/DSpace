@@ -70,6 +70,8 @@
                 additivity='false'>
             <AppenderRef ref='A2'/>
         </logger>
+        
+        <logger name='org.dspace.statistics.export.ExportUsageEventListener' level='DEBUG' />
 
         # Block services logging except on exceptions
         <logger name='org.dspace.kernel'

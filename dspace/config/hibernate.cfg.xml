@@ -82,5 +82,7 @@
         <mapping class="org.dspace.xmlworkflow.storedcomponents.WorkflowItemRole"/>
         <mapping class="org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem"/>
 
+        <mapping class="org.dspace.statistics.export.OpenURLTracker"/>
+
     </session-factory>
 </hibernate-configuration>
