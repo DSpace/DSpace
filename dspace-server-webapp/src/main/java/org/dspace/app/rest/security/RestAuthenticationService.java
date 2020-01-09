@@ -26,7 +26,7 @@ import org.springframework.stereotype.Service;
 public interface RestAuthenticationService {
 
     void addAuthenticationDataForUser(HttpServletRequest request, HttpServletResponse response,
-                                      DSpaceAuthentication authentication) throws IOException;
+                                      DSpaceAuthentication authentication, Boolean addCookie) throws IOException;
 
     EPerson getAuthenticatedEPerson(HttpServletRequest request, Context context);
 

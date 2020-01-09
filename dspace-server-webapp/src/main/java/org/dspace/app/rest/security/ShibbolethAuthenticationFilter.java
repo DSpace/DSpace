@@ -34,7 +34,8 @@ public class ShibbolethAuthenticationFilter extends StatelessLoginFilter {
                                             FilterChain chain,
                                             Authentication auth) throws IOException, ServletException {
 
-        super.successfulAuthentication(req, res, chain, auth);
+        DSpaceAuthentication dSpaceAuthentication = (DSpaceAuthentication) auth;
+        restAuthenticationService.addAuthenticationDataForUser(req, res, dSpaceAuthentication, true);
         chain.doFilter(req, res);
     }
 

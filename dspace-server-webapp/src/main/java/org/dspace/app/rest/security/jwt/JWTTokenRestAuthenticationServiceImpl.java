@@ -65,7 +65,7 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
 
     @Override
     public void addAuthenticationDataForUser(HttpServletRequest request, HttpServletResponse response,
-                                             DSpaceAuthentication authentication) throws IOException {
+            DSpaceAuthentication authentication, Boolean addCookie) throws IOException {
         try {
             Context context = ContextUtil.obtainContext(request);
             context.setCurrentUser(ePersonService.findByEmail(context, authentication.getName()));
@@ -75,7 +75,7 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
             String token = jwtTokenHandler.createTokenForEPerson(context, request,
                                                                  authentication.getPreviousLoginDate(), groups);
 
-            addTokenToResponse(response, token);
+            addTokenToResponse(response, token, addCookie);
             context.commit();
 
         } catch (JOSEException e) {
@@ -149,10 +149,13 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
         return wwwAuthenticate.toString();
     }
 
-    private void addTokenToResponse(final HttpServletResponse response, final String token) throws IOException {
-        Cookie cookie = new Cookie(AUTHORIZATION_COOKIE, token);
-        cookie.setHttpOnly(true);
-        response.addCookie(cookie);
+    private void addTokenToResponse(final HttpServletResponse response, final String token, final Boolean addCookie)
+            throws IOException {
+        if (addCookie) {
+            Cookie cookie = new Cookie(AUTHORIZATION_COOKIE, token);
+            cookie.setHttpOnly(true);
+            response.addCookie(cookie);
+        }
         response.setHeader(AUTHORIZATION_HEADER, String.format("%s %s", AUTHORIZATION_TYPE, token));
     }
 
