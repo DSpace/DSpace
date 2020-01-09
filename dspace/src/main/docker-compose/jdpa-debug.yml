@@ -20,6 +20,7 @@ services:
     - /bin/bash
     - '-c'
     - |
+      while (!</dev/tcp/dspacedb/5432) > /dev/null 2>&1; do sleep 1; done;
       /dspace/bin/dspace database migrate
       catalina.sh jpda run
       
