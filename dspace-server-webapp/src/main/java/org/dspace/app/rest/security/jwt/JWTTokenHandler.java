@@ -168,7 +168,7 @@ public class JWTTokenHandler implements InitializingBean {
             if (ePerson != null) {
                 ePerson.setSessionSalt("");
             }
-            context.commit();
+
         }
     }
 
