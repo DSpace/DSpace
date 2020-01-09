@@ -113,6 +113,7 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
         String token = getToken(request);
         Cookie cookie = new Cookie(AUTHORIZATION_COOKIE, "");
         cookie.setHttpOnly(true);
+        cookie.setMaxAge(0);
         response.addCookie(cookie);
         jwtTokenHandler.invalidateToken(token, request, context);
     }
