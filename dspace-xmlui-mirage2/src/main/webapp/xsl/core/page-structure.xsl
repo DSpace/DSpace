@@ -65,12 +65,13 @@
 
             <!--<xsl:text disable-output-escaping='yes'>&lt;!DOCTYPE html&gt;
             </xsl:text>-->
-                <html>
-                <xsl:comment>[if lt IE 7]&gt; &lt;html class=&quot;no-js lt-ie9 lt-ie8 lt-ie7&quot; lang=&quot;en&quot;&gt; &lt;![endif]--&gt;
-                    &lt;!--[if IE 7]&gt;    &lt;html class=&quot;no-js lt-ie9 lt-ie8&quot; lang=&quot;en&quot;&gt; &lt;![endif]--&gt;
-                    &lt;!--[if IE 8]&gt;    &lt;html class=&quot;no-js lt-ie9&quot; lang=&quot;en&quot;&gt; &lt;![endif]--&gt;
-                    &lt;!--[if gt IE 8]&gt;&lt;!--&gt; &lt;html class=&quot;no-js&quot; lang=&quot;en&quot;&gt; &lt;!--&lt;![endif]
-                </xsl:comment>
+                <!--<html>-->
+
+                <xsl:comment>[if lt IE 7]&gt; &lt;html class=&quot;no-js lt-ie9 lt-ie8 lt-ie7&quot; lang=&quot;en&quot;&gt; &lt;![endif]</xsl:comment>
+                <xsl:comment>[if IE 7]&gt;    &lt;html class=&quot;no-js lt-ie9 lt-ie8&quot; lang=&quot;en&quot;&gt; &lt;![endif]</xsl:comment>
+                <xsl:comment>[if IE 8]&gt;    &lt;html class=&quot;no-js lt-ie9&quot; lang=&quot;en&quot;&gt; &lt;![endif]</xsl:comment>
+                <xsl:comment>[if gt IE 8]&gt;&lt;!</xsl:comment> <html class="no-js" lang="en"> <xsl:comment>&lt;![endif]</xsl:comment>
+
 
                 <!-- First of all, build the HTML head element -->
 
@@ -317,8 +318,6 @@
             <xsl:for-each select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[substring(@element, 1, 9) = 'citation_']">
                 <meta name="{@element}" content="{.}"></meta>
             </xsl:for-each>
-
-            <!-- https://stackoverflow.com/questions/33392114/saxon-he-integrated-extension-functions-how-and-where -->
 
             <!-- Add MathJAX JS library to render scientific formulas-->
             <xsl:if test="$pagemeta/dri:metadata[@element='browse'][@qualifier='render-scientific-formulas'] = 'true'">

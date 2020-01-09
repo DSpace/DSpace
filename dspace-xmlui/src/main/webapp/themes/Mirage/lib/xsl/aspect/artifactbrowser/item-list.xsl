@@ -54,9 +54,9 @@
             </xsl:choose>
         </xsl:variable>
 
-        <xsl:variable name="emphasis" select="confman:getProperty('xmlui.theme.mirage.item-list.emphasis')"/>
+        <!--<xsl:variable name="emphasis" select="confman:getProperty('xmlui.theme.mirage.item-list.emphasis')"/>-->
         <xsl:choose>
-            <xsl:when test="'file' = $emphasis">
+            <xsl:when test="'file' = $pagemeta/dri:metadata[@element='item-list'][@qualifier='emphasis']">
 
 
                 <div class="item-wrapper clearfix">

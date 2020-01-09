@@ -112,7 +112,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
         pageMeta.addMetadata("request","serverName").addContent(request.getServerName());
         pageMeta.addMetadata("request","URI").addContent(request.getSitemapURI());
 
-        // Metadata added to accommodate Saxon-HE XSLT processor that doesn't play easily with Java classes
+        // Metadata for Mirage2 added to accommodate Saxon-HE XSLT processor that doesn't play easily with Java classes
         // Start
 
         ConfigurationService cs = DSpaceServicesFactory.getInstance().getConfigurationService();
@@ -128,6 +128,40 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
         pageMeta.addMetadata("browse", "render-scientific-formulas").addContent(cs.getProperty("webui.browse.render-scientific-formulas", "false"));
 
         pageMeta.addMetadata("METSRIGHTS-enabled").addContent((cs.getProperty("plugin.named.org.dspace.content.crosswalk.DisseminationCrosswalk").contains("METSRIGHTS")) ? "true": "false");
+
+        // End
+
+        // Metadata for Mirage
+
+        pageMeta.addMetadata("scheme").addContent(cs.getProperty("dspace.baseUrl").contains("https://") ? "https://": "http://");
+
+        String altmetricEnabled = cs.getProperty("altmetric.enabled", "false");
+        pageMeta.addMetadata("altmetric", "enabled").addContent(altmetricEnabled);
+
+        if(!altmetricEnabled.equals("false"))   {
+            pageMeta.addMetadata("altmetric", "badgeType").addContent(cs.getProperty("altmetric.badgeType"));
+            pageMeta.addMetadata("altmetric", "popover").addContent(cs.getProperty("altmetric.popover"));
+            pageMeta.addMetadata("altmetric", "details").addContent(cs.getProperty("altmetric.details"));
+            pageMeta.addMetadata("altmetric", "noScore").addContent(cs.getProperty("altmetric.noScore"));
+            pageMeta.addMetadata("altmetric", "hideNoMentions").addContent(cs.getProperty("altmetric.hideNoMentions"));
+            pageMeta.addMetadata("altmetric", "linkTarget").addContent(cs.getProperty("altmetric.linkTarget"));
+
+        }
+
+        String plumxEnabled = cs.getProperty("plumx.enabled", "false");
+        pageMeta.addMetadata("plumx", "enabled").addContent(plumxEnabled);
+
+        if(!plumxEnabled.equals("false"))   {
+            pageMeta.addMetadata("plumx", "widget-type").addContent(cs.getProperty("plumx.widget-type"));
+            pageMeta.addMetadata("plumx", "data-popup").addContent(cs.getProperty("plumx.data-popup"));
+            pageMeta.addMetadata("plumx", "data-hide-when-empty").addContent(cs.getProperty("plumx.data-hide-when-empty"));
+            pageMeta.addMetadata("plumx", "data-hide-print").addContent(cs.getProperty("plumx.data-hide-print"));
+            pageMeta.addMetadata("plumx", "data-orientation").addContent(cs.getProperty("plumx.data-orientation"));
+            pageMeta.addMetadata("plumx", "data-width").addContent(cs.getProperty("plumx.data-width"));
+            pageMeta.addMetadata("plumx", "data-border").addContent(cs.getProperty("plumx.data-border"));
+
+        }
+
 
         // End
 
