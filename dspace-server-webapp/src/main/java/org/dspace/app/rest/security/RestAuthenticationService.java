@@ -45,4 +45,6 @@ public interface RestAuthenticationService {
      */
     String getWwwAuthenticateHeaderValue(HttpServletRequest request, HttpServletResponse response);
 
+    void invalidateAuthenticationCookie(HttpServletResponse res);
+
 }
