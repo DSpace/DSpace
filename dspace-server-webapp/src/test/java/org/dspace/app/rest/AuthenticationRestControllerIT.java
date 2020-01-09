@@ -360,8 +360,8 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                 .andExpect(status().isUnauthorized())
                 .andExpect(header().string("WWW-Authenticate",
                         "shibboleth realm=\"DSpace REST API\", " +
-                                "location=\"/Shibboleth.sso/Login?" + 
-                                "target=http%3A%2F%2Flocalhost%2Fapi%2Fauthn%2Fshibboleth%3F" + 
+                                "location=\"/Shibboleth.sso/Login?" +
+                                "target=http%3A%2F%2Flocalhost%2Fapi%2Fauthn%2Fshibboleth%3F" +
                                 "redirectUrl%3Dhttp%3A%2F%2Fmy.uni.edu\""));
 
         //Simulate that a shibboleth authentication has happened
@@ -396,8 +396,8 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                 .andExpect(status().isUnauthorized())
                 .andExpect(header().string("WWW-Authenticate",
                         "ip realm=\"DSpace REST API\", shibboleth realm=\"DSpace REST API\", " +
-                                "location=\"/Shibboleth.sso/Login?" + 
-                                "target=http%3A%2F%2Flocalhost%2Fapi%2Fauthn%2Fshibboleth%3F" + 
+                                "location=\"/Shibboleth.sso/Login?" +
+                                "target=http%3A%2F%2Flocalhost%2Fapi%2Fauthn%2Fshibboleth%3F" +
                                 "redirectUrl%3Dhttp%3A%2F%2Fmy.uni.edu\""));
 
         //Simulate that a shibboleth authentication has happened
