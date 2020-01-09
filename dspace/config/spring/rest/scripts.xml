@@ -8,8 +8,7 @@
 
     <!-- This primary attribute is present so that we can assure that in the REST layer we'll always use this
         bean if it is present-->
-    <bean id="MetadataImport" class="org.dspace.app.bulkedit.MetadataImport" scope="prototype" primary="true">
-        <property name="name" value="metadata-import" />
+    <bean id="metadata-import" class="org.dspace.app.bulkedit.MetadataImport" scope="prototype" primary="true">
         <property name="description" value="Import metadata after batch editing" />
     </bean>
 </beans>
