@@ -8,13 +8,17 @@
 package org.dspace.app.rest.security;
 
 import java.io.IOException;
+import java.util.ArrayList;
+
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 
 /**
  * This class will filter shibboleth requests to try and authenticate them
@@ -26,6 +30,19 @@ public class ShibbolethAuthenticationFilter extends StatelessLoginFilter {
     public ShibbolethAuthenticationFilter(String url, AuthenticationManager authenticationManager,
             RestAuthenticationService restAuthenticationService) {
         super(url, authenticationManager, restAuthenticationService);
+    }
+
+    @Override
+    public Authentication attemptAuthentication(HttpServletRequest req,
+                                                HttpServletResponse res) throws AuthenticationException {
+
+        if (restAuthenticationService.hasAuthenticationData(req)) {
+            return authenticationManager.authenticate(
+                    new DSpaceAuthentication(null, null, new ArrayList<>())
+            );
+        } else {
+            throw new BadCredentialsException("Login failed");
+        }
     }
 
     @Override
