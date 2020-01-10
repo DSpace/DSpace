@@ -673,7 +673,11 @@
             <artifactId>hibernate-jpa-2.1-api</artifactId>
             <version>1.0.0.Final</version>
         </dependency>
-
+        <dependency>
+            <groupId>com.openaire</groupId>
+            <artifactId>openaireapifordspace</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
 </project>
