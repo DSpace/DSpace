@@ -14,6 +14,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -50,9 +51,13 @@ public class StatelessLoginFilter extends AbstractAuthenticationProcessingFilter
         String user = req.getParameter("user");
         String password = req.getParameter("password");
 
-        return authenticationManager.authenticate(
-                new DSpaceAuthentication(user, password, new ArrayList<>())
-        );
+        if (StringUtils.isNotBlank(user) && StringUtils.isNotBlank(password)) {
+            return authenticationManager.authenticate(
+                    new DSpaceAuthentication(user, password, new ArrayList<>())
+            );
+        } else {
+            return null;
+        }
     }
 
 
