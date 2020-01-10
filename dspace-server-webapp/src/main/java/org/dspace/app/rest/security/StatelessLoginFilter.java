@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
@@ -56,7 +57,7 @@ public class StatelessLoginFilter extends AbstractAuthenticationProcessingFilter
                     new DSpaceAuthentication(user, password, new ArrayList<>())
             );
         } else {
-            return null;
+            throw new BadCredentialsException("Login failed");
         }
     }
 
