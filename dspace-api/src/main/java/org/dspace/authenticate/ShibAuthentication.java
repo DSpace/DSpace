@@ -227,10 +227,6 @@ public class ShibAuthentication implements AuthenticationMethod {
                 return AuthenticationMethod.NO_SUCH_USER;
             }
 
-            if (eperson != null && StringUtils.isNotBlank(eperson.getSessionSalt())) {
-                return AuthenticationMethod.NO_SUCH_USER;
-            }
-
             // Step 3: Update User's Metadata
             updateEPerson(context, request, eperson);
 
