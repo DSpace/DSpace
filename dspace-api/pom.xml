@@ -51,20 +51,30 @@
                     <debug>true</debug>
                     <showDeprecation>true</showDeprecation>
                     <annotationProcessorPaths>
+                        <!-- Enable Hibernate's Metamodel Generator to generate metadata model classes
+                             (ending in _ suffix) for more type-safe Criteria queries -->
                         <path>
                             <groupId>org.hibernate</groupId>
                             <artifactId>hibernate-jpamodelgen</artifactId>
                             <version>${hibernate.version}</version>
                         </path>
+                        <!-- Enable JAXB -->
                         <path>
                             <groupId>javax.xml.bind</groupId>
                             <artifactId>jaxb-api</artifactId>
                             <version>${jaxb-api.version}</version>
                         </path>
+                        <!-- Enable Commons Annotations -->
                         <path>
                             <groupId>javax.annotation</groupId>
                             <artifactId>javax.annotation-api</artifactId>
                             <version>${javax-annotation.version}</version>
+                        </path>
+                        <!-- Enable http://errorprone.info -->
+                        <path>
+                            <groupId>com.google.errorprone</groupId>
+                            <artifactId>error_prone_core</artifactId>
+                            <version>${errorprone.version}</version>
                         </path>
                     </annotationProcessorPaths>
                 </configuration>
