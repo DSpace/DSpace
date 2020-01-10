@@ -190,7 +190,4 @@ public abstract class IndexFactoryImpl<T extends IndexableObject, S> implements 
     public void deleteAll() throws IOException, SolrServerException {
         solrSearchCore.getSolr().deleteByQuery(SearchUtils.RESOURCE_TYPE_FIELD + ":" + getType());
     }
-
-    @Override
-    public abstract List getIndexableObjects(Context context, S object) throws SQLException;
 }

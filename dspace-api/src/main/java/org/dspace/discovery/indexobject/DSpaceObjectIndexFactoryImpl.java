@@ -21,7 +21,7 @@ import org.dspace.discovery.indexobject.factory.DSpaceObjectIndexFactory;
  * Factory implementation for indexing/retrieving DSpaceObjects in the search core
  * @author Kevin Van de Velde (kevin at atmire dot com)
  */
-public abstract class DSpaceObjectIndexFactoryImpl<T extends IndexableDSpaceObject, S>
+public abstract class DSpaceObjectIndexFactoryImpl<T extends IndexableDSpaceObject, S extends DSpaceObject>
         extends IndexFactoryImpl<T, S> implements DSpaceObjectIndexFactory<T, S> {
 
     @Override

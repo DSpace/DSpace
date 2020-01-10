@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 import org.apache.solr.common.SolrInputDocument;
+import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 import org.dspace.discovery.indexobject.IndexableDSpaceObject;
 
@@ -19,7 +20,8 @@ import org.dspace.discovery.indexobject.IndexableDSpaceObject;
  *
  * @author Kevin Van de Velde (kevin at atmire dot com)
  */
-public interface DSpaceObjectIndexFactory<T extends IndexableDSpaceObject, S> extends IndexFactory<T, S> {
+public interface DSpaceObjectIndexFactory<T extends IndexableDSpaceObject, S extends DSpaceObject>
+        extends IndexFactory<T, S> {
 
 
     /**

@@ -26,8 +26,9 @@ import org.springframework.beans.factory.annotation.Autowired;
  * Factory implementation for indexing/retrieving InProgressSubmissions in the search core
  * @author Kevin Van de Velde (kevin at atmire dot com)
  */
-public abstract class InprogressSubmissionIndexFactoryImpl<T extends IndexableInProgressSubmission, S>
-        extends IndexFactoryImpl<T, S> implements InprogressSubmissionIndexFactory<T, S> {
+public abstract class InprogressSubmissionIndexFactoryImpl
+        <T extends IndexableInProgressSubmission, S extends InProgressSubmission> extends IndexFactoryImpl<T, S>
+        implements InprogressSubmissionIndexFactory<T, S> {
 
     @Autowired
     protected CollectionIndexFactory indexableCollectionService;
