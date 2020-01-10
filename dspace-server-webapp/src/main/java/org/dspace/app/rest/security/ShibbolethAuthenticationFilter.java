@@ -16,7 +16,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 
@@ -36,13 +35,9 @@ public class ShibbolethAuthenticationFilter extends StatelessLoginFilter {
     public Authentication attemptAuthentication(HttpServletRequest req,
                                                 HttpServletResponse res) throws AuthenticationException {
 
-        if (restAuthenticationService.hasAuthenticationData(req)) {
-            return authenticationManager.authenticate(
-                    new DSpaceAuthentication(null, null, new ArrayList<>())
-            );
-        } else {
-            throw new BadCredentialsException("Login failed");
-        }
+        return authenticationManager.authenticate(
+                new DSpaceAuthentication(null, null, new ArrayList<>())
+        );
     }
 
     @Override
