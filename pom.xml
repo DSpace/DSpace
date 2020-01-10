@@ -465,7 +465,7 @@
                 </property>
             </activation>
             <properties>
-                <test.argLine>-Xmx1024m</test.argLine>
+                <test.argLine>-Xmx1024m -Djdk.attach.allowAttachSelf -javaagent:${settings.localRepository}/org/jmockit/jmockit/${jmockit.version}/jmockit-${jmockit.version}.jar</test.argLine>
             </properties>
         </profile>
 
