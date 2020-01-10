@@ -41,6 +41,7 @@ import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Context;
+import org.dspace.core.LogManager;
 import org.dspace.discovery.FullTextContentStreams;
 import org.dspace.discovery.IndexableObject;
 import org.dspace.discovery.SearchUtils;
@@ -614,7 +615,8 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
             }
 
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            log.error(LogManager.getHeader(context, "item_metadata_discovery_error",
+                    "Item identifier: " + item.getID()), e);
         }
 
 
@@ -636,7 +638,8 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
             }
 
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            log.error(LogManager.getHeader(context, "item_publication_group_discovery_error",
+                    "Item identifier: " + item.getID()), e);
         }
 
 

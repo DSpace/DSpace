@@ -19,7 +19,8 @@ import org.dspace.discovery.indexobject.IndexableInProgressSubmission;
  *
  * @author Kevin Van de Velde (kevin at atmire dot com)
  */
-public interface InprogressSubmissionIndexFactory<T extends IndexableInProgressSubmission, S>
+public interface InprogressSubmissionIndexFactory<T extends IndexableInProgressSubmission,
+        S extends InProgressSubmission>
         extends IndexFactory<T, S> {
 
     /**

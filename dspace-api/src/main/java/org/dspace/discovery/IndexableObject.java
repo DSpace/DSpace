@@ -29,6 +29,10 @@ public interface IndexableObject<T extends ReloadableEntity, PK extends Serializ
      */
     String getType();
 
+    /**
+     * Return the identifier of this indexableObject, this will be the identifier of the object in the database
+     * @return for a DSpaceObject a uuid will be returned, for a tasks or workflow items an integer will be returned
+     */
     PK getID();
 
     /**

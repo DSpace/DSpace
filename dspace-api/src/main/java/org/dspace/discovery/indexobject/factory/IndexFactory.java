@@ -91,9 +91,9 @@ public interface IndexFactory<T extends IndexableObject, S> {
     Optional<T> findIndexableObject(Context context, String id) throws SQLException;
 
     /**
-     * Determine whether the class can handle the object
-     * @param object        The object which should be handle
-     * @return              True if the class can handle the given object. False if it doesn't.
+     * Determine whether the class can handle the factory implementation
+     * @param object        The object which we want to check
+     * @return              True if the factory implementation can handle the given object. False if it doesn't.
      */
     boolean supports(Object object);
 
