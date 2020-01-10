@@ -54,6 +54,7 @@
         <link rel="stylesheet" href="<%= request.getContextPath() %>/static/css/bootstrap/bootstrap.min.css" type="text/css" />
         <link rel="stylesheet" href="<%= request.getContextPath() %>/static/css/bootstrap/bootstrap-theme.min.css" type="text/css" />
         <link rel="stylesheet" href="<%= request.getContextPath() %>/static/css/bootstrap/dspace-theme.css" type="text/css" />
+        <link href="<%= request.getContextPath() %>/static/css/bootstrap-cascader/bootstrap-cascader.min.css" rel="stylesheet">
 <%
     if (!"NONE".equals(feedRef))
     {
@@ -80,11 +81,14 @@
 %>
         
         <script type='text/javascript' src="<%= request.getContextPath() %>/static/js/jquery/jquery-1.10.2.min.js"></script>
+        <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/jquery-migrate.js"></script>
         <script type='text/javascript' src='<%= request.getContextPath() %>/static/js/jquery/jquery-ui-1.10.3.custom.min.js'></script>
+        <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/jquery.autocomplete.js"></script>
         <script type='text/javascript' src='<%= request.getContextPath() %>/static/js/bootstrap/bootstrap.min.js'></script>
         <script type='text/javascript' src='<%= request.getContextPath() %>/static/js/holder.js'></script>
         <script type="text/javascript" src="<%= request.getContextPath() %>/utils.js"></script>
         <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/choice-support.js"> </script>
+        <script src="<%= request.getContextPath() %>/static/js/bootstrap-cascader/bootstrap-cascader.min.js"></script>
         <dspace:include page="/layout/google-analytics-snippet.jsp" />
 
     <%

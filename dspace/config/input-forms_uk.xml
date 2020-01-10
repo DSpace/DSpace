@@ -99,7 +99,7 @@
                     <dc-qualifier>citation</dc-qualifier>
                     <repeatable>false</repeatable>
                     <label>Бібліографічний опис</label>
-                    <input-type>onebox</input-type>
+                    <input-type>textarea</input-type>
                     <hint>Введіть стандартний бібліографічний опис для попередьо випущеного примірника цього матеріалу.</hint>
                     <required></required>
                 </field>
@@ -123,7 +123,7 @@
                     <label>Вид документа</label>
                     <input-type value-pairs-name="common_types">dropdown</input-type>
                     <hint>Виберіть тип(и) змісту матеріалу. Щоб вибрати більш ніж одне значення у списку, Вам необхідно тримати натиснутою клавішу [CTRL] або ж [Shift].</hint>
-                    <required></required>
+                    <required>Виберіть тип(и) змісту матеріалу</required>
                 </field>
 
                 <field>

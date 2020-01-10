@@ -101,6 +101,17 @@
          <dc-qualifier>citation</dc-qualifier>
          <repeatable>false</repeatable>
          <label>Citation</label>
+         <input-type>textarea</input-type>
+         <hint>Enter the standard citation for the previously issued instance of this item.</hint>
+         <required></required>
+       </field>
+
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>speciality</dc-element>
+         <dc-qualifier>id</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Speciality id</label>
          <input-type>onebox</input-type>
          <hint>Enter the standard citation for the previously issued instance of this item.</hint>
          <required></required>
@@ -108,12 +119,12 @@
 
        <field>
          <dc-schema>dc</dc-schema>
-         <dc-element>relation</dc-element>
-         <dc-qualifier>ispartofseries</dc-qualifier>
-         <repeatable>true</repeatable>
-         <label>Series/Report No.</label>
-         <input-type>series</input-type>
-         <hint>Enter the series and number assigned to this item by your community.</hint>
+         <dc-element>date</dc-element>
+         <dc-qualifier>presentation</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Presentation date</label>
+         <input-type>onebox</input-type>
+         <hint></hint>
          <required></required>
        </field>
 
@@ -138,7 +149,7 @@ it, please enter the types and the actual numbers or codes.</hint>
          <label>Type</label>
          <input-type value-pairs-name="common_types">dropdown</input-type>
          <hint>Select the type(s) of content of the item. To select more than one value in the list, you may have to hold down the "CTRL" or "Shift" key.</hint>
-         <required></required>
+         <required>Select the type(s) of content of the item</required>
        </field>
 
        <field>
@@ -161,7 +172,7 @@ it, please enter the types and the actual numbers or codes.</hint>
          <!-- An input-type of twobox MUST be marked as repeatable -->
          <repeatable>true</repeatable>
          <label>Subject Keywords</label>
-         <input-type>twobox</input-type>
+         <input-type>threelocbox</input-type>
          <hint>Enter appropriate subject keywords or phrases. </hint>
          <required></required>
          <vocabulary>srsc</vocabulary>
@@ -261,10 +272,10 @@ it, please enter the types and the actual numbers or codes.</hint>
    </value-pairs>
 
    <value-pairs value-pairs-name="common_types" dc-term="type">
-     <pair>
-       <displayed-value>Animation</displayed-value>
-       <stored-value>Animation</stored-value>
-     </pair>
+     <!--<pair>-->
+       <!--<displayed-value>Animation</displayed-value>-->
+       <!--<stored-value>Animation</stored-value>-->
+     <!--</pair>-->
      <pair>
        <displayed-value>Article</displayed-value>
        <stored-value>Article</stored-value>
@@ -344,6 +355,10 @@ it, please enter the types and the actual numbers or codes.</hint>
      <pair>
        <displayed-value>Working Paper</displayed-value>
        <stored-value>Working Paper</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>Bachelous Paper</displayed-value>
+       <stored-value>Bachelous paper</stored-value>
      </pair>
      <pair>
        <displayed-value>Other</displayed-value>

@@ -280,7 +280,8 @@ public class DescribeStep extends AbstractProcessingStep
             }
             else if ((inputType.equals("onebox"))
                     || (inputType.equals("twobox"))
-                    || (inputType.equals("textarea")))
+                    || (inputType.equals("textarea"))
+                    || inputType.equals("threelocbox"))
             {
                 readText(context, request, item, schema, element, qualifier, inputs[j]
                         .getRepeatable(), LANGUAGE_QUALIFIER, inputs[j].getLanguage());

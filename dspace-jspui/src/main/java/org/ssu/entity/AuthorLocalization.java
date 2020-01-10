@@ -28,6 +28,14 @@ public class AuthorLocalization {
             this.surname = surname;
             this.initials = initials;
         }
+
+        @Override
+        public String toString() {
+            return "AuthorData{" +
+                    "surname='" + surname + '\'' +
+                    ", initials='" + initials + '\'' +
+                    '}';
+        }
     }
 
     private Map<String, AuthorData> authorLocalizations = new HashMap<>();
@@ -80,5 +88,13 @@ public class AuthorLocalization {
                 .append(authorLocalizations)
                 .append(orcid)
                 .toHashCode();
+    }
+
+    @Override
+    public String toString() {
+        return "AuthorLocalization{" +
+                "authorLocalizations=" + authorLocalizations +
+                ", orcid='" + orcid + '\'' +
+                '}';
     }
 }

@@ -99,7 +99,7 @@
                     <dc-qualifier>citation</dc-qualifier>
                     <repeatable>false</repeatable>
                     <label>Библиографическое описание</label>
-                    <input-type>onebox</input-type>
+                    <input-type>textarea</input-type>
                     <hint>Введите стандартное библиографическое описание предыдущего идательства для даннoго материала.</hint>
                     <required></required>
                 </field>
@@ -123,7 +123,7 @@
                     <label>Вид документа</label>
                     <input-type value-pairs-name="common_types">dropdown</input-type>
                     <hint>Выберите тип(ы) содержания материала. Для того чтобы выбрать больше чем одно значение в списке, Вам необходимо держать нажатой клавишу [CTRL] или [Shift].</hint>
-                    <required></required>
+                    <required>Выберите тип(ы) содержания материала</required>
                 </field>
 
                 <field>
@@ -162,7 +162,7 @@
                     <hint>Введите ниже соответствующие материалу ключевые слова. Каждое ключевое слово или фраза заносятся в отдельную ячейку с маленькой буквы.</hint>
                     <required></required>
                     <vocabulary>srsc</vocabulary>
-                </field>
+                </field>/edit-metadata.jsp
 
                 <field>
                     <dc-schema>dc</dc-schema>

@@ -36,6 +36,7 @@ import org.ssu.entity.AuthorLocalization;
 import org.ssu.entity.response.CommunityResponse;
 import org.ssu.entity.response.ItemTypeResponse;
 import org.ssu.entity.response.RecentItem;
+import org.ssu.repository.FacultyRepository;
 import org.ssu.service.localization.TypeLocalization;
 import org.ssu.service.CommunityService;
 import org.ssu.service.statistics.EssuirStatistics;
@@ -57,6 +58,9 @@ import java.util.stream.Collectors;
 @Controller
 public class EssuirSiteController {
     private static Logger log = Logger.getLogger(EssuirSiteController.class);
+    @Resource
+    private FacultyRepository facultyRepository;
+
     @Resource
     private TypeLocalization typeLocalization;
 
@@ -317,5 +321,16 @@ public class EssuirSiteController {
 
         }
         return feedbackPage(model, request, email, feedback, message, messageType);
+    }
+
+    @RequestMapping(value = "/api/facultylist", method = RequestMethod.GET, produces = "text/plain;charset=UTF-8")
+    @ResponseBody
+    public String getFacultyList() throws JsonProcessingException {
+        try {
+            return new ObjectMapper().writeValueAsString(facultyRepository.findAll());
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        return "";
     }
 }
