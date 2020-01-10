@@ -30,6 +30,7 @@
         <jaxb-runtime.version>2.3.1</jaxb-runtime.version>
         <javax-annotation.version>1.3.2</javax-annotation.version>
         <jmockit.version>1.48</jmockit.version>
+        <errorprone.version>2.3.4</errorprone.version>
         <log4j.version>2.11.2</log4j.version>
         <slf4j.version>1.7.25</slf4j.version>
         <!-- NOTE: when updating jackson.version, also sync jackson-databind dependency below -->
@@ -101,6 +102,18 @@
                     <version>3.8.1</version>
                     <configuration>
                         <release>11</release>
+                        <!-- Turn on http://errorprone.info -->
+                        <compilerArgs>
+                            <arg>-XDcompilePolicy=simple</arg>
+                            <arg>-Xplugin:ErrorProne</arg>
+                        </compilerArgs>
+                        <annotationProcessorPaths>
+                            <path>
+                                <groupId>com.google.errorprone</groupId>
+                                <artifactId>error_prone_core</artifactId>
+                                <version>${errorprone.version}</version>
+                            </path>
+                        </annotationProcessorPaths>
                     </configuration>
                 </plugin>
                 <!-- Used to package all DSpace JARs -->
@@ -1493,6 +1506,12 @@
                 <groupId>org.slf4j</groupId>
                 <artifactId>log4j-over-slf4j</artifactId>
                 <version>${slf4j.version}</version>
+            </dependency>
+            <!-- http://errorprone.info : used to check for common/obvious code errors during compilation -->
+            <dependency>
+                <groupId>com.google.errorprone</groupId>
+                <artifactId>error_prone_core</artifactId>
+                <version>${errorprone.version}</version>
             </dependency>
             <!-- JMockit, JUnit and Hamcrest are used for Unit/Integration tests -->
             <!-- Keep jmockit before junit -->
