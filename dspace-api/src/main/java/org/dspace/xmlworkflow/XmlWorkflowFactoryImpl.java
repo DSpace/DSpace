@@ -20,6 +20,7 @@ import org.dspace.core.Context;
 import org.dspace.handle.service.HandleService;
 import org.dspace.utils.DSpace;
 import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
+import org.dspace.xmlworkflow.state.Step;
 import org.dspace.xmlworkflow.state.Workflow;
 import org.dspace.xmlworkflow.state.actions.WorkflowActionConfig;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,10 +48,10 @@ public class XmlWorkflowFactoryImpl implements XmlWorkflowFactory {
 
     private Map<String, Workflow> workflowMapping;
 
-    @Autowired(required = true)
+    @Autowired
     protected CollectionService collectionService;
 
-    @Autowired(required = true)
+    @Autowired
     protected HandleService handleService;
 
     @Override
@@ -154,9 +155,12 @@ public class XmlWorkflowFactoryImpl implements XmlWorkflowFactory {
 
     @Override
     public WorkflowActionConfig getActionByName(String workflowActionName) {
-        WorkflowActionConfig actionConfig
-                = new DSpace().getServiceManager().getServiceByName(workflowActionName, WorkflowActionConfig.class);
-        return actionConfig;
+        return new DSpace().getServiceManager().getServiceByName(workflowActionName, WorkflowActionConfig.class);
+    }
+
+    @Override
+    public Step getStepByName(String workflowStepName) {
+        return new DSpace().getServiceManager().getServiceByName(workflowStepName, Step.class);
     }
 
 }

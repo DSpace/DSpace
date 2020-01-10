@@ -19,7 +19,7 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Component;
 
 /**
- * This is the rest repository responsible for managing WorkflowAction Rest objects
+ * This is the rest repository responsible for managing {@link WorkflowActionRest} objects
  *
  * @author Maria Verdonck (Atmire) on 06/01/2020
  */

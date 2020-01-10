@@ -12,6 +12,7 @@ import java.util.List;
 import org.dspace.content.Collection;
 import org.dspace.core.Context;
 import org.dspace.xmlworkflow.WorkflowConfigurationException;
+import org.dspace.xmlworkflow.state.Step;
 import org.dspace.xmlworkflow.state.Workflow;
 import org.dspace.xmlworkflow.state.actions.WorkflowActionConfig;
 
@@ -95,10 +96,18 @@ public interface XmlWorkflowFactory {
     public List<Collection> getAllNonMappedCollectionsHandles(Context context);
 
     /**
-     * Retrieve a WorkflowActionConfig object based on its name, should correspond with bean id in workflow-actions.xml
+     * Retrieves a {@link WorkflowActionConfig} object based on its name, should correspond with bean id in workflow-actions.xml
      *
      * @param workflowActionName Name of workflow action we want to retrieve
-     * @return WorkflowActionConfig object corresponding to the given workflowActionName
+     * @return Workflow action object corresponding to the given workflowActionName
      */
     public WorkflowActionConfig getActionByName(String workflowActionName);
+
+    /**
+     * Retrieves a {@link Step} object based on its name, should correspond with bean id in workflow.xml
+     *
+     * @param workflowStepName Name of workflow step we want to retrieve
+     * @return Workflow step object corresponding to the given workflowStepName
+     */
+    public Step getStepByName(String workflowStepName);
 }
