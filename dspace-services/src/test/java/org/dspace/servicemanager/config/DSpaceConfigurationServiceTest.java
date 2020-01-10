@@ -14,6 +14,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -23,6 +24,7 @@ import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
 import org.apache.commons.configuration2.builder.fluent.Configurations;
 import org.apache.commons.configuration2.ex.ConfigurationException;
+import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -523,13 +525,17 @@ public class DSpaceConfigurationServiceTest {
      * of time.
      */
     @Test
-    public void testAutomaticReload() throws ConfigurationException, InterruptedException {
+    public void testAutomaticReload() throws ConfigurationException, IOException, InterruptedException {
         // Initialize new config service
         DSpaceConfigurationService dscs = new DSpaceConfigurationService();
 
         // Assert a property exists with a specific initial value
         assertNotNull(dscs.getProperty("prop.to.auto.reload"));
         assertEquals("D-space", dscs.getProperty("prop.to.auto.reload"));
+
+        // Copy our test local.properties file to a temp location (so we can restore it after tests below)
+        File tempPropFile = File.createTempFile("temp", "properties");
+        FileUtils.copyFile(new File(propertyFilePath), tempPropFile);
 
         // Now, change the value of that Property in the file itself (using a separate builder instance)
         FileBasedConfigurationBuilder<PropertiesConfiguration> builder = new Configurations()
@@ -538,7 +544,7 @@ public class DSpaceConfigurationServiceTest {
         // Clear out current value. Add in a new value
         config.clearProperty("prop.to.auto.reload");
         config.addProperty("prop.to.auto.reload", "DSpace");
-        // Save updates to file
+        // Save updates to file (this changes our test local.properties)
         builder.save();
 
         // Check immediately. Property should be unchanged
@@ -551,6 +557,9 @@ public class DSpaceConfigurationServiceTest {
         // Check again. Property should have reloaded
         // NOTE: reload time is set in config-definition.xml to reload every 2 seconds
         assertEquals("DSpace", dscs.getProperty("prop.to.auto.reload"));
+
+        // Restore our test local.properties file to original content
+        FileUtils.copyFile(tempPropFile, new File(propertyFilePath));
     }
 
     /**
