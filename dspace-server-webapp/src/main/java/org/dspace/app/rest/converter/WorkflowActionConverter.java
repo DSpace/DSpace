@@ -13,7 +13,7 @@ import org.dspace.xmlworkflow.state.actions.WorkflowActionConfig;
 import org.springframework.stereotype.Component;
 
 /**
- * Converter to translate WorkflowActionConfig to a WorkflowActionRest object
+ * Converter to translate {@link WorkflowActionConfig} to a {@link WorkflowActionRest} object
  *
  * @author Maria Verdonck (Atmire) on 06/01/2020
  */

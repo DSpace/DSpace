@@ -11,7 +11,7 @@ import org.dspace.app.rest.model.WorkflowActionRest;
 import org.dspace.app.rest.utils.Utils;
 
 /**
- * WorkflowAction Rest HAL Resource. The HAL Resource wraps the REST Resource
+ * {@link WorkflowActionRest} HAL Resource. The HAL Resource wraps the REST Resource
  * adding support for the links and embedded resources
  *
  * @author Maria Verdonck (Atmire) on 06/01/2020
