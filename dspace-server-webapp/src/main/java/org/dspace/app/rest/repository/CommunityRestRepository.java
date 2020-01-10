@@ -149,7 +149,8 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
     public Page<CommunityRest> findAll(Context context, Pageable pageable) {
         try {
             long total = cs.countTotal(context);
-            List<Community> communities = cs.findAll(context, pageable.getPageSize(), pageable.getOffset());
+            List<Community> communities = cs.findAll(context, pageable.getPageSize(),
+                    Math.toIntExact(pageable.getOffset()));
             return converter.toRestPage(communities, pageable, total, utils.obtainProjection(true));
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);

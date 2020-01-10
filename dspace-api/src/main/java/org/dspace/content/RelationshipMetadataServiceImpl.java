@@ -240,7 +240,6 @@ public class RelationshipMetadataServiceImpl implements RelationshipMetadataServ
             return null;
         }
         metadataValue.setMetadataField(metadataField);
-        metadataValue.setLanguage(Item.ANY);
         return metadataValue;
     }
 
