@@ -13,6 +13,7 @@
         <rightCardinality>
             <min>0</min>
         </rightCardinality>
+        <copyToLeft>true</copyToLeft>
     </type>
     <type>
         <leftType>Publication</leftType>
@@ -25,6 +26,7 @@
         <rightCardinality>
             <min>0</min>
         </rightCardinality>
+        <copyToLeft>true</copyToLeft>
     </type>
     <type>
         <leftType>Publication</leftType>
@@ -37,6 +39,7 @@
         <rightCardinality>
             <min>0</min>
         </rightCardinality>
+        <copyToLeft>true</copyToLeft>
     </type>
     <type>
         <leftType>Person</leftType>
@@ -110,6 +113,7 @@
         <rightCardinality>
             <min>0</min>
         </rightCardinality>
+        <copyToLeft>true</copyToLeft>
     </type>
     <type>
         <leftType>JournalIssue</leftType>
@@ -123,5 +127,6 @@
             <min>0</min>
             <max>1</max>
         </rightCardinality>
+        <copyToRight>true</copyToRight>
     </type>
 </relationships>

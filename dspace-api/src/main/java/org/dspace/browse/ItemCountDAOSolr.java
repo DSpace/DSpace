@@ -129,7 +129,7 @@ public class ItemCountDAOSolr implements ItemCountDAO {
 
         DiscoverResult sResponse = null;
         try {
-            sResponse = searcher.search(context, query, false);
+            sResponse = searcher.search(context, query);
             List<FacetResult> commCount = sResponse.getFacetResult("location.comm");
             List<FacetResult> collCount = sResponse.getFacetResult("location.coll");
             for (FacetResult c : commCount) {
