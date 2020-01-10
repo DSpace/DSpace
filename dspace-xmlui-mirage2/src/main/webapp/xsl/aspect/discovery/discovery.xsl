@@ -388,6 +388,11 @@
     <xsl:template match="dri:table[@id='aspect.discovery.SimpleSearch.table.discovery-filters']/dri:row">
         <script type="text/javascript">
             <xsl:text>
+
+                <!--
+                https://www.freeformatter.com/javascript-escape.html
+                -->
+
                 if (!window.DSpace) {
                     window.DSpace = {};
                 }
@@ -398,9 +403,9 @@
                     window.DSpace.discovery.filters = [];
                 }
                 window.DSpace.discovery.filters.push({
-                    type: '</xsl:text><xsl:value-of select="dri:cell/dri:field[starts-with(@n, 'filtertype')]/dri:value/@option"/><xsl:text>',
-                    relational_operator: '</xsl:text><xsl:value-of select="dri:cell/dri:field[starts-with(@n, 'filter_relational_operator')]/dri:value/@option"/><xsl:text>',
-                    query: '</xsl:text><xsl:value-of select="dri:cell/dri:field[@rend = 'discovery-filter-input']/dri:value"/><xsl:text>',
+                    type: '</xsl:text><xsl:value-of select="util:escapejs(dri:cell/dri:field[starts-with(@n, 'filtertype')]/dri:value/@option)"/><xsl:text>',
+                    relational_operator: '</xsl:text><xsl:value-of select="util:escapejs(dri:cell/dri:field[starts-with(@n, 'filter_relational_operator')]/dri:value/@option)"/><xsl:text>',
+                    query: '</xsl:text><xsl:value-of select="util:escapejs(dri:cell/dri:field[@rend = 'discovery-filter-input']/dri:value)"/><xsl:text>',
                 });
             </xsl:text>
         </script>

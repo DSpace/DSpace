@@ -235,5 +235,19 @@
         </xsl:analyze-string>
     </xsl:function>
 
+   <!--
+   This just escapes backslashes, double and single quotes.
+   I'm assuming escaping the whitespace characters isn't necessary
+   https://www.freeformatter.com/javascript-escape.html
+   -->
+
+    <xsl:function name="util:escapejs">
+        <xsl:param name="string"/>
+        <xsl:variable name="single-quote">'</xsl:variable>
+        <xsl:variable name="double-quote">"</xsl:variable>
+
+        <xsl:value-of select="replace(replace(replace($string, '\\', '\\\\'), $double-quote, concat('\\', $double-quote)), $single-quote, concat('\\', $single-quote))"/>
+
+    </xsl:function>
 
 </xsl:stylesheet>
