@@ -113,7 +113,6 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
                 .withDspaceObject(community)
                 .withAction(Constants.READ)
-                .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
                 .withUser(eperson1)
                 .build();
 
@@ -135,7 +134,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         Community community = CommunityBuilder.createCommunity(context).withName("My community").build();
 
         ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context).withDspaceObject(community)
-                .withAction(Constants.READ).withPolicyType(ResourcePolicy.TYPE_CUSTOM).withUser(eperson).build();
+                .withAction(Constants.READ).withUser(eperson).build();
 
         context.restoreAuthSystemState();
 
@@ -340,11 +339,6 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
                 .andExpect(jsonPath("$.page.totalElements", is(2)));
     }
 
-    /**
-     * this method return 422, but must return 400
-     * FIX BUG
-     * @throws Exception
-     */
     @Test
     public void findResoucesPolicyEPersonWithoutParametersBadRequestTest() throws Exception {
         context.turnOffAuthorisationSystem();
@@ -384,7 +378,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
     }
 
     @Test
-    public void findEPersonNotFoundTest() throws Exception {
+    public void findResoucesPolicyByEPersonNotFoundTest() throws Exception {
 
         String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken).perform(get("/api/authz/resourcepolicies/search/eperson")
@@ -496,16 +490,13 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
         Community community = CommunityBuilder.createCommunity(context).withName("My community").build();
 
-        Collection collection = CollectionBuilder.createCollection(context,community).withName("My collection").build();
-
-
         ResourcePolicy firstResourcePolicyOfEPerson1 = ResourcePolicyBuilder.createResourcePolicy(context)
                 .withDspaceObject(community)
                 .withAction(Constants.ADMIN)
                 .withUser(eperson1).build();
 
         ResourcePolicy firstResourcePolicyOfEPerson2 = ResourcePolicyBuilder.createResourcePolicy(context)
-                .withDspaceObject(collection)
+                .withDspaceObject(community)
                 .withAction(Constants.ADD)
                 .withUser(eperson2).build();
 
@@ -514,11 +505,11 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
       String authToken = getAuthToken(eperson1.getEmail(), "qwerty01");
       getClient(authToken).perform(get("/api/authz/resourcepolicies/search/resource")
                 .param("uuid", community.getID().toString())
-                .param("action", "ADMIN"))
+                .param("action", "ADD"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$._embedded.resourcepolicies",Matchers.contains(
-                        ResoucePolicyMatcher.matchResourcePolicy(firstResourcePolicyOfEPerson1)
+                        ResoucePolicyMatcher.matchResourcePolicy(firstResourcePolicyOfEPerson2)
                         )))
                 .andExpect(jsonPath("$._links.self.href",
                         Matchers.containsString("api/authz/resourcepolicies/search/resource")))
@@ -526,16 +517,11 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
       String authToken2 = getAuthToken(eperson2.getEmail(), "qwerty02");
       getClient(authToken2).perform(get("/api/authz/resourcepolicies/search/resource")
-                .param("uuid", collection.getID().toString())
+                .param("uuid", community.getID().toString())
                 .param("action", "ADD"))
                 .andExpect(status().isForbidden());
   }
 
-  /**
-   * this method return 422, but must return 400
-   * FIX BUG
-   * @throws Exception
-   */
   @Test
   public void findResoucesPoliciesOfResourceWithoutParametersBadRequestTest() throws Exception {
       context.turnOffAuthorisationSystem();
@@ -720,11 +706,6 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
                 .andExpect(jsonPath("$.page.totalElements", is(1)));
     }
 
-    /**
-     * this method return 422, but must return 400
-     * FIX BUG
-     * @throws Exception
-     */
     @Test
     public void findResoucesPoliciesByGroupWithoutParametersBadRequestTest() throws Exception {
         context.turnOffAuthorisationSystem();
@@ -796,15 +777,8 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
         Community community = CommunityBuilder.createCommunity(context).withName("My community").build();
 
-        Community community2 = CommunityBuilder.createCommunity(context).withName("My 2 community").build();
-
         ResourcePolicy resourcePolicyOfGroup1 = ResourcePolicyBuilder.createResourcePolicy(context)
                 .withDspaceObject(community).withAction(Constants.WRITE)
-                .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
-                .withGroup(group1).build();
-
-        ResourcePolicy secondresourcePolicyOfGroup1 = ResourcePolicyBuilder.createResourcePolicy(context)
-                .withDspaceObject(community2).withAction(Constants.ADD)
                 .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
                 .withGroup(group1).build();
 
@@ -813,7 +787,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         String authToken = getAuthToken(eperson2.getEmail(), "qwerty02");
         getClient(authToken).perform(get("/api/authz/resourcepolicies/search/group")
                 .param("uuid", group1.getID().toString())
-                .param("resource", community2.getID().toString()))
+                .param("resource", community.getID().toString()))
                 .andExpect(status().isForbidden());
     }
 
@@ -896,6 +870,16 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
                    .param("eperson", eperson1.getID().toString())
                    .contentType(contentType))
         .andExpect(status().isUnauthorized());
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+        getClient(authToken).perform(get("/api/authz/resourcepolicies/search/resource")
+                  .param("uuid", community.getID().toString())
+                  .param("action", "ADMIN"))
+                  .andExpect(status().isOk())
+                  .andExpect(content().contentType(contentType))
+                  .andExpect(jsonPath("$._links.self.href",
+                          Matchers.containsString("api/authz/resourcepolicies/search/resource")))
+                  .andExpect(jsonPath("$.page.totalElements", is(0)));
     }
 
     @Test
@@ -925,6 +909,16 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
                 .param("eperson", eperson1.getID().toString())
                 .contentType(contentType))
         .andExpect(status().isForbidden());
+
+        String authToken2 = getAuthToken(admin.getEmail(), password);
+        getClient(authToken2).perform(get("/api/authz/resourcepolicies/search/resource")
+                  .param("uuid", community.getID().toString())
+                  .param("action", "ADMIN"))
+                  .andExpect(status().isOk())
+                  .andExpect(content().contentType(contentType))
+                  .andExpect(jsonPath("$._links.self.href",
+                          Matchers.containsString("api/authz/resourcepolicies/search/resource")))
+                  .andExpect(jsonPath("$.page.totalElements", is(0)));
     }
 
     @Test
@@ -958,7 +952,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
     }
 
     @Test
-    public void deliteOneUnAuthenticatedTest() throws Exception {
+    public void deleteOneUnAuthenticatedTest() throws Exception {
         context.turnOffAuthorisationSystem();
         Community community = CommunityBuilder.createCommunity(context).withName("My community").build();
 
@@ -985,7 +979,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
     }
 
     @Test
-    public void deliteOneForbiddenTest() throws Exception {
+    public void deleteOneForbiddenTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
         EPerson eperson1 = EPersonBuilder.createEPerson(context)
@@ -1008,10 +1002,16 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         getClient(authToken).perform(delete("/api/authz/resourcepolicies/" + resourcePolicy.getID()))
                 .andExpect(status().isForbidden());
 
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(get("/api/authz/resourcepolicies/" + resourcePolicy.getID()))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$", is(ResoucePolicyMatcher.matchResourcePolicy(resourcePolicy))))
+        .andExpect(jsonPath("$._links.self.href", Matchers
+            .containsString("/api/authz/resourcepolicies/" + resourcePolicy.getID())));
     }
 
     @Test
-    public void deliteOneNotFoundTest() throws Exception {
+    public void deleteOneNotFoundTest() throws Exception {
         String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken).perform(delete("/api/authz/resourcepolicies/" + Integer.MAX_VALUE))
                  .andExpect(status().isNotFound());
@@ -1047,7 +1047,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
                 .withAction(Constants.READ)
                 .withDspaceObject(publicItem1)
-                .withUser(eperson1)
+                .withGroup(EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS))
                 .withStartDate(data)
                 .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
                 .build();
@@ -1109,7 +1109,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
                 .withAction(Constants.READ)
                 .withDspaceObject(publicItem1)
-                .withUser(eperson1)
+                .withGroup(EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS))
                 .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
                 .build();
 
@@ -1178,7 +1178,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
                 .withAction(Constants.READ)
                 .withDspaceObject(publicItem1)
-                .withUser(eperson1)
+                .withGroup(EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS))
                 .withStartDate(data)
                 .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
                 .build();
@@ -1210,7 +1210,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
     }
 
     @Test
-    public void patchReplaceStartDateBadRequastTest() throws Exception {
+    public void patchReplaceStartDateBadRequestTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
         EPerson eperson1 = EPersonBuilder.createEPerson(context)
@@ -1239,7 +1239,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
                 .withAction(Constants.READ)
                 .withDspaceObject(publicItem1)
-                .withUser(eperson1)
+                .withGroup(EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS))
                 .withStartDate(date)
                 .withDescription("my description")
                 .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
@@ -1285,12 +1285,12 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         calendar.set(Calendar.MONTH, 5);
         calendar.set(Calendar.DATE, 15);
 
-        Date data = calendar.getTime();
+        Date date = calendar.getTime();
 
         ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
                 .withAction(Constants.WRITE)
                 .withDspaceObject(item)
-                .withStartDate(data)
+                .withStartDate(date)
                 .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
                 .build();
 
@@ -1314,6 +1314,14 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
                    .content(patchBody)
                    .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                    .andExpect(status().isUnauthorized());
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+        getClient(authToken).perform(get("/api/authz/resourcepolicies/" + resourcePolicy.getID()))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$",Matchers.allOf(
+                hasJsonPath("$.action", is(Constants.actionText[resourcePolicy.getAction()])),
+                hasJsonPath("$.startDate", is(formatDate.format(date))),
+                hasJsonPath("$.description", is(resourcePolicy.getRpDescription())))));
     }
 
     @Test
@@ -1339,13 +1347,13 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         calendar.set(Calendar.MONTH, 9);
         calendar.set(Calendar.DATE, 31);
 
-        Date data = calendar.getTime();
+        Date date = calendar.getTime();
 
         ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
                 .withAction(Constants.READ)
                 .withDspaceObject(item)
-                .withUser(eperson1)
-                .withStartDate(data)
+                .withGroup(EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS))
+                .withStartDate(date)
                 .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
                 .build();
 
@@ -1370,6 +1378,14 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
                             .content(patchBody)
                             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                             .andExpect(status().isForbidden());
+
+        String authToken2 = getAuthToken(admin.getEmail(), password);
+        getClient(authToken2).perform(get("/api/authz/resourcepolicies/" + resourcePolicy.getID()))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$",Matchers.allOf(
+                hasJsonPath("$.action", is(Constants.actionText[resourcePolicy.getAction()])),
+                hasJsonPath("$.startDate", is(formatDate.format(date))),
+                hasJsonPath("$.description", is(resourcePolicy.getRpDescription())))));
     }
 
     @Test
@@ -1500,7 +1516,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
                 .withAction(Constants.READ)
                 .withDspaceObject(publicItem1)
-                .withUser(eperson1)
+                .withGroup(EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS))
                 .withDescription("my description")
                 .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
                 .build();
@@ -1531,7 +1547,203 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
     }
 
     @Test
-    public void patchReplaceDescriptionBadRequastTest() throws Exception {
+    public void patchAddDescriptionTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson eperson1 = EPersonBuilder.createEPerson(context)
+                .withEmail("eperson1@mail.com")
+                .withPassword("qwerty01")
+                .build();
+
+        Community community = CommunityBuilder.createCommunity(context).build();
+
+        Collection collection = CollectionBuilder.createCollection(context, community)
+                .withAdminGroup(eperson1)
+                .build();
+
+        Item item = ItemBuilder.createItem(context, collection)
+                .withTitle("Public item")
+                .build();
+
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+                .withAction(Constants.READ)
+                .withDspaceObject(item)
+                .withGroup(EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS))
+                .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
+                .build();
+
+        context.restoreAuthSystemState();
+
+        String description = "My Description";
+        List<Operation> ops = new ArrayList<Operation>();
+        AddOperation replaceOperation = new AddOperation("/description", description);
+        ops.add(replaceOperation);
+        String patchBody = getPatchContent(ops);
+
+        String authToken = getAuthToken(eperson1.getEmail(),"qwerty01");
+        getClient(authToken).perform(patch("/api/authz/resourcepolicies/" + resourcePolicy.getID())
+                            .content(patchBody)
+                            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$",Matchers.allOf(
+                                    hasJsonPath("$.name", is(resourcePolicy.getRpName())),
+                                    hasJsonPath("$.description", is(description)),
+                                    hasJsonPath("$.action", is(Constants.actionText[resourcePolicy.getAction()])))));
+
+        getClient(authToken).perform(get("/api/authz/resourcepolicies/" + resourcePolicy.getID()))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$",Matchers.allOf(
+                                    hasJsonPath("$.action", is(Constants.actionText[resourcePolicy.getAction()])),
+                                    hasJsonPath("$.description", is(description)))));
+    }
+
+    @Test
+    public void patchRemoveDescriptionTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson eperson1 = EPersonBuilder.createEPerson(context)
+                .withEmail("eperson1@mail.com")
+                .withPassword("qwerty01")
+                .build();
+
+        Community community = CommunityBuilder.createCommunity(context).build();
+
+        Collection collection = CollectionBuilder.createCollection(context, community)
+                .withAdminGroup(eperson1)
+                .build();
+
+        Item item = ItemBuilder.createItem(context, collection)
+                .withTitle("Public item")
+                .build();
+
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+                .withAction(Constants.READ)
+                .withDspaceObject(item)
+                .withDescription("my description")
+                .withGroup(EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS))
+                .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
+                .build();
+
+        context.restoreAuthSystemState();
+
+        List<Operation> ops = new ArrayList<Operation>();
+        RemoveOperation replaceOperation = new RemoveOperation("/description");
+        ops.add(replaceOperation);
+        String patchBody = getPatchContent(ops);
+
+        String authToken = getAuthToken(eperson1.getEmail(),"qwerty01");
+        getClient(authToken).perform(patch("/api/authz/resourcepolicies/" + resourcePolicy.getID())
+                            .content(patchBody)
+                            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$",Matchers.allOf(
+                                    hasJsonPath("$.name", is(resourcePolicy.getRpName())),
+                                    hasJsonPath("$.description", nullValue()),
+                                    hasJsonPath("$.action", is(Constants.actionText[resourcePolicy.getAction()])))));
+
+        getClient(authToken).perform(get("/api/authz/resourcepolicies/" + resourcePolicy.getID()))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$",Matchers.allOf(
+                                    hasJsonPath("$.action", is(Constants.actionText[resourcePolicy.getAction()])),
+                                    hasJsonPath("$.description", nullValue()))));
+    }
+
+    @Test
+    public void patchReplaceDescriptionUnAuthenticatedTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Community community = CommunityBuilder.createCommunity(context).build();
+
+        Collection collection = CollectionBuilder.createCollection(context, community).build();
+
+        Item item = ItemBuilder.createItem(context, collection).build();
+
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+                .withAction(Constants.WRITE)
+                .withDspaceObject(item)
+                .withDescription("My Description")
+                .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
+                .build();
+
+        context.restoreAuthSystemState();
+
+        String newDescription = "New Description";
+
+        List<Operation> ops = new ArrayList<Operation>();
+        ReplaceOperation replaceOperation = new ReplaceOperation("/description", newDescription);
+        ops.add(replaceOperation);
+        String patchBody = getPatchContent(ops);
+
+        getClient().perform(patch("/api/authz/resourcepolicies/" + resourcePolicy.getID())
+                   .content(patchBody)
+                   .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                   .andExpect(status().isUnauthorized());
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+        getClient(authToken).perform(get("/api/authz/resourcepolicies/" + resourcePolicy.getID()))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$",Matchers.allOf(
+                hasJsonPath("$.action", is(Constants.actionText[resourcePolicy.getAction()])),
+                hasJsonPath("$.description", is(resourcePolicy.getRpDescription())))));
+    }
+
+    @Test
+    public void patchReplaceDescriptionForbiddenTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson eperson1 = EPersonBuilder.createEPerson(context)
+                .withEmail("eperson1@mail.com")
+                .withPassword("qwerty01")
+                .build();
+
+        Community community = CommunityBuilder.createCommunity(context).build();
+
+        Collection collection = CollectionBuilder.createCollection(context, community).build();
+
+        Item item = ItemBuilder.createItem(context, collection)
+                .withTitle("Public item")
+                .build();
+
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+                .withAction(Constants.READ)
+                .withDspaceObject(item)
+                .withGroup(EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS))
+                .withDescription("My Description")
+                .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
+                .build();
+
+        context.restoreAuthSystemState();
+
+        String newDescription = "New Description";
+        List<Operation> ops = new ArrayList<Operation>();
+        ReplaceOperation replaceOperation = new ReplaceOperation("/description", newDescription);
+        ops.add(replaceOperation);
+        String patchBody = getPatchContent(ops);
+
+        String authToken = getAuthToken(eperson1.getEmail(),"qwerty01");
+        getClient(authToken).perform(patch("/api/authz/resourcepolicies/" + resourcePolicy.getID())
+                            .content(patchBody)
+                            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                            .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void patchRemoveDescriptionNotFounfdTest() throws Exception {
+
+        List<Operation> ops = new ArrayList<Operation>();
+        RemoveOperation removeOperation = new RemoveOperation("/description");
+        ops.add(removeOperation);
+        String patchBody = getPatchContent(ops);
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+        getClient(authToken).perform(patch("/api/authz/resourcepolicies/" + Integer.MAX_VALUE )
+                            .content(patchBody)
+                            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                            .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void patchReplaceDescriptionBadRequestTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
         EPerson eperson1 = EPersonBuilder.createEPerson(context)
@@ -1552,7 +1764,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
                 .withAction(Constants.READ)
                 .withDspaceObject(publicItem1)
-                .withUser(eperson1)
+                .withGroup(EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS))
                 .withDescription("my description")
                 .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
                 .build();
@@ -1600,7 +1812,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
                 .withAction(Constants.READ)
                 .withDspaceObject(myItem)
-                .withUser(eperson1)
+                .withGroup(EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS))
                 .withName("My name")
                 .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
                 .build();
@@ -1627,5 +1839,247 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
                             .andExpect(jsonPath("$",Matchers.allOf(
                                     hasJsonPath("$.action", is(Constants.actionText[resourcePolicy.getAction()])),
                                     hasJsonPath("$.name", is(newName)))));
+    }
+
+    @Test
+    public void patchReplaceNameBadRequestTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson eperson1 = EPersonBuilder.createEPerson(context)
+                .withEmail("eperson1@mail.com")
+                .withPassword("qwerty01")
+                .build();
+
+        Community community = CommunityBuilder.createCommunity(context).build();
+
+        Collection collection = CollectionBuilder.createCollection(context, community)
+                .withAdminGroup(eperson1)
+                .build();
+
+        Item myItem = ItemBuilder.createItem(context, collection)
+                .withTitle("Public item")
+                .build();
+
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+                .withAction(Constants.READ)
+                .withDspaceObject(myItem)
+                .withGroup(EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS))
+                .withName("My name")
+                .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
+                .build();
+
+        context.restoreAuthSystemState();
+
+        String errorName = "";
+        List<Operation> ops = new ArrayList<Operation>();
+        ReplaceOperation replaceOperation = new ReplaceOperation("/name", errorName);
+        ops.add(replaceOperation);
+        String patchBody = getPatchContent(ops);
+
+        String authToken = getAuthToken(eperson1.getEmail(),"qwerty01");
+        getClient(authToken).perform(patch("/api/authz/resourcepolicies/" + resourcePolicy.getID())
+                            .content(patchBody)
+                            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                            .andExpect(status().isBadRequest());
+
+        getClient(authToken).perform(get("/api/authz/resourcepolicies/" + resourcePolicy.getID()))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$",Matchers.allOf(
+                                    hasJsonPath("$.action", is(Constants.actionText[resourcePolicy.getAction()])),
+                                    hasJsonPath("$.name", is(resourcePolicy.getRpName())))));
+    }
+
+    @Test
+    public void patchAddNameTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson eperson1 = EPersonBuilder.createEPerson(context)
+                .withEmail("eperson1@mail.com")
+                .withPassword("qwerty01")
+                .build();
+
+        Community community = CommunityBuilder.createCommunity(context).build();
+
+        Collection collection = CollectionBuilder.createCollection(context, community)
+                .withAdminGroup(eperson1)
+                .build();
+
+        Item myItem = ItemBuilder.createItem(context, collection)
+                .withTitle("Public item")
+                .build();
+
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+                .withAction(Constants.READ)
+                .withDspaceObject(myItem)
+                .withGroup(EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS))
+                .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
+                .build();
+
+        context.restoreAuthSystemState();
+
+        String name = "My Name";
+        List<Operation> ops = new ArrayList<Operation>();
+        AddOperation replaceOperation = new AddOperation("/name", name);
+        ops.add(replaceOperation);
+        String patchBody = getPatchContent(ops);
+
+        String authToken = getAuthToken(eperson1.getEmail(),"qwerty01");
+        getClient(authToken).perform(patch("/api/authz/resourcepolicies/" + resourcePolicy.getID())
+                            .content(patchBody)
+                            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$",Matchers.allOf(
+                                    hasJsonPath("$.name", is(name)),
+                                    hasJsonPath("$.action", is(Constants.actionText[resourcePolicy.getAction()])))));
+
+        getClient(authToken).perform(get("/api/authz/resourcepolicies/" + resourcePolicy.getID()))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$",Matchers.allOf(
+                                    hasJsonPath("$.action", is(Constants.actionText[resourcePolicy.getAction()])),
+                                    hasJsonPath("$.name", is(name)))));
+    }
+
+    @Test
+    public void patchAddNameBadRequestTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson eperson1 = EPersonBuilder.createEPerson(context)
+                .withEmail("eperson1@mail.com")
+                .withPassword("qwerty01")
+                .build();
+
+        Community community = CommunityBuilder.createCommunity(context).build();
+
+        Collection collection = CollectionBuilder.createCollection(context, community)
+                .withAdminGroup(eperson1)
+                .build();
+
+        Item myItem = ItemBuilder.createItem(context, collection)
+                .withTitle("Public item")
+                .build();
+
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+                .withAction(Constants.READ)
+                .withDspaceObject(myItem)
+                .withName("My name")
+                .withGroup(EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS))
+                .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
+                .build();
+
+        context.restoreAuthSystemState();
+
+        String name = "Add Name";
+        List<Operation> ops = new ArrayList<Operation>();
+        AddOperation replaceOperation = new AddOperation("/name", name);
+        ops.add(replaceOperation);
+        String patchBody = getPatchContent(ops);
+
+        String authToken = getAuthToken(eperson1.getEmail(),"qwerty01");
+        getClient(authToken).perform(patch("/api/authz/resourcepolicies/" + resourcePolicy.getID())
+                            .content(patchBody)
+                            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                            .andExpect(status().isBadRequest());
+
+        getClient(authToken).perform(get("/api/authz/resourcepolicies/" + resourcePolicy.getID()))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$",Matchers.allOf(
+                                    hasJsonPath("$.action", is(Constants.actionText[resourcePolicy.getAction()])),
+                                    hasJsonPath("$.name", is(resourcePolicy.getRpName())))));
+    }
+
+    @Test
+    public void patchRemoveNameTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson eperson1 = EPersonBuilder.createEPerson(context)
+                .withEmail("eperson1@mail.com")
+                .withPassword("qwerty01")
+                .build();
+
+        Community community = CommunityBuilder.createCommunity(context).build();
+
+        Collection collection = CollectionBuilder.createCollection(context, community)
+                .withAdminGroup(eperson1)
+                .build();
+
+        Item myItem = ItemBuilder.createItem(context, collection)
+                .withTitle("Public item")
+                .build();
+
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+                .withAction(Constants.READ)
+                .withDspaceObject(myItem)
+                .withGroup(EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS))
+                .withName("My Name")
+                .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
+                .build();
+
+        context.restoreAuthSystemState();
+
+        List<Operation> ops = new ArrayList<Operation>();
+        RemoveOperation replaceOperation = new RemoveOperation("/name");
+        ops.add(replaceOperation);
+        String patchBody = getPatchContent(ops);
+
+        String authToken = getAuthToken(eperson1.getEmail(),"qwerty01");
+        getClient(authToken).perform(patch("/api/authz/resourcepolicies/" + resourcePolicy.getID())
+                            .content(patchBody)
+                            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$",Matchers.allOf(
+                                    hasJsonPath("$.action", is(Constants.actionText[resourcePolicy.getAction()])),
+                                    hasJsonPath("$.name", nullValue()))));
+
+        getClient(authToken).perform(get("/api/authz/resourcepolicies/" + resourcePolicy.getID()))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$",Matchers.allOf(
+                                    hasJsonPath("$.action", is(Constants.actionText[resourcePolicy.getAction()])),
+                                    hasJsonPath("$.name", nullValue()))));
+    }
+
+    @Test
+    public void patchRemoveNameForbiddenTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson eperson1 = EPersonBuilder.createEPerson(context)
+                .withEmail("eperson1@mail.com")
+                .withPassword("qwerty01")
+                .build();
+
+        Community community = CommunityBuilder.createCommunity(context).build();
+
+        Collection collection = CollectionBuilder.createCollection(context, community)
+                .build();
+
+        Item myItem = ItemBuilder.createItem(context, collection)
+                .withTitle("Public item")
+                .build();
+
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+                .withAction(Constants.READ)
+                .withDspaceObject(myItem)
+                .withGroup(EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS))
+                .withName("My Name")
+                .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
+                .build();
+
+        context.restoreAuthSystemState();
+
+        List<Operation> ops = new ArrayList<Operation>();
+        RemoveOperation replaceOperation = new RemoveOperation("/name");
+        ops.add(replaceOperation);
+        String patchBody = getPatchContent(ops);
+
+        String authToken = getAuthToken(eperson1.getEmail(),"qwerty01");
+        getClient(authToken).perform(patch("/api/authz/resourcepolicies/" + resourcePolicy.getID())
+                            .content(patchBody)
+                            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                            .andExpect(status().isForbidden());
+
+        getClient(authToken).perform(get("/api/authz/resourcepolicies/" + resourcePolicy.getID()))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$",Matchers.allOf(
+                                    hasJsonPath("$.action", is(Constants.actionText[resourcePolicy.getAction()])),
+                                    hasJsonPath("$.name", is(resourcePolicy.getRpName())))));
     }
 }

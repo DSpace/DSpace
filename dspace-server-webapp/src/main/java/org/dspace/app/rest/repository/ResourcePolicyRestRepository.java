@@ -185,7 +185,7 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
 
     @Override
     @PreAuthorize("hasAuthority('ADMIN')")
-    protected ResourcePolicyRest createAndReturn(Context context) throws AuthorizeException {
+    protected ResourcePolicyRest createAndReturn(Context context) throws AuthorizeException, SQLException {
 
         String resourceUuidStr = getRequestService().getCurrentRequest().getServletRequest().getParameter("resource");
         String epersonUuidStr = getRequestService().getCurrentRequest().getServletRequest().getParameter("eperson");
@@ -196,7 +196,7 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
             throw new MissingParameterException("Missing resource (uuid) parameter");
         }
         if ((epersonUuidStr == null && groupUuidStr == null) || (epersonUuidStr != null && groupUuidStr != null)) {
-            throw new MissingParameterException("Both eperson than group parameters supploed, only one allowed");
+            throw new MissingParameterException("Both eperson than group parameters supplied, only one allowed");
         }
 
         HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
@@ -212,22 +212,18 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
             throw new UnprocessableEntityException("error parsing the body " + exIO.getMessage(), exIO);
         }
 
-        try {
-            DSpaceObject dspaceObject = dspaceObjectUtils.findDSpaceObject(context, resourceUuid);
-            if (dspaceObject == null) {
-                throw new UnprocessableEntityException("DSpaceObject with this uuid: " + resourceUuid + " not found");
-            }
-            resourcePolicy = resourcePolicyService.create(context);
-            resourcePolicy.setRpType(resourcePolicyRest.getPolicyType());
-            resourcePolicy.setdSpaceObject(dspaceObject);
-            resourcePolicy.setRpName(resourcePolicyRest.getName());
-            resourcePolicy.setRpDescription(resourcePolicyRest.getDescription());
-            resourcePolicy.setAction(Constants.getActionID(resourcePolicyRest.getAction()));
-            resourcePolicy.setStartDate(resourcePolicyRest.getStartDate());
-            resourcePolicy.setEndDate(resourcePolicyRest.getEndDate());
-        } catch (SQLException excSQL) {
-            throw new RuntimeException(excSQL.getMessage(), excSQL);
+        DSpaceObject dspaceObject = dspaceObjectUtils.findDSpaceObject(context, resourceUuid);
+        if (dspaceObject == null) {
+            throw new UnprocessableEntityException("DSpaceObject with this uuid: " + resourceUuid + " not found");
         }
+        resourcePolicy = resourcePolicyService.create(context);
+        resourcePolicy.setRpType(resourcePolicyRest.getPolicyType());
+        resourcePolicy.setdSpaceObject(dspaceObject);
+        resourcePolicy.setRpName(resourcePolicyRest.getName());
+        resourcePolicy.setRpDescription(resourcePolicyRest.getDescription());
+        resourcePolicy.setAction(Constants.getActionID(resourcePolicyRest.getAction()));
+        resourcePolicy.setStartDate(resourcePolicyRest.getStartDate());
+        resourcePolicy.setEndDate(resourcePolicyRest.getEndDate());
 
         if (epersonUuidStr != null) {
             try {
@@ -275,7 +271,7 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
     }
 
     @Override
-    @PreAuthorize("hasPermission(#id, 'resourcePolicyPatch', 'ADMIN')")
+    @PreAuthorize("hasPermission(#id, 'resourcepolicy', 'ADMIN')")
     protected void patch(Context context, HttpServletRequest request, String apiCategory, String model, Integer id,
             Patch patch)
             throws RepositoryMethodNotImplementedException, SQLException, AuthorizeException, DCInputsReaderException {
