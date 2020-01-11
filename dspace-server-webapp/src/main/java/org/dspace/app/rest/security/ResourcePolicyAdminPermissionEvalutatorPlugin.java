@@ -30,15 +30,16 @@ import org.springframework.stereotype.Component;
 
 /**
  * 
+ * {@link RestPermissionEvaluatorPlugin} class that evaluate ADMIN permissions over a Resource Policy
  * 
- * @author Mykhaylo Boychuk - 4Science
+ * @author Mykhaylo Boychuk - (4Science.it)
  */
 @Component
-public class ResourcePolicyPatchPermissionEvalutatorPlagin extends RestObjectPermissionEvaluatorPlugin {
+public class ResourcePolicyAdminPermissionEvalutatorPlugin extends RestObjectPermissionEvaluatorPlugin {
 
     private static final Logger log = LoggerFactory.getLogger(ResourcePolicyRestPermissionEvaluatorPlugin.class);
 
-    public static final String RESOURCE_POLICY_PATCH = "resourcePolicyPatch";
+    public static final String RESOURCE_POLICY_PATCH = "resourcepolicy";
 
     @Autowired
     AuthorizeService authorizeService;
