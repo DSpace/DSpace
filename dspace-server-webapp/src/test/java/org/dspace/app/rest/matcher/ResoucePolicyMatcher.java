@@ -17,7 +17,12 @@ import org.dspace.authorize.ResourcePolicy;
 import org.dspace.core.Constants;
 import org.hamcrest.Matcher;
 
-
+/**
+ * Provide convenient org.hamcrest.Matcher to verify a ResourcePolicyRest json response
+ * 
+ * @author Mykhaylo Boychuk (4science.it)
+ *
+ */
 public class ResoucePolicyMatcher {
 
     private ResoucePolicyMatcher() {
