@@ -24,7 +24,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
-
+/**
+ * {@link RestPermissionEvaluatorPlugin} class that evaluate permissions against a generic DSpace Object
+ * 
+ * @author Mykhaylo Boychuk (4science.it)
+ */
 @Component
 public class DSpaceObjectRestPermissionEvaluatorPlugin extends RestObjectPermissionEvaluatorPlugin {
 

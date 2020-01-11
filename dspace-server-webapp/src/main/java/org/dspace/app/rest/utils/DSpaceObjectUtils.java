@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component;
 
 
 /**
- * 
+ * Utility class providing methods to deal with generic DSpace Object of unknown type
  *
  * @author Mykhaylo Boychuk (4science.it)
  */
