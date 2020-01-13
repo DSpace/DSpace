@@ -7,14 +7,14 @@
  */
 package org.dspace.app.rest.converter;
 
+import java.util.stream.Collectors;
+
 import org.dspace.app.rest.model.WorkflowActionRest;
 import org.dspace.app.rest.model.WorkflowStepRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.xmlworkflow.state.Step;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.stream.Collectors;
 
 /**
  * Converter to translate {@link Step} to a {@link WorkflowStepRest} object
@@ -31,7 +31,7 @@ public class WorkflowStepConverter implements DSpaceConverter<Step, WorkflowStep
     public WorkflowStepRest convert(Step modelObject, Projection projection) {
         WorkflowStepRest restModel = new WorkflowStepRest();
         restModel.setId(modelObject.getId());
-        restModel.setActions(modelObject.getActions().stream()
+        restModel.setWorkflowactions(modelObject.getActions().stream()
             .map(x -> (WorkflowActionRest) converter.toRest(x, projection))
             .collect(Collectors.toList()));
         return restModel;

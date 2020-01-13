@@ -7,11 +7,11 @@
  */
 package org.dspace.app.rest.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.dspace.xmlworkflow.state.actions.WorkflowActionConfig;
-import org.dspace.app.rest.RestResourceController;
-
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.dspace.app.rest.RestResourceController;
+import org.dspace.xmlworkflow.state.actions.WorkflowActionConfig;
 
 /**
  * The rest resource used for workflow steps
@@ -24,7 +24,7 @@ public class WorkflowStepRest extends BaseObjectRest {
     public static final String NAME = "workflowstep";
     public static final String NAME_PLURAL = "workflowsteps";
 
-    private List<WorkflowActionRest> actions;
+    private List<WorkflowActionRest> workflowactions;
 
     @Override
     public String getCategory() {
@@ -43,11 +43,11 @@ public class WorkflowStepRest extends BaseObjectRest {
 
     @LinkRest(linkClass = WorkflowActionConfig.class)
     @JsonIgnore
-    public List<WorkflowActionRest> getActions() {
-        return actions;
+    public List<WorkflowActionRest> getWorkflowactions() {
+        return workflowactions;
     }
 
-    public void setActions(List<WorkflowActionRest> actions) {
-        this.actions = actions;
+    public void setWorkflowactions(List<WorkflowActionRest> actions) {
+        this.workflowactions = actions;
     }
 }
