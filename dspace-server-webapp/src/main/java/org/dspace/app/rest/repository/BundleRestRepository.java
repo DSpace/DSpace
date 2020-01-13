@@ -18,14 +18,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.dspace.app.rest.converter.BundleConverter;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.BundleRest;
-import org.dspace.app.rest.model.hateoas.BundleResource;
-import org.dspace.app.rest.model.hateoas.DSpaceResource;
 import org.dspace.app.rest.model.patch.Patch;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.repository.patch.BundlePatch;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
@@ -42,6 +40,7 @@ import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
@@ -57,12 +56,8 @@ public class BundleRestRepository extends DSpaceObjectRestRepository<Bundle, Bun
 
     private static final Logger log = LogManager.getLogger();
 
-
     @Autowired
     private BundleService bundleService;
-
-    @Autowired
-    private BundlePatch bundlePatch;
 
     @Autowired
     private AuthorizeService authorizeService;
@@ -76,11 +71,8 @@ public class BundleRestRepository extends DSpaceObjectRestRepository<Bundle, Bun
     @Autowired
     private BitstreamFormatService bitstreamFormatService;
 
-
-    public BundleRestRepository(BundleService dsoService,
-                                BundleConverter dsoConverter,
-                                BundlePatch dsoPatch) {
-        super(dsoService, dsoConverter, dsoPatch);
+    public BundleRestRepository(BundleService dsoService, BundlePatch dsoPatch) {
+        super(dsoService, dsoPatch);
         this.bundleService = dsoService;
     }
 
@@ -95,7 +87,7 @@ public class BundleRestRepository extends DSpaceObjectRestRepository<Bundle, Bun
         if (bundle == null) {
             return null;
         }
-        return dsoConverter.fromModel(bundle);
+        return converter.toRest(bundle, utils.obtainProjection());
     }
 
     public Page<BundleRest> findAll(Context context, Pageable pageable) {
@@ -131,8 +123,8 @@ public class BundleRestRepository extends DSpaceObjectRestRepository<Bundle, Bun
      * @param properties      The properties to be assigned to the bitstream
      * @return The uploaded bitstream
      */
-    public Bitstream uploadBitstream(Context context, Bundle bundle, String fileName, InputStream fileInputStream,
-                                     String properties) {
+    public BitstreamRest uploadBitstream(Context context, Bundle bundle, String fileName, InputStream fileInputStream,
+                                         String properties) {
         Item item = null;
         Bitstream bitstream = null;
         try {
@@ -159,7 +151,7 @@ public class BundleRestRepository extends DSpaceObjectRestRepository<Bundle, Bun
             throw new RuntimeException(message, e);
         }
 
-        return bitstream;
+        return converter.toRest(bitstream, Projection.DEFAULT);
     }
 
     /**
@@ -212,7 +204,29 @@ public class BundleRestRepository extends DSpaceObjectRestRepository<Bundle, Bun
         return BundleRest.class;
     }
 
-    public DSpaceResource<BundleRest> wrapResource(BundleRest model, String... rels) {
-        return new BundleResource(model, utils, rels);
+    /**
+     * Deletes a bundle whose uuid is given and deletes all the bitstreams it contains in BundleService.delete
+     * @param context
+     *            the dspace context
+     * @param id
+     *            the id of the bundle to delete
+     */
+    @Override
+    @PreAuthorize("hasPermission(#id, 'BUNDLE', 'DELETE')")
+    protected void delete(Context context, UUID id) throws AuthorizeException {
+        Bundle bundleToDelete = null;
+        try {
+            bundleToDelete = bundleService.find(context, id);
+            if (bundleToDelete == null) {
+                throw new ResourceNotFoundException("Bundle with id: " + id + " not found");
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Can't find a bundle with id: " + id, e);
+        }
+        try {
+            bundleService.delete(context, bundleToDelete);
+        } catch (IOException | SQLException e) {
+            throw new RuntimeException("Something went wrong trying to delete bundle with id: " + id, e);
+        }
     }
 }

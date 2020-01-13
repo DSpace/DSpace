@@ -17,7 +17,7 @@ import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.dspace.app.rest.converter.DSpaceObjectConverter;
+import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.link.HalLinkService;
 import org.dspace.app.rest.model.BitstreamRest;
@@ -36,6 +36,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ControllerUtils;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.hateoas.ResourceSupport;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PostAuthorize;
@@ -63,7 +64,7 @@ public class BitstreamBundleController {
     private BitstreamService bitstreamService;
 
     @Autowired
-    DSpaceObjectConverter<Bundle, BundleRest> dsoConverter;
+    ConverterService converter;
 
     @Autowired
     HalLinkService halLinkService;
@@ -106,10 +107,10 @@ public class BitstreamBundleController {
             return ControllerUtils.toEmptyResponse(HttpStatus.NO_CONTENT);
         }
 
-        BundleResource bundleResource = new BundleResource(dsoConverter.fromModel(bundles.get(0)), utils);
-        halLinkService.addLinks(bundleResource);
+        BundleResource bundleResource = converter.toResource(
+                converter.toRest(bundles.get(0), utils.obtainProjection()));
 
-        return ControllerUtils.toResponseEntity(HttpStatus.OK, null, bundleResource);
+        return ControllerUtils.toResponseEntity(HttpStatus.OK, new HttpHeaders(), bundleResource);
     }
 
     /**
@@ -126,7 +127,7 @@ public class BitstreamBundleController {
     @RequestMapping(method = RequestMethod.PUT, consumes = {"text/uri-list"})
     @PreAuthorize("hasPermission(#uuid, 'BITSTREAM','WRITE')")
     @PostAuthorize("returnObject != null")
-    public BundleResource move(@PathVariable UUID uuid, HttpServletResponse response,
+    public BundleRest move(@PathVariable UUID uuid, HttpServletResponse response,
                                HttpServletRequest request)
             throws SQLException, IOException, AuthorizeException {
         Context context = ContextUtil.obtainContext(request);
@@ -143,17 +144,11 @@ public class BitstreamBundleController {
             throw new ResourceNotFoundException("Bitstream with id: " + uuid + " not found");
         }
 
-        Bundle targetBundle = bitstreamRestRepository.performBitstreamMove(context, bitstream, (Bundle) dsoList.get(0));
-
-        if (targetBundle == null) {
-            return null;
-        }
-        BundleResource bundleResource = new BundleResource(dsoConverter.fromModel(targetBundle), utils);
-        halLinkService.addLinks(bundleResource);
+        BundleRest bundleRest = bitstreamRestRepository.performBitstreamMove(context, bitstream,
+                (Bundle) dsoList.get(0));
 
         context.commit();
 
-        return bundleResource;
-
+        return bundleRest;
     }
 }

@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.dspace.app.rest.converter.ItemConverter;
+import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.link.HalLinkService;
 import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.MappedItemRestWrapper;
@@ -54,7 +54,7 @@ public class MappedItemRestController {
     private ItemService itemService;
 
     @Autowired
-    private ItemConverter itemConverter;
+    private ConverterService converter;
 
     @Autowired
     Utils utils;
@@ -90,17 +90,18 @@ public class MappedItemRestController {
         Context context = ContextUtil.obtainContext(request);
         Collection collection = collectionService.find(context, uuid);
         Iterator<Item> itemIterator = itemService.findByCollectionMapping(context, collection, pageable.getPageSize(),
-                                                                          pageable.getOffset());
+                Math.toIntExact(pageable.getOffset()));
         int totalElements = itemService.countByCollectionMapping(context, collection);
         List<ItemRest> mappedItemRestList = new LinkedList<>();
         while (itemIterator.hasNext()) {
             Item item = itemIterator.next();
             if (item.getOwningCollection().getID() != uuid) {
-                mappedItemRestList.add(itemConverter.fromModel(item));
+                mappedItemRestList.add(converter.toRest(item, utils.obtainProjection()));
             }
         }
 
         MappedItemRestWrapper mappedItemRestWrapper = new MappedItemRestWrapper();
+        mappedItemRestWrapper.setProjection(utils.obtainProjection());
         mappedItemRestWrapper.setMappedItemRestList(mappedItemRestList);
         mappedItemRestWrapper.setCollectionUuid(uuid);
         MappedItemResourceWrapper mappedItemResourceWrapper =

@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
@@ -23,7 +24,6 @@ import org.dspace.app.rest.exception.RESTAuthorizationException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.RestAddressableModel;
-import org.dspace.app.rest.model.hateoas.DSpaceResource;
 import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.authorize.AuthorizeException;
@@ -38,9 +38,8 @@ import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
- * This is the base class for any Rest Repository. It add a DSpaceContext to the
- * normal Spring Data Repository methods signature and assure that the
- * repository is able to wrap a DSpace Rest Object in a HAL Resource
+ * Base class for any Rest Repository. Adds a DSpaceContext to the
+ * normal Spring Data Repository methods signature.
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
@@ -96,7 +95,7 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
     /**
      * Method to implement to support bulk update of a REST objects via a PUT request
      */
-    public <S extends T> Iterable<S> save(Iterable<S> entities) {
+    public <S extends T> Iterable<S> saveAll(Iterable<S> entities) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -107,9 +106,14 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
      *
      * @return the REST object identified by its ID
      */
-    public T findOne(ID id) {
+    public Optional<T> findById(ID id) {
         Context context = obtainContext();
-        return thisRepository.findOne(context, id);
+        final T object = thisRepository.findOne(context, id);
+        if (object == null) {
+            return Optional.empty();
+        } else {
+            return Optional.of(object);
+        }
     }
 
     /**
@@ -128,8 +132,8 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
      * Return true if an object exist for the specified ID. The default implementation is inefficient as it retrieves
      * the actual object to state that it exists. This could lead to retrieve and inizialize lot of linked objects
      */
-    public boolean exists(ID id) {
-        return findOne(id) != null;
+    public boolean existsById(ID id) {
+        return findById(id).isPresent();
     }
 
     @Override
@@ -145,7 +149,7 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
      * This method could be implemented to support bulk retrieval of specific object by their IDs. Unfortunately, this
      * method doesn't allow pagination and it could be misused to retrieve thousand objects at once
      */
-    public Iterable<T> findAll(Iterable<ID> ids) {
+    public Iterable<T> findAllById(Iterable<ID> ids) {
         throw new RuntimeException("findAll MUST be paginated");
     }
 
@@ -163,7 +167,7 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
     /**
      * Delete the object identified by its ID
      */
-    public void delete(ID id) {
+    public void deleteById(ID id) {
         Context context = obtainContext();
         try {
             thisRepository.delete(context, id);
@@ -202,7 +206,7 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
     /**
      * Method to implement to support bulk delete of multiple entity instances
      */
-    public void delete(Iterable<? extends T> entities) {
+    public void deleteAll(Iterable<? extends T> entities) {
         // TODO Auto-generated method stub
 
     }
@@ -248,17 +252,6 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
      * The REST model supported by the repository
      */
     public abstract Class<T> getDomainClass();
-
-    /**
-     * Wrap the REST model in a REST HAL Resource
-     *
-     * @param model
-     *            the rest model instance
-     * @param rels
-     *            the HAL links
-     * @return the REST Resource
-     */
-    public abstract DSpaceResource<T> wrapResource(T model, String... rels);
 
     /**
      * Create and return a new instance. Data are usually retrieved from the thread bound http request
@@ -425,7 +418,7 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
         } catch (SQLException | DCInputsReaderException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        return findOne(id);
+        return findById(id).orElse(null);
     }
 
     /**
@@ -531,7 +524,7 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
             throw new RuntimeException("Unable to perform PUT request as the " +
                                            "current user does not have sufficient rights", e);
         }
-        return findOne(uuid);
+        return findById(uuid).orElse(null);
     }
 
     /**
@@ -553,7 +546,7 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
         } catch (SQLException | AuthorizeException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        return findOne(id);
+        return findById(id).orElse(null);
     }
 
     /**
