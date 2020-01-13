@@ -112,11 +112,13 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
             if (action != null) {
                 int actionId = Constants.getActionID(action);
                 resourcePolisies = resourcePolicyService.findByResouceUuidAndActionId(context, resourceUuid, actionId,
-                        pageable.getOffset(), pageable.getOffset() + pageable.getPageSize());
+                        Math.toIntExact(pageable.getOffset()),
+                        Math.toIntExact(pageable.getOffset() + pageable.getPageSize()));
                 total = resourcePolicyService.countByResouceUuidAndActionId(context, resourceUuid, actionId);
             } else {
                 resourcePolisies = resourcePolicyService.findByResouceUuid(context, resourceUuid,
-                        pageable.getOffset(), pageable.getOffset() + pageable.getPageSize());
+                        Math.toIntExact(pageable.getOffset()),
+                        Math.toIntExact(pageable.getOffset() + pageable.getPageSize()));
                 total = resourcePolicyService.countByResourceUuid(context, resourceUuid);
             }
         } catch (SQLException e) {
@@ -140,12 +142,14 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
             }
             if (resourceUuid != null) {
                 resourcePolisies = resourcePolicyService.findByEPersonAndResourceUuid(context, eperson, resourceUuid,
-                                   pageable.getOffset(), pageable.getOffset() + pageable.getPageSize());
+                        Math.toIntExact(pageable.getOffset()),
+                        Math.toIntExact(pageable.getOffset() + pageable.getPageSize()));
                 total = resourcePolicyService.countResourcePoliciesByEPersonAndResourceUuid(context,
                         resourceUuid, eperson);
             } else {
-                resourcePolisies = resourcePolicyService.findByEPerson(context, eperson, pageable.getOffset(),
-                        pageable.getOffset() + pageable.getPageSize());
+                resourcePolisies = resourcePolicyService.findByEPerson(context, eperson,
+                        Math.toIntExact(pageable.getOffset()),
+                        Math.toIntExact(pageable.getOffset() + pageable.getPageSize()));
                 total = resourcePolicyService.countByEPerson(context, eperson);
             }
         } catch (SQLException e) {
@@ -169,11 +173,13 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
             }
             if (resourceUuid != null) {
                 resourcePolisies = resourcePolicyService.findByGroupAndResourceUuid(context, group, resourceUuid,
-                        pageable.getOffset(), pageable.getOffset() + pageable.getPageSize());
+                        Math.toIntExact(pageable.getOffset()),
+                        Math.toIntExact(pageable.getOffset() + pageable.getPageSize()));
                 total = resourcePolicyService.countByGroupAndResourceUuid(context, group, resourceUuid);
             } else {
-                resourcePolisies = resourcePolicyService.findByGroup(context, group, pageable.getOffset(),
-                        pageable.getOffset() + pageable.getPageSize());
+                resourcePolisies = resourcePolicyService.findByGroup(context, group,
+                        Math.toIntExact(pageable.getOffset()),
+                        Math.toIntExact(pageable.getOffset() + pageable.getPageSize()));
                 total = resourcePolicyService.countResourcePolicyByGroup(context, group);
             }
 
@@ -275,7 +281,7 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
     protected void patch(Context context, HttpServletRequest request, String apiCategory, String model, Integer id,
             Patch patch)
             throws RepositoryMethodNotImplementedException, SQLException, AuthorizeException, DCInputsReaderException {
-        ResourcePolicyRest rest = findOne(id);
+        ResourcePolicyRest rest = findOne(context,id);
         if (rest == null) {
             throw new ResourceNotFoundException(
                     ResourcePolicyRest.CATEGORY + "." + ResourcePolicyRest.NAME + " with id: " + id + " not found");
