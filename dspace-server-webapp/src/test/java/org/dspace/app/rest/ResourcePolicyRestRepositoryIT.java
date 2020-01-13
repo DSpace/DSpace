@@ -2082,4 +2082,178 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
                                     hasJsonPath("$.action", is(Constants.actionText[resourcePolicy.getAction()])),
                                     hasJsonPath("$.name", is(resourcePolicy.getRpName())))));
     }
+
+    @Test
+    public void patchSuccessfulMultipleOperationsTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson eperson1 = EPersonBuilder.createEPerson(context)
+                .withEmail("eperson1@mail.com")
+                .withPassword("qwerty01")
+                .build();
+
+        Community community = CommunityBuilder.createCommunity(context).build();
+
+        Collection collection = CollectionBuilder.createCollection(context, community)
+                .withAdminGroup(eperson1)
+                .build();
+
+        Item publicItem1 = ItemBuilder.createItem(context, collection)
+                .withTitle("Public item")
+                .build();
+
+        Calendar calendarStartDate = Calendar.getInstance();
+
+        calendarStartDate.set(Calendar.YEAR, 2017);
+        calendarStartDate.set(Calendar.MONTH, 0);
+        calendarStartDate.set(Calendar.DATE, 1);
+
+        Date startDate = calendarStartDate.getTime();
+
+        Calendar calendarEndDate = Calendar.getInstance();
+
+        calendarEndDate.set(Calendar.YEAR, 2022);
+        calendarEndDate.set(Calendar.MONTH, 11);
+        calendarEndDate.set(Calendar.DATE, 31);
+
+        Date endDate = calendarEndDate.getTime();
+
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+                .withAction(Constants.READ)
+                .withDspaceObject(publicItem1)
+                .withStartDate(startDate)
+                .withEndDate(endDate)
+                .withGroup(EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS))
+                .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
+                .build();
+
+        context.restoreAuthSystemState();
+
+        List<Operation> ops = new ArrayList<Operation>();
+
+        String addName = "My Name";
+        AddOperation addNameOperation = new AddOperation("/name", addName);
+        ops.add(addNameOperation);
+
+        String addDescription = "My Description";
+        AddOperation addDescriptionOperation = new AddOperation("/description", addDescription);
+        ops.add(addDescriptionOperation);
+
+        String newName = "New Name";
+        ReplaceOperation replaceNameOperation = new ReplaceOperation("/name", newName);
+        ops.add(replaceNameOperation);
+
+        SimpleDateFormat formatDate = new SimpleDateFormat("yyyy-MM-dd");
+        Calendar calendarNewStartDate = Calendar.getInstance();
+        calendarNewStartDate.set(Calendar.YEAR, 2018);
+        calendarNewStartDate.set(Calendar.MONTH, 1);
+        calendarNewStartDate.set(Calendar.DATE, 1);
+
+        Date newStartDate = calendarNewStartDate.getTime();
+        ReplaceOperation replaceStartDateOperation = new ReplaceOperation("/startDate",
+                                                        formatDate.format(newStartDate));
+        ops.add(replaceStartDateOperation);
+
+        RemoveOperation removeEndDateOperation = new RemoveOperation("/endDate");
+        ops.add(removeEndDateOperation);
+
+        String patchBody = getPatchContent(ops);
+
+        String authToken = getAuthToken(eperson1.getEmail(),"qwerty01");
+        getClient(authToken).perform(patch("/api/authz/resourcepolicies/" + resourcePolicy.getID())
+                            .content(patchBody)
+                            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$",Matchers.allOf(
+                                    hasJsonPath("$.name", is(newName)),
+                                    hasJsonPath("$.description", is(addDescription)),
+                                    hasJsonPath("$.startDate", is(formatDate.format(newStartDate))),
+                                    hasJsonPath("$.endDate", nullValue()),
+                                    hasJsonPath("$.action", is(Constants.actionText[resourcePolicy.getAction()])))));
+
+        getClient(authToken).perform(get("/api/authz/resourcepolicies/" + resourcePolicy.getID()))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$",Matchers.allOf(
+                                    hasJsonPath("$.action", is(Constants.actionText[resourcePolicy.getAction()])),
+                                    hasJsonPath("$.name", is(newName)),
+                                    hasJsonPath("$.startDate", is(formatDate.format(newStartDate))),
+                                    hasJsonPath("$.endDate", nullValue()),
+                                    hasJsonPath("$.description", is(addDescription)))));
+    }
+
+    @Test
+    public void patchWithMultipleOperationsFailTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson eperson1 = EPersonBuilder.createEPerson(context)
+                .withEmail("eperson1@mail.com")
+                .withPassword("qwerty01")
+                .build();
+
+        Community community = CommunityBuilder.createCommunity(context).build();
+
+        Collection collection = CollectionBuilder.createCollection(context, community)
+                .withAdminGroup(eperson1)
+                .build();
+
+        Item publicItem1 = ItemBuilder.createItem(context, collection)
+                .withTitle("Public item")
+                .build();
+
+        Calendar calendarEndDate = Calendar.getInstance();
+
+        calendarEndDate.set(Calendar.YEAR, 2022);
+        calendarEndDate.set(Calendar.MONTH, 11);
+        calendarEndDate.set(Calendar.DATE, 31);
+
+        Date endDate = calendarEndDate.getTime();
+
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+                .withAction(Constants.READ)
+                .withDspaceObject(publicItem1)
+                .withName("My Name")
+                .withEndDate(endDate)
+                .withGroup(EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS))
+                .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
+                .build();
+
+        context.restoreAuthSystemState();
+
+        List<Operation> ops = new ArrayList<Operation>();
+
+        String newName = "New Name";
+        ReplaceOperation replaceNameOperation = new ReplaceOperation("/name", newName);
+        ops.add(replaceNameOperation);
+
+        SimpleDateFormat formatDate = new SimpleDateFormat("yyyy-MM-dd");
+        Calendar calendarNewStartDate = Calendar.getInstance();
+        calendarNewStartDate.set(Calendar.YEAR, 2018);
+        calendarNewStartDate.set(Calendar.MONTH, 1);
+        calendarNewStartDate.set(Calendar.DATE, 1);
+
+        Date newStartDate = calendarNewStartDate.getTime();
+        ReplaceOperation replaceStartDateOperation = new ReplaceOperation("/startDate",
+                                                        formatDate.format(newStartDate));
+        ops.add(replaceStartDateOperation);
+
+        RemoveOperation removeEndDateOperation = new RemoveOperation("/endDate");
+        ops.add(removeEndDateOperation);
+
+        String patchBody = getPatchContent(ops);
+
+        String authToken = getAuthToken(eperson1.getEmail(),"qwerty01");
+        getClient(authToken).perform(patch("/api/authz/resourcepolicies/" + resourcePolicy.getID())
+                            .content(patchBody)
+                            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                            .andExpect(status().isBadRequest());
+
+        getClient(authToken).perform(get("/api/authz/resourcepolicies/" + resourcePolicy.getID()))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$",Matchers.allOf(
+                                    hasJsonPath("$.action", is(Constants.actionText[resourcePolicy.getAction()])),
+                                    hasJsonPath("$.name", is(resourcePolicy.getRpName())),
+                                    hasJsonPath("$.startDate", nullValue()),
+                                    hasJsonPath("$.endDate", is(formatDate.format(endDate))),
+                                    hasJsonPath("$.description", nullValue()))));
+    }
 }
