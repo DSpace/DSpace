@@ -233,6 +233,15 @@ public interface ResourcePolicyService extends DSpaceCRUDService<ResourcePolicy>
      */
     public int countByGroupAndResourceUuid(Context context, Group group, UUID resourceUuid) throws SQLException;
 
+    /**
+     * Check if the resource policy identified with (id) belong to ePerson
+     * 
+     * @param context           DSpace context object
+     * @param eperson           ePerson
+     * @param id                id of resource policy
+     * @return
+     * @throws SQLException     if database error
+     */
     public boolean isMyResourcePolicy(Context context, EPerson eperson, Integer id) throws SQLException;
 
 }
