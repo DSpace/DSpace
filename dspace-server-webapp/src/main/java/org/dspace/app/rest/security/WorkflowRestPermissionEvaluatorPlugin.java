@@ -63,7 +63,7 @@ public class WorkflowRestPermissionEvaluatorPlugin extends RestObjectPermissionE
         //This plugin currently only evaluates READ access
         DSpaceRestPermission restPermission = DSpaceRestPermission.convert(permission);
         if (!DSpaceRestPermission.READ.equals(restPermission)
-                || !StringUtils.equals(WorkflowItemRest.NAME, targetType)) {
+                || !StringUtils.equalsIgnoreCase(WorkflowItemRest.NAME, targetType)) {
             return false;
         }
 
