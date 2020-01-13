@@ -122,7 +122,8 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
     public Page<ItemRest> findAll(Context context, Pageable pageable) {
         try {
             long total = itemService.countTotal(context);
-            Iterator<Item> it = itemService.findAll(context, pageable.getPageSize(), pageable.getOffset());
+            Iterator<Item> it = itemService.findAll(context, pageable.getPageSize(),
+                    Math.toIntExact(pageable.getOffset()));
             List<Item> items = new ArrayList<>();
             while (it.hasNext()) {
                 items.add(it.next());
