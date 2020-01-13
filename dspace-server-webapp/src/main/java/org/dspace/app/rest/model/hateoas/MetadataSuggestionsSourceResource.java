@@ -17,8 +17,7 @@ import org.dspace.app.rest.utils.Utils;
 @RelNameDSpaceResource(MetadataSuggestionsSourceRest.NAME)
 public class MetadataSuggestionsSourceResource extends DSpaceResource<MetadataSuggestionsSourceRest> {
 
-    public MetadataSuggestionsSourceResource(MetadataSuggestionsSourceRest data, Utils utils,
-                                             String... rels) {
+    public MetadataSuggestionsSourceResource(MetadataSuggestionsSourceRest data, Utils utils) {
         super(data, utils);
     }
 

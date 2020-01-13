@@ -28,6 +28,11 @@ public class MetadataSuggestionEntryRest extends BaseObjectRest<String> {
     @JsonProperty("metadata")
     private MetadataRest metadataRest;
 
+    @JsonIgnore
+    private Integer workspaceItemId;
+    @JsonIgnore
+    private Integer workflowItemId;
+
     //TODO Change to REST/RESOURCE
     @JsonIgnore
     private MetadataChangeRest metadataChangeRest;
@@ -139,5 +144,37 @@ public class MetadataSuggestionEntryRest extends BaseObjectRest<String> {
      */
     public void setMetadataChangeRest(MetadataChangeRest metadataChangeRest) {
         this.metadataChangeRest = metadataChangeRest;
+    }
+
+    /**
+     * Generic getter for the workspaceItemId
+     * @return the workspaceItemId value of this MetadataSuggestionEntryRest
+     */
+    public Integer getWorkspaceItemId() {
+        return workspaceItemId;
+    }
+
+    /**
+     * Generic setter for the workspaceItemId
+     * @param workspaceItemId   The workspaceItemId to be set on this MetadataSuggestionEntryRest
+     */
+    public void setWorkspaceItemId(Integer workspaceItemId) {
+        this.workspaceItemId = workspaceItemId;
+    }
+
+    /**
+     * Generic getter for the workflowItemId
+     * @return the workflowItemId value of this MetadataSuggestionEntryRest
+     */
+    public Integer getWorkflowItemId() {
+        return workflowItemId;
+    }
+
+    /**
+     * Generic setter for the workflowItemId
+     * @param workflowItemId   The workflowItemId to be set on this MetadataSuggestionEntryRest
+     */
+    public void setWorkflowItemId(Integer workflowItemId) {
+        this.workflowItemId = workflowItemId;
     }
 }

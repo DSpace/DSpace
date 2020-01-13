@@ -15,7 +15,7 @@ public class MetadataChange {
     /**
      * A String representing the type of change
      */
-    private String op;
+    private String operation;
     /**
      * A String representing the metadata key
      */
@@ -27,30 +27,30 @@ public class MetadataChange {
 
     /**
      * Constructor for this object
-     * @param op            The operation
+     * @param operation     The operation
      * @param metadataKey   The metadata key
      * @param value         The value
      */
-    public MetadataChange(String op, String metadataKey, String value) {
-        this.op = op;
+    public MetadataChange(String operation, String metadataKey, String value) {
+        this.operation = operation;
         this.metadataKey = metadataKey;
         this.value = value;
     }
 
     /**
-     * Generic getter for the op
-     * @return the op value of this MetadataChange
+     * Generic getter for the operation
+     * @return the operation value of this MetadataChange
      */
-    public String getOp() {
-        return op;
+    public String getOperation() {
+        return operation;
     }
 
     /**
-     * Generic setter for the op
-     * @param op   The op to be set on this MetadataChange
+     * Generic setter for the operation
+     * @param operation   The operation to be set on this MetadataChange
      */
-    public void setOp(String op) {
-        this.op = op;
+    public void setOperation(String operation) {
+        this.operation = operation;
     }
 
     /**

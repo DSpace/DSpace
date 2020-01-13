@@ -10,7 +10,10 @@ package org.dspace.app.rest.converter;
 import org.dspace.app.rest.model.MetadataSuggestionEntryRest;
 import org.dspace.app.rest.model.MetadataValueDTOList;
 import org.dspace.app.rest.projection.Projection;
+import org.dspace.content.InProgressSubmission;
+import org.dspace.content.WorkspaceItem;
 import org.dspace.external.provider.metadata.service.impl.MetadataItemSuggestions;
+import org.dspace.workflow.WorkflowItem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -33,6 +36,12 @@ public class MetadataSuggestionEntryConverter implements
         metadataSuggestionEntryRest.setDisplay(obj.getExternalDataObject().getDisplayValue());
         metadataSuggestionEntryRest.setId(obj.getExternalDataObject().getId());
         metadataSuggestionEntryRest.setValue(obj.getExternalDataObject().getValue());
+        InProgressSubmission inProgressSubmission = obj.getInProgressSubmission();
+        if (inProgressSubmission instanceof WorkflowItem) {
+            metadataSuggestionEntryRest.setWorkflowItemId(((WorkflowItem) inProgressSubmission).getID());
+        } else {
+            metadataSuggestionEntryRest.setWorkspaceItemId(((WorkspaceItem) inProgressSubmission).getID());
+        }
         MetadataValueDTOList metadataValueDTOList = new MetadataValueDTOList(obj.getExternalDataObject().getMetadata());
         metadataSuggestionEntryRest
             .setMetadataRest(converter.toRest(metadataValueDTOList, Projection.DEFAULT));

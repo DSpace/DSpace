@@ -8,7 +8,9 @@
 package org.dspace.external.provider.metadata.service.impl;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -63,5 +65,39 @@ public class MetadataSuggestionProviderServiceImpl implements MetadataSuggestion
         }
 
         return Optional.empty();
+    }
+
+    public Optional<MetadataSuggestionDifferences> getMetadataSuggestionDifferences(String suggestionName,
+        String entryId, InProgressSubmission inProgressSubmission) {
+
+        Optional<MetadataItemSuggestions> optional = getMetadataItemSuggestions(suggestionName, entryId,
+                                                                                inProgressSubmission);
+        if (optional.isPresent()) {
+            MetadataItemSuggestions metadataItemSuggestions = optional.get();
+            List<MetadataChange> metadataChanges = metadataItemSuggestions.getMetadataChanges();
+            Map<String, List<String>> inProgressSubmissionMetadataMap = metadataItemSuggestions
+                .getInProgressSubmissionMetadata();
+            MetadataSuggestionDifferences metadataSuggestionDifferences =
+                new MetadataSuggestionDifferences(suggestionName, inProgressSubmission, entryId);
+            for (MetadataChange metadataChange : metadataChanges) {
+                MetadataSuggestionDifference metadataSuggestionDifference = metadataSuggestionDifferences
+                    .getDifference(metadataChange.getMetadataKey());
+                if (metadataSuggestionDifference != null) {
+                    metadataSuggestionDifference.addMetadataChange(metadataChange);
+                } else {
+                    metadataSuggestionDifference = new MetadataSuggestionDifference();
+                    List<MetadataChange> list = new LinkedList<>();
+                    list.add(metadataChange);
+                    metadataSuggestionDifference.setMetadataChanges(list);
+                    metadataSuggestionDifference.setCurrentValues(inProgressSubmissionMetadataMap
+                                                                      .get(metadataChange.getMetadataKey()));
+                    metadataSuggestionDifferences.addDifference(metadataChange.getMetadataKey(),
+                                                                metadataSuggestionDifference);
+                }
+            }
+            return Optional.of(metadataSuggestionDifferences);
+        }
+        return Optional.empty();
+
     }
 }

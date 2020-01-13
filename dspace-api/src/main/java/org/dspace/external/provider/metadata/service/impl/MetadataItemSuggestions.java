@@ -67,20 +67,28 @@ public class MetadataItemSuggestions {
      */
     private void constructMetadataChanges() {
         metadataChanges = new LinkedList<>();
-        Map<String, List<String>> inProgressSubmissionMetadataMap = new HashMap<String, List<String>>();
-        List<MetadataValueDTO> mockMetadataFromInProgressSubmission = inProgressSubmission.getItem().getMetadata()
-            .stream().map(metadataValue -> new MetadataValueDTO(metadataValue)).collect(Collectors.toList());
-        mockMetadataFromInProgressSubmission.stream().forEach(mockMetadataValue -> {
-            inProgressSubmissionMetadataMap.computeIfAbsent(mockMetadataValue.getKey(), k -> new LinkedList<>())
-                                           .add(mockMetadataValue.getValue());
-        });
+        Map<String, List<String>> inProgressSubmissionMetadataMap = getInProgressSubmissionMetadata();
 
         for (MetadataValueDTO mockMetadataValue : externalDataObject.getMetadata()) {
             if (!inProgressSubmissionMetadataMap.containsKey(mockMetadataValue.getKey())) {
                 metadataChanges
-                    .add(new MetadataChange("add", mockMetadataValue.getKey(), mockMetadataValue.getValue()));
+                    .add(new MetadataChange("add/metadata/" + mockMetadataValue.getKey() + "/-",
+                                            mockMetadataValue.getKey(), mockMetadataValue.getValue()));
             }
         }
+    }
+
+    public Map<String, List<String>> getInProgressSubmissionMetadata() {
+        Map<String, List<String>> map = new HashMap<>();
+        List<MetadataValueDTO> mockMetadataFromInProgressSubmission =
+            inProgressSubmission.getItem().getMetadata().stream().map(
+                metadataValue -> new MetadataValueDTO(metadataValue)).collect(Collectors.toList());
+        mockMetadataFromInProgressSubmission.stream().forEach(mockMetadataValue -> {
+            map.computeIfAbsent(mockMetadataValue.getKey(), k -> new LinkedList<>())
+                .add(mockMetadataValue.getValue());
+        });
+
+        return map;
     }
 
     /**
@@ -89,5 +97,21 @@ public class MetadataItemSuggestions {
      */
     public void setMetadataChanges(List<MetadataChange> metadataChanges) {
         this.metadataChanges = metadataChanges;
+    }
+
+    /**
+     * Generic getter for the inProgressSubmission
+     * @return the inProgressSubmission value of this MetadataItemSuggestions
+     */
+    public InProgressSubmission getInProgressSubmission() {
+        return inProgressSubmission;
+    }
+
+    /**
+     * Generic setter for the inProgressSubmission
+     * @param inProgressSubmission   The inProgressSubmission to be set on this MetadataItemSuggestions
+     */
+    public void setInProgressSubmission(InProgressSubmission inProgressSubmission) {
+        this.inProgressSubmission = inProgressSubmission;
     }
 }

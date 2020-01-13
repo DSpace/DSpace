@@ -8,12 +8,11 @@
 package org.dspace.app.rest.converter;
 
 import java.sql.SQLException;
-import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.dspace.app.rest.model.MetadataRest;
@@ -47,22 +46,23 @@ public class MetadataDTOConverter implements DSpaceConverter<MetadataValueDTOLis
     public MetadataRest convert(MetadataValueDTOList metadataValues,
                                 Projection projection) {
         // Convert each value to a DTO while retaining place order in a map of key -> SortedSet
-        Map<String, SortedSet<MetadataValueRest>> mapOfSortedSets = new HashMap<>();
+        Map<String, Set<MetadataValueRest>> mapOfSortedSets = new HashMap<>();
         for (MetadataValueDTO metadataValue : metadataValues) {
             String key = metadataValue.getKey();
-            SortedSet<MetadataValueRest> set = mapOfSortedSets.get(key);
+            Set<MetadataValueRest> set = mapOfSortedSets.get(key);
             if (set == null) {
-                set = new TreeSet<>(Comparator.comparingInt(MetadataValueRest::getPlace));
+                set = new LinkedHashSet<>();
                 mapOfSortedSets.put(key, set);
             }
             set.add(converter.toRest(metadataValue, projection));
+            mapOfSortedSets.put(key, set);
         }
 
         MetadataRest metadataRest = new MetadataRest();
 
         // Populate MetadataRest's map of key -> List while respecting SortedSet's order
         Map<String, List<MetadataValueRest>> mapOfLists = metadataRest.getMap();
-        for (Map.Entry<String, SortedSet<MetadataValueRest>> entry : mapOfSortedSets.entrySet()) {
+        for (Map.Entry<String, Set<MetadataValueRest>> entry : mapOfSortedSets.entrySet()) {
             mapOfLists.put(entry.getKey(), entry.getValue().stream().collect(Collectors.toList()));
         }
 

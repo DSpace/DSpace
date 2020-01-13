@@ -10,6 +10,9 @@ package org.dspace.app.rest.model;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  * This class acts as the REST representation for the
  * {@link org.dspace.external.provider.metadata.service.impl.MetadataChange} object. The only difference is that this
@@ -20,81 +23,75 @@ public class MetadataChangeEntryRest {
     /**
      * The operation for the MetadataChange
      */
-    private String op;
+    private List<String> operations = new LinkedList<>();
     /**
      * The path to the metadata change
      */
-    private String path;
+    @JsonIgnore
+    private String metadataKey;
     /**
      * The list of values
      */
-    private List<String> values;
+    @JsonProperty("newvalue")
+    private String value;
 
     /**
      * Constructor for this object
-     * @param op            The operation
+     * @param operation     The operation
      * @param metadataKey   The metadata key
      * @param value         The value
      */
-    public MetadataChangeEntryRest(String op, String metadataKey, String value) {
-        this.op = op;
-        this.path = metadataKey;
-        this.values = new LinkedList<>();
-        values.add(value);
+    public MetadataChangeEntryRest(String operation, String metadataKey, String value) {
+        operations.add(operation);
+        this.metadataKey = metadataKey;
+        this.value = value;
     }
 
     /**
-     * Generic getter for the op
-     * @return the op value of this MetadataChangeEntryRest
+     * Generic getter for the operations
+     * @return the operations value of this MetadataChangeEntryRest
      */
-    public String getOp() {
-        return op;
+    public List<String> getOperations() {
+        return operations;
     }
 
     /**
-     * Generic setter for the op
-     * @param op   The op to be set on this MetadataChangeEntryRest
+     * Generic setter for the operations
+     * @param operations   The operations to be set on this MetadataChangeEntryRest
      */
-    public void setOp(String op) {
-        this.op = op;
+    public void setOperations(List<String> operations) {
+        this.operations = operations;
     }
 
     /**
-     * Generic getter for the path
-     * @return the path value of this MetadataChangeEntryRest
+     * Generic getter for the metadataKey
+     * @return the metadataKey value of this MetadataChangeEntryRest
      */
-    public String getPath() {
-        return path;
+    public String getMetadataKey() {
+        return metadataKey;
     }
 
     /**
-     * Generic setter for the path
-     * @param path   The path to be set on this MetadataChangeEntryRest
+     * Generic setter for the metadataKey
+     * @param metadataKey   The metadataKey to be set on this MetadataChangeEntryRest
      */
-    public void setPath(String path) {
-        this.path = path;
+    public void setMetadataKey(String metadataKey) {
+        this.metadataKey = metadataKey;
     }
 
     /**
-     * Generic getter for the values
-     * @return the values value of this MetadataChangeEntryRest
+     * Generic getter for the value
+     * @return the value value of this MetadataChangeEntryRest
      */
-    public List<String> getValues() {
-        return values;
+    public String getValue() {
+        return value;
     }
 
     /**
-     * Generic setter for the values
-     * @param values   The values to be set on this MetadataChangeEntryRest
+     * Generic setter for the value
+     * @param value   The value to be set on this MetadataChangeEntryRest
      */
-    public void setValues(List<String> values) {
-        this.values = values;
-    }
-
-    public void addValue(String value) {
-        if (values == null) {
-            values = new LinkedList<>();
-        }
-        values.add(value);
+    public void setValue(String value) {
+        this.value = value;
     }
 }

@@ -23,6 +23,5 @@ public class MetadataSuggestionEntryResource extends HALResource<MetadataSuggest
      */
     public MetadataSuggestionEntryResource(MetadataSuggestionEntryRest content) {
         super(content);
-        embedResource("changes", new MetadataChangeResource(content.getMetadataChangeRest()));
     }
 }

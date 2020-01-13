@@ -13,6 +13,7 @@ import java.util.Optional;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.external.provider.metadata.MetadataSuggestionProvider;
 import org.dspace.external.provider.metadata.service.impl.MetadataItemSuggestions;
+import org.dspace.external.provider.metadata.service.impl.MetadataSuggestionDifferences;
 
 /**
  * This is the interface for the MetadataSuggestionService implementation
@@ -38,8 +39,11 @@ public interface MetadataSuggestionProviderService {
      * @param suggestionName        The name of the MetadataSuggestionProvider to be used
      * @param entryId               The ID of the entry to be searched for in the relevant MetadataSuggestionProvider
      * @param inProgressSubmission  The InProgressSubmission for this suggestion
-     * @return                      The MetadataItemSuggestion
+     * @return The MetadataItemSuggestion
      */
     Optional<MetadataItemSuggestions> getMetadataItemSuggestions(String suggestionName, String entryId,
                                                                  InProgressSubmission inProgressSubmission);
+
+    public Optional<MetadataSuggestionDifferences> getMetadataSuggestionDifferences(String suggestionName,
+        String entryId, InProgressSubmission inProgressSubmission);
 }

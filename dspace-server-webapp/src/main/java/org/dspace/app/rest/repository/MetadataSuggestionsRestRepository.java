@@ -18,9 +18,8 @@ import org.dspace.app.rest.converter.MetadataSuggestionEntryConverter;
 import org.dspace.app.rest.converter.MetadataSuggestionsSourceRestConverter;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.model.MetadataSuggestionEntryRest;
+import org.dspace.app.rest.model.MetadataSuggestionsDifferencesRest;
 import org.dspace.app.rest.model.MetadataSuggestionsSourceRest;
-import org.dspace.app.rest.model.hateoas.DSpaceResource;
-import org.dspace.app.rest.model.hateoas.MetadataSuggestionsSourceResource;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.content.service.WorkspaceItemService;
@@ -28,6 +27,7 @@ import org.dspace.core.Context;
 import org.dspace.external.provider.metadata.MetadataSuggestionProvider;
 import org.dspace.external.provider.metadata.service.MetadataSuggestionProviderService;
 import org.dspace.external.provider.metadata.service.impl.MetadataItemSuggestions;
+import org.dspace.external.provider.metadata.service.impl.MetadataSuggestionDifferences;
 import org.dspace.workflow.WorkflowItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -99,6 +99,19 @@ public class MetadataSuggestionsRestRepository extends DSpaceRestRepository<Meta
         }
     }
 
+    public MetadataSuggestionsDifferencesRest getMetadataSuggestionsDifferences(String suggestionName, String entryId,
+        InProgressSubmission inProgressSubmission) {
+        Optional<MetadataSuggestionDifferences> metadataSuggestionDifferences = metadataSuggestionProviderService
+            .getMetadataSuggestionDifferences(suggestionName, entryId, inProgressSubmission);
+        if (metadataSuggestionDifferences.isPresent()) {
+            return converter.toRest(metadataSuggestionDifferences.get(), Projection.DEFAULT);
+        } else {
+            throw new ResourceNotFoundException(
+                "The MetadataSuggestionDifferences for suggestioName: " + suggestionName + " and entryId: " + entryId +
+                    " for InProgressSubmission with id: " + inProgressSubmission.getID() + " could not be found");
+        }
+    }
+
     @Override
     public MetadataSuggestionsSourceRest findOne(Context context, String id) {
         Optional<MetadataSuggestionProvider> metadataSuggestionProviderOptional = metadataSuggestionProviderService
@@ -149,8 +162,4 @@ public class MetadataSuggestionsRestRepository extends DSpaceRestRepository<Meta
         return MetadataSuggestionsSourceRest.class;
     }
 
-    public DSpaceResource<MetadataSuggestionsSourceRest> wrapResource(MetadataSuggestionsSourceRest model,
-                                                                      String... rels) {
-        return new MetadataSuggestionsSourceResource(model, utils, rels);
-    }
 }

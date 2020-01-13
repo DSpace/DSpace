@@ -10,7 +10,6 @@ package org.dspace.app.rest.converter;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.model.MetadataChangeEntryRest;
 import org.dspace.app.rest.model.MetadataChangeRest;
 import org.dspace.external.provider.metadata.service.impl.MetadataChange;
@@ -31,20 +30,9 @@ public class MetadataChangeConverter implements Converter<List<MetadataChange>, 
         List<MetadataChangeEntryRest> metadataChangeEntryRests = new LinkedList<>();
         for (MetadataChange metadataChange : metadataChanges) {
 
-            boolean found = false;
-            for (MetadataChangeEntryRest metadataChangeEntryRest : metadataChangeEntryRests) {
-                if (StringUtils.equalsIgnoreCase(metadataChangeEntryRest.getPath(), metadataChange.getMetadataKey())
-                    && StringUtils.equalsIgnoreCase(metadataChangeEntryRest.getOp(), metadataChange.getOp())) {
-                    metadataChangeEntryRest.addValue(metadataChange.getValue());
-                    found = true;
-                }
-            }
-
-            if (!found) {
-                metadataChangeEntryRests.add(
-                    new MetadataChangeEntryRest(metadataChange.getOp(), metadataChange.getMetadataKey(),
-                                                metadataChange.getValue()));
-            }
+            metadataChangeEntryRests.add(
+                new MetadataChangeEntryRest(metadataChange.getOperation(), metadataChange.getMetadataKey(),
+                                            metadataChange.getValue()));
         }
 
         metadataChangeRest.setMetadataChangeEntryRests(metadataChangeEntryRests);

@@ -11,27 +11,18 @@ import java.util.LinkedList;
 
 import org.dspace.app.rest.MetadataSuggestionsRestController;
 import org.dspace.app.rest.link.HalLinkFactory;
-import org.dspace.app.rest.model.hateoas.MetadataSuggestionEntryResource;
+import org.dspace.app.rest.model.hateoas.MetadataSuggestionsDifferencesResource;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.Link;
 import org.springframework.stereotype.Component;
 
-/**
- * This HalLinkFactory will implement links on the {@link MetadataSuggestionEntryResource} object
- */
 @Component
-public class MetadataSuggestionEntryHalLinkFactory
-    extends HalLinkFactory<MetadataSuggestionEntryResource, MetadataSuggestionsRestController> {
-
-    @Override
-    protected void addLinks(MetadataSuggestionEntryResource halResource, Pageable pageable, LinkedList<Link> list)
-        throws Exception {
-
+public class MetadataSuggestionDifferencesHalLinkFactory
+    extends HalLinkFactory<MetadataSuggestionsDifferencesResource, MetadataSuggestionsRestController> {
+    protected void addLinks(MetadataSuggestionsDifferencesResource halResource, Pageable pageable,
+                            LinkedList<Link> list) throws Exception {
 
         list.add(buildLink(Link.REL_SELF, getMethodOn()
-            .getMetadataSuggestionEntry(halResource.getContent().getMetadataSuggestion(),
-                                        halResource.getContent().getId(), null, null, null, null)));
-        list.add(buildLink("differences", getMethodOn()
             .getMetadataSuggestionEntryDifferences(halResource.getContent().getMetadataSuggestion(),
                                                    halResource.getContent().getId(),
                                                    halResource.getContent().getWorkspaceItemId(),
@@ -39,13 +30,11 @@ public class MetadataSuggestionEntryHalLinkFactory
 
     }
 
-    @Override
     protected Class<MetadataSuggestionsRestController> getControllerClass() {
         return MetadataSuggestionsRestController.class;
     }
 
-    @Override
-    protected Class<MetadataSuggestionEntryResource> getResourceClass() {
-        return MetadataSuggestionEntryResource.class;
+    protected Class<MetadataSuggestionsDifferencesResource> getResourceClass() {
+        return MetadataSuggestionsDifferencesResource.class;
     }
 }

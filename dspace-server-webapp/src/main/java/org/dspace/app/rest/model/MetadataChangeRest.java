@@ -9,7 +9,10 @@ package org.dspace.app.rest.model;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonValue;
+import org.dspace.app.rest.MetadataSuggestionsRestController;
 
 /**
  * This class acts as a REST wrapper for the {@link MetadataChangeEntryRest} objects
@@ -30,13 +33,14 @@ public class MetadataChangeRest extends BaseObjectRest<String> {
 
     @Override
     public Class getController() {
-        return null;
+        return MetadataSuggestionsRestController.class;
     }
 
     /**
      * Generic getter for the metadataChangeEntryRests
      * @return the metadataChangeEntryRests value of this MetadataChangeRest
      */
+    @JsonValue
     public List<MetadataChangeEntryRest> getMetadataChangeEntryRests() {
         return metadataChangeEntryRests;
     }
@@ -51,12 +55,14 @@ public class MetadataChangeRest extends BaseObjectRest<String> {
 
     @Override
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @JsonIgnore
     public String getType() {
         return NAME;
     }
 
     @Override
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @JsonIgnore
     public String getId() {
         return id;
     }

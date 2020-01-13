@@ -15,7 +15,7 @@
 
     <bean class="org.dspace.external.provider.metadata.impl.MockMetadataSuggestionProvider">
         <property name="externalDataProvider" ref="mockDataProvider"/>
-        <property name="id" value="pubmed"/>
+        <property name="id" value="mock"/>
         <property name="fileBased" value="false"/>
         <property name="metadataBased" value="true"/>
         <property name="queryBased" value="true"/>
