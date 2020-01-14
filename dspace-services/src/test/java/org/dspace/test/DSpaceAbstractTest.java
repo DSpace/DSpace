@@ -7,14 +7,10 @@
  */
 package org.dspace.test;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
 import org.dspace.kernel.DSpaceKernel;
 import org.dspace.kernel.ServiceManager;
 import org.dspace.servicemanager.DSpaceKernelImpl;
 import org.dspace.servicemanager.DSpaceKernelInit;
-import org.dspace.servicemanager.config.DSpaceConfigurationService;
 import org.dspace.services.RequestService;
 
 /**
@@ -50,12 +46,9 @@ public abstract class DSpaceAbstractTest {
      * do not run this after each individual test
      */
     public static void _initializeKernel() {
-        // First, ensure DSPACE_HOME is set to our /src/test/resources directory.
-        // This ensures Kernel finds our test configs in that directory
-        Path resourceDirectory = Paths.get("src", "test", "resources");
-        System.setProperty(DSpaceConfigurationService.DSPACE_HOME, resourceDirectory.toAbsolutePath().toString());
-
-        // Now, init the Kernel and start it
+        // Init the Kernel and start it
+        // NOTE: the "dspace.dir" system property MUST be specified via Maven
+        // For example: by using <systemPropertyVariables> of maven-surefire-plugin or maven-failsafe-plugin
         kernelImpl = DSpaceKernelInit.getKernel(null);
         kernelImpl.start();
         kernel = kernelImpl.getManagedBean();
