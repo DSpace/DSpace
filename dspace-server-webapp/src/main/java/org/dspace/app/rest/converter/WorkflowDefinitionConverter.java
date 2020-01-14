@@ -30,6 +30,7 @@ public class WorkflowDefinitionConverter implements DSpaceConverter<Workflow, Wo
         WorkflowDefinitionRest restModel = new WorkflowDefinitionRest();
         restModel.setName(modelObject.getID());
         restModel.setIsDefault(xmlWorkflowFactory.isDefaultWorkflow(modelObject.getID()));
+        restModel.setProjection(projection);
         return restModel;
     }
 
