@@ -7,7 +7,6 @@
  */
 package org.dspace.external.provider.metadata.impl;
 
-import org.dspace.content.InProgressSubmission;
 import org.dspace.external.provider.impl.OrcidV2AuthorDataProvider;
 import org.dspace.external.provider.metadata.MetadataSuggestionProvider;
 
@@ -15,9 +14,4 @@ import org.dspace.external.provider.metadata.MetadataSuggestionProvider;
  * The implementation of the {@link MetadataSuggestionProvider} for the {@link OrcidV2AuthorDataProvider}
  */
 public class OrcidV2AuthorMetadataSuggestionProvider extends MetadataSuggestionProvider<OrcidV2AuthorDataProvider> {
-
-    @Override
-    public boolean supports(InProgressSubmission inProgressSubmission) {
-        return true;
-    }
 }

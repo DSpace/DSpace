@@ -7,7 +7,6 @@
  */
 package org.dspace.external.provider.metadata.impl;
 
-import org.dspace.content.InProgressSubmission;
 import org.dspace.external.provider.impl.PubmedArticleDataProvider;
 import org.dspace.external.provider.metadata.MetadataSuggestionProvider;
 
@@ -15,9 +14,4 @@ import org.dspace.external.provider.metadata.MetadataSuggestionProvider;
  * An implementation of the {@link MetadataSuggestionProvider} for the {@link PubmedArticleDataProvider}
  */
 public class PubmedArticleMetadataSuggestionProvider extends MetadataSuggestionProvider<PubmedArticleDataProvider> {
-
-    @Override
-    public boolean supports(InProgressSubmission inProgressSubmission) {
-        return true;
-    }
 }

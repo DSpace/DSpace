@@ -46,6 +46,14 @@
         <property name="fileBased" value="false"/>
         <property name="metadataBased" value="true"/>
         <property name="queryBased" value="true"/>
+        <property name="metadataSuggestionProviderFilters">
+            <util:list>
+                <bean class="org.dspace.external.provider.metadata.filter.impl.MetadataSuggestionProviderEqualityFilter">
+                    <property name="metadataFieldString" value="relationship.type"/>
+                    <property name="value" value="author"/>
+                </bean>
+            </util:list>
+        </property>
     </bean>
 
     <bean class="org.dspace.external.provider.metadata.impl.PubmedArticleMetadataSuggestionProvider">
@@ -54,6 +62,17 @@
         <property name="fileBased" value="false"/>
         <property name="metadataBased" value="true"/>
         <property name="queryBased" value="true"/>
+        <property name="metadataSuggestionProviderFilters">
+            <util:list>
+                <bean class="org.dspace.external.provider.metadata.filter.impl.MetadataSuggestionProviderEqualityFilter">
+                    <property name="metadataFieldString" value="relationship.type"/>
+                    <property name="value" value="publication"/>
+                </bean>
+                <bean class="org.dspace.external.provider.metadata.filter.impl.MetadataSuggestionProviderEmptyValueFilter">
+                    <property name="metadataFieldString" value="relationship.type"/>
+                </bean>
+            </util:list>
+        </property>
     </bean>
 </beans>
 

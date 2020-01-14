@@ -14,15 +14,16 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-import org.dspace.app.rest.converter.MetadataSuggestionEntryConverter;
-import org.dspace.app.rest.converter.MetadataSuggestionsSourceRestConverter;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.model.MetadataSuggestionEntryRest;
 import org.dspace.app.rest.model.MetadataSuggestionsDifferencesRest;
 import org.dspace.app.rest.model.MetadataSuggestionsSourceRest;
 import org.dspace.app.rest.projection.Projection;
+import org.dspace.app.rest.utils.Utils;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.content.service.WorkspaceItemService;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.external.provider.metadata.MetadataSuggestionProvider;
 import org.dspace.external.provider.metadata.service.MetadataSuggestionProviderService;
@@ -33,6 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
 
 /**
@@ -47,16 +49,16 @@ public class MetadataSuggestionsRestRepository extends DSpaceRestRepository<Meta
     private MetadataSuggestionProviderService metadataSuggestionProviderService;
 
     @Autowired
-    private MetadataSuggestionEntryConverter metadataSuggestionEntryConverter;
-
-    @Autowired
-    private MetadataSuggestionsSourceRestConverter metadataSuggestionsSourceRestConverter;
+    private AuthorizeService authorizeService;
 
     @Autowired
     private WorkflowItemService workflowItemService;
 
     @Autowired
     private WorkspaceItemService workspaceItemService;
+
+    @Autowired
+    private Utils utils;
 
     /**
      * This method will create a page of MetadataSuggestionsSources that adheres to the given parameters
@@ -68,15 +70,9 @@ public class MetadataSuggestionsRestRepository extends DSpaceRestRepository<Meta
                                                                                InProgressSubmission
                                                                                    inProgressSubmission) {
 
-        if (inProgressSubmission == null) {
-            throw new DSpaceBadRequestException("A valid workflowItem or workspaceItem needs to be passed along in" +
-                                                    " the request parameters");
-        }
         List<MetadataSuggestionProvider> metadataSuggestionProviders = metadataSuggestionProviderService
             .getMetadataSuggestionProviders(inProgressSubmission);
-
-        return converter
-            .toRestPage(metadataSuggestionProviders, pageable, metadataSuggestionProviders.size(), Projection.DEFAULT);
+        return converter.toRestPage(utils.getPage(metadataSuggestionProviders, pageable), Projection.DEFAULT);
     }
 
     /**
@@ -138,6 +134,20 @@ public class MetadataSuggestionsRestRepository extends DSpaceRestRepository<Meta
         }
         InProgressSubmission inProgressSubmission = resolveInProgressSubmission(workspaceItemId, workflowItemId,
                                                                                 context);
+        if (inProgressSubmission == null) {
+            throw new DSpaceBadRequestException("A valid workflowItem or workspaceItem needs to be passed along in" +
+                                                    " the request parameters");
+        }
+        try {
+            if (!authorizeService.authorizeActionBoolean(context, context.getCurrentUser(),
+                                                         inProgressSubmission.getItem(), Constants.WRITE, false)) {
+                throw new AccessDeniedException("You do not have write rights on this InProgressSubmission for id: " +
+                                                    inProgressSubmission.getID());
+            }
+        } catch (SQLException e) {
+            log.error("Looking up permissions for InProgressSubmission with ID: " + inProgressSubmission.getID() +
+                          " threw an error", e);
+        }
         Page<MetadataSuggestionsSourceRest> metadataSuggestionsSourceRestPage =
             getAllMetadataSuggestionSources(pageable, inProgressSubmission);
         return metadataSuggestionsSourceRestPage;

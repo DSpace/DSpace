@@ -7,8 +7,11 @@
  */
 package org.dspace.external.provider.metadata;
 
+import java.util.List;
+
 import org.dspace.content.InProgressSubmission;
 import org.dspace.external.provider.ExternalDataProvider;
+import org.dspace.external.provider.metadata.filter.MetadataSuggestionProviderFilter;
 
 /**
  * This is the abstract class that all MetadataSuggestionProviders will extend. It contains a set of basic
@@ -38,6 +41,7 @@ public abstract class MetadataSuggestionProvider<T extends ExternalDataProvider>
      */
     private T externalDataProvider;
 
+    private List<MetadataSuggestionProviderFilter> metadataSuggestionProviderFilters;
 
     /**
      * Generic getter for the id
@@ -120,11 +124,36 @@ public abstract class MetadataSuggestionProvider<T extends ExternalDataProvider>
     }
 
     /**
+     * Generic getter for the metadataSuggestionProviderFilters
+     * @return the metadataSuggestionProviderFilters value of this MetadataSuggestionProvider
+     */
+    public List<MetadataSuggestionProviderFilter> getMetadataSuggestionProviderFilters() {
+        return metadataSuggestionProviderFilters;
+    }
+
+    /**
+     * Generic setter for the metadataSuggestionProviderFilters
+     * @param metadataSuggestionProviderFilters   The metadataSuggestionProviderFilters to be set on this
+     *                                            MetadataSuggestionProvider
+     */
+    public void setMetadataSuggestionProviderFilters(
+        List<MetadataSuggestionProviderFilter> metadataSuggestionProviderFilters) {
+        this.metadataSuggestionProviderFilters = metadataSuggestionProviderFilters;
+    }
+
+    /**
      * This method will decide whether the MetadataSuggestionProvider supports the given InProgressSubmission
      * or not
      * @param inProgressSubmission  The relevant InProgressSubmission
-     * @return                      A boolean indicating whether the argument is supported or not
+     * @return A boolean indicating whether the argument is supported or not
      */
-    public abstract boolean supports(InProgressSubmission inProgressSubmission);
+    public boolean supports(InProgressSubmission inProgressSubmission) {
+        for (MetadataSuggestionProviderFilter metadataSuggestionProviderFilter : metadataSuggestionProviderFilters) {
+            if (metadataSuggestionProviderFilter.supports(inProgressSubmission)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
 }

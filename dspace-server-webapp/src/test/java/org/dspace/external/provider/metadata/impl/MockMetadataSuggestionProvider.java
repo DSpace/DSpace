@@ -13,6 +13,6 @@ import org.dspace.external.provider.metadata.MetadataSuggestionProvider;
 public class MockMetadataSuggestionProvider extends
     MetadataSuggestionProvider<org.dspace.external.provider.impl.MockDataProvider> {
     public boolean supports(InProgressSubmission inProgressSubmission) {
-        return false;
+        return true;
     }
 }
