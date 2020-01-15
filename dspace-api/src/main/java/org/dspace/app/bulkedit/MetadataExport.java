@@ -7,9 +7,11 @@
  */
 package org.dspace.app.bulkedit;
 
+import java.io.OutputStream;
+
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.dspace.content.service.MetadataExportService;
+import org.dspace.content.service.MetadataDSpaceCsvExportService;
 import org.dspace.core.Context;
 import org.dspace.scripts.DSpaceRunnable;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +31,7 @@ public class MetadataExport extends DSpaceRunnable {
     private boolean exportAllItems = false;
 
     @Autowired
-    private MetadataExportService metadataExportService;
+    private MetadataDSpaceCsvExportService metadataDSpaceCsvExportService;
 
     private MetadataExport() {
         this.options = constructOptions();
@@ -41,7 +43,7 @@ public class MetadataExport extends DSpaceRunnable {
         options.addOption("i", "id", true, "ID or handle of thing to export (item, collection, or community)");
         options.getOption("i").setType(String.class);
         options.addOption("f", "file", true, "destination where you want file written");
-        options.getOption("f").setType(String.class);
+        options.getOption("f").setType(OutputStream.class);
         options.getOption("f").setRequired(true);
         options.addOption("a", "all", false,
                           "include all metadata fields that are not normally changed (e.g. provenance)");
@@ -61,8 +63,9 @@ public class MetadataExport extends DSpaceRunnable {
             return;
         }
 
-        DSpaceCSV dSpaceCSV = metadataExportService.handleExport(context, exportAllItems, exportAllMetadata, handle,
-                                                                 handler);
+        DSpaceCSV dSpaceCSV = metadataDSpaceCsvExportService
+            .handleExport(context, exportAllItems, exportAllMetadata, handle,
+                          handler);
         handler.writeFilestream(context, filename, dSpaceCSV.getInputStream(), "exportCSV");
         context.restoreAuthSystemState();
         context.complete();
@@ -74,6 +77,7 @@ public class MetadataExport extends DSpaceRunnable {
 
         if (commandLine.hasOption('h')) {
             help = true;
+            return;
         }
 
         // Check a filename is given

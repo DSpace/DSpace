@@ -10,6 +10,7 @@ package org.dspace.scripts.handler;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.util.Optional;
 
 import org.apache.commons.cli.Options;
 import org.dspace.authorize.AuthorizeException;
@@ -93,7 +94,7 @@ public interface DSpaceRunnableHandler {
      * @throws IOException  If something goes wrong
      * @throws AuthorizeException   If something goes wrong
      */
-    public InputStream getFileStream(Context context, String fileName) throws IOException, AuthorizeException;
+    public Optional<InputStream> getFileStream(Context context, String fileName) throws IOException, AuthorizeException;
 
     /**
      * This method will write the InputStream to either a file on the filesystem or a bitstream in the database
@@ -105,5 +106,5 @@ public interface DSpaceRunnableHandler {
      * @throws IOException  If something goes wrong
      */
     public void writeFilestream(Context context, String fileName, InputStream inputStream, String type)
-        throws IOException;
+        throws IOException, SQLException, AuthorizeException;
 }

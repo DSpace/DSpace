@@ -143,7 +143,7 @@ public class ScriptRestRepository extends DSpaceRestRepository<ScriptRest, Strin
 
     private void runDSpaceScript(List<MultipartFile> files, Context context, DSpaceRunnable scriptToExecute,
                                  RestDSpaceRunnableHandler restDSpaceRunnableHandler, List<String> args)
-        throws IOException {
+        throws IOException, SQLException, AuthorizeException {
         try {
             scriptToExecute.initialize(args.toArray(new String[0]), restDSpaceRunnableHandler);
             checkFileNames(scriptToExecute, files);
@@ -160,7 +160,7 @@ public class ScriptRestRepository extends DSpaceRestRepository<ScriptRest, Strin
 
     private void processFiles(Context context, RestDSpaceRunnableHandler restDSpaceRunnableHandler,
                               List<MultipartFile> files)
-        throws IOException {
+        throws IOException, SQLException, AuthorizeException {
         for (MultipartFile file : files) {
             restDSpaceRunnableHandler
                 .writeFilestream(context, file.getOriginalFilename(), file.getInputStream(), "inputfile");

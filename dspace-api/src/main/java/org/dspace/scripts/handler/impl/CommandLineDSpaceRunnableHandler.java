@@ -10,6 +10,7 @@ package org.dspace.scripts.handler.impl;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Optional;
 
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
@@ -92,12 +93,12 @@ public class CommandLineDSpaceRunnableHandler implements DSpaceRunnableHandler {
     }
 
     @Override
-    public InputStream getFileStream(Context context, String fileName) throws IOException {
+    public Optional<InputStream> getFileStream(Context context, String fileName) throws IOException {
         File file = new File(fileName);
-        if (!file.isFile()) {
-            return null;
+        if (!(file.exists() && file.isFile())) {
+            return Optional.empty();
         }
-        return FileUtils.openInputStream(file);
+        return Optional.of(FileUtils.openInputStream(file));
     }
 
     @Override

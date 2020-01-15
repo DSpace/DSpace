@@ -18,7 +18,7 @@ import org.dspace.scripts.handler.DSpaceRunnableHandler;
 /**
  * This is the interface to be implemented by a Service that deals with the exporting of Metadata
  */
-public interface MetadataExportService {
+public interface MetadataDSpaceCsvExportService {
 
     /**
      * This method will export DSpaceObject objects depending on the parameters it gets. It can export all the items

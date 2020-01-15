@@ -13,6 +13,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
@@ -186,11 +187,17 @@ public class RestDSpaceRunnableHandler implements DSpaceRunnableHandler {
     }
 
     @Override
-    public InputStream getFileStream(Context context, String fileName) throws IOException, AuthorizeException {
+    public Optional<InputStream> getFileStream(Context context, String fileName) throws IOException,
+        AuthorizeException {
         try {
             Process process = processService.find(context, processId);
             Bitstream bitstream = processService.getBitstreamByName(context, process, fileName);
-            return bitstreamService.retrieve(context, bitstream);
+            InputStream inputStream = bitstreamService.retrieve(context, bitstream);
+            if (inputStream == null) {
+                return Optional.empty();
+            } else {
+                return Optional.of(inputStream);
+            }
         } catch (SQLException sqlException) {
             log.error("SQL exception while attempting to find process", sqlException);
         }
@@ -199,13 +206,9 @@ public class RestDSpaceRunnableHandler implements DSpaceRunnableHandler {
 
     @Override
     public void writeFilestream(Context context, String fileName, InputStream inputStream, String type)
-        throws IOException {
-        try {
-            Process process = processService.find(context, processId);
-            processService.appendFile(context, process, inputStream, type, fileName);
-        } catch (SQLException | AuthorizeException exception) {
-            log.error("Exception occurred while attempting to find process", exception);
-        }
+        throws IOException, SQLException, AuthorizeException {
+        Process process = processService.find(context, processId);
+        processService.appendFile(context, process, inputStream, type, fileName);
     }
 
     /**

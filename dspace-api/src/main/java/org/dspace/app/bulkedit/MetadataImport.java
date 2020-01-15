@@ -17,6 +17,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import javax.annotation.Nullable;
@@ -177,10 +178,8 @@ public class MetadataImport extends DSpaceRunnable implements InitializingBean {
      * @param c        The context
      * @param toImport An array of CSV lines to examine
      */
-    public void initMetadataImport(Context c, DSpaceCSV toImport) {
+    public void initMetadataImport(DSpaceCSV toImport) {
         // Store the import settings
-        this.c = c;
-        csv = toImport;
         this.toImport = toImport.getCSVLines();
     }
 
@@ -193,7 +192,13 @@ public class MetadataImport extends DSpaceRunnable implements InitializingBean {
         // Read commandLines from the CSV file
         try {
 
-            csv = new DSpaceCSV(handler.getFileStream(c, filename), c);
+            Optional<InputStream> optionalFileStream = handler.getFileStream(c, filename);
+            if (optionalFileStream.isPresent()) {
+                csv = new DSpaceCSV(optionalFileStream.get(), c);
+            } else {
+                throw new IllegalArgumentException("Error reading file, the file couldn't be found for filename: " +
+                                                       filename);
+            }
         } catch (MetadataImportInvalidHeadingException miihe) {
             throw miihe;
         } catch (Exception e) {
@@ -201,7 +206,7 @@ public class MetadataImport extends DSpaceRunnable implements InitializingBean {
         }
 
         // Perform the first import - just highlight differences
-        initMetadataImport(c, csv);
+        initMetadataImport(csv);
         List<BulkEditChange> changes;
 
         if (!commandLine.hasOption('s') || validateOnly) {
@@ -257,6 +262,14 @@ public class MetadataImport extends DSpaceRunnable implements InitializingBean {
 
     }
 
+    /**
+     * This method determines whether the changes should be applied or not. This is default set to true for the REST
+     * script as we don't want to interact with the caller. This will be overwritten in the CLI script to ask for
+     * confirmation
+     * @param handler   Applicable DSpaceRunnableHandler
+     * @return boolean indicating the value
+     * @throws IOException  If something goes wrong
+     */
     protected boolean determineChange(DSpaceRunnableHandler handler) throws IOException {
         return true;
     }
@@ -269,6 +282,7 @@ public class MetadataImport extends DSpaceRunnable implements InitializingBean {
 
         if (commandLine.hasOption('h')) {
             help = true;
+            return;
         }
 
         // Check a filename is given
@@ -1238,7 +1252,7 @@ public class MetadataImport extends DSpaceRunnable implements InitializingBean {
      * @param changed Whether or not the changes have been made
      * @return The number of items that have changed
      */
-    private static int displayChanges(List<BulkEditChange> changes, boolean changed) {
+    private int displayChanges(List<BulkEditChange> changes, boolean changed) {
         // Display the changes
         int changeCounter = 0;
         for (BulkEditChange change : changes) {
@@ -1253,20 +1267,19 @@ public class MetadataImport extends DSpaceRunnable implements InitializingBean {
                 (change.isDeleted()) || (change.isWithdrawn()) || (change.isReinstated())) {
                 // Show the item
                 Item i = change.getItem();
-
-                System.out.println("-----------------------------------------------------------");
+                handler.logInfo("-----------------------------------------------------------");
                 if (!change.isNewItem()) {
-                    System.out.println("Changes for item: " + i.getID() + " (" + i.getHandle() + ")");
+                    handler.logInfo("Changes for item: " + i.getID() + " (" + i.getHandle() + ")");
                 } else {
-                    System.out.print("New item: ");
+                    handler.logInfo("New item: ");
                     if (i != null) {
                         if (i.getHandle() != null) {
-                            System.out.print(i.getID() + " (" + i.getHandle() + ")");
+                            handler.logInfo(i.getID() + " (" + i.getHandle() + ")");
                         } else {
-                            System.out.print(i.getID() + " (in workflow)");
+                            handler.logInfo(i.getID() + " (in workflow)");
                         }
                     }
-                    System.out.println();
+                    handler.logInfo("");
                 }
                 changeCounter++;
             }
@@ -1274,23 +1287,23 @@ public class MetadataImport extends DSpaceRunnable implements InitializingBean {
             // Show actions
             if (change.isDeleted()) {
                 if (changed) {
-                    System.out.println(" - EXPUNGED!");
+                    handler.logInfo(" - EXPUNGED!");
                 } else {
-                    System.out.println(" - EXPUNGE!");
+                    handler.logInfo(" - EXPUNGE!");
                 }
             }
             if (change.isWithdrawn()) {
                 if (changed) {
-                    System.out.println(" - WITHDRAWN!");
+                    handler.logInfo(" - WITHDRAWN!");
                 } else {
-                    System.out.println(" - WITHDRAW!");
+                    handler.logInfo(" - WITHDRAW!");
                 }
             }
             if (change.isReinstated()) {
                 if (changed) {
-                    System.out.println(" - REINSTATED!");
+                    handler.logInfo(" - REINSTATED!");
                 } else {
-                    System.out.println(" - REINSTATE!");
+                    handler.logInfo(" - REINSTATE!");
                 }
             }
 
@@ -1300,11 +1313,11 @@ public class MetadataImport extends DSpaceRunnable implements InitializingBean {
                     String cHandle = c.getHandle();
                     String cName = c.getName();
                     if (!changed) {
-                        System.out.print(" + New owning collection (" + cHandle + "): ");
+                        handler.logInfo(" + New owning collection (" + cHandle + "): ");
                     } else {
-                        System.out.print(" + New owning collection  (" + cHandle + "): ");
+                        handler.logInfo(" + New owning collection  (" + cHandle + "): ");
                     }
-                    System.out.println(cName);
+                    handler.logInfo(cName);
                 }
 
                 c = change.getOldOwningCollection();
@@ -1312,11 +1325,11 @@ public class MetadataImport extends DSpaceRunnable implements InitializingBean {
                     String cHandle = c.getHandle();
                     String cName = c.getName();
                     if (!changed) {
-                        System.out.print(" + Old owning collection (" + cHandle + "): ");
+                        handler.logInfo(" + Old owning collection (" + cHandle + "): ");
                     } else {
-                        System.out.print(" + Old owning collection  (" + cHandle + "): ");
+                        handler.logInfo(" + Old owning collection  (" + cHandle + "): ");
                     }
-                    System.out.println(cName);
+                    handler.logInfo(cName);
                 }
             }
 
@@ -1325,11 +1338,11 @@ public class MetadataImport extends DSpaceRunnable implements InitializingBean {
                 String cHandle = c.getHandle();
                 String cName = c.getName();
                 if (!changed) {
-                    System.out.print(" + Map to collection (" + cHandle + "): ");
+                    handler.logInfo(" + Map to collection (" + cHandle + "): ");
                 } else {
-                    System.out.print(" + Mapped to collection  (" + cHandle + "): ");
+                    handler.logInfo(" + Mapped to collection  (" + cHandle + "): ");
                 }
-                System.out.println(cName);
+                handler.logInfo(cName);
             }
 
             // Show old mapped collections
@@ -1337,11 +1350,11 @@ public class MetadataImport extends DSpaceRunnable implements InitializingBean {
                 String cHandle = c.getHandle();
                 String cName = c.getName();
                 if (!changed) {
-                    System.out.print(" + Un-map from collection (" + cHandle + "): ");
+                    handler.logInfo(" + Un-map from collection (" + cHandle + "): ");
                 } else {
-                    System.out.print(" + Un-mapped from collection  (" + cHandle + "): ");
+                    handler.logInfo(" + Un-mapped from collection  (" + cHandle + "): ");
                 }
-                System.out.println(cName);
+                handler.logInfo(cName);
             }
 
             // Show additions
@@ -1354,16 +1367,16 @@ public class MetadataImport extends DSpaceRunnable implements InitializingBean {
                     md += "[" + metadataValue.getLanguage() + "]";
                 }
                 if (!changed) {
-                    System.out.print(" + Add    (" + md + "): ");
+                    handler.logInfo(" + Add    (" + md + "): ");
                 } else {
-                    System.out.print(" + Added   (" + md + "): ");
+                    handler.logInfo(" + Added   (" + md + "): ");
                 }
-                System.out.print(metadataValue.getValue());
+                handler.logInfo(metadataValue.getValue());
                 if (isAuthorityControlledField(md)) {
-                    System.out.print(", authority = " + metadataValue.getAuthority());
-                    System.out.print(", confidence = " + metadataValue.getConfidence());
+                    handler.logInfo(", authority = " + metadataValue.getAuthority());
+                    handler.logInfo(", confidence = " + metadataValue.getConfidence());
                 }
-                System.out.println("");
+                handler.logInfo("");
             }
 
             // Show removals
@@ -1376,16 +1389,16 @@ public class MetadataImport extends DSpaceRunnable implements InitializingBean {
                     md += "[" + metadataValue.getLanguage() + "]";
                 }
                 if (!changed) {
-                    System.out.print(" - Remove (" + md + "): ");
+                    handler.logInfo(" - Remove (" + md + "): ");
                 } else {
-                    System.out.print(" - Removed (" + md + "): ");
+                    handler.logInfo(" - Removed (" + md + "): ");
                 }
-                System.out.print(metadataValue.getValue());
+                handler.logInfo(metadataValue.getValue());
                 if (isAuthorityControlledField(md)) {
-                    System.out.print(", authority = " + metadataValue.getAuthority());
-                    System.out.print(", confidence = " + metadataValue.getConfidence());
+                    handler.logInfo(", authority = " + metadataValue.getAuthority());
+                    handler.logInfo(", confidence = " + metadataValue.getConfidence());
                 }
-                System.out.println("");
+                handler.logInfo("");
             }
         }
         return changeCounter;
