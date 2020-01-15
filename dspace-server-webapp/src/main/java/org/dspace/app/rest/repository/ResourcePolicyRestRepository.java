@@ -100,9 +100,21 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
         return ResourcePolicyRest.class;
     }
 
+    /**
+     * Find the resource policies matching the uuid of the resource object and/or the specified action
+     * 
+     * @param resourceUuid
+     *            mandatory, the uuid of the resource object of the policy
+     * @param action
+     *            optional, limit the returned policies to the specified action
+     * @param pageable
+     *            contains the pagination information
+     * @return a Page of ResourcePolicyRest instances matching the uuid of the resource object and/or the specified
+     *         action
+     */
     @PreAuthorize("hasPermission(#resourceUuid, 'dspaceObject', 'ADMIN')")
     @SearchRestMethod(name = "resource")
-    public Page<ResourcePolicyRest> resource(@Parameter(value = "uuid", required = true) UUID resourceUuid,
+    public Page<ResourcePolicyRest> findByResource(@Parameter(value = "uuid", required = true) UUID resourceUuid,
                                       @Parameter(value = "action", required = false) String action, Pageable pageable) {
 
         List<ResourcePolicy> resourcePolisies = null;
@@ -127,9 +139,22 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
         return converter.toRestPage(resourcePolisies, pageable, total, utils.obtainProjection(true));
     }
 
+    /**
+     * Find the resource policies matching uuid of the eperson and/or the one specified resource object
+     * 
+     * @param epersonUuid
+     *            mandatory, the uuid of the eperson that benefit of the policy
+     * @param resourceUuid
+     *            optional, limit the returned policies to the ones related to the specified resource
+     * @param pageable
+     *            contains the pagination information
+     *
+     * @return It returns the list of explicit matching resource policies, no inherited or broader resource policies
+     *         will be included in the list nor policies derived by groups' membership
+     */
     @PreAuthorize("hasPermission(#epersonUuid, 'EPERSON', 'READ')")
     @SearchRestMethod(name = "eperson")
-    public Page<ResourcePolicyRest> eperson(@Parameter(value = "uuid", required = true) UUID epersonUuid,
+    public Page<ResourcePolicyRest> findByEPerson(@Parameter(value = "uuid", required = true) UUID epersonUuid,
                                 @Parameter(value = "resource", required = false) UUID resourceUuid, Pageable pageable) {
 
         List<ResourcePolicy> resourcePolisies = null;
@@ -158,9 +183,22 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
         return converter.toRestPage(resourcePolisies, pageable, total, utils.obtainProjection(true));
     }
 
+    /**
+     * Find the resource policies matching uuid of the group and/or the ones specified resource object
+     * 
+     * @param groupUuid
+     *            mandatory, the uuid of the group that benefit of the policy
+     * @param resourceUuid
+     *            optional, limit the returned policies to the ones related to the specified resource
+     * @param pageable
+     *            contains the pagination information
+     * 
+     * @return It returns the list of explicit matching resource policies, no inherited or broader resource policies
+     *         will be included in the list nor policies derived by groups' membership
+     */
     @PreAuthorize("hasPermission(#groupUuid, 'GROUP', 'READ')")
     @SearchRestMethod(name = "group")
-    public Page<ResourcePolicyRest> group(@Parameter(value = "uuid", required = true) UUID groupUuid,
+    public Page<ResourcePolicyRest> findByGroup(@Parameter(value = "uuid", required = true) UUID groupUuid,
                                 @Parameter(value = "resource", required = false) UUID resourceUuid, Pageable pageable) {
 
         List<ResourcePolicy> resourcePolisies = null;
