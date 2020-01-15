@@ -32,7 +32,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class DSpaceObjectRestPermissionEvaluatorPlugin extends RestObjectPermissionEvaluatorPlugin {
 
-    private static final Logger log = LoggerFactory.getLogger(ResourcePolicyRestPermissionEvaluatorPlugin.class);
+    private static final Logger log = LoggerFactory.getLogger(DSpaceObjectRestPermissionEvaluatorPlugin.class);
 
     public static final String DSPACE_OBJECT = "dspaceObject";
 
