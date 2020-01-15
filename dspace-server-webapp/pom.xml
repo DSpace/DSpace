@@ -28,7 +28,7 @@
         <!-- Define our starting class for our Spring Boot Application -->
         <start-class>org.dspace.app.rest.Application</start-class>
         <!-- Library for managing JSON Web Tokens (JWT): https://bitbucket.org/connect2id/nimbus-jose-jwt/wiki/Home -->
-        <nimbus-jose-jwt.version>6.2</nimbus-jose-jwt.version>
+        <nimbus-jose-jwt.version>7.9</nimbus-jose-jwt.version>
     </properties>
 
     <profiles>
