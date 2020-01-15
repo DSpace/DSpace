@@ -13,6 +13,10 @@ import java.io.InputStreamReader;
 
 import org.dspace.scripts.handler.DSpaceRunnableHandler;
 
+/**
+ * CLI variant for the {@link MetadataImport} class
+ * This has been made so that we can specify the behaviour of the determineChanges method to be specific for the CLI
+ */
 public class MetadataImportCLI extends MetadataImport {
 
     @Override

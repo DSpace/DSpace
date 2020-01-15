@@ -108,6 +108,18 @@ public interface ProcessService {
      */
     public void complete(Context context, Process process) throws SQLException;
 
+    /**
+     * The method will create a bitstream from the given inputstream with the given type as metadata and given name
+     * as name and attach it to the given process
+     * @param context       The relevant DSpace context
+     * @param process       The process for which the bitstream will be made
+     * @param is            The inputstream for the bitstream
+     * @param type          The type of the bitstream
+     * @param fileName      The name of the bitstream
+     * @throws IOException  If something goes wrong
+     * @throws SQLException If something goes wrong
+     * @throws AuthorizeException   If something goes wrong
+     */
     public void appendFile(Context context, Process process, InputStream is, String type, String fileName)
         throws IOException, SQLException, AuthorizeException;
 

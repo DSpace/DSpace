@@ -15,14 +15,14 @@ import java.util.List;
 import com.google.common.collect.Iterators;
 import org.dspace.app.bulkedit.DSpaceCSV;
 import org.dspace.content.service.ItemService;
-import org.dspace.content.service.MetadataExportService;
+import org.dspace.content.service.MetadataDSpaceCsvExportService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.scripts.handler.DSpaceRunnableHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class MetadataExportServiceImpl implements MetadataExportService {
+public class MetadataDSpaceCsvExportServiceImpl implements MetadataDSpaceCsvExportService {
 
     @Autowired
     private ItemService itemService;
