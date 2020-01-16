@@ -75,6 +75,6 @@ public class CommunityConverter
 
     @Override
     public boolean supportsModel(IndexableObject idxo) {
-        return idxo instanceof Community;
+        return idxo.getIndexedObject() instanceof Community;
     }
 }

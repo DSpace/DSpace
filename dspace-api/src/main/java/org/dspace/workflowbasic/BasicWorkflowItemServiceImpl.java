@@ -17,7 +17,6 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.service.ItemService;
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
@@ -54,11 +53,6 @@ public class BasicWorkflowItemServiceImpl implements BasicWorkflowItemService {
     }
 
     @Override
-    public int getSupportsIndexableObjectTypeConstant() {
-        return Constants.WORKFLOWITEM;
-    }
-
-    @Override
     public BasicWorkflowItem create(Context context, Item item, Collection collection)
         throws SQLException, AuthorizeException {
         if (findByItem(context, item) != null) {
@@ -88,14 +82,6 @@ public class BasicWorkflowItemServiceImpl implements BasicWorkflowItemService {
             }
         }
         return workflowItem;
-    }
-
-    @Override
-    public BasicWorkflowItem findIndexableObject(Context context, Integer id) throws SQLException {
-        if (id != null) {
-            return find(context, id);
-        }
-        return null;
     }
 
     @Override

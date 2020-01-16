@@ -14,6 +14,7 @@ import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
+import org.dspace.discovery.indexobject.IndexableItem;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -29,9 +30,9 @@ public class SolrServiceSpellIndexingPlugin implements SolrServiceIndexPlugin {
     protected ItemService itemService;
 
     @Override
-    public void additionalIndex(Context context, IndexableObject dso, SolrInputDocument document) {
-        if (dso instanceof Item) {
-            Item item = (Item) dso;
+    public void additionalIndex(Context context, IndexableObject indexableObject, SolrInputDocument document) {
+        if (indexableObject instanceof IndexableItem) {
+            Item item = ((IndexableItem) indexableObject).getIndexedObject();
             List<MetadataValue> dcValues = itemService.getMetadata(item, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
             List<String> toIgnoreMetadataFields = SearchUtils.getIgnoredMetadataFields(item.getType());
             for (MetadataValue dcValue : dcValues) {
