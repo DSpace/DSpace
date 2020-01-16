@@ -7,8 +7,11 @@
  */
 package org.dspace.app.rest.model;
 
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.dspace.app.rest.RestResourceController;
+import org.dspace.xmlworkflow.state.Step;
 
 /**
  * The rest resource used for workflow definitions
@@ -23,6 +26,7 @@ public class WorkflowDefinitionRest extends BaseObjectRest<String> {
 
     private String name;
     private boolean isDefault;
+    private List<WorkflowStepRest> steps;
 
     @Override
     public String getCategory() {
@@ -45,39 +49,29 @@ public class WorkflowDefinitionRest extends BaseObjectRest<String> {
         return name;
     }
 
-    /**
-     * Generic getter for the name
-     *
-     * @return the name value of this WorkflowDefinitionRest
-     */
     public String getName() {
         return name;
     }
 
-    /**
-     * Generic setter for the name
-     *
-     * @param name The name to be set on this WorkflowDefinitionRest
-     */
     public void setName(String name) {
         this.name = name;
     }
 
-    /**
-     * Generic getter for the isDefault
-     *
-     * @return the isDefault value of this WorkflowDefinitionRest
-     */
     public boolean getIsDefault() {
         return isDefault;
     }
 
-    /**
-     * Generic setter for the isDefault
-     *
-     * @param isDefault The isDefault to be set on this WorkflowDefinitionRest
-     */
     public void setIsDefault(boolean isDefault) {
         this.isDefault = isDefault;
+    }
+
+    @LinkRest(linkClass = Step.class)
+    @JsonIgnore
+    public List<WorkflowStepRest> getSteps() {
+        return steps;
+    }
+
+    public void setSteps(List<WorkflowStepRest> steps) {
+        this.steps = steps;
     }
 }

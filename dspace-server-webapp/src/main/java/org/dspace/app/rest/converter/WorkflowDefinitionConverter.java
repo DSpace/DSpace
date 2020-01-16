@@ -7,7 +7,10 @@
  */
 package org.dspace.app.rest.converter;
 
+import java.util.stream.Collectors;
+
 import org.dspace.app.rest.model.WorkflowDefinitionRest;
+import org.dspace.app.rest.model.WorkflowStepRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
 import org.dspace.xmlworkflow.state.Workflow;
@@ -25,12 +28,18 @@ public class WorkflowDefinitionConverter implements DSpaceConverter<Workflow, Wo
     @Autowired
     protected XmlWorkflowFactory xmlWorkflowFactory;
 
+    @Autowired
+    ConverterService converter;
+
     @Override
     public WorkflowDefinitionRest convert(Workflow modelObject, Projection projection) {
         WorkflowDefinitionRest restModel = new WorkflowDefinitionRest();
         restModel.setName(modelObject.getID());
         restModel.setIsDefault(xmlWorkflowFactory.isDefaultWorkflow(modelObject.getID()));
         restModel.setProjection(projection);
+        restModel.setSteps(modelObject.getSteps().stream()
+            .map(x -> (WorkflowStepRest) converter.toRest(x, projection))
+            .collect(Collectors.toList()));
         return restModel;
     }
 
