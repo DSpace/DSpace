@@ -86,6 +86,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
     private Item author3;
 
     private Item orgUnit1;
+    private Item orgUnit2;
     private Item project1;
 
     private Item publication1;
@@ -156,6 +157,13 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                               .withIssueDate("2015-01-01")
                               .withRelationshipType("OrgUnit")
                               .build();
+
+        orgUnit2 = ItemBuilder.createItem(context, col3)
+                .withTitle("OrgUnit2")
+                .withAuthor("Testy, TEst")
+                .withIssueDate("2015-01-01")
+                .withRelationshipType("OrgUnit")
+                .build();
 
         project1 = ItemBuilder.createItem(context, col3)
                               .withTitle("Project1")
@@ -2161,6 +2169,9 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         Relationship relationship1 = RelationshipBuilder
             .createRelationshipBuilder(context, author1, orgUnit1, isOrgUnitOfPersonRelationshipType).build();
 
+        Relationship relationshipOrgunitExtra = RelationshipBuilder
+                .createRelationshipBuilder(context, author1, orgUnit2, isOrgUnitOfPersonRelationshipType).build();
+
         // We're creating a Relationship of type isOrgUnitOfPerson between a different author and the same orgunit
         Relationship relationshipAuthorExtra = RelationshipBuilder
             .createRelationshipBuilder(context, author2, orgUnit1, isOrgUnitOfPersonRelationshipType).build();
@@ -2186,10 +2197,16 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
 
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.page",
-                                       is(PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 1))))
+                                       is(PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 2))))
                    .andExpect(jsonPath("$._embedded.relationships", hasItem(
                        RelationshipMatcher.matchRelationship(relationship1)
-                   )))
+                   ))) //check ordering
+                   .andExpect(jsonPath("$._embedded.relationships[0]._links.rightItem.href",
+                       containsString(orgUnit1.getID().toString())
+                   ))
+                   .andExpect(jsonPath("$._embedded.relationships[1]._links.rightItem.href",
+                       containsString(orgUnit2.getID().toString())
+                   ))
         ;
 
         // Perform a GET request to the searchByLabel endpoint, asking for Relationships of type isOrgUnitOfPerson
@@ -2201,10 +2218,11 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
 
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.page",
-                                       is(PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 2))))
+                                       is(PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 3))))
                    .andExpect(jsonPath("$._embedded.relationships", containsInAnyOrder(
                        RelationshipMatcher.matchRelationship(relationship1),
-                       RelationshipMatcher.matchRelationship(relationshipAuthorExtra)
+                       RelationshipMatcher.matchRelationship(relationshipAuthorExtra),
+                       RelationshipMatcher.matchRelationship(relationshipOrgunitExtra)
                    )))
         ;
     }
