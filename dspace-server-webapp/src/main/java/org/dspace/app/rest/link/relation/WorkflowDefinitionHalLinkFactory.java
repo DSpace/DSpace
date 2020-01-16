@@ -32,8 +32,6 @@ public class WorkflowDefinitionHalLinkFactory extends HalLinkFactory<WorkflowDef
         throws Exception {
         list.add(buildLink("collections", getMethodOn()
             .getCollections(null, halResource.getContent().getId(), pageable)));
-        list.add(buildLink("steps", getMethodOn()
-            .getSteps(null, halResource.getContent().getId(), pageable)));
     }
 
     @Override
