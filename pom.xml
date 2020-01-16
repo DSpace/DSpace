@@ -1772,7 +1772,7 @@
     <repositories>
         <repository>
             <id>maven-snapshots</id>
-            <url>http://oss.sonatype.org/content/repositories/snapshots</url>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
             <layout>default</layout>
             <releases>
                 <enabled>false</enabled>
@@ -1780,6 +1780,14 @@
             <snapshots>
                 <enabled>true</enabled>
             </snapshots>
+        </repository>
+        <!-- Currently NEEDED for Solr 7.x, as the solr-parent POM has an old, invalid URL for this repository.
+             The URL is corrected (to the below value) as of Solr 8.3.x, but has not yet been backported to 7.x.
+             Once we upgrade to Solr 8+, we should be able to remove this repository. -->
+        <repository>
+            <id>maven-restlet</id>
+            <name>Public online Restlet repository</name>
+            <url>https://maven.restlet.com</url>
         </repository>
     </repositories>
 
