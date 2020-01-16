@@ -12,12 +12,29 @@ import java.util.Map;
 
 import org.dspace.content.InProgressSubmission;
 
+/**
+ * This class holds the map of differences for the metadatafields together with the name of the service that was
+ * used to retrieve the differences, the id that was used within that service and the InProgressSubmission that was used
+ * to retrieve the current metadata values
+ */
 public class MetadataSuggestionDifferences {
 
+    /**
+     * The map that holds the metadata field String representation as key and the MetadataDifference object as value
+     */
     private Map<String, MetadataSuggestionDifference> differences = new HashMap<>();
 
+    /**
+     * The name of the service that was used to retrieve information
+     */
     private String suggestionName;
+    /**
+     * The InProgressSubmission that was used to retrieve the metadata
+     */
     private InProgressSubmission inProgressSubmission;
+    /**
+     * The id of the record in the suggestionName service
+     */
     private String id;
 
     public MetadataSuggestionDifferences(String suggestionName, InProgressSubmission inProgressSubmission,
@@ -48,6 +65,11 @@ public class MetadataSuggestionDifferences {
         return differences.get(metadataKey);
     }
 
+    /**
+     * This method adds a MetadataDifference with its metadatafield String representation as key to the map
+     * @param metadataKey   The given key
+     * @param metadataSuggestionDifference  The given MetadataSuggestionDifference
+     */
     public void addDifference(String metadataKey, MetadataSuggestionDifference metadataSuggestionDifference) {
         differences.put(metadataKey, metadataSuggestionDifference);
     }

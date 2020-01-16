@@ -95,6 +95,14 @@ public class MetadataSuggestionsRestRepository extends DSpaceRestRepository<Meta
         }
     }
 
+    /**
+     * This method constructs a MetadataSuggestionsDifferencesRest object from the given parameters
+     * @param suggestionName        The suggestionName from where the information will be retrieved
+     * @param entryId               The id of the entry for the given suggestionName
+     * @param inProgressSubmission  The InProgressSubmission who's metadata will be checked
+     * @return  A MetadataSuggestionsDifferencesRest object that holds all the differences between the found values and
+     * the values within the InProgressSubmission
+     */
     public MetadataSuggestionsDifferencesRest getMetadataSuggestionsDifferences(String suggestionName, String entryId,
         InProgressSubmission inProgressSubmission) {
         Optional<MetadataSuggestionDifferences> metadataSuggestionDifferences = metadataSuggestionProviderService
@@ -103,7 +111,7 @@ public class MetadataSuggestionsRestRepository extends DSpaceRestRepository<Meta
             return converter.toRest(metadataSuggestionDifferences.get(), Projection.DEFAULT);
         } else {
             throw new ResourceNotFoundException(
-                "The MetadataSuggestionDifferences for suggestioName: " + suggestionName + " and entryId: " + entryId +
+                "The MetadataSuggestionDifferences for suggestionName: " + suggestionName + " and entryId: " + entryId +
                     " for InProgressSubmission with id: " + inProgressSubmission.getID() + " could not be found");
         }
     }

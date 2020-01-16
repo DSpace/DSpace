@@ -9,9 +9,19 @@ package org.dspace.external.provider.metadata.service.impl;
 
 import java.util.List;
 
+/**
+ * This class holds a representation of the list of String values that represents the current values for a certain
+ * metadata field and the list of metadata changes that can be made to this list
+ */
 public class MetadataSuggestionDifference {
 
+    /**
+     * List of String values that represent the current values of a metadatafield's values
+     */
     private List<String> currentValues;
+    /**
+     * The list of MetadataChanges that can be made to the metadatafield's values
+     */
     private List<MetadataChange> metadataChanges;
 
     /**

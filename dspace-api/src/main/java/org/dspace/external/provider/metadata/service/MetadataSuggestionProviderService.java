@@ -44,6 +44,16 @@ public interface MetadataSuggestionProviderService {
     Optional<MetadataItemSuggestions> getMetadataItemSuggestions(String suggestionName, String entryId,
                                                                  InProgressSubmission inProgressSubmission);
 
+    /**
+     * This method will construct a MetadataSuggestionDifferences object wrapped in an optional from the given
+     * SuggestionName service with the given ID and the InProgressSubmission's metadata.
+     * It will retrieve the metadata from the given service and compare this with the metadata from the
+     * InProgressSubmission and it'll construct the MetadataSuggestionDifferences object based on that
+     * @param suggestionName        The name for the service to be used
+     * @param entryId               The id of the entry to be queried in the service
+     * @param inProgressSubmission  The InProgressSubmission to be used for the current metadata
+     * @return                      The constructed MetadataSuggestionDifferences object
+     */
     public Optional<MetadataSuggestionDifferences> getMetadataSuggestionDifferences(String suggestionName,
         String entryId, InProgressSubmission inProgressSubmission);
 }

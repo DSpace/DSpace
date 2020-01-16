@@ -26,9 +26,6 @@ public class MetadataSuggestionEntryConverter implements
                                               DSpaceConverter<MetadataItemSuggestions, MetadataSuggestionEntryRest> {
 
     @Autowired
-    private MetadataChangeConverter metadataChangeConverter;
-
-    @Autowired
     private ConverterService converter;
 
     public MetadataSuggestionEntryRest convert(MetadataItemSuggestions obj, Projection projection) {
@@ -46,7 +43,6 @@ public class MetadataSuggestionEntryConverter implements
         metadataSuggestionEntryRest
             .setMetadataRest(converter.toRest(metadataValueDTOList, Projection.DEFAULT));
         metadataSuggestionEntryRest.setMetadataSuggestion(obj.getExternalDataObject().getSource());
-        metadataSuggestionEntryRest.setMetadataChangeRest(metadataChangeConverter.convert(obj.getMetadataChanges()));
         return metadataSuggestionEntryRest;
     }
 

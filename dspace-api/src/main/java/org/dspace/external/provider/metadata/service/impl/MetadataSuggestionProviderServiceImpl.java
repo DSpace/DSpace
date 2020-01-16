@@ -67,9 +67,13 @@ public class MetadataSuggestionProviderServiceImpl implements MetadataSuggestion
         return Optional.empty();
     }
 
+    @Override
     public Optional<MetadataSuggestionDifferences> getMetadataSuggestionDifferences(String suggestionName,
         String entryId, InProgressSubmission inProgressSubmission) {
 
+        // Here we fetch the MetadataItemSuggestions object from which we'll start cause it contains
+        // the changes and the map of metadata for the InProgressSubmissions so we don't have to
+        // calculate this again
         Optional<MetadataItemSuggestions> optional = getMetadataItemSuggestions(suggestionName, entryId,
                                                                                 inProgressSubmission);
         if (optional.isPresent()) {
@@ -77,14 +81,21 @@ public class MetadataSuggestionProviderServiceImpl implements MetadataSuggestion
             List<MetadataChange> metadataChanges = metadataItemSuggestions.getMetadataChanges();
             Map<String, List<String>> inProgressSubmissionMetadataMap = metadataItemSuggestions
                 .getInProgressSubmissionMetadata();
+            // Create a new MetadataSuggestionDifferences object so we can start filling up the map
             MetadataSuggestionDifferences metadataSuggestionDifferences =
                 new MetadataSuggestionDifferences(suggestionName, inProgressSubmission, entryId);
+            // Traverse all our changes to see what we need to add to the map
             for (MetadataChange metadataChange : metadataChanges) {
                 MetadataSuggestionDifference metadataSuggestionDifference = metadataSuggestionDifferences
                     .getDifference(metadataChange.getMetadataKey());
+                // If the key already exists, we add it to the MetadataSuggestionDifference object in that value
                 if (metadataSuggestionDifference != null) {
                     metadataSuggestionDifference.addMetadataChange(metadataChange);
                 } else {
+                    // If the key didn't exist, we have to make a new MetadataSuggestionDifference object
+                    // and populate it with the changes (that contains only this one metadataChange object for now)
+                    // the current values for the metadata field and add the MetadataSuggestionDifference to the big map
+                    // with the appropriate key
                     metadataSuggestionDifference = new MetadataSuggestionDifference();
                     List<MetadataChange> list = new LinkedList<>();
                     list.add(metadataChange);

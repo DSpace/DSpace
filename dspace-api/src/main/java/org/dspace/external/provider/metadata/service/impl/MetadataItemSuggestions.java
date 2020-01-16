@@ -78,6 +78,11 @@ public class MetadataItemSuggestions {
         }
     }
 
+    /**
+     * This method will produce a map with the metadatafield String representation as key and the list of its values
+     * as value of the map. This metadata is metadata that is currently present on the InProgressSubmission's item
+     * @return  The map with the metadatafield string key and list of values
+     */
     public Map<String, List<String>> getInProgressSubmissionMetadata() {
         Map<String, List<String>> map = new HashMap<>();
         List<MetadataValueDTO> mockMetadataFromInProgressSubmission =

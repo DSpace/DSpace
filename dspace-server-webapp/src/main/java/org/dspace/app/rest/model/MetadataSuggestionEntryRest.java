@@ -33,11 +33,6 @@ public class MetadataSuggestionEntryRest extends BaseObjectRest<String> {
     @JsonIgnore
     private Integer workflowItemId;
 
-    //TODO Change to REST/RESOURCE
-    @JsonIgnore
-    private MetadataChangeRest metadataChangeRest;
-
-
     public String getCategory() {
         return CATEGORY;
     }
@@ -128,22 +123,6 @@ public class MetadataSuggestionEntryRest extends BaseObjectRest<String> {
      */
     public void setMetadataRest(MetadataRest metadataRest) {
         this.metadataRest = metadataRest;
-    }
-
-    /**
-     * Generic getter for the metadataChangeRest
-     * @return the metadataChangeRest value of this MetadataSuggestionEntryRest
-     */
-    public MetadataChangeRest getMetadataChangeRest() {
-        return metadataChangeRest;
-    }
-
-    /**
-     * Generic setter for the metadataChangeRest
-     * @param metadataChangeRest   The metadataChangeRest to be set on this MetadataSuggestionEntryRest
-     */
-    public void setMetadataChangeRest(MetadataChangeRest metadataChangeRest) {
-        this.metadataChangeRest = metadataChangeRest;
     }
 
     /**

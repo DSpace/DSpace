@@ -30,7 +30,8 @@ public class MetadataSuggestionEntryHalLinkFactory
 
         list.add(buildLink(Link.REL_SELF, getMethodOn()
             .getMetadataSuggestionEntry(halResource.getContent().getMetadataSuggestion(),
-                                        halResource.getContent().getId(), null, null, null, null)));
+                                        halResource.getContent().getId(), halResource.getContent().getWorkspaceItemId(),
+                                        halResource.getContent().getWorkflowItemId(), null, null)));
         list.add(buildLink("differences", getMethodOn()
             .getMetadataSuggestionEntryDifferences(halResource.getContent().getMetadataSuggestion(),
                                                    halResource.getContent().getId(),
