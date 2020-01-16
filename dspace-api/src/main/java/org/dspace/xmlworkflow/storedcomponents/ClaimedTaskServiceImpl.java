@@ -14,7 +14,6 @@ import java.util.List;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.xmlworkflow.storedcomponents.dao.ClaimedTaskDAO;
@@ -38,11 +37,6 @@ public class ClaimedTaskServiceImpl implements ClaimedTaskService {
     }
 
     @Override
-    public int getSupportsIndexableObjectTypeConstant() {
-        return Constants.CLAIMEDTASK;
-    }
-
-    @Override
     public ClaimedTask create(Context context) throws SQLException, AuthorizeException {
         return claimedTaskDAO.create(context, new ClaimedTask());
     }
@@ -53,11 +47,8 @@ public class ClaimedTaskServiceImpl implements ClaimedTaskService {
     }
 
     @Override
-    public ClaimedTask findIndexableObject(Context context, Integer id) throws SQLException {
-        if (id == null) {
-            return null;
-        }
-        return find(context, id.intValue());
+    public List<ClaimedTask> findAll(Context context) throws SQLException {
+        return claimedTaskDAO.findAll(context, ClaimedTask.class);
     }
 
     @Override
