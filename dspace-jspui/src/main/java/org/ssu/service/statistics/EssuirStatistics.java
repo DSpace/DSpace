@@ -1,6 +1,16 @@
 package org.ssu.service.statistics;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.tuple.Triple;
+import org.dspace.browse.*;
+import org.dspace.content.Item;
+import org.dspace.content.MetadataSchema;
+import org.dspace.content.MetadataValue;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Context;
+import org.dspace.sort.SortException;
+import org.dspace.sort.SortOption;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
@@ -19,10 +29,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,7 +37,8 @@ public class EssuirStatistics {
     private static final org.ssu.entity.jooq.Item ITEM = org.ssu.entity.jooq.Item.TABLE;
     private static final org.ssu.entity.jooq.Statistics STATISTICS = org.ssu.entity.jooq.Statistics.TABLE;
     private static final org.ssu.entity.jooq.Metadatavalue METADATAVALUE = org.ssu.entity.jooq.Metadatavalue.TABLE;
-    private static final org.ssu.entity.jooq.Handle HANDLE = org.ssu.entity.jooq.Handle.TABLE;
+//    private static final org.ssu.entity.jooq.Handle HANDLE = org.ssu.entity.jooq.Handle.TABLE;
+private org.dspace.content.service.ItemService dspaceItemService = ContentServiceFactory.getInstance().getItemService();
 
     @Resource
     private MetadatavalueRepository metadatavalueRepository;
@@ -44,25 +52,48 @@ public class EssuirStatistics {
     @Resource
     private GeoIpService geoIpService;
 
-    private String getLastUpdate() {
-        return dsl.select(METADATAVALUE.value)
-                .from(ITEM)
-                .join(HANDLE).on(HANDLE.resourceLegacyId.eq(ITEM.itemId))
-                .join(METADATAVALUE).on(METADATAVALUE.dspaceObjectId.eq(HANDLE.resourceId))
-                .where(ITEM.inArchive.isTrue().and(METADATAVALUE.metadataFieldId.eq(11)).and(METADATAVALUE.place.eq(1)))
-                .orderBy(METADATAVALUE.value.desc())
-                .limit(1)
-                .fetchAny(METADATAVALUE.value);
+    enum StatisticType {
+        VIEWS, DOWNLOADS;
     }
 
-    public StatisticsData getTotalStatistic() {
+    private String getLastUpdate(Context context) {
+        try {
+            BrowseEngine be = new BrowseEngine(context);
+            BrowserScope bs = new BrowserScope(context);
+            BrowseIndex bi = BrowseIndex.getItemBrowseIndex();
+            bs.setBrowseIndex(bi);
+            bs.setOrder(SortOption.DESCENDING);
+            bs.setResultsPerPage(1);
+
+            bs.setSortBy(SortOption.getSortOptions()
+                    .stream()
+                    .filter(option -> option.getName().equals("dateaccessioned"))
+                    .map(option -> option.getNumber())
+                    .findFirst()
+                    .orElse(0));
+            BrowseInfo browse = be.browseMini(bs);
+            Item item = browse.getBrowseItemResults().stream().findFirst().orElseThrow(NullPointerException::new);
+            return dspaceItemService.getMetadata(item, MetadataSchema.DC_SCHEMA, "date", "accessioned", Item.ANY)
+                    .stream()
+                    .findFirst()
+                    .map(MetadataValue::getValue)
+                    .orElseThrow(NullPointerException::new);
+        } catch (BrowseException e) {
+            e.printStackTrace();
+        } catch (SortException e) {
+            e.printStackTrace();
+        }
+        return LocalDate.now().toString();
+    }
+
+    public StatisticsData getTotalStatistic(Context context) {
         Integer count = dsl.select(DSL.count())
                 .from(ITEM)
                 .where(ITEM.inArchive.isTrue())
                 .fetchAny(DSL.count());
 
         return new StatisticsData.Builder()
-                .withLastUpdate(Arrays.stream(getLastUpdate().split("T")).findFirst().orElse(LocalDate.now().toString()))
+                .withLastUpdate(Arrays.stream(getLastUpdate(context).split("T")).findFirst().orElse(LocalDate.now().toString()))
                 .withTotalCount(count)
                 .withTotalDownloads(getTotalDownloads())
                 .withTotalViews(getTotalViews())
@@ -72,9 +103,8 @@ public class EssuirStatistics {
     public Map<String, Integer> getStatisticsByType() {
         return dsl.select(METADATAVALUE.value, DSL.count())
                 .from(ITEM)
-                .join(HANDLE).on(HANDLE.resourceLegacyId.eq(ITEM.itemId))
-                .join(METADATAVALUE).on(METADATAVALUE.dspaceObjectId.eq(HANDLE.resourceId))
-                .where(ITEM.inArchive.isTrue().and(METADATAVALUE.metadataFieldId.eq(66)))
+                .join(METADATAVALUE).on(METADATAVALUE.dspaceObjectId.eq(ITEM.uuid))
+                .where(METADATAVALUE.metadataFieldId.eq(66).and(ITEM.inArchive.isTrue()))
                 .groupBy(METADATAVALUE.value)
                 .fetch()
                 .stream()
@@ -82,37 +112,36 @@ public class EssuirStatistics {
     }
 
     private Map<Integer, Long> getDownloadsStatistics() {
-        return getStatistics(STATISTICS.sequenceId.greaterOrEqual(0));
-    }
-
-    private Map<Integer, Long> getViewStatistics() {
-        return getStatistics(STATISTICS.sequenceId.lessThan(0));
+        return getStatistics()
+                .entrySet()
+                .stream()
+                .filter(item -> item.getKey().getRight().equals(StatisticType.DOWNLOADS))
+                .collect(Collectors.toMap(item -> item.getKey().getLeft(), item -> item.getValue(), (a, b) -> a));
     }
 
     private Integer getTotalViews() {
-        return getViewStatistics()
-                .values()
-                .stream()
-                .mapToInt(Long::intValue)
-                .sum();
+        return dsl.select(DSL.sum(STATISTICS.viewCount))
+                .from(STATISTICS)
+                .where(STATISTICS.sequenceId.lessThan(0))
+                .fetchSingle(DSL.sum(STATISTICS.viewCount))
+                .intValue();
     }
 
     private Integer getTotalDownloads() {
-        return getDownloadsStatistics()
-                .values()
-                .stream()
-                .mapToInt(Long::intValue)
-                .sum();
-    }
-
-    private Map<Integer, Long> getStatistics(Condition condition) {
-        return dsl.select(STATISTICS.itemId, DSL.sum(STATISTICS.viewCount))
+        return dsl.select(DSL.sum(STATISTICS.viewCount))
                 .from(STATISTICS)
-                .where(condition)
-                .groupBy(STATISTICS.itemId)
-                .fetch()
-                .stream()
-                .collect(Collectors.toMap(item -> item.get(STATISTICS.itemId), item -> item.get(DSL.sum(STATISTICS.viewCount)).longValue()));
+                .where(STATISTICS.sequenceId.greaterOrEqual(0))
+                .fetchSingle(DSL.sum(STATISTICS.viewCount))
+                .intValue();    }
+
+    private Map<Pair<Integer, StatisticType>, Long> getStatistics() {
+
+        return Seq.seq(dsl.select(STATISTICS.itemId, STATISTICS.sequenceId, STATISTICS.viewCount)
+                .from(STATISTICS)
+                .fetch())
+                .map(item -> Triple.of(item.get(STATISTICS.itemId), item.get(STATISTICS.sequenceId) >= 0 ? StatisticType.DOWNLOADS : StatisticType.VIEWS, item.get(STATISTICS.viewCount)))
+                .grouped(tuple -> Pair.of(tuple.getLeft(), tuple.getMiddle()), Collectors.summingLong(item -> item.getRight()))
+                .toMap(item -> item.v1(), item -> item.v2());
     }
 
     public List<org.ssu.entity.Item> topPublications(int limit) {
@@ -153,11 +182,11 @@ public class EssuirStatistics {
 
 
     public Integer getViewsForItem(Integer itemId) {
-        return getStatistics(STATISTICS.sequenceId.lessThan(0).and(STATISTICS.itemId.eq(itemId))).getOrDefault(itemId, 0L).intValue();
+        return getStatistics().getOrDefault(Pair.of(itemId, StatisticType.VIEWS), 0L).intValue();
     }
 
     public Integer getDownloadsForItem(Integer itemId) {
-        return getStatistics(STATISTICS.sequenceId.greaterOrEqual(0).and(STATISTICS.itemId.eq(itemId))).getOrDefault(itemId, 0L).intValue();
+        return getStatistics().getOrDefault(Pair.of(itemId, StatisticType.DOWNLOADS), 0L).intValue();
     }
 
     public void updateItemViews(HttpServletRequest request, Integer itemId) {

@@ -25,7 +25,7 @@ public class ScheduledTasks {
     @Scheduled(cron = "0 0 0/3 1-2 * ? *")
     public void finalizeMonthStatistics() {
         LocalDate previousMonth = LocalDate.now().minusDays(25);
-        StatisticsData statisticsData = essuirStatistics.getTotalStatistic();
+        StatisticsData statisticsData = essuirStatistics.getTotalStatistic(null);
         GeneralStatistics generalStatistics = new GeneralStatistics.Builder()
                 .withMonth(previousMonth.getMonthValue() - 1)
                 .withYear(previousMonth.getYear())

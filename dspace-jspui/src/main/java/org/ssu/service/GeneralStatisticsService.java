@@ -1,5 +1,6 @@
 package org.ssu.service;
 
+import org.dspace.core.Context;
 import org.springframework.stereotype.Service;
 import org.ssu.entity.statistics.GeneralStatistics;
 import org.ssu.entity.statistics.YearStatistics;
@@ -58,8 +59,8 @@ public class GeneralStatisticsService {
     }
 
 
-    public GeneralStatisticsResponse collectGeneralStatistics() {
-        StatisticsData statisticsData = essuirStatistics.getTotalStatistic();
+    public GeneralStatisticsResponse collectGeneralStatistics(Context context) {
+        StatisticsData statisticsData = essuirStatistics.getTotalStatistic(context);
         return new GeneralStatisticsResponse.Builder()
                 .withTotalCount(statisticsData.getTotalCount())
                 .withTotalViews(statisticsData.getTotalViews())

@@ -99,7 +99,7 @@ public class EssuirSiteController {
                     return 0;
                 }));
 
-        StatisticsData totalStatistic = essuirStatistics.getTotalStatistic();
+        StatisticsData totalStatistic = essuirStatistics.getTotalStatistic(dspaceContext);
         List<ItemTypeResponse> submissionStatisticsByType = typeLocalization.getSubmissionStatisticsByType(locale).stream().sorted(Comparator.comparing(ItemTypeResponse::getTitle)).collect(Collectors.toList());
         model.addObject("topNews", String.format(topNews, totalStatistic.getTotalCount(), totalStatistic.getLastUpdate()));
         model.addObject("sideNews", sideNews);
@@ -201,9 +201,10 @@ public class EssuirSiteController {
 
     @RequestMapping(value = "/current", method = RequestMethod.GET)
     @ResponseBody
-    public String getTotalStatistics(HttpServletRequest request) throws JsonProcessingException {
+    public String getTotalStatistics(HttpServletRequest request) throws JsonProcessingException, SQLException {
+        Context dspaceContext = UIUtil.obtainContext(request);
         return new ObjectMapper()
-                .writeValueAsString(generalStatisticsService.collectGeneralStatistics());
+                .writeValueAsString(generalStatisticsService.collectGeneralStatistics(dspaceContext));
     }
 
     @RequestMapping(value = "/general-statistics", method = RequestMethod.GET)
