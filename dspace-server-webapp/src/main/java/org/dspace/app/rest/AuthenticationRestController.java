@@ -10,6 +10,7 @@ package org.dspace.app.rest;
 import java.sql.SQLException;
 import java.util.Arrays;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.converter.EPersonConverter;
@@ -20,6 +21,7 @@ import org.dspace.app.rest.model.EPersonRest;
 import org.dspace.app.rest.model.hateoas.AuthenticationStatusResource;
 import org.dspace.app.rest.model.hateoas.AuthnResource;
 import org.dspace.app.rest.projection.Projection;
+import org.dspace.app.rest.security.RestAuthenticationService;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.core.Context;
@@ -61,6 +63,9 @@ public class AuthenticationRestController implements InitializingBean {
     private HalLinkService halLinkService;
 
     @Autowired
+    private RestAuthenticationService restAuthenticationService;
+
+    @Autowired
     private Utils utils;
 
     @Override
@@ -77,7 +82,8 @@ public class AuthenticationRestController implements InitializingBean {
     }
 
     @RequestMapping(value = "/status", method = RequestMethod.GET)
-    public AuthenticationStatusResource status(HttpServletRequest request) throws SQLException {
+    public AuthenticationStatusResource status(HttpServletRequest request, HttpServletResponse response)
+            throws SQLException {
         Context context = ContextUtil.obtainContext(request);
         EPersonRest ePersonRest = null;
         Projection projection = utils.obtainProjection();
@@ -86,6 +92,12 @@ public class AuthenticationRestController implements InitializingBean {
         }
 
         AuthenticationStatusRest authenticationStatusRest = new AuthenticationStatusRest(ePersonRest);
+        if (!authenticationStatusRest.isAuthenticated()) {
+            String authenticateHeaderValue = restAuthenticationService
+                    .getWwwAuthenticateHeaderValue(request, response);
+
+            response.setHeader("WWW-Authenticate", authenticateHeaderValue);
+        }
         authenticationStatusRest.setProjection(projection);
         AuthenticationStatusResource authenticationStatusResource = converter.toResource(authenticationStatusRest);
 
