@@ -25,7 +25,6 @@ import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.CollectionRest;
 import org.dspace.app.rest.model.CommunityRest;
 import org.dspace.app.rest.model.ItemRest;
-import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.repository.patch.ResourcePatch;
 import org.dspace.app.rest.utils.CollectionRestEqualityUtils;
@@ -73,7 +72,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
     private ItemService itemService;
 
     public CollectionRestRepository(CollectionService dsoService) {
-            super(dsoService, new ResourcePatch<CollectionRest>() {});
+        super(dsoService, new ResourcePatch<CollectionRest>() {});
     }
 
     @Override

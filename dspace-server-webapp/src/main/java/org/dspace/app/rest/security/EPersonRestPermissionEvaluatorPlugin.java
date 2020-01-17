@@ -15,9 +15,6 @@ import java.util.UUID;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import org.dspace.app.rest.model.patch.Operation;
-import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.repository.patch.OperationPaths;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.authorize.service.AuthorizeService;
