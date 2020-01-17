@@ -7,25 +7,33 @@
  */
 package org.dspace.app.rest.utils;
 
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.dspace.discovery.configuration.DiscoveryConfigurationParameters.SORT.COUNT;
+import static org.dspace.discovery.configuration.DiscoveryConfigurationParameters.SORT.VALUE;
+import static org.dspace.discovery.configuration.DiscoveryConfigurationParameters.TYPE_HIERARCHICAL;
+import static org.dspace.discovery.configuration.DiscoveryConfigurationParameters.TYPE_TEXT;
+import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.isEmptyOrNullString;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.eq;
+import static org.junit.Assert.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.when;
 
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Function;
 
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.parameter.SearchFilter;
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.discovery.DiscoverFacetField;
 import org.dspace.discovery.DiscoverFilterQuery;
@@ -42,14 +50,17 @@ import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
 import org.dspace.discovery.configuration.DiscoverySortConfiguration;
 import org.dspace.discovery.configuration.DiscoverySortFieldConfiguration;
 import org.dspace.discovery.configuration.HierarchicalSidebarFacetConfiguration;
+import org.dspace.discovery.indexobject.IndexableItem;
+import org.dspace.discovery.indexobject.factory.IndexFactory;
 import org.dspace.services.ConfigurationService;
+import org.hamcrest.FeatureMatcher;
+import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.internal.matchers.apachecommons.ReflectionEquals;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
@@ -74,6 +85,9 @@ public class DiscoverQueryBuilderTest {
     @Mock
     private IndexableObject scope;
 
+    @Mock
+    private IndexFactory indexFactory;
+
     private DiscoveryConfiguration discoveryConfiguration;
     private String query;
     private SearchFilter searchFilter;
@@ -81,15 +95,17 @@ public class DiscoverQueryBuilderTest {
 
     @Before
     public void setUp() throws Exception {
-        when(configurationService.getIntProperty(eq("rest.search.max.results"), anyInt())).thenReturn(100);
+        queryBuilder.setIndexableFactories(Collections.singletonList(indexFactory));
 
-        when(searchService.escapeQueryChars(any(String.class))).then(invocation -> invocation.getArguments()[0]);
+        when(indexFactory.getType()).thenReturn(IndexableItem.TYPE);
+
+        when(configurationService.getIntProperty(eq("rest.search.max.results"), anyInt())).thenReturn(100);
 
         when(searchService.toSortFieldIndex(any(String.class), any(String.class)))
             .then(invocation -> invocation.getArguments()[0] + "_sort");
 
         when(searchService
-            .getFacetYearRange(eq(context), any(IndexableObject.class), any(DiscoverySearchFilterFacet.class),
+            .getFacetYearRange(eq(context), nullable(IndexableObject.class), any(DiscoverySearchFilterFacet.class),
                 any(), any(DiscoverQuery.class)))
             .then(invocation -> new FacetYearRange((DiscoverySearchFilterFacet) invocation.getArguments()[2]));
 
@@ -144,9 +160,9 @@ public class DiscoverQueryBuilderTest {
         dateFacet.setFacetLimit(6);
         HierarchicalSidebarFacetConfiguration hierarchyFacet = new HierarchicalSidebarFacetConfiguration();
         hierarchyFacet.setIndexFieldName("hierarchy");
-        hierarchyFacet.setType(DiscoveryConfigurationParameters.TYPE_HIERARCHICAL);
+        hierarchyFacet.setType(TYPE_HIERARCHICAL);
         hierarchyFacet.setFacetLimit(7);
-        hierarchyFacet.setSortOrderSidebar(DiscoveryConfigurationParameters.SORT.VALUE);
+        hierarchyFacet.setSortOrderSidebar(VALUE);
         discoveryConfiguration.setSidebarFacets(Arrays.asList(subjectFacet, dateFacet, hierarchyFacet));
         discoveryConfiguration.setSearchFilters(Arrays.asList(subjectFacet, dateFacet, hierarchyFacet));
 
@@ -165,7 +181,7 @@ public class DiscoverQueryBuilderTest {
 
         assertThat(discoverQuery.getFilterQueries(), containsInAnyOrder("archived:true", "subject:\"Java\""));
         assertThat(discoverQuery.getQuery(), is(query));
-        assertThat(discoverQuery.getDSpaceObjectFilter(), is(Constants.ITEM));
+        assertThat(discoverQuery.getDSpaceObjectFilter(), is(IndexableItem.TYPE));
         assertThat(discoverQuery.getSortField(), is("dc.title_sort"));
         assertThat(discoverQuery.getSortOrder(), is(DiscoverQuery.SORT_ORDER.asc));
         assertThat(discoverQuery.getMaxResults(), is(10));
@@ -173,15 +189,15 @@ public class DiscoverQueryBuilderTest {
         assertThat(discoverQuery.getFacetMinCount(), is(1));
         assertThat(discoverQuery.getFacetOffset(), is(0));
         assertThat(discoverQuery.getFacetFields(), hasSize(2));
-        assertThat(discoverQuery.getFacetFields(), containsInAnyOrder(new ReflectionEquals(
-            new DiscoverFacetField("subject", DiscoveryConfigurationParameters.TYPE_TEXT, 6,
-                DiscoveryConfigurationParameters.SORT.COUNT)), new ReflectionEquals(
-            new DiscoverFacetField("hierarchy", DiscoveryConfigurationParameters.TYPE_HIERARCHICAL, 8,
-                DiscoveryConfigurationParameters.SORT.VALUE))));
+        assertThat(discoverQuery.getFacetFields(), containsInAnyOrder(
+                discoverFacetFieldMatcher(new DiscoverFacetField("subject", TYPE_TEXT, 6, COUNT)),
+                discoverFacetFieldMatcher(new DiscoverFacetField("hierarchy", TYPE_HIERARCHICAL, 8, VALUE))
+        ));
         assertThat(discoverQuery.getHitHighlightingFields(), hasSize(2));
-        assertThat(discoverQuery.getHitHighlightingFields(),
-            containsInAnyOrder(new ReflectionEquals(new DiscoverHitHighlightingField("dc.title", 0, 3)),
-                new ReflectionEquals(new DiscoverHitHighlightingField("fulltext", 0, 3))));
+        assertThat(discoverQuery.getHitHighlightingFields(), containsInAnyOrder(
+                discoverHitHighlightingFieldMatcher(new DiscoverHitHighlightingField("dc.title", 0, 3)),
+                discoverHitHighlightingFieldMatcher(new DiscoverHitHighlightingField("fulltext", 0, 3))
+        ));
     }
 
     @Test
@@ -191,7 +207,7 @@ public class DiscoverQueryBuilderTest {
 
         assertThat(discoverQuery.getFilterQueries(), containsInAnyOrder("archived:true"));
         assertThat(discoverQuery.getQuery(), isEmptyOrNullString());
-        assertThat(discoverQuery.getDSpaceObjectFilter(), is(-1));
+        assertThat(discoverQuery.getDSpaceObjectFilter(), isEmptyOrNullString());
         //Note this should actually be "dc.date.accessioned_dt"  but remember that our searchService is just a stupid
         // mock
         assertThat(discoverQuery.getSortField(), is("dc.date.accessioned_sort"));
@@ -201,15 +217,15 @@ public class DiscoverQueryBuilderTest {
         assertThat(discoverQuery.getFacetMinCount(), is(1));
         assertThat(discoverQuery.getFacetOffset(), is(0));
         assertThat(discoverQuery.getFacetFields(), hasSize(2));
-        assertThat(discoverQuery.getFacetFields(), containsInAnyOrder(new ReflectionEquals(
-            new DiscoverFacetField("subject", DiscoveryConfigurationParameters.TYPE_TEXT, 6,
-                DiscoveryConfigurationParameters.SORT.COUNT)), new ReflectionEquals(
-            new DiscoverFacetField("hierarchy", DiscoveryConfigurationParameters.TYPE_HIERARCHICAL, 8,
-                DiscoveryConfigurationParameters.SORT.VALUE))));
+        assertThat(discoverQuery.getFacetFields(), containsInAnyOrder(
+                discoverFacetFieldMatcher(new DiscoverFacetField("subject", TYPE_TEXT, 6, COUNT)),
+                discoverFacetFieldMatcher(new DiscoverFacetField("hierarchy", TYPE_HIERARCHICAL, 8, VALUE))
+        ));
         assertThat(discoverQuery.getHitHighlightingFields(), hasSize(2));
-        assertThat(discoverQuery.getHitHighlightingFields(),
-            containsInAnyOrder(new ReflectionEquals(new DiscoverHitHighlightingField("dc.title", 0, 3)),
-                new ReflectionEquals(new DiscoverHitHighlightingField("fulltext", 0, 3))));
+        assertThat(discoverQuery.getHitHighlightingFields(), containsInAnyOrder(
+                discoverHitHighlightingFieldMatcher(new DiscoverHitHighlightingField("dc.title", 0, 3)),
+                discoverHitHighlightingFieldMatcher(new DiscoverHitHighlightingField("fulltext", 0, 3))
+        ));
     }
 
     @Test
@@ -221,7 +237,7 @@ public class DiscoverQueryBuilderTest {
 
         assertThat(discoverQuery.getFilterQueries(), containsInAnyOrder("archived:true"));
         assertThat(discoverQuery.getQuery(), isEmptyOrNullString());
-        assertThat(discoverQuery.getDSpaceObjectFilter(), is(-1));
+        assertThat(discoverQuery.getDSpaceObjectFilter(), is(isEmptyOrNullString()));
         //Note this should actually be "dc.date.accessioned_dt"  but remember that our searchService is just a stupid
         // mock
         assertThat(discoverQuery.getSortField(), is("score_sort"));
@@ -231,15 +247,15 @@ public class DiscoverQueryBuilderTest {
         assertThat(discoverQuery.getFacetMinCount(), is(1));
         assertThat(discoverQuery.getFacetOffset(), is(0));
         assertThat(discoverQuery.getFacetFields(), hasSize(2));
-        assertThat(discoverQuery.getFacetFields(), containsInAnyOrder(new ReflectionEquals(
-            new DiscoverFacetField("subject", DiscoveryConfigurationParameters.TYPE_TEXT, 6,
-                DiscoveryConfigurationParameters.SORT.COUNT)), new ReflectionEquals(
-            new DiscoverFacetField("hierarchy", DiscoveryConfigurationParameters.TYPE_HIERARCHICAL, 8,
-                DiscoveryConfigurationParameters.SORT.VALUE))));
+        assertThat(discoverQuery.getFacetFields(), containsInAnyOrder(
+                discoverFacetFieldMatcher(new DiscoverFacetField("subject", TYPE_TEXT, 6, COUNT)),
+                discoverFacetFieldMatcher(new DiscoverFacetField("hierarchy", TYPE_HIERARCHICAL, 8, VALUE))
+        ));
         assertThat(discoverQuery.getHitHighlightingFields(), hasSize(2));
-        assertThat(discoverQuery.getHitHighlightingFields(),
-            containsInAnyOrder(new ReflectionEquals(new DiscoverHitHighlightingField("dc.title", 0, 3)),
-                new ReflectionEquals(new DiscoverHitHighlightingField("fulltext", 0, 3))));
+        assertThat(discoverQuery.getHitHighlightingFields(), containsInAnyOrder(
+                discoverHitHighlightingFieldMatcher(new DiscoverHitHighlightingField("dc.title", 0, 3)),
+                discoverHitHighlightingFieldMatcher(new DiscoverHitHighlightingField("fulltext", 0, 3))
+        ));
     }
 
     @Test(expected = DSpaceBadRequestException.class)
@@ -250,7 +266,7 @@ public class DiscoverQueryBuilderTest {
 
     @Test(expected = DSpaceBadRequestException.class)
     public void testInvalidSortField() throws Exception {
-        page = new PageRequest(2, 10, Sort.Direction.ASC, "test");
+        page = PageRequest.of(2, 10, Sort.Direction.ASC, "test");
         queryBuilder
             .buildQuery(context, scope, discoveryConfiguration, query, Arrays.asList(searchFilter), "ITEM", page);
     }
@@ -281,7 +297,7 @@ public class DiscoverQueryBuilderTest {
 
         assertThat(discoverQuery.getFilterQueries(), containsInAnyOrder("archived:true", "subject:\"Java\""));
         assertThat(discoverQuery.getQuery(), is(query));
-        assertThat(discoverQuery.getDSpaceObjectFilter(), is(Constants.ITEM));
+        assertThat(discoverQuery.getDSpaceObjectFilter(), is(IndexableItem.TYPE));
         assertThat(discoverQuery.getSortField(), isEmptyOrNullString());
         assertThat(discoverQuery.getMaxResults(), is(0));
         assertThat(discoverQuery.getStart(), is(0));
@@ -289,8 +305,7 @@ public class DiscoverQueryBuilderTest {
         assertThat(discoverQuery.getFacetOffset(), is(10));
         assertThat(discoverQuery.getFacetFields(), hasSize(1));
         assertThat(discoverQuery.getFacetFields(), contains(
-            new ReflectionEquals(new DiscoverFacetField("subject", DiscoveryConfigurationParameters.TYPE_TEXT, 11,
-                                                        DiscoveryConfigurationParameters.SORT.COUNT, "prefix"))
+                discoverFacetFieldMatcher(new DiscoverFacetField("subject", TYPE_TEXT, 11, COUNT, "prefix"))
         ));
     }
 
@@ -300,4 +315,35 @@ public class DiscoverQueryBuilderTest {
                 Arrays.asList(searchFilter), "item", page, "test");
     }
 
+    public Matcher<DiscoverFacetField> discoverFacetFieldMatcher(DiscoverFacetField expected) {
+
+        return allOf(
+                hasProperty(expected, DiscoverFacetField::getField, "field"),
+                hasProperty(expected, DiscoverFacetField::getType, "type"),
+                hasProperty(expected, DiscoverFacetField::getPrefix, "prefix"),
+                hasProperty(expected, DiscoverFacetField::getLimit, "limit"),
+                hasProperty(expected, DiscoverFacetField::getOffset, "offset")
+        );
+    }
+
+    public Matcher<DiscoverHitHighlightingField> discoverHitHighlightingFieldMatcher
+            (DiscoverHitHighlightingField expected) {
+
+        return allOf(
+                hasProperty(expected, DiscoverHitHighlightingField::getField, "field"),
+                hasProperty(expected, DiscoverHitHighlightingField::getMaxChars, "maxChars"),
+                hasProperty(expected, DiscoverHitHighlightingField::getMaxSnippets, "maxSnippets")
+        );
+    }
+
+    public <T, U> FeatureMatcher<T, U> hasProperty(T expected, Function<T, U> property, String description) {
+
+        return new FeatureMatcher<T, U>
+                (equalTo(property.apply(expected)), description, description) {
+
+            protected U featureValueOf(T actual) {
+                return property.apply(actual);
+            }
+        };
+    }
 }

@@ -20,8 +20,8 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Community;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
-import org.dspace.discovery.MockSolrServiceImpl;
-import org.dspace.discovery.SearchService;
+import org.dspace.discovery.MockSolrSearchCore;
+import org.dspace.discovery.SolrSearchCore;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
@@ -179,10 +179,9 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
             cleanupContext();
 
             // Clear the search core.
-            MockSolrServiceImpl searchService = DSpaceServicesFactory.getInstance()
-                                                                     .getServiceManager()
-                                                                     .getServiceByName(SearchService.class.getName(),
-                                                                                       MockSolrServiceImpl.class);
+            MockSolrSearchCore searchService = DSpaceServicesFactory.getInstance()
+                    .getServiceManager()
+                    .getServiceByName(SolrSearchCore.class.getName(), MockSolrSearchCore.class);
             searchService.reset();
 
             // Reload our ConfigurationService (to reset configs to defaults again)
