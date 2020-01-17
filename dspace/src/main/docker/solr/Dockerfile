@@ -13,11 +13,13 @@ FROM dspace/dspace:dspace-7_x-jdk8 as dspace
 FROM solr:7
 # Directory on 'dspace' image (see above) where DSpace is installed
 ENV DSPACE_INSTALL=/dspace
+# Solr user
+ENV SOLR_USER=solr
 # Expose Solr on localhost:8983
 EXPOSE 8983 8983
 
 WORKDIR /opt/solr/server/solr
-USER solr
+USER $SOLR_USER
 # Create DSpace-specific Solr cores (based on default configset provided by Solr)
 RUN \
     cp -r configsets/_default authority && \
@@ -31,7 +33,7 @@ RUN \
 
 # Copy the DSpace-specific Solr schemas & configs (from our 'dspace' image)
 # into corresponding Solr core directory
-COPY --from=dspace $DSPACE_INSTALL/solr/authority authority/
-COPY --from=dspace $DSPACE_INSTALL/solr/oai oai/
-COPY --from=dspace $DSPACE_INSTALL/solr/search search/
-COPY --from=dspace $DSPACE_INSTALL/solr/statistics statistics/
+COPY --from=dspace --chown=$SOLR_USER:$SOLR_USER $DSPACE_INSTALL/solr/authority authority/
+COPY --from=dspace --chown=$SOLR_USER:$SOLR_USER $DSPACE_INSTALL/solr/oai oai/
+COPY --from=dspace --chown=$SOLR_USER:$SOLR_USER $DSPACE_INSTALL/solr/search search/
+COPY --from=dspace --chown=$SOLR_USER:$SOLR_USER $DSPACE_INSTALL/solr/statistics statistics/
