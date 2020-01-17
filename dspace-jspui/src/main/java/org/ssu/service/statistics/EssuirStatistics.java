@@ -182,11 +182,23 @@ private org.dspace.content.service.ItemService dspaceItemService = ContentServic
 
 
     public Integer getViewsForItem(Integer itemId) {
-        return getStatistics().getOrDefault(Pair.of(itemId, StatisticType.VIEWS), 0L).intValue();
+        return dsl.select(STATISTICS.itemId, DSL.sum(STATISTICS.viewCount))
+                .from(STATISTICS)
+                .where(STATISTICS.itemId.equal(itemId).and(STATISTICS.sequenceId.lessThan(0)))
+                .groupBy(STATISTICS.itemId)
+                .fetchOptional(DSL.sum(STATISTICS.viewCount))
+                .map(BigDecimal::intValue)
+                .orElse(0);
     }
 
     public Integer getDownloadsForItem(Integer itemId) {
-        return getStatistics().getOrDefault(Pair.of(itemId, StatisticType.DOWNLOADS), 0L).intValue();
+        return dsl.select(STATISTICS.itemId, DSL.sum(STATISTICS.viewCount))
+                .from(STATISTICS)
+                .where(STATISTICS.itemId.equal(itemId).and(STATISTICS.sequenceId.greaterOrEqual(0)))
+                .groupBy(STATISTICS.itemId)
+                .fetchOptional(DSL.sum(STATISTICS.viewCount))
+                .map(BigDecimal::intValue)
+                .orElse(0);
     }
 
     public void updateItemViews(HttpServletRequest request, Integer itemId) {
