@@ -54,14 +54,12 @@ public class NameAscendingComparatorTest {
 
     @Test
     public void testCompareFirstNull() throws Exception {
-        when(dso2.getName()).thenReturn("b");
 
         assertTrue(comparator.compare(null, dso2) < 0);
     }
 
     @Test
     public void testCompareSecondNull() throws Exception {
-        when(dso1.getName()).thenReturn("a");
 
         assertTrue(comparator.compare(dso1, null) > 0);
     }
