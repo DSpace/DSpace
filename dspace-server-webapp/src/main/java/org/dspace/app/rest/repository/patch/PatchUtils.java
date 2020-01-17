@@ -72,7 +72,7 @@ public class PatchUtils {
 
     /**
      * Modifies move operation paths by removing "_link" and "/href" from
-     * the path. Required when moving bundle bitstreams (and perhaps in other
+     * the path. Required when reordering bundle bitstreams (and perhaps in other
      * situations). If a non-move operation is supplied the node is
      * unchanged.
      * @param jsonNode original json node
@@ -83,37 +83,51 @@ public class PatchUtils {
             if (operation.get("op").asText().contentEquals("move")) {
                 String path = replaceLinkPath(operation.get("path").asText());
                 path = replaceHrefPath(path);
-                modifyPath(operation, "path", path);
+                modifyPatchOperation(operation, "path", path);
                 if (operation.get("from") != null) {
                     String from = replaceLinkPath(operation.get("from").asText());
                     from = replaceHrefPath(from);
-                    modifyPath(operation, "from", from);
+                    modifyPatchOperation(operation, "from", from);
                 }
             }
         }
         return jsonNode;
     }
 
-    private JsonNode modifyPath(JsonNode node, String fieldName, String path) {
-        JsonNode newPathNode = new TextNode(path);
+    /**
+     * Modifies JsonNode patch operation. Replaces the value for the
+     * specified field.
+     * @param node patch operation
+     * @param fieldName field to replace
+     * @param value the new value
+     */
+    private void modifyPatchOperation(JsonNode node, String fieldName, String value) {
+        JsonNode newPathNode = new TextNode(value);
         ObjectNode nodeObj = (ObjectNode) node;
         nodeObj.remove(fieldName);
         nodeObj.set(fieldName, newPathNode);
-        return nodeObj;
     }
 
+    /**
+     * Removes "/_link" from beginning of path
+     * @param path original path
+     * @return modifed path
+     */
     private String replaceLinkPath(String path) {
         Pattern p = Pattern.compile("^/_links", Pattern.CASE_INSENSITIVE);
         Matcher m = p.matcher(path);
-        String result = m.replaceFirst("");
-        return result;
+        return m.replaceFirst("");
     }
 
+    /**
+     * Removes "/href" from end of path
+     * @param path original path
+     * @return modifed path
+     */
     private String replaceHrefPath(String path) {
         Pattern p = Pattern.compile("/href$", Pattern.CASE_INSENSITIVE);
         Matcher m = p.matcher(path);
-        String result = m.replaceFirst("");
-        return result;
+        return m.replaceFirst("");
     }
 
     /**
