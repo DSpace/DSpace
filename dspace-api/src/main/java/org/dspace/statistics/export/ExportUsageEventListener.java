@@ -26,10 +26,14 @@ import org.dspace.app.util.Util;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.DCDate;
+import org.dspace.content.Entity;
+import org.dspace.content.EntityType;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.EntityService;
+import org.dspace.content.service.EntityTypeService;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -54,6 +58,10 @@ public class ExportUsageEventListener extends AbstractUsageEventListener {
     /* The metadata field which is to be checked for */
     private static MetadataField trackerType;
 
+    /* A list of entity types that will be processed */
+    private static List<EntityType> entityTypes;
+    private static final String ENTITY_TYPE_DEFAULT = "Publication";
+
     /* A list of values the type might have */
     private static List<String> trackerValues;
 
@@ -67,11 +75,20 @@ public class ExportUsageEventListener extends AbstractUsageEventListener {
 
     private static ConfigurationService configurationService;
 
+    private static EntityTypeService entityTypeService;
+    private static EntityService entityService;
+
 
     public void init(Context context) {
         try {
             if (configurationService == null) {
                 configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+            }
+            if (entityService == null) {
+                entityService = ContentServiceFactory.getInstance().getEntityService();
+            }
+            if (entityTypeService == null) {
+                entityTypeService = ContentServiceFactory.getInstance().getEntityTypeService();
             }
             if (trackerType == null) {
                 trackerType = resolveConfigPropertyToMetadataField(context, "tracker.type-field");
@@ -93,8 +110,16 @@ public class ExportUsageEventListener extends AbstractUsageEventListener {
                 }
 
                 trackerUrlVersion = configurationService.getProperty("stats.tracker.urlversion");
-
-
+            }
+            if (entityTypes == null) {
+                String[] entityTypeStrings = configurationService.getArrayProperty("stats.tracker.entity-types");
+                entityTypes = new ArrayList<>();
+                for (String type : entityTypeStrings) {
+                    entityTypes.add(entityTypeService.findByEntityType(context, type));
+                }
+                if (entityTypes.isEmpty()) {
+                    entityTypes.add(entityTypeService.findByEntityType(context, ENTITY_TYPE_DEFAULT));
+                }
             }
         } catch (Exception e) {
             log.error("Unknown error resolving configuration for the export usage event.", e);
@@ -117,7 +142,7 @@ public class ExportUsageEventListener extends AbstractUsageEventListener {
                                                                    .canEdit(context, item)) {
                         init(context);
 
-                        if (shouldProcessItem(item)) {
+                        if (shouldProcessEntityType(context, item) && shouldProcessItemType(item)) {
                             processItem(ue.getContext(), item, null, ue.getRequest(), ITEM_VIEW);
                         }
                     }
@@ -140,7 +165,7 @@ public class ExportUsageEventListener extends AbstractUsageEventListener {
                                                                                .canEdit(context, item)) {
                                     //Check if we have a valid type of item !
                                     init(context);
-                                    if (shouldProcessItem(item)) {
+                                    if (shouldProcessEntityType(context, item) && shouldProcessItemType(item)) {
                                         processItem(ue.getContext(), item, bit, ue.getRequest(), BITSTREAM_DOWNLOAD);
                                     }
                                 }
@@ -168,12 +193,23 @@ public class ExportUsageEventListener extends AbstractUsageEventListener {
         }
     }
 
-    private boolean shouldProcessItem(Item item) {
+    private boolean shouldProcessEntityType(Context context, Item item) throws SQLException {
+        Entity entity = entityService.findByItemId(context, item.getID());
+        EntityType type = entityService.getType(context, entity);
+
+        if (type != null && entityTypes.contains(type)) {
+            return true;
+        }
+        return false;
+    }
+
+    private boolean shouldProcessItemType(Item item) {
         if (trackerType != null && trackerValues != null) {
             List<MetadataValue> types = ContentServiceFactory.getInstance().getItemService()
-                                 .getMetadata(item, trackerType.getMetadataSchema().getName(),
-                                        trackerType.getElement(),
-                                        trackerType.getQualifier(), Item.ANY);
+                                                             .getMetadata(item,
+                                                                          trackerType.getMetadataSchema().getName(),
+                                                                          trackerType.getElement(),
+                                                                          trackerType.getQualifier(), Item.ANY);
 
             if (!types.isEmpty()) {
                 //Find out if we have a type that needs to be excluded
