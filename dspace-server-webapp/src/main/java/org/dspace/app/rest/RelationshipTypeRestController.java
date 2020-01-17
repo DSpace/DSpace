@@ -65,6 +65,8 @@ public class RelationshipTypeRestController {
      * @param id        The ID of the EntityType objects that we'll use to retrieve the RelationshipTypes
      * @param response  The response object
      * @param request   The request object
+     * @param pageable  The pagination object
+     * @param assembler The assembler object
      * @return The wrapped resource containing the list of RelationshipType objects as defined above
      * @throws SQLException If something goes wrong
      */
