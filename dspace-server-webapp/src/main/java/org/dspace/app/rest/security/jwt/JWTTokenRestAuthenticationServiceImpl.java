@@ -87,7 +87,7 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
 
     @Override
     public EPerson getAuthenticatedEPerson(HttpServletRequest request, Context context) {
-        String token = getToken(request, false);
+        String token = getToken(request);
         try {
             EPerson ePerson = jwtTokenHandler.parseEPersonFromToken(token, request, context);
             return ePerson;
@@ -110,7 +110,7 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
     @Override
     public void invalidateAuthenticationData(HttpServletRequest request, HttpServletResponse response,
                                              Context context) throws Exception {
-        String token = getToken(request, true);
+        String token = getToken(request);
         Cookie cookie = new Cookie(AUTHORIZATION_COOKIE, "");
         cookie.setHttpOnly(true);
         cookie.setMaxAge(0);
@@ -168,10 +168,10 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
         response.setHeader(AUTHORIZATION_HEADER, String.format("%s %s", AUTHORIZATION_TYPE, token));
     }
 
-    private String getToken(HttpServletRequest request, Boolean useCookie) {
+    private String getToken(HttpServletRequest request) {
         String tokenValue = null;
         String authHeader = request.getHeader(AUTHORIZATION_HEADER);
-        String authCookie = useCookie ? getAuthorizationCookie(request) : "";
+        String authCookie = getAuthorizationCookie(request);
         if (StringUtils.isNotBlank(authHeader)) {
             tokenValue = authHeader.replace(AUTHORIZATION_TYPE, "").trim();
         } else if (StringUtils.isNotBlank(authCookie)) {
