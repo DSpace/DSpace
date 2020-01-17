@@ -16,12 +16,12 @@ import java.util.List;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.BundleRest;
-import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.projection.Projection;
-import org.dspace.app.rest.repository.patch.DSpaceObjectPatch;
+import org.dspace.app.rest.repository.patch.ResourcePatch;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Bitstream;
@@ -67,7 +67,7 @@ public class BitstreamRestRepository extends DSpaceObjectRestRepository<Bitstrea
 
     @Autowired
     public BitstreamRestRepository(BitstreamService dsoService) {
-        super(dsoService, new DSpaceObjectPatch<BitstreamRest>() { });
+        super(dsoService, new ResourcePatch<BitstreamRest>() { });
         this.bs = dsoService;
     }
 
@@ -117,7 +117,7 @@ public class BitstreamRestRepository extends DSpaceObjectRestRepository<Bitstrea
     @Override
     @PreAuthorize("hasPermission(#id, 'BITSTREAM', 'WRITE')")
     protected void patch(Context context, HttpServletRequest request, String apiCategory, String model, UUID id,
-                         Patch patch) throws AuthorizeException, SQLException {
+                         JsonNode patch) throws AuthorizeException, SQLException {
         patchDSpaceObject(apiCategory, model, id, patch);
     }
 

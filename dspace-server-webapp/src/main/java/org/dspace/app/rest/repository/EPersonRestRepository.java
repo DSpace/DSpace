@@ -14,15 +14,16 @@ import java.util.Objects;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
+import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.EPersonRest;
-import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.projection.Projection;
-import org.dspace.app.rest.repository.patch.EPersonPatch;
+import org.dspace.app.rest.repository.patch.ResourcePatch;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Context;
@@ -49,11 +50,8 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
 
     private final EPersonService es;
 
-    @Autowired
-    EPersonPatch epersonPatch;
-
     public EPersonRestRepository(EPersonService dsoService,
-                                 EPersonPatch dsoPatch) {
+                                 ResourcePatch<EPersonRest> dsoPatch) {
         super(dsoService, dsoPatch);
         this.es = dsoService;
     }
@@ -168,19 +166,23 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
     }
 
     @Override
-    @PreAuthorize("hasPermission(#uuid, 'EPERSON', #patch)")
-    protected void patch(Context context, HttpServletRequest request, String apiCategory, String model, UUID uuid,
-                         Patch patch) throws AuthorizeException, SQLException {
-        patchDSpaceObject(apiCategory, model, uuid, patch);
+    @PreAuthorize("hasPermission(#id, 'EPERSON', #patch)")
+    protected void patch(Context context, HttpServletRequest request, String apiCategory, String model, UUID id,
+                         JsonNode patch) throws AuthorizeException, SQLException {
+        patchDSpaceObject(apiCategory, model, id, patch);
     }
 
     @Override
     protected void updateDSpaceObject(EPerson ePerson, EPersonRest ePersonRest)
-            throws AuthorizeException, SQLException {
+        throws AuthorizeException, SQLException {
         super.updateDSpaceObject(ePerson, ePersonRest);
 
         Context context = obtainContext();
         if (ePersonRest.getPassword() != null) {
+            if (es.getPasswordHash(ePerson) == null
+                || es.getPasswordHash(ePerson).getHash() == null) {
+                throw new DSpaceBadRequestException("Attempting to replace a non-existent value (password).");
+            }
             es.setPassword(ePerson, ePersonRest.getPassword());
         }
         if (ePersonRest.isRequireCertificate() != ePerson.getRequireCertificate()) {
@@ -190,9 +192,18 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
             ePerson.setCanLogIn(ePersonRest.isCanLogIn());
         }
         if (!Objects.equals(ePersonRest.getEmail(), ePerson.getEmail())) {
+            if (ePersonRest.getEmail() == null) {
+                throw new DSpaceBadRequestException("Cannot set email to null value.");
+            }
             ePerson.setEmail(ePersonRest.getEmail());
         }
         if (!Objects.equals(ePersonRest.getNetid(), ePerson.getNetid())) {
+            if (ePerson.getNetid() == null) {
+                throw new DSpaceBadRequestException("Attempting to replace a non-existent value (netId).");
+            }
+            if (ePersonRest.getNetid() == null) {
+                throw new DSpaceBadRequestException("Cannot set netId to null value.");
+            }
             ePerson.setNetid(ePersonRest.getNetid());
         }
 

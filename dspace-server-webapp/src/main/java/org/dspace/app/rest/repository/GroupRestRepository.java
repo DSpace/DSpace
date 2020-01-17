@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.app.rest.converter.MetadataConverter;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
@@ -20,7 +21,7 @@ import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.GroupRest;
 import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.projection.Projection;
-import org.dspace.app.rest.repository.patch.DSpaceObjectPatch;
+import org.dspace.app.rest.repository.patch.ResourcePatch;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.eperson.Group;
@@ -44,7 +45,7 @@ public class GroupRestRepository extends DSpaceObjectRestRepository<Group, Group
 
     @Autowired
     GroupRestRepository(GroupService dsoService) {
-        super(dsoService, new DSpaceObjectPatch<GroupRest>() {});
+        super(dsoService, new ResourcePatch<GroupRest>() {});
         this.gs = dsoService;
     }
 
@@ -109,7 +110,7 @@ public class GroupRestRepository extends DSpaceObjectRestRepository<Group, Group
     @Override
     @PreAuthorize("hasPermission(#id, 'GROUP', 'WRITE')")
     protected void patch(Context context, HttpServletRequest request, String apiCategory, String model, UUID id,
-                         Patch patch) throws AuthorizeException, SQLException {
+                         JsonNode patch) throws AuthorizeException, SQLException {
         patchDSpaceObject(apiCategory, model, id, patch);
     }
 

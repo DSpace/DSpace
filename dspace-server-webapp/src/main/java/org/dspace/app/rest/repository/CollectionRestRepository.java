@@ -27,7 +27,7 @@ import org.dspace.app.rest.model.CommunityRest;
 import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.projection.Projection;
-import org.dspace.app.rest.repository.patch.DSpaceObjectPatch;
+import org.dspace.app.rest.repository.patch.ResourcePatch;
 import org.dspace.app.rest.utils.CollectionRestEqualityUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
@@ -73,7 +73,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
     private ItemService itemService;
 
     public CollectionRestRepository(CollectionService dsoService) {
-        super(dsoService, new DSpaceObjectPatch<CollectionRest>() {});
+            super(dsoService, new ResourcePatch<CollectionRest>() {});
     }
 
     @Override
@@ -135,7 +135,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
     @Override
     @PreAuthorize("hasPermission(#id, 'COLLECTION', 'WRITE')")
     protected void patch(Context context, HttpServletRequest request, String apiCategory, String model, UUID id,
-                         Patch patch) throws AuthorizeException, SQLException {
+                         JsonNode patch) throws AuthorizeException, SQLException {
         patchDSpaceObject(apiCategory, model, id, patch);
     }
 

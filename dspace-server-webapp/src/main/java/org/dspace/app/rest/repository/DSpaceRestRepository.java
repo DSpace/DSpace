@@ -422,6 +422,38 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
     }
 
     /**
+     * Apply a partial update to the REST object via JSON Patch
+     *
+     * @param request
+     *            the http request
+     * @param apiCategory
+     * @param model
+     * @param id
+     *            the ID of the target REST object
+     * @param patch
+     * the JSON Patch (https://tools.ietf.org/html/rfc6902) operation
+     * @return
+     * @throws HttpRequestMethodNotSupportedException
+     * @throws UnprocessableEntityException
+     * @throws DSpaceBadRequestException
+     */
+    public T patch(HttpServletRequest request, String apiCategory, String model, ID id, JsonNode patch)
+        throws HttpRequestMethodNotSupportedException, UnprocessableEntityException, DSpaceBadRequestException {
+        Context context = obtainContext();
+
+        try {
+            thisRepository.patch(context, request, apiCategory, model, id, patch);
+            context.commit();
+
+        } catch (AuthorizeException ae) {
+            throw new RESTAuthorizationException(ae);
+        } catch (SQLException | DCInputsReaderException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+        return findOne(id);
+    }
+
+    /**
      * Method to implement to allow partial update of the REST object via JSON Patch
      *
      * @param request
@@ -445,6 +477,36 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
      */
     protected void patch(Context context, HttpServletRequest request, String apiCategory, String model, ID id,
                          Patch patch)
+        throws RepositoryMethodNotImplementedException, SQLException, AuthorizeException, DCInputsReaderException {
+        throw new RepositoryMethodNotImplementedException(apiCategory, model);
+    }
+
+
+
+    /**
+     * Method to implement to allow partial update of the REST object via JSON Patch.
+     *
+     * @param request
+     *            the http request
+     * @param apiCategory
+     * @param model
+     * @param id
+     *            the ID of the target REST object
+     * @param patch
+     *            the JSON Patch (https://tools.ietf.org/html/rfc6902) operation
+     * @return the full new state of the REST object after patching
+     * @throws HttpRequestMethodNotSupportedException
+     * @throws UnprocessableEntityException
+     * @throws DSpaceBadRequestException
+     * @throws RepositoryMethodNotImplementedException
+     *             returned by the default implementation when the operation is not supported for the entity
+     *
+     * @throws SQLException
+     * @throws AuthorizeException
+     * @throws DCInputsReaderException
+     */
+    protected void patch(Context context, HttpServletRequest request, String apiCategory, String model, ID id,
+                         JsonNode patch)
         throws RepositoryMethodNotImplementedException, SQLException, AuthorizeException, DCInputsReaderException {
         throw new RepositoryMethodNotImplementedException(apiCategory, model);
     }

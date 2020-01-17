@@ -24,9 +24,8 @@ import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.CommunityRest;
-import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.projection.Projection;
-import org.dspace.app.rest.repository.patch.DSpaceObjectPatch;
+import org.dspace.app.rest.repository.patch.ResourcePatch;
 import org.dspace.app.rest.utils.CommunityRestEqualityUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
@@ -63,7 +62,7 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
     CommunityRestEqualityUtils communityRestEqualityUtils;
 
     public CommunityRestRepository(CommunityService dsoService) {
-        super(dsoService, new DSpaceObjectPatch<CommunityRest>() {});
+        super(dsoService, new ResourcePatch<CommunityRest>() {});
         this.cs = dsoService;
     }
 
@@ -191,7 +190,7 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
     @Override
     @PreAuthorize("hasPermission(#id, 'COMMUNITY', 'WRITE')")
     protected void patch(Context context, HttpServletRequest request, String apiCategory, String model, UUID id,
-                         Patch patch) throws AuthorizeException, SQLException {
+                         JsonNode patch) throws AuthorizeException, SQLException {
         patchDSpaceObject(apiCategory, model, id, patch);
     }
 

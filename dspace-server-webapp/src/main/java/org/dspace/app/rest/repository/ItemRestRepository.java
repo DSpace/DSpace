@@ -21,17 +21,15 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-import org.dspace.app.rest.converter.JsonPatchConverter;
 import org.dspace.app.rest.converter.MetadataConverter;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.BundleRest;
 import org.dspace.app.rest.model.ItemRest;
-import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.repository.handler.service.UriListHandlerService;
-import org.dspace.app.rest.repository.patch.ItemPatch;
+import org.dspace.app.rest.repository.patch.ResourcePatch;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
@@ -98,7 +96,7 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
     private UriListHandlerService uriListHandlerService;
 
 
-    public ItemRestRepository(ItemService dsoService, ItemPatch dsoPatch) {
+    public ItemRestRepository(ItemService dsoService, ResourcePatch<ItemRest> dsoPatch) {
         super(dsoService, dsoPatch);
     }
 
@@ -137,7 +135,7 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
     @Override
     @PreAuthorize("hasPermission(#id, 'ITEM', #patch)")
     protected void patch(Context context, HttpServletRequest request, String apiCategory, String model, UUID id,
-                         Patch patch) throws AuthorizeException, SQLException {
+                         JsonNode patch) throws AuthorizeException, SQLException {
         patchDSpaceObject(apiCategory, model, id, patch);
     }
 
@@ -378,11 +376,7 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
     public ItemRest patchTemplateItem(Item item, JsonNode jsonNode)
         throws SQLException, AuthorizeException {
 
-        ObjectMapper mapper = new ObjectMapper();
-        JsonPatchConverter patchConverter = new JsonPatchConverter(mapper);
-        Patch patch = patchConverter.convert(jsonNode);
-
-        ItemRest patchedItemRest = dsoPatch.patch(converter.toRest(item, Projection.DEFAULT), patch.getOperations());
+        ItemRest patchedItemRest = dsoPatch.patch(converter.toRest(item, Projection.DEFAULT), jsonNode);
         updateDSpaceObject(item, patchedItemRest);
 
         return converter.toRest(item, Projection.DEFAULT);

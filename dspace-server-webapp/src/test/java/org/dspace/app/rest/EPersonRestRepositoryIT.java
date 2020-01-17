@@ -615,7 +615,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         List<Operation> ops = new ArrayList<Operation>();
 
         // String should be converted to boolean.
-        ReplaceOperation replaceOperation = new ReplaceOperation("/canLogin", "true");
+        ReplaceOperation replaceOperation = new ReplaceOperation("/canLogIn", "true");
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
 
@@ -629,7 +629,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                         .andExpect(jsonPath("$.canLogIn", Matchers.is(true)));
 
         // String should be converted to boolean.
-        replaceOperation = new ReplaceOperation("/canLogin", "false");
+        replaceOperation = new ReplaceOperation("/canLogIn", "false");
         ops.set(0, replaceOperation);
         patchBody = getPatchContent(ops);
 
@@ -734,7 +734,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                                         .build();
 
         List<Operation> ops = new ArrayList<Operation>();
-        ReplaceOperation replaceOperation = new ReplaceOperation("/canLogin", true);
+        ReplaceOperation replaceOperation = new ReplaceOperation("/canLogIn", true);
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
 
@@ -765,7 +765,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         String token = getAuthToken(admin.getEmail(), password);
 
         List<Operation> ops = new ArrayList<Operation>();
-        ReplaceOperation replaceOperation = new ReplaceOperation("/canLogin", true);
+        ReplaceOperation replaceOperation = new ReplaceOperation("/canLogIn", true);
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
 
@@ -778,7 +778,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
 
         List<Operation> ops2 = new ArrayList<Operation>();
-        ReplaceOperation replaceOperation2 = new ReplaceOperation("/canLogin", null);
+        ReplaceOperation replaceOperation2 = new ReplaceOperation("/canLogIn", null);
         ops2.add(replaceOperation2);
         patchBody = getPatchContent(ops2);
 
@@ -809,7 +809,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         List<Operation> ops = new ArrayList<Operation>();
         // Boolean operations should accept either string or boolean as value. Try boolean.
-        ReplaceOperation replaceOperation = new ReplaceOperation("/certificate", false);
+        ReplaceOperation replaceOperation = new ReplaceOperation("/requireCertificate", false);
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
 
@@ -839,7 +839,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         String token = getAuthToken(admin.getEmail(), password);
 
         List<Operation> ops = new ArrayList<Operation>();
-        ReplaceOperation replaceOperation = new ReplaceOperation("/certificate", true);
+        ReplaceOperation replaceOperation = new ReplaceOperation("/requireCertificate", true);
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
 
@@ -851,7 +851,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                         .andExpect(jsonPath("$.requireCertificate", Matchers.is(true)));;
 
         List<Operation> ops2 = new ArrayList<Operation>();
-        ReplaceOperation replaceOperation2 = new ReplaceOperation("/certificate",null);
+        ReplaceOperation replaceOperation2 = new ReplaceOperation("/requireCertificate",null);
         ops2.add(replaceOperation2);
         patchBody = getPatchContent(ops2);
 
@@ -990,7 +990,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         context.restoreAuthSystemState();
 
-        ReplaceOperation replaceOperation = new ReplaceOperation("/canLogin", true);
+        ReplaceOperation replaceOperation = new ReplaceOperation("/canLogIn", true);
         List<Operation> ops = new ArrayList<Operation>();
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
@@ -1017,7 +1017,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         context.restoreAuthSystemState();
 
-        ReplaceOperation replaceOperation = new ReplaceOperation("/certificate", true);
+        ReplaceOperation replaceOperation = new ReplaceOperation("/requireCertificate", true);
         List<Operation> ops = new ArrayList<Operation>();
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
@@ -1068,7 +1068,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient(token).perform(patch("/api/eperson/epersons/" + ePerson.getID())
                 .content(patchBody)
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
-                        .andExpect(status().isBadRequest());
+                        .andExpect(status().isOk());
 
         // login with original password
         token = getAuthToken(ePerson.getEmail(), newPassword);
@@ -1186,11 +1186,11 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         List<Operation> ops = new ArrayList<Operation>();
 
-        ReplaceOperation replaceOperation1 = new ReplaceOperation("/canLogin", true);
+        ReplaceOperation replaceOperation1 = new ReplaceOperation("/canLogIn", true);
         ops.add(replaceOperation1);
         ReplaceOperation replaceOperation2 = new ReplaceOperation("/netid", "multitestId");
         ops.add(replaceOperation2);
-        ReplaceOperation replaceOperation3 = new ReplaceOperation("/certificate", true);
+        ReplaceOperation replaceOperation3 = new ReplaceOperation("/requireCertificate", true);
         ops.add(replaceOperation3);
         String patchBody = getPatchContent(ops);
 
@@ -1217,7 +1217,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         String token = getAuthToken(admin.getEmail(), password);
 
         List<Operation> ops = new ArrayList<Operation>();
-        ReplaceOperation replaceOperation0 = new ReplaceOperation("/canLogin", true);
+        ReplaceOperation replaceOperation0 = new ReplaceOperation("/canLogIn", true);
         ops.add(replaceOperation0);
         String patchBody = getPatchContent(ops);
 
@@ -1229,14 +1229,14 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                         .andExpect(jsonPath("$.canLogIn", Matchers.is(true)));
 
         // The first operation in the series sets canLogIn to be false.
-        ReplaceOperation replaceOperation1 = new ReplaceOperation("/canLogin", false);
+        ReplaceOperation replaceOperation1 = new ReplaceOperation("/canLogIn", false);
         ops.add(replaceOperation1);
-        ReplaceOperation replaceOperation2 = new ReplaceOperation("/certificate", true);
+        ReplaceOperation replaceOperation2 = new ReplaceOperation("/requireCertificate", true);
         ops.add(replaceOperation2);
         // This will fail. The path does not exist.
         ReplaceOperation replaceOperation3 = new ReplaceOperation("/nonexistentPath", "somevalue");
         ops.add(replaceOperation3);
-        ReplaceOperation replaceOperation4 = new ReplaceOperation("/certificate", false);
+        ReplaceOperation replaceOperation4 = new ReplaceOperation("/requireCertificate", false);
         ops.add(replaceOperation4);
         patchBody = getPatchContent(ops);
 

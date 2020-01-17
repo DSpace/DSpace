@@ -16,6 +16,8 @@ import static org.mockito.Mockito.when;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.model.patch.ReplaceOperation;
@@ -32,6 +34,8 @@ public class EPersonRestPermissionEvaluatorPluginTest {
     private EPersonRestPermissionEvaluatorPlugin ePersonRestPermissionEvaluatorPlugin;
 
     private Authentication authentication;
+
+    private ObjectMapper objectMapper = new ObjectMapper();
 
     @Before
     public void setUp() throws Exception {
@@ -50,9 +54,9 @@ public class EPersonRestPermissionEvaluatorPluginTest {
         ops.add(passwordOperation);
         ReplaceOperation canLoginOperation = new ReplaceOperation("/canLogin", false);
         ops.add(canLoginOperation);
-        Patch patch = new Patch(ops);
+        JsonNode jsonNode = objectMapper.valueToTree(ops);
         assertFalse(ePersonRestPermissionEvaluatorPlugin
-                .hasPatchPermission(authentication, null, null, patch));
+                .hasPatchPermission(authentication, null, null, jsonNode));
 
     }
 
@@ -62,9 +66,9 @@ public class EPersonRestPermissionEvaluatorPluginTest {
         List<Operation> ops = new ArrayList<Operation>();
         ReplaceOperation passwordOperation = new ReplaceOperation("/password", "testpass");
         ops.add(passwordOperation);
-        Patch patch = new Patch(ops);
+        JsonNode jsonNode = objectMapper.valueToTree(ops);
         assertTrue(ePersonRestPermissionEvaluatorPlugin
-                .hasPatchPermission(authentication, null, null, patch));
+                .hasPatchPermission(authentication, null, null, jsonNode));
 
     }
 

@@ -13,9 +13,9 @@ import java.util.List;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import org.dspace.app.rest.model.SiteRest;
-import org.dspace.app.rest.model.patch.Patch;
-import org.dspace.app.rest.repository.patch.DSpaceObjectPatch;
+import org.dspace.app.rest.repository.patch.ResourcePatch;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Site;
 import org.dspace.content.service.SiteService;
@@ -39,7 +39,7 @@ public class SiteRestRepository extends DSpaceObjectRestRepository<Site, SiteRes
 
     @Autowired
     public SiteRestRepository(SiteService dsoService) {
-        super(dsoService, new DSpaceObjectPatch<SiteRest>() {});
+        super(dsoService, new ResourcePatch<SiteRest>() {});
         this.sitesv = dsoService;
     }
 
@@ -70,7 +70,7 @@ public class SiteRestRepository extends DSpaceObjectRestRepository<Site, SiteRes
     @Override
     @PreAuthorize("hasAuthority('ADMIN')")
     protected void patch(Context context, HttpServletRequest request, String apiCategory, String model, UUID id,
-                         Patch patch) throws AuthorizeException, SQLException {
+                         JsonNode patch) throws AuthorizeException, SQLException {
         patchDSpaceObject(apiCategory, model, id, patch);
     }
 

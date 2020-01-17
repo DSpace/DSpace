@@ -10,10 +10,12 @@ package org.dspace.app.rest.repository;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
@@ -22,9 +24,9 @@ import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.BundleRest;
-import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.projection.Projection;
-import org.dspace.app.rest.repository.patch.BundlePatch;
+import org.dspace.app.rest.repository.patch.PatchUtils;
+import org.dspace.app.rest.repository.patch.ResourcePatch;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Bitstream;
@@ -71,7 +73,10 @@ public class BundleRestRepository extends DSpaceObjectRestRepository<Bundle, Bun
     @Autowired
     private BitstreamFormatService bitstreamFormatService;
 
-    public BundleRestRepository(BundleService dsoService, BundlePatch dsoPatch) {
+    @Autowired
+    private PatchUtils patchUtils;
+
+    public BundleRestRepository(BundleService dsoService, ResourcePatch<BundleRest> dsoPatch) {
         super(dsoService, dsoPatch);
         this.bundleService = dsoService;
     }
@@ -109,8 +114,31 @@ public class BundleRestRepository extends DSpaceObjectRestRepository<Bundle, Bun
     @Override
     @PreAuthorize("hasPermission(#uuid, 'BUNDLE', 'WRITE')")
     protected void patch(Context context, HttpServletRequest request, String apiCategory, String model, UUID uuid,
-                         Patch patch) throws AuthorizeException, SQLException {
-        patchDSpaceObject(apiCategory, model, uuid, patch);
+                         JsonNode patch) throws AuthorizeException, SQLException {
+        // Validate move operations before applying patch.
+        for (JsonNode operation : patch) {
+            if (operation.get("op").asText().contentEquals("move")) {
+                final int from = Integer.parseInt(patchUtils.getIndexFromPath(operation.get("from").asText()));
+                final int to = Integer.parseInt(patchUtils.getIndexFromPath(operation.get("path").asText()));
+                patchUtils.validateMoveOperation(context, from, to, uuid);
+            }
+        }
+        patchDSpaceObject(apiCategory, model, uuid, patchUtils.modifyMoveOperation(patch));
+    }
+
+    @Override
+    protected void updateDSpaceObject(Bundle bundle, BundleRest bundleRest)
+        throws AuthorizeException, SQLException {
+        super.updateDSpaceObject(bundle, bundleRest);
+        Context context = obtainContext();
+        List<BitstreamRest> bits = bundleRest.getBitstreams();
+        List<UUID> uuids = new ArrayList<>();
+        for (BitstreamRest bit : bits) {
+            uuids.add(UUID.fromString(bit.getId()));
+        }
+        UUID[] uuidArray = new UUID[uuids.size()];
+        uuidArray = uuids.toArray(uuidArray);
+        bundleService.setOrder(context, bundle, uuidArray);
     }
 
     /**
@@ -199,6 +227,8 @@ public class BundleRestRepository extends DSpaceObjectRestRepository<Bundle, Bun
 
         return bitstream;
     }
+
+
 
     public Class<BundleRest> getDomainClass() {
         return BundleRest.class;

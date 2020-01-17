@@ -9,6 +9,7 @@ package org.dspace.app.rest.security;
 
 import java.io.Serializable;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import org.dspace.app.rest.model.BaseObjectRest;
 import org.dspace.app.rest.model.patch.Patch;
 import org.springframework.security.core.Authentication;
@@ -41,8 +42,8 @@ public abstract class RestObjectPermissionEvaluatorPlugin  implements RestPermis
     public boolean hasPermission(Authentication authentication, Serializable targetId, String targetType,
                           Object permission) {
 
-        if (permission instanceof Patch) {
-            return hasPatchPermission(authentication, targetId, targetType, (Patch) permission);
+        if (permission instanceof JsonNode) {
+            return hasPatchPermission(authentication, targetId, targetType, (JsonNode) permission);
         } else {
             DSpaceRestPermission restPermission = DSpaceRestPermission.convert(permission);
             return hasDSpacePermission(authentication, targetId, targetType, restPermission);
@@ -59,7 +60,7 @@ public abstract class RestObjectPermissionEvaluatorPlugin  implements RestPermis
      * @return true if the user is allowed to perform the action described by the permission. False otherwise
      */
     public boolean hasPatchPermission(Authentication authentication, Serializable targetId, String targetType,
-                               Patch patch) {
+                               JsonNode patch) {
 
         return hasPermission(authentication, targetId, targetType, "WRITE");
     }

@@ -9,12 +9,16 @@ package org.dspace.app.rest.security;
 
 import java.io.Serializable;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.Patch;
-import org.dspace.app.rest.repository.patch.factories.EPersonOperationFactory;
+import org.dspace.app.rest.repository.patch.OperationPaths;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Constants;
@@ -46,6 +50,8 @@ public class EPersonRestPermissionEvaluatorPlugin extends RestObjectPermissionEv
 
     @Autowired
     private EPersonService ePersonService;
+
+    private ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
     public boolean hasDSpacePermission(Authentication authentication, Serializable targetId,
@@ -88,7 +94,7 @@ public class EPersonRestPermissionEvaluatorPlugin extends RestObjectPermissionEv
 
     @Override
     public boolean hasPatchPermission(Authentication authentication, Serializable targetId, String targetType,
-                                      Patch patch) {
+                                      JsonNode patch) {
 
         /**
          * First verify that the user has write permission on the eperson.
@@ -97,15 +103,18 @@ public class EPersonRestPermissionEvaluatorPlugin extends RestObjectPermissionEv
             return false;
         }
 
-        List<Operation> operations = patch.getOperations();
-
         /**
          * The entire Patch request should be denied if it contains operations that are
-         * restricted to Dspace administrators. The authenticated user is currently allowed to
+         * restricted to DSpace administrators. The authenticated user is currently allowed to
          * update their own password.
          */
-        for (Operation op: operations) {
-            if (!op.getPath().contentEquals(EPersonOperationFactory.OPERATION_PASSWORD_CHANGE)) {
+        List<String> pathList = new ArrayList<>();
+        for (JsonNode operation : patch) {
+            String path = operation.get("path").asText();
+            pathList.add(path);
+        }
+        for (String path: pathList) {
+            if (!path.contentEquals(OperationPaths.OPERATION_PASSWORD_CHANGE.toString())) {
                 return false;
             }
         }
