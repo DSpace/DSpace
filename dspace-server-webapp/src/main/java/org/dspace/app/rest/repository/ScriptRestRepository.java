@@ -30,6 +30,7 @@ import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.scripts.handler.impl.RestDSpaceRunnableHandler;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
 import org.dspace.scripts.DSpaceCommandLineParameter;
 import org.dspace.scripts.DSpaceRunnable;
 import org.dspace.scripts.service.ScriptService;
@@ -99,6 +100,10 @@ public class ScriptRestRepository extends DSpaceRestRepository<ScriptRest, Strin
         }
         if (!scriptToExecute.isAllowedToExecute(context)) {
             throw new AuthorizeException("Current user is not eligible to execute script with name: " + scriptName);
+        }
+        EPerson currentUser = context.getCurrentUser();
+        if (currentUser != null) {
+            scriptToExecute.setEpersonIdentifier(currentUser.getID());
         }
         RestDSpaceRunnableHandler restDSpaceRunnableHandler = new RestDSpaceRunnableHandler(
             context.getCurrentUser(), scriptName, dSpaceCommandLineParameters);

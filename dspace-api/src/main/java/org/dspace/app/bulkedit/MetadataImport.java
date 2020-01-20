@@ -1279,7 +1279,6 @@ public class MetadataImport extends DSpaceRunnable implements InitializingBean {
                             handler.logInfo(i.getID() + " (in workflow)");
                         }
                     }
-                    handler.logInfo("");
                 }
                 changeCounter++;
             }
@@ -1376,7 +1375,6 @@ public class MetadataImport extends DSpaceRunnable implements InitializingBean {
                     handler.logInfo(", authority = " + metadataValue.getAuthority());
                     handler.logInfo(", confidence = " + metadataValue.getConfidence());
                 }
-                handler.logInfo("");
             }
 
             // Show removals
@@ -1398,7 +1396,6 @@ public class MetadataImport extends DSpaceRunnable implements InitializingBean {
                     handler.logInfo(", authority = " + metadataValue.getAuthority());
                     handler.logInfo(", confidence = " + metadataValue.getConfidence());
                 }
-                handler.logInfo("");
             }
         }
         return changeCounter;

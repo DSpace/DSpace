@@ -11,6 +11,7 @@ import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
@@ -31,6 +32,7 @@ import org.springframework.beans.factory.annotation.Required;
  */
 public abstract class DSpaceRunnable implements Runnable, BeanNameAware {
 
+    private UUID epersonIdentifier;
     /**
      * The name of the script
      */
@@ -177,5 +179,21 @@ public abstract class DSpaceRunnable implements Runnable, BeanNameAware {
      */
     public String getName() {
         return name;
+    }
+
+    /**
+     * Generic getter for the epersonIdentifier
+     * @return the epersonIdentifier value of this DSpaceRunnable
+     */
+    public UUID getEpersonIdentifier() {
+        return epersonIdentifier;
+    }
+
+    /**
+     * Generic setter for the epersonIdentifier
+     * @param epersonIdentifier   The epersonIdentifier to be set on this DSpaceRunnable
+     */
+    public void setEpersonIdentifier(UUID epersonIdentifier) {
+        this.epersonIdentifier = epersonIdentifier;
     }
 }

@@ -8,11 +8,13 @@
 package org.dspace.app.bulkedit;
 
 import java.io.OutputStream;
+import java.sql.SQLException;
 
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.dspace.content.service.MetadataDSpaceCsvExportService;
 import org.dspace.core.Context;
+import org.dspace.eperson.service.EPersonService;
 import org.dspace.scripts.DSpaceRunnable;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -32,6 +34,9 @@ public class MetadataExport extends DSpaceRunnable {
 
     @Autowired
     private MetadataDSpaceCsvExportService metadataDSpaceCsvExportService;
+
+    @Autowired
+    private EPersonService ePersonService;
 
     private MetadataExport() {
         this.options = constructOptions();
@@ -92,5 +97,11 @@ public class MetadataExport extends DSpaceRunnable {
             exportAllItems = true;
         }
         handle = commandLine.getOptionValue('i');
+
+        try {
+            context.setCurrentUser(ePersonService.find(context, getEpersonIdentifier()));
+        } catch (SQLException e) {
+            handler.handleException(e);
+        }
     }
 }
