@@ -256,7 +256,7 @@
     <field name="search.resourceid" type="string" indexed="true" stored="true" required="true" omitNorms="true" />
 
     <!-- Internal DSpaceObject Type ID -->
-    <field name="search.resourcetype" type="sint" indexed="true" stored="true" required="true" omitNorms="true" />
+    <field name="search.resourcetype" type="string" indexed="true" stored="true" required="true" omitNorms="true" />
 
     <!-- All object placed in Discovery must have an unique id (for standard DSpaceObject it is resourceID-resourceTypeID) -->
     <field name="search.uniqueid" type="string" indexed="true" stored="true" required="true" omitNorms="true" docValues="true"/>

@@ -55,7 +55,7 @@ public class SpecialGroupClaimProviderTest {
         context = Mockito.mock(Context.class);
         //Stub the specialgroups list that is normally kept in the context class
         Mockito.doAnswer(invocation -> {
-            UUID uuid = invocation.getArgumentAt(0, UUID.class);
+            UUID uuid = invocation.getArgument(0);
             specialGroups.add(uuid);
             return "done";
         }).when(context).setSpecialGroup(any(UUID.class));

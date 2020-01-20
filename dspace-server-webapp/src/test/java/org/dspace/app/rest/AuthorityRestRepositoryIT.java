@@ -182,7 +182,7 @@ public class AuthorityRestRepositoryIT extends AbstractControllerIntegrationTest
     public void retrieveCommonTypesWithSpaceValueTest() throws Exception {
         String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(
-                get("/api/integration/authorities/common_types/entryValues/Learning%20Object"))
+                get("/api/integration/authorities/common_types/entryValues/Learning+Object"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.page.totalElements", Matchers.is(1)));
     }

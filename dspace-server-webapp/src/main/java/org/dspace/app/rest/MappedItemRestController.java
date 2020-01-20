@@ -90,7 +90,7 @@ public class MappedItemRestController {
         Context context = ContextUtil.obtainContext(request);
         Collection collection = collectionService.find(context, uuid);
         Iterator<Item> itemIterator = itemService.findByCollectionMapping(context, collection, pageable.getPageSize(),
-                                                                          pageable.getOffset());
+                Math.toIntExact(pageable.getOffset()));
         int totalElements = itemService.countByCollectionMapping(context, collection);
         List<ItemRest> mappedItemRestList = new LinkedList<>();
         while (itemIterator.hasNext()) {

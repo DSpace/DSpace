@@ -121,9 +121,10 @@ public class Utils {
             throw new PaginationException(total);
         } else {
             if (pageable.getOffset() + pageable.getPageSize() > total) {
-                pageContent = fullContents.subList(pageable.getOffset(), total);
+                pageContent = fullContents.subList(Math.toIntExact(pageable.getOffset()), total);
             } else {
-                pageContent = fullContents.subList(pageable.getOffset(), pageable.getOffset() + pageable.getPageSize());
+                pageContent = fullContents.subList(Math.toIntExact(pageable.getOffset()),
+                        Math.toIntExact(pageable.getOffset()) + pageable.getPageSize());
             }
             return new PageImpl<T>(pageContent, pageable, total);
         }

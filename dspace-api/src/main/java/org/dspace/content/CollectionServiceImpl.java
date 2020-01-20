@@ -278,15 +278,6 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
     }
 
     @Override
-    /**
-     * This method is an alias of the find method needed to avoid ambiguity between the IndexableObjectService interface
-     * and the DSpaceObjectService interface
-     */
-    public Collection findIndexableObject(Context context, UUID id) throws SQLException {
-        return collectionDAO.findByID(context, Collection.class, id);
-    }
-
-    @Override
     public void setMetadata(Context context, Collection collection, String field, String value)
         throws MissingResourceException, SQLException {
         if ((field.trim()).equals("name") && (value == null || value.trim().equals(""))) {
@@ -792,15 +783,6 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
     @Override
     public int getSupportsTypeConstant() {
         return Constants.COLLECTION;
-    }
-
-    @Override
-    /**
-     * This method is an alias of the getSupportsTypeConstant method needed to avoid ambiguity between the
-     * IndexableObjectService interface and the DSpaceObjectService interface
-     */
-    public int getSupportsIndexableObjectTypeConstant() {
-        return getSupportsTypeConstant();
     }
 
     @Override

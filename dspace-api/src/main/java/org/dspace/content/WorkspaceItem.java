@@ -8,7 +8,6 @@
 package org.dspace.content;
 
 import java.io.Serializable;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,10 +26,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.core.ReloadableEntity;
-import org.dspace.discovery.IndexableObject;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.workflow.WorkflowItem;
@@ -45,7 +41,7 @@ import org.hibernate.proxy.HibernateProxyHelper;
 @Entity
 @Table(name = "workspaceitem")
 public class WorkspaceItem
-    implements InProgressSubmission<Integer>, Serializable, ReloadableEntity<Integer>, IndexableObject<Integer> {
+    implements InProgressSubmission, Serializable {
 
     @Id
     @Column(name = "workspace_item_id", unique = true, nullable = false)
@@ -197,7 +193,7 @@ public class WorkspaceItem
     }
 
     @Override
-    public EPerson getSubmitter() throws SQLException {
+    public EPerson getSubmitter() {
         return item.getSubmitter();
     }
 
@@ -242,10 +238,4 @@ public class WorkspaceItem
     void addSupervisorGroup(Group group) {
         supervisorGroups.add(group);
     }
-
-    @Override
-    public int getType() {
-        return Constants.WORKSPACEITEM;
-    }
-
 }

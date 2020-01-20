@@ -21,6 +21,7 @@ import java.lang.reflect.Method;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -218,16 +219,16 @@ public class RestResourceController implements InitializingBean {
     private <ID extends Serializable> DSpaceResource<RestAddressableModel> findOneInternal(String apiCategory,
                                                                                            String model, ID id) {
         DSpaceRestRepository<RestAddressableModel, ID> repository = utils.getResourceRepository(apiCategory, model);
-        RestAddressableModel modelObject = null;
+        Optional<RestAddressableModel> modelObject = Optional.empty();
         try {
-            modelObject = repository.findOne(id);
+            modelObject = repository.findById(id);
         } catch (ClassCastException e) {
             // ignore, as handled below
         }
-        if (modelObject == null) {
+        if (!modelObject.isPresent()) {
             throw new ResourceNotFoundException(apiCategory + "." + model + " with id: " + id + " not found");
         }
-        return converter.toResource(modelObject);
+        return converter.toResource(modelObject.get());
     }
 
     /**
@@ -427,7 +428,7 @@ public class RestResourceController implements InitializingBean {
         }
         DSpaceResource result = converter.toResource(modelObject);
         //TODO manage HTTPHeader
-        return ControllerUtils.toResponseEntity(HttpStatus.CREATED, null, result);
+        return ControllerUtils.toResponseEntity(HttpStatus.CREATED, new HttpHeaders(), result);
     }
 
     /**
@@ -459,7 +460,7 @@ public class RestResourceController implements InitializingBean {
         }
         DSpaceResource result = converter.toResource(modelObject);
         //TODO manage HTTPHeader
-        return ControllerUtils.toResponseEntity(HttpStatus.CREATED, null, result);
+        return ControllerUtils.toResponseEntity(HttpStatus.CREATED, new HttpHeaders(), result);
     }
 
 
@@ -496,7 +497,7 @@ public class RestResourceController implements InitializingBean {
 
         if (modelObject != null) {
             DSpaceResource result = converter.toResource(modelObject);
-            return ControllerUtils.toResponseEntity(HttpStatus.CREATED, null, result);
+            return ControllerUtils.toResponseEntity(HttpStatus.CREATED, new HttpHeaders(), result);
         } else {
             return ControllerUtils.toEmptyResponse(HttpStatus.NO_CONTENT);
         }
@@ -587,7 +588,7 @@ public class RestResourceController implements InitializingBean {
             return ControllerUtils.toEmptyResponse(HttpStatus.INTERNAL_SERVER_ERROR);
         }
         DSpaceResource result = converter.toResource(modelObject);
-        return ControllerUtils.toResponseEntity(HttpStatus.CREATED, null, result);
+        return ControllerUtils.toResponseEntity(HttpStatus.CREATED, new HttpHeaders(), result);
     }
 
     /**
@@ -626,7 +627,7 @@ public class RestResourceController implements InitializingBean {
             DSpaceResource result = converter.toResource(modelObject);
             resources.add(result);
         }
-        return ControllerUtils.toResponseEntity(HttpStatus.OK, null, Resources.wrap(resources));
+        return ControllerUtils.toResponseEntity(HttpStatus.OK, new HttpHeaders(), Resources.wrap(resources));
     }
 
     /**
@@ -704,7 +705,7 @@ public class RestResourceController implements InitializingBean {
         }
         DSpaceResource result = converter.toResource(modelObject);
         //TODO manage HTTPHeader
-        return ControllerUtils.toResponseEntity(HttpStatus.OK, null, result);
+        return ControllerUtils.toResponseEntity(HttpStatus.OK, new HttpHeaders(), result);
 
     }
 
@@ -829,7 +830,7 @@ public class RestResourceController implements InitializingBean {
                 }
             }
         }
-        RestAddressableModel modelObject = repository.findOne(uuid);
+        RestAddressableModel modelObject = repository.findById(uuid).orElse(null);
 
         if (modelObject == null) {
             throw new ResourceNotFoundException(apiCategory + "." + model + " with id: " + uuid + " not found");
@@ -870,7 +871,7 @@ public class RestResourceController implements InitializingBean {
                 result = assembler.toResource(pageResult);
                 return result;
             }
-            int start = page.getOffset();
+            int start = Math.toIntExact(page.getOffset());
             int end = (start + page.getPageSize()) > fullList.size() ? fullList.size() : (start + page.getPageSize());
             DSpaceRestRepository<RestAddressableModel, ?> resourceRepository = utils
                 .getResourceRepository(fullList.get(0).getCategory(), fullList.get(0).getType());
@@ -902,6 +903,7 @@ public class RestResourceController implements InitializingBean {
                                                                                       Pageable page,
                                                                                       PagedResourcesAssembler assembler,
                                                                                       HttpServletResponse response) {
+
         DSpaceRestRepository<T, ?> repository = utils.getResourceRepository(apiCategory, model);
         Link link = linkTo(methodOn(this.getClass(), apiCategory, model).findAll(apiCategory, model,
                                                                                  page, assembler, response))
@@ -911,9 +913,7 @@ public class RestResourceController implements InitializingBean {
         try {
             resources = repository.findAll(page).map(converter::toResource);
         } catch (PaginationException pe) {
-            resources = new PageImpl<DSpaceResource<T>>(new ArrayList<DSpaceResource<T>>(), page, pe.getTotal());
-        } catch (RepositoryMethodNotImplementedException mne) {
-            throw mne;
+            resources = new PageImpl<>(new ArrayList<>(), page, pe.getTotal());
         }
         PagedResources<DSpaceResource<T>> result = assembler.toResource(resources, link);
         if (repositoryUtils.haveSearchMethods(repository)) {
@@ -1041,7 +1041,7 @@ public class RestResourceController implements InitializingBean {
                                                                                      ID id) {
         checkModelPluralForm(apiCategory, model);
         DSpaceRestRepository<RestAddressableModel, ID> repository = utils.getResourceRepository(apiCategory, model);
-        repository.delete(id);
+        repository.deleteById(id);
         return ControllerUtils.toEmptyResponse(HttpStatus.NO_CONTENT);
     }
 
