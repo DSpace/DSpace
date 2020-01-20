@@ -105,7 +105,7 @@ public class MetadataSuggestionsRestController {
         throw new RepositoryMethodNotImplementedException("", "Method not yet implemented");
     }
 
-    @RequestMapping(method = RequestMethod.GET, value = "/entryValuesDifferences/{entryId}")
+    @RequestMapping(method = RequestMethod.GET, value = "/entryValueDifferences/{entryId}")
     public MetadataSuggestionsDifferencesResource getMetadataSuggestionEntryDifferences(
         @PathVariable("suggestionName") String suggestionName, @PathVariable("entryId") String entryId,
         @RequestParam(name = "workspaceitem", required = false) Integer workspaceitem,

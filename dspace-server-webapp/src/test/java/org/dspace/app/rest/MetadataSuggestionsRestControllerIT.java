@@ -116,13 +116,13 @@ public class MetadataSuggestionsRestControllerIT extends AbstractControllerInteg
 
     @Test
     public void getMetadataSuggestionDifferencesTestWithoutWorkflowWorkspaceItemBadRequest() throws Exception {
-        getClient().perform(get("/api/integration/metadatasuggestions/mock/entryValuesDifferences/one"))
+        getClient().perform(get("/api/integration/metadatasuggestions/mock/entryValueDifferences/one"))
                    .andExpect(status().isBadRequest());
     }
 
     @Test
     public void getMetadataSuggestionDifferencesTestWrongInProgressSubmissionIdResourceNotFound() throws Exception {
-        getClient().perform(get("/api/integration/metadatasuggestions/mock/entryValuesDifferences/one")
+        getClient().perform(get("/api/integration/metadatasuggestions/mock/entryValueDifferences/one")
                                 .param("workspaceitem", "123123123"))
                    .andExpect(status().is(404));
     }
@@ -131,7 +131,7 @@ public class MetadataSuggestionsRestControllerIT extends AbstractControllerInteg
     public void getMetadataSuggestionDifferencesTestWrongSuggestionNameResourceNotFound() throws Exception {
         String token = getAuthToken(admin.getEmail(), password);
 
-        getClient(token).perform(get("/api/integration/metadatasuggestions/mockInvalid/entryValuesDifferences/one")
+        getClient(token).perform(get("/api/integration/metadatasuggestions/mockInvalid/entryValueDifferences/one")
                                      .param("workspaceitem", String.valueOf(workspaceItem.getID())))
                         .andExpect(status().is(404));
     }
@@ -139,7 +139,7 @@ public class MetadataSuggestionsRestControllerIT extends AbstractControllerInteg
 
     @Test
     public void getMetadataSuggestionDifferencesTestUnAuthorizedInProgressSubmissionAccessDenied() throws Exception {
-        getClient().perform(get("/api/integration/metadatasuggestions/mock/entryValuesDifferences/one")
+        getClient().perform(get("/api/integration/metadatasuggestions/mock/entryValueDifferences/one")
                                 .param("workspaceitem", String.valueOf(workspaceItem.getID())))
                    .andExpect(status().isUnauthorized());
     }
@@ -148,7 +148,7 @@ public class MetadataSuggestionsRestControllerIT extends AbstractControllerInteg
     public void getMetadataSuggestionDifferencesTestForbiddenInProgressSubmissionAccessDenied() throws Exception {
 
         String token = getAuthToken(eperson.getEmail(), password);
-        getClient(token).perform(get("/api/integration/metadatasuggestions/mock/entryValuesDifferences/one")
+        getClient(token).perform(get("/api/integration/metadatasuggestions/mock/entryValueDifferences/one")
                                      .param("workspaceitem", String.valueOf(workspaceItem.getID())))
                         .andExpect(status().isForbidden());
     }
@@ -161,7 +161,7 @@ public class MetadataSuggestionsRestControllerIT extends AbstractControllerInteg
         context.restoreAuthSystemState();
 
         String token = getAuthToken(admin.getEmail(), password);
-        getClient(token).perform(get("/api/integration/metadatasuggestions/mock/entryValuesDifferences/one")
+        getClient(token).perform(get("/api/integration/metadatasuggestions/mock/entryValueDifferences/one")
                                      .param("workspaceitem", String.valueOf(workspaceItem.getID())))
                         .andExpect(jsonPath("$.differences['dc.contributor.author'].suggestions[0].operations[0]",
                                             Matchers.containsString("add/metadata/dc.contributor.author")))
