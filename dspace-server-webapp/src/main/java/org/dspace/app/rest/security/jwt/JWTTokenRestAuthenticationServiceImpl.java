@@ -65,7 +65,7 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
 
     @Override
     public void addAuthenticationDataForUser(HttpServletRequest request, HttpServletResponse response,
-            DSpaceAuthentication authentication, Boolean addCookie) throws IOException {
+            DSpaceAuthentication authentication, boolean addCookie) throws IOException {
         try {
             Context context = ContextUtil.obtainContext(request);
             context.setCurrentUser(ePersonService.findByEmail(context, authentication.getName()));
