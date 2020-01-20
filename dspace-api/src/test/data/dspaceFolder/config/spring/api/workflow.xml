@@ -29,14 +29,7 @@
 
     <bean name="reviewstep" class="org.dspace.xmlworkflow.state.Step">
         <property name="userSelectionMethod" ref="claimaction"/>
-        <property name="role">
-            <bean name="reviewer" class="org.dspace.xmlworkflow.Role">
-                <property name="scope" value="#{ T(org.dspace.xmlworkflow.Role.Scope).COLLECTION}"/>
-                <property name="name" value="Reviewer"/>
-                <property name="description"
-                          value="The people responsible for this step are able to edit the metadata of incoming submissions, and then accept or reject them."/>
-            </bean>
-        </property>
+        <property name="role" ref="reviewer"/>
         <property name="outcomes">
             <util:map>
                 <entry key="#{ T(org.dspace.xmlworkflow.state.actions.ActionResult).OUTCOME_COMPLETE}"
@@ -49,16 +42,17 @@
             </util:list>
         </property>
     </bean>
+
+    <bean name="reviewer" class="org.dspace.xmlworkflow.Role">
+        <property name="scope" value="#{ T(org.dspace.xmlworkflow.Role.Scope).COLLECTION}"/>
+        <property name="name" value="Reviewer"/>
+        <property name="description"
+                  value="The people responsible for this step are able to edit the metadata of incoming submissions, and then accept or reject them."/>
+    </bean>
+
     <bean name="editstep" class="org.dspace.xmlworkflow.state.Step">
         <property name="userSelectionMethod" ref="claimaction"/>
-        <property name="role">
-            <bean name="editor" class="org.dspace.xmlworkflow.Role">
-                <property name="scope" value="#{ T(org.dspace.xmlworkflow.Role.Scope).COLLECTION}"/>
-                <property name="name" value="Editor"/>
-                <property name="description"
-                          value="The people responsible for this step are able to edit the metadata of incoming submissions, and then accept or reject them."/>
-            </bean>
-        </property>
+        <property name="role" ref="editor" />
         <property name="outcomes">
             <util:map>
                 <entry key="#{ T(org.dspace.xmlworkflow.state.actions.ActionResult).OUTCOME_COMPLETE}"
@@ -71,16 +65,17 @@
             </list>
         </property>
     </bean>
+
+    <bean name="editor" class="org.dspace.xmlworkflow.Role">
+        <property name="scope" value="#{ T(org.dspace.xmlworkflow.Role.Scope).COLLECTION}"/>
+        <property name="name" value="Editor"/>
+        <property name="description"
+                  value="The people responsible for this step are able to edit the metadata of incoming submissions, and then accept or reject them."/>
+    </bean>
+
     <bean name="finaleditstep" class="org.dspace.xmlworkflow.state.Step">
         <property name="userSelectionMethod" ref="claimaction"/>
-        <property name="role">
-            <bean name="finaleditor" class="org.dspace.xmlworkflow.Role">
-                <property name="scope" value="#{ T(org.dspace.xmlworkflow.Role.Scope).COLLECTION}"/>
-                <property name="name" value="Final Editor"/>
-                <property name="description"
-                          value="The people responsible for this step are able to edit the metadata of incoming submissions, but will not be able to reject them."/>
-            </bean>
-        </property>
+        <property name="role" ref="finaleditor" />
         <property name="actions">
             <list>
                 <ref bean="finaleditaction"/>
@@ -88,6 +83,12 @@
         </property>
     </bean>
 
+    <bean name="finaleditor" class="org.dspace.xmlworkflow.Role">
+        <property name="scope" value="#{ T(org.dspace.xmlworkflow.Role.Scope).COLLECTION}"/>
+        <property name="name" value="Final Editor"/>
+        <property name="description"
+                  value="The people responsible for this step are able to edit the metadata of incoming submissions, but will not be able to reject them."/>
+    </bean>
 
     <!--Workflow where a reviewManager can select a single review who will then either accept/reject the item-->
     <bean name="selectSingleReviewer" class="org.dspace.xmlworkflow.state.Workflow">
@@ -102,11 +103,7 @@
 
     <bean name="selectReviewerStep" class="org.dspace.xmlworkflow.state.Step">
         <property name="userSelectionMethod" ref="claimaction"/>
-        <property name="role">
-            <bean name="reviewmanagers" class="org.dspace.xmlworkflow.Role">
-                <property name="scope" value="#{ T(org.dspace.xmlworkflow.Role.Scope).REPOSITORY}"/>
-                <property name="name" value="ReviewManagers"/>
-            </bean>
+        <property name="role" ref="reviewmanagers">
         </property>
         <property name="actions">
             <list>
@@ -121,13 +118,14 @@
         </property>
     </bean>
 
+    <bean name="reviewmanagers" class="org.dspace.xmlworkflow.Role">
+        <property name="scope" value="#{ T(org.dspace.xmlworkflow.Role.Scope).REPOSITORY}"/>
+        <property name="name" value="ReviewManagers"/>
+    </bean>
+
     <bean name="singleUserReviewStep" class="org.dspace.xmlworkflow.state.Step">
         <property name="userSelectionMethod" ref="autoassignAction"/>
-        <property name="role">
-            <bean name="reviewer" class="org.dspace.xmlworkflow.Role">
-                <property name="scope" value="#{ T(org.dspace.xmlworkflow.Role.Scope).ITEM}"/>
-                <property name="name" value="Reviewer"/>
-            </bean>
+        <property name="role" ref="scoreAssignedReviewer">
         </property>
         <property name="actions">
             <list>
@@ -142,6 +140,12 @@
         </property>
     </bean>
 
+    <bean name="scoreAssignedReviewer" class="org.dspace.xmlworkflow.Role">
+        <property name="scope" value="#{ T(org.dspace.xmlworkflow.Role.Scope).ITEM}"/>
+        <property name="name" value="Reviewer"/>
+    </bean>
+
+
     <!--Workflow where a number of users will perform reviews on an item and depending on the scores the item will be archived/rejected-->
     <bean name="scoreReview" class="org.dspace.xmlworkflow.state.Workflow">
         <property name="firstStep" ref="scoreReviewStep"/>
@@ -155,12 +159,7 @@
 
     <bean name="scoreReviewStep" class="org.dspace.xmlworkflow.state.Step">
         <property name="userSelectionMethod" ref="claimaction"/>
-        <property name="role">
-            <bean name="scoreReviewers" class="org.dspace.xmlworkflow.Role">
-                <property name="scope" value="#{ T(org.dspace.xmlworkflow.Role.Scope).COLLECTION}"/>
-                <property name="name" value="ScoreReviewers"/>
-            </bean>
-        </property>
+        <property name="role" ref="scoreReviewers"/>
         <property name="outcomes">
             <util:map>
                 <entry key="#{ T(org.dspace.xmlworkflow.state.actions.ActionResult).OUTCOME_COMPLETE}"
@@ -182,5 +181,10 @@
                 <ref bean="evaluationaction"/>
             </list>
         </property>
+    </bean>
+
+    <bean name="scoreReviewers" class="org.dspace.xmlworkflow.Role">
+        <property name="scope" value="#{ T(org.dspace.xmlworkflow.Role.Scope).COLLECTION}"/>
+        <property name="name" value="ScoreReviewers"/>
     </bean>
 </beans>
