@@ -33,6 +33,7 @@ import org.dspace.content.NonUniqueMetadataException;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.MetadataSchemaService;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
@@ -509,18 +510,16 @@ public class ShibAuthentication implements AuthenticationMethod {
             int port = request.getServerPort();
             String contextPath = request.getContextPath();
 
-            String returnURL = request.getHeader("Referer");
-            if (returnURL == null) {
-                if (request.isSecure() || forceHTTPS) {
-                    returnURL = "https://";
-                } else {
-                    returnURL = "http://";
-                }
-                returnURL += host;
-                if (!(port == 443 || port == 80)) {
-                    returnURL += ":" + port;
-                }
+            String redirectUrl = null;
+            if (request.getHeader("Referer") != null && StringUtils.isNotBlank(request.getHeader("Referer"))) {
+                redirectUrl = request.getHeader("Referer");
+            } else if (request.getHeader("X-Requested-With") != null
+                    && StringUtils.isNotBlank(request.getHeader("X-Requested-With"))) {
+                redirectUrl = request.getHeader("X-Requested-With");
             }
+
+            String returnURL = ConfigurationManager.getProperty("dspace.baseUrl") + "/api/authn/shibboleth"
+                    + ((redirectUrl != null) ? "?redirectUrl=" + redirectUrl : "");
 
             try {
                 shibURL += "?target=" + URLEncoder.encode(returnURL, "UTF-8");
