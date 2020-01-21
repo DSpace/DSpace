@@ -113,6 +113,15 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
     @After
     @Override
     public void destroy() {
+        context.turnOffAuthorisationSystem();
+        // Delete community created in init()
+        try {
+            communityService.delete(context, c);
+        } catch (Exception e) {
+            // ignore
+        }
+        context.restoreAuthSystemState();
+
         c = null;
         super.destroy();
     }
@@ -727,8 +736,19 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testRemoveCollectionAuth() throws Exception {
-        // Allow current Community ADD perms (to add Collections)
-        doNothing().when(authorizeServiceSpy).authorizeAction(context, c, Constants.ADD);
+        // Allow current Community REMOVE perms (to remove Collection from Community & delete)
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, c, Constants.REMOVE);
+        // Allow collection WRITE perms (needed to remove Logo before Collection can be deleted)
+        doNothing().when(authorizeServiceSpy)
+                   .authorizeAction(any(Context.class), any(Collection.class), eq(Constants.WRITE), eq(true));
+        // Use JMockit to mock the AuthorizeUtil
+        new MockUp<AuthorizeUtil>() {
+            // Allow Collection ManageTemplateItem perms (needed to remove Item Template before Collection is deleted)
+            @Mock
+            public void authorizeManageTemplateItem(Context context, Collection collection) {
+                return; // allow permissions by not throwing an exception
+            }
+        };
 
         // Turn off authorization temporarily to create a new Collection
         context.turnOffAuthorisationSystem();
@@ -738,7 +758,8 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
         assertTrue("testRemoveCollectionAuth 1", c.getCollections().size() == 1);
         assertThat("testRemoveCollectionAuth 2", c.getCollections().get(0), equalTo(col));
 
-        c.removeCollection(col);
+        // Note that this will *also* delete the collection (hence the extra permissions provided above)
+        communityService.removeCollection(context, c, col);
         assertThat("testRemoveCollectionAuth 3", c.getCollections(), notNullValue());
         assertTrue("testRemoveCollectionAuth 4", c.getCollections().size() == 0);
     }
@@ -748,12 +769,13 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
      */
     @Test(expected = AuthorizeException.class)
     public void testRemoveCollectionNoAuth() throws Exception {
-        // Allow current Community ADD perms (to add Collections)
-        doNothing().when(authorizeServiceSpy).authorizeAction(context, c, Constants.ADD);
         // Disallow current Community REMOVE perms
         doThrow(new AuthorizeException()).when(authorizeServiceSpy).authorizeAction(context, c, Constants.REMOVE);
 
+        // Turn off authorization temporarily to create a new Collection
+        context.turnOffAuthorisationSystem();
         Collection col = collectionService.create(context, c);
+        context.restoreAuthSystemState();
         assertThat("testRemoveCollectionNoAuth 0", c.getCollections(), notNullValue());
         assertTrue("testRemoveCollectionNoAuth 1", c.getCollections().size() == 1);
         assertThat("testRemoveCollectionNoAuth 2", c.getCollections().get(0), equalTo(col));
@@ -884,9 +906,8 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
         Collection grandchildCol = collectionService.create(context, grandchild);
         // Create two separate items
         WorkspaceItem wsItem = workspaceItemService.create(context, childCol, false);
-        Item item = installItemService.installItem(context, wsItem);
         wsItem = workspaceItemService.create(context, childCol, false);
-        item = installItemService.installItem(context, wsItem);
+        Item item = installItemService.installItem(context, wsItem);
 
         // Done creating the objects. Turn auth system back on
         context.restoreAuthSystemState();
