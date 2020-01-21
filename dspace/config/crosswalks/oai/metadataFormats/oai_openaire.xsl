@@ -608,7 +608,9 @@
         <!-- only consider elements with valid date types -->
         <xsl:if test="$dateType != ''">
             <datacite:date>
-                <xsl:attribute name="dateType" select="$dateType"/>
+                <xsl:attribute name="dateType">
+                    <xsl:value-of select="$dateType"/>
+                </xsl:attribute>
                 <xsl:value-of select="./doc:element/doc:field[@name='value']/text()"/>
             </datacite:date>
         </xsl:if>
