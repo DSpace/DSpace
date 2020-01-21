@@ -21,14 +21,11 @@ import org.dspace.statistics.SolrLoggerServiceImpl;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.runners.MockitoJUnitRunner;
 
 /**
  * @author mwood
  * @author frederic at atmire.com
  */
-@RunWith(MockitoJUnitRunner.class)
 public class SpiderDetectorServiceImplTest extends AbstractDSpaceTest {
     private static final String NOT_A_BOT_ADDRESS = "192.168.0.1";
 
