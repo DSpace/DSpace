@@ -8,6 +8,7 @@
 package org.dspace.xmlworkflow.state;
 
 import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertNull;
 
 import java.util.List;
 
@@ -58,6 +59,7 @@ public class StepTest extends AbstractUnitTest {
         assertEquals(step.getRole().getName(), "Final Editor");
         List<WorkflowActionConfig> actions = step.getActions();
         assert (this.containsActionNamed(actions, "finaleditaction"));
+        assertNull(step.getNextStep(0));
     }
 
     @Test
@@ -96,6 +98,8 @@ public class StepTest extends AbstractUnitTest {
         Step step = scoreReview.getStep("evaluationStep");
         assertEquals(step.getUserSelectionMethod().getId(), "noUserSelectionAction");
         List<WorkflowActionConfig> actions = step.getActions();
+        assert (this.containsActionNamed(actions, "evaluationaction"));
+        assertNull(step.getNextStep(0));
     }
 
     private boolean containsActionNamed(List<WorkflowActionConfig> actions, String actionName) {
