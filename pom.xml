@@ -36,7 +36,7 @@
         <!-- PIN Solr to 7.3.x until SOLR-12858 is fixed. This bug affects all integration tests that use Solr
              https://issues.apache.org/jira/browse/SOLR-12858 -->
         <solr.client.version>7.3.1</solr.client.version>
-        <spring.version>5.1.9.RELEASE</spring.version>
+        <spring.version>5.2.3.RELEASE</spring.version>
         <spring-boot.version>2.1.8.RELEASE</spring-boot.version>
         <!-- Library for reading JSON documents: https://github.com/json-path/JsonPath -->
         <json-path.version>2.4.0</json-path.version>
