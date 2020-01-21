@@ -123,7 +123,7 @@ public class BundleRestRepository extends DSpaceObjectRestRepository<Bundle, Bun
                 patchUtils.validateMoveOperation(context, from, to, uuid);
             }
         }
-        patchDSpaceObject(apiCategory, model, uuid, patchUtils.modifyMoveOperation(patch));
+        patchDSpaceObject(apiCategory, model, uuid, patchUtils.modifyMoveOperations(patch));
     }
 
     @Override

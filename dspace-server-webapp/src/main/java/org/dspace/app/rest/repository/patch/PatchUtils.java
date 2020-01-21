@@ -78,7 +78,7 @@ public class PatchUtils {
      * @param jsonNode original json node
      * @return json node with modified paths
      */
-    public JsonNode modifyMoveOperation(JsonNode jsonNode) {
+    public JsonNode modifyMoveOperations(JsonNode jsonNode) {
         for (JsonNode operation : jsonNode) {
             if (operation.get("op").asText().contentEquals("move")) {
                 String path = replaceLinkPath(operation.get("path").asText());
