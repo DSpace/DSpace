@@ -111,10 +111,7 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
     public void invalidateAuthenticationData(HttpServletRequest request, HttpServletResponse response,
                                              Context context) throws Exception {
         String token = getToken(request);
-        Cookie cookie = new Cookie(AUTHORIZATION_COOKIE, "");
-        cookie.setHttpOnly(true);
-        cookie.setMaxAge(0);
-        response.addCookie(cookie);
+        invalidateAuthenticationCookie(response);
         jwtTokenHandler.invalidateToken(token, request, context);
     }
 
