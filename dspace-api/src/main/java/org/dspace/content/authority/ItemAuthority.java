@@ -22,6 +22,7 @@ import org.dspace.content.authority.service.ItemAuthorityService;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.discovery.DiscoverQuery;
 import org.dspace.discovery.DiscoverResult;
@@ -73,7 +74,7 @@ public class ItemAuthority implements ChoiceAuthority {
         String luceneQuery = itemAuthorityService.getSolrQuery(text);
 
         DiscoverQuery discoverQuery = new DiscoverQuery();
-        discoverQuery.setDSpaceObjectFilter(org.dspace.core.Constants.ITEM);
+        discoverQuery.setDSpaceObjectFilter(Constants.typeText[Constants.ITEM]);
 
         String relationshipType = ConfigurationManager.getProperty("cris", "ItemAuthority."
                 + field + ".relationshipType");
@@ -90,8 +91,7 @@ public class ItemAuthority implements ChoiceAuthority {
         DiscoverResult resultSearch;
         try {
             context = new Context();
-            resultSearch = searchService.search(context,
-                                                discoverQuery, false);
+            resultSearch = searchService.search(context, discoverQuery);
             List<Choice> choiceList = new ArrayList<Choice>();
 
             // Process results of query

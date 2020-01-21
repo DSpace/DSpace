@@ -96,7 +96,7 @@ public class AuthorityEntryLinkRepository extends AbstractDSpaceRestRepository
 
         List<AuthorityEntryRest> results = new ArrayList<AuthorityEntryRest>();
         if (StringUtils.isNotBlank(id) && authorityUtils.isHierarchical(name)) {
-            Choices choices = cas.getChoicesByParent(name, id, pageable.getOffset(), pageable.getPageSize(),
+            Choices choices = cas.getChoicesByParent(name, id, (int) pageable.getOffset(), pageable.getPageSize(),
                     context.getCurrentLocale().toString());
 
             for (Choice value : choices.values) {
@@ -119,7 +119,7 @@ public class AuthorityEntryLinkRepository extends AbstractDSpaceRestRepository
         Context context = obtainContext();
         List<AuthorityEntryRest> results = new ArrayList<AuthorityEntryRest>();
         if (authorityUtils.isHierarchical(name)) {
-            Choices choices = cas.getTopChoices(name, pageable.getOffset(), pageable.getPageSize(),
+            Choices choices = cas.getTopChoices(name, (int) pageable.getOffset(), pageable.getPageSize(),
                     context.getCurrentLocale().toString());
 
             for (Choice value : choices.values) {
