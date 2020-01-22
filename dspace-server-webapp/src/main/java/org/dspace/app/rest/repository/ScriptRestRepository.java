@@ -172,6 +172,12 @@ public class ScriptRestRepository extends DSpaceRestRepository<ScriptRest, Strin
         }
     }
 
+    /**
+     * This method checks if the files referenced in the options are actually present for the request
+     * If this isn't the case, we'll abort the script now instead of creating issues later on
+     * @param scriptToExecute   The script that we'll attempt to run
+     * @param files             The list of files in the request
+     */
     private void checkFileNames(DSpaceRunnable scriptToExecute, List<MultipartFile> files) {
         List<String> fileNames = new LinkedList<>();
         for (MultipartFile file : files) {

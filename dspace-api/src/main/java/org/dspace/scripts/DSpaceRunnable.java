@@ -18,6 +18,7 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Context;
 import org.dspace.scripts.handler.DSpaceRunnableHandler;
@@ -80,7 +81,8 @@ public abstract class DSpaceRunnable implements Runnable, BeanNameAware {
         List<String> fileNames = new LinkedList<>();
 
         for (Option option : options.getOptions()) {
-            if (option.getType() == InputStream.class) {
+            if (option.getType() == InputStream.class &&
+                StringUtils.isNotBlank(commandLine.getOptionValue(option.getOpt()))) {
                 fileNames.add(commandLine.getOptionValue(option.getOpt()));
             }
         }

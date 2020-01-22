@@ -17,6 +17,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
@@ -145,11 +146,14 @@ public class ProcessServiceImpl implements ProcessService {
     }
 
     @Override
-    public void delete(Context context, Process process) throws SQLException {
+    public void delete(Context context, Process process) throws SQLException, IOException, AuthorizeException {
+
+        for (Bitstream bitstream : ListUtils.emptyIfNull(process.getBitstreams())) {
+            bitstreamService.delete(context, bitstream);
+        }
         processDAO.delete(context, process);
         log.info(LogManager.getHeader(context, "process_delete", "Process with ID " + process.getID()
             + " and name " + process.getName() + " has been deleted"));
-
     }
 
     @Override
