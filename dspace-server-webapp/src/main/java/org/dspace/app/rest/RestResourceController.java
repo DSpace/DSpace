@@ -695,8 +695,8 @@ public class RestResourceController implements InitializingBean {
         DSpaceRestRepository<RestAddressableModel, ID> repository = utils.getResourceRepository(apiCategory, model);
         RestAddressableModel modelObject = null;
         try {
-            // This POC branch does not apply to workflows. These still require a Patch object.
-            if (apiCategory.contentEquals("workflow") || apiCategory.contentEquals("workspace")) {
+            // This POC branch does not apply to submissions or workflow items. These still require a Patch object.
+            if (apiCategory.contentEquals("submission") | apiCategory.contentEquals("workflow")) {
                 JsonPatchConverter patchConverter = new JsonPatchConverter(mapper);
                 Patch patch = patchConverter.convert(jsonNode);
                 modelObject = repository.patch(request, apiCategory, model, id, patch);

@@ -58,11 +58,12 @@ public abstract class DSpaceObjectRestRepository<M extends DSpaceObject, R exten
      */
     protected void patchDSpaceObject(String apiCategory, String model, UUID id, JsonNode jsonNode)
         throws AuthorizeException, ResourceNotFoundException, SQLException, UnprocessableEntityException {
-        M dso = dsoService.find(obtainContext(), id);
+        Context context = obtainContext();
+        M dso = dsoService.find(context, id);
         if (dso == null) {
             throw new ResourceNotFoundException(apiCategory + "." + model + " with id: " + id + " not found");
         }
-        R dsoRest = dsoPatch.patch(findOne(id), jsonNode);
+        R dsoRest = dsoPatch.patch(findOne(context, id), jsonNode, getDomainClass());
         updateDSpaceObject(dso, dsoRest);
     }
 

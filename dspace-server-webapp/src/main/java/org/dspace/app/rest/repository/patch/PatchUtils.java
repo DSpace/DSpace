@@ -16,7 +16,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
+import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.content.Bundle;
+import org.dspace.content.Item;
 import org.dspace.content.service.BundleService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,11 +27,15 @@ import org.springframework.stereotype.Component;
 @Component
 public class PatchUtils {
 
+    private static final String DISCOVERABLE_PATH = "/discoverable";
+    private static final String WITHDRAWN_PATH = "/withdrawn";
+    private static final String IN_ARCHIVE_PATH = "/inArchive";
+
     @Autowired
     private BundleService bundleService;
 
     /**
-     * Validates a move operation by assuring bitream exist and the parameters
+     * Validates a move operation by assuring bitstream exist and that the parameters
      * supplied by the move operations are not out of bounds.
      * @param context
      * @param from
@@ -71,6 +77,36 @@ public class PatchUtils {
     }
 
     /**
+     * Checks for illegal patch operations in the item template. (Item templates cannot be discoverable).
+     * @param item the DSpace object
+     * @param jsonNode the patch
+     */
+    public void validateItemTemplatePatch(Item item, JsonNode jsonNode) {
+        for (JsonNode operation : jsonNode) {
+            String path = operation.get("path").asText();
+            if (path.equals(DISCOVERABLE_PATH)) {
+                if (operation.get("value").asBoolean()) {
+                    if (item.getTemplateItemOf() != null) {
+                        throw new UnprocessableEntityException("A template item cannot be discoverable.");
+                    }
+                }
+            }
+            if (path.equals(WITHDRAWN_PATH)) {
+                if (operation.get("value").asBoolean()) {
+                    if (item.getTemplateItemOf() != null) {
+                        throw new UnprocessableEntityException("A template item cannot be withdrawn.");
+                    }
+                }
+            }
+            if (path.equals(IN_ARCHIVE_PATH)) {
+                if (operation.get("value").asBoolean()) {
+                    throw new DSpaceBadRequestException("A template item does not support this operation.");
+                }
+            }
+        }
+    }
+
+    /**
      * Modifies move operation paths by removing "_link" and "/href" from
      * the path. Required when reordering bundle bitstreams (and perhaps in other
      * situations). If a non-move operation is supplied the node is
@@ -95,7 +131,7 @@ public class PatchUtils {
     }
 
     /**
-     * Modifies JsonNode patch operation. Replaces the value for the
+     * Modifies JsonNode patch operation by replacing the value for the
      * specified field.
      * @param node patch operation
      * @param fieldName field to replace

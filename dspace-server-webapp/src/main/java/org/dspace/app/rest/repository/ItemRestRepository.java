@@ -29,6 +29,7 @@ import org.dspace.app.rest.model.BundleRest;
 import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.repository.handler.service.UriListHandlerService;
+import org.dspace.app.rest.repository.patch.PatchUtils;
 import org.dspace.app.rest.repository.patch.ResourcePatch;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bundle;
@@ -94,6 +95,9 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
 
     @Autowired
     private UriListHandlerService uriListHandlerService;
+
+    @Autowired
+    private PatchUtils patchUtils;
 
 
     public ItemRestRepository(ItemService dsoService, ResourcePatch<ItemRest> dsoPatch) {
@@ -375,8 +379,9 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
      */
     public ItemRest patchTemplateItem(Item item, JsonNode jsonNode)
         throws SQLException, AuthorizeException {
-
-        ItemRest patchedItemRest = dsoPatch.patch(converter.toRest(item, Projection.DEFAULT), jsonNode);
+        patchUtils.validateItemTemplatePatch(item, jsonNode);
+        ItemRest patchedItemRest = dsoPatch.patch(converter.toRest(item, Projection.DEFAULT),
+            jsonNode, getDomainClass());
         updateDSpaceObject(item, patchedItemRest);
 
         return converter.toRest(item, Projection.DEFAULT);

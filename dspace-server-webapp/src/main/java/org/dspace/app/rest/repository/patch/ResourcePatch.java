@@ -21,6 +21,7 @@ import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.model.DSpaceObjectRest;
 import org.dspace.app.rest.model.MetadataRest;
 import org.springframework.data.rest.webmvc.json.patch.JsonPatchPatchConverter;
+import org.springframework.data.rest.webmvc.json.patch.PatchException;
 import org.springframework.expression.spel.SpelEvaluationException;
 import org.springframework.stereotype.Component;
 
@@ -46,7 +47,7 @@ public class ResourcePatch<R extends DSpaceObjectRest> {
      * @param jsonNode the JsonNode for patch operation.
      * @return the modified DSpaceObjectRest instance.
      */
-    public R patch(R dsoRest, JsonNode jsonNode) {
+    public R patch(R dsoRest, JsonNode jsonNode,  Class<R> domainClass) {
         List<Integer> toRemove = new ArrayList<>();
         List<JsonNode> metadataList = new ArrayList<>();
         ArrayNode metadataOperationsNode = objectMapper.valueToTree(metadataList);
@@ -69,16 +70,16 @@ public class ResourcePatch<R extends DSpaceObjectRest> {
                 ((ArrayNode) jsonNode).remove(idx);
             }
         }
-        try {
-            // Use Spring to apply all non-metadata patch operations.
-            new JsonPatchPatchConverter(objectMapper).convert(jsonNode).apply(dsoRest, DSpaceObjectRest.class);
-        } catch (SpelEvaluationException e) {
-            throw new DSpaceBadRequestException(e.getMessage(), e);
-        }
-
+        applyResourcePatch(dsoRest, jsonNode, domainClass);
         return dsoRest;
     }
 
+    /**
+     * Creates a new MetadataRest object to which the patch has been applied.
+     * @param patch
+     * @param metadataRest
+     * @return
+     */
     private MetadataRest applyMetadataPatch(JsonNode patch, MetadataRest metadataRest) {
         try {
             ObjectNode objectNode = objectMapper.createObjectNode();
@@ -88,6 +89,19 @@ public class ResourcePatch<R extends DSpaceObjectRest> {
             return objectMapper.treeToValue(objectNode.get("metadata"), MetadataRest.class);
         } catch (IOException e) {
             throw new IllegalArgumentException(e);
+        }
+    }
+
+    /**
+     * Uses Spring patch to the REST resource's non-metadata fields.
+     * @param dsoRest
+     * @param jsonNode
+     */
+    private void applyResourcePatch(R dsoRest, JsonNode jsonNode, Class<R> domainClass) {
+        try {
+            new JsonPatchPatchConverter(objectMapper).convert(jsonNode).apply(dsoRest, domainClass);
+        } catch (SpelEvaluationException | PatchException e) {
+            throw new DSpaceBadRequestException(e.getMessage(), e);
         }
     }
 

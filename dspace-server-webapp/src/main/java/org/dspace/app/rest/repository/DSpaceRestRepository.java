@@ -450,7 +450,7 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
         } catch (SQLException | DCInputsReaderException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        return findOne(id);
+        return findOne(context, id);
     }
 
     /**
