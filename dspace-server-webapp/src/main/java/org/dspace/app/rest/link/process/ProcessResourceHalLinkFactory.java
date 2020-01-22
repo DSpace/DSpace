@@ -9,8 +9,7 @@ package org.dspace.app.rest.link.process;
 
 import java.util.LinkedList;
 
-import org.dspace.app.rest.RestResourceController;
-import org.dspace.app.rest.link.HalLinkFactory;
+import org.dspace.app.rest.ProcessRestController;
 import org.dspace.app.rest.model.hateoas.ProcessResource;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,24 +17,24 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.Link;
 import org.springframework.stereotype.Component;
 
-/**
- * This class will provide the ProcessResource with links
- */
 @Component
-public class ProcessResourceHalLinkFactory extends HalLinkFactory<ProcessResource, RestResourceController> {
+public class ProcessResourceHalLinkFactory extends ProcessHalLinkFactory<ProcessResource> {
 
     @Autowired
     private ConfigurationService configurationService;
 
     protected void addLinks(ProcessResource halResource, Pageable pageable, LinkedList<Link> list) throws Exception {
         String dspaceRestUrl = configurationService.getProperty("dspace.restUrl");
+//        list.add(
+//            buildLink("script", dspaceRestUrl + "/api/system/scripts/" + halResource.getContent().getScriptName()));
+        list.add(buildLink("files", getMethodOn().listFilesFromProcess(halResource.getContent().getProcessId())));
         list.add(
             buildLink("script", dspaceRestUrl + "/api/system/scripts/" + halResource.getContent().getScriptName()));
 
     }
 
-    protected Class<RestResourceController> getControllerClass() {
-        return RestResourceController.class;
+    protected Class<ProcessRestController> getControllerClass() {
+        return ProcessRestController.class;
     }
 
     protected Class<ProcessResource> getResourceClass() {

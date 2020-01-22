@@ -129,7 +129,7 @@ public interface ProcessService {
      * @param process   The Process object to be deleted
      * @throws SQLException If something goes wrong
      */
-    public void delete(Context context, Process process) throws SQLException;
+    public void delete(Context context, Process process) throws SQLException, IOException, AuthorizeException;
 
     /**
      * This method will be used to update the given Process object in the database

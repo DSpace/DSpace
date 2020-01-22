@@ -13,6 +13,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.LinkedList;
 
@@ -21,6 +22,7 @@ import org.dspace.app.rest.builder.ProcessBuilder;
 import org.dspace.app.rest.matcher.PageMatcher;
 import org.dspace.app.rest.matcher.ProcessMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.ProcessStatus;
 import org.dspace.scripts.DSpaceCommandLineParameter;
 import org.dspace.scripts.Process;
@@ -206,7 +208,7 @@ public class ProcessRestRepositoryIT extends AbstractControllerIntegrationTest {
         CollectionUtils.emptyIfNull(processService.findAll(context)).stream().forEach(process -> {
             try {
                 processService.delete(context, process);
-            } catch (SQLException e) {
+            } catch (SQLException | IOException | AuthorizeException e) {
                 throw new RuntimeException(e);
             }
         });

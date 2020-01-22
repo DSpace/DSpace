@@ -7,6 +7,8 @@
  */
 package org.dspace.scripts.impl;
 
+import java.io.InputStream;
+
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.dspace.scripts.DSpaceRunnable;
@@ -37,6 +39,9 @@ public class MockDSpaceRunnableScript extends DSpaceRunnable {
         options.addOption("i", "index", false, "description i");
         options.getOption("i").setType(boolean.class);
         options.getOption("i").setRequired(true);
+        options.addOption("f", "file", true, "source file");
+        options.getOption("f").setType(InputStream.class);
+        options.getOption("f").setRequired(false);
         return options;
     }
 }
