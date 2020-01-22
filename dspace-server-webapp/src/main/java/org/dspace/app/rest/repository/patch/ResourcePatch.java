@@ -62,9 +62,11 @@ public class ResourcePatch<R extends DSpaceObjectRest> {
         }
         // If metadata operations are found, apply and remove the operations from the original JsonNode.
         if (metadataOperationsNode.size() != 0) {
-            dsoRest.setMetadata(applyMetadataPatch(
-                metadataOperationsNode,
-                dsoRest.getMetadata()));
+            dsoRest.setMetadata(
+                applyMetadataPatch(
+                    metadataOperationsNode,
+                    dsoRest.getMetadata())
+            );
             toRemove.sort(Collections.reverseOrder());
             for (Integer idx : toRemove) {
                 ((ArrayNode) jsonNode).remove(idx);
