@@ -25,9 +25,9 @@ import com.maxmind.geoip2.record.Postal;
 import com.maxmind.geoip2.record.RepresentedCountry;
 import com.maxmind.geoip2.record.Subdivision;
 import com.maxmind.geoip2.record.Traits;
-import mockit.Deencapsulation;
 import mockit.Mock;
 import mockit.MockUp;
+import mockit.internal.reflection.ConstructorReflection;
 
 /**
  * Mock service to mock the location Lookup Service used by the SOLR statistics
@@ -112,7 +112,7 @@ public class FakeDatabaseReader
         @Mock
         public DatabaseReader build()
                 throws IOException {
-            return Deencapsulation.newUninitializedInstance(DatabaseReader.class);
+            return ConstructorReflection.newInstanceUsingDefaultConstructor(DatabaseReader.class);
         }
     }
 }
