@@ -12,6 +12,7 @@ import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasNoJsonPath;
 
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.core.Constants;
@@ -38,7 +39,17 @@ public class ResoucePolicyMatcher {
                 resourcePolicy.getRpType() != null ?
                         hasJsonPath("$.policyType", is(resourcePolicy.getRpType())) :
                                hasNoJsonPath("$.policyType"),
-                hasJsonPath("$.type", is("resourcepolicy")));
+                hasJsonPath("$.type", is("resourcepolicy")),
+                hasJsonPath("$._embedded.resource.id", is(resourcePolicy.getdSpaceObject().getID().toString())),
+                resourcePolicy.getEPerson() != null ?
+                               hasJsonPath("$._embedded.eperson.id",
+                                        is(resourcePolicy.getEPerson().getID().toString())) :
+                               hasJsonPath("$._embedded.eperson", nullValue()),
+                resourcePolicy.getGroup() != null ?
+                               hasJsonPath("$._embedded.group.id",
+                                        is(resourcePolicy.getGroup().getID().toString())) :
+                               hasJsonPath("$._embedded.group", nullValue())
+                        );
     }
 
 }
