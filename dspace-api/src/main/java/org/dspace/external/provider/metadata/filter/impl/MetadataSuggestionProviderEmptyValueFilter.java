@@ -15,6 +15,10 @@ import org.dspace.content.service.ItemService;
 import org.dspace.external.provider.metadata.filter.MetadataSuggestionProviderFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 
+/**
+ * This class is an implementation of {@link MetadataSuggestionProviderFilter} and checks that the MetadataValue for
+ * the given MetadataField is empty
+ */
 public class MetadataSuggestionProviderEmptyValueFilter implements MetadataSuggestionProviderFilter {
 
     @Autowired

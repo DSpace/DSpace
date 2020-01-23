@@ -16,6 +16,10 @@ import org.dspace.content.service.ItemService;
 import org.dspace.external.provider.metadata.filter.MetadataSuggestionProviderFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 
+/**
+ * This class is an implementation of {@link MetadataSuggestionProviderFilter} and checks whether the
+ * MetadataValue for a given MetadataField is equal to the given value passed along through the bean
+ */
 public class MetadataSuggestionProviderEqualityFilter implements MetadataSuggestionProviderFilter {
 
     @Autowired
