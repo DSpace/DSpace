@@ -28,11 +28,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
-import mockit.Mock;
-import mockit.MockUp;
 import org.apache.logging.log4j.Logger;
-import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -95,11 +93,14 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
             // Initialize our spy of the autowired (global) authorizeService bean.
             // This allows us to customize the bean's method return values in tests below
             authorizeServiceSpy = spy(authorizeService);
-            // "Wire" our spy to be used by the current loaded CommunityService, CollectionService & ItemService
+            // "Wire" our spy to be used by the current loaded object services
             // (To ensure these services use the spy instead of the real service)
             ReflectionTestUtils.setField(communityService, "authorizeService", authorizeServiceSpy);
             ReflectionTestUtils.setField(collectionService, "authorizeService", authorizeServiceSpy);
             ReflectionTestUtils.setField(itemService, "authorizeService", authorizeServiceSpy);
+            // Also wire into current AuthorizeServiceFactory, as that is used for some checks (e.g. AuthorizeUtil)
+            ReflectionTestUtils.setField(AuthorizeServiceFactory.getInstance(), "authorizeService",
+                                         authorizeServiceSpy);
         } catch (AuthorizeException ex) {
             log.error("Authorization Error in init", ex);
             fail("Authorization Error in init: " + ex.getMessage());
@@ -378,13 +379,8 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testCreateWorkflowGroupAuth() throws Exception {
-        // Use JMockit to mock the AuthorizeUtil & allow permissions
-        new MockUp<AuthorizeUtil>() {
-            @Mock
-            public void authorizeManageWorkflowsGroup(Context context, Collection collection) {
-                return; // allow permissions by not throwing an exception
-            }
-        };
+        // Allow Collection ADMIN (to manage workflow group)
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, collection, Constants.ADMIN);
 
         int step = 1;
         Group result = collectionService.createWorkflowGroup(context, collection, step);
@@ -396,15 +392,6 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
      */
     @Test(expected = AuthorizeException.class)
     public void testCreateWorkflowGroupNoAuth() throws Exception {
-        // Use JMockit to mock the AuthorizeUtil & disallow permissions
-        new MockUp<AuthorizeUtil>() {
-            @Mock
-            public void authorizeManageWorkflowsGroup(Context context, Collection collection)
-                throws AuthorizeException {
-                throw new AuthorizeException();
-            }
-        };
-
         int step = 1;
         Group result = collectionService.createWorkflowGroup(context, collection, step);
         fail("Exception expected");
@@ -462,13 +449,8 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testCreateSubmittersAuth() throws Exception {
-        // Use JMockit to mock the AuthorizeUtil & allow permissions
-        new MockUp<AuthorizeUtil>() {
-            @Mock
-            public void authorizeManageSubmittersGroup(Context context, Collection collection) {
-                return; // allow permissions by not throwing an exception
-            }
-        };
+        // Allow Collection ADMIN (to manage submitter group)
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, collection, Constants.ADMIN);
 
         Group result = collectionService.createSubmitters(context, collection);
         assertThat("testCreateSubmittersAuth 0", result, notNullValue());
@@ -479,15 +461,6 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
      */
     @Test(expected = AuthorizeException.class)
     public void testCreateSubmittersNoAuth() throws Exception {
-        // Use JMockit to mock the AuthorizeUtil & disallow permissions
-        new MockUp<AuthorizeUtil>() {
-            @Mock
-            public void authorizeManageSubmittersGroup(Context context, Collection collection)
-                throws AuthorizeException {
-                throw new AuthorizeException();
-            }
-        };
-
         Group result = collectionService.createSubmitters(context, collection);
         fail("Exception expected");
     }
@@ -497,13 +470,8 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testRemoveSubmittersAuth() throws Exception {
-        // Use JMockit to mock the AuthorizeUtil & allow permissions
-        new MockUp<AuthorizeUtil>() {
-            @Mock
-            public void authorizeManageSubmittersGroup(Context context, Collection collection) {
-                return; // allow permissions by not throwing an exception
-            }
-        };
+        // Allow Collection ADMIN (to manage submitter group)
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, collection, Constants.ADMIN);
 
         collectionService.removeSubmitters(context, collection);
         assertThat("testRemoveSubmittersAuth 0", collection.getSubmitters(), nullValue());
@@ -514,15 +482,6 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
      */
     @Test(expected = AuthorizeException.class)
     public void testRemoveSubmittersNoAuth() throws Exception {
-        // Use JMockit to mock the AuthorizeUtil & disallow permissions
-        new MockUp<AuthorizeUtil>() {
-            @Mock
-            public void authorizeManageSubmittersGroup(Context context, Collection collection)
-                throws AuthorizeException {
-                throw new AuthorizeException();
-            }
-        };
-
         collectionService.removeSubmitters(context, collection);
         fail("Exception expected");
     }
@@ -540,13 +499,8 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testCreateAdministratorsAuth() throws Exception {
-        // Use JMockit to mock the AuthorizeUtil & allow permissions
-        new MockUp<AuthorizeUtil>() {
-            @Mock
-            public void authorizeManageAdminGroup(Context context, Collection collection) {
-                return; // allow permissions by not throwing an exception
-            }
-        };
+        // Allow Collection ADMIN (to manage admin group)
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, collection, Constants.ADMIN);
 
         Group result = collectionService.createAdministrators(context, collection);
         assertThat("testCreateAdministratorsAuth 0", result, notNullValue());
@@ -557,15 +511,6 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
      */
     @Test(expected = AuthorizeException.class)
     public void testCreateAdministratorsNoAuth() throws Exception {
-        // Use JMockit to mock the AuthorizeUtil & disallow permissions
-        new MockUp<AuthorizeUtil>() {
-            @Mock
-            public void authorizeManageAdminGroup(Context context, Collection collection)
-                throws AuthorizeException {
-                throw new AuthorizeException();
-            }
-        };
-
         Group result = collectionService.createAdministrators(context, collection);
         fail("Exception expected");
     }
@@ -575,13 +520,8 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testRemoveAdministratorsAuth() throws Exception {
-        // Use JMockit to mock the AuthorizeUtil & allow permissions
-        new MockUp<AuthorizeUtil>() {
-            @Mock
-            public void authorizeRemoveAdminGroup(Context context, Collection collection) {
-                return; // allow permissions by not throwing an exception
-            }
-        };
+        // Allow parent Community ADMIN (only Community Admins can delete a Collection Admin group)
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, owningCommunity, Constants.ADMIN);
 
         // Ensure admin group is created first
         context.turnOffAuthorisationSystem();
@@ -599,14 +539,6 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
      */
     @Test(expected = AuthorizeException.class)
     public void testRemoveAdministratorsNoAuth() throws Exception {
-        // Use JMockit to mock the AuthorizeUtil & disallow permissions
-        new MockUp<AuthorizeUtil>() {
-            @Mock
-            public void authorizeRemoveAdminGroup(Context context, Collection collection) throws AuthorizeException {
-                throw new AuthorizeException();
-            }
-        };
-
         // Ensure admin group is created first
         context.turnOffAuthorisationSystem();
         Group result = collectionService.createAdministrators(context, collection);
@@ -679,13 +611,8 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testCreateTemplateItemAuth() throws Exception {
-        // Use JMockit to mock the AuthorizeUtil & allow permissions
-        new MockUp<AuthorizeUtil>() {
-            @Mock
-            public void authorizeManageTemplateItem(Context context, Collection collection) {
-                return; // allow permissions by not throwing an exception
-            }
-        };
+        // Allow Collection ADMIN (to manage template item)
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, collection, Constants.ADMIN);
 
         itemService.createTemplateItem(context, collection);
         assertThat("testCreateTemplateItemAuth 0", collection.getTemplateItem(), notNullValue());
@@ -696,15 +623,6 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
      */
     @Test(expected = AuthorizeException.class)
     public void testCreateTemplateItemNoAuth() throws Exception {
-        // Use JMockit to mock the AuthorizeUtil & disallow permissions
-        new MockUp<AuthorizeUtil>() {
-            @Mock
-            public void authorizeManageTemplateItem(Context context, Collection collection)
-                throws AuthorizeException {
-                throw new AuthorizeException();
-            }
-        };
-
         itemService.createTemplateItem(context, collection);
         fail("Exception expected");
     }
@@ -714,13 +632,8 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testRemoveTemplateItemAuth() throws Exception {
-        // Use JMockit to mock the AuthorizeUtil & allow permissions
-        new MockUp<AuthorizeUtil>() {
-            @Mock
-            public void authorizeManageTemplateItem(Context context, Collection collection) {
-                return; // allow permissions by not throwing an exception
-            }
-        };
+        // Allow Collection ADMIN (to manage template item)
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, collection, Constants.ADMIN);
 
         collectionService.removeTemplateItem(context, collection);
         assertThat("testRemoveTemplateItemAuth 0", collection.getTemplateItem(), nullValue());
@@ -731,15 +644,6 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
      */
     @Test(expected = AuthorizeException.class)
     public void testRemoveTemplateItemNoAuth() throws Exception {
-        // Use JMockit to mock the AuthorizeUtil & disallow permissions
-        new MockUp<AuthorizeUtil>() {
-            @Mock
-            public void authorizeManageTemplateItem(Context context, Collection collection)
-                throws AuthorizeException {
-                throw new AuthorizeException();
-            }
-        };
-
         collectionService.removeTemplateItem(context, collection);
         fail("Exception expected");
     }
@@ -1069,13 +973,8 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
     public void testDeleteAuth() throws Exception {
         // Allow Collection WRITE perms
         doNothing().when(authorizeServiceSpy).authorizeAction(context, collection, Constants.WRITE, true);
-        // Use JMockit to mock the AuthorizeUtil & allow permissions
-        new MockUp<AuthorizeUtil>() {
-            @Mock
-            public void authorizeManageTemplateItem(Context context, Collection collection) {
-                return; // allow permissions by not throwing an exception
-            }
-        };
+        // Allow Collection ADMIN perms
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, collection, Constants.ADMIN);
 
         UUID id = collection.getID();
         collectionService.delete(context, collection);
@@ -1088,26 +987,6 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
      */
     @Test(expected = AuthorizeException.class)
     public void testDeleteNoAuth() throws Exception {
-        collectionService.delete(context, collection);
-        fail("Exception expected");
-    }
-
-    /**
-     * Test of delete method, of class Collection.
-     */
-    @Test(expected = AuthorizeException.class)
-    public void testDeleteNoAuth2() throws Exception {
-        // Allow Collection WRITE perms
-        doThrow(new AuthorizeException()).when(authorizeServiceSpy)
-                                         .authorizeAction(context, collection, Constants.WRITE, true);
-        // Use JMockit to mock the AuthorizeUtil & allow permissions
-        new MockUp<AuthorizeUtil>() {
-            @Mock
-            public void authorizeManageTemplateItem(Context context, Collection collection) {
-                return; // allow permissions by not throwing an exception
-            }
-        };
-
         collectionService.delete(context, collection);
         fail("Exception expected");
     }
