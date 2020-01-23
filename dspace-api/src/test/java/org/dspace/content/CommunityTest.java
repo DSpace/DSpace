@@ -29,11 +29,9 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 
-import mockit.Mock;
-import mockit.MockUp;
 import org.apache.logging.log4j.Logger;
-import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -89,11 +87,14 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
             // Initialize our spy of the autowired (global) authorizeService bean.
             // This allows us to customize the bean's method return values in tests below
             authorizeServiceSpy = spy(authorizeService);
-            // "Wire" our spy to be used by the current loaded CommunityService, CollectionService & ItemService
+            // "Wire" our spy to be used by the current loaded object services
             // (To ensure both these services use the spy instead of the real service)
             ReflectionTestUtils.setField(communityService, "authorizeService", authorizeServiceSpy);
             ReflectionTestUtils.setField(collectionService, "authorizeService", authorizeServiceSpy);
             ReflectionTestUtils.setField(itemService, "authorizeService", authorizeServiceSpy);
+            // Also wire into current AuthorizeServiceFactory, as that is used for some checks (e.g. AuthorizeUtil)
+            ReflectionTestUtils.setField(AuthorizeServiceFactory.getInstance(), "authorizeService",
+                                         authorizeServiceSpy);
         } catch (AuthorizeException ex) {
             log.error("Authorization Error in init", ex);
             fail("Authorization Error in init: " + ex.getMessage());
@@ -411,13 +412,8 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testCreateAdministratorsAuth() throws Exception {
-        // Use JMockit to mock the AuthorizeUtil which is used by createAdministrators() to check permissions
-        new MockUp<AuthorizeUtil>() {
-            @Mock
-            public void authorizeManageAdminGroup(Context context, Community community) {
-                return; // allow permissions by not throwing an exception
-            }
-        };
+        // Allow Community ADMIN perms
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, c, Constants.ADMIN);
 
         Group result = communityService.createAdministrators(context, c);
         assertThat("testCreateAdministratorsAuth 0", c.getAdministrators(), notNullValue());
@@ -429,14 +425,6 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
      */
     @Test(expected = AuthorizeException.class)
     public void testCreateAdministratorsNoAuth() throws Exception {
-        // Use JMockit to mock the AuthorizeUtil which is used by createAdministrators() to check permissions
-        new MockUp<AuthorizeUtil>() {
-            @Mock
-            public void authorizeManageAdminGroup(Context context, Community community) throws AuthorizeException {
-                throw new AuthorizeException("fake error message");
-            }
-        };
-
         Group result = communityService.createAdministrators(context, c);
         fail("Exception should have been thrown");
     }
@@ -447,13 +435,8 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testRemoveAdministratorsAuth() throws Exception {
-        // Use JMockit to mock the AuthorizeUtil which is used by createAdministrators() to check permissions
-        new MockUp<AuthorizeUtil>() {
-            @Mock
-            public void authorizeRemoveAdminGroup(Context context, Community community) {
-                return; // allow permissions by not throwing an exception
-            }
-        };
+        // Allow Full ADMIN perms (Community Admins cannot delete their Admin Group)
+        when(authorizeServiceSpy.isAdmin(context)).thenReturn(true);
 
         // Ensure admin group is created first
         context.turnOffAuthorisationSystem();
@@ -471,13 +454,8 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
      */
     @Test(expected = AuthorizeException.class)
     public void testRemoveAdministratorsNoAuth() throws Exception {
-        // Use JMockit to mock the AuthorizeUtil which is used by createAdministrators() to check permissions
-        new MockUp<AuthorizeUtil>() {
-            @Mock
-            public void authorizeRemoveAdminGroup(Context context, Community community)  throws AuthorizeException {
-                throw new AuthorizeException("fake error message");
-            }
-        };
+        // Allow Community ADMIN perms (Community Admins cannot delete their Admin Group)
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, c, Constants.ADMIN);
 
         // Ensure admin group is created first
         context.turnOffAuthorisationSystem();
@@ -736,20 +714,6 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testRemoveCollectionAuth() throws Exception {
-        // Allow current Community REMOVE perms (to remove Collection from Community & delete)
-        doNothing().when(authorizeServiceSpy).authorizeAction(context, c, Constants.REMOVE);
-        // Allow collection WRITE perms (needed to remove Logo before Collection can be deleted)
-        doNothing().when(authorizeServiceSpy)
-                   .authorizeAction(any(Context.class), any(Collection.class), eq(Constants.WRITE), eq(true));
-        // Use JMockit to mock the AuthorizeUtil
-        new MockUp<AuthorizeUtil>() {
-            // Allow Collection ManageTemplateItem perms (needed to remove Item Template before Collection is deleted)
-            @Mock
-            public void authorizeManageTemplateItem(Context context, Collection collection) {
-                return; // allow permissions by not throwing an exception
-            }
-        };
-
         // Turn off authorization temporarily to create a new Collection
         context.turnOffAuthorisationSystem();
         Collection col = collectionService.create(context, c);
@@ -757,6 +721,13 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
         assertThat("testRemoveCollectionAuth 0", c.getCollections(), notNullValue());
         assertTrue("testRemoveCollectionAuth 1", c.getCollections().size() == 1);
         assertThat("testRemoveCollectionAuth 2", c.getCollections().get(0), equalTo(col));
+
+        // Allow current Community REMOVE perms (to remove Collection from Community & delete)
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, c, Constants.REMOVE);
+        // Allow collection WRITE perms (needed to remove Logo before Collection can be deleted)
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, col, Constants.WRITE,true);
+        // Allow current Community ADMIN perms (to remove Collection from Community & delete)
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, col, Constants.ADMIN);
 
         // Note that this will *also* delete the collection (hence the extra permissions provided above)
         communityService.removeCollection(context, c, col);
@@ -876,6 +847,9 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
         // Allow current Collection DELETE perms (needed to delete a Collection)
         doNothing().when(authorizeServiceSpy)
                    .authorizeAction(any(Context.class), any(Collection.class), eq(Constants.DELETE), eq(true));
+        // Allow current Collection ADMIN perms (needed to delete a Collection)
+        doNothing().when(authorizeServiceSpy)
+                   .authorizeAction(any(Context.class), any(Collection.class), eq(Constants.ADMIN));
         // Allow current Item WRITE perms (needed to remove identifiers from an Item prior to deletion)
         doNothing().when(authorizeServiceSpy)
                    .authorizeAction(any(Context.class), any(Item.class), eq(Constants.WRITE), eq(true));
@@ -885,14 +859,6 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
         // Allow current Item REMOVE perms (needed to delete Item)
         doNothing().when(authorizeServiceSpy)
                    .authorizeAction(any(Context.class), any(Item.class), eq(Constants.REMOVE), eq(true));
-        // Use JMockit to mock the AuthorizeUtil
-        new MockUp<AuthorizeUtil>() {
-            // Allow Collection ManageTemplateItem perms (needed to delete a collection)
-            @Mock
-            public void authorizeManageTemplateItem(Context context, Collection collection) {
-                return; // allow permissions by not throwing an exception
-            }
-        };
 
         // Create a dummy Community hierarchy to test delete with
         // Turn off authorization temporarily to create some test objects.

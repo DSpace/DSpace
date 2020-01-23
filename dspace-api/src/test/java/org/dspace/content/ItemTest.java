@@ -33,13 +33,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
-import mockit.Mock;
-import mockit.MockUp;
 import org.apache.commons.lang3.time.DateUtils;
 import org.apache.logging.log4j.Logger;
-import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamFormatService;
@@ -121,6 +119,9 @@ public class ItemTest extends AbstractDSpaceObjectTest {
             ReflectionTestUtils.setField(workspaceItemService, "authorizeService", authorizeServiceSpy);
             ReflectionTestUtils.setField(bundleService, "authorizeService", authorizeServiceSpy);
             ReflectionTestUtils.setField(bitstreamService, "authorizeService", authorizeServiceSpy);
+            // Also wire into current AuthorizeServiceFactory, as that is used for some checks (e.g. AuthorizeUtil)
+            ReflectionTestUtils.setField(AuthorizeServiceFactory.getInstance(), "authorizeService",
+                                         authorizeServiceSpy);
         } catch (AuthorizeException ex) {
             log.error("Authorization Error in init", ex);
             fail("Authorization Error in init: " + ex.getMessage());
@@ -1124,14 +1125,8 @@ public class ItemTest extends AbstractDSpaceObjectTest {
     public void testWithdrawAuth() throws Exception {
         // Allow Item WRITE perms
         doNothing().when(authorizeServiceSpy).authorizeAction(context, it, Constants.WRITE);
-
-        // Use JMockit to mock the AuthorizeUtil & allow permissions
-        new MockUp<AuthorizeUtil>() {
-            @Mock
-            public void authorizeWithdrawItem(Context context, Item item) {
-                return; // allow permissions by not throwing an exception
-            }
-        };
+        // Allow Collection ADMIN perms
+        when(authorizeServiceSpy.authorizeActionBoolean(context, collection, Constants.ADMIN)).thenReturn(true);
 
         itemService.withdraw(context, it);
         assertTrue("testWithdrawAuth 0", it.isWithdrawn());
@@ -1153,14 +1148,8 @@ public class ItemTest extends AbstractDSpaceObjectTest {
     public void testReinstateAuth() throws Exception {
         // Allow Item WRITE perms
         doNothing().when(authorizeServiceSpy).authorizeAction(context, it, Constants.WRITE);
-
-        // Use JMockit to mock the AuthorizeUtil & allow permissions
-        new MockUp<AuthorizeUtil>() {
-            @Mock
-            public void authorizeReinstateItem(Context context, Item item) {
-                return; // allow permissions by not throwing an exception
-            }
-        };
+        // Allow Collection ADD perms (needed to reinstate)
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, collection, Constants.ADD);
 
         // initialize item as withdrawn
         context.turnOffAuthorisationSystem();
@@ -1199,8 +1188,6 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         doNothing().when(authorizeServiceSpy).authorizeAction(context, item, Constants.REMOVE, true);
         // Allow Item DELETE perms
         doNothing().when(authorizeServiceSpy).authorizeAction(context, item, Constants.DELETE);
-        // Allow Item WRITE perms
-        doNothing().when(authorizeServiceSpy).authorizeAction(context, item, Constants.WRITE);
 
         UUID id = item.getID();
         itemService.delete(context, item);
