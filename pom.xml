@@ -155,7 +155,7 @@
                     <configuration>
                         <!-- Allow for the ability to pass JVM memory flags for Unit Tests. Since
                              maven-surefire-plugin forks a new JVM, it ignores MAVEN_OPTS.-->
-                        <argLine>${test.argLine} ${surefireJacoco}</argLine>
+                        <argLine>${test.argLine} -javaagent:${settings.localRepository}/org/jmockit/jmockit/${jmockit.version}/jmockit-${jmockit.version}.jar ${surefireJacoco}</argLine>
                         <!-- tests whose name starts by Abstract will be ignored -->
                         <excludes>
                             <exclude>**/Abstract*</exclude>
@@ -177,7 +177,7 @@
                     <configuration>
                         <!-- Allow for the ability to pass JVM memory flags for Unit Tests. Since
                              maven-failsafe-plugin forks a new JVM, it ignores MAVEN_OPTS.-->
-                        <argLine>${test.argLine} ${failsafeJacoco}</argLine>
+                        <argLine>${test.argLine} -javaagent:${settings.localRepository}/org/jmockit/jmockit/${jmockit.version}/jmockit-${jmockit.version}.jar ${failsafeJacoco}</argLine>
                         <excludes>
                             <exclude>**/Abstract*</exclude>
                         </excludes>
@@ -465,7 +465,7 @@
                 </property>
             </activation>
             <properties>
-                <test.argLine>-Xmx1024m -Djdk.attach.allowAttachSelf -javaagent:${settings.localRepository}/org/jmockit/jmockit/${jmockit.version}/jmockit-${jmockit.version}.jar</test.argLine>
+                <test.argLine>-Xmx1024m</test.argLine>
             </properties>
         </profile>
 
