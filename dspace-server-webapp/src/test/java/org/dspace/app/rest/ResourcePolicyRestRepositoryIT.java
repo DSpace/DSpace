@@ -440,6 +440,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
         Community community = CommunityBuilder.createCommunity(context).withName("My community").build();
 
+        Community community2 = CommunityBuilder.createCommunity(context).withName("My second community").build();
 
         ResourcePolicy firstResourcePolicyOfEPerson1 = ResourcePolicyBuilder.createResourcePolicy(context)
                 .withDspaceObject(community)
@@ -447,7 +448,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
                 .withUser(eperson1).build();
 
         ResourcePolicy firstResourcePolicyOfEPerson2 = ResourcePolicyBuilder.createResourcePolicy(context)
-                .withDspaceObject(community)
+                .withDspaceObject(community2)
                 .withAction(Constants.ADD)
                 .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
                 .withUser(eperson2).build();
@@ -466,12 +467,13 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$._embedded.resourcepolicies",Matchers.containsInAnyOrder(
                         ResoucePolicyMatcher.matchResourcePolicy(firstResourcePolicyOfEPerson1),
-                        ResoucePolicyMatcher.matchResourcePolicy(firstResourcePolicyOfEPerson2),
                         ResoucePolicyMatcher.matchResourcePolicy(resourcePolicyAnonymous)
                         )))
+                .andExpect(jsonPath("$._embedded.resourcepolicies",
+                        Matchers.not(is(ResoucePolicyMatcher.matchResourcePolicy(firstResourcePolicyOfEPerson2)))))
                 .andExpect(jsonPath("$._links.self.href",
                         Matchers.containsString("api/authz/resourcepolicies/search/resource")))
-                .andExpect(jsonPath("$.page.totalElements", is(3)));
+                .andExpect(jsonPath("$.page.totalElements", is(2)));
   }
 
   @Test
@@ -490,6 +492,8 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
         Community community = CommunityBuilder.createCommunity(context).withName("My community").build();
 
+        Community community2 = CommunityBuilder.createCommunity(context).withName("My 2 community").build();
+
         ResourcePolicy firstResourcePolicyOfEPerson1 = ResourcePolicyBuilder.createResourcePolicy(context)
                 .withDspaceObject(community)
                 .withAction(Constants.ADMIN)
@@ -497,6 +501,11 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
         ResourcePolicy firstResourcePolicyOfEPerson2 = ResourcePolicyBuilder.createResourcePolicy(context)
                 .withDspaceObject(community)
+                .withAction(Constants.ADD)
+                .withUser(eperson2).build();
+
+        ResourcePolicy secondResourcePolicyOfEPerson2 = ResourcePolicyBuilder.createResourcePolicy(context)
+                .withDspaceObject(community2)
                 .withAction(Constants.ADD)
                 .withUser(eperson2).build();
 
@@ -511,6 +520,8 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
                 .andExpect(jsonPath("$._embedded.resourcepolicies",Matchers.contains(
                         ResoucePolicyMatcher.matchResourcePolicy(firstResourcePolicyOfEPerson2)
                         )))
+                .andExpect(jsonPath("$._embedded.resourcepolicies",
+                        Matchers.not(is(ResoucePolicyMatcher.matchResourcePolicy(secondResourcePolicyOfEPerson2)))))
                 .andExpect(jsonPath("$._links.self.href",
                         Matchers.containsString("api/authz/resourcepolicies/search/resource")))
                 .andExpect(jsonPath("$.page.totalElements", is(1)));
@@ -523,6 +534,60 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
   }
 
   @Test
+public void findResourcePoliciesOfOneResourceCheckPaginationsTest() throws Exception {
+    context.turnOffAuthorisationSystem();
+
+    EPerson eperson1 = EPersonBuilder.createEPerson(context)
+            .withEmail("eperson1@mail.com")
+            .withPassword("qwerty01")
+            .build();
+
+    EPerson eperson2 = EPersonBuilder.createEPerson(context)
+            .withEmail("eperson2@mail.com")
+            .withPassword("qwerty02")
+            .build();
+
+    Community community = CommunityBuilder.createCommunity(context).withName("My community").build();
+
+
+    ResourcePolicy firstResourcePolicyOfEPerson1 = ResourcePolicyBuilder.createResourcePolicy(context)
+            .withDspaceObject(community)
+            .withAction(Constants.ADMIN)
+            .withUser(eperson1).build();
+
+    ResourcePolicy firstResourcePolicyOfEPerson2 = ResourcePolicyBuilder.createResourcePolicy(context)
+            .withDspaceObject(community)
+            .withAction(Constants.ADD)
+            .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
+            .withUser(eperson2).build();
+
+    ResourcePolicy resourcePolicyAnonymous = authorizeService
+            .findByTypeGroupAction(context,community, EPersonServiceFactory.getInstance()
+            .getGroupService()
+            .findByName(context, Group.ANONYMOUS),Constants.READ);
+
+
+    context.restoreAuthSystemState();
+
+    String authToken = getAuthToken(eperson1.getEmail(), "qwerty01");
+    getClient(authToken).perform(get("/api/authz/resourcepolicies/search/resource")
+              .param("uuid", community.getID().toString())
+              .param("page","0")
+              .param("size","2"))
+              .andExpect(status().isOk())
+              .andExpect(content().contentType(contentType))
+              .andExpect(jsonPath("$._embedded.resourcepolicies",
+                      Matchers.containsInAnyOrder(
+                              hasJsonPath("$.type", is("resourcepolicy")),
+                              hasJsonPath("$.type", is("resourcepolicy"))
+                      )))
+              .andExpect(jsonPath("$._links.self.href",
+                      Matchers.containsString("api/authz/resourcepolicies/search/resource")))
+              .andExpect(jsonPath("$.page.totalElements", is(3)))
+              .andExpect(jsonPath("$.page.size", is(2)));
+}
+
+@Test
   public void findResoucesPoliciesOfResourceWithoutParametersBadRequestTest() throws Exception {
       context.turnOffAuthorisationSystem();
 
@@ -619,14 +684,21 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
         Group group1 = GroupBuilder.createGroup(context).withName("My group").build();
 
+        Group group2 = GroupBuilder.createGroup(context).withName("My 2 group").build();
+
         EPerson eperson1 = EPersonBuilder.createEPerson(context)
                 .withEmail("eperson1@mail.com")
                 .withPassword("qwerty01")
                 .withGroupMembership(group1)
+                .withGroupMembership(group2)
                 .build();
 
         Community community = CommunityBuilder.createCommunity(context)
                 .withName("My community")
+                .build();
+
+        Community community2 = CommunityBuilder.createCommunity(context)
+                .withName("My 2 community")
                 .build();
 
         Collection collection = CollectionBuilder.createCollection(context, community)
@@ -648,6 +720,11 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
                 .withAction(Constants.WRITE)
                 .withGroup(group1).build();
 
+        ResourcePolicy firstResourcePolicyOfGroup2 = ResourcePolicyBuilder.createResourcePolicy(context)
+                .withDspaceObject(community2)
+                .withAction(Constants.ADD)
+                .withGroup(group2).build();
+
         context.restoreAuthSystemState();
 
         String authToken = getAuthToken(eperson1.getEmail(), "qwerty01");
@@ -660,9 +737,23 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
                                 ResoucePolicyMatcher.matchResourcePolicy(firstResourcePolicyOfGroup1),
                                 ResoucePolicyMatcher.matchResourcePolicy(secondResourcePolicyOfGroup1),
                                 ResoucePolicyMatcher.matchResourcePolicy(collectionResourcePolicyOfGroup1))))
+                .andExpect(jsonPath("$._embedded.resourcepolicies",
+                        Matchers.not(is(ResoucePolicyMatcher.matchResourcePolicy(firstResourcePolicyOfGroup2)))))
                 .andExpect(jsonPath("$._links.self.href",
                         Matchers.containsString("api/authz/resourcepolicies/search/group")))
                 .andExpect(jsonPath("$.page.totalElements", is(3)));
+
+        String authToken2 = getAuthToken(eperson1.getEmail(), "qwerty01");
+        getClient(authToken2)
+                .perform(get("/api/authz/resourcepolicies/search/group")
+                        .param("uuid", group2.getID().toString()))
+                .andExpect(status().isOk()).andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._embedded.resourcepolicies",
+                        Matchers.contains(
+                                ResoucePolicyMatcher.matchResourcePolicy(firstResourcePolicyOfGroup2))))
+                .andExpect(jsonPath("$._links.self.href",
+                        Matchers.containsString("api/authz/resourcepolicies/search/group")))
+                .andExpect(jsonPath("$.page.totalElements", is(1)));
     }
 
     @Test
