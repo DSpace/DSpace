@@ -54,9 +54,10 @@ import java.util.List;
 public class FeideAuthentication implements AuthenticationMethod {
 
     private static final String BIBSYS_REALM = "@bibsys.no";
-    private static final String UNIT_REALM = "@unit.no";
     private static final String BRAGE_BIBSYS_NO = "brage@bibsys.no";
     private static final String BRAGE_UNIT_NO = "brage@unit.no";
+
+    public static final String MEMBER_GROUP = "Member";
     /**
      * log4j category
      */
@@ -72,9 +73,6 @@ public class FeideAuthentication implements AuthenticationMethod {
      */
     private static final String EFFECTIVE_USER_ID = "dspace.user.effective";
     private static final String AUTHENTICATED_USER_ID = "dspace.user.authenticated";
-    private static final String NO_BRAGE_INSTITUTE = "xmlui.Eperson.FailedAuthentication.noBrageInstitution";
-    /** User is not at an appropriate brage institution. */
-    public static final int BAD_INST = 6;
 
     protected AuthenticationService authenticationService = AuthenticateServiceFactory.getInstance().getAuthenticationService();
     protected EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
@@ -103,7 +101,7 @@ public class FeideAuthentication implements AuthenticationMethod {
 
         boolean isBIBSYSFeide = StringUtils.endsWith(eduPerson.getPrincipalName().trim(), BIBSYS_REALM);
 
-        if(isSystemAdmin(eduPerson)) {
+        if (isSystemAdmin(eduPerson)) {
 
             return true;
 
@@ -177,10 +175,24 @@ public class FeideAuthentication implements AuthenticationMethod {
     }
 
     /**
-     * Add authenticated users to the group defined in authentication-password.cfg by
-     * the login.specialgroup key.
+     * Add authenticated users to the group named 'Member'.
+     * The 'Member'-group has to exist.
      */
-    public  List<Group> getSpecialGroups(Context context, HttpServletRequest request) {
+    public List<Group> getSpecialGroups(Context context, HttpServletRequest request) {
+        try {
+            // Prevents anonymous users from being added to this group
+            if (context.getCurrentUser() != null) {
+                Group specialGroup = EPersonServiceFactory.getInstance().getGroupService().findByName(context, MEMBER_GROUP);
+                if (specialGroup == null) {
+                    log.warn(LogManager.getHeader(context, "feide_specialgroup", "'Member' group does not exist."));
+                    return ListUtils.EMPTY_LIST;
+                } else {
+                    return Arrays.asList(specialGroup);
+                }
+            }
+        } catch (Exception e) {
+            log.error(LogManager.getHeader(context, "getSpecialGroups", ""), e);
+        }
         return ListUtils.EMPTY_LIST;
     }
 
@@ -298,7 +310,7 @@ public class FeideAuthentication implements AuthenticationMethod {
 
         eperson.setSelfRegistered(true);
         eperson.setCanLogIn(true);
-        eperson.setLanguage(context,"no");
+        eperson.setLanguage(context, "no");
         log.debug("before initEPerson");
 
         authenticationService.initEPerson(context, request, eperson);
