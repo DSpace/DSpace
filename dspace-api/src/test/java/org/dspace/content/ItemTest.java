@@ -255,7 +255,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         Iterator<Item> all = itemService.findInArchiveOrWithdrawnDiscoverableModifiedSince(context,
                 DateUtils.addDays(it.getLastModified(),1));
         assertThat("Returned list should not be null", all, notNullValue());
-         boolean added = false;
+        boolean added = false;
         while (all.hasNext()) {
             Item tmp = all.next();
             if (tmp.equals(it)) {
@@ -268,7 +268,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         all = itemService.findInArchiveOrWithdrawnDiscoverableModifiedSince(context,
                 DateUtils.addDays(it.getLastModified(),-1));
         assertThat("Returned list should not be null", all, notNullValue());
-         added = false;
+        added = false;
         while (all.hasNext()) {
             Item tmp = all.next();
             if (tmp.equals(it)) {
@@ -284,7 +284,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         all = itemService.findInArchiveOrWithdrawnDiscoverableModifiedSince(context,
                 DateUtils.addDays(it.getLastModified(),-1));
         assertThat("Returned list should not be null", all, notNullValue());
-         added = false;
+        added = false;
         while (all.hasNext()) {
             Item tmp = all.next();
             if (tmp.equals(it)) {
@@ -298,7 +298,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         all = itemService.findInArchiveOrWithdrawnDiscoverableModifiedSince(context,
                 DateUtils.addDays(it.getLastModified(),-1));
         assertThat("Returned list should not be null", all, notNullValue());
-         added = false;
+        added = false;
         while (all.hasNext()) {
             Item tmp = all.next();
             if (tmp.equals(it)) {
@@ -307,7 +307,8 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         }
         // Test 7: We should not find our item in this list
         assertFalse("List should not contain non-discoverable items", added);
-     }
+    }
+
      /**
      * Test of findInArchiveOrWithdrawnNonDiscoverableModifiedSince method, of class Item.
      */
@@ -321,7 +322,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         Iterator<Item> all = itemService.findInArchiveOrWithdrawnNonDiscoverableModifiedSince(context,
                 DateUtils.addDays(it.getLastModified(),1));
         assertThat("Returned list should not be null", all, notNullValue());
-         boolean added = false;
+        boolean added = false;
         while (all.hasNext()) {
             Item tmp = all.next();
             if (tmp.equals(it)) {
@@ -334,7 +335,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         all = itemService.findInArchiveOrWithdrawnNonDiscoverableModifiedSince(context,
                 DateUtils.addDays(it.getLastModified(),-1));
         assertThat("Returned list should not be null", all, notNullValue());
-         added = false;
+        added = false;
         while (all.hasNext()) {
             Item tmp = all.next();
             if (tmp.equals(it)) {
@@ -349,7 +350,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         all = itemService.findInArchiveOrWithdrawnNonDiscoverableModifiedSince(context,
                 DateUtils.addDays(it.getLastModified(),-1));
         assertThat("Returned list should not be null", all, notNullValue());
-         added = false;
+        added = false;
         while (all.hasNext()) {
             Item tmp = all.next();
             if (tmp.equals(it)) {
@@ -1188,6 +1189,8 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         doNothing().when(authorizeServiceSpy).authorizeAction(context, item, Constants.REMOVE, true);
         // Allow Item DELETE perms
         doNothing().when(authorizeServiceSpy).authorizeAction(context, item, Constants.DELETE);
+        // Allow Item WRITE perms (required to first delete identifiers)
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, item, Constants.WRITE);
 
         UUID id = item.getID();
         itemService.delete(context, item);

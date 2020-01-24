@@ -23,7 +23,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.logging.log4j.Logger;
-import org.dspace.AbstractUnitTest;
+import org.dspace.AbstractIntegrationTest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
@@ -67,7 +67,6 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-//import org.springframework.test.util.ReflectionTestUtils;
 
 /**
  * Basic integration testing for the AIP Backup and Restore feature
@@ -75,7 +74,7 @@ import org.junit.rules.TemporaryFolder;
  *
  * @author Tim Donohue
  */
-public class ITDSpaceAIP extends AbstractUnitTest {
+public class ITDSpaceAIP extends AbstractIntegrationTest {
     /**
      * log4j category
      */
