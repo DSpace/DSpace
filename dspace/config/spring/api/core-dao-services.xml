@@ -34,6 +34,8 @@
 
     <bean class="org.dspace.content.dao.impl.ProcessDAOImpl"/>
 
+    <bean class="org.dspace.deduplication.dao.impl.DeduplicationDAOImpl"/>
+
     <bean class="org.dspace.eperson.dao.impl.EPersonDAOImpl"/>
     <bean class="org.dspace.eperson.dao.impl.Group2GroupCacheDAOImpl"/>
     <bean class="org.dspace.eperson.dao.impl.GroupDAOImpl"/>

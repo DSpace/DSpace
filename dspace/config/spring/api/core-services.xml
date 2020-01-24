@@ -82,6 +82,8 @@
     <!-- Ensure EmbargoService is initialized properly via init() method -->
     <bean class="org.dspace.embargo.EmbargoServiceImpl" init-method="init"/>
 
+    <bean class="org.dspace.deduplication.DeduplicationServiceImpl"/>
+
     <bean class="org.dspace.eperson.AccountServiceImpl"/>
     <bean class="org.dspace.eperson.EPersonServiceImpl"/>
     <bean class="org.dspace.eperson.GroupServiceImpl"/>

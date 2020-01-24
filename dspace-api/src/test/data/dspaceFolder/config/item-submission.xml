@@ -92,9 +92,10 @@
             <type>cclicense</type> </step> -->
 
         <!--Step will be to Check for potential duplicate -->
-        <!-- <step id="detect-duplicate"> <heading>submit.progressbar.detect.duplicate</heading>
+        <step id="detect-duplicate"> <heading>submit.progressbar.detect.duplicate</heading>
             <processing-class>org.dspace.submit.step.DetectPotentialDuplicate</processing-class>
-            <type>duplicate</type> </step> -->
+            <type>duplicate</type>
+        </step>
 
         <!--Step will be to Verify/Review everything -->
         <!-- <step id="verify"> <heading>submit.progressbar.verify</heading> <processing-class>org.dspace.submit.step.VerifyStep</processing-class>
