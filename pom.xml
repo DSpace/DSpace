@@ -391,11 +391,7 @@
                     </excludes>
                     <mapping>
                         <!-- Custom DSpace file extensions which are not recognized by maven-release-plugin:
-                             *.xmap, *.xslt, *.wsdd, *.wsdl, *.ttl, *.LICENSE -->
-                        <xmap>XML_STYLE</xmap>
-                        <xslt>XML_STYLE</xslt>
-                        <wsdd>XML_STYLE</wsdd>
-                        <wsdl>XML_STYLE</wsdl>
+                             *.ttl, *.LICENSE -->
                         <ttl>SCRIPT_STYLE</ttl>
                         <LICENSE>TEXT</LICENSE>
                     </mapping>
@@ -412,6 +408,38 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+
+            <!-- Validate all XML formatted files in the project (including submodules) -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>xml-maven-plugin</artifactId>
+                <version>1.0.2</version>
+                <executions>
+                    <execution>
+                        <id>validate-ALL-xml-and-xsl</id>
+                        <phase>process-test-resources</phase>
+                        <goals>
+                            <goal>validate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <validationSets>
+                        <!-- validate ALL XML and XSL files throughout the project (excluding target dirs) -->
+                        <validationSet>
+                            <dir>${root.basedir}</dir>
+                            <includes>
+                                <include>**/*.xml</include>
+                                <include>**/*.xsl</include>
+                                <include>**/*.xsd</include>
+                            </includes>
+                            <excludes>
+                                <exclude>**/target/**</exclude>
+                            </excludes>
+                        </validationSet>
+                    </validationSets>
+                </configuration>
             </plugin>
 
             <!-- Enforce our version of Java, Maven, dependencies, etc. -->
@@ -1420,7 +1448,6 @@
                 <groupId>xerces</groupId>
                 <artifactId>xercesImpl</artifactId>
                 <version>2.11.0</version>
-                <!--  <version>2.8.0</version> in xmlui -->
             </dependency>
             <dependency>
                 <groupId>xml-apis</groupId>
