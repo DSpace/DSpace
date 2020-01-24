@@ -7,12 +7,14 @@
  */
 package org.dspace.external.provider.metadata.impl;
 
+import org.dspace.content.Bitstream;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.external.provider.metadata.MetadataSuggestionProvider;
 
 public class MockMetadataSuggestionProvider extends
     MetadataSuggestionProvider<org.dspace.external.provider.impl.MockDataProvider> {
-    public boolean supports(InProgressSubmission inProgressSubmission) {
+    public boolean supports(InProgressSubmission inProgressSubmission, String query,
+                            Bitstream bitstream, boolean useMetadata) {
         return true;
     }
 }

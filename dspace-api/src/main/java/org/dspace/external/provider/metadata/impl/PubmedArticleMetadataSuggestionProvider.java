@@ -7,11 +7,31 @@
  */
 package org.dspace.external.provider.metadata.impl;
 
+import java.util.List;
+
+import org.dspace.content.Item;
+import org.dspace.content.service.ItemService;
+import org.dspace.external.model.ExternalDataObject;
 import org.dspace.external.provider.impl.PubmedArticleDataProvider;
 import org.dspace.external.provider.metadata.MetadataSuggestionProvider;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * An implementation of the {@link MetadataSuggestionProvider} for the {@link PubmedArticleDataProvider}
  */
 public class PubmedArticleMetadataSuggestionProvider extends MetadataSuggestionProvider<PubmedArticleDataProvider> {
+
+    @Autowired
+    private ItemService itemService;
+
+    public List<ExternalDataObject> metadataQuery(Item item, int start, int limit) {
+        // Concatenate metadata and send to query
+        String title = itemService.getMetadataFirstValue(item, "dc", "title", null, Item.ANY);
+        return query(title, start, limit);
+    }
+
+    public List<ExternalDataObject> query(String query, int start, int limit) {
+        return getExternalDataProvider().searchExternalDataObjects(query, 0, 100);
+    }
+
 }

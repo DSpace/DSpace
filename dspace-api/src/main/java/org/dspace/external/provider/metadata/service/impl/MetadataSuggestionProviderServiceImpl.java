@@ -15,6 +15,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+import org.dspace.content.Bitstream;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.external.model.ExternalDataObject;
 import org.dspace.external.provider.metadata.MetadataSuggestionProvider;
@@ -33,7 +34,8 @@ public class MetadataSuggestionProviderServiceImpl implements MetadataSuggestion
     public List<MetadataSuggestionProvider> getMetadataSuggestionProviders(InProgressSubmission inProgressSubmission) {
 
         return metadataSuggestionProviders.stream().filter(
-            metadataSuggestionProvider -> metadataSuggestionProvider.supports(inProgressSubmission)).collect(
+            metadataSuggestionProvider -> metadataSuggestionProvider.supports(inProgressSubmission, null, null,
+                                                                              false)).collect(
             Collectors.toList());
     }
 
@@ -69,7 +71,7 @@ public class MetadataSuggestionProviderServiceImpl implements MetadataSuggestion
 
     @Override
     public Optional<MetadataSuggestionDifferences> getMetadataSuggestionDifferences(String suggestionName,
-        String entryId, InProgressSubmission inProgressSubmission) {
+                                                    String entryId, InProgressSubmission inProgressSubmission) {
 
         // Here we fetch the MetadataItemSuggestions object from which we'll start cause it contains
         // the changes and the map of metadata for the InProgressSubmissions so we don't have to
@@ -111,4 +113,27 @@ public class MetadataSuggestionProviderServiceImpl implements MetadataSuggestion
         return Optional.empty();
 
     }
+
+    public List<MetadataItemSuggestions> getMetadataSuggestionEntryRests(
+        MetadataSuggestionProvider metadataSuggestionProvider, InProgressSubmission inProgressSubmission, String query,
+        Bitstream bitstream, boolean useMetadata,
+        int start, int limit) {
+        List<ExternalDataObject> list = new LinkedList<>();
+
+        if (StringUtils.isNotBlank(query)) {
+            list = metadataSuggestionProvider.query(query, start, limit);
+        } else if (bitstream != null) {
+            list = metadataSuggestionProvider.bitstreamQuery(bitstream);
+        } else if (useMetadata) {
+            list = metadataSuggestionProvider.metadataQuery(inProgressSubmission.getItem(), start, limit);
+        }
+
+        List<MetadataItemSuggestions> listToReturn = new LinkedList<>();
+        for (ExternalDataObject externalDataObject : list) {
+            listToReturn.add(new MetadataItemSuggestions(externalDataObject, inProgressSubmission));
+        }
+        return listToReturn;
+    }
+
+
 }

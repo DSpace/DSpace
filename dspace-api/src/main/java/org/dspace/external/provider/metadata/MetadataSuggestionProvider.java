@@ -9,7 +9,11 @@ package org.dspace.external.provider.metadata;
 
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+import org.dspace.content.Bitstream;
 import org.dspace.content.InProgressSubmission;
+import org.dspace.content.Item;
+import org.dspace.external.model.ExternalDataObject;
 import org.dspace.external.provider.ExternalDataProvider;
 import org.dspace.external.provider.metadata.filter.MetadataSuggestionProviderFilter;
 
@@ -145,9 +149,22 @@ public abstract class MetadataSuggestionProvider<T extends ExternalDataProvider>
      * This method will decide whether the MetadataSuggestionProvider supports the given InProgressSubmission
      * or not
      * @param inProgressSubmission  The relevant InProgressSubmission
+     * @param query
+     * @param bitstream
+     * @param useMetadata
      * @return A boolean indicating whether the argument is supported or not
      */
-    public boolean supports(InProgressSubmission inProgressSubmission) {
+    public boolean supports(InProgressSubmission inProgressSubmission, String query,
+                            Bitstream bitstream, boolean useMetadata) {
+        if (StringUtils.isNotBlank(query) && !isQueryBased()) {
+            return false;
+        }
+        if (bitstream != null && !isFileBased()) {
+            return false;
+        }
+        if (useMetadata && !isMetadataBased()) {
+            return false;
+        }
         for (MetadataSuggestionProviderFilter metadataSuggestionProviderFilter : metadataSuggestionProviderFilters) {
             if (metadataSuggestionProviderFilter.supports(inProgressSubmission)) {
                 return true;
@@ -156,4 +173,36 @@ public abstract class MetadataSuggestionProvider<T extends ExternalDataProvider>
         return false;
     }
 
+    /**
+     * This method can be overridden in the implementing MetadataSuggestionProvider classes to support a query
+     * based on a bitstream
+     * @param bitstream The bitstream that the query will be based of
+     * @return          A list of ExternalDataObjects resulting from this query
+     */
+    public List<ExternalDataObject> bitstreamQuery(Bitstream bitstream) {
+        throw new UnsupportedOperationException("This method is not supported by the MetadataSuggestionProvider");
+    }
+
+    /**
+     * This method can be overridden in the implementing MetadataSuggestionProvider classes to support a query
+     * based on an item
+     * @param item      The Item that the query will be based on
+     * @param start     The start integer of the call
+     * @param limit     The max number of records to be returned by the call
+     * @return          A list of ExternalDataObjects resulting from this query
+     */
+    public List<ExternalDataObject> metadataQuery(Item item, int start, int limit) {
+        throw new UnsupportedOperationException("This method is not supported by the MetadataSuggestionProvider");
+    }
+
+    /**
+     * This method can be overridden in the implementing MetadataSuggestionProvider classes to support a query
+     * @param query     the query for this call
+     * @param start     The start integer of the call
+     * @param limit     The max number of records to be returned by the call
+     * @return          A list of ExternalDataObjects resulting from this query
+     */
+    public List<ExternalDataObject> query(String query, int start, int limit) {
+        throw new UnsupportedOperationException("This method is not supported by the MetadataSuggestionProvider");
+    }
 }

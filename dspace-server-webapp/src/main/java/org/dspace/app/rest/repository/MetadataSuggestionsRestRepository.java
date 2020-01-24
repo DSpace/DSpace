@@ -21,6 +21,7 @@ import org.dspace.app.rest.model.MetadataSuggestionsSourceRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.content.Bitstream;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Constants;
@@ -100,11 +101,11 @@ public class MetadataSuggestionsRestRepository extends DSpaceRestRepository<Meta
      * @param suggestionName        The suggestionName from where the information will be retrieved
      * @param entryId               The id of the entry for the given suggestionName
      * @param inProgressSubmission  The InProgressSubmission who's metadata will be checked
-     * @return  A MetadataSuggestionsDifferencesRest object that holds all the differences between the found values and
+     * @return A MetadataSuggestionsDifferencesRest object that holds all the differences between the found values and
      * the values within the InProgressSubmission
      */
     public MetadataSuggestionsDifferencesRest getMetadataSuggestionsDifferences(String suggestionName, String entryId,
-        InProgressSubmission inProgressSubmission) {
+                                                                        InProgressSubmission inProgressSubmission) {
         Optional<MetadataSuggestionDifferences> metadataSuggestionDifferences = metadataSuggestionProviderService
             .getMetadataSuggestionDifferences(suggestionName, entryId, inProgressSubmission);
         if (metadataSuggestionDifferences.isPresent()) {
@@ -180,4 +181,40 @@ public class MetadataSuggestionsRestRepository extends DSpaceRestRepository<Meta
         return MetadataSuggestionsSourceRest.class;
     }
 
+    /**
+     * This is the Repository method that will retrieve all the MetadataSuggestionEntries for the given Parameters
+     * @param suggestionName        The name of the suggestionProvider to use
+     * @param inProgressSubmission  The InProgressSubmission that will be used
+     * @param query                 The query for the request
+     * @param bitstream             The bitstream for the request
+     * @param useMetadata           The boolean indicating whether we use metadata or not
+     * @param pageable              The pageable
+     * @return A page containing the MetadataSuggestionEntryRest objects resulting from the calls to the Provider
+     */
+    public Page<MetadataSuggestionEntryRest> getMetadataSuggestionEntries(String suggestionName,
+                                                                          InProgressSubmission inProgressSubmission,
+                                                                          String query,
+                                                                          Bitstream bitstream,
+                                                                          boolean useMetadata, Pageable pageable) {
+        Optional<MetadataSuggestionProvider> metadataSuggestionProviderOptional = metadataSuggestionProviderService
+            .getMetadataSuggestionProvider(suggestionName);
+        MetadataSuggestionProvider metadataSuggestionProvider = null;
+        if (metadataSuggestionProviderOptional.isPresent()) {
+            metadataSuggestionProvider = metadataSuggestionProviderOptional.get();
+        } else {
+            throw new DSpaceBadRequestException(
+                "The given SuggestionName could not be resolved to a MetadataSuggestionProvider");
+        }
+        if (metadataSuggestionProvider.supports(inProgressSubmission, query, bitstream, useMetadata)) {
+        } else {
+            throw new DSpaceBadRequestException(
+                "The given MetadataSuggestionProvider doesn't support this InProgressSubmission");
+        }
+
+        List<MetadataItemSuggestions> list = metadataSuggestionProviderService
+            .getMetadataSuggestionEntryRests(metadataSuggestionProvider, inProgressSubmission, query, bitstream,
+                                             useMetadata,
+                                             pageable.getOffset(), pageable.getPageSize());
+        return converter.toRestPage(utils.getPage(list, pageable), Projection.DEFAULT);
+    }
 }

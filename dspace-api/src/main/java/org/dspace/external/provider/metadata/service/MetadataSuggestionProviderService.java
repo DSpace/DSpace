@@ -10,6 +10,7 @@ package org.dspace.external.provider.metadata.service;
 import java.util.List;
 import java.util.Optional;
 
+import org.dspace.content.Bitstream;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.external.provider.metadata.MetadataSuggestionProvider;
 import org.dspace.external.provider.metadata.service.impl.MetadataItemSuggestions;
@@ -52,8 +53,26 @@ public interface MetadataSuggestionProviderService {
      * @param suggestionName        The name for the service to be used
      * @param entryId               The id of the entry to be queried in the service
      * @param inProgressSubmission  The InProgressSubmission to be used for the current metadata
-     * @return                      The constructed MetadataSuggestionDifferences object
+     * @return The constructed MetadataSuggestionDifferences object
      */
     public Optional<MetadataSuggestionDifferences> getMetadataSuggestionDifferences(String suggestionName,
-        String entryId, InProgressSubmission inProgressSubmission);
+                                                    String entryId, InProgressSubmission inProgressSubmission);
+
+    /**
+     * This method will retrieve a List of {@link MetadataItemSuggestions} objects based on the given parameters.
+     * It will call a query on the {@link MetadataSuggestionProvider} to find the information required
+     * @param metadataSuggestionProvider    The MetadataSuggestionProvider that will be used
+     * @param inProgressSubmission          The InProgressSubmission that will be used
+     * @param query                         The query for the call
+     * @param bitstream                     The bitstream for the call
+     * @param useMetadata                   Boolean indicating whether to use metadata or not
+     * @param start                         The start index for the call
+     * @param limit                         The max number of records to be returned by the call
+     * @return A list of MetadataItemSuggestions based on the given parameters
+     */
+    public List<MetadataItemSuggestions> getMetadataSuggestionEntryRests(
+        MetadataSuggestionProvider metadataSuggestionProvider, InProgressSubmission inProgressSubmission, String query,
+        Bitstream bitstream, boolean useMetadata,
+        int start, int limit);
+
 }
