@@ -53,8 +53,7 @@ public class PoolTaskConverter
     }
 
     @Override
-    public boolean supportsModel(IndexableObject object) {
-        return object instanceof PoolTask;
+    public boolean supportsModel(IndexableObject idxo) {
+        return idxo.getIndexedObject() instanceof PoolTask;
     }
-
 }

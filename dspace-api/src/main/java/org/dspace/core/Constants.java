@@ -56,30 +56,10 @@ public class Constants {
     public static final int EPERSON = 7;
 
     /**
-     * Type of workspace item objects
-     */
-    public static final int WORKSPACEITEM = 8;
-
-    /**
-     * Type of workflow item objects
-     */
-    public static final int WORKFLOWITEM = 9;
-
-    /**
-     * Type of pool task objects
-     */
-    public static final int POOLTASK = 10;
-
-    /**
-     * Type of claimed task objects
-     */
-    public static final int CLAIMEDTASK = 11;
-
-    /**
      * lets you look up type names from the type IDs
      */
     public static final String[] typeText = { "BITSTREAM", "BUNDLE", "ITEM", "COLLECTION", "COMMUNITY", "SITE", "GROUP",
-        "EPERSON", "WORKSPACEITEM", "WORKFLOWITEM", "POOLTASK", "CLAIMEDTASK" };
+        "EPERSON"};
 
     /**
      * Special Bundle and Bitstream Names:

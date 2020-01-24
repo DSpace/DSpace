@@ -13,7 +13,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -35,7 +34,6 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.discovery.IndexableObject;
 import org.dspace.eperson.EPerson;
 import org.hibernate.proxy.HibernateProxyHelper;
 
@@ -55,7 +53,7 @@ import org.hibernate.proxy.HibernateProxyHelper;
  */
 @Entity
 @Table(name = "item")
-public class Item extends DSpaceObject implements DSpaceObjectLegacySupport, IndexableObject<UUID> {
+public class Item extends DSpaceObject implements DSpaceObjectLegacySupport {
 
     /**
      * log4j logger
@@ -376,10 +374,4 @@ public class Item extends DSpaceObject implements DSpaceObjectLegacySupport, Ind
         }
         return itemService;
     }
-
-    @Override
-    public String getTypeText() {
-        return getItemService().getTypeText(this);
-    }
-
 }

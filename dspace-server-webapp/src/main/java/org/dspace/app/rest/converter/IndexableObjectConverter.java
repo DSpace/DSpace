@@ -17,11 +17,11 @@ import org.dspace.discovery.IndexableObject;
  * @param <R> the Class in the DSpace REST data model
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
-public interface IndexableObjectConverter<M extends IndexableObject,
+public interface IndexableObjectConverter<M,
     R extends org.dspace.app.rest.model.RestAddressableModel> extends DSpaceConverter<M, R> {
 
     /**
-     * 
+     *
      * @param idxo
      *            the IndexableObject to check
      * @return true if the actual converter implementation is able to manage the supplied IndexableObject

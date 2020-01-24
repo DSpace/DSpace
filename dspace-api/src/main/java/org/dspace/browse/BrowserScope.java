@@ -12,6 +12,8 @@ import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 import org.dspace.discovery.IndexableObject;
+import org.dspace.discovery.indexobject.IndexableCollection;
+import org.dspace.discovery.indexobject.IndexableCommunity;
 import org.dspace.sort.SortException;
 import org.dspace.sort.SortOption;
 
@@ -136,10 +138,10 @@ public class BrowserScope {
      */
     public void setBrowseContainer(IndexableObject dso)
         throws BrowseException {
-        if (dso instanceof Collection) {
-            this.collection = (Collection) dso;
-        } else if (dso instanceof Community) {
-            this.community = (Community) dso;
+        if (dso instanceof IndexableCollection) {
+            this.collection = ((IndexableCollection) dso).getIndexedObject();
+        } else if (dso instanceof IndexableCommunity) {
+            this.community = ((IndexableCommunity) dso).getIndexedObject();
         } else {
             throw new BrowseException("The container must be a community or a collection");
         }
