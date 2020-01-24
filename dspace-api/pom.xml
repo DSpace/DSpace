@@ -481,12 +481,6 @@
             <groupId>org.dspace</groupId>
             <artifactId>dspace-services</artifactId>
         </dependency>
-        <!-- Keep jmockit before junit -->
-        <dependency>
-            <groupId>org.jmockit</groupId>
-            <artifactId>jmockit</artifactId>
-            <scope>test</scope>
-        </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
