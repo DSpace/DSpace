@@ -675,8 +675,9 @@
         </dependency>
         <dependency>
             <groupId>com.openaire</groupId>
-            <artifactId>openaireapifordspace</artifactId>
+            <artifactId>openaire-funders-jaxb</artifactId>
             <version>1.0-SNAPSHOT</version>
+            <type>jar</type>
         </dependency>
     </dependencies>
 
