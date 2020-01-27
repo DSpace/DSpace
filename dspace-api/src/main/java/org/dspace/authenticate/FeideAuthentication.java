@@ -31,6 +31,7 @@ import javax.servlet.http.HttpSession;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A stackable authentication method
@@ -118,7 +119,12 @@ public class FeideAuthentication implements AuthenticationMethod {
                 affiliations = eduPerson.getEduPersonScopedAffiliation();
 
                 // BIBSYS hosted institution OrgNr is found in attribute edupersonorgunitdn:noreduorgunituniqueidentifier
-                List<String> orgNrs = eduPerson.getAttributesMap().get("noreduorgunituniqueidentifier");
+                final Map<String, List<String>> attributesMap = eduPerson.getAttributesMap();
+                log.info("AttributesMap:");
+                for (String key : attributesMap.keySet()) {
+                    log.info("'" + key + "' : '" + attributesMap.get(key) + "'");
+                }
+                List<String> orgNrs = attributesMap.get("noreduorgunituniqueidentifier");
                 if (orgNrs == null || orgNrs.isEmpty()) {
                     isAllowedOrgNr = false;
                     log.info("BIBSYSFeide: Orgnr is not allowed");
