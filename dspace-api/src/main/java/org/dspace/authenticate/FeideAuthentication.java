@@ -124,7 +124,7 @@ public class FeideAuthentication implements AuthenticationMethod {
                 for (String key : attributesMap.keySet()) {
                     log.info("'" + key + "' : '" + attributesMap.get(key) + "'");
                 }
-                List<String> orgNrs = attributesMap.get("noreduorgunituniqueidentifier");
+                List<String> orgNrs = attributesMap.get("edupersonorgunitdn:noreduorgunituniqueidentifier");
                 if (orgNrs == null || orgNrs.isEmpty()) {
                     isAllowedOrgNr = false;
                     log.info("BIBSYSFeide: Orgnr is not allowed");
