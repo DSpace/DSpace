@@ -109,7 +109,7 @@ public class MetadataSuggestionsRestController {
             .resolveInProgressSubmission(workspaceItemId, workflowItemId, context);
         Bitstream bitstream = null;
         if (bitstreamUuid != null) {
-            bitstreamService.find(context, bitstreamUuid);
+            bitstream = bitstreamService.find(context, bitstreamUuid);
             if (!isBitstreamValid(bitstream, inProgressSubmission)) {
                 throw new DSpaceBadRequestException("The given Bitstream UUID couldn't be resolved to a Bitstream" +
                                                         " within the item for the InProgressSubmission provided");

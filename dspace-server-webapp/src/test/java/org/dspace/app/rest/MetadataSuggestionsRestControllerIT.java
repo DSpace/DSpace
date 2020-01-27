@@ -11,12 +11,18 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.io.InputStream;
 import java.sql.SQLException;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.CharEncoding;
+import org.dspace.app.rest.builder.BitstreamBuilder;
 import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.builder.WorkspaceItemBuilder;
+import org.dspace.app.rest.matcher.MetadataSuggestionEntryMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
@@ -39,6 +45,7 @@ public class MetadataSuggestionsRestControllerIT extends AbstractControllerInteg
     private ItemService itemService;
 
     WorkspaceItem workspaceItem = null;
+    Collection collection = null;
 
     @Before
     public void setup() throws SQLException {
@@ -52,12 +59,12 @@ public class MetadataSuggestionsRestControllerIT extends AbstractControllerInteg
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                                            .withName("Sub Community")
                                            .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        collection = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
         Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
 
 
         //2. Three workspace items in two different collections
-        workspaceItem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+        workspaceItem = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
                                             .withTitle("Workspace Item 1")
                                             .withIssueDate("2017-10-17")
                                             .build();
@@ -167,6 +174,90 @@ public class MetadataSuggestionsRestControllerIT extends AbstractControllerInteg
                                             Matchers.containsString("add/metadata/dc.contributor.author")))
                         .andExpect(jsonPath("$.differences['dc.contributor.author'].suggestions[0].newvalue",
                                             Matchers.is("Donald, Smith")));
+
+    }
+
+    @Test
+    public void getMetadataSuggestionEntriesWithBitstreamQueryTest() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        //2. A public item with a bitstream
+        String bitstreamContent = "0123456789";
+
+        Bitstream bitstream = null;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+
+            bitstream = BitstreamBuilder
+                .createBitstream(context, workspaceItem.getItem(), is)
+                .withName("Test bitstream")
+                .withDescription("This is a bitstream to test range requests")
+                .withMimeType("text/plain")
+                .build();
+
+        }
+
+        context.restoreAuthSystemState();
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(get("/api/integration/metadatasuggestions/mock/entries")
+                                        .param("workspaceitem", String.valueOf(workspaceItem.getID()))
+                                        .param("bitstream", String.valueOf(bitstream.getID())))
+                        .andExpect(jsonPath("$._embedded.metadataSuggestionEntries", Matchers.containsInAnyOrder(
+                            MetadataSuggestionEntryMatcher.matchEntry("mock",
+                                                                      "one"),
+                            MetadataSuggestionEntryMatcher.matchEntry("mock",
+                                                                      "two")
+                        )));
+    }
+
+    @Test
+    public void getMetadataSuggestionEntriesWithBitstreamQueryTestPagination() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        //2. A public item with a bitstream
+        String bitstreamContent = "0123456789";
+
+        Bitstream bitstream = null;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+
+            bitstream = BitstreamBuilder
+                .createBitstream(context, workspaceItem.getItem(), is)
+                .withName("Test bitstream")
+                .withDescription("This is a bitstream to test range requests")
+                .withMimeType("text/plain")
+                .build();
+
+        }
+
+        context.restoreAuthSystemState();
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(get("/api/integration/metadatasuggestions/mock/entries")
+                                     .param("workspaceitem", String.valueOf(workspaceItem.getID()))
+                                     .param("bitstream", String.valueOf(bitstream.getID()))
+                                     .param("size", "1"))
+                        .andExpect(jsonPath("$._embedded.metadataSuggestionEntries", Matchers.contains(
+                            MetadataSuggestionEntryMatcher.matchEntry("mock",
+                                                                      "one")
+                        )))
+                        .andExpect(jsonPath("$._embedded.metadataSuggestionEntries", Matchers.not(Matchers.contains(
+                            MetadataSuggestionEntryMatcher.matchEntry("mock",
+                                                                      "two")
+                        ))));
+
+        getClient(token).perform(get("/api/integration/metadatasuggestions/mock/entries")
+                                    .param("workspaceitem", String.valueOf(workspaceItem.getID()))
+                                    .param("bitstream", String.valueOf(bitstream.getID()))
+                                    .param("size", "1")
+                                    .param("page", "1"))
+                        .andExpect(jsonPath("$._embedded.metadataSuggestionEntries", Matchers.contains(
+                            MetadataSuggestionEntryMatcher.matchEntry("mock",
+                                                                      "two")
+                        )))
+                        .andExpect(jsonPath("$._embedded.metadataSuggestionEntries", Matchers.not(Matchers.contains(
+                            MetadataSuggestionEntryMatcher.matchEntry("mock",
+                                                                      "one")
+                        ))));
 
     }
 
