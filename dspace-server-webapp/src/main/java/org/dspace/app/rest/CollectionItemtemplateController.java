@@ -20,8 +20,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.CollectionRest;
-import org.dspace.app.rest.model.ItemRest;
-import org.dspace.app.rest.model.hateoas.ItemResource;
+import org.dspace.app.rest.model.TemplateItemRest;
+import org.dspace.app.rest.model.hateoas.TemplateItemResource;
 import org.dspace.app.rest.repository.CollectionRestRepository;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.rest.utils.Utils;
@@ -112,19 +112,20 @@ public class CollectionItemtemplateController {
         Context context = ContextUtil.obtainContext(request);
         Collection collection = getCollection(context, uuid);
 
-        ItemRest inputItemRest;
+        TemplateItemRest inputTemplateItemRest;
         try {
             ObjectMapper mapper = new ObjectMapper();
-            inputItemRest = mapper.readValue(itemBody.toString(), ItemRest.class);
+            inputTemplateItemRest = mapper.readValue(itemBody.toString(), TemplateItemRest.class);
         } catch (IOException e1) {
             throw new UnprocessableEntityException("Error parsing request body", e1);
         }
 
-        ItemRest templateItem = collectionRestRepository.createTemplateItem(context, collection, inputItemRest);
+        TemplateItemRest templateItem =
+            collectionRestRepository.createTemplateItem(context, collection, inputTemplateItemRest);
         context.commit();
 
-        return ControllerUtils.toResponseEntity(HttpStatus.CREATED, new HttpHeaders(),
-                new ItemResource(templateItem, utils));
+        return ControllerUtils.toResponseEntity(HttpStatus.CREATED, null,
+                converter.toResource(templateItem));
     }
 
     /**
@@ -144,12 +145,12 @@ public class CollectionItemtemplateController {
      */
     @PreAuthorize("hasPermission(#uuid, 'COLLECTION', 'READ')")
     @RequestMapping(method = RequestMethod.GET)
-    public ItemResource getTemplateItem(HttpServletRequest request, @PathVariable UUID uuid)
+    public TemplateItemResource getTemplateItem(HttpServletRequest request, @PathVariable UUID uuid)
             throws SQLException {
 
         Context context = ContextUtil.obtainContext(request);
         Collection collection = getCollection(context, uuid);
-        ItemRest templateItem = collectionRestRepository.getTemplateItem(collection);
+        TemplateItemRest templateItem = collectionRestRepository.getTemplateItem(collection);
 
         return converter.toResource(templateItem);
     }
