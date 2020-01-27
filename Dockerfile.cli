@@ -1,12 +1,11 @@
 # This image will be published as dspace/dspace-cli
-# See https://dspace-labs.github.io/DSpace-Docker-Images/ for usage details
+# See https://github.com/DSpace/DSpace/tree/master/dspace/src/main/docker for usage details
 #
-# This version is JDK8 compatible
-# - openjdk:8-jdk
+# This version is JDK11 compatible
+# - openjdk:11
 # - ANT 1.10.7
-# - maven:3-jdk-8
-# - note:
-# - default tag for branch: dspace/dspace-cli: dspace/dspace-cli:dspace-7_x
+# - maven:3-jdk-11 (see dspace-dependencies)
+# - note: default tag for branch: dspace/dspace-cli: dspace/dspace-cli:dspace-7_x
 
 # Step 1 - Run Maven Build
 FROM dspace/dspace-dependencies:dspace-7_x as build
@@ -30,7 +29,7 @@ RUN mvn package -P'!dspace-rest' && \
   mvn clean
 
 # Step 2 - Run Ant Deploy
-FROM openjdk:8-jdk as ant_build
+FROM openjdk:11 as ant_build
 ARG TARGET_DIR=dspace-installer
 COPY --from=build /install /dspace-src
 WORKDIR /dspace-src
@@ -47,7 +46,7 @@ RUN ant init_installation update_configs update_code
 
 # Step 3 - Run jdk
 # Create a new tomcat image that does not retain the the build directory contents
-FROM openjdk:8-jdk
+FROM openjdk:11
 ENV DSPACE_INSTALL=/dspace
 COPY --from=ant_build /dspace $DSPACE_INSTALL
 
