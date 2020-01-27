@@ -23,6 +23,7 @@ import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -95,8 +96,9 @@ public class FeideAuthentication implements AuthenticationMethod {
         HttpSession session = request.getSession();
         EduPerson eduPerson = Common.getEduPerson(session);
 
-        String allowedOrgNrs = ConfigurationManager.getProperty("dspace.orgnr");
-
+        String allowedOrgNrs = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty(
+                "dspace.orgnr");
+        log.info("allowed Orgnrs: " + allowedOrgNrs);
         List<String> allowedOrgNrsList = Arrays.asList(allowedOrgNrs.split(","));
 
         boolean isBIBSYSFeide = StringUtils.endsWith(eduPerson.getPrincipalName().trim(), BIBSYS_REALM);
@@ -119,18 +121,23 @@ public class FeideAuthentication implements AuthenticationMethod {
                 List<String> orgNrs = eduPerson.getAttributesMap().get("noreduorgunituniqueidentifier");
                 if (orgNrs == null || orgNrs.isEmpty()) {
                     isAllowedOrgNr = false;
+                    log.info("BIBSYSFeide: Orgnr is not allowed");
                 } else {
-                    isAllowedOrgNr = allowedOrgNrsList.contains(orgNrs.get(0));
+                    final String firstOrgNr = orgNrs.get(0);
+                    isAllowedOrgNr = allowedOrgNrsList.contains(firstOrgNr);
+                    log.info("BIBSYSFeide: Orgnr " + firstOrgNr + " is allowed: ");
                 }
             } else {
                 affiliations = eduPerson.getAffiliation();
 
                 // "Normal" OrgNr found in attribute edupersonorgdn:noreduorgnin
                 isAllowedOrgNr = allowedOrgNrsList.contains(eduPerson.getNorEduOrgNIN());
+                log.info("No BIBSYSFeide: Orgnr " + eduPerson.getNorEduOrgNIN() + " is allowed: ");
             }
 
             if (isAllowedOrgNr && affiliations != null) {
                 for (String affiliation : affiliations) {
+                    log.info("Affiliation: " + affiliation);
                     if (StringUtils.startsWith(affiliation.toLowerCase(), "member")) {
                         isMember = true;
                         break;
