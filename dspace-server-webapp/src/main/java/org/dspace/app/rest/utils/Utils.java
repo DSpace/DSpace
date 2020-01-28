@@ -458,10 +458,10 @@ public class Utils {
         Projection projection = halResource.getContent().getProjection();
         getLinkRests(halResource.getContent().getClass()).stream().forEach((linkRest) -> {
             Link link = linkToSubResource(halResource.getContent(), linkRest.name());
-            if (!linkRest.embedOptional() || projection.allowOptionalEmbed(halResource, linkRest)) {
+            if (!linkRest.embedOptional() || projection.allowEmbedding(halResource, linkRest)) {
                 embedRelFromRepository(halResource, linkRest.name(), link, linkRest);
                 halResource.add(link); // unconditionally link if embedding was allowed
-            } else if (!linkRest.linkOptional() || projection.allowOptionalLink(halResource, linkRest)) {
+            } else if (!linkRest.linkOptional() || projection.allowLinking(halResource, linkRest)) {
                 halResource.add(link);
             }
         });
@@ -573,7 +573,7 @@ public class Utils {
         try {
             if (linkRest != null) {
                 if (linkRest.embedOptional()
-                        && !resource.getContent().getProjection().allowOptionalEmbed(resource, linkRest)) {
+                        && !resource.getContent().getProjection().allowEmbedding(resource, linkRest)) {
                     return; // projection disallows this optional method-level embed
                 }
                 if (StringUtils.isNotBlank(linkRest.name())) {
