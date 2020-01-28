@@ -148,7 +148,7 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
         if (item.getTemplateItemOf() != null) {
             throw new DSpaceBadRequestException("The given ID resolved to a template item");
         }
-        ItemRest itemRest = dsoPatch.patch(findOne(id), patch.getOperations());
+        ItemRest itemRest = dsoPatch.patch(findOne(context, id), patch.getOperations());
         updateDSpaceObject(item, itemRest);
     }
 

@@ -135,7 +135,7 @@ public class ItemtemplateRestController {
         TemplateItemRest templateItemRest = templateItemRestRepository.patchTemplateItem(templateItem, jsonNode);
         context.commit();
 
-        return ControllerUtils.toResponseEntity(HttpStatus.OK, null,
+        return ControllerUtils.toResponseEntity(HttpStatus.OK, new HttpHeaders(),
             converter.toResource(templateItemRest));
     }
 

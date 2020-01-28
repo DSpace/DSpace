@@ -124,7 +124,7 @@ public class CollectionItemtemplateController {
             collectionRestRepository.createTemplateItem(context, collection, inputTemplateItemRest);
         context.commit();
 
-        return ControllerUtils.toResponseEntity(HttpStatus.CREATED, null,
+        return ControllerUtils.toResponseEntity(HttpStatus.CREATED, new HttpHeaders(),
                 converter.toResource(templateItem));
     }
 
