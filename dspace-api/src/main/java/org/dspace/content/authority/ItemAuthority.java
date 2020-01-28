@@ -17,12 +17,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.Item;
 import org.dspace.content.authority.factory.ItemAuthorityServiceFactory;
 import org.dspace.content.authority.service.ItemAuthorityService;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.discovery.DiscoverQuery;
 import org.dspace.discovery.DiscoverResult;
@@ -74,7 +74,7 @@ public class ItemAuthority implements ChoiceAuthority {
         String luceneQuery = itemAuthorityService.getSolrQuery(text);
 
         DiscoverQuery discoverQuery = new DiscoverQuery();
-        discoverQuery.setDSpaceObjectFilter(Constants.typeText[Constants.ITEM]);
+        discoverQuery.setDSpaceObjectFilter(Item.class.getSimpleName());
 
         String relationshipType = ConfigurationManager.getProperty("cris", "ItemAuthority."
                 + field + ".relationshipType");
@@ -97,7 +97,7 @@ public class ItemAuthority implements ChoiceAuthority {
             // Process results of query
             Iterator<IndexableObject> dsoIterator = resultSearch.getIndexableObjects().iterator();
             while (dsoIterator.hasNext()) {
-                DSpaceObject dso = (DSpaceObject) dsoIterator.next();
+                DSpaceObject dso = (DSpaceObject) dsoIterator.next().getIndexedObject();
                 choiceList.add(new Choice(dso.getID().toString(), dso.getName(), dso.getName()));
             }
 
