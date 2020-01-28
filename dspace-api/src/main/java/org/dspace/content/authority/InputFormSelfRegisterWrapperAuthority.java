@@ -18,6 +18,7 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.content.Collection;
+import org.dspace.core.SelfNamedPlugin;
 
 /**
  * This authority is registered automatically by the ChoiceAuthorityService for
@@ -51,13 +52,24 @@ public class InputFormSelfRegisterWrapperAuthority implements ChoiceAuthority {
 
     @Override
     public Choices getMatches(String field, String query, Collection collection, int start, int limit, String locale) {
+    	return getMatches(null, field, query, collection, start, limit, locale);
+    }
+
+    @Override
+    public Choices getMatches(String authorityName, String field, String query, Collection collection,
+    		int start, int limit, String locale) {
         String formName;
         try {
             init();
             if (collection == null) {
                 Set<Choice> choices = new HashSet<Choice>();
-                //workaround search in all authority configured
+                // workaround search in all authority configured
                 for (ChoiceAuthority ca : delegates.values()) {
+                	// if authority name is present skip authority that doesn't match
+                	if (StringUtils.isNotBlank(authorityName) &&
+                			!(((SelfNamedPlugin) ca).getPluginInstanceName().equals(authorityName))) {
+                		continue;
+                	}
                     Choices tmp = ca.getMatches(field, query, null, start, limit, locale);
                     if (tmp.total > 0) {
                         Set<Choice> mySet = new HashSet<Choice>(Arrays.asList(tmp.values));

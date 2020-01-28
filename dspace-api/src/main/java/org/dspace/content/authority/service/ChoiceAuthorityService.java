@@ -89,6 +89,24 @@ public interface ChoiceAuthorityService {
     public Choices getMatches(String fieldKey, String query, Collection collection,
                               int start, int limit, String locale);
 
+    /**
+     * Wrapper calls getMatches method of the plugin corresponding to
+     * the metadata field defined by single field key related to a specific authority.
+     *
+     * @param authorityName authority name
+     * @param fieldKey   	single string identifying metadata field
+     * @param query      	user's value to match
+     * @param collection 	database ID of Collection for context (owner of Item)
+     * @param start      	choice at which to start, 0 is first.
+     * @param limit      	maximum number of choices to return, 0 for no limit.
+     * @param locale     	explicit localization key if available, or null
+     * @return a Choices object (never null).
+     * @see org.dspace.content.authority.ChoiceAuthority#getMatches(java.lang.String, java.lang.String, org.dspace
+     * .content.Collection, int, int, java.lang.String)
+     */
+    public Choices getMatches(String authorityName, String fieldKey, String query, Collection collection,
+                              int start, int limit, String locale);
+
     public Choices getMatches(String fieldKey, String query, Collection collection, int start, int limit, String locale,
                               boolean externalInput);
 
