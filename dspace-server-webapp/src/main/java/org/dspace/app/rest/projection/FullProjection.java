@@ -20,10 +20,12 @@ public class FullProjection extends AbstractProjection {
         return NAME;
     }
 
+    @Override
     public boolean allowEmbedding(HALResource halResource, LinkRest linkRest) {
         return true;
     }
 
+    @Override
     public boolean allowLinking(HALResource halResource, LinkRest linkRest) {
         return true;
     }

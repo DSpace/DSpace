@@ -43,9 +43,9 @@ import org.springframework.web.bind.annotation.RestController;
  *        via {@link #transformModel(Object)}.</li>
  *   <li> After it is converted to a {@link RestModel}, the projection may modify it
  *        via {@link #transformRest(RestModel)}.</li>
- *   <li> During conversion to a {@link HALResource}, the projection may opt out of certain annotation-discovered
- *        HAL embeds and links via {@link #allowOptionalEmbed(HALResource, LinkRest)}
- *        and {@link #allowOptionalLink(HALResource, LinkRest)}.</li>
+ *   <li> During conversion to a {@link HALResource}, the projection may opt in of certain annotation-discovered
+ *        HAL embeds and links via {@link #allowEmbedding(HALResource, LinkRest)}
+ *        and {@link #allowLinking(HALResource, LinkRest)}</li>
  *   <li> After conversion to a {@link HALResource}, the projection may modify it
  *        via {@link #transformResource(HALResource)}.</li>
  * </ul>
@@ -107,7 +107,23 @@ public interface Projection {
      */
     <T extends HALResource> T transformResource(T halResource);
 
+    /**
+     * This method will indicate or define whether a certain linkRest annotated property can be embedded onto the
+     * resource. This will define whether an optional property is allowed to be embedded; if the property isn't
+     * optional then the value of this method will not be accounted for
+     * @param halResource   The HALResource on which we want to embed
+     * @param linkRest      The annotation on the property that we want to embed
+     * @return              A boolean indicating whether we should embed or not
+     */
     boolean allowEmbedding(HALResource halResource, LinkRest linkRest);
 
+    /**
+     * This method will indicate or define whether a certain linkRest annotated property can be linked to in the
+     * resource. This will define whether an optional property is allowed to be linked to; if the property isn't
+     * optional then the value of this method will not be accounted for
+     * @param halResource   The HALResource on which we want to add the link
+     * @param linkRest      The annotation on the property that we want to link to
+     * @return              A boolean indicating whether we should create a link or not
+     */
     boolean allowLinking(HALResource halResource, LinkRest linkRest);
 }
