@@ -107,29 +107,7 @@ public interface Projection {
      */
     <T extends HALResource> T transformResource(T halResource);
 
-    /**
-     * Tells whether this projection permits the embedding of a particular optionally-embeddable related resource.
-     *
-     * Optionally-embeddable related resources, discovered through {@link LinkRest} annotations, are normally
-     * automatically embedded. This method gives the projection an opportunity to opt out of some or all such embeds,
-     * by returning {@code false}.
-     *
-     * @param halResource the resource from which the embed may or may not be made.
-     * @param linkRest the LinkRest annotation through which the related resource was discovered on the rest object.
-     * @return true if allowed, false otherwise.
-     */
-    boolean allowOptionalEmbed(HALResource halResource, LinkRest linkRest);
+    boolean allowEmbedding(HALResource halResource, LinkRest linkRest);
 
-    /**
-     * Tells whether this projection permits the linking of a particular optionally-linkable related resource.
-     *
-     * Optionally-linkable related resources, discovered through {@link LinkRest} annotations, are normally
-     * automatically linked. This method gives the projection an opportunity to opt out of some or all such links,
-     * by returning {@code false}.
-     *
-     * @param halResource the resource from which the embed may or may not be made.
-     * @param linkRest the LinkRest annotation through which the related resource was discovered on the rest object.
-     * @return true if allowed, false otherwise.
-     */
-    boolean allowOptionalLink(HALResource halResource, LinkRest linkRest);
+    boolean allowLinking(HALResource halResource, LinkRest linkRest);
 }

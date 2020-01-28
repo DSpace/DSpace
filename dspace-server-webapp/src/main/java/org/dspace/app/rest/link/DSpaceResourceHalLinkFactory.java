@@ -68,7 +68,7 @@ public class DSpaceResourceHalLinkFactory extends HalLinkFactory<DSpaceResource,
 
                                 if (linkRest.linkOptional() && linkRest.embedOptional()
                                         && !halResource.getContent().getProjection()
-                                        .allowOptionalLink(halResource, linkRest)) {
+                                        .allowLinking(halResource, linkRest)) {
                                     continue; // projection disallows this optional method-level link
                                 }
 

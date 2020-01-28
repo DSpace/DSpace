@@ -31,13 +31,11 @@ public abstract class AbstractProjection implements Projection {
         return halResource;
     }
 
-    @Override
-    public boolean allowOptionalEmbed(HALResource halResource, LinkRest linkRest) {
-        return true;
+    public boolean allowEmbedding(HALResource halResource, LinkRest linkRest) {
+        return false;
     }
 
-    @Override
-    public boolean allowOptionalLink(HALResource halResource, LinkRest linkRest) {
-        return true;
+    public boolean allowLinking(HALResource halResource, LinkRest linkRest) {
+        return false;
     }
 }
