@@ -202,7 +202,7 @@
                         </xsl:variable>
                         <xsl:choose>
                             <xsl:when test="contains($src,'isAllowed=n')">
-                                <div style="width: 100%; text-align: center">
+                                <div style="width: 100%; height: 100%; text-align: center">
                                     <i aria-hidden="true" class="glyphicon  glyphicon-lock"></i>
                                 </div>
                             </xsl:when>
@@ -218,8 +218,8 @@
                     <xsl:otherwise>
                         <img class="img-thumbnail" alt="xmlui.mirage2.item-list.thumbnail" i18n:attr="alt">
                             <xsl:attribute name="data-src">
-                                <xsl:text>holder.js/100%x</xsl:text>
-                                <xsl:value-of select="$thumbnail.maxheight"/>
+                                <xsl:text>holder.js/100%x100</xsl:text>
+<!--                                <xsl:value-of select="$thumbnail.maxheight"/>-->
                                 <xsl:text>/text:No Thumbnail</xsl:text>
                             </xsl:attribute>
                         </img>

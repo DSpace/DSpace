@@ -226,8 +226,8 @@
                 <xsl:otherwise>
                     <img class="img-thumbnail" alt="Thumbnail">
                         <xsl:attribute name="data-src">
-                            <xsl:text>holder.js/100%x</xsl:text>
-                            <xsl:value-of select="$thumbnail.maxheight"/>
+                            <xsl:text>holder.js/100%x100</xsl:text>
+<!--                            <xsl:value-of select="$thumbnail.maxheight"/>-->
                             <xsl:text>/text:No Thumbnail</xsl:text>
                         </xsl:attribute>
                     </img>
@@ -771,8 +771,8 @@
                             <xsl:otherwise>
                                 <img class="img-thumbnail" alt="Thumbnail">
                                     <xsl:attribute name="data-src">
-                                        <xsl:text>holder.js/100%x</xsl:text>
-                                        <xsl:value-of select="$thumbnail.maxheight"/>
+                                        <xsl:text>holder.js/100%x100</xsl:text>
+<!--                                        <xsl:value-of select="$thumbnail.maxheight"/>-->
                                         <xsl:text>/text:No Thumbnail</xsl:text>
                                     </xsl:attribute>
                                 </img>
