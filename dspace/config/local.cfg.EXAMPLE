@@ -34,10 +34,10 @@ dspace.dir=/dspace
 dspace.hostname = localhost
 
 # DSpace server backend webapp URL.  Include port number etc.
-dspace.baseUrl = http://localhost:8080/server
+dspace.server.url = http://localhost:8080/server
 
 # Full link your end users will use to access DSpace. This is the URL of your angular UI
-dspace.url = http://localhost:3000
+dspace.ui.url = http://localhost:3000
 
 # Name of the site
 dspace.name = DSpace at My University
@@ -138,7 +138,7 @@ db.schema = public
 #
 # Items in DSpace receive a unique URL, stored in dc.identifier.uri
 # after it is generated during the submission process.
-# 
+#
 # If you register with CNRI's handle service at http://www.handle.net/,
 # these links can be generated as permalinks using http://hdl.handle.net/
 # as canonical prefix. Please make sure to change handle.canonical.prefix
