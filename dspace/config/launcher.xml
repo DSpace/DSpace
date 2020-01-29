@@ -401,4 +401,11 @@
             <class>org.dspace.app.util.Version</class>
         </step>
     </command>
+    <command>
+        <name>list-number-of-downloaded-bitstreams</name>
+        <description>List number of downloaded bitstreams for all institutions.</description>
+        <step>
+            <class>org.dspace.app.statistics.ListNumberOfDownloadedBitstreamsPerInstitution</class>
+        </step>
+    </command>
 </commands>
