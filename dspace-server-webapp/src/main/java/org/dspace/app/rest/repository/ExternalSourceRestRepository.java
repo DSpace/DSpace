@@ -74,7 +74,7 @@ public class ExternalSourceRestRepository extends DSpaceRestRepository<ExternalS
                     pageable.getPageSize());
         int numberOfResults = externalDataService.getNumberOfResults(externalSourceName, query);
         return converter.toRestPage(externalDataObjects, pageable, numberOfResults,
-                                    utils.obtainProjection(true));
+                                    utils.obtainProjection());
     }
 
     @Override
@@ -91,7 +91,7 @@ public class ExternalSourceRestRepository extends DSpaceRestRepository<ExternalS
     public Page<ExternalSourceRest> findAll(Context context, Pageable pageable) {
         List<ExternalDataProvider> externalSources = externalDataService.getExternalDataProviders();
         return converter.toRestPage(externalSources, pageable, externalSources.size(),
-                                    utils.obtainProjection(true));
+                                    utils.obtainProjection());
     }
 
     public Class<ExternalSourceRest> getDomainClass() {

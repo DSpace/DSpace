@@ -41,7 +41,7 @@ public class RelationshipTypeRestRepository extends DSpaceRestRepository<Relatio
     public Page<RelationshipTypeRest> findAll(Context context, Pageable pageable) {
         try {
             List<RelationshipType> relationshipTypes = relationshipTypeService.findAll(context);
-            return converter.toRestPage(utils.getPage(relationshipTypes, pageable), utils.obtainProjection(true));
+            return converter.toRestPage(utils.getPage(relationshipTypes, pageable), utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }

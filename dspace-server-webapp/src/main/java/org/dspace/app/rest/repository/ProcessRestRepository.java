@@ -54,7 +54,7 @@ public class ProcessRestRepository extends DSpaceRestRepository<ProcessRest, Int
             int total = processService.countTotal(context);
             List<Process> processes = processService.findAll(context, pageable.getPageSize(),
                     Math.toIntExact(pageable.getOffset()));
-            return converter.toRestPage(processes, pageable, total, utils.obtainProjection(true));
+            return converter.toRestPage(processes, pageable, total, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }

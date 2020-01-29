@@ -57,7 +57,6 @@ import org.dspace.app.rest.model.hateoas.DSpaceResource;
 import org.dspace.app.rest.model.hateoas.EmbeddedPage;
 import org.dspace.app.rest.model.hateoas.HALResource;
 import org.dspace.app.rest.projection.DefaultProjection;
-import org.dspace.app.rest.projection.ListProjection;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.repository.DSpaceRestRepository;
 import org.dspace.app.rest.repository.LinkRestRepository;
@@ -421,22 +420,6 @@ public class Utils {
     }
 
     /**
-     * Gets the projection requested by the current servlet request, or a default projection if none is specified.
-     *
-     * @param defaultToList whether to return {@link ListProjection} by default. If false, the no-op
-     *                      {@link DefaultProjection} will be returned by default.
-     * @return the requested or default projection, never {@code null}.
-     * @throws IllegalArgumentException if the request specifies an unknown projection name.
-     */
-    public Projection obtainProjection(boolean defaultToList) {
-        String projectionName = requestService.getCurrentRequest().getServletRequest().getParameter("projection");
-        if (projectionName == null && defaultToList) {
-            projectionName = ListProjection.NAME;
-        }
-        return converter.getProjection(projectionName);
-    }
-
-    /**
      * Gets the projection requested by the current servlet request, or {@link DefaultProjection} if none
      * is specified.
      *
@@ -444,10 +427,9 @@ public class Utils {
      * @throws IllegalArgumentException if the request specifies an unknown projection name.
      */
     public Projection obtainProjection() {
-        return obtainProjection(false);
+        String projectionName = requestService.getCurrentRequest().getServletRequest().getParameter("projection");
+        return converter.getProjection(projectionName);
     }
-
-
 
     /**
      * Adds embeds or links for all class-level LinkRel annotations for which embeds or links are allowed.
