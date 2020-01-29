@@ -7,9 +7,6 @@
  */
 package org.dspace.app.rest.model;
 
-import java.util.List;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -17,45 +14,34 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
+@LinksRest(links = {
+        @LinkRest(
+                name = CommunityRest.COLLECTIONS,
+                linkClass = CollectionRest.class,
+                method = "getCollections",
+                embedOptional = true
+        ),
+        @LinkRest(
+                name = CommunityRest.LOGO,
+                linkClass = BitstreamRest.class,
+                method = "getLogo",
+                embedOptional = true
+        ),
+        @LinkRest(
+                name = CommunityRest.SUBCOMMUNITIES,
+                linkClass = CommunityRest.class,
+                method = "getSubcommunities",
+                embedOptional = true
+        )
+})
 public class CommunityRest extends DSpaceObjectRest {
     public static final String NAME = "community";
     public static final String PLURAL_NAME = "communities";
     public static final String CATEGORY = RestAddressableModel.CORE;
 
-    @JsonIgnore
-    private BitstreamRest logo;
-
-    private List<CollectionRest> collections;
-
-    @LinkRest(linkClass = CollectionRest.class)
-    @JsonIgnore
-    public List<CollectionRest> getCollections() {
-        return collections;
-    }
-
-    public void setCollections(List<CollectionRest> collections) {
-        this.collections = collections;
-    }
-
-    private List<CommunityRest> subcommunities;
-
-    @LinkRest(linkClass = CommunityRest.class)
-    @JsonIgnore
-    public List<CommunityRest> getSubcommunities() {
-        return subcommunities;
-    }
-
-    public void setSubCommunities(List<CommunityRest> subcommunities) {
-        this.subcommunities = subcommunities;
-    }
-
-    public BitstreamRest getLogo() {
-        return logo;
-    }
-
-    public void setLogo(BitstreamRest logo) {
-        this.logo = logo;
-    }
+    public static final String COLLECTIONS = "collections";
+    public static final String LOGO = "logo";
+    public static final String SUBCOMMUNITIES = "subcommunities";
 
     @Override
     public String getCategory() {
@@ -67,5 +53,4 @@ public class CommunityRest extends DSpaceObjectRest {
     public String getType() {
         return NAME;
     }
-
 }
