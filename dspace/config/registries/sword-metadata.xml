@@ -102,13 +102,6 @@
 
   <dc-type>
 	<schema>dc</schema>
-    <element>language</element>
-    <qualifier>rfc3066</qualifier>
-    <scope_note>the rfc3066 form of the language for the item</scope_note>
-  </dc-type>
-
-  <dc-type>
-	<schema>dc</schema>
     <element>rights</element>
     <qualifier>holder</qualifier>
     <scope_note>The owner of the copyright</scope_note>
