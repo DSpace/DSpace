@@ -30,13 +30,17 @@
 # Windows note: Please remember to use forward slashes for all paths (e.g. C:/dspace)
 dspace.dir=/dspace
 
-# DSpace host name - should match base URL.  Do not include port number
-dspace.hostname = localhost
-
-# DSpace server backend webapp URL.  Include port number etc.
+# URL of DSpace backend ('server' webapp). Include port number etc.
+# This is where REST API and all enabled server modules (OAI-PMH, SWORD, SWORDv2, RDF, etc) will respond
 dspace.server.url = http://localhost:8080/server
 
-# Full link your end users will use to access DSpace. This is the URL of your angular UI
+# DSpace UI hostname. Should match dspace.ui.url.  Do not include port number.
+# This is used by some modules (e.g. OAI) as an identifier for your site.
+# You also may chose to use this to populate other configurations below.
+dspace.ui.hostname = localhost
+
+# URL of DSpace frontend (Angular UI). Include port number etc
+# This is used by the backend to provide links in emails, RSS feeds, Sitemaps, etc.
 dspace.ui.url = http://localhost:3000
 
 # Name of the site
@@ -51,7 +55,7 @@ dspace.name = DSpace at My University
 
 # Solr server/webapp.
 # DSpace uses Solr for all search/browse capability (and for usage statistics).
-# since DSpace 7, SOLR must be installed as a stand-alone service
+# Since DSpace 7, SOLR must be installed as a stand-alone service
 #solr.server = http://localhost:8983/solr
 
 ##########################

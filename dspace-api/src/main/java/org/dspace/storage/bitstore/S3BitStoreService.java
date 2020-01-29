@@ -92,7 +92,7 @@ public class S3BitStoreService implements BitStoreService {
 
         // bucket name
         if (StringUtils.isEmpty(bucketName)) {
-            bucketName = "dspace-asset-" + ConfigurationManager.getProperty("dspace.hostname");
+            bucketName = "dspace-asset-" + ConfigurationManager.getProperty("dspace.ui.hostname");
             log.warn("S3 BucketName is not configured, setting default: " + bucketName);
         }
 
@@ -343,7 +343,7 @@ public class S3BitStoreService implements BitStoreService {
         store.s3Service.setRegion(usEast1);
 
         //Bucketname should be lowercase
-        store.bucketName = "dspace-asset-" + ConfigurationManager.getProperty("dspace.hostname") + ".s3test";
+        store.bucketName = "dspace-asset-" + ConfigurationManager.getProperty("dspace.ui.hostname") + ".s3test";
         store.s3Service.createBucket(store.bucketName);
 /* Broken in DSpace 6 TODO Refactor
         // time everything, todo, swtich to caliper

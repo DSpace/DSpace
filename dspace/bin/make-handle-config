@@ -17,7 +17,7 @@ BINDIR=`dirname $0`
 echo "Writing simple Handle server configuration"
 
 # Read parameters from DSpace config
-dshostname=`$BINDIR/dspace dsprop --property dspace.hostname`
+dshostname=`$BINDIR/dspace dsprop --property dspace.ui.hostname`
 dshostip=`host $dshostname | awk '/has address/ { print $4; exit }'`
 if [ "$dshostip" = "127.0.0.1" ]; then
   # Just use default. SimpleSetup will fail when trying to bind to localhost addresses.
