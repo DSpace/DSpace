@@ -152,25 +152,22 @@ public class ConverterServiceIT extends AbstractControllerIntegrationTest {
 
         assertHasEmbeds(resource, new String[] {
                 "restProp1",    // restProp1 embedded;     value != null, embedOptional == false
-                "restProp2",    // restProp2 embedded;     value != null, embedOptional == true
+                                // restProp2 not embedded; value != null, embedOptional == true
                                 // restProp3 not embedded; value == null, embedOptional == true
                                 // restProp4 not embedded; value == null, embedOptional == true
                 "restPropFive", // restPropFive embedded;  value == null, embedOptional == false
                 "restProp6",    // restProp6 embedded;     value != null, embedOptional == false
-                "oChildren",    // oChildren embedded;     value != null, embedOptional == true
+                                // oChildren not embedded; value != null, embedOptional == true
                 "aChildren"     // aChildren embedded;     value != null, embedOptional == false
                                 // nChildren not embedded; value != null, linkOptional == false, embedOptional == false
                                 //                         (embed disallowed by link repository)
         }, new Class[] {
                 Resource.class,
-                Resource.class,
                 null,
                 Resource.class,
-                EmbeddedPage.class,
                 EmbeddedPage.class
         });
 
-        assertEmbeddedPageSize(resource, "oChildren", 2);
         assertEmbeddedPageSize(resource, "aChildren", 2);
 
         assertHasLinks(resource, new String[] {
