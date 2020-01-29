@@ -421,7 +421,7 @@ public class SWORDUrlManager {
             }
 
             String handle = item.getHandle();
-            String bsLink = ConfigurationManager.getProperty("dspace.url");
+            String bsLink = ConfigurationManager.getProperty("dspace.ui.url");
 
             if (handle != null && !"".equals(handle)) {
                 bsLink = bsLink + "/bitstream/" + handle + "/" +

@@ -583,7 +583,7 @@ public class LogAnalyser {
         // now do the host name and url lookup
         hostName = ConfigurationManager.getProperty("dspace.hostname").trim();
         name = ConfigurationManager.getProperty("dspace.name").trim();
-        url = ConfigurationManager.getProperty("dspace.url").trim();
+        url = ConfigurationManager.getProperty("dspace.ui.url").trim();
         if ((url != null) && (!url.endsWith("/"))) {
             url = url + "/";
         }

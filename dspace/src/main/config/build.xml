@@ -849,9 +849,9 @@ Common usage:
 
    ${dspace.dir}/bin/dspace create-administrator
 
- You should then be able to access your DSpace's 'home page':
+ You should then be able to access your DSpace's REST API:
 
-   ${dspace.url}
+   ${dspace.server.url}
 
 ====================================================================
         </echo>
