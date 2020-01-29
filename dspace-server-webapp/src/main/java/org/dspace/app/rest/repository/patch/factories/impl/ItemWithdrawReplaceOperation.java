@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
  * This is the implementation for Item resource patches.
  * <p>
  * Example: <code>
- * curl -X PATCH http://${dspace.url}/api/item/<:id-item> -H "
+ * curl -X PATCH http://${dspace.server.url}/api/item/<:id-item> -H "
  * Content-Type: application/json" -d '[{ "op": "replace", "path": "
  * /withdrawn", "value": true|false]'
  * </code>
