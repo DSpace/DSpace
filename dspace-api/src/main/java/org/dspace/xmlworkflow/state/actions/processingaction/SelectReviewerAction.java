@@ -19,12 +19,14 @@ import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.workflow.WorkflowException;
+import org.dspace.xmlworkflow.Role;
 import org.dspace.xmlworkflow.state.Step;
 import org.dspace.xmlworkflow.state.actions.ActionResult;
 import org.dspace.xmlworkflow.storedcomponents.WorkflowItemRole;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.service.WorkflowItemRoleService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Required;
 
 /**
  * Processing class for an action where an assigned user can
@@ -42,7 +44,7 @@ public class SelectReviewerAction extends ProcessingAction {
 
     public static final int RESULTS_PER_PAGE = 5;
 
-    private String roleId;
+    private Role role;
 
     @Autowired(required = true)
     protected EPersonService ePersonService;
@@ -90,7 +92,7 @@ public class SelectReviewerAction extends ProcessingAction {
             //We have a reviewer, assign him, the workflowitemrole will be translated into a task in the autoassign
             WorkflowItemRole workflowItemRole = workflowItemRoleService.create(c);
             workflowItemRole.setEPerson(reviewer);
-            workflowItemRole.setRoleId(getRoleId());
+            workflowItemRole.setRoleId(getRole().getId());
             workflowItemRole.setWorkflowItem(wfi);
             workflowItemRoleService.update(c, workflowItemRole);
             return new ActionResult(ActionResult.TYPE.TYPE_OUTCOME, ActionResult.OUTCOME_COMPLETE);
@@ -100,11 +102,12 @@ public class SelectReviewerAction extends ProcessingAction {
         return new ActionResult(ActionResult.TYPE.TYPE_ERROR);
     }
 
-    public String getRoleId() {
-        return roleId;
+    public Role getRole() {
+        return role;
     }
 
-    public void setRoleId(String roleId) {
-        this.roleId = roleId;
+    @Required
+    public void setRole(Role role) {
+        this.role = role;
     }
 }
