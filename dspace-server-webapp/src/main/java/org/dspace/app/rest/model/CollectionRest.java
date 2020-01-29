@@ -32,6 +32,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
                 linkClass = BitstreamRest.class,
                 method = "getLogo",
                 embedOptional = true
+        ),
+        @LinkRest(
+                name = CollectionRest.MAPPED_ITEMS,
+                linkClass = ItemRest.class,
+                method = "getMappedItems",
+                embedOptional = true
         )
 })
 public class CollectionRest extends DSpaceObjectRest {
@@ -39,10 +45,11 @@ public class CollectionRest extends DSpaceObjectRest {
     public static final String PLURAL_NAME = "collections";
     public static final String CATEGORY = RestAddressableModel.CORE;
 
+    public static final String DEFAULT_ACCESS_CONDITIONS = "defaultAccessConditions";
     public static final String HARVEST = "harvester";
     public static final String LICENSE = "license";
     public static final String LOGO = "logo";
-    public static final String DEFAULT_ACCESS_CONDITIONS = "defaultAccessConditions";
+    public static final String MAPPED_ITEMS = "mappedItems";
 
     @Override
     public String getCategory() {
