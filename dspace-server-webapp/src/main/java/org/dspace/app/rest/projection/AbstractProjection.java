@@ -12,7 +12,8 @@ import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.hateoas.HALResource;
 
 /**
- * Abstract base class for projections. By default each method has no effect unless overridden by a subclass.
+ * Abstract base class for projections. By default no transformation is done, optional embeds are not included,
+ * and optional links are included.
  */
 public abstract class AbstractProjection implements Projection {
 
@@ -38,6 +39,6 @@ public abstract class AbstractProjection implements Projection {
 
     @Override
     public boolean allowLinking(HALResource halResource, LinkRest linkRest) {
-        return false;
+        return true;
     }
 }
