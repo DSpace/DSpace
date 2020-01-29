@@ -21,6 +21,5 @@ import org.dspace.app.rest.utils.Utils;
 public class ItemResource extends DSpaceResource<ItemRest> {
     public ItemResource(ItemRest item, Utils utils) {
         super(item, utils);
-        add(utils.linkToSubResource(item, "mappedCollections"));
     }
 }
