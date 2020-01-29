@@ -43,7 +43,7 @@ import org.springframework.web.bind.annotation.RestController;
  *        via {@link #transformModel(Object)}.</li>
  *   <li> After it is converted to a {@link RestModel}, the projection may modify it
  *        via {@link #transformRest(RestModel)}.</li>
- *   <li> During conversion to a {@link HALResource}, the projection may opt in of certain annotation-discovered
+ *   <li> During conversion to a {@link HALResource}, the projection may opt in to certain annotation-discovered
  *        HAL embeds and links via {@link #allowEmbedding(HALResource, LinkRest)}
  *        and {@link #allowLinking(HALResource, LinkRest)}</li>
  *   <li> After conversion to a {@link HALResource}, the projection may modify it
@@ -52,10 +52,8 @@ import org.springframework.web.bind.annotation.RestController;
  *
  * <h2>How a projection is chosen</h2>
  *
- * When a REST request is made, the use of a projection may be explicit, as when it is provided as an argument
- * to the request, e.g. {@code /items/{uuid}?projection={projectionName}}. It may also be implicit, as when the
- * {@link ListProjection} is used automatically, in order to provide an abbreviated representation when serving
- * a collection of resources.
+ * When a REST request is made, the projection argument, if present, is used to look up the projection to use,
+ * by name. If no argument is present, {@link DefaultProjection} will be used.
  */
 public interface Projection {
 
@@ -108,22 +106,24 @@ public interface Projection {
     <T extends HALResource> T transformResource(T halResource);
 
     /**
-     * This method will indicate or define whether a certain linkRest annotated property can be embedded onto the
-     * resource. This will define whether an optional property is allowed to be embedded; if the property isn't
-     * optional then the value of this method will not be accounted for
-     * @param halResource   The HALResource on which we want to embed
-     * @param linkRest      The annotation on the property that we want to embed
-     * @return              A boolean indicating whether we should embed or not
+     * Tells whether this projection permits the embedding of a particular optionally-embeddable related resource.
+     *
+     * This gives the projection an opportunity to opt in to to certain embeds, by returning {@code true}.
+     *
+     * @param halResource the resource from which the embed may or may not be made.
+     * @param linkRest the LinkRest annotation through which the related resource was discovered on the rest object.
+     * @return true if allowed, false otherwise.
      */
     boolean allowEmbedding(HALResource halResource, LinkRest linkRest);
 
     /**
-     * This method will indicate or define whether a certain linkRest annotated property can be linked to in the
-     * resource. This will define whether an optional property is allowed to be linked to; if the property isn't
-     * optional then the value of this method will not be accounted for
-     * @param halResource   The HALResource on which we want to add the link
-     * @param linkRest      The annotation on the property that we want to link to
-     * @return              A boolean indicating whether we should create a link or not
+     * Tells whether this projection permits the linking of a particular optionally-linkable related resource.
+     *
+     * This gives the projection an opportunity to opt in to to certain links, by returning {@code true}.
+     *
+     * @param halResource the resource from which the link may or may not be made.
+     * @param linkRest the LinkRest annotation through which the related resource was discovered on the rest object.
+     * @return true if allowed, false otherwise.
      */
     boolean allowLinking(HALResource halResource, LinkRest linkRest);
 }
