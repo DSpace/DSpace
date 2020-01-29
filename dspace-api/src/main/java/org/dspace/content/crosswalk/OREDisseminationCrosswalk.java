@@ -265,7 +265,7 @@ public class OREDisseminationCrosswalk
         Element pmhMeta = new Element("entry",ATOM_NS);
 
         pUri = new Element("id",ATOM_NS);
-        String oaiId = new String("oai:" + ConfigurationManager.getProperty("dspace.hostname") + ":" + item.getHandle
+        String oaiId = new String("oai:" + ConfigurationManager.getProperty("dspace.ui.hostname") + ":" + item.getHandle
         ());
         pUri.addContent(oaiId + "#oai_dc");
         pmhMeta.addContent(pUri);
