@@ -45,7 +45,7 @@ public class BrowseIndexRestRepository extends DSpaceRestRepository<BrowseIndexR
     public Page<BrowseIndexRest> findAll(Context context, Pageable pageable) {
         try {
             List<BrowseIndex> indexes = Arrays.asList(BrowseIndex.getBrowseIndices());
-            return converter.toRestPage(indexes, pageable, indexes.size(), utils.obtainProjection(true));
+            return converter.toRestPage(indexes, pageable, indexes.size(), utils.obtainProjection());
         } catch (BrowseException e) {
             throw new RuntimeException(e.getMessage(), e);
         }

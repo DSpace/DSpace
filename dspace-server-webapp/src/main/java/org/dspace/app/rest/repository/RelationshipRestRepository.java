@@ -86,7 +86,7 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
             long total = relationshipService.countTotal(context);
             List<Relationship> relationships = relationshipService.findAll(context,
                     pageable.getPageSize(), Math.toIntExact(pageable.getOffset()));
-            return converter.toRestPage(relationships, pageable, total, utils.obtainProjection(true));
+            return converter.toRestPage(relationships, pageable, total, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -367,6 +367,6 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
             }
         }
 
-        return converter.toRestPage(relationships, pageable, total, utils.obtainProjection(true));
+        return converter.toRestPage(relationships, pageable, total, utils.obtainProjection());
     }
 }

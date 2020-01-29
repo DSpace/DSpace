@@ -142,7 +142,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
             long total = wis.countTotal(context);
             List<WorkspaceItem> witems = wis.findAll(context, pageable.getPageSize(),
                     Math.toIntExact(pageable.getOffset()));
-            return converter.toRestPage(witems, pageable, total, utils.obtainProjection(true));
+            return converter.toRestPage(witems, pageable, total, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -158,7 +158,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
             long total = wis.countByEPerson(context, ep);
             List<WorkspaceItem> witems = wis.findByEPerson(context, ep, pageable.getPageSize(),
                     Math.toIntExact(pageable.getOffset()));
-            return converter.toRestPage(witems, pageable, total, utils.obtainProjection(true));
+            return converter.toRestPage(witems, pageable, total, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }

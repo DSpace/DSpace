@@ -108,7 +108,7 @@ public class BitstreamRestRepository extends DSpaceObjectRestRepository<Bitstrea
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Projection projection = utils.obtainProjection(true);
+        Projection projection = utils.obtainProjection();
         Page<BitstreamRest> page = new PageImpl<>(bit, pageable, total)
                 .map((bitstream) -> converter.toRest(bitstream, projection));
         return page;

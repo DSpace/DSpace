@@ -57,7 +57,7 @@ public class SubmissionDefinitionRestRepository extends DSpaceRestRepository<Sub
         int total = submissionConfigReader.countSubmissionConfigs();
         List<SubmissionConfig> subConfs = submissionConfigReader.getAllSubmissionConfigs(
                 pageable.getPageSize(), Math.toIntExact(pageable.getOffset()));
-        return converter.toRestPage(subConfs, pageable, total, utils.obtainProjection(true));
+        return converter.toRestPage(subConfs, pageable, total, utils.obtainProjection());
     }
 
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
