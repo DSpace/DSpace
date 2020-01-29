@@ -24,6 +24,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
                 embedOptional = true
         ),
         @LinkRest(
+                name = ItemRest.MAPPED_COLLECTIONS,
+                linkClass = CollectionRest.class,
+                method = "getMappedCollections",
+                embedOptional = true
+        ),
+        @LinkRest(
                 name = ItemRest.OWNING_COLLECTION,
                 linkClass = CollectionRest.class,
                 method = "getOwningCollection",
@@ -48,6 +54,7 @@ public class ItemRest extends DSpaceObjectRest {
     public static final String CATEGORY = RestAddressableModel.CORE;
 
     public static final String BUNDLES = "bundles";
+    public static final String MAPPED_COLLECTIONS = "mappedCollections";
     public static final String OWNING_COLLECTION = "owningCollection";
     public static final String RELATIONSHIPS = "relationships";
     public static final String TEMPLATE_ITEM_OF = "templateItemOf";
