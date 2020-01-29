@@ -317,7 +317,7 @@
         <dependency>
             <groupId>commons-httpclient</groupId>
             <artifactId>commons-httpclient</artifactId>
-            <version>3.1</version>
+<!--            <version>3.1</version>-->
         </dependency>
         <dependency>
             <groupId>com.squareup.okhttp3</groupId>
@@ -743,12 +743,6 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        <dependency>
-            <groupId>commons-httpclient</groupId>
-            <artifactId>commons-httpclient</artifactId>
-            <version>3.1</version>
-            <scope>compile</scope>
-        </dependency>
 
         <!-- Feide authentication -->
         <dependency>
@@ -756,12 +750,12 @@
             <artifactId>feidelib-jar</artifactId>
             <version>1.0.29</version>
         </dependency>
-        <dependency>
-            <groupId>commons-httpclient</groupId>
-            <artifactId>commons-httpclient</artifactId>
-            <version>3.1</version>
-            <scope>test</scope>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>commons-httpclient</groupId>-->
+<!--            <artifactId>commons-httpclient</artifactId>-->
+<!--            <version>3.1</version>-->
+<!--            <scope>test</scope>-->
+<!--        </dependency>-->
     </dependencies>
 
 </project>
