@@ -92,7 +92,8 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
 
         String token = getAuthToken(admin.getEmail(), password);
 
-        getClient(token).perform(get("/api/core/bitstreams/"))
+        getClient(token).perform(get("/api/core/bitstreams/")
+                   .param("projection", "full"))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$._embedded.bitstreams", Matchers.containsInAnyOrder(
@@ -150,7 +151,8 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
         String token = getAuthToken(admin.getEmail(), password);
 
         getClient(token).perform(get("/api/core/bitstreams/")
-                                .param("size", "1"))
+                   .param("size", "1")
+                   .param("projection", "full"))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$._embedded.bitstreams", Matchers.contains(
@@ -289,7 +291,8 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                                          .build();
         }
 
-        getClient().perform(get("/api/core/bitstreams/" + bitstream.getID()))
+        getClient().perform(get("/api/core/bitstreams/" + bitstream.getID())
+                   .param("projection", "full"))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$", BitstreamMatcher.matchBitstreamEntry(bitstream)))

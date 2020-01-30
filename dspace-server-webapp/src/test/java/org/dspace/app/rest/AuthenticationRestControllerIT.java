@@ -59,7 +59,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
     public void testStatusAuthenticated() throws Exception {
         String token = getAuthToken(eperson.getEmail(), password);
 
-        getClient(token).perform(get("/api/authn/status"))
+        getClient(token).perform(get("/api/authn/status").param("projection", "full"))
 
                         .andExpect(status().isOk())
 
@@ -370,7 +370,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getHeader(AUTHORIZATION_HEADER);
 
-        getClient(token).perform(get("/api/authn/status"))
+        getClient(token).perform(get("/api/authn/status").param("projection", "full"))
                 .andExpect(status().isOk())
                 //We expect the content type to be "application/hal+json;charset=UTF-8"
                 .andExpect(content().contentType(contentType))
@@ -403,7 +403,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getHeader(AUTHORIZATION_HEADER);
 
-        getClient(token).perform(get("/api/authn/status")
+        getClient(token).perform(get("/api/authn/status").param("projection", "full")
                                     .with(ip("123.123.123.123")))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(status().isOk())
@@ -423,7 +423,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getHeader(AUTHORIZATION_HEADER);
 
-        getClient(token).perform(get("/api/authn/status")
+        getClient(token).perform(get("/api/authn/status").param("projection", "full")
                 .with(ip("234.234.234.234")))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(status().isOk())

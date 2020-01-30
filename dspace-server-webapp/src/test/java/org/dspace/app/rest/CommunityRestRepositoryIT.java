@@ -545,7 +545,8 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
 
         context.restoreAuthSystemState();
 
-        getClient().perform(get("/api/core/communities/" + parentCommunity.getID().toString()))
+        getClient().perform(get("/api/core/communities/" + parentCommunity.getID().toString())
+                   .param("projection", "full"))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$", Matchers.is(
@@ -624,7 +625,8 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
 
         context.restoreAuthSystemState();
 
-        getClient().perform(get("/api/core/communities/search/top"))
+        getClient().perform(get("/api/core/communities/search/top")
+                   .param("projection", "full"))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$._embedded.communities", Matchers.containsInAnyOrder(
@@ -686,7 +688,8 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
         context.restoreAuthSystemState();
 
         getClient().perform(get("/api/core/communities/search/subCommunities")
-                .param("parent", parentCommunity.getID().toString()))
+                .param("parent", parentCommunity.getID().toString())
+                .param("projection", "full"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
                 //Checking that these communities are present
@@ -898,7 +901,8 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
 
         context.restoreAuthSystemState();
 
-        getClient(token).perform(get("/api/core/communities/" + parentCommunity.getID().toString()))
+        getClient(token).perform(get("/api/core/communities/" + parentCommunity.getID().toString())
+                        .param("projection", "full"))
                         .andExpect(status().isOk())
                         .andExpect(content().contentType(contentType))
                         .andExpect(jsonPath("$", Matchers.is(
@@ -959,7 +963,8 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
 
         context.restoreAuthSystemState();
 
-        getClient().perform(get("/api/core/communities/" + parentCommunity.getID().toString()))
+        getClient().perform(get("/api/core/communities/" + parentCommunity.getID().toString())
+                        .param("projection", "full"))
                         .andExpect(status().isOk())
                         .andExpect(content().contentType(contentType))
                         .andExpect(jsonPath("$", Matchers.is(
@@ -991,7 +996,8 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
 
         context.restoreAuthSystemState();
 
-        getClient(token).perform(get("/api/core/communities/" + parentCommunity.getID().toString()))
+        getClient(token).perform(get("/api/core/communities/" + parentCommunity.getID().toString())
+                        .param("projection", "full"))
                         .andExpect(status().isOk())
                         .andExpect(content().contentType(contentType))
                         .andExpect(jsonPath("$", Matchers.is(

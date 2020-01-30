@@ -109,7 +109,8 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         context.restoreAuthSystemState();
 
-        getClient().perform(get("/api/core/bundles/" + bundle1.getID()))
+        getClient().perform(get("/api/core/bundles/" + bundle1.getID())
+                   .param("projection", "full"))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$", BundleMatcher.matchBundle(bundle1.getName(),
@@ -146,7 +147,8 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         context.restoreAuthSystemState();
 
-        getClient().perform(get("/api/core/items/" + item.getID() + "/bundles"))
+        getClient().perform(get("/api/core/items/" + item.getID() + "/bundles")
+                   .param("projection", "full"))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$._embedded.bundles", Matchers.hasItems(
@@ -187,7 +189,8 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
         UUID bundleUuid = UUID.fromString(String.valueOf(map.get("uuid")));
 
 
-        getClient().perform(get("/api/core/bundles/" + bundleUuid))
+        getClient().perform(get("/api/core/bundles/" + bundleUuid)
+                   .param("projection", "full"))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$", BundleMatcher.matchBundle(
@@ -221,7 +224,8 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
         UUID bundleUuid = UUID.fromString(String.valueOf(map.get("uuid")));
 
 
-        getClient().perform(get("/api/core/bundles/" + bundleUuid))
+        getClient().perform(get("/api/core/bundles/" + bundleUuid)
+                   .param("projection", "full"))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$", BundleMatcher.matchBundle(
@@ -308,7 +312,8 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
         UUID bundleUuid = UUID.fromString(String.valueOf(map.get("uuid")));
 
 
-        getClient().perform(get("/api/core/bundles/" + bundleUuid))
+        getClient().perform(get("/api/core/bundles/" + bundleUuid)
+                   .param("projection", "full"))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$", BundleMatcher.matchBundle(
@@ -359,7 +364,8 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         context.restoreAuthSystemState();
 
-        getClient().perform(get("/api/core/bundles/" + bundle1.getID() + "/bitstreams"))
+        getClient().perform(get("/api/core/bundles/" + bundle1.getID() + "/bitstreams")
+                   .param("projection", "full"))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$._embedded.bitstreams", Matchers.hasItems(
@@ -394,7 +400,8 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         context.restoreAuthSystemState();
 
-        getClient().perform(get("/api/core/bundles/" + bundle1.getID() + "/bitstreams"))
+        getClient().perform(get("/api/core/bundles/" + bundle1.getID() + "/bitstreams")
+                .param("projection", "full"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$._embedded.bitstreams", Matchers.contains(
@@ -453,7 +460,8 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
         String token = getAuthToken(admin.getEmail(), password);
 
         // Check if bundle is present
-        getClient().perform(get("/api/core/bundles/" + bundle1.getID() + "/bitstreams"))
+        getClient().perform(get("/api/core/bundles/" + bundle1.getID() + "/bitstreams")
+                .param("projection", "full"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$._embedded.bitstreams", Matchers.hasItems(
