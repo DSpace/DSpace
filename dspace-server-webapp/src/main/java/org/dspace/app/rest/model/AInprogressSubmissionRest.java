@@ -19,10 +19,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  * 
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
- * @param <T>
- *            the serializable class used as primary key
  */
-public abstract class AInprogressSubmissionRest<T extends Serializable> extends BaseObjectRest<T> {
+public abstract class AInprogressSubmissionRest extends BaseObjectRest<Integer> {
 
     private Date lastModified = new Date();
     private Map<String, Serializable> sections;

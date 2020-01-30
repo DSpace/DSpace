@@ -8,6 +8,7 @@
 package org.dspace.discovery;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import org.dspace.core.Constants;
 import org.dspace.core.ReloadableEntity;
@@ -20,13 +21,31 @@ import org.dspace.core.ReloadableEntity;
  * @param <PK>
  *            the Class of the primary key
  */
-public interface IndexableObject<PK extends Serializable> extends ReloadableEntity<PK> {
+public interface IndexableObject<T extends ReloadableEntity, PK extends Serializable> {
 
     /**
      * 
-     * @return the integer constant representing the Entity Type, @see {@link Constants}
+     * @return the string constant representing the Entity Type, @see {@link Constants}
      */
-    public int getType();
+    String getType();
+
+    /**
+     * Return the identifier of this indexableObject, this will be the identifier of the object in the database
+     * @return for a DSpaceObject a uuid will be returned, for a tasks or workflow items an integer will be returned
+     */
+    PK getID();
+
+    /**
+     * Get the entity that is linked to this indexable object
+     * @return a database entity
+     */
+    T getIndexedObject();
+
+    /**
+     * Set the entity that is linked to this indexable object
+     * @param object the database entity
+     */
+    void setIndexedObject(T object);
 
     /**
      * 
@@ -37,11 +56,16 @@ public interface IndexableObject<PK extends Serializable> extends ReloadableEnti
     }
 
     /**
-     * 
+     *
      * @return a textual alias of the Entity Type @see {@link #getType()}
      */
-    default public String getTypeText() {
-        return Constants.typeText[getType()];
-    };
+    String getTypeText();
 
+    /**
+     * Return the last modified date of an of an object, or if no modification dates are stored, return NUll
+     * @return the last modified date
+     */
+    default Date getLastModified() {
+        return null;
+    }
 }
