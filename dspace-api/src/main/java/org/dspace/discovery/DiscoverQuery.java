@@ -31,7 +31,7 @@ public class DiscoverQuery {
      **/
     private String query;
     private List<String> filterQueries;
-    private int DSpaceObjectFilter = -1;
+    private String DSpaceObjectFilter = null;
     private List<String> fieldPresentQueries;
     private boolean spellCheck;
 
@@ -120,7 +120,7 @@ public class DiscoverQuery {
      *
      * @param DSpaceObjectFilter the DSpace object filer
      */
-    public void setDSpaceObjectFilter(int DSpaceObjectFilter) {
+    public void setDSpaceObjectFilter(String DSpaceObjectFilter) {
         this.DSpaceObjectFilter = DSpaceObjectFilter;
     }
 
@@ -130,7 +130,7 @@ public class DiscoverQuery {
      *
      * @return the DSpace object filer
      */
-    public int getDSpaceObjectFilter() {
+    public String getDSpaceObjectFilter() {
         return DSpaceObjectFilter;
     }
 
