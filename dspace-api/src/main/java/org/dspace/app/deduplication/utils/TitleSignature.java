@@ -3,38 +3,38 @@
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
  *
- * https://github.com/CILEA/dspace-cris/wiki/License
+ * http://www.dspace.org/license/
  */
 package org.dspace.app.deduplication.utils;
 
 import java.util.Locale;
 
-import org.dspace.content.DSpaceObject;
-
 import com.ibm.icu.text.CharsetDetector;
 import com.ibm.icu.text.CharsetMatch;
 import com.ibm.icu.text.Normalizer;
 
+import org.dspace.content.DSpaceObject;
+
 public class TitleSignature extends MD5ValueSignature {
 
-	@Override
-	protected String normalize(/*BrowsableDSpaceObject*/DSpaceObject item, String value) {
-		if (value != null) {
+    @Override
+    protected String normalize(/* BrowsableDSpaceObject */DSpaceObject item, String value) {
+        if (value != null) {
 
-			String norm = Normalizer.normalize(value, Normalizer.NFD);
-			CharsetDetector cd = new CharsetDetector();
-			cd.setText(value.getBytes());
-			CharsetMatch detect = cd.detect();
-			if (detect != null && detect.getLanguage() != null) {
-				norm = norm.replaceAll("[^\\p{L}]", "").toLowerCase(new Locale(detect.getLanguage()));
-			} else {
-				norm = norm.replaceAll("[^\\p{L}]", "").toLowerCase();
-			}
-			return norm;
-		} else {
-			return "item:" + item.getID();
-		}
+            String norm = Normalizer.normalize(value, Normalizer.NFD);
+            CharsetDetector cd = new CharsetDetector();
+            cd.setText(value.getBytes());
+            CharsetMatch detect = cd.detect();
+            if (detect != null && detect.getLanguage() != null) {
+                norm = norm.replaceAll("[^\\p{L}]", "").toLowerCase(new Locale(detect.getLanguage()));
+            } else {
+                norm = norm.replaceAll("[^\\p{L}]", "").toLowerCase();
+            }
+            return norm;
+        } else {
+            return "item:" + item.getID();
+        }
 
-	}
+    }
 
 }

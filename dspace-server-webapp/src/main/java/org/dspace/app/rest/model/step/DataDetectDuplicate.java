@@ -18,15 +18,15 @@ import com.fasterxml.jackson.annotation.JsonUnwrapped;
  * @author Giuseppe Digilio (giuseppe.digilio at 4science.it)
  */
 public class DataDetectDuplicate implements SectionData {
-	@JsonUnwrapped
-	private Map<UUID, DuplicateMatch> matches = null;
+    @JsonUnwrapped
+    private Map<UUID, DuplicateMatch> matches = null;
 
-	public Map<UUID, DuplicateMatch> getMatches() {
-		return matches;
-	}
+    public Map<UUID, DuplicateMatch> getMatches() {
+        return matches;
+    }
 
-	public void setMatches(Map<UUID, DuplicateMatch> matches) {
-		this.matches = matches;
-	}
+    public void setMatches(Map<UUID, DuplicateMatch> matches) {
+        this.matches = matches;
+    }
 
 }

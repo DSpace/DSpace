@@ -3,7 +3,7 @@
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
  *
- * https://github.com/CILEA/dspace-cris/wiki/License
+ * http://www.dspace.org/license/
  */
 package org.dspace.app.deduplication.service.impl;
 
@@ -11,7 +11,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.solr.common.SolrInputDocument;
 import org.dspace.app.deduplication.service.SolrDedupServiceIndexPlugin;
@@ -23,64 +23,64 @@ import org.dspace.core.Context;
 
 public class ItemMetadataDedupServiceIndexPlugin implements SolrDedupServiceIndexPlugin {
 
-	private static final Logger log = Logger.getLogger(ItemMetadataDedupServiceIndexPlugin.class);
+    private static final Logger log = Logger.getLogger(ItemMetadataDedupServiceIndexPlugin.class);
 
-	private List<String> metadata;
+    private List<String> metadata;
 
-	private String field;
+    private String field;
 
-	@Override
-	public void additionalIndex(Context context, UUID firstId, UUID secondId, Integer type,
-			SolrInputDocument document) {
+    @Override
+    public void additionalIndex(Context context, UUID firstId, UUID secondId, Integer type,
+            SolrInputDocument document) {
 
-		if (type == Constants.ITEM) {
-			internal(context, firstId, document);
-			if (firstId != secondId) {
-				internal(context, secondId, document);
-			}
-		}
+        if (type == Constants.ITEM) {
+            internal(context, firstId, document);
+            if (firstId != secondId) {
+                internal(context, secondId, document);
+            }
+        }
 
-	}
+    }
 
-	private void internal(Context context, UUID itemId, SolrInputDocument document) {
-		try {
+    private void internal(Context context, UUID itemId, SolrInputDocument document) {
+        try {
 
-			Item item = ContentServiceFactory.getInstance().getItemService().find(context, itemId);
+            Item item = ContentServiceFactory.getInstance().getItemService().find(context, itemId);
 
-			if (item == null) {
-				// found a zombie reference in solr, ignore it
-				return;
-			}
+            if (item == null) {
+                // found a zombie reference in solr, ignore it
+                return;
+            }
 
-			for (String meta : metadata) {
-				for (MetadataValue mm : ContentServiceFactory.getInstance().getItemService()
-						.getMetadataByMetadataString(item, meta)) {
-					if (StringUtils.isNotEmpty(field)) {
-						document.addField(field, mm.getValue());
-					} else {
-						document.addField(mm.getMetadataField().toString('.') + "_s", mm.getValue());
-					}
-				}
-			}
-		} catch (SQLException e) {
-			log.error(e.getMessage(), e);
-		}
-	}
+            for (String meta : metadata) {
+                for (MetadataValue mm : ContentServiceFactory.getInstance().getItemService()
+                        .getMetadataByMetadataString(item, meta)) {
+                    if (StringUtils.isNotEmpty(field)) {
+                        document.addField(field, mm.getValue());
+                    } else {
+                        document.addField(mm.getMetadataField().toString('.') + "_s", mm.getValue());
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            log.error(e.getMessage(), e);
+        }
+    }
 
-	public List<String> getMetadata() {
-		return metadata;
-	}
+    public List<String> getMetadata() {
+        return metadata;
+    }
 
-	public void setMetadata(List<String> metadata) {
-		this.metadata = metadata;
-	}
+    public void setMetadata(List<String> metadata) {
+        this.metadata = metadata;
+    }
 
-	public String getField() {
-		return field;
-	}
+    public String getField() {
+        return field;
+    }
 
-	public void setField(String field) {
-		this.field = field;
-	}
+    public void setField(String field) {
+        this.field = field;
+    }
 
 }

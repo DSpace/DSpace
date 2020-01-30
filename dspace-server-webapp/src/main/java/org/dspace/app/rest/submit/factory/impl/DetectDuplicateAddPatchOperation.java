@@ -30,61 +30,61 @@ import org.dspace.utils.DSpace;
  */
 public class DetectDuplicateAddPatchOperation extends AddPatchOperation<DuplicateDecisionObjectRest> {
 
-	@Override
-	void add(Context context, Request currentRequest, InProgressSubmission source, String path, Object value)
-			throws Exception {
-		String[] split = getAbsolutePath(path).split("/");
-		if ((split.length != 3) || (split[0].compareTo("matches") != 0)) {
-			throw new IllegalArgumentException(
-					String.format("The specified path '%s' is not valid", getAbsolutePath(path)));
-		}
+    @Override
+    void add(Context context, Request currentRequest, InProgressSubmission source, String path, Object value)
+            throws Exception {
+        String[] split = getAbsolutePath(path).split("/");
+        if ((split.length != 3) || (split[0].compareTo("matches") != 0)) {
+            throw new IllegalArgumentException(
+                    String.format("The specified path '%s' is not valid", getAbsolutePath(path)));
+        }
 
-		DedupUtils dedupUtils = new DSpace().getServiceManager().getServiceByName("dedupUtils", DedupUtils.class);
+        DedupUtils dedupUtils = new DSpace().getServiceManager().getServiceByName("dedupUtils", DedupUtils.class);
 
-		DuplicateDecisionObjectRest decisionObject = evaluateSingleObject((LateObjectEvaluator) value);
-		UUID currentItemID = source.getItem().getID();
-		UUID duplicateItemID = UUID.fromString(split[1]);
-		boolean isInWorkflow = !(source instanceof WorkspaceItem);
-		String subPath = split[2];
-		Integer resourceType = source.getItem().getType();
+        DuplicateDecisionObjectRest decisionObject = evaluateSingleObject((LateObjectEvaluator) value);
+        UUID currentItemID = source.getItem().getID();
+        UUID duplicateItemID = UUID.fromString(split[1]);
+        boolean isInWorkflow = !(source instanceof WorkspaceItem);
+        String subPath = split[2];
+        Integer resourceType = source.getItem().getType();
 
-		switch (subPath) {
-		case "submitterDecision":
-			decisionObject.setType(DuplicateDecisionType.WORKSPACE);
-			break;
-		case "workflowDecision":
-			decisionObject.setType(DuplicateDecisionType.WORKFLOW);
-			break;
-		case "adminDecision":
-			decisionObject.setType(DuplicateDecisionType.ADMIN);
-			break;
-		default:
-			throw new IllegalArgumentException(String.format("The specified path %s is not valid", subPath));
-		}
+        switch (subPath) {
+            case "submitterDecision":
+                decisionObject.setType(DuplicateDecisionType.WORKSPACE);
+                break;
+            case "workflowDecision":
+                decisionObject.setType(DuplicateDecisionType.WORKFLOW);
+                break;
+            case "adminDecision":
+                decisionObject.setType(DuplicateDecisionType.ADMIN);
+                break;
+            default:
+                throw new IllegalArgumentException(String.format("The specified path %s is not valid", subPath));
+        }
 
-		if (!dedupUtils.validateDecision(decisionObject)) {
-			throw new IllegalArgumentException(
-					String.format("The specified decision %s is not valid", decisionObject.getValue()));
-		}
+        if (!dedupUtils.validateDecision(decisionObject)) {
+            throw new IllegalArgumentException(
+                    String.format("The specified decision %s is not valid", decisionObject.getValue()));
+        }
 
-		if (!dedupUtils.matchExist(context, currentItemID, duplicateItemID, resourceType, null, isInWorkflow)) {
-			throw new PatchUnprocessableEntityException(
-					String.format("Cannot find any duplicate match related to Item %s", duplicateItemID));
-		}
+        if (!dedupUtils.matchExist(context, currentItemID, duplicateItemID, resourceType, null, isInWorkflow)) {
+            throw new PatchUnprocessableEntityException(
+                    String.format("Cannot find any duplicate match related to Item %s", duplicateItemID));
+        }
 
-		dedupUtils.setDuplicateDecision(context, source.getItem().getID(), duplicateItemID, source.getItem().getType(),
-				decisionObject);
+        dedupUtils.setDuplicateDecision(context, source.getItem().getID(), duplicateItemID, source.getItem().getType(),
+                decisionObject);
 
-	}
+    }
 
-	@Override
-	protected Class<DuplicateDecisionObjectRest[]> getArrayClassForEvaluation() {
-		return DuplicateDecisionObjectRest[].class;
-	}
+    @Override
+    protected Class<DuplicateDecisionObjectRest[]> getArrayClassForEvaluation() {
+        return DuplicateDecisionObjectRest[].class;
+    }
 
-	@Override
-	protected Class<DuplicateDecisionObjectRest> getClassForEvaluation() {
-		return DuplicateDecisionObjectRest.class;
-	}
+    @Override
+    protected Class<DuplicateDecisionObjectRest> getClassForEvaluation() {
+        return DuplicateDecisionObjectRest.class;
+    }
 
 }

@@ -93,7 +93,7 @@
 
         <!--Step will be to Check for potential duplicate -->
         <step id="detect-duplicate"> <heading>submit.progressbar.detect.duplicate</heading>
-            <processing-class>org.dspace.submit.step.DetectPotentialDuplicate</processing-class>
+            <processing-class>org.dspace.app.rest.submit.step.DetectPotentialDuplicateStep</processing-class>
             <type>duplicate</type>
         </step>
 
@@ -148,7 +148,7 @@
             <!--Step will be to Upload the item -->
             <step id="upload"/>
             <!-- <step id="upload-with-embargo"/> -->
-            <!-- <step id="detect-duplicate"/> -->
+            <step id="detect-duplicate"/>
 
             <!--Step will be to Sign off on the License -->
             <step id="license"/>

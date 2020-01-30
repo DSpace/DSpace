@@ -11,84 +11,92 @@ import org.dspace.app.deduplication.service.impl.SolrDedupServiceImpl.Deduplicat
 
 public class DuplicateDecisionObjectRest {
 
-	String value;
+    String value;
 
-	DuplicateDecisionType type;
+    DuplicateDecisionType type;
 
-	String note;
+    String note;
 
-	public DuplicateDecisionValue getValue() {
-		return (value != null) ? DuplicateDecisionValue.fromString(value) : null;
-	}
+    public DuplicateDecisionValue getValue() {
+        return (value != null) ? DuplicateDecisionValue.fromString(value) : null;
+    }
 
-	public void setValue(String value) {
-		this.value = value;
-	}
+    public void setValue(String value) {
+        this.value = value;
+    }
 
-	public DuplicateDecisionType getType() {
-		return type;
-	}
+    public DuplicateDecisionType getType() {
+        return type;
+    }
 
-	public void setType(DuplicateDecisionType type) {
-		this.type = type;
-	}
+    public void setType(DuplicateDecisionType type) {
+        this.type = type;
+    }
 
-	public String getNote() {
-		return note;
-	}
+    public String getNote() {
+        return note;
+    }
 
-	public void setNote(String note) {
-		this.note = note;
-	}
+    public void setNote(String note) {
+        this.note = note;
+    }
 
-	public DeduplicationFlag getDecisionFlag() {
-		DeduplicationFlag flag = DeduplicationFlag.MATCH;
-		if (getValue() != null) {
-			switch (getValue()) {
-			case REJECT:
-				flag = getRejectDecisionFlagByType(getType());
-				break;
-			case VERIFY:
-				flag = getVerifyDecisionFlagByType(getType());
-				break;
+    public DeduplicationFlag getDecisionFlag() {
+        DeduplicationFlag flag = DeduplicationFlag.MATCH;
+        if (getValue() != null) {
+            switch (getValue()) {
+                case REJECT:
+                    flag = getRejectDecisionFlagByType(getType());
+                    break;
+                case VERIFY:
+                    flag = getVerifyDecisionFlagByType(getType());
+                    break;
+                default:
+                    // use default
+                    break;
+            }
+        }
+        return flag;
+    }
 
-			}
-		}
-		return flag;
-	}
+    private DeduplicationFlag getRejectDecisionFlagByType(DuplicateDecisionType type) {
+        DeduplicationFlag flag = null;
+        switch (getType()) {
+            case ADMIN:
+                flag = DeduplicationFlag.REJECTADMIN;
+                break;
+            case WORKSPACE:
+                flag = DeduplicationFlag.REJECTWS;
+                break;
+            case WORKFLOW:
+                flag = DeduplicationFlag.REJECTWF;
+                break;
+            default:
+                // do nothing
+                break;
+        }
 
-	private DeduplicationFlag getRejectDecisionFlagByType(DuplicateDecisionType type) {
-		DeduplicationFlag flag = null;
-		switch (getType()) {
-		case ADMIN:
-			flag = DeduplicationFlag.REJECTADMIN;
-			break;
-		case WORKSPACE:
-			flag = DeduplicationFlag.REJECTWS;
-			break;
-		case WORKFLOW:
-			flag = DeduplicationFlag.REJECTWF;
-			break;
-		}
+        return flag;
+    }
 
-		return flag;
-	}
+    private DeduplicationFlag getVerifyDecisionFlagByType(DuplicateDecisionType type) {
+        DeduplicationFlag flag = null;
+        switch (getType()) {
+            case ADMIN:
+                flag = null;
+                break;
+            case WORKSPACE:
+                flag = DeduplicationFlag.VERIFYWS;
+                break;
+            case WORKFLOW:
+                flag = DeduplicationFlag.VERIFYWF;
+                break;
+            default:
+                // do nothing
+                break;
+        }
 
-	private DeduplicationFlag getVerifyDecisionFlagByType(DuplicateDecisionType type) {
-		DeduplicationFlag flag = null;
-		switch (getType()) {
-		case ADMIN:
-			flag = null;
-			break;
-		case WORKSPACE:
-			flag = DeduplicationFlag.VERIFYWS;
-			break;
-		case WORKFLOW:
-			flag = DeduplicationFlag.VERIFYWF;
-			break;
-		}
-
-		return flag;
-	}
+        return flag;
+    }
 
 }

@@ -18,52 +18,52 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 public class DeduplicationServiceImpl implements DeduplicationService {
 
-	/**
-	 * log4j logger
-	 */
-	private final Logger log = org.apache.logging.log4j.LogManager.getLogger(DeduplicationServiceImpl.class);
+    /**
+     * log4j logger
+     */
+    private final Logger log = org.apache.logging.log4j.LogManager.getLogger(DeduplicationServiceImpl.class);
 
-	@Autowired(required = true)
-	protected DeduplicationDAO deduplicationDAO;
+    @Autowired(required = true)
+    protected DeduplicationDAO deduplicationDAO;
 
-	protected DeduplicationServiceImpl() {
-		super();
-	}
+    protected DeduplicationServiceImpl() {
+        super();
+    }
 
-	@Override
-	public Deduplication create(Context context) throws SQLException {
-		// Create a table row
-		Deduplication dedup = deduplicationDAO.create(context, new Deduplication());
+    @Override
+    public Deduplication create(Context context) throws SQLException {
+        // Create a table row
+        Deduplication dedup = deduplicationDAO.create(context, new Deduplication());
 
-		dedup.setDeduplicationId(deduplicationDAO.getNextDeduplicationId(context));
+        dedup.setDeduplicationId(deduplicationDAO.getNextDeduplicationId(context));
 
-		return dedup;
-	}
+        return dedup;
+    }
 
-	@Override
-	public List<Deduplication> findAll(Context context) throws SQLException {
-		return deduplicationDAO.findAll(context);
-	}
+    @Override
+    public List<Deduplication> findAll(Context context) throws SQLException {
+        return deduplicationDAO.findAll(context);
+    }
 
-	@Override
-	public int countTotal(Context context) throws SQLException {
-		return deduplicationDAO.countRows(context);
-	}
+    @Override
+    public int countTotal(Context context) throws SQLException {
+        return deduplicationDAO.countRows(context);
+    }
 
-	@Override
-	public void update(Context context, Deduplication dedup) throws SQLException {
-		deduplicationDAO.save(context, dedup);
-	}
+    @Override
+    public void update(Context context, Deduplication dedup) throws SQLException {
+        deduplicationDAO.save(context, dedup);
+    }
 
-	@Override
-	public List<Deduplication> getDeduplicationByFirstAndSecond(Context context, String firstId, String secondId)
-			throws SQLException {
-		return deduplicationDAO.findByFirstAndSecond(context, firstId, secondId);
-	}
+    @Override
+    public List<Deduplication> getDeduplicationByFirstAndSecond(Context context, String firstId, String secondId)
+            throws SQLException {
+        return deduplicationDAO.findByFirstAndSecond(context, firstId, secondId);
+    }
 
-	@Override
-	public Deduplication uniqueDeduplicationByFirstAndSecond(Context context, String firstId, String secondId)
-			throws SQLException {
-		return deduplicationDAO.uniqueByFirstAndSecond(context, firstId, secondId);
-	}
+    @Override
+    public Deduplication uniqueDeduplicationByFirstAndSecond(Context context, String firstId, String secondId)
+            throws SQLException {
+        return deduplicationDAO.uniqueByFirstAndSecond(context, firstId, secondId);
+    }
 }

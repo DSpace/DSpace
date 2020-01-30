@@ -9,7 +9,7 @@ package org.dspace.app.deduplication.model;
 
 public enum DuplicateDecisionValue {
 
-	REJECT("reject"), VERIFY("verify");
+    REJECT("reject"), VERIFY("verify");
 
     private String text;
 

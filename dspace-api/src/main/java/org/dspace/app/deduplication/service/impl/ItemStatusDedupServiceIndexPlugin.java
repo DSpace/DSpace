@@ -3,7 +3,7 @@
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
  *
- * https://github.com/CILEA/dspace-cris/wiki/License
+ * http://www.dspace.org/license/
  */
 package org.dspace.app.deduplication.service.impl;
 
@@ -21,34 +21,34 @@ import org.dspace.util.ItemUtils;
 
 public class ItemStatusDedupServiceIndexPlugin implements SolrDedupServiceIndexPlugin {
 
-	private static final Logger log = Logger.getLogger(ItemStatusDedupServiceIndexPlugin.class);
+    private static final Logger log = Logger.getLogger(ItemStatusDedupServiceIndexPlugin.class);
 
-	@Override
-	public void additionalIndex(Context context, UUID firstId, UUID secondId, Integer type,
-			SolrInputDocument document) {
+    @Override
+    public void additionalIndex(Context context, UUID firstId, UUID secondId, Integer type,
+            SolrInputDocument document) {
 
-		if (type == Constants.ITEM) {
-			internal(context, firstId, document);
-			if (firstId != secondId) {
-				internal(context, secondId, document);
-			}
-		}
+        if (type == Constants.ITEM) {
+            internal(context, firstId, document);
+            if (firstId != secondId) {
+                internal(context, secondId, document);
+            }
+        }
 
-	}
+    }
 
-	private void internal(Context context, UUID itemId, SolrInputDocument document) {
-		try {
-			Item item = ContentServiceFactory.getInstance().getItemService().find(context, itemId);
+    private void internal(Context context, UUID itemId, SolrInputDocument document) {
+        try {
+            Item item = ContentServiceFactory.getInstance().getItemService().find(context, itemId);
 
-			if (item == null) {
-				// found a zombie reference in solr, ignore it
-				return;
-			}
+            if (item == null) {
+                // found a zombie reference in solr, ignore it
+                return;
+            }
 
-			document.addField("itemstatus_i", ItemUtils.getItemStatus(context, item));
-		} catch (SQLException e) {
-			log.error(e.getMessage(), e);
-		}
-	}
+            document.addField("itemstatus_i", ItemUtils.getItemStatus(context, item));
+        } catch (SQLException e) {
+            log.error(e.getMessage(), e);
+        }
+    }
 
 }

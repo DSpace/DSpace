@@ -3,7 +3,7 @@
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
  *
- * https://github.com/CILEA/dspace-cris/wiki/License
+ * http://www.dspace.org/license/
  */
 package org.dspace.app.deduplication.utils;
 
@@ -13,11 +13,11 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 
 public interface Signature {
-	public List<String> getSignature(/* BrowsableDSpaceObject */DSpaceObject item, Context context);
+    public List<String> getSignature(/* BrowsableDSpaceObject */DSpaceObject item, Context context);
 
-	public int getResourceTypeID();
+    public int getResourceTypeID();
 
-	public String getSignatureType();
+    public String getSignatureType();
 
-	public String getMetadata();
+    public String getMetadata();
 }

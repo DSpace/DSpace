@@ -1971,156 +1971,142 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
     public void patchDeduplicationTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
-        //** GIVEN **
-        //1. A community-collection structure with one parent community with sub-community and two collections.
-        parentCommunity = CommunityBuilder.createCommunity(context)
-                                          .withName("Parent Community")
-                                          .build();
-        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
-                                           .withName("Sub Community")
-                                           .build();
+        // ** GIVEN **
+        // 1. A community-collection structure with one parent community with
+        // sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context).withName("Parent Community").build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity).withName("Sub Community")
+                .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
         String authToken = getAuthToken(admin.getEmail(), password);
 
-        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
-                .withTitle("Test WorkspaceItem")
-                .withIssueDate("2017-10-17")
-                .grantLicense()
+        InputStream pdf = getClass().getResourceAsStream("simple-article.pdf");
+
+        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1).withTitle("Test WorkspaceItem")
+                .withIssueDate("2017-10-17").withFulltext("simple-article.pdf", "/local/path/simple-article.pdf", pdf)
                 .build();
 
-        WorkspaceItem witem2 = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
-                .withTitle("Test WorkspaceItem 2")
-                .withIssueDate("2017-10-17")
-                .grantLicense()
+        // check the file metadata
+        getClient().perform(get("/api/submission/workspaceitems/" + witem.getID())).andExpect(status().isOk())
+                .andExpect(jsonPath("$.sections.upload.files[0].metadata['dc.source'][0].value",
+                        is("/local/path/simple-article.pdf")))
+                .andExpect(
+                        jsonPath("$.sections.upload.files[0].metadata['dc.title'][0].value", is("simple-article.pdf")));
+
+        pdf.close();
+        pdf = getClass().getResourceAsStream("simple-article.pdf");
+
+        WorkspaceItem witem2 = WorkspaceItemBuilder.createWorkspaceItem(context, col1).withTitle("Test WorkspaceItem 2")
+                .withIssueDate("2017-10-18").withFulltext("simple-article.pdf", "/local/path/simple-article.pdf", pdf)
                 .build();
 
-        WorkspaceItem witem3 = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
-                .withTitle("Test WorkspaceItem 3")
-                .withIssueDate("2017-10-17")
-                .grantLicense()
-                .build();
+        // check the file metadata
+        getClient().perform(get("/api/submission/workspaceitems/" + witem2.getID())).andExpect(status().isOk())
+                .andExpect(jsonPath("$.sections.upload.files[0].metadata['dc.source'][0].value",
+                        is("/local/path/simple-article.pdf")))
+                .andExpect(
+                        jsonPath("$.sections.upload.files[0].metadata['dc.title'][0].value", is("simple-article.pdf")));
 
-        WorkspaceItem witem4 = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
-                .withTitle("Test WorkspaceItem 4")
-                .withIssueDate("2017-10-17")
-                .grantLicense()
-                .build();
+        pdf.close();
 
-        // check that our workspaceitems come with a license (all are build in the same way, just check the first)
-        getClient().perform(get("/api/submission/workspaceitems/" + witem.getID()))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.sections.license.granted",
-                    is(true)))
-            .andExpect(jsonPath("$.sections.license.acceptanceDate").isNotEmpty())
-            .andExpect(jsonPath("$.sections.license.url").isNotEmpty())
-        ;
+        // check that our workspaceitems come with a license (all are build in the same
+        // way, just check the first)
+//        getClient().perform(get("/api/submission/workspaceitems/" + witem.getID())).andExpect(status().isOk());
+//                .andExpect(jsonPath("$.sections.license.granted", is(true)))
+//                .andExpect(jsonPath("$.sections.license.acceptanceDate").isNotEmpty())
+//                .andExpect(jsonPath("$.sections.license.url").isNotEmpty());
 
-        // try to reject the license with an add operation
-        List<Operation> addGrant = new ArrayList<Operation>();
-        addGrant.add(new AddOperation("/sections/license/granted", false));
+        // try to reject
+        List<Operation> detectDuplicate = new ArrayList<Operation>();
+        // create a list of values to use in add operation
+        List<Map<String, String>> values = new ArrayList<Map<String, String>>();
+        Map<String, String> value = new HashMap<String, String>();
+        value.put("value", "reject");
+        value.put("note", null);
+        values.add(value);
+        detectDuplicate.add(new AddOperation("/sections/detect-duplicate/matches/"
+                + witem2.getItem().getID() + "/submitterDecision", values));
 
-        String patchBody = getPatchContent(addGrant);
-        getClient(authToken).perform(patch("/api/submission/workspaceitems/" + witem.getID())
-                .content(patchBody)
-                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
-                            .andExpect(status().isOk())
-                            .andExpect(jsonPath("$.errors").doesNotExist())
-                            .andExpect(jsonPath("$.sections.license.granted",
-                                    is(false)))
-                            .andExpect(jsonPath("$.sections.license.acceptanceDate").isEmpty())
-                            .andExpect(jsonPath("$.sections.license.url").isEmpty())
-        ;
-
-//        // verify that the patch changes have been persisted
-//        getClient().perform(get("/api/submission/workspaceitems/" + witem.getID()))
-//            .andExpect(status().isOk())
-//            .andExpect(jsonPath("$.errors").doesNotExist())
-//            .andExpect(jsonPath("$.sections.license.granted",
-//                    is(false)))
-//            .andExpect(jsonPath("$.sections.license.acceptanceDate").isEmpty())
-//            .andExpect(jsonPath("$.sections.license.url").isEmpty())
-//        ;
+        String patchBody = getPatchContent(detectDuplicate);
+        getClient(authToken)
+                .perform(patch("/api/submission/workspaceitems/" + witem2.getID())
+                        .content(patchBody).contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isOk());
+//                .andExpect(status().isOk()).andExpect(jsonPath("$.errors").doesNotExist())
+//                .andExpect(jsonPath("$.sections.license.granted", is(false)))
+//                .andExpect(jsonPath("$.sections.license.acceptanceDate").isEmpty())
+//                .andExpect(jsonPath("$.sections.license.url").isEmpty());
 //
-//        // try to reject the license with an add operation supplying a string instead than a boolean
+//        // verify that the patch changes have been persisted
+//        getClient().perform(get("/api/submission/workspaceitems/" + witem.getID())).andExpect(status().isOk())
+//                .andExpect(jsonPath("$.errors").doesNotExist())
+//                .andExpect(jsonPath("$.sections.license.granted", is(false)))
+//                .andExpect(jsonPath("$.sections.license.acceptanceDate").isEmpty())
+//                .andExpect(jsonPath("$.sections.license.url").isEmpty());
+//
+//        // try to reject the license with an add operation supplying a string instead
+//        // than a boolean
 //        List<Operation> addGrantString = new ArrayList<Operation>();
 //        addGrantString.add(new AddOperation("/sections/license/granted", "false"));
 //
 //        patchBody = getPatchContent(addGrantString);
-//        getClient(authToken).perform(patch("/api/submission/workspaceitems/" + witem2.getID())
-//                .content(patchBody)
-//                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
-//                            .andExpect(status().isOk())
-//                            .andExpect(jsonPath("$.errors").doesNotExist())
-//                            .andExpect(jsonPath("$.sections.license.granted",
-//                                    is(false)))
-//                            .andExpect(jsonPath("$.sections.license.acceptanceDate").isEmpty())
-//                            .andExpect(jsonPath("$.sections.license.url").isEmpty())
-//        ;
+//        getClient(authToken)
+//                .perform(patch("/api/submission/workspaceitems/" + witem2.getID()).content(patchBody)
+//                        .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+//                .andExpect(status().isOk()).andExpect(jsonPath("$.errors").doesNotExist())
+//                .andExpect(jsonPath("$.sections.license.granted", is(false)))
+//                .andExpect(jsonPath("$.sections.license.acceptanceDate").isEmpty())
+//                .andExpect(jsonPath("$.sections.license.url").isEmpty());
 //
 //        // verify that the patch changes have been persisted
-//        getClient().perform(get("/api/submission/workspaceitems/" + witem2.getID()))
-//            .andExpect(status().isOk())
-//            .andExpect(jsonPath("$.errors").doesNotExist())
-//            .andExpect(jsonPath("$.sections.license.granted",
-//                    is(false)))
-//            .andExpect(jsonPath("$.sections.license.acceptanceDate").isEmpty())
-//            .andExpect(jsonPath("$.sections.license.url").isEmpty())
-//        ;
+//        getClient().perform(get("/api/submission/workspaceitems/" + witem2.getID())).andExpect(status().isOk())
+//                .andExpect(jsonPath("$.errors").doesNotExist())
+//                .andExpect(jsonPath("$.sections.license.granted", is(false)))
+//                .andExpect(jsonPath("$.sections.license.acceptanceDate").isEmpty())
+//                .andExpect(jsonPath("$.sections.license.url").isEmpty());
 //
 //        // try to reject the license with a replace operation
 //        List<Operation> replaceGrant = new ArrayList<Operation>();
 //        replaceGrant.add(new ReplaceOperation("/sections/license/granted", false));
 //
 //        patchBody = getPatchContent(replaceGrant);
-//        getClient(authToken).perform(patch("/api/submission/workspaceitems/" + witem3.getID())
-//                .content(patchBody)
-//                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
-//                            .andExpect(status().isOk())
-//                            .andExpect(jsonPath("$.errors").doesNotExist())
-//                            .andExpect(jsonPath("$.sections.license.granted",
-//                                    is(false)))
-//                            .andExpect(jsonPath("$.sections.license.acceptanceDate").isEmpty())
-//                            .andExpect(jsonPath("$.sections.license.url").isEmpty())
-//        ;
+//        getClient(authToken)
+//                .perform(patch("/api/submission/workspaceitems/" + witem3.getID()).content(patchBody)
+//                        .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+//                .andExpect(status().isOk()).andExpect(jsonPath("$.errors").doesNotExist())
+//                .andExpect(jsonPath("$.sections.license.granted", is(false)))
+//                .andExpect(jsonPath("$.sections.license.acceptanceDate").isEmpty())
+//                .andExpect(jsonPath("$.sections.license.url").isEmpty());
 //
 //        // verify that the patch changes have been persisted
-//        getClient().perform(get("/api/submission/workspaceitems/" + witem3.getID()))
-//            .andExpect(status().isOk())
-//            .andExpect(jsonPath("$.errors").doesNotExist())
-//            .andExpect(jsonPath("$.sections.license.granted",
-//                    is(false)))
-//            .andExpect(jsonPath("$.sections.license.acceptanceDate").isEmpty())
-//            .andExpect(jsonPath("$.sections.license.url").isEmpty())
-//        ;
+//        getClient().perform(get("/api/submission/workspaceitems/" + witem3.getID())).andExpect(status().isOk())
+//                .andExpect(jsonPath("$.errors").doesNotExist())
+//                .andExpect(jsonPath("$.sections.license.granted", is(false)))
+//                .andExpect(jsonPath("$.sections.license.acceptanceDate").isEmpty())
+//                .andExpect(jsonPath("$.sections.license.url").isEmpty());
 //
 //        // try to reject the license with a replace operation supplying a string
 //        List<Operation> replaceGrantString = new ArrayList<Operation>();
 //        replaceGrant.add(new ReplaceOperation("/sections/license/granted", "false"));
 //
 //        patchBody = getPatchContent(replaceGrant);
-//        getClient(authToken).perform(patch("/api/submission/workspaceitems/" + witem4.getID())
-//                .content(patchBody)
-//                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
-//                            .andExpect(status().isOk())
-//                            .andExpect(jsonPath("$.errors").doesNotExist())
-//                            .andExpect(jsonPath("$.sections.license.granted",
-//                                    is(false)))
-//                            .andExpect(jsonPath("$.sections.license.acceptanceDate").isEmpty())
-//                            .andExpect(jsonPath("$.sections.license.url").isEmpty())
-//        ;
+//        getClient(authToken)
+//                .perform(patch("/api/submission/workspaceitems/" + witem4.getID()).content(patchBody)
+//                        .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+//                .andExpect(status().isOk()).andExpect(jsonPath("$.errors").doesNotExist())
+//                .andExpect(jsonPath("$.sections.license.granted", is(false)))
+//                .andExpect(jsonPath("$.sections.license.acceptanceDate").isEmpty())
+//                .andExpect(jsonPath("$.sections.license.url").isEmpty());
 //
 //        // verify that the patch changes have been persisted
-//        getClient().perform(get("/api/submission/workspaceitems/" + witem4.getID()))
-//            .andExpect(status().isOk())
-//            .andExpect(jsonPath("$.errors").doesNotExist())
-//            .andExpect(jsonPath("$.sections.license.granted",
-//                    is(false)))
-//            .andExpect(jsonPath("$.sections.license.acceptanceDate").isEmpty())
-//            .andExpect(jsonPath("$.sections.license.url").isEmpty())
-//        ;
+//        getClient().perform(get("/api/submission/workspaceitems/" + witem4.getID())).andExpect(status().isOk())
+//                .andExpect(jsonPath("$.errors").doesNotExist())
+//                .andExpect(jsonPath("$.sections.license.granted", is(false)))
+//                .andExpect(jsonPath("$.sections.license.acceptanceDate").isEmpty())
+//                .andExpect(jsonPath("$.sections.license.url").isEmpty());
 
     }
-    
+
     @Test
     /**
      * Test the upload of files in the upload over section

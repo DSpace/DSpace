@@ -41,6 +41,7 @@
                         <exclude>**/static/reports/spin.js</exclude>
                         <exclude>**/static/reports/README.md</exclude>
                         <exclude>**/*.xsd</exclude>
+                        <exclude>**/rebel.xml</exclude>
                     </excludes>
                 </configuration>
             </plugin>

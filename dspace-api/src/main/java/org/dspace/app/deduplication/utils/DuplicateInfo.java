@@ -3,7 +3,7 @@
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
  *
- * https://github.com/CILEA/dspace-cris/wiki/License
+ * http://www.dspace.org/license/
  */
 package org.dspace.app.deduplication.utils;
 
@@ -13,50 +13,50 @@ import java.util.List;
 import org.dspace.content.DSpaceObject;
 
 public abstract class DuplicateInfo {
-	private String signatureId;
-	private List</*BrowsableDSpaceObject*/DSpaceObject> items;
-	private String signature;
-	private List<String> otherSignature;
+    private String signatureId;
+    private List</* BrowsableDSpaceObject */DSpaceObject> items;
+    private String signature;
+    private List<String> otherSignature;
 
-	public int getNumItems() {
-		return items.size();
-	}
+    public int getNumItems() {
+        return items.size();
+    }
 
-	public List</*BrowsableDSpaceObject*/DSpaceObject> getItems() {
-		if (items == null) {
-			items = new ArrayList</*BrowsableDSpaceObject*/DSpaceObject>();
-		}
-		return items;
-	}
+    public List</* BrowsableDSpaceObject */DSpaceObject> getItems() {
+        if (items == null) {
+            items = new ArrayList</* BrowsableDSpaceObject */DSpaceObject>();
+        }
+        return items;
+    }
 
-	public String getSignature() {
-		return signature;
-	}
+    public String getSignature() {
+        return signature;
+    }
 
-	public String getSignatureId() {
-		return signatureId;
-	}
+    public String getSignatureId() {
+        return signatureId;
+    }
 
-	public void setSignatureId(String signatureId) {
-		this.signatureId = signatureId;
-	}
+    public void setSignatureId(String signatureId) {
+        this.signatureId = signatureId;
+    }
 
-	public void setItems(List</*BrowsableDSpaceObject*/DSpaceObject> items) {
-		this.items = items;
-	}
+    public void setItems(List</* BrowsableDSpaceObject */DSpaceObject> items) {
+        this.items = items;
+    }
 
-	public void setSignature(String signature) {
-		this.signature = signature;
-	}
+    public void setSignature(String signature) {
+        this.signature = signature;
+    }
 
-	public List<String> getOtherSignature() {
-		if (this.otherSignature == null) {
-			this.otherSignature = new ArrayList<String>();
-		}
-		return otherSignature;
-	}
+    public List<String> getOtherSignature() {
+        if (this.otherSignature == null) {
+            this.otherSignature = new ArrayList<String>();
+        }
+        return otherSignature;
+    }
 
-	public void setOtherSignature(List<String> otherSignature) {
-		this.otherSignature = otherSignature;
-	}
+    public void setOtherSignature(List<String> otherSignature) {
+        this.otherSignature = otherSignature;
+    }
 }

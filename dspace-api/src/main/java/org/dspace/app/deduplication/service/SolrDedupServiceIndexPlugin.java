@@ -3,7 +3,7 @@
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
  *
- * https://github.com/CILEA/dspace-cris/wiki/License
+ * http://www.dspace.org/license/
  */
 package org.dspace.app.deduplication.service;
 
@@ -13,6 +13,6 @@ import org.apache.solr.common.SolrInputDocument;
 import org.dspace.core.Context;
 
 public interface SolrDedupServiceIndexPlugin {
-	public void additionalIndex(Context context, UUID dsoFirst, UUID dsoSecond, Integer type,
-			SolrInputDocument document);
+    public void additionalIndex(Context context, UUID dsoFirst, UUID dsoSecond, Integer type,
+            SolrInputDocument document);
 }
