@@ -103,8 +103,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         context.restoreAuthSystemState();
 
         getClient().perform(get("/api/core/collections")
-                                .param("size", "1"))
-                   .andExpect(status().isOk())
+                .param("size", "1"))
+                .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$._embedded.collections", Matchers.contains(
                        CollectionMatcher.matchCollectionEntry(col1.getName(), col1.getID(), col1.getHandle())
@@ -186,7 +186,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
 
         context.restoreAuthSystemState();
 
-        getClient().perform(get("/api/core/collections/" + col1.getID()))
+        getClient().perform(get("/api/core/collections/" + col1.getID())
+                   .param("projection", "full"))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$", is(
