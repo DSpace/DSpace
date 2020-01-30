@@ -60,6 +60,6 @@ public class EPersonGroupLinkRepository extends AbstractDSpaceRestRepository
 
     @Override
     public boolean isEmbeddableRelation(Object data, String name) {
-        return false;
+        return true;
     }
 }
