@@ -34,11 +34,6 @@ dspace.dir=/dspace
 # This is where REST API and all enabled server modules (OAI-PMH, SWORD, SWORDv2, RDF, etc) will respond
 dspace.server.url = http://localhost:8080/server
 
-# DSpace UI hostname. Should match dspace.ui.url.  Do not include port number.
-# This is used by some modules (e.g. OAI) as an identifier for your site.
-# You also may chose to use this to populate other configurations below.
-dspace.ui.hostname = localhost
-
 # URL of DSpace frontend (Angular UI). Include port number etc
 # This is used by the backend to provide links in emails, RSS feeds, Sitemaps, etc.
 dspace.ui.url = http://localhost:3000
