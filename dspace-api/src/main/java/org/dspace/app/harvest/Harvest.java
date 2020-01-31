@@ -10,10 +10,12 @@ package org.dspace.app.harvest;
 import org.apache.commons.cli.*;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
+import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -29,6 +31,8 @@ import org.dspace.harvest.service.HarvestedCollectionService;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
@@ -45,6 +49,7 @@ public class Harvest
     private static final HarvestedCollectionService harvestedCollectionService = HarvestServiceFactory.getInstance().getHarvestedCollectionService();
     private static final EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
     private static final CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
+    private static final CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
 
     public static void main(String[] argv) throws Exception
     {
@@ -62,6 +67,10 @@ public class Harvest
         options.addOption("R", "reset", false, "reset harvest status on all collections");
         options.addOption("P", "purge", false, "purge all harvestable collections");
         
+        // /BIBSYS : harvest all collections
+        options.addOption("H", "harvest_all", false, "harvest all harvestable collections (implemented by BIBSYS)");
+        options.addOption("I", "harvest_info", false, "get information about all harvestable collections (implemented by BIBSYS)");
+        // /BIBSYS: harvest all collections
 
         options.addOption("e", "eperson", true, "eperson");
         options.addOption("c", "collection", true, "harvesting collection (handle or id)");
@@ -116,6 +125,12 @@ public class Harvest
         }
         if (line.hasOption('r')) {
             command = "run";
+        }
+        if (line.hasOption("H")) {
+            command = "harvest_all";
+        }
+        if (line.hasOption("I")) {
+            command = "harvest_info";
         }
         if (line.hasOption('g')) {
             command = "ping";
@@ -180,6 +195,21 @@ public class Harvest
             }
             
             harvester.runHarvest(collection, eperson);
+        }
+        // Harvest all harvestable collections
+        else if ("harvest_all".equals(command)) {
+            if (eperson == null)
+            {
+                System.out.println("An eperson must be provided");
+                System.out.println(" (run with -h flag for details)");
+                System.exit(1);
+            }
+
+            harvester.runHarvestAllCollection(eperson);
+        }
+        // print information about harvestable collections
+        else if ("harvest_info".equals(command)) {
+            harvester.printInfoAboutHarvestableCollections();
         }
         // start the harvest loop
         else if ("start".equals(command))
@@ -263,6 +293,105 @@ public class Harvest
         }
     }
     
+    /**
+     * BIBSYS modification
+     * Print information about harvestable collections
+     */
+    private void printInfoAboutHarvestableCollections() {
+
+        try {
+            boolean lastHarvestSuccessful = true;
+            List<String> failedCollections = new ArrayList<>();
+            List<HarvestedCollection> harvestedCollections = harvestedCollectionService.findAll(context);
+
+            String template = "%-6s %-70s %-20s %-45s %s";
+            System.out.println();
+            System.out.println(String.format(template, "Id", "Name", "Metadata format", "Harvest type", "Community"));
+
+            for (HarvestedCollection harvestedCollection : harvestedCollections) {
+
+                Collection collection = collectionService.find(context, harvestedCollection.getCollection().getID());
+
+                List<Community> topCommunities = communityService.findAllTop(context);
+                for (Community topCommunity : topCommunities) {
+                    String topCommunityName = topCommunity == null ? "" : topCommunity.getName();
+                    String harvestType = humanReadableHarvestType(harvestedCollection.getHarvestType());
+                    Object[] harvestCollectionInfo = {harvestedCollection.getID(), collection.getName(),
+                            harvestedCollection.getHarvestMetadataConfig(), harvestType, topCommunityName};
+
+                    System.out.println(String.format(template, harvestCollectionInfo));
+
+                    if (harvestedCollection.getHarvestStatus() != 0) {
+                        lastHarvestSuccessful = false;
+                        failedCollections.add(String.format("%s (%s, %s, %s, %s)", harvestCollectionInfo));
+                    }
+                }
+
+            }
+            System.out.println();
+            if (!lastHarvestSuccessful) {
+                for (String s : failedCollections) {
+                    System.out.println("ERROR : Harvesting fails for collection " + s);
+                }
+            } else {
+                System.out.println("Last harvest completed with success.");
+            }
+
+            System.out.println(String.format("\n%1$tFT%1$tT%1$tz\n", new Date()));
+            System.exit(lastHarvestSuccessful ? 0 : 1);
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+    }
+
+    /**
+     * BIBSYS modification. Translate harvest type id to human readable format
+     * @param harvestTypeId The database id for the harvest type
+     */
+    private String humanReadableHarvestType(int harvestTypeId) {
+        String harvestType;
+        switch (harvestTypeId) {
+            case 0:
+                harvestType = "None";
+                break;
+            case 1:
+                harvestType = "Metadata only";
+                break;
+            case 2:
+                harvestType = "Metadata and references to bitstreams";
+                break;
+            case 3:
+                harvestType = "Metadata and bitstreams";
+                break;
+            default:
+                harvestType = "Unknown";
+        }
+        return harvestType + " (" + harvestTypeId + ")";
+    }
+
+    /**
+     * BIBSYS modification. Harvest all harvestable collection under the authorization of the supplied EPerson
+     * @param eperson Run harvest as Eperson
+     */
+    private void runHarvestAllCollection(String eperson) {
+        try {
+            List<HarvestedCollection> harvestedCollections = harvestedCollectionService.findAll(context);
+            for (HarvestedCollection hc : harvestedCollections)
+            {
+                if (!context.isValid()) {
+                    // Create new context since runHarvest does a context.complete()
+                    context = new Context();
+                }
+                runHarvest(hc.getID().toString(), eperson);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+    }
+
     /*
      * Resolve the ID into a collection and check to see if its harvesting options are set. If so, return
      * the collection, if not, bail out. 
