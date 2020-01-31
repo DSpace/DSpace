@@ -34,10 +34,10 @@ public class IndexEventConsumer implements Consumer {
     private static Logger log = org.apache.logging.log4j.LogManager.getLogger(IndexEventConsumer.class);
 
     // collect Items, Collections, Communities that need indexing
-    private Set<IndexableObject> objectsToUpdate = null;
+    private Set<IndexableObject> objectsToUpdate = new HashSet<>();
 
     // unique search IDs to delete
-    private Set<String> uniqueIdsToDelete = null;
+    private Set<String> uniqueIdsToDelete = new HashSet<>();
 
     IndexingService indexer = DSpaceServicesFactory.getInstance().getServiceManager()
                                                    .getServiceByName(IndexingService.class.getName(),
@@ -154,23 +154,22 @@ public class IndexEventConsumer implements Consumer {
     @Override
     public void end(Context ctx) throws Exception {
 
-        if (objectsToUpdate != null && uniqueIdsToDelete != null) {
-
+        try {
             // update the changed Items not deleted because they were on create list
             for (IndexableObject iu : objectsToUpdate) {
                 /* we let all types through here and
                  * allow the search indexer to make
                  * decisions on indexing and/or removal
                  */
-                iu.setIndexedObject(ctx.reloadEntity(iu.getIndexedObject())); ;
+                iu.setIndexedObject(ctx.reloadEntity(iu.getIndexedObject()));
                 String uniqueIndexID = iu.getUniqueIndexID();
                 if (uniqueIndexID != null && !uniqueIdsToDelete.contains(uniqueIndexID)) {
                     try {
-                        indexer.indexContent(ctx, iu, true, true);
+                        indexer.indexContent(ctx, iu, true, false);
                         log.debug("Indexed "
-                                      + iu.getTypeText()
-                                      + ", id=" + iu.getID()
-                                      + ", unique_id=" + uniqueIndexID);
+                                + iu.getTypeText()
+                                + ", id=" + iu.getID()
+                                + ", unique_id=" + uniqueIndexID);
                     } catch (Exception e) {
                         log.error("Failed while indexing object: ", e);
                     }
@@ -179,21 +178,24 @@ public class IndexEventConsumer implements Consumer {
 
             for (String uid : uniqueIdsToDelete) {
                 try {
-                    indexer.unIndexContent(ctx, uid, true);
+                    indexer.unIndexContent(ctx, uid, false);
                     if (log.isDebugEnabled()) {
                         log.debug("UN-Indexed Item, handle=" + uid);
                     }
                 } catch (Exception e) {
                     log.error("Failed while UN-indexing object: " + uid, e);
                 }
-
             }
+        } finally {
+            if (!objectsToUpdate.isEmpty() || !uniqueIdsToDelete.isEmpty()) {
 
+                indexer.commit();
+
+                // "free" the resources
+                objectsToUpdate.clear();
+                uniqueIdsToDelete.clear();
+            }
         }
-
-        // "free" the resources
-        objectsToUpdate = null;
-        uniqueIdsToDelete = null;
     }
 
     @Override
