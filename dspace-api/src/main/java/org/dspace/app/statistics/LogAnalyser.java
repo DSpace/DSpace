@@ -33,6 +33,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
+import org.dspace.core.Utils;
 import org.dspace.discovery.DiscoverQuery;
 import org.dspace.discovery.SearchServiceException;
 import org.dspace.discovery.SearchUtils;
@@ -581,7 +582,7 @@ public class LogAnalyser {
         }
 
         // now do the host name and url lookup
-        hostName = ConfigurationManager.getProperty("dspace.ui.hostname").trim();
+        hostName = Utils.getHostName(ConfigurationManager.getProperty("dspace.ui.url"));
         name = ConfigurationManager.getProperty("dspace.name").trim();
         url = ConfigurationManager.getProperty("dspace.ui.url").trim();
         if ((url != null) && (!url.endsWith("/"))) {
