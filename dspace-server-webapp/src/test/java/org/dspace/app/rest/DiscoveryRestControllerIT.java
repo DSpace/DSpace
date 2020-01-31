@@ -918,7 +918,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 //These search results have to be shown in the embedded.objects section as these are the items
                 // given in the structure defined above.
                 //Seeing as everything fits onto one page, they have to all be present
-                .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
+                .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.hasItems(
                         SearchResultMatcher.match("core", "community", "communities"),
                         SearchResultMatcher.match("core", "community", "communities"),
                         //This has to be like this because collections don't have anything else
@@ -1000,7 +1000,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 )))
                 //All elements have to be present in the embedded.objects section, these are the ones we made in
                 // the structure defined above
-                .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
+                .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.hasItems(
                         SearchResultMatcher.match("core", "community", "communities"),
                         SearchResultMatcher.match("core", "community", "communities"),
                         //Match without any parameters because collections don't have anything special to check in the
@@ -1089,7 +1089,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                         PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 7)
                 )))
                 //All the elements created in the structure above have to be present in the embedded.objects section
-                .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
+                .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.hasItems(
                         SearchResultMatcher.match("core", "community", "communities"),
                         SearchResultMatcher.match("core", "community", "communities"),
                         //Collections are specified like this because they don't have any special properties
@@ -1251,7 +1251,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 //The scope property has to be set to the value we entered in the parameters
                 .andExpect(jsonPath("$.scope", is("test")))
                 //All the elements created in the structure above have to be present in the embedded.objects section
-                .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
+                .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.hasItems(
                         SearchResultMatcher.match("core", "community", "communities"),
                         SearchResultMatcher.match("core", "community", "communities"),
                         //Collections are specified like this because they don't have any special properties
@@ -1319,7 +1319,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         //An anonymous user browses this endpoint to find the the objects in the system
         //With a dsoType 'item'
         getClient().perform(get("/api/discover/search/objects")
-                .param("dsoType", "item"))
+                .param("dsoType", "Item"))
 
                 //** THEN **
                 //The status has to be 200 OK
@@ -1396,7 +1396,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         //With a dsoType 'item'
         //And a sort on the dc.title ascending
         getClient().perform(get("/api/discover/search/objects")
-                .param("dsoType", "item")
+                .param("dsoType", "Item")
                 .param("sort", "dc.title,ASC"))
 
                 //** THEN **
@@ -1794,7 +1794,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                         PageMatcher.pageEntry(0, 20)
                 )))
                 //These are the items that aren't set to private
-                .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
+                .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.hasItems(
                         SearchResultMatcher.match("core", "community", "communities"),
                         SearchResultMatcher.match("core", "community", "communities"),
                         //Collections are specified like this because they don't have any special properties
@@ -3578,6 +3578,141 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 )))
                 //There always needs to be a self link
                 .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
+        ;
+
+    }
+
+    @Test
+    public void discoverSearchObjectsTestForWithdrawnOrPrivateItemsNonAdmin() throws Exception {
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
+        //2. One public item, one private, one withdrawn.
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                                      .withTitle("Test")
+                                      .withIssueDate("2010-10-17")
+                                      .withAuthor("Smith, Donald")
+                                      .withSubject("ExtraEntry")
+                                      .build();
+
+        Item publicItem2 = ItemBuilder.createItem(context, col2)
+                                      .withTitle("WithdrawnTest 2")
+                                      .withIssueDate("1990-02-13")
+                                      .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
+                                      .withSubject("ExtraEntry")
+                                      .withdrawn()
+                                      .build();
+
+        Item publicItem3 = ItemBuilder.createItem(context, col2)
+                                      .withTitle("Private Test item 2")
+                                      .withIssueDate("2010-02-13")
+                                      .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
+                                      .withSubject("AnotherTest").withSubject("ExtraEntry")
+                                      .makeUnDiscoverable()
+                                      .build();
+
+
+        String query = "Test";
+        //** WHEN **
+        //A non-admin user browses this endpoint to find the withdrawn or private objects in the system
+        //With a query stating 'Test'
+        getClient().perform(get("/api/discover/search/objects")
+            .param("configuration", "undiscoverable")
+            .param("query", query))
+                   //** THEN **
+                   //The status has to be 200 OK
+                   .andExpect(status().isOk())
+                   //The type has to be 'discover'
+                   .andExpect(jsonPath("$.type", is("discover")))
+                   //The page object needs to look like this
+                   .andExpect(jsonPath("$._embedded.searchResult.page", is(
+                       PageMatcher.pageEntry(0, 20)
+                   )))
+                   //The search results should be an empty list.
+                   .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.empty()))
+                   //There always needs to be a self link available
+                   .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
+
+        ;
+
+    }
+
+    @Test
+    public void discoverSearchObjectsTestForWithdrawnOrPrivateItemsByAdminUser() throws Exception {
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
+        //2. One public item, one private, one withdrawn.
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                                      .withTitle("Test")
+                                      .withIssueDate("2010-10-17")
+                                      .withAuthor("Smith, Donald")
+                                      .withSubject("ExtraEntry")
+                                      .build();
+
+        Item publicItem2 = ItemBuilder.createItem(context, col2)
+                                      .withTitle("Withdrawn Test 2")
+                                      .withIssueDate("1990-02-13")
+                                      .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
+                                      .withSubject("ExtraEntry")
+                                      .withdrawn()
+                                      .build();
+
+        Item publicItem3 = ItemBuilder.createItem(context, col2)
+                                      .withTitle("Private Test item 2")
+                                      .withIssueDate("2010-02-13")
+                                      .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
+                                      .withSubject("AnotherTest").withSubject("ExtraEntry")
+                                      .makeUnDiscoverable()
+                                      .build();
+        context.restoreAuthSystemState();
+
+        String query = "Test";
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        //** WHEN **
+        // A system admin user browses this endpoint to find the withdrawn or private objects in the system
+        // With a query stating 'Test'
+        getClient(adminToken).perform(get("/api/discover/search/objects")
+            .param("configuration", "undiscoverable")
+            .param("query", query))
+                   //** THEN **
+                   //The status has to be 200 OK
+                   .andExpect(status().isOk())
+                   //The type has to be 'discover'
+                   .andExpect(jsonPath("$.type", is("discover")))
+                   //The page object needs to look like this
+                   .andExpect(jsonPath("$._embedded.searchResult.page", is(
+                       PageMatcher.pageEntry(0, 20)
+                   )))
+                   //The search results should be an empty list.
+                             .andExpect(jsonPath("$._embedded.searchResult._embedded.objects",
+                                 Matchers.containsInAnyOrder(
+                                 SearchResultMatcher.matchOnItemName("item", "items", "Private Test item 2"),
+                                 SearchResultMatcher.matchOnItemName("item", "items", "Withdrawn Test 2")
+                             )))
+                   //There always needs to be a self link available
+                   .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
+
         ;
 
     }

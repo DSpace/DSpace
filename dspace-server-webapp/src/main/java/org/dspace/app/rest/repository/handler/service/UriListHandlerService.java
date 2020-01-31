@@ -47,9 +47,9 @@ public class UriListHandlerService {
         // Loop all the uriListHandlers
         for (UriListHandler uriListHandler : uriListHandlers) {
             // Does the class support the given uri list and the request method
-            if (uriListHandler.supports(uriList, request.getMethod())) {
+            if (uriListHandler.supports(uriList, request.getMethod(), clazz)) {
                 // Can the class handle the given uri list and can the given class, params and authorization be handled
-                if (uriListHandler.validate(context, request, uriList, clazz)) {
+                if (uriListHandler.validate(context, request, uriList)) {
                     // If all these things succeed, call handle
                     return (T) uriListHandler.handle(context, request, uriList);
                 } else {

@@ -19,6 +19,7 @@ import org.dspace.app.rest.repository.patch.DSpaceObjectPatch;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.service.DSpaceObjectService;
+import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 
@@ -57,11 +58,12 @@ public abstract class DSpaceObjectRestRepository<M extends DSpaceObject, R exten
      */
     protected void patchDSpaceObject(String apiCategory, String model, UUID id, Patch patch)
             throws AuthorizeException, ResourceNotFoundException, SQLException, UnprocessableEntityException {
-        M dso = dsoService.find(obtainContext(), id);
+        Context context = obtainContext();
+        M dso = dsoService.find(context, id);
         if (dso == null) {
             throw new ResourceNotFoundException(apiCategory + "." + model + " with id: " + id + " not found");
         }
-        R dsoRest = dsoPatch.patch(findOne(id), patch.getOperations());
+        R dsoRest = dsoPatch.patch(findOne(context, id), patch.getOperations());
         updateDSpaceObject(dso, dsoRest);
     }
 

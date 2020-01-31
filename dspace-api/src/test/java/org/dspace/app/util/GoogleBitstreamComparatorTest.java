@@ -138,7 +138,6 @@ public class GoogleBitstreamComparatorTest extends AbstractUnitTest {
         when(bitstreamFormat3.getMIMEType()).thenReturn("application/postscript");
         when(bitstream1.getSizeBytes()).thenReturn(Long.valueOf(100));
         when(bitstream2.getSizeBytes()).thenReturn(Long.valueOf(200));
-        when(bitstream3.getSizeBytes()).thenReturn(Long.valueOf(300));
 
         List<Bitstream> toSort = bundle.getBitstreams();
         Collections.sort(toSort, new GoogleBitstreamComparator(context, settings));
@@ -181,7 +180,6 @@ public class GoogleBitstreamComparatorTest extends AbstractUnitTest {
         when(bitstreamFormat1.getMIMEType()).thenReturn("unknown");
         when(bitstreamFormat2.getMIMEType()).thenReturn("text/richtext");
         when(bitstreamFormat3.getMIMEType()).thenReturn("text/richtext");
-        when(bitstream1.getSizeBytes()).thenReturn(Long.valueOf(400));
         when(bitstream2.getSizeBytes()).thenReturn(Long.valueOf(200));
         when(bitstream3.getSizeBytes()).thenReturn(Long.valueOf(300));
 
@@ -342,9 +340,6 @@ public class GoogleBitstreamComparatorTest extends AbstractUnitTest {
         when(bitstreamFormat1.getMIMEType()).thenReturn("text/richtext");
         when(bitstreamFormat2.getMIMEType()).thenReturn("application/msword");
         when(bitstreamFormat3.getMIMEType()).thenReturn("application/postscript");
-        when(bitstream1.getSizeBytes()).thenReturn(Long.valueOf(100));
-        when(bitstream2.getSizeBytes()).thenReturn(Long.valueOf(200));
-        when(bitstream3.getSizeBytes()).thenReturn(Long.valueOf(300));
 
         List<Bitstream> toSort = bundle.getBitstreams();
         Collections.sort(toSort, new GoogleBitstreamComparator(context, settings));
@@ -362,9 +357,6 @@ public class GoogleBitstreamComparatorTest extends AbstractUnitTest {
         when(bitstreamFormat1.getMIMEType()).thenReturn("text/richtext");
         when(bitstreamFormat2.getMIMEType()).thenReturn("application/msword");
         when(bitstreamFormat3.getMIMEType()).thenReturn("audio/x-wav");
-        when(bitstream1.getSizeBytes()).thenReturn(Long.valueOf(300));
-        when(bitstream2.getSizeBytes()).thenReturn(Long.valueOf(200));
-        when(bitstream3.getSizeBytes()).thenReturn(Long.valueOf(100));
 
         List<Bitstream> toSort = bundle.getBitstreams();
         Collections.sort(toSort, new GoogleBitstreamComparator(context, settings));

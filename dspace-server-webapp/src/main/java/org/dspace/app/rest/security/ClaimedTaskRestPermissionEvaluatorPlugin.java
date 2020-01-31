@@ -10,8 +10,9 @@ package org.dspace.app.rest.security;
 import java.io.Serializable;
 import java.sql.SQLException;
 
+import org.apache.commons.lang3.StringUtils;
+import org.dspace.app.rest.model.ClaimedTaskRest;
 import org.dspace.app.rest.utils.ContextUtil;
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.service.EPersonService;
@@ -49,7 +50,7 @@ public class ClaimedTaskRestPermissionEvaluatorPlugin extends RestObjectPermissi
     public boolean hasDSpacePermission(Authentication authentication, Serializable targetId,
                                  String targetType, DSpaceRestPermission permission) {
 
-        if (Constants.getTypeID(targetType) != Constants.CLAIMEDTASK) {
+        if (!StringUtils.equalsIgnoreCase(ClaimedTaskRest.NAME, targetType)) {
             return false;
         }
 

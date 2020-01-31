@@ -14,6 +14,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
+import javax.annotation.Nullable;
+
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
@@ -222,5 +224,13 @@ public interface BitstreamService extends DSpaceObjectService<Bitstream>, DSpace
 
     List<Bitstream> getNotReferencedBitstreams(Context context) throws SQLException;
 
-    public Long getLastModified(Bitstream bitstream);
+    /**
+     * Gets the last modified timestamp of the the given bitstream's content, if known.
+     *
+     * @param bitstream the bitstream.
+     * @return the timestamp in milliseconds, or {@code null} if unknown.
+     * @throws IOException if an unexpected io error occurs.
+     */
+    @Nullable
+    Long getLastModified(Bitstream bitstream) throws IOException;
 }

@@ -17,6 +17,7 @@ import org.dspace.app.rest.repository.ScriptRestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ControllerUtils;
 import org.springframework.hateoas.ResourceSupport;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -56,7 +57,7 @@ public class ScriptProcessesController {
         }
         ProcessRest processRest = scriptRestRepository.startProcess(scriptName);
         ProcessResource processResource = converter.toResource(processRest);
-        return ControllerUtils.toResponseEntity(HttpStatus.ACCEPTED, null, processResource);
+        return ControllerUtils.toResponseEntity(HttpStatus.ACCEPTED, new HttpHeaders(), processResource);
     }
 
 }
