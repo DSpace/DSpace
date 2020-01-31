@@ -64,7 +64,8 @@ public class WorkflowDefinitionController {
             if (xmlWorkflowFactory.isDefaultWorkflow(workflowName)) {
                 collectionsMappedToWorkflow.addAll(xmlWorkflowFactory.getAllNonMappedCollectionsHandles(context));
             }
-            collectionsMappedToWorkflow.addAll(xmlWorkflowFactory.getCollectionHandlesMappedToWorklow(context, workflowName));
+            collectionsMappedToWorkflow.addAll(xmlWorkflowFactory.getCollectionHandlesMappedToWorklow(context,
+                workflowName));
             return converter.toRestPage(utils.getPage(collectionsMappedToWorkflow, pageable),
                 utils.obtainProjection(true));
         } else {
