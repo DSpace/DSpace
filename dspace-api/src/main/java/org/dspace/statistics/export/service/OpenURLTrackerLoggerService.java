@@ -14,13 +14,31 @@ import org.dspace.core.Context;
 import org.dspace.statistics.export.OpenURLTracker;
 
 /**
- * Created by jonas - jonas@atmire.com on 09/02/17.
+ * Interface of the service that handles the OpenURLTracker database operations
  */
 public interface OpenURLTrackerLoggerService {
 
+    /**
+     * Removes an OpenURLTracker from the database
+     * @param context
+     * @param openURLTracker
+     * @throws SQLException
+     */
     void remove(Context context, OpenURLTracker openURLTracker) throws SQLException;
 
+    /**
+     * Returns all OpenURLTrackers from the database
+     * @param context
+     * @return all OpenURLTrackers
+     * @throws SQLException
+     */
     List<OpenURLTracker> findAll(Context context) throws SQLException;
 
+    /**
+     * Creates a new OpenURLTracker
+     * @param context
+     * @return the creatred OpenURLTracker
+     * @throws SQLException
+     */
     OpenURLTracker create(Context context) throws SQLException;
 }

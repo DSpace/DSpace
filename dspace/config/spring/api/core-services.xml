@@ -117,7 +117,5 @@
     <bean class="org.dspace.xmlworkflow.WorkflowRequirementsServiceImpl"/>
     <bean class="org.dspace.xmlworkflow.XmlWorkflowFactoryImpl"/>
 
-    <bean class="org.dspace.statistics.export.OpenURLTrackerLoggerServiceImpl"/>
-
 </beans>
 

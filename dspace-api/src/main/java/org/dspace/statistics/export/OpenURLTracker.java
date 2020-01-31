@@ -22,7 +22,7 @@ import org.dspace.core.ReloadableEntity;
 import org.hibernate.proxy.HibernateProxyHelper;
 
 /**
- * Created by jonas - jonas@atmire.com on 09/02/17.
+ * Class that represents an OpenURLTracker which tracks a failed transmission to IRUS
  */
 @Entity
 @Table(name = "OpenUrlTracker")
@@ -42,32 +42,54 @@ public class OpenURLTracker implements ReloadableEntity<Integer> {
     private Date uploadDate;
 
     protected OpenURLTracker() {
-
     }
 
+    /**
+     * Gets the OpenURLTracker id
+     * @return the id
+     */
     @Override
     public Integer getID() {
         return id;
     }
 
-
+    /**
+     * Gets the OpenURLTracker url
+     * @return the url
+     */
     public String getUrl() {
         return url;
     }
 
+    /**
+     * Sets the OpenURLTracker url
+     * @param url
+     */
     public void setUrl(String url) {
         this.url = url;
     }
 
+    /**
+     * Returns the upload date
+     * @return upload date
+     */
     public Date getUploadDate() {
         return uploadDate;
     }
 
+    /**
+     * Set the upload date
+     * @param uploadDate
+     */
     public void setUploadDate(Date uploadDate) {
         this.uploadDate = uploadDate;
     }
 
-
+    /**
+     * Determines whether two objects of this class are equal by comparing the ID
+     * @param o - object to compare
+     * @return whether the objects are equal
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -86,6 +108,10 @@ public class OpenURLTracker implements ReloadableEntity<Integer> {
         return true;
     }
 
+    /**
+     * Returns the hash code value for the object
+     * @return hash code
+     */
     @Override
     public int hashCode() {
         int hash = 8;
