@@ -113,17 +113,17 @@ public interface ChoiceAuthority {
      * that matches the value.
      *
      * @param authorityName authority name
-     * @param field      	being matched for
-     * @param text       	user's value to match
-     * @param collection 	database ID of Collection for context (owner of Item)
-     * @param start      	choice at which to start, 0 is first.
-     * @param limit      	maximum number of choices to return, 0 for no limit.
-     * @param locale     	explicit localization key if available, or null
+     * @param field         being matched for
+     * @param text          user's value to match
+     * @param collection    database ID of Collection for context (owner of Item)
+     * @param start         choice at which to start, 0 is first.
+     * @param limit         maximum number of choices to return, 0 for no limit.
+     * @param locale        explicit localization key if available, or null
      * @return a Choices object (never null).
      */
     default public Choices getMatches(String authorityName, String field, String text, Collection collection,
-    		int start, int limit, String locale) {
-    	return getMatches(field, text, collection, start, limit, locale);
+            int start, int limit, String locale) {
+        return getMatches(field, text, collection, start, limit, locale);
     }
 
 }
