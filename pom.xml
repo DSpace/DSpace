@@ -36,7 +36,7 @@
         <!-- NOTE: when updating jackson.version, also sync jackson-databind dependency below -->
         <jackson.version>2.10.2</jackson.version>
         <jersey.version>2.28</jersey.version>
-        <hibernate.version>5.3.11.Final</hibernate.version>
+        <hibernate.version>5.4.10.Final</hibernate.version>
         <hibernate-validator.version>6.0.17.Final</hibernate-validator.version>
         <!-- PIN Solr to 7.3.x until SOLR-12858 is fixed. This bug affects all integration tests that use Solr
              https://issues.apache.org/jira/browse/SOLR-12858 -->
