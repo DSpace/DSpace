@@ -384,12 +384,38 @@ public class Harvest
                     // Create new context since runHarvest does a context.complete()
                     context = new Context();
                 }
-                runHarvest(hc.getID().toString(), eperson);
+                runHarvest(hc.getCollection(), hc, eperson);
             }
         } catch (SQLException e) {
             e.printStackTrace();
             System.exit(1);
         }
+    }
+
+    /**
+     * UNIT modification: overload method since we already have the collection
+     * Run a single harvest cycle on the specified collection under the authorization of the supplied EPerson
+     */
+    private void runHarvest(Collection collection, HarvestedCollection harvestedCollection, String email) {
+        System.out.println("Running: a harvest cycle on " + collection.getID().toString());
+
+        System.out.print("Initializing the harvester... ");
+        OAIHarvester harvester = null;
+        try {
+            harvester = new OAIHarvester(context, collection, harvestedCollection);
+            System.out.println("success. ");
+        }
+        catch (HarvestingException hex) {
+            System.out.print("failed. ");
+            System.out.println(hex.getMessage());
+            throw new IllegalStateException("Unable to harvest", hex);
+        } catch (SQLException se) {
+            System.out.print("failed. ");
+            System.out.println(se.getMessage());
+            throw new IllegalStateException("Unable to access database", se);
+        }
+
+        runHarvester(email, harvester);
     }
 
     /*
@@ -531,12 +557,14 @@ public class Harvest
     }
     
     
+
+
     /**
-     * Run a single harvest cycle on the specified collection under the authorization of the supplied EPerson 
+     * Run a single harvest cycle on the specified collection under the authorization of the supplied EPerson
      */
     private void runHarvest(String collectionID, String email) {
     	System.out.println("Running: a harvest cycle on " + collectionID);
-    	
+
     	System.out.print("Initializing the harvester... ");
     	OAIHarvester harvester = null;
     	try {
@@ -554,22 +582,23 @@ public class Harvest
             System.out.println(se.getMessage());
             throw new IllegalStateException("Unable to access database", se);
 		}
-    	    	
-    	try {
-    		// Harvest will not work for an anonymous user
-        	EPerson eperson = ePersonService.findByEmail(context, email);
-        	System.out.println("Harvest started... ");
-        	context.setCurrentUser(eperson);
-    		harvester.runHarvest();
-    		context.complete();
-    	}
-        catch (SQLException e) {
+
+        runHarvester(email, harvester);
+    }
+
+    private void runHarvester(String email, OAIHarvester harvester) {
+        try {
+            // Harvest will not work for an anonymous user
+            EPerson eperson = ePersonService.findByEmail(context, email);
+            System.out.println("Harvest started... ");
+            context.setCurrentUser(eperson);
+            harvester.runHarvest();
+            context.complete();
+        } catch (SQLException e) {
             throw new IllegalStateException("Failed to run harvester", e);
-        }
-        catch (AuthorizeException e) {
+        } catch (AuthorizeException e) {
             throw new IllegalStateException("Failed to run harvester", e);
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             throw new IllegalStateException("Failed to run harvester", e);
         }
 
