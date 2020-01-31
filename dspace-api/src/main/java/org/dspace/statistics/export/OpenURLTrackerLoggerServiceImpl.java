@@ -16,23 +16,41 @@ import org.dspace.statistics.export.service.OpenURLTrackerLoggerService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Created by jonas - jonas@atmire.com on 09/02/17.
+ * Implementation of the service that handles the OpenURLTracker database operations
  */
 public class OpenURLTrackerLoggerServiceImpl implements OpenURLTrackerLoggerService {
 
     @Autowired(required = true)
     protected OpenURLTrackerDAO openURLTrackerDAO;
 
+    /**
+     * Removes an OpenURLTracker from the database
+     * @param context
+     * @param openURLTracker
+     * @throws SQLException
+     */
     @Override
     public void remove(Context context, OpenURLTracker openURLTracker) throws SQLException {
         openURLTrackerDAO.delete(context, openURLTracker);
     }
 
+    /**
+     * Returns all OpenURLTrackers from the database
+     * @param context
+     * @return all OpenURLTrackers
+     * @throws SQLException
+     */
     @Override
     public List<OpenURLTracker> findAll(Context context) throws SQLException {
         return openURLTrackerDAO.findAll(context, OpenURLTracker.class);
     }
 
+    /**
+     * Creates a new OpenURLTracker
+     * @param context
+     * @return the creatred OpenURLTracker
+     * @throws SQLException
+     */
     @Override
     public OpenURLTracker create(Context context) throws SQLException {
         OpenURLTracker openURLTracker = openURLTrackerDAO.create(context, new OpenURLTracker());

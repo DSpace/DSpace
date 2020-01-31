@@ -8,18 +8,35 @@
 package org.dspace.statistics.export.factory;
 
 import org.dspace.statistics.export.service.OpenURLTrackerLoggerService;
+import org.dspace.statistics.export.service.OpenUrlService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Created by jonas - jonas@atmire.com on 09/02/17.
+ * The service factory implementation for the OpenUrlTracker related services
  */
 public class OpenURLTrackerLoggerServiceFactoryImpl extends OpenURLTrackerLoggerServiceFactory {
 
     @Autowired(required = true)
     private OpenURLTrackerLoggerService openURLTrackerLoggerService;
 
+    @Autowired(required = true)
+    private OpenUrlService openUrlService;
+
+    /**
+     * Returns the OpenURLTrackerLoggerService
+     * @return OpenURLTrackerLoggerService instance
+     */
     @Override
     public OpenURLTrackerLoggerService getOpenUrlTrackerLoggerService() {
         return openURLTrackerLoggerService;
+    }
+
+    /**
+     * Returns the OpenUrlService
+     * @return OpenUrlService instance
+     */
+    @Override
+    public OpenUrlService getOpenUrlService() {
+        return openUrlService;
     }
 }

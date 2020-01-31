@@ -9,14 +9,23 @@ package org.dspace.statistics.export.factory;
 
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.statistics.export.service.OpenURLTrackerLoggerService;
+import org.dspace.statistics.export.service.OpenUrlService;
 
 /**
- * Created by jonas - jonas@atmire.com on 09/02/17.
+ * The service factory for the OpenUrlTracker related services
  */
 public abstract class OpenURLTrackerLoggerServiceFactory {
 
+    /**
+     * Returns the OpenURLTrackerLoggerService
+     * @return OpenURLTrackerLoggerService instance
+     */
     public abstract OpenURLTrackerLoggerService getOpenUrlTrackerLoggerService();
 
+    /**
+     * Retrieve the OpenURLTrackerLoggerServiceFactory
+     * @return OpenURLTrackerLoggerServiceFactory instance
+     */
     public static OpenURLTrackerLoggerServiceFactory getInstance() {
         return DSpaceServicesFactory.getInstance().getServiceManager()
                                     .getServiceByName("openURLTrackerLoggerServiceFactory",
@@ -24,4 +33,9 @@ public abstract class OpenURLTrackerLoggerServiceFactory {
 
     }
 
+    /**
+     * Returns the OpenUrlService
+     * @return OpenUrlService instance
+     */
+    public abstract OpenUrlService getOpenUrlService();
 }

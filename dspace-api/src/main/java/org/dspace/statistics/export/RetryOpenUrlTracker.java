@@ -13,8 +13,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.core.Context;
 import org.dspace.scripts.DSpaceRunnable;
+import org.dspace.statistics.export.factory.OpenURLTrackerLoggerServiceFactory;
+import org.dspace.statistics.export.service.OpenUrlService;
 
-
+/**
+ * Script to retry the failed url transmissions to IRUS
+ * This script also has an option to add new failed urls for testing purposes
+ */
 public class RetryOpenUrlTracker extends DSpaceRunnable {
     private static final Logger log = Logger.getLogger(RetryOpenUrlTracker.class);
 
@@ -22,6 +27,14 @@ public class RetryOpenUrlTracker extends DSpaceRunnable {
     private String lineToAdd = null;
     private boolean help = false;
 
+    private OpenUrlService openUrlService;
+
+    /**
+     * Run the script
+     * When the -a option is used, a new "failed" url will be added to the database
+     *
+     * @throws Exception
+     */
     public void internalRun() throws Exception {
         if (help) {
             printHelp();
@@ -30,10 +43,10 @@ public class RetryOpenUrlTracker extends DSpaceRunnable {
         context.turnOffAuthorisationSystem();
 
         if (StringUtils.isNotBlank(lineToAdd)) {
-            ExportUsageEventListener.logfailed(context, lineToAdd);
+            openUrlService.logfailed(context, lineToAdd);
             log.info("Created dummy entry in OpenUrlTracker with URL: " + lineToAdd);
         } else {
-            ExportUsageEventListener.reprocessFailedQueue(context);
+            openUrlService.reprocessFailedQueue(context);
         }
         context.restoreAuthSystemState();
         try {
@@ -43,8 +56,17 @@ public class RetryOpenUrlTracker extends DSpaceRunnable {
         }
     }
 
+    /**
+     * Setups the parameters
+     *
+     * @throws ParseException
+     */
     public void setup() throws ParseException {
         context = new Context();
+        openUrlService = OpenURLTrackerLoggerServiceFactory.getInstance().getOpenUrlService();
+
+        lineToAdd = null;
+        help = false;
 
         if (commandLine.hasOption('h')) {
             help = true;
@@ -59,6 +81,11 @@ public class RetryOpenUrlTracker extends DSpaceRunnable {
         this.options = options;
     }
 
+    /**
+     * Constructs the script options
+     *
+     * @return the constructed options
+     */
     private Options constructOptions() {
         Options options = new Options();
 
