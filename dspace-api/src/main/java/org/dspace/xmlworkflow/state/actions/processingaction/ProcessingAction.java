@@ -34,6 +34,7 @@ public abstract class ProcessingAction extends Action {
     @Autowired(required = true)
     protected ItemService itemService;
 
+    protected static final String SUBMIT_EDIT_METADATA = "submit_edit_metadata";
 
     @Override
     public boolean isAuthorized(Context context, HttpServletRequest request, XmlWorkflowItem wfi) throws SQLException {

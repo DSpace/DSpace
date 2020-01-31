@@ -33,7 +33,6 @@ import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 public class FinalEditAction extends ProcessingAction {
 
     private static final String SUBMIT_APPROVE = "submit_approve";
-    private static final String SUBMIT_EDIT_METADATA = "submit_edit_metadata";
 
     @Override
     public void activate(Context c, XmlWorkflowItem wf) {
@@ -63,7 +62,7 @@ public class FinalEditAction extends ProcessingAction {
     public List<String> getOptions() {
         List<String> options = new ArrayList<>();
         options.add(SUBMIT_APPROVE);
-        options.add(SUBMIT_EDIT_METADATA);
+        options.add(ProcessingAction.SUBMIT_EDIT_METADATA);
         return options;
     }
 
