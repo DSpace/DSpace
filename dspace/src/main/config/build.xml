@@ -926,15 +926,20 @@ You may manually install this file by following these steps:
 
     <!-- installs and/or updates Project Counter Robot List resolution database -->
     <target name="update_spiders">
-        <echo>Downloading: https://raw.githubusercontent.com/atmire/COUNTER-Robots/master/generated/COUNTER_Robots_list.txt</echo>
-        <get src="https://raw.githubusercontent.com/atmire/COUNTER-Robots/master/generated/COUNTER_Robots_list.txt" dest="${dspace.dir}/config/COUNTER_Robots_list.txt" verbose="true" />
+        <echo>Downloading: ${stats.spider.agentregex.url}</echo>
+        <get src="${stats.spider.agentregex.url}" dest="${stats.spider.agentregex.regexfile}" verbose="true" />
     </target>
 
     <target name="check_spiders">
         <condition property="need.spiders">
-            <not>
-                <available file="${dspace.dir}/config/COUNTER_Robots_list.txt" />
-            </not>
+            <and>
+                <not>
+                    <available file="${stats.spider.agentregex.regexfile}" />
+                </not>
+                <not>
+                    <contains string="${stats.spider.agentregex.url}" substring="stats.spider.agentregex.url"/>
+                </not>
+            </and>
         </condition>
     </target>
 
