@@ -61,6 +61,10 @@ public class WorkflowActionConfig {
         return step;
     }
 
+    /**
+     * Returns a list of options the user has on this action, resulting in the next step of the workflow
+     * @return  A list of options of this action, resulting in the next step of the workflow
+     */
     public List<String> getOptions() {
         return this.processingAction.getOptions();
     }

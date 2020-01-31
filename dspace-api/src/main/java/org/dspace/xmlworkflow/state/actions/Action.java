@@ -44,6 +44,10 @@ public abstract class Action {
     public abstract ActionResult execute(Context c, XmlWorkflowItem wfi, Step step, HttpServletRequest request)
         throws SQLException, AuthorizeException, IOException, WorkflowException;
 
+    /**
+     * Returns a list of options that the user can select at this action which results in the next step in the workflow
+     * @return  A list of options of this action, resulting in the next step of the workflow
+     */
     public abstract List<String> getOptions();
 
     public WorkflowActionConfig getParent() {

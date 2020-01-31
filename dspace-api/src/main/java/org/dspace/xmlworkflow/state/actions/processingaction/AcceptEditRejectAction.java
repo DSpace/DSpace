@@ -35,7 +35,6 @@ public class AcceptEditRejectAction extends ProcessingAction {
 
     private static final String SUBMIT_APPROVE = "submit_approve";
     private static final String SUBMIT_REJECT = "submit_reject";
-    private static final String SUBMIT_EDIT_METADATA = "submit_edit_metadata";
 
     //TODO: rename to AcceptAndEditMetadataAction
 
@@ -63,7 +62,7 @@ public class AcceptEditRejectAction extends ProcessingAction {
         List<String> options = new ArrayList<>();
         options.add(SUBMIT_APPROVE);
         options.add(SUBMIT_REJECT);
-        options.add(SUBMIT_EDIT_METADATA);
+        options.add(ProcessingAction.SUBMIT_EDIT_METADATA);
         return options;
     }
 
