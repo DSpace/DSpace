@@ -71,7 +71,6 @@ public class JWTTokenHandlerTest {
 
     @Before
     public void setUp() throws Exception {
-        when(ePerson.getEmail()).thenReturn("test@dspace.org");
         when(ePerson.getSessionSalt()).thenReturn("01234567890123456789012345678901");
         when(ePerson.getLastActive()).thenReturn(new Date());
         when(context.getCurrentUser()).thenReturn(ePerson);

@@ -132,7 +132,7 @@ public class OrcidV2AuthorDataProvider implements ExternalDataProvider {
         }
         externalDataObject.setId(person.getName().getPath());
         externalDataObject
-            .addMetadata(new MetadataValueDTO("dc", "identifier", "orcid", null, person.getName().getPath()));
+            .addMetadata(new MetadataValueDTO("person", "identifier", "orcid", null, person.getName().getPath()));
         externalDataObject
             .addMetadata(new MetadataValueDTO("dc", "identifier", "uri", null, orcidUrl + person.getName().getPath()));
         if (!StringUtils.isBlank(lastName) && !StringUtils.isBlank(firstName)) {

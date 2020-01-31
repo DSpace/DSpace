@@ -12,7 +12,7 @@
     <url>https://github.com/dspace/DSpace</url>
 
     <organization>
-        <name>DuraSpace</name>
+        <name>LYRASIS</name>
         <url>http://www.dspace.org</url>
     </organization>
 
@@ -26,23 +26,22 @@
         <!-- PIN Jena to 2.x until both RDF and SWORDv2 can be updated to Jena 3. Requires package renaming, see
              https://jena.apache.org/documentation/migrate_jena2_jena3.html -->
         <jena.version>2.13.0</jena.version>
-        <log4j.version>2.6.2</log4j.version>
-        <slf4j.version>1.7.22</slf4j.version>
+        <log4j.version>2.11.2</log4j.version>
+        <slf4j.version>1.7.25</slf4j.version>
         <!-- NOTE: when updating jackson.version, also sync jackson-databind dependency below -->
-        <jackson.version>2.8.11</jackson.version>
-        <jersey.version>2.26</jersey.version>
-        <hibernate.version>5.2.8.Final</hibernate.version>
-        <hibernate-validator.version>5.4.2.Final</hibernate-validator.version>
+        <jackson.version>2.10.2</jackson.version>
+        <jersey.version>2.28</jersey.version>
+        <hibernate.version>5.3.11.Final</hibernate.version>
+        <hibernate-validator.version>6.0.17.Final</hibernate-validator.version>
         <!-- PIN Solr to 7.3.x until SOLR-12858 is fixed. This bug affects all integration tests that use Solr
              https://issues.apache.org/jira/browse/SOLR-12858 -->
         <solr.client.version>7.3.1</solr.client.version>
-        <spring.version>4.3.24.RELEASE</spring.version>
-        <spring-boot.version>1.4.4.RELEASE</spring-boot.version>
+        <spring.version>5.1.9.RELEASE</spring.version>
+        <spring-boot.version>2.1.8.RELEASE</spring-boot.version>
         <!-- Library for reading JSON documents: https://github.com/json-path/JsonPath -->
         <json-path.version>2.4.0</json-path.version>
-
         <!-- 'root.basedir' is the path to the root [dspace-src] dir. It must be redefined by each child POM,
-             as it is used to reference the LICENSE_HEADER and *.properties file(s) in that directory. -->
+                     as it is used to reference the LICENSE_HEADER and *.properties file(s) in that directory. -->
         <root.basedir>${basedir}</root.basedir>
     </properties>
 
@@ -1008,7 +1007,7 @@
             <dependency>
                 <groupId>org.apache.zookeeper</groupId>
                 <artifactId>zookeeper</artifactId>
-                <version>3.4.11</version>
+                <version>3.4.14</version>
             </dependency>
 
             <!-- solr-cell and axiom-api disagree on versions -->
@@ -1180,6 +1179,12 @@
                 <artifactId>apache-jena-libs</artifactId>
                 <type>pom</type>
                 <version>${jena.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-log4j12</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
@@ -1330,15 +1335,25 @@
                 <artifactId>log4j-core</artifactId>
                 <version>${log4j.version}</version>
             </dependency>
-	    <dependency>
+            <dependency>
                 <groupId>org.apache.logging.log4j</groupId>
                 <artifactId>log4j-web</artifactId>
                 <version>${log4j.version}</version>
-	    </dependency>
+            </dependency>
             <dependency>
                 <groupId>org.apache.logging.log4j</groupId>
                 <artifactId>log4j-slf4j-impl</artifactId>
                 <version>${log4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-jul</artifactId>
+                <version>${log4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>jul-to-slf4j</artifactId>
+                <version>${slf4j.version}</version>
             </dependency>
 
             <dependency>
@@ -1487,7 +1502,7 @@
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-log4j12</artifactId>
+                <artifactId>log4j-over-slf4j</artifactId>
                 <version>${slf4j.version}</version>
             </dependency>
             <!-- JMockit, JUnit and Hamcrest are used for Unit/Integration tests -->
@@ -1580,7 +1595,7 @@
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-core</artifactId>
-                <version>1.10.19</version>
+                <version>2.23.4</version>
                 <scope>test</scope>
             </dependency>
             <!-- Converge miscellaneous transitive dependencies. -->
@@ -1602,7 +1617,7 @@
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-databind</artifactId>
-                <version>2.8.11.2</version> <!-- TODO sync. with jackson.version -->
+                <version>${jackson.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.google.guava</groupId>
@@ -1757,7 +1772,7 @@
     <repositories>
         <repository>
             <id>maven-snapshots</id>
-            <url>http://oss.sonatype.org/content/repositories/snapshots</url>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
             <layout>default</layout>
             <releases>
                 <enabled>false</enabled>
@@ -1765,6 +1780,14 @@
             <snapshots>
                 <enabled>true</enabled>
             </snapshots>
+        </repository>
+        <!-- Currently NEEDED for Solr 7.x, as the solr-parent POM has an old, invalid URL for this repository.
+             The URL is corrected (to the below value) as of Solr 8.3.x, but has not yet been backported to 7.x.
+             Once we upgrade to Solr 8+, we should be able to remove this repository. -->
+        <repository>
+            <id>maven-restlet</id>
+            <name>Public online Restlet repository</name>
+            <url>https://maven.restlet.com</url>
         </repository>
     </repositories>
 
