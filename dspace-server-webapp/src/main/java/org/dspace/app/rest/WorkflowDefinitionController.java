@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest;
 
+import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
@@ -59,13 +60,11 @@ public class WorkflowDefinitionController {
                                                Pageable pageable) {
         if (xmlWorkflowFactory.workflowByThisNameExists(workflowName)) {
             Context context = ContextUtil.obtainContext(request);
-            List<Collection> collectionsMappedToWorkflow;
+            List<Collection> collectionsMappedToWorkflow = new ArrayList<>();
             if (xmlWorkflowFactory.isDefaultWorkflow(workflowName)) {
-                collectionsMappedToWorkflow = xmlWorkflowFactory.getAllNonMappedCollectionsHandles(context);
-            } else {
-                collectionsMappedToWorkflow
-                    = xmlWorkflowFactory.getCollectionHandlesMappedToWorklow(context, workflowName);
+                collectionsMappedToWorkflow.addAll(xmlWorkflowFactory.getAllNonMappedCollectionsHandles(context));
             }
+            collectionsMappedToWorkflow.addAll(xmlWorkflowFactory.getCollectionHandlesMappedToWorklow(context, workflowName));
             return converter.toRestPage(utils.getPage(collectionsMappedToWorkflow, pageable),
                 utils.obtainProjection(true));
         } else {
