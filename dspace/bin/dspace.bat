@@ -24,9 +24,9 @@ goto end
 :okExec
 echo Using DSpace installation in: %cd%
 
-REM Build a CLASSPATH including all classes in oai webapp, all libraries in [dspace]/lib and the config folder.
-set DSPACE_CLASSPATH=%CLASSPATH%;config;webapps\oai\WEB-INF\classes\
-for %%f in (lib\*.jar) DO CALL bin\buildpath.bat %%f
+REM Build a CLASSPATH including all libraries in [dspace]/lib and the config folder.
+set DSPACE_CLASSPATH=%CLASSPATH%;config
+set DSPACE_CLASSPATH=%DSPACE_CLASSPATH%;%CURRENT_DIR%\..\lib\*
 
 REM If the user only wants the CLASSPATH, just give it now.
 if not "%1"=="classpath" goto javaOpts
