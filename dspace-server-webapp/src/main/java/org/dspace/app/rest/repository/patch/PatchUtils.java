@@ -35,31 +35,47 @@ public class PatchUtils {
     private BundleService bundleService;
 
     /**
-     * Validates a move operation by assuring bitstream exist and that the parameters
+     * Validates a bundle move operation by assuring bitstream exist and that the parameters
      * supplied by the move operations are not out of bounds.
-     * @param context
-     * @param from
-     * @param to
-     * @param uuid
+     * @param context dspace context
+     * @param patch patch operation
+     * @param uuid id of the target bundle
      * @throws SQLException
      */
-    public void validateMoveOperation(Context context, int from, int to, UUID uuid) throws SQLException {
+    public void validateBundleMoveOperation(Context context, JsonNode patch, UUID uuid) throws SQLException {
         Bundle bundle = bundleService.find(context, uuid);
         final int totalAmount = bundle.getBitstreams().size();
+        for (JsonNode operation : patch) {
+            if (operation.get("op").asText().contentEquals("move")) {
+                final int from = Integer.parseInt(getIndexFromPath(operation.get("from").asText()));
+                final int to = Integer.parseInt(getIndexFromPath(operation.get("path").asText()));
+                checkBoundaries(uuid, totalAmount, from, to);
+            }
+        }
+    }
+
+    /**
+     * Method for checking the boundaries of a move operation against the target object.
+     * @param uuid id of the target
+     * @param totalAmount the count of resources in the target
+     * @param from current location of the resource
+     * @param to the location to which the resource will be moved
+     */
+    private void checkBoundaries(UUID uuid, int totalAmount, int from, int to) {
         if (totalAmount < 1) {
             throw new DSpaceBadRequestException(
-                createMoveExceptionMessage(bundle, from, to, "No bitstreams found.")
+                createMoveExceptionMessage(uuid, from, to, "Cannot find resources to move.")
             );
         }
         if (from >= totalAmount) {
             throw new DSpaceBadRequestException(
-                createMoveExceptionMessage(bundle, from, to,
+                createMoveExceptionMessage(uuid, from, to,
                     "\"from\" location out of bounds. Latest available position: " + (totalAmount - 1))
             );
         }
         if (to >= totalAmount) {
             throw new DSpaceBadRequestException(
-                createMoveExceptionMessage(bundle, from, to,
+                createMoveExceptionMessage(uuid, from, to,
                     "\"to\" location out of bounds. Latest available position: " + (totalAmount - 1))
             );
         }
@@ -169,15 +185,15 @@ public class PatchUtils {
     /**
      * Create an exception message for the move operation
      *
-     * @param bundle    The bundle we're performing a move operation on
+     * @param uuid    The uuid of the resource
      * @param from      The "from" location
      * @param to        The "to" location
      * @param message   A message to add after the prefix
      * @return The created message
      */
-    private String createMoveExceptionMessage(Bundle bundle, int from, int to, String message) {
-        return "Failed moving bitstreams of bundle with id " +
-            bundle.getID() + " from location " + from + " to " + to + ": " + message;
+    private String createMoveExceptionMessage(UUID uuid, int from, int to, String message) {
+        return "Failed moving elements for object with id " +
+            uuid + " from location " + from + " to " + to + ": " + message;
     }
 
 }

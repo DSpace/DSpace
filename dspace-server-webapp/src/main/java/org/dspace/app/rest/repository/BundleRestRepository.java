@@ -115,15 +115,9 @@ public class BundleRestRepository extends DSpaceObjectRestRepository<Bundle, Bun
     @PreAuthorize("hasPermission(#uuid, 'BUNDLE', 'WRITE')")
     protected void patch(Context context, HttpServletRequest request, String apiCategory, String model, UUID uuid,
                          JsonNode patch) throws AuthorizeException, SQLException {
-        // Validate move operations before applying patch.
-        for (JsonNode operation : patch) {
-            if (operation.get("op").asText().contentEquals("move")) {
-                final int from = Integer.parseInt(patchUtils.getIndexFromPath(operation.get("from").asText()));
-                final int to = Integer.parseInt(patchUtils.getIndexFromPath(operation.get("path").asText()));
-                patchUtils.validateMoveOperation(context, from, to, uuid);
-            }
-        }
-        patchDSpaceObject(apiCategory, model, uuid, patchUtils.modifyMoveOperations(patch));
+        // Validate bitstream move operations before applying patch.
+        patchUtils.validateBundleMoveOperation(context, patch, uuid);
+        patchDSpaceObject(apiCategory, model, uuid, patch);
     }
 
     @Override

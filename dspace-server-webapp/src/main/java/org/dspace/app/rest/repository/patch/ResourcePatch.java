@@ -18,8 +18,10 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.flipkart.zjsonpatch.JsonPatch;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
+import org.dspace.app.rest.model.BundleRest;
 import org.dspace.app.rest.model.DSpaceObjectRest;
 import org.dspace.app.rest.model.MetadataRest;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.json.patch.JsonPatchPatchConverter;
 import org.springframework.data.rest.webmvc.json.patch.PatchException;
 import org.springframework.expression.spel.SpelEvaluationException;
@@ -37,6 +39,9 @@ public class ResourcePatch<R extends DSpaceObjectRest> {
 
     private ObjectMapper objectMapper = new ObjectMapper();
 
+    @Autowired
+    private PatchUtils patchUtils;
+
     /**
      * This experimental method applies patches using Spring rather
      * than local patch implementations.  The metadata patches are handled separately
@@ -44,13 +49,19 @@ public class ResourcePatch<R extends DSpaceObjectRest> {
      * https://github.com/DSpace/DSpace/pull/2591
      *
      * @param dsoRest the instance to apply the changes to.
-     * @param jsonNode the JsonNode for patch operation.
-     * @return the modified DSpaceObjectRest instance.
+     * @param jsonNode the <code>JsonNode</code> for patch operation.
+     * @return the modified <code>DSpaceObjectRest</code> instance.
      */
     public R patch(R dsoRest, JsonNode jsonNode,  Class<R> domainClass) {
-        List<Integer> toRemove = new ArrayList<>();
+        // When reordering bitstreams in bundles the patch operation paths need to
+        // be modified to align with the rest model.
+        if (dsoRest instanceof BundleRest) {
+            patchUtils.modifyMoveOperations(jsonNode);
+        }
+        // Add metadata operations to ArrayNode and track indicies to be removed later.
         List<JsonNode> metadataList = new ArrayList<>();
         ArrayNode metadataOperationsNode = objectMapper.valueToTree(metadataList);
+        List<Integer> toRemove = new ArrayList<>();
         Integer index = 0;
         for (JsonNode operation : jsonNode) {
             String path = operation.get("path").asText();
@@ -60,7 +71,7 @@ public class ResourcePatch<R extends DSpaceObjectRest> {
             }
             index++;
         }
-        // If metadata operations are found, apply and remove the operations from the original JsonNode.
+        // If metadata operations are found, apply here and remove the operations from the original patch request.
         if (metadataOperationsNode.size() != 0) {
             dsoRest.setMetadata(
                 applyMetadataPatch(
@@ -72,15 +83,16 @@ public class ResourcePatch<R extends DSpaceObjectRest> {
                 ((ArrayNode) jsonNode).remove(idx);
             }
         }
+        // Apply non-metadata patch operations.
         applyResourcePatch(dsoRest, jsonNode, domainClass);
         return dsoRest;
     }
 
     /**
      * Creates a new MetadataRest object to which the patch has been applied.
-     * @param patch
-     * @param metadataRest
-     * @return
+     * @param patch the metadata patch request
+     * @param metadataRest metadata rest object
+     * @return modified rest object
      */
     private MetadataRest applyMetadataPatch(JsonNode patch, MetadataRest metadataRest) {
         try {
@@ -96,8 +108,9 @@ public class ResourcePatch<R extends DSpaceObjectRest> {
 
     /**
      * Uses Spring patch to the REST resource's non-metadata fields.
-     * @param dsoRest
-     * @param jsonNode
+     * @param dsoRest the rest model instance
+     * @param jsonNode the patch request
+     * @param domainClass the class type
      */
     private void applyResourcePatch(R dsoRest, JsonNode jsonNode, Class<R> domainClass) {
         try {
@@ -106,5 +119,7 @@ public class ResourcePatch<R extends DSpaceObjectRest> {
             throw new DSpaceBadRequestException(e.getMessage(), e);
         }
     }
+
+
 
 }
