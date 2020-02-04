@@ -270,7 +270,7 @@ public class ResourcePolicyDAOImpl extends AbstractHibernateDAO<ResourcePolicy> 
     }
 
     @Override
-    public int countByEPersonAndResourceUuid(Context context, UUID resourceUuid, EPerson eperson) throws SQLException {
+    public int countByEPersonAndResourceUuid(Context context, EPerson eperson, UUID resourceUuid) throws SQLException {
         Query query = createQuery(context, "SELECT count(*) FROM " + ResourcePolicy.class.getSimpleName()
                 + " WHERE eperson_id = (:epersonUuid) AND dspace_object = (:resourceUuid) ");
         query.setParameter("resourceUuid", resourceUuid);

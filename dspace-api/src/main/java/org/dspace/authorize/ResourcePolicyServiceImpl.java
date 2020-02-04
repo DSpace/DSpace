@@ -337,9 +337,9 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService {
     }
 
     @Override
-    public int countResourcePoliciesByEPersonAndResourceUuid(Context context, UUID resourceUuid, EPerson eperson)
+    public int countResourcePoliciesByEPersonAndResourceUuid(Context context, EPerson eperson, UUID resourceUuid)
         throws SQLException {
-        return resourcePolicyDAO.countByEPersonAndResourceUuid(context, resourceUuid, eperson);
+        return resourcePolicyDAO.countByEPersonAndResourceUuid(context, eperson, resourceUuid);
     }
 
     @Override

@@ -19,7 +19,7 @@ import org.dspace.app.rest.utils.Utils;
  */
 @RelNameDSpaceResource(ResourcePolicyRest.NAME)
 public class ResourcePolicyResource extends DSpaceResource<ResourcePolicyRest> {
-    public ResourcePolicyResource(ResourcePolicyRest eperson, Utils utils) {
-        super(eperson, utils);
+    public ResourcePolicyResource(ResourcePolicyRest resource, Utils utils) {
+        super(resource, utils);
     }
 }
