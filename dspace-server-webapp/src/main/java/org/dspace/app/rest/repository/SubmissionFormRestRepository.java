@@ -25,8 +25,7 @@ import org.springframework.stereotype.Component;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @Component(SubmissionFormRest.CATEGORY + "." + SubmissionFormRest.NAME)
-public class SubmissionFormRestRepository extends DSpaceRestRepository<SubmissionFormRest, String>
-    implements LinkRestRepository {
+public class SubmissionFormRestRepository extends DSpaceRestRepository<SubmissionFormRest, String> {
 
     private DCInputsReader inputReader;
 
