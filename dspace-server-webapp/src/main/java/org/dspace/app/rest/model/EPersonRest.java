@@ -22,7 +22,6 @@ import org.dspace.app.rest.RestResourceController;
 @LinksRest(links = {
         @LinkRest(
                 name = EPersonRest.GROUPS,
-                linkClass = GroupRest.class,
                 method = "getGroups"
         )
 })

@@ -17,22 +17,18 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @LinksRest(links = {
         @LinkRest(
                 name = CollectionRest.DEFAULT_ACCESS_CONDITIONS,
-                linkClass = ResourcePolicyRest.class,
                 method = "getDefaultAccessConditions"
         ),
         @LinkRest(
                 name = CollectionRest.LICENSE,
-                linkClass = LicenseRest.class,
                 method = "getLicense"
         ),
         @LinkRest(
                 name = CollectionRest.LOGO,
-                linkClass = BitstreamRest.class,
                 method = "getLogo"
         ),
         @LinkRest(
                 name = CollectionRest.MAPPED_ITEMS,
-                linkClass = ItemRest.class,
                 method = "getMappedItems"
         )
 })

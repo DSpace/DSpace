@@ -21,12 +21,10 @@ import org.dspace.app.rest.RestResourceController;
 @LinksRest(links = {
     @LinkRest(
             name = BrowseIndexRest.ITEMS,
-            linkClass = ItemRest.class,
             method = "listBrowseItems"
     ),
     @LinkRest(
             name = BrowseIndexRest.ENTRIES,
-            linkClass = BrowseEntryRest.class,
             method = "listBrowseEntries"
     )
 })

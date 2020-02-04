@@ -17,17 +17,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @LinksRest(links = {
         @LinkRest(
                 name = CommunityRest.COLLECTIONS,
-                linkClass = CollectionRest.class,
                 method = "getCollections"
         ),
         @LinkRest(
                 name = CommunityRest.LOGO,
-                linkClass = BitstreamRest.class,
                 method = "getLogo"
         ),
         @LinkRest(
                 name = CommunityRest.SUBCOMMUNITIES,
-                linkClass = CommunityRest.class,
                 method = "getSubcommunities"
         )
 })
