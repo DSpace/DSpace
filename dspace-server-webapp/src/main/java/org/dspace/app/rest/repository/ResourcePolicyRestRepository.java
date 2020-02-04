@@ -170,7 +170,7 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
                         Math.toIntExact(pageable.getOffset()),
                         Math.toIntExact(pageable.getOffset() + pageable.getPageSize()));
                 total = resourcePolicyService.countResourcePoliciesByEPersonAndResourceUuid(context,
-                        resourceUuid, eperson);
+                        eperson, resourceUuid);
             } else {
                 resourcePolisies = resourcePolicyService.findByEPerson(context, eperson,
                         Math.toIntExact(pageable.getOffset()),

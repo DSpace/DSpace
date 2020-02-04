@@ -135,7 +135,7 @@ public interface ResourcePolicyService extends DSpaceCRUDService<ResourcePolicy>
      * @return               total policies
      * @throws SQLException  if database error
      */
-    public int countResourcePoliciesByEPersonAndResourceUuid(Context context, UUID resourceUuid, EPerson ePerson)
+    public int countResourcePoliciesByEPersonAndResourceUuid(Context context, EPerson ePerson, UUID resourceUuid)
         throws SQLException;
 
     /**

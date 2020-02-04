@@ -126,7 +126,7 @@ public interface ResourcePolicyDAO extends GenericDAO<ResourcePolicy> {
      * @return               total policies
      * @throws SQLException  if database error
      */
-    public int countByEPersonAndResourceUuid(Context context, UUID resourceUuid, EPerson ePerson)
+    public int countByEPersonAndResourceUuid(Context context, EPerson ePerson, UUID resourceUuid)
         throws SQLException;
 
     /**
