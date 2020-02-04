@@ -57,8 +57,7 @@ public class DSpaceResourceHalLinkFactory extends HalLinkFactory<DSpaceResource,
                         if (StringUtils.isBlank(linkRest.method())) {
                             Object linkedObject = readMethod.invoke(data);
 
-                            if (linkedObject instanceof RestAddressableModel
-                                    && linkRest.linkClass().isAssignableFrom(linkedObject.getClass())) {
+                            if (linkedObject instanceof RestAddressableModel) {
 
                                 linkToSubResource = utils
                                     .linkToSingleResource((RestAddressableModel) linkedObject, name);

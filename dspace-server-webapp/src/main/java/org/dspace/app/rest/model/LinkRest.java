@@ -54,12 +54,4 @@ public @interface LinkRest {
      * @return the method name, or the empty string if unspecified by the annotation.
      */
     String method() default "";
-
-    /**
-     * The class of object returned by invoking the link method. If a list or page is returned, this should
-     * specify the inner type.
-     *
-     * @return the class.
-     */
-    Class linkClass();
 }

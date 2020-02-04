@@ -20,7 +20,6 @@ import org.dspace.app.rest.RestResourceController;
 @LinksRest(links = {
         @LinkRest(
                 name = GroupRest.GROUPS,
-                linkClass = GroupRest.class,
                 method = "getGroups"
         )
 })

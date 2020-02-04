@@ -16,12 +16,10 @@ import org.dspace.app.rest.RestResourceController;
  */
 @LinksRest(links = {
     @LinkRest(name = AuthorityRest.ENTRIES,
-            linkClass = AuthorityEntryRest.class,
             method = "query"
     ),
     @LinkRest(
             name = AuthorityRest.ENTRY,
-            linkClass = AuthorityEntryRest.class,
             method = "getResource"
     )
 })

@@ -18,12 +18,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @LinksRest(links = {
         @LinkRest(
                 name = BundleRest.BITSTREAMS,
-                linkClass = BitstreamRest.class,
                 method = "getBitstreams"
         ),
         @LinkRest(
                 name = BundleRest.PRIMARY_BITSTREAM,
-                linkClass = BitstreamRest.class,
                 method = "getPrimaryBitstream"
         )
 })

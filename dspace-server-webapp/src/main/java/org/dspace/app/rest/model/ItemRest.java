@@ -19,27 +19,22 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @LinksRest(links = {
         @LinkRest(
                 name = ItemRest.BUNDLES,
-                linkClass = BundleRest.class,
                 method = "getBundles"
         ),
         @LinkRest(
                 name = ItemRest.MAPPED_COLLECTIONS,
-                linkClass = CollectionRest.class,
                 method = "getMappedCollections"
         ),
         @LinkRest(
                 name = ItemRest.OWNING_COLLECTION,
-                linkClass = CollectionRest.class,
                 method = "getOwningCollection"
         ),
         @LinkRest(
                 name = ItemRest.RELATIONSHIPS,
-                linkClass = RelationshipRest.class,
                 method = "getRelationships"
         ),
         @LinkRest(
                 name = ItemRest.TEMPLATE_ITEM_OF,
-                linkClass = CollectionRest.class,
                 method = "getTemplateItemOf"
         )
 })

@@ -16,17 +16,14 @@ import org.dspace.app.rest.projection.Projection;
 @LinksRest(links = {
         @LinkRest(
                 name = MockObjectRest.O_CHILDREN,
-                linkClass = MockObjectRest.class,
                 method = "getMockObjectChildren"
         ),
         @LinkRest(
                 name = MockObjectRest.A_CHILDREN,
-                linkClass = MockObjectRest.class,
                 method = "getMockObjectChildren"
         ),
         @LinkRest(
                 name = MockObjectRest.N_CHILDREN,
-                linkClass = MockObjectRest.class,
                 method = "getMockObjectChildren"
         )
 })
@@ -87,7 +84,7 @@ public class MockObjectRest extends BaseObjectRest<Long> {
         this.value = value;
     }
 
-    @LinkRest(linkClass = MockObjectRest.class)
+    @LinkRest
     public MockObjectRest getRestProp1() {
         return restProp1;
     }
@@ -96,7 +93,7 @@ public class MockObjectRest extends BaseObjectRest<Long> {
         this.restProp1 = restProp1;
     }
 
-    @LinkRest(linkClass = MockObjectRest.class)
+    @LinkRest
     public MockObjectRest getRestProp2() {
         return restProp2;
     }
@@ -105,7 +102,7 @@ public class MockObjectRest extends BaseObjectRest<Long> {
         this.restProp2 = restProp2;
     }
 
-    @LinkRest(linkClass = MockObjectRest.class)
+    @LinkRest
     public MockObjectRest getRestProp3() {
         return restProp3;
     }
@@ -114,7 +111,7 @@ public class MockObjectRest extends BaseObjectRest<Long> {
         this.restProp3 = restProp3;
     }
 
-    @LinkRest(linkClass = MockObjectRest.class)
+    @LinkRest
     public MockObjectRest getRestProp4() {
         return restProp4;
     }
@@ -123,7 +120,7 @@ public class MockObjectRest extends BaseObjectRest<Long> {
         this.restProp4 = restProp4;
     }
 
-    @LinkRest(linkClass = MockObjectRest.class, name = "restPropFive")
+    @LinkRest(name = "restPropFive")
     public MockObjectRest getRestProp5() {
         return restProp5;
     }
