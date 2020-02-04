@@ -32,6 +32,9 @@ public class ResourcePolicyConverter implements DSpaceConverter<ResourcePolicy, 
     @Autowired
     GroupConverter groupConverter;
 
+    @Autowired
+    ConverterService converterService;
+
     @Override
     public ResourcePolicyRest convert(ResourcePolicy obj, Projection projection) {
 
@@ -57,6 +60,9 @@ public class ResourcePolicyConverter implements DSpaceConverter<ResourcePolicy, 
         if (obj.getEPerson() != null) {
             model.setEpersonUUID(obj.getEPerson().getID());
             model.setEperson(epersonConverter.convert(obj.getEPerson(), projection));
+        }
+        if (obj.getdSpaceObject() != null) {
+            model.setResource(converterService.toRest(obj.getdSpaceObject(), projection));
         }
         return model;
     }
