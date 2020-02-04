@@ -64,16 +64,11 @@ public class DSpaceResourceHalLinkFactory extends HalLinkFactory<DSpaceResource,
                                     .linkToSingleResource((RestAddressableModel) linkedObject, name);
                             }
 
-                            if (linkedObject != null || !linkRest.linkOptional() || !linkRest.embedOptional()) {
-
-                                if (linkRest.linkOptional() && linkRest.embedOptional()
-                                        && !halResource.getContent().getProjection()
-                                        .allowLinking(halResource, linkRest)) {
-                                    continue; // projection disallows this optional method-level link
-                                }
-
-                                halResource.add(linkToSubResource);
+                            if (!halResource.getContent().getProjection().allowLinking(halResource, linkRest)) {
+                                continue; // projection disallows this optional method-level link
                             }
+
+                            halResource.add(linkToSubResource);
                         }
 
                     } else if (RestModel.class.isAssignableFrom(readMethod.getReturnType())) {

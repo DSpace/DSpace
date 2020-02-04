@@ -23,8 +23,7 @@ import org.dspace.app.rest.RestResourceController;
         @LinkRest(
                 name = EPersonRest.GROUPS,
                 linkClass = GroupRest.class,
-                method = "getGroups",
-                embedOptional = true
+                method = "getGroups"
         )
 })
 public class EPersonRest extends DSpaceObjectRest {

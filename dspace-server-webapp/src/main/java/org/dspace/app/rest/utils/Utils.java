@@ -445,10 +445,10 @@ public class Utils {
         Projection projection = halResource.getContent().getProjection();
         getLinkRests(halResource.getContent().getClass()).stream().forEach((linkRest) -> {
             Link link = linkToSubResource(halResource.getContent(), linkRest.name());
-            if (!linkRest.embedOptional() || projection.allowEmbedding(halResource, linkRest)) {
+            if (projection.allowEmbedding(halResource, linkRest)) {
                 embedRelFromRepository(halResource, linkRest.name(), link, linkRest);
                 halResource.add(link); // unconditionally link if embedding was allowed
-            } else if (!linkRest.linkOptional() || projection.allowLinking(halResource, linkRest)) {
+            } else if (projection.allowLinking(halResource, linkRest)) {
                 halResource.add(link);
             }
         });
@@ -492,9 +492,7 @@ public class Utils {
             Object contentId = getContentIdForLinkMethod(resource.getContent(), method);
             try {
                 Object linkedObject = method.invoke(linkRepository, null, contentId, null, projection);
-                if (linkedObject != null || !linkRest.embedOptional()) {
-                    resource.embedResource(rel, wrapForEmbedding(linkedObject, link));
-                }
+                resource.embedResource(rel, wrapForEmbedding(linkedObject, link));
             } catch (InvocationTargetException e) {
                 if (e.getTargetException() instanceof RuntimeException) {
                     throw (RuntimeException) e.getTargetException();
@@ -559,8 +557,7 @@ public class Utils {
         LinkRest linkRest = findLinkAnnotation(readMethod);
         try {
             if (linkRest != null) {
-                if (linkRest.embedOptional()
-                        && !resource.getContent().getProjection().allowEmbedding(resource, linkRest)) {
+                if (!resource.getContent().getProjection().allowEmbedding(resource, linkRest)) {
                     return; // projection disallows this optional method-level embed
                 }
                 if (StringUtils.isNotBlank(linkRest.name())) {
@@ -569,9 +566,7 @@ public class Utils {
                 Link link = linkToSubResource(resource.getContent(), rel);
                 if (StringUtils.isBlank(linkRest.method())) {
                     Object linkedObject = readMethod.invoke(resource.getContent());
-                    if (linkedObject != null || !linkRest.embedOptional()) {
-                        resource.embedResource(rel, wrapForEmbedding(linkedObject, link));
-                    }
+                    resource.embedResource(rel, wrapForEmbedding(linkedObject, link));
                 } else {
                     embedRelFromRepository(resource, rel, link, linkRest);
                 }
