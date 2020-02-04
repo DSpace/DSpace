@@ -46,7 +46,7 @@
 		</xsl:variable>
 
 		<xsl:choose>
-			<xsl:when test="not(count($bitstreams) = 0) and count($embargoed[text() = 'forever']) = count($bitstreams) ">
+			<xsl:when test="count($bitstreams) &gt; 0 and count($embargoed[text() = 'forever']) = count($bitstreams) ">
 				<doc:element name='driver'>
 					<doc:element name='rights'>
 						<doc:element name='accessRights'>
