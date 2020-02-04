@@ -67,6 +67,7 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedResources;
+import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.ResourceSupport;
 import org.springframework.hateoas.Resources;
 import org.springframework.hateoas.UriTemplate;
@@ -809,8 +810,8 @@ public class RestResourceController implements InitializingBean {
                         link = linkTo(this.getClass(), apiCategory, model).slash(uuid).slash(subpath).withSelfRel();
                     }
 
-                    Page<HALResource> halResources = pageResult.map(object -> converter.toResource(object));
-                    return assembler.toResource(halResources, link);
+                    return new Resource(new EmbeddedPage(link.getHref(),
+                            pageResult.map(converter::toResource), null, subpath));
                 } else {
                     RestModel object = (RestModel) linkMethod.invoke(linkRepository, request, uuid, page,
                             utils.obtainProjection());
