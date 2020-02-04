@@ -18,26 +18,22 @@ import com.fasterxml.jackson.annotation.JsonProperty;
         @LinkRest(
                 name = CollectionRest.DEFAULT_ACCESS_CONDITIONS,
                 linkClass = ResourcePolicyRest.class,
-                method = "getDefaultAccessConditions",
-                embedOptional = true
+                method = "getDefaultAccessConditions"
         ),
         @LinkRest(
                 name = CollectionRest.LICENSE,
                 linkClass = LicenseRest.class,
-                method = "getLicense",
-                embedOptional = true
+                method = "getLicense"
         ),
         @LinkRest(
                 name = CollectionRest.LOGO,
                 linkClass = BitstreamRest.class,
-                method = "getLogo",
-                embedOptional = true
+                method = "getLogo"
         ),
         @LinkRest(
                 name = CollectionRest.MAPPED_ITEMS,
                 linkClass = ItemRest.class,
-                method = "getMappedItems",
-                embedOptional = true
+                method = "getMappedItems"
         )
 })
 public class CollectionRest extends DSpaceObjectRest {

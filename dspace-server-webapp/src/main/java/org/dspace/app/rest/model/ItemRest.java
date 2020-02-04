@@ -20,32 +20,27 @@ import com.fasterxml.jackson.annotation.JsonProperty;
         @LinkRest(
                 name = ItemRest.BUNDLES,
                 linkClass = BundleRest.class,
-                method = "getBundles",
-                embedOptional = true
+                method = "getBundles"
         ),
         @LinkRest(
                 name = ItemRest.MAPPED_COLLECTIONS,
                 linkClass = CollectionRest.class,
-                method = "getMappedCollections",
-                embedOptional = true
+                method = "getMappedCollections"
         ),
         @LinkRest(
                 name = ItemRest.OWNING_COLLECTION,
                 linkClass = CollectionRest.class,
-                method = "getOwningCollection",
-                embedOptional = true
+                method = "getOwningCollection"
         ),
         @LinkRest(
                 name = ItemRest.RELATIONSHIPS,
                 linkClass = RelationshipRest.class,
-                method = "getRelationships",
-                embedOptional = true
+                method = "getRelationships"
         ),
         @LinkRest(
                 name = ItemRest.TEMPLATE_ITEM_OF,
                 linkClass = CollectionRest.class,
-                method = "getTemplateItemOf",
-                embedOptional = true
+                method = "getTemplateItemOf"
         )
 })
 public class ItemRest extends DSpaceObjectRest {

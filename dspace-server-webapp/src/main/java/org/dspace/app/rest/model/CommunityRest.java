@@ -18,20 +18,17 @@ import com.fasterxml.jackson.annotation.JsonProperty;
         @LinkRest(
                 name = CommunityRest.COLLECTIONS,
                 linkClass = CollectionRest.class,
-                method = "getCollections",
-                embedOptional = true
+                method = "getCollections"
         ),
         @LinkRest(
                 name = CommunityRest.LOGO,
                 linkClass = BitstreamRest.class,
-                method = "getLogo",
-                embedOptional = true
+                method = "getLogo"
         ),
         @LinkRest(
                 name = CommunityRest.SUBCOMMUNITIES,
                 linkClass = CommunityRest.class,
-                method = "getSubcommunities",
-                embedOptional = true
+                method = "getSubcommunities"
         )
 })
 public class CommunityRest extends DSpaceObjectRest {
