@@ -307,8 +307,7 @@ public class ResourcePolicyDAOImpl extends AbstractHibernateDAO<ResourcePolicy> 
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, ResourcePolicy.class);
         Root<ResourcePolicy> resourcePolicyRoot = criteriaQuery.from(ResourcePolicy.class);
         Join<ResourcePolicy, DSpaceObject> join = resourcePolicyRoot.join(ResourcePolicy_.dSpaceObject);
-        criteriaBuilder.and(criteriaBuilder.equal(resourcePolicyRoot.get(ResourcePolicy_.dSpaceObject), resourceUuid),
-                criteriaBuilder.equal(join.get(DSpaceObject_.id), resourceUuid));
+        criteriaQuery.where(criteriaBuilder.equal(join.get(DSpaceObject_.id), resourceUuid));
         return list(context, criteriaQuery, false, ResourcePolicy.class, limit, offset);
     }
 
