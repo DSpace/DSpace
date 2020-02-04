@@ -381,7 +381,14 @@
                     <RightCondition>
                         <And>
                             <LeftCondition>
-                                <Custom ref="snrdDocumentTypeCondition"/>
+                                <And>
+                                    <LeftCondition>
+                                        <Custom ref="snrdDocumentTypeCondition"/>
+                                    </LeftCondition>
+                                    <RightCondition>
+                                        <Custom ref="fulltextOnlyFilter"/>
+                                    </RightCondition>
+                                </And>
                             </LeftCondition>
                             <RightCondition>
                                 <Or>
