@@ -88,7 +88,7 @@ public class MockProjection implements Projection {
     }
 
     public boolean allowEmbedding(HALResource halResource, LinkRest linkRest) {
-        return false;
+        return true;
     }
 
     public boolean allowLinking(HALResource halResource, LinkRest linkRest) {
