@@ -655,7 +655,7 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                    .andExpect(jsonPath("$.page.number", is(0)))
 
                    //Verify that the index filters to the "Universe" entries and Counts 2 Items.
-                   .andExpect(jsonPath("$._embedded.browseEntries",
+                   .andExpect(jsonPath("$._embedded.entries",
                                        contains(BrowseEntryResourceMatcher.matchBrowseEntry("Universe", 2)
                                        )))
                    //Verify startsWith parameter is included in the links
@@ -679,7 +679,7 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                    .andExpect(jsonPath("$.page.number", is(0)))
 
                    //Verify that the index filters to the "Turing, Alan'" items.
-                   .andExpect(jsonPath("$._embedded.browseEntries",
+                   .andExpect(jsonPath("$._embedded.entries",
                                        contains(BrowseEntryResourceMatcher.matchBrowseEntry("Turing, Alan Mathison", 1)
                                        )))
                    //Verify that the startsWith paramater is included in the links
@@ -702,7 +702,7 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                    .andExpect(jsonPath("$.page.number", is(0)))
 
                    //Verify that the index filters to the "Computing'" items.
-                   .andExpect(jsonPath("$._embedded.browseEntries",
+                   .andExpect(jsonPath("$._embedded.entries",
                                        contains(BrowseEntryResourceMatcher.matchBrowseEntry("Computing", 3)
                                        )))
                    //Verify that the startsWith paramater is included in the links
