@@ -266,7 +266,8 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                         .is(CollectionMatcher.matchCollectionEntry(col1.getName(), col1.getID(), col1.getHandle()))
                 ));
 
-        getClient(token).perform(get("/api/submission/workspaceitems/" + witem.getID() + "/item")).andExpect(status().isOk())
+        getClient(token).perform(get("/api/submission/workspaceitems/" + witem.getID() + "/item"))
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("$", Matchers.is(ItemMatcher.matchItemWithTitleAndDateIssued(witem.getItem(),
                         "Workspace Item 1", "2017-10-17"))));
 
