@@ -40,6 +40,7 @@ public class TemplateItemConverter
         templateItemRest.setProjection(projection);
         if (templateItem.getID() != null) {
             templateItemRest.setId(templateItem.getID().toString());
+            templateItemRest.setUuid(templateItem.getID().toString());
         }
 
         templateItemRest.setLastModified(templateItem.getLastModified());
