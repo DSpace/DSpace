@@ -17,7 +17,9 @@ import org.dspace.app.rest.RestResourceController;
  * The TemplateItem REST Resource
  */
 public class TemplateItemRest extends BaseObjectRest<String> {
-    public static final String NAME = "templateItem";
+    private String uuid;
+
+    public static final String NAME = "itemtemplate";
     public static final String CATEGORY = RestAddressableModel.CORE;
     @JsonIgnore
     private CollectionRest templateItemOf;
@@ -63,4 +65,18 @@ public class TemplateItemRest extends BaseObjectRest<String> {
     public String getType() {
         return NAME;
     }
+
+    @Override
+    public String getId() {
+        return uuid;
+    }
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
+    }
+
 }

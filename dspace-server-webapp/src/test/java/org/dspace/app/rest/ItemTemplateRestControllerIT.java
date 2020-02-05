@@ -150,7 +150,8 @@ public class ItemTemplateRestControllerIT extends AbstractControllerIntegrationT
                                  .andExpect(status().isOk())
                                  .andExpect(jsonPath("$", Matchers.allOf(
                                      hasJsonPath("$.id", is(itemUuidString)),
-                                     hasJsonPath("$.type", is("templateItem")),
+                                     hasJsonPath("$.uuid", is(itemUuidString)),
+                                     hasJsonPath("$.type", is("itemtemplate")),
                                      hasJsonPath("$.metadata", Matchers.allOf(
                                          MetadataMatcher.matchMetadata("dc.description",
                                                                        "dc description content"),
@@ -168,7 +169,8 @@ public class ItemTemplateRestControllerIT extends AbstractControllerIntegrationT
                                  .andExpect(status().isOk())
                                  .andExpect(jsonPath("$", Matchers.allOf(
                                      hasJsonPath("$.id", is(itemUuidString)),
-                                     hasJsonPath("$.type", is("templateItem")),
+                                     hasJsonPath("$.uuid", is(itemUuidString)),
+                                     hasJsonPath("$.type", is("itemtemplate")),
                                      hasJsonPath("$.metadata", Matchers.allOf(
                                          MetadataMatcher.matchMetadata("dc.description",
                                                                        "dc description content"),
@@ -200,7 +202,7 @@ public class ItemTemplateRestControllerIT extends AbstractControllerIntegrationT
                                               .contentType(contentType))
                                  .andExpect(status().isOk())
                                  .andExpect(jsonPath("$", Matchers.allOf(
-                                     hasJsonPath("$.type", is("templateItem")),
+                                     hasJsonPath("$.type", is("itemtemplate")),
                                      hasJsonPath("$.metadata", Matchers.allOf(
                                          MetadataMatcher.matchMetadata("dc.description",
                                                                        "dc description content"),
@@ -213,7 +215,7 @@ public class ItemTemplateRestControllerIT extends AbstractControllerIntegrationT
         getClient(adminAuthToken).perform(get(getCollectionTemplateItemUrlTemplate(childCollection.getID().toString())))
                                  .andExpect(status().isOk())
                                  .andExpect(jsonPath("$", Matchers.allOf(
-                                     hasJsonPath("$.type", is("templateItem")),
+                                     hasJsonPath("$.type", is("itemtemplate")),
                                      hasJsonPath("$.metadata", Matchers.allOf(
                                          MetadataMatcher.matchMetadata("dc.description",
                                                                        "dc description content"),
