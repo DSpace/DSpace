@@ -50,14 +50,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class DedupUtils {
 
     /** log4j logger */
-    private static Logger log = Logger.getLogger(/* DedupUtils */DedupUtils.class);
+    private static Logger log = Logger.getLogger(DedupUtils.class);
 
     private DedupService dedupService;
 
     @Autowired(required = true)
     private DeduplicationService deduplicationService;
-
-    // private DSpace dspace = new DSpace();
 
     public DuplicateInfoList findSignatureWithDuplicate(Context context, String signatureType, int resourceType,
             int limit, int offset, int rule) throws SearchServiceException, SQLException {
@@ -145,9 +143,6 @@ public class DedupUtils {
      */
     private List<DuplicateItemInfo> findDuplicate(Context context, UUID targetItemID, Integer resourceType,
             String signatureType, Boolean isInWorkflow) throws SQLException, SearchServiceException {
-        // ViewResolver resolver = dspace.getServiceManager()
-        // .getServiceByName(/*CrisConstants.getEntityTypeText(resourceType)*/"item" +
-        // "ViewResolver", ViewResolver.class);
 
         List<UUID> result = new ArrayList<UUID>();
         Map<UUID, String> verify = new HashMap<UUID, String>();
@@ -302,7 +297,7 @@ public class DedupUtils {
         DuplicateSignatureInfo dsi = findPotentialMatchByID(context, signatureType, resourceType, itemID);
 
         boolean found = false;
-        for (/* BrowsableDSpaceObject */DSpaceObject item : dsi.getItems()) {
+        for (DSpaceObject item : dsi.getItems()) {
             if (item != null) {
                 if (item.getID() == itemID) {
                     found = true;
@@ -311,7 +306,7 @@ public class DedupUtils {
             }
         }
         if (found && dsi.getNumItems() > 1) {
-            for (/* BrowsableDSpaceObject */DSpaceObject item : dsi.getItems()) {
+            for (DSpaceObject item : dsi.getItems()) {
                 if (item != null) {
                     if (item.getID() != itemID) {
                         rejectAdminDups(context, itemID, item.getID(), resourceType);
@@ -622,7 +617,6 @@ public class DedupUtils {
                 for (SolrDocument solrDocument : solrDocumentList) {
 
                     List<String> signatureTypeList = (List<String>) (solrDocument.getFieldValue(signatureType));
-                    // Collection<Object> tmp = (Collection<Object>)
                     for (String signatureTypeString : signatureTypeList) {
                         if (name.equals(signatureTypeString)) {
 
@@ -631,8 +625,6 @@ public class DedupUtils {
                                     .getFieldValue(SolrDedupServiceImpl.RESOURCE_RESOURCETYPE_FIELD));
                             List<String> ids = (List<String>) solrDocument
                                     .getFieldValue(SolrDedupServiceImpl.RESOURCE_IDS_FIELD);
-
-                            // if (resourceTypeString < CrisConstants.CRIS_TYPE_ID_START) {
 
                             for (String obj : ids) {
                                 Item item = ContentServiceFactory.getInstance().getItemService().find(context,
@@ -643,15 +635,6 @@ public class DedupUtils {
                                     }
                                 }
                             }
-                            // } else {
-                            // for (String obj : ids) {
-                            // /*BrowsableDSpaceObject*/DSpaceObject dspaceObject =
-                            // getApplicationService().getEntityByCrisId(obj);
-                            // if (!(dsi.getItems().contains(dspaceObject))) {
-                            // dsi.getItems().add(dspaceObject);
-                            // }
-                            // }
-                            // }
 
                             result.add(dsi);
                         } else {
@@ -699,24 +682,12 @@ public class DedupUtils {
                     .getFieldValue(SolrDedupServiceImpl.RESOURCE_RESOURCETYPE_FIELD));
             List<String> ids = (List<String>) solrDocument.getFieldValue(SolrDedupServiceImpl.RESOURCE_IDS_FIELD);
 
-            // if (resourceTypeString < CrisConstants.CRIS_TYPE_ID_START) {
-
             for (String obj : ids) {
                 Item item = ContentServiceFactory.getInstance().getItemService().find(context, UUID.fromString(obj));
                 if (!(dsi.getItems().contains(item))) {
                     dsi.getItems().add(item);
                 }
             }
-            // } else {
-            // for (String obj : ids) {
-            // /*BrowsableDSpaceObject*/DSpaceObject dspaceObject =
-            // getApplicationService().getEntityByCrisId(obj);
-            // if (!(dsi.getItems().contains(dspaceObject))) {
-            // dsi.getItems().add(dspaceObject);
-            // }
-            // }
-            // }
-
         }
 
         return dsi;
@@ -729,14 +700,6 @@ public class DedupUtils {
     public void setDedupService(DedupService dedupService) {
         this.dedupService = dedupService;
     }
-
-    // public ApplicationService getApplicationService() {
-    // return applicationService;
-    // }
-
-    // public void setApplicationService(ApplicationService applicationService) {
-    // this.applicationService = applicationService;
-    // }
 
     public void commit() {
         dedupService.commit();
@@ -795,8 +758,6 @@ public class DedupUtils {
                     .getFieldValue(SolrDedupServiceImpl.RESOURCE_RESOURCETYPE_FIELD));
             List<String> ids = (List<String>) solrDocument.getFieldValue(SolrDedupServiceImpl.RESOURCE_IDS_FIELD);
 
-            // if (resourceTypeString < CrisConstants.CRIS_TYPE_ID_START) {
-
             for (String obj : ids) {
                 Item item = ContentServiceFactory.getInstance().getItemService().find(context, UUID.fromString(obj));
                 if (item != null) {
@@ -805,16 +766,6 @@ public class DedupUtils {
                     }
                 }
             }
-            // } else {
-            // for (String obj : ids) {
-            // /*BrowsableDSpaceObject*/DSpaceObject dspaceObject =
-            // getApplicationService().getEntityByCrisId(obj);
-            // if (!(dsi.getItems().contains(dspaceObject))) {
-            // dsi.getItems().add(dspaceObject);
-            // }
-            // }
-            // }
-
             result.add(dsi);
             index++;
         }
@@ -823,8 +774,4 @@ public class DedupUtils {
         dil.setSize(solrDocumentList.getNumFound());
         return dil;
     }
-
-    // protected Session getHibernateSession(Context context) throws SQLException {
-    // return ((Session) context.getDBConnection().getSession());
-    // }
 }

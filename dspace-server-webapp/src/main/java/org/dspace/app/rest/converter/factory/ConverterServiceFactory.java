@@ -8,18 +8,11 @@
 package org.dspace.app.rest.converter.factory;
 
 import org.dspace.app.rest.converter.ConverterService;
-import org.dspace.utils.DSpace;
 
 /**
- * Abstract factory to get services for the services package, use
- * DSpaceServicesFactory.getInstance() to retrieve an implementation
+ * Interface of ConverterServiceFactory.
  */
-public abstract class ConverterServiceFactory {
+public interface ConverterServiceFactory {
 
-    public abstract ConverterService getConverterService();
-
-    public static ConverterServiceFactory getInstance() {
-        return new DSpace().getServiceManager().getServiceByName("ConverterServiceFactory",
-                ConverterServiceFactory.class);
-    }
+    public ConverterService getConverterService();
 }

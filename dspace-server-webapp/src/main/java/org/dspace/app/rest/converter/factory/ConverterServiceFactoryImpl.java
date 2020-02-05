@@ -8,16 +8,28 @@
 package org.dspace.app.rest.converter.factory;
 
 import org.dspace.app.rest.converter.ConverterService;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-@Service
-public class ConverterServiceFactoryImpl extends ConverterServiceFactory {
+@Service("converterServiceFactory")
+public class ConverterServiceFactoryImpl implements ConverterServiceFactory, InitializingBean {
     @Autowired(required = true)
     private ConverterService converter;
+
+    private static ConverterServiceFactory instance;
 
     @Override
     public ConverterService getConverterService() {
         return converter;
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        instance = this;
+    }
+
+    public static ConverterServiceFactory getInstance() {
+        return instance;
     }
 }

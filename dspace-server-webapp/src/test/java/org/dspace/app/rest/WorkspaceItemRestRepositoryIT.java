@@ -36,6 +36,8 @@ import org.dspace.app.rest.builder.BitstreamBuilder;
 import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.builder.EPersonBuilder;
+import org.dspace.app.rest.builder.ItemBuilder;
+import org.dspace.app.rest.builder.PoolTaskBuilder;
 import org.dspace.app.rest.builder.WorkspaceItemBuilder;
 import org.dspace.app.rest.matcher.CollectionMatcher;
 import org.dspace.app.rest.matcher.ItemMatcher;
@@ -54,6 +56,7 @@ import org.dspace.content.WorkspaceItem;
 import org.dspace.eperson.EPerson;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.xmlworkflow.storedcomponents.PoolTask;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.springframework.mock.web.MockMultipartFile;
@@ -1964,11 +1967,12 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
     @Test
     /**
-     * Test the deduplication on a group of items
+     * Test reject deduplication during workspace submission. Both verify and reject
+     * operation are tested. The reference object of the test is an item.
      *
      * @throws Exception
      */
-    public void patchDeduplicationTest() throws Exception {
+    public void patchDeduplicationItemAndWorkspaceItemTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
         // ** GIVEN **
@@ -1977,134 +1981,357 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         parentCommunity = CommunityBuilder.createCommunity(context).withName("Parent Community").build();
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity).withName("Sub Community")
                 .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection colItem = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection colWorkspace = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
         String authToken = getAuthToken(admin.getEmail(), password);
 
+        // 2. an item with title "Sample submission"
+        Item item = ItemBuilder.createItem(context, colItem).withTitle("Sample submission").withIssueDate("2020-01-31")
+                .withAuthor("Cadili, Francesco").withAuthor("Perelli, Matteo").withSubject("Sample").build();
+
+        // Test reject patch operation with a workspace item
         InputStream pdf = getClass().getResourceAsStream("simple-article.pdf");
 
-        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1).withTitle("Test WorkspaceItem")
-                .withIssueDate("2017-10-17").withFulltext("simple-article.pdf", "/local/path/simple-article.pdf", pdf)
-                .build();
+        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, colWorkspace)
+                .withTitle("Sample submission").withIssueDate("2020-02-01")
+                .withFulltext("simple-article.pdf", "/local/path/simple-article.pdf", pdf).build();
 
-        // check the file metadata
         getClient().perform(get("/api/submission/workspaceitems/" + witem.getID())).andExpect(status().isOk())
-                .andExpect(jsonPath("$.sections.upload.files[0].metadata['dc.source'][0].value",
-                        is("/local/path/simple-article.pdf")))
-                .andExpect(
-                        jsonPath("$.sections.upload.files[0].metadata['dc.title'][0].value", is("simple-article.pdf")));
+                .andExpect(jsonPath("$.sections['detect-duplicate'].matches['" + item.getID() + "'].matchObject.id",
+                        is(item.getID().toString())));
 
         pdf.close();
-        pdf = getClass().getResourceAsStream("simple-article.pdf");
-
-        WorkspaceItem witem2 = WorkspaceItemBuilder.createWorkspaceItem(context, col1).withTitle("Test WorkspaceItem 2")
-                .withIssueDate("2017-10-18").withFulltext("simple-article.pdf", "/local/path/simple-article.pdf", pdf)
-                .build();
-
-        // check the file metadata
-        getClient().perform(get("/api/submission/workspaceitems/" + witem2.getID())).andExpect(status().isOk())
-                .andExpect(jsonPath("$.sections.upload.files[0].metadata['dc.source'][0].value",
-                        is("/local/path/simple-article.pdf")))
-                .andExpect(
-                        jsonPath("$.sections.upload.files[0].metadata['dc.title'][0].value", is("simple-article.pdf")));
-
-        pdf.close();
-
-        // check that our workspaceitems come with a license (all are build in the same
-        // way, just check the first)
-//        getClient().perform(get("/api/submission/workspaceitems/" + witem.getID())).andExpect(status().isOk());
-//                .andExpect(jsonPath("$.sections.license.granted", is(true)))
-//                .andExpect(jsonPath("$.sections.license.acceptanceDate").isNotEmpty())
-//                .andExpect(jsonPath("$.sections.license.url").isNotEmpty());
 
         // try to reject
         List<Operation> detectDuplicate = new ArrayList<Operation>();
-        // create a list of values to use in add operation
-        List<Map<String, String>> values = new ArrayList<Map<String, String>>();
         Map<String, String> value = new HashMap<String, String>();
         value.put("value", "reject");
         value.put("note", null);
-        values.add(value);
-        detectDuplicate.add(new AddOperation("/sections/detect-duplicate/matches/"
-                + witem2.getItem().getID() + "/submitterDecision", values));
+        detectDuplicate.add(
+                new AddOperation("/sections/detect-duplicate/matches/" + item.getID() + "/submitterDecision", value));
 
         String patchBody = getPatchContent(detectDuplicate);
         getClient(authToken)
-                .perform(patch("/api/submission/workspaceitems/" + witem2.getID())
-                        .content(patchBody).contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
-                .andExpect(status().isOk());
-//                .andExpect(status().isOk()).andExpect(jsonPath("$.errors").doesNotExist())
-//                .andExpect(jsonPath("$.sections.license.granted", is(false)))
-//                .andExpect(jsonPath("$.sections.license.acceptanceDate").isEmpty())
-//                .andExpect(jsonPath("$.sections.license.url").isEmpty());
-//
-//        // verify that the patch changes have been persisted
-//        getClient().perform(get("/api/submission/workspaceitems/" + witem.getID())).andExpect(status().isOk())
-//                .andExpect(jsonPath("$.errors").doesNotExist())
-//                .andExpect(jsonPath("$.sections.license.granted", is(false)))
-//                .andExpect(jsonPath("$.sections.license.acceptanceDate").isEmpty())
-//                .andExpect(jsonPath("$.sections.license.url").isEmpty());
-//
-//        // try to reject the license with an add operation supplying a string instead
-//        // than a boolean
-//        List<Operation> addGrantString = new ArrayList<Operation>();
-//        addGrantString.add(new AddOperation("/sections/license/granted", "false"));
-//
-//        patchBody = getPatchContent(addGrantString);
-//        getClient(authToken)
-//                .perform(patch("/api/submission/workspaceitems/" + witem2.getID()).content(patchBody)
-//                        .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
-//                .andExpect(status().isOk()).andExpect(jsonPath("$.errors").doesNotExist())
-//                .andExpect(jsonPath("$.sections.license.granted", is(false)))
-//                .andExpect(jsonPath("$.sections.license.acceptanceDate").isEmpty())
-//                .andExpect(jsonPath("$.sections.license.url").isEmpty());
-//
-//        // verify that the patch changes have been persisted
-//        getClient().perform(get("/api/submission/workspaceitems/" + witem2.getID())).andExpect(status().isOk())
-//                .andExpect(jsonPath("$.errors").doesNotExist())
-//                .andExpect(jsonPath("$.sections.license.granted", is(false)))
-//                .andExpect(jsonPath("$.sections.license.acceptanceDate").isEmpty())
-//                .andExpect(jsonPath("$.sections.license.url").isEmpty());
-//
-//        // try to reject the license with a replace operation
-//        List<Operation> replaceGrant = new ArrayList<Operation>();
-//        replaceGrant.add(new ReplaceOperation("/sections/license/granted", false));
-//
-//        patchBody = getPatchContent(replaceGrant);
-//        getClient(authToken)
-//                .perform(patch("/api/submission/workspaceitems/" + witem3.getID()).content(patchBody)
-//                        .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
-//                .andExpect(status().isOk()).andExpect(jsonPath("$.errors").doesNotExist())
-//                .andExpect(jsonPath("$.sections.license.granted", is(false)))
-//                .andExpect(jsonPath("$.sections.license.acceptanceDate").isEmpty())
-//                .andExpect(jsonPath("$.sections.license.url").isEmpty());
-//
-//        // verify that the patch changes have been persisted
-//        getClient().perform(get("/api/submission/workspaceitems/" + witem3.getID())).andExpect(status().isOk())
-//                .andExpect(jsonPath("$.errors").doesNotExist())
-//                .andExpect(jsonPath("$.sections.license.granted", is(false)))
-//                .andExpect(jsonPath("$.sections.license.acceptanceDate").isEmpty())
-//                .andExpect(jsonPath("$.sections.license.url").isEmpty());
-//
-//        // try to reject the license with a replace operation supplying a string
-//        List<Operation> replaceGrantString = new ArrayList<Operation>();
-//        replaceGrant.add(new ReplaceOperation("/sections/license/granted", "false"));
-//
-//        patchBody = getPatchContent(replaceGrant);
-//        getClient(authToken)
-//                .perform(patch("/api/submission/workspaceitems/" + witem4.getID()).content(patchBody)
-//                        .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
-//                .andExpect(status().isOk()).andExpect(jsonPath("$.errors").doesNotExist())
-//                .andExpect(jsonPath("$.sections.license.granted", is(false)))
-//                .andExpect(jsonPath("$.sections.license.acceptanceDate").isEmpty())
-//                .andExpect(jsonPath("$.sections.license.url").isEmpty());
-//
-//        // verify that the patch changes have been persisted
-//        getClient().perform(get("/api/submission/workspaceitems/" + witem4.getID())).andExpect(status().isOk())
-//                .andExpect(jsonPath("$.errors").doesNotExist())
-//                .andExpect(jsonPath("$.sections.license.granted", is(false)))
-//                .andExpect(jsonPath("$.sections.license.acceptanceDate").isEmpty())
-//                .andExpect(jsonPath("$.sections.license.url").isEmpty());
+                .perform(patch("/api/submission/workspaceitems/" + witem.getID()).content(patchBody)
+                        .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.sections['detect-duplicate']").isEmpty());
 
+        // check that changes persist
+        getClient().perform(get("/api/submission/workspaceitems/" + witem.getID())).andExpect(status().isOk())
+                .andExpect(jsonPath("$.sections['detect-duplicate']").isEmpty());
+
+        String firstWitemUuid = witem.getItem().getID().toString();
+        witem = null;
+        detectDuplicate = null;
+        value = null;
+        patchBody = null;
+        pdf = null;
+
+        // Test verify patch operation with another workspace item
+        pdf = getClass().getResourceAsStream("simple-article.pdf");
+
+        witem = WorkspaceItemBuilder.createWorkspaceItem(context, colWorkspace).withTitle("Sample submission")
+                .withIssueDate("2021-01-01").withFulltext("article.pdf", "/local/path/simple-article.pdf", pdf).build();
+
+        getClient().perform(get("/api/submission/workspaceitems/" + witem.getID())).andExpect(status().isOk())
+                .andExpect(jsonPath("$.sections['detect-duplicate'].matches['" + item.getID() + "'].matchObject.id",
+                        is(item.getID().toString())));
+
+        pdf.close();
+
+        getClient().perform(get("/api/submission/workspaceitems/" + witem.getID())).andExpect(status().isOk())
+                .andExpect(jsonPath("$.sections['detect-duplicate'].matches['" + item.getID() + "'].matchObject.id",
+                        is(item.getID().toString())))
+                .andExpect(jsonPath("$.sections['detect-duplicate'].matches['" + firstWitemUuid + "'].matchObject.id",
+                        is(firstWitemUuid)));
+
+        // try to verify the item
+        detectDuplicate = new ArrayList<Operation>();
+        value = new HashMap<String, String>();
+        value.put("value", "verify");
+        value.put("note", "test");
+        detectDuplicate.add(
+                new AddOperation("/sections/detect-duplicate/matches/" + item.getID() + "/submitterDecision", value));
+
+        patchBody = getPatchContent(detectDuplicate);
+        getClient(authToken)
+                .perform(patch("/api/submission/workspaceitems/" + witem.getID()).content(patchBody)
+                        .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.sections['detect-duplicate'].matches['" + firstWitemUuid + "'].matchObject.id",
+                        is(firstWitemUuid)));
+
+        detectDuplicate = null;
+        value = null;
+        patchBody = null;
+
+        // try to verify the fist workspace item
+        detectDuplicate = new ArrayList<Operation>();
+        value = new HashMap<String, String>();
+        value.put("value", "verify");
+        value.put("note", "test");
+        detectDuplicate.add(
+                new AddOperation("/sections/detect-duplicate/matches/" + firstWitemUuid + "/submitterDecision", value));
+
+        patchBody = getPatchContent(detectDuplicate);
+        getClient(authToken)
+                .perform(patch("/api/submission/workspaceitems/" + witem.getID()).content(patchBody)
+                        .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.sections['detect-duplicate']").isEmpty());
+
+        // check that changes persist
+        getClient().perform(get("/api/submission/workspaceitems/" + witem.getID())).andExpect(status().isOk())
+                .andExpect(jsonPath("$.sections['detect-duplicate']").isEmpty());
+    }
+
+    @Test
+    /**
+     * Test reject deduplication during workspace submission. Both verify and reject
+     * operation are tested. The reference object of the test is a workflow item.
+     *
+     * @throws Exception
+     */
+    public void patchDeduplicationWorkflowAndWorkspaceItemTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        // ** GIVEN **
+        // 1. create a normal user to use as reviewer
+        EPerson reviewer = EPersonBuilder.createEPerson(context).withEmail("reviewer@example.com")
+                .withPassword(password).build();
+
+        // ** GIVEN **
+        // 2. A community-collection structure with one parent community with
+        // sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context).withName("Parent Community").build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity).withName("Sub Community")
+                .build();
+        Collection colWorkflow = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
+                .withWorkflowGroup(1, reviewer).build();
+        Collection colWorkspace = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
+
+        // 3. create a normal user to use as submitter
+        EPerson submitter = EPersonBuilder.createEPerson(context).withEmail("submitter@example.com")
+                .withPassword(password).build();
+
+        // 4. a workflow item title "Sample submission"
+        PoolTask poolTask = PoolTaskBuilder.createPoolTask(context, colWorkflow, reviewer)
+                .withTitle("Sample submission").withIssueDate("2017-10-17").withAuthor("Smith, Donald")
+                .withAuthor("Doe, John").withSubject("ExtraEntry").build();
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+        String reviewerToken = getAuthToken(reviewer.getEmail(), password);
+
+        InputStream pdf = getClass().getResourceAsStream("simple-article.pdf");
+
+        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, colWorkspace)
+                .withTitle("Sample submission").withIssueDate("2020-02-01")
+                .withFulltext("simple-article.pdf", "/local/path/simple-article.pdf", pdf).build();
+
+        String workflowItemId = poolTask.getWorkflowItem().getItem().getID().toString();
+        getClient().perform(get("/api/submission/workspaceitems/" + witem.getID())).andExpect(status().isOk())
+                .andExpect(jsonPath("$.sections['detect-duplicate'].matches['" + workflowItemId + "'].matchObject.id",
+                        is(workflowItemId)));
+
+        pdf.close();
+
+        // try to reject
+        List<Operation> detectDuplicate = new ArrayList<Operation>();
+        Map<String, String> value = new HashMap<String, String>();
+        value.put("value", "reject");
+        value.put("note", null);
+        detectDuplicate.add(
+                new AddOperation("/sections/detect-duplicate/matches/" + workflowItemId + "/submitterDecision", value));
+
+        String patchBody = getPatchContent(detectDuplicate);
+        getClient(authToken)
+                .perform(patch("/api/submission/workspaceitems/" + witem.getID()).content(patchBody)
+                        .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.sections['detect-duplicate']").isEmpty());
+
+        // check that changes persist
+        getClient().perform(get("/api/submission/workspaceitems/" + witem.getID())).andExpect(status().isOk())
+                .andExpect(jsonPath("$.sections['detect-duplicate']").isEmpty());
+
+        String firstWitemUuid = witem.getItem().getID().toString();
+        witem = null;
+        detectDuplicate = null;
+        value = null;
+        patchBody = null;
+        pdf = null;
+
+        // Test verify patch operation with another workspace item
+        pdf = getClass().getResourceAsStream("simple-article.pdf");
+
+        witem = WorkspaceItemBuilder.createWorkspaceItem(context, colWorkspace).withTitle("Sample submission")
+                .withIssueDate("2021-01-01").withFulltext("article.pdf", "/local/path/simple-article.pdf", pdf).build();
+
+        getClient().perform(get("/api/submission/workspaceitems/" + witem.getID())).andExpect(status().isOk())
+                .andExpect(jsonPath("$.sections['detect-duplicate'].matches['" + workflowItemId + "'].matchObject.id",
+                        is(workflowItemId)));
+
+        pdf.close();
+
+        getClient().perform(get("/api/submission/workspaceitems/" + witem.getID())).andExpect(status().isOk())
+                .andExpect(jsonPath("$.sections['detect-duplicate'].matches['" + workflowItemId + "'].matchObject.id",
+                        is(workflowItemId)))
+                .andExpect(jsonPath("$.sections['detect-duplicate'].matches['" + firstWitemUuid + "'].matchObject.id",
+                        is(firstWitemUuid)));
+
+        // try to verify the workflow item
+        detectDuplicate = new ArrayList<Operation>();
+        value = new HashMap<String, String>();
+        value.put("value", "verify");
+        value.put("note", "test");
+        detectDuplicate.add(
+                new AddOperation("/sections/detect-duplicate/matches/" + workflowItemId + "/submitterDecision", value));
+
+        patchBody = getPatchContent(detectDuplicate);
+        getClient(authToken)
+                .perform(patch("/api/submission/workspaceitems/" + witem.getID()).content(patchBody)
+                        .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.sections['detect-duplicate'].matches['" + firstWitemUuid + "'].matchObject.id",
+                        is(firstWitemUuid)));
+
+        detectDuplicate = null;
+        value = null;
+        patchBody = null;
+
+        // try to verify the fist workspace item
+        detectDuplicate = new ArrayList<Operation>();
+        value = new HashMap<String, String>();
+        value.put("value", "verify");
+        value.put("note", "test");
+        detectDuplicate.add(
+                new AddOperation("/sections/detect-duplicate/matches/" + firstWitemUuid + "/submitterDecision", value));
+
+        patchBody = getPatchContent(detectDuplicate);
+        getClient(authToken)
+                .perform(patch("/api/submission/workspaceitems/" + witem.getID()).content(patchBody)
+                        .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.sections['detect-duplicate']").isEmpty());
+
+        // check that changes persist
+        getClient().perform(get("/api/submission/workspaceitems/" + witem.getID())).andExpect(status().isOk())
+                .andExpect(jsonPath("$.sections['detect-duplicate']").isEmpty());
+    }
+
+    @Test
+    /**
+     * Test reject deduplication during workspace submission. A workspace item with
+     * the same title of the one created before starting submission. The reference
+     * object of the test are only workspace items.
+     *
+     * @throws Exception
+     */
+    public void patchDeduplicationWorkspaceItemsTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        // ** GIVEN **
+        // 1. A community-collection structure with one parent community with
+        // sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context).withName("Parent Community").build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity).withName("Sub Community")
+                .build();
+        Collection colWorkspace0 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection colWorkspace = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
+        String authToken = getAuthToken(admin.getEmail(), password);
+
+        WorkspaceItem witem0 = WorkspaceItemBuilder.createWorkspaceItem(context, colWorkspace0)
+                .withTitle("Sample submission").withIssueDate("2020-01-31").withAuthor("Cadili, Francesco")
+                .withAuthor("Perelli, Matteo").withSubject("Sample").build();
+
+        InputStream pdf = getClass().getResourceAsStream("simple-article.pdf");
+
+        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, colWorkspace)
+                .withTitle("Sample submission").withIssueDate("2020-02-01")
+                .withFulltext("simple-article.pdf", "/local/path/simple-article.pdf", pdf).build();
+
+        getClient().perform(get("/api/submission/workspaceitems/" + witem.getID())).andExpect(status().isOk())
+                .andExpect(jsonPath(
+                        "$.sections['detect-duplicate'].matches['" + witem0.getItem().getID() + "'].matchObject.id",
+                        is(witem0.getItem().getID().toString())));
+
+        pdf.close();
+
+        // try to reject
+        List<Operation> detectDuplicate = new ArrayList<Operation>();
+        Map<String, String> value = new HashMap<String, String>();
+        value.put("value", "reject");
+        value.put("note", null);
+        detectDuplicate.add(new AddOperation(
+                "/sections/detect-duplicate/matches/" + witem0.getItem().getID() + "/submitterDecision", value));
+
+        String patchBody = getPatchContent(detectDuplicate);
+        getClient(authToken)
+                .perform(patch("/api/submission/workspaceitems/" + witem.getID()).content(patchBody)
+                        .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.sections['detect-duplicate']").isEmpty());
+
+        String secondWitemUuid = witem.getItem().getID().toString();
+        witem = null;
+        detectDuplicate = null;
+        value = null;
+        patchBody = null;
+        pdf = null;
+
+        // Test verify patch operation with another workspace item
+        pdf = getClass().getResourceAsStream("simple-article.pdf");
+
+        witem = WorkspaceItemBuilder.createWorkspaceItem(context, colWorkspace).withTitle("Sample submission")
+                .withIssueDate("2021-01-01").withFulltext("article.pdf", "/local/path/simple-article.pdf", pdf).build();
+
+        getClient().perform(get("/api/submission/workspaceitems/" + witem.getID())).andExpect(status().isOk())
+                .andExpect(jsonPath(
+                        "$.sections['detect-duplicate'].matches['" + witem0.getItem().getID() + "'].matchObject.id",
+                        is(witem0.getItem().getID().toString())));
+
+        pdf.close();
+
+        getClient().perform(get("/api/submission/workspaceitems/" + witem.getID())).andExpect(status().isOk())
+                .andExpect(jsonPath(
+                        "$.sections['detect-duplicate'].matches['" + witem0.getItem().getID() + "'].matchObject.id",
+                        is(witem0.getItem().getID().toString())))
+                .andExpect(jsonPath("$.sections['detect-duplicate'].matches['" + secondWitemUuid + "'].matchObject.id",
+                        is(secondWitemUuid)));
+
+        // try to verify the item
+        detectDuplicate = new ArrayList<Operation>();
+        value = new HashMap<String, String>();
+        value.put("value", "verify");
+        value.put("note", "test");
+        detectDuplicate.add(new AddOperation(
+                "/sections/detect-duplicate/matches/" + witem0.getItem().getID() + "/submitterDecision", value));
+
+        patchBody = getPatchContent(detectDuplicate);
+        getClient(authToken)
+                .perform(patch("/api/submission/workspaceitems/" + witem.getID()).content(patchBody)
+                        .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.sections['detect-duplicate'].matches['" + secondWitemUuid + "'].matchObject.id",
+                        is(secondWitemUuid)));
+
+        detectDuplicate = null;
+        value = null;
+        patchBody = null;
+
+        // try to verify the second workspace item
+        detectDuplicate = new ArrayList<Operation>();
+        value = new HashMap<String, String>();
+        value.put("value", "verify");
+        value.put("note", "test");
+        detectDuplicate.add(new AddOperation(
+                "/sections/detect-duplicate/matches/" + secondWitemUuid + "/submitterDecision", value));
+
+        patchBody = getPatchContent(detectDuplicate);
+        getClient(authToken)
+                .perform(patch("/api/submission/workspaceitems/" + witem.getID()).content(patchBody)
+                        .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.sections['detect-duplicate']").isEmpty());
+
+        // check that changes persist
+        getClient().perform(get("/api/submission/workspaceitems/" + witem.getID())).andExpect(status().isOk())
+                .andExpect(jsonPath("$.sections['detect-duplicate']").isEmpty());
     }
 
     @Test

@@ -40,7 +40,7 @@ public class MD5ValueSignature implements Signature {
 
     private ItemService itemService;
 
-    public List<String> getSignature(/* BrowsableDSpaceObject */DSpaceObject item, Context context) {
+    public List<String> getSignature(DSpaceObject item, Context context) {
         List<String> result = new ArrayList<String>();
         try {
             MessageDigest digester = MessageDigest.getInstance("MD5");
@@ -71,11 +71,11 @@ public class MD5ValueSignature implements Signature {
         }
     }
 
-    protected String normalize(/* BrowsableDSpaceObject */DSpaceObject item, Context context, String value) {
+    protected String normalize(DSpaceObject item, Context context, String value) {
         return normalize(item, value);
     }
 
-    protected String normalize(/* BrowsableDSpaceObject */DSpaceObject item, String value) {
+    protected String normalize(DSpaceObject item, String value) {
         String result = value;
         if (StringUtils.isEmpty(value)) {
             if (StringUtils.isNotEmpty(prefix)) {
@@ -98,11 +98,11 @@ public class MD5ValueSignature implements Signature {
         return result;
     }
 
-    protected String getSingleValue(/* BrowsableDSpaceObject */DSpaceObject item, String metadata) {
+    protected String getSingleValue(DSpaceObject item, String metadata) {
         return ContentServiceFactory.getInstance().getDSpaceObjectService(item).getMetadata(item, metadata);
     }
 
-    protected List<String> getMultiValue(/* BrowsableDSpaceObject */DSpaceObject item, String metadata) {
+    protected List<String> getMultiValue(DSpaceObject item, String metadata) {
         List<MetadataValue> values = ContentServiceFactory.getInstance().getDSpaceObjectService(item)
                 .getMetadataByMetadataString(item, metadata);
         ArrayList<String> retValue = new ArrayList<String>();

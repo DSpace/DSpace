@@ -50,8 +50,6 @@ public class ItemLocationDedupServiceIndexPlugin implements SolrDedupServiceInde
             List<Collection> collections = item.getCollections();
 
             // now put those into strings
-            // int i = 0;
-
             for (Community community : communities) {
                 document.addField("parentlocation_s", community.getName());
             }

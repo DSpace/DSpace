@@ -18,7 +18,7 @@ import org.dspace.content.DSpaceObject;
 public class TitleWithDigitSignature extends MD5ValueSignature {
 
     @Override
-    protected String normalize(/* BrowsableDSpaceObject */DSpaceObject item, String value) {
+    protected String normalize(DSpaceObject item, String value) {
         if (value != null) {
 
             String norm = Normalizer.normalize(value, Normalizer.NFD);

@@ -19,9 +19,6 @@
 
 	<bean class="org.dspace.app.deduplication.utils.DedupUtils" name="dedupUtils">
 		<property name="dedupService" ref="org.dspace.app.deduplication.service.DedupService" />
-		<!--
-		<property name="applicationService" ref="applicationService" />
-		-->
 	</bean>
 
 	<bean class="org.dspace.app.deduplication.utils.TitleSignature" name="TitleSignaturePlugin">
@@ -128,36 +125,4 @@
 		<property name="field" value="dc.identifier_s"/>
 	</bean>
 
-	<!--
-	<bean class="org.dspace.app.configuration.ViewResolver" name="itemViewResolver">
-		<property name="metadata">
-			<list>
-				<value>dc.title</value>
-				<value>dc.contributor.author</value>
-				<value>dc.description.numberofpages</value>
-				<value>dc.description.firstpage</value>
-				<value>dc.description.lastpage</value>
-				<value>dc.identifier.doi</value>
-				<value>dc.relation.volume</value>
-				<value>dc.date.issued</value>
-				<value>dc.identifier.doi</value>
-				<value>dc.identifier.issn</value>
-				<value>crisitem.journal.issn</value>
-				<value>crisitem.journal.eissn</value>
-				<value>dc.identifier.isbn</value>
-				<value>dc.identifier.scopus</value>
-				<value>dc.identifier.isi</value>
-			</list>
-		</property>
-		<property name="plugins">
-			<list>
-				<ref bean="itemViewResolverDefaultPlugin"/>
-			</list>
-		</property>
-	</bean>
-	-->
-
-	<!--
-	<bean class="org.dspace.app.configuration.SimpleItemViewResolver" id="itemViewResolverDefaultPlugin"/>
-	-->
 </beans>

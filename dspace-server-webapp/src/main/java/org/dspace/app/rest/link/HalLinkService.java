@@ -20,7 +20,6 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.hateoas.EmbeddedPage;
 import org.dspace.app.rest.model.hateoas.HALResource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.Link;
 import org.springframework.stereotype.Component;
@@ -30,7 +29,6 @@ import org.springframework.stereotype.Component;
  * The links will only be added if the factories are allowed to do so by checking the resource's type.
  */
 @Component
-@ComponentScan
 public class HalLinkService {
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(HalLinkService.class);

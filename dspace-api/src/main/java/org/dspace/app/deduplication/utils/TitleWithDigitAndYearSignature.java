@@ -20,7 +20,7 @@ import org.dspace.content.factory.ContentServiceFactory;
 public class TitleWithDigitAndYearSignature extends MD5ValueSignature {
 
     @Override
-    protected String normalize(/* BrowsableDSpaceObject */DSpaceObject item, String value) {
+    protected String normalize(DSpaceObject item, String value) {
         if (value != null) {
             String temp = null;
             if (item != null) {
@@ -45,7 +45,7 @@ public class TitleWithDigitAndYearSignature extends MD5ValueSignature {
 
     }
 
-    private String getYear(/* BrowsableDSpaceObject */DSpaceObject item) {
+    private String getYear(DSpaceObject item) {
         String year = null;
         String dcvalue = ContentServiceFactory.getInstance().getDSpaceObjectService(item).getMetadata(item,
                 "dc.date.issued");
@@ -69,7 +69,7 @@ public class TitleWithDigitAndYearSignature extends MD5ValueSignature {
         TitleSignature tss = new TitleSignature();
         for (String test : testStrings) {
             System.out.println(test + " -> " + tdss.normalize(null, test) + " ||| "
-                    + tss.normalize((/* BrowsableDSpaceObject */DSpaceObject) null, test));
+                    + tss.normalize((DSpaceObject) null, test));
         }
     }
 }

@@ -20,15 +20,14 @@ import org.dspace.core.Context;
 public class TitleWithDigitAndCollectionSignature extends MD5ValueSignature {
 
     @Override
-    protected String normalize(/* BrowsableDSpaceObject */DSpaceObject item, Context context, String value) {
+    protected String normalize(DSpaceObject item, Context context, String value) {
         if (value != null) {
             String temp = null;
             if (item != null) {
-                /* BrowsableDSpaceObject */DSpaceObject parent = null;
+                DSpaceObject parent = null;
                 try {
                     parent = ContentServiceFactory.getInstance().getDSpaceObjectService(item).getParentObject(context,
                             item);
-                    // parent = item.getParentObject();
                 } catch (Exception e) {
                     log.error(e.getMessage());
                 }

@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.dspace.app.deduplication.model.DuplicateDecisionType;
 import org.dspace.app.deduplication.utils.DedupUtils;
 import org.dspace.app.deduplication.utils.DuplicateItemInfo;
-import org.dspace.app.rest.converter.factory.ConverterServiceFactory;
+import org.dspace.app.rest.converter.factory.ConverterServiceFactoryImpl;
 import org.dspace.app.rest.model.MetadataValueRest;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.step.DataDetectDuplicate;
@@ -49,10 +49,6 @@ public class DetectPotentialDuplicateStep extends AbstractProcessingStep impleme
 
     public static final String DETECT_DUPLICATE_STEP_ADD_OPERATION_ENTRY = "detectduplicateadd";
 
-//  private ConverterService converter;
-//
-//  private RequestService requestService;
-
     @Override
     public DataDetectDuplicate getData(SubmissionService submissionService, InProgressSubmission obj,
             SubmissionStepConfig config) throws Exception {
@@ -77,16 +73,13 @@ public class DetectPotentialDuplicateStep extends AbstractProcessingStep impleme
 
     private Map<UUID, DuplicateMatch> processPotentialDuplicates(UUID itemID, boolean check,
             List<DuplicateItemInfo> potentialDuplicates) {
-        // DedupUtils dedupUtils = new
-        // DSpace().getServiceManager().getServiceByName("dedupUtils",
-        // DedupUtils.class);
         Map<UUID, DuplicateMatch> matches = new HashMap<UUID, DuplicateMatch>();
 
         for (DuplicateItemInfo itemInfo : potentialDuplicates) {
             DuplicateMatch match = new DuplicateMatch();
-            /* BrowsableDSpaceObject */DSpaceObject duplicateItem = itemInfo.getDuplicateItem();
+            DSpaceObject duplicateItem = itemInfo.getDuplicateItem();
 
-            match.setMatchObject(ConverterServiceFactory.getInstance().getConverterService()
+            match.setMatchObject(ConverterServiceFactoryImpl.getInstance().getConverterService()
                     .toRest((Item) duplicateItem, Projection.DEFAULT));
             match.setSubmitterDecision(itemInfo.getDecision(DuplicateDecisionType.WORKSPACE));
             match.setWorkflowDecision(itemInfo.getDecision(DuplicateDecisionType.WORKFLOW));

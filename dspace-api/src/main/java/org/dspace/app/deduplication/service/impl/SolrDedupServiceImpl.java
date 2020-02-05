@@ -94,7 +94,7 @@ public class SolrDedupServiceImpl implements DedupService {
     /**
      * Non-Static CommonsHttpSolrServer for processing indexing events.
      */
-    private /* HttpSolrServer */HttpSolrClient solr = null;
+    protected SolrClient solr = null;
 
     private DSpace dspace = new DSpace();
 
@@ -184,7 +184,7 @@ public class SolrDedupServiceImpl implements DedupService {
         }
     }
 
-    protected /* HttpSolrServer */SolrClient getSolr() {
+    protected SolrClient getSolr() {
         if (solr == null) {
             String solrService = DSpaceServicesFactory.getInstance().getConfigurationService()
                     .getProperty("deduplication.search.server");
@@ -194,10 +194,9 @@ public class SolrDedupServiceImpl implements DedupService {
                     || ConfigurationManager.getBooleanProperty("deduplication", "solr.url.validation.enabled", true)) {
                 try {
                     log.debug("Solr URL: " + solrService);
-                    // solr = new HttpSolrServer(solrService);
                     solr = new HttpSolrClient.Builder(solrService).build();
 
-                    solr.setBaseURL(solrService);
+                    ((HttpSolrClient) solr).setBaseURL(solrService);
 
                     // Dummy/test query to search for Item (type=2) of ID=1
                     SolrQuery solrQuery = new SolrQuery()
@@ -218,8 +217,7 @@ public class SolrDedupServiceImpl implements DedupService {
     }
 
     @Override
-    public void indexContent(Context ctx, /* BrowsableDSpaceObject<UUID> */DSpaceObject iu, boolean force)
-            throws SearchServiceException {
+    public void indexContent(Context ctx, DSpaceObject iu, boolean force) throws SearchServiceException {
 
         Map<String, List<String>> tmpMapFilter = new HashMap<String, List<String>>();
         List<String> tmpFilter = new ArrayList<String>();
@@ -234,9 +232,8 @@ public class SolrDedupServiceImpl implements DedupService {
         String dedupID = iu.getID() + "-" + iu.getID();
 
         // retrieve all search plugin to build search document in the same index
-        SearchDeduplication searchSignature = dspace.getServiceManager().getServiceByName(
-                /* CrisConstants.getEntityTypeText(iu.getType()) */"item".toUpperCase() + "SearchDeduplication",
-                SearchDeduplication.class);
+        SearchDeduplication searchSignature = dspace.getServiceManager()
+                .getServiceByName("item".toUpperCase() + "SearchDeduplication", SearchDeduplication.class);
 
         // build the dedup reject in the dedup index core
         buildFromDedupReject(ctx, iu, tmpMapFilter, tmpFilter, searchSignature);
@@ -256,8 +253,8 @@ public class SolrDedupServiceImpl implements DedupService {
 
     }
 
-    private void fillSignature(Context ctx, /* BrowsableDSpaceObject */DSpaceObject iu,
-            Map<String, List<String>> tmpMapFilter, List<String> tmpFilter) {
+    private void fillSignature(Context ctx, DSpaceObject iu, Map<String, List<String>> tmpMapFilter,
+            List<String> tmpFilter) {
         // get all algorithms to build signature
         List<Signature> signAlgo = dspace.getServiceManager().getServicesByType(Signature.class);
         for (Signature algo : signAlgo) {
@@ -305,9 +302,8 @@ public class SolrDedupServiceImpl implements DedupService {
         }
     }
 
-    private void buildPotentialMatch(Context ctx, /* BrowsableDSpaceObject */DSpaceObject iu,
-            Map<String, List<String>> tmpMapFilter, List<String> tmpFilter, SearchDeduplication searchSignature)
-            throws SearchServiceException {
+    private void buildPotentialMatch(Context ctx, DSpaceObject iu, Map<String, List<String>> tmpMapFilter,
+            List<String> tmpFilter, SearchDeduplication searchSignature) throws SearchServiceException {
         tmpFilter.add("+" + RESOURCE_FLAG_FIELD + ":" + DeduplicationFlag.FAKE.getDescription());
         // select all fake not in reject and build the potential match
         String[] tmpArrayFilter = new String[tmpFilter.size()];
@@ -454,7 +450,7 @@ public class SolrDedupServiceImpl implements DedupService {
     }
 
     @Override
-    public void unIndexContent(Context context, /* BrowsableDSpaceObject */DSpaceObject dso) {
+    public void unIndexContent(Context context, DSpaceObject dso) {
         try {
             delete(MessageFormat.format(QUERY_REMOVE, dso.getID(), dso.getType()));
 
@@ -535,10 +531,6 @@ public class SolrDedupServiceImpl implements DedupService {
             }
         } else {
             cleanIndex(false, Constants.ITEM);
-            // cleanIndex(false, CrisConstants.RP_TYPE_ID);
-            // cleanIndex(false, CrisConstants.PROJECT_TYPE_ID);
-            // cleanIndex(false, CrisConstants.OU_TYPE_ID);
-            // cleanIndex(false, CrisConstants.CRIS_DYNAMIC_TYPE_ID_START);
         }
     }
 
@@ -570,15 +562,15 @@ public class SolrDedupServiceImpl implements DedupService {
                     Collection<Object> ids = doc.getFieldValues(RESOURCE_IDS_FIELD);
 
                     for (Object id : ids) {
-                        /* RootObject */DSpaceObject o = ContentServiceFactory.getInstance()
-                                .getDSpaceObjectService(type).find(context, UUID.fromString((String) id));
+                        DSpaceObject o = ContentServiceFactory.getInstance().getDSpaceObjectService(type).find(context,
+                                UUID.fromString((String) id));
 
                         if (o == null) {
                             log.info("Deleting: " + id);
                             /*
                              * Use IndexWriter to delete, its easier to manage write.lock
                              */
-                            unIndexContent(context, /* (BrowsableDSpaceObject) */(DSpaceObject) o);
+                            unIndexContent(context, (DSpaceObject) o);
                         }
                     }
                 }
@@ -597,29 +589,6 @@ public class SolrDedupServiceImpl implements DedupService {
                 case Constants.ITEM:
                     startMultiThreadIndex(context, force, ids);
                     break;
-//              case CrisConstants.RP_TYPE_ID:
-//                  List<ResearcherPage> rps = getApplicationService().getList(ResearcherPage.class, ids);
-//                  for (ResearcherPage rp : rps) {
-//                      indexContent(context, rp, force);
-//                  }
-//                  break;
-//              case CrisConstants.PROJECT_TYPE_ID:
-//                  List<Project> pjs = getApplicationService().getList(Project.class);
-//                  for (Project rp : pjs) {
-//                      indexContent(context, rp, force);
-//                  }
-//                  break;
-//              case CrisConstants.OU_TYPE_ID:
-//                  List<OrganizationUnit> orgs = getApplicationService().getList(OrganizationUnit.class, ids);
-//                  for (OrganizationUnit rp : orgs) {
-//                      indexContent(context, rp, force);
-//                  }
-//                  break;
-//              default:
-//                  List<ResearchObject> robjs = getApplicationService().getList(ResearchObject.class, ids);
-//                  for (ResearchObject rp : robjs) {
-//                      indexContent(context, rp, force);
-//                  }
                 default:
                     // no-action
                     break;
@@ -632,10 +601,6 @@ public class SolrDedupServiceImpl implements DedupService {
 
     @Override
     public void updateIndex(Context context, boolean force) {
-//      updateIndex(context, force, CrisConstants.CRIS_DYNAMIC_TYPE_ID_START);
-//      updateIndex(context, force, CrisConstants.OU_TYPE_ID);
-//      updateIndex(context, force, CrisConstants.PROJECT_TYPE_ID);
-//      updateIndex(context, force, CrisConstants.RP_TYPE_ID);
         updateIndex(context, force, Constants.ITEM);
     }
 
@@ -649,29 +614,6 @@ public class SolrDedupServiceImpl implements DedupService {
                     startMultiThreadIndex(context, false, null);
                     commit();
                     break;
-//              case CrisConstants.RP_TYPE_ID:
-//                  List<ResearcherPage> rps = getApplicationService().getList(ResearcherPage.class);
-//                  for (ResearcherPage rp : rps) {
-//                      indexContent(context, rp, force);
-//                  }
-//                  break;
-//              case CrisConstants.PROJECT_TYPE_ID:
-//                  List<Project> pjs = getApplicationService().getList(Project.class);
-//                  for (Project rp : pjs) {
-//                      indexContent(context, rp, force);
-//                  }
-//                  break;
-//              case CrisConstants.OU_TYPE_ID:
-//                  List<OrganizationUnit> orgs = getApplicationService().getList(OrganizationUnit.class);
-//                  for (OrganizationUnit rp : orgs) {
-//                      indexContent(context, rp, force);
-//                  }
-//                  break;
-//              default:
-//                  List<ResearchObject> robjs = getApplicationService().getList(ResearchObject.class);
-//                  for (ResearchObject rp : robjs) {
-//                      indexContent(context, rp, force);
-//                  }
                 default:
                     // no-action
                     break;
@@ -703,27 +645,16 @@ public class SolrDedupServiceImpl implements DedupService {
 
     @Override
     public void unIndexContent(Context context, String handleOrUuid) throws IllegalStateException, SQLException {
-        /* BrowsableDSpaceObject */DSpaceObject dso = null;
+        DSpaceObject dso = null;
         if (StringUtils.isNotEmpty(handleOrUuid)) {
             String handlePrefix = ConfigurationManager.getProperty("handle.prefix");
-//          if (handleOrUuid.startsWith(handlePrefix) || handleOrUuid.startsWith("123456789/")) {
-//              dso = /*(BrowsableDSpaceObject)*/ HandleServiceFactory.getInstance().getHandleService()
-//                      .resolveToObject(context, handleOrUuid);
-//          } else {
-//              dso = getApplicationService().getEntityByUUID(handleOrUuid);
-//          }
-            dso = /* (BrowsableDSpaceObject) */ HandleServiceFactory.getInstance().getHandleService()
-                    .resolveToObject(context, handleOrUuid);
+
+            dso = HandleServiceFactory.getInstance().getHandleService().resolveToObject(context, handleOrUuid);
         }
         if (dso != null) {
             unIndexContent(context, dso);
         }
     }
-
-//  public ApplicationService getApplicationService() {
-//
-//      return new DSpace().getServiceManager().getServiceByName("applicationService", ApplicationService.class);
-//  }
 
     private void startMultiThreadIndex(Context context, boolean onlyFake, List<UUID> ids) throws SQLException {
         int numThreads = ConfigurationManager.getIntProperty("deduplication", "indexer.items.threads", 5);
@@ -775,14 +706,11 @@ public class SolrDedupServiceImpl implements DedupService {
                         Item item = ContentServiceFactory.getInstance().getItemService().find(context, id);
                         Map<String, List<String>> tmpMapFilter = new HashMap<String, List<String>>();
                         List<String> tmpFilter = new ArrayList<String>();
-                        fillSignature(context, /* (BrowsableDSpaceObject) */(DSpaceObject) item, tmpMapFilter,
-                                tmpFilter);
+                        fillSignature(context, (DSpaceObject) item, tmpMapFilter, tmpFilter);
                         if (!tmpFilter.isEmpty()) {
                             // retrieve all search plugin to build search document in the same index
                             SearchDeduplication searchSignature = dspace.getServiceManager().getServiceByName(
-                                    /* CrisConstants.getEntityTypeText(Constants.ITEM) */"item".toUpperCase()
-                                            + "SearchDeduplication",
-                                    SearchDeduplication.class);
+                                    "item".toUpperCase() + "SearchDeduplication", SearchDeduplication.class);
                             if (onlyFake) {
                                 buildFromDedupReject(context, item, tmpMapFilter, tmpFilter, searchSignature);
                                 build(context, item.getID().toString(), item.getID().toString(), DeduplicationFlag.FAKE,
@@ -807,12 +735,12 @@ public class SolrDedupServiceImpl implements DedupService {
         }
     }
 
-    private void buildFromDedupReject(Context ctx, /* BrowsableDSpaceObject */DSpaceObject iu,
-            Map<String, List<String>> tmpMapFilter, List<String> tmpFilter, SearchDeduplication searchSignature) {
+    private void buildFromDedupReject(Context ctx, DSpaceObject iu, Map<String, List<String>> tmpMapFilter,
+            List<String> tmpFilter, SearchDeduplication searchSignature) {
 
         try {
-            List<Deduplication> tri = /* getApplicationService() */deduplicationService
-                    .getDeduplicationByFirstAndSecond(ctx, iu.getID().toString(), iu.getID().toString());
+            List<Deduplication> tri = deduplicationService.getDeduplicationByFirstAndSecond(ctx, iu.getID().toString(),
+                    iu.getID().toString());
 
             for (Deduplication row : tri) {
 
