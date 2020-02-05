@@ -277,9 +277,10 @@ public class BundleUploadBitstreamControllerIT extends AbstractEntityIntegration
                                          .file(file))
                         .andExpect(status().isForbidden());
 
-        getClient(token).perform(get("/api/core/bundles/" + bundle.getID() + "/bitstreams"))
+        getClient(token).perform(get("/api/core/bundles/" + bundle.getID() + "/bitstreams")
+                        .param("projection", "full"))
                         .andExpect(status().isOk())
-                        .andExpect(jsonPath("_embedded.bitstreams").doesNotExist());
+                        .andExpect(jsonPath("_embedded.bitstreams").isEmpty());
     }
 
     @Test
@@ -318,9 +319,10 @@ public class BundleUploadBitstreamControllerIT extends AbstractEntityIntegration
                                                   .file(file))
                    .andExpect(status().isUnauthorized());
 
-        getClient(token).perform(get("/api/core/bundles/" + bundle.getID() + "/bitstreams"))
+        getClient(token).perform(get("/api/core/bundles/" + bundle.getID() + "/bitstreams")
+                        .param("projection", "full"))
                         .andExpect(status().isOk())
-                        .andExpect(jsonPath("_embedded.bitstreams").doesNotExist());
+                        .andExpect(jsonPath("_embedded.bitstreams").isEmpty());
     }
 
     @Test

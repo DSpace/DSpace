@@ -99,7 +99,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
 
         assertNotEquals(token1, token2);
 
-        getClient(token1).perform(get("/api/authn/status"))
+        getClient(token1).perform(get("/api/authn/status").param("projection", "full"))
 
                          .andExpect(status().isOk())
 
@@ -113,7 +113,8 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                          .andExpect(jsonPath("$._embedded.eperson",
                                 EPersonMatcher.matchEPersonOnEmail(eperson.getEmail())));
 
-        getClient(token2).perform(get("/api/authn/status"))
+        getClient(token2).perform(get("/api/authn/status")
+                         .param("projection", "full"))
 
                          .andExpect(status().isOk())
 

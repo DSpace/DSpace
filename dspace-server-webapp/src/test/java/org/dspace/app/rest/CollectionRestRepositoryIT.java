@@ -72,7 +72,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         Collection col2 = CollectionBuilder.createCollection(context, child2).withName("Collection 2").build();
 
 
-        getClient().perform(get("/api/core/collections"))
+        getClient().perform(get("/api/core/collections")
+                   .param("projection", "full"))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
@@ -103,7 +104,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         context.restoreAuthSystemState();
 
         getClient().perform(get("/api/core/collections")
-                .param("size", "1"))
+                .param("size", "1")
+                .param("projection", "full"))
                 .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$._embedded.collections", Matchers.contains(
@@ -117,7 +119,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
 
         getClient().perform(get("/api/core/collections")
                                 .param("size", "1")
-                                .param("page", "1"))
+                                .param("page", "1")
+                                .param("projection", "full"))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$._embedded.collections", Matchers.contains(
@@ -152,7 +155,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
 
         context.restoreAuthSystemState();
 
-        getClient().perform(get("/api/core/collections/" + col1.getID()))
+        getClient().perform(get("/api/core/collections/" + col1.getID())
+                   .param("projection", "full"))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$", is(
@@ -332,7 +336,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
 
         context.restoreAuthSystemState();
 
-        getClient().perform(get("/api/core/collections/" + col1.getID()))
+        getClient().perform(get("/api/core/collections/" + col1.getID())
+                   .param("projection", "full"))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$", is(
@@ -359,7 +364,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
 
-        getClient().perform(get("/api/core/collections/" + col1.getID().toString()))
+        getClient().perform(get("/api/core/collections/" + col1.getID().toString())
+                   .param("projection", "full"))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$", Matchers.is(
@@ -385,7 +391,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                         .andExpect(status().isOk())
         ;
 
-        getClient().perform(get("/api/core/collections/" + col1.getID().toString()))
+        getClient().perform(get("/api/core/collections/" + col1.getID().toString())
+                   .param("projection", "full"))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$", Matchers.is(
@@ -426,7 +433,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
 
         context.restoreAuthSystemState();
 
-        getClient(token).perform(get("/api/core/collections/" + col1.getID().toString()))
+        getClient(token).perform(get("/api/core/collections/" + col1.getID().toString())
+                        .param("projection", "full"))
                         .andExpect(status().isOk())
                         .andExpect(content().contentType(contentType))
                         .andExpect(jsonPath("$", Matchers.is(
@@ -469,7 +477,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
 
         context.restoreAuthSystemState();
 
-        getClient().perform(get("/api/core/collections/" + col1.getID().toString()))
+        getClient().perform(get("/api/core/collections/" + col1.getID().toString())
+                        .param("projection", "full"))
                         .andExpect(status().isOk())
                         .andExpect(content().contentType(contentType))
                         .andExpect(jsonPath("$", Matchers.is(
@@ -680,7 +689,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
 
         context.restoreAuthSystemState();
 
-        getClient(token).perform(get("/api/core/collections/" + col1.getID().toString()))
+        getClient(token).perform(get("/api/core/collections/" + col1.getID().toString())
+                        .param("projection", "full"))
                         .andExpect(status().isOk())
                         .andExpect(content().contentType(contentType))
                         .andExpect(jsonPath("$", Matchers.is(
@@ -715,7 +725,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
 
-        getClient().perform(get("/api/core/collections/" + col1.getID().toString()))
+        getClient().perform(get("/api/core/collections/" + col1.getID().toString())
+                   .param("projection", "full"))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$", Matchers.is(
@@ -744,7 +755,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                         .andExpect(status().isOk())
         ;
 
-        getClient().perform(get("/api/core/collections/" + col1.getID().toString()))
+        getClient().perform(get("/api/core/collections/" + col1.getID().toString())
+                   .param("projection", "full"))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$", Matchers.is(
@@ -884,7 +896,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         Collection col2 = CollectionBuilder.createCollection(context, child2).withName("Collection 2").build();
 
 
-        getClient().perform(get("/api/core/collections"))
+        getClient().perform(get("/api/core/collections")
+                   .param("projection", "full"))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(

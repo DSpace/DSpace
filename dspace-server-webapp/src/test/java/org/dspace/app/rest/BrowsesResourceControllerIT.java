@@ -169,7 +169,8 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
 
         //** WHEN **
         //An anonymous user browses this endpoint to find which subjects are currently in the repository
-        getClient().perform(get("/api/discover/browses/subject/entries"))
+        getClient().perform(get("/api/discover/browses/subject/entries")
+                    .param("projection", "full"))
 
                    //** THEN **
                    //The status has to be 200
@@ -183,7 +184,7 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                    //Check the embedded resources and that they're sorted alphabetically
                    //Check that the subject matches as expected
                    //Verify that they're sorted alphabetically
-                   .andExpect(jsonPath("$._embedded.browseEntries",
+                   .andExpect(jsonPath("$._embedded.entries",
                                        contains(BrowseEntryResourceMatcher.matchBrowseEntry("AnotherTest", 1),
                                                 BrowseEntryResourceMatcher.matchBrowseEntry("ExtraEntry", 3),
                                                 BrowseEntryResourceMatcher.matchBrowseEntry("TestingForMore", 2)
@@ -204,7 +205,7 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                    //Check the embedded resources and that they're sorted alphabetically
                    //Check that the subject matches as expected
                    //Verify that they're sorted alphabetically
-                   .andExpect(jsonPath("$._embedded.browseEntries",
+                   .andExpect(jsonPath("$._embedded.entries",
                                        contains(BrowseEntryResourceMatcher.matchBrowseEntry("TestingForMore", 2),
                                                 BrowseEntryResourceMatcher.matchBrowseEntry("ExtraEntry", 3),
                                                 BrowseEntryResourceMatcher.matchBrowseEntry("AnotherTest", 1)

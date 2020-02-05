@@ -978,7 +978,8 @@ public class BitstreamControllerIT extends AbstractControllerIntegrationTest {
                                  ))
                 .andExpect(status().isForbidden());
 
-        getClient(token).perform(get("/api/core/bitstreams/" + bitstream.getID() + "/bundle"))
+        getClient(token).perform(get("/api/core/bitstreams/" + bitstream.getID() + "/bundle")
+                        .param("projection", "full"))
                         .andExpect(status().isOk())
                         .andExpect(content().contentType(contentType))
                         .andExpect(jsonPath("$", Matchers.is(
@@ -1284,7 +1285,8 @@ public class BitstreamControllerIT extends AbstractControllerIntegrationTest {
                                  ))
                 .andExpect(status().isForbidden());
 
-        getClient(token).perform(get("/api/core/bitstreams/" + bitstream.getID() + "/bundle"))
+        getClient(token).perform(get("/api/core/bitstreams/" + bitstream.getID() + "/bundle")
+                        .param("projection", "full"))
                         .andExpect(status().isOk())
                         .andExpect(content().contentType(contentType))
                         .andExpect(jsonPath("$", Matchers.is(
