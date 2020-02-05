@@ -419,7 +419,8 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
 
         //** WHEN **
         //An anonymous user browses the items in the Browse by item endpoint
-        getClient().perform(get("/api/discover/browses/title/items"))
+        getClient().perform(get("/api/discover/browses/title/items")
+               .param("projection", "full"))
                //** THEN **
                //The status has to be 200 OK
                .andExpect(status().isOk())
@@ -433,13 +434,12 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                // embedded items are already checked by other test, we focus on links here
                .andExpect(jsonPath("$._links.next.href", Matchers.containsString("/api/discover/browses/title/items?")))
                .andExpect(jsonPath("$._links.last.href", Matchers.containsString("/api/discover/browses/title/items?")))
-               .andExpect(
-                        jsonPath("$._links.first.href", Matchers.containsString("/api/discover/browses/title/items?")))
                .andExpect(jsonPath("$._links.self.href", Matchers.endsWith("/api/discover/browses/title/items")));
 
         //** WHEN **
         //An anonymous user browses the items in the Browse by item endpoint
-        getClient().perform(get("/api/discover/browses/author/entries"))
+        getClient().perform(get("/api/discover/browses/author/entries")
+               .param("projection", "full"))
                //** THEN **
                //The status has to be 200 OK
                .andExpect(status().isOk())
@@ -454,8 +454,6 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                 .andExpect(jsonPath("$._links.next.href",
                         Matchers.containsString("/api/discover/browses/author/entries?")))
                 .andExpect(jsonPath("$._links.last.href",
-                        Matchers.containsString("/api/discover/browses/author/entries?")))
-                .andExpect(jsonPath("$._links.first.href",
                         Matchers.containsString("/api/discover/browses/author/entries?")))
                 .andExpect(jsonPath("$._links.self.href", Matchers.endsWith("/api/discover/browses/author/entries")));
     }
@@ -641,7 +639,8 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
         //An anonymous user browses the entries in the Browse by Author endpoint
         //with startsWith set to U
         getClient().perform(get("/api/discover/browses/author/entries?startsWith=U")
-                                .param("size", "2"))
+                                .param("size", "2")
+                   .param("projection", "full"))
 
                    //** THEN **
                    //The status has to be 200 OK
@@ -780,7 +779,8 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
         //An anonymous user browses the items in the Browse by date issued endpoint
         //with startsWith set to 1990
         getClient().perform(get("/api/discover/browses/dateissued/items?startsWith=1990")
-                                .param("size", "2"))
+                                .param("size", "2")
+                                .param("projection", "full"))
 
                    //** THEN **
                    //The status has to be 200 OK
@@ -806,7 +806,8 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
         //An anonymous user browses the items in the Browse by Title endpoint
         //with startsWith set to T
         getClient().perform(get("/api/discover/browses/title/items?startsWith=T")
-                            .param("size", "2"))
+                            .param("size", "2")
+                            .param("projection", "full"))
 
                    //** THEN **
                    //The status has to be 200 OK
@@ -818,7 +819,7 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                    .andExpect(jsonPath("$.page.totalElements", is(7)))
                    //We expect to jump to page 2 in the index
                    .andExpect(jsonPath("$.page.number", is(2)))
-                   .andExpect(jsonPath("$._links.first.href", containsString("startsWith=T")))
+                   .andExpect(jsonPath("$._links.self.href", containsString("startsWith=T")))
 
                    //Verify that the index jumps to the "T-800" item.
                    .andExpect(jsonPath("$._embedded.items",
@@ -834,7 +835,8 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
         //with startsWith set to Blade and scope set to Col 1
         getClient().perform(get("/api/discover/browses/title/items?startsWith=Blade")
                                 .param("scope", col1.getID().toString())
-                                .param("size", "2"))
+                                .param("size", "2")
+                                .param("projection", "full"))
 
                    //** THEN **
                    //The status has to be 200 OK
@@ -846,7 +848,7 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                    .andExpect(jsonPath("$.page.totalElements", is(3)))
                    //As this is is a small collection, we expect to go-to page 0
                    .andExpect(jsonPath("$.page.number", is(0)))
-                   .andExpect(jsonPath("$._links.first.href", containsString("startsWith=Blade")))
+                   .andExpect(jsonPath("$._links.self.href", containsString("startsWith=Blade")))
 
                    //Verify that the index jumps to the "Blade Runner" item.
                    .andExpect(jsonPath("$._embedded.items",
@@ -942,7 +944,7 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                    //We expect to jump to page 1 of the index
                    .andExpect(jsonPath("$.page.number", is(2)))
                    .andExpect(jsonPath("$.page.size", is(2)))
-                   .andExpect(jsonPath("$._links.first.href", containsString("startsWith=1990")))
+                   .andExpect(jsonPath("$._links.self.href", containsString("startsWith=1990")))
 
                    //Verify that the index jumps to the "Zeta Reticuli" item.
                    .andExpect(jsonPath("$._embedded.items",
