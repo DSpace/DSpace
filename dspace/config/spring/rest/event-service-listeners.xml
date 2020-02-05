@@ -22,8 +22,8 @@
     </bean>
 
     <!--  Irus statistics tracking  -->
-    <bean class="org.dspace.statistics.export.ExportUsageEventListener">
-        <property name="eventService" ref="org.dspace.services.EventService"/>
-    </bean>
+<!--    <bean class="org.dspace.statistics.export.ExportUsageEventListener">-->
+<!--        <property name="eventService" ref="org.dspace.services.EventService"/>-->
+<!--    </bean>-->
 
 </beans>
