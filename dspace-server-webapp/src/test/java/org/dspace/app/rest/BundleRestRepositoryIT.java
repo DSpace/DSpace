@@ -422,7 +422,8 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                     .andExpect(status().isOk());
 
-        getClient().perform(get("/api/core/bundles/" + bundle1.getID() + "/bitstreams"))
+        getClient().perform(get("/api/core/bundles/" + bundle1.getID() + "/bitstreams")
+                .param("projection", "full"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$._embedded.bitstreams", Matchers.contains(

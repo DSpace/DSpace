@@ -168,7 +168,8 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
 
         getClient(token).perform(get("/api/core/bitstreams/")
                                 .param("size", "1")
-                                .param("page", "1"))
+                                .param("page", "1")
+                                .param("projection", "full"))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$._embedded.bitstreams", Matchers.contains(

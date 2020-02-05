@@ -128,7 +128,8 @@ public class SubmissionDefinitionsControllerIT extends AbstractControllerIntegra
 
 
         //Match only that a section exists with a submission configuration behind
-        getClient(token).perform(get("/api/config/submissiondefinitions/traditional/collections"))
+        getClient(token).perform(get("/api/config/submissiondefinitions/traditional/collections")
+                   .param("projection", "full"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.page.totalElements", is(0)));
     }
@@ -142,7 +143,8 @@ public class SubmissionDefinitionsControllerIT extends AbstractControllerIntegra
 
         String token = getAuthToken(admin.getEmail(), password);
 
-        getClient(token).perform(get("/api/config/submissiondefinitions/traditional/sections"))
+        getClient(token).perform(get("/api/config/submissiondefinitions/traditional/sections")
+                   .param("projection", "full"))
                    // The status has to be 200 OK
                    .andExpect(status().isOk())
                    // We expect the content type to be "application/hal+json;charset=UTF-8"
