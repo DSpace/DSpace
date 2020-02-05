@@ -29,6 +29,18 @@ public class DSpaceObjectUtils {
     @Autowired
     private ContentServiceFactory contentServiceFactory;
 
+    /**
+     * Retrieve a DSpaceObject from its uuid. As this method need to iterate over all the different services that
+     * support concrete class of DSpaceObject it has poor performance. Please consider the use of the direct service
+     * (ItemService, CommunityService, etc.) if you know in advance the type of DSpaceObject that you are looking for
+     * 
+     * @param context
+     *            DSpace context
+     * @param uuid
+     *            the uuid to lookup
+     * @return the DSpaceObject if any with the supplied uuid
+     * @throws SQLException
+     */
     public DSpaceObject findDSpaceObject(Context context, UUID uuid) throws SQLException {
         for (DSpaceObjectService<? extends DSpaceObject> dSpaceObjectService :
                               contentServiceFactory.getDSpaceObjectServices()) {
