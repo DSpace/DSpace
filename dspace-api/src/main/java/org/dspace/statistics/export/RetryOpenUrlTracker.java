@@ -65,9 +65,6 @@ public class RetryOpenUrlTracker extends DSpaceRunnable {
         context = new Context();
         openUrlService = OpenURLTrackerLoggerServiceFactory.getInstance().getOpenUrlService();
 
-        lineToAdd = null;
-        help = false;
-
         if (commandLine.hasOption('h')) {
             help = true;
         }

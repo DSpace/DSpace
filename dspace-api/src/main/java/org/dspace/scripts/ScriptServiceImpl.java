@@ -30,6 +30,6 @@ public class ScriptServiceImpl implements ScriptService {
     @Override
     public List<DSpaceRunnable> getDSpaceRunnables(Context context) {
         return serviceManager.getServicesByType(DSpaceRunnable.class).stream().filter(
-                dSpaceRunnable -> dSpaceRunnable.isAllowedToExecute(context)).collect(Collectors.toList());
+            dSpaceRunnable -> dSpaceRunnable.isAllowedToExecute(context)).collect(Collectors.toList());
     }
 }
