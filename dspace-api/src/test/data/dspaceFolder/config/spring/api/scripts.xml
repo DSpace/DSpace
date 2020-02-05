@@ -4,17 +4,17 @@
     xsi:schemaLocation="http://www.springframework.org/schema/beans
            http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
 
-    <bean id="indexClient" class="org.dspace.discovery.IndexClient" scope="prototype">
+    <bean id="index-discovery" class="org.dspace.discovery.IndexClient" scope="prototype">
         <property name="name" value="index-discovery"/>
         <property name="description" value="Update Discovery Solr Search Index"/>
     </bean>
 
-    <bean id="MockScript" class="org.dspace.scripts.impl.MockDSpaceRunnableScript" scope="prototype">
+    <bean id="mock-script" class="org.dspace.scripts.impl.MockDSpaceRunnableScript" scope="prototype">
         <property name="name" value="mock-script" />
         <property name="description" value="Mocking a script for testing purposes" />
     </bean>
 
-    <bean id="retryOpenUrlTracker" class="org.dspace.statistics.export.RetryOpenUrlTracker" scope="prototype">
+    <bean id="retry-tracker" class="org.dspace.statistics.export.RetryOpenUrlTracker" scope="prototype">
         <property name="name" value="retry-tracker"/>
         <property name="description" value="Retry all failed commits to the OpenURLTracker"/>
     </bean>
