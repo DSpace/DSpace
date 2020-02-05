@@ -67,7 +67,7 @@ public class HibernateDBConnection implements DBConnection<Session> {
     /**
      * Retrieves the current Session from Hibernate (per our settings, Hibernate is configured to create one Session
      * per thread). If Session doesn't yet exist, it is created. A Transaction is also initialized (or reinintialized)
-     * in the Session if one doesn't exist, or was previously closed
+     * in the Session if one doesn't exist, or was previously closed (e.g. if commit() was previously called)
      * @return Hibernate current Session object
      * @throws SQLException
      */
@@ -83,6 +83,11 @@ public class HibernateDBConnection implements DBConnection<Session> {
         return sessionFactory.getCurrentSession();
     }
 
+    /**
+     * Check if the connection has a currently active Transaction. A Transaction is active if it has not yet been
+     * either committed or rolled back.
+     * @return
+     */
     @Override
     public boolean isTransActionAlive() {
         Transaction transaction = getTransaction();
@@ -98,19 +103,22 @@ public class HibernateDBConnection implements DBConnection<Session> {
     }
 
     /**
-     * Check if Hibernate Session is still "alive" / active. Per the type of Session configuration we use,
-     * we only consider a Session to be alive if a Transaction is currently ACTIVE.
-     * <P>
-     * This method is used by Context.abort() to determine if the Session can be closed.
-     * @return boolean true or false
+     * Check if Hibernate Session is still "alive" / open. An open Session may or may not have an open Transaction
+     * (so isTransactionAlive() may return false even if isSessionAlive() returns true). A Session may be reused for
+     * multiple transactions (e.g. if commit() is called, the Session remains alive while the Transaction is closed)
+     *
+     * @return true if Session is alive, false otherwise
      */
     @Override
     public boolean isSessionAlive() {
-        return sessionFactory.getCurrentSession() != null &&
-            sessionFactory.getCurrentSession().getTransaction() != null &&
-            sessionFactory.getCurrentSession().getTransaction().getStatus().isOneOf(TransactionStatus.ACTIVE);
+        return sessionFactory.getCurrentSession() != null && sessionFactory.getCurrentSession().isOpen();
     }
 
+    /**
+     * Rollback any changes applied to the current Transaction. This also closes the Transaction. A new Transaction
+     * may be opened the next time getSession() is called.
+     * @throws SQLException
+     */
     @Override
     public void rollback() throws SQLException {
         if (isTransActionAlive()) {
@@ -119,7 +127,11 @@ public class HibernateDBConnection implements DBConnection<Session> {
     }
 
     /**
-     * This closes & unbinds the Hibernate Session from our thread. Once closed, a Session cannot be used again.
+     * Close our current Database connection. This also closes & unbinds the Hibernate Session from our thread.
+     * <P>
+     * NOTE: Because DSpace configures Hibernate to automatically create a Session per thread, a Session may still
+     * exist after this method is called (as Hibernate may automatically create a new Session for the current thread).
+     * However, Hibernate will automatically clean up any existing Session when the thread closes.
      * @throws SQLException
      */
     @Override
@@ -186,6 +198,16 @@ public class HibernateDBConnection implements DBConnection<Session> {
         return getSession().getStatistics().getEntityCount();
     }
 
+    /**
+     * Reload an entity into the Hibernate cache. This can be called after a call to commit() to recache an object
+     * in the Hibernate Session (see commit()). Failing to reload objects into the cache may result in a Hibernate
+     * throwing a "LazyInitializationException" if you attempt to use an object that has been disconnected from the
+     * Session cache.
+     * @param entity The DSpace object to reload
+     * @param <E> The class of the enity. The entity must implement the {@link ReloadableEntity} interface.
+     * @return the newly cached object.
+     * @throws SQLException
+     */
     @Override
     @SuppressWarnings("unchecked")
     public <E extends ReloadableEntity> E reloadEntity(final E entity) throws SQLException {
@@ -223,7 +245,7 @@ public class HibernateDBConnection implements DBConnection<Session> {
     /**
      * Evict an entity from the hibernate cache. This is necessary when batch processing a large number of items.
      *
-     * @param entity The entity to reload
+     * @param entity The entity to evict
      * @param <E>    The class of the enity. The entity must implement the {@link ReloadableEntity} interface.
      * @throws SQLException When reloading the entity from the database fails.
      */

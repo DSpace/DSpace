@@ -11,6 +11,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -269,9 +270,9 @@ public class ContextTest extends AbstractUnitTest {
         Context instance = new Context();
 
         // By default, we should have a new DB connection, so let's make sure it is there
-        assertThat("HibernateDBConnection is null", instance.getDBConnection(), notNullValue());
-        assertThat("Hibernate Session is not alive", instance.getDBConnection().isSessionAlive(), equalTo(true));
-        assertThat("Context is invalid", instance.isValid(), equalTo(true));
+        assertThat("HibernateDBConnection should exist", instance.getDBConnection(), notNullValue());
+        assertTrue("Context should be valid", instance.isValid());
+        assertTrue("Transaction should be open", instance.isTransactionAlive());
 
         // Allow full Admin perms (in new context)
         when(authorizeServiceSpy.isAdmin(instance)).thenReturn(true);
@@ -289,28 +290,16 @@ public class ContextTest extends AbstractUnitTest {
         instance.commit();
 
         // We expect our DB connection to still exist
-        assertThat("HibernateDBConnection is null after commit", instance.getDBConnection(), notNullValue());
-        // We expect the Hibernate Transaction to be CLOSED
-        //assertThat("Hibernate Transaction is not closed after commit",
-        //           instance.getDBConnection().isTransActionAlive(), equalTo(false));
-        // We expect Context to claim it is "invalid"
-        // TODO: Is this correct behavior? This seems odd, as we can reuse the context -- see below
-        //assertThat("Context is valid after commit", instance.isValid(), equalTo(false));
-
-        // Hibernate's Session should still exist.
-        // Also, this call to getSession() should create a NEW Transaction.
-        //assertThat("Cannot get a new Session after commit",
-        //           instance.getDBConnection().getSession(), notNullValue());
-        // We expect that a new Transaction now exists.
-        assertThat("Hibernate Transaction is not reopened after getSession()",
-                   instance.getDBConnection().isTransActionAlive(), equalTo(true));
-        // We expect Context to be valid again. (NOTE: A Context is NOT Valid until a Transaction is open)
-        assertThat("Context is not valid after getSession()", instance.isValid(), equalTo(true));
+        assertThat("HibernateDBConnection should still be open", instance.getDBConnection(), notNullValue());
+        // We expect the Context to be valid
+        assertTrue("Context should still be valid", instance.isValid());
+        // However, the transaction should now be closed
+        assertFalse("DB transaction should be closed", instance.isTransactionAlive());
 
         // ReloadEntity and verify changes saved
         // NOTE: reloadEntity() is required, see commit() method Javadocs
-        //newUser = instance.reloadEntity(newUser);
-        assertEquals("Content was not committed as expected", newUser.getEmail(), createdEmail);
+        newUser = instance.reloadEntity(newUser);
+        assertEquals("New user should be created", newUser.getEmail(), createdEmail);
 
         // Change the email and commit again (a Context should support multiple commit() calls)
         String newEmail = "myrealemail@gmail.com";
@@ -318,48 +307,12 @@ public class ContextTest extends AbstractUnitTest {
         instance.commit();
 
         // Reload entity and new value should be there.
-        //newUser = instance.reloadEntity(newUser);
-        assertEquals("testCommit 9", newUser.getEmail(), newEmail);
+        newUser = instance.reloadEntity(newUser);
+        assertEquals("New email address should be saved", newUser.getEmail(), newEmail);
 
         // Cleanup our new object & context
         ePersonService.delete(instance, newUser);
         cleanupContext(instance);
-    }
-
-    /**
-     * Test of commit method, of class Context.
-     */
-    @Test
-    public void testCommitReuseWithoutReload() throws SQLException, AuthorizeException, IOException {
-        // To test commit() we need a new Context object
-        Context instance = new Context();
-
-        // Allow full Admin perms (in new context)
-        when(authorizeServiceSpy.isAdmin(instance)).thenReturn(true);
-
-        // Create a new user to test with
-        String createdEmail = "anotherfakeuser@gmail.com";
-        EPerson newUser = ePersonService.create(instance);
-        newUser.setFirstName(instance, "Samantha");
-        newUser.setLastName(instance, "Smith");
-        newUser.setEmail(createdEmail);
-        newUser.setCanLogIn(true);
-        newUser.setLanguage(instance, I18nUtil.getDefaultLocale().getLanguage());
-
-        // Now, call commit()
-        instance.commit();
-
-        try {
-            newUser.getEmail();
-            fail();
-        } catch (Exception ex) {
-            assertTrue(ex instanceof UnsupportedOperationException);
-        } finally {
-            // Cleanup our new object & context
-            ePersonService.delete(instance, newUser);
-            cleanupContext(instance);
-        }
-
     }
 
     /**
