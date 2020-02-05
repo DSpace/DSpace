@@ -35,6 +35,23 @@ import org.springframework.orm.hibernate5.SessionFactoryUtils;
 
 /**
  * Hibernate implementation of the DBConnection.
+ * <P>
+ * NOTE: This class does NOT represent a single Hibernate database connection. Instead, it wraps
+ * Hibernate's Session object to obtain access to a database connection in order to execute one or more
+ * transactions.
+ * <P>
+ * Per DSpace's current Hibernate configuration ([dspace]/config/core-hibernate.xml), we use the one-session-per-thread
+ * approach (ThreadLocalSessionContext). This means that Hibernate creates a single Session per thread (request), at the
+ * time when getCurrentSession() is first called.
+ * <P>
+ * This Session may be reused for multiple Transactions, but if commit() is called, any objects (Entities) in
+ * the Session become disconnected and MUST be reloaded into the Session (see reloadEntity() method below).
+ * <P>
+ * If an Error occurs, the Session itself is invalidated. No further Transactions can be run on that Session.
+ * <P>
+ * DSpace follows the "Session-per-request" transactional pattern described here:
+ * https://docs.jboss.org/hibernate/orm/5.0/userguide/en-US/html/ch06.html#session-per-request
+ *
  *
  * @author kevinvandevelde at atmire.com
  */
@@ -47,12 +64,22 @@ public class HibernateDBConnection implements DBConnection<Session> {
     private boolean batchModeEnabled = false;
     private boolean readOnlyEnabled = false;
 
+    /**
+     * Retrieves the current Session from Hibernate (per our settings, Hibernate is configured to create one Session
+     * per thread). If Session doesn't yet exist, it is created. A Transaction is also initialized (or reinintialized)
+     * in the Session if one doesn't exist, or was previously closed
+     * @return Hibernate current Session object
+     * @throws SQLException
+     */
     @Override
     public Session getSession() throws SQLException {
+        // If we don't yet have a live transaction, start a new one
+        // NOTE: a Session cannot be used until a Transaction is started.
         if (!isTransActionAlive()) {
             sessionFactory.getCurrentSession().beginTransaction();
             configureDatabaseMode();
         }
+        // Return the current Hibernate Session object (Hibernate will create one if it doesn't yet exist)
         return sessionFactory.getCurrentSession();
     }
 
@@ -62,15 +89,26 @@ public class HibernateDBConnection implements DBConnection<Session> {
         return transaction != null && transaction.isActive();
     }
 
+    /**
+     * Retrieve the current Hibernate Transaction object from our Hibernate Session.
+     * @return current Transaction (may be active or inactive) or null
+     */
     protected Transaction getTransaction() {
         return sessionFactory.getCurrentSession().getTransaction();
     }
 
+    /**
+     * Check if Hibernate Session is still "alive" / active. Per the type of Session configuration we use,
+     * we only consider a Session to be alive if a Transaction is currently ACTIVE.
+     * <P>
+     * This method is used by Context.abort() to determine if the Session can be closed.
+     * @return boolean true or false
+     */
     @Override
     public boolean isSessionAlive() {
-        return sessionFactory.getCurrentSession() != null && sessionFactory.getCurrentSession()
-                                                                           .getTransaction() != null && sessionFactory
-            .getCurrentSession().getTransaction().getStatus().isOneOf(TransactionStatus.ACTIVE);
+        return sessionFactory.getCurrentSession() != null &&
+            sessionFactory.getCurrentSession().getTransaction() != null &&
+            sessionFactory.getCurrentSession().getTransaction().getStatus().isOneOf(TransactionStatus.ACTIVE);
     }
 
     @Override
@@ -80,6 +118,10 @@ public class HibernateDBConnection implements DBConnection<Session> {
         }
     }
 
+    /**
+     * This closes & unbinds the Hibernate Session from our thread. Once closed, a Session cannot be used again.
+     * @throws SQLException
+     */
     @Override
     public void closeDBConnection() throws SQLException {
         if (sessionFactory.getCurrentSession() != null && sessionFactory.getCurrentSession().isOpen()) {
@@ -87,11 +129,23 @@ public class HibernateDBConnection implements DBConnection<Session> {
         }
     }
 
+    /**
+     * Commits any current changes cached in the Hibernate Session to the database & closes the Transaction.
+     * To open a new Transaction, you may call getSession().
+     * <P>
+     * WARNING: When commit() is called, while the Session is still "alive", all previously loaded objects (entities)
+     * become disconnected from the Session. Therefore, if you continue to use the Session, you MUST reload any needed
+     * objects (entities) using reloadEntity() method.
+     *
+     * @throws SQLException
+     */
     @Override
     public void commit() throws SQLException {
         if (isTransActionAlive() && !getTransaction().getStatus().isOneOf(TransactionStatus.MARKED_ROLLBACK,
                                                                           TransactionStatus.ROLLING_BACK)) {
+            // Flush synchronizes the database with in-memory objects in Session (and frees up that memory)
             getSession().flush();
+            // Commit those results to the database & ends the Transaction
             getTransaction().commit();
         }
     }
