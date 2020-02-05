@@ -366,8 +366,7 @@ public class Context implements AutoCloseable {
 
         try {
             // As long as we have a valid, writeable database connection,
-            // commit changes. Otherwise, we'll just close the DB connection (below)
-            // otherwise, commit any changes made as part of the transaction
+            // commit changes. Otherwise, we'll just close the DB connection (see below)
             if (!isReadOnly()) {
                 commit();
             }
@@ -411,7 +410,7 @@ public class Context implements AutoCloseable {
             }
 
             if (dbConnection != null) {
-                //Commit our changes
+                // Commit our changes (this closes the transaction but leaves database connection open)
                 dbConnection.commit();
                 reloadContextBoundEntities();
             }
@@ -533,7 +532,7 @@ public class Context implements AutoCloseable {
                 dbConnection.rollback();
             }
         } catch (SQLException se) {
-            log.error(se.getMessage(), se);
+            log.error("Error rolling back transaction during an abort()", se);
         } finally {
             try {
                 if (dbConnection != null) {
@@ -542,7 +541,7 @@ public class Context implements AutoCloseable {
                     dbConnection = null;
                 }
             } catch (Exception ex) {
-                log.error("Exception aborting context", ex);
+                log.error("Error closing the database connection", ex);
             }
             events = null;
         }
@@ -564,6 +563,7 @@ public class Context implements AutoCloseable {
      */
     public boolean isValid() {
         // Only return true if our DB connection is live
+        // NOTE: A transaction need not exist for our Context to be valid, as a Context may use multiple transactions.
         return dbConnection != null && dbConnection.isSessionAlive();
     }
 
