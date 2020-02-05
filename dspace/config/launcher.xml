@@ -138,6 +138,13 @@
             <class>org.dspace.authority.indexer.AuthorityIndexClient</class>
         </step>
     </command>
+	<command>
+        <name>index-deduplication</name>
+        <description>Update Deduplication Solr Search Index</description>
+        <step>
+            <class>org.dspace.app.batch.DedupClient</class>
+        </step>
+    </command>
     <command>
         <name>itemupdate</name>
         <description>Item update tool for altering metadata and bitstream content in items</description>

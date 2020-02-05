@@ -36,7 +36,7 @@ public class DedupEventConsumer implements Consumer {
     private static Logger log = Logger.getLogger(IndexEventConsumer.class);
 
     // collect Items, Collections, Communities that need indexing
-    private Set</* UsageEventEntity */DSpaceObject> objectsToUpdate = null;
+    private Set<DSpaceObject> objectsToUpdate = null;
 
     private Set<UUID> objectsToDelete = null;
 
@@ -66,7 +66,7 @@ public class DedupEventConsumer implements Consumer {
     public void consume(Context ctx, Event event) throws Exception {
 
         if (objectsToUpdate == null) {
-            objectsToUpdate = new HashSet</* UsageEventEntity */DSpaceObject>();
+            objectsToUpdate = new HashSet<DSpaceObject>();
             objectsToDelete = new HashSet<UUID>();
         }
 
@@ -77,9 +77,9 @@ public class DedupEventConsumer implements Consumer {
             return;
         }
 
-        /* UsageEventEntity */DSpaceObject subject = event.getSubject(ctx);
+        DSpaceObject subject = event.getSubject(ctx);
 
-        /* UsageEventEntity */DSpaceObject object = event.getObject(ctx);
+        DSpaceObject object = event.getObject(ctx);
 
         // If event subject is a Bundle and event was Add or Remove,
         // transform the event to be a Modify on the owning Item.
@@ -124,7 +124,7 @@ public class DedupEventConsumer implements Consumer {
         }
     }
 
-    private void fillObjectToUpdate(/* UsageEventEntity */DSpaceObject subject) {
+    private void fillObjectToUpdate(DSpaceObject subject) {
         if (!cache.containsKey(subject.getID())) {
             objectsToUpdate.add(subject);
             Map<String, List<String>> newCacheMetadata = new HashMap<String, List<String>>();
@@ -201,7 +201,7 @@ public class DedupEventConsumer implements Consumer {
         if (objectsToUpdate != null && objectsToDelete != null) {
 
             // update the changed Items not deleted because they were on create list
-            for (/* UsageEventEntity */DSpaceObject iu : objectsToUpdate) {
+            for (DSpaceObject iu : objectsToUpdate) {
                 /*
                  * we let all types through here and allow the search DSIndexer to make
                  * decisions on indexing and/or removal
