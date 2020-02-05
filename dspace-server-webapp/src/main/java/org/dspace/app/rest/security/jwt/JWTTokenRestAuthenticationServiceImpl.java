@@ -160,6 +160,7 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
         if (addCookie) {
             Cookie cookie = new Cookie(AUTHORIZATION_COOKIE, token);
             cookie.setHttpOnly(true);
+            cookie.setSecure(true);
             response.addCookie(cookie);
         }
         response.setHeader(AUTHORIZATION_HEADER, String.format("%s %s", AUTHORIZATION_TYPE, token));
