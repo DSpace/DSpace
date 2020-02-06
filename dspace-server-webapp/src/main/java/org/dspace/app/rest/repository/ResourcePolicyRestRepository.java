@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.exception.MissingParameterException;
+import org.dspace.app.rest.exception.RESTAuthorizationException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.ResourcePolicyRest;
@@ -205,6 +206,9 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
         int total = 0;
         try {
             Context context = obtainContext();
+            if (context.getCurrentUser() == null) {
+                throw new RESTAuthorizationException("Only loggedin users can search resource policies by group");
+            }
             Group group = groupService.find(context, groupUuid);
             if (group == null) {
                 return null;
