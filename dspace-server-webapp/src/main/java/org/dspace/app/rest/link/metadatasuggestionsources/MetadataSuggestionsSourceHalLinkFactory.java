@@ -29,8 +29,9 @@ public class MetadataSuggestionsSourceHalLinkFactory
 //        list.add(buildLink(Link.REL_SELF, getMethodOn().getMetadataSuggestion(halResource.getContent().getId())));
 
         //TODO Uncomment when method is created
-//        list.add(buildLink("entries", getMethodOn()
-//            .(halResource.getContent().getName(), "", null, null, null)));
+        list.add(buildLink("entries", getMethodOn()
+            .getMetadataSugggestionEntries(pageable, null, null, halResource.getContent().getName(),
+                                           null, null, null, null, null, null)));
 
 
     }

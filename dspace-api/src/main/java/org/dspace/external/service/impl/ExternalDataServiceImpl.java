@@ -8,6 +8,7 @@
 package org.dspace.external.service.impl;
 
 import java.sql.SQLException;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,8 +35,7 @@ public class ExternalDataServiceImpl implements ExternalDataService {
 
     private static final Logger log = Logger.getLogger(ExternalDataServiceImpl.class);
 
-    @Autowired
-    private List<ExternalDataProvider> externalDataProviders;
+    private List<ExternalDataProvider> externalDataProviders = new LinkedList<>();
 
     @Autowired
     private ItemService itemService;
@@ -111,5 +111,13 @@ public class ExternalDataServiceImpl implements ExternalDataService {
             "with id: " + item.getID() + " from source: " + externalDataObject.getSource() + " with identifier: " +
             externalDataObject.getId()));
         return workspaceItem;
+    }
+
+    /**
+     * Generic setter for the externalDataProviders
+     * @param externalDataProviders   The externalDataProviders to be set on this ExternalDataServiceImpl
+     */
+    public void setExternalDataProviders(List<ExternalDataProvider> externalDataProviders) {
+        this.externalDataProviders = externalDataProviders;
     }
 }

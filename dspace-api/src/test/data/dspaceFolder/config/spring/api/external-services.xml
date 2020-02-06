@@ -4,9 +4,22 @@
     xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd"
     default-lazy-init="true">
 
-    <bean class="org.dspace.external.service.impl.ExternalDataServiceImpl"/>
+    <bean class="org.dspace.external.service.impl.ExternalDataServiceImpl">
+        <property name="externalDataProviders">
+            <util:list>
+                <ref bean="mockDataProvider"/>
+            </util:list>
+        </property>
+    </bean>
 
-    <bean class="org.dspace.external.provider.metadata.service.impl.MetadataSuggestionProviderServiceImpl"/>
+    <bean class="org.dspace.external.provider.metadata.service.impl.MetadataSuggestionProviderServiceImpl">
+        <property name="metadataSuggestionProviders">
+            <util:list>
+                <ref bean="mockMetadataSuggestionProvider1"/>
+                <ref bean="mockMetadataSuggestionProvider2"/>
+            </util:list>
+        </property>
+    </bean>
 
     <bean name="mockDataProvider" class="org.dspace.external.provider.impl.MockDataProvider" init-method="init">
         <property name="sourceIdentifier" value="mock"/>

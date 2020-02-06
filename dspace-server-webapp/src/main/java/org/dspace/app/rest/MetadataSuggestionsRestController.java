@@ -29,7 +29,6 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.content.service.BitstreamService;
-import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,9 +59,6 @@ public class MetadataSuggestionsRestController {
     private BitstreamService bitstreamService;
 
     @Autowired
-    private ItemService itemService;
-
-    @Autowired
     HalLinkService linkService;
 
     @Autowired
@@ -91,7 +87,7 @@ public class MetadataSuggestionsRestController {
         @PathVariable("suggestionName") String suggestionName,
         @RequestParam(name = "query", required = false) String query,
         @RequestParam(name = "bitstream", required = false) UUID bitstreamUuid,
-        @RequestParam(name = "use-metadata", required = false, defaultValue = "false") boolean useMetadata,
+        @RequestParam(name = "use-metadata", required = false, defaultValue = "false") Boolean useMetadata,
         @RequestParam(name = "workspaceitem", required = false) Integer workspaceItemId,
         @RequestParam(name = "workflowitem", required = false) Integer workflowItemId,
         PagedResourcesAssembler assembler) throws SQLException {
@@ -107,6 +103,10 @@ public class MetadataSuggestionsRestController {
         Context context = ContextUtil.obtainContext(request);
         InProgressSubmission inProgressSubmission = metadataSuggestionsRestRepository
             .resolveInProgressSubmission(workspaceItemId, workflowItemId, context);
+        if (inProgressSubmission == null) {
+            throw new DSpaceBadRequestException("A valid InProgressSubmission couldn't be found for the given" +
+                                                    " parameters");
+        }
         Bitstream bitstream = null;
         if (bitstreamUuid != null) {
             bitstream = bitstreamService.find(context, bitstreamUuid);
@@ -189,6 +189,17 @@ public class MetadataSuggestionsRestController {
         @RequestParam(name = "workflowitem", required = false) Integer workflowItemId,
         HttpServletResponse response, HttpServletRequest request) throws SQLException {
 
+        InProgressSubmission inProgressSubmission = getInProgressSubmission(workspaceItemId, workflowItemId, request);
+        MetadataSuggestionEntryRest metadataSuggestionEntryRest = metadataSuggestionsRestRepository
+            .getMetadataSuggestionEntry(suggestionName, entryId, inProgressSubmission);
+        MetadataSuggestionEntryResource metadataSuggestionEntryResource = new MetadataSuggestionEntryResource(
+            metadataSuggestionEntryRest);
+        linkService.addLinks(metadataSuggestionEntryResource);
+        return metadataSuggestionEntryResource;
+    }
+
+    private InProgressSubmission getInProgressSubmission(Integer workspaceItemId, Integer workflowItemId,
+        HttpServletRequest request) throws SQLException {
         if (workflowItemId == null && workspaceItemId == null) {
             throw new DSpaceBadRequestException("You need to provide either a workflowitem ID or a workspaceitem ID");
         }
@@ -200,16 +211,11 @@ public class MetadataSuggestionsRestController {
                                                     "not found");
         }
         if (!authorizeService.authorizeActionBoolean(context, context.getCurrentUser(), inProgressSubmission.getItem(),
-                                                    Constants.WRITE, false)) {
+                                                     Constants.WRITE, false)) {
             throw new AccessDeniedException("You do not have write rights on this InProgressSubmission for id: " +
                                                 inProgressSubmission.getID());
         }
-        MetadataSuggestionEntryRest metadataSuggestionEntryRest = metadataSuggestionsRestRepository
-            .getMetadataSuggestionEntry(suggestionName, entryId, inProgressSubmission);
-        MetadataSuggestionEntryResource metadataSuggestionEntryResource = new MetadataSuggestionEntryResource(
-            metadataSuggestionEntryRest);
-        linkService.addLinks(metadataSuggestionEntryResource);
-        return metadataSuggestionEntryResource;
+        return inProgressSubmission;
     }
 
 
@@ -230,21 +236,7 @@ public class MetadataSuggestionsRestController {
         @RequestParam(name = "workflowitem", required = false) Integer workflowitem,
         HttpServletResponse response, HttpServletRequest request) throws SQLException {
 
-        if (workflowitem == null && workspaceitem == null) {
-            throw new DSpaceBadRequestException("You need to provide either a workflowitem ID or a workspaceitem ID");
-        }
-        Context context = ContextUtil.obtainContext(request);
-        InProgressSubmission inProgressSubmission = metadataSuggestionsRestRepository
-            .resolveInProgressSubmission(workspaceitem, workflowitem, context);
-        if (inProgressSubmission == null) {
-            throw new ResourceNotFoundException("The InProgressSubmission for the given workspace or workflow ID was " +
-                                                    "not found");
-        }
-        if (!authorizeService.authorizeActionBoolean(context, context.getCurrentUser(), inProgressSubmission.getItem(),
-                                                     Constants.WRITE, false)) {
-            throw new AccessDeniedException("You do not have write rights on this InProgressSubmission for id: " +
-                                                inProgressSubmission.getID());
-        }
+        InProgressSubmission inProgressSubmission = getInProgressSubmission(workspaceitem, workflowitem, request);
         MetadataSuggestionsDifferencesRest metadataSuggestionsDifferencesRest = metadataSuggestionsRestRepository
             .getMetadataSuggestionsDifferences(suggestionName, entryId, inProgressSubmission);
 

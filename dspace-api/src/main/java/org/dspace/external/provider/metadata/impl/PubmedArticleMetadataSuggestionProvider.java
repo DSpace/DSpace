@@ -7,8 +7,10 @@
  */
 package org.dspace.external.provider.metadata.impl;
 
+import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.content.Item;
 import org.dspace.content.service.ItemService;
 import org.dspace.external.model.ExternalDataObject;
@@ -27,11 +29,14 @@ public class PubmedArticleMetadataSuggestionProvider extends MetadataSuggestionP
     public List<ExternalDataObject> metadataQuery(Item item, int start, int limit) {
         // Concatenate metadata and send to query
         String title = itemService.getMetadataFirstValue(item, "dc", "title", null, Item.ANY);
+        if (StringUtils.isBlank(title)) {
+            return Collections.emptyList();
+        }
         return query(title, start, limit);
     }
 
     public List<ExternalDataObject> query(String query, int start, int limit) {
-        return getExternalDataProvider().searchExternalDataObjects(query, 0, 100);
+        return getExternalDataProvider().searchExternalDataObjects(query, start, limit);
     }
 
 }

@@ -20,14 +20,12 @@ import org.dspace.content.InProgressSubmission;
 import org.dspace.external.model.ExternalDataObject;
 import org.dspace.external.provider.metadata.MetadataSuggestionProvider;
 import org.dspace.external.provider.metadata.service.MetadataSuggestionProviderService;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * The implementation class for {@link MetadataSuggestionProviderService}
  */
 public class MetadataSuggestionProviderServiceImpl implements MetadataSuggestionProviderService {
 
-    @Autowired(required = false)
     private List<MetadataSuggestionProvider> metadataSuggestionProviders = new ArrayList<>();
 
     @Override
@@ -114,20 +112,20 @@ public class MetadataSuggestionProviderServiceImpl implements MetadataSuggestion
 
     }
 
+    @Override
     public List<MetadataItemSuggestions> getMetadataSuggestionEntryRests(
         MetadataSuggestionProvider metadataSuggestionProvider, InProgressSubmission inProgressSubmission, String query,
         Bitstream bitstream, boolean useMetadata,
         int start, int limit) {
-        List<ExternalDataObject> list = new LinkedList<>();
+        List<ExternalDataObject> list = getExternalDataObjects(metadataSuggestionProvider, inProgressSubmission, query,
+                                                               bitstream, useMetadata, start, limit);
 
-        if (StringUtils.isNotBlank(query)) {
-            list = metadataSuggestionProvider.query(query, start, limit);
-        } else if (bitstream != null) {
-            list = metadataSuggestionProvider.bitstreamQuery(bitstream);
-        } else if (useMetadata) {
-            list = metadataSuggestionProvider.metadataQuery(inProgressSubmission.getItem(), start, limit);
-        }
+        List<MetadataItemSuggestions> listToReturn = convertExternalDataObjects(inProgressSubmission, list);
+        return listToReturn;
+    }
 
+    private List<MetadataItemSuggestions> convertExternalDataObjects(InProgressSubmission inProgressSubmission,
+                                                                     List<ExternalDataObject> list) {
         List<MetadataItemSuggestions> listToReturn = new LinkedList<>();
         for (ExternalDataObject externalDataObject : list) {
             listToReturn.add(new MetadataItemSuggestions(externalDataObject, inProgressSubmission));
@@ -135,5 +133,39 @@ public class MetadataSuggestionProviderServiceImpl implements MetadataSuggestion
         return listToReturn;
     }
 
+    private List<ExternalDataObject> getExternalDataObjects(MetadataSuggestionProvider metadataSuggestionProvider,
+                                                            InProgressSubmission inProgressSubmission, String query,
+                                                            Bitstream bitstream, boolean useMetadata, int start,
+                                                            int limit) {
+        List<ExternalDataObject> list;
 
+        if (StringUtils.isNotBlank(query)) {
+            list = metadataSuggestionProvider.query(query, start, limit);
+        } else if (bitstream != null) {
+            list = metadataSuggestionProvider.bitstreamQuery(bitstream);
+        } else if (useMetadata) {
+            list = metadataSuggestionProvider.metadataQuery(inProgressSubmission.getItem(), start, limit);
+        } else {
+            list = new LinkedList<>();
+        }
+        return list;
+    }
+
+    /**
+     * Generic getter for the metadataSuggestionProviders
+     * @return the metadataSuggestionProviders value of this MetadataSuggestionProviderServiceImpl
+     */
+    public List<MetadataSuggestionProvider> getMetadataSuggestionProviders() {
+        return metadataSuggestionProviders;
+    }
+
+    /**
+     * Generic setter for the metadataSuggestionProviders
+     * @param metadataSuggestionProviders   The metadataSuggestionProviders to be set on this
+     *                                      MetadataSuggestionProviderServiceImpl
+     */
+    public void setMetadataSuggestionProviders(
+        List<MetadataSuggestionProvider> metadataSuggestionProviders) {
+        this.metadataSuggestionProviders = metadataSuggestionProviders;
+    }
 }

@@ -215,6 +215,7 @@ public class MetadataSuggestionsRestRepository extends DSpaceRestRepository<Meta
             .getMetadataSuggestionEntryRests(metadataSuggestionProvider, inProgressSubmission, query, bitstream,
                                              useMetadata,
                                              pageable.getOffset(), pageable.getPageSize());
-        return converter.toRestPage(utils.getPage(list, pageable), Projection.DEFAULT);
+        //TODO This -1 is placeholder for when to get the total
+        return converter.toRestPage(list, pageable, -1, Projection.DEFAULT);
     }
 }

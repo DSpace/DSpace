@@ -4,18 +4,34 @@
     xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd"
     default-lazy-init="true">
 
-    <bean class="org.dspace.external.service.impl.ExternalDataServiceImpl"/>
+    <bean class="org.dspace.external.service.impl.ExternalDataServiceImpl">
+        <property name="externalDataProviders">
+            <util:list>
+                <ref bean="lcNameDataProvider"/>
+                <ref bean="sherpaJournalDataProvider"/>
+                <ref bean="sherpaPublisherDataProvider"/>
+                <ref bean="orcidV2AuthorDataProvider"/>
+            </util:list>
+        </property>
+    </bean>
 
-    <bean class="org.dspace.external.provider.metadata.service.impl.MetadataSuggestionProviderServiceImpl"/>
+    <bean class="org.dspace.external.provider.metadata.service.impl.MetadataSuggestionProviderServiceImpl">
+        <property name="metadataSuggestionProviders">
+            <util:list>
+                <ref bean="pubmedArticleMetadataSuggestionProvider"/>
+                <ref bean="orcidV2AuthorMetadataSuggestionProvider"/>
+            </util:list>
+        </property>
+    </bean>
 
-    <bean class="org.dspace.external.provider.impl.SherpaJournalDataProvider" init-method="init">
+    <bean name="sherpaJournalDataProvider" class="org.dspace.external.provider.impl.SherpaJournalDataProvider" init-method="init">
         <property name="sourceIdentifier" value="sherpaJournal"/>
         <property name="url" value="${sherpa.romeo.url}"/>
         <!-- please register for a free api access key to get many benefits -->
         <property name="apiKey" value="${sherpa.romeo.apikey}"/>
 
     </bean>
-    <bean class="org.dspace.external.provider.impl.SherpaPublisherDataProvider">
+    <bean name="sherpaPublisherDataProvider" class="org.dspace.external.provider.impl.SherpaPublisherDataProvider">
         <property name="sourceIdentifier" value="sherpaPublisher"/>
         <property name="url" value="${sherpa.romeo.url}"/>
         <!-- please register for a free api access key to get many benefits -->
@@ -28,7 +44,7 @@
         <property name="orcidUrl" value="${orcid.url}" />
     </bean>
 
-    <bean class="org.dspace.external.provider.impl.LCNameDataProvider">
+    <bean name="lcNameDataProvider" class="org.dspace.external.provider.impl.LCNameDataProvider">
         <property name="url" value="${lcname.url}"/>
         <property name="sourceIdentifier" value="lcname"/>
     </bean>
@@ -40,7 +56,8 @@
         <property name="baseAddress" value="https://eutils.ncbi.nlm.nih.gov/entrez/eutils/"/>
     </bean>
 
-    <bean class="org.dspace.external.provider.metadata.impl.OrcidV2AuthorMetadataSuggestionProvider">
+    <bean name="orcidV2AuthorMetadataSuggestionProvider"
+        class="org.dspace.external.provider.metadata.impl.OrcidV2AuthorMetadataSuggestionProvider">
         <property name="externalDataProvider" ref="orcidV2AuthorDataProvider"/>
         <property name="id" value="orcidv2"/>
         <property name="fileBased" value="false"/>
@@ -56,7 +73,8 @@
         </property>
     </bean>
 
-    <bean class="org.dspace.external.provider.metadata.impl.PubmedArticleMetadataSuggestionProvider">
+    <bean name="pubmedArticleMetadataSuggestionProvider"
+        class="org.dspace.external.provider.metadata.impl.PubmedArticleMetadataSuggestionProvider">
         <property name="externalDataProvider" ref="pubmedArticleDataProvider"/>
         <property name="id" value="pubmed"/>
         <property name="fileBased" value="false"/>
