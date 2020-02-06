@@ -130,6 +130,36 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
     }
 
     @Test
+    public void findOneResourcePolicyOfAnonymousGroupTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Group groupAnonymous = EPersonServiceFactory.getInstance().getGroupService().findByName(context,
+                       Group.ANONYMOUS);
+
+        EPerson eperson1 = EPersonBuilder.createEPerson(context)
+                .withEmail("eperson1@mail.com")
+                .withPassword("qwerty01")
+                .build();
+
+        Community community = CommunityBuilder.createCommunity(context).withName("My community").build();
+
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+                .withDspaceObject(community)
+                .withAction(Constants.READ)
+                .withGroup(groupAnonymous)
+                .build();
+
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(eperson1.getEmail(), "qwerty01");
+        getClient(authToken).perform(get("/api/authz/resourcepolicies/" + resourcePolicy.getID()))
+                            .andExpect(status().isOk());
+
+        getClient().perform(get("/api/authz/resourcepolicies/" + resourcePolicy.getID()))
+                   .andExpect(status().isOk());
+    }
+
+    @Test
     public void findOneUnAuthenticatedTest() throws Exception {
         context.turnOffAuthorisationSystem();
         Community community = CommunityBuilder.createCommunity(context).withName("My community").build();
