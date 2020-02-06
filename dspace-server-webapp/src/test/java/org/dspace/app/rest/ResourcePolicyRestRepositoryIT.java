@@ -156,7 +156,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
                             .andExpect(status().isOk());
 
         getClient().perform(get("/api/authz/resourcepolicies/" + resourcePolicy.getID()))
-                   .andExpect(status().isOk());
+                   .andExpect(status().isUnauthorized());
     }
 
     @Test
