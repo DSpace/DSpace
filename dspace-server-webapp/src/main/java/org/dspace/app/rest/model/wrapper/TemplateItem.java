@@ -9,6 +9,7 @@ package org.dspace.app.rest.model.wrapper;
 
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
@@ -33,7 +34,7 @@ public class TemplateItem {
         return item.getMetadata();
     }
 
-    public Object getID() {
+    public UUID getID() {
         return item.getID();
     }
 

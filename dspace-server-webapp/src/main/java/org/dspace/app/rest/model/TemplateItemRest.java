@@ -8,6 +8,7 @@
 package org.dspace.app.rest.model;
 
 import java.util.Date;
+import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -16,8 +17,8 @@ import org.dspace.app.rest.RestResourceController;
 /**
  * The TemplateItem REST Resource
  */
-public class TemplateItemRest extends BaseObjectRest<String> {
-    private String uuid;
+public class TemplateItemRest extends BaseObjectRest<UUID> {
+    private UUID uuid;
 
     public static final String NAME = "itemtemplate";
     public static final String CATEGORY = RestAddressableModel.CORE;
@@ -67,15 +68,15 @@ public class TemplateItemRest extends BaseObjectRest<String> {
     }
 
     @Override
-    public String getId() {
+    public UUID getId() {
         return uuid;
     }
 
-    public String getUuid() {
+    public UUID getUuid() {
         return uuid;
     }
 
-    public void setUuid(String uuid) {
+    public void setUuid(UUID uuid) {
         this.uuid = uuid;
     }
 
