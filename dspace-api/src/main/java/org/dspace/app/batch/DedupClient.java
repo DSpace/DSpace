@@ -26,82 +26,62 @@ import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.dspace.app.deduplication.service.DedupService;
 import org.dspace.content.DSpaceObject;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.discovery.SearchServiceException;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.utils.DSpace;
 
-public class DedupClient
-{
+public class DedupClient {
     private static final Logger log = Logger.getLogger(DedupClient.class);
 
+    private DedupClient() {
+    }
+
     /**
-     * When invoked as a command-line tool, creates, updates, removes content
-     * from the whole index
+     * When invoked as a command-line tool, creates, updates, removes content from
+     * the whole index
      *
      * @param args the command-line arguments, none used
      * @throws java.io.IOException
      * @throws java.sql.SQLException
-     * @throws SolrServerException 
+     * @throws SolrServerException
      *
      */
-    public static void main(String[] args) throws SQLException, IOException, SearchServiceException, SolrServerException {
+    public static void main(String[] args)
+            throws SQLException, IOException, SearchServiceException, SolrServerException {
 
         Context context = new Context();
         context.turnOffAuthorisationSystem();
 
-        String usage = "org.dspace.app.cris.batch.DedupClient [-chfueto[r <item handle/uuid>]] or nothing to update/clean an existing index.";
+        String usage = "org.dspace.app.cris.batch.DedupClient [-chfueto[r <item handle/uuid>]]"
+                + " or nothing to update/clean an existing index.";
         Options options = new Options();
         HelpFormatter formatter = new HelpFormatter();
         CommandLine line = null;
 
-        options
-                .addOption(OptionBuilder
-                        .withArgName("item handle")
-                        .hasArg(true)
-                        .withDescription(
-                                "remove an object from your handle/uuid")
-                        .create("r"));
+        options.addOption(OptionBuilder.withArgName("item handle").hasArg(true)
+                .withDescription("remove an object from your handle/uuid").create("r"));
 
+        options.addOption(OptionBuilder.isRequired(false)
+                .withDescription("clean existing index removing any documents that no longer exist in the db")
+                .create("c"));
 
-        options
-                .addOption(OptionBuilder
-                        .isRequired(false)
-                        .withDescription(
-                                "clean existing index removing any documents that no longer exist in the db")
-                        .create("c"));
+        options.addOption(OptionBuilder.isRequired(false)
+                .withDescription("if updating existing index, force each handle to be reindexed even if uptodate")
+                .create("f"));
 
-        options
-                .addOption(OptionBuilder
-                        .isRequired(false)
-                        .withDescription(
-                                "if updating existing index, force each handle to be reindexed even if uptodate")
-                        .create("f"));
+        options.addOption(OptionBuilder.isRequired(false).hasArg(true)
+                .withDescription("update a specific class of objects based on its type").create("t"));
 
-        options
-        .addOption(OptionBuilder
-                .isRequired(false)
-                .hasArg(true)
-                .withDescription(
-                        "update a specific class of objects based on its type")
-                .create("t"));
-
-        options
-        .addOption(OptionBuilder
-                .isRequired(false)
-                .hasArg(true)
-                .withDescription(
-                "update an entity from index based on its handle or uuid, use with -f to force clean")
+        options.addOption(OptionBuilder.isRequired(false).hasArg(true)
+                .withDescription("update an entity from index based on its handle or uuid, use with -f to force clean")
                 .create("u"));
-        
-        options.addOption(OptionBuilder.isRequired(false).withDescription(
-                "print this help message").create("h"));
 
-        options.addOption(OptionBuilder.isRequired(false).withDescription(
-                "optimize search core").create("o"));
-        
+        options.addOption(OptionBuilder.isRequired(false).withDescription("print this help message").create("h"));
+
+        options.addOption(OptionBuilder.isRequired(false).withDescription("optimize search core").create("o"));
+
         options.addOption("e", "readfile", true, "Read the identifier from a file");
 
         try {
@@ -120,12 +100,14 @@ public class DedupClient
 
         /** Acquire from dspace-services in future */
         /**
-         * new DSpace.getServiceManager().getServiceByName("org.dspace.discovery.SolrIndexer");
+         * new
+         * DSpace.getServiceManager().getServiceByName("org.dspace.discovery.SolrIndexer");
          */
 
         DSpace dspace = new DSpace();
 
-        DedupService indexer = dspace.getServiceManager().getServiceByName(DedupService.class.getName(),DedupService.class);
+        DedupService indexer = dspace.getServiceManager().getServiceByName(DedupService.class.getName(),
+                DedupService.class);
 
         if (line.hasOption("r")) {
             log.info("Removing " + line.getOptionValue("r") + " from Index");
@@ -135,19 +117,20 @@ public class DedupClient
             indexer.cleanIndex(line.hasOption("f"));
         } else if (line.hasOption("o")) {
             log.info("Optimizing dedup core.");
-            indexer.optimize();                   
+            indexer.optimize();
         } else if (line.hasOption("t")) {
             log.info("Updating and Cleaning a specific Index");
             String optionValue = line.getOptionValue("t");
             indexer.cleanIndex(line.hasOption("f"), Integer.valueOf(optionValue));
             indexer.updateIndex(context, true, Integer.valueOf(optionValue));
-        } else if (line.hasOption("u")) {           
+        } else if (line.hasOption("u")) {
             String optionValue = line.getOptionValue("u");
             String[] identifiers = optionValue.split("\\s*,\\s*");
             for (String id : identifiers) {
                 DSpaceObject dso;
-                //if (id.startsWith(ConfigurationManager.getProperty("handle.prefix")) || id.startsWith("123456789/")) {
-                    dso =(DSpaceObject)HandleServiceFactory.getInstance().getHandleService().resolveToObject(context, id);
+                // if (id.startsWith(ConfigurationManager.getProperty("handle.prefix")) ||
+                // id.startsWith("123456789/")) {
+                dso = (DSpaceObject) HandleServiceFactory.getInstance().getHandleService().resolveToObject(context, id);
 //                } else {
 //
 //                    dso =(DSpaceObject)dspace.getSingletonService(ExternalService.class).getObject(id);
@@ -193,6 +176,5 @@ public class DedupClient
 
         log.info("Done with indexing");
     }
-
 
 }
