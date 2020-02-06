@@ -33,7 +33,7 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Component;
 
 @Component(TemplateItemRest.CATEGORY + "." + TemplateItemRest.NAME)
-public class TemplateItemRestRepository extends DSpaceRestRepository<TemplateItemRest, String> {
+public class TemplateItemRestRepository extends DSpaceRestRepository<TemplateItemRest, UUID> {
 
     @Autowired
     private ItemService itemService;
@@ -47,10 +47,10 @@ public class TemplateItemRestRepository extends DSpaceRestRepository<TemplateIte
     @Autowired
     private CollectionService collectionService;
 
-    public TemplateItemRest findOne(Context context, String s) {
+    public TemplateItemRest findOne(Context context, UUID uuid) {
         Item item = null;
         try {
-            item = itemService.find(context, UUID.fromString(s));
+            item = itemService.find(context, uuid);
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }

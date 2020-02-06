@@ -90,7 +90,7 @@ public class ItemtemplateRestController {
     public TemplateItemResource getTemplateItem(HttpServletRequest request, @PathVariable UUID uuid) {
 
         Context context = ContextUtil.obtainContext(request);
-        TemplateItemRest templateItem = templateItemRestRepository.findOne(context, uuid.toString());
+        TemplateItemRest templateItem = templateItemRestRepository.findOne(context, uuid);
 
         if (templateItem == null) {
             throw new ResourceNotFoundException("Item with id: " + uuid + " not found");
