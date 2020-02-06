@@ -12,8 +12,9 @@ import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.hateoas.HALResource;
 
 /**
- * Abstract base class for projections. By default no transformation is done, optional embeds are not included,
- * and optional links are included.
+ * Abstract base class for projections.
+ *
+ * By default, this does no transformation, and allows linking but not embedding of all subresources.
  */
 public abstract class AbstractProjection implements Projection {
 

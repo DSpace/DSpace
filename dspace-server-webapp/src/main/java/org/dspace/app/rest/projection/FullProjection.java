@@ -11,6 +11,9 @@ import org.dspace.app.rest.model.LinkRest;
 import org.dspace.app.rest.model.hateoas.HALResource;
 import org.springframework.stereotype.Component;
 
+/**
+ * Catch-all projection that allows embedding of all subresources.
+ */
 @Component
 public class FullProjection extends AbstractProjection {
 

@@ -19,8 +19,7 @@ import org.dspace.app.rest.utils.Utils;
 import org.springframework.stereotype.Component;
 
 /**
- * Class or method-level annotation to control linking/embedding behavior when a {@link RestModel}
- * is wrapped as a {@link HALResource}
+ * Class or method-level annotation to provide information about linked/embedded subresources of a {@link RestModel}.
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
