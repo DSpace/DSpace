@@ -32,6 +32,7 @@ import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.builder.EPersonBuilder;
 import org.dspace.app.rest.builder.ItemBuilder;
 import org.dspace.app.rest.matcher.EPersonMatcher;
+import org.dspace.app.rest.matcher.ProjectionsMatcher;
 import org.dspace.app.rest.model.EPersonRest;
 import org.dspace.app.rest.model.MetadataRest;
 import org.dspace.app.rest.model.MetadataValueRest;
@@ -182,6 +183,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
     @Test
     public void findOneTest() throws Exception {
         context.turnOffAuthorisationSystem();
+        ProjectionsMatcher projectionsMatcher = new ProjectionsMatcher();
 
         EPerson ePerson = EPersonBuilder.createEPerson(context)
                                         .withNameInMetadata("John", "Doe")
@@ -194,8 +196,10 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                                          .build();
 
         String authToken = getAuthToken(admin.getEmail(), password);
-        getClient(authToken).perform(get("/api/eperson/epersons/" + ePerson2.getID()))
+        getClient(authToken).perform(get("/api/eperson/epersons/" + ePerson2.getID()).param("projection", "full"))
                    .andExpect(status().isOk())
+                   .andExpect(jsonPath("$", projectionsMatcher.matchEpersonEmbeds()))
+                   .andExpect(jsonPath("$", projectionsMatcher.matchEpersonLinks()))
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$", is(
                        EPersonMatcher.matchEPersonEntry(ePerson2)
@@ -204,7 +208,13 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                        is(
                            EPersonMatcher.matchEPersonEntry(ePerson)
                        )
-                   )));
+                   )))
+        ;
+
+        getClient(authToken).perform(get("/api/eperson/epersons/" + ePerson2.getID()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", projectionsMatcher.matchNoEmbeds()))
+        ;
 
     }
 

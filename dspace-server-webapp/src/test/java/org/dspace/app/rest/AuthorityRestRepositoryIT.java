@@ -16,6 +16,7 @@ import java.util.UUID;
 
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.response.QueryResponse;
+import org.dspace.app.rest.matcher.ProjectionsMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.authority.PersonAuthorityValue;
 import org.dspace.authority.factory.AuthorityServiceFactory;
@@ -174,10 +175,21 @@ public class AuthorityRestRepositoryIT extends AbstractControllerIntegrationTest
     @Test
     public void retrieveCommonTypesValueTest() throws Exception {
         String token = getAuthToken(admin.getEmail(), password);
+        ProjectionsMatcher projectionsMatcher = new ProjectionsMatcher();
         getClient(token).perform(
-                get("/api/integration/authorities/common_types/entryValues/Book"))
+                get("/api/integration/authorities/common_types/entryValues/Book").param("projection", "full"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.page.totalElements", Matchers.is(1)));
+                .andExpect(jsonPath("$", projectionsMatcher.matchAuthorityEmbeds()))
+                .andExpect(jsonPath("$", projectionsMatcher.matchAuthorityLinks()))
+                .andExpect(jsonPath("$.page.totalElements", Matchers.is(1)))
+        ;
+
+//        getClient(token).perform(
+//                get("/api/integration/authorities/common_types/entryValues/Book"))
+//                .andExpect(status().isOk())
+//                .andExpect(jsonPath("$", projectionsMatcher.matchAuthorityNoEmbeds()))
+//        ;
+
     }
 
     @Test
