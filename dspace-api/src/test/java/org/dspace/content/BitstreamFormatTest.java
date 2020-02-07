@@ -232,7 +232,7 @@ public class BitstreamFormatTest extends AbstractUnitTest {
         // Disalow full Admin perms
         when(authorizeServiceSpy.isAdmin(context)).thenReturn(false);
 
-        BitstreamFormat found = bitstreamFormatService.create(context);
+        bitstreamFormatService.create(context);
         fail("Exception should have been thrown");
     }
 
