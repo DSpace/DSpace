@@ -292,6 +292,7 @@ public class DummyHttpServletRequest implements HttpServletRequest {
      * @see javax.servlet.http.HttpServletRequest#isRequestedSessionIdFromUrl()
      */
     @Override
+    @Deprecated
     public boolean isRequestedSessionIdFromUrl() {
         // TODO Auto-generated method stub
         return false;
@@ -502,6 +503,7 @@ public class DummyHttpServletRequest implements HttpServletRequest {
      * @see javax.servlet.ServletRequest#getRealPath(java.lang.String)
      */
     @Override
+    @Deprecated
     public String getRealPath(String arg0) {
         // TODO Auto-generated method stub
         return null;
