@@ -528,14 +528,14 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                 .requestAttr("SHIB-SCOPED-AFFILIATION", "faculty;staff"))
             .andExpect(status().isOk())
             .andReturn().getResponse().getHeader(AUTHORIZATION_HEADER).replace("Bearer ", "");
-        
+
         //Check if we have a valid token
         getClient(token).perform(get("/api/authn/status"))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$.okay", is(true)))
                         .andExpect(jsonPath("$.authenticated", is(true)))
                         .andExpect(jsonPath("$.type", is("status")));
-        
+
         //Logout
         getClient(token).perform(get("/api/authn/logout"))
                         .andExpect(status().isNoContent());
