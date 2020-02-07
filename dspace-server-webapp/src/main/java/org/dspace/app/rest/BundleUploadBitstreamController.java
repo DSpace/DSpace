@@ -87,7 +87,7 @@ public class BundleUploadBitstreamController {
     @RequestMapping(method = RequestMethod.POST, headers = "content-type=multipart/form-data")
     @PreAuthorize("hasPermission(#uuid, 'BUNDLE', 'ADD') && hasPermission(#uuid, 'BUNDLE', 'WRITE')")
     public ResponseEntity<ResourceSupport> uploadBitstream(HttpServletRequest request, @PathVariable UUID uuid,
-                                           @RequestParam("file") MultipartFile uploadfile,
+                                           @RequestParam(value = "file", required = false) MultipartFile uploadfile,
                                            @RequestParam(value = "properties", required = false) String properties) {
 
         Context context = ContextUtil.obtainContext(request);
@@ -99,6 +99,9 @@ public class BundleUploadBitstreamController {
         }
         if (bundle == null) {
             throw new ResourceNotFoundException("The given uuid did not resolve to a Bundle on the server: " + uuid);
+        }
+        if (uploadfile == null) {
+            throw new UnprocessableEntityException("No file was provided");
         }
         InputStream fileInputStream = null;
         try {
