@@ -29,11 +29,6 @@ import org.junit.Test;
  */
 public class DCDateTest {
     /**
-     * log4j category
-     */
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(DCDateTest.class);
-
-    /**
      * Object to use in the tests
      */
     private DCDate dc;

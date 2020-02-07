@@ -49,11 +49,6 @@ public class ThumbnailTest extends AbstractUnitTest {
     private Bitstream orig;
 
     /**
-     * Thumbnail instance for the tests, original copy
-     */
-    private Thumbnail t;
-
-    /**
      * This method will be run before every test as per @Before. It will
      * initialize resources required for the tests.
      *
@@ -69,7 +64,7 @@ public class ThumbnailTest extends AbstractUnitTest {
             File f = new File(testProps.get("test.bitstream").toString());
             thumb = bitstreamService.create(context, new FileInputStream(f));
             orig = bitstreamService.create(context, new FileInputStream(f));
-            t = new Thumbnail(thumb, orig);
+            Thumbnail t = new Thumbnail(thumb, orig);
         } catch (IOException ex) {
             log.error("IO Error in init", ex);
             fail("SQL Error in init: " + ex.getMessage());
@@ -91,7 +86,6 @@ public class ThumbnailTest extends AbstractUnitTest {
     public void destroy() {
         thumb = null;
         orig = null;
-        t = null;
         super.destroy();
     }
 
