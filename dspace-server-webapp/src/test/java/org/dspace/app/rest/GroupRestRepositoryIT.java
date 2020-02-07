@@ -22,6 +22,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.app.rest.builder.GroupBuilder;
 import org.dspace.app.rest.matcher.GroupMatcher;
+import org.dspace.app.rest.matcher.ProjectionsMatcher;
 import org.dspace.app.rest.model.GroupRest;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.app.rest.test.MetadataPatchSuite;
@@ -155,6 +156,7 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
     @Test
     public void findOneTest() throws Exception {
         context.turnOffAuthorisationSystem();
+        ProjectionsMatcher projectionsMatcher = new ProjectionsMatcher();
 
         String testGroupName = "Test group";
         Group group = GroupBuilder.createGroup(context)
@@ -173,13 +175,21 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
                        GroupMatcher.matchGroupEntry(group.getID(), group.getName())
                    )))
         ;
-        getClient(token).perform(get("/api/eperson/groups"))
+
+        getClient(token).perform(get("/api/eperson/groups")
                    //The status has to be 200 OK
+                   .param("projection", "full"))
                    .andExpect(status().isOk())
+                   .andExpect(jsonPath("$", projectionsMatcher.matchGroupsEmbeds()))
+                   .andExpect(jsonPath("$", projectionsMatcher.matchGroupsLinks()))
                    .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$.page.totalElements", is(3)))
+        ;
 
-                   .andExpect(jsonPath("$.page.totalElements", is(3)));
-
+        getClient(token).perform(get("/api/eperson/groups/"  + generatedGroupId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", projectionsMatcher.matchNoEmbeds()))
+        ;
     }
 
     @Test

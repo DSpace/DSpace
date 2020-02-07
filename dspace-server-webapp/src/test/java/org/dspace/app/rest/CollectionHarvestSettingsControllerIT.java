@@ -25,6 +25,7 @@ import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.builder.EPersonBuilder;
 import org.dspace.app.rest.matcher.MetadataConfigsMatcher;
+import org.dspace.app.rest.matcher.ProjectionsMatcher;
 import org.dspace.app.rest.model.HarvestTypeEnum;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.authorize.AuthorizeException;
@@ -109,6 +110,7 @@ public class CollectionHarvestSettingsControllerIT extends AbstractControllerInt
     @Test
     public void GetCollectionHarvestSettings() throws Exception {
         String token = getAuthToken(admin.getEmail(), password);
+        ProjectionsMatcher projectionsMatcher = new ProjectionsMatcher();
 
         List<Map<String,String>> configs = OAIHarvester.getAvailableMetadataFormats();
 
@@ -125,6 +127,8 @@ public class CollectionHarvestSettingsControllerIT extends AbstractControllerInt
         getClient(token).perform(
             get("/api/core/collections/" + collection.getID() + "/harvester"))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$", projectionsMatcher.matchHarvesterMetadataEmbeds()))
+                .andExpect(jsonPath("$", projectionsMatcher.matchHarvesterMetadataLinks()))
                 .andExpect(jsonPath("$.harvest_type", is("METADATA_ONLY")))
                 .andExpect(jsonPath("$.oai_source", is("https://dspace.org/oai/request")))
                 .andExpect(jsonPath("$.oai_set_id", is("col_1721.1_114174")))
@@ -139,7 +143,8 @@ public class CollectionHarvestSettingsControllerIT extends AbstractControllerInt
                     MetadataConfigsMatcher.matchMetadataConfigs(configs)
                 )))
                 .andExpect(jsonPath("$._embedded.harvestermetadata._links.self.href",
-                    endsWith("/api/config/harvestermetadata")));
+                    endsWith("/api/config/harvestermetadata")))
+        ;
     }
 
     @Test

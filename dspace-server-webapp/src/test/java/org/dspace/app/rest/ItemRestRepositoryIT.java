@@ -37,6 +37,7 @@ import org.dspace.app.rest.builder.ItemBuilder;
 import org.dspace.app.rest.builder.WorkspaceItemBuilder;
 import org.dspace.app.rest.matcher.ItemMatcher;
 import org.dspace.app.rest.matcher.MetadataMatcher;
+import org.dspace.app.rest.matcher.ProjectionsMatcher;
 import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.MetadataRest;
 import org.dspace.app.rest.model.MetadataValueRest;
@@ -199,6 +200,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
     @Test
     public void findOneTest() throws Exception {
         context.turnOffAuthorisationSystem();
+        ProjectionsMatcher projectionsMatcher = new ProjectionsMatcher();
 
         //** GIVEN **
         //1. A community-collection structure with one parent community with sub-community and two collections.
@@ -234,9 +236,12 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                       .withSubject("ExtraEntry")
                                       .build();
 
-        getClient().perform(get("/api/core/items/" + publicItem1.getID()))
+        getClient().perform(get("/api/core/items/" + publicItem1.getID())
+                   .param("projection", "full"))
                    .andExpect(status().isOk())
-                   .andExpect(jsonPath("$", Matchers.is(
+                   .andExpect(jsonPath("$", projectionsMatcher.matchItemEmbeds()))
+                   .andExpect(jsonPath("$", projectionsMatcher.matchItemLinks()))
+                .andExpect(jsonPath("$", Matchers.is(
                        ItemMatcher.matchItemWithTitleAndDateIssued(publicItem1,
                                "Public item 1", "2017-10-17")
                    )))
@@ -246,8 +251,11 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                    "Public item 2", "2016-02-13")
                        )
                    )))
-                   .andExpect(jsonPath("$._links.self.href",
-                           Matchers.containsString("/api/core/items")))
+        ;
+
+        getClient().perform(get("/api/core/items/" + publicItem1.getID()))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$", projectionsMatcher.matchNoEmbeds()))
         ;
     }
 
@@ -329,10 +337,6 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$._links.self.href",
                            Matchers.containsString("/api/core/collections")))
-        ;
-
-        getClient().perform(get("/api/core/items/" + publicItem1.getID() + "/templateItemOf"))
-                   .andExpect(status().isNoContent());
         ;
     }
 

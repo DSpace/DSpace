@@ -36,6 +36,7 @@ import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.matcher.CommunityMatcher;
 import org.dspace.app.rest.matcher.MetadataMatcher;
 import org.dspace.app.rest.matcher.PageMatcher;
+import org.dspace.app.rest.matcher.ProjectionsMatcher;
 import org.dspace.app.rest.model.CommunityRest;
 import org.dspace.app.rest.model.MetadataRest;
 import org.dspace.app.rest.model.MetadataValueRest;
@@ -503,6 +504,7 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
     public void findOneTest() throws Exception {
         //We turn off the authorization system in order to create the structure as defined below
         context.turnOffAuthorisationSystem();
+        ProjectionsMatcher projectionsMatcher = new ProjectionsMatcher();
 
         //** GIVEN **
         //1. A community-collection structure with one parent community with sub-community and one collection.
@@ -519,6 +521,8 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
         getClient().perform(get("/api/core/communities/" + parentCommunity.getID().toString())
                    .param("projection", "full"))
                    .andExpect(status().isOk())
+                   .andExpect(jsonPath("$", projectionsMatcher.matchCommunityEmbeds()))
+                   .andExpect(jsonPath("$", projectionsMatcher.matchCommunityLinks()))
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$", Matchers.is(
                        CommunityMatcher.matchCommunityEntry(parentCommunity.getName(), parentCommunity.getID(),
@@ -529,7 +533,12 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                            CommunityMatcher.matchCommunityEntry(child1.getName(), child1.getID(), child1.getHandle())
                        )
                    )))
-                   .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/communities")))
+        ;
+
+        getClient().perform(get("/api/core/communities/" + parentCommunity.getID().toString()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", projectionsMatcher.matchNoEmbeds()))
+
         ;
     }
 

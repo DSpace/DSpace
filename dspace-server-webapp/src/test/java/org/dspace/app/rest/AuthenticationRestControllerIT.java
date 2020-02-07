@@ -24,6 +24,7 @@ import java.util.Base64;
 
 import org.dspace.app.rest.builder.GroupBuilder;
 import org.dspace.app.rest.matcher.EPersonMatcher;
+import org.dspace.app.rest.matcher.ProjectionsMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.eperson.Group;
 import org.dspace.services.ConfigurationService;
@@ -58,11 +59,13 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
     @Test
     public void testStatusAuthenticated() throws Exception {
         String token = getAuthToken(eperson.getEmail(), password);
+        ProjectionsMatcher projectionsMatcher = new ProjectionsMatcher();
 
         getClient(token).perform(get("/api/authn/status").param("projection", "full"))
 
                         .andExpect(status().isOk())
-
+                        .andExpect(jsonPath("$", projectionsMatcher.matchAuthStatusEmbeds()))
+                        .andExpect(jsonPath("$", projectionsMatcher.matchAuthStatusLinks()))
                         //We expect the content type to be "application/hal+json;charset=UTF-8"
                         .andExpect(content().contentType(contentType))
                         .andExpect(jsonPath("$.okay", is(true)))
@@ -71,7 +74,13 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
 
                         .andExpect(jsonPath("$._links.eperson.href", startsWith(REST_SERVER_URL)))
                         .andExpect(jsonPath("$._embedded.eperson",
-                                EPersonMatcher.matchEPersonWithGroups(eperson.getEmail(), "Anonymous")));
+                                EPersonMatcher.matchEPersonWithGroups(eperson.getEmail(), "Anonymous")))
+        ;
+
+        getClient(token).perform(get("/api/authn/status"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", projectionsMatcher.matchNoEmbeds()))
+        ;
     }
 
     @Test

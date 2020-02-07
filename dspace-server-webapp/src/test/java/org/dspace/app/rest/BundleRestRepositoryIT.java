@@ -39,6 +39,7 @@ import org.dspace.app.rest.builder.ResourcePolicyBuilder;
 import org.dspace.app.rest.matcher.BitstreamMatcher;
 import org.dspace.app.rest.matcher.BundleMatcher;
 import org.dspace.app.rest.matcher.MetadataMatcher;
+import org.dspace.app.rest.matcher.ProjectionsMatcher;
 import org.dspace.app.rest.model.BundleRest;
 import org.dspace.app.rest.model.MetadataRest;
 import org.dspace.app.rest.model.MetadataValueRest;
@@ -93,6 +94,7 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
     @Test
     public void GetSingleBundle() throws Exception {
         context.turnOffAuthorisationSystem();
+        ProjectionsMatcher projectionsMatcher = new ProjectionsMatcher();
 
         String bitstreamContent = "Dummy content";
         try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
@@ -112,6 +114,8 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient().perform(get("/api/core/bundles/" + bundle1.getID())
                    .param("projection", "full"))
                    .andExpect(status().isOk())
+                   .andExpect(jsonPath("$", projectionsMatcher.matchBundleEmbeds()))
+                   .andExpect(jsonPath("$", projectionsMatcher.matchBundleLinks()))
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$", BundleMatcher.matchBundle(bundle1.getName(),
                                                                       bundle1.getID(),
@@ -123,6 +127,12 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
                            BitstreamMatcher.matchBitstreamEntry(bitstream1.getID(), bitstream1.getSizeBytes())))
                    )
         ;
+
+        getClient().perform(get("/api/core/bundles/" + bundle1.getID()))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$", projectionsMatcher.matchNoEmbeds()))
+        ;
+
     }
 
 
