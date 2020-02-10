@@ -32,6 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ControllerUtils;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.hateoas.ResourceSupport;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -118,7 +119,7 @@ public class CollectionItemtemplateController {
         ItemRest templateItem = collectionRestRepository.createTemplateItem(context, collection, inputItemRest);
         context.commit();
 
-        return ControllerUtils.toResponseEntity(HttpStatus.CREATED, null,
+        return ControllerUtils.toResponseEntity(HttpStatus.CREATED, new HttpHeaders(),
                 new ItemResource(templateItem, utils));
     }
 

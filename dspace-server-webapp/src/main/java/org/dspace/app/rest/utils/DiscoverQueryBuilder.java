@@ -12,13 +12,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.converter.query.SearchQueryConverter;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.parameter.SearchFilter;
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.discovery.DiscoverFacetField;
@@ -35,6 +33,7 @@ import org.dspace.discovery.configuration.DiscoverySearchFilter;
 import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
 import org.dspace.discovery.configuration.DiscoverySortConfiguration;
 import org.dspace.discovery.configuration.DiscoverySortFieldConfiguration;
+import org.dspace.discovery.indexobject.factory.IndexFactory;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,6 +54,9 @@ public class DiscoverQueryBuilder implements InitializingBean {
 
     @Autowired
     private ConfigurationService configurationService;
+
+    @Autowired
+    private List<IndexFactory> indexableFactories;
 
     private int pageSizeLimit;
 
@@ -119,7 +121,7 @@ public class DiscoverQueryBuilder implements InitializingBean {
 
     private void configurePaginationForFacets(Pageable page, DiscoverQuery queryArgs) {
         if (page != null) {
-            queryArgs.setFacetOffset(page.getOffset());
+            queryArgs.setFacetOffset(Math.toIntExact(page.getOffset()));
         }
     }
 
@@ -182,7 +184,7 @@ public class DiscoverQueryBuilder implements InitializingBean {
 
         //Limit results to DSO type
         if (StringUtils.isNotBlank(dsoType)) {
-            queryArgs.setDSpaceObjectFilter(getDsoTypeId(dsoType));
+            queryArgs.setDSpaceObjectFilter(getDsoType(dsoType));
         }
         return queryArgs;
     }
@@ -262,19 +264,24 @@ public class DiscoverQueryBuilder implements InitializingBean {
     private void configurePagination(Pageable page, DiscoverQuery queryArgs) {
         if (page != null) {
             queryArgs.setMaxResults(Math.min(pageSizeLimit, page.getPageSize()));
-            queryArgs.setStart(page.getOffset());
+            queryArgs.setStart(Math.toIntExact(page.getOffset()));
         } else {
             queryArgs.setMaxResults(pageSizeLimit);
             queryArgs.setStart(0);
         }
     }
 
-    private int getDsoTypeId(String dsoType) throws DSpaceBadRequestException {
-        int index = ArrayUtils.indexOf(Constants.typeText, dsoType.toUpperCase());
-        if (index < 0) {
-            throw new DSpaceBadRequestException(dsoType + " is not a valid DSpace Object type");
+    private String getDsoType(String dsoType) throws DSpaceBadRequestException {
+        for (IndexFactory indexFactory : indexableFactories) {
+            if (StringUtils.equalsIgnoreCase(indexFactory.getType(), dsoType)) {
+                return indexFactory.getType();
+            }
         }
-        return index;
+        throw new DSpaceBadRequestException(dsoType + " is not a valid DSpace Object type");
+    }
+
+    public void setIndexableFactories(List<IndexFactory> indexableFactories) {
+        this.indexableFactories = indexableFactories;
     }
 
     private String[] convertFilters(Context context, DiscoveryConfiguration discoveryConfiguration,

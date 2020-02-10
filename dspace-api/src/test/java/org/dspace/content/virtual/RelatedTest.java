@@ -132,9 +132,7 @@ public class RelatedTest {
         // Mock the state of objects utilized in getRelationsByLabel() to meet the success criteria of an invocation
         when(item.getID()).thenReturn(UUID.randomUUID());
         when(relationshipType.getLeftwardType()).thenReturn("LeftwardType");
-        when(relationshipType.getRightwardType()).thenReturn("RightwardType");
         when(relationshipType.getLeftType()).thenReturn(entityType);
-        when(relationshipType.getRightType()).thenReturn(entityType);
         when(entityService.getAllRelationshipTypes(context, entity)).thenReturn(relationshipTypeList);
         when(entityService.findByItemId(context, item.getID())).thenReturn(entity);
         when(entityService.getType(context, entity)).thenReturn(entityType);
@@ -142,9 +140,7 @@ public class RelatedTest {
                 .thenReturn(relationshipList);
         when(relationship.getRelationshipType()).thenReturn(relationshipType);
         when(relationship.getLeftPlace()).thenReturn(0);
-        when(relationship.getRightPlace()).thenReturn(1);
         when(relationship.getRightItem()).thenReturn(item);
-        when(relationship.getLeftItem()).thenReturn(item);
 
         // The reported values should match out mocked collection of values
         assertEquals("TestGetValues 0", virtualMetadataConfiguration.getValues(context, item),

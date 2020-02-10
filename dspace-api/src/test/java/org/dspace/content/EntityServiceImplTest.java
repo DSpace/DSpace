@@ -68,7 +68,6 @@ public class EntityServiceImplTest  {
         // Mock the state of objects utilized in findByItemId() to meet the success criteria of an invocation
         when(itemService.find(any(), any())).thenReturn(item);
         when(item.getName()).thenReturn("ItemName");
-        when(relationshipService.findByItem(any(), any())).thenReturn(relationshipList);
 
         // The returned Entity's item should match the mocked item's name
         assertEquals("TestFindByItem 0", "ItemName",
@@ -85,10 +84,6 @@ public class EntityServiceImplTest  {
         MetadataValue metadataValue = mock(MetadataValue.class);
         list.add(metadataValue);
         EntityType entityType = entityTypeService.findByEntityType(context, "testType");
-
-        // Mock the state of objects utilized in getType() to meet the success criteria of an invocation
-        when(metadataValue.getValue()).thenReturn("testType");
-        when(itemService.getMetadata(item, "relationship", "type", null, Item.ANY, false)).thenReturn(list);
 
         // The returned EntityType should equal our defined entityType case
         assertEquals("TestGetType 0", entityType, entityService.getType(context, entity));
@@ -146,10 +141,6 @@ public class EntityServiceImplTest  {
         relationshipList.add(relationship);
 
         // Mock the state of objects utilized in getRelationsByType() to meet the success criteria of an invocation
-        when(relationshipService.findAll(context, -1, -1)).thenReturn(relationshipList);
-        when(relationship.getRelationshipType()).thenReturn(relationshipType);
-        when(relationshipType.getLeftwardType()).thenReturn("leftwardType");
-        when(relationshipType.getRightwardType()).thenReturn("rightwardType");
         when(relationshipService.findByTypeName(context, "leftwardType", -1, -1)).thenReturn(relationshipList);
 
         // The relation(s) reported from our defined type should match our relationshipList
@@ -176,17 +167,7 @@ public class EntityServiceImplTest  {
 
         // Mock the state of objects utilized in getAllRelationshipTypes()
         // to meet the success criteria of the invocation
-        when(metadataValue.getValue()).thenReturn("testType");
         when(entity.getItem()).thenReturn(item);
-        when(itemService.getMetadata(item, "relationship", "type", null, Item.ANY, false)).thenReturn(list);
-        when(relationshipTypeDAO.findAll(context, RelationshipType.class, -1, -1)).thenReturn(relationshipTypeList);
-        when(relationshipTypeService.findAll(context, -1, -1)).thenReturn(relationshipTypeList);
-        when(relationshipType.getLeftType()).thenReturn(leftType);
-        when(relationshipType.getRightType()).thenReturn(rightType);
-        when(entityTypeService.findByEntityType(context, "value")).thenReturn(leftType);
-        when(leftType.getID()).thenReturn(0);
-        when(rightType.getID()).thenReturn(1);
-        when(entityService.getType(context, entity)).thenReturn(leftType); // Mock
         when(relationshipTypeService.findByEntityType(context, entityService.getType(context, entity), -1, -1))
                 .thenReturn(relationshipTypeList);
 
@@ -214,11 +195,7 @@ public class EntityServiceImplTest  {
         // to meet the success criteria of the invocation
         when(itemService.getMetadata(item, "relationship", "type", null, Item.ANY, false)).thenReturn(metsList);
         when(entity.getItem()).thenReturn(item);
-        when(entityType.getID()).thenReturn(0);
-        when(relationshipTypeService.findAll(context, -1, -1)).thenReturn(relationshipTypeList);
-        when(relationshipType.getLeftType()).thenReturn(entityType);
         when(entityService.getType(context, entity)).thenReturn(entityType);
-        when(entityTypeService.findByEntityType(any(), any())).thenReturn(entityType);
         when(relationshipTypeService.findByEntityType(context, entityService.getType(context, entity), true, -1, -1))
                 .thenReturn(relationshipTypeList);
 
@@ -246,11 +223,7 @@ public class EntityServiceImplTest  {
         // to meet the success criteria of the invocation
         when(itemService.getMetadata(item, "relationship", "type", null, Item.ANY, false)).thenReturn(metsList);
         when(entity.getItem()).thenReturn(item);
-        when(entityType.getID()).thenReturn(0);
-        when(relationshipTypeService.findAll(context, -1, -1)).thenReturn(relationshipTypeList);
-        when(relationshipType.getRightType()).thenReturn(entityType);
         when(entityService.getType(context, entity)).thenReturn(entityType);
-        when(entityTypeService.findByEntityType(any(), any())).thenReturn(entityType);
         when(relationshipTypeService.findByEntityType(context, entityService.getType(context, entity), false, -1, -1))
                 .thenReturn(relationshipTypeList);
 
@@ -269,9 +242,6 @@ public class EntityServiceImplTest  {
 
         // Mock the state of objects utilized in getRelationshipTypesByTypeName()
         // to meet the success criteria of the invocation
-        when(relationshipTypeService.findAll(context, -1, -1)).thenReturn(list);
-        when(relationshipType.getLeftwardType()).thenReturn("leftwardType");
-        when(relationshipType.getRightwardType()).thenReturn("rightwardType");
         when(relationshipTypeService.findByLeftwardOrRightwardTypeName(context, "leftwardType", -1, -1))
                 .thenReturn(list);
 

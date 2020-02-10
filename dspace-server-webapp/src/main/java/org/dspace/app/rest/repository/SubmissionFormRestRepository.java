@@ -54,7 +54,8 @@ public class SubmissionFormRestRepository extends DSpaceRestRepository<Submissio
     public Page<SubmissionFormRest> findAll(Context context, Pageable pageable) {
         try {
             long total = inputReader.countInputs();
-            List<DCInputSet> subConfs = inputReader.getAllInputs(pageable.getPageSize(), pageable.getOffset());
+            List<DCInputSet> subConfs = inputReader.getAllInputs(pageable.getPageSize(),
+                    Math.toIntExact(pageable.getOffset()));
             return converter.toRestPage(subConfs, pageable, total, utils.obtainProjection(true));
         } catch (DCInputsReaderException e) {
             throw new IllegalStateException(e.getMessage(), e);

@@ -13,7 +13,6 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import java.util.MissingResourceException;
-import java.util.UUID;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
@@ -31,8 +30,7 @@ import org.dspace.eperson.Group;
  * @author kevinvandevelde at atmire.com
  */
 public interface CollectionService
-        extends DSpaceObjectService<Collection>, DSpaceObjectLegacySupportService<Collection>,
-        IndexableObjectService<Collection, UUID> {
+        extends DSpaceObjectService<Collection>, DSpaceObjectLegacySupportService<Collection> {
 
     /**
      * Create a new collection with a new ID.

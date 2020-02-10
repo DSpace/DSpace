@@ -95,7 +95,8 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
     public Page<CollectionRest> findAll(Context context, Pageable pageable) {
         try {
             long total = cs.countTotal(context);
-            List<Collection> collections = cs.findAll(context, pageable.getPageSize(), pageable.getOffset());
+            List<Collection> collections = cs.findAll(context, pageable.getPageSize(),
+                    Math.toIntExact(pageable.getOffset()));
             return converter.toRestPage(collections, pageable, total, utils.obtainProjection(true));
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
