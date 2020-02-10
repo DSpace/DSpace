@@ -28,12 +28,12 @@ import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
 /**
- * Class to test the RetryfailedOpenUrlTracker
+ * Class to test the RetryFailedOpenUrlTracker
  */
 @RunWith(MockitoJUnitRunner.class)
-public class ITRetryfailedOpenUrlTracker extends AbstractIntegrationTest {
+public class ITRetryFailedOpenUrlTracker extends AbstractIntegrationTest {
 
-    private static Logger log = Logger.getLogger(ITRetryfailedOpenUrlTracker.class);
+    private static Logger log = Logger.getLogger(ITRetryFailedOpenUrlTracker.class);
 
 
     protected FailedOpenURLTrackerService failedOpenURLTrackerService =
