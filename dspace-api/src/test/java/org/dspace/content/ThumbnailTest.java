@@ -88,8 +88,10 @@ public class ThumbnailTest extends AbstractUnitTest {
     @Override
     public void destroy() {
         try {
+            context.turnOffAuthorisationSystem();
             bitstreamService.delete(context, thumb);
             bitstreamService.delete(context, orig);
+            context.restoreAuthSystemState();
             thumb = null;
             orig = null;
         } catch (Exception e) {
