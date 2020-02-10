@@ -34,7 +34,8 @@ import org.hamcrest.Matchers;
 import org.junit.Test;
 
 /**
- * Integration tests for the {@link WorkflowDefinitionRestRepository} and {@link WorkflowDefinitionController} controlled endpoints
+ * Integration tests for the {@link WorkflowDefinitionRestRepository}
+ * and {@link WorkflowDefinitionCollectionsLinkRepository} controlled endpoints
  *
  * @author Maria Verdonck (Atmire) on 17/12/2019
  */

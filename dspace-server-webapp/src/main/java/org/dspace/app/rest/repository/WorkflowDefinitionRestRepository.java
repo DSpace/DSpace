@@ -46,7 +46,7 @@ public class WorkflowDefinitionRestRepository extends DSpaceRestRepository<Workf
     public WorkflowDefinitionRest findOne(Context context, String workflowName) {
         if (xmlWorkflowFactory.workflowByThisNameExists(workflowName)) {
             try {
-                return converter.toRest(xmlWorkflowFactory.getWorkflowByName(workflowName), utils.obtainProjection());
+                return converter.toRest(xmlWorkflowFactory.getWorkflowByName(workflowName), utils.obtainProjection(true));
             } catch (WorkflowConfigurationException e) {
                 // Should never occur, since xmlWorkflowFactory.getWorkflowByName only throws a
                 //      WorkflowConfigurationException if no workflow by that name is configured (tested earlier)

@@ -18,11 +18,21 @@ import org.dspace.xmlworkflow.state.Step;
  *
  * @author Maria Verdonck (Atmire) on 11/12/2019
  */
+@LinksRest(links = {
+    @LinkRest(
+        name = WorkflowDefinitionRest.COLLECTIONS_MAPPED_TO,
+        linkClass = CollectionRest.class,
+        method = "getCollections",
+        embedOptional = true,
+        linkOptional = true
+    )
+})
 public class WorkflowDefinitionRest extends BaseObjectRest<String> {
 
     public static final String CATEGORY = "config";
     public static final String NAME = "workflowdefinition";
     public static final String NAME_PLURAL = "workflowdefinitions";
+    public static final String COLLECTIONS_MAPPED_TO = "collections";
 
     private String name;
     private boolean isDefault;
@@ -65,7 +75,7 @@ public class WorkflowDefinitionRest extends BaseObjectRest<String> {
         this.isDefault = isDefault;
     }
 
-    @LinkRest(linkClass = Step.class)
+    @LinkRest(linkClass = Step.class, embedOptional = true)
     @JsonIgnore
     public List<WorkflowStepRest> getSteps() {
         return steps;
