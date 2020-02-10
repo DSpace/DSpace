@@ -106,4 +106,18 @@
            timeToLiveSeconds="1800" overflowToDisk="true" diskExpiryThreadIntervalSeconds="60"
            memoryStoreEvictionPolicy="LRU"/>
 
+    <cache name="org.dspace.eperson.FacultyEntity"
+           maxElementsInMemory="200" eternal="false"  timeToIdleSeconds="43200"
+           timeToLiveSeconds="43200" overflowToDisk="true" diskExpiryThreadIntervalSeconds="60"
+           memoryStoreEvictionPolicy="LRU"/>
+
+    <cache name="org.dspace.eperson.ChairEntity"
+           maxElementsInMemory="200" eternal="false"  timeToIdleSeconds="43200"
+           timeToLiveSeconds="43200" overflowToDisk="true" diskExpiryThreadIntervalSeconds="60"
+           memoryStoreEvictionPolicy="LRU"/>
+
+    <cache name="org.dspace.eperson.Speciality"
+           maxElementsInMemory="200" eternal="false"  timeToIdleSeconds="43200"
+           timeToLiveSeconds="43200" overflowToDisk="true" diskExpiryThreadIntervalSeconds="60"
+           memoryStoreEvictionPolicy="LRU"/>
 </ehcache>

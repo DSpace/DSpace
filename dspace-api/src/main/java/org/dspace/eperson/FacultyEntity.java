@@ -1,48 +1,56 @@
-package org.ssu.entity;
+package org.dspace.eperson;
+
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.dspace.content.DSpaceObject;
+import org.dspace.eperson.essuir.DepositorDivision;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
-import org.ssu.entity.response.DepositorDivision;
 
 import javax.persistence.*;
 import java.util.List;
 
 @Entity
+//@Cacheable
+//@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE, include = "non-lazy")
 @Table(name = "faculty")
-public class FacultyEntity implements DepositorDivision {
-    @Id
+public class FacultyEntity extends DSpaceObject implements DepositorDivision {
     @Column(name = "faculty_id")
     @JsonProperty("id")
-    private Integer id;
+    private Integer facultyId;
 
     @Column(name = "faculty_name")
     @JsonProperty("name")
     private String name;
 
-    @OneToMany(mappedBy = "facultyEntityName")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "faculty")
     @JsonProperty("chairs")
     @JsonManagedReference
-    @LazyCollection(LazyCollectionOption.FALSE)
     private List<ChairEntity> chairs;
 
     private FacultyEntity(Builder builder) {
-        setId(builder.id);
+        setId(builder.facultyId);
         setName(builder.name);
     }
 
     public FacultyEntity() {
     }
 
+    @Override
+    public int getType() {
+        return 1337;
+    }
+
     public Integer getId() {
-        return id;
+        return facultyId;
     }
 
     public void setId(Integer id) {
-        this.id = id;
+        this.facultyId = facultyId;
     }
 
     public String getName() {
@@ -84,19 +92,19 @@ public class FacultyEntity implements DepositorDivision {
     }
 
     public static final class Builder {
-        private Integer id;
+        private Integer facultyId;
         private String name;
 
         public Builder() {
         }
 
         public Builder(FacultyEntity copy) {
-            this.id = copy.getId();
+            this.facultyId = copy.getId();
             this.name = copy.getName();
         }
 
         public Builder withId(Integer id) {
-            this.id = id;
+            this.facultyId = id;
             return this;
         }
 

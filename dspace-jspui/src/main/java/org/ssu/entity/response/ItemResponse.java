@@ -3,7 +3,6 @@ package org.ssu.entity.response;
 import org.dspace.eperson.EPerson;
 
 import java.time.LocalDate;
-import java.util.List;
 
 public class ItemResponse {
     private String handle;
@@ -63,7 +62,6 @@ public class ItemResponse {
     public EPerson getSubmitter() {
         return submitter;
     }
-
 
     public static final class Builder {
         private String handle;

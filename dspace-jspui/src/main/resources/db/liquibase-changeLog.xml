@@ -9,4 +9,27 @@
     <include file="changelog/03-metadata-field.xml" relativeToChangelogFile="true"/>
     <include file="changelog/04-add-law-speciality.xml" relativeToChangelogFile="true"/>
     <include file="changelog/05-add-applied-math-speciality.xml" relativeToChangelogFile="true"/>
+
+    <changeSet id="6" author="Igor Marchenko">
+        <addColumn tableName="faculty">
+            <column name="uuid" defaultValueComputed="gen_random_uuid()" type="UUID"/>
+        </addColumn>
+        <addColumn tableName="chair">
+            <column name="uuid" defaultValueComputed="gen_random_uuid()" type="UUID"/>
+        </addColumn>
+        <addColumn tableName="speciality">
+            <column name="uuid" defaultValueComputed="gen_random_uuid()" type="UUID"/>
+        </addColumn>
+    </changeSet>
+    <changeSet id="7" author="Igor Marchenko">
+        <sql>
+            insert into dspaceobject (select uuid from faculty)
+        </sql>
+        <sql>
+            insert into dspaceobject (select uuid from chair)
+        </sql>
+        <sql>
+            insert into dspaceobject (select uuid from speciality)
+        </sql>
+    </changeSet>
 </databaseChangeLog>

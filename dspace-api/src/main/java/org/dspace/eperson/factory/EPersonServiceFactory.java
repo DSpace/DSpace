@@ -29,6 +29,8 @@ public abstract class EPersonServiceFactory {
 
     public abstract SupervisorService getSupervisorService();
 
+    public abstract FacultyService getFacultyService();
+
     public static EPersonServiceFactory getInstance(){
         return DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName("ePersonServiceFactory", EPersonServiceFactory.class);
     }

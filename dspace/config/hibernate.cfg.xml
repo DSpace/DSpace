@@ -52,6 +52,9 @@
 
         <mapping class="org.dspace.eperson.EPerson"/>
         <mapping class="org.dspace.eperson.Group"/>
+        <mapping class="org.dspace.eperson.FacultyEntity"/>
+        <mapping class="org.dspace.eperson.Speciality"/>
+        <mapping class="org.dspace.eperson.ChairEntity"/>
         <mapping class="org.dspace.eperson.Group2GroupCache"/>
         <mapping class="org.dspace.eperson.RegistrationData"/>
         <mapping class="org.dspace.eperson.Subscription"/>

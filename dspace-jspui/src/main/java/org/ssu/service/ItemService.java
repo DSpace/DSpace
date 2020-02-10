@@ -37,6 +37,8 @@ public class ItemService {
     private TypeLocalization typeLocalization;
     @Resource
     private MetadatavalueRepository metadatavalueRepository;
+    @Resource
+    private EpersonService epersonService;
 
     public Iterator<Item> findAll(Context context) throws SQLException {
         return itemService.findAll(context);

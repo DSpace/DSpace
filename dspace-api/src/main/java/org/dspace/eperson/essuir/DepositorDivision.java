@@ -1,4 +1,4 @@
-package org.ssu.entity.response;
+package org.dspace.eperson.essuir;
 
 public interface DepositorDivision {
     String getName();

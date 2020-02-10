@@ -5,13 +5,12 @@ import com.google.common.collect.Lists;
 import org.apache.commons.lang3.tuple.Pair;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
+import org.dspace.eperson.ChairEntity;
+import org.dspace.eperson.EPerson;
+import org.dspace.eperson.essuir.DepositorDivision;
+import org.dspace.eperson.essuir.DepositorSimpleUnit;
 import org.jooq.lambda.Seq;
 import org.springframework.stereotype.Service;
-import org.ssu.entity.ChairEntity;
-import org.ssu.entity.EssuirEperson;
-import org.ssu.entity.jooq.Faculty;
-import org.ssu.entity.response.DepositorDivision;
-import org.ssu.entity.response.DepositorSimpleUnit;
 import org.ssu.entity.response.ItemDepositorResponse;
 import org.ssu.entity.response.ItemResponse;
 
@@ -57,8 +56,9 @@ public class ReportService {
                 .collect(Collectors.toList());
 
         return Seq.seq(data)
-                .grouped(item -> item.getKey().getChairEntity().getFacultyEntity(),
-                        Collectors.groupingBy(it -> it.getKey().getChairEntity(),
+                .filter(person -> person.getKey().getChair() != null)
+                .grouped(item -> item.getKey().getChair().getFacultyEntity(),
+                        Collectors.groupingBy(it -> it.getKey().getChair(),
                                 Collectors.mapping(countContributionForSpeciality, Collectors.toList())))
                 .map(item -> Pair.of(item.v1, fetchDepositorsForFaculty.apply(item.v2)))
                 .map(item -> fetchDepositorDataForDepositorDivision.apply(item.getKey(), item.getValue()))
@@ -70,24 +70,25 @@ public class ReportService {
         return Seq.seq(Lists.newArrayList(essuirItemService.findAll(context)))
                 .filter(submission -> isDateInRange.test(allDatesAvailable.getOrDefault(submission.getID(), LocalDate.MIN), Pair.of(from, to)));
     }
+
     public List<ItemDepositorResponse> getUsersSubmissionCountBetweenDates(Context context, LocalDate from, LocalDate to) throws SQLException, IOException {
-        List<Pair<EssuirEperson, Long>> submissionsByEperson = getItemsBetweenDates(context, from, to)
+        List<Pair<EPerson, Long>> submissionsByEperson = getItemsBetweenDates(context, from, to)
                 .grouped(Item::getSubmitter, Collectors.counting())
-                .map(submission -> Pair.of(epersonService.extendEpersonInformation(submission.v1), submission.v2))
+                .map(submission -> Pair.of(submission.v1, submission.v2))
                 .toList();
         return collectStatistics(submissionsByEperson);
     }
 
     public List<ItemResponse> getUploadedItemsByFacultyName(Context context, String faculty, LocalDate from, LocalDate to) throws SQLException, IOException {
         return getItemsBetweenDates(context, from, to)
-                .filter(item -> faculty.equals(epersonService.extendEpersonInformation(item.getSubmitter()).getChairEntity().getFacultyEntityName()))
+                .filter(item -> faculty.equals(item.getSubmitter().getChair().getFacultyEntityName()))
                 .map(item -> new ItemResponse.Builder().withTitle(item.getName()).withHandle(item.getHandle()).build())
                 .collect(Collectors.toList());
     }
 
     public List<ItemResponse> getUploadedItemsByChairName(Context context, String chair, LocalDate from, LocalDate to) throws SQLException, IOException {
         return getItemsBetweenDates(context, from, to)
-                .filter(item -> chair.equals(epersonService.extendEpersonInformation(item.getSubmitter()).getChairEntity().getName()))
+                .filter(item -> chair.equals(item.getSubmitter().getChair().getName()))
                 .map(item -> new ItemResponse.Builder().withTitle(item.getName()).withHandle(item.getHandle()).build())
                 .collect(Collectors.toList());
     }

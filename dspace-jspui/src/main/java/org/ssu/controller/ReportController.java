@@ -1,6 +1,5 @@
 package org.ssu.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.content.Item;
@@ -11,9 +10,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
-import org.ssu.entity.FacultyEntity;
-import org.ssu.entity.jooq.Faculty;
-import org.ssu.entity.response.ItemDepositorResponse;
 import org.ssu.entity.response.ItemResponse;
 import org.ssu.service.EpersonService;
 import org.ssu.service.ReportService;

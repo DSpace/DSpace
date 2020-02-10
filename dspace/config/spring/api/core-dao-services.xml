@@ -30,6 +30,7 @@
     <bean class="org.dspace.content.dao.impl.WorkspaceItemDAOImpl"/>
 
     <bean class="org.dspace.eperson.dao.impl.EPersonDAOImpl"/>
+    <bean class="org.dspace.eperson.dao.impl.FacultyDAOImpl"/>
     <bean class="org.dspace.eperson.dao.impl.Group2GroupCacheDAOImpl"/>
     <bean class="org.dspace.eperson.dao.impl.GroupDAOImpl"/>
     <bean class="org.dspace.eperson.dao.impl.RegistrationDataDAOImpl"/>

@@ -10,18 +10,20 @@ import org.apache.log4j.Logger;
 import org.dspace.app.webui.components.RecentSubmissionsException;
 import org.dspace.app.webui.components.RecentSubmissionsManager;
 import org.dspace.app.webui.util.UIUtil;
-import org.dspace.browse.*;
+import org.dspace.browse.ItemCountException;
+import org.dspace.browse.ItemCounter;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataSchema;
 import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.Email;
 import org.dspace.core.I18nUtil;
 import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.core.service.NewsService;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.FacultyService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -32,17 +34,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.ModelAndView;
-import org.ssu.entity.AuthorLocalization;
 import org.ssu.entity.response.CommunityResponse;
 import org.ssu.entity.response.ItemTypeResponse;
 import org.ssu.entity.response.RecentItem;
-import org.ssu.repository.FacultyRepository;
-import org.ssu.service.localization.TypeLocalization;
-import org.ssu.service.CommunityService;
-import org.ssu.service.statistics.EssuirStatistics;
-import org.ssu.service.GeneralStatisticsService;
-import org.ssu.service.statistics.ScheduledTasks;
 import org.ssu.entity.statistics.StatisticsData;
+import org.ssu.service.CommunityService;
+import org.ssu.service.GeneralStatisticsService;
+import org.ssu.service.localization.TypeLocalization;
+import org.ssu.service.statistics.EssuirStatistics;
+import org.ssu.service.statistics.ScheduledTasks;
 
 import javax.annotation.Resource;
 import javax.mail.MessagingException;
@@ -51,16 +51,13 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @RequestMapping("/")
 @Controller
 public class EssuirSiteController {
     private static Logger log = Logger.getLogger(EssuirSiteController.class);
-    @Resource
-    private FacultyRepository facultyRepository;
-
+    private FacultyService facultyService = EPersonServiceFactory.getInstance().getFacultyService();
     @Resource
     private TypeLocalization typeLocalization;
 
@@ -264,7 +261,7 @@ public class EssuirSiteController {
         ResponseEntity<Map> recaptchaResponseEntity = new RestTemplate()
                 .postForEntity("https://www.google.com/recaptcha/api/siteverify?secret={secret}&response={response}&remoteip={remoteip}", googleRequestParameters, Map.class, googleRequestParameters);
         Map<String, Object> googleCaptchaVerifyRepsonse = recaptchaResponseEntity.getBody();
-       return (Boolean)googleCaptchaVerifyRepsonse.get("success");
+        return (Boolean) googleCaptchaVerifyRepsonse.get("success");
     }
 
     @RequestMapping(value = "/feedback", method = RequestMethod.POST)
@@ -287,17 +284,17 @@ public class EssuirSiteController {
             messageType = "warning";
         }
 
-        if(!isFeedbackTextFilled) {
+        if (!isFeedbackTextFilled) {
             message = I18nUtil.getMessage("feedback.feedback.empty", locale);
             messageType = "warning";
         }
 
-        if(!verifyStatus) {
+        if (!verifyStatus) {
             message = I18nUtil.getMessage("feedback.captcha.fail", locale);
             messageType = "warning";
         }
 
-        if(isFeedbackTextFilled && isEmailCorrect && verifyStatus) {
+        if (isFeedbackTextFilled && isEmailCorrect && verifyStatus) {
             EPerson currentUser = dspaceContext.getCurrentUser();
             Email emailTemplate = Email.getEmail(I18nUtil.getEmailFilename(dspaceContext.getCurrentLocale(), "feedback"));
             emailTemplate.addRecipient(DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("feedback.recipient"));
@@ -326,9 +323,10 @@ public class EssuirSiteController {
 
     @RequestMapping(value = "/api/facultylist", method = RequestMethod.GET, produces = "text/plain;charset=UTF-8")
     @ResponseBody
-    public String getFacultyList() throws JsonProcessingException {
+    public String getFacultyList(HttpServletRequest request) throws JsonProcessingException, SQLException {
+        Context dspaceContext = UIUtil.obtainContext(request);
         try {
-            return new ObjectMapper().writeValueAsString(facultyRepository.findAll());
+            return new ObjectMapper().writeValueAsString(facultyService.findAll(dspaceContext));
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }

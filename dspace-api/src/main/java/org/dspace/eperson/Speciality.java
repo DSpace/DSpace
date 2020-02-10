@@ -1,41 +1,47 @@
-package org.ssu.entity;
+package org.dspace.eperson;
+
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.hp.hpl.jena.sparql.function.library.print;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.ssu.entity.response.DepositorSimpleUnit;
+import org.dspace.content.DSpaceObject;
+import org.dspace.eperson.essuir.DepositorSimpleUnit;
 
 import javax.persistence.*;
 
 @Entity
-public class Speciality  implements DepositorSimpleUnit {
-    @Id
+@Table(name = "speciality")
+public class Speciality extends DSpaceObject implements DepositorSimpleUnit {
     @Column(name = "id")
     @JsonProperty("id")
-    private Integer id;
+    private Integer specialityId;
 
     @Column(name = "name")
     @JsonIgnore
     private String name;
 
     @Column(name = "code")
-//    @JsonProperty("code")
     @JsonIgnore
     private String code;
 
-    @OneToOne
-    @JoinColumn(name = "chair_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "chair_id", referencedColumnName = "chair_id")
     @JsonBackReference
     private ChairEntity chairEntity;
 
     public Speciality() {
     }
 
+    @Override
+    public int getType() {
+        return 0;
+    }
+
     private Speciality(Builder builder) {
-        id = builder.id;
+        specialityId = builder.id;
         name = builder.name;
         code = builder.code;
         chairEntity = builder.chairEntity;
@@ -47,7 +53,7 @@ public class Speciality  implements DepositorSimpleUnit {
     }
 
     public Integer getId() {
-        return id;
+        return specialityId;
     }
 
     public String getName() {
@@ -58,7 +64,9 @@ public class Speciality  implements DepositorSimpleUnit {
         return code;
     }
 
-    public ChairEntity getChairEntity() {
+    @Override
+    @JsonIgnore
+    public ChairEntity getChair() {
         return chairEntity;
     }
 
@@ -101,7 +109,7 @@ public class Speciality  implements DepositorSimpleUnit {
             this.id = copy.getId();
             this.name = copy.getName();
             this.code = copy.getCode();
-            this.chairEntity = copy.getChairEntity();
+            this.chairEntity = copy.getChair();
         }
 
         public Builder withId(Integer id) {

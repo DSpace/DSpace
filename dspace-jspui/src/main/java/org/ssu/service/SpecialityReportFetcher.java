@@ -8,15 +8,13 @@ import org.apache.log4j.Logger;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.core.Context;
+import org.dspace.eperson.ChairEntity;
+import org.dspace.eperson.FacultyEntity;
+import org.dspace.eperson.Speciality;
 import org.jooq.lambda.Seq;
-import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import org.ssu.entity.ChairEntity;
-import org.ssu.entity.FacultyEntity;
-import org.ssu.entity.Speciality;
 import org.ssu.entity.SpecialityDetailedInfo;
-import org.ssu.entity.jooq.Faculty;
 import org.ssu.repository.MetadatavalueRepository;
 
 import javax.annotation.Resource;
@@ -34,15 +32,20 @@ import java.util.stream.Stream;
 @Component
 public class SpecialityReportFetcher {
     private static Logger log = Logger.getLogger(SpecialityReportFetcher.class);
-
+    transient private final org.dspace.content.service.ItemService itemService = ContentServiceFactory.getInstance().getItemService();
     @Resource
     private ItemService essuirItemService;
-
     @Resource
     private MetadatavalueRepository metadatavalueRepository;
-
-    transient private final org.dspace.content.service.ItemService itemService = ContentServiceFactory.getInstance().getItemService();
     private BiPredicate<LocalDate, Pair<LocalDate, LocalDate>> isDateInRange = (date, range) -> date.isAfter(range.getLeft().minusDays(1)) && date.isBefore(range.getRight().plusDays(1));
+    private BiFunction<Context, UUID, Optional<Item>> getItemByUUID = (context, uuid) -> {
+        try {
+            return Optional.ofNullable(itemService.find(context, uuid));
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return Optional.empty();
+    };
 
     private Speciality extractSpecialityCode(String data) {
         FacultyEntity defaultFacultyEntity = new FacultyEntity.Builder().withId(-1).withName("-").build();
@@ -88,8 +91,9 @@ public class SpecialityReportFetcher {
     public List<Speciality> getBachelorsPapersMetadata(Context context, LocalDate from, LocalDate to) throws IOException, SQLException {
         Function<String, Speciality> facultyEntityObjectMapper = (jsonData) -> {
             try {
-                List<SpecialityDetailedInfo> specialityDetailedInfoList = new ObjectMapper().readValue(jsonData, new TypeReference<List<SpecialityDetailedInfo>>(){});
-                if(specialityDetailedInfoList.size() == 3) {
+                List<SpecialityDetailedInfo> specialityDetailedInfoList = new ObjectMapper().readValue(jsonData, new TypeReference<List<SpecialityDetailedInfo>>() {
+                });
+                if (specialityDetailedInfoList.size() == 3) {
                     FacultyEntity faculty = new FacultyEntity.Builder()
                             .withId(specialityDetailedInfoList.get(0).getCode())
                             .withName(specialityDetailedInfoList.get(0).getName())
@@ -130,15 +134,6 @@ public class SpecialityReportFetcher {
                 .map(item -> Pair.of(item.v1(), item.v2()))
                 .toList();
     }
-
-    private BiFunction<Context, UUID, Optional<Item>> getItemByUUID = (context, uuid) -> {
-        try {
-            return Optional.ofNullable(itemService.find(context, uuid));
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return Optional.empty();
-    };
 
     public List<Item> getBachelorsWithoutSpeciality(Context context) {
         Map<UUID, String> papersWithData = essuirItemService.fetchMastersAndBachelorsPapers();

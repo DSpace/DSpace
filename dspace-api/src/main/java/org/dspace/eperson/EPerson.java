@@ -14,6 +14,7 @@ import org.dspace.content.DSpaceObjectLegacySupport;
 import org.dspace.content.Item;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.eperson.essuir.DepositorSimpleUnit;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
@@ -35,7 +36,7 @@ import java.util.List;
 @Cacheable
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE, include = "non-lazy")
 @Table(name = "eperson")
-public class EPerson extends DSpaceObject implements DSpaceObjectLegacySupport
+public class EPerson extends DSpaceObject implements DSpaceObjectLegacySupport, DepositorSimpleUnit
 {
     @Column(name="eperson_id", insertable = false, updatable = false)
     private Integer legacyId;
@@ -68,6 +69,16 @@ public class EPerson extends DSpaceObject implements DSpaceObjectLegacySupport
     @Column(name="digest_algorithm", length = 16)
     private String digestAlgorithm;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "chair_id", referencedColumnName = "chair_id", insertable = false, updatable = false)
+    private ChairEntity chair;
+
+    @Column(name="chair_id")
+    private Integer chairId;
+
+    @Column(name="position")
+    private String position;
+
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "epeople")
     private final List<Group> groups = new ArrayList<>();
 
@@ -97,6 +108,29 @@ public class EPerson extends DSpaceObject implements DSpaceObjectLegacySupport
     protected EPerson()
     {
 
+    }
+    public ChairEntity getChair() {
+        return chair;
+    }
+
+    public String getPosition() {
+        return position;
+    }
+
+    public void setChair(ChairEntity chair) {
+        this.chair = chair;
+    }
+
+    public void setPosition(String position) {
+        this.position = position;
+    }
+
+    public Integer getChairId() {
+        return chairId;
+    }
+
+    public void setChairId(Integer chairId) {
+        this.chairId = chairId;
     }
 
     @Override
@@ -383,7 +417,7 @@ public class EPerson extends DSpaceObject implements DSpaceObjectLegacySupport
     @Override
     public String getName()
     {
-        return getEmail();
+        return String.format("%s %s(%s)", getLastName(), getFirstName(), getEmail());
     }
 
     String getDigestAlgorithm() {
