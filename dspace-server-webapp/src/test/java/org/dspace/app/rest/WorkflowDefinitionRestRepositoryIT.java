@@ -266,7 +266,7 @@ public class WorkflowDefinitionRestRepositoryIT extends AbstractControllerIntegr
             //We expect a 200 OK status
             .andExpect(status().isOk())
             //Number of total workflows is equals to number of non-mapped collections
-            .andExpect(jsonPath("$.totalElements", is(allNonMappedCollections.size())));
+            .andExpect(jsonPath("$.page.totalElements", is(allNonMappedCollections.size())));
     }
 
     @Test
@@ -304,13 +304,13 @@ public class WorkflowDefinitionRestRepositoryIT extends AbstractControllerIntegr
                 //We expect a 200 OK status
                 .andExpect(status().isOk())
                 //Number of total workflows is equals to number of configured workflows
-                .andExpect(jsonPath("$.totalElements", is(allNonMappedCollections.size())))
+                .andExpect(jsonPath("$.page.totalElements", is(allNonMappedCollections.size())))
                 //Page size is 1
-                .andExpect(jsonPath("$.size", is(1)))
+                .andExpect(jsonPath("$.page.size", is(1)))
                 //Page nr is 1
-                .andExpect(jsonPath("$.number", is(0)))
+                .andExpect(jsonPath("$.page.number", is(0)))
                 //Contains only the first non-mapped collection
-                .andExpect(jsonPath("$.content", Matchers.contains(
+                .andExpect(jsonPath("$._embedded.collections", Matchers.contains(
                     WorkflowDefinitionMatcher.matchCollectionEntry(firstNonMappedCollection.getName(),
                         firstNonMappedCollection.getID(), firstNonMappedCollection.getHandle())
                 )));
@@ -359,13 +359,13 @@ public class WorkflowDefinitionRestRepositoryIT extends AbstractControllerIntegr
                     //We expect a 200 OK status
                     .andExpect(status().isOk())
                     //Number of total workflows is equals to number of configured workflows
-                    .andExpect(jsonPath("$.totalElements", is(mappedCollections.size())))
+                    .andExpect(jsonPath("$.page.totalElements", is(mappedCollections.size())))
                     //Page size is 1
-                    .andExpect(jsonPath("$.size", is(1)))
+                    .andExpect(jsonPath("$.page.size", is(1)))
                     //Page nr is 1
-                    .andExpect(jsonPath("$.number", is(0)))
+                    .andExpect(jsonPath("$.page.number", is(0)))
                     //Contains only the first mapped collection
-                    .andExpect(jsonPath("$.content", Matchers.contains(
+                    .andExpect(jsonPath("$._embedded.collections", Matchers.contains(
                         WorkflowDefinitionMatcher.matchCollectionEntry(firstMappedCollection.getName(),
                             firstMappedCollection.getID(), firstMappedCollection.getHandle())
                     )));
@@ -376,7 +376,7 @@ public class WorkflowDefinitionRestRepositoryIT extends AbstractControllerIntegr
                     //We expect a 200 OK status
                     .andExpect(status().isOk())
                     //results in empty list
-                    .andExpect(jsonPath("$.content", empty()));
+                    .andExpect(jsonPath("$._embedded.collections", empty()));
             }
         }
     }
@@ -388,21 +388,18 @@ public class WorkflowDefinitionRestRepositoryIT extends AbstractControllerIntegr
 
         //When we call this facets endpoint
         getClient(token).perform(get(WORKFLOW_DEFINITIONS_ENDPOINT + "/" + workflowName + "/collections"))
-            //We expect a 404 Not Found status
-            .andExpect(status().isNotFound());
+            .andExpect(status().isInternalServerError());
     }
 
     @Test
     public void getCollectionsOfWorkflowByName_DefaultWorkflow_NoValidToken() throws Exception {
         String token = "NonValidToken";
         Workflow defaultWorkflow = xmlWorkflowFactory.getDefaultWorkflow();
-        List<Collection> allNonMappedCollections = xmlWorkflowFactory.getAllNonMappedCollectionsHandles(context);
 
         //When we call this facets endpoint
         getClient(token).perform(get(WORKFLOW_DEFINITIONS_ENDPOINT + "/" + defaultWorkflow.getID()
             + "/collections"))
-            //We expect a 403 Forbidden status
-            .andExpect(status().isForbidden());
+            .andExpect(status().isInternalServerError());
     }
 
     @Test
@@ -413,7 +410,6 @@ public class WorkflowDefinitionRestRepositoryIT extends AbstractControllerIntegr
         //When we call this facets endpoint
         getClient().perform(get(WORKFLOW_DEFINITIONS_ENDPOINT + "/" + defaultWorkflow.getID()
             + "/collections"))
-            //We expect a 401 Unauthorized
-            .andExpect(status().isUnauthorized());
+            .andExpect(status().isInternalServerError());
     }
 }
