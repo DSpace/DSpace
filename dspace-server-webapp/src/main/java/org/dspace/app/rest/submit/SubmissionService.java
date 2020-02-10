@@ -8,6 +8,7 @@
 package org.dspace.app.rest.submit;
 
 import java.io.IOException;
+
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +24,7 @@ import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.CheckSumRest;
 import org.dspace.app.rest.model.MetadataValueRest;
-import org.dspace.app.rest.model.ResourcePolicyRest;
+import org.dspace.app.rest.model.UploadAccessConditionDTO;
 import org.dspace.app.rest.model.WorkspaceItemRest;
 import org.dspace.app.rest.model.step.UploadBitstreamRest;
 import org.dspace.app.rest.projection.Projection;
@@ -168,8 +169,8 @@ public class SubmissionService {
 
         for (ResourcePolicy rp : source.getResourcePolicies()) {
             if (ResourcePolicy.TYPE_CUSTOM.equals(rp.getRpType())) {
-                ResourcePolicyRest resourcePolicyRest = converter.toRest(rp, Projection.DEFAULT);
-                data.getAccessConditions().add(resourcePolicyRest);
+                UploadAccessConditionDTO uploadAccessCondition = createAccessConditionFromResourcePolicy(rp);
+                data.getAccessConditions().add(uploadAccessCondition);
             }
         }
 
@@ -233,6 +234,23 @@ public class SubmissionService {
         }
 
         return wi;
+    }
+
+    private UploadAccessConditionDTO createAccessConditionFromResourcePolicy(ResourcePolicy rp) {
+        UploadAccessConditionDTO accessCondition = new UploadAccessConditionDTO();
+
+        accessCondition.setId(rp.getID());
+        accessCondition.setName(rp.getRpName());
+        accessCondition.setDescription(rp.getRpDescription());
+        accessCondition.setStartDate(rp.getStartDate());
+        accessCondition.setEndDate(rp.getEndDate());
+        if (rp.getGroup() != null) {
+            accessCondition.setGroupUUID(rp.getGroup().getID());
+        }
+        if (rp.getEPerson() != null) {
+            accessCondition.setEpersonUUID(rp.getEPerson().getID());
+        }
+        return accessCondition;
     }
 
     public void saveWorkflowItem(Context context, XmlWorkflowItem source) throws SQLException, AuthorizeException {
