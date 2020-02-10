@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 /**
@@ -41,6 +42,7 @@ public class WorkflowDefinitionRestRepository extends DSpaceRestRepository<Workf
     private CollectionService collectionService;
 
     @Override
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
     public WorkflowDefinitionRest findOne(Context context, String workflowName) {
         if (xmlWorkflowFactory.workflowByThisNameExists(workflowName)) {
             try {
@@ -56,6 +58,7 @@ public class WorkflowDefinitionRestRepository extends DSpaceRestRepository<Workf
     }
 
     @Override
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
     public Page<WorkflowDefinitionRest> findAll(Context context, Pageable pageable) {
         List<Workflow> workflows = xmlWorkflowFactory.getAllConfiguredWorkflows();
         return converter.toRestPage(utils.getPage(workflows, pageable), utils.obtainProjection(true));
@@ -69,6 +72,7 @@ public class WorkflowDefinitionRestRepository extends DSpaceRestRepository<Workf
      * @return the workflow definition for this collection
      */
     @SearchRestMethod(name = "findByCollection")
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
     public WorkflowDefinitionRest findByCollection(@Parameter(value = "uuid") UUID collectionId) throws SQLException {
         Context context = obtainContext();
         Collection collectionFromUuid = collectionService.find(context, collectionId);

@@ -23,6 +23,7 @@ import org.junit.Test;
 
 /**
  * Integration tests for the {@link WorkflowStepRestRepository} controlled endpoints
+ *
  * @author Maria Verdonck (Atmire) on 13/01/2020
  */
 public class WorkflowStepRestRepositoryIT extends AbstractControllerIntegrationTest {
@@ -34,27 +35,47 @@ public class WorkflowStepRestRepositoryIT extends AbstractControllerIntegrationT
 
     @Test
     public void getAllWorkflowSteps_NonImplementedEndpoint() throws Exception {
+        String token = getAuthToken(eperson.getEmail(), password);
         //When we call this facets endpoint
-        getClient().perform(get(WORKFLOW_ACTIONS_ENDPOINT))
+        getClient(token).perform(get(WORKFLOW_ACTIONS_ENDPOINT))
             //We expect a 405 Method not allowed status
             .andExpect(status().isMethodNotAllowed());
     }
 
     @Test
+    public void getAllWorkflowSteps_NonImplementedEndpoint_NonValidToken() throws Exception {
+        String token = "NonValidToken";
+        //When we call this facets endpoint
+        getClient(token).perform(get(WORKFLOW_ACTIONS_ENDPOINT))
+            //We expect a 403 Forbidden status
+            .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void getAllWorkflowSteps_NonImplementedEndpoint_NoToken() throws Exception {
+        //When we call this facets endpoint
+        getClient().perform(get(WORKFLOW_ACTIONS_ENDPOINT))
+            //We expect a 401 Unauthorized
+            .andExpect(status().isUnauthorized());
+    }
+
+    @Test
     public void getWorkflowStepByName_NonExistentWorkflowStep() throws Exception {
+        String token = getAuthToken(eperson.getEmail(), password);
         String nameNonExistentWorkflowActionName = "TestNameNonExistentWorkflowStep9999";
         //When we call this facets endpoint
-        getClient().perform(get(WORKFLOW_ACTIONS_ENDPOINT + "/" + nameNonExistentWorkflowActionName))
+        getClient(token).perform(get(WORKFLOW_ACTIONS_ENDPOINT + "/" + nameNonExistentWorkflowActionName))
             //We expect a 404 Not Found status
             .andExpect(status().isNotFound());
     }
 
     @Test
     public void getWorkflowStepByName_ExistentStep_reviewstep() throws Exception {
+        String token = getAuthToken(eperson.getEmail(), password);
         String nameStep = "reviewstep";
         Step existentStep = xmlWorkflowFactory.getStepByName(nameStep);
         //When we call this facets endpoint
-        getClient().perform(get(WORKFLOW_ACTIONS_ENDPOINT + "/" + nameStep))
+        getClient(token).perform(get(WORKFLOW_ACTIONS_ENDPOINT + "/" + nameStep))
             //We expect a 200 is ok status
             .andExpect(status().isOk())
             //Matches expected step

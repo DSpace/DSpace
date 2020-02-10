@@ -43,92 +43,114 @@ public class WorkflowDefinitionRestRepositoryIT extends AbstractControllerIntegr
     private XmlWorkflowFactory xmlWorkflowFactory = XmlWorkflowServiceFactory.getInstance().getWorkflowFactory();
 
     private static final String WORKFLOW_DEFINITIONS_ENDPOINT
-            = "/api/" + WorkflowDefinitionRest.CATEGORY + "/" + WorkflowDefinitionRest.NAME_PLURAL;
+        = "/api/" + WorkflowDefinitionRest.CATEGORY + "/" + WorkflowDefinitionRest.NAME_PLURAL;
 
     @Test
     public void getAllWorkflowDefinitionsEndpoint() throws Exception {
+        String token = getAuthToken(eperson.getEmail(), password);
         List<Workflow> allConfiguredWorkflows = xmlWorkflowFactory.getAllConfiguredWorkflows();
         //When we call this facets endpoint
-        getClient().perform(get(WORKFLOW_DEFINITIONS_ENDPOINT))
-                //We expect a 200 OK status
-                .andExpect(status().isOk())
-                //Number of total workflows is equals to number of configured workflows
-                .andExpect(jsonPath("$.page.totalElements", is(allConfiguredWorkflows.size())))
-                //There needs to be a self link to this endpoint
-                .andExpect(jsonPath("$._links.self.href", containsString(WORKFLOW_DEFINITIONS_ENDPOINT)));
+        getClient(token).perform(get(WORKFLOW_DEFINITIONS_ENDPOINT))
+            //We expect a 200 OK status
+            .andExpect(status().isOk())
+            //Number of total workflows is equals to number of configured workflows
+            .andExpect(jsonPath("$.page.totalElements", is(allConfiguredWorkflows.size())))
+            //There needs to be a self link to this endpoint
+            .andExpect(jsonPath("$._links.self.href", containsString(WORKFLOW_DEFINITIONS_ENDPOINT)));
     }
 
     @Test
     public void getAllWorkflowDefinitionsEndpoint_Pagination_Size1() throws Exception {
+        String token = getAuthToken(eperson.getEmail(), password);
         List<Workflow> allConfiguredWorkflows = xmlWorkflowFactory.getAllConfiguredWorkflows();
         //When we call this facets endpoint
-        getClient().perform(get(WORKFLOW_DEFINITIONS_ENDPOINT)
-                .param("size", "1"))
-                //We expect a 200 OK status
-                .andExpect(status().isOk())
-                //Number of total workflows is equals to number of configured workflows
-                .andExpect(jsonPath("$.page.totalElements", is(allConfiguredWorkflows.size())))
-                //Page size is 1
-                .andExpect(jsonPath("$.page.size", is(1)))
-                //Page nr is 1
-                .andExpect(jsonPath("$.page.number", is(0)))
-                //Contains only the first configured workflow
-                .andExpect(jsonPath("$._embedded.workflowDefinitionResources", Matchers.contains(
-                        WorkflowDefinitionMatcher.matchWorkflowDefinitionEntry(allConfiguredWorkflows.get(0))
-                )))
-                //Doesn't contain the other workflows
-                .andExpect(jsonPath("$._embedded.workflowDefinitionResources", Matchers.not(
-                        Matchers.contains(
-                                WorkflowDefinitionMatcher.matchWorkflowDefinitionEntry(allConfiguredWorkflows.get(1))
-                        )
-                )));
+        getClient(token).perform(get(WORKFLOW_DEFINITIONS_ENDPOINT)
+            .param("size", "1"))
+            //We expect a 200 OK status
+            .andExpect(status().isOk())
+            //Number of total workflows is equals to number of configured workflows
+            .andExpect(jsonPath("$.page.totalElements", is(allConfiguredWorkflows.size())))
+            //Page size is 1
+            .andExpect(jsonPath("$.page.size", is(1)))
+            //Page nr is 1
+            .andExpect(jsonPath("$.page.number", is(0)))
+            //Contains only the first configured workflow
+            .andExpect(jsonPath("$._embedded.workflowDefinitionResources", Matchers.contains(
+                WorkflowDefinitionMatcher.matchWorkflowDefinitionEntry(allConfiguredWorkflows.get(0))
+            )))
+            //Doesn't contain the other workflows
+            .andExpect(jsonPath("$._embedded.workflowDefinitionResources", Matchers.not(
+                Matchers.contains(
+                    WorkflowDefinitionMatcher.matchWorkflowDefinitionEntry(allConfiguredWorkflows.get(1))
+                )
+            )));
     }
 
     @Test
     public void getAllWorkflowDefinitionsEndpoint_Pagination_Size1_Page1() throws Exception {
+        String token = getAuthToken(eperson.getEmail(), password);
         List<Workflow> allConfiguredWorkflows = xmlWorkflowFactory.getAllConfiguredWorkflows();
         //When we call this facets endpoint
-        getClient().perform(get(WORKFLOW_DEFINITIONS_ENDPOINT)
-                .param("size", "1")
-                .param("page", "1"))
-                //We expect a 200 OK status
-                .andExpect(status().isOk())
-                //Number of total workflows is equals to number of configured workflows
-                .andExpect(jsonPath("$.page.totalElements", is(allConfiguredWorkflows.size())))
-                //Page size is 1
-                .andExpect(jsonPath("$.page.size", is(1)))
-                //Page nr is 2
-                .andExpect(jsonPath("$.page.number", is(1)))
-                //Contains only the second configured workflow
-                .andExpect(jsonPath("$._embedded.workflowDefinitionResources", Matchers.contains(
-                        WorkflowDefinitionMatcher.matchWorkflowDefinitionEntry(allConfiguredWorkflows.get(1))
-                )))
-                //Doesn't contain 1st configured workflow
-                .andExpect(jsonPath("$._embedded.workflowDefinitionResources", Matchers.not(
-                        Matchers.contains(
-                                WorkflowDefinitionMatcher.matchWorkflowDefinitionEntry(allConfiguredWorkflows.get(0))
-                        )
-                )));
+        getClient(token).perform(get(WORKFLOW_DEFINITIONS_ENDPOINT)
+            .param("size", "1")
+            .param("page", "1"))
+            //We expect a 200 OK status
+            .andExpect(status().isOk())
+            //Number of total workflows is equals to number of configured workflows
+            .andExpect(jsonPath("$.page.totalElements", is(allConfiguredWorkflows.size())))
+            //Page size is 1
+            .andExpect(jsonPath("$.page.size", is(1)))
+            //Page nr is 2
+            .andExpect(jsonPath("$.page.number", is(1)))
+            //Contains only the second configured workflow
+            .andExpect(jsonPath("$._embedded.workflowDefinitionResources", Matchers.contains(
+                WorkflowDefinitionMatcher.matchWorkflowDefinitionEntry(allConfiguredWorkflows.get(1))
+            )))
+            //Doesn't contain 1st configured workflow
+            .andExpect(jsonPath("$._embedded.workflowDefinitionResources", Matchers.not(
+                Matchers.contains(
+                    WorkflowDefinitionMatcher.matchWorkflowDefinitionEntry(allConfiguredWorkflows.get(0))
+                )
+            )));
+    }
+
+    @Test
+    public void getAllWorkflowDefinitionsEndpoint_NonValidToken() throws Exception {
+        String token = "NonValidToken";
+        //When we call this facets endpoint
+        getClient(token).perform(get(WORKFLOW_DEFINITIONS_ENDPOINT))
+            //We expect a 403 Forbidden status
+            .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void getAllWorkflowDefinitionsEndpoint_NoToken() throws Exception {
+        //When we call this facets endpoint
+        getClient().perform(get(WORKFLOW_DEFINITIONS_ENDPOINT))
+            //We expect a 401 Unauthorized
+            .andExpect(status().isUnauthorized());
     }
 
     @Test
     public void getWorkflowDefinitionByName_DefaultWorkflow() throws Exception {
+        String token = getAuthToken(eperson.getEmail(), password);
         Workflow defaultWorkflow = xmlWorkflowFactory.getDefaultWorkflow();
         String workflowName = defaultWorkflow.getID();
         //When we call this facets endpoint
-        getClient().perform(get(WORKFLOW_DEFINITIONS_ENDPOINT + "/" + workflowName))
-                //We expect a 200 OK status
-                .andExpect(status().isOk())
-                //There needs to be a self link to this endpoint
-                .andExpect(jsonPath("$._links.self.href", containsString(WORKFLOW_DEFINITIONS_ENDPOINT)))
-                // its name is default
-                .andExpect(jsonPath("$.name", equalToIgnoringCase(workflowName)))
-                // is default
-                .andExpect(jsonPath("$.isDefault", is(true)));
+        getClient(token).perform(get(WORKFLOW_DEFINITIONS_ENDPOINT + "/" + workflowName))
+            //We expect a 200 OK status
+            .andExpect(status().isOk())
+            //There needs to be a self link to this endpoint
+            .andExpect(jsonPath("$._links.self.href", containsString(WORKFLOW_DEFINITIONS_ENDPOINT)))
+            // its name is default
+            .andExpect(jsonPath("$.name", equalToIgnoringCase(workflowName)))
+            // is default
+            .andExpect(jsonPath("$.isDefault", is(true)));
     }
 
     @Test
     public void getWorkflowDefinitionByName_NonDefaultWorkflow() throws Exception {
+        String token = getAuthToken(eperson.getEmail(), password);
         Workflow defaultWorkflow = xmlWorkflowFactory.getDefaultWorkflow();
         List<Workflow> allConfiguredWorkflows = xmlWorkflowFactory.getAllConfiguredWorkflows();
         String firstNonDefaultWorkflowName = "";
@@ -139,106 +161,133 @@ public class WorkflowDefinitionRestRepositoryIT extends AbstractControllerIntegr
         }
         if (StringUtils.isNotBlank(firstNonDefaultWorkflowName)) {
             //When we call this facets endpoint
-            getClient().perform(get(WORKFLOW_DEFINITIONS_ENDPOINT + "/" + firstNonDefaultWorkflowName))
-                    //We expect a 200 OK status
-                    .andExpect(status().isOk())
-                    //There needs to be a self link to this endpoint
-                    .andExpect(jsonPath("$._links.self.href", containsString(WORKFLOW_DEFINITIONS_ENDPOINT)))
-                    // its name is name of non-default workflow
-                    .andExpect(jsonPath("$.name", equalToIgnoringCase(firstNonDefaultWorkflowName)))
-                    // is not default
-                    .andExpect(jsonPath("$.isDefault", is(false)));
+            getClient(token).perform(get(WORKFLOW_DEFINITIONS_ENDPOINT + "/" + firstNonDefaultWorkflowName))
+                //We expect a 200 OK status
+                .andExpect(status().isOk())
+                //There needs to be a self link to this endpoint
+                .andExpect(jsonPath("$._links.self.href", containsString(WORKFLOW_DEFINITIONS_ENDPOINT)))
+                // its name is name of non-default workflow
+                .andExpect(jsonPath("$.name", equalToIgnoringCase(firstNonDefaultWorkflowName)))
+                // is not default
+                .andExpect(jsonPath("$.isDefault", is(false)));
         }
     }
 
     @Test
     public void getWorkflowDefinitionByName_NonExistentWorkflow() throws Exception {
+        String token = getAuthToken(eperson.getEmail(), password);
         String workflowName = "TestNameNonExistentWorkflow9999";
         //When we call this facets endpoint
+        getClient(token).perform(get(WORKFLOW_DEFINITIONS_ENDPOINT + "/" + workflowName))
+            //We expect a 404 Not Found status
+            .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void getWorkflowDefinitionByName_DefaultWorkflow_NonValidToken() throws Exception {
+        String token = "UnvalidToken";
+        Workflow defaultWorkflow = xmlWorkflowFactory.getDefaultWorkflow();
+        String workflowName = defaultWorkflow.getID();
+        //When we call this facets endpoint
+        getClient(token).perform(get(WORKFLOW_DEFINITIONS_ENDPOINT + "/" + workflowName))
+            //We expect a 403 Forbidden status
+            .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void getWorkflowDefinitionByName_DefaultWorkflow_NoToken() throws Exception {
+        Workflow defaultWorkflow = xmlWorkflowFactory.getDefaultWorkflow();
+        String workflowName = defaultWorkflow.getID();
+        //When we call this facets endpoint
         getClient().perform(get(WORKFLOW_DEFINITIONS_ENDPOINT + "/" + workflowName))
-                //We expect a 404 Not Found status
-                .andExpect(status().isNotFound());
+            //We expect a 401 Unauthorized
+            .andExpect(status().isUnauthorized());
     }
 
     @Test
     public void getWorkflowDefinitionByCollectionId_ExistentCollection() throws Exception {
+        String token = getAuthToken(eperson.getEmail(), password);
         //We turn off the authorization system in order to create the structure as defined below
         context.turnOffAuthorisationSystem();
         //** GIVEN **
         //1. A community-collection structure with one parent community with sub-community and one collection.
         parentCommunity = CommunityBuilder.createCommunity(context)
-                .withName("Parent Community")
-                .build();
+            .withName("Parent Community")
+            .build();
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
-                .withName("Sub Community")
-                .build();
+            .withName("Sub Community")
+            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
         context.restoreAuthSystemState();
 
         Workflow workflowForThisCollection = xmlWorkflowFactory.getWorkflow(col1);
 
         //When we call this facets endpoint
-        getClient().perform(get(WORKFLOW_DEFINITIONS_ENDPOINT + "/search/findByCollection?uuid=" + col1.getID()))
-                //We expect a 200 OK status
-                .andExpect(status().isOk())
-                // its name is name of corresponding workflow
-                .andExpect(jsonPath("$.name", equalToIgnoringCase(workflowForThisCollection.getID())));
+        getClient(token).perform(get(WORKFLOW_DEFINITIONS_ENDPOINT + "/search/findByCollection?uuid=" + col1.getID()))
+            //We expect a 200 OK status
+            .andExpect(status().isOk())
+            // its name is name of corresponding workflow
+            .andExpect(jsonPath("$.name", equalToIgnoringCase(workflowForThisCollection.getID())));
     }
 
     @Test
     public void getWorkflowDefinitionByCollectionId_nonValidUUID() throws Exception {
+        String token = getAuthToken(eperson.getEmail(), password);
         String nonValidUUID = "TestNonValidUUID";
 
         //When we call this facets endpoint
-        getClient().perform(get(WORKFLOW_DEFINITIONS_ENDPOINT + "/search/findByCollection?uuid=" + nonValidUUID))
-                //We expect a 422 Unprocessable Entity status
-                .andExpect(status().is(422));
+        getClient(token).perform(get(WORKFLOW_DEFINITIONS_ENDPOINT + "/search/findByCollection?uuid=" + nonValidUUID))
+            //We expect a 422 Unprocessable Entity status
+            .andExpect(status().is(422));
     }
 
     @Test
     public void getWorkflowDefinitionByCollectionId_nonExistentCollection() throws Exception {
+        String token = getAuthToken(eperson.getEmail(), password);
         UUID nonExistentCollectionUUID = UUID.randomUUID();
 
         //When we call this facets endpoint
-        getClient().perform(get(WORKFLOW_DEFINITIONS_ENDPOINT + "/search/findByCollection?uuid="
-                + nonExistentCollectionUUID))
-                //We expect a 404 Not Found status
-                .andExpect(status().isNotFound());
+        getClient(token).perform(get(WORKFLOW_DEFINITIONS_ENDPOINT + "/search/findByCollection?uuid="
+            + nonExistentCollectionUUID))
+            //We expect a 404 Not Found status
+            .andExpect(status().isNotFound());
     }
 
     @Test
     public void getCollectionsOfWorkflowByName_DefaultWorkflow_AllNonMappedCollections() throws Exception {
+        String token = getAuthToken(eperson.getEmail(), password);
         Workflow defaultWorkflow = xmlWorkflowFactory.getDefaultWorkflow();
         List<Collection> allNonMappedCollections = xmlWorkflowFactory.getAllNonMappedCollectionsHandles(context);
 
         //When we call this facets endpoint
-        getClient().perform(get(WORKFLOW_DEFINITIONS_ENDPOINT + "/" + defaultWorkflow.getID()
-                + "/collections"))
-                //We expect a 200 OK status
-                .andExpect(status().isOk())
-                //Number of total workflows is equals to number of non-mapped collections
-                .andExpect(jsonPath("$.totalElements", is(allNonMappedCollections.size())));
+        getClient(token).perform(get(WORKFLOW_DEFINITIONS_ENDPOINT + "/" + defaultWorkflow.getID()
+            + "/collections"))
+            //We expect a 200 OK status
+            .andExpect(status().isOk())
+            //Number of total workflows is equals to number of non-mapped collections
+            .andExpect(jsonPath("$.totalElements", is(allNonMappedCollections.size())));
     }
 
     @Test
     public void getCollectionsOfWorkflowByName_DefaultWorkflow_AllNonMappedCollections_Paginated_Size1()
-            throws Exception {
+        throws Exception {
+        String token = getAuthToken(eperson.getEmail(), password);
         //We turn off the authorization system in order to create the structure as defined below
         context.turnOffAuthorisationSystem();
         //** GIVEN **
         //1. A community-collection structure with one parent community with sub-community and two collections.
         parentCommunity = CommunityBuilder.createCommunity(context)
-                .withName("Parent Community")
-                .build();
+            .withName("Parent Community")
+            .build();
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
-                .withName("Sub Community")
-                .build();
+            .withName("Sub Community")
+            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1)
-                .withName("Collection 1")
-                .build();
+            .withName("Collection 1")
+            .build();
         Collection col2 = CollectionBuilder.createCollection(context, child1, "123456789/non-mapped-collection")
-                .withName("Collection 2")
-                .build();
+            .withName("Collection 2")
+            .build();
         context.restoreAuthSystemState();
 
         Workflow defaultWorkflow = xmlWorkflowFactory.getDefaultWorkflow();
@@ -248,40 +297,41 @@ public class WorkflowDefinitionRestRepositoryIT extends AbstractControllerIntegr
             Collection firstNonMappedCollection = allNonMappedCollections.get(0);
 
             //When we call this facets endpoint
-            getClient().perform(get(WORKFLOW_DEFINITIONS_ENDPOINT + "/" + defaultWorkflow.getID()
-                    + "/collections")
-                    .param("size", "1"))
-                    //We expect a 200 OK status
-                    .andExpect(status().isOk())
-                    //Number of total workflows is equals to number of configured workflows
-                    .andExpect(jsonPath("$.totalElements", is(allNonMappedCollections.size())))
-                    //Page size is 1
-                    .andExpect(jsonPath("$.size", is(1)))
-                    //Page nr is 1
-                    .andExpect(jsonPath("$.number", is(0)))
-                    //Contains only the first non-mapped collection
-                    .andExpect(jsonPath("$.content", Matchers.contains(
-                            WorkflowDefinitionMatcher.matchCollectionEntry(firstNonMappedCollection.getName(),
-                                    firstNonMappedCollection.getID(), firstNonMappedCollection.getHandle())
-                    )));
+            getClient(token).perform(get(WORKFLOW_DEFINITIONS_ENDPOINT + "/" + defaultWorkflow.getID()
+                + "/collections")
+                .param("size", "1"))
+                //We expect a 200 OK status
+                .andExpect(status().isOk())
+                //Number of total workflows is equals to number of configured workflows
+                .andExpect(jsonPath("$.totalElements", is(allNonMappedCollections.size())))
+                //Page size is 1
+                .andExpect(jsonPath("$.size", is(1)))
+                //Page nr is 1
+                .andExpect(jsonPath("$.number", is(0)))
+                //Contains only the first non-mapped collection
+                .andExpect(jsonPath("$.content", Matchers.contains(
+                    WorkflowDefinitionMatcher.matchCollectionEntry(firstNonMappedCollection.getName(),
+                        firstNonMappedCollection.getID(), firstNonMappedCollection.getHandle())
+                )));
         }
     }
 
     @Test
     public void getCollectionsOfWorkflowByName_NonDefaultWorkflow() throws Exception {
+        String token = getAuthToken(eperson.getEmail(), password);
         //We turn off the authorization system in order to create the structure as defined below
         context.turnOffAuthorisationSystem();
         //** GIVEN **
         //1. A community-collection structure with one parent community with sub-community and one collection.
         parentCommunity = CommunityBuilder.createCommunity(context)
-                .withName("Parent Community")
-                .build();
+            .withName("Parent Community")
+            .build();
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
-                .withName("Sub Community")
-                .build();
+            .withName("Sub Community")
+            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1, "123456789/workflow-test-1")
-                .withName("Collection 1")
-                .build();
+            .withName("Collection 1")
+            .build();
         // until handle 123456789/5 used in example in workflow.xml (if uncommented)
         context.restoreAuthSystemState();
 
@@ -296,47 +346,73 @@ public class WorkflowDefinitionRestRepositoryIT extends AbstractControllerIntegr
 
         if (StringUtils.isNotBlank(firstNonDefaultWorkflowName)) {
             List<Collection> mappedCollections
-                    = xmlWorkflowFactory.getCollectionHandlesMappedToWorklow(context, firstNonDefaultWorkflowName);
+                = xmlWorkflowFactory.getCollectionHandlesMappedToWorklow(context, firstNonDefaultWorkflowName);
             //When we call this facets endpoint
             if (mappedCollections.size() > 0) {
                 //returns array of collection jsons that are mapped to given workflow
                 //When we call this facets endpoint
                 Collection firstMappedCollection = mappedCollections.get(0);
-                getClient().perform(get(WORKFLOW_DEFINITIONS_ENDPOINT + "/" + firstNonDefaultWorkflowName
-                        + "/collections")
-                        .param("size", "1"))
-                        //We expect a 200 OK status
-                        .andExpect(status().isOk())
-                        //Number of total workflows is equals to number of configured workflows
-                        .andExpect(jsonPath("$.totalElements", is(mappedCollections.size())))
-                        //Page size is 1
-                        .andExpect(jsonPath("$.size", is(1)))
-                        //Page nr is 1
-                        .andExpect(jsonPath("$.number", is(0)))
-                        //Contains only the first mapped collection
-                        .andExpect(jsonPath("$.content", Matchers.contains(
-                                WorkflowDefinitionMatcher.matchCollectionEntry(firstMappedCollection.getName(),
-                                        firstMappedCollection.getID(), firstMappedCollection.getHandle())
-                        )));
+                getClient(token).perform(get(WORKFLOW_DEFINITIONS_ENDPOINT + "/" + firstNonDefaultWorkflowName
+                    + "/collections")
+                    .param("size", "1"))
+                    //We expect a 200 OK status
+                    .andExpect(status().isOk())
+                    //Number of total workflows is equals to number of configured workflows
+                    .andExpect(jsonPath("$.totalElements", is(mappedCollections.size())))
+                    //Page size is 1
+                    .andExpect(jsonPath("$.size", is(1)))
+                    //Page nr is 1
+                    .andExpect(jsonPath("$.number", is(0)))
+                    //Contains only the first mapped collection
+                    .andExpect(jsonPath("$.content", Matchers.contains(
+                        WorkflowDefinitionMatcher.matchCollectionEntry(firstMappedCollection.getName(),
+                            firstMappedCollection.getID(), firstMappedCollection.getHandle())
+                    )));
             } else {
                 //no collections mapped to this workflow
                 getClient().perform(get(WORKFLOW_DEFINITIONS_ENDPOINT + "/"
-                        + firstNonDefaultWorkflowName + "/collections"))
-                        //We expect a 200 OK status
-                        .andExpect(status().isOk())
-                        //results in empty list
-                        .andExpect(jsonPath("$.content", empty()));
+                    + firstNonDefaultWorkflowName + "/collections"))
+                    //We expect a 200 OK status
+                    .andExpect(status().isOk())
+                    //results in empty list
+                    .andExpect(jsonPath("$.content", empty()));
             }
         }
     }
 
     @Test
     public void getCollectionsOfWorkflowByName_NonExistentWorkflow() throws Exception {
+        String token = getAuthToken(eperson.getEmail(), password);
         String workflowName = "TestNameNonExistentWorkflow9999";
 
         //When we call this facets endpoint
-        getClient().perform(get(WORKFLOW_DEFINITIONS_ENDPOINT + "/" + workflowName + "/collections"))
-                //We expect a 404 Not Found status
-                .andExpect(status().isNotFound());
+        getClient(token).perform(get(WORKFLOW_DEFINITIONS_ENDPOINT + "/" + workflowName + "/collections"))
+            //We expect a 404 Not Found status
+            .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void getCollectionsOfWorkflowByName_DefaultWorkflow_NoValidToken() throws Exception {
+        String token = "NonValidToken";
+        Workflow defaultWorkflow = xmlWorkflowFactory.getDefaultWorkflow();
+        List<Collection> allNonMappedCollections = xmlWorkflowFactory.getAllNonMappedCollectionsHandles(context);
+
+        //When we call this facets endpoint
+        getClient(token).perform(get(WORKFLOW_DEFINITIONS_ENDPOINT + "/" + defaultWorkflow.getID()
+            + "/collections"))
+            //We expect a 403 Forbidden status
+            .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void getCollectionsOfWorkflowByName_DefaultWorkflow_NoToken() throws Exception {
+        Workflow defaultWorkflow = xmlWorkflowFactory.getDefaultWorkflow();
+        List<Collection> allNonMappedCollections = xmlWorkflowFactory.getAllNonMappedCollectionsHandles(context);
+
+        //When we call this facets endpoint
+        getClient().perform(get(WORKFLOW_DEFINITIONS_ENDPOINT + "/" + defaultWorkflow.getID()
+            + "/collections"))
+            //We expect a 401 Unauthorized
+            .andExpect(status().isUnauthorized());
     }
 }
