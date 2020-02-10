@@ -92,7 +92,7 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
                 HttpStatus.UNPROCESSABLE_ENTITY.value());
     }
 
-    @ExceptionHandler( {MissingParameterException.class, QueryMethodParameterConversionException.class})
+    @ExceptionHandler(QueryMethodParameterConversionException.class)
     protected void ParameterConversionException(HttpServletRequest request, HttpServletResponse response, Exception ex)
         throws IOException {
 
@@ -102,6 +102,15 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
         sendErrorResponse(request, response, null,
                           ex.getMessage(),
                           HttpStatus.UNPROCESSABLE_ENTITY.value());
+    }
+
+    @ExceptionHandler(MissingParameterException.class)
+    protected void MissingParameterException(HttpServletRequest request, HttpServletResponse response, Exception ex)
+        throws IOException {
+
+        sendErrorResponse(request, response, null,
+                          ex.getMessage(),
+                          HttpStatus.BAD_REQUEST.value());
     }
 
     @Override
