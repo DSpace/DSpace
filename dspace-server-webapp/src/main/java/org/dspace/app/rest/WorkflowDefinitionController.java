@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -56,6 +57,7 @@ public class WorkflowDefinitionController {
      * @return List of collections mapped to the requested workflow
      */
     @RequestMapping(method = RequestMethod.GET, value = "/{workflowName}/collections")
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
     public Page<CollectionRest> getCollections(HttpServletRequest request, @PathVariable String workflowName,
                                                Pageable pageable) {
         if (xmlWorkflowFactory.workflowByThisNameExists(workflowName)) {

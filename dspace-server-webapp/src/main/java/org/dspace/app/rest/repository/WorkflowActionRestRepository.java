@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 /**
@@ -30,6 +31,7 @@ public class WorkflowActionRestRepository extends DSpaceRestRepository<WorkflowA
     protected XmlWorkflowFactory xmlWorkflowFactory;
 
     @Override
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
     public WorkflowActionRest findOne(Context context, String workflowActionName) {
         WorkflowActionConfig actionConfig = this.xmlWorkflowFactory.getActionByName(workflowActionName);
         if (actionConfig != null) {
@@ -41,6 +43,7 @@ public class WorkflowActionRestRepository extends DSpaceRestRepository<WorkflowA
     }
 
     @Override
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
     public Page<WorkflowActionRest> findAll(Context context, Pageable pageable) {
         throw new RepositoryMethodNotImplementedException(WorkflowActionRest.NAME, "findAll");
     }
