@@ -24,7 +24,7 @@ import java.util.Base64;
 
 import org.dspace.app.rest.builder.GroupBuilder;
 import org.dspace.app.rest.matcher.EPersonMatcher;
-import org.dspace.app.rest.matcher.ProjectionsMatcher;
+import org.dspace.app.rest.matcher.HalMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.eperson.Group;
 import org.dspace.services.ConfigurationService;
@@ -59,7 +59,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
     @Test
     public void testStatusAuthenticated() throws Exception {
         String token = getAuthToken(eperson.getEmail(), password);
-        ProjectionsMatcher projectionsMatcher = new ProjectionsMatcher();
+        HalMatcher projectionsMatcher = new HalMatcher();
 
         getClient(token).perform(get("/api/authn/status").param("projection", "full"))
 

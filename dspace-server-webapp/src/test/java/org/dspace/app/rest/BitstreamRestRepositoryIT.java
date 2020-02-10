@@ -26,7 +26,7 @@ import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.builder.ItemBuilder;
 import org.dspace.app.rest.matcher.BitstreamFormatMatcher;
 import org.dspace.app.rest.matcher.BitstreamMatcher;
-import org.dspace.app.rest.matcher.ProjectionsMatcher;
+import org.dspace.app.rest.matcher.HalMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.app.rest.test.MetadataPatchSuite;
 import org.dspace.content.Bitstream;
@@ -251,7 +251,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
 
         //We turn off the authorization system in order to create the structure as defined below
         context.turnOffAuthorisationSystem();
-        ProjectionsMatcher projectionsMatcher = new ProjectionsMatcher();
+        HalMatcher projectionsMatcher = new HalMatcher();
 
 
         //** GIVEN **

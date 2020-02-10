@@ -5,95 +5,76 @@ import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasNoJsonPath;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.hamcrest.Matcher;
 
 /**
- * Utility class to construct a Matcher for an item
+ * Utility class to construct matchers for HAL resources.
  *
  * @author Andrew Wood (AndrewZDemouraAtmire at gmail dot com)
  */
-    public class ProjectionsMatcher {
+public class HalMatcher {
 
-    public ProjectionsMatcher() { }
-
+    public HalMatcher() { }
 
     /**
-     * Check that the full set of embeds are included for ItemRest
+     * Gets a matcher for no _embedded property.
      */
-    public static Matcher<? super Object> matchItemEmbeds() {
-        return allOf(
-                hasJsonPath("$._embedded.relationships._embedded.relationships"),
-                hasJsonPath("$._embedded.owningCollection"),
-                hasJsonPath("$._embedded.bundles._embedded.bundles"),
-                hasJsonPath("$._embedded.templateItemOf"),
-                hasJsonPath("$._embedded.length()", equalTo(4))
-        );
+    public static Matcher<? super Object> matchNoEmbeds() {
+        return hasNoJsonPath("$._embedded");
     }
 
     /**
-     * Check that the full set of links are included for ItemRest
+     * Gets a matcher for the given set of _embedded rels.
+     *
+     * The matcher checks that exactly the given set of embeds is included. It does not verify exact values;
+     * just that a value is given for each specified rel name. Value verification, if needed, should use
+     * a separate matcher.
+     *
+     * @param rels the names of the rels. If a given name ends with "[]", it is assumed to be a paged subresource
+     *             and must therefore contain an embeded array with the same property name as the rel (without the []).
      */
-    public static Matcher<? super Object> matchItemLinks() {
-        return allOf(
-                hasJsonPath("$._links.bundles.href"),
-                hasJsonPath("$._links.mappedCollections.href"),
-                hasJsonPath("$._links.owningCollection.href"),
-                hasJsonPath("$._links.relationships.href"),
-                hasJsonPath("$._links.templateItemOf.href"),
-                hasJsonPath("$._links.self.href", containsString("/api/core/items")),
-                hasJsonPath("$._links.length()", equalTo(6))
-        );
+    public static Matcher<? super Object> matchEmbeds(String... rels) {
+        if (rels.length == 0) {
+            return matchNoEmbeds();
+        }
+        List<Matcher<? super Object>> matchers = new ArrayList<>();
+        for (String rel : rels) {
+            if (rel.endsWith("[]")) {
+                // paged
+                rel = rel.replace("[]", "");
+                matchers.add(hasJsonPath("$._embedded." + rel + "._embedded." + rel));
+            } else {
+                // non-paged
+                matchers.add(hasJsonPath("$._embedded." + rel));
+            }
+        }
+        matchers.add(hasJsonPath("$._embedded.length()", equalTo(rels.length)));
+        return allOf(matchers);
     }
 
     /**
-     * Check that the full set of embeds are included for CommunityRest
+     * Gets a matcher for the given set of _link rels.
+     *
+     * The matcher checks that exactly the given set of links is included, and that each has the expected
+     * href value.
+     *
+     * @param selfHref the href
+     * @param rels the names of the rels, which are assumed to be subresources and thus have hrefs ending with
+     *             "/rel"
      */
-    public static Matcher<? super Object> matchCommunityEmbeds() {
-        return allOf(
-                hasJsonPath("$._embedded.collections._embedded.collections"),
-                hasJsonPath("$._embedded.logo"),
-                hasJsonPath("$._embedded.length()", equalTo(2))
-        );
-    }
-
-    /**
-     * Check that the full set of links are included for CommunityRest
-     */
-    public static Matcher<? super Object> matchCommunityLinks() {
-        return allOf(
-                hasJsonPath("$._links.collections.href"),
-                hasJsonPath("$._links.logo.href"),
-                hasJsonPath("$._links.subcommunities.href"),
-                hasJsonPath("$._links.self.href", containsString("/api/core/communities")),
-                hasJsonPath("$._links.length()", equalTo(4))
-        );
-    }
-
-    /**
-     * Check that the full set of embeds are included for CollectionRest
-     */
-    public static Matcher<? super Object> matchCollectionEmbeds() {
-        return allOf(
-                hasJsonPath("$._embedded.logo"),
-                hasJsonPath("$._embedded.defaultAccessConditions._embedded.defaultAccessConditions"),
-                hasJsonPath("$._embedded.length()", equalTo(2))
-        );
-    }
-
-    /**
-     * Check that the full set of links are included for CollectionRest
-     */
-    public static Matcher<? super Object> matchCollectionLinks() {
-        return allOf(
-                hasJsonPath("$._links.harvester.href"),
-                hasJsonPath("$._links.itemtemplate.href"),
-                hasJsonPath("$._links.defaultAccessConditions.href"),
-                hasJsonPath("$._links.license.href"),
-                hasJsonPath("$._links.logo.href"),
-                hasJsonPath("$._links.self.href", containsString("/api/core/collections")),
-                hasJsonPath("$._links.length()", equalTo(7))
-        );
+    public static Matcher<? super Object> hasLinks(String selfHref, String... rels) {
+        List<Matcher<? super Object>> matchers = new ArrayList<>();
+        for (String rel : rels) {
+            String href = rel.equals("self") ? selfHref : selfHref + "/" + rel;
+            matchers.add(hasJsonPath("$._links." + rel + ".href", is(href)));
+        }
+        matchers.add(hasJsonPath("$._links.length()", equalTo(rels.length)));
+        return allOf(matchers);
     }
 
     /**
@@ -265,15 +246,6 @@ import org.hamcrest.Matcher;
                 hasJsonPath("$._links.sections.href"),
                 hasJsonPath("$._links.self.href", containsString("/api/config/submissiondefinitions/traditional")),
                 hasJsonPath("$._links.length()", equalTo(3))
-        );
-    }
-
-    /**
-     * Check that there is no top level _embedded node in the a rest response
-     */
-    public static Matcher<? super Object> matchNoEmbeds() {
-        return allOf(
-                hasNoJsonPath("$._embedded")
         );
     }
 }

@@ -25,7 +25,7 @@ import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.builder.EPersonBuilder;
 import org.dspace.app.rest.matcher.MetadataConfigsMatcher;
-import org.dspace.app.rest.matcher.ProjectionsMatcher;
+import org.dspace.app.rest.matcher.HalMatcher;
 import org.dspace.app.rest.model.HarvestTypeEnum;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.authorize.AuthorizeException;
@@ -110,7 +110,7 @@ public class CollectionHarvestSettingsControllerIT extends AbstractControllerInt
     @Test
     public void GetCollectionHarvestSettings() throws Exception {
         String token = getAuthToken(admin.getEmail(), password);
-        ProjectionsMatcher projectionsMatcher = new ProjectionsMatcher();
+        HalMatcher projectionsMatcher = new HalMatcher();
 
         List<Map<String,String>> configs = OAIHarvester.getAvailableMetadataFormats();
 

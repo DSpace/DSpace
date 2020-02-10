@@ -19,7 +19,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
-import org.dspace.app.rest.matcher.ProjectionsMatcher;
+import org.dspace.app.rest.matcher.HalMatcher;
 import org.dspace.app.rest.matcher.SubmissionDefinitionsMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.content.Collection;
@@ -65,7 +65,7 @@ public class SubmissionDefinitionsControllerIT extends AbstractControllerIntegra
 
     @Test
     public void findDefault() throws Exception {
-        ProjectionsMatcher projectionsMatcher = new ProjectionsMatcher();
+        HalMatcher projectionsMatcher = new HalMatcher();
 
         getClient().perform(get("/api/config/submissiondefinitions/traditional"))
                    //The status has to be 403 Not Authorized

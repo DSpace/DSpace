@@ -22,7 +22,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.app.rest.builder.GroupBuilder;
 import org.dspace.app.rest.matcher.GroupMatcher;
-import org.dspace.app.rest.matcher.ProjectionsMatcher;
+import org.dspace.app.rest.matcher.HalMatcher;
 import org.dspace.app.rest.model.GroupRest;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.app.rest.test.MetadataPatchSuite;
@@ -156,7 +156,7 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
     @Test
     public void findOneTest() throws Exception {
         context.turnOffAuthorisationSystem();
-        ProjectionsMatcher projectionsMatcher = new ProjectionsMatcher();
+        HalMatcher projectionsMatcher = new HalMatcher();
 
         String testGroupName = "Test group";
         Group group = GroupBuilder.createGroup(context)

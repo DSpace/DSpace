@@ -28,7 +28,7 @@ import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.matcher.CollectionMatcher;
 import org.dspace.app.rest.matcher.MetadataMatcher;
 import org.dspace.app.rest.matcher.PageMatcher;
-import org.dspace.app.rest.matcher.ProjectionsMatcher;
+import org.dspace.app.rest.matcher.HalMatcher;
 import org.dspace.app.rest.model.CollectionRest;
 import org.dspace.app.rest.model.MetadataRest;
 import org.dspace.app.rest.model.MetadataValueRest;
@@ -140,7 +140,6 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
 
         //We turn off the authorization system in order to create the structure as defined below
         context.turnOffAuthorisationSystem();
-        ProjectionsMatcher projectionsMatcher = new ProjectionsMatcher();
 
         //** GIVEN **
         //1. A community-collection structure with one parent community with sub-community and one collection.
@@ -158,25 +157,22 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
 
         context.restoreAuthSystemState();
 
+        // When full projection is requested, response should include expected properties, links, and embeds.
         getClient().perform(get("/api/core/collections/" + col1.getID())
-                   .param("projection", "full"))
-                   .andExpect(status().isOk())
-                   .andExpect(jsonPath("$", projectionsMatcher.matchCollectionEmbeds()))
-                   .andExpect(jsonPath("$", projectionsMatcher.matchCollectionLinks()))
-                   .andExpect(content().contentType(contentType))
-                   .andExpect(jsonPath("$", is(
-                       CollectionMatcher.matchCollectionEntry(col1.getName(), col1.getID(), col1.getHandle())
-                   )))
-                   .andExpect(jsonPath("$", Matchers.not(
-                       is(
-                           CollectionMatcher.matchCollectionEntry(col2.getName(), col2.getID(), col2.getHandle())
-                       ))))
-        ;
+                .param("projection", "full"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$", CollectionMatcher.matchFullEmbeds()))
+                .andExpect(jsonPath("$", CollectionMatcher.matchCollectionEntry(
+                        col1.getName(), col1.getID(), col1.getHandle())));
 
+        // When no projection is requested, response should include expected properties, links, and no embeds.
         getClient().perform(get("/api/core/collections/" + col1.getID()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", projectionsMatcher.matchNoEmbeds()))
-        ;
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()))
+                .andExpect(jsonPath("$", CollectionMatcher.matchProperties(
+                        col1.getName(), col1.getID(), col1.getHandle())));
     }
 
     @Test
