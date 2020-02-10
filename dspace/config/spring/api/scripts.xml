@@ -9,7 +9,7 @@
         <property name="description" value="Update Discovery Solr Search Index"/>
     </bean>
 
-    <bean id="retry-tracker" class="org.dspace.statistics.export.RetryfailedOpenUrlTracker" scope="prototype">
+    <bean id="retry-tracker" class="org.dspace.statistics.export.RetryFailedOpenUrlTracker" scope="prototype">
         <property name="name" value="retry-tracker"/>
         <property name="description" value="Retry all failed commits to the OpenURLTracker"/>
     </bean>

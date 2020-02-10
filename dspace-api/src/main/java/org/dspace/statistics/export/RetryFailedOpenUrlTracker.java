@@ -19,7 +19,7 @@ import org.dspace.statistics.export.service.OpenUrlService;
  * Script to retry the failed url transmissions to IRUS
  * This script also has an option to add new failed urls for testing purposes
  */
-public class RetryfailedOpenUrlTracker extends DSpaceRunnable {
+public class RetryFailedOpenUrlTracker extends DSpaceRunnable {
 
     private Context context = null;
     private String lineToAdd = null;
@@ -82,7 +82,7 @@ public class RetryfailedOpenUrlTracker extends DSpaceRunnable {
         }
     }
 
-    private RetryfailedOpenUrlTracker() {
+    private RetryFailedOpenUrlTracker() {
         Options options = constructOptions();
         this.options = options;
     }
