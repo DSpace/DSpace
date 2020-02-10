@@ -9,6 +9,7 @@ package org.dspace.statistics;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,6 +29,8 @@ import com.maxmind.geoip2.record.Traits;
 import mockit.Deencapsulation;
 import mockit.Mock;
 import mockit.MockUp;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Mock service to mock the location Lookup Service used by the SOLR statistics
@@ -35,14 +38,17 @@ import mockit.MockUp;
  */
 public class FakeDatabaseReader
         extends MockUp<DatabaseReader> {
+    private static final Logger LOG = LogManager.getLogger();
 
     FakeDatabaseReader() {
     }
 
-    public FakeDatabaseReader(Object object) {
+    private FakeDatabaseReader(Builder builder) {
+        LOG.debug("constructor({})", () -> builder.toString());
     }
 
     public FakeDatabaseReader $init(Builder builder) {
+        LOG.debug("$init({})", () -> builder.toString());
         return this;
     }
 
@@ -67,6 +73,8 @@ public class FakeDatabaseReader
 
     @Mock
     public CityResponse city(InetAddress address) {
+        LOG.debug("city({})", () -> address.toString());
+
         List<String> names = new ArrayList<>(1);
 
         names.add("New York");
@@ -103,15 +111,30 @@ public class FakeDatabaseReader
 
         /**
          * Fake constructor.
+         * @param stream ignored.
+         */
+        @Mock
+        public void $init(InputStream stream) {
+            LOG.debug("Builder.$init(\"{}\")", () -> stream.toString());
+        }
+
+        /**
+         * Fake constructor.
          * @param file ignored.
          */
         @Mock
         public void $init(File file) {
+            try {
+                LOG.debug("Builder.$init(\"{}\")", file.getCanonicalPath());
+            } catch (IOException e) {
+                LOG.warn("Cannot getCanonicalPath(file):  {}", e.getMessage(), e);
+            }
         }
 
         @Mock
         public DatabaseReader build()
                 throws IOException {
+            LOG.debug("build");
             return Deencapsulation.newUninitializedInstance(DatabaseReader.class);
         }
     }

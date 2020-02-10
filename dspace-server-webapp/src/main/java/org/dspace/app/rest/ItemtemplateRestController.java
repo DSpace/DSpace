@@ -30,6 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ControllerUtils;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.hateoas.ResourceSupport;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -125,7 +126,7 @@ public class ItemtemplateRestController {
         ItemRest templateItem = itemRestRepository.patchTemplateItem(item, jsonNode);
         context.commit();
 
-        return ControllerUtils.toResponseEntity(HttpStatus.OK, null,
+        return ControllerUtils.toResponseEntity(HttpStatus.OK, new HttpHeaders(),
             new ItemResource(templateItem, utils));
     }
 

@@ -60,9 +60,6 @@ public class EntityTypeServiceImplTest   {
         // Declare objects utilized in unit test
         List<EntityType> entityTypeList = new ArrayList<>();
 
-        // Mock DAO to return our mocked entityTypeList
-        when(entityTypeDAO.findAll(context, EntityType.class)).thenReturn(entityTypeList);
-
         // The EntityType(s) reported from our mocked state should match our entityTypeList
         assertEquals("TestFindAll 0", entityTypeList, entityTypeService.findAll(context));
     }

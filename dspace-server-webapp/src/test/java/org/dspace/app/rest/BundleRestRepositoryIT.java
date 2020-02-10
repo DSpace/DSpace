@@ -9,7 +9,6 @@ package org.dspace.app.rest;
 
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -164,7 +163,8 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
                                                      bundle2.getBitstreams())
 
                    )))
-                   .andExpect(jsonPath("$._links.self.href", endsWith("/api/core/items/" + item.getID() + "/bundles")))
+                   .andExpect(jsonPath("$._links.self.href",
+                           Matchers.containsString("/api/core/items/" + item.getID() + "/bundles")))
         ;
     }
 

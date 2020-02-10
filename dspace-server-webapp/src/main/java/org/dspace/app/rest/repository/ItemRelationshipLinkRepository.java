@@ -53,7 +53,7 @@ public class ItemRelationshipLinkRepository extends AbstractDSpaceRestRepository
             }
             Pageable pageable = optionalPageable != null ? optionalPageable : new PageRequest(0, 20);
             Integer limit = pageable == null ? null : pageable.getPageSize();
-            Integer offset = pageable == null ? null : pageable.getOffset();
+            Integer offset = pageable == null ? null : Math.toIntExact(pageable.getOffset());
             int total = relationshipService.countByItem(context, item);
             List<Relationship> relationships = relationshipService.findByItem(context, item, limit, offset);
             return converter.toRestPage(relationships, pageable, total, projection);

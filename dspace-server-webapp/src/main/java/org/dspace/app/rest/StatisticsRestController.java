@@ -28,6 +28,7 @@ import org.springframework.data.rest.webmvc.ControllerUtils;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedResources;
 import org.springframework.hateoas.ResourceSupport;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -96,13 +97,13 @@ public class StatisticsRestController implements InitializingBean {
     @RequestMapping(method = RequestMethod.POST, value = "/viewevents")
     public ResponseEntity<ResourceSupport> postViewEvent() throws Exception {
         ViewEventResource result = converter.toResource(viewEventRestRepository.createViewEvent());
-        return ControllerUtils.toResponseEntity(HttpStatus.CREATED, null, result);
+        return ControllerUtils.toResponseEntity(HttpStatus.CREATED, new HttpHeaders(), result);
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "/searchevents")
     public ResponseEntity<ResourceSupport> postSearchEvent() throws Exception {
         SearchEventResource result = converter.toResource(searchEventRestRepository.createSearchEvent());
-        return ControllerUtils.toResponseEntity(HttpStatus.CREATED, null, result);
+        return ControllerUtils.toResponseEntity(HttpStatus.CREATED, new HttpHeaders(), result);
     }
 
 }

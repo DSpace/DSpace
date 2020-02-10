@@ -56,7 +56,6 @@ public class EPersonClaimProviderTest {
     public void setUp() throws Exception {
         context = Mockito.mock(Context.class);
         Mockito.doCallRealMethod().when(context).setCurrentUser(any(EPerson.class));
-        Mockito.doCallRealMethod().when(context).getCurrentUser();
         when(ePerson.getID()).thenReturn(UUID.fromString("c3bae216-a481-496b-a524-7df5aabdb609"));
         jwtClaimsSet = new JWTClaimsSet.Builder()
             .claim(EPersonClaimProvider.EPERSON_ID, "c3bae216-a481-496b-a524-7df5aabdb609")
