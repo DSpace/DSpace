@@ -80,7 +80,8 @@ public class CommunityMatcher {
     public static Matcher<? super Object> matchFullEmbeds() {
         return matchEmbeds(
                 "collections[]",
-                "logo"
+                "logo",
+                "subcommunities[]"
         );
     }
 
