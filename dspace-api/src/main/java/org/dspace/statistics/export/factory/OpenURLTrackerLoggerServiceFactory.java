@@ -8,7 +8,7 @@
 package org.dspace.statistics.export.factory;
 
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.dspace.statistics.export.service.OpenURLTrackerLoggerService;
+import org.dspace.statistics.export.service.FailedOpenURLTrackerService;
 import org.dspace.statistics.export.service.OpenUrlService;
 
 /**
@@ -17,10 +17,10 @@ import org.dspace.statistics.export.service.OpenUrlService;
 public abstract class OpenURLTrackerLoggerServiceFactory {
 
     /**
-     * Returns the OpenURLTrackerLoggerService
-     * @return OpenURLTrackerLoggerService instance
+     * Returns the FailedOpenURLTrackerService
+     * @return FailedOpenURLTrackerService instance
      */
-    public abstract OpenURLTrackerLoggerService getOpenUrlTrackerLoggerService();
+    public abstract FailedOpenURLTrackerService getOpenUrlTrackerLoggerService();
 
     /**
      * Retrieve the OpenURLTrackerLoggerServiceFactory

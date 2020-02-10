@@ -212,7 +212,7 @@
         <name>retry-tracker</name>
         <description>Retry all failed commits to the OpenURLTracker</description>
         <step>
-            <class>org.dspace.statistics.export.RetryOpenUrlTracker</class>
+            <class>org.dspace.statistics.export.RetryfailedOpenUrlTracker</class>
         </step>
     </command>
     <command>

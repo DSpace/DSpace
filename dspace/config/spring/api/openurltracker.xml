@@ -4,7 +4,7 @@
        default-lazy-init="true">
 
 
-    <bean class="org.dspace.statistics.export.OpenURLTrackerLoggerServiceImpl"/>
+    <bean class="org.dspace.statistics.export.FailedOpenURLTrackerServiceImpl"/>
     <bean class="org.dspace.statistics.export.service.OpenUrlServiceImpl"/>
 
 </beans>

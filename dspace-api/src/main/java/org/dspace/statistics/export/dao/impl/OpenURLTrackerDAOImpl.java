@@ -12,10 +12,12 @@ import org.dspace.statistics.export.OpenURLTracker;
 import org.dspace.statistics.export.dao.OpenURLTrackerDAO;
 
 /**
- * Created by jonas - jonas@atmire.com on 09/02/17.
+ * Hibernate implementation of the Database Access Object interface class for the OpenURLTracker object.
+ * This class is responsible for all database calls for the OpenURLTracker object and is autowired by spring
+ * This class should never be accessed directly.
+ *
  */
 public class OpenURLTrackerDAOImpl extends AbstractHibernateDAO<OpenURLTracker> implements OpenURLTrackerDAO {
-
 
     protected OpenURLTrackerDAOImpl() {
         super();

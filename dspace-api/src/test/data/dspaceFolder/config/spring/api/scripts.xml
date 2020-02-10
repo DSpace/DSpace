@@ -14,7 +14,7 @@
         <property name="description" value="Mocking a script for testing purposes" />
     </bean>
 
-    <bean id="retry-tracker" class="org.dspace.statistics.export.RetryOpenUrlTracker" scope="prototype">
+    <bean id="retry-tracker" class="org.dspace.statistics.export.RetryfailedOpenUrlTracker" scope="prototype">
         <property name="name" value="retry-tracker"/>
         <property name="description" value="Retry all failed commits to the OpenURLTracker"/>
     </bean>

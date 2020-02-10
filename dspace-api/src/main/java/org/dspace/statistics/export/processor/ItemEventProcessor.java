@@ -44,7 +44,7 @@ public class ItemEventProcessor extends ExportEventProcessor {
      */
     public void processEvent() throws SQLException, IOException {
         if (shouldProcessItem(item)) {
-            String baseParam = getBaseParamaters(item);
+            String baseParam = getBaseParameters(item);
             String fullParam = addObjectSpecificData(baseParam, item);
             processObject(fullParam);
         }
@@ -60,10 +60,10 @@ public class ItemEventProcessor extends ExportEventProcessor {
     protected String addObjectSpecificData(final String string, Item item) throws UnsupportedEncodingException {
         StringBuilder data = new StringBuilder(string);
         String itemInfo = getItemInfo(item);
-        data.append("&").append(URLEncoder.encode("svc_dat", "UTF-8")).append("=")
-            .append(URLEncoder.encode(itemInfo, "UTF-8"));
-        data.append("&").append(URLEncoder.encode("rft_dat", "UTF-8")).append("=")
-            .append(URLEncoder.encode(ITEM_VIEW, "UTF-8"));
+        data.append("&").append(URLEncoder.encode("svc_dat", UTF_8)).append("=")
+            .append(URLEncoder.encode(itemInfo, UTF_8));
+        data.append("&").append(URLEncoder.encode("rft_dat", UTF_8)).append("=")
+            .append(URLEncoder.encode(ITEM_VIEW, UTF_8));
         return data.toString();
     }
 

@@ -26,13 +26,13 @@ import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
 /**
- * Class to test the OpenURLTrackerLoggerServiceImpl
+ * Class to test the FailedOpenURLTrackerServiceImpl
  */
 @RunWith(MockitoJUnitRunner.class)
-public class OpenURLTrackerLoggerServiceImplTest {
+public class FailedOpenURLTrackerServiceImplTest {
 
     @InjectMocks
-    private OpenURLTrackerLoggerServiceImpl openURLTrackerLoggerService;
+    private FailedOpenURLTrackerServiceImpl openURLTrackerLoggerService;
 
     @Mock
     private Context context;

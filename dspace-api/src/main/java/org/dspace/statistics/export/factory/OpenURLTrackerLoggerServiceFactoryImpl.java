@@ -7,7 +7,7 @@
  */
 package org.dspace.statistics.export.factory;
 
-import org.dspace.statistics.export.service.OpenURLTrackerLoggerService;
+import org.dspace.statistics.export.service.FailedOpenURLTrackerService;
 import org.dspace.statistics.export.service.OpenUrlService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -17,18 +17,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class OpenURLTrackerLoggerServiceFactoryImpl extends OpenURLTrackerLoggerServiceFactory {
 
     @Autowired(required = true)
-    private OpenURLTrackerLoggerService openURLTrackerLoggerService;
+    private FailedOpenURLTrackerService failedOpenURLTrackerService;
 
     @Autowired(required = true)
     private OpenUrlService openUrlService;
 
     /**
-     * Returns the OpenURLTrackerLoggerService
-     * @return OpenURLTrackerLoggerService instance
+     * Returns the FailedOpenURLTrackerService
+     * @return FailedOpenURLTrackerService instance
      */
     @Override
-    public OpenURLTrackerLoggerService getOpenUrlTrackerLoggerService() {
-        return openURLTrackerLoggerService;
+    public FailedOpenURLTrackerService getOpenUrlTrackerLoggerService() {
+        return failedOpenURLTrackerService;
     }
 
     /**

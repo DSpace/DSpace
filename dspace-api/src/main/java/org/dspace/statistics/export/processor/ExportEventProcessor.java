@@ -17,6 +17,7 @@ import java.util.Date;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.codec.CharEncoding;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.content.DCDate;
@@ -67,6 +68,8 @@ public abstract class ExportEventProcessor {
 
     protected static OpenUrlService openUrlService;
 
+    protected final static String UTF_8 = CharEncoding.UTF_8;
+
 
     protected Context context;
     protected HttpServletRequest request;
@@ -111,7 +114,7 @@ public abstract class ExportEventProcessor {
      * @return the parameter string to be used in the url
      * @throws UnsupportedEncodingException
      */
-    protected String getBaseParamaters(Item item)
+    protected String getBaseParameters(Item item)
             throws UnsupportedEncodingException {
 
         //We have a valid url collect the rest of the data
@@ -134,20 +137,20 @@ public abstract class ExportEventProcessor {
 
         //Start adding our data
         StringBuilder data = new StringBuilder();
-        data.append(URLEncoder.encode("url_ver", "UTF-8") + "=" + URLEncoder.encode(trackerUrlVersion, "UTF-8"));
-        data.append("&").append(URLEncoder.encode("req_id", "UTF-8")).append("=")
-            .append(URLEncoder.encode(clientIP, "UTF-8"));
-        data.append("&").append(URLEncoder.encode("req_dat", "UTF-8")).append("=")
-            .append(URLEncoder.encode(clientUA, "UTF-8"));
-        data.append("&").append(URLEncoder.encode("rft.artnum", "UTF-8")).append("=").
+        data.append(URLEncoder.encode("url_ver", UTF_8) + "=" + URLEncoder.encode(trackerUrlVersion, UTF_8));
+        data.append("&").append(URLEncoder.encode("req_id", UTF_8)).append("=")
+            .append(URLEncoder.encode(clientIP, UTF_8));
+        data.append("&").append(URLEncoder.encode("req_dat", UTF_8)).append("=")
+            .append(URLEncoder.encode(clientUA, UTF_8));
+        data.append("&").append(URLEncoder.encode("rft.artnum", UTF_8)).append("=").
                 append(URLEncoder.encode("oai:" + configurationService.getProperty("dspace.hostname") + ":" + item
-                        .getHandle(), "UTF-8"));
-        data.append("&").append(URLEncoder.encode("rfr_dat", "UTF-8")).append("=")
-            .append(URLEncoder.encode(referer, "UTF-8"));
-        data.append("&").append(URLEncoder.encode("rfr_id", "UTF-8")).append("=")
-            .append(URLEncoder.encode(configurationService.getProperty("dspace.hostname"), "UTF-8"));
-        data.append("&").append(URLEncoder.encode("url_tim", "UTF-8")).append("=")
-            .append(URLEncoder.encode(getCurrentDateString(), "UTF-8"));
+                        .getHandle(), UTF_8));
+        data.append("&").append(URLEncoder.encode("rfr_dat", UTF_8)).append("=")
+            .append(URLEncoder.encode(referer, UTF_8));
+        data.append("&").append(URLEncoder.encode("rfr_id", UTF_8)).append("=")
+            .append(URLEncoder.encode(configurationService.getProperty("dspace.hostname"), UTF_8));
+        data.append("&").append(URLEncoder.encode("url_tim", UTF_8)).append("=")
+            .append(URLEncoder.encode(getCurrentDateString(), UTF_8));
 
         return data.toString();
     }
