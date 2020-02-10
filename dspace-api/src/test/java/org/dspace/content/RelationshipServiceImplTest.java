@@ -230,7 +230,6 @@ public class RelationshipServiceImplTest {
     public void testDelete() throws Exception {
 
         // Declare objects utilized in unit test
-        MetadataValue metVal = mock(MetadataValue.class);
         List<Relationship> leftTypelist = new ArrayList<>();
         List<Relationship> rightTypelist = new ArrayList<>();
         Item leftItem = mock(Item.class);

@@ -7,6 +7,7 @@
  */
 package org.dspace.content;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -65,6 +66,8 @@ public class ThumbnailTest extends AbstractUnitTest {
             thumb = bitstreamService.create(context, new FileInputStream(f));
             orig = bitstreamService.create(context, new FileInputStream(f));
             Thumbnail t = new Thumbnail(thumb, orig);
+            assertEquals(orig, t.getOriginal());
+            assertEquals(thumb, t.getThumb());
         } catch (IOException ex) {
             log.error("IO Error in init", ex);
             fail("SQL Error in init: " + ex.getMessage());
@@ -84,8 +87,14 @@ public class ThumbnailTest extends AbstractUnitTest {
     @After
     @Override
     public void destroy() {
-        thumb = null;
-        orig = null;
+        try {
+            bitstreamService.delete(context, thumb);
+            bitstreamService.delete(context, orig);
+            thumb = null;
+            orig = null;
+        } catch (Exception e) {
+            throw new AssertionError("Error in destroy()", e);
+        }
         super.destroy();
     }
 
