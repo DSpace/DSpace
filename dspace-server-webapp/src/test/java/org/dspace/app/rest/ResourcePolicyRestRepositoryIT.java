@@ -55,7 +55,6 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.hamcrest.Matchers;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -371,7 +370,6 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
     }
 
     @Test
-    @Ignore("Currently fail due to https://jira.lyrasis.org/browse/DS-4428")
     public void findResoucesPoliciesEPersonWithoutParametersBadRequestTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
@@ -620,7 +618,6 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
   }
 
   @Test
-  @Ignore("Currently fail due to https://jira.lyrasis.org/browse/DS-4428")
   public void findResoucesPoliciesOfResourceWithoutParametersBadRequestTest() throws Exception {
       context.turnOffAuthorisationSystem();
 
@@ -831,7 +828,6 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
     }
 
     @Test
-    @Ignore("Currently fail due to https://jira.lyrasis.org/browse/DS-4428")
     public void findResoucesPoliciesByGroupWithoutParametersBadRequestTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
