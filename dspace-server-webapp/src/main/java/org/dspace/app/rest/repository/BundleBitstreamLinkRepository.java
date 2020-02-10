@@ -29,7 +29,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 /**
- * Link repository for "relationships" subresource of an individual bundle.
+ * Link repository for "bitstreams" subresource of an individual bundle.
  */
 @Component(BundleRest.CATEGORY + "." + BundleRest.NAME + "." + BundleRest.BITSTREAMS)
 public class BundleBitstreamLinkRepository extends AbstractDSpaceRestRepository
