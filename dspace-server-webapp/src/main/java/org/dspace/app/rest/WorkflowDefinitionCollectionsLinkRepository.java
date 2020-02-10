@@ -9,34 +9,36 @@ package org.dspace.app.rest;
 
 import java.util.ArrayList;
 import java.util.List;
+import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletRequest;
 
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.model.CollectionRest;
 import org.dspace.app.rest.model.WorkflowDefinitionRest;
-import org.dspace.app.rest.utils.ContextUtil;
+import org.dspace.app.rest.projection.Projection;
+import org.dspace.app.rest.repository.AbstractDSpaceRestRepository;
+import org.dspace.app.rest.repository.LinkRestRepository;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.content.Collection;
 import org.dspace.core.Context;
 import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Component;
 
 /**
- * Rest controller that handles the config for workflow definitions
+ * Link repository for "collections" subresource of an individual workflow definition.
  *
  * @author Maria Verdonck (Atmire) on 11/12/2019
  */
-@RestController
-@RequestMapping("/api/" + WorkflowDefinitionRest.CATEGORY + "/" + WorkflowDefinitionRest.NAME_PLURAL)
-public class WorkflowDefinitionController {
+@Component(WorkflowDefinitionRest.CATEGORY + "." + WorkflowDefinitionRest.NAME + "."
+    + WorkflowDefinitionRest.COLLECTIONS_MAPPED_TO)
+public class WorkflowDefinitionCollectionsLinkRepository extends AbstractDSpaceRestRepository
+    implements LinkRestRepository {
 
     @Autowired
     protected XmlWorkflowFactory xmlWorkflowFactory;
@@ -56,20 +58,22 @@ public class WorkflowDefinitionController {
      * @param workflowName Name of workflow we want the collections of that are mapped to is
      * @return List of collections mapped to the requested workflow
      */
-    @RequestMapping(method = RequestMethod.GET, value = "/{workflowName}/collections")
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
-    public Page<CollectionRest> getCollections(HttpServletRequest request, @PathVariable String workflowName,
-                                               Pageable pageable) {
+    public Page<CollectionRest> getCollections(@Nullable HttpServletRequest request,
+                                               String workflowName,
+                                               @Nullable Pageable optionalPageable,
+                                               Projection projection) {
         if (xmlWorkflowFactory.workflowByThisNameExists(workflowName)) {
-            Context context = ContextUtil.obtainContext(request);
+            Context context = obtainContext();
             List<Collection> collectionsMappedToWorkflow = new ArrayList<>();
             if (xmlWorkflowFactory.isDefaultWorkflow(workflowName)) {
                 collectionsMappedToWorkflow.addAll(xmlWorkflowFactory.getAllNonMappedCollectionsHandles(context));
             }
             collectionsMappedToWorkflow.addAll(xmlWorkflowFactory.getCollectionHandlesMappedToWorklow(context,
                 workflowName));
+            Pageable pageable = optionalPageable != null ? optionalPageable : new PageRequest(0, 20);
             return converter.toRestPage(utils.getPage(collectionsMappedToWorkflow, pageable),
-                utils.obtainProjection(true));
+                projection);
         } else {
             throw new ResourceNotFoundException("No workflow with name " + workflowName + " is configured");
         }
