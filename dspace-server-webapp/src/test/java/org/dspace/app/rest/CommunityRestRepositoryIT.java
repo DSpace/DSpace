@@ -523,6 +523,8 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$", CommunityMatcher.matchFullEmbeds()))
+                .andExpect(jsonPath("$._embedded.subcommunities._embedded.subcommunities[0]",
+                        HalMatcher.matchNoEmbeds())) // embeds should not be included in embeds (MAX_EMBED_LEVEL = 1)
                 .andExpect(jsonPath("$", CommunityMatcher.matchCommunityEntry(
                         parentCommunity.getName(), parentCommunity.getID(), parentCommunity.getHandle())));
 
