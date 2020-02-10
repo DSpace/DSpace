@@ -29,7 +29,7 @@ public class OpenUrlServiceImpl implements OpenUrlService {
     private Logger log = Logger.getLogger(OpenUrlService.class);
 
     @Autowired
-    protected OpenURLTrackerLoggerService openUrlTrackerLoggerService;
+    protected FailedOpenURLTrackerService failedOpenUrlTrackerService;
 
     /**
      * Processes the url
@@ -87,7 +87,7 @@ public class OpenUrlServiceImpl implements OpenUrlService {
             success = false;
         } finally {
             if (success) {
-                openUrlTrackerLoggerService
+                failedOpenUrlTrackerService
                         .remove(context, tracker);
                 // If the tracker was able to post successfully, we remove it from the database
                 log.info("Successfully posted " + tracker.getUrl() + " from " + tracker.getUploadDate());
@@ -104,11 +104,11 @@ public class OpenUrlServiceImpl implements OpenUrlService {
      * @throws SQLException
      */
     public void reprocessFailedQueue(Context context) throws SQLException {
-        if (openUrlTrackerLoggerService == null) {
-            log.error("Error retrieving the \"openUrlTrackerLoggerService\" instance, aborting the processing");
+        if (failedOpenUrlTrackerService == null) {
+            log.error("Error retrieving the \"failedOpenUrlTrackerService\" instance, aborting the processing");
             return;
         }
-        List<OpenURLTracker> openURLTrackers = openUrlTrackerLoggerService.findAll(context);
+        List<OpenURLTracker> openURLTrackers = failedOpenUrlTrackerService.findAll(context);
         for (OpenURLTracker openURLTracker : openURLTrackers) {
             tryReprocessFailed(context, openURLTracker);
         }
@@ -126,7 +126,7 @@ public class OpenUrlServiceImpl implements OpenUrlService {
             return;
         }
 
-        OpenURLTracker tracker = openUrlTrackerLoggerService.create(context);
+        OpenURLTracker tracker = failedOpenUrlTrackerService.create(context);
         tracker.setUploadDate(now);
         tracker.setUrl(url);
     }

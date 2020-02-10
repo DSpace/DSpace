@@ -73,7 +73,7 @@ public class BitstreamEventProcessor extends ExportEventProcessor {
      */
     public void processEvent() throws SQLException, IOException {
         if (shouldProcessItem(item)) {
-            String baseParam = getBaseParamaters(item);
+            String baseParam = getBaseParameters(item);
             String fullParam = addObjectSpecificData(baseParam, item, bitstream);
             processObject(fullParam);
         }
@@ -92,10 +92,10 @@ public class BitstreamEventProcessor extends ExportEventProcessor {
         StringBuilder data = new StringBuilder(string);
 
         String bitstreamInfo = getBitstreamInfo(item, bitstream);
-        data.append("&").append(URLEncoder.encode("svc_dat", "UTF-8")).append("=")
-            .append(URLEncoder.encode(bitstreamInfo, "UTF-8"));
-        data.append("&").append(URLEncoder.encode("rft_dat", "UTF-8")).append("=")
-            .append(URLEncoder.encode(BITSTREAM_DOWNLOAD, "UTF-8"));
+        data.append("&").append(URLEncoder.encode("svc_dat", UTF_8)).append("=")
+            .append(URLEncoder.encode(bitstreamInfo, UTF_8));
+        data.append("&").append(URLEncoder.encode("rft_dat", UTF_8)).append("=")
+            .append(URLEncoder.encode(BITSTREAM_DOWNLOAD, UTF_8));
 
         return data.toString();
     }
@@ -125,7 +125,7 @@ public class BitstreamEventProcessor extends ExportEventProcessor {
         // If we can, append the pretty name of the bitstream to the URL
         try {
             if (bitstream.getName() != null) {
-                sb.append(Util.encodeBitstreamName(bitstream.getName(), "UTF-8"));
+                sb.append(Util.encodeBitstreamName(bitstream.getName(), UTF_8));
             }
         } catch (UnsupportedEncodingException uee) {
             // just ignore it, we don't have to have a pretty

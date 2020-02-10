@@ -16,7 +16,7 @@ import org.dspace.statistics.export.OpenURLTracker;
 /**
  * Interface of the service that handles the OpenURLTracker database operations
  */
-public interface OpenURLTrackerLoggerService {
+public interface FailedOpenURLTrackerService {
 
     /**
      * Removes an OpenURLTracker from the database

@@ -12,13 +12,13 @@ import java.util.List;
 
 import org.dspace.core.Context;
 import org.dspace.statistics.export.dao.OpenURLTrackerDAO;
-import org.dspace.statistics.export.service.OpenURLTrackerLoggerService;
+import org.dspace.statistics.export.service.FailedOpenURLTrackerService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Implementation of the service that handles the OpenURLTracker database operations
  */
-public class OpenURLTrackerLoggerServiceImpl implements OpenURLTrackerLoggerService {
+public class FailedOpenURLTrackerServiceImpl implements FailedOpenURLTrackerService {
 
     @Autowired(required = true)
     protected OpenURLTrackerDAO openURLTrackerDAO;

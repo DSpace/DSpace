@@ -47,7 +47,7 @@ import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.statistics.export.factory.OpenURLTrackerLoggerServiceFactory;
-import org.dspace.statistics.export.service.OpenURLTrackerLoggerService;
+import org.dspace.statistics.export.service.FailedOpenURLTrackerService;
 import org.dspace.usage.UsageEvent;
 import org.junit.After;
 import org.junit.Before;
@@ -72,7 +72,7 @@ public class ITExportUsageEventListener extends AbstractIntegrationTest {
     protected BundleService bundleService = ContentServiceFactory.getInstance().getBundleService();
     protected BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
     protected EntityTypeService entityTypeService = ContentServiceFactory.getInstance().getEntityTypeService();
-    protected OpenURLTrackerLoggerService openURLTrackerLoggerService =
+    protected FailedOpenURLTrackerService failedOpenURLTrackerService =
             OpenURLTrackerLoggerServiceFactory.getInstance().getOpenUrlTrackerLoggerService();
 
     protected ArrayList testProcessedUrls = DSpaceServicesFactory.getInstance().getServiceManager()
@@ -129,9 +129,9 @@ public class ITExportUsageEventListener extends AbstractIntegrationTest {
             entityTypeService.delete(context, entityType);
 
 
-            List<OpenURLTracker> all = openURLTrackerLoggerService.findAll(context);
+            List<OpenURLTracker> all = failedOpenURLTrackerService.findAll(context);
             for (OpenURLTracker tracker : all) {
-                openURLTrackerLoggerService.remove(context, tracker);
+                failedOpenURLTrackerService.remove(context, tracker);
             }
 
             entityType = null;
@@ -167,7 +167,7 @@ public class ITExportUsageEventListener extends AbstractIntegrationTest {
         exportUsageEventListener.receiveEvent(usageEvent);
 
 
-        List<OpenURLTracker> all = openURLTrackerLoggerService.findAll(context);
+        List<OpenURLTracker> all = failedOpenURLTrackerService.findAll(context);
 
 
         String regex = "https://irus.jisc.ac.uk/counter/test/\\?url_ver=Z39.88-2004&req_id=" +
@@ -201,7 +201,7 @@ public class ITExportUsageEventListener extends AbstractIntegrationTest {
 
         exportUsageEventListener.receiveEvent(usageEvent);
 
-        List<OpenURLTracker> all = openURLTrackerLoggerService.findAll(context);
+        List<OpenURLTracker> all = failedOpenURLTrackerService.findAll(context);
 
         String regex = "https://irus.jisc.ac.uk/counter/test/\\?url_ver=Z39.88-2004&req_id=" +
                 URLEncoder.encode(request.getRemoteAddr(), "UTF-8") + "&req_dat=&rft" +
@@ -241,7 +241,7 @@ public class ITExportUsageEventListener extends AbstractIntegrationTest {
 
         exportUsageEventListener.receiveEvent(usageEvent);
 
-        List<OpenURLTracker> all = openURLTrackerLoggerService.findAll(context);
+        List<OpenURLTracker> all = failedOpenURLTrackerService.findAll(context);
 
 
         assertThat(testProcessedUrls.size(), is(0));
@@ -275,7 +275,7 @@ public class ITExportUsageEventListener extends AbstractIntegrationTest {
         assertThat(testProcessedUrls.size(), is(1));
         assertThat(isMatch, is(true));
 
-        List<OpenURLTracker> all = openURLTrackerLoggerService.findAll(context);
+        List<OpenURLTracker> all = failedOpenURLTrackerService.findAll(context);
         assertThat(all.size(), is(0));
     }
 
@@ -296,7 +296,7 @@ public class ITExportUsageEventListener extends AbstractIntegrationTest {
 
         exportUsageEventListener.receiveEvent(usageEvent);
 
-        List<OpenURLTracker> all = openURLTrackerLoggerService.findAll(context);
+        List<OpenURLTracker> all = failedOpenURLTrackerService.findAll(context);
 
         String regex = "https://irus.jisc.ac.uk/counter/test/\\?url_ver=Z39.88-2004&req_id=" +
                 URLEncoder.encode(request.getRemoteAddr(), "UTF-8") + "&req_dat=&rft" +
@@ -336,7 +336,7 @@ public class ITExportUsageEventListener extends AbstractIntegrationTest {
 
         exportUsageEventListener.receiveEvent(usageEvent);
 
-        List<OpenURLTracker> all = openURLTrackerLoggerService.findAll(context);
+        List<OpenURLTracker> all = failedOpenURLTrackerService.findAll(context);
 
 
         assertThat(all.size(), is(0));
@@ -361,7 +361,7 @@ public class ITExportUsageEventListener extends AbstractIntegrationTest {
 
         exportUsageEventListener.receiveEvent(usageEvent);
 
-        List<OpenURLTracker> all = openURLTrackerLoggerService.findAll(context);
+        List<OpenURLTracker> all = failedOpenURLTrackerService.findAll(context);
 
 
         assertThat(all.size(), is(0));

@@ -21,22 +21,22 @@ import org.dspace.scripts.factory.ScriptServiceFactory;
 import org.dspace.scripts.service.ScriptService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.statistics.export.factory.OpenURLTrackerLoggerServiceFactory;
-import org.dspace.statistics.export.service.OpenURLTrackerLoggerService;
+import org.dspace.statistics.export.service.FailedOpenURLTrackerService;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
 /**
- * Class to test the RetryOpenUrlTracker
+ * Class to test the RetryfailedOpenUrlTracker
  */
 @RunWith(MockitoJUnitRunner.class)
-public class ITRetryOpenUrlTracker extends AbstractIntegrationTest {
+public class ITRetryfailedOpenUrlTracker extends AbstractIntegrationTest {
 
-    private static Logger log = Logger.getLogger(ITRetryOpenUrlTracker.class);
+    private static Logger log = Logger.getLogger(ITRetryfailedOpenUrlTracker.class);
 
 
-    protected OpenURLTrackerLoggerService openURLTrackerLoggerService =
+    protected FailedOpenURLTrackerService failedOpenURLTrackerService =
             OpenURLTrackerLoggerServiceFactory.getInstance().getOpenUrlTrackerLoggerService();
 
     protected ArrayList testProcessedUrls = DSpaceServicesFactory.getInstance().getServiceManager()
@@ -54,9 +54,9 @@ public class ITRetryOpenUrlTracker extends AbstractIntegrationTest {
         try {
             context.turnOffAuthorisationSystem();
 
-            List<OpenURLTracker> all = openURLTrackerLoggerService.findAll(context);
+            List<OpenURLTracker> all = failedOpenURLTrackerService.findAll(context);
             for (OpenURLTracker tracker : all) {
-                openURLTrackerLoggerService.remove(context, tracker);
+                failedOpenURLTrackerService.remove(context, tracker);
             }
 
             // Clear the list of processedUrls
@@ -85,7 +85,7 @@ public class ITRetryOpenUrlTracker extends AbstractIntegrationTest {
         retryOpenUrlTracker.initialize(args, testDSpaceRunnableHandler);
         retryOpenUrlTracker.internalRun();
 
-        List<OpenURLTracker> all = openURLTrackerLoggerService.findAll(context);
+        List<OpenURLTracker> all = failedOpenURLTrackerService.findAll(context);
 
         assertThat(testProcessedUrls.size(), is(0));
         assertThat(all.size(), is(1));
@@ -101,20 +101,20 @@ public class ITRetryOpenUrlTracker extends AbstractIntegrationTest {
 
         TestDSpaceRunnableHandler testDSpaceRunnableHandler = new TestDSpaceRunnableHandler();
         DSpaceRunnable retryOpenUrlTracker = scriptService.getScriptForName("retry-tracker");
-        String[] args = {};
+        String[] args = {"-r"};
 
-        OpenURLTracker tracker1 = openURLTrackerLoggerService.create(context);
+        OpenURLTracker tracker1 = failedOpenURLTrackerService.create(context);
         tracker1.setUrl("test-url-1");
-        OpenURLTracker tracker2 = openURLTrackerLoggerService.create(context);
+        OpenURLTracker tracker2 = failedOpenURLTrackerService.create(context);
         tracker2.setUrl("test-url-2");
-        OpenURLTracker tracker3 = openURLTrackerLoggerService.create(context);
+        OpenURLTracker tracker3 = failedOpenURLTrackerService.create(context);
         tracker3.setUrl("test-url-3");
 
 
         retryOpenUrlTracker.initialize(args, testDSpaceRunnableHandler);
         retryOpenUrlTracker.internalRun();
 
-        List<OpenURLTracker> all = openURLTrackerLoggerService.findAll(context);
+        List<OpenURLTracker> all = failedOpenURLTrackerService.findAll(context);
 
         assertThat(testProcessedUrls.size(), is(3));
         assertThat(testProcessedUrls.contains("test-url-1"), is(true));
@@ -133,24 +133,24 @@ public class ITRetryOpenUrlTracker extends AbstractIntegrationTest {
 
         TestDSpaceRunnableHandler testDSpaceRunnableHandler = new TestDSpaceRunnableHandler();
         DSpaceRunnable retryOpenUrlTracker = scriptService.getScriptForName("retry-tracker");
-        String[] args = {};
+        String[] args = {"-r"};
 
-        OpenURLTracker tracker1 = openURLTrackerLoggerService.create(context);
+        OpenURLTracker tracker1 = failedOpenURLTrackerService.create(context);
         tracker1.setUrl("test-url-1");
-        OpenURLTracker tracker2 = openURLTrackerLoggerService.create(context);
+        OpenURLTracker tracker2 = failedOpenURLTrackerService.create(context);
         tracker2.setUrl("test-url-2-fail");
-        OpenURLTracker tracker3 = openURLTrackerLoggerService.create(context);
+        OpenURLTracker tracker3 = failedOpenURLTrackerService.create(context);
         tracker3.setUrl("test-url-3-fail");
-        OpenURLTracker tracker4 = openURLTrackerLoggerService.create(context);
+        OpenURLTracker tracker4 = failedOpenURLTrackerService.create(context);
         tracker4.setUrl("test-url-4-fail");
-        OpenURLTracker tracker5 = openURLTrackerLoggerService.create(context);
+        OpenURLTracker tracker5 = failedOpenURLTrackerService.create(context);
         tracker5.setUrl("test-url-5");
 
 
         retryOpenUrlTracker.initialize(args, testDSpaceRunnableHandler);
         retryOpenUrlTracker.internalRun();
 
-        List<OpenURLTracker> all = openURLTrackerLoggerService.findAll(context);
+        List<OpenURLTracker> all = failedOpenURLTrackerService.findAll(context);
         List<String> storedTrackerUrls = new ArrayList<>();
         for (OpenURLTracker tracker : all) {
             storedTrackerUrls.add(tracker.getUrl());

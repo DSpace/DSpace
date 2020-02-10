@@ -76,8 +76,8 @@ public class ExportEventProcessorTest extends AbstractDSpaceTest {
 
         when(item.getHandle()).thenReturn("123456/1");
 
-        when(exportEventProcessor.getBaseParamaters(item)).thenCallRealMethod();
-        String result = exportEventProcessor.getBaseParamaters(item);
+        when(exportEventProcessor.getBaseParameters(item)).thenCallRealMethod();
+        String result = exportEventProcessor.getBaseParameters(item);
         String expected = "url_ver=Z39.88-2004&req_id=test-client-ip&req_dat=test-user-agent&rft.artnum=" +
                 "oai%3Alocalhost%3A123456%2F1&rfr_dat=test-referer&rfr_id=localhost&url_tim=2020-01-24T13%3A24%3A33Z";
 

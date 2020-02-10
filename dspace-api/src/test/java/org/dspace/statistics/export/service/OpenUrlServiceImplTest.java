@@ -45,7 +45,7 @@ public class OpenUrlServiceImplTest {
     private OpenUrlServiceImpl openUrlService;
 
     @Mock
-    private OpenURLTrackerLoggerService openURLTrackerLoggerService;
+    private FailedOpenURLTrackerService failedOpenURLTrackerService;
 
     /**
      * Test the processUrl method
@@ -104,7 +104,7 @@ public class OpenUrlServiceImplTest {
         trackers.add(tracker2);
         trackers.add(tracker3);
 
-        when(openURLTrackerLoggerService.findAll(any(Context.class))).thenReturn(trackers);
+        when(failedOpenURLTrackerService.findAll(any(Context.class))).thenReturn(trackers);
         doNothing().when(openUrlService).tryReprocessFailed(any(Context.class), any(OpenURLTracker.class));
 
         openUrlService.reprocessFailedQueue(context);
@@ -125,7 +125,7 @@ public class OpenUrlServiceImplTest {
         doCallRealMethod().when(tracker1).setUrl(anyString());
         when(tracker1.getUrl()).thenCallRealMethod();
 
-        when(openURLTrackerLoggerService.create(any(Context.class))).thenReturn(tracker1);
+        when(failedOpenURLTrackerService.create(any(Context.class))).thenReturn(tracker1);
 
         String failedUrl = "failed-url";
         openUrlService.logfailed(context, failedUrl);
