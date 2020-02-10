@@ -8,6 +8,7 @@
 package org.dspace.app.rest;
 
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.data.rest.webmvc.RestMediaTypes.TEXT_URI_LIST_VALUE;
 import static org.springframework.http.MediaType.parseMediaType;
@@ -35,6 +36,7 @@ import org.dspace.app.rest.builder.BitstreamBuilder;
 import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.builder.EPersonBuilder;
+import org.dspace.app.rest.builder.GroupBuilder;
 import org.dspace.app.rest.builder.WorkspaceItemBuilder;
 import org.dspace.app.rest.matcher.CollectionMatcher;
 import org.dspace.app.rest.matcher.ItemMatcher;
@@ -51,6 +53,8 @@ import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
+import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.services.ConfigurationService;
 import org.hamcrest.Matchers;
 import org.junit.Before;
@@ -69,16 +73,39 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
     @Autowired
     private ConfigurationService configurationService;
 
+    private Group embargoedGroups;
+    private Group embargoedGroup1;
+    private Group embargoedGroup2;
+    private Group anonymousGroup;
+
     @Before
     @Override
     public void setUp() throws Exception {
-
         super.setUp();
+        context.turnOffAuthorisationSystem();
 
+        embargoedGroups = GroupBuilder.createGroup(context)
+                .withName("Embargoed Groups")
+                .build();
+
+        embargoedGroup1 = GroupBuilder.createGroup(context)
+                .withName("Embargoed Group 1")
+                .withParent(embargoedGroups)
+                .build();
+
+        embargoedGroup2 = GroupBuilder.createGroup(context)
+                .withName("Embargoed Group 2")
+                .withParent(embargoedGroups)
+                .build();
+
+        anonymousGroup = EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS);
+
+        context.restoreAuthSystemState();
+        
         //disable file upload mandatory
         configurationService.setProperty("webui.submit.upload.required", false);
     }
-
+    
     @Test
     /**
      * All the workspaceitem should be returned regardless of the collection where they were created
@@ -1594,6 +1621,147 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$.sections.upload.files[0].metadata['dc.title'][0].value",
                     is("another-filename.pdf")))
         ;
+    }
+
+    @Test
+    public void patchUploadAddAccessConditionTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+
+        Collection collection1 = CollectionBuilder.createCollection(context, child1)
+                .withName("Collection 1")
+                .build();
+
+        InputStream pdf = getClass().getResourceAsStream("simple-article.pdf");
+
+        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, collection1)
+                .withTitle("Test WorkspaceItem")
+                .withIssueDate("2019-10-01")
+                .withFulltext("simple-article.pdf", "/local/path/simple-article.pdf", pdf)
+                .build();
+
+        context.restoreAuthSystemState();
+
+        // create a list of values to use in add accessCondition
+        List<Operation> addAccessCondition = new ArrayList<Operation>();
+        Map<String, String> value = new HashMap<String, String>();
+        value.put("name", "embargoedWithGroupSelect");
+        value.put("groupUUID", embargoedGroup1.getID().toString());
+        value.put("endDate", "2030-10-02");
+        addAccessCondition.add(new AddOperation("/sections/upload/files/0/accessConditions/-", value));
+
+        String patchBody = getPatchContent(addAccessCondition);
+        String authToken = getAuthToken(admin.getEmail(), password);
+
+        getClient(authToken).perform(patch("/api/submission/workspaceitems/" + witem.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$",Matchers.allOf(
+                                    hasJsonPath("$.sections.upload.files[0].accessConditions[0].name",
+                                             is("embargoedWithGroupSelect")),
+                                    hasJsonPath("$.sections.upload.files[0].accessConditions[0].groupUUID",
+                                             is(embargoedGroup1.getID().toString()))
+                                    )));
+
+        // verify that the patch changes have been persisted
+        getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$",Matchers.allOf(
+                    hasJsonPath("$.sections.upload.files[0].accessConditions[0].name",
+                             is("embargoedWithGroupSelect")),
+                    hasJsonPath("$.sections.upload.files[0].accessConditions[0].groupUUID",
+                             is(embargoedGroup1.getID().toString()))
+                    )));
+    }
+
+    @Test
+    public void patchUploadRemoveAccessConditionTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+
+        Collection collection1 = CollectionBuilder.createCollection(context, child1)
+                .withName("Collection 1")
+                .build();
+
+        InputStream pdf = getClass().getResourceAsStream("simple-article.pdf");
+
+        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, collection1)
+                .withTitle("Test WorkspaceItem")
+                .withIssueDate("2019-10-01")
+                .withFulltext("simple-article.pdf", "/local/path/simple-article.pdf", pdf)
+                .build();
+
+        context.restoreAuthSystemState();
+
+        // create a list of values to use in add operation
+        List<Operation> addAccessCondition = new ArrayList<Operation>();
+        Map<String, String> value = new HashMap<String, String>();
+        value.put("name", "embargoedWithGroupSelect");
+        value.put("groupUUID", embargoedGroup1.getID().toString());
+        value.put("endDate", "2020-01-01");
+        addAccessCondition.add(new AddOperation("/sections/upload/files/0/accessConditions/-", value));
+
+        String patchBody = getPatchContent(addAccessCondition);
+        String authToken = getAuthToken(admin.getEmail(), password);
+
+        getClient(authToken).perform(patch("/api/submission/workspaceitems/" + witem.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$",Matchers.allOf(
+                        hasJsonPath("$.sections.upload.files[0].accessConditions[0].name",
+                                 is("embargoedWithGroupSelect")),
+                        hasJsonPath("$.sections.upload.files[0].accessConditions[0].endDate",
+                                is("2020-01-01")),
+                        hasJsonPath("$.sections.upload.files[0].accessConditions[0].groupUUID",
+                                 is(embargoedGroup1.getID().toString()))
+                        )));
+
+        // verify that the patch changes have been persisted
+        getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$",Matchers.allOf(
+                    hasJsonPath("$.sections.upload.files[0].accessConditions[0].name",
+                             is("embargoedWithGroupSelect")),
+                    hasJsonPath("$.sections.upload.files[0].accessConditions[0].endDate",
+                            is("2020-01-01")),
+                    hasJsonPath("$.sections.upload.files[0].accessConditions[0].groupUUID",
+                             is(embargoedGroup1.getID().toString()))
+                    )));
+
+        // create a list of values to use in remove operation
+        List<Operation> removeAccessCondition = new ArrayList<Operation>();
+        removeAccessCondition.add(new RemoveOperation("/sections/upload/files/0/accessConditions"));
+
+        String patchReplaceBody = getPatchContent(removeAccessCondition);
+        getClient(authToken).perform(patch("/api/submission/workspaceitems/" + witem.getID())
+                .content(patchReplaceBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$",Matchers.allOf(
+                            hasJsonPath("$.sections.upload.files[0].accessConditions",hasSize(0)))));
+
+        // verify that the patch changes have been persisted
+        getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$",Matchers.allOf(
+                hasJsonPath("$.sections.upload.files[0].accessConditions", hasSize(0))
+                )));
     }
 
     @Test
