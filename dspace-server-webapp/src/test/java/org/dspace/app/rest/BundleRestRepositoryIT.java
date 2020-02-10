@@ -39,7 +39,7 @@ import org.dspace.app.rest.builder.ResourcePolicyBuilder;
 import org.dspace.app.rest.matcher.BitstreamMatcher;
 import org.dspace.app.rest.matcher.BundleMatcher;
 import org.dspace.app.rest.matcher.MetadataMatcher;
-import org.dspace.app.rest.matcher.ProjectionsMatcher;
+import org.dspace.app.rest.matcher.HalMatcher;
 import org.dspace.app.rest.model.BundleRest;
 import org.dspace.app.rest.model.MetadataRest;
 import org.dspace.app.rest.model.MetadataValueRest;
@@ -94,7 +94,7 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
     @Test
     public void GetSingleBundle() throws Exception {
         context.turnOffAuthorisationSystem();
-        ProjectionsMatcher projectionsMatcher = new ProjectionsMatcher();
+        HalMatcher projectionsMatcher = new HalMatcher();
 
         String bitstreamContent = "Dummy content";
         try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {

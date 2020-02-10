@@ -32,7 +32,7 @@ import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.builder.EPersonBuilder;
 import org.dspace.app.rest.builder.ItemBuilder;
 import org.dspace.app.rest.matcher.EPersonMatcher;
-import org.dspace.app.rest.matcher.ProjectionsMatcher;
+import org.dspace.app.rest.matcher.HalMatcher;
 import org.dspace.app.rest.model.EPersonRest;
 import org.dspace.app.rest.model.MetadataRest;
 import org.dspace.app.rest.model.MetadataValueRest;
@@ -183,7 +183,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
     @Test
     public void findOneTest() throws Exception {
         context.turnOffAuthorisationSystem();
-        ProjectionsMatcher projectionsMatcher = new ProjectionsMatcher();
+        HalMatcher projectionsMatcher = new HalMatcher();
 
         EPerson ePerson = EPersonBuilder.createEPerson(context)
                                         .withNameInMetadata("John", "Doe")

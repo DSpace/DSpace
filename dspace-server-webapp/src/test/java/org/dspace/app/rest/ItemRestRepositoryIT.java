@@ -35,9 +35,9 @@ import org.dspace.app.rest.builder.EPersonBuilder;
 import org.dspace.app.rest.builder.GroupBuilder;
 import org.dspace.app.rest.builder.ItemBuilder;
 import org.dspace.app.rest.builder.WorkspaceItemBuilder;
+import org.dspace.app.rest.matcher.HalMatcher;
 import org.dspace.app.rest.matcher.ItemMatcher;
 import org.dspace.app.rest.matcher.MetadataMatcher;
-import org.dspace.app.rest.matcher.ProjectionsMatcher;
 import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.MetadataRest;
 import org.dspace.app.rest.model.MetadataValueRest;
@@ -52,6 +52,7 @@ import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.springframework.test.web.servlet.MvcResult;
@@ -200,7 +201,6 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
     @Test
     public void findOneTest() throws Exception {
         context.turnOffAuthorisationSystem();
-        ProjectionsMatcher projectionsMatcher = new ProjectionsMatcher();
 
         //** GIVEN **
         //1. A community-collection structure with one parent community with sub-community and two collections.
@@ -236,27 +236,21 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                       .withSubject("ExtraEntry")
                                       .build();
 
-        getClient().perform(get("/api/core/items/" + publicItem1.getID())
-                   .param("projection", "full"))
-                   .andExpect(status().isOk())
-                   .andExpect(jsonPath("$", projectionsMatcher.matchItemEmbeds()))
-                   .andExpect(jsonPath("$", projectionsMatcher.matchItemLinks()))
-                .andExpect(jsonPath("$", Matchers.is(
-                       ItemMatcher.matchItemWithTitleAndDateIssued(publicItem1,
-                               "Public item 1", "2017-10-17")
-                   )))
-                   .andExpect(jsonPath("$", Matchers.not(
-                       Matchers.is(
-                           ItemMatcher.matchItemWithTitleAndDateIssued(publicItem2,
-                                   "Public item 2", "2016-02-13")
-                       )
-                   )))
-        ;
+        Matcher<? super Object> publicItem1Matcher = ItemMatcher.matchItemWithTitleAndDateIssued(publicItem1,
+                        "Public item 1", "2017-10-17");
 
+        // When full projection is requested, response should include expected properties, links, and embeds.
+        getClient().perform(get("/api/core/items/" + publicItem1.getID())
+                .param("projection", "full"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", ItemMatcher.matchFullEmbeds()))
+                .andExpect(jsonPath("$", publicItem1Matcher));
+
+        // When no projection is requested, response should include expected properties, links, and no embeds.
         getClient().perform(get("/api/core/items/" + publicItem1.getID()))
-                   .andExpect(status().isOk())
-                   .andExpect(jsonPath("$", projectionsMatcher.matchNoEmbeds()))
-        ;
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()))
+                .andExpect(jsonPath("$", publicItem1Matcher));
     }
 
     @Test
