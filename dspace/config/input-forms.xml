@@ -345,7 +345,7 @@ it, please enter the types and the actual numbers or codes.</hint>
        <stored-value>Technical Report</stored-value>
      </pair>
      <pair>
-       <displayed-value>Thesis</displayed-value>
+       <displayed-value>PhD Thesis</displayed-value>
        <stored-value>Thesis</stored-value>
      </pair>
      <pair>
@@ -359,6 +359,10 @@ it, please enter the types and the actual numbers or codes.</hint>
      <pair>
        <displayed-value>Bachelous Paper</displayed-value>
        <stored-value>Bachelous paper</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>Conference Papers</displayed-value>
+       <stored-value>Theses</stored-value>
      </pair>
      <pair>
        <displayed-value>Other</displayed-value>
