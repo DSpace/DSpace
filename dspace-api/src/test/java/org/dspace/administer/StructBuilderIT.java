@@ -314,9 +314,9 @@ public class StructBuilderIT
     }
 
     /**
-     * Reject uninteresting nodes.
+     * Reject uninteresting nodes. (currently commented out of tests above)
      */
-    private static class MyNodeFilter implements Predicate<Node> {
+    /*private static class MyNodeFilter implements Predicate<Node> {
         private static final List<String> dontCare = Arrays.asList(
             "description",
             "intro",
@@ -330,5 +330,5 @@ public class StructBuilderIT
             String type = node.getLocalName();
             return ! dontCare.contains(type);
         }
-    }
+    }*/
 }

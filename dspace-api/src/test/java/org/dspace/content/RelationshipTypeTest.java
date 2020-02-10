@@ -14,11 +14,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import org.apache.logging.log4j.Logger;
 import org.dspace.content.dao.RelationshipTypeDAO;
 import org.dspace.core.Context;
 import org.junit.Before;
@@ -30,9 +29,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class RelationshipTypeTest {
-
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(RelationshipTypeTest.class);
-
     @InjectMocks
     private RelationshipTypeServiceImpl relationshipTypeService;
 
@@ -102,7 +98,7 @@ public class RelationshipTypeTest {
     @Test
     public void testRelationshipTypeFindAll() throws Exception {
         // Declare objects utilized for this test
-        List<RelationshipType> mockedList = new LinkedList<>();
+        List<RelationshipType> mockedList = new ArrayList<>();
         mockedList.add(firstRelationshipType);
         mockedList.add(secondRelationshipType);
 
@@ -120,7 +116,7 @@ public class RelationshipTypeTest {
     @Test
     public void testRelationshipTypeFindByLeftOrRightwardType() throws Exception {
         // Declare objects utilized for this test
-        List<RelationshipType> mockedList = new LinkedList<>();
+        List<RelationshipType> mockedList = new ArrayList<>();
         mockedList.add(firstRelationshipType);
 
         // Mock DAO to return our mockedList
@@ -138,7 +134,7 @@ public class RelationshipTypeTest {
     @Test
     public void testRelationshipTypefindByEntityType() throws Exception {
         // Declare objects utilized for this test
-        List<RelationshipType> mockedList = new LinkedList<>();
+        List<RelationshipType> mockedList = new ArrayList<>();
         mockedList.add(firstRelationshipType);
 
         // Mock DAO to return our mockedList
