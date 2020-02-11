@@ -8,7 +8,6 @@
 package org.dspace.app.rest.matcher;
 
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
-import static org.dspace.app.rest.matcher.HalMatcher.hasLinks;
 import static org.dspace.app.rest.matcher.HalMatcher.matchEmbeds;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
 import static org.dspace.app.rest.test.AbstractControllerIntegrationTest.REST_SERVER_URL;
@@ -17,6 +16,7 @@ import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 
+import java.sql.SQLException;
 import java.util.UUID;
 
 import org.dspace.content.Bitstream;
@@ -42,7 +42,7 @@ public class BitstreamMatcher {
     public static Matcher<? super Object> matchBitstreamEntry(UUID uuid, long size, String name, String description) {
         return allOf(
                 //Check ID and size
-                matchProperties(uuid,size,name,description),
+                matchProperties(uuid, size, name, description),
                 //Make sure we have a checksum
                 hasJsonPath("$.checkSum", matchChecksum()),
                 //Make sure we have a valid format
@@ -94,7 +94,7 @@ public class BitstreamMatcher {
      * Gets a matcher for all expected links.
      */
     public static Matcher<? super Object> matchLinks(UUID uuid) {
-        return hasLinks(REST_SERVER_URL + "core/bitstreams/" + uuid,
+        return HalMatcher.matchLinks(REST_SERVER_URL + "core/bitstreams/" + uuid,
                 "bundle",
                 "content",
                 "format",
@@ -103,24 +103,27 @@ public class BitstreamMatcher {
     }
 
     private static Matcher<? super Object> matchProperties(Bitstream bitstream) {
-        return allOf(
-                hasJsonPath("$.uuid", is(bitstream.getID().toString())),
-                hasJsonPath("$.name", is(bitstream.getName())),
-                hasJsonPath("$.bundleName", is("ORIGINAL")),
-                hasJsonPath("$.metadata", allOf(
-                        matchMetadata("dc.title", bitstream.getName()),
-                        matchMetadata("dc.description", bitstream.getDescription())
-                )),
-                hasJsonPath("$.sizeBytes", is((int) bitstream.getSizeBytes())),
-                hasJsonPath("$.checkSum", matchChecksum())
-        );
+        try {
+            return allOf(
+                    hasJsonPath("$.uuid", is(bitstream.getID().toString())),
+                    hasJsonPath("$.name", is(bitstream.getName())),
+                    hasJsonPath("$.bundleName", is(bitstream.getBundles().get(0).getName())),
+                    hasJsonPath("$.metadata", allOf(
+                            matchMetadata("dc.title", bitstream.getName()),
+                            matchMetadata("dc.description", bitstream.getDescription())
+                    )),
+                    hasJsonPath("$.sizeBytes", is((int) bitstream.getSizeBytes())),
+                    hasJsonPath("$.checkSum", matchChecksum())
+            );
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private static Matcher<? super Object> matchProperties(UUID uuid, long size, String name, String description) {
         return allOf(
-                hasJsonPath("$.uuid", is(uuid)),
+                hasJsonPath("$.uuid", is(uuid.toString())),
                 hasJsonPath("$.name", is(name)),
-                hasJsonPath("$.bundleName", is("ORIGINAL")),
                 hasJsonPath("$.metadata", allOf(
                         matchMetadata("dc.title", name),
                         matchMetadata("dc.description", description)
@@ -129,5 +132,4 @@ public class BitstreamMatcher {
                 hasJsonPath("$.checkSum", matchChecksum())
         );
     }
-
 }
