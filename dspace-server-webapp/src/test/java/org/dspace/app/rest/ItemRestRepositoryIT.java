@@ -251,6 +251,16 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()))
                 .andExpect(jsonPath("$", publicItem1Matcher));
+
+        // When exact embeds are requested, response should include expected properties, links, and exact embeds.
+        getClient().perform(get("/api/core/items/" + publicItem1.getID())
+                .param("embed", "bundles,owningCollection"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", HalMatcher.matchEmbeds(
+                        "bundles[]",
+                        "owningCollection"
+                )))
+                .andExpect(jsonPath("$", publicItem1Matcher));
     }
 
     @Test

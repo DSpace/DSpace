@@ -13,6 +13,7 @@ import org.dspace.app.rest.model.LinkRest;
 import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.hateoas.HALResource;
 import org.dspace.app.rest.repository.DSpaceRestRepository;
+import org.dspace.app.rest.utils.Utils;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -52,8 +53,7 @@ import org.springframework.web.bind.annotation.RestController;
  *
  * <h2>How a projection is chosen</h2>
  *
- * When a REST request is made, the projection argument, if present, is used to look up the projection to use,
- * by name. If no argument is present, {@link DefaultProjection} will be used.
+ * See {@link Utils#obtainProjection()}.
  */
 public interface Projection {
 

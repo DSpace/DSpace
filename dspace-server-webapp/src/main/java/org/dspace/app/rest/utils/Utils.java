@@ -27,6 +27,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +38,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
 import javax.annotation.Nullable;
+import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
@@ -56,7 +58,9 @@ import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.hateoas.DSpaceResource;
 import org.dspace.app.rest.model.hateoas.EmbeddedPage;
 import org.dspace.app.rest.model.hateoas.HALResource;
+import org.dspace.app.rest.projection.CompositeProjection;
 import org.dspace.app.rest.projection.DefaultProjection;
+import org.dspace.app.rest.projection.EmbedRelsProjection;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.repository.DSpaceRestRepository;
 import org.dspace.app.rest.repository.LinkRestRepository;
@@ -439,15 +443,73 @@ public class Utils {
     }
 
     /**
-     * Gets the projection requested by the current servlet request, or {@link DefaultProjection} if none
+     * Gets the effective projection requested by the current servlet request, or {@link DefaultProjection} if none
      * is specified.
+     * <p>
+     * Any number of individual {@code Projections} that are spring-registered {@link Component}s may be specified
+     * by name via the {@code projection} parameter. If multiple projections are specified, they will be wrapped in a
+     * {@link CompositeProjection} and applied in order as described there.
+     * </p><p>
+     * In addition, any number of embeds may be specified by rel name via the {@code embed} parameter.
+     * When provided, these act as a whitelist of embeds that may be included in the response, as described
+     * and implemented by {@link EmbedRelsProjection}.
+     * </p>
      *
      * @return the requested or default projection, never {@code null}.
      * @throws IllegalArgumentException if the request specifies an unknown projection name.
      */
     public Projection obtainProjection() {
-        String projectionName = requestService.getCurrentRequest().getServletRequest().getParameter("projection");
-        return converter.getProjection(projectionName);
+        ServletRequest servletRequest = requestService.getCurrentRequest().getServletRequest();
+        List<String> projectionNames = getValues(servletRequest, "projection");
+        Set<String> embedRels = new HashSet<>(getValues(servletRequest, "embed"));
+
+        List<Projection> projections = new ArrayList<>();
+
+        for (String projectionName : projectionNames) {
+            projections.add(converter.getProjection(projectionName));
+        }
+
+        if (!embedRels.isEmpty()) {
+            projections.add(new EmbedRelsProjection(embedRels));
+        }
+
+        if (projections.isEmpty()) {
+            return Projection.DEFAULT;
+        } else if (projections.size() == 1) {
+            return projections.get(0);
+        } else {
+            return new CompositeProjection(projections);
+        }
+    }
+
+    /**
+     * Gets zero or more values for the given servlet request parameter.
+     * <p>
+     * This convenience method reads multiple values that have been specified as request parameter in multiple ways:
+     * via * {@code ?paramName=value1&paramName=value2}, via {@code ?paramName=value1,value2},
+     * or a combination.
+     * </p><p>
+     * It provides the values in the order they were given in the request, and automatically de-dupes them.
+     * </p>
+     *
+     * @param servletRequest the servlet request.
+     * @param parameterName the parameter name.
+     * @return the ordered, de-duped values, possibly empty, never {@code null}.
+     */
+    private List<String> getValues(ServletRequest servletRequest, String parameterName) {
+        String[] rawValues = servletRequest.getParameterValues(parameterName);
+        List<String> values = new ArrayList<>();
+        if (rawValues != null) {
+            for (String rawValue : rawValues) {
+                for (String value : rawValue.split(",")) {
+                    String trimmedValue = value.trim();
+                    if (trimmedValue.length() > 0 && !values.contains(trimmedValue)) {
+                        values.add(trimmedValue);
+                    }
+                }
+            }
+        }
+        return values;
     }
 
     /**
