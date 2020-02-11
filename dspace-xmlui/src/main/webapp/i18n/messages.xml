@@ -581,6 +581,7 @@
     <message key="org.dspace.authenticate.ShibAuthentication.title">Shibboleth Authentication</message>
     <message key="org.dspace.eperson.LDAPAuthentication.title">LDAP Authentication</message>
     <message key="org.dspace.eperson.PasswordAuthentication.title">Password Authentication</message>
+    <message key="org.dspace.eperson.FeideAuthentication.title">FEIDE Authentication</message>
     <message key="org.dspace.eperson.X509Authentication.title">Web Certificate Authentication</message>
 
     <!-- org.dspace.app.xmlui.eperson.FailedAuthentication -->

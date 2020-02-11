@@ -398,6 +398,6 @@ public class FeideAuthentication implements AuthenticationMethod {
      * @return Message key to look up in i18n message catalog.
      */
     public String loginPageTitle(Context context) {
-        return "org.dspace.eperson.PasswordAuthentication.title";
+        return "org.dspace.eperson.FeideAuthentication.title";
     }
 }
