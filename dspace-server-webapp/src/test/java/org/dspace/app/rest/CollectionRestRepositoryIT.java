@@ -275,7 +275,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
     @Test
     public void findAuthorizedByCommunityWithoutUUIDTest() throws Exception {
         getClient().perform(get("/api/core/collections/search/findAuthorizedByCommunity"))
-                   .andExpect(status().isUnprocessableEntity());
+                   .andExpect(status().isBadRequest());
     }
 
     @Test

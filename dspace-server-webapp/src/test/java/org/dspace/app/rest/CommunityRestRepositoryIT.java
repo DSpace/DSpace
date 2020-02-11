@@ -767,7 +767,7 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
     @Test
     public void findAllSubCommunitiesWithoutUUID() throws Exception {
         getClient().perform(get("/api/core/communities/search/subCommunities"))
-                 .andExpect(status().isUnprocessableEntity());
+                 .andExpect(status().isBadRequest());
     }
 
     @Test
