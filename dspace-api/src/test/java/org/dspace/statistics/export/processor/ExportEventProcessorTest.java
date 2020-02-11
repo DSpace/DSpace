@@ -9,7 +9,8 @@ package org.dspace.statistics.export.processor;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -30,12 +31,15 @@ import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 
 /**
  * Test for the ExportEventProcessor class
  */
+@RunWith(MockitoJUnitRunner.class)
 public class ExportEventProcessorTest extends AbstractDSpaceTest {
 
     @Mock
@@ -94,11 +98,6 @@ public class ExportEventProcessorTest extends AbstractDSpaceTest {
         exportEventProcessor.itemService = itemService;
         exportEventProcessor.context = context;
 
-        when(item.isArchived()).thenReturn(true);
-        when(itemService.canEdit(context, item)).thenReturn(false);
-        when(exportEventProcessor.shouldProcessItemType(item)).thenReturn(true);
-        when(exportEventProcessor.shouldProcessEntityType(item)).thenReturn(true);
-
         when(exportEventProcessor.shouldProcessItem(null)).thenCallRealMethod();
         boolean result = exportEventProcessor.shouldProcessItem(null);
         assertThat(result, is(false));
@@ -111,10 +110,6 @@ public class ExportEventProcessorTest extends AbstractDSpaceTest {
     public void testShouldProcessItemWhenNotArchived() throws SQLException {
         exportEventProcessor.itemService = itemService;
         exportEventProcessor.context = context;
-
-        when(itemService.canEdit(context, item)).thenReturn(false);
-        when(exportEventProcessor.shouldProcessItemType(item)).thenReturn(true);
-        when(exportEventProcessor.shouldProcessEntityType(item)).thenReturn(true);
 
         when(item.isArchived()).thenReturn(false);
 
@@ -132,8 +127,6 @@ public class ExportEventProcessorTest extends AbstractDSpaceTest {
         exportEventProcessor.context = context;
 
         when(item.isArchived()).thenReturn(true);
-        when(exportEventProcessor.shouldProcessItemType(item)).thenReturn(true);
-        when(exportEventProcessor.shouldProcessEntityType(item)).thenReturn(true);
 
         when(itemService.canEdit(context, item)).thenReturn(true);
 
@@ -153,8 +146,6 @@ public class ExportEventProcessorTest extends AbstractDSpaceTest {
 
         when(item.isArchived()).thenReturn(true);
         when(itemService.canEdit(context, item)).thenReturn(false);
-        when(exportEventProcessor.shouldProcessEntityType(item)).thenReturn(true);
-
         when(exportEventProcessor.shouldProcessItemType(item)).thenReturn(false);
 
         when(exportEventProcessor.shouldProcessItem(item)).thenCallRealMethod();
@@ -292,8 +283,7 @@ public class ExportEventProcessorTest extends AbstractDSpaceTest {
         List<MetadataValue> values = new ArrayList<>();
         values.add(metadataValue);
 
-        when(itemService.getMetadata(any(Item.class), any(String.class), any(String.class), any(String.class),
-                                     any(String.class))).thenReturn(values);
+        doReturn(values).when(itemService).getMetadata(item, "dc", "type", null, Item.ANY);
 
 
         when(exportEventProcessor.shouldProcessItemType(item)).thenCallRealMethod();
@@ -323,8 +313,7 @@ public class ExportEventProcessorTest extends AbstractDSpaceTest {
         List<MetadataValue> values = new ArrayList<>();
         values.add(metadataValue);
 
-        when(itemService.getMetadata(any(Item.class), any(String.class), any(String.class), any(String.class),
-                                     any(String.class))).thenReturn(values);
+        doReturn(values).when(itemService).getMetadata(item, "dc", "type", null, Item.ANY);
 
 
         when(exportEventProcessor.shouldProcessItemType(item)).thenCallRealMethod();

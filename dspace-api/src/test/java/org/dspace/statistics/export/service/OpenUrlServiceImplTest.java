@@ -8,8 +8,8 @@
 package org.dspace.statistics.export.service;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
@@ -32,7 +32,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 /**
  * Test class for the OpenUrlServiceImpl
@@ -58,8 +58,6 @@ public class OpenUrlServiceImplTest {
 
         doReturn(HttpURLConnection.HTTP_OK).when(openUrlService)
                                            .getResponseCodeFromUrl(anyString());
-        doNothing().when(openUrlService).logfailed(any(Context.class), anyString());
-
         openUrlService.processUrl(context, "test-url");
 
         verify(openUrlService, times(0)).logfailed(context, "test-url");
