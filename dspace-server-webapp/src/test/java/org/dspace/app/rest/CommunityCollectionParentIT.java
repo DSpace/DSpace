@@ -1,8 +1,18 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
 package org.dspace.app.rest;
 
 import java.sql.SQLException;
 import java.util.Map;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.not;
+import static org.junit.Assert.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -62,7 +72,6 @@ public class CommunityCollectionParentIT extends AbstractControllerIntegrationTe
                                                 .build();
         communityAB = CommunityBuilder.createSubCommunity(context, communityA)
                                                 .withName("Sub Community Two")
-                                                .addParentCommunity(context, communityB)
                                                 .build();
         col1 = CollectionBuilder.createCollection(context, communityAA).withName("Collection 1").build();
         col2 = CollectionBuilder.createCollection(context, communityAA).withName("Collection 2").build();
@@ -95,14 +104,201 @@ public class CommunityCollectionParentIT extends AbstractControllerIntegrationTe
     }
 
     @Test
-    public void itemOwningCollectionTest() throws Exception {
-
-        String token = getAuthToken(admin.getEmail(), password);
-        MvcResult mvcResult = getClient(token).perform(get("/api/core/items/" + itemX + "/owningCollection")).andReturn();
+    public void itemXOwningCollectionTest() throws Exception {
 
         ObjectMapper mapper = new ObjectMapper();
+        String token = getAuthToken(admin.getEmail(), password);
+        MvcResult mvcResult = getClient(token).perform(get("/api/core/items/" + itemX.getID() + "/owningCollection")).andReturn();
+
         String content = mvcResult.getResponse().getContentAsString();
         Map<String,Object> map = mapper.readValue(content, Map.class);
-        String uuidString =  String.valueOf(map.get("uuid"));
+        String collectionUuidString =  String.valueOf(map.get("uuid"));
+        String collectionName = String.valueOf(map.get("name"));
+
+        mvcResult = getClient(token).perform(get("/api/core/collections/" + col1.getID())).andReturn();
+        content = mvcResult.getResponse().getContentAsString();
+        map = mapper.readValue(content, Map.class);
+        String actualCollectionName = String.valueOf(map.get("name"));
+
+        assertThat(collectionName, equalTo(actualCollectionName));
+        assertThat(collectionUuidString, equalTo(String.valueOf(col1.getID())));
+        assertThat(collectionUuidString, not(String.valueOf(col2.getID())));
+
     }
+
+    @Test
+    public void itemYOwningCollectionTest() throws Exception {
+
+        ObjectMapper mapper = new ObjectMapper();
+        String token = getAuthToken(admin.getEmail(), password);
+        MvcResult mvcResult = getClient(token).perform(get("/api/core/items/" + itemY.getID() + "/owningCollection")).andReturn();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        Map<String,Object> map = mapper.readValue(content, Map.class);
+        String collectionUuidString =  String.valueOf(map.get("uuid"));
+        String collectionName = String.valueOf(map.get("name"));
+
+        mvcResult = getClient(token).perform(get("/api/core/collections/" + col1.getID())).andReturn();
+        content = mvcResult.getResponse().getContentAsString();
+        map = mapper.readValue(content, Map.class);
+        String actualCollectionName = String.valueOf(map.get("name"));
+
+        assertThat(collectionName, equalTo(actualCollectionName));
+        assertThat(collectionUuidString, equalTo(String.valueOf(col1.getID())));
+        assertThat(collectionUuidString, not(String.valueOf(col2.getID())));
+
+    }
+
+    @Test
+    public void itemZOwningCollectionTest() throws Exception {
+
+        ObjectMapper mapper = new ObjectMapper();
+        String token = getAuthToken(admin.getEmail(), password);
+        MvcResult mvcResult = getClient(token).perform(get("/api/core/items/" + itemZ.getID() + "/owningCollection")).andReturn();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        Map<String,Object> map = mapper.readValue(content, Map.class);
+        String collectionUuidString =  String.valueOf(map.get("uuid"));
+        String collectionName = String.valueOf(map.get("name"));
+
+        mvcResult = getClient(token).perform(get("/api/core/collections/" + col2.getID())).andReturn();
+        content = mvcResult.getResponse().getContentAsString();
+        map = mapper.readValue(content, Map.class);
+        String actualCollectionName = String.valueOf(map.get("name"));
+
+        assertThat(collectionName, equalTo(actualCollectionName));
+        assertThat(collectionUuidString, equalTo(String.valueOf(col2.getID())));
+        assertThat(collectionUuidString, not(String.valueOf(col1.getID())));
+
+    }
+
+    @Test
+    public void col1ParentCommunityTest() throws Exception {
+
+        ObjectMapper mapper = new ObjectMapper();
+        String token = getAuthToken(admin.getEmail(), password);
+        MvcResult mvcResult = getClient(token).perform(get("/api/core/collections/" + col1.getID() + "/parentCommunity")).andReturn();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        Map<String,Object> map = mapper.readValue(content, Map.class);
+        String communityUuidString =  String.valueOf(map.get("uuid"));
+        String communityName = String.valueOf(map.get("name"));
+
+        mvcResult = getClient(token).perform(get("/api/core/communities/" + communityAA.getID())).andReturn();
+        content = mvcResult.getResponse().getContentAsString();
+        map = mapper.readValue(content, Map.class);
+        String actualCommunityName = String.valueOf(map.get("name"));
+
+        assertThat(communityName, equalTo(actualCommunityName));
+        assertThat(communityUuidString, equalTo(String.valueOf(communityAA.getID())));
+        assertThat(communityUuidString, not(String.valueOf(communityA.getID())));
+        assertThat(communityUuidString, not(String.valueOf(communityAB.getID())));
+
+    }
+
+    @Test
+    public void col2ParentCommunityTest() throws Exception {
+
+        ObjectMapper mapper = new ObjectMapper();
+        String token = getAuthToken(admin.getEmail(), password);
+        MvcResult mvcResult = getClient(token).perform(get("/api/core/collections/" + col2.getID() + "/parentCommunity")).andReturn();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        Map<String,Object> map = mapper.readValue(content, Map.class);
+        String communityUuidString =  String.valueOf(map.get("uuid"));
+        String communityName = String.valueOf(map.get("name"));
+
+        mvcResult = getClient(token).perform(get("/api/core/communities/" + communityAA.getID())).andReturn();
+        content = mvcResult.getResponse().getContentAsString();
+        map = mapper.readValue(content, Map.class);
+        String actualCommunityName = String.valueOf(map.get("name"));
+
+        assertThat(communityName, equalTo(actualCommunityName));
+        assertThat(communityUuidString, equalTo(String.valueOf(communityAA.getID())));
+        assertThat(communityUuidString, not(String.valueOf(communityA.getID())));
+        assertThat(communityUuidString, not(String.valueOf(communityAB.getID())));
+
+    }
+
+    @Test
+    public void col3ParentCommunityTest() throws Exception {
+
+        ObjectMapper mapper = new ObjectMapper();
+        String token = getAuthToken(admin.getEmail(), password);
+        MvcResult mvcResult = getClient(token).perform(get("/api/core/collections/" + col3.getID() + "/parentCommunity")).andReturn();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        Map<String,Object> map = mapper.readValue(content, Map.class);
+        String communityUuidString =  String.valueOf(map.get("uuid"));
+        String communityName = String.valueOf(map.get("name"));
+
+        mvcResult = getClient(token).perform(get("/api/core/communities/" + communityAB.getID())).andReturn();
+        content = mvcResult.getResponse().getContentAsString();
+        map = mapper.readValue(content, Map.class);
+        String actualCommunityName = String.valueOf(map.get("name"));
+
+        assertThat(communityName, equalTo(actualCommunityName));
+        assertThat(communityUuidString, equalTo(String.valueOf(communityAB.getID())));
+        assertThat(communityUuidString, not(String.valueOf(communityA.getID())));
+        assertThat(communityUuidString, not(String.valueOf(communityAA.getID())));
+
+    }
+
+    @Test
+    public void comAAParentCommunityTest() throws Exception {
+
+        ObjectMapper mapper = new ObjectMapper();
+        String token = getAuthToken(admin.getEmail(), password);
+        MvcResult mvcResult = getClient(token).perform(get("/api/core/communities/" + communityAA.getID() + "/parentCommunity")).andReturn();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        Map<String,Object> map = mapper.readValue(content, Map.class);
+        String communityUuidString =  String.valueOf(map.get("uuid"));
+        String communityName = String.valueOf(map.get("name"));
+
+        mvcResult = getClient(token).perform(get("/api/core/communities/" + communityA.getID())).andReturn();
+        content = mvcResult.getResponse().getContentAsString();
+        map = mapper.readValue(content, Map.class);
+        String actualCommunityName = String.valueOf(map.get("name"));
+
+        assertThat(communityName, equalTo(actualCommunityName));
+        assertThat(communityUuidString, equalTo(String.valueOf(communityA.getID())));
+        assertThat(communityUuidString, not(String.valueOf(communityB.getID())));
+
+    }
+
+
+    @Test
+    public void comABParentCommunityTest() throws Exception {
+
+        ObjectMapper mapper = new ObjectMapper();
+        String token = getAuthToken(admin.getEmail(), password);
+        MvcResult mvcResult = getClient(token).perform(get("/api/core/communities/" + communityAB.getID() + "/parentCommunity")).andReturn();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        Map<String,Object> map = mapper.readValue(content, Map.class);
+        String communityUuidString =  String.valueOf(map.get("uuid"));
+        String communityName = String.valueOf(map.get("name"));
+
+        mvcResult = getClient(token).perform(get("/api/core/communities/" + communityA.getID())).andReturn();
+        content = mvcResult.getResponse().getContentAsString();
+        map = mapper.readValue(content, Map.class);
+        String actualCommunityName = String.valueOf(map.get("name"));
+
+        assertThat(communityName, equalTo(actualCommunityName));
+        assertThat(communityUuidString, equalTo(String.valueOf(communityA.getID())));
+        assertThat(communityUuidString, not(String.valueOf(communityB.getID())));
+
+    }
+
+    @Test
+    public void comAParentCommunityTest() throws Exception {
+
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(get("/api/core/communities/" + communityA.getID() + "/parentCommunity"))
+                                                        .andExpect(status().isNoContent());
+
+
+    }
+
 }
