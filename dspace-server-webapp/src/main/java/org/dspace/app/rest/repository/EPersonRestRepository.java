@@ -150,7 +150,7 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
      *
      * @param email
      *            is the *required* email address
-     * @return a Page of EPersonRest instances matching the user query
+     * @return the EPersonRest instance, if any, matching the user query
      */
     @SearchRestMethod(name = "byEmail")
     public EPersonRest findByEmail(@Parameter(value = "email", required = true) String email) {
