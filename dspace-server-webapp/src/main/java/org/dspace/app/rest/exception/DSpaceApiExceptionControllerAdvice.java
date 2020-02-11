@@ -107,7 +107,7 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
     @ExceptionHandler(MissingParameterException.class)
     protected void MissingParameterException(HttpServletRequest request, HttpServletResponse response, Exception ex)
         throws IOException {
-
+        // we want the 400 status for missing parameters, see https://jira.lyrasis.org/browse/DS-4428
         sendErrorResponse(request, response, null,
                           ex.getMessage(),
                           HttpStatus.BAD_REQUEST.value());
@@ -117,9 +117,8 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
     protected ResponseEntity<Object> handleMissingServletRequestParameter(MissingServletRequestParameterException ex,
                                                                           HttpHeaders headers, HttpStatus status,
                                                                           WebRequest request) {
-        // we want the 422 status for missing parameter as it seems to be the common behavior for REST application, see
-        // https://stackoverflow.com/questions/3050518/what-http-status-response-code-should-i-use-if-the-request-is-missing-a-required
-        return super.handleMissingServletRequestParameter(ex, headers, HttpStatus.UNPROCESSABLE_ENTITY, request);
+        // we want the 400 status for missing parameters, see https://jira.lyrasis.org/browse/DS-4428
+        return super.handleMissingServletRequestParameter(ex, headers, HttpStatus.BAD_REQUEST, request);
     }
 
     @Override
