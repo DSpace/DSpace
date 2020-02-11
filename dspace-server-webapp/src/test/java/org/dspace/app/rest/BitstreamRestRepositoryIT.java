@@ -26,6 +26,7 @@ import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.builder.ItemBuilder;
 import org.dspace.app.rest.matcher.BitstreamFormatMatcher;
 import org.dspace.app.rest.matcher.BitstreamMatcher;
+import org.dspace.app.rest.matcher.HalMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.app.rest.test.MetadataPatchSuite;
 import org.dspace.content.Bitstream;
@@ -250,6 +251,8 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
 
         //We turn off the authorization system in order to create the structure as defined below
         context.turnOffAuthorisationSystem();
+        HalMatcher projectionsMatcher = new HalMatcher();
+
 
         //** GIVEN **
         //1. A community-collection structure with one parent community with sub-community and one collection.
@@ -295,9 +298,16 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
         getClient().perform(get("/api/core/bitstreams/" + bitstream.getID())
                    .param("projection", "full"))
                    .andExpect(status().isOk())
+                   .andExpect(jsonPath("$", projectionsMatcher.matchBitstreamEmbeds()))
+                   .andExpect(jsonPath("$", projectionsMatcher.matchBitstreamLinks()))
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$", BitstreamMatcher.matchBitstreamEntry(bitstream)))
                    .andExpect(jsonPath("$", not(BitstreamMatcher.matchBitstreamEntry(bitstream1))))
+        ;
+
+        getClient().perform(get("/api/core/bitstreams/" + bitstream.getID()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", projectionsMatcher.matchNoEmbeds()))
         ;
 
     }
