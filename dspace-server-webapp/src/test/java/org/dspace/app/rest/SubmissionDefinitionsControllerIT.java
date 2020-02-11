@@ -19,6 +19,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
+import org.dspace.app.rest.matcher.HalMatcher;
 import org.dspace.app.rest.matcher.SubmissionDefinitionsMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.content.Collection;
@@ -64,6 +65,7 @@ public class SubmissionDefinitionsControllerIT extends AbstractControllerIntegra
 
     @Test
     public void findDefault() throws Exception {
+        HalMatcher projectionsMatcher = new HalMatcher();
 
         getClient().perform(get("/api/config/submissiondefinitions/traditional"))
                    //The status has to be 403 Not Authorized
@@ -71,9 +73,11 @@ public class SubmissionDefinitionsControllerIT extends AbstractControllerIntegra
 
         String token = getAuthToken(admin.getEmail(), password);
 
-        getClient(token).perform(get("/api/config/submissiondefinitions/traditional"))
+        getClient(token).perform(get("/api/config/submissiondefinitions/traditional").param("projection", "full"))
                    //The status has to be 200 OK
                    .andExpect(status().isOk())
+                   .andExpect(jsonPath("$", projectionsMatcher.matchSubmissionDefintionsEmbeds()))
+                   .andExpect(jsonPath("$", projectionsMatcher.matchSubmissionDefintionsLinks()))
                    //We expect the content type to be "application/hal+json;charset=UTF-8"
                    .andExpect(content().contentType(contentType))
 

@@ -36,6 +36,7 @@ import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.matcher.CommunityMatcher;
 import org.dspace.app.rest.matcher.MetadataMatcher;
 import org.dspace.app.rest.matcher.PageMatcher;
+import org.dspace.app.rest.matcher.HalMatcher;
 import org.dspace.app.rest.model.CommunityRest;
 import org.dspace.app.rest.model.MetadataRest;
 import org.dspace.app.rest.model.MetadataValueRest;
@@ -516,21 +517,25 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
 
         context.restoreAuthSystemState();
 
+        // When full projection is requested, response should include expected properties, links, and embeds.
         getClient().perform(get("/api/core/communities/" + parentCommunity.getID().toString())
-                   .param("projection", "full"))
-                   .andExpect(status().isOk())
-                   .andExpect(content().contentType(contentType))
-                   .andExpect(jsonPath("$", Matchers.is(
-                       CommunityMatcher.matchCommunityEntry(parentCommunity.getName(), parentCommunity.getID(),
-                                                            parentCommunity.getHandle())
-                   )))
-                   .andExpect(jsonPath("$", Matchers.not(
-                       Matchers.is(
-                           CommunityMatcher.matchCommunityEntry(child1.getName(), child1.getID(), child1.getHandle())
-                       )
-                   )))
-                   .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/communities")))
-        ;
+                .param("projection", "full"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$", CommunityMatcher.matchFullEmbeds()))
+                .andExpect(jsonPath("$._embedded.subcommunities._embedded.subcommunities[0]",
+                        HalMatcher.matchNoEmbeds())) // embeds should not be included in embeds (MAX_EMBED_LEVEL = 1)
+                .andExpect(jsonPath("$", CommunityMatcher.matchCommunityEntry(
+                        parentCommunity.getName(), parentCommunity.getID(), parentCommunity.getHandle())));
+
+        // When no projection is requested, response should include expected properties, links, and no embeds.
+        getClient().perform(get("/api/core/communities/" + parentCommunity.getID().toString()))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()))
+                .andExpect(jsonPath("$", CommunityMatcher.matchLinks(parentCommunity.getID())))
+                .andExpect(jsonPath("$", CommunityMatcher.matchProperties(
+                        parentCommunity.getName(), parentCommunity.getID(), parentCommunity.getHandle())));
     }
 
     @Test
