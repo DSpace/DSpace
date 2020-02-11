@@ -25,6 +25,13 @@ public class ParameterRest {
      */
     private String type;
 
+    /**
+     * Boolean indicating whether the parameter is mandatory or not
+     */
+    private boolean mandatory;
+
+
+
     public String getName() {
         return name;
     }
@@ -47,5 +54,21 @@ public class ParameterRest {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    /**
+     * Generic getter for the mandatory
+     * @return the mandatory value of this ParameterRest
+     */
+    public boolean isMandatory() {
+        return mandatory;
+    }
+
+    /**
+     * Generic setter for the mandatory
+     * @param mandatory   The mandatory to be set on this ParameterRest
+     */
+    public void setMandatory(boolean mandatory) {
+        this.mandatory = mandatory;
     }
 }

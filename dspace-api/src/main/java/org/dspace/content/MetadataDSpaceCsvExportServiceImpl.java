@@ -32,7 +32,7 @@ public class MetadataDSpaceCsvExportServiceImpl implements MetadataDSpaceCsvExpo
                                   DSpaceRunnableHandler handler) throws Exception {
         Iterator<Item> toExport = null;
 
-        if (!exportAllItems) {
+        if (exportAllItems) {
             handler.logInfo("Exporting whole repository WARNING: May take some time!");
             toExport = itemService.findAll(context);
         } else {

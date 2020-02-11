@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * The implementation for the {@link ScriptService}
  */
 public class ScriptServiceImpl implements ScriptService {
+
     @Autowired
     private ServiceManager serviceManager;
 

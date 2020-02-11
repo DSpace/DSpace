@@ -93,7 +93,7 @@ public class MetadataExport extends DSpaceRunnable {
 
         exportAllMetadata = commandLine.hasOption('a');
 
-        if (commandLine.hasOption('i')) {
+        if (!commandLine.hasOption('i')) {
             exportAllItems = true;
         }
         handle = commandLine.getOptionValue('i');
