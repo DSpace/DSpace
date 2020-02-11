@@ -251,7 +251,6 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
 
         //We turn off the authorization system in order to create the structure as defined below
         context.turnOffAuthorisationSystem();
-        HalMatcher projectionsMatcher = new HalMatcher();
 
 
         //** GIVEN **
@@ -295,19 +294,20 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                                          .build();
         }
 
+        // When full projection is requested, response should include expected properties, links, and embeds.
         getClient().perform(get("/api/core/bitstreams/" + bitstream.getID())
                    .param("projection", "full"))
                    .andExpect(status().isOk())
-                   .andExpect(jsonPath("$", projectionsMatcher.matchBitstreamEmbeds()))
-                   .andExpect(jsonPath("$", projectionsMatcher.matchBitstreamLinks()))
                    .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$", BitstreamMatcher.matchFullEmbeds()))
                    .andExpect(jsonPath("$", BitstreamMatcher.matchBitstreamEntry(bitstream)))
                    .andExpect(jsonPath("$", not(BitstreamMatcher.matchBitstreamEntry(bitstream1))))
         ;
 
+        // When no projection is requested, response should include expected properties, links, and no embeds.
         getClient().perform(get("/api/core/bitstreams/" + bitstream.getID()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", projectionsMatcher.matchNoEmbeds()))
+                .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()))
         ;
 
     }

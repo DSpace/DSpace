@@ -23,6 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.Base64;
 
 import org.dspace.app.rest.builder.GroupBuilder;
+import org.dspace.app.rest.matcher.AuthenticationStatusMatcher;
 import org.dspace.app.rest.matcher.EPersonMatcher;
 import org.dspace.app.rest.matcher.HalMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
@@ -59,13 +60,12 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
     @Test
     public void testStatusAuthenticated() throws Exception {
         String token = getAuthToken(eperson.getEmail(), password);
-        HalMatcher projectionsMatcher = new HalMatcher();
 
         getClient(token).perform(get("/api/authn/status").param("projection", "full"))
 
                         .andExpect(status().isOk())
-                        .andExpect(jsonPath("$", projectionsMatcher.matchAuthStatusEmbeds()))
-                        .andExpect(jsonPath("$", projectionsMatcher.matchAuthStatusLinks()))
+                        .andExpect(jsonPath("$", AuthenticationStatusMatcher.matchFullEmbeds()))
+                        .andExpect(jsonPath("$", AuthenticationStatusMatcher.matchLinks()))
                         //We expect the content type to be "application/hal+json;charset=UTF-8"
                         .andExpect(content().contentType(contentType))
                         .andExpect(jsonPath("$.okay", is(true)))
@@ -79,7 +79,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
 
         getClient(token).perform(get("/api/authn/status"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", projectionsMatcher.matchNoEmbeds()))
+                .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()))
         ;
     }
 
