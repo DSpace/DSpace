@@ -1,9 +1,15 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
 package org.dspace.app.rest.matcher;
 
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasNoJsonPath;
 import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 
@@ -19,7 +25,7 @@ import org.hamcrest.Matcher;
  */
 public class HalMatcher {
 
-    public HalMatcher() { }
+    private HalMatcher() { }
 
     /**
      * Gets a matcher for no _embedded property.
@@ -67,7 +73,7 @@ public class HalMatcher {
      * @param rels the names of the rels, which are assumed to be subresources and thus have hrefs ending with
      *             "/rel"
      */
-    public static Matcher<? super Object> hasLinks(String selfHref, String... rels) {
+    public static Matcher<? super Object> matchLinks(String selfHref, String... rels) {
         List<Matcher<? super Object>> matchers = new ArrayList<>();
         for (String rel : rels) {
             String href = rel.equals("self") ? selfHref : selfHref + "/" + rel;

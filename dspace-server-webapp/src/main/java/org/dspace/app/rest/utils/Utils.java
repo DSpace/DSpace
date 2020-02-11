@@ -95,7 +95,7 @@ public class Utils {
     /**
      * The maximum number of embed levels to allow.
      */
-    private static final int EMBED_MAX_LEVELS = 1;
+    private static final int EMBED_MAX_LEVELS = 3;
 
     @Autowired
     ApplicationContext applicationContext;

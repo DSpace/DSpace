@@ -112,16 +112,16 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         // When full projection is requested, response should include expected properties, links, and embeds.
         getClient().perform(get("/api/core/bundles/" + bundle1.getID())
-                   .param("projection", "full"))
-                   .andExpect(status().isOk())
-                   .andExpect(content().contentType(contentType))
-                   .andExpect(jsonPath("$", BundleMatcher.matchFullEmbeds()))
-                   .andExpect(jsonPath("$", BundleMatcher.matchBundle(bundle1.getName(),
-                                                                      bundle1.getID(),
-                                                                      bundle1.getHandle(),
-                                                                      bundle1.getType(),
-                                                                      bundle1.getBitstreams())
-                   ))
+                .param("projection", "full"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$", BundleMatcher.matchFullEmbeds()))
+                .andExpect(jsonPath("$", BundleMatcher.matchBundle(bundle1.getName(),
+                        bundle1.getID(),
+                        bundle1.getHandle(),
+                        bundle1.getType(),
+                        bundle1.getBitstreams())
+                ))
         ;
 
         // When no projection is requested, response should include expected properties, links, and no embeds.
@@ -129,13 +129,13 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()))
+                .andExpect(jsonPath("$", BundleMatcher.matchLinks(bundle1.getID())))
                 .andExpect(jsonPath("$", BundleMatcher.matchProperties(bundle1.getName(),
                         bundle1.getID(),
                         bundle1.getHandle(),
                         bundle1.getType())
                 ))
         ;
-
     }
 
 
