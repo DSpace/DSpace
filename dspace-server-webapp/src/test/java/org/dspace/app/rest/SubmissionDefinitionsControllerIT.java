@@ -65,19 +65,17 @@ public class SubmissionDefinitionsControllerIT extends AbstractControllerIntegra
 
     @Test
     public void findDefault() throws Exception {
-        HalMatcher projectionsMatcher = new HalMatcher();
-
         getClient().perform(get("/api/config/submissiondefinitions/traditional"))
                    //The status has to be 403 Not Authorized
                    .andExpect(status().isUnauthorized());
 
         String token = getAuthToken(admin.getEmail(), password);
 
+        // When full projection is requested, response should include expected properties, links, and embeds.
         getClient(token).perform(get("/api/config/submissiondefinitions/traditional").param("projection", "full"))
                    //The status has to be 200 OK
                    .andExpect(status().isOk())
-                   .andExpect(jsonPath("$", projectionsMatcher.matchSubmissionDefintionsEmbeds()))
-                   .andExpect(jsonPath("$", projectionsMatcher.matchSubmissionDefintionsLinks()))
+                   .andExpect(jsonPath("$", SubmissionDefinitionsMatcher.matchFullEmbeds()))
                    //We expect the content type to be "application/hal+json;charset=UTF-8"
                    .andExpect(content().contentType(contentType))
 
