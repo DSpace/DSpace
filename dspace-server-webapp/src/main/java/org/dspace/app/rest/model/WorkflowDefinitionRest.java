@@ -75,7 +75,7 @@ public class WorkflowDefinitionRest extends BaseObjectRest<String> {
         this.isDefault = isDefault;
     }
 
-    @LinkRest(linkClass = Step.class, embedOptional = true)
+    @LinkRest(linkClass = Step.class)
     @JsonIgnore
     public List<WorkflowStepRest> getSteps() {
         return steps;
