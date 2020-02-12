@@ -63,9 +63,4 @@ public class CollectionMappedItemLinkRepository extends AbstractDSpaceRestReposi
             throw new RuntimeException(e);
         }
     }
-
-    @Override
-    public boolean isEmbeddableRelation(Object data, String name) {
-        return false;
-    }
 }
