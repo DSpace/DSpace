@@ -53,7 +53,9 @@ public class CollectionMatcher {
     public static Matcher<? super Object> matchFullEmbeds() {
         return matchEmbeds(
                 "defaultAccessConditions[]",
-                "logo"
+                "license",
+                "logo",
+                "mappedItems[]"
         );
     }
 
