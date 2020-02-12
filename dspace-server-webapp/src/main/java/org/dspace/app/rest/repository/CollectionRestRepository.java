@@ -260,7 +260,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
      * @param context
      * @param collection    The collection for which to make the item
      * @param inputItemRest The new item
-     * @return The created item
+     * @return The created TemplateItem
      * @throws SQLException
      * @throws AuthorizeException
      */

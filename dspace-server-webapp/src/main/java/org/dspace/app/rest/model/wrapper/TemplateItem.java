@@ -15,6 +15,10 @@ import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 
+/**
+ * This class represents a Collection's Item Template. It acts as a wrapper for an {@link Item} object to differentiate
+ * between actual Items and TemplateItems
+ */
 public class TemplateItem {
     private Item item;
 

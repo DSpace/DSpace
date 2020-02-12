@@ -32,6 +32,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Component;
 
+/**
+ * This is the repository class that is responsible for handling {@link TemplateItemRest} objects
+ */
 @Component(TemplateItemRest.CATEGORY + "." + TemplateItemRest.NAME)
 public class TemplateItemRestRepository extends DSpaceRestRepository<TemplateItemRest, UUID> {
 
@@ -47,6 +50,7 @@ public class TemplateItemRestRepository extends DSpaceRestRepository<TemplateIte
     @Autowired
     private CollectionService collectionService;
 
+    @Override
     public TemplateItemRest findOne(Context context, UUID uuid) {
         Item item = null;
         try {
@@ -65,10 +69,12 @@ public class TemplateItemRestRepository extends DSpaceRestRepository<TemplateIte
         }
     }
 
+    @Override
     public Page<TemplateItemRest> findAll(Context context, Pageable pageable) {
         return null;
     }
 
+    @Override
     public Class<TemplateItemRest> getDomainClass() {
         return TemplateItemRest.class;
     }
