@@ -101,11 +101,8 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         anonymousGroup = EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS);
 
         context.restoreAuthSystemState();
-        
-        //disable file upload mandatory
-        configurationService.setProperty("webui.submit.upload.required", false);
     }
-    
+
     @Test
     /**
      * All the workspaceitem should be returned regardless of the collection where they were created
@@ -659,6 +656,9 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .withIssueDate("2017-10-17")
                 .build();
 
+        //disable file upload mandatory
+        configurationService.setProperty("webui.submit.upload.required", false);
+
         getClient(authToken).perform(get("/api/submission/workspaceitems/" + workspaceItem1.getID()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.errors").doesNotExist())
@@ -718,6 +718,9 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .withIssueDate("2017-10-17")
                 .withSubject("ExtraEntry")
                 .build();
+
+        //disable file upload mandatory
+        configurationService.setProperty("webui.submit.upload.required", false);
 
         // a simple patch to update an existent metadata
         List<Operation> updateTitle = new ArrayList<Operation>();
@@ -824,6 +827,9 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                     Matchers.is(WorkspaceItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(witem,
                             null, "2017-10-17", "ExtraEntry"))))
         ;
+
+        //disable file upload mandatory
+        configurationService.setProperty("webui.submit.upload.required", false);
 
         // try to remove a metadata in a specific position
         List<Operation> removeMidSubject = new ArrayList<Operation>();
@@ -954,6 +960,8 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .withSubject("ExtraEntry")
                 .build();
 
+        //disable file upload mandatory
+        configurationService.setProperty("webui.submit.upload.required", false);
 
         // try to add the title
         List<Operation> addTitle = new ArrayList<Operation>();
@@ -1010,6 +1018,9 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .withTitle("Test WorkspaceItem")
                 .withIssueDate("2017-10-17")
                 .build();
+
+        //disable file upload mandatory
+        configurationService.setProperty("webui.submit.upload.required", false);
 
         // try to add multiple subjects at once
         List<Operation> addSubjects = new ArrayList<Operation>();
@@ -1232,6 +1243,9 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$.sections.license.url").isEmpty())
         ;
 
+        //disable file upload mandatory
+        configurationService.setProperty("webui.submit.upload.required", false);
+
         // try to grant the license with an add operation
         List<Operation> addGrant = new ArrayList<Operation>();
         addGrant.add(new AddOperation("/sections/license/granted", true));
@@ -1380,6 +1394,9 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .withIssueDate("2017-10-17")
                 .grantLicense()
                 .build();
+
+        //disable file upload mandatory
+        configurationService.setProperty("webui.submit.upload.required", false);
 
         // check that our workspaceitems come with a license (all are build in the same way, just check the first)
         getClient().perform(get("/api/submission/workspaceitems/" + witem.getID()))
@@ -1835,8 +1852,6 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
             .withIssueDate("2017-10-17")
             .build();
 
-        configurationService.setProperty("webui.submit.upload.required", true);
-
         InputStream pdf = getClass().getResourceAsStream("simple-article.pdf");
         final MockMultipartFile pdfFile = new MockMultipartFile("file", "/local/path/simple-article.pdf",
             "application/pdf", pdf);
@@ -1877,8 +1892,6 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
             .withTitle("Test WorkspaceItem")
             .withIssueDate("2017-10-17")
             .build();
-
-        configurationService.setProperty("webui.submit.upload.required", true);
 
         //Verify there is an error since no file was uploaded (with upload required set to true)
         getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID()))
