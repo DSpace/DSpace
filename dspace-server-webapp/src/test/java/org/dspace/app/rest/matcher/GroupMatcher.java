@@ -8,6 +8,7 @@
 package org.dspace.app.rest.matcher;
 
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
+import static org.dspace.app.rest.matcher.HalMatcher.matchEmbeds;
 import static org.dspace.app.rest.test.AbstractControllerIntegrationTest.REST_SERVER_URL;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.containsString;
@@ -34,6 +35,15 @@ public class GroupMatcher {
             hasJsonPath("$.type", is("group")),
             hasJsonPath("$._links.self.href", containsString("/api/eperson/groups/")),
             hasJsonPath("$._links.groups.href", endsWith("/groups"))
+        );
+    }
+
+    /**
+     * Gets a matcher for all expected embeds when the full projection is requested.
+     */
+    public static Matcher<? super Object> matchFullEmbeds() {
+        return matchEmbeds(
+                "groups[]"
         );
     }
 

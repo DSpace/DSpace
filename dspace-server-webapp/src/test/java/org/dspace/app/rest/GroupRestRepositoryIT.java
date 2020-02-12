@@ -171,7 +171,8 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
         //The status has to be 200 OK
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
-                   .andExpect(jsonPath("$", GroupMatcher.matchLinks(group.getID())))
+                .andExpect(jsonPath("$", GroupMatcher.matchFullEmbeds()))
+                .andExpect(jsonPath("$", GroupMatcher.matchLinks(group.getID())))
                    .andExpect(jsonPath("$", Matchers.is(
                        GroupMatcher.matchGroupEntry(group.getID(), group.getName())
                    )))

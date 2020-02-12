@@ -51,6 +51,7 @@ public class ItemMatcher {
     public static Matcher<? super Object> matchFullEmbeds() {
         return matchEmbeds(
                 "bundles[]",
+                "mappedCollections[]",
                 "owningCollection",
                 "relationships[]",
                 "templateItemOf"
