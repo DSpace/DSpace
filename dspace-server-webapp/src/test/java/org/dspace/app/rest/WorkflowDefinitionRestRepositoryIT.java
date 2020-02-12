@@ -330,9 +330,6 @@ public class WorkflowDefinitionRestRepositoryIT extends AbstractControllerIntegr
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
             .withName("Sub Community")
             .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1, "123456789/workflow-test-1")
-            .withName("Collection 1")
-            .build();
         // until handle 123456789/5 used in example in workflow.xml (if uncommented)
         context.restoreAuthSystemState();
 
@@ -410,6 +407,42 @@ public class WorkflowDefinitionRestRepositoryIT extends AbstractControllerIntegr
         //When we call this facets endpoint
         getClient().perform(get(WORKFLOW_DEFINITIONS_ENDPOINT + "/" + defaultWorkflow.getID()
             + "/collections"))
+            .andExpect(status().isInternalServerError());
+    }
+
+    @Test
+    public void getStepsOfWorkflowByName_DefaultWorkflow() throws Exception {
+        String token = getAuthToken(eperson.getEmail(), password);
+        Workflow defaultWorkflow = xmlWorkflowFactory.getDefaultWorkflow();
+
+        //When we call this facets endpoint
+        getClient(token).perform(get(WORKFLOW_DEFINITIONS_ENDPOINT + "/" + defaultWorkflow.getID()
+            + "/steps"))
+            //We expect a 200 OK status
+            .andExpect(status().isOk())
+            //Number of total workflows is equals to number of non-mapped collections
+            .andExpect(jsonPath("$.page.totalElements", is(defaultWorkflow.getSteps().size())));
+    }
+
+    @Test
+    public void getStepsOfWorkflowByName_DefaultWorkflow_NoValidToken() throws Exception {
+        String token = "NonValidToken";
+        Workflow defaultWorkflow = xmlWorkflowFactory.getDefaultWorkflow();
+
+        //When we call this facets endpoint
+        getClient(token).perform(get(WORKFLOW_DEFINITIONS_ENDPOINT + "/" + defaultWorkflow.getID()
+            + "/steps"))
+            .andExpect(status().isInternalServerError());
+    }
+
+    @Test
+    public void getStepsOfWorkflowByName_DefaultWorkflow_NoToken() throws Exception {
+        Workflow defaultWorkflow = xmlWorkflowFactory.getDefaultWorkflow();
+        List<Collection> allNonMappedCollections = xmlWorkflowFactory.getAllNonMappedCollectionsHandles(context);
+
+        //When we call this facets endpoint
+        getClient().perform(get(WORKFLOW_DEFINITIONS_ENDPOINT + "/" + defaultWorkflow.getID()
+            + "/steps"))
             .andExpect(status().isInternalServerError());
     }
 }
