@@ -76,11 +76,11 @@ public class WorkflowDefinitionRestRepositoryIT extends AbstractControllerIntegr
             //Page nr is 1
             .andExpect(jsonPath("$.page.number", is(0)))
             //Contains only the first configured workflow
-            .andExpect(jsonPath("$._embedded.workflowDefinitionResources", Matchers.contains(
+            .andExpect(jsonPath("$._embedded.workflowdefinitions", Matchers.contains(
                 WorkflowDefinitionMatcher.matchWorkflowDefinitionEntry(allConfiguredWorkflows.get(0))
             )))
             //Doesn't contain the other workflows
-            .andExpect(jsonPath("$._embedded.workflowDefinitionResources", Matchers.not(
+            .andExpect(jsonPath("$._embedded.workflowdefinitions", Matchers.not(
                 Matchers.contains(
                     WorkflowDefinitionMatcher.matchWorkflowDefinitionEntry(allConfiguredWorkflows.get(1))
                 )
@@ -104,11 +104,11 @@ public class WorkflowDefinitionRestRepositoryIT extends AbstractControllerIntegr
             //Page nr is 2
             .andExpect(jsonPath("$.page.number", is(1)))
             //Contains only the second configured workflow
-            .andExpect(jsonPath("$._embedded.workflowDefinitionResources", Matchers.contains(
+            .andExpect(jsonPath("$._embedded.workflowdefinitions", Matchers.contains(
                 WorkflowDefinitionMatcher.matchWorkflowDefinitionEntry(allConfiguredWorkflows.get(1))
             )))
             //Doesn't contain 1st configured workflow
-            .andExpect(jsonPath("$._embedded.workflowDefinitionResources", Matchers.not(
+            .andExpect(jsonPath("$._embedded.workflowdefinitions", Matchers.not(
                 Matchers.contains(
                     WorkflowDefinitionMatcher.matchWorkflowDefinitionEntry(allConfiguredWorkflows.get(0))
                 )
@@ -330,7 +330,10 @@ public class WorkflowDefinitionRestRepositoryIT extends AbstractControllerIntegr
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
             .withName("Sub Community")
             .build();
-        // until handle 123456789/5 used in example in workflow.xml (if uncommented)
+        // Collection with handle used in workflow.xml!
+        Collection col1 = CollectionBuilder.createCollection(context, child1, "123456789/workflow-test-1")
+            .withName("Collection 1")
+            .build();
         context.restoreAuthSystemState();
 
         Workflow defaultWorkflow = xmlWorkflowFactory.getDefaultWorkflow();
@@ -432,7 +435,8 @@ public class WorkflowDefinitionRestRepositoryIT extends AbstractControllerIntegr
         //When we call this facets endpoint
         getClient(token).perform(get(WORKFLOW_DEFINITIONS_ENDPOINT + "/" + defaultWorkflow.getID()
             + "/steps"))
-            .andExpect(status().isInternalServerError());
+            //We expect a 403 Forbidden status
+            .andExpect(status().isForbidden());
     }
 
     @Test
@@ -443,6 +447,7 @@ public class WorkflowDefinitionRestRepositoryIT extends AbstractControllerIntegr
         //When we call this facets endpoint
         getClient().perform(get(WORKFLOW_DEFINITIONS_ENDPOINT + "/" + defaultWorkflow.getID()
             + "/steps"))
-            .andExpect(status().isInternalServerError());
+            //We expect a 401 Unauthorized
+            .andExpect(status().isUnauthorized());
     }
 }
