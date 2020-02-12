@@ -65,9 +65,4 @@ public class CollectionLicenseLinkRepository extends AbstractDSpaceRestRepositor
             throw new RuntimeException(e);
         }
     }
-
-    @Override
-    public boolean isEmbeddableRelation(Object data, String name) {
-        return false;
-    }
 }
