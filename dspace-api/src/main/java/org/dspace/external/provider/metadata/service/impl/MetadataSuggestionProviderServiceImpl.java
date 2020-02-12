@@ -113,7 +113,7 @@ public class MetadataSuggestionProviderServiceImpl implements MetadataSuggestion
     }
 
     @Override
-    public List<MetadataItemSuggestions> getMetadataSuggestionEntryRests(
+    public List<MetadataItemSuggestions> getMetadataItemSuggestions(
         MetadataSuggestionProvider metadataSuggestionProvider, InProgressSubmission inProgressSubmission, String query,
         Bitstream bitstream, boolean useMetadata,
         int start, int limit) {
@@ -122,6 +122,21 @@ public class MetadataSuggestionProviderServiceImpl implements MetadataSuggestion
 
         List<MetadataItemSuggestions> listToReturn = convertExternalDataObjects(inProgressSubmission, list);
         return listToReturn;
+    }
+
+    @Override
+    public int getTotalMetadataItemSuggestions(MetadataSuggestionProvider metadataSuggestionProvider,
+                                                InProgressSubmission inProgressSubmission, String query,
+                                                Bitstream bitstream, boolean useMetadata) {
+        int total = 0;
+        if (StringUtils.isNotBlank(query)) {
+            total = metadataSuggestionProvider.queryTotals(query);
+        } else if (bitstream != null) {
+            total = metadataSuggestionProvider.bitstreamQueryTotals(bitstream);
+        } else if (useMetadata) {
+            total = metadataSuggestionProvider.metadataQueryTotals(inProgressSubmission.getItem());
+        }
+        return total;
     }
 
     private List<MetadataItemSuggestions> convertExternalDataObjects(InProgressSubmission inProgressSubmission,

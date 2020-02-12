@@ -163,7 +163,7 @@ public class PubmedArticleDataProvider implements ExternalDataProvider {
      * @param query a query string to base the search on.
      * @return the sum of the matching records over this import source
      */
-    public int getNbRecords(String query) {
+    private int getNbRecords(String query) {
 
         WebTarget getRecordIdsTarget = pubmedWebTarget.queryParam("term", query);
 

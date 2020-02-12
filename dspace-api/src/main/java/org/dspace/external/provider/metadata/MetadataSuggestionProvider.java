@@ -205,4 +205,34 @@ public abstract class MetadataSuggestionProvider<T extends ExternalDataProvider>
     public List<ExternalDataObject> query(String query, int start, int limit) {
         throw new UnsupportedOperationException("This method is not supported by the MetadataSuggestionProvider");
     }
+
+    /**
+     * This method can be overriden in the implementing MetadataSuggestionProvider classes to support retrieving the
+     * total amount of results that will be return by performing a certain query
+     * @param query The query
+     * @return      The amount of results returned by this query
+     */
+    public int queryTotals(String query) {
+        return 0;
+    }
+
+    /**
+     * This method can be overriden in the implementing MetadataSuggestionProvider classes to support retrieving the
+     * total amount of results that will be return by performing a certain query based on a bitstream
+     * @param bitstream The bitstream
+     * @return          The amount of results returned by this bitstream query
+     */
+    public int bitstreamQueryTotals(Bitstream bitstream) {
+        return 0;
+    }
+
+    /**
+     * This method can be overriden in the implementing MetadataSuggestionProvider classes to support retrieving the
+     * total amount of results that will be return by performing a certain query based on an item
+     * @param item  The item
+     * @return      The amount of results returned by this item query
+     */
+    public int metadataQueryTotals(Item item) {
+        return 0;
+    }
 }

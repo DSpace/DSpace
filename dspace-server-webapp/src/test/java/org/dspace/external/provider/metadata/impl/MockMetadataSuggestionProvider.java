@@ -33,13 +33,14 @@ public class MockMetadataSuggestionProvider extends MetadataSuggestionProvider<M
         return list;
     }
 
+    @Override
     public List<ExternalDataObject> metadataQuery(Item item, int start, int limit) {
-        //TODO Validate
         List<ExternalDataObject> list = new LinkedList<>();
         list.add(getExternalDataProvider().getExternalDataObject("one").get());
         return list;
     }
 
+    @Override
     public List<ExternalDataObject> query(String query, int start, int limit) {
         List<ExternalDataObject> list = new LinkedList<>();
         if (StringUtils.equalsIgnoreCase(query, "one")) {

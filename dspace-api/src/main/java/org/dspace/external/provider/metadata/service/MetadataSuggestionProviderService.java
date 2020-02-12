@@ -70,9 +70,22 @@ public interface MetadataSuggestionProviderService {
      * @param limit                         The max number of records to be returned by the call
      * @return A list of MetadataItemSuggestions based on the given parameters
      */
-    public List<MetadataItemSuggestions> getMetadataSuggestionEntryRests(
+    public List<MetadataItemSuggestions> getMetadataItemSuggestions(
         MetadataSuggestionProvider metadataSuggestionProvider, InProgressSubmission inProgressSubmission, String query,
         Bitstream bitstream, boolean useMetadata,
         int start, int limit);
+
+    /**
+     * This method will retrieve the total amount of MetadataItemSuggestions returned for the given parameters
+     * @param metadataSuggestionProvider    The MetadataSuggestionProvider that will be used
+     * @param inProgressSubmission          The InProgressSubmission that will be used
+     * @param query                         The query for the call
+     * @param bitstream                     The bitstream for the call
+     * @param useMetadata                   Boolean indicating whether to use metadata or not
+     * @return A list of MetadataItemSuggestions based on the given parameters
+     */
+    int getTotalMetadataItemSuggestions(MetadataSuggestionProvider metadataSuggestionProvider,
+                                        InProgressSubmission inProgressSubmission, String query,
+                                        Bitstream bitstream, boolean useMetadata);
 
 }

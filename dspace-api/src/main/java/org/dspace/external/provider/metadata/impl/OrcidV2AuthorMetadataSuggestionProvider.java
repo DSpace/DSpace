@@ -7,7 +7,6 @@
  */
 package org.dspace.external.provider.metadata.impl;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -26,24 +25,39 @@ public class OrcidV2AuthorMetadataSuggestionProvider extends MetadataSuggestionP
     @Autowired
     private ItemService itemService;
 
+    @Override
     public List<ExternalDataObject> metadataQuery(Item item, int start, int limit) {
         // Concatenate metadata and send to query
+        String query = getQueryFromItem(item);
+        return query(query, start, limit);
+    }
+
+    private String getQueryFromItem(Item item) {
         String familyName = itemService.getMetadataFirstValue(item, "person", "familyName", null, Item.ANY);
         String firstName = itemService.getMetadataFirstValue(item, "person", "givenName", null, Item.ANY);
         String query = null;
         if (StringUtils.isNotBlank(familyName) && StringUtils.isNotBlank(firstName)) {
             query = familyName + ", " + firstName;
-        } else if (StringUtils.isBlank(familyName)) {
+        } else if (StringUtils.isBlank(familyName) && StringUtils.isNotBlank(firstName)) {
             query = firstName;
-        } else if (StringUtils.isBlank(firstName)) {
+        } else if (StringUtils.isBlank(firstName) && StringUtils.isNotBlank(familyName)) {
             query = familyName;
-        } else if (StringUtils.isBlank(familyName) && StringUtils.isBlank(firstName)) {
-            return Collections.emptyList();
         }
-        return query(query, start, limit);
+        return query;
     }
 
+    @Override
     public List<ExternalDataObject> query(String query, int start, int limit) {
         return getExternalDataProvider().searchExternalDataObjects(query, start, limit);
+    }
+
+    @Override
+    public int queryTotals(String query) {
+        return getExternalDataProvider().getNumberOfResults(query);
+    }
+
+    @Override
+    public int metadataQueryTotals(Item item) {
+        return getExternalDataProvider().getNumberOfResults(getQueryFromItem(item));
     }
 }

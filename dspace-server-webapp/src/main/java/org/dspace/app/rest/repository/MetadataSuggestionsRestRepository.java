@@ -205,17 +205,17 @@ public class MetadataSuggestionsRestRepository extends DSpaceRestRepository<Meta
             throw new DSpaceBadRequestException(
                 "The given SuggestionName could not be resolved to a MetadataSuggestionProvider");
         }
-        if (metadataSuggestionProvider.supports(inProgressSubmission, query, bitstream, useMetadata)) {
-        } else {
+        if (!metadataSuggestionProvider.supports(inProgressSubmission, query, bitstream, useMetadata)) {
             throw new DSpaceBadRequestException(
                 "The given MetadataSuggestionProvider doesn't support this InProgressSubmission");
         }
 
         List<MetadataItemSuggestions> list = metadataSuggestionProviderService
-            .getMetadataSuggestionEntryRests(metadataSuggestionProvider, inProgressSubmission, query, bitstream,
-                                             useMetadata,
-                                             pageable.getOffset(), pageable.getPageSize());
-        //TODO This -1 is placeholder for when to get the total
-        return converter.toRestPage(list, pageable, -1, Projection.DEFAULT);
+            .getMetadataItemSuggestions(metadataSuggestionProvider, inProgressSubmission, query, bitstream,
+                                        useMetadata, pageable.getOffset(), pageable.getPageSize());
+        int total = metadataSuggestionProviderService.getTotalMetadataItemSuggestions(metadataSuggestionProvider,
+                                                                                      inProgressSubmission, query,
+                                                                                      bitstream, useMetadata);
+        return converter.toRestPage(list, pageable, total, Projection.DEFAULT);
     }
 }

@@ -26,17 +26,32 @@ public class PubmedArticleMetadataSuggestionProvider extends MetadataSuggestionP
     @Autowired
     private ItemService itemService;
 
+    @Override
     public List<ExternalDataObject> metadataQuery(Item item, int start, int limit) {
         // Concatenate metadata and send to query
-        String title = itemService.getMetadataFirstValue(item, "dc", "title", null, Item.ANY);
+        String title = getQueryFromItem(item);
         if (StringUtils.isBlank(title)) {
             return Collections.emptyList();
         }
         return query(title, start, limit);
     }
 
+    private String getQueryFromItem(Item item) {
+        return itemService.getMetadataFirstValue(item, "dc", "title", null, Item.ANY);
+    }
+
+    @Override
     public List<ExternalDataObject> query(String query, int start, int limit) {
         return getExternalDataProvider().searchExternalDataObjects(query, start, limit);
     }
 
+    @Override
+    public int queryTotals(String query) {
+        return getExternalDataProvider().getNumberOfResults(query);
+    }
+
+    @Override
+    public int metadataQueryTotals(Item item) {
+        return getExternalDataProvider().getNumberOfResults(getQueryFromItem(item));
+    }
 }
