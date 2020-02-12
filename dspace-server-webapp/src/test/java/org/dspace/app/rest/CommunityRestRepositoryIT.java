@@ -34,9 +34,9 @@ import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.matcher.CommunityMatcher;
+import org.dspace.app.rest.matcher.HalMatcher;
 import org.dspace.app.rest.matcher.MetadataMatcher;
 import org.dspace.app.rest.matcher.PageMatcher;
-import org.dspace.app.rest.matcher.HalMatcher;
 import org.dspace.app.rest.model.CommunityRest;
 import org.dspace.app.rest.model.MetadataRest;
 import org.dspace.app.rest.model.MetadataValueRest;
@@ -300,11 +300,6 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                                            .withName("Sub Community")
                                            .build();
 
-        Collection col1 = CollectionBuilder.createCollection(context, child1)
-                                           .withName("Collection 1")
-                                           .withLogo("Test Logo")
-                                           .build();
-
         context.restoreAuthSystemState();
 
         getClient().perform(get("/api/core/communities")
@@ -315,8 +310,7 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                        CommunityMatcher.matchCommunityEntry(parentCommunity.getName(), parentCommunity.getID(),
                                                             parentCommunity.getHandle()),
                        CommunityMatcher
-                           .matchCommunityWithCollectionEntry(child1.getName(), child1.getID(), child1.getHandle(),
-                                                              col1)
+                           .matchCommunityEntry(child1.getName(), child1.getID(), child1.getHandle())
                    )))
                    .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/communities")))
                    .andExpect(jsonPath("$.page.size", is(20)))

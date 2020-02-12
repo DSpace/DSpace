@@ -26,7 +26,6 @@ import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.builder.EPersonBuilder;
 import org.dspace.app.rest.matcher.HarvesterMetadataMatcher;
 import org.dspace.app.rest.matcher.MetadataConfigsMatcher;
-import org.dspace.app.rest.matcher.HalMatcher;
 import org.dspace.app.rest.model.HarvestTypeEnum;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.authorize.AuthorizeException;
