@@ -183,7 +183,7 @@ public class Utils {
         if (modelPlural.equals("authorities")) {
             return AuthorityRest.NAME;
         }
-        if (modelPlural.equals("resourcePolicies")) {
+        if (modelPlural.equals("resourcepolicies")) {
             return ResourcePolicyRest.NAME;
         }
         if (StringUtils.equals(modelPlural, "processes")) {
