@@ -52,7 +52,6 @@ public class CollectionMatcher {
      */
     public static Matcher<? super Object> matchFullEmbeds() {
         return matchEmbeds(
-                "defaultAccessConditions[]",
                 "license",
                 "logo",
                 "mappedItems[]"
@@ -64,7 +63,6 @@ public class CollectionMatcher {
      */
     public static Matcher<? super Object> matchLinks(UUID uuid) {
         return HalMatcher.matchLinks(REST_SERVER_URL + "core/collections/" + uuid,
-                "defaultAccessConditions",
                 "harvester",
                 "itemtemplate",
                 "license",
