@@ -132,6 +132,12 @@ public class Utils {
         }
     }
 
+    /**
+     * Convenience method to get a default pageable instance if needed.
+     *
+     * @param optionalPageable the existing pageable instance, may be null.
+     * @return the existing instance if it is not null, a default pageable instance otherwise.
+     */
     public Pageable getPageable(@Nullable Pageable optionalPageable) {
         return optionalPageable != null ? optionalPageable : new PageRequest(0, 20);
     }
