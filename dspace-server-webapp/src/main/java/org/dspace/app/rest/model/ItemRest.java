@@ -24,6 +24,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
             linkClass = RelationshipRest.class,
             method = "getItemRelationships",
             embedOptional = true
+    ),
+    @LinkRest(
+        name = ItemRest.VERSION,
+        linkClass = VersionRest.class,
+        method = "getItemVersion",
+        embedOptional = true
     )
 })
 public class ItemRest extends DSpaceObjectRest {
@@ -31,6 +37,7 @@ public class ItemRest extends DSpaceObjectRest {
     public static final String PLURAL_NAME = "items";
     public static final String CATEGORY = RestAddressableModel.CORE;
     public static final String RELATIONSHIPS = "relationships";
+    public static final String VERSION = "version";
     private boolean inArchive = false;
     private boolean discoverable = false;
     private boolean withdrawn = false;
