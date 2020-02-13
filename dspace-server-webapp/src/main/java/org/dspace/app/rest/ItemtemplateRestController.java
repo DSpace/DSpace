@@ -19,7 +19,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.hateoas.ItemResource;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.repository.ItemRestRepository;
+import org.dspace.app.rest.repository.ItemTemplateItemOfLinkRepository;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.authorize.AuthorizeException;
@@ -57,6 +59,9 @@ public class ItemtemplateRestController {
     @Autowired
     private ItemRestRepository itemRestRepository;
 
+    @Autowired
+    private ItemTemplateItemOfLinkRepository itemTemplateItemOfLinkRepository;
+
     /**
      * This method gets a template Item based on its uuid
      *
@@ -83,7 +88,7 @@ public class ItemtemplateRestController {
             throw new ResourceNotFoundException("Item with id: " + uuid + " not found");
         }
 
-        if (templateItem.getTemplateItemOf() == null) {
+        if (itemTemplateItemOfLinkRepository.getTemplateItemOf(request, uuid, null, Projection.DEFAULT) == null) {
             throw new ResourceNotFoundException("The item with id " + uuid + " is not a template item");
         }
 

@@ -8,8 +8,9 @@
 package org.dspace.app.rest.matcher;
 
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
+import static org.dspace.app.rest.matcher.HalMatcher.matchEmbeds;
+import static org.dspace.app.rest.test.AbstractControllerIntegrationTest.REST_SERVER_URL;
 import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 
 import java.util.UUID;
@@ -20,7 +21,8 @@ import org.hamcrest.Matchers;
 
 public class CollectionMatcher {
 
-    private CollectionMatcher() { }
+    private CollectionMatcher() {
+    }
 
     public static Matcher<? super Object> matchCollectionEntry(String name, UUID uuid, String handle) {
         return matchCollectionEntry(name, uuid, handle, null);
@@ -28,22 +30,45 @@ public class CollectionMatcher {
 
     public static Matcher<? super Object> matchCollectionEntry(String name, UUID uuid, String handle, Bitstream logo) {
         return allOf(
-            hasJsonPath("$.uuid", is(uuid.toString())),
-            hasJsonPath("$.name", is(name)),
-            hasJsonPath("$.handle", is(handle)),
-            hasJsonPath("$.type", is("collection")),
-            hasJsonPath("$.metadata", Matchers.allOf(
-                MetadataMatcher.matchMetadata("dc.title", name)
-            )),
-            matchLinks(uuid),
-            matchLogo(logo)
+                matchProperties(name, uuid, handle),
+                matchLinks(uuid),
+                matchLogo(logo)
         );
     }
 
-    private static Matcher<? super Object> matchLinks(UUID uuid) {
+    public static Matcher<? super Object> matchProperties(String name, UUID uuid, String handle) {
         return allOf(
-            hasJsonPath("$._links.logo.href", containsString("api/core/collections/" + uuid.toString() + "/logo")),
-            hasJsonPath("$._links.self.href", containsString("api/core/collections/" + uuid.toString()))
+                hasJsonPath("$.uuid", is(uuid.toString())),
+                hasJsonPath("$.name", is(name)),
+                hasJsonPath("$.handle", is(handle)),
+                hasJsonPath("$.type", is("collection")),
+                hasJsonPath("$.metadata", Matchers.allOf(
+                        MetadataMatcher.matchMetadata("dc.title", name)
+                )));
+    }
+
+    /**
+     * Gets a matcher for all expected embeds when the full projection is requested.
+     */
+    public static Matcher<? super Object> matchFullEmbeds() {
+        return matchEmbeds(
+                "license",
+                "logo",
+                "mappedItems[]"
+        );
+    }
+
+    /**
+     * Gets a matcher for all expected links.
+     */
+    public static Matcher<? super Object> matchLinks(UUID uuid) {
+        return HalMatcher.matchLinks(REST_SERVER_URL + "core/collections/" + uuid,
+                "harvester",
+                "itemtemplate",
+                "license",
+                "logo",
+                "mappedItems",
+                "self"
         );
     }
 
@@ -57,5 +82,4 @@ public class CollectionMatcher {
                         BitstreamMatcher.matchBitstreamEntry(logo.getID(), logo.getSizeBytes()))
             );
     }
-
 }

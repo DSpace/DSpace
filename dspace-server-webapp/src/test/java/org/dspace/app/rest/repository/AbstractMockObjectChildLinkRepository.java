@@ -16,7 +16,6 @@ import org.dspace.app.rest.model.MockObject;
 import org.dspace.app.rest.model.MockObjectRest;
 import org.dspace.app.rest.projection.Projection;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 /**
@@ -34,7 +33,7 @@ abstract class AbstractMockObjectChildLinkRepository
             children.add(MockObject.create(101));
             children.add(MockObject.create(102));
         }
-        Pageable pageable = optionalPageable != null ? optionalPageable : new PageRequest(0, 20);
+        Pageable pageable = utils.getPageable(optionalPageable);
         return converter.toRestPage(children, pageable, children.size(), projection);
     }
 }
