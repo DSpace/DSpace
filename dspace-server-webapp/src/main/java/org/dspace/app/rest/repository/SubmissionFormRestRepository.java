@@ -25,8 +25,7 @@ import org.springframework.stereotype.Component;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @Component(SubmissionFormRest.CATEGORY + "." + SubmissionFormRest.NAME)
-public class SubmissionFormRestRepository extends DSpaceRestRepository<SubmissionFormRest, String>
-    implements LinkRestRepository {
+public class SubmissionFormRestRepository extends DSpaceRestRepository<SubmissionFormRest, String> {
 
     private DCInputsReader inputReader;
 
@@ -56,7 +55,7 @@ public class SubmissionFormRestRepository extends DSpaceRestRepository<Submissio
             long total = inputReader.countInputs();
             List<DCInputSet> subConfs = inputReader.getAllInputs(pageable.getPageSize(),
                     Math.toIntExact(pageable.getOffset()));
-            return converter.toRestPage(subConfs, pageable, total, utils.obtainProjection(true));
+            return converter.toRestPage(subConfs, pageable, total, utils.obtainProjection());
         } catch (DCInputsReaderException e) {
             throw new IllegalStateException(e.getMessage(), e);
         }
