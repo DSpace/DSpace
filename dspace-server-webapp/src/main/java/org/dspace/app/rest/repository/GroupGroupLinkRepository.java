@@ -51,9 +51,4 @@ public class GroupGroupLinkRepository extends AbstractDSpaceRestRepository
             throw new RuntimeException(e);
         }
     }
-
-    @Override
-    public boolean isEmbeddableRelation(Object data, String name) {
-        return false;
-    }
 }

@@ -57,9 +57,4 @@ public class EPersonGroupLinkRepository extends AbstractDSpaceRestRepository
             throw new RuntimeException(e);
         }
     }
-
-    @Override
-    public boolean isEmbeddableRelation(Object data, String name) {
-        return true;
-    }
 }

@@ -9,7 +9,6 @@ package org.dspace.app.rest.matcher;
 
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.dspace.app.rest.matcher.HalMatcher.matchEmbeds;
-import static org.dspace.app.rest.matcher.HalMatcher.hasLinks;
 import static org.dspace.app.rest.test.AbstractControllerIntegrationTest.REST_SERVER_URL;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.is;
@@ -89,7 +88,7 @@ public class CommunityMatcher {
      * Gets a matcher for all expected links.
      */
     public static Matcher<? super Object> matchLinks(UUID uuid) {
-        return hasLinks(REST_SERVER_URL + "core/communities/" + uuid,
+        return HalMatcher.matchLinks(REST_SERVER_URL + "core/communities/" + uuid,
                 "collections",
                 "logo",
                 "self",

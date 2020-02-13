@@ -16,10 +16,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 @LinksRest(links = {
         @LinkRest(
-                name = CollectionRest.DEFAULT_ACCESS_CONDITIONS,
-                method = "getDefaultAccessConditions"
-        ),
-        @LinkRest(
                 name = CollectionRest.LICENSE,
                 method = "getLicense"
         ),
@@ -41,7 +37,6 @@ public class CollectionRest extends DSpaceObjectRest {
     public static final String PLURAL_NAME = "collections";
     public static final String CATEGORY = RestAddressableModel.CORE;
 
-    public static final String DEFAULT_ACCESS_CONDITIONS = "defaultAccessConditions";
     public static final String HARVEST = "harvester";
     public static final String LICENSE = "license";
     public static final String LOGO = "logo";
