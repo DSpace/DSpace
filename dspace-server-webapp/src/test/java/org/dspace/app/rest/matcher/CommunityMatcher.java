@@ -80,6 +80,7 @@ public class CommunityMatcher {
         return matchEmbeds(
                 "collections[]",
                 "logo",
+                "parentCommunity",
                 "subcommunities[]"
         );
     }
@@ -92,6 +93,7 @@ public class CommunityMatcher {
                 "collections",
                 "logo",
                 "self",
+                "parentCommunity",
                 "subcommunities"
         );
     }
